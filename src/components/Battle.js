@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
 import '../styles/Battle.css';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 
 const Battle = () => {
   const { enemies, player } = useContext(GameStateContext);
@@ -85,48 +86,52 @@ const Battle = () => {
   }, [battleStarted, enemyHP, playerHP]);
 
   return (
-    <div className="battle">
-      <h2>Battle</h2>
-      {!battleStarted ? (
-        <div>
-          <h3>Select a Monster</h3>
-          {enemies && enemies.length > 0 ? (
-            <ul>
-              {enemies.map((enemy) => (
-                <li key={enemy.id}>
-                  <label>
-                    <input
-                      type="radio"
-                      name="selectedMonster"
-                      value={enemy.id}
-                      onChange={() => handleSelectMonster(enemy.id)}
-                      checked={selectedMonsterId === enemy.id}
-                    />
-                    {enemy.name} (HP: {enemy.hp}, Attack: {enemy.attack}, Defense: {enemy.defense})
-                  </label>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No enemies available!</p>
-          )}
-          <Button variant="contained" onClick={handleStartBattle}>Start Battle</Button>
-        </div>
-      ) : (
-        <div>
-          <h3>Battle in Progress</h3>
-          <p>
-            {player.name}: {playerHP} HP | {currentMonster.name}: {enemyHP} HP
-          </p>
-          <div className="battle-log">
-            <h4>Battle Log</h4>
-            {battleLog.map((entry, index) => (
-              <p key={index}>{entry}</p>
-            ))}
+    <Grid container>
+      <Grid item xs={12} md={6}>
+        {!battleStarted ? (
+          <div>
+            <h3>Select a Monster</h3>
+            {enemies && enemies.length > 0 ? (
+              <ul>
+                {enemies.map((enemy) => (
+                  <li key={enemy.id}>
+                    <label>
+                      <input
+                        type="radio"
+                        name="selectedMonster"
+                        value={enemy.id}
+                        onChange={() => handleSelectMonster(enemy.id)}
+                        checked={selectedMonsterId === enemy.id}
+                      />
+                      {enemy.name} (HP: {enemy.hp}, Attack: {enemy.attack}, Defense: {enemy.defense})
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No enemies available!</p>
+            )}
+            <Button variant="contained" onClick={handleStartBattle}>Start Battle</Button>
           </div>
-        </div>
-      )}
-    </div>
+        ) : null}
+      </Grid>
+      <Grid item xs={12} md={6}>
+        {battleStarted ? (
+          <div>
+            <h3>Battle in Progress</h3>
+            <p>
+              {player.name}: {playerHP} HP | {currentMonster.name}: {enemyHP} HP
+            </p>
+            <div className="battle-log">
+              <h4>Battle Log</h4>
+              {battleLog.map((entry, index) => (
+                <p key={index}>{entry}</p>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </Grid>
+    </Grid>
   );
 };
 
