@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
 import '../styles/Battle.css';
+import Button from '@mui/material/Button';
 
 const Battle = () => {
   const { enemies, player } = useContext(GameStateContext);
@@ -109,7 +110,7 @@ const Battle = () => {
           ) : (
             <p>No enemies available!</p>
           )}
-          <button className="btn btn-primary" onClick={handleStartBattle}>Start Battle</button>
+          <Button variant="contained" onClick={handleStartBattle}>Start Battle</Button>
         </div>
       ) : (
         <div>
