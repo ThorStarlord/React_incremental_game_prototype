@@ -35,9 +35,29 @@ const initialState = {
     essence: 0,
     gold: 0,
     acquiredTraits: [],
-    learnedSkills: []
+    learnedSkills: [],
+    factionId: null,
+    factionRole: null,
   },
   
+  factions: [
+    {
+      id: 1,
+      name: "Mystic Order",
+      type: "Knowledge",
+      level: 1,
+      description: "Seekers of ancient wisdom and forbidden knowledge",
+      memberCount: 0,
+      buildings: [],
+      upgrades: [],
+      resources: {
+        influence: 0,
+        knowledge: 0,
+      },
+      members: []
+    }
+  ],
+
   npcs: [
     {
       id: 1,
@@ -215,6 +235,113 @@ const gameReducer = (state, action) => {
             : npc
         )
       };
+    case 'CREATE_FACTION': {
+      const { name, type, description } = action.payload;
+      const newFaction = {
+        id: state.factions.length + 1,
+        name,
+        type,
+        level: 1,
+        description,
+        memberCount: 1, // Starting with the player
+        buildings: [],
+        upgrades: [],
+        resources: {
+          influence: 0,
+          knowledge: 0,
+        },
+        members: [{
+          id: state.player.id,
+          name: state.player.name,
+          role: 'Leader',
+          type: 'Player'
+        }]
+      };
+
+      const updatedPlayer = {
+        ...state.player,
+        factionId: newFaction.id,
+        factionRole: 'Leader'
+      };
+
+      return {
+        ...state,
+        factions: [...state.factions, newFaction],
+        player: updatedPlayer
+      };
+    }
+
+    case 'JOIN_FACTION': {
+      const { factionId, role = 'Member' } = action.payload;
+      const faction = state.factions.find(f => f.id === factionId);
+      
+      if (!faction) return state;
+
+      const updatedFactions = state.factions.map(f => {
+        if (f.id === factionId) {
+          return {
+            ...f,
+            memberCount: f.memberCount + 1,
+            members: [...f.members, {
+              id: state.player.id,
+              name: state.player.name,
+              role,
+              type: 'Player'
+            }]
+          };
+        }
+        return f;
+      });
+
+      const updatedPlayer = {
+        ...state.player,
+        factionId,
+        factionRole: role
+      };
+
+      return {
+        ...state,
+        factions: updatedFactions,
+        player: updatedPlayer
+      };
+    }
+
+    case 'ADD_FACTION_MEMBER': {
+      const { factionId, member } = action.payload;
+      return {
+        ...state,
+        factions: state.factions.map(f => {
+          if (f.id === factionId) {
+            return {
+              ...f,
+              memberCount: f.memberCount + 1,
+              members: [...f.members, member]
+            };
+          }
+          return f;
+        })
+      };
+    }
+
+    case 'UPDATE_FACTION_RESOURCES': {
+      const { factionId, resources } = action.payload;
+      return {
+        ...state,
+        factions: state.factions.map(f => {
+          if (f.id === factionId) {
+            return {
+              ...f,
+              resources: {
+                ...f.resources,
+                ...resources
+              }
+            };
+          }
+          return f;
+        })
+      };
+    }
+
     default:
       return state;
   }
