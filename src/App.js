@@ -1,14 +1,14 @@
 import React from 'react';
 import { GameProvider } from './context/GameStateContext';
-import AppRouter from './routes/AppRouter';
+import GameContainer from './components/GameContainer';
 import './styles/App.css';
 
 const App = () => {
-    return (
-        <GameProvider>
-            <AppRouter />
-        </GameProvider>
-    );
-}
+  return (
+    <GameProvider>
+      <GameContainer />
+    </GameProvider>
+  );
+};
 
 export default App;
