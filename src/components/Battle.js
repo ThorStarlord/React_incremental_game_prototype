@@ -51,11 +51,22 @@ const Battle = () => {
 
     // Check if the monster is defeated.
     if (newEnemyHP === 0) {
+      const earnedEssence = currentMonster.essenceDrop;
+      const earnedGold = currentMonster.goldDrop;
+      const updatedPlayer = { 
+        ...player, 
+        statPoints: player.statPoints + 1,
+        essence: player.essence + earnedEssence,
+        gold: player.gold + earnedGold
+      };
+      
       setBattleLog((prevLog) => [
         ...prevLog,
-        `${currentMonster.name} has been defeated! You gain 1 stat point.`,
+        `${currentMonster.name} has been defeated!`,
+        `You gained ${earnedEssence} Essence and ${earnedGold} Gold!`,
+        `You gained 1 stat point.`
       ]);
-      const updatedPlayer = { ...player, statPoints: player.statPoints + 1 };
+      
       dispatch({ type: 'UPDATE_PLAYER', payload: updatedPlayer });
       setBattleStarted(false);
       return;

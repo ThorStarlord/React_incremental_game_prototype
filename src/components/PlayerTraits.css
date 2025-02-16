@@ -1,0 +1,61 @@
+.player-traits {
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  margin: 15px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.player-traits h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+}
+
+.traits-list {
+  display: grid;
+  gap: 15px;
+}
+
+.trait-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px;
+  background-color: #fafafa;
+  transition: transform 0.2s;
+}
+
+.trait-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trait-item h4 {
+  margin: 0 0 8px 0;
+  color: #1976d2;
+}
+
+.trait-description {
+  color: #666;
+  margin: 0 0 8px 0;
+  font-size: 0.9em;
+}
+
+.trait-type {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.no-traits {
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}

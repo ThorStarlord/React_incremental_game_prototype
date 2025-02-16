@@ -6,6 +6,7 @@ import QuestLog from './QuestLog';
 import Shop from './Shop';
 import Battle from './Battle';
 import Footer from './Footer';
+import '../styles/GameContainer.css';
 
 const GameContainer = () => {
     return (

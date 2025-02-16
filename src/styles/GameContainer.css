@@ -1,0 +1,29 @@
+:root {
+    --grid-gap: 10px;
+    --padding: 20px;
+}
+
+.game-container {
+    display: grid;
+    grid-template-areas: 
+        "header header header"
+        "player-stats inventory inventory"
+        "quest-log quest-log shop"
+        "battle battle battle"
+        "footer footer footer";
+    grid-gap: var(--grid-gap);
+    padding: var(--padding);
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        grid-template-areas: 
+            "header"
+            "player-stats"
+            "inventory"
+            "quest-log"
+            "shop"
+            "battle"
+            "footer";
+    }
+}

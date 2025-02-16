@@ -1,0 +1,59 @@
+.droppable-stat {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+  transition: all 0.2s ease;
+  background-color: #f5f5f5;
+  position: relative;
+  overflow: hidden;
+}
+
+.droppable-stat.over {
+  border-color: #1976d2;
+  background-color: #e3f2fd;
+}
+
+.droppable-stat.active {
+  border-style: solid;
+  border-color: #2e7d32;
+  background-color: #e8f5e9;
+}
+
+.stat-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #1976d2;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.drop-zone-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #1976d2;
+  color: white;
+  text-align: center;
+  padding: 4px;
+  font-size: 0.8em;
+  transform: translateY(100%);
+  transition: transform 0.2s ease;
+}
+
+.droppable-stat.over .drop-zone-indicator {
+  transform: translateY(0);
+}

@@ -1,0 +1,49 @@
+.stat-points {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #1976d2;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  width: fit-content;
+  transition: all 0.2s ease;
+  margin: 10px 0;
+}
+
+.stat-points.dragging {
+  opacity: 0.8;
+  cursor: grabbing;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform-origin: 50% 50%;
+}
+
+.stat-points.empty {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.stat-points-label {
+  font-weight: 500;
+}
+
+.stat-points-value {
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.drag-handle {
+  font-size: 20px;
+  line-height: 1;
+  cursor: grab;
+  padding: 0 4px;
+}
+
+.dragging .drag-handle {
+  cursor: grabbing;
+}
