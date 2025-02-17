@@ -9,19 +9,6 @@ const FactionOverview = () => {
   const { player, factions } = useContext(GameStateContext);
   const faction = factions.find(f => f.id === player.factionId);
 
-  if (!faction) {
-    return (
-      <Paper className="faction-overview no-faction">
-        <Typography variant="h5" component="h2">
-          No Faction
-        </Typography>
-        <Typography>
-          You are not currently a member of any faction.
-        </Typography>
-      </Paper>
-    );
-  }
-
   return (
     <Paper className="faction-overview">
       <Box className="faction-header">

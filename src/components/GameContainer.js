@@ -1,23 +1,15 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
-import GroupIcon from '@mui/icons-material/Group';
-import BusinessIcon from '@mui/icons-material/Business';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
-import PersonIcon from '@mui/icons-material/Person';
-import StorefrontIcon from '@mui/icons-material/Storefront';
+import { Box } from '@mui/material';
 import FactionContainer from './FactionUI/FactionContainer';
 import Battle from './Battle';
 import NPCEncounter from './NPCEncounter';
 import PlayerStats from './PlayerStats';
 import PlayerTraits from './PlayerTraits';
-// Removed Inventory, QuestLog, and Shop components
 import Header from './Header';
 import Footer from './Footer';
 import './GameContainer.css';
 
 const GameContainer = () => {
-
   return (
     <Box className="game-container">
       <Box id="header" className="game-area">

@@ -6,10 +6,10 @@
 .game-container {
     display: grid;
     grid-template-areas:
-        "header header header header"
-        "player-stats inventory quest-log npcs" /* Rearranged layout */
-        "battle battle traits faction"        /* Rearranged layout */
-        "shop shop footer footer";             /* Shop and Footer at bottom */
+        "header header"
+        "player-stats battle"
+        "traits faction"
+        "npcs footer";
     grid-gap: var(--grid-gap);
     padding: var(--padding);
     height: auto; /* Adjust height to content */
@@ -24,42 +24,17 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-#header {
+/* Grid area assignments */
+#header { 
     grid-area: header;
     text-align: center; /* Center header text */
 }
 
-#player-stats {
-    grid-area: player-stats;
-}
-
-#inventory {
-    grid-area: inventory;
-}
-
-#quest-log {
-    grid-area: quest-log;
-}
-
-#shop {
-    grid-area: shop;
-}
-
-#battle {
-    grid-area: battle;
-}
-
-#traits {
-    grid-area: traits;
-}
-
-#faction {
-    grid-area: faction;
-}
-
-#npcs {
-    grid-area: npcs;
-}
+#player-stats { grid-area: player-stats; }
+#battle { grid-area: battle; }
+#traits { grid-area: traits; }
+#faction { grid-area: faction; }
+#npcs { grid-area: npcs; }
 
 #footer {
     grid-area: footer;
@@ -67,46 +42,17 @@
     background-color: #f0f0f0; /* Slightly different footer background */
 }
 
-/* Responsive adjustments for smaller screens */
+/* Responsive layout */
 @media (max-width: 1024px) { /* Adjust breakpoint as needed */
     .game-container {
         grid-template-areas:
             "header"
             "player-stats"
-            "inventory"
-            "quest-log"
+            "battle"
             "traits"
             "faction"
             "npcs"
-            "battle"
-            "shop"
             "footer";
         grid-template-columns: 1fr; /* Single column layout */
     }
-}
-
-/* Remove sidebar related styles - not needed anymore */
-.sidebar, .sidebar-paper, .sidebar-header, .sidebar .MuiListItemButton-root,
-.sidebar .MuiListItemIcon-root, .sidebar .MuiListItemText-primary,
-.sidebar .Mui-selected, .sidebar .Mui-selected .MuiListItemIcon-root,
-.sidebar .Mui-selected .MuiListItemText-primary,
-.sidebar .MuiListItemButton-root:hover, .content {
-    /* You can leave these empty or remove them entirely from the CSS file */
-    display: block; /* Or display: none; if you want to completely remove them */
-    width: auto;    /* Reset widths */
-    flex-grow: 0;   /* Reset flex grow */
-    padding: initial;
-    background-color: transparent !important; /* Reset background */
-    color: inherit !important;              /* Reset color */
-    height: auto;
-    overflow-y: visible;
-}
-
-/* If you want to ensure .content class doesn't interfere */
-.content {
-    display: block; /* Ensure it's block level */
-    padding: 0;     /* Reset padding */
-    background-color: transparent; /* Reset background */
-    height: auto;    /* Reset height */
-    overflow-y: visible; /* Reset overflow */
 }

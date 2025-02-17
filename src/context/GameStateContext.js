@@ -27,6 +27,7 @@ const applyTraitEffects = (player) => {
 
 const initialState = {
   player: {
+    id: 'player1', // Added player ID for member list reference
     name: "Hero",
     hp: 100,
     attack: 10,
@@ -36,8 +37,8 @@ const initialState = {
     gold: 0,
     acquiredTraits: [],
     learnedSkills: [],
-    factionId: null,
-    factionRole: null,
+    factionId: 1, // Player starts as part of the Mystic Order
+    factionRole: 'Member', // Player starts as a regular member
   },
   
   factions: [
@@ -47,14 +48,45 @@ const initialState = {
       type: "Knowledge",
       level: 1,
       description: "Seekers of ancient wisdom and forbidden knowledge",
-      memberCount: 0,
+      memberCount: 5, // Starting with some existing members
       buildings: [],
       upgrades: [],
       resources: {
-        influence: 0,
-        knowledge: 0,
+        influence: 100, // Starting with some initial resources
+        knowledge: 50,
       },
-      members: []
+      members: [
+        {
+          id: 'npc1',
+          name: "Elder Willow",
+          role: 'Leader',
+          type: 'NPC'
+        },
+        {
+          id: 'npc2',
+          name: "Scholar Elara",
+          role: 'Senior Member',
+          type: 'NPC'
+        },
+        {
+          id: 'npc3',
+          name: "Apprentice Jin",
+          role: 'Member',
+          type: 'NPC'
+        },
+        {
+          id: 'npc4',
+          name: "Sage Theron",
+          role: 'Senior Member',
+          type: 'NPC'
+        },
+        {
+          id: 'player1',
+          name: "Hero",
+          role: 'Member',
+          type: 'Player'
+        }
+      ]
     }
   ],
 
@@ -235,42 +267,6 @@ const gameReducer = (state, action) => {
             : npc
         )
       };
-    case 'CREATE_FACTION': {
-      const { name, type, description } = action.payload;
-      const newFaction = {
-        id: state.factions.length + 1,
-        name,
-        type,
-        level: 1,
-        description,
-        memberCount: 1, // Starting with the player
-        buildings: [],
-        upgrades: [],
-        resources: {
-          influence: 0,
-          knowledge: 0,
-        },
-        members: [{
-          id: state.player.id,
-          name: state.player.name,
-          role: 'Leader',
-          type: 'Player'
-        }]
-      };
-
-      const updatedPlayer = {
-        ...state.player,
-        factionId: newFaction.id,
-        factionRole: 'Leader'
-      };
-
-      return {
-        ...state,
-        factions: [...state.factions, newFaction],
-        player: updatedPlayer
-      };
-    }
-
     case 'JOIN_FACTION': {
       const { factionId, role = 'Member' } = action.payload;
       const faction = state.factions.find(f => f.id === factionId);
