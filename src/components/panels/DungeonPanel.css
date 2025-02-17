@@ -1,0 +1,40 @@
+.dungeon-panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dungeon-header {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.back-button {
+    color: #666;
+}
+
+.dungeon-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.dungeon-description {
+    margin-bottom: 24px;
+}
+
+.dungeon-section {
+    margin-bottom: 24px;
+}
+
+.dungeon-section .MuiChip-root {
+    margin: 4px;
+}
+
+.dungeon-actions {
+    margin-top: 32px;
+    padding: 16px;
+    border-top: 1px solid #eee;
+}

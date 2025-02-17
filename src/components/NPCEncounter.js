@@ -4,9 +4,11 @@ import { getDialogueOptions } from '../modules/dialogueManager';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import PersonIcon from '@mui/icons-material/Person';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { IconButton, Box } from '@mui/material';
 import './NPCEncounter.css';
 
-const NPCEncounter = ({ npcId }) => {
+const NPCEncounter = ({ npcId, onBack }) => {
   const gameState = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
   const [dialogueResponse, setDialogueResponse] = useState('');
@@ -166,6 +168,11 @@ const NPCEncounter = ({ npcId }) => {
 
   return (
     <div className="npc-encounter">
+      <Box className="npc-header-nav">
+        <IconButton onClick={onBack} className="back-button">
+          <ArrowBackIcon />
+        </IconButton>
+      </Box>
       <div className="npc-info">
         <div className="npc-portrait">
           {npc.portrait ? (

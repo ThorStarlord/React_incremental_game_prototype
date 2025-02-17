@@ -8,6 +8,14 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.npc-header-nav {
+  margin-bottom: 16px;
+}
+
+.back-button {
+  color: #666;
+}
+
 .npc-info {
   margin-bottom: 20px;
   text-align: center;

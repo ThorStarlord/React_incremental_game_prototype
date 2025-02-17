@@ -1,188 +1,296 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
+import { dungeons } from '../modules/data/dungeons';
+import { dungeonEnemies } from '../modules/data/dungeonEnemies';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { 
+    Button, 
+    Grid, 
+    Typography, 
+    List, 
+    ListItem, 
+    Radio, 
+    FormControlLabel, 
+    Box,
+    Chip,
+    Stack,
+    Tooltip,
+    IconButton 
+} from '@mui/material';
 import '../styles/Battle.css';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Radio from '@mui/material/Radio';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Box from '@mui/material/Box';
 
-const Battle = () => {
-  const { enemies, player } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
-  const [selectedMonsterId, setSelectedMonsterId] = useState(null);
-  const [battleStarted, setBattleStarted] = useState(false);
-  const [playerHP, setPlayerHP] = useState(null);
-  const [enemyHP, setEnemyHP] = useState(null);
-  const [battleLog, setBattleLog] = useState([]);
-  const [currentMonster, setCurrentMonster] = useState(null);
+const DUNGEON_BATTLES = 3;
 
-  const handleSelectMonster = (id) => {
-    setSelectedMonsterId(id);
-  };
+const EnemyDisplay = ({ enemy, selected, onSelect, traits }) => {
+    return (
+        <ListItem>
+            <FormControlLabel
+                control={
+                    <Radio
+                        checked={selected}
+                        onChange={() => onSelect(enemy.id)}
+                        value={enemy.id}
+                        name="selectedMonster"
+                    />
+                }
+                label={
+                    <Box>
+                        <Typography>{enemy.name}</Typography>
+                        <Typography variant="body2" color="textSecondary">
+                            HP: {enemy.hp}, Attack: {enemy.attack}, Defense: {enemy.defense}
+                        </Typography>
+                        <Stack direction="row" spacing={1} mt={1}>
+                            {enemy.traits.map(traitId => {
+                                const trait = traits.monsterTraits[traitId];
+                                return (
+                                    <Tooltip key={traitId} title={trait.description}>
+                                        <Chip
+                                            size="small"
+                                            label={trait.name}
+                                            variant="outlined"
+                                            color="secondary"
+                                            icon={<HelpOutlineIcon />}
+                                        />
+                                    </Tooltip>
+                                );
+                            })}
+                        </Stack>
+                    </Box>
+                }
+            />
+        </ListItem>
+    );
+};
 
-  const handleStartBattle = () => {
-    if (!selectedMonsterId) {
-      alert("Please select a monster first.");
-      return;
-    }
-    const monster = enemies.find((enemy) => enemy.id === selectedMonsterId);
-    setCurrentMonster(monster);
-    setPlayerHP(player.hp);
-    setEnemyHP(monster.hp);
-    setBattleLog([
-      `Battle Started! ${player.name} (HP: ${player.hp}, Attack: ${player.attack}, Defense: ${player.defense}) vs ${monster.name} (HP: ${monster.hp}, Attack: ${monster.attack}, Defense: ${monster.defense})`,
-    ]);
-    setBattleStarted(true);
-  };
+const Battle = ({ dungeonId, onExplorationComplete }) => {
+    const { enemies: regularEnemies, player, traits } = useContext(GameStateContext);
+    const dispatch = useContext(GameDispatchContext);
+    const [selectedMonsterId, setSelectedMonsterId] = useState(null);
+    const [battleStarted, setBattleStarted] = useState(false);
+    const [playerHP, setPlayerHP] = useState(null);
+    const [enemyHP, setEnemyHP] = useState(null);
+    const [battleLog, setBattleLog] = useState([]);
+    const [currentMonster, setCurrentMonster] = useState(null);
+    const [dungeonProgress, setDungeonProgress] = useState(0);
+    const [dungeonRewards, setDungeonRewards] = useState([]);
 
-  const handleAttack = () => {
-    if (!battleStarted || !currentMonster) return;
+    const dungeon = dungeonId ? dungeons.find(d => d.id === dungeonId) : null;
+    const isDungeonBattle = !!dungeon;
+    
+    const availableEnemies = isDungeonBattle ? 
+        dungeonEnemies[dungeonId] : 
+        regularEnemies;
 
-    // Player attacks monster.
-    const playerDamage = Math.max(0, player.attack - currentMonster.defense);
-    const newEnemyHP = Math.max(0, enemyHP - playerDamage);
-    let logEntry = `${player.name} attacks ${currentMonster.name} for ${playerDamage} damage. ${currentMonster.name} HP: ${newEnemyHP}`;
-    setBattleLog((prevLog) => [...prevLog, logEntry]);
-    setEnemyHP(newEnemyHP);
+    const handleSelectMonster = (id) => {
+        setSelectedMonsterId(id);
+    };
 
-    // Check if the monster is defeated.
-    if (newEnemyHP === 0) {
-      const earnedEssence = currentMonster.essenceDrop;
-      const earnedGold = currentMonster.goldDrop;
-      const updatedPlayer = { 
-        ...player, 
-        statPoints: player.statPoints + 1,
-        essence: player.essence + earnedEssence,
-        gold: player.gold + earnedGold
-      };
-      
-      setBattleLog((prevLog) => [
-        ...prevLog,
-        `${currentMonster.name} has been defeated!`,
-        `You gained ${earnedEssence} Essence and ${earnedGold} Gold!`,
-        `You gained 1 stat point.`
-      ]);
-      
-      dispatch({ type: 'UPDATE_PLAYER', payload: updatedPlayer });
-      setBattleStarted(false);
-      return;
-    }
+    const handleStartBattle = () => {
+        if (!selectedMonsterId) {
+            alert("Please select a monster first.");
+            return;
+        }
+        const monster = availableEnemies.find((enemy) => enemy.id === selectedMonsterId);
+        setCurrentMonster(monster);
+        setPlayerHP(player.hp);
+        setEnemyHP(monster.hp);
+        setBattleLog([
+            isDungeonBattle ? 
+                `${dungeon.name} - Battle ${dungeonProgress + 1} of ${DUNGEON_BATTLES}!` : 
+                'Battle Started!',
+            `${player.name} (HP: ${player.hp}, Attack: ${player.attack}, Defense: ${player.defense}) vs ${monster.name} (HP: ${monster.hp}, Attack: ${monster.attack}, Defense: ${monster.defense})`,
+        ]);
+        setBattleStarted(true);
+    };
 
-    // Monster attacks player.
-    const enemyDamage = Math.max(0, currentMonster.attack - player.defense);
-    const newPlayerHP = Math.max(0, playerHP - enemyDamage);
-    logEntry = `${currentMonster.name} attacks ${player.name} for ${enemyDamage} damage. ${player.name} HP: ${newPlayerHP}`;
-    setBattleLog((prevLog) => [...prevLog, logEntry]);
-    setPlayerHP(newPlayerHP);
+    const handleAttack = () => {
+        if (!battleStarted || !currentMonster) return;
 
-    // Check if the player is defeated.
-    if (newPlayerHP === 0) {
-      setBattleLog((prevLog) => [
-        ...prevLog,
-        `${player.name} has been defeated!`,
-      ]);
-      setBattleStarted(false);
-    }
-  };
+        const playerDamage = Math.max(0, player.attack - currentMonster.defense);
+        const newEnemyHP = Math.max(0, enemyHP - playerDamage);
+        let logEntry = `${player.name} attacks ${currentMonster.name} for ${playerDamage} damage. ${currentMonster.name} HP: ${newEnemyHP}`;
+        setBattleLog((prevLog) => [...prevLog, logEntry]);
+        setEnemyHP(newEnemyHP);
 
-  useEffect(() => {
-    if (battleStarted) {
-      const intervalId = setInterval(() => {
-        handleAttack();
-      }, 1000);
-      return () => clearInterval(intervalId);
-    }
-  }, [battleStarted, enemyHP, playerHP]);
+        if (newEnemyHP === 0) {
+            const earnedEssence = currentMonster.essenceDrop;
+            const earnedGold = currentMonster.goldDrop;
+            const updatedPlayer = { 
+                ...player, 
+                statPoints: player.statPoints + 1,
+                essence: player.essence + earnedEssence,
+                gold: player.gold + earnedGold
+            };
+            
+            setBattleLog((prevLog) => [
+                ...prevLog,
+                `${currentMonster.name} has been defeated!`,
+                `You gained ${earnedEssence} Essence and ${earnedGold} Gold!`,
+                `You gained 1 stat point.`
+            ]);
+            
+            dispatch({ type: 'UPDATE_PLAYER', payload: updatedPlayer });
+            setBattleStarted(false);
 
-  return (
-    <Grid container>
-      {/* Left Section */}
-      <Grid item xs={3}>
-        <Box sx={{
-          padding: 2,
-          backgroundColor: '#e0f7fa',
-          border: '1px solid #9e9e9e',
-          borderRadius: '8px',
-          height: '100%', // Ensure it stretches vertically
-        }}>
-          {!battleStarted ? (
-            <div>
-              <Typography variant="h5" component="h3">Select a Monster</Typography>
-              {enemies && enemies.length > 0 ? (
-                <List>
-                  {enemies.map((enemy) => (
-                    <ListItem key={enemy.id}>
-                      <FormControlLabel
-                        control={
-                          <Radio
-                            checked={selectedMonsterId === enemy.id}
-                            onChange={() => handleSelectMonster(enemy.id)}
-                            value={enemy.id}
-                            name="selectedMonster"
-                          />
+            if (isDungeonBattle) {
+                const newProgress = dungeonProgress + 1;
+                setDungeonProgress(newProgress);
+
+                if (newProgress >= DUNGEON_BATTLES) {
+                    const rewards = dungeon.rewards.slice(0, 2);
+                    setDungeonRewards(rewards);
+                    setBattleLog((prevLog) => [
+                        ...prevLog,
+                        `Dungeon Completed! You found:`,
+                        ...rewards.map(reward => `- ${reward}`)
+                    ]);
+                    
+                    setTimeout(() => {
+                        if (onExplorationComplete) {
+                            onExplorationComplete();
                         }
-                        label={`${enemy.name} (HP: ${enemy.hp}, Attack: ${enemy.attack}, Defense: ${enemy.defense})`}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              ) : (
-                <Typography>No enemies available!</Typography>
-              )}
-              <Button variant="contained" color="success" onClick={handleStartBattle}>Start Battle</Button>
-            </div>
-          ) : null}
-        </Box>
-      </Grid>
+                    }, 5000);
+                }
+            }
+            return;
+        }
 
-      {/* Center Section */}
-      <Grid item xs={6}>
-        <Box sx={{
-          padding: 2,
-          backgroundColor: '#f5f5f5',
-          border: '1px solid lightgray',
-          borderRadius: '8px',
-          textAlign: 'center', // Center-align text inside
-          margin: '0 auto', // Center the box horizontally
-        }}>
-          {battleStarted ? (
-            <div>
-              <Typography variant="h5" component="h3">Battle in Progress</Typography>
-              <Typography>
-                {player.name}: {playerHP} HP | {currentMonster.name}: {enemyHP} HP
-              </Typography>
-              <div className="battle-log">
-                <Typography variant="h6" component="h4">Battle Log</Typography>
-                {battleLog.map((entry, index) => (
-                  <Typography key={index} variant="body2" sx={{ color: '#424242' }}>{entry}</Typography>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </Box>
-      </Grid>
+        const enemyDamage = Math.max(0, currentMonster.attack - player.defense);
+        const newPlayerHP = Math.max(0, playerHP - enemyDamage);
+        logEntry = `${currentMonster.name} attacks ${player.name} for ${enemyDamage} damage. ${player.name} HP: ${newPlayerHP}`;
+        setBattleLog((prevLog) => [...prevLog, logEntry]);
+        setPlayerHP(newPlayerHP);
 
-      {/* Right Section */}
-      <Grid item xs={3}>
-        <Box sx={{
-          padding: 2,
-          backgroundColor: '#e0e0e0',
-          border: '1px solid #9e9e9e',
-          borderRadius: '8px',
-          height: '100%', // Ensure it stretches vertically
-        }}>
-          <Typography variant="h5" component="h3">Player Stats</Typography>
-          <Typography>HP: {player.hp}</Typography>
-          <Typography>Attack: {player.attack}</Typography>
-          <Typography>Defense: {player.defense}</Typography>
-        </Box>
-      </Grid>
-    </Grid>
-  );
+        if (newPlayerHP === 0) {
+            setBattleLog((prevLog) => [
+                ...prevLog,
+                `${player.name} has been defeated!`,
+                isDungeonBattle ? 'You retreat from the dungeon...' : ''
+            ]);
+            setBattleStarted(false);
+            if (isDungeonBattle && onExplorationComplete) {
+                setTimeout(onExplorationComplete, 3000);
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (battleStarted) {
+            const intervalId = setInterval(() => {
+                handleAttack();
+            }, 1000);
+            return () => clearInterval(intervalId);
+        }
+    }, [battleStarted, enemyHP, playerHP]);
+
+    return (
+        <Grid container spacing={2}>
+            {isDungeonBattle && (
+                <Grid item xs={12}>
+                    <Box className="dungeon-progress">
+                        <Typography variant="h6">
+                            {dungeon.name} - Progress: {dungeonProgress}/{DUNGEON_BATTLES}
+                        </Typography>
+                        <Box className="dungeon-progress-bar">
+                            <div 
+                                className="dungeon-progress-fill" 
+                                style={{ width: `${(dungeonProgress / DUNGEON_BATTLES) * 100}%` }} 
+                            />
+                        </Box>
+                    </Box>
+                </Grid>
+            )}
+
+            <Grid item xs={12}>
+                <Box className="enemy-info">
+                    {!battleStarted ? (
+                        <div>
+                            <Typography variant="h6">
+                                {isDungeonBattle ? `Choose your next opponent in ${dungeon.name}` : 'Select an Enemy'}
+                            </Typography>
+                            {availableEnemies && availableEnemies.length > 0 ? (
+                                <List>
+                                    {availableEnemies.map((enemy) => (
+                                        <EnemyDisplay
+                                            key={enemy.id}
+                                            enemy={enemy}
+                                            selected={selectedMonsterId === enemy.id}
+                                            onSelect={handleSelectMonster}
+                                            traits={traits}
+                                        />
+                                    ))}
+                                </List>
+                            ) : (
+                                <Typography>No enemies available!</Typography>
+                            )}
+                            <Button 
+                                variant="contained" 
+                                color="primary" 
+                                onClick={handleStartBattle}
+                                disabled={!selectedMonsterId}
+                                fullWidth
+                            >
+                                {isDungeonBattle ? 'Continue Exploration' : 'Start Battle'}
+                            </Button>
+                        </div>
+                    ) : (
+                        <div>
+                            <Typography variant="h6">Battle in Progress</Typography>
+                            <Box mb={2}>
+                                <Typography>
+                                    {player.name}: {playerHP} HP | {currentMonster.name}: {enemyHP} HP
+                                </Typography>
+                                {currentMonster.traits.length > 0 && (
+                                    <Stack direction="row" spacing={1} mt={1}>
+                                        {currentMonster.traits.map(traitId => {
+                                            const trait = traits.monsterTraits[traitId];
+                                            return (
+                                                <Tooltip key={traitId} title={trait.description}>
+                                                    <Chip
+                                                        size="small"
+                                                        label={trait.name}
+                                                        variant="outlined"
+                                                        color="secondary"
+                                                    />
+                                                </Tooltip>
+                                            );
+                                        })}
+                                    </Stack>
+                                )}
+                            </Box>
+                        </div>
+                    )}
+                </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+                <Box className="battle-log">
+                    <Typography variant="h6">Battle Log</Typography>
+                    {battleLog.map((entry, index) => (
+                        <Typography key={index} variant="body2">{entry}</Typography>
+                    ))}
+                </Box>
+            </Grid>
+
+            {dungeonRewards.length > 0 && (
+                <Grid item xs={12}>
+                    <Box className="battle-rewards">
+                        <Typography variant="h6">Dungeon Rewards</Typography>
+                        <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
+                            {dungeonRewards.map((reward, index) => (
+                                <Chip
+                                    key={index}
+                                    label={reward}
+                                    color="success"
+                                    className="reward-chip"
+                                />
+                            ))}
+                        </Stack>
+                    </Box>
+                </Grid>
+            )}
+        </Grid>
+    );
 };
 
 export default Battle;
