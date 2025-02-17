@@ -1,0 +1,30 @@
+.shop {
+  background-color: white;
+  border-radius: 8px;
+  padding: 10px; /* Reduced padding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 15px;
+}
+
+.shop h2 {
+  margin: 0 0 10px 0; /* Reduced margin */
+  font-size: 1.2em; /* Reduced size */
+  color: #333;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 5px; /* Reduced padding */
+}
+
+.items-container {
+  display: grid;
+  gap: 10px; /* Reduced gap */
+  margin: 10px 0; /* Reduced margin */
+}
+
+.item {
+  margin: 4px 0; /* Reduced margin */
+  font-size: 0.9em; /* Reduced size */
+  color: #666;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

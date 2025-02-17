@@ -1,66 +1,112 @@
+:root {
+    --grid-gap: 20px; /* Increased gap for better spacing */
+    --padding: 24px;
+}
+
 .game-container {
-  display: flex;
-  height: 100vh;
+    display: grid;
+    grid-template-areas:
+        "header header header header"
+        "player-stats inventory quest-log npcs" /* Rearranged layout */
+        "battle battle traits faction"        /* Rearranged layout */
+        "shop shop footer footer";             /* Shop and Footer at bottom */
+    grid-gap: var(--grid-gap);
+    padding: var(--padding);
+    height: auto; /* Adjust height to content */
+    max-width: 1400px; /* Optional: Limit max width for wider screens */
+    margin: 0 auto;     /* Center the container */
 }
 
-.sidebar {
-  width: 240px;
-  flex-shrink: 0;
+.game-area {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar-paper {
-  width: 240px;
-  background-color: #1a1a2e !important;
-  color: white !important;
+#header {
+    grid-area: header;
+    text-align: center; /* Center header text */
 }
 
-.sidebar-header {
-  padding: 16px;
-  background-color: #16213e;
+#player-stats {
+    grid-area: player-stats;
 }
 
-.sidebar-header h1 {
-  color: white;
-  font-size: 1.25rem;
-  font-weight: 600;
+#inventory {
+    grid-area: inventory;
 }
 
-/* Sidebar List Items Styling */
-.sidebar .MuiListItemButton-root {
-  padding: 12px 16px;
+#quest-log {
+    grid-area: quest-log;
 }
 
-.sidebar .MuiListItemIcon-root {
-  color: #90caf9;
-  min-width: 40px;
+#shop {
+    grid-area: shop;
 }
 
-.sidebar .MuiListItemText-primary {
-  color: #e3f2fd;
-  font-weight: 500;
+#battle {
+    grid-area: battle;
 }
 
-.sidebar .Mui-selected {
-  background-color: rgba(144, 202, 249, 0.08) !important;
+#traits {
+    grid-area: traits;
 }
 
-.sidebar .Mui-selected .MuiListItemIcon-root {
-  color: #64b5f6;
+#faction {
+    grid-area: faction;
 }
 
-.sidebar .Mui-selected .MuiListItemText-primary {
-  color: #fff;
+#npcs {
+    grid-area: npcs;
 }
 
-.sidebar .MuiListItemButton-root:hover {
-  background-color: rgba(144, 202, 249, 0.12);
+#footer {
+    grid-area: footer;
+    text-align: center; /* Center footer text */
+    background-color: #f0f0f0; /* Slightly different footer background */
 }
 
-/* Main Content Area */
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1024px) { /* Adjust breakpoint as needed */
+    .game-container {
+        grid-template-areas:
+            "header"
+            "player-stats"
+            "inventory"
+            "quest-log"
+            "traits"
+            "faction"
+            "npcs"
+            "battle"
+            "shop"
+            "footer";
+        grid-template-columns: 1fr; /* Single column layout */
+    }
+}
+
+/* Remove sidebar related styles - not needed anymore */
+.sidebar, .sidebar-paper, .sidebar-header, .sidebar .MuiListItemButton-root,
+.sidebar .MuiListItemIcon-root, .sidebar .MuiListItemText-primary,
+.sidebar .Mui-selected, .sidebar .Mui-selected .MuiListItemIcon-root,
+.sidebar .Mui-selected .MuiListItemText-primary,
+.sidebar .MuiListItemButton-root:hover, .content {
+    /* You can leave these empty or remove them entirely from the CSS file */
+    display: block; /* Or display: none; if you want to completely remove them */
+    width: auto;    /* Reset widths */
+    flex-grow: 0;   /* Reset flex grow */
+    padding: initial;
+    background-color: transparent !important; /* Reset background */
+    color: inherit !important;              /* Reset color */
+    height: auto;
+    overflow-y: visible;
+}
+
+/* If you want to ensure .content class doesn't interfere */
 .content {
-  flex-grow: 1;
-  padding: 24px;
-  background-color: #f5f5f5;
-  height: 100vh;
-  overflow-y: auto;
+    display: block; /* Ensure it's block level */
+    padding: 0;     /* Reset padding */
+    background-color: transparent; /* Reset background */
+    height: auto;    /* Reset height */
+    overflow-y: visible; /* Reset overflow */
 }

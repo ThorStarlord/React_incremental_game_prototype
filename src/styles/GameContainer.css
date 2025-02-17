@@ -11,8 +11,22 @@
         "quest-log quest-log shop"
         "battle battle battle"
         "footer footer footer";
-    grid-gap: var(--grid-gap);
-    padding: var(--padding);
+    grid-gap: 16px;
+    padding: 16px;
+    height: 100vh;
+}
+
+#header { grid-area: header; }
+#player-stats { grid-area: player-stats; }
+#inventory { grid-area: inventory; }
+#quest-log { grid-area: quest-log; }
+#shop { grid-area: shop; }
+#battle { grid-area: battle; }
+#footer { grid-area: footer; }
+
+.content {
+    background-color: #f5f5f5;
+    overflow-y: auto;
 }
 
 @media (max-width: 768px) {
@@ -27,3 +41,13 @@
             "footer";
     }
 }
+
+<Box className="game-container">
+    <Box id="header"><Header /></Box>
+    <Box id="player-stats"><PlayerStats /></Box>
+    <Box id="inventory"><Inventory /></Box>
+    <Box id="quest-log"><QuestLog /></Box>
+    <Box id="shop"><Shop /></Box>
+    <Box id="battle"><Battle /></Box>
+    <Box id="footer"><Footer /></Box>
+</Box>
