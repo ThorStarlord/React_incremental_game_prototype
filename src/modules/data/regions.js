@@ -24,7 +24,8 @@ export const regions = [
             'Crystal-clear spring water'
         ],
         townIds: ['oakhaven'],
-        dungeonIds: ['whisperingCaves']
+        dungeonIds: ['whisperingCaves'],
+        mapCoordinates: { x: 50, y: 50, width: 200, height: 150 }
     },
     {
         id: 'craggedPeaks',
@@ -49,7 +50,8 @@ export const regions = [
             'Mountain herbs'
         ],
         townIds: ['stonefangHold'],
-        dungeonIds: ['cragheartMine']
+        dungeonIds: ['cragheartMine'],
+        mapCoordinates: { x: 300, y: 100, width: 250, height: 100 }
     },
     {
         id: 'sunkenCoast',
@@ -74,7 +76,8 @@ export const regions = [
             'Sea salt'
         ],
         townIds: ['saltyWharf'],
-        dungeonIds: ['drownedGrotto']
+        dungeonIds: ['drownedGrotto'],
+        mapCoordinates: { x: 100, y: 250, width: 200, height: 180 }
     },
     {
         id: 'emeraldPlains',
@@ -99,6 +102,7 @@ export const regions = [
             'Wind energy'
         ],
         townIds: ['windriderCamp'],
-        dungeonIds: ['plainMonolith']
+        dungeonIds: ['plainMonolith'],
+        mapCoordinates: { x: 400, y: 250, width: 300, height: 200 }
     }
 ];

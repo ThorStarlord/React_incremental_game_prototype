@@ -8,7 +8,7 @@ import Footer from './Footer';
 import PlayerStats from './PlayerStats';
 import PlayerTraits from './PlayerTraits';
 import FactionContainer from './FactionUI/FactionContainer';
-import RegionsPanel from './panels/RegionsPanel';
+import WorldMap from './panels/WorldMap';
 import TownArea from './areas/TownArea';
 import ExplorationArea from './areas/ExplorationArea';
 import EssenceDisplay from './EssenceDisplay';
@@ -76,7 +76,7 @@ const GameContainer = () => {
     }
 
     return (
-      <RegionsPanel 
+      <WorldMap
         onTownSelect={handleTownSelect}
         onDungeonSelect={(dungeonId, regionId) => {
           setSelectedDungeon({ id: dungeonId, regionId });

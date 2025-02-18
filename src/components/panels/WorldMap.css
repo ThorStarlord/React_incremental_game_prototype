@@ -1,0 +1,115 @@
+.world-map-container {
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 600px;
+    position: relative;
+    overflow: hidden;
+}
+
+.world-map-container svg {
+    background-color: #e8f5e9;
+    background-image: linear-gradient(45deg, #e8f5e9 25%, #c8e6c9 25%, #c8e6c9 50%, #e8f5e9 50%, #e8f5e9 75%, #c8e6c9 75%, #c8e6c9 100%);
+    background-size: 56.57px 56.57px;
+}
+
+/* Region types */
+.region-Forest {
+    fill: #81c784;
+}
+
+.region-Mountains {
+    fill: #90a4ae;
+}
+
+.region-Coastal {
+    fill: #4fc3f7;
+}
+
+.region-Plains {
+    fill: #aed581;
+}
+
+/* Region hover states */
+.region-Forest:hover {
+    fill: #66bb6a;
+}
+
+.region-Mountains:hover {
+    fill: #78909c;
+}
+
+.region-Coastal:hover {
+    fill: #29b6f6;
+}
+
+.region-Plains:hover {
+    fill: #9ccc65;
+}
+
+/* Common region styles */
+rect {
+    transition: all 0.3s ease;
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.1));
+}
+
+rect:hover {
+    filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.2));
+    transform: translateY(-2px);
+}
+
+/* Town marker styles */
+circle {
+    transition: all 0.3s ease;
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+circle:hover {
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.3));
+    transform: scale(1.2);
+}
+
+/* Route styles */
+.route-road {
+    stroke: #8d6e63;
+}
+
+.route-trail {
+    stroke: #a1887f;
+    stroke-dasharray: 5,5;
+}
+
+.route-coastal-road {
+    stroke: #78909c;
+}
+
+/* Text styles */
+text {
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+/* Region text */
+rect + text {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+/* Town text */
+g text {
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+g:hover text {
+    opacity: 1;
+}
+
+/* Route hover effect */
+path:hover {
+    filter: brightness(1.2);
+    stroke-width: 4;
+}

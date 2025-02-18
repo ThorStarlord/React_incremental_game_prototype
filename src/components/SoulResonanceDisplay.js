@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { GameStateContext } from '../context/GameStateContext';
 import { Typography, Box } from '@mui/material';
 
-const SoulResonanceDisplay = () => {
+const EssenceDisplay = () => {
   const { essence } = useContext(GameStateContext);
 
   return (
@@ -12,4 +12,4 @@ const SoulResonanceDisplay = () => {
   );
 };
 
-export default SoulResonanceDisplay;
+export default EssenceDisplay;
