@@ -221,7 +221,9 @@ const initialState = {
       portrait: "golem_portrait",
       traits: ["StoneSkin"]
     }
-  ]
+  ],
+  essence: 100, // Starting Essence value
+  affinities: {}
 };
 
 const gameReducer = (state, action) => {
@@ -337,6 +339,24 @@ const gameReducer = (state, action) => {
       };
     }
 
+    case 'GAIN_ESSENCE':
+      return {
+        ...state,
+        essence: state.essence + action.payload
+      };
+    case 'SPEND_ESSENCE':
+      return {
+        ...state,
+        essence: state.essence - action.payload
+      };
+    case 'UPDATE_AFFINITY':
+      return {
+        ...state,
+        affinities: {
+          ...state.affinities,
+          [action.payload.npcId]: action.payload.level
+        }
+      };
     default:
       return state;
   }

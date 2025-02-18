@@ -1,4 +1,5 @@
-export const calculateSoulResonanceGeneration = (affinities) => {
+// Updated utility function to reflect the Essence mechanic
+export const calculateEssenceGeneration = (affinities) => {
   let total = 0;
   for (const level of Object.values(affinities)) {
     switch (level) {
