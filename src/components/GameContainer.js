@@ -1,3 +1,5 @@
+// src/components/GameContainer.js
+
 import React, { useState, useEffect, useContext } from 'react';
 import { Box } from '@mui/material';
 import { GameDispatchContext, GameStateContext } from '../context/GameStateContext';
@@ -48,43 +50,12 @@ const GameContainer = () => {
 
   const renderMainContent = () => {
     if (isExploring || selectedDungeon) {
-      return (
-        <ExplorationArea 
-          dungeonId={selectedDungeon?.id}
-          regionId={selectedDungeon?.regionId}
-          onExplorationComplete={() => {
-            setIsExploring(false);
-            setSelectedDungeon(null);
-          }}
-          onBack={handleBackToRegions}
-          onStartBattle={() => setIsExploring(true)}
-        />
-      );
+      return <ExplorationArea /* ... props ... */ />;
     }
-
     if (selectedTownId) {
-      return (
-        <TownArea 
-          townId={selectedTownId}
-          selectedNpcId={selectedNpcId}
-          onBack={handleBackToRegions}
-          onNpcSelect={setSelectedNpcId}
-          onBackToTown={() => setSelectedNpcId(null)}
-        />
-      );
+      return <TownArea /* ... props ... */ />;
     }
-
-    return (
-      <WorldMap
-        onTownSelect={handleTownSelect}
-        onDungeonSelect={(dungeonId, regionId) => {
-          setSelectedDungeon({ id: dungeonId, regionId });
-          setSelectedTownId(null);
-          setSelectedNpcId(null);
-          setIsExploring(false);
-        }}
-      />
-    );
+    return <WorldMap onTownSelect={handleTownSelect} onDungeonSelect={(dungeonId, regionId) => setSelectedDungeon({ id: dungeonId, regionId })} />;
   };
 
   return (

@@ -1,74 +1,91 @@
+/* src/components/GameContainer.css */
+
 :root {
-    --grid-gap: 20px; /* Increased gap for better spacing */
-    --padding: 24px;
+  --grid-gap: 20px;
+  --padding: 24px;
+  --header-height: 80px; /* Example height for header */
+  --main-content-height: 400px; /* Example height for main content */
+  --world-map-height: 400px; /* Example height for world map */
 }
 
 .game-container {
-    display: grid;
-    grid-template-areas:
-        "header header header"
-        "player-stats main-content battle"
-        "traits faction footer";
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: var(--grid-gap);
-    padding: var(--padding);
-    height: auto; /* Adjust height to content */
-    max-width: 1400px; /* Optional: Limit max width for wider screens */
-    margin: 0 auto;     /* Center the container */
+  display: grid;
+  grid-template-areas:
+      "header"
+      "main-content"
+      "world-map-area"
+      "bottom-windows"; /* New area for bottom windows */
+  grid-template-rows: var(--header-height) var(--main-content-height) var(--world-map-height) auto; /* Define row heights */
+  grid-template-columns: 1fr; /* Single column layout for these top sections */
+  grid-gap: var(--grid-gap);
+  padding: var(--padding);
+  height: 100vh; /* Full viewport height */
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.game-container.exploring {
-    grid-template-areas:
-        "header header header"
-        "player-stats main-content main-content"
-        "traits faction footer";
+#header {
+  grid-area: header;
+  position: fixed; /* ⭐️ Fixed position for header */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100; /* Ensure header is on top of other content */
+  background-color: #f0f0f0; /* Example header background */
+  padding: 16px;
+  text-align: center;
 }
 
-.game-area {
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+#main-content {
+  grid-area: main-content;
+  position: relative; /* Needed for absolute positioning of content within if needed */
+  background-color: #fff; /* Example main content background */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow: hidden; /* To contain content within */
+  height: var(--main-content-height); /* Fixed height */
 }
 
-/* Grid area assignments */
-#header { 
-    grid-area: header;
-    text-align: center; /* Center header text */
+#world-map-area { /* New area for world map */
+  grid-area: world-map-area;
+  display: flex; /* Use flexbox to center the world map */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically (if needed, based on world map's aspect ratio) */
+  background-color: #e0e0e0; /* Example world map area background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: var(--world-map-height); /* Fixed height for world map area */
 }
 
-#player-stats { grid-area: player-stats; }
-#main-content { 
-    grid-area: main-content;
-    min-height: 500px;
+#world-map-area > .world-map-container { /* Target the WorldMap component */
+  height: 100%; /* Make WorldMap container fill the area */
+  width: 100%;  /* Make WorldMap container fill the area */
+  max-width: 800px; /* Example max width for the map itself */
+  max-height: 600px; /* Example max height for the map itself */
+  margin: auto; /* Center the map within its area if it's smaller */
 }
-#battle { grid-area: battle; }
-#traits { grid-area: traits; }
-#faction { grid-area: faction; }
-#npcs { grid-area: npcs; }
 
+
+#bottom-windows { /* New area for draggable windows */
+  grid-area: bottom-windows;
+  display: grid; /* Grid within a grid! For flexible window arrangement */
+  grid-template-columns: 1fr 1fr 1fr; /* Three columns for PlayerStats, Traits, Faction */
+  grid-gap: var(--grid-gap);
+}
+
+#player-stats { grid-area: auto; /* Let it flow into bottom-windows grid */ }
+#traits { grid-area: auto; /* Let it flow into bottom-windows grid */ }
+#faction { grid-area: auto; /* Let it flow into bottom-windows grid */ }
+#battle { grid-area: battle; /* Still use 'battle' area if needed elsewhere, or remove if not used outside main-content */ }
 #footer {
-    grid-area: footer;
-    text-align: center; /* Center footer text */
-    background-color: #f0f0f0; /* Slightly different footer background */
+  grid-area: footer; /* You can keep the footer or remove it if not needed in this layout */
+  text-align: center;
+  background-color: #f0f0f0;
+  padding: 10px;
 }
 
-/* Responsive layout */
-@media (max-width: 1024px) { /* Adjust breakpoint as needed */
-    .game-container,
-    .game-container.exploring {
-        grid-template-areas:
-            "header"
-            "player-stats"
-            "main-content"
-            "battle"
-            "traits"
-            "faction"
-            "footer";
-        grid-template-columns: 1fr; /* Single column layout */
-    }
-
-    #main-content {
-        min-height: 400px;
-    }
-}
+/*  Remove media query for now, we're focusing on desktop layout first
+@media (max-width: 1024px) { ... }
+*/
