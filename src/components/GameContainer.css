@@ -72,9 +72,9 @@
 #bottom-windows {
   grid-area: bottom-windows;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: var(--grid-gap);
-  margin-top: var(--world-map-height); /* Push below fixed world-map-area */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
 }
 
 #player-stats { grid-area: auto; }

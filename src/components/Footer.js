@@ -1,11 +1,13 @@
 import React from 'react';
+import { Box, Typography } from '@mui/material';
+import './Footer.css';
 
 const Footer = () => {
-    return (
-        <footer className="game-footer">
-            <p>&copy; 2025 Incremental RPG Game. All rights reserved.</p>
-        </footer>
-    );
-}
+  return (
+    <Box className="footer">
+      <Typography variant="body1" align="center">Game Footer</Typography>
+    </Box>
+  );
+};
 
 export default Footer;

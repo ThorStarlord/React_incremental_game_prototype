@@ -17,6 +17,9 @@ import EssenceDisplay from './EssenceDisplay';
 import './GameContainer.css';
 import { towns } from '../modules/data/towns'; // ⭐️ Import towns data
 import { DndContext } from '@dnd-kit/core'; // ⭐️ Import DndContext!
+import LeftColumn from './LeftColumn';
+import MiddleColumn from './MiddleColumn';
+import RightColumn from './RightColumn';
 
 const GameContainer = () => {
   // ⭐️ Get the ID of the first town
@@ -52,15 +55,8 @@ const GameContainer = () => {
     setIsExploring(false);
   };
 
-
   const renderMainContent = () => {
-    if (isExploring || selectedDungeon) {
-      return <ExplorationArea /* ... props ... */ />;
-    }
-    if (selectedTownId) {
-      return <TownArea townId={selectedTownId} onBack={handleBackToWorldMap} /* ... other props for TownArea ... */ />; // ⭐️ Pass onBack for TownArea
-    }
-    return null; // ⭐️ renderMainContent now returns null if no Town or Dungeon is selected, NO WorldMap here!
+    return <MiddleColumn />;
   };
 
   return (
@@ -80,11 +76,13 @@ const GameContainer = () => {
           />
         </Box>
         <Box id="bottom-windows">
-          <PlayerStats />
-          <PlayerTraits />
-          <FactionContainer />
+          <LeftColumn />
+          <MiddleColumn />
+          <RightColumn />
         </Box>
-        <Footer /> {/* ⭐️ Closing Box - INSIDE DndContext */}
+        <Box id="footer">
+          <Footer />
+        </Box>
       </Box>
     </DndContext>
   );
