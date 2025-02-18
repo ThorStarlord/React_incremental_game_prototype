@@ -1,50 +1,30 @@
-const dialogueOptions = {
-  Sage: {
-    options: [
-      { id: 'learn', text: 'Seek Knowledge', action: 'LEARN' },
-      { id: 'inquire', text: 'Ask About Ancient Wisdom', action: 'INQUIRE' },
-      { id: 'meditate', text: 'Meditate Together', action: 'MEDITATE' }
-    ],
-    responses: {
-      LEARN: "Let me share with you the wisdom of ages...",
-      INQUIRE: "Ah, you seek the deeper mysteries...",
-      MEDITATE: "Find your center, and let wisdom flow..."
-    }
-  },
-  Merchant: {
-    options: [
-      { id: 'browse', text: 'Browse Wares', action: 'BROWSE' },
-      { id: 'haggle', text: 'Haggle Prices', action: 'HAGGLE' },
-      { id: 'trade_routes', text: 'Ask About Trade Routes', action: 'ROUTES' }
-    ],
-    responses: {
-      BROWSE: "Take a look at my finest goods...",
-      HAGGLE: "Everything's negotiable, for the right price...",
-      ROUTES: "The caravans bring exotic goods from far lands..."
-    }
-  },
-  Trainer: {
-    options: [
-      { id: 'train', text: 'Train Skills', action: 'TRAIN' },
-      { id: 'spar', text: 'Request Sparring', action: 'SPAR' },
-      { id: 'technique', text: 'Discuss Techniques', action: 'TECHNIQUE' }
-    ],
-    responses: {
-      TRAIN: "Let's hone your abilities...",
-      SPAR: "Show me what you've learned...",
-      TECHNIQUE: "Here's an advanced technique I've mastered..."
-    }
-  }
+import { useCallback } from 'react';
+import elaraDialogues from '../data/dialogues/elara.json';
+import borinDialogues from '../data/dialogues/borin.json';
+import willaDialogues from '../data/dialogues/willa.json';
+import { startQuest } from './questManager';
+
+const dialogueData = {
+  elara: elaraDialogues.elara,
+  borin: borinDialogues.borin,
+  willa: willaDialogues.willa
 };
 
-export const getDialogueOptions = (npcType) => {
-  return dialogueOptions[npcType] || {
-    options: [
-      { id: 'talk', text: 'Talk', action: 'TALK' }
-    ],
-    responses: {
-      TALK: "Hello there!"
+export const useDialogue = (npcId) => {
+  const getDialogue = useCallback((dialogueId) => {
+    const npcDialogues = dialogueData[npcId]?.dialogues;
+    return npcDialogues?.find(d => d.id === dialogueId);
+  }, [npcId]);
+
+  const handleDialogueAction = useCallback((dialogue, dispatch) => {
+    if (dialogue.action === 'start_quest') {
+      startQuest(dialogue.questId, dispatch);
     }
+  }, []);
+
+  return {
+    getDialogue,
+    handleDialogueAction
   };
 };
 

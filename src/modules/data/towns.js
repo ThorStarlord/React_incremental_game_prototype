@@ -5,9 +5,9 @@ export const towns = [
         id: 'oakhaven',
         name: 'Oakhaven',
         type: 'Lumber Town',
-        description: 'A bustling lumber town nestled in the Whispering Woods. Massive tree-platforms connected by rope bridges house many of its residents, while the ground level serves as a trading post.',
+        description: 'A small, rustic town surrounded by the Whispering Woods. Known for its lumber mill and friendly inhabitants.',
         regionId: 'whisperingWoods',
-        npcIds: [1, 3], // Elder Willow and Scholar Elara
+        npcIds: ['elara', 'borin', 'willa'], // Elder Willow and Scholar Elara
     },
     {
         id: 'stonefangHold',

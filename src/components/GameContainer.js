@@ -1,22 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Box } from '@mui/material';
-import FactionContainer from './FactionUI/FactionContainer';
-import Battle from './Battle';
-import NPCEncounter from './NPCEncounter';
-import PlayerStats from './PlayerStats';
-import PlayerTraits from './PlayerTraits';
+import { GameDispatchContext, GameStateContext } from '../context/GameStateContext';
+import { calculateEssenceGeneration } from '../utils/soulResonanceUtils';
+import { UPDATE_INTERVALS } from '../config/gameConstants';
 import Header from './Header';
 import Footer from './Footer';
+import PlayerStats from './PlayerStats';
+import PlayerTraits from './PlayerTraits';
+import FactionContainer from './FactionUI/FactionContainer';
 import RegionsPanel from './panels/RegionsPanel';
-import TownPanel from './panels/TownPanel';
-import DungeonPanel from './panels/DungeonPanel';
+import TownArea from './areas/TownArea';
+import ExplorationArea from './areas/ExplorationArea';
+import EssenceDisplay from './EssenceDisplay';
 import './GameContainer.css';
 
 const GameContainer = () => {
   const [selectedTownId, setSelectedTownId] = useState(null);
   const [selectedNpcId, setSelectedNpcId] = useState(null);
-  const [selectedDungeon, setSelectedDungeon] = useState(null); // { id, regionId }
+  const [selectedDungeon, setSelectedDungeon] = useState(null);
   const [isExploring, setIsExploring] = useState(false);
+  const dispatch = useContext(GameDispatchContext);
+  const { affinities } = useContext(GameStateContext);
+
+  useEffect(() => {
+    if (selectedTownId) {
+      const interval = setInterval(() => {
+        const essenceGain = calculateEssenceGeneration(affinities);
+        dispatch({ type: 'GAIN_ESSENCE', payload: essenceGain });
+      }, UPDATE_INTERVALS.ESSENCE_GENERATION);
+
+      return () => clearInterval(interval);
+    }
+  }, [selectedTownId, affinities, dispatch]);
 
   const handleTownSelect = (townId) => {
     setSelectedTownId(townId);
@@ -32,113 +47,60 @@ const GameContainer = () => {
     setIsExploring(false);
   };
 
-  const handleNpcSelect = (npcId) => {
-    setSelectedNpcId(npcId);
-  };
-
-  const handleBackToTown = () => {
-    setSelectedNpcId(null);
-  };
-
-  const handleDungeonSelect = (dungeonId, regionId) => {
-    setSelectedDungeon({ id: dungeonId, regionId });
-    setSelectedTownId(null);
-    setSelectedNpcId(null);
-    setIsExploring(false);
-  };
-
-  const handleStartExploration = (dungeonId) => {
-    setIsExploring(true);
-  };
-
-  const handleExplorationComplete = () => {
-    setIsExploring(false);
-    setSelectedDungeon(null);
-  };
-
   const renderMainContent = () => {
-    if (isExploring) {
+    if (isExploring || selectedDungeon) {
       return (
-        <Box id="main-content" className="game-area">
-          <Battle 
-            dungeonId={selectedDungeon.id}
-            onExplorationComplete={handleExplorationComplete}
-          />
-        </Box>
-      );
-    }
-
-    if (selectedNpcId) {
-      return (
-        <Box id="main-content" className="game-area">
-          <NPCEncounter 
-            npcId={selectedNpcId} 
-            onBack={handleBackToTown}
-          />
-        </Box>
-      );
-    }
-
-    if (selectedDungeon) {
-      return (
-        <Box id="main-content" className="game-area">
-          <DungeonPanel 
-            dungeonId={selectedDungeon.id}
-            regionId={selectedDungeon.regionId}
-            onBack={handleBackToRegions}
-            onStartBattle={handleStartExploration}
-          />
-        </Box>
+        <ExplorationArea 
+          dungeonId={selectedDungeon?.id}
+          regionId={selectedDungeon?.regionId}
+          onExplorationComplete={() => {
+            setIsExploring(false);
+            setSelectedDungeon(null);
+          }}
+          onBack={handleBackToRegions}
+          onStartBattle={() => setIsExploring(true)}
+        />
       );
     }
 
     if (selectedTownId) {
       return (
-        <Box id="main-content" className="game-area">
-          <TownPanel 
-            townId={selectedTownId} 
-            onBack={handleBackToRegions}
-            onNpcSelect={handleNpcSelect}
-          />
-        </Box>
+        <TownArea 
+          townId={selectedTownId}
+          selectedNpcId={selectedNpcId}
+          onBack={handleBackToRegions}
+          onNpcSelect={setSelectedNpcId}
+          onBackToTown={() => setSelectedNpcId(null)}
+        />
       );
     }
 
     return (
-      <Box id="main-content" className="game-area">
-        <RegionsPanel 
-          onTownSelect={handleTownSelect}
-          onDungeonSelect={handleDungeonSelect} 
-        />
-      </Box>
+      <RegionsPanel 
+        onTownSelect={handleTownSelect}
+        onDungeonSelect={(dungeonId, regionId) => {
+          setSelectedDungeon({ id: dungeonId, regionId });
+          setSelectedTownId(null);
+          setSelectedNpcId(null);
+          setIsExploring(false);
+        }}
+      />
     );
   };
 
   return (
     <Box className={`game-container ${isExploring ? 'exploring' : ''}`}>
-      <Box id="header" className="game-area">
-        <Header />
-      </Box>
-      <Box id="player-stats" className="game-area">
-        <PlayerStats />
-      </Box>
+      <Header />
+      <PlayerStats />
+      <EssenceDisplay />
       {renderMainContent()}
       {!isExploring && (
         <>
-          <Box id="battle" className="game-area">
-            <Battle />
-          </Box>
-          <Box id="traits" className="game-area">
-            <PlayerTraits />
-          </Box>
-          <Box id="faction" className="game-area">
-            <FactionContainer />
-          </Box>
+          <PlayerTraits />
+          <FactionContainer />
         </>
       )}
-      <Box id="footer" className="game-area">
-        <Footer />
-      </Box>
+      <Footer />
     </Box>
   );
 };

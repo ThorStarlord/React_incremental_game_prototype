@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { GameStateContext } from '../../context/GameStateContext';
+import { GameStateContext } from '../context/GameStateContext';
 import { Typography, Box } from '@mui/material';
 
 const SoulResonanceDisplay = () => {

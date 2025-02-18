@@ -1,5 +1,182 @@
-import React, { createContext, useReducer } from 'react';
+import React, { createContext, useReducer, useCallback, useContext } from 'react';
 import { npcs } from '../modules/data/npcs';
+import { ESSENCE_COSTS, AFFINITY_LEVELS } from '../config/gameConstants';
+
+// Action Types
+const ACTION_TYPES = {
+  // Player Actions
+  UPDATE_PLAYER: 'UPDATE_PLAYER',
+  COPY_TRAIT: 'COPY_TRAIT',
+  LEARN_SKILL: 'LEARN_SKILL',
+
+  // Essence Actions
+  GAIN_ESSENCE: 'GAIN_ESSENCE',
+  SPEND_ESSENCE: 'SPEND_ESSENCE',
+
+  // Social Actions
+  UPDATE_AFFINITY: 'UPDATE_AFFINITY',
+  UPDATE_NPC_OPINION: 'UPDATE_NPC_OPINION',
+
+  // Faction Actions
+  JOIN_FACTION: 'JOIN_FACTION',
+  ADD_FACTION_MEMBER: 'ADD_FACTION_MEMBER',
+  UPDATE_FACTION_RESOURCES: 'UPDATE_FACTION_RESOURCES',
+  CREATE_FACTION: 'CREATE_FACTION',
+
+  // Inventory Actions
+  UPDATE_INVENTORY: 'UPDATE_INVENTORY',
+  UPDATE_QUESTS: 'UPDATE_QUESTS',
+  UPDATE_ENEMIES: 'UPDATE_ENEMIES'
+};
+
+// Reducer functions organized by domain
+const playerReducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_TYPES.UPDATE_PLAYER:
+      return { ...state, player: applyTraitEffects(action.payload) };
+    case ACTION_TYPES.COPY_TRAIT:
+      return handleCopyTrait(state, action.payload);
+    case ACTION_TYPES.LEARN_SKILL:
+      return handleLearnSkill(state, action.payload);
+    default:
+      return state;
+  }
+};
+
+const essenceReducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_TYPES.GAIN_ESSENCE:
+      return { ...state, essence: state.essence + action.payload };
+    case ACTION_TYPES.SPEND_ESSENCE:
+      return { ...state, essence: state.essence - action.payload };
+    default:
+      return state;
+  }
+};
+
+const socialReducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_TYPES.UPDATE_AFFINITY:
+      return {
+        ...state,
+        affinities: {
+          ...state.affinities,
+          [action.payload.npcId]: action.payload.level
+        }
+      };
+    case ACTION_TYPES.UPDATE_NPC_OPINION:
+      return {
+        ...state,
+        npcs: state.npcs.map(npc =>
+          npc.id === action.payload.npcId
+            ? { ...npc, opinionLevel: action.payload.opinion }
+            : npc
+        )
+      };
+    default:
+      return state;
+  }
+};
+
+const factionReducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_TYPES.JOIN_FACTION:
+    case ACTION_TYPES.ADD_FACTION_MEMBER:
+    case ACTION_TYPES.UPDATE_FACTION_RESOURCES:
+    case ACTION_TYPES.CREATE_FACTION:
+      return handleFactionAction(state, action);
+    default:
+      return state;
+  }
+};
+
+const gameReducer = (state, action) => {
+  // Try each domain reducer in sequence
+  const newState = playerReducer(
+    essenceReducer(
+      socialReducer(
+        factionReducer(state, action),
+        action
+      ),
+      action
+    ),
+    action
+  );
+
+  // Handle any remaining generic actions
+  switch (action.type) {
+    case ACTION_TYPES.UPDATE_INVENTORY:
+      return { ...newState, inventory: action.payload };
+    case ACTION_TYPES.UPDATE_QUESTS:
+      return { ...newState, quests: action.payload };
+    case ACTION_TYPES.UPDATE_ENEMIES:
+      return { ...newState, enemies: action.payload };
+    default:
+      return newState;
+  }
+};
+
+// Context creation
+export const GameStateContext = createContext();
+export const GameDispatchContext = createContext();
+
+// Custom hooks for selecting specific state slices
+export const usePlayerState = () => {
+  const { player } = useContext(GameStateContext);
+  return player;
+};
+
+export const useEssence = () => {
+  const { essence } = useContext(GameStateContext);
+  return essence;
+};
+
+export const useAffinities = () => {
+  const { affinities } = useContext(GameStateContext);
+  return affinities;
+};
+
+export const useFactions = () => {
+  const { factions } = useContext(GameStateContext);
+  return factions;
+};
+
+// Provider component
+export const GameProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(gameReducer, initialState);
+
+  // Memoized dispatch functions
+  const memoizedDispatch = useCallback((action) => {
+    dispatch(action);
+  }, []);
+
+  return (
+    <GameStateContext.Provider value={state}>
+      <GameDispatchContext.Provider value={memoizedDispatch}>
+        {children}
+      </GameDispatchContext.Provider>
+    </GameStateContext.Provider>
+  );
+};
+
+// Action creators
+export const createEssenceAction = {
+  gain: (amount) => ({
+    type: ACTION_TYPES.GAIN_ESSENCE,
+    payload: amount
+  }),
+  spend: (amount) => ({
+    type: ACTION_TYPES.SPEND_ESSENCE,
+    payload: amount
+  })
+};
+
+export const createAffinityAction = {
+  update: (npcId, level) => ({
+    type: ACTION_TYPES.UPDATE_AFFINITY,
+    payload: { npcId, level }
+  })
+};
 
 const applyTraitEffects = (player) => {
   let modifiedPlayer = { ...player };
@@ -226,49 +403,51 @@ const initialState = {
   affinities: {}
 };
 
-const gameReducer = (state, action) => {
+const handleCopyTrait = (state, payload) => {
+  const { traitId, essenceCost } = payload;
+  const trait = state.traits.copyableTraits[traitId];
+  
+  if (!trait || state.player.essence < essenceCost || 
+      state.player.acquiredTraits.includes(traitId)) {
+    return state;
+  }
+
+  const updatedPlayer = {
+    ...state.player,
+    essence: state.player.essence - essenceCost,
+    acquiredTraits: [...state.player.acquiredTraits, traitId]
+  };
+
+  return {
+    ...state,
+    player: applyTraitEffects(updatedPlayer)
+  };
+};
+
+const handleLearnSkill = (state, payload) => {
+  const { skillId, goldCost } = payload;
+  const skill = state.skills.physical[skillId] || state.skills.mental[skillId];
+  
+  if (!skill || state.player.gold < goldCost || 
+      state.player.learnedSkills.includes(skillId)) {
+    return state;
+  }
+
+  const updatedPlayer = {
+    ...state.player,
+    gold: state.player.gold - goldCost,
+    learnedSkills: [...state.player.learnedSkills, skillId]
+  };
+
+  return {
+    ...state,
+    player: updatedPlayer
+  };
+};
+
+const handleFactionAction = (state, action) => {
   switch (action.type) {
-    case 'UPDATE_PLAYER':
-      const updatedPlayer = applyTraitEffects(action.payload);
-      return { ...state, player: updatedPlayer };
-      
-    case 'COPY_TRAIT': {
-      const { traitId, essenceCost } = action.payload;
-      const trait = state.traits.copyableTraits[traitId];
-      
-      if (!trait || state.player.essence < essenceCost || 
-          state.player.acquiredTraits.includes(traitId)) {
-        return state;
-      }
-
-      const updatedPlayer = {
-        ...state.player,
-        essence: state.player.essence - essenceCost,
-        acquiredTraits: [...state.player.acquiredTraits, traitId]
-      };
-
-      return {
-        ...state,
-        player: applyTraitEffects(updatedPlayer)
-      };
-    }
-
-    case 'UPDATE_INVENTORY':
-      return { ...state, inventory: action.payload };
-    case 'UPDATE_QUESTS':
-      return { ...state, quests: action.payload };
-    case 'UPDATE_ENEMIES':
-      return { ...state, enemies: action.payload };
-    case 'UPDATE_NPC_OPINION':
-      return {
-        ...state,
-        npcs: state.npcs.map(npc =>
-          npc.id === action.payload.npcId
-            ? { ...npc, opinionLevel: action.payload.opinion }
-            : npc
-        )
-      };
-    case 'JOIN_FACTION': {
+    case ACTION_TYPES.JOIN_FACTION: {
       const { factionId, role = 'Member' } = action.payload;
       const faction = state.factions.find(f => f.id === factionId);
       
@@ -303,7 +482,7 @@ const gameReducer = (state, action) => {
       };
     }
 
-    case 'ADD_FACTION_MEMBER': {
+    case ACTION_TYPES.ADD_FACTION_MEMBER: {
       const { factionId, member } = action.payload;
       return {
         ...state,
@@ -320,7 +499,7 @@ const gameReducer = (state, action) => {
       };
     }
 
-    case 'UPDATE_FACTION_RESOURCES': {
+    case ACTION_TYPES.UPDATE_FACTION_RESOURCES: {
       const { factionId, resources } = action.payload;
       return {
         ...state,
@@ -339,40 +518,15 @@ const gameReducer = (state, action) => {
       };
     }
 
-    case 'GAIN_ESSENCE':
+    case ACTION_TYPES.CREATE_FACTION: {
+      const { faction } = action.payload;
       return {
         ...state,
-        essence: state.essence + action.payload
+        factions: [...state.factions, faction]
       };
-    case 'SPEND_ESSENCE':
-      return {
-        ...state,
-        essence: state.essence - action.payload
-      };
-    case 'UPDATE_AFFINITY':
-      return {
-        ...state,
-        affinities: {
-          ...state.affinities,
-          [action.payload.npcId]: action.payload.level
-        }
-      };
+    }
+
     default:
       return state;
   }
-};
-
-export const GameStateContext = createContext();
-export const GameDispatchContext = createContext();
-
-export const GameProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(gameReducer, initialState);
-
-  return (
-    <GameStateContext.Provider value={state}>
-      <GameDispatchContext.Provider value={dispatch}>
-        {children}
-      </GameDispatchContext.Provider>
-    </GameStateContext.Provider>
-  );
 };

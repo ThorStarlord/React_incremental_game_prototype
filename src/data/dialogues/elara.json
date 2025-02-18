@@ -1,0 +1,32 @@
+{
+  "elara": {
+    "id": "elara",
+    "dialogues": [
+      {
+        "id": "intro",
+        "text": "Welcome to Oakhaven, traveler. I am Elder Elara. Our town is small but full of heart. We could use some help around here.",
+        "options": [
+          { "text": "How can I help?", "next": "quest_offer" },
+          { "text": "Just passing through.", "next": "end" }
+        ]
+      },
+      {
+        "id": "quest_offer",
+        "text": "Could you deliver this medicinal herb pouch to Borin at the lumber mill? He has been having some trouble lately.",
+        "options": [
+          { "text": "Sure, I can do that.", "next": "accept_quest" },
+          { "text": "Maybe later.", "next": "end" }
+        ]
+      },
+      {
+        "id": "accept_quest",
+        "text": "Thank you. Borin will be grateful. You can find him at the lumber mill.",
+        "action": "start_quest",
+        "questId": "welcome_to_oakhaven",
+        "options": [
+          { "text": "I will go now.", "next": "end" }
+        ]
+      }
+    ]
+  }
+}

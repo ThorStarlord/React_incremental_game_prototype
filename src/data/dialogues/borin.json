@@ -1,0 +1,32 @@
+{
+  "borin": {
+    "id": "borin",
+    "dialogues": [
+      {
+        "id": "intro",
+        "text": "What do you want? Oh, Elara sent you? Thanks for the herbs. We have a minor cave-in at the lumber storage. Can you help clear it?",
+        "options": [
+          { "text": "I can help.", "next": "quest_offer" },
+          { "text": "Not right now.", "next": "end" }
+        ]
+      },
+      {
+        "id": "quest_offer",
+        "text": "Great. Just clear the debris in the storage area. It should not take long.",
+        "options": [
+          { "text": "I will get to it.", "next": "accept_quest" },
+          { "text": "Maybe later.", "next": "end" }
+        ]
+      },
+      {
+        "id": "accept_quest",
+        "text": "Thanks. Let me know when you are done.",
+        "action": "start_quest",
+        "questId": "lumber_mill_troubles",
+        "options": [
+          { "text": "I will go now.", "next": "end" }
+        ]
+      }
+    ]
+  }
+}

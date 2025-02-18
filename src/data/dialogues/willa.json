@@ -1,0 +1,32 @@
+{
+  "willa": {
+    "id": "willa",
+    "dialogues": [
+      {
+        "id": "intro",
+        "text": "Hello there! I am Whispering Willa. I hear all the rumors around here. Want to trade a favor for some information?",
+        "options": [
+          { "text": "What kind of favor?", "next": "quest_offer" },
+          { "text": "Not interested.", "next": "end" }
+        ]
+      },
+      {
+        "id": "quest_offer",
+        "text": "There is a rare flower near the edge of the Whispering Woods. Bring it to me and I will tell you what I know.",
+        "options": [
+          { "text": "I will find it.", "next": "accept_quest" },
+          { "text": "Maybe later.", "next": "end" }
+        ]
+      },
+      {
+        "id": "accept_quest",
+        "text": "Great! I will be waiting at the tavern.",
+        "action": "start_quest",
+        "questId": "tavern_tales",
+        "options": [
+          { "text": "I will go now.", "next": "end" }
+        ]
+      }
+    ]
+  }
+}
