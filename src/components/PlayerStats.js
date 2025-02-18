@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
+import { useDraggable } from '@dnd-kit/core'; // ⭐️ Import useDraggable
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
 import DraggableStatPoint from './DraggableStatPoint';
 import DroppableStat from './DroppableStat';
@@ -60,8 +61,24 @@ const PlayerStats = () => {
     }
   };
 
+  // ⭐️ Draggable setup for PlayerStats itself
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: 'player-stats-window', // Unique ID for this draggable
+    data: { type: 'window', windowType: 'player-stats' } // Data to identify this window
+  });
+
+  const draggableStyle = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined;
+
   return (
-    <div className="player-stats">
+    <div
+      ref={setNodeRef} // ⭐️ Attach ref to the main div
+      style={draggableStyle} // ⭐️ Apply draggable style
+      {...listeners} // ⭐️ Attach listeners for drag events
+      {...attributes} // ⭐️ Attach accessibility attributes
+      className="player-stats"
+    >
       <h2>Player Stats</h2>
       <p>Name: {player.name}</p>
       

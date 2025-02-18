@@ -1,9 +1,20 @@
 import React, { useContext } from 'react';
+import { useDraggable } from '@dnd-kit/core'; // ⭐️ Import useDraggable
 import { GameStateContext } from '../context/GameStateContext';
 import './PlayerTraits.css';
 
 const PlayerTraits = () => {
   const { player, traits } = useContext(GameStateContext);
+
+  // ⭐️ Draggable setup for PlayerTraits itself
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: 'player-traits-window', // Unique ID for this draggable
+    data: { type: 'window', windowType: 'player-traits' } // Data to identify this window
+  });
+
+  const draggableStyle = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined;
 
   const renderAcquiredTraits = () => {
     if (!player.acquiredTraits.length) {
@@ -23,7 +34,13 @@ const PlayerTraits = () => {
   };
 
   return (
-    <div className="player-traits">
+    <div
+      ref={setNodeRef} // ⭐️ Attach ref to the main div
+      style={draggableStyle} // ⭐️ Apply draggable style
+      {...listeners} // ⭐️ Attach listeners for drag events
+      {...attributes} // ⭐️ Attach accessibility attributes
+      className="player-traits"
+    >
       <h3>Acquired Traits</h3>
       <div className="traits-list">
         {renderAcquiredTraits()}
