@@ -23,5 +23,6 @@ export const ESSENCE_GENERATION_RATES = {
 };
 
 export const UPDATE_INTERVALS = {
-  ESSENCE_GENERATION: 60000 // 1 minute in milliseconds
+  ESSENCE_GENERATION: 60000, // 1 minute in milliseconds
+  BATTLE_ATTACK: 1000 // 1 second in milliseconds - interval between battle attacks
 };

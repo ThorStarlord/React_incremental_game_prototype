@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
 import { dungeons } from '../modules/data/dungeons';
 import { dungeonEnemies } from '../modules/data/dungeonEnemies';
+import { UPDATE_INTERVALS } from '../config/gameConstants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { 
     Button, 
@@ -17,7 +18,7 @@ import {
     Tooltip,
     IconButton 
 } from '@mui/material';
-import '../styles/Battle.css';
+import './Battle.css';  // Updated import path
 
 const DUNGEON_BATTLES = 3;
 
@@ -73,6 +74,7 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
     const [currentMonster, setCurrentMonster] = useState(null);
     const [dungeonProgress, setDungeonProgress] = useState(0);
     const [dungeonRewards, setDungeonRewards] = useState([]);
+    const [dungeonCompleted, setDungeonCompleted] = useState(false);
 
     const dungeon = dungeonId ? dungeons.find(d => d.id === dungeonId) : null;
     const isDungeonBattle = !!dungeon;
@@ -106,6 +108,20 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
     const handleAttack = () => {
         if (!battleStarted || !currentMonster) return;
 
+        /**
+         * @TECHNICAL_DEBT: Potential Race Condition in Battle Log
+         * The current implementation updates HP state and battle log entries separately,
+         * which could theoretically lead to race conditions where log entries don't perfectly
+         * match the game state. For the prototype phase, this is acceptable as it doesn't
+         * affect gameplay.
+         * 
+         * Future Enhancement:
+         * If log accuracy becomes crucial, consider:
+         * 1. Using a reducer to handle both HP and log updates atomically
+         * 2. Implementing a more robust logging system with timestamps
+         * 3. Batching state updates using useReducer or custom hook
+         */
+
         const playerDamage = Math.max(0, player.attack - currentMonster.defense);
         const newEnemyHP = Math.max(0, enemyHP - playerDamage);
         let logEntry = `${player.name} attacks ${currentMonster.name} for ${playerDamage} damage. ${currentMonster.name} HP: ${newEnemyHP}`;
@@ -137,6 +153,19 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
                 setDungeonProgress(newProgress);
 
                 if (newProgress >= DUNGEON_BATTLES) {
+                    /**
+                     * @GAME_DESIGN: Dungeon Reward System
+                     * Currently using slice(0, 2) to limit rewards to 2 items per dungeon completion.
+                     * This is an intentional design choice for game balance to:
+                     * 1. Prevent players from getting too powerful too quickly
+                     * 2. Encourage multiple dungeon runs for different rewards
+                     * 3. Maintain game progression curve
+                     * 
+                     * Future Enhancements Planned:
+                     * - Scale number of rewards based on dungeon difficulty
+                     * - Add rare chance for bonus rewards
+                     * - Implement reward selection based on player progress
+                     */
                     const rewards = dungeon.rewards.slice(0, 2);
                     setDungeonRewards(rewards);
                     setBattleLog((prevLog) => [
@@ -145,11 +174,7 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
                         ...rewards.map(reward => `- ${reward}`)
                     ]);
                     
-                    setTimeout(() => {
-                        if (onExplorationComplete) {
-                            onExplorationComplete();
-                        }
-                    }, 5000);
+                    setDungeonCompleted(true);
                 }
             }
             return;
@@ -178,10 +203,16 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
         if (battleStarted) {
             const intervalId = setInterval(() => {
                 handleAttack();
-            }, 1000);
+            }, UPDATE_INTERVALS.BATTLE_ATTACK);
             return () => clearInterval(intervalId);
         }
     }, [battleStarted, enemyHP, playerHP]);
+
+    useEffect(() => {
+        if (dungeonCompleted && onExplorationComplete) {
+            onExplorationComplete();
+        }
+    }, [dungeonCompleted, onExplorationComplete]);
 
     return (
         <Grid container spacing={2}>
