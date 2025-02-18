@@ -16,6 +16,7 @@ import ExplorationArea from './areas/ExplorationArea';
 import EssenceDisplay from './EssenceDisplay';
 import './GameContainer.css';
 import { towns } from '../modules/data/towns'; // ⭐️ Import towns data
+import { DndContext } from '@dnd-kit/core'; // ⭐️ Import DndContext!
 
 const GameContainer = () => {
   // ⭐️ Get the ID of the first town
@@ -63,27 +64,29 @@ const GameContainer = () => {
   };
 
   return (
-    <Box className="game-container">
-      <Box id="header"><Header /></Box>
-      <Box id="main-content-area">{renderMainContent()}</Box> {/* Renamed ID */}
-      <Box id="world-map-area"> {/* World map area - ALWAYS shows WorldMap */}
-        <WorldMap
-          onTownSelect={handleTownSelect}
-          onDungeonSelect={(dungeonId, regionId) => {
-            setSelectedDungeon({ id: dungeonId, regionId });
-            setSelectedTownId(null);
-            setSelectedNpcId(null);
-            setIsExploring(false);
-          }}
-        />
+    <DndContext> {/* ⭐️ Opening DndContext - OUTSIDE */}
+      <Box className="game-container"> {/* ⭐️ Opening Box - INSIDE DndContext */}
+        <Box id="header"><Header /></Box>
+        <Box id="main-content-area">{renderMainContent()}</Box>
+        <Box id="world-map-area">
+          <WorldMap
+            onTownSelect={handleTownSelect}
+            onDungeonSelect={(dungeonId, regionId) => {
+              setSelectedDungeon({ id: dungeonId, regionId });
+              setSelectedTownId(null);
+              setSelectedNpcId(null);
+              setIsExploring(false);
+            }}
+          />
+        </Box>
+        <Box id="bottom-windows">
+          <PlayerStats />
+          <PlayerTraits />
+          <FactionContainer />
+        </Box>
+        <Footer /> {/* ⭐️ Closing Box - INSIDE DndContext */}
       </Box>
-      <Box id="bottom-windows">
-        <PlayerStats />
-        <PlayerTraits />
-        <FactionContainer />
-      </Box>
-      <Footer />
-    </Box>
+    </DndContext>
   );
 };
 
