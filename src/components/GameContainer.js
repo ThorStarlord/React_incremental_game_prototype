@@ -15,9 +15,12 @@ import TownArea from './areas/TownArea';
 import ExplorationArea from './areas/ExplorationArea';
 import EssenceDisplay from './EssenceDisplay';
 import './GameContainer.css';
+import { towns } from '../modules/data/towns'; // ⭐️ Import towns data
 
 const GameContainer = () => {
-  const [selectedTownId, setSelectedTownId] = useState(null);
+  // ⭐️ Get the ID of the first town
+  const firstTownId = towns[0]?.id;
+  const [selectedTownId, setSelectedTownId] = useState(firstTownId || null); // ⭐️ Initialize with first town
   const [selectedNpcId, setSelectedNpcId] = useState(null);
   const [selectedDungeon, setSelectedDungeon] = useState(null);
   const [isExploring, setIsExploring] = useState(false);
@@ -41,28 +44,29 @@ const GameContainer = () => {
     setIsExploring(false);
   };
 
-  const handleBackToRegions = () => {
+  const handleBackToWorldMap = () => { // ⭐️ New function to go back to World Map (TownArea -> WorldMap)
     setSelectedTownId(null);
     setSelectedNpcId(null);
     setSelectedDungeon(null);
     setIsExploring(false);
   };
 
+
   const renderMainContent = () => {
     if (isExploring || selectedDungeon) {
       return <ExplorationArea /* ... props ... */ />;
     }
     if (selectedTownId) {
-      return <TownArea /* ... props ... */ />;
+      return <TownArea townId={selectedTownId} onBack={handleBackToWorldMap} /* ... other props for TownArea ... */ />; // ⭐️ Pass onBack for TownArea
     }
-    return <WorldMap onTownSelect={handleTownSelect} onDungeonSelect={(dungeonId, regionId) => setSelectedDungeon({ id: dungeonId, regionId })} />;
+    return null; // ⭐️ renderMainContent now returns null if no Town or Dungeon is selected, NO WorldMap here!
   };
 
   return (
-    <Box className="game-container"> {/* Removed 'exploring' class from here */}
+    <Box className="game-container">
       <Box id="header"><Header /></Box>
-      <Box id="main-content">{renderMainContent()}</Box> {/* Main content area */}
-      <Box id="world-map-area"> {/* World map area */}
+      <Box id="main-content-area">{renderMainContent()}</Box> {/* Renamed ID */}
+      <Box id="world-map-area"> {/* World map area - ALWAYS shows WorldMap */}
         <WorldMap
           onTownSelect={handleTownSelect}
           onDungeonSelect={(dungeonId, regionId) => {
@@ -73,13 +77,12 @@ const GameContainer = () => {
           }}
         />
       </Box>
-      <Box id="bottom-windows"> {/* Bottom windows area */}
+      <Box id="bottom-windows">
         <PlayerStats />
         <PlayerTraits />
         <FactionContainer />
       </Box>
-      {/* Removed EssenceDisplay from direct placement, we can put it in PlayerStats or Header later */}
-      <Footer /> {/* Footer is now at the very bottom because of grid layout */}
+      <Footer />
     </Box>
   );
 };

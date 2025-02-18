@@ -3,89 +3,88 @@
 :root {
   --grid-gap: 20px;
   --padding: 24px;
-  --header-height: 80px; /* Example height for header */
+  --header-height: 80px;       /* Example height for header */
   --main-content-height: 400px; /* Example height for main content */
-  --world-map-height: 400px; /* Example height for world map */
+  --world-map-height: 400px;   /* Example height for world map */
 }
 
 .game-container {
   display: grid;
   grid-template-areas:
       "header"
-      "main-content"
+      "main-content-area"      /* Renamed area for clarity */
       "world-map-area"
-      "bottom-windows"; /* New area for bottom windows */
+      "bottom-windows";        /* Bottom windows area remains */
   grid-template-rows: var(--header-height) var(--main-content-height) var(--world-map-height) auto; /* Define row heights */
-  grid-template-columns: 1fr; /* Single column layout for these top sections */
+  grid-template-columns: 1fr; /* Single column layout */
   grid-gap: var(--grid-gap);
   padding: var(--padding);
-  height: 100vh; /* Full viewport height */
+  height: 100vh;             /* Full viewport height */
   max-width: 1400px;
   margin: 0 auto;
 }
 
 #header {
   grid-area: header;
-  position: fixed; /* ⭐️ Fixed position for header */
+  position: fixed;           /* Fixed header */
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100; /* Ensure header is on top of other content */
-  background-color: #f0f0f0; /* Example header background */
+  z-index: 100;
+  background-color: #f0f0f0;
   padding: 16px;
   text-align: center;
 }
 
-#main-content {
-  grid-area: main-content;
-  position: relative; /* Needed for absolute positioning of content within if needed */
-  background-color: #fff; /* Example main content background */
+#main-content-area {          /* Renamed ID to match grid area */
+  grid-area: main-content-area;
+  position: relative;
+  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  overflow: hidden; /* To contain content within */
+  overflow: auto;           /* Allow scrolling if content overflows */
   height: var(--main-content-height); /* Fixed height */
+  margin-top: var(--header-height); /* Push below fixed header */
 }
 
-#world-map-area { /* New area for world map */
+#world-map-area {
   grid-area: world-map-area;
-  display: flex; /* Use flexbox to center the world map */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically (if needed, based on world map's aspect ratio) */
-  background-color: #e0e0e0; /* Example world map area background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0e0e0;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: var(--world-map-height); /* Fixed height for world map area */
+  height: var(--world-map-height); /* Fixed height for world map */
+  margin-top: var(--main-content-height); /* Push below fixed main-content */
 }
 
-#world-map-area > .world-map-container { /* Target the WorldMap component */
-  height: 100%; /* Make WorldMap container fill the area */
-  width: 100%;  /* Make WorldMap container fill the area */
-  max-width: 800px; /* Example max width for the map itself */
-  max-height: 600px; /* Example max height for the map itself */
-  margin: auto; /* Center the map within its area if it's smaller */
+#world-map-area > .world-map-container {
+  height: 100%;
+  width: 100%;
+  max-width: 800px;
+  max-height: 600px;
+  margin: auto;
 }
 
-
-#bottom-windows { /* New area for draggable windows */
+#bottom-windows {
   grid-area: bottom-windows;
-  display: grid; /* Grid within a grid! For flexible window arrangement */
-  grid-template-columns: 1fr 1fr 1fr; /* Three columns for PlayerStats, Traits, Faction */
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-gap: var(--grid-gap);
+  margin-top: var(--world-map-height); /* Push below fixed world-map-area */
 }
 
-#player-stats { grid-area: auto; /* Let it flow into bottom-windows grid */ }
-#traits { grid-area: auto; /* Let it flow into bottom-windows grid */ }
-#faction { grid-area: auto; /* Let it flow into bottom-windows grid */ }
-#battle { grid-area: battle; /* Still use 'battle' area if needed elsewhere, or remove if not used outside main-content */ }
+#player-stats { grid-area: auto; }
+#traits { grid-area: auto; }
+#faction { grid-area: auto; }
+#battle { grid-area: battle; }
 #footer {
-  grid-area: footer; /* You can keep the footer or remove it if not needed in this layout */
+  grid-area: footer; /* If you still want a footer */
   text-align: center;
   background-color: #f0f0f0;
   padding: 10px;
+  margin-top: var(--bottom-windows-height); /* Push below bottom windows if needed */
 }
-
-/*  Remove media query for now, we're focusing on desktop layout first
-@media (max-width: 1024px) { ... }
-*/
