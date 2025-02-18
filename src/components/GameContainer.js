@@ -28,7 +28,6 @@ const GameContainer = () => {
         const essenceGain = calculateEssenceGeneration(affinities);
         dispatch({ type: 'GAIN_ESSENCE', payload: essenceGain });
       }, UPDATE_INTERVALS.ESSENCE_GENERATION);
-
       return () => clearInterval(interval);
     }
   }, [selectedTownId, affinities, dispatch]);
@@ -89,18 +88,27 @@ const GameContainer = () => {
   };
 
   return (
-    <Box className={`game-container ${isExploring ? 'exploring' : ''}`}>
-      <Header />
-      <PlayerStats />
-      <EssenceDisplay />
-      {renderMainContent()}
-      {!isExploring && (
-        <>
-          <PlayerTraits />
-          <FactionContainer />
-        </>
-      )}
-      <Footer />
+    <Box className="game-container"> {/* Removed 'exploring' class from here */}
+      <Box id="header"><Header /></Box>
+      <Box id="main-content">{renderMainContent()}</Box> {/* Main content area */}
+      <Box id="world-map-area"> {/* World map area */}
+        <WorldMap
+          onTownSelect={handleTownSelect}
+          onDungeonSelect={(dungeonId, regionId) => {
+            setSelectedDungeon({ id: dungeonId, regionId });
+            setSelectedTownId(null);
+            setSelectedNpcId(null);
+            setIsExploring(false);
+          }}
+        />
+      </Box>
+      <Box id="bottom-windows"> {/* Bottom windows area */}
+        <PlayerStats />
+        <PlayerTraits />
+        <FactionContainer />
+      </Box>
+      {/* Removed EssenceDisplay from direct placement, we can put it in PlayerStats or Header later */}
+      <Footer /> {/* Footer is now at the very bottom because of grid layout */}
     </Box>
   );
 };
