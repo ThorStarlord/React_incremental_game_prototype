@@ -48,3 +48,24 @@
 .draggable-item > * {
   padding-left: 24px;
 }
+
+.draggable-component {
+    user-select: none;
+    touch-action: none;
+    position: relative;
+    margin: 8px 0;
+}
+
+.draggable-component.dragging {
+    opacity: 0.5;
+    background: #f5f5f5;
+    border: 2px dashed #1976d2;
+}
+
+.draggable-component:hover {
+    cursor: grab;
+}
+
+.draggable-component:active {
+    cursor: grabbing;
+}

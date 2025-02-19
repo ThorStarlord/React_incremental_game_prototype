@@ -1,15 +1,26 @@
 .column {
-  padding: 16px;
-  height: 100%;
-  overflow-y: auto;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .column-paper {
-  padding: 16px;
+    height: 100%;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.world-map-wrapper {
+    flex: 1;
+    overflow: hidden;
+}
+
+#middle-column {
+    flex: 2; /* Makes middle column take up more space */
 }
 
 .battle-module {
-  margin-top: 16px;
-  padding: 16px;
-  background-color: #fff;
+    margin-top: 16px;
+    padding: 16px;
+    background-color: #fff;
 }

@@ -6,26 +6,23 @@ import { GameDispatchContext, GameStateContext } from '../context/GameStateConte
 import { calculateEssenceGeneration } from '../utils/soulResonanceUtils';
 import { UPDATE_INTERVALS } from '../config/gameConstants';
 import Header from './Header';
-import PlayerStats from './PlayerStats';
-import PlayerTraits from './PlayerTraits';
-import FactionContainer from './FactionUI/FactionContainer';
-import WorldMap from './panels/WorldMap';
-import TownArea from './areas/TownArea';
-import ExplorationArea from './areas/ExplorationArea';
-import SoulResonanceDisplay from './SoulResonanceDisplay'; // ⭐️ Import SoulResonanceDisplay
-import './GameContainer.css';
-import { towns } from '../modules/data/towns'; // ⭐️ Import towns data
-import { DndContext } from '@dnd-kit/core'; // ⭐️ Import DndContext!
+import { towns } from '../modules/data/towns';
+import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
+import { 
+  arrayMove, 
+  SortableContext, 
+  verticalListSortingStrategy,
+  horizontalListSortingStrategy
+} from '@dnd-kit/sortable';
 import LeftColumn from './LeftColumn';
 import MiddleColumn from './MiddleColumn';
 import RightColumn from './RightColumn';
-import DroppableColumn from './DroppableColumn'; // ⭐️ Import DroppableColumn
-import { saveLayout } from '../storage'; // ⭐️ Import saveLayout
+import { saveLayout } from '../storage';
+import './GameContainer.css';
 
 const GameContainer = () => {
-  // ⭐️ Get the ID of the first town
   const firstTownId = towns[0]?.id;
-  const [selectedTownId, setSelectedTownId] = useState(firstTownId || null); // ⭐️ Initialize with first town
+  const [selectedTownId, setSelectedTownId] = useState(firstTownId || null);
   const [selectedNpcId, setSelectedNpcId] = useState(null);
   const [selectedDungeon, setSelectedDungeon] = useState(null);
   const [isExploring, setIsExploring] = useState(false);
@@ -55,68 +52,61 @@ const GameContainer = () => {
     }
   }, [selectedTownId, affinities, dispatch]);
 
-  const handleTownSelect = (townId) => {
-    setSelectedTownId(townId);
-    setSelectedNpcId(null);
-    setSelectedDungeon(null);
-    setIsExploring(false);
-  };
-
-  const handleBackToWorldMap = () => { // ⭐️ New function to go back to World Map (TownArea -> WorldMap)
-    setSelectedTownId(null);
-    setSelectedNpcId(null);
-    setSelectedDungeon(null);
-    setIsExploring(false);
-  };
-
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (!over) return;
 
     const draggedComponent = active.id;
-    const newColumn = over.id;
+    const newColumn = over.data?.current?.sortable?.containerId || over.id;
 
     setColumnLayout((prev) => {
       const updatedColumns = { ...prev };
-
-      // Remove from previous column
-      Object.keys(updatedColumns).forEach((key) => {
-        updatedColumns[key] = updatedColumns[key].filter((comp) => comp !== draggedComponent);
-      });
-
-      // Add to new column
-      updatedColumns[newColumn].push(draggedComponent);
+      const sourceColumn = Object.keys(prev).find(key => 
+        prev[key].includes(draggedComponent)
+      );
+      
+      if (sourceColumn === newColumn) {
+        // If in same column, handle reordering
+        const oldIndex = prev[sourceColumn].indexOf(draggedComponent);
+        const newIndex = prev[sourceColumn].indexOf(over.id);
+        updatedColumns[sourceColumn] = arrayMove(
+          prev[sourceColumn],
+          oldIndex,
+          newIndex
+        );
+      } else {
+        // Move between columns
+        Object.keys(updatedColumns).forEach((key) => {
+          updatedColumns[key] = updatedColumns[key].filter(
+            (comp) => comp !== draggedComponent
+          );
+        });
+        updatedColumns[newColumn].push(draggedComponent);
+      }
 
       return updatedColumns;
     });
   };
 
-  const renderMainContent = () => {
-    return <MiddleColumn />;
-  };
-
   return (
-    <DndContext onDragEnd={handleDragEnd}> {/* ⭐️ Opening DndContext - OUTSIDE */}
-      <Box className="game-container"> {/* ⭐️ Opening Box - INSIDE DndContext */}
+    <DndContext 
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <Box className="game-container">
         <Box id="header"><Header /></Box>
-        <DroppableColumn id="left" components={columnLayout.left} />
-        <DroppableColumn id="middle" components={columnLayout.middle} />
-        <DroppableColumn id="right" components={columnLayout.right} />
-        <Box id="world-map-area">
-          <WorldMap
-            onTownSelect={handleTownSelect}
-            onDungeonSelect={(dungeonId, regionId) => {
-              setSelectedDungeon({ id: dungeonId, regionId });
-              setSelectedTownId(null);
-              setSelectedNpcId(null);
-              setIsExploring(false);
-            }}
-          />
-        </Box>
         <Box id="bottom-windows">
-          <LeftColumn />
-          <MiddleColumn />
-          <RightColumn />
+          <LeftColumn components={columnLayout.left} />
+          <MiddleColumn 
+            components={columnLayout.middle}
+            selectedTownId={selectedTownId}
+            selectedNpcId={selectedNpcId}
+            selectedDungeon={selectedDungeon}
+            isExploring={isExploring}
+            onTownSelect={setSelectedTownId}
+            onBackToWorldMap={() => setSelectedTownId(null)}
+          />
+          <RightColumn components={columnLayout.right} />
         </Box>
       </Box>
     </DndContext>

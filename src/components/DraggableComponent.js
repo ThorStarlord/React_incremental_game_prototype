@@ -1,5 +1,6 @@
 import React from 'react';
-import { useDraggable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import PlayerStats from './PlayerStats';
 import Battle from './Battle';
 import PlayerTraits from './PlayerTraits';
@@ -11,18 +12,26 @@ const componentMap = {
   PlayerTraits: <PlayerTraits />,
 };
 
-const DraggableComponent = ({ id }) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+const DraggableComponent = ({ id, children }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    cursor: 'grab',
+    opacity: isDragging ? 0.5 : 1
+  };
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={{ transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined }}
-      {...listeners}
-      {...attributes}
-      className="draggable-item"
-    >
-      {componentMap[id]}
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+      {children}
     </div>
   );
 };
