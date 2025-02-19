@@ -6,7 +6,6 @@ import { GameDispatchContext, GameStateContext } from '../context/GameStateConte
 import { calculateEssenceGeneration } from '../utils/soulResonanceUtils';
 import { UPDATE_INTERVALS } from '../config/gameConstants';
 import Header from './Header';
-import Footer from './Footer';
 import PlayerStats from './PlayerStats';
 import PlayerTraits from './PlayerTraits';
 import FactionContainer from './FactionUI/FactionContainer';
@@ -118,9 +117,6 @@ const GameContainer = () => {
           <LeftColumn />
           <MiddleColumn />
           <RightColumn />
-        </Box>
-        <Box id="footer">
-          <Footer />
         </Box>
       </Box>
     </DndContext>

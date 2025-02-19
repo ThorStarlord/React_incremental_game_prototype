@@ -104,14 +104,6 @@
 #faction { grid-area: auto; }
 #battle { grid-area: battle; }
 
-#footer {
-  grid-area: footer;
-  text-align: center;
-  background-color: #f0f0f0;
-  padding: 10px;
-  margin-top: var(--bottom-windows-height);
-}
-
 /* Content area styles */
 .content {
   background-color: #f5f5f5;
