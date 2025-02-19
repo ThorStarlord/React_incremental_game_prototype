@@ -20,6 +20,13 @@
     flex: 2; /* Makes middle column take up more space */
 }
 
+.main-content-container {
+    margin: 16px 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .battle-module {
     margin-top: 16px;
     padding: 16px;
@@ -27,3 +34,4 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+

@@ -4,8 +4,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import DraggableComponent from './DraggableComponent';
 import Battle from './Battle';
 import WorldMap from './panels/WorldMap';
-import TownArea from './areas/TownArea';
-import ExplorationArea from './areas/ExplorationArea';
+import MainContent from './MainContent';
 import './MiddleColumn.css';
 
 const MiddleColumn = ({ 
@@ -29,8 +28,18 @@ const MiddleColumn = ({
   return (
     <Box id="middle-column" className="column">
       <Paper elevation={3} className="column-paper">
-        <Typography variant="h6" align="center">Main Content</Typography>
+        <Typography variant="h6" align="center">Game World</Typography>
         
+        <Box className="main-content-container">
+          <MainContent 
+            selectedTownId={selectedTownId}
+            selectedNpcId={selectedNpcId}
+            selectedDungeon={selectedDungeon}
+            isExploring={isExploring}
+            onBackToWorldMap={onBackToWorldMap}
+          />
+        </Box>
+
         <Box className="world-map-wrapper">
           <WorldMap
             onTownSelect={onTownSelect}
