@@ -1,0 +1,11 @@
+.column {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-y: auto;
+  min-height: 300px;
+}
+
+.highlight {
+  background-color: #e0e0e0;
+}

@@ -20,6 +20,7 @@ import { DndContext } from '@dnd-kit/core'; // ⭐️ Import DndContext!
 import LeftColumn from './LeftColumn';
 import MiddleColumn from './MiddleColumn';
 import RightColumn from './RightColumn';
+import DroppableColumn from './DroppableColumn'; // ⭐️ Import DroppableColumn
 
 const GameContainer = () => {
   // ⭐️ Get the ID of the first town
@@ -30,6 +31,11 @@ const GameContainer = () => {
   const [isExploring, setIsExploring] = useState(false);
   const dispatch = useContext(GameDispatchContext);
   const { affinities } = useContext(GameStateContext);
+  const [columnLayout, setColumnLayout] = useState({
+    left: ['PlayerStats'],
+    middle: ['Battle'],
+    right: ['PlayerTraits']
+  });
 
   useEffect(() => {
     if (selectedTownId) {
@@ -55,15 +61,39 @@ const GameContainer = () => {
     setIsExploring(false);
   };
 
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const draggedComponent = active.id;
+    const newColumn = over.id;
+
+    setColumnLayout((prev) => {
+      const updatedColumns = { ...prev };
+
+      // Remove from previous column
+      Object.keys(updatedColumns).forEach((key) => {
+        updatedColumns[key] = updatedColumns[key].filter((comp) => comp !== draggedComponent);
+      });
+
+      // Add to new column
+      updatedColumns[newColumn].push(draggedComponent);
+
+      return updatedColumns;
+    });
+  };
+
   const renderMainContent = () => {
     return <MiddleColumn />;
   };
 
   return (
-    <DndContext> {/* ⭐️ Opening DndContext - OUTSIDE */}
+    <DndContext onDragEnd={handleDragEnd}> {/* ⭐️ Opening DndContext - OUTSIDE */}
       <Box className="game-container"> {/* ⭐️ Opening Box - INSIDE DndContext */}
         <Box id="header"><Header /></Box>
-        <Box id="main-content-area">{renderMainContent()}</Box>
+        <DroppableColumn id="left" components={columnLayout.left} />
+        <DroppableColumn id="middle" components={columnLayout.middle} />
+        <DroppableColumn id="right" components={columnLayout.right} />
         <Box id="world-map-area">
           <WorldMap
             onTownSelect={handleTownSelect}
