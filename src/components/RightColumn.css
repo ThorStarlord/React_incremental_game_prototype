@@ -1,0 +1,17 @@
+.column {
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.column-paper {
+  padding: 16px;
+}
+
+.faction-info {
+  margin-bottom: 16px;
+}
+
+.player-traits {
+  margin-top: 16px;
+}

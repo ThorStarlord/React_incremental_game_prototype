@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
 import { dungeons } from '../modules/data/dungeons';
 import { dungeonEnemies } from '../modules/data/dungeonEnemies';
@@ -75,6 +75,7 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
     const [dungeonProgress, setDungeonProgress] = useState(0);
     const [dungeonRewards, setDungeonRewards] = useState([]);
     const [dungeonCompleted, setDungeonCompleted] = useState(false);
+    const lastHpUpdate = useRef({ player: null, enemy: null });
 
     const dungeon = dungeonId ? dungeons.find(d => d.id === dungeonId) : null;
     const isDungeonBattle = !!dungeon;
@@ -105,26 +106,65 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
         setBattleStarted(true);
     };
 
+    const validateBattleState = (newHp, type, logEntry) => {
+        const lastUpdate = lastHpUpdate.current[type];
+        if (lastUpdate !== null && Math.abs(lastUpdate - newHp) > 100) {
+            console.warn(`Possible race condition detected in battle log:
+                Type: ${type}
+                Previous HP: ${lastUpdate}
+                New HP: ${newHp}
+                Log Entry: ${logEntry}
+            `);
+        }
+        lastHpUpdate.current[type] = newHp;
+    };
+
     const handleAttack = () => {
         if (!battleStarted || !currentMonster) return;
 
         /**
-         * @TECHNICAL_DEBT: Potential Race Condition in Battle Log
-         * The current implementation updates HP state and battle log entries separately,
-         * which could theoretically lead to race conditions where log entries don't perfectly
-         * match the game state. For the prototype phase, this is acceptable as it doesn't
-         * affect gameplay.
+         * @TECHNICAL_DEBT: Battle Log Race Conditions
          * 
-         * Future Enhancement:
-         * If log accuracy becomes crucial, consider:
-         * 1. Using a reducer to handle both HP and log updates atomically
-         * 2. Implementing a more robust logging system with timestamps
-         * 3. Batching state updates using useReducer or custom hook
+         * Current Implementation:
+         * - HP updates and battle log entries are handled as separate setState calls
+         * - This can lead to potential race conditions in React's batch updates
+         * - Log entries might not perfectly sync with actual game state
+         * 
+         * Current Status:
+         * - Acceptable for prototype phase since:
+         *   1. Visual delay is minimal due to React's batching
+         *   2. Core gameplay isn't affected
+         *   3. Battle outcome remains deterministic
+         * 
+         * Future Solutions (when log accuracy becomes crucial):
+         * 1. Atomic State Updates:
+         *    - Use useReducer to handle HP and log updates in a single action
+         *    - Example structure:
+         *      type BattleAction = {
+         *        type: 'ATTACK'
+         *        payload: {
+         *          damage: number,
+         *          newHp: number,
+         *          logEntry: string
+         *        }
+         *      }
+         * 
+         * 2. Robust Battle Log System:
+         *    - Implement timestamped entries
+         *    - Store battle state with each log entry
+         *    - Enable log replay/verification
+         * 
+         * 3. State Synchronization:
+         *    - Create a BattleState type combining HP and logs
+         *    - Update both in a single transaction
+         *    - Add verification layer between state updates
          */
 
         const playerDamage = Math.max(0, player.attack - currentMonster.defense);
         const newEnemyHP = Math.max(0, enemyHP - playerDamage);
         let logEntry = `${player.name} attacks ${currentMonster.name} for ${playerDamage} damage. ${currentMonster.name} HP: ${newEnemyHP}`;
+        
+        validateBattleState(newEnemyHP, 'enemy', logEntry);
         setBattleLog((prevLog) => [...prevLog, logEntry]);
         setEnemyHP(newEnemyHP);
 
@@ -183,6 +223,8 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
         const enemyDamage = Math.max(0, currentMonster.attack - player.defense);
         const newPlayerHP = Math.max(0, playerHP - enemyDamage);
         logEntry = `${currentMonster.name} attacks ${player.name} for ${enemyDamage} damage. ${player.name} HP: ${newPlayerHP}`;
+        
+        validateBattleState(newPlayerHP, 'player', logEntry);
         setBattleLog((prevLog) => [...prevLog, logEntry]);
         setPlayerHP(newPlayerHP);
 
@@ -198,6 +240,12 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
             }
         }
     };
+
+    useEffect(() => {
+        if (battleStarted) {
+            lastHpUpdate.current = { player: null, enemy: null };
+        }
+    }, [battleStarted]);
 
     useEffect(() => {
         if (battleStarted) {

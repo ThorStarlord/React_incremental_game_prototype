@@ -13,7 +13,7 @@ import FactionContainer from './FactionUI/FactionContainer';
 import WorldMap from './panels/WorldMap';
 import TownArea from './areas/TownArea';
 import ExplorationArea from './areas/ExplorationArea';
-import EssenceDisplay from './EssenceDisplay';
+import SoulResonanceDisplay from './SoulResonanceDisplay'; // ⭐️ Import SoulResonanceDisplay
 import './GameContainer.css';
 import { towns } from '../modules/data/towns'; // ⭐️ Import towns data
 import { DndContext } from '@dnd-kit/core'; // ⭐️ Import DndContext!

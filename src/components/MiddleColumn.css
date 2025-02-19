@@ -1,0 +1,15 @@
+.column {
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.column-paper {
+  padding: 16px;
+}
+
+.battle-module {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: #fff;
+}

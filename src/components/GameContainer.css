@@ -77,14 +77,44 @@
   margin-top: 16px;
 }
 
+/* Grid area assignments */
 #player-stats { grid-area: auto; }
 #traits { grid-area: auto; }
 #faction { grid-area: auto; }
 #battle { grid-area: battle; }
+
 #footer {
-  grid-area: footer; /* If you still want a footer */
+  grid-area: footer;
   text-align: center;
   background-color: #f0f0f0;
   padding: 10px;
-  margin-top: var(--bottom-windows-height); /* Push below bottom windows if needed */
+  margin-top: var(--bottom-windows-height);
+}
+
+/* Content area styles */
+.content {
+  background-color: #f5f5f5;
+  overflow-y: auto;
+}
+
+/* Responsive layout adjustments */
+@media (max-width: 768px) {
+  .game-container {
+    grid-template-areas: 
+      "header"
+      "main-content-area"
+      "world-map-area"
+      "bottom-windows";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  #bottom-windows {
+    grid-template-columns: 1fr; /* Stack columns on mobile */
+  }
+
+  #world-map-area {
+    height: auto; /* Allow map to be responsive */
+    min-height: var(--world-map-height);
+  }
 }

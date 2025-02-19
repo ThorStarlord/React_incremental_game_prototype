@@ -1,15 +1,17 @@
 import React, { useContext } from 'react';
+import { Box, Typography } from '@mui/material';
 import { GameStateContext } from '../context/GameStateContext';
-import { Typography, Box } from '@mui/material';
 
-const EssenceDisplay = () => {
-  const { essence } = useContext(GameStateContext);
-
-  return (
-    <Box>
-      <Typography variant="h6">Essence: {essence}</Typography>
-    </Box>
-  );
+const SoulResonanceDisplay = () => {
+    const { player } = useContext(GameStateContext);
+    
+    return (
+        <Box className="soul-resonance-display">
+            <Typography variant="h6">
+                Essence: {player.essence}
+            </Typography>
+        </Box>
+    );
 };
 
-export default EssenceDisplay;
+export default SoulResonanceDisplay;

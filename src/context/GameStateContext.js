@@ -1,6 +1,8 @@
-import React, { createContext, useReducer, useCallback, useContext } from 'react';
+import React, { createContext, useReducer, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { npcs } from '../modules/data/npcs';
 import { ESSENCE_COSTS, AFFINITY_LEVELS } from '../config/gameConstants';
+import { saveGame, loadGame } from '../storage';
+import { Snackbar, Alert } from '@mui/material';
 
 // Action Types
 const ACTION_TYPES = {
@@ -141,11 +143,54 @@ export const useFactions = () => {
   return factions;
 };
 
+// Debounce utility
+const debounce = (func, wait) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
 // Provider component
 export const GameProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(gameReducer, initialState);
+  const [loadError, setLoadError] = useState(null);
+  const [showLoadNotification, setShowLoadNotification] = useState(false);
 
-  // Memoized dispatch functions
+  // Initialize state with saved game data or default initial state
+  const [state, dispatch] = useReducer(gameReducer, null, () => {
+    try {
+      const savedGame = loadGame();
+      if (savedGame) {
+        setShowLoadNotification(true);
+        return savedGame;
+      }
+      return initialState;
+    } catch (err) {
+      setLoadError('Failed to load saved game. Starting new game...');
+      return initialState;
+    }
+  });
+
+  const [showSaveNotification, setShowSaveNotification] = useState(false);
+
+  // Create debounced save function
+  const debouncedSave = useMemo(
+    () => debounce((gameState) => {
+      const saved = saveGame(gameState);
+      if (saved) {
+        setShowSaveNotification(true);
+      }
+    }, 1000),
+    []
+  );
+
+  // Save game state when it changes
+  useEffect(() => {
+    debouncedSave(state);
+  }, [state, debouncedSave]);
+
+  // Memoized dispatch with save feedback
   const memoizedDispatch = useCallback((action) => {
     dispatch(action);
   }, []);
@@ -154,6 +199,35 @@ export const GameProvider = ({ children }) => {
     <GameStateContext.Provider value={state}>
       <GameDispatchContext.Provider value={memoizedDispatch}>
         {children}
+        <Snackbar
+          open={showSaveNotification}
+          autoHideDuration={2000}
+          onClose={() => setShowSaveNotification(false)}
+          message="Game saved"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        />
+        <Snackbar
+          open={showLoadNotification}
+          autoHideDuration={3000}
+          onClose={() => setShowLoadNotification(false)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert severity="success" onClose={() => setShowLoadNotification(false)}>
+            Game loaded successfully!
+          </Alert>
+        </Snackbar>
+        {loadError && (
+          <Snackbar
+            open={!!loadError}
+            autoHideDuration={5000}
+            onClose={() => setLoadError(null)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          >
+            <Alert severity="warning" onClose={() => setLoadError(null)}>
+              {loadError}
+            </Alert>
+          </Snackbar>
+        )}
       </GameDispatchContext.Provider>
     </GameStateContext.Provider>
   );
