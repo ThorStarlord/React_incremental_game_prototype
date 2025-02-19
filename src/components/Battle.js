@@ -16,7 +16,7 @@ import {
     Chip,
     Stack,
     Tooltip,
-    IconButton 
+    Paper
 } from '@mui/material';
 import './Battle.css';  // Updated import path
 
@@ -263,112 +263,148 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
     }, [dungeonCompleted, onExplorationComplete]);
 
     return (
-        <Grid container spacing={2}>
-            {isDungeonBattle && (
-                <Grid item xs={12}>
-                    <Box className="dungeon-progress">
-                        <Typography variant="h6">
-                            {dungeon.name} - Progress: {dungeonProgress}/{DUNGEON_BATTLES}
-                        </Typography>
-                        <Box className="dungeon-progress-bar">
-                            <div 
-                                className="dungeon-progress-fill" 
-                                style={{ width: `${(dungeonProgress / DUNGEON_BATTLES) * 100}%` }} 
-                            />
-                        </Box>
-                    </Box>
-                </Grid>
-            )}
-
-            <Grid item xs={12}>
-                <Box className="enemy-info">
-                    {!battleStarted ? (
-                        <div>
+        <Box sx={{
+            height: '100%',
+            overflow: 'auto',
+            p: 2,
+            bgcolor: 'background.paper',
+            borderRadius: 1
+        }}>
+            <Grid container spacing={2}>
+                {isDungeonBattle && (
+                    <Grid item xs={12}>
+                        <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
                             <Typography variant="h6">
-                                {isDungeonBattle ? `Choose your next opponent in ${dungeon.name}` : 'Select an Enemy'}
+                                {dungeon.name} - Progress: {dungeonProgress}/{DUNGEON_BATTLES}
                             </Typography>
-                            {availableEnemies && availableEnemies.length > 0 ? (
-                                <List>
-                                    {availableEnemies.map((enemy) => (
-                                        <EnemyDisplay
-                                            key={enemy.id}
-                                            enemy={enemy}
-                                            selected={selectedMonsterId === enemy.id}
-                                            onSelect={handleSelectMonster}
-                                            traits={traits}
-                                        />
-                                    ))}
-                                </List>
-                            ) : (
-                                <Typography>No enemies available!</Typography>
-                            )}
-                            <Button 
-                                variant="contained" 
-                                color="primary" 
-                                onClick={handleStartBattle}
-                                disabled={!selectedMonsterId}
-                                fullWidth
-                            >
-                                {isDungeonBattle ? 'Continue Exploration' : 'Start Battle'}
-                            </Button>
-                        </div>
-                    ) : (
-                        <div>
-                            <Typography variant="h6">Battle in Progress</Typography>
-                            <Box mb={2}>
-                                <Typography>
-                                    {player.name}: {playerHP} HP | {currentMonster.name}: {enemyHP} HP
-                                </Typography>
-                                {currentMonster.traits.length > 0 && (
-                                    <Stack direction="row" spacing={1} mt={1}>
-                                        {currentMonster.traits.map(traitId => {
-                                            const trait = traits.monsterTraits[traitId];
-                                            return (
-                                                <Tooltip key={traitId} title={trait.description}>
-                                                    <Chip
-                                                        size="small"
-                                                        label={trait.name}
-                                                        variant="outlined"
-                                                        color="secondary"
-                                                    />
-                                                </Tooltip>
-                                            );
-                                        })}
-                                    </Stack>
-                                )}
+                            <Box sx={{
+                                height: 10,
+                                bgcolor: 'grey.200',
+                                borderRadius: 5,
+                                mt: 1
+                            }}>
+                                <Box sx={{
+                                    height: '100%',
+                                    width: `${(dungeonProgress / DUNGEON_BATTLES) * 100}%`,
+                                    bgcolor: 'primary.main',
+                                    borderRadius: 5,
+                                    transition: 'width 0.3s ease'
+                                }} />
                             </Box>
-                        </div>
-                    )}
-                </Box>
-            </Grid>
+                        </Paper>
+                    </Grid>
+                )}
 
-            <Grid item xs={12}>
-                <Box className="battle-log">
-                    <Typography variant="h6">Battle Log</Typography>
-                    {battleLog.map((entry, index) => (
-                        <Typography key={index} variant="body2">{entry}</Typography>
-                    ))}
-                </Box>
-            </Grid>
-
-            {dungeonRewards.length > 0 && (
                 <Grid item xs={12}>
-                    <Box className="battle-rewards">
-                        <Typography variant="h6">Dungeon Rewards</Typography>
-                        <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
-                            {dungeonRewards.map((reward, index) => (
-                                <Chip
-                                    key={index}
-                                    label={reward}
-                                    color="success"
-                                    className="reward-chip"
-                                />
-                            ))}
-                        </Stack>
-                    </Box>
+                    <Paper elevation={1} sx={{ p: 2 }}>
+                        {!battleStarted ? (
+                            <Box>
+                                <Typography variant="h6" sx={{ mb: 2 }}>
+                                    {isDungeonBattle ? `Choose your next opponent in ${dungeon.name}` : 'Select an Enemy'}
+                                </Typography>
+                                {availableEnemies && availableEnemies.length > 0 ? (
+                                    <List sx={{ mb: 2 }}>
+                                        {availableEnemies.map((enemy) => (
+                                            <EnemyDisplay
+                                                key={enemy.id}
+                                                enemy={enemy}
+                                                selected={selectedMonsterId === enemy.id}
+                                                onSelect={handleSelectMonster}
+                                                traits={traits}
+                                            />
+                                        ))}
+                                    </List>
+                                ) : (
+                                    <Typography>No enemies available!</Typography>
+                                )}
+                                <Button 
+                                    variant="contained" 
+                                    color="primary" 
+                                    onClick={handleStartBattle}
+                                    disabled={!selectedMonsterId}
+                                    fullWidth
+                                >
+                                    {isDungeonBattle ? 'Continue Exploration' : 'Start Battle'}
+                                </Button>
+                            </Box>
+                        ) : (
+                            <Box>
+                                <Typography variant="h6" sx={{ mb: 2 }}>Battle in Progress</Typography>
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography>
+                                        {player.name}: {playerHP} HP | {currentMonster.name}: {enemyHP} HP
+                                    </Typography>
+                                    {currentMonster.traits.length > 0 && (
+                                        <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                                            {currentMonster.traits.map(traitId => {
+                                                const trait = traits.monsterTraits[traitId];
+                                                return (
+                                                    <Tooltip key={traitId} title={trait.description}>
+                                                        <Chip
+                                                            size="small"
+                                                            label={trait.name}
+                                                            variant="outlined"
+                                                            color="secondary"
+                                                        />
+                                                    </Tooltip>
+                                                );
+                                            })}
+                                        </Stack>
+                                    )}
+                                </Box>
+                            </Box>
+                        )}
+                    </Paper>
                 </Grid>
-            )}
-        </Grid>
+
+                <Grid item xs={12}>
+                    <Paper elevation={1} sx={{ 
+                        p: 2,
+                        maxHeight: 200,
+                        overflow: 'auto'
+                    }}>
+                        <Typography variant="h6" sx={{ mb: 1 }}>Battle Log</Typography>
+                        <Box sx={{ 
+                            display: 'flex',
+                            flexDirection: 'column-reverse'
+                        }}>
+                            {battleLog.map((entry, index) => (
+                                <Typography 
+                                    key={index} 
+                                    variant="body2" 
+                                    sx={{ mb: 0.5 }}
+                                >
+                                    {entry}
+                                </Typography>
+                            ))}
+                        </Box>
+                    </Paper>
+                </Grid>
+
+                {dungeonRewards.length > 0 && (
+                    <Grid item xs={12}>
+                        <Paper elevation={1} sx={{ p: 2 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }}>Dungeon Rewards</Typography>
+                            <Stack 
+                                direction="row" 
+                                spacing={1} 
+                                justifyContent="center" 
+                                flexWrap="wrap"
+                                sx={{ gap: 1 }}
+                            >
+                                {dungeonRewards.map((reward, index) => (
+                                    <Chip
+                                        key={index}
+                                        label={reward}
+                                        color="success"
+                                    />
+                                ))}
+                            </Stack>
+                        </Paper>
+                    </Grid>
+                )}
+            </Grid>
+        </Box>
     );
 };
 

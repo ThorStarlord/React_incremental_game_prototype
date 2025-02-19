@@ -1,0 +1,32 @@
+/* Shared variables */
+:root {
+  --primary-spacing: 1rem;
+  --secondary-spacing: 0.75rem;
+  --border-radius: 0.5rem;
+  --border-color: #e0e0e0;
+  --background-light: #f9f9f9;
+}
+
+/* Shared layout styles */
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexGrow {
+  flex: 1;
+}
+
+/* Shared component styles */
+.card {
+  background: var(--background-light);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  padding: var(--primary-spacing);
+  margin-bottom: var(--primary-spacing);
+}
+
+.container {
+  padding: var(--primary-spacing);
+  background: white;
+}

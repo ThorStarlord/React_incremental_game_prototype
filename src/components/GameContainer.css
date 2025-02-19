@@ -5,65 +5,76 @@
   --padding: 24px;
   --header-height: 80px;
   --main-content-height: 600px;
+  --column-width: 180px;  /* Even narrower side columns */
+  --middle-max-width: 900px;
+  --component-height: 250px;
 }
 
 .game-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
 }
 
 #header {
   flex: 0 0 auto;
-  grid-area: header;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background-color: #f0f0f0;
   padding: 16px;
-  text-align: center;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 #bottom-windows {
   display: flex;
-  flex: 1;
   gap: 16px;
   padding: 16px;
-}
-
-#bottom-windows > * {
   flex: 1;
-  min-width: 0; /* Prevents flex items from overflowing */
 }
 
-#left {
+#bottom-windows > :first-child,
+#bottom-windows > :last-child {
+  width: 200px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+#bottom-windows > :nth-child(2) {
+  flex: 1;
+  max-width: 900px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+#left-column {
   grid-area: left;
-  background: var(--column-bg, #f9f9f9);
+  background: #f9f9f9;
   border-radius: 8px;
-  padding: 16px;
+  border: 1px solid #e0e0e0;
+  overflow-y: auto;
 }
 
-#middle {
+#middle-column {
   grid-area: middle;
-  background: var(--column-bg, #f9f9f9);
+  background: #f9f9f9;
   border-radius: 8px;
-  padding: 16px;
+  border: 1px solid #e0e0e0;
+  overflow-y: auto;
 }
 
-#right {
+#right-column {
   grid-area: right;
-  background: var(--column-bg, #f9f9f9);
+  background: #f9f9f9;
   border-radius: 8px;
-  padding: 16px;
+  border: 1px solid #e0e0e0;
+  overflow-y: auto;
 }
 
 .column {
   background: #f9f9f9;
-  padding: 16px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 6px;
   border: 1px solid #e0e0e0;
   overflow-y: auto;
   transition: background-color 0.2s ease;
@@ -72,6 +83,14 @@
 .column.highlight {
   background-color: #e3f2fd;
   border: 1px dashed #1976d2;
+}
+
+.column-paper {
+  height: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 @media (max-width: 768px) {

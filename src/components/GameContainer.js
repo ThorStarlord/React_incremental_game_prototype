@@ -7,18 +7,12 @@ import { calculateEssenceGeneration } from '../utils/soulResonanceUtils';
 import { UPDATE_INTERVALS } from '../config/gameConstants';
 import Header from './Header';
 import { towns } from '../modules/data/towns';
-import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
-  verticalListSortingStrategy,
-  horizontalListSortingStrategy
-} from '@dnd-kit/sortable';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
 import LeftColumn from './LeftColumn';
 import MiddleColumn from './MiddleColumn';
 import RightColumn from './RightColumn';
 import { saveLayout } from '../storage';
-import './GameContainer.css';
 
 const GameContainer = () => {
   const firstTownId = towns[0]?.id;
@@ -93,20 +87,44 @@ const GameContainer = () => {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <Box className="game-container">
-        <Box id="header"><Header /></Box>
-        <Box id="bottom-windows">
-          <LeftColumn components={columnLayout.left} />
-          <MiddleColumn 
-            components={columnLayout.middle}
-            selectedTownId={selectedTownId}
-            selectedNpcId={selectedNpcId}
-            selectedDungeon={selectedDungeon}
-            isExploring={isExploring}
-            onTownSelect={setSelectedTownId}
-            onBackToWorldMap={() => setSelectedTownId(null)}
-          />
-          <RightColumn components={columnLayout.right} />
+      <Box 
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          bgcolor: 'background.default',
+          overflowX: 'hidden' // Prevent horizontal scroll
+        }}
+      >
+        <Box sx={{ flex: '0 0 auto' }}>
+          <Header />
+        </Box>
+        <Box 
+          sx={{
+            display: 'flex',
+            flex: 1,
+            gap: 2,
+            p: 2,
+            alignItems: 'stretch'
+          }}
+        >
+          <Box sx={{ width: 200 }}>
+            <LeftColumn components={columnLayout.left} />
+          </Box>
+          <Box sx={{ flex: 1, maxWidth: 900, mx: 'auto' }}>
+            <MiddleColumn 
+              components={columnLayout.middle}
+              selectedTownId={selectedTownId}
+              selectedNpcId={selectedNpcId}
+              selectedDungeon={selectedDungeon}
+              isExploring={isExploring}
+              onTownSelect={setSelectedTownId}
+              onBackToWorldMap={() => setSelectedTownId(null)}
+            />
+          </Box>
+          <Box sx={{ width: 200 }}>
+            <RightColumn components={columnLayout.right} />
+          </Box>
         </Box>
       </Box>
     </DndContext>

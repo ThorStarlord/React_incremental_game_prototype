@@ -2,7 +2,6 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import TownArea from './areas/TownArea';
 import ExplorationArea from './areas/ExplorationArea';
-import './MainContent.css';
 
 const MainContent = ({ 
   selectedTownId, 
@@ -32,8 +31,35 @@ const MainContent = ({
   };
 
   return (
-    <Box id="main-content-area-dynamic" className="main-content">
-      {renderGameContent()}
+    <Box 
+      id="main-content-area-dynamic" 
+      sx={{
+        height: '100%',
+        overflowY: 'hidden',
+        position: 'relative'
+      }}
+    >
+      <Box 
+        sx={{
+          p: 2.5,
+          border: 1,
+          borderStyle: 'dashed',
+          borderColor: 'grey.400',
+          borderRadius: 1,
+          bgcolor: 'background.paper',
+          mb: 2.5,
+          flex: 1,
+          minHeight: 200,
+          maxHeight: 300,
+          maxWidth: 700,
+          display: 'flex',
+          flexDirection: 'column',
+          mx: 'auto',
+          overflow: 'hidden',
+        }}
+      >
+        {renderGameContent()}
+      </Box>
     </Box>
   );
 };

@@ -1,51 +1,81 @@
 import React, { useContext } from 'react';
-import { useDraggable } from '@dnd-kit/core'; // ⭐️ Import useDraggable
+import { Box, Typography, Paper, Chip, Stack } from '@mui/material';
+import { useDraggable } from '@dnd-kit/core';
 import { GameStateContext } from '../context/GameStateContext';
-import './PlayerTraits.css';
 
 const PlayerTraits = () => {
   const { player, traits } = useContext(GameStateContext);
 
-  // ⭐️ Draggable setup for PlayerTraits itself
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: 'player-traits-window', // Unique ID for this draggable
-    data: { type: 'window', windowType: 'player-traits' } // Data to identify this window
+    id: 'player-traits-window',
+    data: { type: 'window', windowType: 'player-traits' }
   });
-
-  const draggableStyle = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
 
   const renderAcquiredTraits = () => {
     if (!player.acquiredTraits.length) {
-      return <p className="no-traits">No traits acquired yet</p>;
+      return (
+        <Typography color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+          No traits acquired yet
+        </Typography>
+      );
     }
 
     return player.acquiredTraits.map(traitId => {
       const trait = traits.copyableTraits[traitId];
       return (
-        <div key={traitId} className="trait-item">
-          <h4>{trait.name}</h4>
-          <p className="trait-description">{trait.description}</p>
-          <span className="trait-type">{trait.type}</span>
-        </div>
+        <Paper
+          key={traitId}
+          elevation={1}
+          sx={{
+            p: 1.5,
+            mb: 1,
+            '&:last-child': { mb: 0 },
+            border: '1px solid',
+            borderColor: 'divider'
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ mb: 0.5 }}>
+            {trait.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            {trait.description}
+          </Typography>
+          <Chip
+            size="small"
+            label={trait.type}
+            color="primary"
+            variant="outlined"
+          />
+        </Paper>
       );
     });
   };
 
   return (
-    <div
-      ref={setNodeRef} // ⭐️ Attach ref to the main div
-      style={draggableStyle} // ⭐️ Apply draggable style
-      {...listeners} // ⭐️ Attach listeners for drag events
-      {...attributes} // ⭐️ Attach accessibility attributes
-      className="player-traits"
+    <Box
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      sx={{
+        p: 2,
+        bgcolor: 'background.paper',
+        borderRadius: 1,
+        width: '100%',
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        transition: 'transform 0.2s ease'
+      }}
     >
-      <h3>Acquired Traits</h3>
-      <div className="traits-list">
+      <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
+        Acquired Traits
+      </Typography>
+      <Box sx={{ 
+        mt: 2,
+        maxHeight: '300px',
+        overflow: 'auto'
+      }}>
         {renderAcquiredTraits()}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

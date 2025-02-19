@@ -1,16 +1,27 @@
-.main-content {
-    padding: 20px;
-    border: 1px dashed #aaa;
-    border-radius: 8px;
-    background-color: #fafafa;
-    margin-bottom: 20px;
-    flex: 1;
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-}
+import { makeStyles } from '@mui/styles';
 
-#main-content-area-dynamic {
-    height: 100%;
-    overflow-y: auto;
-}
+const useStyles = makeStyles((theme) => ({
+  mainContent: {
+    padding: theme.spacing(2.5),
+    border: `1px dashed ${theme.palette.grey[400]}`,
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: theme.palette.background.paper,
+    marginBottom: theme.spacing(2.5),
+    flex: 1,
+    minHeight: 200,
+    maxHeight: 300,
+    maxWidth: 700,
+    display: 'flex',
+    flexDirection: 'column',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    overflow: 'hidden',
+  },
+  mainContentAreaDynamic: {
+    height: '100%',
+    overflowY: 'hidden',
+    position: 'relative',
+  },
+}));
+
+export default useStyles;

@@ -5,7 +5,8 @@ import DraggableComponent from './DraggableComponent';
 import Battle from './Battle';
 import WorldMap from './panels/WorldMap';
 import MainContent from './MainContent';
-import './MiddleColumn.css';
+import styles from './styles/MiddleColumn.module.css';
+import sharedStyles from './styles/shared.module.css';
 
 const MiddleColumn = ({ 
   components,
@@ -26,11 +27,31 @@ const MiddleColumn = ({
   };
 
   return (
-    <Box id="middle-column" className="column">
-      <Paper elevation={3} className="column-paper">
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Paper 
+        sx={{ 
+          p: 2,
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          bgcolor: 'background.default',
+          overflow: 'visible'
+        }} 
+        elevation={3}
+      >
         <Typography variant="h6" align="center">Game World</Typography>
         
-        <Box className="main-content-container">
+        <Box sx={{ 
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          overflow: 'visible',
+          mb: 2
+        }}>
           <MainContent 
             selectedTownId={selectedTownId}
             selectedNpcId={selectedNpcId}
@@ -40,7 +61,14 @@ const MiddleColumn = ({
           />
         </Box>
 
-        <Box className="world-map-wrapper">
+        <Box sx={{ 
+          flex: 1,
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          overflow: 'visible',
+          mb: 2
+        }}>
           <WorldMap
             onTownSelect={onTownSelect}
             onDungeonSelect={(dungeonId, regionId) => {
@@ -54,11 +82,13 @@ const MiddleColumn = ({
           items={components}
           strategy={verticalListSortingStrategy}
         >
-          {components.map((componentId) => (
-            <DraggableComponent key={componentId} id={componentId}>
-              {renderComponent(componentId)}
-            </DraggableComponent>
-          ))}
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {components.map((componentId) => (
+              <DraggableComponent key={componentId} id={componentId}>
+                {renderComponent(componentId)}
+              </DraggableComponent>
+            ))}
+          </Box>
         </SortableContext>
       </Paper>
     </Box>
