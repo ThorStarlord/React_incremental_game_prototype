@@ -3,20 +3,18 @@
 :root {
   --grid-gap: 20px;
   --padding: 24px;
-  --header-height: 80px;       /* Example height for header */
-  --main-content-height: 400px; /* Example height for main content */
-  --world-map-height: 400px;   /* Example height for world map */
+  --header-height: 80px;
+  --main-content-height: 600px;
 }
 
 .game-container {
   display: grid;
   grid-template-areas:
       "header header header"
-      "draggable-left draggable-middle draggable-right"
-      "world-map world-map world-map"
-      "bottom-left bottom-middle bottom-right";
+      "left middle right"
+      "footer footer footer";
   grid-template-columns: 1fr 2fr 1fr;
-  grid-template-rows: auto minmax(300px, auto) auto auto;
+  grid-template-rows: auto 1fr auto;
   gap: var(--grid-gap);
   padding: var(--padding);
   height: 100vh;
@@ -26,7 +24,7 @@
 
 #header {
   grid-area: header;
-  position: fixed;           /* Fixed header */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -36,87 +34,37 @@
   text-align: center;
 }
 
-#main-content-area {          /* Renamed ID to match grid area */
-  grid-area: main-content-area;
-  position: relative;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  overflow: auto;           /* Allow scrolling if content overflows */
-  height: var(--main-content-height); /* Fixed height */
-  margin-top: var(--header-height); /* Push below fixed header */
-}
-
-#world-map-area {
-  grid-area: world-map;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #e0e0e0;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: var(--world-map-height); /* Fixed height for world map */
-  margin-top: var(--main-content-height); /* Push below fixed main-content */
-}
-
-#world-map-area > .world-map-container {
-  height: 100%;
-  width: 100%;
-  max-width: 800px;
-  max-height: 600px;
-  margin: auto;
-}
-
-#bottom-windows {
-  grid-area: bottom-left / bottom-left / bottom-right / bottom-right;
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 16px;
-  margin-top: 16px;
-}
-
-#left { 
-  grid-area: draggable-left;
+#left {
+  grid-area: left;
   background: var(--column-bg, #f9f9f9);
   border-radius: 8px;
   padding: 16px;
 }
 
-#middle { 
-  grid-area: draggable-middle;
+#middle {
+  grid-area: middle;
   background: var(--column-bg, #f9f9f9);
   border-radius: 8px;
   padding: 16px;
 }
 
-#right { 
-  grid-area: draggable-right;
+#right {
+  grid-area: right;
   background: var(--column-bg, #f9f9f9);
   border-radius: 8px;
   padding: 16px;
 }
 
-/* Grid area assignments */
-#player-stats { grid-area: auto; }
-#traits { grid-area: auto; }
-#faction { grid-area: auto; }
-#battle { grid-area: battle; }
-
-/* Content area styles */
-.content {
-  background-color: #f5f5f5;
-  overflow-y: auto;
+#footer {
+  grid-area: footer;
 }
 
-/* Draggable columns */
 .column {
   background: #f9f9f9;
   padding: 16px;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
-  min-height: 300px;
+  overflow-y: auto;
   transition: background-color 0.2s ease;
 }
 
@@ -125,28 +73,15 @@
   border: 1px dashed #1976d2;
 }
 
-/* Responsive layout adjustments */
 @media (max-width: 768px) {
   .game-container {
     grid-template-areas: 
       "header"
-      "draggable-left"
-      "draggable-middle"
-      "draggable-right"
-      "world-map"
-      "bottom-left"
-      "bottom-middle"
-      "bottom-right";
+      "left"
+      "middle"
+      "right"
+      "footer";
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-  }
-
-  #bottom-windows {
-    grid-template-columns: 1fr; /* Stack columns on mobile */
-  }
-
-  #world-map-area {
-    height: auto; /* Allow map to be responsive */
-    min-height: var(--world-map-height);
   }
 }
