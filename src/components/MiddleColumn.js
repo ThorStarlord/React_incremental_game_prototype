@@ -17,29 +17,6 @@ const MiddleColumn = ({
   onTownSelect, 
   onBackToWorldMap 
 }) => {
-  const renderGameContent = () => {
-    if (isExploring || selectedDungeon) {
-      return <ExplorationArea />;
-    }
-    if (selectedTownId) {
-      return <TownArea
-        townId={selectedTownId}
-        selectedNpcId={selectedNpcId}
-        onBack={onBackToWorldMap}
-      />;
-    }
-    return (
-      <Box className="world-map-wrapper">
-        <WorldMap
-          onTownSelect={onTownSelect}
-          onDungeonSelect={(dungeonId, regionId) => {
-            console.log("Dungeon Selected:", dungeonId, regionId);
-          }}
-        />
-      </Box>
-    );
-  };
-
   const renderComponent = (componentId) => {
     switch (componentId) {
       case 'Battle':
@@ -53,7 +30,16 @@ const MiddleColumn = ({
     <Box id="middle-column" className="column">
       <Paper elevation={3} className="column-paper">
         <Typography variant="h6" align="center">Main Content</Typography>
-        {renderGameContent()}
+        
+        <Box className="world-map-wrapper">
+          <WorldMap
+            onTownSelect={onTownSelect}
+            onDungeonSelect={(dungeonId, regionId) => {
+              console.log("Dungeon Selected:", dungeonId, regionId);
+            }}
+          />
+        </Box>
+
         <SortableContext 
           id="middle"
           items={components}
