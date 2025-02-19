@@ -21,6 +21,7 @@ import LeftColumn from './LeftColumn';
 import MiddleColumn from './MiddleColumn';
 import RightColumn from './RightColumn';
 import DroppableColumn from './DroppableColumn'; // ⭐️ Import DroppableColumn
+import { saveLayout } from '../storage'; // ⭐️ Import saveLayout
 
 const GameContainer = () => {
   // ⭐️ Get the ID of the first town
@@ -31,11 +32,19 @@ const GameContainer = () => {
   const [isExploring, setIsExploring] = useState(false);
   const dispatch = useContext(GameDispatchContext);
   const { affinities } = useContext(GameStateContext);
-  const [columnLayout, setColumnLayout] = useState({
-    left: ['PlayerStats'],
-    middle: ['Battle'],
-    right: ['PlayerTraits']
+  const [columnLayout, setColumnLayout] = useState(() => {
+    const savedLayout = localStorage.getItem('incremental_rpg_layout');
+    return savedLayout ? JSON.parse(savedLayout) : {
+      left: ['PlayerStats'],
+      middle: ['Battle'],
+      right: ['PlayerTraits']
+    };
   });
+
+  // Save layout when it changes
+  useEffect(() => {
+    saveLayout(columnLayout);
+  }, [columnLayout]);
 
   useEffect(() => {
     if (selectedTownId) {

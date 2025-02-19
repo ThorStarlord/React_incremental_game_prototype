@@ -1,9 +1,18 @@
-// Enhanced storage management for game state
+// Storage utilities for game state
 export const saveGame = (gameState) => {
   try {
     // Validate gameState before saving
     if (!gameState || typeof gameState !== 'object') {
       throw new Error('Invalid game state');
+    }
+
+    // Add UI layout to the saved state
+    const layoutState = localStorage.getItem('incremental_rpg_layout');
+    if (layoutState) {
+      gameState.ui = {
+        ...gameState.ui,
+        columnLayout: JSON.parse(layoutState)
+      };
     }
 
     const serializedState = JSON.stringify(gameState);
@@ -26,6 +35,16 @@ export const saveGame = (gameState) => {
   }
 };
 
+export const saveLayout = (columnLayout) => {
+  try {
+    localStorage.setItem('incremental_rpg_layout', JSON.stringify(columnLayout));
+    return true;
+  } catch (err) {
+    console.error('Failed to save layout:', err);
+    return false;
+  }
+};
+
 export const loadGame = () => {
   try {
     const serializedState = localStorage.getItem('incremental_rpg_save');
@@ -42,6 +61,15 @@ export const loadGame = () => {
     if (missingProperties.length > 0) {
       console.error(`Corrupted save file detected. Missing properties: ${missingProperties.join(', ')}`);
       throw new Error('Corrupted save file');
+    }
+
+    // Load UI layout if available
+    const layoutState = localStorage.getItem('incremental_rpg_layout');
+    if (layoutState) {
+      state.ui = {
+        ...state.ui,
+        columnLayout: JSON.parse(layoutState)
+      };
     }
 
     // Validate save file timestamp
