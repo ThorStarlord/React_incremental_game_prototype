@@ -1,7 +1,5 @@
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import DraggableComponent from './DraggableComponent';
 import Battle from './Battle';
 import WorldMap from './panels/WorldMap';
 import MainContent from './MainContent';
@@ -77,19 +75,13 @@ const MiddleColumn = ({
           />
         </Box>
 
-        <SortableContext 
-          id="middle"
-          items={components}
-          strategy={verticalListSortingStrategy}
-        >
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {components.map((componentId) => (
-              <DraggableComponent key={componentId} id={componentId}>
-                {renderComponent(componentId)}
-              </DraggableComponent>
-            ))}
-          </Box>
-        </SortableContext>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {components.map((componentId) => (
+            <div key={componentId}>
+              {renderComponent(componentId)}
+            </div>
+          ))}
+        </Box>
       </Paper>
     </Box>
   );

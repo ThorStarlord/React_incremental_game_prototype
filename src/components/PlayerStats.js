@@ -1,13 +1,9 @@
 import React, { useContext, useState } from 'react';
-import { Box, Typography, CardHeader, Card, CardContent, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Box, Typography, Card, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { DndContext, DragOverlay } from '@dnd-kit/core';
-import { useDraggable } from '@dnd-kit/core';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
-import DraggableStatPoint from './DraggableStatPoint';
-import DroppableStat from './DroppableStat';
 import './PlayerStats.css';
 
 const PlayerStats = () => {
@@ -19,10 +15,8 @@ const PlayerStats = () => {
 
   const handleDragEnd = ({ active, over }) => {
     if (!over) return;
-
     const statId = over.id;
     let upgradeSuccessful = false;
-
     switch(statId) {
       case 'attack':
         if (player.statPoints > 0) {
@@ -68,30 +62,25 @@ const PlayerStats = () => {
     }
   };
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: 'player-stats-window',
-    data: { type: 'window', windowType: 'player-stats' }
-  });
-
-  const draggableStyle = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
-
   return (
-    <ResizableBox
-      width={width}
-      height={height}
-      minConstraints={[200, 150]}
-      maxConstraints={[600, 400]}
-      onResize={(e, data) => {
-        setWidth(data.size.width);
-        setHeight(data.size.height);
-      }}
-    >
+    // Commenting out the ResizableBox wrapper as well if you suspect conflicts.
+    // <ResizableBox
+    //   width={width}
+    //   height={height}
+    //   minConstraints={[200, 150]}
+    //   maxConstraints={[600, 400]}
+    //   onResize={(e, data) => {
+    //     setWidth(data.size.width);
+    //     setHeight(data.size.height);
+    //   }}
+    // >
       <Card sx={{ width: '100%', height: '100%' }}>
         <Accordion
           expanded={expanded}
-          onChange={() => setExpanded(!expanded)}
+          onChange={() => {
+              console.log("Accordion onChange triggered, expanded:", !expanded);
+              setExpanded(!expanded);
+          }}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -105,10 +94,6 @@ const PlayerStats = () => {
             <Typography variant="h6">Player Stats</Typography>
           </AccordionSummary>
           <AccordionDetails
-            ref={setNodeRef}
-            style={draggableStyle}
-            {...listeners}
-            {...attributes}
             sx={{
               p: 2,
               borderRadius: 1,
@@ -121,6 +106,8 @@ const PlayerStats = () => {
               Name: {player.name}
             </Typography>
             
+            {/* Commenting out drag and drop related components */}
+            {/*
             <DndContext onDragEnd={handleDragEnd}>
               <Box sx={{ mb: 2 }}>
                 <DraggableStatPoint statPoints={player.statPoints} />
@@ -150,7 +137,6 @@ const PlayerStats = () => {
                   isActive={player.statPoints > 0}
                 />
               </Box>
-
               <DragOverlay>
                 {active => {
                   if (active?.id === 'stat-points') {
@@ -164,6 +150,14 @@ const PlayerStats = () => {
                 }}
               </DragOverlay>
             </DndContext>
+            */}
+            
+            {/* You can add non-drag related content here */}
+            <Box>
+              <Typography>HP: {player.hp}</Typography>
+              <Typography>Attack: {player.attack}</Typography>
+              <Typography>Defense: {player.defense}</Typography>
+            </Box>
 
             <div className="other-stats">
               <p>Essence: {player.essence}</p>
@@ -172,7 +166,7 @@ const PlayerStats = () => {
           </AccordionDetails>
         </Accordion>
       </Card>
-    </ResizableBox>
+    // </ResizableBox>
   );
 };
 
