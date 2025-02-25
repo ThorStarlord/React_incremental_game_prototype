@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useState, useContext } from 'react';
+import { Box, Typography, useTheme } from '@mui/material';
 import RegionDetailsModal from './RegionDetailsModal';
 import { regions, towns } from '../modules/data';
 
 const WorldMap = ({ onTownSelect }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState(null);
+  const theme = useTheme();
 
   const handleRegionClick = (regionId) => {
     setSelectedRegion(regionId);
     setModalOpen(true);
+  };
+
+  const getRegionColor = (regionType) => {
+    const colors = {
+      forest: theme.palette.mode === 'dark' ? '#2e7d32' : '#4CAF50',
+      mountain: theme.palette.mode === 'dark' ? '#5d4037' : '#795548',
+      desert: theme.palette.mode === 'dark' ? '#fdd835' : '#FFD700',
+      default: theme.palette.grey[500]
+    };
+    return colors[regionType] || colors.default;
   };
 
   return (
@@ -28,22 +39,17 @@ const WorldMap = ({ onTownSelect }) => {
                 height={region.mapCoordinates.height}
                 onClick={() => handleRegionClick(region.id)}
                 style={{
-                  fill: region.type === 'forest' ? '#4CAF50' : 
-                        region.type === 'mountain' ? '#795548' : 
-                        region.type === 'desert' ? '#FFD700' : '#90A4AE',
+                  fill: getRegionColor(region.type),
                   cursor: 'pointer',
                   transition: 'opacity 0.2s',
                   opacity: 0.8,
-                  '&:hover': {
-                    opacity: 1
-                  }
                 }}
               />
               <text
                 x={region.mapCoordinates.x + region.mapCoordinates.width / 2}
                 y={region.mapCoordinates.y + region.mapCoordinates.height / 2}
                 textAnchor="middle"
-                fill="white"
+                fill={theme.palette.mode === 'dark' ? '#fff' : '#000'}
                 style={{ pointerEvents: 'none' }}
               >
                 {region.name}
@@ -59,7 +65,7 @@ const WorldMap = ({ onTownSelect }) => {
               cx={town.mapCoordinates.x}
               cy={town.mapCoordinates.y}
               r={5}
-              fill="red"
+              fill={theme.palette.error.main}
               onClick={() => onTownSelect(town.id)}
               style={{ cursor: 'pointer' }}
             />

@@ -1,37 +1,33 @@
-// Storage utilities for game state
+/**
+ * Save game state to local storage
+ * @param {Object} gameState - The game state to save
+ * @returns {boolean} - Whether the save was successful
+ */
 export const saveGame = (gameState) => {
   try {
-    // Validate gameState before saving
-    if (!gameState || typeof gameState !== 'object') {
-      throw new Error('Invalid game state');
-    }
-
-    // Add UI layout to the saved state
-    const layoutState = localStorage.getItem('incremental_rpg_layout');
-    if (layoutState) {
-      gameState.ui = {
-        ...gameState.ui,
-        columnLayout: JSON.parse(layoutState)
-      };
-    }
-
     const serializedState = JSON.stringify(gameState);
-    if (serializedState.length > 5242880) { // 5MB localStorage limit
-      console.warn('Warning: Save file is getting large, may hit storage limits soon');
-    }
-
-    localStorage.setItem('incremental_rpg_save', serializedState);
-    localStorage.setItem('incremental_rpg_save_timestamp', Date.now().toString());
+    localStorage.setItem('incrementalRPG_saveData', serializedState);
     return true;
   } catch (err) {
-    console.error('Failed to save game:', err);
-    // Try to save a backup if main save fails
-    try {
-      localStorage.setItem('incremental_rpg_save_backup', JSON.stringify(gameState));
-    } catch (backupErr) {
-      console.error('Backup save also failed:', backupErr);
-    }
+    console.error('Could not save game:', err);
     return false;
+  }
+};
+
+/**
+ * Load game state from local storage
+ * @returns {Object|null} - The loaded game state or null if not found
+ */
+export const loadGame = () => {
+  try {
+    const serializedState = localStorage.getItem('incrementalRPG_saveData');
+    if (serializedState === null) {
+      return null;
+    }
+    return JSON.parse(serializedState);
+  } catch (err) {
+    console.error('Could not load game:', err);
+    return null;
   }
 };
 
@@ -42,69 +38,6 @@ export const saveLayout = (columnLayout) => {
   } catch (err) {
     console.error('Failed to save layout:', err);
     return false;
-  }
-};
-
-export const loadGame = () => {
-  try {
-    const serializedState = localStorage.getItem('incremental_rpg_save');
-    if (serializedState === null) {
-      return null;
-    }
-
-    const state = JSON.parse(serializedState);
-    
-    // Enhanced state validation
-    const requiredProperties = ['player', 'essence', 'factions', 'npcs', 'traits', 'skills'];
-    const missingProperties = requiredProperties.filter(prop => !(prop in state));
-    
-    if (missingProperties.length > 0) {
-      console.error(`Corrupted save file detected. Missing properties: ${missingProperties.join(', ')}`);
-      throw new Error('Corrupted save file');
-    }
-
-    // Load UI layout if available
-    const layoutState = localStorage.getItem('incremental_rpg_layout');
-    if (layoutState) {
-      state.ui = {
-        ...state.ui,
-        columnLayout: JSON.parse(layoutState)
-      };
-    }
-
-    // Validate save file timestamp
-    const saveTimestamp = localStorage.getItem('incremental_rpg_save_timestamp');
-    if (saveTimestamp) {
-      const timeSinceSave = Date.now() - parseInt(saveTimestamp);
-      console.log(`Loading save file from ${Math.round(timeSinceSave / 1000 / 60)} minutes ago`);
-    }
-
-    return state;
-  } catch (err) {
-    console.error('Failed to load game:', err);
-    
-    // Try to load backup if main save is corrupted
-    try {
-      const backupState = localStorage.getItem('incremental_rpg_save_backup');
-      if (backupState) {
-        console.log('Attempting to restore from backup save...');
-        const state = JSON.parse(backupState);
-        
-        // Validate backup state as well
-        if (!state.player || !state.essence || !state.factions) {
-          throw new Error('Backup save is also corrupted');
-        }
-        
-        // If backup is valid, restore it as main save
-        localStorage.setItem('incremental_rpg_save', backupState);
-        localStorage.setItem('incremental_rpg_save_timestamp', Date.now().toString());
-        
-        return state;
-      }
-    } catch (backupErr) {
-      console.error('Backup restore also failed:', backupErr);
-    }
-    return null;
   }
 };
 

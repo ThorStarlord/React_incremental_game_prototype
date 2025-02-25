@@ -1,8 +1,9 @@
 import React, { createContext, useReducer, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { npcs } from '../modules/data/npcs';
-import { ESSENCE_COSTS, AFFINITY_LEVELS } from '../config/gameConstants';
+import { ESSENCE_COSTS, AFFINITY_LEVELS, RELATIONSHIP_TIERS } from '../config/gameConstants';
 import { saveGame, loadGame } from '../storage';
 import { Snackbar, Alert } from '@mui/material';
+import { traits as traitsData } from '../modules/data/traits';
 
 // Action Types
 const ACTION_TYPES = {
@@ -27,8 +28,32 @@ const ACTION_TYPES = {
 
   // Inventory Actions
   UPDATE_INVENTORY: 'UPDATE_INVENTORY',
+  ADD_ITEM: 'ADD_ITEM',
+  REMOVE_ITEM: 'REMOVE_ITEM',
+  MOVE_ITEM: 'MOVE_ITEM',
+  USE_ITEM: 'USE_ITEM',
+
+  // Other Actions
   UPDATE_QUESTS: 'UPDATE_QUESTS',
-  UPDATE_ENEMIES: 'UPDATE_ENEMIES'
+  UPDATE_ENEMIES: 'UPDATE_ENEMIES',
+
+  // NPC Actions
+  UPDATE_NPC_RELATIONSHIP: 'UPDATE_NPC_RELATIONSHIP',
+  UPDATE_DIALOGUE_STATE: 'UPDATE_DIALOGUE_STATE',
+  DECAY_RELATIONSHIPS: 'DECAY_RELATIONSHIPS',
+
+  // Trait Actions
+  EQUIP_TRAIT: 'EQUIP_TRAIT',
+  UNEQUIP_TRAIT: 'UNEQUIP_TRAIT',
+
+  // Upgrade Actions
+  UPGRADE_TRAIT_SLOTS: 'UPGRADE_TRAIT_SLOTS',
+
+  // Initialization Action
+  INITIALIZE_GAME_DATA: 'INITIALIZE_GAME_DATA',
+
+  // Reorder Equipped Traits Action
+  REORDER_EQUIPPED_TRAITS: 'REORDER_EQUIPPED_TRAITS',
 };
 
 // Reducer functions organized by domain
@@ -40,6 +65,43 @@ const playerReducer = (state, action) => {
       return handleCopyTrait(state, action.payload);
     case ACTION_TYPES.LEARN_SKILL:
       return handleLearnSkill(state, action.payload);
+    case ACTION_TYPES.EQUIP_TRAIT: {
+      const traitId = action.payload;
+      
+      // Check if trait is already equipped or player has slots available
+      if (
+        state.player.equippedTraits.includes(traitId) ||
+        state.player.equippedTraits.length >= state.player.traitSlots
+      ) {
+        return state;
+      }
+
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          equippedTraits: [...state.player.equippedTraits, traitId]
+        }
+      };
+    }
+    case ACTION_TYPES.UNEQUIP_TRAIT: {
+      const traitId = action.payload;
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          equippedTraits: state.player.equippedTraits.filter(id => id !== traitId)
+        }
+      };
+    }
+    case ACTION_TYPES.UPGRADE_TRAIT_SLOTS:
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          traitSlots: Math.min(state.player.traitSlots + 1, 8)  // Cap at 8 slots
+        }
+      };
     default:
       return state;
   }
@@ -92,12 +154,201 @@ const factionReducer = (state, action) => {
   }
 };
 
+// New inventory reducer
+const inventoryReducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_TYPES.UPDATE_INVENTORY:
+      return { ...state, inventory: action.payload };
+    case ACTION_TYPES.ADD_ITEM:
+      // Check if we already have this item type and it's stackable
+      if (action.payload.stackable) {
+        const existingItemIndex = state.inventory.findIndex(
+          item => item && item.id === action.payload.id
+        );
+
+        if (existingItemIndex !== -1) {
+          // Item exists, update quantity
+          const updatedInventory = [...state.inventory];
+          updatedInventory[existingItemIndex] = {
+            ...updatedInventory[existingItemIndex],
+            quantity: (updatedInventory[existingItemIndex].quantity || 1) + (action.payload.quantity || 1)
+          };
+          return { ...state, inventory: updatedInventory };
+        }
+      }
+
+      // Find first empty slot
+      const emptySlotIndex = state.inventory.findIndex(item => item === null);
+      if (emptySlotIndex === -1) {
+        // No empty slots
+        console.warn('Inventory full');
+        return state;
+      }
+
+      // Add item to empty slot
+      const newInventory = [...state.inventory];
+      newInventory[emptySlotIndex] = action.payload;
+      return { ...state, inventory: newInventory };
+
+    case ACTION_TYPES.REMOVE_ITEM:
+      const indexToRemove = action.payload.index;
+      if (indexToRemove >= 0 && indexToRemove < state.inventory.length) {
+        const updatedInventory = [...state.inventory];
+        updatedInventory[indexToRemove] = null;
+        return { ...state, inventory: updatedInventory };
+      }
+      return state;
+
+    case ACTION_TYPES.MOVE_ITEM:
+      const { fromIndex, toIndex } = action.payload;
+      if (
+        fromIndex >= 0 && 
+        fromIndex < state.inventory.length &&
+        toIndex >= 0 &&
+        toIndex < state.inventory.length
+      ) {
+        const updatedInventory = [...state.inventory];
+        [updatedInventory[fromIndex], updatedInventory[toIndex]] = 
+          [updatedInventory[toIndex], updatedInventory[fromIndex]];
+        return { ...state, inventory: updatedInventory };
+      }
+      return state;
+
+    case ACTION_TYPES.USE_ITEM:
+      const itemIndex = action.payload.index;
+      if (itemIndex < 0 || itemIndex >= state.inventory.length || !state.inventory[itemIndex]) {
+        return state;
+      }
+
+      const item = state.inventory[itemIndex];
+      let updatedPlayer = { ...state.player };
+      let updatedInventory = [...state.inventory];
+
+      // Apply item effects based on type
+      if (item.type === 'consumable') {
+        // Apply consumable effects
+        if (item.effects) {
+          Object.entries(item.effects).forEach(([stat, value]) => {
+            if (stat === 'hp') {
+              updatedPlayer.hp = Math.min(
+                updatedPlayer.hp + value,
+                updatedPlayer.maxHp || 100
+              );
+            } else if (stat in updatedPlayer) {
+              updatedPlayer[stat] += value;
+            }
+          });
+        }
+
+        // Decrease quantity or remove
+        if (item.quantity > 1) {
+          updatedInventory[itemIndex] = {
+            ...item,
+            quantity: item.quantity - 1
+          };
+        } else {
+          updatedInventory[itemIndex] = null;
+        }
+
+        return {
+          ...state,
+          player: updatedPlayer,
+          inventory: updatedInventory
+        };
+      }
+
+      return state;
+
+    default:
+      return state;
+  }
+};
+
+const npcReducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_TYPES.UPDATE_NPC_RELATIONSHIP: {
+      const { npcId, changeAmount } = action.payload;
+      const npc = state.npcs.find(n => n.id === npcId);
+      if (!npc) return state;
+
+      // Calculate new relationship value clamped between -100 and 100
+      const newRelationship = Math.max(-100, Math.min(100, (npc.relationship || 0) + changeAmount));
+      
+      // Track if relationship tier changed for notification
+      const oldTier = Object.values(RELATIONSHIP_TIERS).find(tier => (npc.relationship || 0) >= tier.threshold);
+      const newTier = Object.values(RELATIONSHIP_TIERS).find(tier => newRelationship >= tier.threshold);
+      const tierChanged = oldTier?.name !== newTier?.name;
+
+      return {
+        ...state,
+        npcs: state.npcs.map(n => 
+          n.id === npcId 
+            ? { 
+                ...n, 
+                relationship: newRelationship,
+                lastInteraction: Date.now(),
+                relationshipChanged: tierChanged,
+                newTier: tierChanged ? newTier?.name : undefined
+              }
+            : n
+        ),
+      };
+    }
+
+    case ACTION_TYPES.UPDATE_DIALOGUE_STATE:
+      return {
+        ...state,
+        npcs: state.npcs.map(n =>
+          n.id === action.payload.npcId
+            ? { 
+                ...n, 
+                dialogueState: {
+                  ...n.dialogueState,
+                  ...action.payload.dialogueState
+                }
+              }
+            : n
+        )
+      };
+
+    case ACTION_TYPES.DECAY_RELATIONSHIPS:
+      // Optional: Implement relationship decay over time
+      // This could make inactive relationships slowly return to neutral
+      return {
+        ...state,
+        npcs: state.npcs.map(npc => {
+          const lastInteraction = npc.lastInteraction || Date.now();
+          const daysSinceInteraction = (Date.now() - lastInteraction) / (1000 * 60 * 60 * 24);
+          
+          if (daysSinceInteraction > 7 && npc.relationship !== 0) {
+            const decayAmount = Math.sign(npc.relationship || 0) * Math.min(Math.abs(npc.relationship || 0), 1);
+            return {
+              ...npc,
+              relationship: (npc.relationship || 0) - decayAmount
+            };
+          }
+          return npc;
+        })
+      };
+
+    default:
+      return state;
+  }
+};
+
+// Update the main reducer to include inventory operations
 const gameReducer = (state, action) => {
   // Try each domain reducer in sequence
   const newState = playerReducer(
     essenceReducer(
       socialReducer(
-        factionReducer(state, action),
+        factionReducer(
+          inventoryReducer(
+            npcReducer(state, action),
+            action
+          ),
+          action
+        ),
         action
       ),
       action
@@ -113,6 +364,21 @@ const gameReducer = (state, action) => {
       return { ...newState, quests: action.payload };
     case ACTION_TYPES.UPDATE_ENEMIES:
       return { ...newState, enemies: action.payload };
+    case ACTION_TYPES.INITIALIZE_GAME_DATA:
+      return {
+        ...newState,
+        traits: {
+          copyableTraits: traitsData.copyableTraits
+        }
+      };
+    case ACTION_TYPES.REORDER_EQUIPPED_TRAITS:
+      return {
+        ...newState,
+        player: {
+          ...newState.player,
+          equippedTraits: action.payload
+        }
+      };
     default:
       return newState;
   }
@@ -194,6 +460,11 @@ export const GameProvider = ({ children }) => {
   const memoizedDispatch = useCallback((action) => {
     dispatch(action);
   }, []);
+
+  // Initialize game data when the provider mounts
+  useEffect(() => {
+    memoizedDispatch({ type: ACTION_TYPES.INITIALIZE_GAME_DATA });
+  }, [memoizedDispatch]);
 
   return (
     <GameStateContext.Provider value={state}>
@@ -282,15 +553,20 @@ const initialState = {
     id: 'player1', // Added player ID for member list reference
     name: "Hero",
     hp: 100,
+    maxHp: 100,
     attack: 10,
     defense: 5,
     statPoints: 0,
     essence: 0,
-    gold: 0,
+    gold: 50,
+    experience: 0,
+    level: 1,
     acquiredTraits: [],
     learnedSkills: [],
     factionId: 1, // Player starts as part of the Mystic Order
     factionRole: 'Member', // Player starts as a regular member
+    equippedTraits: [], // Initialize empty equipped traits array
+    traitSlots: 3, // Start with 3 slots
   },
   
   factions: [
@@ -436,7 +712,50 @@ const initialState = {
     }
   },
 
-  inventory: [],
+  inventory: [
+    { 
+      id: 'health-potion', 
+      name: 'Health Potion', 
+      type: 'consumable', 
+      description: 'Restores 20 HP', 
+      quantity: 3, 
+      stackable: true,
+      effects: { hp: 20 }
+    },
+    { 
+      id: 'wooden-sword', 
+      name: 'Wooden Sword', 
+      type: 'weapon', 
+      description: 'A basic training sword', 
+      rarity: 'common', 
+      stats: { 'Attack': 3 } 
+    },
+    { 
+      id: 'cloth-armor', 
+      name: 'Cloth Armor', 
+      type: 'armor', 
+      description: 'Provides minimal protection', 
+      rarity: 'common', 
+      stats: { 'Defense': 2 } 
+    },
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  ],
   quests: [],
   enemies: [
     {
@@ -603,4 +922,16 @@ const handleFactionAction = (state, action) => {
     default:
       return state;
   }
+};
+
+// Add relationship action creators
+export const createRelationshipAction = {
+  update: (npcId, changeAmount) => ({
+    type: ACTION_TYPES.UPDATE_NPC_RELATIONSHIP,
+    payload: { npcId, changeAmount }
+  }),
+  updateDialogue: (npcId, dialogueState) => ({
+    type: ACTION_TYPES.UPDATE_DIALOGUE_STATE,
+    payload: { npcId, dialogueState }
+  })
 };

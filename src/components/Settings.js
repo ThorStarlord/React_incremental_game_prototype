@@ -1,46 +1,77 @@
-import React, { useState } from 'react';
-import { Container, Box, Typography, Switch, FormGroup, FormControlLabel, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Container, Box, Typography, Switch, FormGroup, FormControlLabel, Button, Divider } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { ThemeContext } from '../context/ThemeContext';
 import Panel from './Panel';
+import BreadcrumbNav from './BreadcrumbNav';
 
 const Settings = () => {
-  const [settings, setSettings] = useState({
-    soundEnabled: true,
-    notifications: true,
-    darkMode: false,
-  });
-
-  const handleChange = (setting) => {
-    setSettings(prev => ({
-      ...prev,
-      [setting]: !prev[setting]
-    }));
-  };
-
+  const { darkMode, setDarkMode } = useContext(ThemeContext);
+  
   return (
     <Container maxWidth="sm">
       <Box sx={{ py: 4 }}>
-        <Panel title="Settings">
-          <FormGroup>
-            <FormControlLabel
-              control={<Switch checked={settings.soundEnabled} onChange={() => handleChange('soundEnabled')} />}
-              label="Sound Effects"
-            />
-            <FormControlLabel
-              control={<Switch checked={settings.notifications} onChange={() => handleChange('notifications')} />}
-              label="Notifications"
-            />
-            <FormControlLabel
-              control={<Switch checked={settings.darkMode} onChange={() => handleChange('darkMode')} />}
-              label="Dark Mode"
-            />
-          </FormGroup>
-          
+        <BreadcrumbNav />
+        <Panel title="Game Settings">
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h6" gutterBottom color="primary">
+              Visual Settings
+            </Typography>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch 
+                    checked={darkMode}
+                    onChange={(e) => setDarkMode(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="Dark Mode"
+              />
+            </FormGroup>
+          </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h6" gutterBottom color="primary">
+              Game Settings
+            </Typography>
+            <FormGroup>
+              <FormControlLabel
+                control={<Switch defaultChecked />}
+                label="Sound Effects"
+              />
+              <FormControlLabel
+                control={<Switch defaultChecked />}
+                label="Background Music"
+              />
+              <FormControlLabel
+                control={<Switch defaultChecked />}
+                label="Combat Animations"
+              />
+              <FormControlLabel
+                control={<Switch defaultChecked />}
+                label="Show Damage Numbers"
+              />
+            </FormGroup>
+          </Box>
+
           <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-            <Button component={Link} to="/" variant="outlined">
+            <Button
+              component={RouterLink}
+              to="/"
+              variant="outlined"
+              color="primary"
+            >
               Back to Menu
             </Button>
-            <Button component={Link} to="/game" variant="contained">
+            <Button
+              component={RouterLink}
+              to="/game"
+              variant="contained"
+              color="primary"
+            >
               Start Game
             </Button>
           </Box>
