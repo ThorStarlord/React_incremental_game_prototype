@@ -1,11 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import './index.css'; // Importing the index.css file
+import './index.css';
+import AppRouter from './routes/AppRouter';
+import { GameProvider } from './context/GameStateContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>
+  <React.StrictMode>
+    <GameProvider>
+      <AppRouter />
+    </GameProvider>
+  </React.StrictMode>
 );
