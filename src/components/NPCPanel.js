@@ -1,24 +1,26 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Paper, 
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
   Fade,
   LinearProgress,
   Avatar,
   Tooltip,
   Divider,
-  Chip
+  Chip,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
+import { GameStateContext, GameDispatchContext, createEssenceAction } from '../context/GameStateContext';
 import { RELATIONSHIP_TIERS } from '../config/gameConstants';
 import Panel from './Panel';
 
 const getRelationshipTier = (value) => {
-  return Object.values(RELATIONSHIP_TIERS).find(tier => 
+  return Object.values(RELATIONSHIP_TIERS).find(tier =>
     value >= tier.threshold
   ) || RELATIONSHIP_TIERS.NEMESIS;
 };
@@ -29,7 +31,7 @@ const DialogueOption = ({ option, onSelect, disabled }) => (
     variant="outlined"
     onClick={() => onSelect(option)}
     disabled={disabled}
-    sx={{ 
+    sx={{
       my: 1,
       textAlign: 'left',
       justifyContent: 'flex-start',
@@ -43,11 +45,13 @@ const DialogueOption = ({ option, onSelect, disabled }) => (
 );
 
 const NPCPanel = ({ npcId }) => {
-  const { npcs } = useContext(GameStateContext);
+  const { npcs, essence } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
   const npc = npcs.find(n => n.id === npcId);
   const [showResponse, setShowResponse] = useState(false);
   const [currentDialogue, setCurrentDialogue] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [showInsufficientEssenceAlert, setShowInsufficientEssenceAlert] = useState(false);
 
   useEffect(() => {
     if (npc && !currentDialogue) {
@@ -58,39 +62,43 @@ const NPCPanel = ({ npcId }) => {
     }
   }, [npc, currentDialogue]);
 
-  if (!npc) return null;
+  useEffect(() => {
+    let timer;
+    if (showInsufficientEssenceAlert) {
+      timer = setTimeout(() => {
+        setShowInsufficientEssenceAlert(false);
+      }, 3000); // Hide the alert after 3 seconds
+    }
+    return () => clearTimeout(timer);
+  }, [showInsufficientEssenceAlert]);
 
-  const relationship = npc.relationship || 0;
-  const relationshipTier = getRelationshipTier(relationship);
-  const essenceRate = relationshipTier.essenceRate;
+  const handleInfluence = (cost) => {
+    if (essence >= cost) {
+      dispatch(createEssenceAction.spend(cost));
+      dispatch({
+        type: 'UPDATE_NPC_RELATIONSHIP',
+        payload: { npcId, changeAmount: 10 }
+      });
+      setOpenSnackbar(true);
+    } else {
+      setShowInsufficientEssenceAlert(true);
+    }
+  };
 
   const handleDialogueChoice = (option) => {
-    // Show response animation
     setShowResponse(true);
-    
-    // Update relationship if the option affects it
     if (option.relationshipChange) {
       dispatch({
         type: 'UPDATE_NPC_RELATIONSHIP',
-        payload: {
-          npcId: npc.id,
-          changeAmount: option.relationshipChange
-        }
+        payload: { npcId: npc.id, changeAmount: option.relationshipChange }
       });
     }
-
-    // Update dialogue state if needed
     if (option.stateChanges) {
       dispatch({
         type: 'UPDATE_DIALOGUE_STATE',
-        payload: {
-          npcId: npc.id,
-          dialogueState: option.stateChanges
-        }
+        payload: { npcId: npc.id, dialogueState: option.stateChanges }
       });
     }
-
-    // Update current dialogue
     if (option.nextDialogue) {
       setTimeout(() => {
         setCurrentDialogue(option.nextDialogue);
@@ -98,6 +106,13 @@ const NPCPanel = ({ npcId }) => {
       }, 1000);
     }
   };
+
+  if (!npc) return null;
+
+  const relationship = npc.relationship || 0;
+  const relationshipTier = getRelationshipTier(relationship);
+  const essenceRate = relationshipTier.essenceRate;
+  const influenceCost = (npc.powerLevel || 1) * 10;
 
   return (
     <Panel title={`Conversation with ${npc.name}`}>
@@ -112,20 +127,18 @@ const NPCPanel = ({ npcId }) => {
             <Chip
               icon={<FavoriteIcon />}
               label={relationshipTier.name}
-              sx={{ 
+              sx={{
                 backgroundColor: relationshipTier.color,
                 color: '#fff',
                 fontWeight: 'bold'
               }}
             />
           </Box>
-          
           <Typography variant="body2" color="text.secondary" gutterBottom>
             {npc.type} - {npc.description}
           </Typography>
-
           <Box sx={{ mt: 1 }}>
-            <Tooltip 
+            <Tooltip
               title={
                 <Box>
                   <Typography variant="body2">Relationship: {relationship}/100</Typography>
@@ -169,9 +182,9 @@ const NPCPanel = ({ npcId }) => {
 
       <Divider sx={{ my: 2 }} />
 
-      <Paper 
+      <Paper
         elevation={0}
-        sx={{ 
+        sx={{
           p: 2,
           bgcolor: 'background.default',
           minHeight: 100,
@@ -192,13 +205,36 @@ const NPCPanel = ({ npcId }) => {
             option={option}
             onSelect={handleDialogueChoice}
             disabled={
-              showResponse || 
+              showResponse ||
               (option.requiresRelationship && relationship < option.requiresRelationship)
             }
           />
         ))}
       </Box>
 
+      <Box sx={{ mt: 2 }}>
+        <Tooltip
+          title={essence < influenceCost ? `Need ${influenceCost} essence` : `Spend ${influenceCost} essence to boost relationship by 10`}
+          arrow
+        >
+          <span>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={() => handleInfluence(influenceCost)}
+              disabled={essence < influenceCost || relationship >= 100}
+              sx={{ bgcolor: 'secondary.main', '&:hover': { bgcolor: 'secondary.dark' } }}
+            >
+              Influence ({influenceCost} Essence)
+            </Button>
+          </span>
+        </Tooltip>
+      </Box>
+      {showInsufficientEssenceAlert && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          Not enough Essence!
+        </Alert>
+      )}
       {currentDialogue?.options?.length === 0 && (
         <Button
           fullWidth
@@ -209,6 +245,16 @@ const NPCPanel = ({ npcId }) => {
           Start Over
         </Button>
       )}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={2000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+          Relationship with {npc.name} increased by 10!
+        </Alert>
+      </Snackbar>
     </Panel>
   );
 };
