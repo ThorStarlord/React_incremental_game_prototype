@@ -6,7 +6,7 @@ import {
   Grid, 
   Divider
 } from '@mui/material';
-import { GameStateContext } from '../context/GameStateContext';
+import { GameStateContext } from '../../../../context/GameStateContext';
 import Panel from './Panel';
 
 const StatisticsPanel = () => {

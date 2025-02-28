@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Box, Typography, Button, Grid, Card } from '@mui/material';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
-import useTraitEffects from '../hooks/useTraitEffects';
+import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
+import useTraitEffects from '../../../../hooks/useTraitEffects';
 
 const Shop = () => {
   const { player, items } = useContext(GameStateContext);
