@@ -7,7 +7,7 @@ import TownArea from '../components/areas/TownArea';
 import NPCEncounter from '../components/NPCEncounter';
 import MainMenu from '../components/MainMenu';
 import Settings from '../components/Settings';
-import NPCPanel from '../components/npc/NPCPanel';
+import NPCPanel from '../features/npc/NPCPanel';
 
 const TownAreaWrapper = () => {
   const { townId } = useParams();

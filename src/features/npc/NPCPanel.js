@@ -3,9 +3,9 @@ import { Box, Typography, Button, Paper, Fade, Avatar, Chip, Divider,
          List, ListItem, ListItemIcon, ListItemText, Tooltip, Snackbar, Alert, LinearProgress, Tabs, Tab } from '@mui/material';
 import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../../context/GameStateContext';
 import { getRelationshipTier, getAvailableInteractions, canLearnTrait, getTierBenefits } from '../../config/relationshipConstants';
-import Panel from '../common/Panel';
+import Panel from '../../components/common/Panel';
 import Icon from '@mui/material/Icon';
-import DialogueHistory from '../DialogueHistory';
+import DialogueHistory from '../../components/DialogueHistory';
 import TradeTab from './trade/TradeTab';
 
 const DialogueOption = ({ option, onSelect, disabled, playerEssence, traitStatus, isNewlyAvailable }) => {
@@ -1527,7 +1527,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import { formatDistanceToNow } from 'date-fns';
 import { formatObjective } from '../../utils/questUtils';
-import Panel from '../common/Panel';
+import Panel from '../../components/common/Panel';
 
 const QuestsPage = () => {
   const [tabValue, setTabValue] = React.useState(0);
