@@ -1,11 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Box, Typography, Button, Paper, Fade, Avatar, Chip, Divider, 
          List, ListItem, ListItemIcon, ListItemText, Tooltip, Snackbar, Alert, LinearProgress, Tabs, Tab } from '@mui/material';
-import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../context/GameStateContext';
-import { getRelationshipTier, getAvailableInteractions, canLearnTrait, getTierBenefits } from '../config/relationshipConstants';
-import Panel from './common/Panel';
+import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../../context/GameStateContext';
+import { getRelationshipTier, getAvailableInteractions, canLearnTrait, getTierBenefits } from '../../config/relationshipConstants';
+import Panel from '../common/Panel';
 import Icon from '@mui/material/Icon';
-import DialogueHistory from './DialogueHistory';
+import DialogueHistory from '../DialogueHistory';
 
 const DialogueOption = ({ option, onSelect, disabled, playerEssence, traitStatus, isNewlyAvailable }) => {
   // Calculate styling based on trait status
@@ -92,7 +92,7 @@ const DialogueOption = ({ option, onSelect, disabled, playerEssence, traitStatus
         <Typography 
           variant="caption" 
           color="error"
-          sx={{ display: 'block', mt: 0.5 }}
+          sx={{ display: 'block', mt: 5 }}
         >
           Not enough essence
         </Typography>
@@ -1053,7 +1053,7 @@ const formatLocationName = (name) => {
 export default NPCPanel;
 
 {
-  id: 'npc2',
+  id: 'npc2',xxxxx
   name: 'Master Thorn', // Add semicolon here or check if it's part of an object
   type: 'Combat Instructor',
   title: 'Blademaster',
@@ -1519,14 +1519,14 @@ useEffect(() => {
 import React, { useContext } from 'react';
 import { Box, Typography, Tabs, Tab, Paper, List, ListItem, ListItemIcon, 
          ListItemText, Chip, Divider, Avatar, Button, Icon } from '@mui/material';
-import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../context/GameStateContext';
+import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../../context/GameStateContext';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleIcon from '@mui/icons-material/Circle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import { formatDistanceToNow } from 'date-fns';
-import { formatObjective } from '../utils/questUtils';
-import Panel from './common/Panel';
+import { formatObjective } from '../../utils/questUtils';
+import Panel from '../common/Panel';
 
 const QuestsPage = () => {
   const [tabValue, setTabValue] = React.useState(0);
@@ -1678,3 +1678,83 @@ const QuestsPage = () => {
 };
 
 export default QuestsPage;
+
+// Import NPC component tabs
+import DialogueTab from './dialogue/DialogueTab';
+import NPCQuestsTab from './quests/NPCQuestsTab';
+import RelationshipTab from './relationship/RelationshipTab';
+import TradeTab from './trade/TradeTab';
+
+// Import utilities
+import { getRelationshipTier, getRelationshipColor } from './utils/relationshipUtils';
+
+// Import animations from existing CSS
+import '../FactionUI/FactionContainer.css';
+
+/**
+ * Main component for NPC interactions
+ */
+const NPCPanel = ({ npc, onClose, locationName }) => {
+  const dispatch = useDispatch();
+  const player = useSelector(state => state.player);
+  const gameState = useSelector(state => state.game);
+  const essence = player.essence || 0;
+  
+  // Add these selectors from Redux
+  const tutorial = useSelector(state => state.tutorial);
+  const traits = useSelector(state => state.traits);
+  
+  // Mark NPC as met if first encounter
+  useEffect(() => {
+    if (!player.metNPCs?.includes(npc.id)) {
+      dispatch({
+        type: 'MEET_NPC',
+        payload: { npcId: npc.id }
+      });
+    }
+  }, [npc.id, player.metNPCs, dispatch]);
+  
+  // Add tutorial hint
+  const [showTutorialHint, setShowTutorialHint] = useState(false);
+  
+  // Check if this is a tutorial NPC
+  useEffect(() => {
+    if (tutorial?.active && tutorial.targetNPCId === npc.id && tutorial.step === 'acquireFirstTrait') {
+      setShowTutorialHint(true);
+    }
+  }, [tutorial, npc.id]);
+  
+  // Rest of the component remains the same
+  // ...
+
+  // Update the RelationshipTab to include additional props:
+  {activeTab === 1 && (
+    <RelationshipTab
+      npc={npc}
+      playerRelationship={currentRelationship}
+      playerTraits={player.acquiredTraits || []}
+      onRelationshipChange={updateRelationship}
+      dispatch={dispatch}
+      tutorial={tutorial}
+      traits={traits}
+    />
+  )}
+  
+  // Add tutorial hint if needed
+  {showTutorialHint && (
+    <Slide direction="up" in={showTutorialHint}>
+      <Alert 
+        severity="info" 
+        sx={{ 
+          position: 'absolute', 
+          bottom: 16, 
+          left: 16, 
+          right: 16, 
+          zIndex: 1000 
+        }}
+        onClose={() => setShowTutorialHint(false)}
+      >
+        This NPC has knowledge to share. Check the Relationship tab to learn a special ability!
+      </Alert>
+    </Slide>
+  )}

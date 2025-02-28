@@ -1,10 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import GameContainer from '../components/GameContainer';
 import TownArea from '../components/areas/TownArea';
 import NPCEncounter from '../components/NPCEncounter';
 import MainMenu from '../components/MainMenu';
 import Settings from '../components/Settings';
+import NPCPanel from '../components/npc/NPCPanel';
 
 const TownAreaWrapper = () => {
   const { townId } = useParams();
@@ -16,6 +18,12 @@ const NPCEncounterWrapper = () => {
   return <NPCEncounter npcId={npcId} />;
 };
 
+// Add this component to your router file
+const RouteWrapper = ({ children }) => {
+  const navigate = useNavigate();
+  return children({ navigate });
+};
+
 const AppRouter = () => (
   <Router>
     <Routes>
@@ -23,7 +31,29 @@ const AppRouter = () => (
       <Route path="/game" element={<GameContainer />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/town/:townId" element={<TownAreaWrapper />} />
-      <Route path="/npc/:npcId" element={<NPCEncounterWrapper />} />
+      <Route 
+        path="/npc/:npcId" 
+        element={
+          <RouteWrapper>
+            {({ navigate }) => {
+              const { npcId } = useParams();
+              const npc = useSelector(state => 
+                state.npcs.find(n => n.id === npcId) || 
+                state.game.currentLocation?.npcs.find(n => n.id === npcId)
+              );
+              const locationName = useSelector(state => state.game.currentLocation?.name);
+              
+              return (
+                <NPCPanel 
+                  npc={npc} 
+                  onClose={() => navigate(-1)}
+                  locationName={locationName}
+                />
+              );
+            }}
+          </RouteWrapper>
+        } 
+      />
     </Routes>
   </Router>
 );
