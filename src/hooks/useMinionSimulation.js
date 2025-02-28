@@ -5,7 +5,9 @@ const useMinionSimulation = () => {
   const { minions } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
   
-  // Simulation for minion task progression
+  // Three main simulation systems:
+  
+  // 1. Task progression - runs every 10 seconds
   useEffect(() => {
     const progressInterval = setInterval(() => {
       minions.forEach(minion => {
@@ -28,7 +30,7 @@ const useMinionSimulation = () => {
     return () => clearInterval(progressInterval);
   }, [minions, dispatch]);
   
-  // Simulation for independent minion decision making
+  // 2. Autonomous decision making - runs every minute
   useEffect(() => {
     const decisionInterval = setInterval(() => {
       minions.forEach(minion => {
@@ -80,7 +82,7 @@ const useMinionSimulation = () => {
     return () => clearInterval(decisionInterval);
   }, [minions, dispatch]);
   
-  // Simulation for assistance bonuses
+  // 3. Assistance bonus calculation - runs every 30 seconds
   useEffect(() => {
     const assistInterval = setInterval(() => {
       // Calculate total assistance bonus from all assisting minions

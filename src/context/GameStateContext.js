@@ -42,6 +42,11 @@ export function GameProvider({ children }) {
   );
 }
 
+export const createEssenceAction = (amount) => ({
+  type: 'GAIN_ESSENCE',
+  payload: amount
+});
+
 // playerReducer.js
 export function playerReducer(state, action) {
   switch (action.type) {

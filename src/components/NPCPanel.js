@@ -1054,7 +1054,7 @@ export default NPCPanel;
 
 {
   id: 'npc2',
-  name: 'Master Thorn',
+  name: 'Master Thorn', // Add semicolon here or check if it's part of an object
   type: 'Combat Instructor',
   title: 'Blademaster',
   location: 'training_grounds',

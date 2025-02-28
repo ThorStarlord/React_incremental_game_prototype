@@ -18,6 +18,7 @@ import CharacterTabBar from './CharacterTabBar';
 import CharacterManagementDrawer from './CharacterManagementDrawer';
 import CompactTraitPanel from './traits/CompactTraitPanel';
 import CompactCharacterPanel from './characters/CompactCharacterPanel';
+import useMinionSimulation from '../hooks/useMinionSimulation';
 
 // Import icons for the header
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
@@ -45,6 +46,9 @@ const GameContainer = () => {
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
   };
+
+  // Enable minion simulation
+  useMinionSimulation();
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
