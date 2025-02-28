@@ -1,4 +1,4 @@
-import { createAffinityAction } from '../context/GameStateContext';
+import { createAffinityAction } from '../../../context/GameStateContext';
 import quests from './data/quests';
 
 export const startQuest = (questId, dispatch) => {

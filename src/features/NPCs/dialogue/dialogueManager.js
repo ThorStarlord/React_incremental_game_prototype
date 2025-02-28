@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import elaraDialogues from '../data/dialogues/elara.json';
 import borinDialogues from '../data/dialogues/borin.json';
 import willaDialogues from '../data/dialogues/willa.json';
-import { startQuest } from './questManager';
+import { startQuest } from '../../Quests/utils/questManager';
 
 const dialogueData = {
   elara: elaraDialogues.elara,

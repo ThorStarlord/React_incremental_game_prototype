@@ -1,15 +1,24 @@
-const initialPlayerState = {
-    name: '',
+const player = {
+    name: 'Hero',
     level: 1,
+    health: 100,
     experience: 0,
-    traits: [],
-    stats: {
-        health: 100,
-        mana: 50,
-        strength: 10,
-        agility: 10,
-        intelligence: 10,
-    },
+    inventory: [],
+    quests: []
 };
 
-export default initialPlayerState;
+export const getPlayer = () => {
+    return player;
+};
+
+export const updatePlayer = (updates) => {
+    Object.assign(player, updates);
+};
+
+export const addItemToInventory = (item) => {
+    player.inventory.push(item);
+};
+
+export const addQuest = (quest) => {
+    player.quests.push(quest);
+};

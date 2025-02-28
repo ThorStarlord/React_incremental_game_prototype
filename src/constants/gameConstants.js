@@ -101,3 +101,14 @@ export const RELATIONSHIP_DECAY = {
   DECAY_AMOUNT: -1, // Amount of decay per day
   MINIMUM_DECAY: 0, // Don't decay below neutral
 };
+
+export const ITEM_TYPES = {
+  CONSUMABLE: 'consumable',
+  WEAPON: 'weapon',
+  ARMOR: 'armor'
+};
+
+export const QUEST_STATUS = {
+  ACTIVE: 'active',
+  COMPLETED: 'completed'
+};

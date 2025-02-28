@@ -1,28 +1,26 @@
-const routes = [
+export const routes = [
     {
-        path: '/towns',
-        name: 'Towns',
-        component: 'TownPanel',
-        description: 'Explore various towns in the game world.'
+        id: 'oakhaven-stonefang',
+        from: 'oakhaven',
+        to: 'stonefangHold',
+        type: 'road',
+        description: 'The Mountain Pass - A well-traveled road connecting Oakhaven to Stonefang Hold',
+        path: 'M 100 100 Q 250 125, 400 150' // Curved path between the towns
     },
     {
-        path: '/dungeons',
-        name: 'Dungeons',
-        component: 'DungeonPanel',
-        description: 'Venture into dungeons filled with challenges and treasures.'
+        id: 'oakhaven-salty',
+        from: 'oakhaven',
+        to: 'saltyWharf',
+        type: 'coastal-road',
+        description: 'The Coastal Trail - A winding path down to Salty Wharf',
+        path: 'M 100 100 Q 125 225, 150 350'
     },
     {
-        path: '/regions',
-        name: 'Regions',
-        component: 'RegionsPanel',
-        description: 'Discover different regions and their unique characteristics.'
-    },
-    {
-        path: '/exploration',
-        name: 'Exploration',
-        component: 'ExplorationArea',
-        description: 'Engage in exploration activities to uncover secrets.'
+        id: 'stonefang-windrider',
+        from: 'stonefangHold',
+        to: 'windriderCamp',
+        type: 'trail',
+        description: 'The Plains Path - A rugged trail to the Windrider Camp',
+        path: 'M 400 150 Q 450 225, 500 300'
     }
 ];
-
-export default routes;
