@@ -1,332 +1,280 @@
 import React, { useState } from 'react';
-import { 
-  Box, Typography, Button, Divider, List, Tabs, Tab, 
-  Chip, Badge, Menu, MenuItem, IconButton, Tooltip, Paper
-} from '@mui/material';
-import QuestItem from './QuestItem';
-import { formatObjective } from '../utils/formatters';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import SortIcon from '@mui/icons-material/Sort';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { getQuestTypeIcon, getQuestDifficultyColor } from '../utils/questHelpers';
+import { Box, Typography, Paper, Button, Divider, List, ListItem, ListItemIcon, ListItemText, Chip, Tabs, Tab, Icon, Tooltip } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CircleIcon from '@mui/icons-material/Circle';
 
-const NPCQuestsTab = ({ npc, player, dispatch, essence }) => {
-  // State for tab selection
-  const [activeTab, setActiveTab] = useState(0);
-  
-  // State for sorting and filtering
-  const [sortMethod, setSortMethod] = useState('default');
-  const [filterType, setFilterType] = useState('all');
-  const [sortMenuAnchor, setSortMenuAnchor] = useState(null);
-  const [filterMenuAnchor, setFilterMenuAnchor] = useState(null);
+const formatObjective = (objective) => {
+  switch (objective.type) {
+    case 'defeat':
+      return `Defeat ${objective.count} ${formatEntityName(objective.target)}`;
+    case 'collect':
+      return `Collect ${objective.count} ${formatEntityName(objective.target)}`;
+    case 'visit':
+      return `Visit ${formatLocationName(objective.target)}`;
+    case 'talk':
+      return `Talk to ${formatEntityName(objective.target)}`;
+    case 'craft':
+      return `Craft ${objective.count} ${formatEntityName(objective.target)}`;
+    default:
+      return `Complete objective (${objective.progress}/${objective.count})`;
+  }
+};
 
-  const activeQuestIds = player.activeQuests?.map(q => q.id) || [];
-  const completedQuestIds = player.completedQuests || [];
+const formatEntityName = (name) => {
+  return name
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const formatLocationName = (name) => {
+  return name
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const NPCQuestsTab = ({ npc, player, dispatch, essence, traits, notifications }) => {
+  const [questView, setQuestView] = useState('available');
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
   
-  // Filter available quests based on relationship requirement and other filters
-  let availableQuests = npc.quests?.filter(quest => 
-    !activeQuestIds.includes(quest.id) && 
-    !completedQuestIds.includes(quest.id) &&
-    quest.relationshipRequirement <= (player.npcRelationships?.[npc.id] || 0)
-  ) || [];
-  
-  // Filter active quests that are from this NPC
-  let activeQuests = (player.activeQuests || [])
-    .filter(quest => npc.quests.some(q => q.id === quest.id));
-  
-  // Get completed quests from this NPC
-  let completedQuests = completedQuestIds
-    .map(id => npc.quests.find(q => q.id === id))
-    .filter(quest => quest !== undefined);
-  
-  // Apply type filtering if needed
-  if (filterType !== 'all') {
-    availableQuests = availableQuests.filter(quest => quest.type === filterType);
-    activeQuests = activeQuests.filter(quest => {
-      const npcQuest = npc.quests.find(q => q.id === quest.id);
-      return npcQuest?.type === filterType;
-    });
-    completedQuests = completedQuests.filter(quest => quest.type === filterType);
-  }
-  
-  // Apply sorting
-  const sortQuests = (quests) => {
-    switch (sortMethod) {
-      case 'difficulty-asc':
-        return [...quests].sort((a, b) => a.difficulty - b.difficulty);
-      case 'difficulty-desc':
-        return [...quests].sort((a, b) => b.difficulty - a.difficulty);
-      case 'rewards':
-        return [...quests].sort((a, b) => 
-          (b.rewards?.essence || 0) - (a.rewards?.essence || 0)
-        );
-      case 'relationship':
-        return [...quests].sort((a, b) => 
-          (a.relationshipRequirement || 0) - (b.relationshipRequirement || 0)
-        );
-      default:
-        return quests;
-    }
-  };
-  
-  availableQuests = sortQuests(availableQuests);
-  completedQuests = sortQuests(completedQuests);
-  
-  // For active quests, we might want to sort by progress
-  if (sortMethod === 'progress') {
-    activeQuests = [...activeQuests].sort((a, b) => {
-      const aProgress = a.objectives.filter(o => o.completed).length / a.objectives.length;
-      const bProgress = b.objectives.filter(o => o.completed).length / b.objectives.length;
-      return bProgress - aProgress;
-    });
-  } else {
-    activeQuests = sortQuests(activeQuests);
-  }
-  
-  // Quest action handlers
-  const acceptQuest = (quest) => {
-    dispatch({
-      type: 'ACCEPT_QUEST',
-      payload: { quest }
-    });
-  };
-  
-  const turnInQuest = (quest) => {
-    dispatch({
-      type: 'COMPLETE_QUEST',
-      payload: { 
-        questId: quest.id,
-        rewards: quest.rewards
-      }
-    });
-  };
-  
-  // Check if a quest is ready to turn in
-  const isQuestCompletable = (quest) => {
-    const activeQuest = player.activeQuests.find(q => q.id === quest.id);
-    if (!activeQuest) return false;
+  // Filter quests by availability and relationship requirements
+  const availableQuests = (npc.quests || []).filter(quest => {
+    const isActive = player.activeQuests?.some(q => q.id === quest.id);
+    const isCompleted = player.completedQuests?.some(q => q.id === quest.id);
+    const meetsRelationship = (npc.relationship || 0) >= (quest.relationshipRequirement || 0);
     
-    return activeQuest.objectives.every(obj => obj.completed);
+    return !isActive && !isCompleted && meetsRelationship;
+  });
+  
+  // Get quests from this NPC that are currently active
+  const activeQuests = (player.activeQuests || []).filter(quest => quest.npcId === npc.id);
+  
+  const handleStartQuest = (questId) => {
+    dispatch({
+      type: 'START_QUEST',
+      payload: { questId, npcId: npc.id }
+    });
+    
+    // Show notification
+    setNotification({
+      open: true,
+      message: "New quest started!",
+      severity: "success"
+    });
   };
   
-  // Render quest count badges for tabs
-  const getQuestCountBadge = (count) => {
-    return count > 0 ? (
-      <Badge 
-        badgeContent={count} 
-        color="primary" 
-        sx={{ '& .MuiBadge-badge': { right: -15, top: -5 } }}
-      />
-    ) : null;
-  };
-  
-  // Menu handlers
-  const handleSortMenuOpen = (event) => {
-    setSortMenuAnchor(event.currentTarget);
-  };
-  
-  const handleSortMenuClose = () => {
-    setSortMenuAnchor(null);
-  };
-  
-  const handleFilterMenuOpen = (event) => {
-    setFilterMenuAnchor(event.currentTarget);
-  };
-  
-  const handleFilterMenuClose = () => {
-    setFilterMenuAnchor(null);
+  const handleTurnInQuest = (questId) => {
+    // Find the quest data to get rewards info
+    const questData = npc.quests?.find(q => q.id === questId);
+    const activeQuest = player.activeQuests?.find(q => q.id === questId);
+    
+    if (!questData || !activeQuest) return;
+    
+    const isComplete = activeQuest.objectives?.every(obj => obj.progress >= obj.count);
+    
+    if (!isComplete) {
+      setNotification({
+        open: true,
+        message: "Complete all objectives before turning in the quest",
+        severity: "warning"
+      });
+      return;
+    }
+    
+    dispatch({
+      type: 'COMPLETE_QUEST', 
+      payload: { questId }
+    });
+    
+    // Generate reward message
+    let rewardMessage = "Quest completed!";
+    if (questData.reward.essence) {
+      rewardMessage += ` Gained ${questData.reward.essence} essence.`;
+    }
+    if (questData.reward.relationship) {
+      rewardMessage += ` Relationship improved by ${questData.reward.relationship}.`;
+    }
+    if (questData.reward.trait) {
+      const traitName = traits?.copyableTraits[questData.reward.trait]?.name || questData.reward.trait;
+      rewardMessage += ` Learned "${traitName}" trait.`;
+    }
+    
+    setNotification({
+      open: true,
+      message: rewardMessage,
+      severity: "success"
+    });
   };
   
   return (
-    <Box>
-      {/* Tabs for different quest categories */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+    <Box sx={{ mt: 2 }}>
+      <Box sx={{ display: 'flex', mb: 2 }}>
         <Tabs 
-          value={activeTab} 
-          onChange={(e, newValue) => setActiveTab(newValue)}
-          aria-label="quest tabs"
+          value={questView} 
+          onChange={(e, val) => setQuestView(val)}
+          sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
         >
           <Tab 
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                Available {getQuestCountBadge(availableQuests.length)}
-              </Box>
-            }
+            label={`Available (${availableQuests.length})`} 
+            value="available" 
           />
           <Tab 
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                Active {getQuestCountBadge(activeQuests.length)}
-              </Box>
-            }
-          />
-          <Tab 
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                Completed {getQuestCountBadge(completedQuests.length)}
-              </Box>
-            }
+            label={`In Progress (${activeQuests.length})`} 
+            value="active" 
           />
         </Tabs>
       </Box>
       
-      {/* Sorting and filtering controls */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Tooltip title="Filter quests by type">
-          <IconButton onClick={handleFilterMenuOpen} size="small">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-        <Menu
-          anchorEl={filterMenuAnchor}
-          open={Boolean(filterMenuAnchor)}
-          onClose={handleFilterMenuClose}
-        >
-          <MenuItem onClick={() => { setFilterType('all'); handleFilterMenuClose(); }}>
-            All Types
-          </MenuItem>
-          <MenuItem onClick={() => { setFilterType('collection'); handleFilterMenuClose(); }}>
-            Collection Quests
-          </MenuItem>
-          <MenuItem onClick={() => { setFilterType('combat'); handleFilterMenuClose(); }}>
-            Combat Quests
-          </MenuItem>
-          <MenuItem onClick={() => { setFilterType('exploration'); handleFilterMenuClose(); }}>
-            Exploration Quests
-          </MenuItem>
-        </Menu>
-        
-        <Tooltip title="Sort quests">
-          <IconButton onClick={handleSortMenuOpen} size="small" sx={{ ml: 1 }}>
-            <SortIcon />
-          </IconButton>
-        </Tooltip>
-        <Menu
-          anchorEl={sortMenuAnchor}
-          open={Boolean(sortMenuAnchor)}
-          onClose={handleSortMenuClose}
-        >
-          <MenuItem onClick={() => { setSortMethod('default'); handleSortMenuClose(); }}>
-            Default Order
-          </MenuItem>
-          <MenuItem onClick={() => { setSortMethod('difficulty-asc'); handleSortMenuClose(); }}>
-            Easiest First
-          </MenuItem>
-          <MenuItem onClick={() => { setSortMethod('difficulty-desc'); handleSortMenuClose(); }}>
-            Hardest First
-          </MenuItem>
-          <MenuItem onClick={() => { setSortMethod('rewards'); handleSortMenuClose(); }}>
-            Best Rewards
-          </MenuItem>
-          <MenuItem onClick={() => { setSortMethod('relationship'); handleSortMenuClose(); }}>
-            Relationship Required
-          </MenuItem>
-          {activeTab === 1 && (
-            <MenuItem onClick={() => { setSortMethod('progress'); handleSortMenuClose(); }}>
-              Most Progress
-            </MenuItem>
-          )}
-        </Menu>
-        
-        <Tooltip title="Quest information">
-          <IconButton size="small" sx={{ ml: 1 }}>
-            <HelpOutlineIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-      
-      {/* Available Quests Tab */}
-      {activeTab === 0 && (
-        <Box>
-          {availableQuests.length > 0 ? (
-            <List>
-              {availableQuests.map(quest => (
-                <QuestItem 
-                  key={quest.id} 
-                  quest={quest} 
-                  buttonText="Accept Quest"
-                  onAction={() => acceptQuest(quest)}
-                  showRequirements={true}
-                  showRewards={true}
-                  currentRelationship={player.npcRelationships?.[npc.id] || 0}
-                  essence={essence}
-                  inventory={player.inventory}
-                  type={quest.type}
-                  difficulty={quest.difficulty}
-                />
-              ))}
-            </List>
-          ) : (
-            <Paper elevation={0} sx={{ p: 3, bgcolor: '#f5f5f5', borderRadius: 2, textAlign: 'center' }}>
-              <Typography>
-                There are no quests available from {npc.name} at this time.
-                Try improving your relationship to unlock more quests.
+      {questView === 'available' && (
+        availableQuests.length > 0 ? (
+          availableQuests.map(quest => (
+            <Paper key={quest.id} sx={{ p: 2, mb: 2 }}>
+              <Typography variant="h6">{quest.title}</Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                {quest.description}
               </Typography>
-            </Paper>
-          )}
-        </Box>
-      )}
-      
-      {/* Active Quests Tab */}
-      {activeTab === 1 && (
-        <Box>
-          {activeQuests.length > 0 ? (
-            <List>
-              {activeQuests.map(activeQuest => {
-                const npcQuest = npc.quests.find(q => q.id === activeQuest.id);
-                const isCompletable = isQuestCompletable(activeQuest);
-                
-                return (
-                  <QuestItem 
-                    key={activeQuest.id} 
-                    quest={npcQuest}
-                    progress={activeQuest.objectives}
-                    status="active"
-                    buttonText={isCompletable ? "Turn In Quest" : undefined}
-                    onAction={isCompletable ? () => turnInQuest(npcQuest) : undefined}
-                    showProgress={true}
-                    showRewards={true}
-                    type={npcQuest.type}
-                    difficulty={npcQuest.difficulty}
+              
+              <Divider sx={{ mb: 2 }} />
+              
+              <Typography variant="subtitle2">Rewards:</Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, my: 1 }}>
+                {quest.reward.essence && (
+                  <Chip 
+                    size="small" 
+                    icon={<Icon>toll</Icon>} 
+                    label={`${quest.reward.essence} Essence`}
+                    color="primary" 
+                    variant="outlined" 
                   />
-                );
-              })}
-            </List>
-          ) : (
-            <Paper elevation={0} sx={{ p: 3, bgcolor: '#f5f5f5', borderRadius: 2, textAlign: 'center' }}>
-              <Typography>
-                You don't have any active quests from {npc.name}.
-              </Typography>
+                )}
+                {quest.reward.relationship && (
+                  <Chip 
+                    size="small" 
+                    icon={<Icon>favorite</Icon>} 
+                    label={`+${quest.reward.relationship} Relationship`}
+                    color="secondary" 
+                    variant="outlined" 
+                  />
+                )}
+                {quest.reward.trait && (
+                  <Tooltip title={traits?.copyableTraits[quest.reward.trait]?.description || "A special trait"}>
+                    <Chip 
+                      size="small" 
+                      icon={<Icon>stars</Icon>} 
+                      label={traits?.copyableTraits[quest.reward.trait]?.name || quest.reward.trait}
+                      color="success" 
+                      variant="outlined" 
+                    />
+                  </Tooltip>
+                )}
+              </Box>
+              
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 2 }}
+                onClick={() => handleStartQuest(quest.id)}
+              >
+                Accept Quest
+              </Button>
             </Paper>
-          )}
-        </Box>
+          ))
+        ) : (
+          <Typography color="text.secondary">
+            No quests available. Improve your relationship with {npc.name} to unlock more quests.
+          </Typography>
+        )
       )}
       
-      {/* Completed Quests Tab */}
-      {activeTab === 2 && (
-        <Box>
-          {completedQuests.length > 0 ? (
-            <List>
-              {completedQuests.map(quest => (
-                <QuestItem 
-                  key={quest.id} 
-                  quest={quest} 
-                  status="completed"
-                  showRewards={true}
-                  completedDate={player.questCompletionDates?.[quest.id]}
-                  type={quest.type}
-                  difficulty={quest.difficulty}
-                />
-              ))}
-            </List>
-          ) : (
-            <Paper elevation={0} sx={{ p: 3, bgcolor: '#f5f5f5', borderRadius: 2, textAlign: 'center' }}>
-              <Typography>
-                You haven't completed any quests from {npc.name} yet.
-              </Typography>
-            </Paper>
-          )}
-        </Box>
+      {questView === 'active' && (
+        activeQuests.length > 0 ? (
+          activeQuests.map(quest => {
+            const questData = npc.quests?.find(q => q.id === quest.id);
+            const isComplete = quest.objectives?.every(obj => obj.progress >= obj.count);
+            
+            return (
+              <Paper key={quest.id} sx={{ p: 2, mb: 2 }}>
+                <Typography variant="h6">{quest.title}</Typography>
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  {questData?.description || "Complete the objectives"}
+                </Typography>
+                
+                <Divider sx={{ mb: 2 }} />
+                
+                <Typography variant="subtitle2">Objectives:</Typography>
+                <List dense>
+                  {quest.objectives.map((obj, i) => (
+                    <ListItem key={i}>
+                      <ListItemIcon>
+                        {obj.progress >= obj.count ? 
+                          <CheckCircleIcon color="success" /> : 
+                          <CircleIcon color="disabled" />}
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={`${formatObjective(obj)}`}
+                        secondary={`${obj.progress}/${obj.count}`} 
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+                
+                {isComplete && questData?.reward && (
+                  <>
+                    <Divider sx={{ my: 1 }} />
+                    <Typography variant="subtitle2">Rewards:</Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, my: 1 }}>
+                      {questData.reward.essence && (
+                        <Chip 
+                          size="small" 
+                          icon={<Icon>toll</Icon>} 
+                          label={`${questData.reward.essence} Essence`}
+                          color="primary" 
+                          variant="outlined" 
+                        />
+                      )}
+                      {questData.reward.relationship && (
+                        <Chip 
+                          size="small" 
+                          icon={<Icon>favorite</Icon>} 
+                          label={`+${questData.reward.relationship} Relationship`}
+                          color="secondary" 
+                          variant="outlined" 
+                        />
+                      )}
+                      {questData.reward.trait && (
+                        <Tooltip title={traits?.copyableTraits[quest.reward.trait]?.description || "A special trait"}>
+                          <Chip 
+                            size="small" 
+                            icon={<Icon>stars</Icon>} 
+                            label={traits?.copyableTraits[quest.reward.trait]?.name || quest.reward.trait}
+                            color="success" 
+                            variant="outlined" 
+                          />
+                        </Tooltip>
+                      )}
+                    </Box>
+                    
+                    <Button
+                      variant="contained"
+                      color="success"
+                      fullWidth
+                      sx={{ mt: 2 }}
+                      onClick={() => handleTurnInQuest(quest.id)}
+                    >
+                      Complete Quest
+                    </Button>
+                  </>
+                )}
+              </Paper>
+            );
+          })
+        ) : (
+          <Typography color="text.secondary">
+            You don't have any active quests from {npc.name}.
+          </Typography>
+        )
       )}
     </Box>
   );

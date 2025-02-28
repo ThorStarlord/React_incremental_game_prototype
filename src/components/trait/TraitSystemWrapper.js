@@ -4,8 +4,8 @@ import TraitList from './TraitList';
 import TraitSlots from './TraitSlots';
 import TraitSlotsFallback from './TraitSlotsFallback';
 import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
-import { traits } from '../modules/data/traits';
+import { GameStateContext, GameDispatchContext } from '../../context/GameStateContext';
+import { traits } from '../../modules/data/traits';
 
 const TraitSystemWrapper = () => {
   const [dndKitError, setDndKitError] = useState(false);

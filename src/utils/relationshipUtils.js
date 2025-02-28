@@ -50,3 +50,23 @@ export const getPointsToNextTier = (value = 0) => {
   const pointsNeeded = nextTier.threshold - value;
   return { nextTier, pointsNeeded };
 };
+
+export const hexToRgb = (hex) => {
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+  
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? 
+    `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : 
+    '0, 0, 0';
+};
+
+export const calculateProgressToNextTier = (relationship, currentTier, nextTier) => {
+  if (!nextTier) return 100; // Max progress if no next tier
+  return ((relationship - currentTier.threshold) / (nextTier.threshold - currentTier.threshold)) * 100;
+};
+
+export const getRelationshipColor = (relationshipValue) => {
+  const tier = getRelationshipTier(relationshipValue);
+  return tier.color;
+};

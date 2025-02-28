@@ -19,9 +19,9 @@ import LockIcon from '@mui/icons-material/Lock';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
-import Panel from './Panel';
-import useTraitEffects from '../hooks/useTraitEffects';
+import { GameStateContext, GameDispatchContext } from '../../context/GameStateContext';
+import Panel from '../Panel';
+import useTraitEffects from '../../hooks/useTraitEffects';
 
 // SortableTraitSlot component for drag-and-drop functionality
 const SortableTraitSlot = ({ traitId, index, trait, onRemove, onMakePermanent, essence }) => {

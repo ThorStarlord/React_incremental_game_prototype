@@ -13,7 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import PersonIcon from '@mui/icons-material/Person';
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
-import IntegratedTraitsPanel from './traits/IntegratedTraitsPanel';
+import IntegratedTraitsPanel from './trait/IntegratedTraitsPanel';
 import NPCPanel from './npcs/NPCPanel';
 import CharactersPanel from './characters/CharactersPanel';
 import { GameStateContext } from '../context/GameStateContext';

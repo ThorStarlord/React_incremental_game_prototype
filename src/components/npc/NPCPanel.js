@@ -6,6 +6,7 @@ import { getRelationshipTier, getAvailableInteractions, canLearnTrait, getTierBe
 import Panel from '../common/Panel';
 import Icon from '@mui/material/Icon';
 import DialogueHistory from '../DialogueHistory';
+import TradeTab from './trade/TradeTab';
 
 const DialogueOption = ({ option, onSelect, disabled, playerEssence, traitStatus, isNewlyAvailable }) => {
   // Calculate styling based on trait status
@@ -1728,7 +1729,7 @@ const NPCPanel = ({ npc, onClose, locationName }) => {
   // ...
 
   // Update the RelationshipTab to include additional props:
-  {activeTab === 1 && (
+  {activeTab === 'relationship' && (
     <RelationshipTab
       npc={npc}
       playerRelationship={currentRelationship}
@@ -1737,6 +1738,15 @@ const NPCPanel = ({ npc, onClose, locationName }) => {
       dispatch={dispatch}
       tutorial={tutorial}
       traits={traits}
+    />
+  )}
+  
+  {activeTab === 'quests' && (
+    <NPCQuestsTab 
+      npc={npc}
+      player={player}
+      dispatch={dispatch}
+      essence={essence}
     />
   )}
   

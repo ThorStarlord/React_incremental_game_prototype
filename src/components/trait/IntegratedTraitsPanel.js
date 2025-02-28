@@ -25,9 +25,9 @@ import LockIcon from '@mui/icons-material/Lock';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { GameStateContext, GameDispatchContext } from '../../context/GameStateContext';
-import TraitCard from './TraitCard';
+import TraitCard from './TraitCardOld';
 import EmptySlotCard from './EmptySlotCard';
-import TraitSlotProgressIndicator from '../TraitSlotProgressIndicator';
+import TraitSlotProgressIndicator from './TraitSlotProgressIndicator';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

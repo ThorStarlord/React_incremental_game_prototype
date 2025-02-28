@@ -9,9 +9,9 @@ import {
 } from '@mui/material';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import Panel from './Panel';
-import HotkeyHelpTooltip from './HotkeyHelpTooltip';
-import useTraitShortcuts from '../hooks/useTraitShortcuts';
+import Panel from '../Panel';
+import HotkeyHelpTooltip from '../HotkeyHelpTooltip';
+import useTraitShortcuts from '../../hooks/useTraitShortcuts';
 
 const TraitSlotsFallback = ({ 
   player, 

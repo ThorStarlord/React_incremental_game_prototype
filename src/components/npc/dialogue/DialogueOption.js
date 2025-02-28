@@ -1,121 +1,108 @@
 import React from 'react';
-import { Tooltip, Box, Typography } from '@mui/material';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import LockIcon from '@mui/icons-material/Lock';
+import { Button, Box, Typography, Chip } from '@mui/material';
 import { getRelationshipTier } from '../utils/relationshipUtils';
 
 /**
  * Component for a single dialogue response option
  */
 const DialogueOption = ({
-  text,
-  relationshipImpact,
-  requiredRelationship = 0,
-  requiredTraits = [],
-  playerRelationship,
-  playerTraits = [],
-  type = 'neutral', // 'friendly', 'neutral', 'aggressive'
-  onClick,
-  disabled = false,
-  tooltip = ''
+  option,
+  onSelect,
+  disabled,
+  playerEssence,
+  traitStatus,
+  isNewlyAvailable
 }) => {
-  // Check if option is available based on relationship level
-  const isRelationshipSufficient = playerRelationship >= requiredRelationship;
-  
-  // Check if player has all required traits
-  const hasRequiredTraits = requiredTraits.every(trait => 
-    playerTraits.includes(trait)
-  );
-
-  // Determine if option should be disabled
-  const isDisabled = disabled || !isRelationshipSufficient || !hasRequiredTraits;
-  
-  // Set style based on dialogue type and availability
-  const getOptionStyle = () => {
-    const baseStyle = {
-      padding: '8px 16px',
-      margin: '6px 0',
-      borderRadius: '4px',
-      cursor: isDisabled ? 'not-allowed' : 'pointer',
-      opacity: isDisabled ? 0.6 : 1,
-      transition: 'all 0.2s ease',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      border: '1px solid #ccc',
-    };
+  // Calculate styling based on trait status
+  const getBorderStyles = () => {
+    if (disabled) return {};
     
-    if (isDisabled) return baseStyle;
-    
-    // Style based on dialogue type
-    switch(type) {
-      case 'friendly':
-        return { ...baseStyle, backgroundColor: '#e8f5e9', borderColor: '#81c784' };
-      case 'aggressive':
-        return { ...baseStyle, backgroundColor: '#ffebee', borderColor: '#e57373' };
-      case 'neutral':
-      default:
-        return { ...baseStyle, backgroundColor: '#f5f5f5', borderColor: '#bdbdbd' };
-    }
-  };
-
-  // Generate requirement message if option is locked
-  const getRequirementMessage = () => {
-    const requirements = [];
-    
-    if (!isRelationshipSufficient) {
-      requirements.push(`Requires ${getRelationshipTier(requiredRelationship)} relationship`);
+    if (isNewlyAvailable) {
+      return {
+        borderColor: 'success.main',
+        borderWidth: '2px',
+        boxShadow: '0 0 12px rgba(46, 125, 50, 0.6)',
+        animation: 'pulse 1.5s infinite ease-in-out',
+        '@keyframes pulse': {
+          '0%': { boxShadow: `0 0 0 0 rgba(46, 125, 50, 0.4)` },
+          '70%': { boxShadow: `0 0 0 8px rgba(46, 125, 50, 0)` },
+          '100%': { boxShadow: `0 0 0 0 rgba(46, 125, 50, 0)` }
+        }
+      };
     }
     
-    if (requiredTraits.length > 0 && !hasRequiredTraits) {
-      const missingTraits = requiredTraits.filter(trait => !playerTraits.includes(trait));
-      requirements.push(`Required traits: ${missingTraits.join(', ')}`);
+    if (traitStatus?.type === "insufficient_essence") {
+      return {
+        borderColor: 'error.main'
+      };
     }
     
-    return requirements.join(' • ');
+    if (option.action === "copyTrait" || option.nextDialogue === "aboutTraits") {
+      return {
+        borderColor: 'primary.main',
+        borderWidth: '2px',
+        boxShadow: '0 0 8px rgba(25, 118, 210, 0.4)'
+      };
+    }
+    
+    return {};
   };
   
-  const handleClick = () => {
-    if (!isDisabled) {
-      onClick();
-    }
-  };
-  
-  const tooltipText = isDisabled ? getRequirementMessage() : tooltip;
-
   return (
-    <Tooltip title={tooltipText} placement="top" arrow>
-      <Box
-        sx={getOptionStyle()}
-        onClick={handleClick}
-      >
-        <Typography variant="body1" sx={{ flexGrow: 1 }}>
-          {text}
-        </Typography>
+    <Button
+      fullWidth
+      variant="outlined"
+      onClick={() => onSelect(option)}
+      disabled={disabled}
+      sx={{ 
+        my: 1, 
+        textAlign: 'left', 
+        justifyContent: 'flex-start', 
+        whiteSpace: 'normal', 
+        height: 'auto', 
+        p: 1.5,
+        position: 'relative',
+        ...getBorderStyles(),
+        '&:hover': {
+          ...getBorderStyles(),
+          opacity: 0.9
+        }
+      }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+        <Typography>{option.text}</Typography>
         
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
-          {isDisabled && <LockIcon fontSize="small" sx={{ color: 'text.disabled', mr: 1 }} />}
-          
-          {relationshipImpact > 0 && (
-            <ArrowUpwardIcon fontSize="small" sx={{ color: 'success.main' }} />
-          )}
-          
-          {relationshipImpact < 0 && (
-            <ArrowDownwardIcon fontSize="small" sx={{ color: 'error.main' }} />
-          )}
-          
-          {relationshipImpact !== 0 && (
-            <Typography variant="caption" sx={{ 
-              color: relationshipImpact > 0 ? 'success.main' : 'error.main',
-              ml: 0.5
-            }}>
-              {Math.abs(relationshipImpact)}
-            </Typography>
-          )}
-        </Box>
+        {option.action === "copyTrait" && (
+          <Chip 
+            size="small" 
+            label={`${option.essenceCost} Essence`}
+            color={traitStatus?.type === "insufficient_essence" ? "error" : 
+                  isNewlyAvailable ? "success" : "primary"}
+            sx={{ ml: 1 }}
+          />
+        )}
+        
+        {isNewlyAvailable && (
+          <Chip
+            size="small"
+            label="New!"
+            color="success"
+            variant="outlined"
+            sx={{ ml: 1 }}
+          />
+        )}
       </Box>
-    </Tooltip>
+      
+      {traitStatus?.type === "insufficient_essence" && (
+        <Typography 
+          variant="caption" 
+          color="error"
+          sx={{ display: 'block', mt: 0.5 }}
+        >
+          Not enough essence
+        </Typography>
+      )}
+    </Button>
   );
 };
 

@@ -1,176 +1,235 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Divider, LinearProgress, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { 
-  getRelationshipTier, 
-  getRelationshipColor, 
-  getRelationshipProgress, 
-  getNextRelationshipTier
-} from '../utils/relationshipUtils';
+import { Box, Typography, Paper, Button, Fade, Snackbar, Alert } from '@mui/material';
 import DialogueOption from './DialogueOption';
 
-/**
- * Component for NPC dialogue interactions
- */
-const DialogueTab = ({
-  npc,
-  playerRelationship,
-  playerTraits = [],
+const DialogueTab = ({ 
+  npc, 
+  player, 
+  dispatch, 
+  essence,
   onRelationshipChange,
-  currentDialogue = {},
-  dialogueTree = {},
-  onDialogueSelect = () => {},
-  dialogueHistory = [],
-  tutorial = null
+  traits
 }) => {
-  const navigate = useNavigate();
-  
-  // State for displaying past dialogue exchanges
-  const [showHistory, setShowHistory] = useState(false);
-  
-  // Get relationship information
-  const relationshipTier = getRelationshipTier(playerRelationship);
-  const relationshipColor = getRelationshipColor(playerRelationship);
-  const relationshipProgress = getRelationshipProgress(playerRelationship);
-  const nextTier = getNextRelationshipTier(playerRelationship);
+  const [currentDialogue, setCurrentDialogue] = useState(null);
+  const [showResponse, setShowResponse] = useState(false);
+  const [notification, setNotification] = useState({ 
+    open: false, 
+    message: '', 
+    severity: 'success' 
+  });
 
-  // Handle dialogue option selection
-  const handleOptionSelect = (option) => {
-    // Update relationship if this option affects it
-    if (option.relationshipImpact) {
-      onRelationshipChange(playerRelationship + option.relationshipImpact);
+  useEffect(() => {
+    const isFirstMeeting = !player.discoveredNPCs?.includes(npc.id);
+    
+    // Handle discovery
+    if (isFirstMeeting) {
+      dispatch({ 
+        type: 'DISCOVER_NPC', 
+        payload: { 
+          npcId: npc.id,
+          npcName: npc.name  // Pass name for notifications
+        }
+      });
+      
+      // Show first meeting dialogue if available
+      if (npc.dialogue?.firstMeeting) {
+        setCurrentDialogue(npc.dialogue.firstMeeting);
+      } else if (!currentDialogue) {
+        setCurrentDialogue(npc.dialogue?.initial || { 
+          text: npc.greeting || "Hello there.", 
+          options: [] 
+        });
+      }
+    } else if (!currentDialogue) {
+      // Regular dialogue for returning visits
+      setCurrentDialogue(npc.dialogue?.initial || { 
+        text: npc.greeting || "Hello there.", 
+        options: [] 
+      });
+    }
+  }, [npc, player.discoveredNPCs, dispatch, currentDialogue]);
+
+  const handleDialogueChoice = (option, index) => {
+    setShowResponse(true);
+    
+    // Record this dialogue choice in history
+    dispatch({
+      type: 'UPDATE_DIALOGUE_HISTORY',
+      payload: {
+        npcId: npc.id,
+        dialogueId: currentDialogue?.id || 'unknown',
+        choice: option.text,
+        choiceIndex: index,
+        relationshipChange: option.relationshipChange || 0
+      }
+    });
+    
+    // Handle relationship changes
+    if (option.relationshipChange) {
+      onRelationshipChange(option.relationshipChange, 'dialogue');
+    }
+    
+    // Handle trait copying
+    if (option.action === "copyTrait" && option.traitId) {
+      // Check if player has enough essence before dispatching
+      if (essence >= option.essenceCost) {
+        dispatch({ 
+          type: 'COPY_TRAIT', 
+          payload: { 
+            traitId: option.traitId, 
+            essenceCost: option.essenceCost,
+            npcId: npc.id,
+            relationshipRequirement: option.relationshipRequirement
+          } 
+        });
+      } else {
+        // Show not enough essence message
+        setNotification({
+          open: true,
+          message: `Not enough essence! Need ${option.essenceCost} but you have ${essence}.`,
+          severity: 'error'
+        });
+        return; // Don't proceed with dialogue
+      }
     }
     
     // Move to next dialogue
-    onDialogueSelect(option);
+    if (option.nextDialogue) {
+      setTimeout(() => {
+        setShowResponse(false);
+        
+        // If string, it's a dialogue key
+        if (typeof option.nextDialogue === 'string') {
+          setCurrentDialogue(npc.dialogue[option.nextDialogue]);
+          
+          // Update dialogue state in game state
+          dispatch({ 
+            type: 'UPDATE_DIALOGUE_STATE', 
+            payload: { npcId: npc.id, dialogueBranch: option.nextDialogue } 
+          });
+        } else {
+          // If object, it's an inline dialogue
+          setCurrentDialogue(option.nextDialogue);
+        }
+      }, 1000);
+    }
+  };
+
+  // Check trait status
+  const getTraitStatus = (option) => {
+    if (option.action !== "copyTrait") return { type: "normal" };
+    
+    if (player.acquiredTraits.includes(option.traitId)) {
+      return { type: "acquired", message: "Already acquired" };
+    }
+    
+    if (essence < option.essenceCost) {
+      return { 
+        type: "insufficient_essence", 
+        message: `Need ${option.essenceCost - essence} more essence` 
+      };
+    }
+    
+    if (option.relationshipRequirement && npc.relationship < option.relationshipRequirement) {
+      return { 
+        type: "insufficient_relationship", 
+        message: `Need ${option.relationshipRequirement - npc.relationship} more relationship` 
+      };
+    }
+    
+    return { type: "available", message: "Available to learn" };
   };
 
   return (
     <Box>
-      {/* NPC Information and Relationship Display */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h6">
-          {npc.name}
-        </Typography>
-        
-        <Box sx={{ textAlign: 'right' }}>
-          <Typography variant="body2" sx={{ color: relationshipColor, fontWeight: 'bold' }}>
-            {relationshipTier} ({playerRelationship}/100)
+      <Paper 
+        elevation={1} 
+        sx={{ 
+          p: 2, 
+          mb: 2, 
+          minHeight: 80, 
+          bgcolor: 'background.paper',
+          borderLeft: '4px solid',
+          borderColor: 'primary.main'
+        }}
+      >
+        <Fade in={!showResponse} timeout={500}>
+          <Typography variant="body1">
+            {currentDialogue?.text || "..."}
           </Typography>
-          
-          {nextTier && (
-            <Box sx={{ width: 150, mt: 0.5 }}>
-              <LinearProgress 
-                variant="determinate" 
-                value={relationshipProgress.progress} 
-                sx={{ 
-                  height: 8, 
-                  borderRadius: 1, 
-                  backgroundColor: 'rgba(0,0,0,0.1)',
-                  '& .MuiLinearProgress-bar': {
-                    backgroundColor: relationshipColor,
-                  }
-                }}
-              />
-              <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-                {relationshipProgress.remaining} to {nextTier.name}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      </Box>
-
-      {/* Current Dialogue Display */}
-      <Paper sx={{ p: 3, mb: 2, backgroundColor: '#f9f9f9', borderRadius: 2 }}>
-        <Typography variant="body1" sx={{ mb: 1 }}>
-          {currentDialogue.text || "Greetings, traveler."}
-        </Typography>
-        
-        {currentDialogue.mood && (
-          <Typography variant="caption" sx={{ display: 'block', fontStyle: 'italic', color: 'text.secondary' }}>
-            {npc.name} seems {currentDialogue.mood}.
-          </Typography>
-        )}
+        </Fade>
       </Paper>
-
-      {tutorial?.active && tutorial.step === 'findFirstMonster' && tutorial.targetNPCId === npc.id && (
-        <Box sx={{ mt: 2, mb: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={() => {
-              // Navigate to monster encounter
-              navigate('/combat/tutorial');
-            }}
-          >
-            Ask About Nearby Threats
-          </Button>
-        </Box>
-      )}
-
-      {/* Dialogue History */}
-      {showHistory && dialogueHistory.length > 0 && (
-        <Paper sx={{ p: 2, mb: 2, maxHeight: '150px', overflowY: 'auto' }}>
-          {dialogueHistory.map((entry, index) => (
-            <Box key={index} sx={{ mb: 1 }}>
-              <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-                {entry.speaker}:
-              </Typography>
-              <Typography variant="body2">
-                {entry.text}
-              </Typography>
-            </Box>
-          ))}
-        </Paper>
-      )}
-
-      {/* Toggle History Button */}
-      {dialogueHistory.length > 0 && (
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            display: 'block', 
-            mb: 2, 
-            textDecoration: 'underline',
-            cursor: 'pointer',
-            color: 'text.secondary'
-          }}
-          onClick={() => setShowHistory(!showHistory)}
-        >
-          {showHistory ? 'Hide conversation history' : 'Show conversation history'}
-        </Typography>
-      )}
       
-      <Divider sx={{ mb: 2 }} />
-
-      {/* Response Options */}
-      <Box>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          Your Response:
-        </Typography>
+      <Box sx={{ mt: 3 }}>
+        {currentDialogue?.options?.map((option, index) => {
+          const traitStatus = getTraitStatus(option);
+          const isDisabled = showResponse || 
+            (traitStatus.type !== "available" && traitStatus.type !== "normal");
+          
+          // Check if trait is newly available (not yet acquired but available)
+          const isNewlyAvailable = traitStatus.type === "available" && 
+            !player.seenTraits?.includes(option.traitId);
+          
+          return (
+            <Box key={index}>
+              <DialogueOption
+                option={option}
+                onSelect={() => {
+                  // Mark trait as seen if it's newly available
+                  if (isNewlyAvailable && option.traitId) {
+                    dispatch({
+                      type: 'MARK_TRAIT_SEEN',
+                      payload: { traitId: option.traitId }
+                    });
+                  }
+                  handleDialogueChoice(option, index);
+                }}
+                disabled={isDisabled}
+                playerEssence={essence}
+                traitStatus={traitStatus}
+                isNewlyAvailable={isNewlyAvailable}
+              />
+              
+              {traitStatus.type !== "normal" && traitStatus.type !== "available" && (
+                <Typography 
+                  variant="caption" 
+                  color={traitStatus.type === "acquired" ? "text.secondary" : "error"}
+                  sx={{ display: 'block', mb: 1, ml: 2 }}
+                >
+                  {traitStatus.message}
+                </Typography>
+              )}
+            </Box>
+          );
+        })}
         
-        {currentDialogue.options?.map((option, index) => (
-          <DialogueOption
-            key={index}
-            text={option.text}
-            relationshipImpact={option.relationshipImpact || 0}
-            requiredRelationship={option.requiredRelationship || 0}
-            requiredTraits={option.requiredTraits || []}
-            playerRelationship={playerRelationship}
-            playerTraits={playerTraits}
-            type={option.type || 'neutral'}
-            tooltip={option.tooltip || ''}
-            onClick={() => handleOptionSelect(option)}
-          />
-        ))}
-        
-        {(!currentDialogue.options || currentDialogue.options.length === 0) && (
-          <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
-            No response options available.
-          </Typography>
+        {(!currentDialogue?.options || currentDialogue.options.length === 0) && (
+          <Button 
+            fullWidth 
+            variant="outlined" 
+            onClick={() => setCurrentDialogue(npc.dialogue?.initial)}
+            sx={{ mt: 2 }}
+          >
+            End conversation
+          </Button>
         )}
       </Box>
+
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={4000}
+        onClose={() => setNotification({...notification, open: false})}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setNotification({...notification, open: false})} 
+          severity={notification.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
