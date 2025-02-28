@@ -1,0 +1,49 @@
+/* WorldMap.css */
+
+/* Styles for the World Map component */
+
+.world-map {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #e0f7fa; /* Light blue background */
+    border: 2px solid #00796b; /* Darker blue border */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.region {
+    position: absolute;
+    border: 1px solid #004d40; /* Dark green border for regions */
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.region:hover {
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.town {
+    background-color: #ffccbc; /* Light orange for towns */
+    border: 1px solid #e65100; /* Dark orange border */
+}
+
+.dungeon {
+    background-color: #d1c4e9; /* Light purple for dungeons */
+    border: 1px solid #6a1b9a; /* Dark purple border */
+}
+
+.exploration-area {
+    background-color: #c8e6c9; /* Light green for exploration areas */
+    border: 1px solid #388e3c; /* Dark green border */
+}
+
+.region-label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffffff; /* White text for labels */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Shadow for better readability */
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+}

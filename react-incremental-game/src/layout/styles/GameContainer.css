@@ -1,0 +1,38 @@
+/* GameContainer.css */
+
+/* Styles for the GameContainer component */
+.game-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100%;
+    background-color: #f0f0f0; /* Light background for the game */
+}
+
+.left-column {
+    flex: 1;
+    padding: 20px;
+    background-color: #ffffff; /* White background for the left column */
+    border-right: 1px solid #ccc; /* Light border for separation */
+}
+
+.middle-column {
+    flex: 2;
+    padding: 20px;
+    background-color: #e0e0e0; /* Slightly darker background for the middle column */
+}
+
+.right-column {
+    flex: 1;
+    padding: 20px;
+    background-color: #ffffff; /* White background for the right column */
+    border-left: 1px solid #ccc; /* Light border for separation */
+}
+
+.header {
+    background-color: #4CAF50; /* Green background for the header */
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 24px;
+}

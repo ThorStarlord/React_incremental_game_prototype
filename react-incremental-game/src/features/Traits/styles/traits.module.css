@@ -1,0 +1,50 @@
+/ src/features/Traits/styles/traits.module.css
+
+.TraitCard {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px;
+    transition: transform 0.2s;
+}
+
+.TraitCard:hover {
+    transform: scale(1.05);
+}
+
+.TraitButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.TraitButton:hover {
+    background-color: #0056b3;
+}
+
+.EmptySlotCard {
+    background-color: #e0e0e0;
+    border: 1px dashed #aaa;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    margin: 8px;
+}
+
+.TraitPanel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.TraitList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}

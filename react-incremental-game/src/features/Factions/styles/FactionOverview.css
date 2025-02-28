@@ -1,0 +1,57 @@
+/***************
+ * Faction Overview Styles
+ ***************/
+
+.faction-overview {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.faction-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.faction-description {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.faction-members {
+    list-style-type: none;
+    padding: 0;
+}
+
+.faction-member {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.faction-member:last-child {
+    border-bottom: none;
+}
+
+.faction-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.faction-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.faction-button:hover {
+    background-color: #007bff;
+    color: white;
+}

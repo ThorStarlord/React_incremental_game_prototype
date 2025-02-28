@@ -1,0 +1,63 @@
+{
+  "name": "Borin",
+  "dialogues": [
+    {
+      "id": 1,
+      "text": "Hello there, traveler! What brings you to these parts?",
+      "responses": [
+        {
+          "id": 1,
+          "text": "I'm looking for adventure.",
+          "nextDialogueId": 2
+        },
+        {
+          "id": 2,
+          "text": "Just passing through.",
+          "nextDialogueId": 3
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "text": "Adventure, you say? There are many dangers lurking in the shadows. Are you prepared?",
+      "responses": [
+        {
+          "id": 3,
+          "text": "I am ready for anything!",
+          "nextDialogueId": 4
+        },
+        {
+          "id": 4,
+          "text": "I need more time to prepare.",
+          "nextDialogueId": 5
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "text": "Ah, a wise choice. Sometimes it's best to tread carefully.",
+      "responses": [
+        {
+          "id": 5,
+          "text": "What do you recommend?",
+          "nextDialogueId": 6
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "text": "Then let the adventure begin! Follow me.",
+      "responses": []
+    },
+    {
+      "id": 5,
+      "text": "Gather supplies and strengthen your skills. You'll need them.",
+      "responses": []
+    },
+    {
+      "id": 6,
+      "text": "Seek out the local merchants and gather information. Knowledge is power.",
+      "responses": []
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+/* Dungeon Panel Styles */
+
+.dungeon-panel {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dungeon-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.dungeon-description {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.dungeon-encounter {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.encounter-card {
+    background-color: #34495e;
+    padding: 15px;
+    border-radius: 5px;
+    transition: transform 0.2s;
+}
+
+.encounter-card:hover {
+    transform: scale(1.05);
+}
+
+.encounter-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.encounter-details {
+    font-size: 14px;
+}
+
+.dungeon-footer {
+    margin-top: 20px;
+    text-align: center;
+}

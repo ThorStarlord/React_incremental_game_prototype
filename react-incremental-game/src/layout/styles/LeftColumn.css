@@ -1,0 +1,36 @@
+/***************
+ * LeftColumn.css
+ ***************/
+
+.left-column {
+    width: 25%;
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.left-column h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.left-column p {
+    font-size: 1em;
+    line-height: 1.5;
+}
+
+.left-column .button {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.left-column .button:hover {
+    background-color: #0056b3;
+}
