@@ -10,8 +10,8 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LoopIcon from '@mui/icons-material/Loop';
 import StarIcon from '@mui/icons-material/Star';
-import { formatObjective } from '../../NPCs/utils/formatters';
-import { getQuestTypeIcon, getQuestDifficultyColor } from '../../NPCs/utils/questHelpers';
+import { formatObjective } from '../utils/formatters';
+import { getQuestTypeIcon, getQuestDifficultyColor } from '../utils/questHelpers';
 
 const QuestItem = ({
   quest,
@@ -271,8 +271,8 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LoopIcon from '@mui/icons-material/Loop';
 import StarIcon from '@mui/icons-material/Star';
-import { formatObjective } from '../../NPCs/utils/formatters';
-import { getQuestTypeIcon, getQuestDifficultyColor } from '../../NPCs/utils/questHelpers';
+import { formatObjective } from '../utils/formatters';
+import { getQuestTypeIcon, getQuestDifficultyColor } from '../utils/questHelpers';
 
 const QuestItem = ({
   quest,

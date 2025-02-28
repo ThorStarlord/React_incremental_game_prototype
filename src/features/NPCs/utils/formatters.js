@@ -1,22 +1,64 @@
-// This file contains utility functions for formatting NPC-related data.
-
-export const formatNPCName = (name) => {
-    return name.charAt(0).toUpperCase() + name.slice(1);
+/**
+ * Format an objective to display text
+ */
+export const formatObjective = (objective) => {
+  switch (objective.type) {
+    case 'defeat':
+      return `Defeat ${objective.count} ${formatEntityName(objective.target)}`;
+    case 'collect':
+      return `Collect ${objective.count} ${formatEntityName(objective.target)}`;
+    case 'craft':
+      return `Craft ${objective.count} ${formatEntityName(objective.target)}`;
+    case 'visit':
+      return `Visit ${formatLocationName(objective.target)}`;
+    default:
+      return `${objective.type}: ${objective.count} ${objective.target}`;
+  }
 };
 
-export const formatNPCDialogue = (dialogue) => {
-    return dialogue.trim().replace(/\s+/g, ' ');
+/**
+ * Format entity names from snake_case to Title Case
+ */
+export const formatEntityName = (name) => {
+  return name
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 };
 
-export const formatNPCRelationshipStatus = (status) => {
-    switch (status) {
-        case 'friendly':
-            return '🤝 Friendly';
-        case 'neutral':
-            return '😐 Neutral';
-        case 'hostile':
-            return '⚔️ Hostile';
-        default:
-            return 'Unknown Status';
-    }
+/**
+ * Format location names from snake_case to Title Case
+ */
+export const formatLocationName = (name) => {
+  return name
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+/**
+ * Format time period names
+ */
+export const formatTimePeriod = (period) => {
+  switch (period) {
+    case 'morning': return 'Morning';
+    case 'afternoon': return 'Afternoon';
+    case 'evening': return 'Evening';
+    case 'night': return 'Night';
+    default: return period;
+  }
+};
+
+/**
+ * Format resource amounts with appropriate units
+ */
+export const formatResource = (amount, type) => {
+  switch (type) {
+    case 'essence':
+      return `${amount} Essence`;
+    case 'gold':
+      return `${amount} Gold`;
+    default:
+      return `${amount} ${type}`;
+  }
 };
