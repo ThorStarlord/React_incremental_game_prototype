@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
+import { GameStateContext, GameDispatchContext } from '../../context/GameStateContext';
 import NewSlotAnimation from './NewSlotAnimation';
 import { Snackbar, Alert } from '@mui/material';
 

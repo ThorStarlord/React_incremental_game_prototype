@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Box, Typography, Paper, Chip, Stack } from '@mui/material';
 import { useDraggable } from '@dnd-kit/core';
-import { GameStateContext } from '../context/GameStateContext';
+import { GameStateContext } from '../../../context/GameStateContext';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Paper, Typography } from '@mui/material';
-import PlayerStats from './PlayerStats';
+import InventoryList from '../InventoryList';
 
-const LeftColumn = ({ components }) => {
+const RightColumn = ({ components }) => {
   const renderComponent = (componentId) => {
     switch (componentId) {
-      case 'PlayerStats':
-        return <PlayerStats />;
+      case 'InventoryList':
+        return <InventoryList />;
       default:
         return null;
     }
@@ -14,19 +14,9 @@ const LeftColumn = ({ components }) => {
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Paper
-        sx={{
-          p: 2,
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          bgcolor: 'background.default',
-          overflow: 'visible'
-        }}
-        elevation={3}
-      >
+      <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }} elevation={3}>
         <Typography variant="h6" align="center" sx={{ mb: 2 }}>
-          Character
+          Inventory
         </Typography>
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           {components.map((componentId) => (
@@ -40,4 +30,4 @@ const LeftColumn = ({ components }) => {
   );
 };
 
-export default LeftColumn;
+export default RightColumn;

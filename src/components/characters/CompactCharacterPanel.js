@@ -16,7 +16,7 @@ import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import PersonIcon from '@mui/icons-material/Person';
 import { GameStateContext } from '../../context/GameStateContext';
-import Panel from '../Panel';
+import Panel from '../panel/Panel';
 
 const CompactCharacterPanel = ({ onExpandView }) => {
   const { npcs, player } = useContext(GameStateContext);

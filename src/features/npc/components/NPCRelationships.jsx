@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { Box, Typography, Paper, Tabs, Tab, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { GameStateContext } from '../context/GameStateContext';
+import { GameStateContext } from '../../../context/GameStateContext';
 import RelationshipDisplay from './RelationshipDisplay';
-import Panel from './common/Panel';
+import Panel from '../../../components/common/Panel';
 
 const NPCRelationships = () => {
   const { npcs, player } = useContext(GameStateContext);

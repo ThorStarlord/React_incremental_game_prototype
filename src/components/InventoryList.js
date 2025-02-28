@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Box, Typography, Tooltip, Grid } from '@mui/material';
 import { DndContext, useDraggable, useDroppable, closestCenter, DragOverlay } from '@dnd-kit/core';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
-import Panel from './Panel';
+import Panel from './panel/Panel';
 
 // Individual inventory item component
 const InventoryItem = ({ item, id, isOverlay = false }) => {

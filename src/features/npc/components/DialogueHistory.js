@@ -4,11 +4,11 @@ import {
   ListItemText, Paper, Chip, IconButton, Button 
 } from '@mui/material';
 import { formatDistanceToNow } from 'date-fns';
-import { GameStateContext } from '../context/GameStateContext';
+import { GameStateContext } from '../../../context/GameStateContext';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { getRelationshipTier } from '../config/relationshipConstants';
+import { getRelationshipTier } from '../../../config/relationshipConstants';
 
 const DialogueHistoryItem = ({ entry, onRevisit }) => {
   const { dialogueId, choice, timestamp, relationshipChange } = entry;

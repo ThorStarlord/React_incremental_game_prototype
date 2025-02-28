@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, LinearProgress, Tooltip, Paper, Avatar, Divider } from '@mui/material';
-import { getRelationshipTier } from '../config/relationshipConstants';
+import { getRelationshipTier } from '../../../config/relationshipConstants';
 import Icon from '@mui/material/Icon';
 
 const RelationshipDisplay = ({ npc }) => {

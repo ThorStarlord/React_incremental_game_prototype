@@ -3,22 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Grid, AppBar, Toolbar, Typography, IconButton, Snackbar, Tooltip } from '@mui/material';
-import PlayerStats from './PlayerStats';
-import WorldMap from './WorldMap';
-import InventoryList from './InventoryList';
-import EssenceDisplay from './EssenceDisplay';
-import TraitSystemWrapper from './trait/TraitSystemWrapper';
-import Panel from './Panel';
-import BreadcrumbNav from './BreadcrumbNav';
-import useEssenceGeneration from '../hooks/useEssenceGeneration';
-import RelationshipNotification from './RelationshipNotification';
-import TraitEffectNotification from './trait/TraitEffectNotification';
-import useTraitNotifications from '../hooks/useTraitNotifications';
-import CharacterTabBar from './CharacterTabBar';
-import CharacterManagementDrawer from './CharacterManagementDrawer';
-import CompactTraitPanel from './trait/CompactTraitPanel';
-import CompactCharacterPanel from './characters/CompactCharacterPanel';
-import useMinionSimulation from '../hooks/useMinionSimulation';
+import PlayerStats from '../../features/player/components/PlayerStats';
+import WorldMap from '../WorldMap';
+import InventoryList from '../InventoryList';
+import EssenceDisplay from '../EssenceDisplay';
+import TraitSystemWrapper from '../trait/TraitSystemWrapper';
+import Panel from '../panel/Panel';
+import BreadcrumbNav from '../BreadcrumbNav';
+import useEssenceGeneration from '../../hooks/useEssenceGeneration';
+import RelationshipNotification from '../../features/npc/components/RelationshipNotification';
+import TraitEffectNotification from '../trait/TraitEffectNotification';
+import useTraitNotifications from '../../hooks/useTraitNotifications';
+import CharacterTabBar from '../CharacterTabBar';
+import CharacterManagementDrawer from '../CharacterManagementDrawer';
+import CompactTraitPanel from '../trait/CompactTraitPanel';
+import CompactCharacterPanel from '../characters/CompactCharacterPanel';
+import useMinionSimulation from '../../hooks/useMinionSimulation';
 
 // Import icons for the header
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';

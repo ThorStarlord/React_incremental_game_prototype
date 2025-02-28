@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Container, Box, Typography, Switch, FormGroup, FormControlLabel, Button, Divider } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { ThemeContext } from '../context/ThemeContext';
-import Panel from './Panel';
+import Panel from './panel/Panel';
 import BreadcrumbNav from './BreadcrumbNav';
 
 const Settings = () => {

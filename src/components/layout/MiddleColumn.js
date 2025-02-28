@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import Battle from './Battle';
+import Battle from '../combat/Battle';
 import WorldMap from './panels/WorldMap';
-import MainContent from './MainContent';
+import MainContent from '../MainContent';
 import styles from './styles/MiddleColumn.module.css';
 import sharedStyles from './styles/shared.module.css';
 

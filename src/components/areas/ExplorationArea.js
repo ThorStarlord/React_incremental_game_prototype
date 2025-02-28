@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import Battle from '../Battle';
+import Battle from '../combat/Battle';
 import NPCEncounter from '../NPCEncounter';
 import DungeonPanel from '../panels/DungeonPanel';
 

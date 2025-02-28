@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { Box, Typography, LinearProgress, Tooltip, Chip, Divider } from '@mui/material';
-import { GameStateContext } from '../context/GameStateContext';
-import Panel from './Panel';
-import useThemeUtils from '../hooks/useThemeUtils';
-import useTraitEffects from '../hooks/useTraitEffects';
+import { GameStateContext } from '../../../context/GameStateContext';
+import Panel from '../../../components/panel/Panel';
+import useThemeUtils from '../../../hooks/useThemeUtils';
+import useTraitEffects from '../../../hooks/useTraitEffects';
 
 const StatDisplay = ({ label, value, bonus }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import BreadcrumbNav from './BreadcrumbNav';
+import BreadcrumbNav from '../../../components/BreadcrumbNav';
 import NPCPanel from './NPCPanel';
 
 const NPCEncounter = ({ npcId }) => {

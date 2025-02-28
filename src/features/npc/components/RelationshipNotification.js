@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Snackbar, Alert, Box, Typography } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { GameStateContext } from '../context/GameStateContext';
-import { RELATIONSHIP_TIERS } from '../config/gameConstants';
+import { GameStateContext } from '../../../context/GameStateContext';
+import { RELATIONSHIP_TIERS } from '../../../config/gameConstants';
 
 const RelationshipNotification = () => {
   const { npcs } = useContext(GameStateContext);

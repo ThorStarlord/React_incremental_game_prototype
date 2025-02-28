@@ -1,12 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Box, Typography, Button, Paper, Fade, Avatar, Chip, Divider, 
          List, ListItem, ListItemIcon, ListItemText, Tooltip, Snackbar, Alert, LinearProgress, Tabs, Tab } from '@mui/material';
-import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../../context/GameStateContext';
-import { getRelationshipTier, getAvailableInteractions, canLearnTrait, getTierBenefits } from '../../config/relationshipConstants';
-import Panel from '../../components/common/Panel';
+import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../../../context/GameStateContext';
+import { getRelationshipTier, getAvailableInteractions, canLearnTrait, getTierBenefits } from '../../../config/relationshipConstants';
+import Panel from '../../../components/common/Panel';
 import Icon from '@mui/material/Icon';
-import DialogueHistory from '../../components/DialogueHistory';
-import TradeTab from './trade/TradeTab';
+import DialogueHistory from './DialogueHistory';
+import TradeTab from '../trade/TradeTab';
 
 const DialogueOption = ({ option, onSelect, disabled, playerEssence, traitStatus, isNewlyAvailable }) => {
   // Calculate styling based on trait status
@@ -1520,14 +1520,14 @@ useEffect(() => {
 import React, { useContext } from 'react';
 import { Box, Typography, Tabs, Tab, Paper, List, ListItem, ListItemIcon, 
          ListItemText, Chip, Divider, Avatar, Button, Icon } from '@mui/material';
-import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../../context/GameStateContext';
+import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../../../context/GameStateContext';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircleIcon from '@mui/icons-material/Circle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import { formatDistanceToNow } from 'date-fns';
-import { formatObjective } from '../../utils/questUtils';
-import Panel from '../../components/common/Panel';
+import { formatObjective } from '../../../utils/questUtils';
+import Panel from '../../../components/common/Panel';
 
 const QuestsPage = () => {
   const [tabValue, setTabValue] = React.useState(0);
@@ -1681,13 +1681,13 @@ const QuestsPage = () => {
 export default QuestsPage;
 
 // Import NPC component tabs
-import DialogueTab from './dialogue/DialogueTab';
-import NPCQuestsTab from './quests/NPCQuestsTab';
-import RelationshipTab from './relationship/RelationshipTab';
-import TradeTab from './trade/TradeTab';
+import DialogueTab from '../dialogue/DialogueTab';
+import NPCQuestsTab from '../quests/NPCQuestsTab';
+import RelationshipTab from '../relationship/RelationshipTab';
+import TradeTab from '../trade/TradeTab';
 
 // Import utilities
-import { getRelationshipTier, getRelationshipColor } from './utils/relationshipUtils';
+import { getRelationshipTier, getRelationshipColor } from '../utils/relationshipUtils';
 
 // Import animations from existing CSS
 import '../FactionUI/FactionContainer.css';

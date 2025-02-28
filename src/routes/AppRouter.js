@@ -2,12 +2,12 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useParams, useNavigate } from 'react-router-dom';
 import { Provider, useSelector } from 'react-redux';
 import store from '../store'; // Import your Redux store
-import GameContainer from '../components/GameContainer';
+import GameContainer from '../components/layout/GameContainer';
 import TownArea from '../components/areas/TownArea';
-import NPCEncounter from '../components/NPCEncounter';
+import NPCEncounter from '../features/npc/components/NPCEncounter';
 import MainMenu from '../components/MainMenu';
 import Settings from '../components/Settings';
-import NPCPanel from '../features/npc/NPCPanel';
+import NPCPanel from '../features/npc/components/NPCPanel';
 
 const TownAreaWrapper = () => {
   const { townId } = useParams();

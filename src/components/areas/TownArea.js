@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, IconButton, Grid, Button, LinearProgress, Tooltip } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import Panel from '../Panel';
+import Panel from '../panel/Panel';
 import BreadcrumbNav from '../BreadcrumbNav';
 import { towns } from '../../modules/data';
 import useThemeUtils from '../../hooks/useThemeUtils';
