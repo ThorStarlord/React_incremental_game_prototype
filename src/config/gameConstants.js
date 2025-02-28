@@ -44,58 +44,60 @@ export const PROGRESSION_THRESHOLDS = {
 };
 
 export const RELATIONSHIP_TIERS = {
-  DEVOTED: {
-    threshold: 80,
-    name: 'Devoted',
-    color: '#9C27B0',
-    essenceRate: 5
+  NEMESIS: {
+    name: 'Nemesis',
+    threshold: -80,
+    color: '#ff0000', // Red
+    benefits: [],
+    description: 'This person despises you and will actively work against you.'
   },
-  TRUSTED: {
-    threshold: 60,
-    name: 'Trusted',
-    color: '#4CAF50',
-    essenceRate: 4
-  },
-  FRIENDLY: {
-    threshold: 40,
-    name: 'Friendly',
-    color: '#2196F3',
-    essenceRate: 3
-  },
-  WARM: {
-    threshold: 20,
-    name: 'Warm',
-    color: '#8BC34A',
-    essenceRate: 2
-  },
-  NEUTRAL: {
-    threshold: 0,
-    name: 'Neutral',
-    color: '#9E9E9E',
-    essenceRate: 0
-  },
-  COLD: {
-    threshold: -20,
-    name: 'Cold',
-    color: '#FF9800',
-    essenceRate: 0
+  ENEMY: {
+    name: 'Enemy',
+    threshold: -50,
+    color: '#ff6b6b', // Light red
+    benefits: [],
+    description: 'This person dislikes you and may refuse to help you.'
   },
   UNFRIENDLY: {
-    threshold: -40,
     name: 'Unfriendly',
-    color: '#F44336',
-    essenceRate: 0
+    threshold: -20,
+    color: '#ffa500', // Orange
+    benefits: [],
+    description: 'This person is wary of you and reluctant to offer assistance.'
   },
-  HOSTILE: {
-    threshold: -60,
-    name: 'Hostile',
-    color: '#D32F2F',
-    essenceRate: 0
+  NEUTRAL: {
+    name: 'Neutral',
+    threshold: 0,
+    color: '#ffff00', // Yellow
+    benefits: ['Basic dialogue options'],
+    description: 'This person has no strong feelings toward you.'
   },
-  NEMESIS: {
-    threshold: -80,
-    name: 'Nemesis',
-    color: '#B71C1C',
-    essenceRate: 0
+  FRIENDLY: {
+    name: 'Friendly',
+    threshold: 20,
+    color: '#90ee90', // Light green
+    benefits: ['Basic dialogue options', 'Basic trade options'],
+    description: 'This person is friendly towards you and willing to help.'
+  },
+  TRUSTED: {
+    name: 'Trusted',
+    threshold: 50,
+    color: '#00cc00', // Medium green
+    benefits: ['Advanced dialogue options', 'Trade discounts', 'Basic trait sharing'],
+    description: 'This person trusts you and values your relationship.'
+  },
+  ALLY: {
+    name: 'Ally',
+    threshold: 80,
+    color: '#008800', // Dark green
+    benefits: ['All dialogue options', 'Best trade deals', 'Advanced trait sharing', 'Faction benefits'],
+    description: 'This person is a close ally and will go out of their way to help you.'
   }
+};
+
+// Time constants for relationship decay
+export const RELATIONSHIP_DECAY = {
+  THRESHOLD_HOURS: 24, // Hours after which relationships start to decay
+  DECAY_AMOUNT: -1, // Amount of decay per day
+  MINIMUM_DECAY: 0, // Don't decay below neutral
 };

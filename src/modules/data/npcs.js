@@ -1,189 +1,153 @@
+// src/modules/data/npcs.js
 export const npcs = [
   {
     id: 'npc1',
-    name: 'Elder Willow',
+    name: 'Elder Elara',
     type: 'Mentor',
-    location: 'woodhaven',
-    relationship: 20, // Starting as slightly warm
+    location: 'oakhaven',
+    relationship: 20,
     description: "A wise elder with deep knowledge of essence manipulation",
     dialogue: {
+      // Special first meeting dialogue
+      firstMeeting: {
+        id: 'firstMeeting',
+        text: "Ah, a new face in Oakhaven. I am Elder Elara, guardian of ancient knowledge. I sense potential in you that few possess. Come, let us talk.",
+        options: [
+          {
+            text: "I'm honored to meet you, Elder.",
+            relationshipChange: 10,
+            nextDialogue: "firstMeetingResponse"
+          },
+          {
+            text: "What kind of potential do you sense?",
+            nextDialogue: "firstMeetingPotential"
+          },
+          {
+            text: "I'm just passing through.",
+            relationshipChange: -5,
+            nextDialogue: "firstMeetingDismissive"
+          }
+        ]
+      },
+      firstMeetingResponse: {
+        id: 'firstMeetingResponse',
+        text: "The honor is mine. It has been some time since I've met someone with your affinity for essence manipulation. I believe our paths crossing is no mere coincidence.",
+        options: [
+          {
+            text: "I'd like to learn more from you.",
+            nextDialogue: "aboutTraits",
+            relationshipChange: 5
+          },
+          {
+            text: "What can you tell me about Oakhaven?",
+            nextDialogue: "aboutOakhaven"
+          }
+        ]
+      },
+      firstMeetingPotential: {
+        id: 'firstMeetingPotential',
+        text: "The essence flows differently around you. Most can barely perceive it, but you... you could learn to shape it, given proper guidance.",
+        options: [
+          {
+            text: "Could you teach me?",
+            nextDialogue: "aboutTraits",
+            relationshipChange: 5
+          },
+          {
+            text: "That sounds like mystical nonsense.",
+            relationshipChange: -10,
+            nextDialogue: "firstMeetingDismissive"
+          }
+        ]
+      },
+      firstMeetingDismissive: {
+        id: 'firstMeetingDismissive',
+        text: "As you wish. The path of knowledge remains open should you change your mind. Many dismiss what they don't understand, only to seek it later.",
+        options: [
+          {
+            text: "Maybe I was hasty. Tell me more.",
+            nextDialogue: "initial",
+            relationshipChange: 5
+          },
+          {
+            text: "I'll be on my way then.",
+            nextDialogue: "initial"
+          }
+        ]
+      },
       initial: {
-        text: "Welcome, seeker of knowledge. What guidance do you seek today?",
+        text: "Welcome, seeker. I sense potential in you.",
+        options: [
+          {
+            text: "I'd like to learn from you.",
+            nextDialogue: "aboutTraits",
+            relationshipChange: 5
+          },
+          {
+            text: "Who are you?",
+            nextDialogue: "aboutSelf"
+          }
+        ]
+      },
+      aboutTraits: {
+        text: "I can teach you Mentor's Insight - a technique to enhance your essence gathering.",
+        options: [
+          {
+            text: "Teach me (50 Essence)",
+            action: "copyTrait",
+            traitId: "MentorsInsight",
+            essenceCost: 50,
+            relationshipRequirement: 20,
+            nextDialogue: "traitLearned"
+          }
+        ]
+      },
+      traitLearned: {
+        text: "You have learned well. This insight will serve you on your journey.",
+        options: [
+          {
+            text: "Thank you for your wisdom.",
+            nextDialogue: "initial",
+            relationshipChange: 5
+          }
+        ]
+      },
+      aboutSelf: {
+        text: "I am Elder Elara, guardian of ancient knowledge. I've studied essence manipulation for longer than most can remember.",
+        options: [
+          {
+            text: "Can you teach me?",
+            nextDialogue: "aboutTraits",
+            relationshipChange: 5
+          }
+        ]
+      },
+      aboutOakhaven: {
+        id: 'aboutOakhaven',
+        text: "Oakhaven has stood for centuries as a sanctuary for those who study essence manipulation. The great oak at its center has roots that reach into the deepest wells of power.",
         options: [
           {
             text: "Tell me about essence manipulation.",
-            relationshipChange: 5,
-            nextDialogue: {
-              text: "Essence is the fundamental force that binds all things. Through meditation and practice, one can learn to harness it.",
-              options: [
-                {
-                  text: "Can you teach me more about meditation?",
-                  relationshipChange: 10,
-                  stateChanges: { learnedMeditation: true },
-                  nextDialogue: {
-                    text: "Close your eyes and focus on your breath. Feel the essence flowing around you...",
-                    options: [
-                      {
-                        text: "Thank you for the lesson.",
-                        relationshipChange: 5,
-                        nextDialogue: { text: "Return when you wish to learn more.", options: [] }
-                      }
-                    ]
-                  }
-                },
-                {
-                  text: "I prefer more direct methods of power.",
-                  relationshipChange: -5,
-                  nextDialogue: {
-                    text: "Power without wisdom leads to destruction. But you must walk your own path.",
-                    options: []
-                  }
-                }
-              ]
-            }
+            nextDialogue: "aboutEssence"
           },
           {
-            text: "I seek to join the Mystic Order.",
-            requiresRelationship: 30,
-            relationshipChange: 15,
-            nextDialogue: {
-              text: "Your dedication shows promise. The path of the Mystic Order is not easy, but it leads to great wisdom.",
-              options: []
-            }
+            text: "I'd like to learn from you.",
+            nextDialogue: "aboutTraits",
+            relationshipChange: 5
+          }
+        ]
+      },
+      aboutEssence: {
+        id: 'aboutEssence',
+        text: "Essence is the fundamental energy that flows through all things. Most can't perceive it, let alone manipulate it. But with training, one can learn to gather and shape it, enhancing natural abilities or creating entirely new ones.",
+        options: [
+          {
+            text: "That sounds powerful.",
+            nextDialogue: "aboutTraits"
           }
         ]
       }
     }
   },
-  {
-    id: 'merchant',
-    name: 'Town Merchant',
-    type: 'Trader',
-    location: 'woodhaven',
-    relationship: 0, // Starting neutral
-    description: "A shrewd but fair merchant who deals in various goods",
-    dialogue: {
-      initial: {
-        text: "Welcome to my shop! What catches your eye today?",
-        options: [
-          {
-            text: "Let's talk about prices.",
-            relationshipChange: -2,
-            nextDialogue: {
-              text: "My prices are fair for the quality I offer.",
-              options: [
-                {
-                  text: "You're right, the quality seems good.",
-                  relationshipChange: 5,
-                  nextDialogue: {
-                    text: "I'm glad you understand. Perhaps I can offer you a small discount on your next purchase.",
-                    options: []
-                  }
-                }
-              ]
-            }
-          },
-          {
-            text: "I'm interested in your rare items.",
-            requiresRelationship: 20,
-            nextDialogue: {
-              text: "Ah, a discerning customer! I might have some special items in the back...",
-              options: []
-            }
-          }
-        ]
-      }
-    }
-  },
-  {
-    id: 'blacksmith',
-    name: 'Master Smith',
-    type: 'Craftsman',
-    location: 'frostkeep',
-    relationship: 0,
-    description: "A skilled blacksmith who can forge powerful equipment",
-    dialogue: {
-      initial: {
-        text: "Need something forged? Or are you just here to chat about metalwork?",
-        options: [
-          {
-            text: "Tell me about your craft.",
-            relationshipChange: 10,
-            nextDialogue: {
-              text: "Each piece of metal has its own song. The key is learning to listen...",
-              options: [
-                {
-                  text: "That's fascinating! Can you teach me more?",
-                  relationshipChange: 15,
-                  stateChanges: { learnedSmithing: true },
-                  nextDialogue: {
-                    text: "You show real interest! Here's what you need to know about tempering...",
-                    options: []
-                  }
-                }
-              ]
-            }
-          },
-          {
-            text: "Just show me your weapons.",
-            relationshipChange: -5,
-            nextDialogue: {
-              text: "Very well. Though there's more to smithing than just weapons...",
-              options: []
-            }
-          }
-        ]
-      }
-    }
-  },
-  {
-    id: 'elder',
-    name: 'Town Elder',
-    type: 'Quest Giver',
-    location: 'sandstone',
-    relationship: 10,
-    description: "A respected leader who guides the town through troubled times",
-    dialogue: {
-      initial: {
-        text: "These are difficult times for our town. We need help from capable adventurers.",
-        options: [
-          {
-            text: "Tell me about the town's troubles.",
-            relationshipChange: 5,
-            nextDialogue: {
-              text: "Bandits have been raiding our caravans, and strange creatures emerge from the desert at night.",
-              options: [
-                {
-                  text: "I'll help deal with the bandits.",
-                  relationshipChange: 15,
-                  stateChanges: { acceptedBanditQuest: true },
-                  nextDialogue: {
-                    text: "Thank you! Their camp is somewhere in the eastern desert. Be careful out there.",
-                    options: []
-                  }
-                },
-                {
-                  text: "What do you know about the creatures?",
-                  relationshipChange: 5,
-                  stateChanges: { investigatingCreatures: true },
-                  nextDialogue: {
-                    text: "They seem drawn to ancient ruins in the desert. Perhaps there's a connection...",
-                    options: []
-                  }
-                }
-              ]
-            }
-          },
-          {
-            text: "I'm too busy for town problems.",
-            relationshipChange: -10,
-            nextDialogue: {
-              text: "I see. Perhaps another adventurer will show more concern for our plight.",
-              options: []
-            }
-          }
-        ]
-      }
-    }
-  }
-];
+  // Add more NPCs...
+]

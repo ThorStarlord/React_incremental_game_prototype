@@ -6,21 +6,21 @@ const TraitSlotProgressIndicator = () => {
   const { player } = useContext(GameStateContext);
   
   // Calculate the next essence threshold for a slot unlock
-  const currentUnlocks = Math.floor(player.totalEssenceEarned / 1000);
+  const currentUnlocks = Math.floor((player.totalEssenceEarned || 0) / 1000);
   const nextThreshold = (currentUnlocks + 1) * 1000;
   
   // Calculate progress percentage toward next slot
-  const progress = ((player.totalEssenceEarned % 1000) / 1000) * 100;
+  const progress = (((player.totalEssenceEarned || 0) % 1000) / 1000) * 100;
   
   // If already at max slots, show 100% progress
-  const isMaxSlots = player.traitSlots >= 8;
+  const isMaxSlots = (player.traitSlots || 3) >= 8;
   const displayProgress = isMaxSlots ? 100 : progress;
   
   return (
     <Tooltip 
       title={isMaxSlots 
         ? "Maximum trait slots reached!" 
-        : `${player.totalEssenceEarned % 1000}/${1000} essence toward next slot`
+        : `${(player.totalEssenceEarned || 0) % 1000}/${1000} essence toward next slot`
       } 
       arrow
     >
@@ -32,7 +32,7 @@ const TraitSlotProgressIndicator = () => {
           <Typography variant="caption" color="text.secondary">
             {isMaxSlots 
               ? "Max slots reached" 
-              : `${Math.floor(progress)}% (${player.traitSlots}/${8} slots)`}
+              : `${Math.floor(progress)}% (${player.traitSlots || 3}/${8} slots)`}
           </Typography>
         </Box>
         
@@ -51,7 +51,7 @@ const TraitSlotProgressIndicator = () => {
         
         {!isMaxSlots && (
           <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-            Need {nextThreshold - player.totalEssenceEarned} more essence
+            Need {nextThreshold - (player.totalEssenceEarned || 0)} more essence
           </Typography>
         )}
       </Box>

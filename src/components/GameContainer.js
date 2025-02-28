@@ -16,6 +16,8 @@ import TraitEffectNotification from './TraitEffectNotification';
 import useTraitNotifications from '../hooks/useTraitNotifications';
 import CharacterTabBar from './CharacterTabBar';
 import CharacterManagementDrawer from './CharacterManagementDrawer';
+import CompactTraitPanel from './traits/CompactTraitPanel';
+import CompactCharacterPanel from './characters/CompactCharacterPanel';
 
 // Import icons for the header
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
@@ -117,25 +119,8 @@ const GameContainer = () => {
           {/* Right Panel - Traits and Characters */}
           <Grid item xs={12} md={3}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {/* Traits at the top right */}
-              <TraitSystemWrapper />
-              
-              {/* Character panel below traits */}
-              <Panel title="Characters">
-                <Box sx={{ mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Quick access to your characters and companions
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <IconButton onClick={() => handleOpenDrawer(0)} color="primary" aria-label="View Characters">
-                    <SportsKabaddiIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleOpenDrawer(1)} color="primary" aria-label="View NPCs">
-                    <PersonIcon />
-                  </IconButton>
-                </Box>
-              </Panel>
+              <CompactTraitPanel onExpandView={() => handleOpenDrawer(2)} />
+              <CompactCharacterPanel onExpandView={() => handleOpenDrawer(0)} />
             </Box>
           </Grid>
         </Grid>

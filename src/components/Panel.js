@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Card, Typography, Accordion, AccordionSummary, AccordionDetails, useTheme } from '@mui/material';
+import { Card, Typography, Accordion, AccordionSummary, AccordionDetails, useTheme, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const Panel = ({ title, children, defaultExpanded = true, sx = {} }) => {
+const Panel = ({ title, icon, children, defaultExpanded = true, sx = {} }) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const theme = useTheme();
 
@@ -37,7 +37,10 @@ const Panel = ({ title, children, defaultExpanded = true, sx = {} }) => {
             },
           }}
         >
-          <Typography variant="h6">{title}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {icon && <Box sx={{ mr: 1 }}>{icon}</Box>}
+            <Typography variant="h6">{title}</Typography>
+          </Box>
         </AccordionSummary>
         <AccordionDetails
           sx={{

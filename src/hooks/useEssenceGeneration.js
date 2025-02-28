@@ -1,62 +1,81 @@
-import { useContext, useEffect } from 'react';
-import { GameStateContext, GameDispatchContext, createEssenceAction } from '../context/GameStateContext';
-import { ESSENCE_GENERATION_RATES, UPDATE_INTERVALS } from '../config/gameConstants';
+import { useState, useEffect, useContext } from 'react';
+import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
 
-// NPC type power levels
-const NPC_POWER_LEVELS = {
-  'Mentor': 3,    // Highest influence
-  'Elder': 3,     // Equal to Mentor
-  'Craftsman': 2, // Medium influence
-  'Trader': 2,    // Equal to Craftsman
-  'Quest Giver': 2,
-  'default': 1    // Base power level for other types
-};
-
-const getGenerationRateForRelationship = (relationship, npcType) => {
-  // Base rate calculation
-  let baseRate = 0;
-  if (relationship >= 80) baseRate = 5; // Devoted
-  else if (relationship >= 60) baseRate = 4; // Trusted
-  else if (relationship >= 40) baseRate = 3; // Friendly
-  else if (relationship >= 20) baseRate = 2; // Warm
-  else if (relationship > 0) baseRate = 1;  // Positive
-
-  // Apply NPC power level multiplier
-  const powerLevel = NPC_POWER_LEVELS[npcType] || NPC_POWER_LEVELS.default;
-  return baseRate * powerLevel;
-};
-
-const useEssenceGeneration = () => {
-  const { npcs } = useContext(GameStateContext);
+const useEssenceGeneration = (baseAmount = 1, interval = 10000) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { player, npcs } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
-
+  
   useEffect(() => {
-    const generateEssence = () => {
-      const essenceGenerated = npcs.reduce((total, npc) => {
-        const relationship = npc.relationship || 0;
-        const rate = getGenerationRateForRelationship(relationship, npc.type);
-        return total + rate;
-      }, 0);
-
-      if (essenceGenerated > 0) {
-        dispatch(createEssenceAction.gain(essenceGenerated));
+    let essenceTimer;
+    let relationshipTimer;
+    
+    if (isGenerating) {
+      // Essence generation timer
+      essenceTimer = setInterval(() => {
+        const finalAmount = calculateFinalAmount(baseAmount, player);
+        dispatch({ type: 'GAIN_ESSENCE', payload: finalAmount });
+      }, interval);
+      
+      // Relationship growth timer - runs every 60 seconds
+      if (player.equippedTraits.includes('GrowingAffinity')) {
+        relationshipTimer = setInterval(() => {
+          // Apply relationship growth to all NPCs
+          npcs.forEach(npc => {
+            // Only improve relationship if not already at max (100)
+            if ((npc.relationship || 0) < 100) {
+              dispatch({ 
+                type: 'UPDATE_NPC_RELATIONSHIP', 
+                payload: { 
+                  npcId: npc.id, 
+                  changeAmount: 1,  // Modest gain per minute
+                  source: 'GrowingAffinity'  // Add source for stat tracking
+                } 
+              });
+              
+              // Occasionally show notifications about relationship growth
+              // This runs with a 10% chance each time to avoid spamming notifications
+              if (Math.random() < 0.1) {
+                dispatch({
+                  type: 'SHOW_NOTIFICATION',
+                  payload: {
+                    message: `Your relationship with ${npc.name} is growing thanks to Growing Affinity`,
+                    severity: 'info',
+                    duration: 3000
+                  }
+                });
+              }
+            }
+          });
+        }, 60000); // Run every minute
       }
+    }
+    
+    // Cleanup timers on component unmount or when generating state changes
+    return () => {
+      clearInterval(essenceTimer);
+      if (relationshipTimer) clearInterval(relationshipTimer);
     };
-
-    const intervalId = setInterval(generateEssence, UPDATE_INTERVALS.ESSENCE_GENERATION);
-    return () => clearInterval(intervalId);
-  }, [npcs, dispatch]);
-
-  // Return generation rates per NPC for UI
-  const npcRates = npcs.map(npc => ({
-    name: npc.name,
-    type: npc.type,
-    rate: getGenerationRateForRelationship(npc.relationship || 0, npc.type)
-  })).filter(info => info.rate > 0);
-
-  const totalRate = npcRates.reduce((sum, info) => sum + info.rate, 0);
-
-  return { totalRate, npcRates };
+  }, [isGenerating, baseAmount, interval, player, npcs, dispatch]);
+  
+  // Calculate final essence amount based on traits and other factors
+  const calculateFinalAmount = (base, player) => {
+    let amount = base;
+    
+    // Apply trait effects
+    if (player.equippedTraits.includes('EssenceAttunement')) {
+      amount *= 1.5; // 50% more essence
+    }
+    
+    return Math.floor(amount);
+  };
+  
+  return {
+    isGenerating,
+    startGenerating: () => setIsGenerating(true),
+    stopGenerating: () => setIsGenerating(false),
+    toggleGenerating: () => setIsGenerating(prev => !prev)
+  };
 };
 
 export default useEssenceGeneration;

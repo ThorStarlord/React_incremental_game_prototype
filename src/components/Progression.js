@@ -1,53 +1,107 @@
-import { useContext, useEffect } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
-import { PROGRESSION_THRESHOLDS } from '../config/gameConstants';
+import NewSlotAnimation from './NewSlotAnimation';
+import { Snackbar, Alert } from '@mui/material';
 
 const Progression = () => {
-  const { essence, player } = useContext(GameStateContext);
+  const { player } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
+  const [newSlots, setNewSlots] = useState(null);
+  const [notification, setNotification] = useState(null);
 
+  // Track essence-based slot unlocks
   useEffect(() => {
-    // Check essence-based slot unlocks
+    // Calculate slots based on total essence earned
     const totalSlots = Math.min(
-      8, // Maximum slots
-      3 + Math.floor(essence / PROGRESSION_THRESHOLDS.TRAIT_SLOT_ESSENCE)
+      8, // Maximum slots cap
+      3 + Math.floor(player.totalEssenceEarned / 1000) // 3 base slots + 1 per 1000 essence
     );
-
+    
+    // If we've unlocked new slots
     if (totalSlots > player.traitSlots) {
-      dispatch({
-        type: 'UNLOCK_TRAIT_SLOTS',
-        payload: {
-          newTotal: totalSlots,
-          reason: 'essence'
-        }
+      // Dispatch the slot unlock action
+      dispatch({ 
+        type: 'UPGRADE_TRAIT_SLOTS', 
+        payload: { 
+          newTotal: totalSlots, 
+          reason: 'essence' 
+        } 
       });
+      
+      // Show animation
+      setNewSlots(totalSlots);
+      
+      // Record this event for analytics and player feedback
+      setNotification({
+        severity: 'success',
+        message: `Trait Slot Unlocked! You now have ${totalSlots}/${8} trait slots.`
+      });
+      
+      // Clear animation after 3 seconds
+      setTimeout(() => setNewSlots(null), 3000);
     }
-  }, [essence, player.traitSlots, dispatch]);
+  }, [player.totalEssenceEarned, player.traitSlots, dispatch]);
 
-  // Level-based progression
+  // Track level-based unlocks (separate from essence-based)
   useEffect(() => {
-    // Unlock a slot every 5 levels after level 5
+    // Level thresholds for unlocking slots (e.g., levels 5, 10, 15)
+    const levelBasedSlots = Math.min(
+      3, // Maximum level-based slots
+      Math.floor((player.level - 5) / 5) + 1
+    );
+    
     if (player.level >= 5) {
-      const levelBasedSlots = Math.min(
-        3, // Maximum level-based slots
-        Math.floor((player.level - 5) / 5) + 1
-      );
+      const totalFromLevel = 3 + levelBasedSlots;
       
-      const totalSlots = Math.min(8, player.traitSlots + levelBasedSlots);
-      
-      if (totalSlots > player.traitSlots) {
-        dispatch({
-          type: 'UNLOCK_TRAIT_SLOTS',
-          payload: {
-            newTotal: totalSlots,
-            reason: 'level'
-          }
+      // Only update if level would give more slots than currently owned
+      if (totalFromLevel > player.traitSlots) {
+        dispatch({ 
+          type: 'UPGRADE_TRAIT_SLOTS', 
+          payload: { 
+            newTotal: totalFromLevel, 
+            reason: 'level' 
+          } 
         });
+        
+        setNewSlots(totalFromLevel);
+        setNotification({
+          severity: 'success',
+          message: `Level ${player.level} reached! New trait slot unlocked!`
+        });
+        
+        setTimeout(() => setNewSlots(null), 3000);
       }
     }
   }, [player.level, player.traitSlots, dispatch]);
 
-  return null; // This is a logic-only component
+  // Calculate progress toward next slot unlock
+  const nextSlotEssenceThreshold = (Math.floor(player.traitSlots - 3) + 1) * 1000;
+  const essenceProgress = player.totalEssenceEarned >= nextSlotEssenceThreshold
+    ? 100
+    : ((player.totalEssenceEarned % 1000) / 1000) * 100;
+
+  return (
+    <>
+      {newSlots && <NewSlotAnimation newSlots={newSlots} />}
+      
+      <Snackbar
+        open={notification !== null}
+        autoHideDuration={6000}
+        onClose={() => setNotification(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        {notification && (
+          <Alert 
+            onClose={() => setNotification(null)} 
+            severity={notification.severity}
+            sx={{ width: '100%' }}
+          >
+            {notification.message}
+          </Alert>
+        )}
+      </Snackbar>
+    </>
+  );
 };
 
 export default Progression;

@@ -5,26 +5,16 @@ import { GameStateContext, GameDispatchContext, createEssenceAction } from '../c
 import { UPDATE_INTERVALS } from '../config/gameConstants';
 import useThemeUtils from '../hooks/useThemeUtils';
 import EssenceGenerationTimer from './EssenceGenerationTimer';
+import useEssenceGeneration from '../hooks/useEssenceGeneration';
 
 const EssenceDisplay = () => {
-  const { essence, npcs } = useContext(GameStateContext);
+  const { essence } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
   const { getProgressColor } = useThemeUtils();
+  const { totalRate, npcContributions } = useEssenceGeneration();
   const [showAnimation, setShowAnimation] = useState(false);
   const [lastEssence, setLastEssence] = useState(essence);
 
-  // Calculate essence generation rate from NPC relationships
-  const essenceGenerationInfo = npcs
-    .filter(npc => (npc.relationship || 0) > 0)
-    .map(npc => ({
-      name: npc.name,
-      rate: Math.floor((npc.relationship || 0) / 20),
-    }))
-    .filter(info => info.rate > 0);
-
-  const totalRate = essenceGenerationInfo.reduce((sum, info) => sum + info.rate, 0);
-
-  // Track essence changes for animation
   useEffect(() => {
     if (essence !== lastEssence) {
       setShowAnimation(true);
@@ -41,9 +31,7 @@ const EssenceDisplay = () => {
     dispatch(createEssenceAction.gain(5));
   };
 
-  const formatTime = (ms) => {
-    return `${ms / 1000} seconds`;
-  };
+  const formatTime = (ms) => `${ms / 1000} seconds`;
 
   return (
     <Paper 
@@ -67,17 +55,17 @@ const EssenceDisplay = () => {
         title={
           <Box>
             <Typography variant="body2">{essence}/{maxStorableEssence} Essence</Typography>
-            {essenceGenerationInfo.length > 0 && (
+            {npcContributions.length > 0 && (
               <>
                 <Typography variant="body2" sx={{ mt: 1, fontWeight: 'bold' }}>
                   Generation Rate: +{totalRate} per {formatTime(UPDATE_INTERVALS.ESSENCE_GENERATION)}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  From relationships with:
+                  Sources:
                 </Typography>
-                {essenceGenerationInfo.map((info, index) => (
+                {npcContributions.map((contribution, index) => (
                   <Typography key={index} variant="body2">
-                    • {info.name}: +{info.rate}
+                    • {contribution.name}: +{contribution.rate}
                   </Typography>
                 ))}
               </>
@@ -129,7 +117,6 @@ const EssenceDisplay = () => {
         </Button>
       </Box>
 
-      {/* Add the essence generation timer */}
       <EssenceGenerationTimer rate={totalRate} />
 
       {showAnimation && (
@@ -142,14 +129,8 @@ const EssenceDisplay = () => {
             color: essence > lastEssence ? 'success.main' : 'error.main',
             animation: 'fadeOut 1s forwards',
             '@keyframes fadeOut': {
-              '0%': {
-                opacity: 1,
-                transform: 'translate(-50%, -50%)'
-              },
-              '100%': {
-                opacity: 0,
-                transform: 'translate(-50%, -100%)'
-              }
+              '0%': { opacity: 1, transform: 'translate(-50%, -50%)' },
+              '100%': { opacity: 0, transform: 'translate(-50%, -100%)' }
             }
           }}
         >

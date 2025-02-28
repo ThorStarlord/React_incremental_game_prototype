@@ -1,268 +1,155 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { 
-  Box, 
   Drawer, 
   Tabs, 
   Tab, 
-  Typography, 
-  List, 
-  ListItem, 
-  ListItemText, 
-  ListItemAvatar, 
-  Avatar, 
-  Chip,
-  IconButton, 
+  Box, 
+  Badge, 
+  IconButton,
   Divider,
-  Button,
-  LinearProgress
+  Typography
 } from '@mui/material';
-import { styled } from '@mui/system';
+import CloseIcon from '@mui/icons-material/Close';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import PersonIcon from '@mui/icons-material/Person';
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
-import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
-import CloseIcon from '@mui/icons-material/Close';
+import IntegratedTraitsPanel from './traits/IntegratedTraitsPanel';
+import NPCPanel from './npcs/NPCPanel';
+import CharactersPanel from './characters/CharactersPanel';
 import { GameStateContext } from '../context/GameStateContext';
-import { RELATIONSHIP_TIERS } from '../config/gameConstants';
-import { useNavigate } from 'react-router-dom';
 
-// Style for controlled NPCs with gradient background
-const ControlledNPCItem = styled(ListItem)(({ theme, controlLevel }) => ({
-  background: `linear-gradient(90deg, ${theme.palette.background.paper} ${100 - controlLevel}%, ${theme.palette.success.light} ${controlLevel}%)`,
-  transition: 'background 0.3s ease',
-  '&:hover': {
-    background: `linear-gradient(90deg, ${theme.palette.background.paper} ${100 - controlLevel - 5}%, ${theme.palette.success.light} ${controlLevel + 5}%)`,
-  }
-}));
-
-// Style for player-controlled characters
-const PlayerCharacterItem = styled(ListItem)(({ theme }) => ({
-  borderLeft: `4px solid ${theme.palette.primary.main}`,
-  background: theme.palette.background.paper,
-  '&:hover': {
-    background: theme.palette.action.hover,
-  }
-}));
-
-// Get relationship tier based on relationship value
-const getRelationshipTier = (value) => {
-  return Object.values(RELATIONSHIP_TIERS).find(tier =>
-    value >= tier.threshold
-  ) || RELATIONSHIP_TIERS.NEMESIS;
-};
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+  
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`drawer-tabpanel-${index}`}
+      aria-labelledby={`drawer-tab-${index}`}
+      style={{ height: '100%', overflow: 'auto' }}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ height: '100%', p: 0 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
 
 const CharacterManagementDrawer = ({ open, onClose, initialTab = 0 }) => {
   const [tabValue, setTabValue] = useState(initialTab);
-  const { npcs, characters, traits } = useContext(GameStateContext);
-  const navigate = useNavigate();
-
+  const { player, discoveryProgress } = useContext(GameStateContext);
+  
+  // Update tab value when initialTab prop changes
+  useEffect(() => {
+    setTabValue(initialTab);
+  }, [initialTab]);
+  
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-
-  const handleNPCClick = (npcId) => {
-    navigate(`/npc/${npcId}`);
-    onClose();
-  };
-
-  const handleCharacterClick = (characterId) => {
-    // Navigate to character details page (to be implemented)
-    navigate(`/character/${characterId}`);
-    onClose();
-  };
-
-  const handleTraitClick = (traitId) => {
-    // Navigate to trait details or highlight in traits panel
-    navigate(`/traits?highlight=${traitId}`);
-    onClose();
-  };
-
+  
+  // Get counts for badges
+  const controlledCharacterCount = player?.controlledCharacters?.length || 0;
+  const metNPCCount = discoveryProgress?.metNPCCount || 0;
+  const traitCount = player?.acquiredTraits?.length || 0;
+  
   return (
     <Drawer
       anchor="right"
       open={open}
       onClose={onClose}
-      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      PaperProps={{
+        sx: { width: { xs: '100%', sm: '450px' }, maxWidth: '100%' }
+      }}
     >
-      <Box sx={{ width: 320, p: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 2, borderBottom: 1, borderColor: 'divider' }}>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Character Management
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100%' 
+      }}>
+        {/* Header with close button */}
+        <Box sx={{ 
+          p: 2, 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          borderBottom: 1,
+          borderColor: 'divider'
+        }}>
+          <Typography variant="h6">
+            {tabValue === 0 ? 'Characters' : 
+             tabValue === 1 ? 'NPCs' : 'Traits'}
           </Typography>
-          <IconButton onClick={onClose}>
+          <IconButton onClick={onClose} aria-label="close">
             <CloseIcon />
           </IconButton>
         </Box>
         
-        <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
-          <Tab icon={<SportsKabaddiIcon />} label="Characters" />
-          <Tab icon={<PersonIcon />} label="NPCs" />
-          <Tab icon={<AutoFixHighIcon />} label="Traits" />
+        {/* Tabs */}
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange}
+          variant="fullWidth"
+          sx={{ borderBottom: 1, borderColor: 'divider' }}
+        >
+          <Tab 
+            icon={
+              <Badge 
+                badgeContent={controlledCharacterCount} 
+                color="success" 
+                max={99}
+                showZero={false}
+              >
+                <SportsKabaddiIcon />
+              </Badge>
+            } 
+            label="Characters" 
+          />
+          <Tab 
+            icon={
+              <Badge 
+                badgeContent={metNPCCount} 
+                color="primary" 
+                max={99}
+                showZero={false}
+              >
+                <PersonIcon />
+              </Badge>
+            } 
+            label="NPCs" 
+          />
+          <Tab 
+            icon={
+              <Badge 
+                badgeContent={traitCount} 
+                color="secondary" 
+                max={99}
+                showZero={false}
+              >
+                <AutoFixHighIcon />
+              </Badge>
+            } 
+            label="Traits" 
+          />
         </Tabs>
         
-        <Box sx={{ mt: 1, overflowY: 'auto', maxHeight: 'calc(100vh - 150px)' }}>
-          {/* Characters Tab */}
-          {tabValue === 0 && (
-            <List>
-              {characters && characters.length > 0 ? (
-                characters.map((character) => (
-                  <PlayerCharacterItem 
-                    button 
-                    key={character.id}
-                    onClick={() => handleCharacterClick(character.id)}
-                  >
-                    <ListItemAvatar>
-                      <Avatar 
-                        src={character.avatar || `https://api.dicebear.com/6.x/personas/svg?seed=${character.id}`}
-                        sx={{ bgcolor: 'primary.main' }}
-                      >
-                        <SportsKabaddiIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText 
-                      primary={character.name} 
-                      secondary={`Level ${character.level || 1} ${character.type || 'Character'}`} 
-                    />
-                    <Chip 
-                      size="small"
-                      label="Controlled" 
-                      color="primary"
-                    />
-                  </PlayerCharacterItem>
-                ))
-              ) : (
-                <Box sx={{ p: 3, textAlign: 'center' }}>
-                  <Typography color="text.secondary" gutterBottom>
-                    No characters yet
-                  </Typography>
-                  <Button variant="outlined" sx={{ mt: 1 }}>
-                    Create Character
-                  </Button>
-                </Box>
-              )}
-            </List>
-          )}
-
-          {/* NPCs Tab */}
-          {tabValue === 1 && (
-            <List>
-              {npcs && npcs.map((npc) => {
-                const relationship = npc.relationship || 0;
-                const relationshipTier = getRelationshipTier(relationship);
-                const controlLevel = Math.max(0, relationship); // Level of control based on relationship
-                
-                // Determine if fully controlled based on relationship level
-                const isFullyControlled = relationship >= 75;
-                const isInfluenced = relationship > 0 && relationship < 75;
-                
-                const ListItemComponent = isInfluenced || isFullyControlled 
-                  ? ControlledNPCItem 
-                  : ListItem;
-                
-                return (
-                  <React.Fragment key={npc.id}>
-                    <ListItemComponent 
-                      button
-                      controlLevel={controlLevel}
-                      onClick={() => handleNPCClick(npc.id)}
-                      sx={{ 
-                        position: 'relative',
-                        ...(isFullyControlled && {
-                          bgcolor: 'success.light',
-                          color: 'white',
-                          '&:hover': {
-                            bgcolor: 'success.main',
-                          }
-                        })
-                      }}
-                    >
-                      <ListItemAvatar>
-                        <Avatar 
-                          src={npc.avatar || `https://api.dicebear.com/6.x/personas/svg?seed=${npc.id}`}
-                          sx={{
-                            ...(isFullyControlled && {
-                              bgcolor: 'success.dark',
-                              border: '2px solid white'
-                            })
-                          }}
-                        >
-                          <PersonIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText 
-                        primary={npc.name} 
-                        secondary={
-                          <Box component="span" sx={{ 
-                            color: isFullyControlled ? 'white' : 'text.secondary'
-                          }}>
-                            {npc.type} - Power Level: {npc.powerLevel || 1}
-                          </Box>
-                        } 
-                      />
-                      <Chip 
-                        size="small"
-                        label={relationshipTier.name} 
-                        sx={{
-                          bgcolor: relationshipTier.color,
-                          color: '#fff',
-                          fontWeight: 'bold'
-                        }}
-                      />
-                      <LinearProgress
-                        variant="determinate"
-                        value={(relationship + 100) / 2}
-                        sx={{
-                          position: 'absolute',
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: 3,
-                          bgcolor: 'transparent',
-                          '& .MuiLinearProgress-bar': {
-                            bgcolor: relationshipTier.color
-                          }
-                        }}
-                      />
-                    </ListItemComponent>
-                    <Divider variant="inset" component="li" />
-                  </React.Fragment>
-                );
-              })}
-            </List>
-          )}
+        {/* Tab panels - with flexGrow to take remaining height */}
+        <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+          <TabPanel value={tabValue} index={0}>
+            <CharactersPanel />
+          </TabPanel>
           
-          {/* Traits Tab */}
-          {tabValue === 2 && (
-            <List>
-              {traits && Object.entries(traits).map(([id, trait]) => (
-                <ListItem 
-                  button 
-                  key={id}
-                  onClick={() => handleTraitClick(id)}
-                >
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: trait.sourceNpc ? 'secondary.main' : 'primary.main' }}>
-                      <AutoFixHighIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText 
-                    primary={trait.name} 
-                    secondary={
-                      trait.sourceNpc 
-                        ? `From NPC - Requires ${trait.requiredRelationship || 0} relationship` 
-                        : `Cost: ${trait.essenceCost || 0} essence`
-                    } 
-                  />
-                  {trait.acquired && (
-                    <Chip 
-                      size="small"
-                      label="Acquired" 
-                      color="success"
-                    />
-                  )}
-                </ListItem>
-              ))}
-            </List>
-          )}
+          <TabPanel value={tabValue} index={1}>
+            <NPCPanel />
+          </TabPanel>
+          
+          <TabPanel value={tabValue} index={2}>
+            <IntegratedTraitsPanel />
+          </TabPanel>
         </Box>
       </Box>
     </Drawer>

@@ -1,248 +1,200 @@
 import React, { useContext, useState } from 'react';
 import {
   Box,
-  Button,
-  Typography,
-  Grid,
   Card,
   CardContent,
   CardActions,
-  Tooltip,
+  Typography,
+  Button,
+  Grid,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Fade,
-  Zoom,
-  Badge
+  Divider,
+  LinearProgress,
+  IconButton
 } from '@mui/material';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PersonIcon from '@mui/icons-material/Person';
+import InfoIcon from '@mui/icons-material/Info';
 import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
-import useTraitEffects from '../hooks/useTraitEffects';
 import Panel from './Panel';
-import ParticleEffect from './ParticleEffect';
 
-const TraitCard = ({ id, trait, onAcquire, essence, isAcquired }) => {
-  const [showConfirm, setShowConfirm] = useState(false);
-  const { activeEffects } = useTraitEffects();
-  const activeEffect = activeEffects.find(effect => effect.id === id);
-  const [showParticles, setShowParticles] = useState(false);
-  const [particlePos, setParticlePos] = useState({ x: 0, y: 0 });
-
-  const handleConfirm = (e) => {
-    setShowConfirm(false);
-    // Store click position for particle effect
-    const rect = e.currentTarget.getBoundingClientRect();
-    setParticlePos({
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2
-    });
-    setShowParticles(true);
-    onAcquire(id, trait.essenceCost);
-  };
+// TraitCard component with NPC source support
+const TraitCard = ({ id, trait, onAcquire, essence, isAcquired, npcs }) => {
+  // Find the source NPC if trait has one
+  const sourceNpc = trait.sourceNpc ? npcs.find(n => n.id === trait.sourceNpc) : null;
+  
+  // Calculate adjusted cost based on NPC power level
+  const adjustedCost = Math.round(trait.essenceCost * (sourceNpc?.powerLevel || 1));
+  
+  // Check if trait is available based on relationship requirement
+  const isAvailable = !isAcquired && (!trait.sourceNpc || 
+    (sourceNpc?.relationship || 0) >= (trait.requiredRelationship || 0));
+  
+  // Calculate relationship progress percentage if there's a source NPC
+  const relationshipProgress = sourceNpc ? 
+    (sourceNpc.relationship || 0) / (trait.requiredRelationship || 1) * 100 : 0;
 
   return (
-    <>
-      {showParticles && (
-        <ParticleEffect 
-          x={particlePos.x}
-          y={particlePos.y}
-          onComplete={() => setShowParticles(false)}
-        />
-      )}
-
-      <Card 
-        sx={{ 
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative',
-          transition: 'all 0.2s',
-          '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: 6
-          }
-        }}
-      >
-        {isAcquired && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              left: 0,
-              bottom: 0,
-              bgcolor: 'success.main',
-              opacity: 0.1,
-              zIndex: 0
-            }}
+    <Card sx={{ 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column',
+      opacity: isAvailable ? 1 : 0.7
+    }}>
+      <CardContent sx={{ flexGrow: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="h6">{trait.name}</Typography>
+          <Chip 
+            label={trait.type || 'Basic'} 
+            size="small" 
+            color={trait.type === 'Social' ? 'secondary' : 'primary'}
           />
-        )}
-        <CardContent sx={{ flexGrow: 1, position: 'relative', zIndex: 1 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="h6">
-                {trait.name}
+        </Box>
+        
+        <Typography variant="body2" color="text.secondary" paragraph>
+          {trait.description}
+        </Typography>
+        
+        {sourceNpc && (
+          <Box sx={{ mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+              <PersonIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+              <Typography variant="body2" color="text.secondary">
+                Source: {sourceNpc.name}
               </Typography>
-              {isAcquired && (
-                <Tooltip title="Acquired">
-                  <CheckCircleIcon color="success" fontSize="small" />
-                </Tooltip>
-              )}
             </Box>
-            <Chip
-              label={trait.type}
-              size="small"
-              color={trait.type === 'Knowledge' ? 'primary' : 'secondary'}
+            
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+              <Typography variant="caption" color="text.secondary">
+                Relationship Required: {trait.requiredRelationship}
+              </Typography>
+              <Typography variant="caption" color={isAvailable ? 'success.main' : 'error.main'}>
+                Current: {sourceNpc.relationship || 0}
+              </Typography>
+            </Box>
+            
+            <LinearProgress 
+              variant="determinate" 
+              value={Math.min(100, relationshipProgress)} 
+              sx={{ height: 4, borderRadius: 2 }} 
+              color={isAvailable ? "success" : "warning"}
             />
           </Box>
-          <Typography variant="body2" color="text.secondary" paragraph>
-            {trait.description}
-          </Typography>
-          {isAcquired && activeEffect && (
-            <Box sx={{ mt: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
-              <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <AutoAwesomeIcon fontSize="small" />
-                Active Effect: {activeEffect.effect}
-              </Typography>
-            </Box>
-          )}
-          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AutoAwesomeIcon color="primary" />
-            <Typography variant="body2" color="primary">
-              {trait.essenceCost} Essence
+        )}
+        
+        <Divider sx={{ my: 1 }} />
+        
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          Cost: <strong>{adjustedCost}</strong> Essence
+          {sourceNpc?.powerLevel > 1 && (
+            <Typography variant="caption" color="warning.main" sx={{ display: 'block' }}>
+              (Base: {trait.essenceCost} × Power Level: {sourceNpc.powerLevel})
             </Typography>
-          </Box>
-        </CardContent>
-        <CardActions sx={{ position: 'relative', zIndex: 1 }}>
-          <Button
-            fullWidth
-            variant={isAcquired ? "outlined" : "contained"}
-            onClick={() => setShowConfirm(true)}
-            disabled={essence < trait.essenceCost || isAcquired}
-            color={isAcquired ? "success" : "primary"}
-            startIcon={isAcquired && <CheckCircleIcon />}
-          >
-            {isAcquired ? "Acquired" : "Acquire"}
-          </Button>
-        </CardActions>
-      </Card>
-
-      <Dialog
-        open={showConfirm}
-        onClose={() => setShowConfirm(false)}
-        TransitionComponent={Zoom}
-      >
-        <DialogTitle>Confirm Trait Acquisition</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to acquire {trait.name} for {trait.essenceCost} essence?
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Effect: {trait.description}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowConfirm(false)}>Cancel</Button>
-          <Button onClick={handleConfirm} variant="contained">
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+          )}
+        </Typography>
+      </CardContent>
+      
+      <CardActions>
+        <Button
+          variant={isAcquired ? "contained" : "outlined"}
+          color={isAcquired ? "success" : "primary"}
+          fullWidth
+          disabled={!isAvailable || essence < adjustedCost || isAcquired}
+          onClick={() => onAcquire(id, adjustedCost)}
+        >
+          {isAcquired ? "Acquired" : isAvailable ? "Acquire" : "Locked"}
+        </Button>
+      </CardActions>
+    </Card>
   );
 };
 
+// Main TraitList component
 const TraitList = () => {
-  const { essence, traits, player } = useContext(GameStateContext);
+  const { player, essence, traits, npcs } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
-  const [showAcquireEffect, setShowAcquireEffect] = useState(false);
-  const [acquiredTraitName, setAcquiredTraitName] = useState('');
-  const { activeEffects } = useTraitEffects();
-
-  const handleAcquire = (traitId, cost) => {
-    if (essence >= cost) {
-      dispatch({ 
-        type: 'COPY_TRAIT', 
-        payload: { traitId, essenceCost: cost } 
-      });
-
-      // Show acquisition effect
-      setAcquiredTraitName(traits.copyableTraits[traitId].name);
-      setShowAcquireEffect(true);
-      setTimeout(() => setShowAcquireEffect(false), 2000);
-    }
+  const [filter, setFilter] = useState('all');
+  
+  // Handle acquiring a trait
+  const handleAcquireTrait = (traitId, essenceCost) => {
+    dispatch({
+      type: 'COPY_TRAIT',
+      payload: {
+        traitId,
+        essenceCost
+      }
+    });
+    
+    // Show notification if you have notification system
+    dispatch({
+      type: 'SHOW_NOTIFICATION',
+      payload: {
+        message: `Acquired trait: ${traits.copyableTraits[traitId]?.name}`,
+        severity: 'success',
+        duration: 3000
+      }
+    });
   };
-
+  
+  // Group traits by type for filtering
+  const groupedTraits = Object.entries(traits.copyableTraits || {}).reduce(
+    (acc, [id, trait]) => {
+      const type = trait.type || 'Other';
+      if (!acc[type]) acc[type] = [];
+      acc[type].push({ id, ...trait });
+      return acc;
+    },
+    {}
+  );
+  
+  // Get trait types for filter options
+  const traitTypes = Object.keys(groupedTraits);
+  
   return (
     <Panel title="Available Traits">
-      {showAcquireEffect && (
-        <Fade in={showAcquireEffect}>
-          <Box
-            sx={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 1000,
-              textAlign: 'center',
-              color: 'success.main',
-              backgroundColor: 'rgba(0,0,0,0.8)',
-              p: 3,
-              borderRadius: 2,
-            }}
+      <Box sx={{ mb: 2 }}>
+        <Box sx={{ display: 'flex', mb: 2, gap: 1, flexWrap: 'wrap' }}>
+          <Button 
+            variant={filter === 'all' ? 'contained' : 'outlined'} 
+            size="small" 
+            onClick={() => setFilter('all')}
           >
-            <AutoAwesomeIcon sx={{ fontSize: 40, mb: 1 }} />
-            <Typography variant="h6">
-              Trait Acquired: {acquiredTraitName}!
-            </Typography>
-          </Box>
-        </Fade>
-      )}
-
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Box>
-            <Typography variant="subtitle1" color="primary" gutterBottom>
-              Current Essence: {essence}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Acquire traits to enhance your character's abilities
-            </Typography>
-          </Box>
-          {activeEffects.length > 0 && (
-            <Chip 
-              label={`${activeEffects.length} Active Traits`}
-              color="success"
-              size="small"
-            />
-          )}
+            All
+          </Button>
+          {traitTypes.map(type => (
+            <Button 
+              key={type}
+              variant={filter === type ? 'contained' : 'outlined'} 
+              size="small" 
+              color={type === 'Social' ? 'secondary' : 'primary'}
+              onClick={() => setFilter(type)}
+            >
+              {type}
+            </Button>
+          ))}
         </Box>
+        
+        <Grid container spacing={2}>
+          {Object.entries(traits.copyableTraits || {}).map(([id, trait]) => {
+            // Skip if filtered by type
+            if (filter !== 'all' && trait.type !== filter) return null;
+            
+            const isAcquired = player.acquiredTraits.includes(id);
+            
+            return (
+              <Grid item xs={12} sm={6} md={4} key={id}>
+                <TraitCard
+                  id={id}
+                  trait={trait}
+                  onAcquire={handleAcquireTrait}
+                  essence={essence}
+                  isAcquired={isAcquired}
+                  npcs={npcs || []}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
       </Box>
-
-      <Grid container spacing={2}>
-        {Object.entries(traits.copyableTraits).map(([id, trait]) => (
-          <Grid item xs={12} sm={6} md={4} key={id}>
-            <TraitCard
-              id={id}
-              trait={trait}
-              onAcquire={handleAcquire}
-              essence={essence}
-              isAcquired={player.acquiredTraits.includes(id)}
-            />
-          </Grid>
-        ))}
-      </Grid>
-
-      {player.acquiredTraits.length === 0 && (
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Typography color="text.secondary">
-            You haven't acquired any traits yet. Gather essence through relationships and meditation to acquire traits!
-          </Typography>
-        </Box>
-      )}
     </Panel>
   );
 };
