@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Box, Typography, Button, LinearProgress } from '@mui/material';
-import { GameStateContext, GameDispatchContext } from '../../context/GameStateContext';
+import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
 import useTraitEffects from '../../hooks/useTraitEffects';
 
 const Combat = ({ enemyId }) => {

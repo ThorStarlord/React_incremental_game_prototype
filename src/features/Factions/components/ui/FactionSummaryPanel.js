@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGameState } from '../../context/GameStateContext';
+import { useGameState } from '../../../../context/GameStateContext';
 import { Typography, Box } from '@mui/material';
 
 const FactionSummaryPanel = () => {

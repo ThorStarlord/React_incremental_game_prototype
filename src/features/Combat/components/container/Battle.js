@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { Box, Typography, Paper, Button, LinearProgress, useTheme } from '@mui/material';
-import { GameStateContext, GameDispatchContext } from '../../context/GameStateContext';
+import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
 import useTraitEffects from '../../hooks/useTraitEffects';
 import Panel from './Panel';
 import useThemeUtils from '../../hooks/useThemeUtils';

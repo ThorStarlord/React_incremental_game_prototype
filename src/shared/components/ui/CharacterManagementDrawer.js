@@ -13,10 +13,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import PersonIcon from '@mui/icons-material/Person';
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
-import IntegratedTraitsPanel from './trait/IntegratedTraitsPanel';
+import IntegratedTraitsPanel from '../../../features/Traits/components/containers/IntegratedTraitsPanel';
 import NPCPanel from './npcs/NPCPanel';
-import CharactersPanel from './characters/CharactersPanel';
-import { GameStateContext } from '../context/GameStateContext';
+import CharactersPanel from '../../../features/Minions/components/ui/CharactersPanel';
+import { GameStateContext } from '../../../context/GameStateContext';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

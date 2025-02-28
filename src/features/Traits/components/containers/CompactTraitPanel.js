@@ -12,7 +12,7 @@ import {
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import LockIcon from '@mui/icons-material/Lock';
-import { GameStateContext } from '../../context/GameStateContext';
+import { GameStateContext } from '../../../../context/GameStateContext';
 import Panel from '../ui/Panel';
 import CompactTraitCard from './CompactTraitCard';
 

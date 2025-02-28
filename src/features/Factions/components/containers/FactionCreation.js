@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { GameDispatchContext, GameStateContext } from '../../context/GameStateContext';
+import { GameDispatchContext, GameStateContext } from '../../../../context/GameStateContext';
 import { 
   Paper,
   TextField,

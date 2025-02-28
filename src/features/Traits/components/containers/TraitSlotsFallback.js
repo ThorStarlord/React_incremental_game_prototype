@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import Panel from '../panel/Panel';
+import Panel from '../../../../components/panel/Panel';
 import HotkeyHelpTooltip from '../HotkeyHelpTooltip';
 import useTraitShortcuts from '../../hooks/useTraitShortcuts';
 

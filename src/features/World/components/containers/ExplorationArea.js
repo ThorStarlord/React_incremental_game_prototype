@@ -1,12 +1,26 @@
 import React from 'react';
+import { Box } from '@mui/material';
+import Battle from '../combat/Battle';
+import NPCEncounter from '../NPCEncounter';
+import DungeonPanel from '../panels/DungeonPanel';
 
-const ExplorationArea = () => {
-    return (
-        <div>
-            <h1>Exploration Area</h1>
-            <p>Welcome to the exploration area! Here you can discover new regions and embark on adventures.</p>
-        </div>
-    );
+const ExplorationArea = ({ dungeonId, onExplorationComplete, onBack, onStartBattle }) => {
+  return (
+    <Box id="main-content" className="game-area">
+      {dungeonId ? (
+        <DungeonPanel
+          dungeonId={dungeonId}
+          onBack={onBack}
+          onStartBattle={onStartBattle}
+        />
+      ) : (
+        <Battle
+          dungeonId={dungeonId}
+          onExplorationComplete={onExplorationComplete}
+        />
+      )}
+    </Box>
+  );
 };
 
 export default ExplorationArea;

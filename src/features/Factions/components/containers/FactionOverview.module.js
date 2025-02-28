@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { GameStateContext } from '../../context/GameStateContext';
+import { GameStateContext } from '../../../../context/GameStateContext';
 import { List, ListItem, ListItemText, ListItemAvatar, Avatar, Typography, Paper, Box } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonIcon from '@mui/icons-material/Person';

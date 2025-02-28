@@ -1,5 +1,5 @@
 import React from 'react';
-import Panel from '../panel/Panel';
+import Panel from '../../../../shared/components/layout/Panel';
 
 const CharactersPanel = ({ characters }) => {
   return (

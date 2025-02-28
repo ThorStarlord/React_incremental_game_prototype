@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Box, Typography, LinearProgress, Tooltip } from '@mui/material';
-import { GameStateContext } from '../../context/GameStateContext';
+import { GameStateContext } from '../../../../context/GameStateContext';
 
 const TraitSlotProgressIndicator = () => {
   const { player } = useContext(GameStateContext);

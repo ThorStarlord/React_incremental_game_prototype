@@ -8,7 +8,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import PersonIcon from '@mui/icons-material/Person';
 import { formatDistanceToNow } from 'date-fns';
-import Panel from '../common/Panel';
+import Panel from '../components/common/Panel';
 
 // Helper function to format objectives
 const formatObjective = (objective) => {

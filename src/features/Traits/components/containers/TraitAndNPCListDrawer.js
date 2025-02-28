@@ -40,8 +40,8 @@ import SortIcon from '@mui/icons-material/Sort';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { GameStateContext } from '../../context/GameStateContext';
-import { getDiscoveryProgress } from '../../utils/discoveryUtils';
+import { GameStateContext } from '../../../../context/GameStateContext';
+import { getDiscoveryProgress } from '../../../../utils/discoveryUtils';
 
 // Initial player state in GameStateContext.js
 const initialPlayerState = {

@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
-import { GameStateContext, GameDispatchContext } from '../../context/GameStateContext';
+import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
 
 const TutorialCombat = () => {
   const { player, tutorial, traits } = useContext(GameStateContext);

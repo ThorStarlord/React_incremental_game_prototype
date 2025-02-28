@@ -1,15 +1,61 @@
-import React from 'react';
-import './Panel.css'; // Assuming you have a CSS file for styling
+import React, { useState } from 'react';
+import { Card, Typography, Accordion, AccordionSummary, AccordionDetails, useTheme, Box } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const Panel = ({ title, children }) => {
-    return (
-        <div className="panel">
-            {title && <h2 className="panel-title">{title}</h2>}
-            <div className="panel-content">
-                {children}
-            </div>
-        </div>
-    );
+const Panel = ({ title, icon, children, defaultExpanded = true, sx = {} }) => {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  const theme = useTheme();
+
+  return (
+    <Card 
+      sx={{ 
+        width: '100%', 
+        height: '100%',
+        backgroundColor: theme.palette.background.paper,
+        ...sx 
+      }}
+    >
+      <Accordion
+        expanded={expanded}
+        onChange={() => setExpanded(!expanded)}
+        sx={{
+          background: 'transparent',
+          '&:before': {
+            display: 'none',
+          },
+        }}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel-content"
+          id="panel-header"
+          sx={{
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            '& .MuiAccordionSummary-expandIconWrapper': {
+              color: theme.palette.primary.contrastText,
+            },
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {icon && <Box sx={{ mr: 1 }}>{icon}</Box>}
+            <Typography variant="h6">{title}</Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails
+          sx={{
+            p: 2,
+            borderRadius: 1,
+            bgcolor: theme.palette.background.default,
+            boxShadow: theme.shadows[1],
+            width: '100%'
+          }}
+        >
+          {children}
+        </AccordionDetails>
+      </Accordion>
+    </Card>
+  );
 };
 
 export default Panel;
