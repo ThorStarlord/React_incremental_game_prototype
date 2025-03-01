@@ -14,6 +14,10 @@ import { getSimplifiedTier } from '../../config/relationshipConstants';
  * 3. Processes NPC interactions based on relationship tiers
  * 4. Applies passive trait effects at regular intervals
  * 5. Manages resource generation and consumption cycles
+ * 6. Processes player stat progression over time
+ * 7. Handles random encounter generation
+ * 8. Updates quest and mission progress automatically
+ * 9. Simulates environmental and world condition changes
  * 
  * Each game system is isolated in its own useEffect for maintainability
  * and to allow for incremental addition of new systems.
@@ -141,6 +145,182 @@ const GameLoop = ({ children }) => {
     
     return () => clearInterval(timeInterval);
   }, [dispatch, gameState.gameTime]);
+
+  // Player Stats Progression System
+  useEffect(() => {
+    const statsInterval = setInterval(() => {
+      // Apply passive skill experience gain
+      if (gameState.player.skills) {
+        const passiveSkillGain = gameState.player.passiveSkillGainRate || 0;
+        
+        if (passiveSkillGain > 0 && gameState.player.activeSkill) {
+          dispatch({
+            type: ACTION_TYPES.GAIN_SKILL_EXPERIENCE,
+            payload: {
+              skillId: gameState.player.activeSkill,
+              amount: passiveSkillGain
+            }
+          });
+          
+          // Notify on significant milestones
+          const currentSkill = gameState.player.skills.find(s => s.id === gameState.player.activeSkill);
+          if (currentSkill && Math.floor(currentSkill.experience) % 100 === 0) {
+            dispatch({
+              type: ACTION_TYPES.ADD_NOTIFICATION,
+              payload: {
+                message: `You've gained experience in ${currentSkill.name}!`,
+                type: 'positive',
+                duration: 3000
+              }
+            });
+          }
+        }
+      }
+      
+      // Apply health regeneration if applicable
+      const healthRegen = gameState.player.healthRegenRate || 0;
+      if (healthRegen > 0 && gameState.player.health < gameState.player.maxHealth) {
+        dispatch({
+          type: ACTION_TYPES.UPDATE_HEALTH,
+          payload: Math.min(gameState.player.health + healthRegen, gameState.player.maxHealth)
+        });
+      }
+    }, 30000); // Run every 30 seconds
+    
+    return () => clearInterval(statsInterval);
+  }, [dispatch, gameState.player]);
+
+  // Combat and Encounter System
+  useEffect(() => {
+    const encounterInterval = setInterval(() => {
+      // Skip if player is already in combat
+      if (gameState.inCombat) return;
+      
+      // Calculate encounter chance based on area danger level
+      const currentArea = gameState.currentArea || {};
+      const dangerLevel = currentArea.dangerLevel || 0;
+      const encounterChance = dangerLevel * 0.05; // 5% per danger level
+      
+      if (Math.random() < encounterChance) {
+        // Determine encounter type based on area
+        const areaEnemies = currentArea.possibleEnemies || [];
+        if (areaEnemies.length > 0) {
+          const randomEnemyIndex = Math.floor(Math.random() * areaEnemies.length);
+          
+          dispatch({
+            type: ACTION_TYPES.START_ENCOUNTER,
+            payload: {
+              enemyType: areaEnemies[randomEnemyIndex],
+              area: currentArea.id
+            }
+          });
+          
+          dispatch({
+            type: ACTION_TYPES.ADD_NOTIFICATION,
+            payload: {
+              message: `You've encountered a ${areaEnemies[randomEnemyIndex]}!`,
+              type: 'warning',
+              duration: 5000
+            }
+          });
+        }
+      }
+    }, 120000); // Check for encounters every 2 minutes
+    
+    return () => clearInterval(encounterInterval);
+  }, [dispatch, gameState.inCombat, gameState.currentArea]);
+
+  // Quest Progression System
+  useEffect(() => {
+    const questInterval = setInterval(() => {
+      // Update time-based quest objectives
+      if (gameState.activeQuests?.length > 0) {
+        gameState.activeQuests.forEach(quest => {
+          if (quest.objectives) {
+            // Check for time-based objectives
+            const timeObjectives = quest.objectives.filter(obj => 
+              obj.type === 'WAIT_TIME' && !obj.completed);
+            
+            if (timeObjectives.length > 0) {
+              timeObjectives.forEach(objective => {
+                // Update progress for time-based objectives
+                dispatch({
+                  type: ACTION_TYPES.UPDATE_QUEST_OBJECTIVE,
+                  payload: {
+                    questId: quest.id,
+                    objectiveId: objective.id,
+                    progress: (objective.progress || 0) + 1
+                  }
+                });
+              });
+            }
+          }
+        });
+      }
+    }, 60000); // Update quest timers every minute
+    
+    return () => clearInterval(questInterval);
+  }, [dispatch, gameState.activeQuests]);
+
+  // Environmental and World Conditions System
+  useEffect(() => {
+    const environmentInterval = setInterval(() => {
+      // Change weather conditions randomly
+      if (Math.random() < 0.2) { // 20% chance to change weather
+        const weatherTypes = ['Clear', 'Rainy', 'Foggy', 'Stormy', 'Snowy'];
+        const newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+        
+        dispatch({
+          type: ACTION_TYPES.UPDATE_WEATHER,
+          payload: newWeather
+        });
+        
+        // Apply weather effects based on type
+        if (newWeather === 'Stormy') {
+          dispatch({
+            type: ACTION_TYPES.ADD_NOTIFICATION,
+            payload: {
+              message: "A storm is brewing. Some areas may be more dangerous!",
+              type: 'warning',
+              duration: 5000
+            }
+          });
+        }
+      }
+      
+      // Update world events
+      const worldEventChance = 0.05; // 5% chance for a world event
+      if (Math.random() < worldEventChance) {
+        const possibleEvents = [
+          'Merchant Festival', 
+          'Monster Invasion', 
+          'Resource Abundance',
+          'Magical Anomaly'
+        ];
+        
+        const newEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
+        
+        dispatch({
+          type: ACTION_TYPES.TRIGGER_WORLD_EVENT,
+          payload: {
+            eventType: newEvent,
+            duration: Math.floor(Math.random() * 3) + 1 // 1-3 day duration
+          }
+        });
+        
+        dispatch({
+          type: ACTION_TYPES.ADD_NOTIFICATION,
+          payload: {
+            message: `World Event: ${newEvent} has begun!`,
+            type: 'info',
+            duration: 10000
+          }
+        });
+      }
+    }, 300000); // Check every 5 minutes
+    
+    return () => clearInterval(environmentInterval);
+  }, [dispatch]);
 
   return <>{children}</>;
 };

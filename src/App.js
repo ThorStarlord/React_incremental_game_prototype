@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import { GameProvider, GameStateContext, GameDispatchContext, createEssenceAction } from './context/GameStateContext';
 import GameContainer from './components/GameContainer';
 import GameLoop from './components/GameLoop';
+import { PlayerProvider } from './features/Player/context/PlayerContext';
+import PlayerStats from './features/Player/components/containers/PlayerStats';
 
 const App = () => {
   const gameState = useContext(GameStateContext);
@@ -19,6 +21,9 @@ const App = () => {
         <GameLoop>
           <GameContainer />
         </GameLoop>
+        <PlayerProvider>
+          <PlayerStats />
+        </PlayerProvider>
       </div>
     </GameProvider>
   );

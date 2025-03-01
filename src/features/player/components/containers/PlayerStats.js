@@ -1,136 +1,117 @@
-import React, { useContext } from 'react';
-import { Box, Typography, LinearProgress, Tooltip, Chip, Divider } from '@mui/material';
-import { GameStateContext } from '../../../../context/GameStateContext';
-import Panel from '../../../components/panel/Panel';
-import useThemeUtils from '../../../hooks/useThemeUtils';
-import useTraitEffects from '../../../hooks/useTraitEffects';
+import React from 'react';
+import { usePlayerContext, PLAYER_ACTIONS } from '../../context/PlayerContext';
 
-const StatDisplay = ({ label, value, bonus }) => (
-  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-    <Typography variant="body2">
-      {label}: {value}
-    </Typography>
-    {bonus > 0 && (
-      <Typography variant="caption" color="success.main">
-        (+{bonus})
-      </Typography>
-    )}
-  </Box>
-);
-
+/**
+ * PlayerStats Container Component
+ * 
+ * @description 
+ * A container component that displays and manages player statistics.
+ * This component renders the player's vital information including name,
+ * level, health, and energy with visual indicators.
+ * 
+ * @example
+ * // Usage (must be within a PlayerProvider)
+ * <PlayerStats />
+ * 
+ * @returns {JSX.Element} A component that displays player stats
+ */
 const PlayerStats = () => {
-  const { player } = useContext(GameStateContext);
-  const { getProgressColor } = useThemeUtils();
-  const { activeEffects, modifiers, calculatedStats } = useTraitEffects();
+  // Get player state from context
+  const { state, dispatch } = usePlayerContext();
+  const playerStats = state.player;
   
-  // Calculate stat bonuses from traits
-  const attackBonus = calculatedStats.attack - player.attack;
-  const defenseBonus = calculatedStats.defense - player.defense;
+  /**
+   * Calculates the percentage for progress bars
+   * @param {number} current - Current value
+   * @param {number} max - Maximum value
+   * @returns {string} Percentage string for CSS width
+   */
+  const calculatePercentage = (current, max) => `${(current / max) * 100}%`;
+
+  /**
+   * Updates the player's health
+   * @param {number} amount - Amount to change health by
+   */
+  const modifyHealth = (amount) => {
+    dispatch({
+      type: PLAYER_ACTIONS.UPDATE_HEALTH,
+      payload: playerStats.health + amount
+    });
+  };
+
+  /**
+   * Updates the player's energy
+   * @param {number} amount - Amount to change energy by
+   */
+  const modifyEnergy = (amount) => {
+    dispatch({
+      type: PLAYER_ACTIONS.UPDATE_ENERGY,
+      payload: playerStats.energy + amount
+    });
+  };
 
   return (
-    <Panel title="Player Stats">
-      <Typography variant="subtitle1" sx={{ mb: 2 }}>
-        {player.name} - Level {player.level}
-      </Typography>
+    <div className="player-stats-container" data-testid="player-stats-container">
+      <h2>Player Statistics</h2>
       
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body2" gutterBottom>
-          HP: {player.hp}/{player.maxHp}
-        </Typography>
-        <Tooltip title={`${player.hp}/{player.maxHp} HP`} arrow>
-          <LinearProgress
-            variant="determinate"
-            value={(player.hp / player.maxHp) * 100}
-            sx={{
-              height: 8,
-              borderRadius: 1,
-              bgcolor: 'grey.200',
-              '& .MuiLinearProgress-bar': {
-                backgroundColor: getProgressColor(player.hp, player.maxHp)
-              }
-            }}
-          />
-        </Tooltip>
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <StatDisplay label="Attack" value={player.attack} bonus={attackBonus} />
-        <StatDisplay label="Defense" value={player.defense} bonus={defenseBonus} />
-        {modifiers.essenceSiphonChance > 0 && (
-          <Typography variant="caption" color="primary" sx={{ display: 'block', mt: 0.5 }}>
-            {Math.round(modifiers.essenceSiphonChance * 100)}% chance to gain essence on hit
-          </Typography>
-        )}
-      </Box>
-
-      <Divider sx={{ my: 2 }} />
-
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="body2" color="primary">
-            Gold: {player.gold}
-          </Typography>
-          {modifiers.shopDiscount > 0 && (
-            <Tooltip title="Shop discount from traits" arrow>
-              <Typography variant="caption" color="success.main">
-                ({Math.round(modifiers.shopDiscount * 100)}% cheaper)
-              </Typography>
-            </Tooltip>
-          )}
-        </Box>
-
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-          <Typography variant="body2" color="secondary">
-            XP: {player.experience}
-          </Typography>
-          {modifiers.xpMultiplier > 1 && (
-            <Tooltip title="XP bonus from traits" arrow>
-              <Typography variant="caption" color="success.main">
-                ({Math.round((modifiers.xpMultiplier - 1) * 100)}% bonus)
-              </Typography>
-            </Tooltip>
-          )}
-        </Box>
-      </Box>
-
-      {player.statPoints > 0 && (
-        <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
-          Stat Points Available: {player.statPoints}
-          {modifiers.statPointBonus > 0 && (
-            <Tooltip title="Additional stat points from traits" arrow>
-              <Typography component="span" sx={{ ml: 1 }} color="success.light">
-                (+{modifiers.statPointBonus} on level up)
-              </Typography>
-            </Tooltip>
-          )}
-        </Typography>
-      )}
-
-      {activeEffects.length > 0 && (
-        <>
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="subtitle2" gutterBottom>
-            Active Traits ({activeEffects.length})
-          </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {activeEffects.map(effect => (
-              <Tooltip 
-                key={effect.id}
-                title={effect.effect}
-                arrow
-              >
-                <Chip
-                  label={effect.name}
-                  size="small"
-                  color={effect.type === 'Knowledge' ? 'primary' : 'secondary'}
-                  variant="outlined"
-                />
-              </Tooltip>
-            ))}
-          </Box>
-        </>
-      )}
-    </Panel>
+      <div className="stats-grid">
+        <div className="stat-item">
+          <span className="stat-label">Name:</span>
+          <span className="stat-value">{playerStats.name}</span>
+        </div>
+        
+        <div className="stat-item">
+          <span className="stat-label">Level:</span>
+          <span className="stat-value">{playerStats.level}</span>
+          <button 
+            onClick={() => dispatch({ type: PLAYER_ACTIONS.LEVEL_UP })}
+            className="small-button"
+          >
+            Level Up
+          </button>
+        </div>
+        
+        <div className="stat-item full-width">
+          <div className="stat-header">
+            <span className="stat-label">Health:</span>
+            <span className="stat-value">{playerStats.health}/{playerStats.maxHealth}</span>
+          </div>
+          <div className="progress-bar">
+            <div 
+              className="progress-fill health" 
+              style={{ width: calculatePercentage(playerStats.health, playerStats.maxHealth) }}
+              aria-valuenow={playerStats.health}
+              aria-valuemin="0"
+              aria-valuemax={playerStats.maxHealth}
+            />
+          </div>
+          <div className="stat-controls">
+            <button onClick={() => modifyHealth(-10)}>-10</button>
+            <button onClick={() => modifyHealth(10)}>+10</button>
+          </div>
+        </div>
+        
+        <div className="stat-item full-width">
+          <div className="stat-header">
+            <span className="stat-label">Energy:</span>
+            <span className="stat-value">{playerStats.energy}/{playerStats.maxEnergy}</span>
+          </div>
+          <div className="progress-bar">
+            <div 
+              className="progress-fill energy" 
+              style={{ width: calculatePercentage(playerStats.energy, playerStats.maxEnergy) }}
+              aria-valuenow={playerStats.energy}
+              aria-valuemin="0"
+              aria-valuemax={playerStats.maxEnergy}
+            />
+          </div>
+          <div className="stat-controls">
+            <button onClick={() => modifyEnergy(-5)}>-5</button>
+            <button onClick={() => modifyEnergy(5)}>+5</button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,0 +1,120 @@
+/* StatDisplay Component Styles
+ * 
+ * This stylesheet provides styling for the StatDisplay component including:
+ * - Basic layout and spacing
+ * - Theme variations (default, primary, success, warning, danger)
+ * - Size variants (small, medium, large)
+ * - Progress bar styling
+ */
+
+.stat-display {
+  margin: 8px 0;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.05);
+  font-family: sans-serif;
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-name {
+  font-weight: 600;
+  flex-grow: 1;
+}
+
+.stat-value {
+  font-family: monospace;
+  font-weight: 700;
+}
+
+.stat-icon {
+  margin-right: 4px;
+  width: 16px;
+  text-align: center;
+}
+
+/* Progress bar styling */
+.stat-progress {
+  margin-top: 4px;
+  height: 6px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-progress-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* Size variants */
+.stat-display.size-small {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+}
+
+.stat-display.size-small .stat-progress {
+  height: 4px;
+}
+
+.stat-display.size-large {
+  font-size: 1.2rem;
+  padding: 8px 12px;
+}
+
+.stat-display.size-large .stat-progress {
+  height: 8px;
+}
+
+/* Theme variants */
+.stat-display.theme-default .stat-progress-bar {
+  background-color: #808080;
+}
+
+.stat-display.theme-primary {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+.stat-display.theme-primary .stat-value,
+.stat-display.theme-primary .stat-icon {
+  color: #0d6efd;
+}
+.stat-display.theme-primary .stat-progress-bar {
+  background-color: #0d6efd;
+}
+
+.stat-display.theme-success {
+  background-color: rgba(25, 135, 84, 0.1);
+}
+.stat-display.theme-success .stat-value,
+.stat-display.theme-success .stat-icon {
+  color: #198754;
+}
+.stat-display.theme-success .stat-progress-bar {
+  background-color: #198754;
+}
+
+.stat-display.theme-warning {
+  background-color: rgba(255, 193, 7, 0.1);
+}
+.stat-display.theme-warning .stat-value,
+.stat-display.theme-warning .stat-icon {
+  color: #ffc107;
+}
+.stat-display.theme-warning .stat-progress-bar {
+  background-color: #ffc107;
+}
+
+.stat-display.theme-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+.stat-display.theme-danger .stat-value,
+.stat-display.theme-danger .stat-icon {
+  color: #dc3545;
+}
+.stat-display.theme-danger .stat-progress-bar {
+  background-color: #dc3545;
+}
