@@ -1,116 +1,315 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { handleCopyTrait, handleAddPermanentTrait, applyTraitEffects } from '../utils/traitUtils';
-import { handleLearnSkill } from '../utils/skillUtils';
 import { addNotification } from '../utils/notificationUtils';
 
-// Handler functions
-const handleEquipTrait = (state, payload) => {
-  const { traitId, slotId } = payload;
-  
-  // Check if trait exists and is acquired - fixed to safely handle undefined acquiredTraits
-  if (!state.acquiredTraits || !state.acquiredTraits.includes(traitId)) {
-    return addNotification(state, {
-      message: "You don't have this trait.",
-      type: "error"
-    });
+// Initial state for the player
+const initialPlayerState = {
+  name: 'Player',
+  level: 1,
+  experience: 0,
+  controlledCharacters: [],
+  acquiredTraits: [],
+  equippedTraits: [], 
+  statistics: {
+    battlesWon: 0,
+    traitsDiscovered: 0,
+    npcsRecruited: 0
   }
-  
-  // Update equipped traits
-  const newState = {
-    ...state,
-    equippedTraits: {
-      ...state.equippedTraits,
-      [slotId]: traitId
-    }
-  };
-  
-  // Apply trait effects
-  return applyTraitEffects(newState);
-};
-
-const handleUnequipTrait = (state, payload) => {
-  const { slotId } = payload;
-  
-  // Create a new equipped traits object without the specified slot
-  const newEquippedTraits = { ...(state.equippedTraits || {}) };
-  delete newEquippedTraits[slotId];
-  
-  const newState = {
-    ...state,
-    equippedTraits: newEquippedTraits
-  };
-  
-  // Reapply trait effects for remaining traits
-  return applyTraitEffects(newState);
 };
 
 /**
  * Player Reducer
  * 
- * Purpose: Manages the player character's state and attributes
- * - Handles updates to player properties (stats, level, etc.)
- * - Centralizes all player-related state changes
+ * Purpose: Manages the core player state in the game
+ * - Handles character progression (XP gain, level ups)
+ * - Manages player attributes and derived stats
+ * - Processes trait acquisition and management
+ * - Handles health, energy, and resource regeneration
+ * - Controls character roster and character switching
  * 
- * This reducer is responsible for maintaining the integrity of the player object
- * which represents the user's character in the game world. It ensures proper
- * updating of player attributes while preserving existing state values.
+ * The player reducer is central to character growth and progression,
+ * turning player actions into meaningful advancement in the game.
+ * 
+ * Actions:
+ * - GAIN_EXPERIENCE: Awards XP and handles level ups
+ * - MODIFY_HEALTH: Adjusts player health (damage/healing)
+ * - MODIFY_ENERGY: Adjusts player energy (consumption/recovery)
+ * - ACQUIRE_TRAIT: Adds new traits to the player
+ * - EQUIP_TRAIT: Places traits in active slots
+ * - ADD_CHARACTER: Adds new character to player roster
+ * - SWITCH_CHARACTER: Changes active character
+ * - ALLOCATE_ATTRIBUTE: Assigns attribute points
+ * - REST: Recovers resources over time
  */
 export const playerReducer = (state, action) => {
   switch (action.type) {
-    case ACTION_TYPES.UPDATE_PLAYER: {
-      // Merge provided properties with existing player state
-      // This allows for partial updates to the player object
+    case ACTION_TYPES.GAIN_EXPERIENCE: {
+      const { amount, source } = action.payload;
+      const currentXP = state.player.experience + amount;
+      
+      // XP required for next level - simple formula, can be adjusted
+      const requiredXP = state.player.level * 100;
+      
+      // Check if player should level up
+      if (currentXP >= requiredXP) {
+        // Calculate new level and remaining XP
+        const newLevel = state.player.level + 1;
+        const remainingXP = currentXP - requiredXP;
+        
+        // Calculate attribute points to award
+        const attributePointsGained = 3; // Standard points per level
+        
+        // Create level up state with notifications
+        const levelUpState = addNotification({
+          ...state,
+          player: {
+            ...state.player,
+            level: newLevel,
+            experience: remainingXP,
+            attributePoints: (state.player.attributePoints || 0) + attributePointsGained,
+            // Increase base health and energy with level
+            maxHealth: state.player.maxHealth + 10,
+            maxEnergy: state.player.maxEnergy + 5,
+            // Restore health and energy on level up
+            health: state.player.maxHealth + 10,
+            energy: state.player.maxEnergy + 5,
+            // Track level up history
+            levelHistory: [
+              ...(state.player.levelHistory || []),
+              {
+                level: newLevel,
+                timestamp: Date.now(),
+                attributesGained: attributePointsGained
+              }
+            ]
+          }
+        }, {
+          message: `Level Up! You are now level ${newLevel}.`,
+          type: "achievement",
+          duration: 6000
+        });
+        
+        return levelUpState;
+      }
+      
+      // No level up, just add XP
       return {
         ...state,
         player: {
           ...state.player,
-          ...action.payload
+          experience: currentXP
         }
       };
     }
-    case ACTION_TYPES.COPY_TRAIT:
-      return handleCopyTrait(state, action.payload);
+    
+    case ACTION_TYPES.MODIFY_HEALTH: {
+      const { amount, source } = action.payload;
+      const newHealth = Math.max(0, Math.min(
+        state.player.health + amount,
+        state.player.maxHealth
+      ));
       
-    case ACTION_TYPES.LEARN_SKILL:
-      return handleLearnSkill(state, action.payload);
+      // Check if player died
+      if (newHealth === 0 && state.player.health > 0) {
+        return addNotification({
+          ...state,
+          player: {
+            ...state.player,
+            health: newHealth,
+            deathCount: (state.player.deathCount || 0) + 1,
+            lastDeath: {
+              timestamp: Date.now(),
+              source: source || 'unknown'
+            }
+          }
+        }, {
+          message: "You have been defeated!",
+          type: "danger",
+          duration: 5000
+        });
+      }
       
-    case ACTION_TYPES.EQUIP_TRAIT:
-      return handleEquipTrait(state, action.payload);
-      
-    case ACTION_TYPES.UNEQUIP_TRAIT:
-      return handleUnequipTrait(state, action.payload);
-      
-    case ACTION_TYPES.UPGRADE_TRAIT_SLOTS:
+      // Regular health change
       return {
         ...state,
-        traitSlots: action.payload.newTotal
+        player: {
+          ...state.player,
+          health: newHealth
+        }
       };
+    }
+    
+    case ACTION_TYPES.MODIFY_ENERGY: {
+      const { amount } = action.payload;
+      const newEnergy = Math.max(0, Math.min(
+        state.player.energy + amount,
+        state.player.maxEnergy
+      ));
       
-    case ACTION_TYPES.ADD_PERMANENT_TRAIT:
-      return handleAddPermanentTrait(state, action.payload);
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          energy: newEnergy
+        }
+      };
+    }
+    
+    case ACTION_TYPES.ACQUIRE_TRAIT: {
+      const { trait } = action.payload;
       
-    case ACTION_TYPES.DISCOVER_NPC:
-      const { npcId } = action.payload;
-      if (state.discoveredNPCs?.includes(npcId)) {
+      // Check if player already has this trait
+      if (state.player.acquiredTraits.some(t => t.id === trait.id)) {
+        return addNotification(state, {
+          message: `You already possess the ${trait.name} trait.`,
+          type: "warning"
+        });
+      }
+      
+      return addNotification({
+        ...state,
+        player: {
+          ...state.player,
+          acquiredTraits: [
+            ...state.player.acquiredTraits,
+            {
+              id: trait.id,
+              name: trait.name,
+              description: trait.description,
+              acquired: Date.now()
+            }
+          ]
+        }
+      }, {
+        message: `Acquired new trait: ${trait.name}`,
+        type: "achievement"
+      });
+    }
+    
+    case ACTION_TYPES.EQUIP_TRAIT: {
+      const { traitId, slot } = action.payload;
+      
+      // Verify player has the trait
+      if (!state.player.acquiredTraits.some(t => t.id === traitId)) {
+        return addNotification(state, {
+          message: "You don't possess this trait.",
+          type: "error"
+        });
+      }
+      
+      // Update equipped traits
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          equippedTraits: {
+            ...state.player.equippedTraits,
+            [slot]: traitId
+          }
+        }
+      };
+    }
+    
+    case ACTION_TYPES.ADD_CHARACTER: {
+      const { character } = action.payload;
+      
+      // Check if character already exists
+      if (state.player.controlledCharacters.some(c => c.id === character.id)) {
         return state;
       }
       
-      // Use the addNotification utility for consistency
-      return addNotification(
-        {
-          ...state,
-          discoveredNPCs: [
-            ...(state.discoveredNPCs || []),
-            npcId
+      return addNotification({
+        ...state,
+        player: {
+          ...state.player,
+          controlledCharacters: [
+            ...state.player.controlledCharacters,
+            character
           ]
-        },
-        {
-          message: `You have discovered ${npcId}!`,
-          type: 'info',
-          duration: 3000
         }
+      }, {
+        message: `${character.name} has joined your party!`,
+        type: "achievement"
+      });
+    }
+    
+    case ACTION_TYPES.SWITCH_CHARACTER: {
+      const { characterId } = action.payload;
+      
+      // Verify character exists
+      const targetCharacter = state.player.controlledCharacters.find(c => c.id === characterId);
+      if (!targetCharacter) {
+        return addNotification(state, {
+          message: "Character not found in your roster.",
+          type: "error"
+        });
+      }
+      
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          activeCharacterId: characterId
+        }
+      };
+    }
+    
+    case ACTION_TYPES.ALLOCATE_ATTRIBUTE: {
+      const { attribute, amount = 1 } = action.payload;
+      
+      // Validate available points
+      if ((state.player.attributePoints || 0) < amount) {
+        return addNotification(state, {
+          message: "Not enough attribute points available.",
+          type: "error"
+        });
+      }
+      
+      // Valid attributes
+      const validAttributes = ["strength", "intelligence", "dexterity", "constitution", "wisdom", "charisma"];
+      if (!validAttributes.includes(attribute)) {
+        return state;
+      }
+      
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          attributePoints: state.player.attributePoints - amount,
+          attributes: {
+            ...(state.player.attributes || {}),
+            [attribute]: ((state.player.attributes || {})[attribute] || 0) + amount
+          }
+        }
+      };
+    }
+    
+    case ACTION_TYPES.REST: {
+      const { duration } = action.payload;
+      const healthRecovery = Math.floor(duration * 0.1); // 10% per rest unit
+      const energyRecovery = Math.floor(duration * 0.2); // 20% per rest unit
+      
+      // Calculate new values with caps
+      const newHealth = Math.min(
+        state.player.health + healthRecovery,
+        state.player.maxHealth
       );
       
+      const newEnergy = Math.min(
+        state.player.energy + energyRecovery,
+        state.player.maxEnergy
+      );
+      
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          health: newHealth,
+          energy: newEnergy,
+          lastRested: Date.now()
+        }
+      };
+    }
+    
     default:
       return state;
   }

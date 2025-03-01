@@ -1,61 +1,183 @@
 import React, { useState, useContext, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { 
   Drawer, 
-  Tabs, 
-  Tab, 
   Box, 
-  Badge, 
   IconButton,
-  Divider,
-  Typography
+  Typography,
+  useTheme,
+  useMediaQuery,
+  Fade,
+  Tooltip,
+  Zoom
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
-import PersonIcon from '@mui/icons-material/Person';
-import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import PersonIcon from '@mui/material/Icon/Person';
+import SportsKabaddiIcon from '@mui/material/Icon/SportsKabaddi';
+import AutoFixHighIcon from '@mui/material/Icon/AutoFixHigh';
 import IntegratedTraitsPanel from '../../../features/Traits/components/containers/IntegratedTraitsPanel';
 import NPCPanel from './npcs/NPCPanel';
 import CharactersPanel from '../../../features/Minions/components/ui/CharactersPanel';
 import { GameStateContext } from '../../../context/GameStateContext';
+import CharacterTabBar from './CharacterTabBar';
+import Panel from './Panel';
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-  
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`drawer-tabpanel-${index}`}
-      aria-labelledby={`drawer-tab-${index}`}
-      style={{ height: '100%', overflow: 'auto' }}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ height: '100%', p: 0 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-const CharacterManagementDrawer = ({ open, onClose, initialTab = 0 }) => {
-  const [tabValue, setTabValue] = useState(initialTab);
+/**
+ * @component CharacterManagementDrawer
+ * @description An enhanced slide-out drawer component that provides access to character management features
+ * using the CharacterTabBar component for navigation and Panel component for consistent styling.
+ * 
+ * Features:
+ * - Integrated CharacterTabBar for tab navigation with animations and notifications
+ * - Responsive design that adapts to different screen sizes
+ * - Animated transitions for smooth user experience
+ * - Accessible keyboard navigation
+ * - Integration with game state context for real-time data
+ * - Consistent styling using the Panel component with collapsible sections
+ * - Tab-specific icons and notifications
+ * 
+ * Integration Notes:
+ * - Panel component is used as a container with conditional collapsibility
+ * - CharacterTabBar handles all tab navigation with custom configuration
+ * - Drawer responsively adapts based on screen size
+ * 
+ * @example
+ * // Basic usage
+ * <CharacterManagementDrawer 
+ *   open={drawerOpen}
+ *   onClose={() => setDrawerOpen(false)}
+ * />
+ * 
+ * @example
+ * // With initial tab selection
+ * <CharacterManagementDrawer 
+ *   open={drawerOpen}
+ *   onClose={() => setDrawerOpen(false)}
+ *   initialTab="npcs" // Opens to NPCs tab
+ * />
+ * 
+ * @param {Object} props - Component props
+ * @param {boolean} props.open - Whether the drawer is open
+ * @param {Function} props.onClose - Callback function called when the drawer should close
+ * @param {string} [props.initialTab="characters"] - The initial active tab key
+ * @returns {JSX.Element} The character management drawer component
+ */
+const CharacterManagementDrawer = ({ open, onClose, initialTab = "characters" }) => {
+  const [activeTab, setActiveTab] = useState(initialTab);
   const { player, discoveryProgress } = useContext(GameStateContext);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const [panelExpanded, setPanelExpanded] = useState(true);
   
-  // Update tab value when initialTab prop changes
+  // Reset tab when drawer opens or initialTab changes
   useEffect(() => {
-    setTabValue(initialTab);
-  }, [initialTab]);
+    if (open) {
+      setActiveTab(initialTab);
+      // Always expand the panel when drawer opens
+      setPanelExpanded(true);
+    }
+  }, [open, initialTab]);
   
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+  /**
+   * Handles tab change events
+   * @param {string} tabValue - The new selected tab key
+   */
+  const handleTabChange = (tabValue) => {
+    setActiveTab(tabValue);
+  };
+
+  /**
+   * Handles keyboard navigation
+   * @param {React.KeyboardEvent} event - Keyboard event
+   */
+  const handleKeyDown = (event) => {
+    // Close drawer on Escape key
+    if (event.key === 'Escape') {
+      onClose();
+    }
   };
   
   // Get counts for badges
   const controlledCharacterCount = player?.controlledCharacters?.length || 0;
   const metNPCCount = discoveryProgress?.metNPCCount || 0;
   const traitCount = player?.acquiredTraits?.length || 0;
+
+  // Configure notifications for CharacterTabBar
+  const notifications = {
+    characters: controlledCharacterCount > 0 ? controlledCharacterCount : 0,
+    npcs: metNPCCount > 0 ? metNPCCount : 0,
+    traits: traitCount > 0 ? traitCount : 0
+  };
+
+  /**
+   * Gets the current tab title for the header
+   * @returns {string} The current tab title
+   */
+  const getCurrentTabTitle = () => {
+    const tabTitles = {
+      characters: 'Characters',
+      npcs: 'NPCs',
+      traits: 'Character Traits'
+    };
+    
+    return tabTitles[activeTab] || 'Character Management';
+  };
+  
+  /**
+   * Gets the appropriate icon for the current tab
+   * @returns {JSX.Element} Icon component for the current tab
+   */
+  const getCurrentTabIcon = () => {
+    const tabIcons = {
+      characters: <SportsKabaddiIcon />,
+      npcs: <PersonIcon />,
+      traits: <AutoFixHighIcon />
+    };
+    
+    return tabIcons[activeTab];
+  };
+  
+  /**
+   * Tab configuration with content components
+   */
+  const tabContent = {
+    characters: <CharactersPanel />,
+    npcs: <NPCPanel />,
+    traits: <IntegratedTraitsPanel />
+  };
+
+  /**
+   * CharacterTabBar configuration with enhanced features
+   */
+  const tabBarConfig = {
+    defaultTab: activeTab,
+    onTabChange: handleTabChange,
+    notifications: notifications,
+    disabledTabs: [], // All tabs are enabled
+    showLabels: true,
+    showLoadingIndicators: true,
+    tabs: [
+      { 
+        key: "characters", 
+        label: "Characters", 
+        icon: <SportsKabaddiIcon />, 
+        tooltip: "Manage your characters and minions" 
+      },
+      { 
+        key: "npcs", 
+        label: "NPCs", 
+        icon: <PersonIcon />, 
+        tooltip: "View discovered NPCs and their information" 
+      },
+      { 
+        key: "traits", 
+        label: "Traits", 
+        icon: <AutoFixHighIcon />, 
+        tooltip: "Browse and manage character traits" 
+      }
+    ]
+  };
   
   return (
     <Drawer
@@ -63,97 +185,147 @@ const CharacterManagementDrawer = ({ open, onClose, initialTab = 0 }) => {
       open={open}
       onClose={onClose}
       PaperProps={{
-        sx: { width: { xs: '100%', sm: '450px' }, maxWidth: '100%' }
+        sx: { 
+          width: { xs: '100%', sm: '450px', md: '500px' }, 
+          maxWidth: '100%',
+          boxShadow: theme.shadows[8],
+        },
+        'aria-label': 'Character management panel'
       }}
+      SlideProps={{
+        timeout: 300
+      }}
+      onKeyDown={handleKeyDown}
+      keepMounted={false}
     >
       <Box sx={{ 
         display: 'flex', 
         flexDirection: 'column', 
-        height: '100%' 
+        height: '100%',
+        bgcolor: 'background.paper',
       }}>
-        {/* Header with close button */}
+        {/* Header with title and close button */}
         <Box sx={{ 
           p: 2, 
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center',
           borderBottom: 1,
-          borderColor: 'divider'
+          borderColor: 'divider',
+          bgcolor: theme.palette.mode === 'dark' ? 
+            'rgba(255,255,255,0.05)' : 
+            'rgba(0,0,0,0.03)',
         }}>
-          <Typography variant="h6">
-            {tabValue === 0 ? 'Characters' : 
-             tabValue === 1 ? 'NPCs' : 'Traits'}
-          </Typography>
-          <IconButton onClick={onClose} aria-label="close">
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {!isSmallScreen && (
+              <Tooltip title="Close panel">
+                <IconButton 
+                  onClick={onClose} 
+                  aria-label="close panel"
+                  edge="start"
+                  sx={{ mr: 1 }}
+                >
+                  <KeyboardArrowLeftIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Zoom in={true} style={{ transitionDelay: '100ms' }}>
+              <Typography variant="h6" component="h2">
+                {getCurrentTabTitle()}
+              </Typography>
+            </Zoom>
+          </Box>
+          <Tooltip title="Close panel">
+            <IconButton 
+              onClick={onClose} 
+              aria-label="close character management panel"
+              edge="end"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
         
-        {/* Tabs */}
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange}
-          variant="fullWidth"
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
-        >
-          <Tab 
-            icon={
-              <Badge 
-                badgeContent={controlledCharacterCount} 
-                color="success" 
-                max={99}
-                showZero={false}
-              >
-                <SportsKabaddiIcon />
-              </Badge>
-            } 
-            label="Characters" 
-          />
-          <Tab 
-            icon={
-              <Badge 
-                badgeContent={metNPCCount} 
-                color="primary" 
-                max={99}
-                showZero={false}
-              >
-                <PersonIcon />
-              </Badge>
-            } 
-            label="NPCs" 
-          />
-          <Tab 
-            icon={
-              <Badge 
-                badgeContent={traitCount} 
-                color="secondary" 
-                max={99}
-                showZero={false}
-              >
-                <AutoFixHighIcon />
-              </Badge>
-            } 
-            label="Traits" 
-          />
-        </Tabs>
+        {/* Main content area with CharacterTabBar and tab panels */}
+        <Box sx={{ 
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}>
+          {/* Use Panel component with enhanced integration */}
+          <Panel
+            title={getCurrentTabTitle()}
+            icon={getCurrentTabIcon()}
+            defaultExpanded={panelExpanded}
+            sx={{ 
+              flexGrow: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              m: 0,
+              borderRadius: 0,
+              boxShadow: 'none',
+              overflow: 'hidden'
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              {/* Use CharacterTabBar with enhanced configuration */}
+              <CharacterTabBar 
+                defaultTab={activeTab}
+                onTabChange={handleTabChange}
+                notifications={notifications}
+                disabledTabs={[]}
+                showLabels={true}
+                showLoadingIndicators={true}
+                customTabs={tabBarConfig.tabs}
+              />
+              
+              {/* Content area */}
+              <Box sx={{ 
+                flexGrow: 1, 
+                overflow: 'auto',
+                p: 2
+              }}>
+                <Fade in={true} timeout={300}>
+                  <Box>
+                    {tabContent[activeTab] || (
+                      <Typography color="text.secondary">
+                        No content available for this tab.
+                      </Typography>
+                    )}
+                  </Box>
+                </Fade>
+              </Box>
+            </Box>
+          </Panel>
+        </Box>
         
-        {/* Tab panels - with flexGrow to take remaining height */}
-        <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-          <TabPanel value={tabValue} index={0}>
-            <CharactersPanel />
-          </TabPanel>
-          
-          <TabPanel value={tabValue} index={1}>
-            <NPCPanel />
-          </TabPanel>
-          
-          <TabPanel value={tabValue} index={2}>
-            <IntegratedTraitsPanel />
-          </TabPanel>
+        {/* Footer with counts */}
+        <Box 
+          sx={{ 
+            p: 2, 
+            borderTop: 1, 
+            borderColor: 'divider',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            bgcolor: theme.palette.mode === 'dark' ? 
+              'rgba(255,255,255,0.03)' : 
+              'rgba(0,0,0,0.02)',
+          }}
+        >
+          <Typography variant="caption" color="text.secondary">
+            {notifications[activeTab] || 0} {getCurrentTabTitle()} available
+          </Typography>
         </Box>
       </Box>
     </Drawer>
   );
+};
+
+CharacterManagementDrawer.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  initialTab: PropTypes.string,
 };
 
 export default CharacterManagementDrawer;

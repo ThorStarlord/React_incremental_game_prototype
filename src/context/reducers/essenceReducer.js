@@ -7,10 +7,16 @@ import { addNotification } from '../utils/notificationUtils';
  * Purpose: Manages the game's primary resource - essence
  * - Handles gaining essence from various game activities
  * - Handles spending essence for upgrades, abilities, etc.
+ * - Tracks lifetime essence statistics for achievements
+ * - Applies trait modifiers to essence gains
  * 
  * Essence serves as the core progression currency in the game,
  * allowing players to advance their character and unlock new features.
  * This reducer ensures proper tracking of this critical resource.
+ * 
+ * Actions:
+ * - GAIN_ESSENCE: Increases player's essence by specified amount
+ * - SPEND_ESSENCE: Decreases player's essence if sufficient funds
  */
 export const essenceReducer = (state, action) => {
   switch (action.type) {
@@ -38,11 +44,19 @@ export const essenceReducer = (state, action) => {
         });
       }
       
+      // Update both current amount and lifetime statistics
       return {
         ...newState,
         essence: {
           ...state.essence,
-          amount: state.essence.amount + modifiedAmount
+          amount: state.essence.amount + modifiedAmount,
+          // Track lifetime essence for achievements
+          lifetimeEarned: (state.essence.lifetimeEarned || 0) + modifiedAmount,
+          // Track sources for analytics
+          sourceStats: {
+            ...(state.essence.sourceStats || {}),
+            [source || 'unknown']: ((state.essence.sourceStats || {})[source || 'unknown'] || 0) + modifiedAmount
+          }
         }
       };
     }
@@ -51,25 +65,20 @@ export const essenceReducer = (state, action) => {
       const { amount, reason } = action.payload;
       
       if (state.essence.amount < amount) {
-        return {
-          ...state,
-          notifications: [
-            ...(state.notifications || []),
-            {
-              id: Date.now(),
-              message: `Not enough essence to ${reason || 'perform this action'}`,
-              type: 'error',
-              duration: 3000
-            }
-          ]
-        };
+        return addNotification(state, {
+          message: `Not enough essence to ${reason || 'perform this action'}`,
+          type: 'error',
+          duration: 3000
+        });
       }
       
       return {
         ...state,
         essence: {
           ...state.essence,
-          amount: state.essence.amount - amount
+          amount: state.essence.amount - amount,
+          // Track spending stats
+          lifetimeSpent: (state.essence.lifetimeSpent || 0) + amount
         }
       };
     }
