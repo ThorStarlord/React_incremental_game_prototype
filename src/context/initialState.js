@@ -1,8 +1,11 @@
-import { traits } from '../data/traits';
-import { npcs } from '../data/npcs';
-import { items } from '../data/items';
+import { worldInitialState } from '../features/World/worldInitialState';
+import { playerInitialState } from '../features/Player/playerInitialState';
+import { npcsInitialState } from '../features/NPCs/npcsInitialState';
+import { traitsInitialState } from '../features/Traits/traitsInitialState';
+import { itemsInitialState } from '../features/Inventory/itemsInitialState';
+import { essenceInitialState } from '../features/Essence/essenceInitialState';
 
-export const initialState = {
+export const getInitialState = () => ({
   player: {
     name: "Adventurer",
     level: 1,
@@ -27,12 +30,14 @@ export const initialState = {
     dialogueState: null,
     dialogueHistory: []
   })),
-  traits: traits,
-  items: items,
+  traits,
+  items,
   gameTime: {
     day: 1,
     period: 'morning', // morning, afternoon, evening, night
     timestamp: Date.now()
   },
   notifications: []
-};
+});
+
+export const initialState = getInitialState();

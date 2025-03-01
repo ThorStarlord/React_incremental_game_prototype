@@ -1,15 +1,14 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { handleCopyTrait, handleAddPermanentTrait } from '../utils/traitUtils';
+import { handleCopyTrait, handleAddPermanentTrait, applyTraitEffects } from '../utils/traitUtils';
 import { handleLearnSkill } from '../utils/skillUtils';
 import { addNotification } from '../utils/notificationUtils';
-import { applyTraitEffects } from '../utils/traitUtils'; // or wherever it's defined
 
 // Handler functions
 const handleEquipTrait = (state, payload) => {
   const { traitId, slotId } = payload;
   
-  // Check if trait exists and is acquired
-  if (!state.acquiredTraits.includes(traitId)) {
+  // Check if trait exists and is acquired - fixed to safely handle undefined acquiredTraits
+  if (!state.acquiredTraits || !state.acquiredTraits.includes(traitId)) {
     return addNotification(state, {
       message: "You don't have this trait.",
       type: "error"
@@ -33,7 +32,7 @@ const handleUnequipTrait = (state, payload) => {
   const { slotId } = payload;
   
   // Create a new equipped traits object without the specified slot
-  const newEquippedTraits = { ...state.equippedTraits };
+  const newEquippedTraits = { ...(state.equippedTraits || {}) };
   delete newEquippedTraits[slotId];
   
   const newState = {

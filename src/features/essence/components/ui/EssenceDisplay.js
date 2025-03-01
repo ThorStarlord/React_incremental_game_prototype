@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Box, Typography, Button, LinearProgress, Tooltip, Paper } from '@mui/material';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
-import { GameStateContext, GameDispatchContext, createEssenceAction } from '../context/GameStateContext';
-import { UPDATE_INTERVALS } from '../config/gameConstants';
-import useThemeUtils from '../hooks/useThemeUtils';
-import EssenceGenerationTimer from './EssenceGenerationTimer';
-import useEssenceGeneration from '../hooks/useEssenceGeneration';
+import { GameStateContext, GameDispatchContext, createEssenceAction } from '../../../../context/GameStateContext';
+import { UPDATE_INTERVALS } from '../../../../constants/gameConstants';
+import useThemeUtils from '../../../../shared/hooks/useThemeUtils';
+import EssenceGenerationTimer from '../containers/EssenceGenerationTimer';
+import useEssenceGeneration from '../../hooks/useEssenceGeneration';
 
 const EssenceDisplay = () => {
   const { essence } = useContext(GameStateContext);

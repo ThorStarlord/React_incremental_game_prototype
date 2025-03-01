@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, LinearProgress, Typography } from '@mui/material';
-import { UPDATE_INTERVALS } from '../config/gameConstants';
+import { UPDATE_INTERVALS } from '../../../../constants/gameConstants';
 
 const EssenceGenerationTimer = ({ rate }) => {
   const [progress, setProgress] = useState(0);
