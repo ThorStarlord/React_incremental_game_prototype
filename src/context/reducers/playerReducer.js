@@ -44,15 +44,30 @@ const handleUnequipTrait = (state, payload) => {
   return applyTraitEffects(newState);
 };
 
-// Main player reducer
+/**
+ * Player Reducer
+ * 
+ * Purpose: Manages the player character's state and attributes
+ * - Handles updates to player properties (stats, level, etc.)
+ * - Centralizes all player-related state changes
+ * 
+ * This reducer is responsible for maintaining the integrity of the player object
+ * which represents the user's character in the game world. It ensures proper
+ * updating of player attributes while preserving existing state values.
+ */
 export const playerReducer = (state, action) => {
   switch (action.type) {
-    case ACTION_TYPES.UPDATE_PLAYER:
+    case ACTION_TYPES.UPDATE_PLAYER: {
+      // Merge provided properties with existing player state
+      // This allows for partial updates to the player object
       return {
         ...state,
-        ...action.payload
+        player: {
+          ...state.player,
+          ...action.payload
+        }
       };
-      
+    }
     case ACTION_TYPES.COPY_TRAIT:
       return handleCopyTrait(state, action.payload);
       

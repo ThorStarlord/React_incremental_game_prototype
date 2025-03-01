@@ -1,6 +1,17 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
 import { addNotification } from '../utils/notificationUtils';
 
+/**
+ * Essence Reducer
+ * 
+ * Purpose: Manages the game's primary resource - essence
+ * - Handles gaining essence from various game activities
+ * - Handles spending essence for upgrades, abilities, etc.
+ * 
+ * Essence serves as the core progression currency in the game,
+ * allowing players to advance their character and unlock new features.
+ * This reducer ensures proper tracking of this critical resource.
+ */
 export const essenceReducer = (state, action) => {
   switch (action.type) {
     case ACTION_TYPES.GAIN_ESSENCE: {
@@ -29,14 +40,17 @@ export const essenceReducer = (state, action) => {
       
       return {
         ...newState,
-        essence: state.essence + modifiedAmount
+        essence: {
+          ...state.essence,
+          amount: state.essence.amount + modifiedAmount
+        }
       };
     }
     
     case ACTION_TYPES.SPEND_ESSENCE: {
       const { amount, reason } = action.payload;
       
-      if (state.essence < amount) {
+      if (state.essence.amount < amount) {
         return {
           ...state,
           notifications: [
@@ -53,7 +67,10 @@ export const essenceReducer = (state, action) => {
       
       return {
         ...state,
-        essence: state.essence - amount
+        essence: {
+          ...state.essence,
+          amount: state.essence.amount - amount
+        }
       };
     }
     

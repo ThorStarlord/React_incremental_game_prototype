@@ -1,54 +1,63 @@
-import { ACTION_TYPES } from './actionTypes';
+import {
+  COLLECT_ESSENCE,
+  SPEND_ESSENCE,
+  UPGRADE_ESSENCE_RATE,
+  GAIN_EXPERIENCE,
+  LEVEL_UP,
+  LEARN_SKILL,
+  EQUIP_ITEM,
+  UNEQUIP_ITEM,
+  ADD_ITEM_TO_INVENTORY,
+  REMOVE_ITEM_FROM_INVENTORY
+} from './actionTypes';
 
 // Essence action creators
-export const createEssenceAction = (amount) => ({
-  type: ACTION_TYPES.GAIN_ESSENCE,
+export const collectEssence = (amount) => ({
+  type: COLLECT_ESSENCE,
   payload: { amount }
 });
 
-export const spendEssence = (amount, reason) => ({
-  type: ACTION_TYPES.SPEND_ESSENCE,
-  payload: { amount, reason }
+export const spendEssence = (amount) => ({
+  type: SPEND_ESSENCE,
+  payload: { amount }
 });
 
-// NPC action creators
-export const updateRelationship = (npcId, amount, notifyPlayer = true) => ({
-  type: ACTION_TYPES.UPDATE_NPC_RELATIONSHIP,
-  payload: { npcId, amount, notifyPlayer }
+export const upgradeEssenceRate = (cost, multiplier) => ({
+  type: UPGRADE_ESSENCE_RATE,
+  payload: { cost, multiplier }
 });
 
-export const meetNpc = (npcId) => ({
-  type: ACTION_TYPES.MEET_NPC,
-  payload: { npcId }
+// Player action creators
+export const gainExperience = (amount) => ({
+  type: GAIN_EXPERIENCE,
+  payload: { amount }
 });
 
-export const updateDialogueState = (npcId, dialogueId) => ({
-  type: ACTION_TYPES.UPDATE_DIALOGUE_STATE,
-  payload: { npcId, dialogueId }
+export const levelUp = () => ({
+  type: LEVEL_UP
 });
 
-export const addDialogueToHistory = (npcId, dialogue) => ({
-  type: ACTION_TYPES.UPDATE_DIALOGUE_HISTORY,
-  payload: { npcId, dialogue }
+export const learnSkill = (skillId) => ({
+  type: LEARN_SKILL,
+  payload: { skillId }
 });
 
-// Quest action creators
-export const startQuest = (questId, npcId) => ({
-  type: ACTION_TYPES.START_QUEST,
-  payload: { questId, npcId }
+export const equipItem = (itemId, slot) => ({
+  type: EQUIP_ITEM,
+  payload: { itemId, slot }
 });
 
-export const updateQuestProgress = (questId, objectiveIndex, progress) => ({
-  type: ACTION_TYPES.UPDATE_QUEST_PROGRESS,
-  payload: { questId, objectiveIndex, progress }
+export const unequipItem = (slot) => ({
+  type: UNEQUIP_ITEM,
+  payload: { slot }
 });
 
-export const completeQuest = (questId) => ({
-  type: ACTION_TYPES.COMPLETE_QUEST,
-  payload: { questId }
+export const addItemToInventory = (item) => ({
+  type: ADD_ITEM_TO_INVENTORY,
+  payload: { item }
 });
 
-export const abandonQuest = (questId) => ({
-  type: ACTION_TYPES.ABANDON_QUEST,
-  payload: { questId }
+export const removeItemFromInventory = (itemId) => ({
+  type: REMOVE_ITEM_FROM_INVENTORY,
+  payload: { itemId }
 });

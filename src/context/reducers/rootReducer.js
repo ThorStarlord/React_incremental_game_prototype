@@ -1,8 +1,10 @@
 import { playerReducer } from './playerReducer';
 import { npcReducer } from './npcReducer';
-import { questReducer } from './questReducer';
 import { essenceReducer } from './essenceReducer';
 import { inventoryReducer } from './inventoryReducer';
+import { traitsReducer } from './traitsReducer';
+import { worldReducer } from './worldReducer';
+import { gameTimeReducer } from './gameTimeReducer';
 import { ACTION_TYPES } from '../actions/actionTypes';
 
 // Main reducer that combines domain-specific reducers
@@ -44,8 +46,10 @@ const rootReducer = (state, action) => {
   let newState = playerReducer(state, action);
   newState = essenceReducer(newState, action);
   newState = npcReducer(newState, action);
-  newState = questReducer(newState, action);
-  newState = inventoryReducer(newState, action);
+  newState = inventoryReducer(newState, action); // handles items state
+  newState = traitsReducer(newState, action);
+  newState = worldReducer(newState, action);
+  newState = gameTimeReducer(newState, action);
 
   return newState;
 };
