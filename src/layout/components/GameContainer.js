@@ -1,6 +1,7 @@
 // src/components/GameContainer.js
 
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Box, Grid, AppBar, Toolbar, Typography, IconButton, Snackbar, Tooltip } from '@mui/material';
 import PlayerStats from '../../features/player/components/PlayerStats';
@@ -19,13 +20,36 @@ import CharacterManagementDrawer from '../CharacterManagementDrawer';
 import CompactTraitPanel from '../trait/CompactTraitPanel';
 import CompactCharacterPanel from '../characters/CompactCharacterPanel';
 import useMinionSimulation from '../../hooks/useMinionSimulation';
+import './GameContainer.css'; // Assuming there will be styling
 
-// Import icons for the header
-import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
-import PersonIcon from '@mui/icons-material/Person';
-import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
-
-const GameContainer = () => {
+/**
+ * GameContainer Component
+ * 
+ * @component
+ * @description
+ * Main container for the incremental RPG game. This component serves as the parent
+ * container for all game-related UI components and manages the overall layout.
+ * It includes a basic game loop implementation and supports theming options.
+ *
+ * @example
+ * return (
+ *   <GameContainer 
+ *     title="My Incremental RPG"
+ *     theme="dark"
+ *   >
+ *     <GamePanel />
+ *     <ResourcePanel />
+ *   </GameContainer>
+ * )
+ */
+const GameContainer = ({ 
+  children,
+  title = 'Incremental RPG',
+  theme = 'light',
+  fullScreen = false,
+  className = '',
+  onGameTick = () => {},
+}) => {
   const navigate = useNavigate();
   // Get essence generation rate from the hook
   const { totalRate } = useEssenceGeneration();
@@ -50,8 +74,45 @@ const GameContainer = () => {
   // Enable minion simulation
   useMinionSimulation();
 
+  // Game tick state for handling game loop
+  const [gameTick, setGameTick] = useState(0);
+  
+  /**
+   * Game loop using useEffect
+   * Sets up the main game loop that triggers onGameTick at regular intervals
+   */
+  useEffect(() => {
+    const gameLoopInterval = setInterval(() => {
+      setGameTick(prevTick => prevTick + 1);
+      onGameTick(gameTick);
+    }, 1000); // 1-second tick rate
+    
+    return () => clearInterval(gameLoopInterval);
+  }, [onGameTick, gameTick]);
+  
+  const containerClasses = [
+    'game-container',
+    `theme-${theme}`,
+    fullScreen ? 'fullscreen' : '',
+    className
+  ].filter(Boolean).join(' ');
+
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }} className={containerClasses} data-testid="game-container">
+      <header className="game-header">
+        <h1>{title}</h1>
+      </header>
+      
+      <main className="game-content">
+        {children}
+      </main>
+      
+      <footer className="game-footer">
+        <div className="game-info">
+          <span>Tick: {gameTick}</span>
+        </div>
+      </footer>
+
       {/* Header with quick access icons */}
       <AppBar position="static">
         <Toolbar>
@@ -141,6 +202,39 @@ const GameContainer = () => {
       />
     </Box>
   );
+};
+
+GameContainer.propTypes = {
+  /**
+   * Child components to render inside the game container
+   */
+  children: PropTypes.node,
+  
+  /**
+   * The title of the game to display in the header
+   */
+  title: PropTypes.string,
+  
+  /**
+   * Theme variant ('light', 'dark', etc.)
+   */
+  theme: PropTypes.string,
+  
+  /**
+   * Whether the game should take up the full screen
+   */
+  fullScreen: PropTypes.bool,
+  
+  /**
+   * Additional CSS class names
+   */
+  className: PropTypes.string,
+  
+  /**
+   * Callback function that gets called on each game tick
+   * @param {number} tick - The current tick count
+   */
+  onGameTick: PropTypes.func,
 };
 
 export default GameContainer;
