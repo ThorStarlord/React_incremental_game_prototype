@@ -1,26 +1,54 @@
-import React, { useContext } from 'react';
-import { Box, Typography, Tabs, Tab, Paper, List, ListItem, ListItemIcon, 
-         ListItemText, Chip, Divider, Avatar, Button, Icon } from '@mui/material';
-import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../context/GameStateContext';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CircleIcon from '@mui/icons-material/Circle';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import React, { useContext, useState } from 'react';
+import { 
+  Box, 
+  Typography, 
+  Tabs, 
+  Tab, 
+  Container,
+  Grid,
+  Divider,
+  Alert,
+  Card,
+  CardContent
+} from '@mui/material';
+import { GameStateContext, GameDispatchContext, ACTION_TYPES } from '../../../context/GameStateContext';
+import QuestItem from './QuestItem';
+import Panel from '../../../components/common/Panel';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
-import { formatDistanceToNow } from 'date-fns';
-import { formatObjective } from '../utils/questUtils';
-import Panel from './common/Panel';
-import { Link } from 'react-router-dom';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+
+/**
+ * @file QuestsPage.js
+ * @description Main page for displaying and managing quests in the game
+ * @module features/Quests/components
+ */
 
 const QuestsPage = () => {
-  const [tabValue, setTabValue] = React.useState(0);
-  const { player, npcs } = useContext(GameStateContext);
+  const [tabValue, setTabValue] = useState(0);
+  const { quests, questProgress } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
   
-  const activeQuests = player.activeQuests || [];
-  const completedQuests = player.completedQuests || [];
+  // Group quests by status
+  const questsByStatus = Object.values(quests.quests || {}).reduce((acc, quest) => {
+    if (!acc[quest.status]) acc[quest.status] = [];
+    acc[quest.status].push(quest);
+    return acc;
+  }, {});
   
-  const handleChange = (event, newValue) => {
+  const activeQuests = questsByStatus['active'] || [];
+  const completedQuests = questsByStatus['completed'] || [];
+  const availableQuests = questsByStatus['not_started'] || [];
+  
+  const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+  };
+  
+  const handleAcceptQuest = (questId) => {
+    dispatch({
+      type: ACTION_TYPES.ACCEPT_QUEST,
+      payload: { questId }
+    });
   };
   
   const handleAbandonQuest = (questId) => {
@@ -31,133 +59,208 @@ const QuestsPage = () => {
       });
     }
   };
+  
+  const handleCompleteQuest = (questId) => {
+    dispatch({
+      type: ACTION_TYPES.COMPLETE_QUEST,
+      payload: { questId }
+    });
+  };
+
+  // Getting the appropriate icon for each tab
+  const getTabIcon = (index) => {
+    switch(index) {
+      case 0: return <AssignmentIcon fontSize="small" sx={{ mr: 1 }} />;
+      case 1: return <HourglassEmptyIcon fontSize="small" sx={{ mr: 1 }} />;
+      case 2: return <TaskAltIcon fontSize="small" sx={{ mr: 1 }} />;
+      default: return null;
+    }
+  };
+
+  // Render the appropriate content for the selected tab
+  const renderTabContent = () => {
+    switch(tabValue) {
+      case 0: // Active Quests Tab
+        return (
+          <>
+            {activeQuests.length === 0 ? (
+              <Alert severity="info" sx={{ mt: 2 }}>
+                You have no active quests. Check available quests or speak with NPCs to find new quests.
+              </Alert>
+            ) : (
+              <Grid container spacing={3} sx={{ mt: 1 }}>
+                {activeQuests.map(quest => (
+                  <Grid item xs={12} key={quest.id}>
+                    <QuestItem 
+                      quest={quest}
+                      progress={questProgress[quest.id] || {}}
+                      onAbandon={handleAbandonQuest}
+                      onComplete={handleCompleteQuest}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </>
+        );
+      
+      case 1: // Available Quests Tab
+        return (
+          <>
+            {availableQuests.length === 0 ? (
+              <Alert severity="info" sx={{ mt: 2 }}>
+                There are no available quests at the moment. Explore the world to unlock more quests.
+              </Alert>
+            ) : (
+              <Grid container spacing={3} sx={{ mt: 1 }}>
+                {availableQuests.map(quest => (
+                  <Grid item xs={12} md={6} lg={4} key={quest.id}>
+                    <Card variant="outlined" sx={{ height: '100%' }}>
+                      <CardContent>
+                        <QuestItem 
+                          quest={quest}
+                          onAccept={handleAcceptQuest}
+                        />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </>
+        );
+      
+      case 2: // Completed Quests Tab
+        return (
+          <>
+            {completedQuests.length === 0 ? (
+              <Alert severity="info" sx={{ mt: 2 }}>
+                You haven't completed any quests yet. Complete active quests to see them here.
+              </Alert>
+            ) : (
+              <Grid container spacing={3} sx={{ mt: 1 }}>
+                {completedQuests.map(quest => (
+                  <Grid item xs={12} key={quest.id}>
+                    <QuestItem 
+                      quest={quest}
+                      progress={questProgress[quest.id] || {}}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </>
+        );
+      
+      default:
+        return null;
+    }
+  };
 
   return (
-    <Panel title="Quests Journal">
-      <Tabs value={tabValue} onChange={handleChange} sx={{ mb: 2 }}>
-        <Tab label={`Active (${activeQuests.length})`} />
-        <Tab label={`Completed (${completedQuests.length})`} />
-      </Tabs>
-      
-      {tabValue === 0 && (
-        <Box>
-          {activeQuests.length === 0 ? (
-            <Typography color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
-              You have no active quests. Speak with NPCs to find quests.
-            </Typography>
-          ) : (
-            activeQuests.map(quest => {
-              const npc = npcs.find(n => n.id === quest.npcId);
-              const isComplete = quest.objectives?.every(obj => obj.progress >= obj.count);
-              
-              return (
-                <Paper key={quest.id} sx={{ p: 2, mb: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Avatar 
-                      src={npc?.portrait || `https://api.dicebear.com/6.x/personas/svg?seed=${quest.npcId}`}
-                      sx={{ mr: 1, width: 32, height: 32 }}
-                    />
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                      {quest.title}
-                    </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Chip 
-                      size="small"
-                      icon={<AccessTimeIcon fontSize="small" />}
-                      label={`Started ${formatDistanceToNow(quest.started)} ago`}
-                      variant="outlined"
-                      color="default"
-                    />
-                  </Box>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    From: {npc?.name || quest.npcId}
-                  </Typography>
-                  
-                  <Divider sx={{ my: 1 }} />
-                  
-                  <Typography variant="subtitle2" sx={{ mt: 1 }}>Objectives:</Typography>
-                  <List dense>
-                    {quest.objectives.map((obj, i) => (
-                      <ListItem key={i} sx={{ py: 0.5 }}>
-                        <ListItemIcon sx={{ minWidth: 36 }}>
-                          {obj.progress >= obj.count ? 
-                            <CheckCircleIcon color="success" fontSize="small" /> : 
-                            <CircleIcon color="disabled" fontSize="small" />}
-                        </ListItemIcon>
-                        <ListItemText 
-                          primary={formatObjective(obj)}
-                          secondary={`${obj.progress}/${obj.count}`} 
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                  
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => handleAbandonQuest(quest.id)}
-                    >
-                      Abandon
-                    </Button>
-                    
-                    {isComplete && (
-                      <Button
-                        component={Link}
-                        to={`/npc/${quest.npcId}`}
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        endIcon={<Icon>person</Icon>}
-                      >
-                        Return to {npc?.name || "NPC"}
-                      </Button>
-                    )}
-                  </Box>
-                </Paper>
-              );
-            })
-          )}
+    <Panel title="Quest Journal">
+      <Container maxWidth="lg" sx={{ mt: 2 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs 
+            value={tabValue} 
+            onChange={handleTabChange} 
+            variant="fullWidth"
+            textColor="primary"
+            indicatorColor="primary"
+            aria-label="quest tabs"
+          >
+            <Tab 
+              icon={getTabIcon(0)} 
+              iconPosition="start" 
+              label={`Active (${activeQuests.length})`}
+              id="quest-tab-0"
+              aria-controls="quest-tabpanel-0" 
+            />
+            <Tab 
+              icon={getTabIcon(1)} 
+              iconPosition="start" 
+              label={`Available (${availableQuests.length})`} 
+              id="quest-tab-1"
+              aria-controls="quest-tabpanel-1"
+            />
+            <Tab 
+              icon={getTabIcon(2)} 
+              iconPosition="start" 
+              label={`Completed (${completedQuests.length})`}
+              id="quest-tab-2"
+              aria-controls="quest-tabpanel-2" 
+            />
+          </Tabs>
         </Box>
-      )}
-      
-      {tabValue === 1 && (
-        <Box>
-          {completedQuests.length === 0 ? (
-            <Typography color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
-              You haven't completed any quests yet.
-            </Typography>
-          ) : (
-            completedQuests.map(quest => {
-              const npc = npcs.find(n => n.id === quest.npcId);
-              
-              return (
-                <Paper key={quest.id} sx={{ p: 2, mb: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <TaskAltIcon sx={{ color: 'success.main', mr: 1 }} />
-                    <Typography variant="subtitle1">
-                      {quest.title}
-                    </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Chip 
-                      size="small"
-                      label={`Completed ${formatDistanceToNow(quest.completed)} ago`}
-                      variant="outlined"
-                      color="success"
-                    />
-                  </Box>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1, mt: 0.5 }}>
-                    From: {npc?.name || quest.npcId}
-                  </Typography>
-                </Paper>
-              );
-            })
-          )}
+        
+        <Box
+          role="tabpanel"
+          id={`quest-tabpanel-${tabValue}`}
+          aria-labelledby={`quest-tab-${tabValue}`}
+          sx={{ py: 3 }}
+        >
+          {renderTabContent()}
         </Box>
-      )}
+        
+        <Divider sx={{ mt: 4, mb: 2 }} />
+        
+        <Typography variant="h6" gutterBottom>
+          Game Stats
+        </Typography>
+        
+        <Grid container spacing={2}>
+          <Grid item xs={6} md={3}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography color="text.secondary" gutterBottom>
+                  Active Quests
+                </Typography>
+                <Typography variant="h4" component="div">
+                  {activeQuests.length}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography color="text.secondary" gutterBottom>
+                  Available Quests
+                </Typography>
+                <Typography variant="h4" component="div">
+                  {availableQuests.length}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography color="text.secondary" gutterBottom>
+                  Completed Quests
+                </Typography>
+                <Typography variant="h4" component="div">
+                  {completedQuests.length}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography color="text.secondary" gutterBottom>
+                  Completion Rate
+                </Typography>
+                <Typography variant="h4" component="div">
+                  {completedQuests.length > 0 
+                    ? Math.round((completedQuests.length / (completedQuests.length + activeQuests.length + availableQuests.length)) * 100)
+                    : 0}%
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
     </Panel>
   );
 };

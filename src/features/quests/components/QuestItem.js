@@ -1,523 +1,222 @@
-import React from 'react';
-import { 
-  Box, Typography, Button, Chip, Paper, 
-  ListItem, ListItemText, Divider, LinearProgress, 
-  Tooltip, Stack, Grid
-} from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LoopIcon from '@mui/icons-material/Loop';
-import StarIcon from '@mui/icons-material/Star';
-import { formatObjective } from '../../NPCs/utils/formatters';
-import { getQuestTypeIcon, getQuestDifficultyColor } from '../../NPCs/utils/questHelpers';
+/**
+ * @file QuestItem.js
+ * @description Component for displaying an individual quest and its details
+ * @module features/Quests/components
+ */
 
-const QuestItem = ({
-  quest,
-  buttonText,
-  onAction,
-  status = 'available', // 'available', 'active', or 'completed'
-  progress = [],
-  showRequirements = false,
-  showProgress = false,
-  showRewards = false,
-  currentRelationship = 0,
-  essence = 0,
-  inventory = {},
-  completedDate,
-  type = 'generic',
-  difficulty = 1
+import React from 'react';
+import PropTypes from 'prop-types';
+import './QuestItem.css'; // You'll need to create this CSS file
+
+/**
+ * QuestItem component displays a single quest with its details
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.quest - The quest object to display
+ * @param {Object} props.progress - The quest progress object
+ * @param {Function} props.onAccept - Function called when a quest is accepted
+ * @param {Function} props.onAbandon - Function called when a quest is abandoned
+ * @param {Function} props.onComplete - Function called when quest completion is attempted
+ * @returns {JSX.Element} The rendered component
+ */
+const QuestItem = ({ 
+  quest, 
+  progress = {}, 
+  onAccept, 
+  onAbandon, 
+  onComplete 
 }) => {
-  // Calculate overall progress percentage
+  const { 
+    id, 
+    title, 
+    description, 
+    objectives, 
+    rewards, 
+    status, 
+    requirements 
+  } = quest;
+
+  /**
+   * Calculate the overall completion percentage of quest objectives
+   * @returns {number} Percentage of completion (0-100)
+   */
   const calculateProgress = () => {
-    if (!progress || progress.length === 0) return 0;
-    const completedCount = progress.filter(obj => obj.completed).length;
-    return (completedCount / progress.length) * 100;
+    if (!progress.objectiveProgress || objectives.length === 0) return 0;
+    
+    const totalCompleted = objectives.reduce((sum, obj) => {
+      const current = progress.objectiveProgress[obj.id] || 0;
+      const completed = Math.min(current, obj.required);
+      return sum + completed;
+    }, 0);
+    
+    const totalRequired = objectives.reduce((sum, obj) => sum + obj.required, 0);
+    
+    return Math.floor((totalCompleted / totalRequired) * 100);
   };
-  
-  // Get icon for quest type
-  const TypeIcon = getQuestTypeIcon(type);
-  
-  // Get color for difficulty
-  const difficultyColor = getQuestDifficultyColor(difficulty);
-  
-  // Format difficulty as stars
-  const formattedDifficulty = Array(difficulty).fill(<StarIcon sx={{ fontSize: 14 }} />);
-  
-  // Check if player has enough inventory space for rewards
-  const canAcceptRewards = () => {
-    // This is a placeholder - implement proper inventory check
-    return true;
+
+  /**
+   * Check if all requirements for the quest are met
+   * @returns {boolean} Whether all requirements are met
+   */
+  const areRequirementsMet = () => {
+    // This would need to be implemented based on your game state
+    // For now, assume true if there are no requirements or the quest is already active/completed
+    return requirements.length === 0 || status !== 'not_started';
   };
-  
-  // Format completion date
-  const formatDate = (timestamp) => {
-    if (!timestamp) return 'Unknown date';
-    return new Date(timestamp).toLocaleDateString();
+
+  /**
+   * Get CSS class name based on quest status
+   * @returns {string} CSS class name
+   */
+  const getStatusClass = () => {
+    switch (status) {
+      case 'active': return 'quest-active';
+      case 'completed': return 'quest-completed';
+      case 'failed': return 'quest-failed';
+      default: return 'quest-not-started';
+    }
   };
 
   return (
-    <ListItem
-      component={Paper}
-      elevation={1}
-      sx={{ 
-        mb: 2, 
-        p: 2,
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        borderLeft: `4px solid ${difficultyColor}`,
-      }}
-    >
-      {/* Quest Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, width: '100%' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <TypeIcon sx={{ mr: 1, color: difficultyColor }} />
-          <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 'bold' }}>
-            {quest.title}
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={1}>
-          {/* Quest type */}
-          <Chip 
-            label={type.charAt(0).toUpperCase() + type.slice(1)} 
-            size="small" 
-            sx={{ bgcolor: 'rgba(0,0,0,0.05)' }}
-          />
-          
-          {/* Difficulty indicator */}
-          <Tooltip title={`Difficulty: ${difficulty}/5`}>
-            <Chip 
-              size="small"
-              label={formattedDifficulty}
-              sx={{ bgcolor: 'rgba(0,0,0,0.05)' }}
-            />
-          </Tooltip>
-          
-          {/* Status indicator */}
-          {status === 'completed' && (
-            <Chip 
-              icon={<CheckCircleIcon />} 
-              label="Completed" 
-              size="small" 
-              color="success"
-            />
-          )}
-          
-          {status === 'active' && (
-            <Chip 
-              icon={<LoopIcon />} 
-              label="Active" 
-              size="small" 
-              color="primary"
-            />
-          )}
-        </Stack>
-      </Box>
+    <div className={`quest-item ${getStatusClass()}`}>
+      <div className="quest-header">
+        <h3 className="quest-title">{title}</h3>
+        <div className="quest-status">{status.replace('_', ' ')}</div>
+      </div>
       
-      {/* Quest Description */}
-      <Typography variant="body2" sx={{ mb: 1.5 }}>
-        {quest.description}
-      </Typography>
+      <div className="quest-description">{description}</div>
       
-      {/* Relationship Requirement */}
-      {showRequirements && quest.relationshipRequirement > 0 && (
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            display: 'block', 
-            mb: 1, 
-            color: currentRelationship >= quest.relationshipRequirement ? 'success.main' : 'error.main'
-          }}
-        >
-          Requires Relationship: {quest.relationshipRequirement}/100
-          {currentRelationship < quest.relationshipRequirement && " (not met)"}
-        </Typography>
+      {/* Requirements Section */}
+      {requirements.length > 0 && (
+        <div className="quest-requirements">
+          <h4>Requirements</h4>
+          <ul>
+            {requirements.map((req, index) => (
+              <li key={index} className="quest-requirement">
+                {req.description}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       
-      {/* Prerequisites */}
-      {showRequirements && quest.prerequisites && quest.prerequisites.length > 0 && (
-        <Box sx={{ mb: 1.5 }}>
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-            Prerequisites:
-          </Typography>
-          <Typography variant="caption">
-            {quest.prerequisites.join(', ')}
-          </Typography>
-        </Box>
-      )}
-      
-      {/* Quest Objectives */}
-      <Divider sx={{ my: 1.5 }} />
-      <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-        Objectives:
-      </Typography>
-      
-      {status === 'active' && showProgress ? (
-        <>
-          {progress.map((objective, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              {objective.completed ? 
-                <CheckCircleIcon sx={{ fontSize: 18, mr: 1, color: 'success.main' }} /> : 
-                <AssignmentIcon sx={{ fontSize: 18, mr: 1, color: 'text.secondary' }} />
-              }
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  textDecoration: objective.completed ? 'line-through' : 'none',
-                  color: objective.completed ? 'text.secondary' : 'text.primary'
-                }}
+      {/* Objectives Section */}
+      <div className="quest-objectives">
+        <h4>Objectives</h4>
+        <ul>
+          {objectives.map((obj) => {
+            const currentProgress = (progress.objectiveProgress && progress.objectiveProgress[obj.id]) || 0;
+            return (
+              <li 
+                key={obj.id} 
+                className={`quest-objective ${obj.completed ? 'completed' : ''}`}
               >
-                {formatObjective(objective)}
-              </Typography>
-            </Box>
-          ))}
-          <LinearProgress 
-            variant="determinate" 
-            value={calculateProgress()} 
-            sx={{ mt: 1, mb: 1.5, height: 8, borderRadius: 1 }}
-          />
-        </>
-      ) : (
-        <Box sx={{ mb: 1.5 }}>
-          {quest.objectives.map((objective, index) => (
-            <Typography key={index} variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
-              <AssignmentIcon sx={{ fontSize: 18, mr: 1, color: 'text.secondary' }} />
-              {formatObjective(objective)}
-            </Typography>
-          ))}
-        </Box>
-      )}
+                <div className="objective-description">{obj.description}</div>
+                <div className="objective-progress">
+                  {currentProgress} / {obj.required}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
       
       {/* Rewards Section */}
-      {showRewards && quest.rewards && (
-        <>
-          <Divider sx={{ my: 1.5 }} />
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              <LocalOfferIcon sx={{ fontSize: 18, mr: 1, color: '#ffc107' }} />
-              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                Rewards:
-              </Typography>
-            </Box>
-            
-            <Grid container spacing={1} sx={{ pl: 1.5 }}>
-              {quest.rewards.essence && (
-                <Grid item xs={6}>
-                  <Typography variant="body2">
-                    {quest.rewards.essence} Essence
-                  </Typography>
-                </Grid>
-              )}
-              
-              {quest.rewards.relationship && (
-                <Grid item xs={6}>
-                  <Typography variant="body2">
-                    +{quest.rewards.relationship} Relationship
-                  </Typography>
-                </Grid>
-              )}
-              
-              {quest.rewards.items && quest.rewards.items.map((item, index) => (
-                <Grid item xs={6} key={index}>
-                  <Typography variant="body2">
-                    {item.quantity}x {item.name}
-                  </Typography>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </>
+      <div className="quest-rewards">
+        <h4>Rewards</h4>
+        <ul>
+          {rewards.map((reward, index) => (
+            <li key={index} className="quest-reward">
+              {reward.type === 'experience' && `${reward.value} XP`}
+              {reward.type === 'gold' && `${reward.value} Gold`}
+              {reward.type === 'item' && `${reward.quantity || 1}x ${reward.value}`}
+            </li>
+          ))}
+        </ul>
+      </div>
+      
+      {/* Progress Bar */}
+      {status === 'active' && (
+        <div className="quest-progress-container">
+          <div className="quest-progress-bar">
+            <div 
+              className="quest-progress-fill" 
+              style={{ width: `${calculateProgress()}%` }}
+            ></div>
+          </div>
+          <div className="quest-progress-text">
+            {calculateProgress()}% Complete
+          </div>
+        </div>
       )}
       
-      {/* Completed Date */}
-      {status === 'completed' && completedDate && (
-        <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
-          <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
-          <Typography variant="caption" color="text.secondary">
-            Completed on {formatDate(completedDate)}
-          </Typography>
-        </Box>
-      )}
-      
-      {/* Action Button */}
-      {buttonText && onAction && (
-        <Button 
-          variant="contained" 
-          onClick={onAction} 
-          sx={{ alignSelf: 'flex-end', mt: 2 }}
-          disabled={
-            status === 'available' && 
-            showRequirements && 
-            quest.relationshipRequirement > currentRelationship
-          }
-        >
-          {buttonText}
-        </Button>
-      )}
-    </ListItem>
+      {/* Action Buttons */}
+      <div className="quest-actions">
+        {status === 'not_started' && areRequirementsMet() && (
+          <button 
+            className="quest-button accept-button" 
+            onClick={() => onAccept && onAccept(id)}
+          >
+            Accept Quest
+          </button>
+        )}
+        
+        {status === 'active' && (
+          <>
+            <button 
+              className="quest-button complete-button" 
+              onClick={() => onComplete && onComplete(id)}
+              disabled={calculateProgress() < 100}
+            >
+              Complete Quest
+            </button>
+            <button 
+              className="quest-button abandon-button" 
+              onClick={() => onAbandon && onAbandon(id)}
+            >
+              Abandon Quest
+            </button>
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
-export default QuestItem;import React from 'react';
-import { 
-  Box, Typography, Button, Chip, Paper, 
-  ListItem, ListItemText, Divider, LinearProgress, 
-  Tooltip, Stack, Grid
-} from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LoopIcon from '@mui/icons-material/Loop';
-import StarIcon from '@mui/icons-material/Star';
-import { formatObjective } from '../../NPCs/utils/formatters';
-import { getQuestTypeIcon, getQuestDifficultyColor } from '../../NPCs/utils/questHelpers';
-
-const QuestItem = ({
-  quest,
-  buttonText,
-  onAction,
-  status = 'available', // 'available', 'active', or 'completed'
-  progress = [],
-  showRequirements = false,
-  showProgress = false,
-  showRewards = false,
-  currentRelationship = 0,
-  essence = 0,
-  inventory = {},
-  completedDate,
-  type = 'generic',
-  difficulty = 1
-}) => {
-  // Calculate overall progress percentage
-  const calculateProgress = () => {
-    if (!progress || progress.length === 0) return 0;
-    const completedCount = progress.filter(obj => obj.completed).length;
-    return (completedCount / progress.length) * 100;
-  };
-  
-  // Get icon for quest type
-  const TypeIcon = getQuestTypeIcon(type);
-  
-  // Get color for difficulty
-  const difficultyColor = getQuestDifficultyColor(difficulty);
-  
-  // Format difficulty as stars
-  const formattedDifficulty = Array(difficulty).fill(<StarIcon sx={{ fontSize: 14 }} />);
-  
-  // Check if player has enough inventory space for rewards
-  const canAcceptRewards = () => {
-    // This is a placeholder - implement proper inventory check
-    return true;
-  };
-  
-  // Format completion date
-  const formatDate = (timestamp) => {
-    if (!timestamp) return 'Unknown date';
-    return new Date(timestamp).toLocaleDateString();
-  };
-
-  return (
-    <ListItem
-      component={Paper}
-      elevation={1}
-      sx={{ 
-        mb: 2, 
-        p: 2,
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        borderLeft: `4px solid ${difficultyColor}`,
-      }}
-    >
-      {/* Quest Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, width: '100%' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <TypeIcon sx={{ mr: 1, color: difficultyColor }} />
-          <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 'bold' }}>
-            {quest.title}
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={1}>
-          {/* Quest type */}
-          <Chip 
-            label={type.charAt(0).toUpperCase() + type.slice(1)} 
-            size="small" 
-            sx={{ bgcolor: 'rgba(0,0,0,0.05)' }}
-          />
-          
-          {/* Difficulty indicator */}
-          <Tooltip title={`Difficulty: ${difficulty}/5`}>
-            <Chip 
-              size="small"
-              label={formattedDifficulty}
-              sx={{ bgcolor: 'rgba(0,0,0,0.05)' }}
-            />
-          </Tooltip>
-          
-          {/* Status indicator */}
-          {status === 'completed' && (
-            <Chip 
-              icon={<CheckCircleIcon />} 
-              label="Completed" 
-              size="small" 
-              color="success"
-            />
-          )}
-          
-          {status === 'active' && (
-            <Chip 
-              icon={<LoopIcon />} 
-              label="Active" 
-              size="small" 
-              color="primary"
-            />
-          )}
-        </Stack>
-      </Box>
-      
-      {/* Quest Description */}
-      <Typography variant="body2" sx={{ mb: 1.5 }}>
-        {quest.description}
-      </Typography>
-      
-      {/* Relationship Requirement */}
-      {showRequirements && quest.relationshipRequirement > 0 && (
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            display: 'block', 
-            mb: 1, 
-            color: currentRelationship >= quest.relationshipRequirement ? 'success.main' : 'error.main'
-          }}
-        >
-          Requires Relationship: {quest.relationshipRequirement}/100
-          {currentRelationship < quest.relationshipRequirement && " (not met)"}
-        </Typography>
-      )}
-      
-      {/* Prerequisites */}
-      {showRequirements && quest.prerequisites && quest.prerequisites.length > 0 && (
-        <Box sx={{ mb: 1.5 }}>
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-            Prerequisites:
-          </Typography>
-          <Typography variant="caption">
-            {quest.prerequisites.join(', ')}
-          </Typography>
-        </Box>
-      )}
-      
-      {/* Quest Objectives */}
-      <Divider sx={{ my: 1.5 }} />
-      <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-        Objectives:
-      </Typography>
-      
-      {status === 'active' && showProgress ? (
-        <>
-          {progress.map((objective, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              {objective.completed ? 
-                <CheckCircleIcon sx={{ fontSize: 18, mr: 1, color: 'success.main' }} /> : 
-                <AssignmentIcon sx={{ fontSize: 18, mr: 1, color: 'text.secondary' }} />
-              }
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  textDecoration: objective.completed ? 'line-through' : 'none',
-                  color: objective.completed ? 'text.secondary' : 'text.primary'
-                }}
-              >
-                {formatObjective(objective)}
-              </Typography>
-            </Box>
-          ))}
-          <LinearProgress 
-            variant="determinate" 
-            value={calculateProgress()} 
-            sx={{ mt: 1, mb: 1.5, height: 8, borderRadius: 1 }}
-          />
-        </>
-      ) : (
-        <Box sx={{ mb: 1.5 }}>
-          {quest.objectives.map((objective, index) => (
-            <Typography key={index} variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
-              <AssignmentIcon sx={{ fontSize: 18, mr: 1, color: 'text.secondary' }} />
-              {formatObjective(objective)}
-            </Typography>
-          ))}
-        </Box>
-      )}
-      
-      {/* Rewards Section */}
-      {showRewards && quest.rewards && (
-        <>
-          <Divider sx={{ my: 1.5 }} />
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              <LocalOfferIcon sx={{ fontSize: 18, mr: 1, color: '#ffc107' }} />
-              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                Rewards:
-              </Typography>
-            </Box>
-            
-            <Grid container spacing={1} sx={{ pl: 1.5 }}>
-              {quest.rewards.essence && (
-                <Grid item xs={6}>
-                  <Typography variant="body2">
-                    {quest.rewards.essence} Essence
-                  </Typography>
-                </Grid>
-              )}
-              
-              {quest.rewards.relationship && (
-                <Grid item xs={6}>
-                  <Typography variant="body2">
-                    +{quest.rewards.relationship} Relationship
-                  </Typography>
-                </Grid>
-              )}
-              
-              {quest.rewards.items && quest.rewards.items.map((item, index) => (
-                <Grid item xs={6} key={index}>
-                  <Typography variant="body2">
-                    {item.quantity}x {item.name}
-                  </Typography>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </>
-      )}
-      
-      {/* Completed Date */}
-      {status === 'completed' && completedDate && (
-        <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
-          <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
-          <Typography variant="caption" color="text.secondary">
-            Completed on {formatDate(completedDate)}
-          </Typography>
-        </Box>
-      )}
-      
-      {/* Action Button */}
-      {buttonText && onAction && (
-        <Button 
-          variant="contained" 
-          onClick={onAction} 
-          sx={{ alignSelf: 'flex-end', mt: 2 }}
-          disabled={
-            status === 'available' && 
-            showRequirements && 
-            quest.relationshipRequirement > currentRelationship
-          }
-        >
-          {buttonText}
-        </Button>
-      )}
-    </ListItem>
-  );
+QuestItem.propTypes = {
+  quest: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    requirements: PropTypes.arrayOf(PropTypes.shape({
+      type: PropTypes.string.isRequired,
+      value: PropTypes.any.isRequired,
+      description: PropTypes.string
+    })),
+    objectives: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      target: PropTypes.any.isRequired,
+      required: PropTypes.number.isRequired,
+      completed: PropTypes.bool.isRequired
+    })).isRequired,
+    rewards: PropTypes.arrayOf(PropTypes.shape({
+      type: PropTypes.string.isRequired,
+      value: PropTypes.any.isRequired,
+      quantity: PropTypes.number
+    })).isRequired,
+    status: PropTypes.oneOf(['not_started', 'active', 'completed', 'failed']).isRequired
+  }).isRequired,
+  progress: PropTypes.shape({
+    objectiveProgress: PropTypes.object,
+    startedAt: PropTypes.instanceOf(Date),
+    completedAt: PropTypes.instanceOf(Date)
+  }),
+  onAccept: PropTypes.func,
+  onAbandon: PropTypes.func,
+  onComplete: PropTypes.func
 };
 
 export default QuestItem;
