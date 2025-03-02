@@ -3,6 +3,9 @@
  * @description Initial state configuration for character traits in the incremental RPG.
  * Traits represent innate abilities, skills, and characteristics that provide various
  * bonuses and gameplay effects.
+ * 
+ * The trait system allows players to customize their character by investing trait points
+ * into different attributes. Each trait provides specific benefits that enhance gameplay.
  */
 
 /**
@@ -22,14 +25,69 @@ export const TRAIT_CATEGORIES = {
 };
 
 /**
+ * Effect Types:
+ * Constants for different effects that traits can provide
+ * @enum {string}
+ */
+export const EFFECT_TYPES = {
+  DAMAGE_MULTIPLIER: 'DAMAGE_MULTIPLIER',
+  ACTION_SPEED: 'ACTION_SPEED',
+  MAX_HEALTH: 'MAX_HEALTH',
+  MAGIC_DAMAGE: 'MAGIC_DAMAGE',
+  ESSENCE_GENERATION: 'ESSENCE_GENERATION',
+  CRITICAL_CHANCE: 'CRITICAL_CHANCE',
+  ESSENCE_COST_REDUCTION: 'ESSENCE_COST_REDUCTION',
+  ELEMENTAL_DAMAGE: 'ELEMENTAL_DAMAGE',
+  SPELL_COOLDOWN_REDUCTION: 'SPELL_COOLDOWN_REDUCTION',
+  VENDOR_PRICES: 'VENDOR_PRICES',
+  ALLY_EFFECTIVENESS: 'ALLY_EFFECTIVENESS',
+  DROP_RATE: 'DROP_RATE',
+  CRITICAL_DAMAGE: 'CRITICAL_DAMAGE',
+  MAX_ESSENCE: 'MAX_ESSENCE',
+  DEFENSE: 'DEFENSE',
+  REGENERATION: 'REGENERATION',
+};
+
+/**
  * Initial state for the Traits feature
  * @typedef {Object} TraitsState
- * @property {Object} traits - Collection of all available traits
  * @property {number} pointsAvailable - Points available to spend on traits
  * @property {number} pointsSpent - Points already spent on traits
- * @property {Object} categoryProgress - Progress towards unlocking trait categories
- * @property {Array} activeEffects - Currently active effects from traits
+ * @property {number} maxTraitLevel - Maximum level for general traits
+ * @property {Object.<string, TraitDefinition>} traits - Collection of all available traits
+ * @property {Object.<string, CategoryProgress>} categoryProgress - Progress towards unlocking trait categories
+ * @property {Array<TraitEffect>} activeEffects - Currently active effects from traits
+ * @property {number} lastUpdateTime - Timestamp of last trait system update
  */
+
+/**
+ * @typedef {Object} TraitDefinition
+ * @property {string} id - Unique identifier for the trait
+ * @property {string} name - Display name of the trait
+ * @property {string} description - Detailed description of what the trait does
+ * @property {string} category - The category this trait belongs to
+ * @property {number} level - Current level of the trait
+ * @property {number} maxLevel - Maximum level this trait can reach
+ * @property {number} costPerLevel - Trait points required per level
+ * @property {TraitEffect|Array<TraitEffect>} effect - Effect(s) provided by this trait
+ * @property {boolean} unlocked - Whether the trait is available to the player
+ * @property {Object} [requirements] - Requirements to unlock this trait
+ * @property {string} icon - Icon identifier used for UI display
+ */
+
+/**
+ * @typedef {Object} TraitEffect
+ * @property {string} type - Type of effect from EFFECT_TYPES
+ * @property {number} value - Magnitude of the effect per level
+ */
+
+/**
+ * @typedef {Object} CategoryProgress
+ * @property {boolean} unlocked - Whether the category is unlocked
+ * @property {number} progress - Current progress towards unlocking
+ * @property {number} requirement - Required progress to unlock
+ */
+
 const initialState = {
   // Points available to spend on traits
   pointsAvailable: 0,
@@ -52,7 +110,7 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 1,
       effect: {
-        type: 'DAMAGE_MULTIPLIER',
+        type: EFFECT_TYPES.DAMAGE_MULTIPLIER,
         value: 0.1, // 10% damage increase per level
       },
       unlocked: true,
@@ -67,7 +125,7 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 1,
       effect: {
-        type: 'ACTION_SPEED',
+        type: EFFECT_TYPES.ACTION_SPEED,
         value: 0.05, // 5% speed increase per level
       },
       unlocked: true,
@@ -82,11 +140,44 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 1,
       effect: {
-        type: 'MAX_HEALTH',
+        type: EFFECT_TYPES.MAX_HEALTH,
         value: 0.08, // 8% max health increase per level
       },
       unlocked: true,
       icon: 'heart',
+    },
+    constitution: {
+      id: 'constitution',
+      name: 'Constitution',
+      description: 'Physical resilience that increases defense against all damage',
+      category: TRAIT_CATEGORIES.PHYSICAL,
+      level: 0,
+      maxLevel: 8,
+      costPerLevel: 2,
+      effect: {
+        type: EFFECT_TYPES.DEFENSE,
+        value: 0.06, // 6% damage reduction per level
+      },
+      unlocked: true,
+      icon: 'shield',
+    },
+    recovery: {
+      id: 'recovery',
+      name: 'Recovery',
+      description: 'Natural healing ability that increases health regeneration',
+      category: TRAIT_CATEGORIES.PHYSICAL,
+      level: 0,
+      maxLevel: 7,
+      costPerLevel: 2,
+      effect: {
+        type: EFFECT_TYPES.REGENERATION,
+        value: 0.05, // 5% health regeneration increase per level
+      },
+      unlocked: false,
+      requirements: {
+        endurance: 2,
+      },
+      icon: 'bandage',
     },
     
     // MENTAL TRAITS
@@ -99,7 +190,7 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 1,
       effect: {
-        type: 'MAGIC_DAMAGE',
+        type: EFFECT_TYPES.MAGIC_DAMAGE,
         value: 0.1, // 10% magic damage increase per level
       },
       unlocked: true,
@@ -114,7 +205,7 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 1,
       effect: {
-        type: 'ESSENCE_GENERATION',
+        type: EFFECT_TYPES.ESSENCE_GENERATION,
         value: 0.07, // 7% essence generation increase per level
       },
       unlocked: true,
@@ -129,11 +220,29 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 1,
       effect: {
-        type: 'CRITICAL_CHANCE',
+        type: EFFECT_TYPES.CRITICAL_CHANCE,
         value: 0.02, // 2% critical chance increase per level
       },
       unlocked: true,
       icon: 'target',
+    },
+    perception: {
+      id: 'perception',
+      name: 'Perception',
+      description: 'Enhanced awareness that improves discovery of hidden elements',
+      category: TRAIT_CATEGORIES.MENTAL,
+      level: 0,
+      maxLevel: 5,
+      costPerLevel: 2,
+      effect: {
+        type: 'DISCOVERY_CHANCE',
+        value: 0.08, // 8% increased chance to discover hidden elements
+      },
+      unlocked: false,
+      requirements: {
+        wisdom: 3,
+      },
+      icon: 'eye',
     },
     
     // MAGICAL TRAITS
@@ -146,7 +255,7 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 2,
       effect: {
-        type: 'ESSENCE_COST_REDUCTION',
+        type: EFFECT_TYPES.ESSENCE_COST_REDUCTION,
         value: 0.03, // 3% essence cost reduction per level
       },
       unlocked: false,
@@ -164,7 +273,7 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 2,
       effect: {
-        type: 'ELEMENTAL_DAMAGE',
+        type: EFFECT_TYPES.ELEMENTAL_DAMAGE,
         value: 0.08, // 8% elemental damage increase per level
       },
       unlocked: false,
@@ -183,7 +292,7 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 2,
       effect: {
-        type: 'SPELL_COOLDOWN_REDUCTION',
+        type: EFFECT_TYPES.SPELL_COOLDOWN_REDUCTION,
         value: 0.04, // 4% cooldown reduction per level
       },
       unlocked: false,
@@ -203,7 +312,7 @@ const initialState = {
       maxLevel: 10,
       costPerLevel: 1,
       effect: {
-        type: 'VENDOR_PRICES',
+        type: EFFECT_TYPES.VENDOR_PRICES,
         value: 0.02, // 2% better prices per level
       },
       unlocked: true,
@@ -218,7 +327,7 @@ const initialState = {
       maxLevel: 5,
       costPerLevel: 2,
       effect: {
-        type: 'ALLY_EFFECTIVENESS',
+        type: EFFECT_TYPES.ALLY_EFFECTIVENESS,
         value: 0.05, // 5% ally effectiveness per level
       },
       unlocked: false,
@@ -239,11 +348,11 @@ const initialState = {
       costPerLevel: 3,
       effects: [
         {
-          type: 'DROP_RATE',
+          type: EFFECT_TYPES.DROP_RATE,
           value: 0.05, // 5% drop rate increase per level
         },
         {
-          type: 'CRITICAL_DAMAGE',
+          type: EFFECT_TYPES.CRITICAL_DAMAGE,
           value: 0.1, // 10% critical damage increase per level
         }
       ],
@@ -262,7 +371,7 @@ const initialState = {
       maxLevel: 3,
       costPerLevel: 5,
       effect: {
-        type: 'MAX_ESSENCE',
+        type: EFFECT_TYPES.MAX_ESSENCE,
         value: 0.25, // 25% essence storage increase per level
       },
       unlocked: false,
@@ -303,11 +412,21 @@ const initialState = {
     },
   },
   
-  // Active effects from traits
+  // Active effects from traits - calculated at runtime based on trait levels
   activeEffects: [],
   
   // Last time traits were updated (for potential time-based trait effects)
   lastUpdateTime: Date.now(),
+  
+  // Trait point distribution history for analytics
+  pointAllocationHistory: [],
+  
+  // Achievement progress related to traits
+  traitAchievements: {
+    masteredCategories: 0,
+    maxedTraits: 0,
+    totalPointsEverSpent: 0
+  }
 };
 
 export default initialState;

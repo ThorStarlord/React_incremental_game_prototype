@@ -22,6 +22,9 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
 import Panel from '../../../../components/panel/Panel';
 import useTraitEffects from '../../hooks/useTraitEffects';
+import PropTypes from 'prop-types';
+import { TRAIT_CATEGORIES } from '../../traitsInitialState';
+import './TraitSlots.css';
 
 // SortableTraitSlot component for drag-and-drop functionality
 const SortableTraitSlot = ({ traitId, index, trait, onRemove, onMakePermanent, essence }) => {
@@ -113,13 +116,226 @@ const SortableTraitSlot = ({ traitId, index, trait, onRemove, onMakePermanent, e
 };
 
 // Main TraitSlots component
-const TraitSlots = () => {
+const TraitSlots = ({ 
+  availableTraits,
+  activeSlots,
+  onAssignTrait,
+  onRemoveTrait,
+  slotUnlockLevels = {},
+  playerLevel = 1
+}) => {
   const { player, traits, essence } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
   const { modifiers } = useTraitEffects();
+  const [selectedTrait, setSelectedTrait] = useState(null);
+  const [showTraitSelector, setShowTraitSelector] = useState(false);
+  const [activeSlotId, setActiveSlotId] = useState(null);
+
+  // Define slot structure based on trait categories
+  const slotStructure = [
+    { 
+      id: 'physical_slot_1', 
+      category: TRAIT_CATEGORIES.PHYSICAL, 
+      unlockLevel: slotUnlockLevels.physical1 || 3 
+    },
+    { 
+      id: 'mental_slot_1', 
+      category: TRAIT_CATEGORIES.MENTAL, 
+      unlockLevel: slotUnlockLevels.mental1 || 5 
+    },
+    { 
+      id: 'magical_slot_1', 
+      category: TRAIT_CATEGORIES.MAGICAL, 
+      unlockLevel: slotUnlockLevels.magical1 || 8 
+    },
+    { 
+      id: 'physical_slot_2', 
+      category: TRAIT_CATEGORIES.PHYSICAL, 
+      unlockLevel: slotUnlockLevels.physical2 || 10 
+    },
+    { 
+      id: 'mental_slot_2', 
+      category: TRAIT_CATEGORIES.MENTAL, 
+      unlockLevel: slotUnlockLevels.mental2 || 15 
+    },
+    { 
+      id: 'special_slot_1', 
+      category: TRAIT_CATEGORIES.SPECIAL, 
+      unlockLevel: slotUnlockLevels.special1 || 20 
+    },
+  ];
+
+  // Handle opening the trait selector for a slot
+  const handleOpenSelector = (slotId) => {
+    setActiveSlotId(slotId);
+    setShowTraitSelector(true);
+  };
+
+  // Handle closing the trait selector
+  const handleCloseSelector = () => {
+    setShowTraitSelector(false);
+    setActiveSlotId(null);
+    setSelectedTrait(null);
+  };
+
+  // Handle selecting a trait
+  const handleSelectTrait = (trait) => {
+    setSelectedTrait(trait);
+  };
+
+  // Handle confirming trait assignment
+  const handleConfirmTraitAssignment = () => {
+    if (selectedTrait && activeSlotId) {
+      onAssignTrait(activeSlotId, selectedTrait.id);
+      handleCloseSelector();
+    }
+  };
+
+  // Handle removing a trait from a slot
+  const handleRemoveTrait = (slotId) => {
+    onRemoveTrait(slotId);
+  };
+
+  // Get the active trait for a slot
+  const getActiveTraitForSlot = (slotId) => {
+    if (!activeSlots || !activeSlots[slotId]) return null;
+    
+    const traitId = activeSlots[slotId];
+    return availableTraits.find(trait => trait.id === traitId);
+  };
+
+  // Determine if a trait is compatible with a slot
+  const isTraitCompatibleWithSlot = (trait, slotCategory) => {
+    return trait.category === slotCategory && trait.level > 0;
+  };
+
+  // Filter available traits for current active slot
+  const getCompatibleTraits = () => {
+    if (!activeSlotId) return [];
+    
+    const slot = slotStructure.find(s => s.id === activeSlotId);
+    if (!slot) return [];
+    
+    return availableTraits.filter(trait => 
+      isTraitCompatibleWithSlot(trait, slot.category)
+    );
+  };
+
+  // Render a trait slot
+  const renderSlot = (slot) => {
+    const isUnlocked = playerLevel >= slot.unlockLevel;
+    const activeTrait = getActiveTraitForSlot(slot.id);
+    
+    return (
+      <div 
+        key={slot.id} 
+        className={`trait-slot ${slot.category} ${isUnlocked ? 'unlocked' : 'locked'}`}
+      >
+        {isUnlocked ? (
+          <>
+            {activeTrait ? (
+              <div className="active-trait">
+                <div className="trait-slot-icon">
+                  <i className={`icon-${activeTrait.icon}`}></i>
+                </div>
+                <div className="trait-slot-details">
+                  <h4>{activeTrait.name}</h4>
+                  <p>Level {activeTrait.level}</p>
+                </div>
+                <button 
+                  className="slot-action-button remove"
+                  onClick={() => handleRemoveTrait(slot.id)}
+                >
+                  ✖
+                </button>
+              </div>
+            ) : (
+              <div 
+                className="empty-slot"
+                onClick={() => handleOpenSelector(slot.id)}
+              >
+                <span className="empty-slot-text">Assign trait</span>
+                <span className="empty-slot-category">
+                  {slot.category.charAt(0).toUpperCase() + slot.category.slice(1)}
+                </span>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="locked-slot">
+            <span className="lock-icon">🔒</span>
+            <span>Unlocks at level {slot.unlockLevel}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Render the trait selector modal
+  const renderTraitSelector = () => {
+    if (!showTraitSelector) return null;
+    
+    const compatibleTraits = getCompatibleTraits();
+    
+    return (
+      <div className="trait-selector-modal">
+        <div className="trait-selector-content">
+          <div className="trait-selector-header">
+            <h3>Select a Trait</h3>
+            <button 
+              className="close-selector-button"
+              onClick={handleCloseSelector}
+            >
+              ✖
+            </button>
+          </div>
+          
+          <div className="trait-selector-list">
+            {compatibleTraits.length > 0 ? (
+              compatibleTraits.map(trait => (
+                <div 
+                  key={trait.id}
+                  className={`trait-selector-item ${selectedTrait?.id === trait.id ? 'selected' : ''}`}
+                  onClick={() => handleSelectTrait(trait)}
+                >
+                  <div className="trait-selector-icon">
+                    <i className={`icon-${trait.icon}`}></i>
+                  </div>
+                  <div className="trait-selector-details">
+                    <h4>{trait.name}</h4>
+                    <p>Level {trait.level}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="no-traits-message">
+                No compatible traits available. Level up traits of this category first.
+              </p>
+            )}
+          </div>
+          
+          <div className="trait-selector-actions">
+            <button
+              className="confirm-selection-button"
+              onClick={handleConfirmTraitAssignment}
+              disabled={!selectedTrait}
+            >
+              Confirm
+            </button>
+            <button
+              className="cancel-selection-button"
+              onClick={handleCloseSelector}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Handle removing a trait
-  const handleRemoveTrait = (traitId) => {
+  const handleRemoveTraitOld = (traitId) => {
     dispatch({
       type: 'UNEQUIP_TRAIT',
       payload: traitId
@@ -229,7 +445,7 @@ const TraitSlots = () => {
                       traitId={traitId}
                       index={index}
                       trait={traits.copyableTraits[traitId]}
-                      onRemove={handleRemoveTrait}
+                      onRemove={handleRemoveTraitOld}
                       onMakePermanent={handleMakePermanent}
                       essence={essence}
                     />
@@ -273,8 +489,65 @@ const TraitSlots = () => {
           </Box>
         )}
       </Box>
+      <div className="trait-slots-container">
+        <div className="trait-slots-header">
+          <h2>Active Trait Slots</h2>
+          <p className="trait-slots-description">
+            Assign your leveled traits to slots for additional bonuses. 
+            Unlock more slots as you level up.
+          </p>
+        </div>
+        
+        <div className="trait-slots-grid">
+          {slotStructure.map(renderSlot)}
+        </div>
+        
+        {/* Active slot bonuses summary */}
+        <div className="active-slot-bonuses">
+          <h3>Active Slot Bonuses</h3>
+          {Object.entries(activeSlots || {}).length > 0 ? (
+            <ul className="bonus-list">
+              {Object.entries(activeSlots || {}).map(([slotId, traitId]) => {
+                const trait = availableTraits.find(t => t.id === traitId);
+                if (!trait) return null;
+                
+                return (
+                  <li key={slotId} className="bonus-item">
+                    <span className="bonus-name">{trait.name}:</span>
+                    <span className="bonus-value">
+                      {trait.effect ? 
+                        `+${(trait.effect.value * trait.level * 0.5 * 100).toFixed(1)}% ${trait.effect.type.toLowerCase().replace(/_/g, ' ')}` 
+                        : 'Special bonus'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="no-bonuses-message">No active bonuses. Assign traits to slots to receive bonuses.</p>
+          )}
+        </div>
+        
+        {renderTraitSelector()}
+      </div>
     </Panel>
   );
+};
+
+TraitSlots.propTypes = {
+  availableTraits: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    level: PropTypes.number.isRequired,
+    icon: PropTypes.string.isRequired,
+    effect: PropTypes.object
+  })).isRequired,
+  activeSlots: PropTypes.object,
+  onAssignTrait: PropTypes.func.isRequired,
+  onRemoveTrait: PropTypes.func.isRequired,
+  slotUnlockLevels: PropTypes.object,
+  playerLevel: PropTypes.number
 };
 
 export default TraitSlots;
