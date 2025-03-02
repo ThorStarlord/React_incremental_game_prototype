@@ -16,17 +16,73 @@ import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import PersonIcon from '@mui/icons-material/Person';
 import { GameStateContext } from '../../../../context/GameStateContext';
-import Panel from '../panel/Panel';
+import Panel from '../../../../shared/components/layout/Panel';
 
+/**
+ * @typedef {Object} Character
+ * @property {string} id - Unique identifier for the character
+ * @property {string} name - Character's name
+ * @property {string} role - Character's role or class
+ * @property {boolean} playerControlled - Whether the character is directly controlled by the player
+ * @property {boolean} playerCreated - Whether the character was created by the player
+ */
+
+/**
+ * @typedef {Object} Player
+ * @property {string[]} controlledCharacters - Array of character IDs controlled by the player
+ */
+
+/**
+ * CompactCharacterPanel Component
+ * 
+ * Displays a compact view of characters under player control in a panel format.
+ * Shows up to 3 characters with a summary and provides a button to expand to a detailed view.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {Function} props.onExpandView - Callback function triggered when the expand button is clicked
+ *                                       Opens the full character management view
+ * 
+ * @example
+ * // Basic usage
+ * <CompactCharacterPanel onExpandView={() => setView('detailed')} />
+ * 
+ * @example
+ * // Inside a layout with other panels
+ * <Grid container spacing={2}>
+ *   <Grid item xs={12} sm={6}>
+ *     <CompactCharacterPanel onExpandView={handleExpandCharacters} />
+ *   </Grid>
+ *   <Grid item xs={12} sm={6}>
+ *     <OtherPanel />
+ *   </Grid>
+ * </Grid>
+ * 
+ * @returns {JSX.Element} Rendered CompactCharacterPanel component
+ */
 const CompactCharacterPanel = ({ onExpandView }) => {
+  // Access game state from context
   const { npcs, player } = useContext(GameStateContext);
   
-  // Get controlled characters
+  /**
+   * Filters the list of NPCs to find characters controlled by the player
+   * Includes characters that:
+   * 1. Have their ID in player.controlledCharacters array
+   * 2. Have the playerControlled flag set to true
+   * 
+   * @type {Character[]}
+   */
   const controlledCharacterIds = player?.controlledCharacters || [];
   const controlledCharacters = npcs
     .filter(npc => controlledCharacterIds.includes(npc.id) || npc.playerControlled)
     .slice(0, 3); // Show only first 3 in compact view
   
+  /**
+   * Total count of all controlled characters (not just the visible ones)
+   * Used to display a "+X more" message when there are more than 3 characters
+   * 
+   * @type {number}
+   */
   const totalControlled = npcs.filter(npc => 
     controlledCharacterIds.includes(npc.id) || npc.playerControlled
   ).length;

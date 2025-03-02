@@ -1,8 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Tooltip, Grid } from '@mui/material';
 import { DndContext, useDraggable, useDroppable, closestCenter, DragOverlay } from '@dnd-kit/core';
-import { GameStateContext, GameDispatchContext } from '../../../context/GameStateContext';
-import Panel from '../../../UI/Panel';
+import { useGameState, useGameDispatch } from '../../../../context/GameStateContext';
+import Panel from '../../../../shared/components/layout/Panel';
 import { itemsCatalog, ITEM_RARITIES } from '../../itemsInitialState';
 
 // Individual inventory item component
@@ -223,9 +223,9 @@ const InventorySlot = ({ id, children }) => {
 };
 
 const InventoryList = () => {
-  // Get inventory from game state
-  const { inventory } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
+  // Get inventory from game state using the hooks
+  const { inventory } = useGameState();
+  const dispatch = useGameDispatch();
 
   // For showing the dragged item
   const [activeId, setActiveId] = useState(null);

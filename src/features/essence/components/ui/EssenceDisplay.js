@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, LinearProgress, Tooltip, Paper, Fade } from '@mui/material';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
-import { GameStateContext, GameDispatchContext, createEssenceAction } from '../../../../context/GameStateContext';
+import { createEssenceAction, useGameState, useGameDispatch } from '../../../../context/GameStateContext';
 import { UPDATE_INTERVALS } from '../../../../constants/gameConstants';
 import useThemeUtils from '../../../../shared/hooks/useThemeUtils';
 import EssenceGenerationTimer from '../containers/EssenceGenerationTimer';
@@ -16,8 +16,8 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
  * @returns {React.ReactElement} A component that displays essence information and controls
  */
 const EssenceDisplay = () => {
-  const { essence } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
+  const { essence } = useGameState();
+  const dispatch = useGameDispatch();
   const { getProgressColor } = useThemeUtils();
   const { totalRate, npcContributions } = useEssenceGeneration();
   const [showAnimation, setShowAnimation] = useState(false);

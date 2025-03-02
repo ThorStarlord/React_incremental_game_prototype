@@ -1,181 +1,180 @@
-import React, { useContext, useMemo } from 'react';
-import { 
-  Box, 
-  Typography, 
-  List, 
-  ListItem, 
-  ListItemText, 
-  Divider, 
-  Paper, 
-  IconButton, 
-  Tooltip, 
-  Chip,
-  Alert 
+import React, { useContext, useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  List,
+  ListItem,
+  Avatar,
+  Divider,
+  IconButton,
+  Tooltip,
+  Badge,
+  useTheme
 } from '@mui/material';
-import { 
-  History as HistoryIcon,
-  ArrowBack as ArrowBackIcon,
-  Replay as ReplayIcon,
-  AccessTime as AccessTimeIcon
-} from '@mui/icons-material';
+import ClearAllIcon from '@mui/icons-material/ClearAll';
+import PersonIcon from '@mui/icons-material/Person';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import { GameStateContext } from '../../../context/GameStateContext';
-import { formatDistanceToNow } from 'date-fns';
+import Panel from '../../../shared/components/layout/Panel';
 
 /**
- * @component DialogueHistory
- * @description Displays the history of dialogues between the player and a specific NPC.
- * Allows players to revisit previous conversation branches.
- * 
- * @param {Object} props Component properties
- * @param {string} props.npcId ID of the NPC whose dialogue history to display
- * @param {Function} props.onRevisitDialogue Callback function when player wants to revisit a dialogue
- * @returns {JSX.Element} Rendered component
+ * @typedef {Object} DialogueMessage
+ * @property {string} id - Unique identifier for the message
+ * @property {string} npcId - ID of the NPC who spoke this message
+ * @property {string} npcName - Name of the NPC who spoke
+ * @property {string} message - Content of the dialogue message
+ * @property {number} timestamp - Unix timestamp when the message was spoken
+ * @property {boolean} isPlayerResponse - Whether this message was a player response
+ * @property {string} [emotion] - Optional emotion/tone of the message
  */
-const DialogueHistory = ({ npcId, onRevisitDialogue }) => {
-  const { playerState, npcs } = useContext(GameStateContext);
-  
-  // Get the specific NPC data
-  const npc = useMemo(() => 
-    npcs.find(n => n.id === npcId), 
-    [npcs, npcId]
-  );
-  
-  // Get dialogue history for this NPC
-  const dialogueHistory = useMemo(() => {
-    if (!playerState?.dialogueHistory || !npcId) return [];
+
+/**
+ * DialogueHistory Component
+ * 
+ * Displays a chronological history of dialogue exchanges between the player and NPCs.
+ * Allows filtering by NPC and clearing conversation history.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {boolean} [props.compact=false] - Whether to show the compact view with limited messages
+ * @param {string} [props.filterNpcId] - Optional NPC ID to filter conversation by specific NPC
+ * @param {number} [props.maxMessages=50] - Maximum number of messages to display
+ * 
+ * @returns {JSX.Element} Rendered DialogueHistory component
+ */
+const DialogueHistory = ({ compact = false, filterNpcId, maxMessages = 50 }) => {
+  const theme = useTheme();
+  const { dialogueHistory, clearDialogueHistory } = useContext(GameStateContext);
+  const [filteredHistory, setFilteredHistory] = useState([]);
+
+  // Format timestamp to a readable time
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Filter and sort dialogue history
+  useEffect(() => {
+    let messages = [...dialogueHistory];
     
-    const history = playerState.dialogueHistory[npcId] || [];
-    // Sort by most recent first
-    return [...history].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  }, [playerState?.dialogueHistory, npcId]);
-  
-  // Track unique dialogue branches to avoid duplicates
-  const uniqueBranches = useMemo(() => {
-    const branches = new Set();
-    const uniqueEntries = [];
+    // Apply NPC filter if specified
+    if (filterNpcId) {
+      messages = messages.filter(msg => msg.npcId === filterNpcId);
+    }
     
-    dialogueHistory.forEach(entry => {
-      if (!branches.has(entry.dialogueBranch)) {
-        branches.add(entry.dialogueBranch);
-        uniqueEntries.push(entry);
-      }
-    });
+    // Sort by timestamp (most recent last)
+    messages.sort((a, b) => a.timestamp - b.timestamp);
     
-    return uniqueEntries;
-  }, [dialogueHistory]);
-  
-  if (!npc) {
-    return <Alert severity="error">NPC not found</Alert>;
-  }
-  
-  if (dialogueHistory.length === 0) {
-    return (
-      <Box sx={{ p: 2, textAlign: 'center' }}>
-        <HistoryIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-        <Typography variant="body2" color="text.secondary">
-          You haven't had any memorable conversations with {npc.name} yet.
-        </Typography>
-      </Box>
-    );
-  }
+    // Limit to maxMessages
+    if (compact) {
+      messages = messages.slice(-5); // Show only 5 most recent in compact mode
+    } else {
+      messages = messages.slice(-maxMessages);
+    }
+    
+    setFilteredHistory(messages);
+  }, [dialogueHistory, filterNpcId, compact, maxMessages]);
+
+  // Handle clearing dialogue history
+  const handleClearHistory = () => {
+    if (window.confirm('Are you sure you want to clear all dialogue history?')) {
+      clearDialogueHistory();
+    }
+  };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <HistoryIcon sx={{ mr: 1 }} />
-        <Typography variant="h6">Conversation History with {npc.name}</Typography>
-      </Box>
-      
-      {/* Stats about interactions */}
-      <Paper variant="outlined" sx={{ p: 1.5, mb: 2, bgcolor: 'background.subtle' }}>
-        <Typography variant="body2">
-          First met: {formatDistanceToNow(
-            new Date(dialogueHistory[dialogueHistory.length - 1].timestamp),
-            { addSuffix: true }
-          )}
-        </Typography>
-        <Typography variant="body2">
-          Total interactions: {dialogueHistory.length}
-        </Typography>
-      </Paper>
-      
-      {/* Dialogue branches list */}
-      <Typography variant="subtitle2" sx={{ mb: 1 }}>
-        Remembered Conversations:
-      </Typography>
-      
-      <List sx={{ 
-        bgcolor: 'background.paper', 
-        borderRadius: 1,
-        maxHeight: '350px',
-        overflow: 'auto'
-      }}>
-        {uniqueBranches.map((entry, index) => (
-          <React.Fragment key={`${entry.dialogueBranch}-${index}`}>
-            {index > 0 && <Divider component="li" />}
-            <ListItem 
-              alignItems="flex-start"
-              secondaryAction={
-                <Tooltip title="Revisit this conversation">
-                  <IconButton 
-                    edge="end" 
-                    onClick={() => onRevisitDialogue(entry.dialogueBranch)}
-                  >
-                    <ReplayIcon />
-                  </IconButton>
-                </Tooltip>
-              }
-              sx={{ 
-                '&:hover': { bgcolor: 'action.hover' },
-                cursor: 'pointer'
-              }}
-              onClick={() => onRevisitDialogue(entry.dialogueBranch)}
+    <Panel
+      title="Dialogue History"
+      icon={<AutoStoriesIcon />}
+      defaultExpanded={!compact}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, alignItems: 'center' }}>
+        <Badge badgeContent={filteredHistory.length} color="primary">
+          <Typography variant="subtitle1">
+            {filterNpcId ? 'Conversation' : 'Recent Dialogues'}
+          </Typography>
+        </Badge>
+        
+        {!compact && (
+          <Tooltip title="Clear History">
+            <IconButton 
+              size="small" 
+              color="error" 
+              onClick={handleClearHistory}
+              disabled={filteredHistory.length === 0}
             >
-              <ListItemText
-                primary={
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-                    <Typography variant="subtitle2" component="span" sx={{ mr: 1 }}>
-                      {npc.dialogue?.[entry.dialogueBranch]?.title || entry.dialogueBranch}
-                    </Typography>
-                    <Chip 
-                      label={entry.category || 'General'}
-                      size="small"
-                      variant="outlined"
-                      sx={{ fontSize: '0.7rem' }}
-                    />
-                  </Box>
-                }
-                secondary={
-                  <>
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      color="text.primary"
-                      sx={{
-                        display: 'inline',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical'
-                      }}
-                    >
-                      {npc.dialogue?.[entry.dialogueBranch]?.snippet || 'A conversation you had...'}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                      <AccessTimeIcon fontSize="small" sx={{ mr: 0.5, fontSize: 14, color: 'text.secondary' }} />
+              <ClearAllIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+
+      {filteredHistory.length === 0 ? (
+        <Typography variant="body2" color="text.secondary" sx={{ py: 2, fontStyle: 'italic', textAlign: 'center' }}>
+          No dialogue history yet
+        </Typography>
+      ) : (
+        <List sx={{ 
+          maxHeight: compact ? '200px' : '400px',
+          overflow: 'auto',
+          bgcolor: theme.palette.background.default,
+          borderRadius: 1
+        }}>
+          {filteredHistory.map((message, index) => (
+            <React.Fragment key={message.id || index}>
+              <ListItem 
+                alignItems="flex-start"
+                sx={{ 
+                  py: 1,
+                  px: 1,
+                  bgcolor: message.isPlayerResponse 
+                    ? theme.palette.action.hover 
+                    : 'transparent'
+                }}
+              >
+                <Box sx={{ display: 'flex', width: '100%' }}>
+                  <Avatar 
+                    sx={{ 
+                      mr: 1, 
+                      bgcolor: message.isPlayerResponse 
+                        ? theme.palette.primary.main 
+                        : theme.palette.secondary.main,
+                      width: 32,
+                      height: 32
+                    }}
+                  >
+                    <PersonIcon fontSize="small" />
+                  </Avatar>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="subtitle2" component="span">
+                        {message.isPlayerResponse ? 'You' : message.npcName}
+                        {message.emotion && !compact && (
+                          <Typography 
+                            component="span" 
+                            variant="caption" 
+                            sx={{ ml: 1, fontStyle: 'italic' }}
+                          >
+                            ({message.emotion})
+                          </Typography>
+                        )}
+                      </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
+                        {formatTime(message.timestamp)}
                       </Typography>
                     </Box>
-                  </>
-                }
-              />
-            </ListItem>
-          </React.Fragment>
-        ))}
-      </List>
-    </Box>
+                    <Typography variant="body2" color="text.primary" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
+                      {message.message}
+                    </Typography>
+                  </Box>
+                </Box>
+              </ListItem>
+              {index < filteredHistory.length - 1 && <Divider component="li" variant="inset" />}
+            </React.Fragment>
+          ))}
+        </List>
+      )}
+    </Panel>
   );
 };
 
