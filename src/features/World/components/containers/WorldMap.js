@@ -1,115 +1,212 @@
-import React, { useState } from 'react';
-import { Box, Typography, Tooltip } from '@mui/material';
-import { towns } from '../../../../modules/data/towns';
-import { regions } from '../../../../modules/data/regions';
-import { routes } from '../../../../modules/data/routes';
-import './WorldMap.css';
+/**
+ * @file WorldMap.js
+ * @description Component for rendering an interactive world map showing all regions
+ * and their current status. Allows players to select regions for further interactions.
+ */
 
-const WorldMap = ({ onTownSelect, onDungeonSelect }) => {
-  const [hoveredRegion, setHoveredRegion] = useState(null);
-  const [hoveredTown, setHoveredTown] = useState(null);
-  const [hoveredRoute, setHoveredRoute] = useState(null);
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
 
+// Assume these actions will be defined elsewhere
+import { selectRegion, exploreRegion } from '../../worldSlice';
+
+/**
+ * Styled components for the world map
+ */
+const MapContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background-color: #2a4d69;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  margin-bottom: 20px;
+`;
+
+const MapTitle = styled.h2`
+  color: #e7eff6;
+  text-align: center;
+  margin-top: 10px;
+  text-shadow: 1px 1px 2px #000;
+`;
+
+const RegionContainer = styled.div`
+  position: absolute;
+  border-radius: 50%;
+  cursor: ${props => props.unlocked ? 'pointer' : 'not-allowed'};
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  border: 2px solid ${props => props.unlocked ? '#fff' : '#555'};
+  opacity: ${props => props.unlocked ? 1 : 0.6};
+  transform: scale(${props => props.selected ? 1.1 : 1});
+  
+  &:hover {
+    transform: ${props => props.unlocked ? 'scale(1.1)' : 'scale(1)'};
+    z-index: 10;
+  }
+`;
+
+const RegionProgress = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background-color: #4CAF50;
+  width: ${props => props.progress}%;
+`;
+
+const RegionName = styled.div`
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black;
+  white-space: nowrap;
+`;
+
+const RegionInfo = styled.div`
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  display: ${props => props.visible ? 'block' : 'none'};
+`;
+
+const UnlockMessage = styled.div`
+  background-color: rgba(209, 87, 0, 0.8);
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  margin-top: 5px;
+`;
+
+/**
+ * WorldMap Component
+ * Renders an interactive map with all the world regions
+ * based on their current state from the Redux store
+ */
+const WorldMap = () => {
+  const dispatch = useDispatch();
+  const regions = useSelector(state => state.world.regions);
+  const playerLevel = useSelector(state => state.player.level);
+  const completedQuests = useSelector(state => state.quests.completed);
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  
+  // Positions for regions on the map - these would normally be configured per region
+  const regionPositions = {
+    forest: { top: '60%', left: '25%', width: '120px', height: '120px', backgroundColor: '#2e7d32' },
+    mountains: { top: '30%', left: '55%', width: '100px', height: '100px', backgroundColor: '#5d4037' },
+    swamp: { top: '70%', left: '65%', width: '90px', height: '90px', backgroundColor: '#4a148c' }
+  };
+  
+  /**
+   * Handle region selection
+   * @param {string} regionId - ID of the selected region
+   */
   const handleRegionClick = (regionId) => {
-    const regionTowns = towns.filter(town => town.regionId === regionId);
-    if (regionTowns.length > 0) {
-      onTownSelect(regionTowns[0].id);
-    } else {
-      alert(`No towns in ${regions.find(r => r.id === regionId).name} yet!`);
+    const region = regions[regionId];
+    
+    if (region.unlocked) {
+      setSelectedRegion(regionId);
+      dispatch(selectRegion(regionId));
     }
   };
-
-  const handleTownClick = (townId, event) => {
-    event.stopPropagation();
-    onTownSelect(townId);
+  
+  /**
+   * Check if a region can be unlocked based on requirements
+   * @param {Object} region - Region object
+   * @returns {boolean} - Whether the region can be unlocked
+   */
+  const canUnlockRegion = (region) => {
+    if (!region.unlockRequirements) return true;
+    
+    const { playerLevel: reqLevel, questCompleted: reqQuest } = region.unlockRequirements;
+    
+    return (
+      (!reqLevel || playerLevel >= reqLevel) && 
+      (!reqQuest || completedQuests.includes(reqQuest))
+    );
   };
-
+  
+  /**
+   * Renders information about unlock requirements for a region
+   * @param {Object} region - Region object
+   * @returns {JSX.Element} - JSX for rendering unlock requirements
+   */
+  const renderUnlockRequirements = (region) => {
+    if (!region.unlockRequirements) return null;
+    
+    const { playerLevel: reqLevel, questCompleted: reqQuest } = region.unlockRequirements;
+    
+    return (
+      <UnlockMessage>
+        Unlock Requirements:
+        {reqLevel && <div>Player Level: {playerLevel}/{reqLevel}</div>}
+        {reqQuest && (
+          <div>
+            Quest: {completedQuests.includes(reqQuest) ? '✓' : '✗'} {reqQuest.replace(/_/g, ' ')}
+          </div>
+        )}
+      </UnlockMessage>
+    );
+  };
+  
   return (
-    <Box className="world-map-container">
-      <Typography variant="h5" component="h2" gutterBottom>
-        World Map
-      </Typography>
-      <svg viewBox="0 0 800 600" width="100%" height="100%">
-        {/* Draw routes first */}
-        <g className="routes-layer">
-          {routes.map(route => (
-            <Tooltip key={route.id} title={route.description}>
-              <path
-                d={route.path}
-                className={`route-${route.type}`}
-                fill="none"
-                strokeWidth={hoveredRoute === route.id ? "4" : "2"}
-                style={{ cursor: 'pointer' }}
-                onMouseEnter={() => setHoveredRoute(route.id)}
-                onMouseLeave={() => setHoveredRoute(null)}
-              />
-            </Tooltip>
-          ))}
-        </g>
-
-        {/* Draw regions */}
-        <g className="regions-layer">
-          {regions.map(region => (
-            <g key={region.id}>
-              <rect
-                className={`region-${region.type}`}
-                x={region.mapCoordinates.x}
-                y={region.mapCoordinates.y}
-                width={region.mapCoordinates.width}
-                height={region.mapCoordinates.height}
-                stroke="#7cb342"
-                strokeWidth="2"
-                style={{ cursor: 'pointer' }}
-                onMouseEnter={() => setHoveredRegion(region.id)}
-                onMouseLeave={() => setHoveredRegion(null)}
-                onClick={() => handleRegionClick(region.id)}
-              />
-              <text
-                x={region.mapCoordinates.x + region.mapCoordinates.width / 2}
-                y={region.mapCoordinates.y + region.mapCoordinates.height / 2}
-                textAnchor="middle"
-                fill="#1b5e20"
-                fontSize="14"
-                style={{ pointerEvents: 'none' }}
-              >
-                {region.name}
-              </text>
-            </g>
-          ))}
-        </g>
-
-        {/* Draw towns on top */}
-        <g className="towns-layer">
-          {towns.map(town => (
-            <Tooltip key={town.id} title={`${town.name} - ${town.type}`}>
-              <g
-                transform={`translate(${town.mapCoordinates.x},${town.mapCoordinates.y})`}
-                onClick={(e) => handleTownClick(town.id, e)}
-                style={{ cursor: 'pointer' }}
-                onMouseEnter={() => setHoveredTown(town.id)}
-                onMouseLeave={() => setHoveredTown(null)}
-              >
-                <circle
-                  r="8"
-                  fill={hoveredTown === town.id ? '#f44336' : '#ff7043'}
-                  stroke="#d32f2f"
-                  strokeWidth="2"
-                />
-                <text
-                  y="20"
-                  textAnchor="middle"
-                  fill="#d32f2f"
-                  fontSize="12"
-                  style={{ pointerEvents: 'none' }}
-                >
-                  {town.name}
-                </text>
-              </g>
-            </Tooltip>
-          ))}
-        </g>
-      </svg>
-    </Box>
+    <div>
+      <MapTitle>World Map</MapTitle>
+      <MapContainer>
+        {Object.entries(regions).map(([id, region]) => (
+          <RegionContainer
+            key={id}
+            style={regionPositions[id]}
+            unlocked={region.unlocked}
+            selected={selectedRegion === id}
+            onClick={() => handleRegionClick(id)}
+            title={region.unlocked ? region.name : `Locked: ${region.name}`}
+          >
+            <RegionName>{region.name}</RegionName>
+            <RegionProgress progress={region.explored * 100} />
+          </RegionContainer>
+        ))}
+        
+        {selectedRegion && (
+          <RegionInfo visible={true}>
+            <h3>{regions[selectedRegion].name}</h3>
+            <p>{regions[selectedRegion].description}</p>
+            <p>Exploration: {Math.round(regions[selectedRegion].explored * 100)}%</p>
+            <p>Danger Level: {regions[selectedRegion].dangerLevel}</p>
+            <p>Locations Discovered: {
+              regions[selectedRegion].locations.filter(loc => loc.discovered).length
+            } / {regions[selectedRegion].locations.length}</p>
+          </RegionInfo>
+        )}
+        
+        {!selectedRegion && Object.entries(regions)
+          .filter(([id, region]) => !region.unlocked)
+          .map(([id, region]) => (
+            canUnlockRegion(region) && (
+              <RegionInfo key={`unlock-${id}`} visible={true} style={{ 
+                bottom: 'auto', 
+                top: regionPositions[id].top, 
+                left: regionPositions[id].left
+              }}>
+                <h4>{region.name} (Locked)</h4>
+                {renderUnlockRequirements(region)}
+              </RegionInfo>
+            )
+          ))
+        }
+      </MapContainer>
+    </div>
   );
 };
 

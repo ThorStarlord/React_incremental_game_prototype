@@ -1,32 +1,57 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { Box, Typography, Paper, Button, LinearProgress, useTheme } from '@mui/material';
+import { Box, Typography, Paper, Button, LinearProgress, useTheme, Grid, Divider } from '@mui/material';
 import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
 import useTraitEffects from '../../hooks/useTraitEffects';
 import Panel from './Panel';
 import useThemeUtils from '../../hooks/useThemeUtils';
 import TraitEffectDialog from './TraitEffectDialog';
 import TraitEffectAnimation from './TraitEffectAnimation';
+import combatInitialState from '../../combatInitialState';
 
+/**
+ * Battle component that handles combat encounters
+ * @param {Object} props Component props
+ * @param {string} props.dungeonId ID of the current dungeon
+ * @param {Function} props.onExplorationComplete Callback for when battle ends
+ */
 const Battle = ({ dungeonId, onExplorationComplete }) => {
-  const { player } = useContext(GameStateContext);
+  const { player, gameState } = useContext(GameStateContext);
   const dispatch = useContext(GameDispatchContext);
   const { modifiers, calculatedStats } = useTraitEffects();
-  const [enemy, setEnemy] = useState({
-    name: 'Goblin',
-    hp: 50,
-    maxHp: 50,
-    attack: 5,
-    defense: 3
+  const theme = useTheme();
+  const { getProgressColor } = useThemeUtils();
+  
+  // Initialize combat state
+  const [combatState, setCombatState] = useState({
+    ...combatInitialState,
+    active: true,
+    playerTurn: true,
+    player: {
+      ...combatInitialState.player,
+      currentHealth: player.hp,
+      maxHealth: player.maxHp,
+      currentMana: player.mana || 50,
+      maxMana: player.maxMana || 50
+    },
+    enemy: {
+      ...combatInitialState.enemy,
+      name: 'Goblin',
+      level: 1,
+      currentHealth: 50,
+      maxHealth: 50,
+      attack: 5,
+      defense: 3,
+      imageUrl: '/assets/enemies/goblin.png',
+      experience: 10,
+      gold: 5
+    }
   });
-  const [battleLog, setBattleLog] = useState([]);
-  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
-  const logRef = useRef(null);
+
+  // UI state
   const [traitEffect, setTraitEffect] = useState(null);
   const [animationEffect, setAnimationEffect] = useState(null);
   const [mousePos, setMousePos] = useState({ x: '50%', y: '50%' });
-
-  const theme = useTheme();
-  const { getProgressColor } = useThemeUtils();
+  const logRef = useRef(null);
 
   // Track mouse position for effect animations
   const handleMouseMove = (e) => {
@@ -42,35 +67,61 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }
-  }, [battleLog]);
+  }, [combatState.log]);
 
+  /**
+   * Adds a new entry to the combat log
+   * @param {Object} entry Log entry with text and type
+   */
   const addLogEntry = (entry) => {
-    setBattleLog(prev => [...prev, entry]);
+    setCombatState(prev => ({
+      ...prev,
+      log: [...prev.log, {
+        timestamp: new Date().toISOString(),
+        message: entry.text,
+        type: entry.type,
+        importance: entry.type === 'victory' || entry.type === 'defeat' ? 'high' : 'normal'
+      }]
+    }));
   };
 
-  const calculateDamage = (attacker, defender, isPlayer = false) => {
-    let attack = isPlayer ? calculatedStats.attack : attacker.attack;
-    let defense = isPlayer ? defender.defense : calculatedStats.defense;
+  /**
+   * Calculates damage based on attacker and defender stats
+   */
+  const calculateDamage = (isPlayerAttacking = true) => {
+    const attackerStats = isPlayerAttacking ? 
+      { attack: calculatedStats.attack } : 
+      { attack: combatState.enemy.attack };
+      
+    const defenderStats = isPlayerAttacking ? 
+      { defense: combatState.enemy.defense } : 
+      { defense: calculatedStats.defense };
     
-    const baseDamage = Math.max(1, attack - defense);
-    const variance = Math.floor(Math.random() * 3) - 1; // -1 to +1
+    const baseDamage = Math.max(1, attackerStats.attack - defenderStats.defense);
+    const variance = Math.floor(Math.random() * 5) - 2; // -2 to +2
     return Math.max(1, baseDamage + variance);
   };
 
+  /**
+   * Displays trait effect animation and dialog
+   */
   const showTraitEffect = (effect) => {
     setTraitEffect(effect);
     setAnimationEffect(effect);
     setTimeout(() => setAnimationEffect(null), 1500);
   };
 
+  /**
+   * Handles player attack action
+   */
   const handleAttack = () => {
-    if (!isPlayerTurn) return;
+    if (!combatState.playerTurn || !combatState.active) return;
 
-    const damage = calculateDamage(player, enemy, true);
-    const newEnemyHp = Math.max(0, enemy.hp - damage);
+    const damage = calculateDamage(true);
+    const newEnemyHealth = Math.max(0, combatState.enemy.currentHealth - damage);
     
     addLogEntry({
-      text: `${player.name} attacks ${enemy.name} for ${damage} damage!`,
+      text: `${player.name} attacks ${combatState.enemy.name} for ${damage} damage!`,
       type: 'player-attack'
     });
 
@@ -102,44 +153,79 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
       }, 500);
     }
     
-    setEnemy(prev => ({ ...prev, hp: newEnemyHp }));
+    setCombatState(prev => ({
+      ...prev,
+      enemy: {
+        ...prev.enemy,
+        currentHealth: newEnemyHealth
+      },
+      playerTurn: newEnemyHealth <= 0 ? true : false,
+      round: prev.round + (newEnemyHealth <= 0 ? 0 : 0.5) // Increment half a round (full round after enemy turn)
+    }));
 
-    if (newEnemyHp <= 0) {
+    if (newEnemyHealth <= 0) {
       handleVictory();
     } else {
-      setIsPlayerTurn(false);
+      // Enemy turn after delay
       setTimeout(enemyTurn, 1000);
     }
   };
 
+  /**
+   * Execute enemy's turn in combat
+   */
   const enemyTurn = () => {
-    const damage = calculateDamage(enemy, player);
+    const damage = calculateDamage(false);
+    const newPlayerHealth = Math.max(0, combatState.player.currentHealth - damage);
     
     addLogEntry({
-      text: `${enemy.name} attacks ${player.name} for ${damage} damage!`,
+      text: `${combatState.enemy.name} attacks ${player.name} for ${damage} damage!`,
       type: 'enemy-attack'
     });
 
+    setCombatState(prev => ({
+      ...prev,
+      player: {
+        ...prev.player,
+        currentHealth: newPlayerHealth
+      },
+      playerTurn: true,
+      round: prev.round + 0.5 // Complete the round
+    }));
+
+    // Also update the main player state
     dispatch({
       type: 'UPDATE_PLAYER',
       payload: {
         ...player,
-        hp: Math.max(0, player.hp - damage)
+        hp: newPlayerHealth
       }
     });
 
-    if (player.hp - damage <= 0) {
+    if (newPlayerHealth <= 0) {
       handleDefeat();
-    } else {
-      setIsPlayerTurn(true);
     }
   };
 
+  /**
+   * Handle player victory
+   */
   const handleVictory = () => {
+    const { experience, gold } = combatState.enemy;
+    
     // Apply XP multiplier from traits
-    const baseReward = Math.floor(Math.random() * 10) + 5;
-    const xpReward = Math.floor(baseReward * modifiers.xpMultiplier);
-    const goldReward = baseReward;
+    const xpReward = Math.floor(experience * modifiers.xpMultiplier);
+    const goldReward = gold;
+
+    setCombatState(prev => ({
+      ...prev,
+      active: false,
+      rewards: {
+        experience: xpReward,
+        gold: goldReward,
+        items: [] // Could be populated based on enemy loot tables
+      }
+    }));
 
     addLogEntry({
       text: `Victory! Gained ${goldReward} gold and ${xpReward} experience!`,
@@ -147,12 +233,12 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
     });
     
     if (modifiers.xpMultiplier > 1) {
-      const bonusXP = Math.floor(baseReward * (modifiers.xpMultiplier - 1));
+      const bonusXP = Math.floor(experience * (modifiers.xpMultiplier - 1));
       setTimeout(() => {
         showTraitEffect({
           traitName: 'Quick Learner',
           description: 'Your trait granted bonus experience!',
-          value: bonusXP
+          value: `+${bonusXP} XP`
         });
       }, 500);
     }
@@ -171,7 +257,15 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
     }
   };
 
+  /**
+   * Handle player defeat
+   */
   const handleDefeat = () => {
+    setCombatState(prev => ({
+      ...prev,
+      active: false
+    }));
+
     addLogEntry({
       text: 'Defeat! You have been knocked out...',
       type: 'defeat'
@@ -182,6 +276,9 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
     }
   };
 
+  /**
+   * Get appropriate color for log message
+   */
   const getMessageColor = (type) => {
     switch (type) {
       case 'player-attack':
@@ -197,6 +294,38 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
       default:
         return theme.palette.text.primary;
     }
+  };
+
+  /**
+   * Handle skill usage in combat
+   */
+  const handleUseSkill = (skill) => {
+    if (!combatState.playerTurn || !combatState.active) return;
+    
+    // Implementation for skills would go here
+    addLogEntry({
+      text: `${player.name} uses ${skill.name}!`,
+      type: 'player-skill'
+    });
+
+    // Handle skill effects, mana cost, etc.
+    // For now just do a basic attack
+    handleAttack();
+  };
+
+  /**
+   * Handle item usage in combat
+   */
+  const handleUseItem = (item) => {
+    if (!combatState.active) return;
+    
+    addLogEntry({
+      text: `${player.name} uses ${item.name}!`,
+      type: 'player-item'
+    });
+
+    // Handle item effects
+    // Then continue combat if it was enemy turn, or wait for player input if player turn
   };
 
   return (
@@ -217,98 +346,194 @@ const Battle = ({ dungeonId, onExplorationComplete }) => {
         />
       )}
       
-      <Panel title="Battle">
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" gutterBottom color="primary">
-            {player.name} vs {enemy.name}
-          </Typography>
-          
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" gutterBottom>
-              Player HP: {player.hp}/{player.maxHp}
-            </Typography>
-            <LinearProgress 
-              variant="determinate" 
-              value={(player.hp / player.maxHp) * 100}
-              sx={{ 
-                height: 10, 
-                borderRadius: 1,
-                backgroundColor: theme.palette.grey[300],
-                '& .MuiLinearProgress-bar': {
-                  backgroundColor: getProgressColor(player.hp, player.maxHp)
-                }
-              }}
-            />
-          </Box>
-
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" gutterBottom>
-              Enemy HP: {enemy.hp}/{enemy.maxHp}
-            </Typography>
-            <LinearProgress 
-              variant="determinate" 
-              value={(enemy.hp / enemy.maxHp) * 100}
-              sx={{ 
-                height: 10, 
-                borderRadius: 1,
-                backgroundColor: theme.palette.grey[300],
-                '& .MuiLinearProgress-bar': {
-                  backgroundColor: getProgressColor(enemy.hp, enemy.maxHp)
-                }
-              }}
-            />
-          </Box>
-        </Box>
-
-        <Button 
-          variant="contained" 
-          onClick={handleAttack}
-          disabled={!isPlayerTurn}
-          fullWidth
-          sx={{ 
-            mb: 2,
-            bgcolor: theme.palette.primary.main,
-            '&:hover': {
-              bgcolor: theme.palette.primary.dark,
-            },
-            '&:disabled': {
-              bgcolor: theme.palette.action.disabledBackground,
-            }
-          }}
-        >
-          Attack
-        </Button>
-
-        <Paper 
-          elevation={1} 
-          ref={logRef}
-          sx={{ 
-            p: 2, 
-            maxHeight: 200, 
-            overflow: 'auto',
-            backgroundColor: theme.palette.background.paper,
-            border: `1px solid ${theme.palette.divider}`
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 1 }} color="primary">
-            Battle Log
-          </Typography>
-          <Box>
-            {battleLog.map((entry, index) => (
-              <Typography
-                key={index}
-                variant="body2"
-                sx={{
-                  mb: 0.5,
-                  color: getMessageColor(entry.type),
-                  fontWeight: ['victory', 'defeat', 'essence-gain'].includes(entry.type) ? 'bold' : 'normal'
-                }}
-              >
-                {entry.text}
+      <Panel title={`Battle - Round ${Math.ceil(combatState.round)}`}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={7}>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" gutterBottom color="primary">
+                {player.name} vs {combatState.enemy.name}
               </Typography>
-            ))}
-          </Box>
-        </Paper>
+              
+              <Grid container spacing={2}>
+                {/* Player stats */}
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Player Stats
+                  </Typography>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" gutterBottom display="flex" justifyContent="space-between">
+                      <span>HP:</span>
+                      <span>{combatState.player.currentHealth}/{combatState.player.maxHealth}</span>
+                    </Typography>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={(combatState.player.currentHealth / combatState.player.maxHealth) * 100}
+                      sx={{ 
+                        height: 10, 
+                        borderRadius: 1,
+                        backgroundColor: theme.palette.grey[300],
+                        '& .MuiLinearProgress-bar': {
+                          backgroundColor: getProgressColor(combatState.player.currentHealth, combatState.player.maxHealth)
+                        }
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" gutterBottom display="flex" justifyContent="space-between">
+                      <span>Mana:</span>
+                      <span>{combatState.player.currentMana}/{combatState.player.maxMana}</span>
+                    </Typography>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={(combatState.player.currentMana / combatState.player.maxMana) * 100}
+                      sx={{ 
+                        height: 8, 
+                        borderRadius: 1,
+                        backgroundColor: theme.palette.grey[300],
+                        '& .MuiLinearProgress-bar': {
+                          backgroundColor: theme.palette.info.main
+                        }
+                      }}
+                    />
+                  </Box>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    Attack: {calculatedStats.attack}
+                  </Typography>
+                  <Typography variant="body2">
+                    Defense: {calculatedStats.defense}
+                  </Typography>
+                </Grid>
+                
+                {/* Enemy stats */}
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {combatState.enemy.name} (Level {combatState.enemy.level})
+                  </Typography>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" gutterBottom display="flex" justifyContent="space-between">
+                      <span>HP:</span>
+                      <span>{combatState.enemy.currentHealth}/{combatState.enemy.maxHealth}</span>
+                    </Typography>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={(combatState.enemy.currentHealth / combatState.enemy.maxHealth) * 100}
+                      sx={{ 
+                        height: 10, 
+                        borderRadius: 1,
+                        backgroundColor: theme.palette.grey[300],
+                        '& .MuiLinearProgress-bar': {
+                          backgroundColor: getProgressColor(combatState.enemy.currentHealth, combatState.enemy.maxHealth)
+                        }
+                      }}
+                    />
+                  </Box>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    Attack: {combatState.enemy.attack}
+                  </Typography>
+                  <Typography variant="body2">
+                    Defense: {combatState.enemy.defense}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+
+            <Divider sx={{ mb: 2 }} />
+
+            {/* Combat actions */}
+            <Grid container spacing={1}>
+              <Grid item xs={12} sm={6} md={4}>
+                <Button 
+                  variant="contained" 
+                  onClick={handleAttack}
+                  disabled={!combatState.playerTurn || !combatState.active}
+                  fullWidth
+                  sx={{ 
+                    bgcolor: theme.palette.primary.main,
+                    '&:hover': {
+                      bgcolor: theme.palette.primary.dark,
+                    },
+                    '&:disabled': {
+                      bgcolor: theme.palette.action.disabledBackground,
+                    }
+                  }}
+                >
+                  Attack
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Button 
+                  variant="outlined" 
+                  disabled={!combatState.playerTurn || !combatState.active}
+                  fullWidth
+                  onClick={() => handleUseSkill({ name: 'Fireball' })}
+                >
+                  Skill
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Button 
+                  variant="outlined" 
+                  fullWidth
+                  disabled={!combatState.active}
+                  onClick={() => handleUseItem({ name: 'Health Potion' })}
+                >
+                  Item
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+          
+          {/* Battle log */}
+          <Grid item xs={12} md={5}>
+            <Paper 
+              elevation={1} 
+              ref={logRef}
+              sx={{ 
+                p: 2, 
+                height: 300, 
+                overflow: 'auto',
+                backgroundColor: theme.palette.background.paper,
+                border: `1px solid ${theme.palette.divider}`
+              }}
+            >
+              <Typography variant="h6" sx={{ mb: 1 }} color="primary">
+                Battle Log
+              </Typography>
+              <Box>
+                {combatState.log.map((entry, index) => (
+                  <Typography
+                    key={index}
+                    variant="body2"
+                    sx={{
+                      mb: 0.5,
+                      color: getMessageColor(entry.type),
+                      fontWeight: entry.importance === 'high' ? 'bold' : 'normal'
+                    }}
+                  >
+                    {entry.message}
+                  </Typography>
+                ))}
+                {combatState.log.length === 0 && (
+                  <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                    Combat begins...
+                  </Typography>
+                )}
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
+          {!combatState.active && (
+            <Button 
+              variant="contained" 
+              color={combatState.player.currentHealth > 0 ? "success" : "error"}
+              onClick={onExplorationComplete}
+            >
+              {combatState.player.currentHealth > 0 ? "Continue Adventure" : "Return to Town"}
+            </Button>
+          )}
+        </Box>
       </Panel>
     </Box>
   );
