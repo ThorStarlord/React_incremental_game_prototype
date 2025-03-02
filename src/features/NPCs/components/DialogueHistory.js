@@ -1,124 +1,180 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { 
-  Box, Typography, Divider, List, ListItem, 
-  ListItemText, Paper, Chip, IconButton, Button 
+  Box, 
+  Typography, 
+  List, 
+  ListItem, 
+  ListItemText, 
+  Divider, 
+  Paper, 
+  IconButton, 
+  Tooltip, 
+  Chip,
+  Alert 
 } from '@mui/material';
-import { formatDistanceToNow } from 'date-fns';
+import { 
+  History as HistoryIcon,
+  ArrowBack as ArrowBackIcon,
+  Replay as ReplayIcon,
+  AccessTime as AccessTimeIcon
+} from '@mui/icons-material';
 import { GameStateContext } from '../../../context/GameStateContext';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { getRelationshipTier } from '../../../config/relationshipConstants';
+import { formatDistanceToNow } from 'date-fns';
 
-const DialogueHistoryItem = ({ entry, onRevisit }) => {
-  const { dialogueId, choice, timestamp, relationshipChange } = entry;
-  
-  return (
-    <ListItem 
-      alignItems="flex-start"
-      sx={{
-        borderLeft: '3px solid',
-        borderLeftColor: relationshipChange > 0 ? 'success.main' : 
-                         relationshipChange < 0 ? 'error.main' : 
-                         'grey.300',
-        mb: 1,
-        bgcolor: 'background.paper',
-        borderRadius: '4px',
-      }}
-    >
-      <ListItemText
-        primary={
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <ArrowRightIcon fontSize="small" />
-            <Typography variant="subtitle2" sx={{ ml: 1 }}>
-              {choice}
-            </Typography>
-          </Box>
-        }
-        secondary={
-          <React.Fragment>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-              <Typography variant="caption" color="text.secondary">
-                {formatDistanceToNow(timestamp, { addSuffix: true })}
-              </Typography>
-              
-              {relationshipChange !== 0 && (
-                <Chip
-                  size="small"
-                  icon={relationshipChange > 0 ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-                  label={`Relationship ${relationshipChange > 0 ? '+' : ''}${relationshipChange}`}
-                  color={relationshipChange > 0 ? 'success' : 'error'}
-                  variant="outlined"
-                  sx={{ height: 20, fontSize: '0.7rem' }}
-                />
-              )}
-            </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-              {dialogueId}
-            </Typography>
-          </React.Fragment>
-        }
-      />
-      {/* "Revisit" button */}
-      <Button 
-        variant="text" 
-        onClick={() => onRevisit(dialogueId)}
-        disabled={dialogueId === 'unknown'} 
-        size="small"
-      >
-        Revisit
-      </Button>
-    </ListItem>
-  );
-};
-
+/**
+ * @component DialogueHistory
+ * @description Displays the history of dialogues between the player and a specific NPC.
+ * Allows players to revisit previous conversation branches.
+ * 
+ * @param {Object} props Component properties
+ * @param {string} props.npcId ID of the NPC whose dialogue history to display
+ * @param {Function} props.onRevisitDialogue Callback function when player wants to revisit a dialogue
+ * @returns {JSX.Element} Rendered component
+ */
 const DialogueHistory = ({ npcId, onRevisitDialogue }) => {
-  const { npcs } = useContext(GameStateContext);
-  const npc = npcs.find(n => n.id === npcId);
+  const { playerState, npcs } = useContext(GameStateContext);
   
-  if (!npc || !npc.dialogueHistory || npc.dialogueHistory.length === 0) {
+  // Get the specific NPC data
+  const npc = useMemo(() => 
+    npcs.find(n => n.id === npcId), 
+    [npcs, npcId]
+  );
+  
+  // Get dialogue history for this NPC
+  const dialogueHistory = useMemo(() => {
+    if (!playerState?.dialogueHistory || !npcId) return [];
+    
+    const history = playerState.dialogueHistory[npcId] || [];
+    // Sort by most recent first
+    return [...history].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  }, [playerState?.dialogueHistory, npcId]);
+  
+  // Track unique dialogue branches to avoid duplicates
+  const uniqueBranches = useMemo(() => {
+    const branches = new Set();
+    const uniqueEntries = [];
+    
+    dialogueHistory.forEach(entry => {
+      if (!branches.has(entry.dialogueBranch)) {
+        branches.add(entry.dialogueBranch);
+        uniqueEntries.push(entry);
+      }
+    });
+    
+    return uniqueEntries;
+  }, [dialogueHistory]);
+  
+  if (!npc) {
+    return <Alert severity="error">NPC not found</Alert>;
+  }
+  
+  if (dialogueHistory.length === 0) {
     return (
-      <Paper sx={{ p: 2, mt: 2 }}>
-        <Typography color="text.secondary">No previous conversations recorded.</Typography>
-      </Paper>
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <HistoryIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
+        <Typography variant="body2" color="text.secondary">
+          You haven't had any memorable conversations with {npc.name} yet.
+        </Typography>
+      </Box>
     );
   }
 
-  // Group conversations by day
-  const groupedHistory = npc.dialogueHistory.reduce((groups, entry) => {
-    const date = new Date(entry.timestamp).toDateString();
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(entry);
-    return groups;
-  }, {});
-
   return (
-    <Box sx={{ mt: 3 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Conversation History with {npc.name}
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <HistoryIcon sx={{ mr: 1 }} />
+        <Typography variant="h6">Conversation History with {npc.name}</Typography>
+      </Box>
+      
+      {/* Stats about interactions */}
+      <Paper variant="outlined" sx={{ p: 1.5, mb: 2, bgcolor: 'background.subtle' }}>
+        <Typography variant="body2">
+          First met: {formatDistanceToNow(
+            new Date(dialogueHistory[dialogueHistory.length - 1].timestamp),
+            { addSuffix: true }
+          )}
+        </Typography>
+        <Typography variant="body2">
+          Total interactions: {dialogueHistory.length}
+        </Typography>
+      </Paper>
+      
+      {/* Dialogue branches list */}
+      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+        Remembered Conversations:
       </Typography>
       
-      {Object.entries(groupedHistory).map(([date, entries], index) => (
-        <Box key={date} sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-            {date}
-          </Typography>
-          <List sx={{ p: 0 }}>
-            {entries.map((entry, i) => (
-              <DialogueHistoryItem 
-                key={i} 
-                entry={entry} 
-                onRevisit={onRevisitDialogue} 
+      <List sx={{ 
+        bgcolor: 'background.paper', 
+        borderRadius: 1,
+        maxHeight: '350px',
+        overflow: 'auto'
+      }}>
+        {uniqueBranches.map((entry, index) => (
+          <React.Fragment key={`${entry.dialogueBranch}-${index}`}>
+            {index > 0 && <Divider component="li" />}
+            <ListItem 
+              alignItems="flex-start"
+              secondaryAction={
+                <Tooltip title="Revisit this conversation">
+                  <IconButton 
+                    edge="end" 
+                    onClick={() => onRevisitDialogue(entry.dialogueBranch)}
+                  >
+                    <ReplayIcon />
+                  </IconButton>
+                </Tooltip>
+              }
+              sx={{ 
+                '&:hover': { bgcolor: 'action.hover' },
+                cursor: 'pointer'
+              }}
+              onClick={() => onRevisitDialogue(entry.dialogueBranch)}
+            >
+              <ListItemText
+                primary={
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                    <Typography variant="subtitle2" component="span" sx={{ mr: 1 }}>
+                      {npc.dialogue?.[entry.dialogueBranch]?.title || entry.dialogueBranch}
+                    </Typography>
+                    <Chip 
+                      label={entry.category || 'General'}
+                      size="small"
+                      variant="outlined"
+                      sx={{ fontSize: '0.7rem' }}
+                    />
+                  </Box>
+                }
+                secondary={
+                  <>
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                      sx={{
+                        display: 'inline',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical'
+                      }}
+                    >
+                      {npc.dialogue?.[entry.dialogueBranch]?.snippet || 'A conversation you had...'}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                      <AccessTimeIcon fontSize="small" sx={{ mr: 0.5, fontSize: 14, color: 'text.secondary' }} />
+                      <Typography variant="caption" color="text.secondary">
+                        {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
+                      </Typography>
+                    </Box>
+                  </>
+                }
               />
-            ))}
-          </List>
-          {index < Object.entries(groupedHistory).length - 1 && (
-            <Divider sx={{ my: 2 }} />
-          )}
-        </Box>
-      ))}
+            </ListItem>
+          </React.Fragment>
+        ))}
+      </List>
     </Box>
   );
 };
