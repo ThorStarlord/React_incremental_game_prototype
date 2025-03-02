@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useParams, useNavigate, Navigate, Outlet } from 'react-router-dom';
 import { Provider, useSelector } from 'react-redux';
 import store from '../store'; // Import your Redux store
 import GameContainer from '../layout/components/GameContainer';
@@ -25,19 +25,28 @@ import CompactTraitPanel from '../features/Traits/components/containers/CompactT
 import CompactCharacterPanel from '../features/Minions/components/ui/CompactCharacterPanel';
 import useMinionSimulation from '../features/Minions/hooks/useMinionSimulation';
 
-// New wrapper component for TownArea
-
+/**
+ * Wrapper component for TownArea that extracts townId from URL parameters
+ * @returns {JSX.Element} TownArea component with townId prop
+ */
 const TownAreaWrapper = () => {
   const { townId } = useParams();
   return <TownArea townId={townId} />;
 };
 
+/**
+ * Wrapper component for NPCEncounter that extracts npcId from URL parameters
+ * @returns {JSX.Element} NPCEncounter component with npcId prop
+ */
 const NPCEncounterWrapper = () => {
   const { npcId } = useParams();
   return <NPCEncounter npcId={npcId} />;
 };
 
-// New wrapper component for NPCPanel that correctly uses hooks
+/**
+ * Wrapper for NPCPanel that uses React Router hooks to get params and navigation
+ * @returns {JSX.Element} NPCPanel with proper props
+ */
 const NPCPanelWrapper = () => {
   const { npcId } = useParams();
   const navigate = useNavigate();
@@ -56,15 +65,71 @@ const NPCPanelWrapper = () => {
   );
 };
 
+/**
+ * Game layout component that wraps game-related routes with common UI elements
+ * @returns {JSX.Element} Layout with common game UI and outlet for nested routes
+ */
+const GameLayout = () => {
+  // Initialize hooks for game systems
+  useEssenceGeneration();
+  useTraitNotifications();
+  useMinionSimulation();
+  
+  return (
+    <GameContainer>
+      <BreadcrumbNav />
+      <EssenceDisplay position="top-right" />
+      <RelationshipNotification />
+      <TraitEffectNotification />
+      <Outlet /> {/* Nested routes will render here */}
+    </GameContainer>
+  );
+};
+
+/**
+ * Character management layout with character tab bar
+ * @returns {JSX.Element} Layout with character UI elements
+ */
+const CharacterLayout = () => {
+  return (
+    <>
+      <CharacterTabBar />
+      <CharacterManagementDrawer />
+      <Outlet />
+    </>
+  );
+};
+
+/**
+ * Main application router that defines all routes in the application
+ * @returns {JSX.Element} Router component tree
+ */
 const AppRouter = () => (
   <Provider store={store}>
     <Router>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<MainMenu />} />
-        <Route path="/game" element={<GameContainer />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/town/:townId" element={<TownAreaWrapper />} />
-        <Route path="/npc/:npcId" element={<NPCPanelWrapper />} />
+        
+        {/* Game routes with common layout */}
+        <Route path="/game" element={<GameLayout />}>
+          <Route index element={<WorldMap />} />
+          <Route path="town/:townId" element={<TownAreaWrapper />} />
+          <Route path="npc/:npcId" element={<NPCPanelWrapper />} />
+          <Route path="encounter/:npcId" element={<NPCEncounterWrapper />} />
+          
+          {/* Character management routes */}
+          <Route path="character" element={<CharacterLayout />}>
+            <Route index element={<PlayerStats />} />
+            <Route path="inventory" element={<InventoryList />} />
+            <Route path="traits" element={<TraitSystemWrapper />} />
+            <Route path="minions" element={<CompactCharacterPanel />} />
+          </Route>
+        </Route>
+        
+        {/* Fallback for undefined routes */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   </Provider>
