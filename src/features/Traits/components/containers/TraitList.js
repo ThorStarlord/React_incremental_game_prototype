@@ -10,7 +10,8 @@ import {
   Chip,
   Divider,
   LinearProgress,
-  IconButton
+  IconButton,
+  Alert
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
@@ -19,8 +20,10 @@ import Panel from '../../../../shared/components/layout/Panel';
 
 // TraitCard component with NPC source support
 const TraitCard = ({ id, trait, onAcquire, essence, isAcquired, npcs }) => {
-  // Find the source NPC if trait has one
-  const sourceNpc = trait.sourceNpc ? npcs.find(n => n.id === trait.sourceNpc) : null;
+  // Add safety check before calling find() on npcs
+  const sourceNpc = trait.sourceNpc && Array.isArray(npcs) 
+    ? npcs.find(n => n && n.id === trait.sourceNpc) 
+    : null;
   
   // Calculate adjusted cost based on NPC power level
   const adjustedCost = Math.round(trait.essenceCost * (sourceNpc?.powerLevel || 1));
@@ -110,9 +113,13 @@ const TraitCard = ({ id, trait, onAcquire, essence, isAcquired, npcs }) => {
 
 // Main TraitList component
 const TraitList = () => {
-  const { player, essence, traits, npcs } = useContext(GameStateContext);
+  // Access game state with safe default fallbacks
+  const { player = {}, essence = 0, traits = { copyableTraits: {} }, npcs = [] } = useContext(GameStateContext);
   const dispatch = useGameDispatch();
   const [filter, setFilter] = useState('all');
+  
+  // Make sure we have an array for player.acquiredTraits
+  const acquiredTraits = player?.acquiredTraits || [];
   
   // Handle acquiring a trait
   const handleAcquireTrait = (traitId, essenceCost) => {
@@ -128,15 +135,18 @@ const TraitList = () => {
     dispatch({
       type: 'SHOW_NOTIFICATION',
       payload: {
-        message: `Acquired trait: ${traits.copyableTraits[traitId]?.name}`,
+        message: `Acquired trait: ${traits.copyableTraits[traitId]?.name || 'New trait'}`,
         severity: 'success',
         duration: 3000
       }
     });
   };
   
+  // Get traits data safely
+  const copyableTraits = traits?.copyableTraits || {};
+  
   // Group traits by type for filtering
-  const groupedTraits = Object.entries(traits.copyableTraits || {}).reduce(
+  const groupedTraits = Object.entries(copyableTraits).reduce(
     (acc, [id, trait]) => {
       const type = trait.type || 'Other';
       if (!acc[type]) acc[type] = [];
@@ -149,52 +159,61 @@ const TraitList = () => {
   // Get trait types for filter options
   const traitTypes = Object.keys(groupedTraits);
   
+  // Check if there are any traits to display
+  const hasTraits = Object.keys(copyableTraits).length > 0;
+  
   return (
     <Panel title="Available Traits">
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', mb: 2, gap: 1, flexWrap: 'wrap' }}>
-          <Button 
-            variant={filter === 'all' ? 'contained' : 'outlined'} 
-            size="small" 
-            onClick={() => setFilter('all')}
-          >
-            All
-          </Button>
-          {traitTypes.map(type => (
+      {!hasTraits ? (
+        <Alert severity="info">
+          No traits are currently available. Continue exploring to discover new traits.
+        </Alert>
+      ) : (
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: 'flex', mb: 2, gap: 1, flexWrap: 'wrap' }}>
             <Button 
-              key={type}
-              variant={filter === type ? 'contained' : 'outlined'} 
+              variant={filter === 'all' ? 'contained' : 'outlined'} 
               size="small" 
-              color={type === 'Social' ? 'secondary' : 'primary'}
-              onClick={() => setFilter(type)}
+              onClick={() => setFilter('all')}
             >
-              {type}
+              All
             </Button>
-          ))}
+            {traitTypes.map(type => (
+              <Button 
+                key={type}
+                variant={filter === type ? 'contained' : 'outlined'} 
+                size="small" 
+                color={type === 'Social' ? 'secondary' : 'primary'}
+                onClick={() => setFilter(type)}
+              >
+                {type}
+              </Button>
+            ))}
+          </Box>
+          
+          <Grid container spacing={2}>
+            {Object.entries(copyableTraits).map(([id, trait]) => {
+              // Skip if filtered by type
+              if (filter !== 'all' && trait.type !== filter) return null;
+              
+              const isAcquired = acquiredTraits.includes(id);
+              
+              return (
+                <Grid item xs={12} sm={6} md={4} key={id}>
+                  <TraitCard
+                    id={id}
+                    trait={trait}
+                    onAcquire={handleAcquireTrait}
+                    essence={essence}
+                    isAcquired={isAcquired}
+                    npcs={Array.isArray(npcs) ? npcs : []} // Ensure npcs is always an array
+                  />
+                </Grid>
+              );
+            })}
+          </Grid>
         </Box>
-        
-        <Grid container spacing={2}>
-          {Object.entries(traits.copyableTraits || {}).map(([id, trait]) => {
-            // Skip if filtered by type
-            if (filter !== 'all' && trait.type !== filter) return null;
-            
-            const isAcquired = player.acquiredTraits.includes(id);
-            
-            return (
-              <Grid item xs={12} sm={6} md={4} key={id}>
-                <TraitCard
-                  id={id}
-                  trait={trait}
-                  onAcquire={handleAcquireTrait}
-                  essence={essence}
-                  isAcquired={isAcquired}
-                  npcs={npcs || []}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
-      </Box>
+      )}
     </Panel>
   );
 };

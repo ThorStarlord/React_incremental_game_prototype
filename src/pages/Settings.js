@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import { Container, Box, Typography, Switch, FormGroup, FormControlLabel, Button, Divider } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { ThemeContext } from '../context/ThemeContext';
-import Panel from './panel/Panel';
-import BreadcrumbNav from './BreadcrumbNav';
+import Panel from '../shared/components/layout/Panel';
+import BreadcrumbNav from '../shared/components/ui/BreadcrumbNav';
 
 const Settings = () => {
   const { darkMode, setDarkMode } = useContext(ThemeContext);

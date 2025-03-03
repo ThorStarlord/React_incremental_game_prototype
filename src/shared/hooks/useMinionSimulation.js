@@ -1,21 +1,26 @@
 import { useEffect, useContext } from 'react';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../context/GameStateContext';
 
 const useMinionSimulation = () => {
-  const { minions } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
+  // Add default empty array to prevent undefined.length issues
+  const { minions = [] } = useGameState();
+  const dispatch = useGameDispatch();
   
   // Three main simulation systems:
   
   // 1. Task progression - runs every 10 seconds
   useEffect(() => {
+    // Even with the default value above, add a guard clause for extra safety
+    if (!Array.isArray(minions)) return;
+    
     const progressInterval = setInterval(() => {
       minions.forEach(minion => {
-        // Skip minions that are idle or assisting
-        if (minion.task === 'idle' || minion.task === 'assist') return;
+        // Skip minions that are idle, assisting or invalid
+        if (!minion || minion.task === 'idle' || minion.task === 'assist') return;
         
-        // Calculate progress increment based on minion stats
-        const progressIncrement = 5 + (minion.intelligence * 0.5);
+        // Calculate progress increment based on minion stats with safe fallbacks
+        const intelligence = minion.intelligence || 0;
+        const progressIncrement = 5 + (intelligence * 0.5);
         
         dispatch({
           type: 'MINION_TASK_PROGRESS',
@@ -32,17 +37,21 @@ const useMinionSimulation = () => {
   
   // 2. Autonomous decision making - runs every minute
   useEffect(() => {
+    // Double-check minions is an array
+    if (!Array.isArray(minions)) return;
+    
     const decisionInterval = setInterval(() => {
       minions.forEach(minion => {
-        if (!minion.isIndependent) return;
+        if (!minion || !minion.isIndependent) return;
         
         // Occasionally change tasks based on intelligence and personality
         if (Math.random() < 0.2) { // 20% chance each minute
           const tasks = ['gather', 'explore', 'train'];
           
           // Higher intelligence minions favor more complex tasks
+          const intelligence = minion.intelligence || 0;
           let taskWeights;
-          if (minion.intelligence > 5) {
+          if (intelligence > 5) {
             taskWeights = [0.2, 0.5, 0.3]; // Prefer exploration
           } else {
             taskWeights = [0.6, 0.2, 0.2]; // Prefer gathering
@@ -84,16 +93,23 @@ const useMinionSimulation = () => {
   
   // 3. Assistance bonus calculation - runs every 30 seconds
   useEffect(() => {
+    // Triple-check minions is an array each time
+    if (!Array.isArray(minions)) return;
+    
     const assistInterval = setInterval(() => {
       // Calculate total assistance bonus from all assisting minions
-      const assistingMinions = minions.filter(m => m.task === 'assist');
+      const assistingMinions = minions.filter(m => m && m.task === 'assist');
       
       if (assistingMinions.length > 0) {
         // Sum up assistance bonus based on minion stats
         const totalAssistBonus = assistingMinions.reduce((total, minion) => {
+          const strength = minion.strength || 0;
+          const intelligence = minion.intelligence || 0;
+          const relationship = minion.relationship || 0;
+          
           return total + (
-            (minion.strength + minion.intelligence) / 20 * 
-            (minion.relationship / 100)
+            (strength + intelligence) / 20 * 
+            (relationship / 100)
           );
         }, 0);
         

@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { Breadcrumbs, Link, Typography, Box, useTheme, useMediaQuery, Chip, Button } from '@mui/material';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { towns } from '../../../modules/data';
-import HomeIcon from '@mui/material/Icon/Home';
-import SettingsIcon from '@mui/material/Icon/Settings';
-import LocationCityIcon from '@mui/material/Icon/LocationCity';
-import PersonIcon from '@mui/material/Icon/Person';
-import BugReportIcon from '@mui/material/Icon/BugReport';
+// Import icons correctly from @mui/icons-material
+import HomeIcon from '@mui/icons-material/Home';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
+import PersonIcon from '@mui/icons-material/Person';
+import BugReportIcon from '@mui/icons-material/BugReport';
+
+// Sample town data since the modules/data import doesn't exist
+const towns = [
+  { id: 'windhelm', name: 'Windhelm' },
+  { id: 'riverwood', name: 'Riverwood' },
+  { id: 'whiterun', name: 'Whiterun' },
+  { id: 'solitude', name: 'Solitude' }
+];
 
 /**
  * @component BreadcrumbNav

@@ -13,15 +13,15 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import PersonIcon from '@mui/material/Icon/Person';
-import SportsKabaddiIcon from '@mui/material/Icon/SportsKabaddi';
-import AutoFixHighIcon from '@mui/material/Icon/AutoFixHigh';
+import PersonIcon from '@mui/icons-material/Person';
+import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import IntegratedTraitsPanel from '../../../features/Traits/components/containers/IntegratedTraitsPanel';
-import NPCPanel from './npcs/NPCPanel';
+import NPCPanel from '../../../features/NPCs/components/container/NPCPanel';
 import CharactersPanel from '../../../features/Minions/components/ui/CharactersPanel';
 import { GameStateContext } from '../../../context/GameStateContext';
 import CharacterTabBar from './CharacterTabBar';
-import Panel from './Panel';
+import Panel from '../layout/Panel';
 
 /**
  * @component CharacterManagementDrawer
@@ -277,7 +277,7 @@ const CharacterManagementDrawer = ({ open, onClose, initialTab = "characters" })
                 disabledTabs={[]}
                 showLabels={true}
                 showLoadingIndicators={true}
-                customTabs={tabBarConfig.tabs}
+                customTabs={tabBarConfig.tabs}  // Changed from "tabs" to "customTabs"
               />
               
               {/* Content area */}

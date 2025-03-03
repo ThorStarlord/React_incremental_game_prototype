@@ -1,10 +1,10 @@
-import { useContext, useCallback } from 'react';
-import { GameStateContext, GameDispatchContext, useGameDispatch } from '../context/GameStateContext';
-import { ESSENCE_COSTS } from '../config/gameConstants';
+import { useContext, useCallback, useState } from 'react';
+import { useGameState, useGameDispatch } from '../../context/GameStateContext';
+import { RESOURCE_TYPES, GENERATION_RATES } from '../../constants/gameConstants';
 
 export const useEssenceManager = () => {
-  const { essence } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
+  const { essence = 0 } = useGameState();
+  const dispatch = useGameDispatch();
 
   const gainEssence = useCallback((amount) => {
     dispatch({ type: 'GAIN_ESSENCE', payload: amount });
@@ -31,8 +31,8 @@ export const useEssenceManager = () => {
 };
 
 export const useAffinityManager = () => {
-  const { affinities } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
+  const { affinities = {} } = useGameState();
+  const dispatch = useGameDispatch();
 
   const updateAffinity = useCallback((npcId, level) => {
     dispatch({ 
@@ -42,7 +42,7 @@ export const useAffinityManager = () => {
   }, [dispatch]);
 
   const getAffinityLevel = useCallback((npcId) => {
-    return affinities[npcId] || 'Stranger';
+    return affinities && affinities[npcId] ? affinities[npcId] : 'Stranger';
   }, [affinities]);
 
   return {
@@ -53,8 +53,8 @@ export const useAffinityManager = () => {
 };
 
 export const useFactionManager = () => {
-  const { factions } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
+  const { factions = [] } = useGameState();
+  const dispatch = useGameDispatch();
 
   const createFaction = useCallback((factionData) => {
     dispatch({
@@ -85,23 +85,20 @@ export const useFactionManager = () => {
 export const useNotification = () => {
   const dispatch = useGameDispatch();
   
+  const [notification, setNotification] = useState({ open: false });
+  
   /**
    * Display a notification to the user
    * 
-   * @param {string} message - The notification message
-   * @param {string} severity - Notification type (success, error, warning, info)
-   * @param {number} duration - How long the notification appears (milliseconds)
+   * @param {Object} notificationOptions - The notification options
    */
-  const notify = useCallback((message, severity = 'info', duration = 3000) => {
-    dispatch({
-      type: 'SHOW_NOTIFICATION',
-      payload: {
-        message,
-        severity,
-        duration
-      }
+  const showNotification = useCallback((notificationOptions) => {
+    setNotification({
+      open: notificationOptions.open || true,
+      message: notificationOptions.message || '',
+      severity: notificationOptions.severity || 'info'
     });
-  }, [dispatch]);
+  }, []);
   
-  return { notify };
+  return { notification, showNotification };
 };

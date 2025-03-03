@@ -8,13 +8,24 @@ import BreadcrumbNav from '../../../../shared/components/ui/BreadcrumbNav';
 import useThemeUtils from '../../../../shared/hooks/useThemeUtils';
 import { GameStateContext } from '../../../../context/GameStateContext';
 
+// Define towns data
+const towns = [
+  { id: 'oakhaven', name: 'Oakhaven', description: 'A peaceful village nestled among ancient oak trees.' },
+  { id: 'riverwood', name: 'Riverwood', description: 'A small settlement by the flowing river.' },
+  { id: 'stonefangHold', name: 'Stonefang Hold', description: 'A fortress carved into the mountain.' },
+  { id: 'saltyWharf', name: 'Salty Wharf', description: 'A coastal trading port with bustling markets.' }
+];
+
 const TownArea = ({ townId }) => {
   const navigate = useNavigate();
   const { getProgressColor } = useThemeUtils();
-  const { npcs: gameNpcs } = useContext(GameStateContext);
+  const { npcs: gameNpcs = [] } = useContext(GameStateContext);
   const town = towns.find(t => t.id === townId);
 
-  const townNpcs = gameNpcs.filter(npc => npc.location === townId);
+  // Add safety check to ensure gameNpcs is an array before filtering
+  const townNpcs = Array.isArray(gameNpcs) 
+    ? gameNpcs.filter(npc => npc && npc.location === townId)
+    : [];
 
   const getRelationshipColor = (value) => {
     if (value >= 60) return '#4CAF50';

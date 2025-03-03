@@ -92,7 +92,7 @@ const QuestsPage = () => {
   
   // Redux selectors and dispatch
   const player = useSelector(state => state.player);
-  const npcs = useSelector(state => state.npcs);
+  const npcs = useSelector(state => state.npcs) || [];
   const dispatch = useDispatch();
   
   // Extract active and completed quests from player state
@@ -163,7 +163,7 @@ const QuestsPage = () => {
               </Typography>
             ) : (
               activeQuests.map(quest => {
-                const npc = npcs.find(n => n.id === quest.npcId);
+                const npc = Array.isArray(npcs) ? npcs.find(n => n && n.id === quest.npcId) : null;
                 const isComplete = quest.objectives?.every(obj => obj.progress >= obj.count);
                 
                 return (

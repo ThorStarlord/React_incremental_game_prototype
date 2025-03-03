@@ -1,241 +1,199 @@
-// src/components/GameContainer.js
+import React, { useState, useContext, useEffect } from 'react';
+import { Box, Grid, Typography, useMediaQuery, useTheme, Drawer, IconButton, Tooltip, Paper } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
+import PersonIcon from '@mui/icons-material/Person';
 
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
-import { Box, Grid, AppBar, Toolbar, Typography, IconButton, Snackbar, Tooltip } from '@mui/material';
-// Fix the PlayerStats import path - try the Player directory with proper capitalization
-import PlayerStats from '../../features/Player/components/containers/PlayerStats';
-import WorldMap from '../../features/World/components/containers/WorldMap';
-import InventoryList from '../InventoryList';
-import EssenceDisplay from '../EssenceDisplay';
-import TraitSystemWrapper from '../trait/TraitSystemWrapper';
-import Panel from '../panel/Panel';
-import BreadcrumbNav from '../BreadcrumbNav';
-import useEssenceGeneration from '../../hooks/useEssenceGeneration';
-import RelationshipNotification from '../../features/npc/components/RelationshipNotification';
-import TraitEffectNotification from '../trait/TraitEffectNotification';
-import useTraitNotifications from '../../hooks/useTraitNotifications';
-import CharacterTabBar from '../CharacterTabBar';
-import CharacterManagementDrawer from '../CharacterManagementDrawer';
-import CompactTraitPanel from '../trait/CompactTraitPanel';
-import CompactCharacterPanel from '../characters/CompactCharacterPanel';
-import useMinionSimulation from '../../hooks/useMinionSimulation';
-import './GameContainer.css'; // Assuming there will be styling
+// Import the correct modules with proper paths
+import InventoryList from '../../features/Inventory/components/containers/InventoryList';
+import EssenceDisplay from '../../features/Essence/components/ui/EssenceDisplay';
+import TraitSystemWrapper from '../../features/Traits/components/containers/TraitSystemWrapper';
+import Panel from '../../shared/components/layout/Panel';
+import BreadcrumbNav from '../../shared/components/ui/BreadcrumbNav';
+import useEssenceGeneration from '../../shared/hooks/useEssenceGeneration';
+import RelationshipNotification from '../../features/NPCs/components/RelationshipNotification';
+import TraitEffectNotification from '../../features/Traits/components/containers/TraitEffectNotification';
+import useTraitNotifications from '../../shared/hooks/useTraitNotifications';
+import CharacterTabBar from '../../shared/components/ui/CharacterTabBar';
+import CharacterManagementDrawer from '../../shared/components/ui/CharacterManagementDrawer';
+import CompactTraitPanel from '../../features/Traits/components/containers/CompactTraitPanel';
+import CompactCharacterPanel from '../../features/Minions/components/ui/CompactCharacterPanel';
+import useMinionSimulation from '../../shared/hooks/useMinionSimulation';
+
+// Import the CSS module with the correct name
+import styles from './GameContainer.module.css';
+
+// Import Context
+import { GameStateContext, useGameDispatch } from '../../context/GameStateContext';
 
 /**
  * GameContainer Component
  * 
  * @component
  * @description
- * Main container for the incremental RPG game. This component serves as the parent
- * container for all game-related UI components and manages the overall layout.
- * It includes a basic game loop implementation and supports theming options.
- *
- * @example
- * return (
- *   <GameContainer 
- *     title="My Incremental RPG"
- *     theme="dark"
- *   >
- *     <GamePanel />
- *     <ResourcePanel />
- *   </GameContainer>
- * )
+ * Main layout component for the game interface. Organizes the game UI into
+ * three columns: left sidebar, main content area, and right sidebar.
+ * 
+ * Features:
+ * - Responsive layout that adapts to different screen sizes
+ * - Organized sections for different game features
+ * - Integration with game state and hooks for real-time updates
+ * - Support for notifications and interactive UI elements
+ * - Collapsible sections for better space management
+ * 
+ * @returns {JSX.Element} The game container UI layout
  */
-const GameContainer = ({ 
-  children,
-  title = 'Incremental RPG',
-  theme = 'light',
-  fullScreen = false,
-  className = '',
-  onGameTick = () => {},
-}) => {
-  const navigate = useNavigate();
-  // Get essence generation rate from the hook
-  const { totalRate } = useEssenceGeneration();
-  const { notification, hideNotification } = useTraitNotifications();
-  
+const GameContainer = () => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [initialTab, setInitialTab] = useState(0);
+  const [characterDrawerOpen, setCharacterDrawerOpen] = useState(false);
+  const { player, world } = useContext(GameStateContext);
+  const dispatch = useGameDispatch();
   
-  const handleTownSelect = (townId) => {
-    navigate(`/town/${townId}`);
-  };
-  
-  const handleOpenDrawer = (tabIndex) => {
-    setInitialTab(tabIndex);
-    setDrawerOpen(true);
-  };
-  
-  const handleCloseDrawer = () => {
-    setDrawerOpen(false);
-  };
-
-  // Enable minion simulation
+  // Hook for simulating minion activities over time
   useMinionSimulation();
+  
+  // Hook for essence generation over time
+  const { essenceRate, generateEssence } = useEssenceGeneration();
+  
+  // Hook for trait notifications
+  const { notifications, dismissNotification } = useTraitNotifications();
+  
+  // Toggle character management drawer
+  const toggleCharacterDrawer = () => {
+    setCharacterDrawerOpen(!characterDrawerOpen);
+  };
 
-  // Game tick state for handling game loop
-  const [gameTick, setGameTick] = useState(0);
-  
-  /**
-   * Game loop using useEffect
-   * Sets up the main game loop that triggers onGameTick at regular intervals
-   */
+  // Auto-generate essence over time
   useEffect(() => {
-    const gameLoopInterval = setInterval(() => {
-      setGameTick(prevTick => prevTick + 1);
-      onGameTick(gameTick);
-    }, 1000); // 1-second tick rate
+    const essenceInterval = setInterval(() => {
+      generateEssence();
+    }, 10000);
     
-    return () => clearInterval(gameLoopInterval);
-  }, [onGameTick, gameTick]);
-  
-  const containerClasses = [
-    'game-container',
-    `theme-${theme}`,
-    fullScreen ? 'fullscreen' : '',
-    className
-  ].filter(Boolean).join(' ');
+    return () => clearInterval(essenceInterval);
+  }, [generateEssence]);
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }} className={containerClasses} data-testid="game-container">
-      <header className="game-header">
-        <h1>{title}</h1>
-      </header>
-      
-      <main className="game-content">
-        {children}
-      </main>
-      
-      <footer className="game-footer">
-        <div className="game-info">
-          <span>Tick: {gameTick}</span>
-        </div>
-      </footer>
-
-      {/* Header with quick access icons */}
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Incremental RPG
-          </Typography>
-          
-          {/* Quick access icons */}
-          <IconButton 
-            color="inherit" 
-            onClick={() => handleOpenDrawer(0)}
-            sx={{ mr: 1 }}
-            aria-label="Characters"
-          >
-            <Tooltip title="Characters">
-              <SportsKabaddiIcon />
-            </Tooltip>
-          </IconButton>
-          
-          <IconButton 
-            color="inherit" 
-            onClick={() => handleOpenDrawer(1)}
-            sx={{ mr: 1 }}
-            aria-label="NPCs"
-          >
-            <Tooltip title="NPCs">
-              <PersonIcon />
-            </Tooltip>
-          </IconButton>
-          
-          <IconButton 
-            color="inherit" 
-            onClick={() => handleOpenDrawer(2)}
-            aria-label="Traits"
-          >
-            <Tooltip title="Traits">
-              <AutoFixHighIcon />
-            </Tooltip>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      
-      {/* Main content */}
-      <Box sx={{ p: 2, flexGrow: 1, overflow: 'auto' }}>
-        <RelationshipNotification />
-        <TraitEffectNotification
-          effect={notification}
-          open={!!notification}
-          onClose={hideNotification}
-        />
+    <Box className={styles['game-container']}>
+      {/* Header */}
+      <Box id="header" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <BreadcrumbNav />
-        <Grid container spacing={2} sx={{ flexGrow: 1 }}>
-          {/* Left Panel - Player Stats */}
-          <Grid item xs={12} md={3}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <PlayerStats />
-              <EssenceDisplay generationRate={totalRate} />
-              <InventoryList />
-            </Box>
-          </Grid>
+        
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <EssenceDisplay essenceRate={essenceRate} />
           
-          {/* Center Panel - Game World */}
-          <Grid item xs={12} md={6}>
-            <Panel title="Game World" sx={{ height: '100%' }}>
-              <WorldMap onTownSelect={handleTownSelect} />
-            </Panel>
-          </Grid>
-          
-          {/* Right Panel - Traits and Characters */}
-          <Grid item xs={12} md={3}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <CompactTraitPanel onExpandView={() => handleOpenDrawer(2)} />
-              <CompactCharacterPanel onExpandView={() => handleOpenDrawer(0)} />
-            </Box>
-          </Grid>
-        </Grid>
+          {isSmallScreen && (
+            <IconButton onClick={() => setDrawerOpen(true)} color="primary">
+              <MenuIcon />
+            </IconButton>
+          )}
+        </Box>
       </Box>
       
-      {/* Character management tab bar */}
-      <CharacterTabBar onOpenDrawer={handleOpenDrawer} />
+      {/* Main Game Area */}
+      <Box id="bottom-windows" className={styles['bottom-windows']}>
+        {/* Left Column - Only shown on desktop or in drawer on mobile */}
+        {!isSmallScreen ? (
+          <Box id="left-column" className={styles.column}>
+            <Panel title="Character">
+              <CompactCharacterPanel />
+              
+              <Box sx={{ mt: 2 }}>
+                <Tooltip title="Open Character Management">
+                  <IconButton 
+                    onClick={toggleCharacterDrawer} 
+                    color="primary"
+                    sx={{ width: '100%', border: '1px dashed', borderColor: 'divider' }}
+                  >
+                    <PersonIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Panel>
+            
+            <Box sx={{ mt: 2 }}>
+              <Panel title="Traits">
+                <CompactTraitPanel />
+              </Panel>
+            </Box>
+            
+            <Box sx={{ mt: 2 }}>
+              <Panel title="Inventory">
+                <InventoryList compact />
+              </Panel>
+            </Box>
+          </Box>
+        ) : (
+          <Drawer 
+            anchor="left" 
+            open={drawerOpen} 
+            onClose={() => setDrawerOpen(false)}
+          >
+            <Box sx={{ width: 280, p: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <BreadcrumbNav />
+                <IconButton onClick={() => setDrawerOpen(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+              <CompactCharacterPanel />
+              <Box sx={{ mt: 2 }}>
+                <CompactTraitPanel />
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <InventoryList compact />
+              </Box>
+            </Box>
+          </Drawer>
+        )}
+        
+        {/* Middle Column - Game Content */}
+        <Box id="middle-column" className={styles.column}>
+          <Panel title="Game World">
+            {world && world.currentArea ? (
+              <Box>
+                <Typography variant="h6">{world.currentArea.name}</Typography>
+                <Typography variant="body2">{world.currentArea.description}</Typography>
+                
+                {/* Game content would go here */}
+                <Box sx={{ mt: 2, p: 2, border: '1px dashed', borderColor: 'divider' }}>
+                  Main game content area
+                </Box>
+              </Box>
+            ) : (
+              <Paper sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="h6" gutterBottom>Welcome to the Game World</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Select an area from the world map to begin exploring.
+                </Typography>
+              </Paper>
+            )}
+          </Panel>
+        </Box>
+        
+        {/* Right Column */}
+        <Box id="right-column" className={styles.column}>
+          <Panel title="System">
+            <TraitSystemWrapper />
+          </Panel>
+        </Box>
+      </Box>
       
-      {/* Character management drawer */}
-      <CharacterManagementDrawer 
-        open={drawerOpen} 
-        onClose={handleCloseDrawer} 
-        initialTab={initialTab} 
+      {/* Character Management Drawer */}
+      <CharacterManagementDrawer
+        open={characterDrawerOpen}
+        onClose={() => setCharacterDrawerOpen(false)}
+      />
+      
+      {/* Notifications */}
+      <RelationshipNotification />
+      <TraitEffectNotification 
+        notifications={notifications}
+        onDismiss={dismissNotification}
       />
     </Box>
   );
-};
-
-GameContainer.propTypes = {
-  /**
-   * Child components to render inside the game container
-   */
-  children: PropTypes.node,
-  
-  /**
-   * The title of the game to display in the header
-   */
-  title: PropTypes.string,
-  
-  /**
-   * Theme variant ('light', 'dark', etc.)
-   */
-  theme: PropTypes.string,
-  
-  /**
-   * Whether the game should take up the full screen
-   */
-  fullScreen: PropTypes.bool,
-  
-  /**
-   * Additional CSS class names
-   */
-  className: PropTypes.string,
-  
-  /**
-   * Callback function that gets called on each game tick
-   * @param {number} tick - The current tick count
-   */
-  onGameTick: PropTypes.func,
 };
 
 export default GameContainer;

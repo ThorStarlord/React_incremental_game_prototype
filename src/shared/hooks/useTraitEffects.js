@@ -1,5 +1,5 @@
 import { useContext, useMemo } from 'react';
-import { GameStateContext } from '../context/GameStateContext';
+import { GameStateContext } from '../../context/GameStateContext';
 
 /**
  * A custom hook that calculates and provides trait effects based on equipped traits
@@ -229,55 +229,3 @@ const useTraitEffects = () => {
 };
 
 export default useTraitEffects;
-
-// Example usage in a Combat component
-import React from 'react';
-import useTraitEffects from '../hooks/useTraitEffects';
-
-const Combat = () => {
-  const { modifiers, checkTraitEffectTrigger, getModifiedStat } = useTraitEffects();
-  
-  const handleAttack = () => {
-    // Check if player dodges based on trait effects
-    if (checkTraitEffectTrigger('dodge')) {
-      console.log('You dodged the attack!');
-    }
-    
-    // Apply attack bonus from traits
-    const baseAttack = 10;
-    const modifiedAttack = getModifiedStat('attack', baseAttack);
-    console.log(`Attack power: ${baseAttack} → ${modifiedAttack}`);
-  };
-  
-  return (
-    <div>
-      <h2>Combat</h2>
-      {modifiers.dodgeChance > 0 && (
-        <p>Dodge chance: {(modifiers.dodgeChance * 100).toFixed(1)}%</p>
-      )}
-      <button onClick={handleAttack}>Attack</button>
-    </div>
-  );
-};
-
-// Example usage in a LevelUp component
-import React from 'react';
-import useTraitEffects from '../hooks/useTraitEffects';
-
-const LevelUp = () => {
-  const { getAdditionalStatPoints } = useTraitEffects();
-  const baseStatPoints = 3;
-  const additionalPoints = getAdditionalStatPoints();
-  
-  return (
-    <div>
-      <h2>Level Up!</h2>
-      <p>
-        Stat Points Available: {baseStatPoints}
-        {additionalPoints > 0 && (
-          <span style={{ color: 'green' }}> +{additionalPoints} (from traits)</span>
-        )}
-      </p>
-    </div>
-  );
-};

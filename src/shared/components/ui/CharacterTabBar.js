@@ -20,14 +20,14 @@ import {
   Card,
   CardContent
 } from '@mui/material';
-import PersonIcon from '@mui/material/Icon/Person';
-import InventoryIcon from '@mui/material/Icon/Inventory';
-import FitnessCenterIcon from '@mui/material/Icon/FitnessCenter';
-import ShieldIcon from '@mui/material/Icon/Shield';
-import AssignmentIcon from '@mui/material/Icon/Assignment';
-import MenuBookIcon from '@mui/material/Icon/MenuBook';
-import StarIcon from '@mui/material/Icon/Star';
-import BugReportIcon from '@mui/material/Icon/BugReport';
+import PersonIcon from '@mui/icons-material/Person';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import ShieldIcon from '@mui/icons-material/Shield';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import StarIcon from '@mui/icons-material/Star';
+import BugReportIcon from '@mui/icons-material/BugReport';
 
 /**
  * @component TabPanel
@@ -158,7 +158,7 @@ const CharacterTabBar = ({
 
   /**
    * Test case configurations to demonstrate different scenarios
-   * @type {Array<{name: string, description: string, defaultTab: string, notifications: Object, disabledTabs: Array<string>}>}
+   * @type {Array<{name: string, description: string, defaultTab: string, notifications: Object, disabledTabs: Array<string}>}>
    */
   const testCases = [
     {
@@ -437,6 +437,9 @@ const CharacterTabBar = ({
    * @param {React.KeyboardEvent} event - Keyboard event
    */
   const handleKeyDown = (event) => {
+    // Ensure tabs is defined before attempting to use it
+    if (!tabs) return;
+    
     // Support left/right arrow keys for tab navigation
     const currentIndex = tabs.findIndex(tab => tab.key === activeTab);
     
@@ -685,7 +688,7 @@ const CharacterTabBar = ({
               },
             }}
           >
-            {tabs.map((tab) => (
+            {tabs && tabs.map((tab) => (
               <Tooltip 
                 key={tab.key} 
                 title={effectiveDisabledTabs.includes(tab.key) ? "Locked" : tab.tooltip}
@@ -715,7 +718,7 @@ const CharacterTabBar = ({
         
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h6" component="h2">
-            {tabs.find(tab => tab.key === activeTab)?.label || ''}
+            {tabs && tabs.find(tab => tab.key === activeTab)?.label || ''}
           </Typography>
           
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -745,7 +748,7 @@ const CharacterTabBar = ({
           }}
         >
           {/* Render each tab panel - they handle their own visibility */}
-          {tabs.map(tab => (
+          {tabs && tabs.map(tab => (
             <TabPanel key={tab.key} value={activeTab} tabKey={tab.key}>
               {/* Display tab content if available, otherwise show placeholder */}
               {tabContent[tab.key] || (

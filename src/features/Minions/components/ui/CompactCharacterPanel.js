@@ -61,8 +61,8 @@ import Panel from '../../../../shared/components/layout/Panel';
  * @returns {JSX.Element} Rendered CompactCharacterPanel component
  */
 const CompactCharacterPanel = ({ onExpandView }) => {
-  // Access game state from context
-  const { npcs, player } = useContext(GameStateContext);
+  // Access game state from context with safe default fallback values
+  const { npcs = [], player = {} } = useContext(GameStateContext);
   
   /**
    * Filters the list of NPCs to find characters controlled by the player
@@ -72,10 +72,18 @@ const CompactCharacterPanel = ({ onExpandView }) => {
    * 
    * @type {Character[]}
    */
-  const controlledCharacterIds = player?.controlledCharacters || [];
-  const controlledCharacters = npcs
-    .filter(npc => controlledCharacterIds.includes(npc.id) || npc.playerControlled)
-    .slice(0, 3); // Show only first 3 in compact view
+  const controlledCharacterIds = Array.isArray(player?.controlledCharacters) 
+    ? player.controlledCharacters
+    : [];
+    
+  const controlledCharacters = Array.isArray(npcs) 
+    ? npcs.filter(npc => 
+        npc && (
+          (Array.isArray(controlledCharacterIds) && controlledCharacterIds.includes(npc.id)) || 
+          npc.playerControlled
+        )
+      ).slice(0, 3) // Show only first 3 in compact view
+    : []; // Empty array fallback if npcs is not an array
   
   /**
    * Total count of all controlled characters (not just the visible ones)
@@ -83,9 +91,14 @@ const CompactCharacterPanel = ({ onExpandView }) => {
    * 
    * @type {number}
    */
-  const totalControlled = npcs.filter(npc => 
-    controlledCharacterIds.includes(npc.id) || npc.playerControlled
-  ).length;
+  const totalControlled = Array.isArray(npcs) 
+    ? npcs.filter(npc => 
+        npc && (
+          (Array.isArray(controlledCharacterIds) && controlledCharacterIds.includes(npc.id)) || 
+          npc.playerControlled
+        )
+      ).length
+    : 0;
   
   return (
     <Panel 

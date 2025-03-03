@@ -1,4 +1,4 @@
-import { RELATIONSHIP_TIERS } from '../config/gameConstants';
+import { RELATIONSHIP_TIERS } from '../constants/gameConstants';
 
 /**
  * Returns the relationship tier object based on relationship value

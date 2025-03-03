@@ -1,327 +1,204 @@
-import React, { useState } from 'react';
-import { Box, Typography, Tooltip, Grid } from '@mui/material';
-import { DndContext, useDraggable, useDroppable, closestCenter, DragOverlay } from '@dnd-kit/core';
-import { useGameState, useGameDispatch } from '../../../../context/GameStateContext';
+import React, { useState, useContext } from 'react';
+import { 
+  Box, Typography, Grid, Button, Divider, 
+  Tabs, Tab, Badge, Chip, LinearProgress
+} from '@mui/material';
+import { GameStateContext, useGameDispatch, useGameState } from '../../../../context/GameStateContext';
 import Panel from '../../../../shared/components/layout/Panel';
-import { itemsCatalog, ITEM_RARITIES } from '../../itemsInitialState';
-
-// Individual inventory item component
-const InventoryItem = ({ itemInstance, id, isOverlay = false }) => {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id,
-    disabled: isOverlay
-  });
-  
-  // Get the full item data from catalog using itemId reference
-  const item = itemInstance ? itemsCatalog[itemInstance.itemId] : null;
-  
-  // Define border color based on item rarity
-  const getBorderColorFromRarity = (rarity) => {
-    switch(rarity) {
-      case ITEM_RARITIES.UNCOMMON: return '#1eff00'; // Green
-      case ITEM_RARITIES.RARE: return '#0070dd'; // Blue
-      case ITEM_RARITIES.EPIC: return '#a335ee'; // Purple
-      case ITEM_RARITIES.LEGENDARY: return '#ff8000'; // Orange
-      default: return 'grey.400'; // Common/default
-    }
-  };
-  
-  const itemStyles = {
-    p: 1,
-    border: '1px solid',
-    borderColor: item ? getBorderColorFromRarity(item.rarity) : 'divider',
-    borderRadius: 1,
-    bgcolor: 'background.paper',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '80px',
-    width: '80px',
-    cursor: 'grab',
-    position: 'relative',
-    opacity: isDragging ? 0.4 : 1,
-    boxShadow: item?.rarity === ITEM_RARITIES.RARE ? '0 0 5px #0070dd' :
-               item?.rarity === ITEM_RARITIES.EPIC ? '0 0 5px #a335ee' :
-               item?.rarity === ITEM_RARITIES.LEGENDARY ? '0 0 5px #ff8000' : 'none',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    '&:hover': {
-      transform: 'scale(1.05)',
-      boxShadow: 'md',
-    }
-  };
-
-  // Display durability for equipment if applicable
-  const showDurability = item && 
-    (item.category === 'weapon' || item.category === 'armor') && 
-    itemInstance.durability !== undefined;
-
-  const content = (
-    <Box sx={itemStyles} ref={!isOverlay ? setNodeRef : undefined} {...(!isOverlay ? attributes : {})} {...(!isOverlay ? listeners : {})}>
-      {item ? (
-        <>
-          <Typography variant="subtitle2" noWrap sx={{ fontWeight: 'bold', fontSize: '0.75rem', mb: 0.5 }}>
-            {item.name}
-          </Typography>
-          <Box 
-            component="img" 
-            src={`/images/items/${item.icon}.png`}
-            alt={item.name} 
-            sx={{ width: 40, height: 40, objectFit: 'contain' }}
-            onError={(e) => {
-              // Fallback image if the item image fails to load
-              e.target.src = `/images/items/default_${item.category}.png`;
-              // Second fallback
-              e.target.onerror = () => {
-                e.target.src = 'https://via.placeholder.com/40?text=Item';
-                e.target.onerror = null;
-              };
-            }}
-          />
-          {itemInstance.quantity > 1 && (
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                position: 'absolute', 
-                bottom: 5, 
-                right: 5, 
-                bgcolor: 'rgba(0,0,0,0.6)',
-                color: 'white',
-                borderRadius: '50%',
-                width: 20,
-                height: 20,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
-            >
-              {itemInstance.quantity}
-            </Typography>
-          )}
-          
-          {showDurability && (
-            <Box 
-              sx={{
-                position: 'absolute',
-                bottom: 2,
-                left: 2,
-                right: 2,
-                height: 3,
-                bgcolor: 'grey.300',
-                borderRadius: 1,
-              }}
-            >
-              <Box 
-                sx={{
-                  height: '100%',
-                  width: `${(itemInstance.durability / item.stats.durability) * 100}%`,
-                  bgcolor: (itemInstance.durability / item.stats.durability) > 0.5 ? 'success.main' : 
-                           (itemInstance.durability / item.stats.durability) > 0.2 ? 'warning.main' : 'error.main',
-                  borderRadius: 1,
-                }}
-              />
-            </Box>
-          )}
-        </>
-      ) : (
-        <Box sx={{ 
-          width: '100%', 
-          height: '100%', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          border: '1px dashed',
-          borderColor: 'divider',
-          borderRadius: 1,
-        }}>
-          <Typography variant="caption" color="text.secondary">Empty</Typography>
-        </Box>
-      )}
-    </Box>
-  );
-
-  if (!item) return content;
-
-  return (
-    <Tooltip 
-      title={
-        <Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: getBorderColorFromRarity(item.rarity) }}>
-            {item.name}
-          </Typography>
-          <Typography variant="caption" sx={{ display: 'block', mb: 1, fontStyle: 'italic' }}>
-            {item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)} {item.category}
-            {item.levelReq > 1 ? ` (Requires Level ${item.levelReq})` : ''}
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 1 }}>{item.description}</Typography>
-          
-          {/* Show stats if applicable */}
-          {item.stats && (
-            <Box sx={{ mb: 1 }}>
-              {Object.entries(item.stats).map(([stat, value], index) => (
-                stat !== 'durability' && (
-                  <Typography key={index} variant="caption" component="div">
-                    {stat.charAt(0).toUpperCase() + stat.slice(1)}: {value > 0 ? `+${value}` : value}
-                  </Typography>
-                )
-              ))}
-              
-              {/* Show durability for equipment */}
-              {showDurability && (
-                <Typography variant="caption" component="div">
-                  Durability: {itemInstance.durability}/{item.stats.durability}
-                </Typography>
-              )}
-            </Box>
-          )}
-          
-          {/* Show value */}
-          <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-            Value: {item.value} gold
-          </Typography>
-          
-          {/* Usage instructions for consumables */}
-          {item.category === 'consumable' && (
-            <Typography variant="caption" component="div" color="info.main" sx={{ mt: 0.5 }}>
-              Right-click to use
-            </Typography>
-          )}
-        </Box>
-      }
-      arrow
-      placement="top"
-    >
-      {content}
-    </Tooltip>
-  );
-};
-
-// Individual slot in the inventory grid
-const InventorySlot = ({ id, children }) => {
-  const { isOver, setNodeRef } = useDroppable({
-    id
-  });
-  
-  return (
-    <Box 
-      ref={setNodeRef} 
-      sx={{ 
-        width: '90px', 
-        height: '90px', 
-        m: 0.5,
-        p: 0.5,
-        bgcolor: isOver ? 'action.hover' : 'transparent',
-        border: '1px dashed',
-        borderColor: isOver ? 'primary.main' : 'divider',
-        borderRadius: 1,
-        transition: 'all 0.2s'
-      }}
-    >
-      {children}
-    </Box>
-  );
-};
+import InventoryItem from '../presentation/InventoryItem';
+import ItemDetailsDialog from '../presentation/ItemDetailsDialog';
+import InventorySlot from '../presentation/InventorySlot';
+import { safeArrayLength, ensureArray } from '../../../../utils/safeArrayUtils';
 
 const InventoryList = () => {
-  // Get inventory from game state using the hooks
-  const { inventory } = useGameState();
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [currentTab, setCurrentTab] = useState(0);
+  
+  // Safely access game state with default values
+  const { player = {}, inventory = { maxSlots: 20 }, resources = {} } = useGameState();
   const dispatch = useGameDispatch();
 
-  // For showing the dragged item
-  const [activeId, setActiveId] = useState(null);
+  // Safely access player inventory with defaults
+  const playerInventory = ensureArray(player?.inventory);
   
-  // Get the active item for the overlay
-  const getActiveIndex = () => activeId ? parseInt(activeId.split('-')[1]) : -1;
-  const activeItem = activeId ? inventory.items[getActiveIndex()] : null;
-
-  // Empty slots to fill the inventory grid if needed
-  const totalSlots = inventory.maxSlots || 20;
-  const filledItems = [...inventory.items];
-  while (filledItems.length < totalSlots) {
-    filledItems.push(null);
-  }
-
-  // Handle item drag end
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    
-    if (!active || !over) {
-      setActiveId(null);
-      return;
-    }
-    
-    const activeIndex = parseInt(active.id.split('-')[1]);
-    const overIndex = parseInt(over.id.split('-')[1]);
-    
-    if (activeIndex !== overIndex) {
-      // Dispatch action to move item in inventory
-      dispatch({
-        type: 'MOVE_INVENTORY_ITEM',
-        payload: {
-          fromIndex: activeIndex,
-          toIndex: overIndex
-        }
-      });
-    }
-    
-    setActiveId(null);
+  // Safely determine maximum inventory slots with fallback value
+  const maxSlots = inventory?.maxSlots || 20;
+  const usedSlots = safeArrayLength(playerInventory);
+  const remainingSlots = Math.max(0, maxSlots - usedSlots);
+  
+  // Item categories for filtering
+  const categories = [
+    { id: 'all', label: 'All' },
+    { id: 'weapon', label: 'Weapons' },
+    { id: 'armor', label: 'Armor' },
+    { id: 'consumable', label: 'Consumables' },
+    { id: 'material', label: 'Materials' },
+    { id: 'quest', label: 'Quest Items' }
+  ];
+  
+  // Handle tab change for category filtering
+  const handleTabChange = (event, newValue) => {
+    setCurrentTab(newValue);
   };
-
-  const handleDragStart = (event) => {
-    setActiveId(event.active.id);
+  
+  // Get current category for filtering
+  const currentCategory = categories[currentTab]?.id || 'all';
+  
+  // Filter items based on selected category
+  const filteredItems = currentCategory === 'all' 
+    ? playerInventory 
+    : playerInventory.filter(item => item?.category === currentCategory);
+  
+  // Handle selecting an item to view details
+  const handleSelectItem = (item) => {
+    setSelectedItem(item);
+    setDetailsOpen(true);
   };
-
-  // Handle right click to use item
-  const handleContextMenu = (e, itemIndex) => {
-    e.preventDefault();
-    const itemInstance = inventory.items[itemIndex];
-    
-    if (!itemInstance) return;
-    
-    const item = itemsCatalog[itemInstance.itemId];
-
-    if (item?.category === 'consumable') {
-      // Dispatch action to use item
+  
+  // Handle closing the details dialog
+  const handleCloseDetails = () => {
+    setDetailsOpen(false);
+  };
+  
+  // Handle using an item
+  const handleUseItem = (itemId) => {
+    dispatch({
+      type: 'USE_ITEM',
+      payload: { itemId }
+    });
+    setDetailsOpen(false);
+  };
+  
+  // Handle dropping/discarding an item
+  const handleDropItem = (itemId, quantity = 1) => {
+    if (window.confirm('Are you sure you want to discard this item?')) {
       dispatch({
-        type: 'USE_ITEM',
-        payload: {
-          index: itemIndex
-        }
+        type: 'REMOVE_ITEM',
+        payload: { itemId, quantity }
       });
+      setDetailsOpen(false);
     }
   };
 
   return (
     <Panel title="Inventory">
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="body2">
-          Drag items to rearrange. Right-click consumables to use them.
-        </Typography>
-        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-          Gold: {inventory.gold}
-        </Typography>
+      {/* Inventory capacity indicator */}
+      <Box sx={{ mb: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+          <Typography variant="body2">
+            Inventory Capacity: {usedSlots}/{maxSlots}
+          </Typography>
+          <Typography variant="body2" color={remainingSlots < 5 ? "error" : "text.secondary"}>
+            {remainingSlots} slots remaining
+          </Typography>
+        </Box>
+        <LinearProgress 
+          variant="determinate" 
+          value={(usedSlots / maxSlots) * 100}
+          sx={{ 
+            height: 8, 
+            borderRadius: 1,
+            bgcolor: 'background.paper',
+            '& .MuiLinearProgress-bar': {
+              bgcolor: remainingSlots < 5 ? 'error.main' : 'primary.main'
+            }
+          }} 
+        />
       </Box>
       
-      <DndContext
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        onDragStart={handleDragStart}
+      {/* Category tabs */}
+      <Tabs 
+        value={currentTab} 
+        onChange={handleTabChange} 
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
       >
-        <Grid container spacing={0} sx={{ maxWidth: '480px' }}>
-          {filledItems.map((itemInstance, index) => (
-            <Grid item key={index} onContextMenu={(e) => handleContextMenu(e, index)}>
-              <InventorySlot id={`slot-${index}`}>
-                {itemInstance && <InventoryItem itemInstance={itemInstance} id={`item-${index}`} />}
-              </InventorySlot>
+        {categories.map((category, index) => (
+          <Tab 
+            key={category.id}
+            label={
+              <Badge 
+                badgeContent={
+                  category.id === 'all' 
+                    ? usedSlots 
+                    : playerInventory.filter(item => item?.category === category.id).length
+                }
+                color="primary"
+                showZero={false}
+                max={99}
+              >
+                {category.label}
+              </Badge>
+            }
+            id={`inventory-tab-${index}`}
+            aria-controls={`inventory-tabpanel-${index}`}
+          />
+        ))}
+      </Tabs>
+
+      {/* Inventory grid */}
+      {filteredItems.length > 0 ? (
+        <Grid container spacing={2}>
+          {filteredItems.map((item) => (
+            <Grid item xs={6} sm={4} md={3} key={`${item.id}-${item.quality || 'normal'}`}>
+              <InventorySlot
+                item={item}
+                onClick={() => handleSelectItem(item)}
+              />
             </Grid>
           ))}
         </Grid>
+      ) : (
+        <Box sx={{ py: 4, textAlign: 'center' }}>
+          <Typography color="text.secondary">
+            No {currentCategory === 'all' ? 'items' : currentCategory + 's'} in your inventory
+          </Typography>
+        </Box>
+      )}
 
-        {/* Overlay for the dragged item */}
-        <DragOverlay>
-          {activeId ? <InventoryItem itemInstance={activeItem} isOverlay={true} /> : null}
-        </DragOverlay>
-      </DndContext>
+      {/* Empty slots visualization */}
+      {remainingSlots > 0 && filteredItems.length > 0 && currentCategory === 'all' && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Empty Slots
+          </Typography>
+          <Grid container spacing={2}>
+            {Array.from({ length: remainingSlots }).map((_, index) => (
+              <Grid item xs={6} sm={4} md={3} key={`empty-${index}`}>
+                <Box
+                  sx={{
+                    border: '1px dashed',
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    height: 80,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Typography variant="caption" color="text.secondary">
+                    Empty
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </>
+      )}
+
+      {/* Item details dialog */}
+      {selectedItem && (
+        <ItemDetailsDialog
+          open={detailsOpen}
+          onClose={handleCloseDetails}
+          item={selectedItem}
+          onUse={handleUseItem}
+          onDrop={handleDropItem}
+        />
+      )}
     </Panel>
   );
 };

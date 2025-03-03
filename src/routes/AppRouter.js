@@ -1,12 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useParams, useNavigate, Navigate, Outlet } from 'react-router-dom';
-import { Provider, useSelector } from 'react-redux';
-import store from '../store'; // Import your Redux store
 import GameContainer from '../layout/components/GameContainer';
 import TownArea from '../features/World/components/containers/TownArea';
 import NPCEncounter from '../features/NPCs/components/NPCEncounter';
 import MainMenu from '../pages/MainMenu';
-import Settings from '../pages/Settings';
+import Settings from '../pages/MainMenu';
 import NPCPanel from '../features/NPCs/components/container/NPCPanel';
 import PlayerStats from '../features/Player/components/containers/PlayerStats';
 import WorldMap from '../features/World/components/containers/WorldMap';
@@ -24,6 +22,7 @@ import CharacterManagementDrawer from '../shared/components/ui/CharacterManageme
 import CompactTraitPanel from '../features/Traits/components/containers/CompactTraitPanel';
 import CompactCharacterPanel from '../features/Minions/components/ui/CompactCharacterPanel';
 import useMinionSimulation from '../features/Minions/hooks/useMinionSimulation';
+import { useGameState } from '../context/GameStateContext';
 
 /**
  * Wrapper component for TownArea that extracts townId from URL parameters
@@ -50,11 +49,17 @@ const NPCEncounterWrapper = () => {
 const NPCPanelWrapper = () => {
   const { npcId } = useParams();
   const navigate = useNavigate();
-  const npc = useSelector(state => 
-    state.npcs.find(n => n.id === npcId) || 
-    state.game.currentLocation?.npcs.find(n => n.id === npcId)
-  );
-  const locationName = useSelector(state => state.game.currentLocation?.name);
+  const { npcs = [], game = {} } = useGameState();
+  
+  // Add safety checks to ensure arrays before using .find()
+  const npcFromList = Array.isArray(npcs) ? npcs.find(n => n && n.id === npcId) : undefined;
+  const npcFromLocation = game?.currentLocation?.npcs && Array.isArray(game.currentLocation.npcs) ? 
+    game.currentLocation.npcs.find(n => n && n.id === npcId) : 
+    undefined;
+    
+  // Use nullish coalescing to handle undefined/null values
+  const npc = npcFromList ?? npcFromLocation;
+  const locationName = game?.currentLocation?.name;
   
   return (
     <NPCPanel 
@@ -105,34 +110,32 @@ const CharacterLayout = () => {
  * @returns {JSX.Element} Router component tree
  */
 const AppRouter = () => (
-  <Provider store={store}>
-    <Router>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<MainMenu />} />
-        <Route path="/settings" element={<Settings />} />
+  <Router>
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<MainMenu />} />
+      <Route path="/settings" element={<Settings />} />
+      
+      {/* Game routes with common layout */}
+      <Route path="/game" element={<GameLayout />}>
+        <Route index element={<WorldMap />} />
+        <Route path="town/:townId" element={<TownAreaWrapper />} />
+        <Route path="npc/:npcId" element={<NPCPanelWrapper />} />
+        <Route path="encounter/:npcId" element={<NPCEncounterWrapper />} />
         
-        {/* Game routes with common layout */}
-        <Route path="/game" element={<GameLayout />}>
-          <Route index element={<WorldMap />} />
-          <Route path="town/:townId" element={<TownAreaWrapper />} />
-          <Route path="npc/:npcId" element={<NPCPanelWrapper />} />
-          <Route path="encounter/:npcId" element={<NPCEncounterWrapper />} />
-          
-          {/* Character management routes */}
-          <Route path="character" element={<CharacterLayout />}>
-            <Route index element={<PlayerStats />} />
-            <Route path="inventory" element={<InventoryList />} />
-            <Route path="traits" element={<TraitSystemWrapper />} />
-            <Route path="minions" element={<CompactCharacterPanel />} />
-          </Route>
+        {/* Character management routes */}
+        <Route path="character" element={<CharacterLayout />}>
+          <Route index element={<PlayerStats />} />
+          <Route path="inventory" element={<InventoryList />} />
+          <Route path="traits" element={<TraitSystemWrapper />} />
+          <Route path="minions" element={<CompactCharacterPanel />} />
         </Route>
-        
-        {/* Fallback for undefined routes */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
-  </Provider>
+      </Route>
+      
+      {/* Fallback for undefined routes */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  </Router>
 );
 
 export default AppRouter;

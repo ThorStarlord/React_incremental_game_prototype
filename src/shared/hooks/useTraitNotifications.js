@@ -1,5 +1,5 @@
 import { useState, useCallback, useContext, useEffect } from 'react';
-import { GameStateContext } from '../context/GameStateContext';
+import { GameStateContext } from '../../context/GameStateContext';
 import useTraitEffects from './useTraitEffects';
 
 const useTraitNotifications = () => {

@@ -1,6 +1,6 @@
 import { useTheme } from '@mui/material/styles';
 import { useContext } from 'react';
-import { ThemeContext } from '../context/ThemeContext';
+import { ThemeContext } from '../../context/ThemeContext';
 
 export const useThemeUtils = () => {
   const theme = useTheme();
