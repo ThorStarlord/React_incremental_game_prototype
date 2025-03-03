@@ -1,0 +1,51 @@
+/**
+ * Constants for action types used in reducers
+ * These string constants help avoid typos in action type names
+ */
+export const ACTION_TYPES = {
+  // Game initialization
+  INITIALIZE_GAME_DATA: 'INITIALIZE_GAME_DATA',
+  RESET_GAME: 'RESET_GAME',
+  
+  // Game time
+  ADVANCE_TIME: 'ADVANCE_TIME',
+  
+  // Player actions
+  UPDATE_PLAYER: 'UPDATE_PLAYER',
+  GAIN_EXPERIENCE: 'GAIN_EXPERIENCE',
+  LEVEL_UP: 'LEVEL_UP',
+  
+  // Resource management
+  GAIN_RESOURCE: 'GAIN_RESOURCE',
+  SPEND_RESOURCE: 'SPEND_RESOURCE',
+  
+  // Essence management
+  GAIN_ESSENCE: 'GAIN_ESSENCE',
+  SPEND_ESSENCE: 'SPEND_ESSENCE',
+  
+  // Inventory actions
+  ADD_ITEM: 'ADD_ITEM',
+  REMOVE_ITEM: 'REMOVE_ITEM',
+  USE_ITEM: 'USE_ITEM',
+  EQUIP_ITEM: 'EQUIP_ITEM',
+  UNEQUIP_ITEM: 'UNEQUIP_ITEM',
+  
+  // Quest actions
+  START_QUEST: 'START_QUEST',
+  COMPLETE_QUEST: 'COMPLETE_QUEST',
+  FAIL_QUEST: 'FAIL_QUEST',
+  UPDATE_QUEST_PROGRESS: 'UPDATE_QUEST_PROGRESS',
+  
+  // Location actions
+  DISCOVER_LOCATION: 'DISCOVER_LOCATION',
+  TRAVEL_TO_LOCATION: 'TRAVEL_TO_LOCATION',
+  
+  // Combat actions
+  START_COMBAT: 'START_COMBAT',
+  END_COMBAT: 'END_COMBAT',
+  PLAYER_ATTACK: 'PLAYER_ATTACK',
+  ENEMY_ATTACK: 'ENEMY_ATTACK',
+  
+  // Settings
+  UPDATE_SETTINGS: 'UPDATE_SETTINGS'
+};

@@ -1,7 +1,84 @@
-import React, { useEffect } from 'react';
-import { useGameState, useGameDispatch } from '../GameDispatchContext';
-import { ACTION_TYPES } from '../GameStateContext';
+import React, { useEffect, ReactNode } from 'react';
+import { useGameState } from '../GameStateContext';
+import { useGameDispatch } from '../GameDispatchContext';
+import { ACTION_TYPES } from '../actions/actionTypes';
 import { getSimplifiedTier } from '../../config/relationshipConstants';
+import { GameState } from '../initialState';
+
+/**
+ * Interface for NPC object in the game state
+ */
+interface NPC {
+  id: string;
+  name: string;
+  relationship: number;
+  [key: string]: any; // For other NPC properties
+}
+
+/**
+ * Interface for area object in the game state
+ */
+interface GameArea {
+  id: string;
+  name?: string;
+  dangerLevel: number;
+  possibleEnemies: string[];
+  [key: string]: any; // For other area properties
+}
+
+/**
+ * Interface for in-game time tracking
+ */
+interface GameTime {
+  day: number;
+  period: 'MORNING' | 'DAY' | 'EVENING' | 'NIGHT';
+  hour?: number;
+  minute?: number;
+}
+
+/**
+ * Interface for quest objectives
+ */
+interface QuestObjective {
+  id: string;
+  type: string;
+  description?: string;
+  completed: boolean;
+  progress?: number;
+  target?: number;
+  [key: string]: any;
+}
+
+/**
+ * Interface for active quests
+ */
+interface Quest {
+  id: string;
+  title?: string;
+  description?: string;
+  objectives?: QuestObjective[];
+  rewards?: any[];
+  status?: string;
+  [key: string]: any;
+}
+
+/**
+ * Props for GameLoop component
+ */
+interface GameLoopProps {
+  children: ReactNode;
+}
+
+/**
+ * Extended GameState with additional properties used in GameLoop
+ */
+interface ExtendedGameState extends GameState {
+  npcs?: NPC[];
+  gameTime?: GameTime;
+  inCombat?: boolean;
+  currentArea?: GameArea;
+  activeQuests?: Quest[];
+}
 
 /**
  * GameLoop Component
@@ -22,8 +99,8 @@ import { getSimplifiedTier } from '../../config/relationshipConstants';
  * Each game system is isolated in its own useEffect for maintainability
  * and to allow for incremental addition of new systems.
  */
-const GameLoop = ({ children }) => {
-  const gameState = useGameState();
+const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
+  const gameState = useGameState() as ExtendedGameState;
   const dispatch = useGameDispatch();
 
   // Relationship system loop - handles NPC relationships and interactions
@@ -71,7 +148,7 @@ const GameLoop = ({ children }) => {
             
           dispatch({ 
             type: ACTION_TYPES.GAIN_ESSENCE, 
-            payload: essenceAmount
+            payload: { amount: essenceAmount }
           });
           
           dispatch({
@@ -108,11 +185,11 @@ const GameLoop = ({ children }) => {
   useEffect(() => {
     const resourceInterval = setInterval(() => {
       // Generate passive resources based on player stats/buildings/etc
-      const passiveGold = gameState.player.goldPerMinute || 0;
+      const passiveGold = (gameState.player as any).goldPerMinute || 0;
       if (passiveGold > 0) {
         dispatch({
           type: ACTION_TYPES.GAIN_GOLD,
-          payload: passiveGold
+          payload: { amount: passiveGold }
         });
       }
       
@@ -129,7 +206,7 @@ const GameLoop = ({ children }) => {
       dispatch({ type: ACTION_TYPES.ADVANCE_TIME });
       
       // Check for time-based events
-      const { day, period } = gameState.gameTime || {};
+      const { day, period } = gameState.gameTime || { day: 1, period: 'DAY' };
       if (period === 'NIGHT') {
         // Night-time specific events
         dispatch({
@@ -150,20 +227,23 @@ const GameLoop = ({ children }) => {
   useEffect(() => {
     const statsInterval = setInterval(() => {
       // Apply passive skill experience gain
-      if (gameState.player.skills) {
-        const passiveSkillGain = gameState.player.passiveSkillGainRate || 0;
+      if ((gameState.player as any).skills) {
+        const passiveSkillGain = (gameState.player as any).passiveSkillGainRate || 0;
         
-        if (passiveSkillGain > 0 && gameState.player.activeSkill) {
+        if (passiveSkillGain > 0 && (gameState.player as any).activeSkill) {
           dispatch({
             type: ACTION_TYPES.GAIN_SKILL_EXPERIENCE,
             payload: {
-              skillId: gameState.player.activeSkill,
+              skillId: (gameState.player as any).activeSkill,
               amount: passiveSkillGain
             }
           });
           
           // Notify on significant milestones
-          const currentSkill = gameState.player.skills.find(s => s.id === gameState.player.activeSkill);
+          const currentSkill = (gameState.player as any).skills.find(
+            (s: any) => s.id === (gameState.player as any).activeSkill
+          );
+          
           if (currentSkill && Math.floor(currentSkill.experience) % 100 === 0) {
             dispatch({
               type: ACTION_TYPES.ADD_NOTIFICATION,
@@ -178,11 +258,17 @@ const GameLoop = ({ children }) => {
       }
       
       // Apply health regeneration if applicable
-      const healthRegen = gameState.player.healthRegenRate || 0;
-      if (healthRegen > 0 && gameState.player.health < gameState.player.maxHealth) {
+      const healthRegen = (gameState.player as any).healthRegenRate || 0;
+      if (healthRegen > 0 && 
+          (gameState.player as any).health < (gameState.player as any).maxHealth) {
         dispatch({
           type: ACTION_TYPES.UPDATE_HEALTH,
-          payload: Math.min(gameState.player.health + healthRegen, gameState.player.maxHealth)
+          payload: {
+            health: Math.min(
+              (gameState.player as any).health + healthRegen, 
+              (gameState.player as any).maxHealth
+            )
+          }
         });
       }
     }, 30000); // Run every 30 seconds
@@ -197,7 +283,7 @@ const GameLoop = ({ children }) => {
       if (gameState.inCombat) return;
       
       // Calculate encounter chance based on area danger level
-      const currentArea = gameState.currentArea || {};
+      const currentArea = gameState.currentArea || { dangerLevel: 0, possibleEnemies: [] };
       const dangerLevel = currentArea.dangerLevel || 0;
       const encounterChance = dangerLevel * 0.05; // 5% per danger level
       
@@ -272,7 +358,7 @@ const GameLoop = ({ children }) => {
         
         dispatch({
           type: ACTION_TYPES.UPDATE_WEATHER,
-          payload: newWeather
+          payload: { weather: newWeather }
         });
         
         // Apply weather effects based on type
