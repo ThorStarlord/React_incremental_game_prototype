@@ -9,8 +9,9 @@ import {
 } from '@mui/material';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import Panel from '../../../../components/panel/Panel';
-import HotkeyHelpTooltip from '../HotkeyHelpTooltip';
+import Panel from '../../../../shared/components/layout/Panel';
+// Fix the import path to point to the correct location in the shared components directory
+import HotkeyHelpTooltip from '../../../../shared/components/ui/HotkeyHelpTooltip';
 import useTraitShortcuts from '../../hooks/useTraitShortcuts';
 
 const TraitSlotsFallback = ({ 

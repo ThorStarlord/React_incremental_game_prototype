@@ -4,101 +4,23 @@
  * and their current status. Allows players to select regions for further interactions.
  */
 
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import styled from 'styled-components';
-
-// Assume these actions will be defined elsewhere
-import { selectRegion, exploreRegion } from '../../worldSlice';
-
-/**
- * Styled components for the world map
- */
-const MapContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 500px;
-  background-color: #2a4d69;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  margin-bottom: 20px;
-`;
-
-const MapTitle = styled.h2`
-  color: #e7eff6;
-  text-align: center;
-  margin-top: 10px;
-  text-shadow: 1px 1px 2px #000;
-`;
-
-const RegionContainer = styled.div`
-  position: absolute;
-  border-radius: 50%;
-  cursor: ${props => props.unlocked ? 'pointer' : 'not-allowed'};
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  border: 2px solid ${props => props.unlocked ? '#fff' : '#555'};
-  opacity: ${props => props.unlocked ? 1 : 0.6};
-  transform: scale(${props => props.selected ? 1.1 : 1});
-  
-  &:hover {
-    transform: ${props => props.unlocked ? 'scale(1.1)' : 'scale(1)'};
-    z-index: 10;
-  }
-`;
-
-const RegionProgress = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 4px;
-  background-color: #4CAF50;
-  width: ${props => props.progress}%;
-`;
-
-const RegionName = styled.div`
-  position: absolute;
-  top: -25px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px black;
-  white-space: nowrap;
-`;
-
-const RegionInfo = styled.div`
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  display: ${props => props.visible ? 'block' : 'none'};
-`;
-
-const UnlockMessage = styled.div`
-  background-color: rgba(209, 87, 0, 0.8);
-  color: white;
-  padding: 5px;
-  border-radius: 3px;
-  font-size: 0.8em;
-  margin-top: 5px;
-`;
+import React, { useState, useContext } from 'react';
+// Remove styled-components import
+import { Box, Typography, Paper, LinearProgress } from '@mui/material';
+import { GameStateContext, useGameDispatch } from '../../../../context/GameStateContext';
+import { ACTION_TYPES } from '../../../../constants/actionTypes';
 
 /**
  * WorldMap Component
  * Renders an interactive map with all the world regions
- * based on their current state from the Redux store
+ * based on their current state from the GameStateContext
  */
 const WorldMap = () => {
-  const dispatch = useDispatch();
-  const regions = useSelector(state => state.world.regions);
-  const playerLevel = useSelector(state => state.player.level);
-  const completedQuests = useSelector(state => state.quests.completed);
+  const dispatch = useGameDispatch();
+  const { world, player, quests } = useContext(GameStateContext);
+  const regions = world?.regions || {};
+  const playerLevel = player?.level || 1;
+  const completedQuests = quests?.completed || [];
   const [selectedRegion, setSelectedRegion] = useState(null);
   
   // Positions for regions on the map - these would normally be configured per region
@@ -117,7 +39,10 @@ const WorldMap = () => {
     
     if (region.unlocked) {
       setSelectedRegion(regionId);
-      dispatch(selectRegion(regionId));
+      dispatch({
+        type: ACTION_TYPES.SELECT_REGION,
+        payload: regionId
+      });
     }
   };
   
@@ -148,65 +73,154 @@ const WorldMap = () => {
     const { playerLevel: reqLevel, questCompleted: reqQuest } = region.unlockRequirements;
     
     return (
-      <UnlockMessage>
+      <Box sx={{
+        bgcolor: 'rgba(209, 87, 0, 0.8)',
+        color: 'white',
+        p: 0.5,
+        borderRadius: '3px',
+        fontSize: '0.8em',
+        mt: 0.5
+      }}>
         Unlock Requirements:
-        {reqLevel && <div>Player Level: {playerLevel}/{reqLevel}</div>}
+        {reqLevel && <Box>Player Level: {playerLevel}/{reqLevel}</Box>}
         {reqQuest && (
-          <div>
+          <Box>
             Quest: {completedQuests.includes(reqQuest) ? '✓' : '✗'} {reqQuest.replace(/_/g, ' ')}
-          </div>
+          </Box>
         )}
-      </UnlockMessage>
+      </Box>
     );
   };
   
   return (
-    <div>
-      <MapTitle>World Map</MapTitle>
-      <MapContainer>
+    <Box>
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          color: '#e7eff6',
+          textAlign: 'center',
+          mt: 1,
+          textShadow: '1px 1px 2px #000'
+        }}
+      >
+        World Map
+      </Typography>
+      
+      <Box 
+        sx={{
+          position: 'relative',
+          width: '100%',
+          height: '500px',
+          bgcolor: '#2a4d69',
+          borderRadius: 2,
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+          overflow: 'hidden',
+          mb: 2.5
+        }}
+      >
         {Object.entries(regions).map(([id, region]) => (
-          <RegionContainer
+          <Box
             key={id}
-            style={regionPositions[id]}
-            unlocked={region.unlocked}
-            selected={selectedRegion === id}
+            sx={{
+              position: 'absolute',
+              borderRadius: '50%',
+              cursor: region.unlocked ? 'pointer' : 'not-allowed',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 0 10px rgba(255, 255, 255, 0.3)',
+              border: `2px solid ${region.unlocked ? '#fff' : '#555'}`,
+              opacity: region.unlocked ? 1 : 0.6,
+              transform: `scale(${selectedRegion === id ? 1.1 : 1})`,
+              '&:hover': {
+                transform: `scale(${region.unlocked ? 1.1 : 1})`,
+                zIndex: 10
+              },
+              ...regionPositions[id]
+            }}
             onClick={() => handleRegionClick(id)}
             title={region.unlocked ? region.name : `Locked: ${region.name}`}
           >
-            <RegionName>{region.name}</RegionName>
-            <RegionProgress progress={region.explored * 100} />
-          </RegionContainer>
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: '-25px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                color: 'white',
+                fontWeight: 'bold',
+                textShadow: '1px 1px 2px black',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {region.name}
+            </Typography>
+            
+            <LinearProgress
+              variant="determinate"
+              value={region.explored * 100}
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                height: '4px',
+                width: '100%',
+                '& .MuiLinearProgress-bar': {
+                  backgroundColor: '#4CAF50'
+                }
+              }}
+            />
+          </Box>
         ))}
         
         {selectedRegion && (
-          <RegionInfo visible={true}>
-            <h3>{regions[selectedRegion].name}</h3>
-            <p>{regions[selectedRegion].description}</p>
-            <p>Exploration: {Math.round(regions[selectedRegion].explored * 100)}%</p>
-            <p>Danger Level: {regions[selectedRegion].dangerLevel}</p>
-            <p>Locations Discovered: {
-              regions[selectedRegion].locations.filter(loc => loc.discovered).length
-            } / {regions[selectedRegion].locations.length}</p>
-          </RegionInfo>
+          <Paper
+            sx={{
+              position: 'absolute',
+              bottom: 10,
+              left: 10,
+              right: 10,
+              bgcolor: 'rgba(0, 0, 0, 0.7)',
+              color: 'white',
+              p: 1.25,
+              borderRadius: '5px'
+            }}
+          >
+            <Typography variant="h5">{regions[selectedRegion].name}</Typography>
+            <Typography variant="body2">{regions[selectedRegion].description}</Typography>
+            <Typography variant="body2">Exploration: {Math.round(regions[selectedRegion].explored * 100)}%</Typography>
+            <Typography variant="body2">Danger Level: {regions[selectedRegion].dangerLevel}</Typography>
+            <Typography variant="body2">
+              Locations Discovered: {
+                regions[selectedRegion].locations.filter(loc => loc.discovered).length
+              } / {regions[selectedRegion].locations.length}
+            </Typography>
+          </Paper>
         )}
         
         {!selectedRegion && Object.entries(regions)
           .filter(([id, region]) => !region.unlocked)
           .map(([id, region]) => (
             canUnlockRegion(region) && (
-              <RegionInfo key={`unlock-${id}`} visible={true} style={{ 
-                bottom: 'auto', 
-                top: regionPositions[id].top, 
-                left: regionPositions[id].left
-              }}>
-                <h4>{region.name} (Locked)</h4>
+              <Paper
+                key={`unlock-${id}`}
+                sx={{
+                  position: 'absolute',
+                  bgcolor: 'rgba(0, 0, 0, 0.7)',
+                  color: 'white',
+                  p: 1.25,
+                  borderRadius: '5px',
+                  bottom: 'auto',
+                  top: regionPositions[id].top,
+                  left: regionPositions[id].left
+                }}
+              >
+                <Typography variant="h6">{region.name} (Locked)</Typography>
                 {renderUnlockRequirements(region)}
-              </RegionInfo>
+              </Paper>
             )
           ))
         }
-      </MapContainer>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

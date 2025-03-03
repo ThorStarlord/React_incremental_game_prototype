@@ -70,3 +70,32 @@ export const getRelationshipColor = (relationshipValue) => {
   const tier = getRelationshipTier(relationshipValue);
   return tier.color;
 };
+
+/**
+ * Determines which interactions are available based on relationship level
+ * Different features unlock as relationship with an NPC improves
+ * 
+ * @param {number} relationshipValue - The current relationship value (-100 to 100)
+ * @returns {string[]} Array of available interaction types
+ */
+export const getAvailableInteractions = (relationshipValue = 0) => {
+  // Dialogue is always available regardless of relationship
+  const available = ['dialogue'];
+  
+  // Basic relationship interactions become available at -50 (Unfriendly)
+  if (relationshipValue >= -50) {
+    available.push('relationship');
+  }
+  
+  // Trade becomes available at 0 (Neutral)
+  if (relationshipValue >= 0) {
+    available.push('trade');
+  }
+  
+  // Quests become available at 25 (Friendly)
+  if (relationshipValue >= 25) {
+    available.push('quests');
+  }
+  
+  return available;
+};

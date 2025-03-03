@@ -1,8 +1,27 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Box, Typography, LinearProgress, Tooltip, Paper, Avatar, Divider } from '@mui/material';
 import { getRelationshipTier } from '../../../config/relationshipConstants';
 import Icon from '@mui/material/Icon';
 
+/**
+ * RelationshipDisplay Component
+ * 
+ * Displays the relationship status between the player and an NPC
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.npc - NPC object containing information about the NPC
+ * @param {string} props.npc.id - Unique identifier for the NPC
+ * @param {string} props.npc.name - Name of the NPC
+ * @param {number} props.npc.relationship - Relationship value with the player (-100 to 100)
+ * @param {string} [props.npc.title] - Optional title of the NPC
+ * @returns {React.Component} A component displaying the relationship with an NPC
+ * 
+ * @example
+ * const npc = { id: 'merchant', name: 'Eliza', relationship: 75, title: 'Merchant' };
+ * return <RelationshipDisplay npc={npc} />;
+ */
 const RelationshipDisplay = ({ npc }) => {
   const relationship = npc.relationship || 0;
   const tier = getRelationshipTier(relationship);
@@ -55,6 +74,22 @@ const RelationshipDisplay = ({ npc }) => {
       </Box>
     </Paper>
   );
+};
+
+RelationshipDisplay.propTypes = {
+  /**
+   * NPC object containing all necessary information
+   */
+  npc: PropTypes.shape({
+    /** Unique identifier for the NPC */
+    id: PropTypes.string.isRequired,
+    /** Name of the NPC */
+    name: PropTypes.string.isRequired,
+    /** Relationship value between player and NPC (-100 to 100) */
+    relationship: PropTypes.number,
+    /** Optional title or role of the NPC */
+    title: PropTypes.string
+  }).isRequired,
 };
 
 export default RelationshipDisplay;

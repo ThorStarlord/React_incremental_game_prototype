@@ -1,5 +1,5 @@
 import { useContext, useCallback } from 'react';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
+import { GameStateContext, GameDispatchContext, useGameDispatch } from '../context/GameStateContext';
 import { ESSENCE_COSTS } from '../config/gameConstants';
 
 export const useEssenceManager = () => {
@@ -75,4 +75,33 @@ export const useFactionManager = () => {
     createFaction,
     joinFaction
   };
+};
+
+/**
+ * Hook for managing game notifications
+ * 
+ * @returns {Object} Notification functions
+ */
+export const useNotification = () => {
+  const dispatch = useGameDispatch();
+  
+  /**
+   * Display a notification to the user
+   * 
+   * @param {string} message - The notification message
+   * @param {string} severity - Notification type (success, error, warning, info)
+   * @param {number} duration - How long the notification appears (milliseconds)
+   */
+  const notify = useCallback((message, severity = 'info', duration = 3000) => {
+    dispatch({
+      type: 'SHOW_NOTIFICATION',
+      payload: {
+        message,
+        severity,
+        duration
+      }
+    });
+  }, [dispatch]);
+  
+  return { notify };
 };

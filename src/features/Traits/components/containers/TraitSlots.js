@@ -18,16 +18,15 @@ import {
 import LockIcon from '@mui/icons-material/Lock';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
-import Panel from '../../../../components/panel/Panel';
+import { GameStateContext, useGameDispatch } from '../../../../context/GameStateContext';
+import Panel from '../../../../shared/components/layout/Panel';
 import useTraitEffects from '../../hooks/useTraitEffects';
 import PropTypes from 'prop-types';
 import { TRAIT_CATEGORIES } from '../../traitsInitialState';
 import './TraitSlots.css';
 
-// SortableTraitSlot component for drag-and-drop functionality
-const SortableTraitSlot = ({ traitId, index, trait, onRemove, onMakePermanent, essence }) => {
+// Simplified TraitSlot component without drag-and-drop
+const TraitSlot = ({ traitId, trait, onRemove, onMakePermanent, essence }) => {
   const [showDetails, setShowDetails] = useState(false);
   const canMakePermanent = essence >= 150;
 
@@ -35,60 +34,53 @@ const SortableTraitSlot = ({ traitId, index, trait, onRemove, onMakePermanent, e
 
   return (
     <>
-      <Draggable draggableId={traitId} index={index}>
-        {(provided) => (
-          <Card
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            sx={{
-              mb: 2,
-              p: 1,
-              border: '1px solid',
-              borderColor: 'primary.light',
-              '&:hover': {
-                boxShadow: 3
-              }
-            }}
+      <Card
+        sx={{
+          mb: 2,
+          p: 1,
+          border: '1px solid',
+          borderColor: 'primary.light',
+          '&:hover': {
+            boxShadow: 3
+          }
+        }}
+      >
+        <CardContent sx={{ py: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6">{trait.name}</Typography>
+            <Box>
+              <IconButton size="small" onClick={() => setShowDetails(true)}>
+                <InfoIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={() => onRemove(traitId)} color="error">
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {trait.description}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          <Tooltip 
+            title={!canMakePermanent ? "Not enough essence (150 required)" : "Make this trait permanent"} 
+            arrow
           >
-            <CardContent sx={{ py: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">{trait.name}</Typography>
-                <Box>
-                  <IconButton size="small" onClick={() => setShowDetails(true)}>
-                    <InfoIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" onClick={() => onRemove(traitId)} color="error">
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              </Box>
-              <Typography variant="body2" color="text.secondary">
-                {trait.description}
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Tooltip 
-                title={!canMakePermanent ? "Not enough essence (150 required)" : "Make this trait permanent"} 
-                arrow
+            <span style={{ width: '100%' }}>
+              <Button 
+                startIcon={<LockIcon />}
+                variant="outlined" 
+                color="secondary" 
+                fullWidth 
+                onClick={() => onMakePermanent(traitId)}
+                disabled={!canMakePermanent}
               >
-                <span style={{ width: '100%' }}>
-                  <Button 
-                    startIcon={<LockIcon />}
-                    variant="outlined" 
-                    color="secondary" 
-                    fullWidth 
-                    onClick={() => onMakePermanent(traitId)}
-                    disabled={!canMakePermanent}
-                  >
-                    Make Permanent (150 Essence)
-                  </Button>
-                </span>
-              </Tooltip>
-            </CardActions>
-          </Card>
-        )}
-      </Draggable>
+                Make Permanent (150 Essence)
+              </Button>
+            </span>
+          </Tooltip>
+        </CardActions>
+      </Card>
 
       <Dialog open={showDetails} onClose={() => setShowDetails(false)}>
         <DialogTitle>{trait.name}</DialogTitle>
@@ -125,7 +117,7 @@ const TraitSlots = ({
   playerLevel = 1
 }) => {
   const { player, traits, essence } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
+  const dispatch = useGameDispatch();
   const { modifiers } = useTraitEffects();
   const [selectedTrait, setSelectedTrait] = useState(null);
   const [showTraitSelector, setShowTraitSelector] = useState(false);
@@ -365,20 +357,6 @@ const TraitSlots = ({
     }
   };
 
-  // Handle drag and drop reordering
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-    
-    const items = Array.from(player.equippedTraits);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    
-    dispatch({
-      type: 'REORDER_EQUIPPED_TRAITS',
-      payload: items
-    });
-  };
-
   // Calculate available and total trait slots
   const availableSlots = Math.max(0, player.traitSlots - (player.equippedTraits?.length || 0));
   const totalSlots = player.traitSlots || 0;
@@ -429,32 +407,21 @@ const TraitSlots = ({
           </Box>
         )}
 
-        {/* Equipped traits section - draggable */}
+        {/* Equipped traits section - replace DragDropContext with regular Box */}
         <Typography variant="h6" sx={{ mb: 1 }}>Equipped Traits</Typography>
         {player.equippedTraits?.length > 0 ? (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="traitSlots">
-              {(provided) => (
-                <Box
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                >
-                  {player.equippedTraits.map((traitId, index) => (
-                    <SortableTraitSlot
-                      key={traitId}
-                      traitId={traitId}
-                      index={index}
-                      trait={traits.copyableTraits[traitId]}
-                      onRemove={handleRemoveTraitOld}
-                      onMakePermanent={handleMakePermanent}
-                      essence={essence}
-                    />
-                  ))}
-                  {provided.placeholder}
-                </Box>
-              )}
-            </Droppable>
-          </DragDropContext>
+          <Box>
+            {player.equippedTraits.map((traitId) => (
+              <TraitSlot
+                key={traitId}
+                traitId={traitId}
+                trait={traits.copyableTraits[traitId]}
+                onRemove={handleRemoveTraitOld}
+                onMakePermanent={handleMakePermanent}
+                essence={essence}
+              />
+            ))}
+          </Box>
         ) : (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
             No traits equipped. Acquire traits and equip them to gain their benefits.

@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, IconButton, Grid, Button, LinearProgress, Tooltip } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import Panel from '../panel/Panel';
-import BreadcrumbNav from '../BreadcrumbNav';
-import { towns } from '../../../../modules/data';
-import useThemeUtils from '../../hooks/useThemeUtils';
+import Panel from '../../../../shared/components/layout/Panel';
+import BreadcrumbNav from '../../../../shared/components/ui/BreadcrumbNav';
+// Fix the import path for useThemeUtils
+import useThemeUtils from '../../../../shared/hooks/useThemeUtils';
 import { GameStateContext } from '../../../../context/GameStateContext';
 
 const TownArea = ({ townId }) => {

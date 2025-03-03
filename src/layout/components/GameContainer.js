@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Box, Grid, AppBar, Toolbar, Typography, IconButton, Snackbar, Tooltip } from '@mui/material';
-import PlayerStats from '../../features/player/components/PlayerStats';
-import WorldMap from '../WorldMap';
+// Fix the PlayerStats import path - try the Player directory with proper capitalization
+import PlayerStats from '../../features/Player/components/containers/PlayerStats';
+import WorldMap from '../../features/World/components/containers/WorldMap';
 import InventoryList from '../InventoryList';
 import EssenceDisplay from '../EssenceDisplay';
 import TraitSystemWrapper from '../trait/TraitSystemWrapper';

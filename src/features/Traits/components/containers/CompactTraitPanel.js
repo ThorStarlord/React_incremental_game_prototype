@@ -13,7 +13,7 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import LockIcon from '@mui/icons-material/Lock';
 import { GameStateContext } from '../../../../context/GameStateContext';
-import Panel from '../ui/Panel';
+import Panel from '../../../../shared/components/layout/Panel';
 import CompactTraitCard from './CompactTraitCard';
 
 const CompactTraitPanel = ({ onExpandView }) => {
