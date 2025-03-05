@@ -1,71 +1,18 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { addNotification } from '../utils/notificationUtils';
-
-/**
- * Inventory Reducer - Manages player's inventory of items and equipment
- */
-
-// Define interfaces for state and items
-interface GameState {
-  player: {
-    inventory: InventoryItem[];
-    health: number;
-    maxHealth: number;
-    energy: number;
-    maxEnergy: number;
-    experience: number;
-  };
-  items?: ItemData[];
-  gameData?: {
-    items?: Record<string, ItemData>;
-  };
-  stats?: {
-    itemsUsed?: Record<string, number>;
-  };
-}
-
-interface InventoryItem {
-  id: string;
-  quantity: number;
-  name: string;
-  type: string;
-  examined?: boolean;
-  acquired?: {
-    timestamp: number;
-    source: string;
-  };
-  [key: string]: any;
-}
-
-interface ItemData {
-  id: string;
-  name: string;
-  type: string;
-  effects?: {
-    health?: number;
-    energy?: number;
-    experience?: number;
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
+import { GameState, InventoryItem } from './types';
+import { withNotification, updateInventoryQuantity } from './utils';
 
 // Helper functions
 const findItem = (inventory: InventoryItem[], itemId: string): number => 
   inventory.findIndex(item => item.id === itemId);
 
-const getItemData = (state: GameState, itemId: string): ItemData | undefined => 
-  state.items?.find(item => item.id === itemId) || state.gameData?.items?.[itemId];
+const getItemData = (state: GameState, itemId: string): any => 
+  state.items?.find((item: any) => item.id === itemId) || 
+  state.gameData?.items?.[itemId];
 
-const updateInventoryQuantity = (inventory: InventoryItem[], itemIndex: number, quantityChange: number): InventoryItem[] => {
-  if (inventory[itemIndex].quantity + quantityChange <= 0) {
-    return inventory.filter((_, idx) => idx !== itemIndex);
-  }
-  return inventory.map((item, idx) => 
-    idx === itemIndex ? { ...item, quantity: item.quantity + quantityChange } : item
-  );
-};
-
+/**
+ * Inventory Reducer - Manages player's inventory of items and equipment
+ */
 export const inventoryReducer = (
   state: GameState, 
   action: { type: string; payload: any }
@@ -77,31 +24,25 @@ export const inventoryReducer = (
       const itemData = getItemData(state, itemId);
       
       if (!itemData) {
-        return addNotification(state, {
-          message: "Invalid item data. Cannot add to inventory.",
-          type: "error"
-        });
+        return withNotification(state, "Invalid item data. Cannot add to inventory.", "error");
       }
-      
-      // Either update existing item or add new one
-      const newInventory = existingItemIndex !== -1 
-        ? updateInventoryQuantity(state.player.inventory, existingItemIndex, quantity)
-        : [...state.player.inventory, {
-            id: itemId,
-            quantity,
-            name: itemData.name,
-            type: itemData.type,
-            acquired: {
-              timestamp: Date.now(),
-              source: source || 'unknown'
-            }
-          }];
       
       return {
         ...state,
         player: {
           ...state.player,
-          inventory: newInventory
+          inventory: existingItemIndex !== -1 
+            ? updateInventoryQuantity(state.player.inventory, existingItemIndex, quantity)
+            : [...state.player.inventory, {
+                id: itemId,
+                quantity,
+                name: itemData.name,
+                type: itemData.type,
+                acquired: {
+                  timestamp: Date.now(),
+                  source: source || 'unknown'
+                }
+              }]
         }
       };
     }
@@ -126,19 +67,12 @@ export const inventoryReducer = (
       const existingItemIndex = findItem(state.player.inventory, itemId);
       
       if (existingItemIndex === -1) {
-        return addNotification(state, {
-          message: "You don't have this item.",
-          type: "error"
-        });
+        return withNotification(state, "You don't have this item.", "error");
       }
       
       const itemData = getItemData(state, itemId);
-      
       if (!itemData) {
-        return addNotification(state, {
-          message: "Unknown item type.",
-          type: "error"
-        });
+        return withNotification(state, "Unknown item type.", "error");
       }
       
       // Apply item effects based on type
@@ -147,41 +81,21 @@ export const inventoryReducer = (
       if (itemData.type === 'consumable' && itemData.effects) {
         const { effects } = itemData;
         
-        // Update player health if item has health effect
-        if (effects.health) {
+        // Update health/energy/experience if applicable
+        if (effects.health || effects.energy || effects.experience) {
           updatedState = {
             ...updatedState,
             player: {
               ...updatedState.player,
-              health: Math.min(
-                updatedState.player.health + effects.health,
-                updatedState.player.maxHealth
-              )
-            }
-          };
-        }
-        
-        // Update player energy if item has energy effect
-        if (effects.energy) {
-          updatedState = {
-            ...updatedState,
-            player: {
-              ...updatedState.player,
-              energy: Math.min(
-                updatedState.player.energy + effects.energy,
-                updatedState.player.maxEnergy
-              )
-            }
-          };
-        }
-        
-        // Update experience if item provides experience
-        if (effects.experience) {
-          updatedState = {
-            ...updatedState,
-            player: {
-              ...updatedState.player,
-              experience: updatedState.player.experience + effects.experience
+              health: effects.health ? 
+                Math.min(updatedState.player.health + effects.health, updatedState.player.maxHealth) :
+                updatedState.player.health,
+              energy: effects.energy ?
+                Math.min(updatedState.player.energy + effects.energy, updatedState.player.maxEnergy) :
+                updatedState.player.energy,
+              experience: effects.experience ? 
+                updatedState.player.experience + effects.experience :
+                updatedState.player.experience
             }
           };
         }
@@ -208,10 +122,7 @@ export const inventoryReducer = (
         }
       };
       
-      return addNotification(updatedState, {
-        message: `Used ${itemData.name}.`,
-        type: "info"
-      });
+      return withNotification(updatedState, `Used ${itemData.name}.`, "info");
     }
     
     case ACTION_TYPES.SORT_INVENTORY: {

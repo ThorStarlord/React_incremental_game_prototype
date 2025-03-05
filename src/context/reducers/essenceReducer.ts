@@ -1,36 +1,8 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { addNotification } from '../utils/notificationUtils';
+import { GameState } from './types';
+import { withNotification } from './utils';
 
-/**
- * Interface for the game state
- */
-interface GameState {
-  essence: EssenceState;
-  player: PlayerState;
-  [key: string]: any;
-}
-
-/**
- * Interface for essence state
- */
-interface EssenceState {
-  amount: number;
-  lifetimeEarned?: number;
-  lifetimeSpent?: number;
-  sourceStats?: Record<string, number>;
-}
-
-/**
- * Interface for player state
- */
-interface PlayerState {
-  equippedTraits?: string[];
-  [key: string]: any;
-}
-
-/**
- * Payload for essence actions
- */
+// Simplified essence payload type
 interface EssencePayload {
   amount: number;
   source?: string;
@@ -40,28 +12,26 @@ interface EssencePayload {
 /**
  * Essence Reducer - Manages the game's primary resource
  */
-export const essenceReducer = (state: GameState, action: { type: string; payload: EssencePayload }): GameState => {
+export const essenceReducer = (
+  state: GameState, 
+  action: { type: string; payload: EssencePayload }
+): GameState => {
   switch (action.type) {
     case ACTION_TYPES.GAIN_ESSENCE: {
       const { amount, source } = action.payload;
       
       // Apply trait multipliers
       const traits = state.player.equippedTraits || [];
-      let multiplier = 1;
-      
-      if (traits.includes?.('EssenceAffinity')) multiplier += 0.2;
-      if (traits.includes?.('SpiritualConnection')) multiplier += 0.3;
+      const multiplier = 1 + 
+        (traits.includes?.('EssenceAffinity') ? 0.2 : 0) + 
+        (traits.includes?.('SpiritualConnection') ? 0.3 : 0);
       
       const modifiedAmount = Math.round(amount * multiplier);
       
       // Only show notification for significant gains
-      let newState = state;
-      if (modifiedAmount >= 10) {
-        newState = addNotification(state, {
-          message: `Gained ${modifiedAmount} essence${source ? ` from ${source}` : ''}`,
-          type: "info"
-        });
-      }
+      const newState = modifiedAmount >= 10 ? 
+        withNotification(state, `Gained ${modifiedAmount} essence${source ? ` from ${source}` : ''}`, "info") : 
+        state;
       
       // Update both current amount and statistics
       return {
@@ -82,11 +52,12 @@ export const essenceReducer = (state: GameState, action: { type: string; payload
       const { amount, reason } = action.payload;
       
       if (state.essence.amount < amount) {
-        return addNotification(state, {
-          message: `Not enough essence to ${reason || 'perform this action'}`,
-          type: 'error',
-          duration: 3000
-        });
+        return withNotification(
+          state, 
+          `Not enough essence to ${reason || 'perform this action'}`,
+          'error',
+          3000
+        );
       }
       
       return {
