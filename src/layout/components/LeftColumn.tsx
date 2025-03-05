@@ -57,7 +57,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import SettingsIcon from '@mui/icons-material/Settings';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
-import PlayerStats from '../../features/Player/components/PlayerStats';
+import PlayerStats from '../../features/Player/data/PlayerStats';
 import InventoryList from '../../features/Inventory/components/containers/InventoryList';
 import EssenceDisplay from '../../features/Essence/components/ui/EssenceDisplay';
 import CompactCharacterPanel from '../../features/Minions/components/ui/CompactCharacterPanel';
