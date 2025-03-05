@@ -6,7 +6,7 @@ import Panel from '../../../../shared/components/layout/Panel';
 import BreadcrumbNav from '../../../../shared/components/ui/BreadcrumbNav';
 // Fix the import path for useThemeUtils
 import useThemeUtils from '../../../../shared/hooks/useThemeUtils';
-import { GameStateContext } from '../../../../context/GameStateContext';
+import { useGameState } from '../../../../context/index';
 
 // Define towns data
 const towns = [
@@ -19,7 +19,7 @@ const towns = [
 const TownArea = ({ townId }) => {
   const navigate = useNavigate();
   const { getProgressColor } = useThemeUtils();
-  const { npcs: gameNpcs = [] } = useContext(GameStateContext);
+  const { npcs: gameNpcs = [] } = useGameState();
   const town = towns.find(t => t.id === townId);
 
   // Add safety check to ensure gameNpcs is an array before filtering

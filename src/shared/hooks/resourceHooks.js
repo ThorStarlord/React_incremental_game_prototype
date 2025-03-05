@@ -1,5 +1,5 @@
 import { useContext, useCallback, useState } from 'react';
-import { useGameState, useGameDispatch } from '../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../context';
 import { RESOURCE_TYPES, GENERATION_RATES } from '../../constants/gameConstants';
 
 export const useEssenceManager = () => {

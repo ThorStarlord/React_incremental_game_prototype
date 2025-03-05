@@ -1,7 +1,8 @@
-import { useEffect, useContext } from 'react';
-import { useGameState, useGameDispatch } from '../../context/GameStateContext';
+import { useState, useEffect } from 'react';
+// Update the import to use the consolidated gameContext
+import { useGameState, useGameDispatch } from '../../context/gameContext';
 
-const useMinionSimulation = () => {
+const useMinionSimulation = (settings = {}) => {
   // Add default empty array to prevent undefined.length issues
   const { minions = [] } = useGameState();
   const dispatch = useGameDispatch();

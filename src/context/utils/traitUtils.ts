@@ -29,7 +29,7 @@
  * );
  */
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { GameState } from '../initialState';
+import { GameState, PlayerState } from '../initialState';
 
 /**
  * Interface for trait effects that can be applied to player
@@ -78,63 +78,35 @@ interface Trait {
 }
 
 /**
- * Extended player state with traits
+ * Type for player state with trait properties
  */
-interface PlayerWithTraits {
-  /** Traits currently equipped in trait slots */
-  equippedTraits?: string[] | Record<string, string>;
-  
-  /** Traits that are permanently active regardless of equipment */
-  permanentTraits?: string[];
-  
-  /** All traits the player has acquired (available to equip) */
+interface PlayerWithTraits extends PlayerState {
   acquiredTraits: string[];
-  
-  /** Base max health before trait bonuses */
-  baseMaxHealth?: number;
-  
-  /** Current max health after all bonuses */
-  maxHealth: number;
-  
-  /** Current health points */
-  health?: number;
-  
-  /** Multiplier applied to damage dealt */
-  damageMultiplier: number;
-  
-  /** Multiplier applied to damage reduction */
-  defenseMultiplier: number;
-  
-  /** Other player properties */
-  [key: string]: any;
+  equippedTraits: string[];
+  permanentTraits: string[];
+  traitSlots: number;
+  health?: number; // Add missing health property
+  baseMaxHealth?: number; // Add missing baseMaxHealth property
+  maxHealth?: number; // Add maxHealth property
+  damageMultiplier?: number; // Add damage multiplier
+  defenseMultiplier?: number; // Add defense multiplier
 }
 
 /**
  * Extended game state with traits and player traits
  */
-interface GameStateWithTraits extends GameState {
+interface GameStateWithTraits {
   /** Player state with trait properties */
   player: PlayerWithTraits;
-  
-  /** All traits in the game */
-  traits: {
-    /** Traits that can be copied from NPCs or other sources */
-    copyableTraits: Record<string, Trait>;
-    
-    /** Other trait-related properties */
+  /** Any additional trait-related state */
+  traits?: {
+    copyableTraits: Record<string, any>;
     [key: string]: any;
   };
-  
-  /** Current essence resource amount (used for copying traits) */
-  essence: number;
-  
-  /** Game notifications */
-  notifications?: Array<{
-    id: number;
-    message: string;
-    type: 'success' | 'warning' | 'error' | 'info';
-    duration: number;
-  }>;
+  /** Essence resource */
+  essence?: number; // Add missing essence property
+  /** Notifications */
+  notifications?: Array<{id: number, message: string, type: string, duration: number}>; // Add missing notifications property
 }
 
 /**
@@ -213,7 +185,7 @@ export const applyTraitEffects = (state: GameStateWithTraits): GameStateWithTrai
   
   // Apply each trait's effects
   allTraits.forEach(traitId => {
-    const trait = state.traits.copyableTraits[traitId];
+    const trait = state.traits?.copyableTraits[traitId]; // Use optional chaining
     if (!trait || !trait.effects) return;
     
     // Apply specific effects
@@ -276,7 +248,7 @@ export const handleCopyTrait = (
   payload: CopyTraitPayload
 ): GameStateWithTraits => {
   const { traitId, essenceCost, npcId } = payload;
-  const trait = state.traits.copyableTraits[traitId];
+  const trait = state.traits?.copyableTraits[traitId]; // Use optional chaining
   
   // Check if player already has this trait
   if (state.player.acquiredTraits.includes(traitId)) {
@@ -295,7 +267,7 @@ export const handleCopyTrait = (
   }
   
   // Check if player has enough essence
-  if (state.essence < essenceCost) {
+  if ((state.essence || 0) < essenceCost) {
     return {
       ...state,
       notifications: [
@@ -313,7 +285,7 @@ export const handleCopyTrait = (
   // If all checks pass, add the trait and subtract essence
   return {
     ...state,
-    essence: state.essence - essenceCost,
+    essence: (state.essence || 0) - essenceCost,
     player: {
       ...state.player,
       acquiredTraits: [...state.player.acquiredTraits, traitId]
@@ -430,14 +402,14 @@ export const equipTrait = (
     equippedTraits = [...state.player.equippedTraits];
   } else if (state.player.equippedTraits) {
     // Convert object to array
-    const traitEntries = Object.entries(state.player.equippedTraits);
+    const traitEntries = Object.entries(state.player.equippedTraits as Record<string, string>);
     equippedTraits = new Array(traitEntries.length);
     
     // Place each trait in the correct position
     traitEntries.forEach(([slot, id]) => {
       const slotNumber = parseInt(slot);
       if (!isNaN(slotNumber)) {
-        equippedTraits[slotNumber] = id;
+        equippedTraits[slotNumber] = id as string;
       }
     });
   }
@@ -488,19 +460,21 @@ export const unequipTrait = (
       }
     };
   } else if (state.player.equippedTraits) {
-    const equippedTraits = { ...state.player.equippedTraits };
+    // Get a copy of the equipped traits as an object
+    const equippedTraitsObj = { ...(state.player.equippedTraits as Record<string, string>) };
     
-    if (!equippedTraits[slotIndex]) {
+    if (!equippedTraitsObj[slotIndex]) {
       return state; // No trait in that slot
     }
     
-    delete equippedTraits[slotIndex]; // Remove the trait
+    delete equippedTraitsObj[slotIndex]; // Remove the trait
     
+    // Always return as an array to match the interface type
     return {
       ...state,
       player: {
         ...state.player,
-        equippedTraits
+        equippedTraits: Object.values(equippedTraitsObj)
       }
     };
   }

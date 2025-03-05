@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useGameState, useGameDispatch } from '../../context/GameStateContext';
-import { ACTION_TYPES } from '../../context/actions/actionTypes';
+// Update the import to use the consolidated gameContext
+import { useGameState, useGameDispatch, ACTION_TYPES } from '../../context/gameContext';
 
 const useEssenceGeneration = (baseAmount = 1, interval = 10000) => {
   const [isGenerating, setIsGenerating] = useState(false);

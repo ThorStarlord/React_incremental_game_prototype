@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, LinearProgress, Tooltip, Paper, Fade } from '@mui/material';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
-import { createEssenceAction, useGameState, useGameDispatch } from '../../../../context/GameStateContext';
+import { ACTION_TYPES, useGameState, useGameDispatch } from '../../../../context/index';
 import { UPDATE_INTERVALS } from '../../../../constants/gameConstants';
 import useThemeUtils from '../../../../shared/hooks/useThemeUtils';
 import EssenceGenerationTimer from '../containers/EssenceGenerationTimer';
@@ -68,13 +68,19 @@ const EssenceDisplay = () => {
   };
 
   const handleBasicEssenceGain = () => {
-    dispatch(createEssenceAction.gain(meditationGain));
+    dispatch({
+      type: ACTION_TYPES.GAIN_ESSENCE,
+      payload: { amount: meditationGain, source: 'meditation' }
+    });
   };
 
   const formatTime = (ms) => `${ms / 1000} seconds`;
 
   const handleGenerateEssence = (amount) => {
-    dispatch(createEssenceAction.gain(amount));
+    dispatch({
+      type: ACTION_TYPES.GAIN_ESSENCE,
+      payload: { amount, source: 'generation' }
+    });
   };
 
   // Determine if storage is nearly full (>90%)

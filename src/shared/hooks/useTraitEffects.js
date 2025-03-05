@@ -1,36 +1,23 @@
 import { useContext, useMemo } from 'react';
-import { GameStateContext } from '../../context/GameStateContext';
+import { useGameState } from '../../context';
 
 /**
  * A custom hook that calculates and provides trait effects based on equipped traits
  * @returns {Object} Object containing modifiers and helper functions
  */
 const useTraitEffects = () => {
-  const { player, traits } = useContext(GameStateContext);
+  const { player, traits } = useGameState();
 
   // Calculate trait modifiers using memoization for performance
   const modifiers = useMemo(() => {
-    // Initialize default modifiers
-    const mods = { 
-      // Combat modifiers
-      attackBonus: 0,
-      defenseBonus: 0,
+    // Initialize mods with default values
+    const mods = {
+      attackPower: 0,
+      defense: 0,
+      healthRegen: 0,
+      critChance: 0,
       dodgeChance: 0,
-      criticalChance: 0,
-      criticalDamage: 0,
-      
-      // Resource modifiers
-      goldMultiplier: 1,
-      essenceGainMultiplier: 1,
-      xpMultiplier: 1,
-      shopDiscount: 0,
-      
-      // Social modifiers
-      relationshipGainMultiplier: 1,
-      
-      // Special effects
-      essenceSiphonChance: 0,
-      statPointBonus: 0
+      // Add other default modifiers as needed
     };
     
     // If no equipped traits or trait data, return default modifiers
@@ -40,8 +27,8 @@ const useTraitEffects = () => {
     
     // Get all active traits (equipped and permanent)
     const allTraits = [
-      ...(player.equippedTraits || []),
-      ...(player.permanentTraits || [])
+      ...(Array.isArray(player.equippedTraits) ? player.equippedTraits : []),
+      ...(Array.isArray(player.permanentTraits) ? player.permanentTraits : [])
     ];
     
     // Process each trait
@@ -68,46 +55,11 @@ const useTraitEffects = () => {
         case 'BattleHardened':
           // Additional attack bonus based on player level
           const levelBonus = (player.level || 1) * 0.01;
-          mods.attackBonus += levelBonus;
-          break;
-          
-        case 'QuickLearner':
-          // XP bonus increases with player level
-          mods.xpMultiplier += (player.level || 1) * 0.005;
-          break;
-          
-        case 'EssenceSiphon':
-          // Essence siphon chance increases with essence gained
-          if (player.totalEssenceEarned > 1000) {
-            mods.essenceSiphonChance += 0.02;
-          }
-          break;
-          
-        case 'RelationshipSage':
-          // Better at higher relationship levels
-          const hasHighRelationship = player.highestRelationship > 70;
-          if (hasHighRelationship) {
-            mods.relationshipGainMultiplier += 0.1;
-          }
-          break;
-          
-        case 'EssenceFlow':
-          // Better with more traits
-          const traitCount = allTraits.length;
-          if (traitCount > 3) {
-            mods.essenceGainMultiplier += (traitCount - 3) * 0.02;
-          }
-          break;
-          
-        case 'BargainingMaster':
-          // Shop discount increases with gold owned
-          if (player.gold > 1000) {
-            mods.shopDiscount += 0.02;
-          }
+          mods.attackPower += levelBonus;
           break;
           
         default:
-          // No special handling for other traits
+          // No special effect for this trait
           break;
       }
     });
@@ -128,10 +80,10 @@ const useTraitEffects = () => {
     
     switch (statType) {
       case 'attack':
-        result *= (1 + modifiers.attackBonus);
+        result *= (1 + modifiers.attackPower);
         break;
       case 'defense':
-        result *= (1 + modifiers.defenseBonus);
+        result *= (1 + modifiers.defense);
         break;
       case 'xpGain':
         result *= modifiers.xpMultiplier;
@@ -184,8 +136,8 @@ const useTraitEffects = () => {
     switch (scenario) {
       case 'combat':
         return {
-          attackBonus: modifiers.attackBonus,
-          defenseBonus: modifiers.defenseBonus,
+          attackBonus: modifiers.attackPower,
+          defenseBonus: modifiers.defense,
           dodgeChance: modifiers.dodgeChance,
           criticalChance: modifiers.criticalChance,
           criticalDamage: modifiers.criticalDamage,

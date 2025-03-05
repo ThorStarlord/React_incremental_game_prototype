@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -14,7 +14,7 @@ import {
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import PersonIcon from '@mui/icons-material/Person';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import { GameStateContext } from '../../../context/GameStateContext';
+import { useGameState } from '../../../context/index';
 import Panel from '../../../shared/components/layout/Panel';
 
 /**
@@ -44,7 +44,7 @@ import Panel from '../../../shared/components/layout/Panel';
  */
 const DialogueHistory = ({ compact = false, filterNpcId, maxMessages = 50 }) => {
   const theme = useTheme();
-  const { dialogueHistory, clearDialogueHistory } = useContext(GameStateContext);
+  const { dialogueHistory, clearDialogueHistory } = useGameState();
   const [filteredHistory, setFilteredHistory] = useState([]);
 
   // Format timestamp to a readable time

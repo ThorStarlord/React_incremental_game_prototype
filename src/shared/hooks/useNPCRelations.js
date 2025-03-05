@@ -1,12 +1,16 @@
-import { useContext, useMemo } from 'react';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
+import { useMemo } from 'react';
+import { useGameState, useGameDispatch } from '../../context/gameContext';
 
 const useNPCRelations = (npcId) => {
-  const { npcs } = useContext(GameStateContext);
-  const dispatch = useContext(GameDispatchContext);
+  const gameState = useGameState();
+  const dispatch = useGameDispatch();
+
+  // Add safety check for npcs property
+  const npcs = gameState?.npcs || [];
 
   const npc = useMemo(() => 
-    npcs.find(n => n.id === npcId),
+    // Use optional chaining to safely handle npcs being undefined
+    Array.isArray(npcs) ? npcs.find(n => n && n.id === npcId) : null,
     [npcs, npcId]
   );
 
@@ -18,50 +22,28 @@ const useNPCRelations = (npcId) => {
     if (value >= 60) return { name: 'Trusted', color: '#4CAF50', tier: 4 };
     if (value >= 40) return { name: 'Friendly', color: '#2196F3', tier: 3 };
     if (value >= 20) return { name: 'Warm', color: '#8BC34A', tier: 2 };
-    if (value >= 0) return { name: 'Neutral', color: '#9E9E9E', tier: 1 };
-    if (value >= -20) return { name: 'Cold', color: '#FF9800', tier: 0 };
-    if (value >= -40) return { name: 'Unfriendly', color: '#F44336', tier: -1 };
-    if (value >= -60) return { name: 'Hostile', color: '#D32F2F', tier: -2 };
-    return { name: 'Nemesis', color: '#B71C1C', tier: -3 };
+    // Add default return for values below 20
+    return { name: 'Neutral', color: '#9E9E9E', tier: 1 };
   }, [npc]);
 
-  const updateRelationship = (change) => {
-    if (!npc) return;
+  // Update NPC relationship with specified amount
+  const updateRelationship = (amount) => {
+    if (!npcId) return;
     
     dispatch({
       type: 'UPDATE_NPC_RELATIONSHIP',
       payload: {
         npcId,
-        changeAmount: change
+        changeAmount: amount
       }
     });
   };
 
-  const updateDialogueState = (changes) => {
-    if (!npc) return;
-
-    dispatch({
-      type: 'UPDATE_DIALOGUE_STATE',
-      payload: {
-        npcId,
-        dialogueState: changes
-      }
-    });
-  };
-
-  const checkRelationshipRequirement = (required) => {
-    if (!npc) return false;
-    return (npc.relationship || 0) >= required;
-  };
-
+  // Return useful values from the hook
   return {
     npc,
     relationshipLevel,
-    updateRelationship,
-    updateDialogueState,
-    checkRelationshipRequirement,
-    currentRelationship: npc?.relationship || 0,
-    dialogueState: npc?.dialogueState || {}
+    updateRelationship
   };
 };
 

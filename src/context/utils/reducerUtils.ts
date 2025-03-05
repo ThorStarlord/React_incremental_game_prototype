@@ -86,14 +86,18 @@ export interface Slice<S = any, A = any> {
  *   todos: todosReducer
  * });
  */
-export function combineReducers<S = any>(reducers: ReducersMapObject<S>): Reducer<S> {
-  return function combinedReducer(state: S = {} as S, action: Action): S {
+export function combineReducers<S extends Record<string, any>, A extends Action = Action>(
+  reducers: Record<keyof S, Reducer<any, A>>
+): Reducer<S, A> {
+  return function combination(state: S = {} as S, action: A): S {
     const nextState: Partial<S> = {};
     let hasChanged = false;
     
     Object.entries(reducers).forEach(([key, reducer]) => {
       const previousStateForKey = state[key as keyof S];
-      const nextStateForKey = reducer(previousStateForKey, action);
+      // Add explicit type for the reducer
+      const typedReducer = reducer as Reducer<typeof previousStateForKey, A>;
+      const nextStateForKey = typedReducer(previousStateForKey, action);
       
       nextState[key as keyof S] = nextStateForKey;
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
@@ -259,12 +263,18 @@ export function enhanceReducer<S = any, A extends Action = Action>(
  *   resetOnLogout
  * );
  */
-export function composeReducers<S = any, A extends Action = Action>(
+export function composeReducers<S, A extends Action = Action>(
   ...reducers: Reducer<S, A>[]
 ): Reducer<S, A> {
-  return function compositeReducer(state: S | undefined, action: A) {
+  return function compositeReducer(state: S | undefined, action: A): S {
+    // Handle undefined state by ensuring at least one reducer exists
+    if (state === undefined && reducers.length > 0) {
+      return reducers[0](undefined, action);
+    }
+    
+    // Now we can safely cast state to S since we've handled the undefined case
     return reducers.reduce((currentState, reducer) => {
       return reducer(currentState, action);
-    }, state);
+    }, state as S);
   };
 }

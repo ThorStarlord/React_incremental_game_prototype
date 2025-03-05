@@ -12,12 +12,12 @@ import {
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import LockIcon from '@mui/icons-material/Lock';
-import { GameStateContext } from '../../../../context/GameStateContext';
+import { useGameState } from '../../../../context/index';
 import Panel from '../../../../shared/components/layout/Panel';
 import CompactTraitCard from './CompactTraitCard';
 
 const CompactTraitPanel = ({ onExpandView }) => {
-  const { player, traits: traitData } = useContext(GameStateContext);
+  const { player, traits: traitData } = useGameState();
   
   // Function to get trait object by ID
   const getTraitById = (traitId) => {

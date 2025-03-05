@@ -15,7 +15,7 @@ import {
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import PersonIcon from '@mui/icons-material/Person';
-import { GameStateContext } from '../../../../context/GameStateContext';
+import { useGameState } from '../../../../context/index';
 import Panel from '../../../../shared/components/layout/Panel';
 
 /**
@@ -62,7 +62,7 @@ import Panel from '../../../../shared/components/layout/Panel';
  */
 const CompactCharacterPanel = ({ onExpandView }) => {
   // Access game state from context with safe default fallback values
-  const { npcs = [], player = {} } = useContext(GameStateContext);
+  const { npcs = [], player = {} } = useGameState();
   
   /**
    * Filters the list of NPCs to find characters controlled by the player

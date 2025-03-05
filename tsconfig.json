@@ -7,7 +7,13 @@
     "moduleResolution": "node",               /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6) */
     "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
     "skipLibCheck": true,                     /* Skip type checking of declaration files (*.d.ts) */
-    "forceConsistentCasingInFileNames": true  /* Disallow inconsistently-cased references to an existing file or directory. */
+    "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to an existing file or directory. */
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ]
   },
-  "include": ["src"]                          /* Specify folders to include in compilation */
+  "include": [
+    "src"
+  ]
 }

@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import InfoIcon from '@mui/icons-material/Info';
-import { GameStateContext } from '../../../../context/GameStateContext';
+import { useGameState } from '../../../../context/index';
 import Panel from '../../../../shared/components/layout/Panel';
 // TraitCard and TraitBrowser imports removed
 
@@ -31,7 +31,7 @@ import Panel from '../../../../shared/components/layout/Panel';
  */
 const IntegratedTraitsPanel = ({ onClose }) => {
   // State and context hooks
-  const { player, traits: traitData, dispatch } = useContext(GameStateContext);
+  const { player, traits: traitData, dispatch } = useGameState();
   const [activeTab, setActiveTab] = useState(0);
   const [selectedTrait, setSelectedTrait] = useState(null);
   

@@ -1,16 +1,11 @@
 import { createContext, useContext } from 'react';
 import { GameState, initialState } from './initialState';
 
-/**
- * Context for storing and accessing the current game state throughout the application
- * Uses the GameState interface to provide proper TypeScript typing
- */
+// Create the context with the proper type and default value
 const GameStateContext = createContext<GameState>(initialState);
 
 /**
  * Custom hook for accessing the game state with proper typing
- * @returns The current game state
- * @throws Error if used outside of a GameStateContext.Provider
  */
 export const useGameState = (): GameState => {
   const context = useContext(GameStateContext);
@@ -20,12 +15,7 @@ export const useGameState = (): GameState => {
   return context;
 };
 
-/**
- * Custom hook for accessing a specific part of the game state
- * @param selector A function that selects a portion of the game state
- * @returns The selected portion of the state
- * @throws Error if used outside of a GameStateContext.Provider
- */
+// Selector hook implementation
 export function useGameStateSelector<Selected>(
   selector: (state: GameState) => Selected
 ): Selected {
@@ -33,9 +23,5 @@ export function useGameStateSelector<Selected>(
   return selector(state);
 }
 
-// Example usage:
-// const playerStats = useGameStateSelector(state => state.player.stats);
-// const inventory = useGameStateSelector(state => state.inventory);
-// const isInCombat = useGameStateSelector(state => state.combat.inCombat);
-
+// Export only as default
 export default GameStateContext;

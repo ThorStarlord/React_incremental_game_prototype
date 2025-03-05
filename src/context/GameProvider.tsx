@@ -1,10 +1,31 @@
-import React, { useReducer, useEffect, ReactNode } from 'react';
-import GameStateContext from './GameStateContext';
-import GameDispatchContext from './GameDispatchContext';
-import rootReducer from './reducers/rootReducer';
+import React, { createContext, useReducer, useEffect, useContext, ReactNode, Dispatch } from 'react';
+import { rootReducer } from './reducers/rootReducer';
 import { initialState, GameState } from './initialState';
 import { ACTION_TYPES } from './actions/actionTypes';
+import { GameAction } from './actions/types';
 
+// Create the context objects directly in this file
+const GameStateContext = createContext<GameState>(initialState);
+const GameDispatchContext = createContext<Dispatch<GameAction> | null>(null);
+
+// Export custom hooks to use the contexts
+export const useGameState = (): GameState => {
+  const context = useContext(GameStateContext);
+  if (context === undefined) {
+    throw new Error('useGameState must be used within a GameProvider');
+  }
+  return context;
+};
+
+export const useGameDispatch = (): Dispatch<GameAction> => {
+  const dispatch = useContext(GameDispatchContext);
+  if (dispatch === null) {
+    throw new Error('useGameDispatch must be used within a GameProvider');
+  }
+  return dispatch;
+};
+
+// Define the provider component props
 interface GameProviderProps {
   children: ReactNode;
 }
@@ -14,14 +35,8 @@ interface GameProviderProps {
  * 
  * Purpose: Sets up the game state management system and provides both state and
  * dispatch function to the application via React Context.
- * 
- * This component:
- * 1. Initializes the game state using useReducer with rootReducer and initialState
- * 2. Handles loading saved game data from localStorage on mount
- * 3. Saves game state to localStorage when it changes
- * 4. Provides both state and dispatch to child components via context
  */
-const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
+export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [gameState, dispatch] = useReducer(rootReducer, initialState);
 
   // Load saved game on mount
@@ -37,7 +52,6 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('Failed to load saved game:', error);
-      // Optionally show an error notification to the user
     }
   }, []);
 
@@ -47,7 +61,6 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       localStorage.setItem('savedGame', JSON.stringify(gameState));
     } catch (error) {
       console.error('Failed to save game:', error);
-      // Optionally show an error notification to the user
     }
   }, [gameState]);
 
@@ -60,4 +73,8 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   );
 };
 
+// Export the context objects for direct access if needed
+export { GameStateContext, GameDispatchContext };
+
+// Export the provider component as default
 export default GameProvider;

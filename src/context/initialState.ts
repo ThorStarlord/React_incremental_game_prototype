@@ -49,6 +49,10 @@ export interface PlayerState {
   stats: PlayerStats;
   totalPlayTime: number;
   creationDate: string | null;  // ISO date string or null
+  equippedTraits?: string[];    // Array of equipped trait IDs
+  permanentTraits?: string[];   // Array of permanent trait IDs
+  acquiredTraits?: string[];    // Array of all acquired trait IDs
+  traitSlots?: number;          // Number of available trait slots
 }
 
 /**
@@ -240,6 +244,7 @@ export interface AudioSettings {
 export interface GameplaySettings {
   difficultyLevel: 'easy' | 'normal' | 'hard' | 'nightmare';
   autosaveInterval: number; // in seconds
+  relationshipDecayDisabled?: boolean; // Whether NPC relationships should decay over time
 }
 
 /**
@@ -454,7 +459,8 @@ export const initialState: GameState = {
     },
     gameplay: {
       difficultyLevel: 'normal',
-      autosaveInterval: 60 // in seconds
+      autosaveInterval: 60, // in seconds
+      relationshipDecayDisabled: false // Relationships decay by default
     }
   },
   

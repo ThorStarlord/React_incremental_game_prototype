@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useGameState, useGameDispatch } from '../../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../../context/index';
 
 const useMinionSimulation = (settings = {}) => {
     const [simResults, setSimResults] = useState([]);

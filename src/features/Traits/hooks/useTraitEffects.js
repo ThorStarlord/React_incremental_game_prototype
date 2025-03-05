@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { GameStateContext } from '../../../context/GameStateContext';
+import { useGameState } from '../../../context/index';
 import { calculateTraitEffect } from '../utils/traitUtils';
 
 /**
@@ -8,7 +8,7 @@ import { calculateTraitEffect } from '../utils/traitUtils';
  * @returns {Object} Object containing trait-related utility functions
  */
 const useTraitEffects = () => {
-  const { player, traits } = useContext(GameStateContext);
+  const { player, traits } = useGameState();
   
   useEffect(() => {
     const applyEffects = () => {

@@ -3,7 +3,7 @@ import {
   Box, Typography, Grid, Button, Divider, 
   Tabs, Tab, Badge, Chip, LinearProgress
 } from '@mui/material';
-import { GameStateContext, useGameDispatch, useGameState } from '../../../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../../../context/index';
 import Panel from '../../../../shared/components/layout/Panel';
 import InventoryItem from '../presentation/InventoryItem';
 import ItemDetailsDialog from '../presentation/ItemDetailsDialog';

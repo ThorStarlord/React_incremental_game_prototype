@@ -3,7 +3,9 @@ import { useGameState } from '../GameStateContext';
 import { useGameDispatch } from '../GameDispatchContext';
 import { ACTION_TYPES } from '../actions/actionTypes';
 import { getSimplifiedTier } from '../../config/relationshipConstants';
-import { GameState } from '../initialState';
+import { GameState, PlayerState } from '../initialState';
+import { UpdateNpcRelationshipPayload } from '../actions/npcActions';
+import { AddNotificationPayload, NotificationType } from '../actions/notificationActions';
 
 /**
  * Interface for NPC object in the game state
@@ -19,7 +21,7 @@ interface NPC {
  * Interface for area object in the game state
  */
 interface GameArea {
-  id: string;
+  id: string; // Ensure this property exists
   name?: string;
   dangerLevel: number;
   possibleEnemies: string[];
@@ -70,9 +72,24 @@ interface GameLoopProps {
 }
 
 /**
+ * Extended PlayerState with required traits property
+ */
+interface ExtendedPlayerState extends PlayerState {
+  equippedTraits?: string[];
+  goldPerMinute?: number;
+  activeSkill?: string;
+  skills?: any[];
+  healthRegenRate?: number;
+  health?: number;
+  maxHealth?: number;
+  passiveSkillGainRate?: number; // Add this property
+}
+
+/**
  * Extended GameState with additional properties used in GameLoop
  */
 interface ExtendedGameState extends GameState {
+  player: ExtendedPlayerState;
   npcs?: NPC[];
   gameTime?: GameTime;
   inCombat?: boolean;
@@ -112,13 +129,15 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
       // Apply trait effects that modify relationships
       const hasGrowingAffinity = gameState.player.equippedTraits?.includes('GrowingAffinity');
       if (hasGrowingAffinity) {
+        const payload: UpdateNpcRelationshipPayload = {
+          npcId: 'all',
+          changeAmount: 1,
+          source: 'GrowingAffinity'
+        };
+        
         dispatch({ 
           type: ACTION_TYPES.UPDATE_NPC_RELATIONSHIP, 
-          payload: {
-            npcId: 'all',
-            changeAmount: 1,
-            source: 'GrowingAffinity'
-          }
+          payload
         });
       }
       
@@ -129,13 +148,15 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
         // ENEMY tier effects
         if (tier === "ENEMY" && Math.random() < 0.05) {
           // 5% chance for negative events from enemies
+          const notificationPayload: AddNotificationPayload = {
+            message: `${npc.name} is spreading rumors about you!`,
+            type: 'negative' as NotificationType,
+            duration: 5000
+          };
+          
           dispatch({
             type: ACTION_TYPES.ADD_NOTIFICATION,
-            payload: {
-              message: `${npc.name} is spreading rumors about you!`,
-              type: 'negative',
-              duration: 5000
-            }
+            payload: notificationPayload
           });
           
           // Additional enemy actions could be implemented here
@@ -151,26 +172,30 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
             payload: { amount: essenceAmount }
           });
           
+          const notificationPayload: AddNotificationPayload = {
+            message: `${npc.name} sent you ${essenceAmount} essence as a gift!`,
+            type: 'positive' as NotificationType,
+            duration: 5000
+          };
+          
           dispatch({
             type: ACTION_TYPES.ADD_NOTIFICATION,
-            payload: {
-              message: `${npc.name} sent you ${essenceAmount} essence as a gift!`,
-              type: 'positive',
-              duration: 5000
-            }
+            payload: notificationPayload
           });
         }
         
         // FRIEND tier effects
         if (tier === "FRIEND" && Math.random() < 0.08) {
           // 8% chance for information from friends
+          const notificationPayload: AddNotificationPayload = {
+            message: `${npc.name} shared some useful information with you.`,
+            type: 'info' as NotificationType,
+            duration: 5000
+          };
+          
           dispatch({
             type: ACTION_TYPES.ADD_NOTIFICATION,
-            payload: {
-              message: `${npc.name} shared some useful information with you.`,
-              type: 'info',
-              duration: 5000
-            }
+            payload: notificationPayload
           });
           
           // Additional friend-based events could be implemented here
@@ -185,7 +210,7 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
   useEffect(() => {
     const resourceInterval = setInterval(() => {
       // Generate passive resources based on player stats/buildings/etc
-      const passiveGold = (gameState.player as any).goldPerMinute || 0;
+      const passiveGold = gameState.player.goldPerMinute || 0;
       if (passiveGold > 0) {
         dispatch({
           type: ACTION_TYPES.GAIN_GOLD,
@@ -209,13 +234,15 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
       const { day, period } = gameState.gameTime || { day: 1, period: 'DAY' };
       if (period === 'NIGHT') {
         // Night-time specific events
+        const notificationPayload: AddNotificationPayload = {
+          message: `Day ${day} has ended. It's now night time.`,
+          type: 'info' as NotificationType,
+          duration: 3000
+        };
+        
         dispatch({
           type: ACTION_TYPES.ADD_NOTIFICATION,
-          payload: {
-            message: `Day ${day} has ended. It's now night time.`,
-            type: 'info',
-            duration: 3000
-          }
+          payload: notificationPayload
         });
       }
     }, 300000); // Run every 5 minutes
@@ -227,46 +254,48 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
   useEffect(() => {
     const statsInterval = setInterval(() => {
       // Apply passive skill experience gain
-      if ((gameState.player as any).skills) {
-        const passiveSkillGain = (gameState.player as any).passiveSkillGainRate || 0;
+      if (gameState.player.skills) {
+        const passiveSkillGain = gameState.player.passiveSkillGainRate || 0;
         
-        if (passiveSkillGain > 0 && (gameState.player as any).activeSkill) {
+        if (passiveSkillGain > 0 && gameState.player.activeSkill) {
           dispatch({
             type: ACTION_TYPES.GAIN_SKILL_EXPERIENCE,
             payload: {
-              skillId: (gameState.player as any).activeSkill,
+              skillId: gameState.player.activeSkill,
               amount: passiveSkillGain
             }
           });
           
           // Notify on significant milestones
-          const currentSkill = (gameState.player as any).skills.find(
-            (s: any) => s.id === (gameState.player as any).activeSkill
+          const currentSkill = gameState.player.skills.find(
+            s => s.id === gameState.player.activeSkill
           );
           
           if (currentSkill && Math.floor(currentSkill.experience) % 100 === 0) {
+            const notificationPayload: AddNotificationPayload = {
+              message: `You've gained experience in ${currentSkill.name}!`,
+              type: 'positive' as NotificationType,
+              duration: 3000
+            };
+            
             dispatch({
               type: ACTION_TYPES.ADD_NOTIFICATION,
-              payload: {
-                message: `You've gained experience in ${currentSkill.name}!`,
-                type: 'positive',
-                duration: 3000
-              }
+              payload: notificationPayload
             });
           }
         }
       }
       
       // Apply health regeneration if applicable
-      const healthRegen = (gameState.player as any).healthRegenRate || 0;
+      const healthRegen = gameState.player.healthRegenRate || 0;
       if (healthRegen > 0 && 
-          (gameState.player as any).health < (gameState.player as any).maxHealth) {
+          (gameState.player.health || 0) < (gameState.player.maxHealth || 100)) {
         dispatch({
-          type: ACTION_TYPES.UPDATE_HEALTH,
+          type: ACTION_TYPES.UPDATE_PLAYER,
           payload: {
             health: Math.min(
-              (gameState.player as any).health + healthRegen, 
-              (gameState.player as any).maxHealth
+              (gameState.player.health || 0) + healthRegen, 
+              (gameState.player.maxHealth || 100)
             )
           }
         });
@@ -283,7 +312,7 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
       if (gameState.inCombat) return;
       
       // Calculate encounter chance based on area danger level
-      const currentArea = gameState.currentArea || { dangerLevel: 0, possibleEnemies: [] };
+      const currentArea = gameState.currentArea || { id: 'unknown', dangerLevel: 0, possibleEnemies: [] };
       const dangerLevel = currentArea.dangerLevel || 0;
       const encounterChance = dangerLevel * 0.05; // 5% per danger level
       
@@ -320,8 +349,10 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
   useEffect(() => {
     const questInterval = setInterval(() => {
       // Update time-based quest objectives
-      if (gameState.activeQuests?.length > 0) {
-        gameState.activeQuests.forEach(quest => {
+      const activeQuests = gameState.activeQuests || [];
+      
+      if (activeQuests.length > 0) {
+        activeQuests.forEach(quest => {
           if (quest.objectives) {
             // Check for time-based objectives
             const timeObjectives = quest.objectives.filter(obj => 

@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Divider, Snackbar, Alert } from '@mui/material';
-import { useGameState, useGameDispatch } from '../../../../context/GameStateContext';
-import { ACTION_TYPES } from '../../../../context/actions/actionTypes';
+import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../../context/index';
 import { getRelationshipTier, getAvailableInteractions } from '../../utils/relationshipUtils';
 import Panel from '../../../../shared/components/layout/Panel';
 
@@ -38,10 +37,11 @@ const NPCPanel = ({ npcId, npc: propNpc, onClose }) => {
   }, [propNpc, npcs, npcId]);
   
   // Always call hooks unconditionally at the top level
-  const { currentDialogue, setCurrentDialogue } = useNPCDiscovery({
-    npc,
-    npcId: npc?.id || npcId,
-    player,
+  // Ensure parameters passed to hooks have default values
+  const { currentDialogue = {}, setCurrentDialogue = () => {} } = useNPCDiscovery({
+    npc: npc || null,
+    npcId: npc?.id || npcId || '',
+    player: player || {},
     dispatch
   });
 

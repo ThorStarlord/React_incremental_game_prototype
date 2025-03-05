@@ -1,5 +1,5 @@
-import { useContext, useMemo } from 'react';
-import { GameStateContext } from '../../../context/GameStateContext';
+import { useContext, useMemo, useEffect, useCallback } from 'react';
+import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../context/index';
 
 /**
  * @function useEssenceGeneration
@@ -15,7 +15,7 @@ import { GameStateContext } from '../../../context/GameStateContext';
  */
 const useEssenceGeneration = () => {
   // Access the game state through context
-  const { npcs, research, playerStats, buildings } = useContext(GameStateContext);
+  const { npcs, research, playerStats, buildings } = useGameState();
   
   // Calculate all essence generation data with memoization for performance
   const essenceGenerationData = useMemo(() => {

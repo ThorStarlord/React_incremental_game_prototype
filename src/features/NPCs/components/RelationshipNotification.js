@@ -1,9 +1,9 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Snackbar, Alert, Box, Typography, Avatar, Fade, LinearProgress, useTheme } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { GameStateContext } from '../../../context/GameStateContext';
+import { useGameState } from '../../../context/index';
 import { getRelationshipTier } from '../../../constants/relationshipConstants';
 
 /**
@@ -31,7 +31,7 @@ const playSound = (src, volume = 0.5) => {
  * @returns {React.Component} A notification component for relationship changes
  */
 const RelationshipNotification = () => {
-  const { npcs, dispatch } = useContext(GameStateContext);
+  const { npcs, dispatch } = useGameState();
   const [notification, setNotification] = useState(null);
   const [open, setOpen] = useState(false);
   const theme = useTheme();

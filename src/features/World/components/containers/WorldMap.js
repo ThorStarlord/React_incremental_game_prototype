@@ -4,10 +4,10 @@
  * and their current status. Allows players to select regions for further interactions.
  */
 
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 // Remove styled-components import
 import { Box, Typography, Paper, LinearProgress } from '@mui/material';
-import { GameStateContext, useGameDispatch } from '../../../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../../../context/index';
 import { ACTION_TYPES } from '../../../../constants/actionTypes';
 
 /**
@@ -17,7 +17,7 @@ import { ACTION_TYPES } from '../../../../constants/actionTypes';
  */
 const WorldMap = () => {
   const dispatch = useGameDispatch();
-  const { world, player, quests } = useContext(GameStateContext);
+  const { world, player, quests } = useGameState();
   const regions = world?.regions || {};
   const playerLevel = player?.level || 1;
   const completedQuests = quests?.completed || [];

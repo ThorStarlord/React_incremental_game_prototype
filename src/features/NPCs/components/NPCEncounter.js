@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -20,7 +20,7 @@ import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import BreadcrumbNav from '../../../shared/components/ui/BreadcrumbNav';
 import NPCPanel from './container/NPCPanel';
 import DialogueHistory from './DialogueHistory';
-import { GameStateContext } from '../../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../../context/index';
 
 /**
  * NPCEncounter Component
@@ -40,7 +40,8 @@ import { GameStateContext } from '../../../context/GameStateContext';
 const NPCEncounter = ({ npcId }) => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const { npcs, player, addDialogueMessage } = useContext(GameStateContext);
+  const gameState = useGameState();
+  const { npcs, player, addDialogueMessage } = gameState;
   
   // Component state
   const [activeTab, setActiveTab] = useState('talk'); // 'talk', 'trade', 'relationship'
@@ -48,7 +49,10 @@ const NPCEncounter = ({ npcId }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Find the current NPC from the game state
-  const currentNpc = npcs.find(npc => npc.id === npcId);
+  // Add proper guard to prevent "Cannot read properties of undefined (reading 'find')" error
+  const currentNpc = Array.isArray(npcs) 
+    ? npcs.find(npc => npc && npc.id === npcId)
+    : null;
   
   // Initialize encounter when component mounts
   useEffect(() => {

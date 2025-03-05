@@ -18,7 +18,7 @@ import {
 import LockIcon from '@mui/icons-material/Lock';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-import { GameStateContext, useGameDispatch } from '../../../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../../../context/index';
 import Panel from '../../../../shared/components/layout/Panel';
 import useTraitEffects from '../../hooks/useTraitEffects';
 import PropTypes from 'prop-types';
@@ -116,7 +116,7 @@ const TraitSlots = ({
   slotUnlockLevels = {},
   playerLevel = 1
 }) => {
-  const { player, traits, essence } = useContext(GameStateContext);
+  const { player, traits, essence } = useGameState();
   const dispatch = useGameDispatch();
   const { modifiers } = useTraitEffects();
   const [selectedTrait, setSelectedTrait] = useState(null);

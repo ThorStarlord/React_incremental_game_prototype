@@ -30,7 +30,8 @@
  * }
  */
 
-import { createContext, Dispatch, useContext } from 'react';
+import { createContext, useContext, Dispatch } from 'react';
+import { GameAction } from './actions/types';
 import { ACTION_TYPES } from './actions/actionTypes';
 import { GameState } from './initialState';
 
@@ -536,62 +537,12 @@ interface UpdateSettingsAction extends BaseAction {
 }
 
 /**
- * Union of all possible game actions
- * This type is used for the dispatch function to ensure type safety
- */
-export type GameAction =
-  | InitializeGameDataAction
-  | ResetGameAction
-  | AdvanceTimeAction
-  | UpdatePlayerAction
-  | GainExperienceAction
-  | LevelUpAction
-  | GainResourceAction
-  | SpendResourceAction
-  | GainEssenceAction
-  | SpendEssenceAction
-  | AddItemAction
-  | RemoveItemAction
-  | UseItemAction
-  | EquipItemAction
-  | UnequipItemAction
-  | StartQuestAction
-  | CompleteQuestAction
-  | FailQuestAction
-  | UpdateQuestProgressAction
-  | DiscoverLocationAction
-  | TravelToLocationAction
-  | StartCombatAction
-  | EndCombatAction
-  | PlayerAttackAction
-  | EnemyAttackAction
-  | UpdateSettingsAction;
-
-/**
  * Context for accessing the dispatch function throughout the application
  * The null default value is overridden by GameProvider component
  */
 const GameDispatchContext = createContext<Dispatch<GameAction> | null>(null);
 
-/**
- * Custom hook for accessing the game dispatch function with proper typing
- * @returns {Dispatch<GameAction>} The dispatch function to trigger game state changes
- * @throws {Error} If used outside of a GameProvider component
- * 
- * @example
- * function PlayerActions() {
- *   const dispatch = useGameDispatch();
- *   
- *   const handleGainGold = () => {
- *     dispatch({
- *       type: ACTION_TYPES.GAIN_RESOURCE,
- *       payload: { resourceType: 'gold', amount: 10 }
- *     });
- *   };
- *   
- *   return <button onClick={handleGainGold}>Mine Gold</button>;
- * }
- */
+// Export these hooks and functions
 export const useGameDispatch = (): Dispatch<GameAction> => {
   const dispatch = useContext(GameDispatchContext);
   if (dispatch === null) {
@@ -653,4 +604,5 @@ export const GameActions = {
   })
 };
 
+// Export only once - as default
 export default GameDispatchContext;

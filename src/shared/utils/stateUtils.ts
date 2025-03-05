@@ -162,25 +162,29 @@ export const mergeState = <T extends StateObject>(currentState: T, newState: Par
  * @template T The type of the state object
  * @template U The type of the value being set
  */
-export const updateNestedState = <T extends StateObject, U = any>(state: T, path: string, value: U): T => {
-  // Create a copy of the state to maintain immutability
+export const updateNestedState = <T extends Record<string, any>>(state: T, path: string, value: any): T => {
+  // Create a copy of the original state
   const result = { ...state };
   
   // Split the path into parts
   const parts = path.split('.');
   
-  // Navigate to the right level in the object
-  let current = result;
+  // Start navigation at the top level
+  let current: Record<string, any> = result;
+  
+  // Navigate through the path, creating objects as needed
   for (let i = 0; i < parts.length - 1; i++) {
     const part = parts[i];
+    
     // Create the property if it doesn't exist
     if (!current[part]) {
-      current[part] = {};
+      // Fix generic type indexing by using type assertion
+      current[part] = {} as Record<string, any>;
     }
     // Create a copy of this level to maintain immutability
-    current[part] = { ...current[part] };
+    current[part] = { ...current[part] as Record<string, any> };
     // Move to the next level
-    current = current[part];
+    current = current[part] as Record<string, any>;
   }
   
   // Set the value at the final level

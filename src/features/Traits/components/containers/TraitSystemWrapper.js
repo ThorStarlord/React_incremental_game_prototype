@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, Alert, Snackbar } from '@mui/material';
 import TraitList from './TraitList';
 import TraitSlots from './TraitSlots';
 import TraitSlotsFallback from './TraitSlotsFallback';
 import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
-import { GameStateContext, useGameDispatch } from '../../../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../../../context/index';
 import { traits } from '../../data/traits';
 
 const TraitSystemWrapper = () => {
   const [dndKitError, setDndKitError] = useState(false);
-  const { player, essence } = useContext(GameStateContext);
+  const { player, essence } = useGameState();
   const dispatch = useGameDispatch();
 
   useEffect(() => {

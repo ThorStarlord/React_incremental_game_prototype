@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { 
   Drawer, 
@@ -19,7 +19,7 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import IntegratedTraitsPanel from '../../../features/Traits/components/containers/IntegratedTraitsPanel';
 import NPCPanel from '../../../features/NPCs/components/container/NPCPanel';
 import CharactersPanel from '../../../features/Minions/components/ui/CharactersPanel';
-import { GameStateContext } from '../../../context/GameStateContext';
+import { useGameState } from '../../../context/index';
 import CharacterTabBar from './CharacterTabBar';
 import Panel from '../layout/Panel';
 
@@ -65,7 +65,7 @@ import Panel from '../layout/Panel';
  */
 const CharacterManagementDrawer = ({ open, onClose, initialTab = "characters" }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
-  const { player, discoveryProgress } = useContext(GameStateContext);
+  const { player, discoveryProgress } = useGameState();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [panelExpanded, setPanelExpanded] = useState(true);

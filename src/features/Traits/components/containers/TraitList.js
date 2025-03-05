@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
-import { GameStateContext, useGameDispatch } from '../../../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../../../context/index';
 import Panel from '../../../../shared/components/layout/Panel';
 
 // TraitCard component with NPC source support
@@ -113,8 +113,8 @@ const TraitCard = ({ id, trait, onAcquire, essence, isAcquired, npcs }) => {
 
 // Main TraitList component
 const TraitList = () => {
-  // Access game state with safe default fallbacks
-  const { player = {}, essence = 0, traits = { copyableTraits: {} }, npcs = [] } = useContext(GameStateContext);
+  // Ensure we have default values for all state
+  const { player = {}, traits = {}, essence = 0, npcs = [] } = useGameState();
   const dispatch = useGameDispatch();
   const [filter, setFilter] = useState('all');
   

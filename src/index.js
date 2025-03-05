@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import AppRouter from './routes/AppRouter';
-import { GameProvider } from './context/GameStateContext';
+// Fix the import to match the export type
+import GameProvider from './context/GameProvider';  
 import { ThemeProviderWrapper } from './context/ThemeContext';
 import { CssBaseline } from '@mui/material';
+import AppRouter from './routes/AppRouter';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
