@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Box, Typography } from '@mui/material';
-import TownArea from './areas/TownArea';
-import ExplorationArea from './areas/ExplorationArea';
+import { TownArea } from '../areas';
+import ExplorationArea from '../containers/ExplorationArea';
 
 /**
  * Interface for MainContent props
@@ -28,7 +28,7 @@ interface MainContentProps {
  * based on the player's current selection/activity
  * 
  * @param {MainContentProps} props - Component props
- * @returns {JSX.Element} The rendered component
+ * @returns {ReactElement} The rendered component
  */
 const MainContent: React.FC<MainContentProps> = ({ 
   selectedTownId, 
@@ -40,11 +40,16 @@ const MainContent: React.FC<MainContentProps> = ({
   /**
    * Renders the appropriate content based on current selection state
    * 
-   * @returns {JSX.Element} The content to display
+   * @returns {ReactElement} The content to display
    */
-  const renderGameContent = (): JSX.Element => {
+  const renderGameContent = (): ReactElement => {
     if (isExploring || selectedDungeon) {
-      return <ExplorationArea />;
+      return <ExplorationArea 
+        dungeonId={selectedDungeon || undefined} 
+        onExplorationComplete={onBackToWorldMap} 
+        onBack={onBackToWorldMap}
+        onStartBattle={(dungeonId) => console.log(`Start battle in ${dungeonId}`)}
+      />;
     }
     if (selectedTownId) {
       return (

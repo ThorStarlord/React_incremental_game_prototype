@@ -195,7 +195,7 @@ export const getDialogueOptions = (npc: NPC): any[] => {
   }
   
   // Filter out options that have requirements not met
-  return options.filter(option => {
+  return options.filter((option: any) => {
     if (!option.requires) return true;
     
     // For now just check relationship requirements

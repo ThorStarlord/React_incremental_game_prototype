@@ -1,18 +1,13 @@
 /**
- * Game Context Exports - provides unified access to all game state management functionality
- * 
- * This file centralizes all context-related exports, making them easily accessible
- * throughout the application with a single import statement.
+ * Game Context - exports all context-related hooks and providers
+ * Provides unified access to game state management functionality
  */
 
-// Import from the consolidated GameProvider file
-import GameProvider, { 
-  useGameState, 
-  useGameDispatch, 
-  GameStateContext, 
-  GameDispatchContext 
-} from './GameProvider';
-
+// Import from the correct source files
+import GameProvider from './GameProvider';
+import GameStateContext, { useGameState, useGameStateSelector } from './GameStateContext';
+import GameDispatchContext, { useGameDispatch, GameAction as DispatchGameAction } from './GameDispatchContext';
+import { EnhancedGameState } from './GameProvider';
 import { ThemeContext, useTheme, ThemeProviderWrapper } from './ThemeContext';
 import { ACTION_TYPES } from './actions/actionTypes';
 
@@ -20,6 +15,7 @@ import { ACTION_TYPES } from './actions/actionTypes';
 export { 
   GameStateContext, 
   useGameState,
+  useGameStateSelector,
   GameDispatchContext,
   useGameDispatch, 
   GameProvider,
@@ -29,11 +25,8 @@ export {
   ACTION_TYPES 
 };
 
-// Define type for action objects
-export interface GameAction<T = any> {
-  type: string;
-  payload?: T;
-}
+// Define type for action objects (using the one from GameDispatchContext)
+export type GameAction<T = any> = DispatchGameAction;
 
 /**
  * Helper function to create consistent actions with proper typing
@@ -42,10 +35,11 @@ export interface GameAction<T = any> {
  * @param payload - Optional data to include with the action
  * @returns A properly formatted action object
  */
-export const createAction = <T = any>(type: string, payload: T = {} as T): GameAction<T> => ({
+export const createAction = <T = any>(type: string, payload: T): GameAction<T> => ({
   type,
   payload
 });
 
-// Re-export types from initialState for convenience
+// Re-export types from initialState and GameProvider
 export type { GameState, PlayerState, PlayerStats } from './initialState';
+export type { EnhancedGameState };

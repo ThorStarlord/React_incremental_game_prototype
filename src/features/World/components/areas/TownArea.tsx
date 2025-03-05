@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, IconButton, Grid, Button, LinearProgress, Tooltip } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -53,7 +53,7 @@ const towns: Town[] = [
 const TownArea: React.FC<TownAreaProps> = ({ 
   townId,
   selectedNpcId,
-  onBack 
+  onBack
 }) => {
   const navigate = useNavigate();
   const themeUtils = useThemeUtils();
@@ -86,11 +86,18 @@ const TownArea: React.FC<TownAreaProps> = ({
       <BreadcrumbNav />
       <Panel title={town?.name || 'Town'}>
         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton onClick={() => navigate('/game')} size="large">
+          <IconButton onClick={onBack ? onBack : () => navigate('/game')} size="large">
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6">{town?.description}</Typography>
         </Box>
+        
+        {/* Highlight the selected NPC if there is one */}
+        {selectedNpcId && (
+          <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main' }}>
+            Selected NPC: {townNpcs.find(n => n.id === selectedNpcId)?.name || 'Unknown'}
+          </Typography>
+        )}
 
         <Grid container spacing={2}>
           {townNpcs.map((npc) => (

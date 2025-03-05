@@ -71,7 +71,7 @@ import CompactTraitPanel from '../../features/Traits/components/containers/Compa
 import CompactCharacterPanel from '../../features/Minions/components/ui/CompactCharacterPanel';
 
 // Import Context from gameContext.ts instead of separate files
-import { useGameState, useGameDispatch } from '../../context/gameContext';
+import { useGameState, useGameDispatch } from '../../context/GameContext';
 
 // Import hook for minion simulation
 import useMinionSimulation from '../../shared/hooks/useMinionSimulation';

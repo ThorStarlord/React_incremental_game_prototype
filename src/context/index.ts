@@ -1,49 +1,25 @@
 /**
- * Context index file - exports all context-related hooks and providers
- * Provides unified access to game state management functionality
+ * Context index file
+ * 
+ * This file exports all context-related hooks, providers, and utilities
+ * to provide a clean, centralized import for the rest of the application.
  */
 
-// Import from the consolidated GameProvider file
-import GameProvider, { 
-  useGameState, 
-  useGameDispatch, 
-  GameStateContext, 
-  GameDispatchContext 
-} from './GameProvider';
+// Re-export from the correctly cased file
+export * from './GameContext';
 
-import { ThemeContext, useTheme, ThemeProviderWrapper } from './ThemeContext';
-import { ACTION_TYPES } from './actions/actionTypes';
+// Export default components explicitly 
+import GameProvider from './GameProvider';
+import GameStateContext from './GameStateContext';
+import GameDispatchContext from './GameDispatchContext';
+import { ThemeProviderWrapper } from './ThemeContext';
 
-// Export everything explicitly
-export { 
-  GameStateContext, 
-  useGameState,
-  GameDispatchContext,
-  useGameDispatch, 
+export {
   GameProvider,
-  ThemeContext, 
-  useTheme, 
-  ThemeProviderWrapper,
-  ACTION_TYPES 
+  GameStateContext,
+  GameDispatchContext,
+  ThemeProviderWrapper
 };
 
-// Define type for action objects
-export interface GameAction<T = any> {
-  type: string;
-  payload?: T;
-}
-
-/**
- * Helper function to create consistent actions with proper typing
- * 
- * @param type - The action type identifier, typically from ACTION_TYPES enum
- * @param payload - Optional data to include with the action
- * @returns A properly formatted action object
- */
-export const createAction = <T = any>(type: string, payload: T = {} as T): GameAction<T> => ({
-  type,
-  payload
-});
-
-// Re-export types from initialState for convenience
-export type { GameState, PlayerState, PlayerStats } from './initialState';
+// Export default for convenience
+export default GameProvider;

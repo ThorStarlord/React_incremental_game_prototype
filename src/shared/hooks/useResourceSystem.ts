@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { useGameState, useGameDispatch } from '../../context/gameContext';
+import { useGameState, useGameDispatch } from '../../context/GameContext';
 
 /**
  * Interface for a resource object

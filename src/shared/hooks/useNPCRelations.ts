@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useGameState, useGameDispatch } from '../../context/gameContext';
+import { useGameState, useGameDispatch } from '../../context/GameContext';
 
 /**
  * Interface for NPC object
@@ -28,6 +28,27 @@ interface UseNPCRelationsReturn {
   updateRelationship: (amount: number) => void;
 }
 
+// Define interface for dialogue options
+interface DialogueOption {
+  id: string;
+  text: string;
+  outcome?: string;
+  nextId?: string;
+  requires?: {
+    relationship?: number;
+    playerLevel?: number;
+    questCompleted?: string;
+    trait?: string;
+    [key: string]: any;
+  };
+  effects?: {
+    relationshipChange?: number;
+    giveQuest?: string;
+    giveItem?: string;
+    [key: string]: any;
+  };
+}
+
 /**
  * Hook to manage NPC relationship data and interactions
  * 
@@ -38,14 +59,15 @@ const useNPCRelations = (npcId: string): UseNPCRelationsReturn => {
   const gameState = useGameState();
   const dispatch = useGameDispatch();
 
-  // Add safety check for npcs property
-  const npcs: NPC[] = gameState?.npcs || [];
+  // Use type assertion to access npcs property that might not be in EnhancedGameState interface
+  const npcs: NPC[] = (gameState as any).npcs || [];
 
-  const npc = useMemo(() => 
-    // Use optional chaining to safely handle npcs being undefined
-    Array.isArray(npcs) ? npcs.find(n => n && n.id === npcId) : null,
-    [npcs, npcId]
-  );
+  const npc = useMemo(() => {
+    // Explicitly return null instead of undefined when no NPC is found
+    if (!Array.isArray(npcs)) return null;
+    const foundNpc = npcs.find(n => n && n.id === npcId);
+    return foundNpc || null; // Ensure we return null when no NPC is found
+  }, [npcs, npcId]);
 
   const relationshipLevel = useMemo((): RelationshipLevel | null => {
     if (!npc) return null;
@@ -78,6 +100,19 @@ const useNPCRelations = (npcId: string): UseNPCRelationsReturn => {
     relationshipLevel,
     updateRelationship
   };
+};
+
+const getAvailableOptions = (options: DialogueOption[], relationshipValue: number): DialogueOption[] => {
+  return options.filter((option: DialogueOption) => {
+    if (!option.requires) return true;
+    
+    // For now just check relationship requirements
+    if (option.requires.relationship && relationshipValue < option.requires.relationship) {
+      return false;
+    }
+    
+    return true;
+  });
 };
 
 export default useNPCRelations;
