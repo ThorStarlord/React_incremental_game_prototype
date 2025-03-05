@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Grid } from '@mui/material';
-import TraitList from '../components/TraitList';
+import TraitList from '../features/Traits/components/containers/TraitList';
 import TraitSlots from '../components/TraitSlots';
 import Page from '../components/Page';
 
