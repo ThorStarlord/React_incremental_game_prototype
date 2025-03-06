@@ -298,7 +298,7 @@ export interface GameState {
  * Initial game state for a new player
  * @type {GameState}
  */
-export const initialState: GameState = {
+export const InitialState: GameState = {
   /**
    * Player information and core statistics
    */
@@ -491,7 +491,7 @@ export const initialState: GameState = {
  * @returns {GameState} A fresh copy of the initial state
  */
 export const resetGameState = (): GameState => {
-  const freshState = JSON.parse(JSON.stringify(initialState)) as GameState;
+  const freshState = JSON.parse(JSON.stringify(InitialState)) as GameState;
   freshState.player.creationDate = new Date().toISOString();
   freshState.meta.playingSince = new Date().toISOString();
   return freshState;
@@ -542,4 +542,4 @@ export const recalculatePlayerStats = (
   return stats;
 };
 
-export default initialState;
+export default InitialState;

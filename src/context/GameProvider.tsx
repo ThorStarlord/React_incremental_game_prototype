@@ -1,11 +1,12 @@
 import React, { useReducer, useEffect, useCallback, ReactNode, Dispatch } from 'react';
 import { rootReducer } from './reducers/rootReducer';
-import { initialState, GameState as InitialGameState } from './initialState';
+import { GameState as InitialGameState } from './GameContext';
 import { GameState as ReducerGameState } from './reducers/types'; 
 import { ACTION_TYPES } from './actions/actionTypes';
 import { GameAction } from './GameDispatchContext';
 import GameStateContext from './GameStateContext';
 import GameDispatchContext from './GameDispatchContext';
+import InitialState from 'InitialState';
 
 // Game version for save compatibility
 const GAME_VERSION = '0.1.0';
@@ -21,10 +22,10 @@ export interface EnhancedGameState extends InitialGameState {
 
 // Main provider component
 const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
-  // Cast initialState to the type expected by rootReducer
+  // Cast InitialState to the type expected by rootReducer
   const [gameState, dispatch] = useReducer(
     rootReducer, 
-    initialState as unknown as ReducerGameState
+    InitialState as unknown as ReducerGameState
   );
 
   // Save game to specific slot (or default)
