@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { PlayerStateContainer, playerInitialState } from '../playerInitialState';
+import { PlayerStateContainer, PlayerInitialState } from '../PlayerInitialState';
 
 /**
  * Type defining all available player action types
@@ -82,7 +82,7 @@ const playerReducer = (state: PlayerStateContainer, action: PlayerAction): Playe
         }
       };
     case PLAYER_ACTIONS.RESET:
-      return playerInitialState;
+      return PlayerInitialState;
     default:
       return state;
   }
@@ -106,7 +106,7 @@ interface PlayerProviderProps {
  * @returns Provider component
  */
 export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(playerReducer, playerInitialState);
+  const [state, dispatch] = useReducer(playerReducer, PlayerInitialState);
 
   return (
     <PlayerContext.Provider value={{ state, dispatch }}>

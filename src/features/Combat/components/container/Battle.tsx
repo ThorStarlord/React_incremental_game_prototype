@@ -7,7 +7,7 @@ import useThemeUtils from '../../hooks/useThemeUtils';
 import TraitEffectDialog from './TraitEffectDialog';
 import TraitEffectAnimation from './TraitEffectAnimation';
 import combatInitialState, { CombatState, CombatLogEntry } from '../../combatInitialState';
-import '../../../../constants/gameStateTypes'; // Import our type extensions
+import '../../../../constants/GameStateTypes'; // Import our type extensions
 
 /**
  * Props for the Battle component

@@ -21,8 +21,8 @@ import {
   SettingsState,
   StatisticsState,
   MetaState
-} from './types/gameStateTypes';
-import { PlayerInitialState, resetPlayerState } from '../features/Player/playerInitialState';
+} from './types/tempfile';
+import { PlayerInitialState, resetPlayerState } from '../features/Player/PlayerInitialState';
 import { ThemeContext, useTheme, ThemeProviderWrapper } from './ThemeContext';
 
 // Export everything explicitly
@@ -53,7 +53,7 @@ export const createAction = <T = any>(type: string, payload: T): GameAction => (
   payload
 });
 
-// Re-export types (originally defined in gameStateTypes.ts)
+// Re-export types (originally defined in GameStateTypes.ts)
 export type {
   GameState,
   PlayerState,

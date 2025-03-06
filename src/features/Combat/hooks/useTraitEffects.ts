@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useGameState } from '../../../context';
-import '../../../constants/gameStateTypes'; // Import our type extensions
+import '../../../constants/GameStateTypes'; // Import our type extensions
 
 /**
  * Hook to calculate trait effects for combat

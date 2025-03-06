@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { GameState, InitialState } from './InitialState';
+import { GameState, InitialState } from './InitialState.ts';
 
 // Extended state interface with utility methods
 export interface EnhancedGameState extends GameState {

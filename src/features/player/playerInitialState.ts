@@ -3,7 +3,7 @@
  * This serves as the starting point for a new player or when resetting the game.
  */
 
-import { PlayerState } from '../../context/types/gameStateTypes';
+import { PlayerState } from '../../context/types/GameStateTypes';
 
 /**
  * Interface for the entire game state related to the player

@@ -15,10 +15,10 @@ import {
   PlayerState, 
   PlayerStats, 
   EquipmentState 
-} from './types/gameStateTypes';
+} from './types/GameStateTypes';
 
 // Import player state from the feature module (fix case sensitivity in path)
-import { PlayerInitialState, resetPlayerState } from '../features/Player/playerInitialState';
+import { PlayerInitialState, resetPlayerState } from '../features/Player/PlayerInitialState';
 
 /**
  * Initial game state for a new player
@@ -26,7 +26,7 @@ import { PlayerInitialState, resetPlayerState } from '../features/Player/playerI
  */
 export const InitialState: GameState = {
   /**
-   * Player information and core statistics - imported from playerInitialState
+   * Player information and core statistics - imported from PlayerInitialState
    */
   player: PlayerInitialState.player,
   

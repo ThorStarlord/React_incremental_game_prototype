@@ -1,4 +1,4 @@
-import { PlayerState } from '../playerInitialState';
+import { PlayerState } from '../PlayerInitialState';
 
 /**
  * Type definition for player updates
@@ -97,7 +97,7 @@ export const getPlayerMaxEnergy = (player: PlayerState): number => {
  * @returns The player's current experience
  */
 export const getPlayerExperience = (player: PlayerState): number => {
-    // Note: This requires adding 'experience' to the PlayerState interface in playerInitialState.ts
+    // Note: This requires adding 'experience' to the PlayerState interface in PlayerInitialState.ts
     return player.experience;
 };
 
@@ -108,6 +108,6 @@ export const getPlayerExperience = (player: PlayerState): number => {
  * @returns The experience required for the next level
  */
 export const getPlayerMaxExperience = (player: PlayerState): number => {
-    // Note: This requires adding 'maxExperience' to the PlayerState interface in playerInitialState.ts
+    // Note: This requires adding 'maxExperience' to the PlayerState interface in PlayerInitialState.ts
     return player.maxExperience;
 };
