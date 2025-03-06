@@ -1,10 +1,17 @@
 import { createContext, useContext } from 'react';
-import { GameState, initialState } from './initialState';
-import { EnhancedGameState } from './GameProvider';
+import { GameState, InitialState } from './InitialState';
+
+// Extended state interface with utility methods
+export interface EnhancedGameState extends GameState {
+  saveGame: (slotId?: string) => Promise<boolean>;
+  loadGame: (slotId: string) => Promise<boolean>;
+  resetGame: () => void;
+  exportSave: () => string;
+  importSave: (saveData: string) => Promise<boolean>;
+}
 
 // Create the context with the proper type and default value
-// Use a type assertion to make TypeScript happy with the default value
-const GameStateContext = createContext<EnhancedGameState>(initialState as unknown as EnhancedGameState);
+const GameStateContext = createContext<EnhancedGameState>(InitialState as unknown as EnhancedGameState);
 
 /**
  * Custom hook for accessing the game state with proper typing

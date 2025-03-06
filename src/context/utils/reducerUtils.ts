@@ -49,7 +49,7 @@ export type ReducersMapObject<S = any> = {
  */
 export interface SliceOptions<S = any, A extends Action = Action> {
   name: string;
-  initialState: S;
+  InitialState: S;
   reducers: {
     [key: string]: (state: S, action: A) => S;
   };
@@ -111,7 +111,7 @@ export function combineReducers<S extends Record<string, any>, A extends Action 
  * A utility to create reducers based on a lookup table of action types
  * rather than using switch statements.
  * 
- * @param {S} initialState - The initial state for this reducer
+ * @param {S} InitialState - The initial state for this reducer
  * @param {ReducerHandlers<S, A>} handlers - Action type to handler function mapping
  * @returns {Reducer<S, A>} A reducer function that uses the handler lookup table
  * 
@@ -136,10 +136,10 @@ export function combineReducers<S extends Record<string, any>, A extends Action 
  * );
  */
 export function createReducer<S = any, A extends Action = Action>(
-  initialState: S, 
+  InitialState: S, 
   handlers: ReducerHandlers<S, A>
 ): Reducer<S, A> {
-  return function reducer(state = initialState, action: A): S {
+  return function reducer(state = InitialState, action: A): S {
     if (handlers.hasOwnProperty(action.type)) {
       return handlers[action.type](state, action);
     }
@@ -164,7 +164,7 @@ export function createReducer<S = any, A extends Action = Action>(
  * 
  * const counterSlice = createSlice<CounterState>({
  *   name: 'counter',
- *   initialState: { value: 0 },
+ *   InitialState: { value: 0 },
  *   reducers: {
  *     increment: (state, action: Action<string, number>) => ({ 
  *       value: state.value + action.payload 
@@ -179,7 +179,7 @@ export function createReducer<S = any, A extends Action = Action>(
  * // dispatch(counterSlice.actions.increment(5))
  */
 export function createSlice<S = any, P = any>(options: SliceOptions<S>): Slice<S, P> {
-  const { name, initialState, reducers } = options;
+  const { name, InitialState, reducers } = options;
   
   // Create action types and action creators
   const actionCreators: { [key: string]: (payload?: P) => Action<string, P> } = {};
@@ -194,7 +194,7 @@ export function createSlice<S = any, P = any>(options: SliceOptions<S>): Slice<S
   });
 
   // Create the reducer
-  const reducer: Reducer<S> = (state = initialState, action: Action) => {
+  const reducer: Reducer<S> = (state = InitialState, action: Action) => {
     if (action.type && action.type.startsWith(`${name}/`)) {
       const actionKey = action.type.replace(`${name}/`, '');
       if (reducers[actionKey]) {
@@ -252,7 +252,7 @@ export function enhanceReducer<S = any, A extends Action = Action>(
  * @example
  * const resetOnLogout = (state: AppState, action: Action) => {
  *   if (action.type === 'LOGOUT') {
- *     return initialState;
+ *     return InitialState;
  *   }
  *   return state;
  * };

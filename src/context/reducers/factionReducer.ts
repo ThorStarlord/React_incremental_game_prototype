@@ -56,7 +56,7 @@ export const REPUTATION_LEVELS = {
 /**
  * Initial faction state
  */
-const initialState: FactionState = {
+const InitialState: FactionState = {
   discoveredFactions: ['villagers'],
   reputations: {
     villagers: 10,
@@ -175,7 +175,7 @@ export const getReputationLevel = (reputation: ReputationValue): string => {
 /**
  * Faction reducer function
  */
-const factionReducer = (state: FactionState = initialState, action: FactionAction): FactionState => {
+const factionReducer = (state: FactionState = InitialState, action: FactionAction): FactionState => {
   switch (action.type) {
     case CHANGE_REPUTATION: {
       const { faction, amount } = action.payload;

@@ -26,7 +26,7 @@
  *   { npcId: 'village_elder', amount: 10, notifyPlayer: true }
  * );
  */
-import { GameState } from '../initialState';
+import { GameState } from '../InitialState';
 
 /**
  * Interface for an NPC with relationship value

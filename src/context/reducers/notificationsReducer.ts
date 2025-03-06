@@ -33,7 +33,7 @@ const ARCHIVE_NOTIFICATION = 'notifications/archive';
 const UPDATE_SETTINGS = 'notifications/updateSettings';
 
 // Initial state
-const initialState: NotificationsState = {
+const InitialState: NotificationsState = {
   queue: [],
   history: [],
   settings: {
@@ -54,7 +54,7 @@ const trimHistory = (history: Notification[], maxSize: number): Notification[] =
 
 // Reducer
 export const notificationsReducer = (
-  state: NotificationsState = initialState,
+  state: NotificationsState = InitialState,
   action: { type: string; payload: any }
 ): NotificationsState => {
   switch (action.type) {

@@ -19,7 +19,7 @@
  * );
  */
 
-import { GameState } from '../initialState';
+import { GameState } from '../InitialState';
 
 /**
  * Types of notifications

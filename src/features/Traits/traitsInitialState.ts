@@ -153,7 +153,7 @@ export interface TraitsState {
 /**
  * Initial state for the Traits feature
  */
-const initialState: TraitsState = {
+const InitialState: TraitsState = {
   // Points available to spend on traits
   pointsAvailable: 0,
   
@@ -494,4 +494,4 @@ const initialState: TraitsState = {
   }
 };
 
-export default initialState;
+export default InitialState;

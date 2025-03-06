@@ -16,7 +16,7 @@ interface DiscoveryState {
 /**
  * Initial state for discovery features
  */
-const initialState: DiscoveryState = {
+const InitialState: DiscoveryState = {
   // Starting defaults
   locations: { village: true },
   resources: { gold: true, wood: true },
@@ -53,7 +53,7 @@ interface DiscoverPayload {
 /**
  * Manages player's discovery progress including locations, resources, and achievements
  */
-export const discoveryReducer = (state = initialState, action: DiscoveryAction): DiscoveryState => {
+export const discoveryReducer = (state = InitialState, action: DiscoveryAction): DiscoveryState => {
   const { type, payload } = action;
 
   switch (type) {
@@ -110,7 +110,7 @@ export const discoveryReducer = (state = initialState, action: DiscoveryAction):
       };
       
     case ACTION_TYPES.RESET_DISCOVERY:
-      return initialState;
+      return InitialState;
       
     default:
       return state;

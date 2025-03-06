@@ -40,7 +40,7 @@ interface UpdateProductionRatePayload {
 /**
  * Initial state for resources
  */
-const initialState: ResourcesState = {
+const InitialState: ResourcesState = {
   gold: 100,
   wood: 50,
   stone: 20,
@@ -87,7 +87,7 @@ const updateNestedResource = (
  * Resources reducer - Manages all resource quantities and production rates
  */
 export const resourcesReducer = (
-  state: ResourcesState = initialState,
+  state: ResourcesState = InitialState,
   action: ResourceAction
 ): ResourcesState => {
   switch (action.type) {
@@ -167,7 +167,7 @@ export const resourcesReducer = (
     }
     
     case ACTION_TYPES.RESET_RESOURCES:
-      return initialState;
+      return InitialState;
       
     default:
       return state;

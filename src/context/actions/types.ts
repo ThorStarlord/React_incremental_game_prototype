@@ -1,4 +1,4 @@
-import { GameState } from '../initialState';
+import { GameState } from '../InitialState';
 
 /**
  * Base action interface

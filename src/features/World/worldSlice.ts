@@ -142,7 +142,7 @@ const initialRegions: Record<string, Region> = {
 };
 
 // Initial state for the world slice
-const initialState: WorldState = {
+const InitialState: WorldState = {
   regions: initialRegions,
   currentRegion: 'whisperingWoods', // Default starting region
   discoveredPoints: 0,
@@ -166,7 +166,7 @@ const initialState: WorldState = {
  */
 const worldSlice = createSlice({
   name: 'world',
-  initialState,
+  InitialState,
   reducers: {
     /**
      * Select a region to view/interact with

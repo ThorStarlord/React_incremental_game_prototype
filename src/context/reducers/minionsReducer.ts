@@ -30,7 +30,7 @@ interface MinionAction {
 /**
  * Initial state - empty array of minions
  */
-const initialState: Minion[] = [];
+const InitialState: Minion[] = [];
 
 /**
  * Helper functions
@@ -42,7 +42,7 @@ const updateMinionById = (minions: Minion[], id: string, updates: Partial<Minion
  * Minions Reducer - Manages minion collection and attributes
  */
 const minionsReducer = (
-  state: Minion[] = initialState,
+  state: Minion[] = InitialState,
   action: MinionAction
 ): Minion[] => {
   switch (action.type) {

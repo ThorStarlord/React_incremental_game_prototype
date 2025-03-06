@@ -106,7 +106,7 @@ export interface QuestsState {
 /**
  * Initial state for the quests feature
  */
-const initialState: QuestsState = {
+const InitialState: QuestsState = {
   quests: {
     'quest-1': {
       id: 'quest-1',
@@ -213,4 +213,4 @@ const initialState: QuestsState = {
   questProgress: {}
 };
 
-export default initialState;
+export default InitialState;

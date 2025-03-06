@@ -75,7 +75,7 @@ export const submitQuestThunk = createAsyncThunk<
 
 export const npcSlice = createSlice({
   name: 'npcs',
-  initialState: npcsInitialState,
+  InitialState: npcsInitialState,
   reducers: {
     // Dialog interactions
     startDialogue: (state, action: PayloadAction<DialogueParams>) => {

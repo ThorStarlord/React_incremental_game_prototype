@@ -109,7 +109,7 @@ export interface SkillsState {
 /**
  * Initial state for the skills system
  */
-const initialState: SkillsState = {
+const InitialState: SkillsState = {
   availableSkills: {
     'fireball': {
       id: 'fireball',
@@ -232,4 +232,4 @@ const initialState: SkillsState = {
   availableSkillPoints: 0
 };
 
-export default initialState;
+export default InitialState;

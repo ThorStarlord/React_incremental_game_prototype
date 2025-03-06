@@ -1,31 +1,20 @@
 import React, { useReducer, useEffect, useCallback, ReactNode, Dispatch } from 'react';
 import { rootReducer } from './reducers/rootReducer';
-import { GameState as InitialGameState } from './GameContext';
-import { GameState as ReducerGameState } from './reducers/types'; 
 import { ACTION_TYPES } from './actions/actionTypes';
 import { GameAction } from './GameDispatchContext';
-import GameStateContext from './GameStateContext';
+import GameStateContext, { EnhancedGameState } from './GameStateContext';
 import GameDispatchContext from './GameDispatchContext';
-import InitialState from 'InitialState';
+import { GameState, InitialState } from './InitialState';
 
 // Game version for save compatibility
 const GAME_VERSION = '0.1.0';
 
-// Define an extended state interface that includes our utility functions
-export interface EnhancedGameState extends InitialGameState {
-  saveGame: (slotId?: string) => Promise<boolean>;
-  loadGame: (slotId: string) => Promise<boolean>;
-  resetGame: () => void;
-  exportSave: () => string;
-  importSave: (saveData: string) => Promise<boolean>;
-}
-
 // Main provider component
 const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
-  // Cast InitialState to the type expected by rootReducer
+  // Use InitialState with the correct type casting
   const [gameState, dispatch] = useReducer(
     rootReducer, 
-    InitialState as unknown as ReducerGameState
+    InitialState as GameState
   );
 
   // Save game to specific slot (or default)
@@ -47,7 +36,7 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
           name: gameState.player?.name || 'Unnamed Hero',
           timestamp: Date.now(),
           playerLevel: gameState.player?.level || 1,
-          playtime: gameState.stats?.playtime || 0
+          playtime: gameState.statistics?.totalPlayTime || 0
         };
         
         // Update or add to saved games list
@@ -145,7 +134,7 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
 
   // Create the context value with game state and utility functions
   const contextValue: EnhancedGameState = {
-    ...(gameState as unknown as InitialGameState),
+    ...gameState,
     saveGame,
     loadGame,
     resetGame,

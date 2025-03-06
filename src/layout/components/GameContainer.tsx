@@ -77,7 +77,7 @@ import { useGameState, useGameDispatch } from '../../context/GameContext';
 import useMinionSimulation from '../../shared/hooks/useMinionSimulation';
 
 // Import proper types
-import { GameState } from '../../context/initialState';
+import { GameState } from '../../context/InitialState';
 
 /**
  * Styled wrapper for the game area with full viewport height

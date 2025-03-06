@@ -44,7 +44,7 @@ export const UNLOCK_LOCATION = 'UNLOCK_LOCATION';
 /**
  * Initial state
  */
-const initialState: LocationState = {
+const InitialState: LocationState = {
   currentLocation: 'village',
   discoveredLocations: ['village'],
   locations: {
@@ -93,7 +93,7 @@ const initialState: LocationState = {
  * Location reducer function
  */
 const locationReducer = (
-  state: LocationState = initialState,
+  state: LocationState = InitialState,
   action: { type: string; payload: any }
 ): LocationState => {
   switch (action.type) {

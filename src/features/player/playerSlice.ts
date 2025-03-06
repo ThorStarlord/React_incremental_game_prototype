@@ -63,7 +63,7 @@ interface PlayerState {
 /**
  * Initial state for the player
  */
-const initialState: PlayerState = {
+const InitialState: PlayerState = {
   name: 'Adventurer',
   stats: {
     strength: 5,
@@ -91,7 +91,7 @@ const initialState: PlayerState = {
  */
 const playerSlice = createSlice({
   name: 'player',
-  initialState,
+  InitialState,
   reducers: {
     /**
      * Updates player's name

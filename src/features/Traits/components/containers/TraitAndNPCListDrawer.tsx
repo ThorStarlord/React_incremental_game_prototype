@@ -46,7 +46,7 @@ import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { GameStateContext, useGameDispatch } from '../../../../context/GameStateContext';
 import { getDiscoveryProgress } from '../../../../shared/utils/discoveryUtils';
-import { NPC, TraitDefinition, PlayerState, TraitsState, GameState } from '../../../../context/initialState';
+import { NPC, TraitDefinition, PlayerState, TraitsState, GameState } from '../../../../context/InitialState';
 
 interface TraitAndNPCListDrawerProps {
     open: boolean;

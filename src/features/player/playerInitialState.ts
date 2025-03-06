@@ -3,20 +3,7 @@
  * This serves as the starting point for a new player or when resetting the game.
  */
 
-/**
- * Interface defining the structure of the player state
- * Contains all properties that track the player's progress and attributes
- */
-export interface PlayerState {
-  name: string;            // The player's character name
-  level: number;           // Current character level
-  health: number;          // Current health points
-  maxHealth: number;       // Maximum possible health points
-  energy: number;          // Current energy/mana points for special abilities
-  maxEnergy: number;       // Maximum possible energy/mana points
-  totalEssenceEarned: number; // Total essence earned throughout the game
-  traitSlots: number;      // Number of trait slots currently unlocked
-}
+import { PlayerState } from '../../context/types/gameStateTypes';
 
 /**
  * Interface for the entire game state related to the player
@@ -28,15 +15,45 @@ export interface PlayerStateContainer {
 /**
  * The default initial state for a new player character
  */
-export const playerInitialState: PlayerStateContainer = {
+export const PlayerInitialState: PlayerStateContainer = {
   player: {
     name: "Adventurer", // Default character name
     level: 1,           // Players start at level 1
-    health: 100,        // Starting health points
-    maxHealth: 100,     // Starting maximum health capacity
-    energy: 50,         // Starting energy/mana points
-    maxEnergy: 50,      // Starting maximum energy capacity
-    totalEssenceEarned: 0, // Initial essence earned
+    experience: 0,
+    experienceToNextLevel: 100,
+    attributes: {
+      strength: 5,
+      intelligence: 5,
+      dexterity: 5,
+      vitality: 5,
+      luck: 1
+    },
+    stats: {
+      health: 100,
+      maxHealth: 100,
+      healthRegen: 1,
+      mana: 50,         // Previously "energy"
+      maxMana: 50,      // Previously "maxEnergy"
+      manaRegen: 0.5,
+      physicalDamage: 5,
+      magicalDamage: 2,
+      critChance: 5,
+      critMultiplier: 1.5
+    },
+    totalPlayTime: 0,
+    creationDate: null,
     traitSlots: 3,      // Default starting trait slots
+    acquiredTraits: []  // Start with no acquired traits
   },
+};
+
+/**
+ * Reset player to initial state but keep the creation date
+ * @param creationDate - Optional ISO date string to preserve
+ * @returns A fresh copy of the initial player state
+ */
+export const resetPlayerState = (creationDate: string | null = null): PlayerState => {
+  const freshState = JSON.parse(JSON.stringify(PlayerInitialState.player)) as PlayerState;
+  freshState.creationDate = creationDate || new Date().toISOString();
+  return freshState;
 };

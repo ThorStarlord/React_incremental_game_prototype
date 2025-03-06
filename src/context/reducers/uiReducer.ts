@@ -33,7 +33,7 @@ interface ModalState {
 }
 
 // Initial state with default values
-const initialState: UIState = {
+const InitialState: UIState = {
   activeMenus: {
     inventory: false,
     character: false,
@@ -73,7 +73,7 @@ const updateMenu = (
 });
 
 export const uiReducer = (
-  state: UIState = initialState,
+  state: UIState = InitialState,
   action: { type: string; payload: any }
 ): UIState => {
   switch (action.type) {

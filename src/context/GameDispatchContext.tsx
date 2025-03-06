@@ -15,15 +15,15 @@
  */
 
 import { createContext, useContext, Dispatch } from 'react';
-import { GameState } from './initialState';
+import { GameState } from './InitialState';
 import { ACTION_TYPES } from './actions/actionTypes';
 
 /**
- * Generic Action interface with optional payload
+ * Generic Action interface with required payload
  */
 export interface GameAction {
   type: string;
-  payload: any; // Make payload required to match what rootReducer expects
+  payload: any;
 }
 
 /**
