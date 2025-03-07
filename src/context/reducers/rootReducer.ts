@@ -1,8 +1,8 @@
-import { GameState } from './types';
+import { GameState } from '../types/GameStateTypes';
 import { combatReducer } from './combatReducer';
 import { craftingReducer } from './craftingReducer';
 import { discoveryReducer } from './discoveryReducer';
-import { essenceReducer } from './essenceReducer';
+import { essenceReducer } from './EssenceReducer';
 import factionReducer from './factionReducer';
 import { gameTimeReducer } from './gameTimeReducer';
 import { inventoryReducer } from './inventoryReducer';

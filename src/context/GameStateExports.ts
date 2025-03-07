@@ -21,7 +21,7 @@ import {
   SettingsState,
   StatisticsState,
   MetaState
-} from './types/tempfile';
+} from './types/GameStateTypes';
 import { PlayerInitialState, resetPlayerState } from '../features/Player/PlayerInitialState';
 import { ThemeContext, useTheme, ThemeProviderWrapper } from './ThemeContext';
 

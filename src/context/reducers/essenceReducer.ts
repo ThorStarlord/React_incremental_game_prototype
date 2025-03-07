@@ -1,6 +1,11 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { GameState } from './types';
-import { withNotification } from './utils';
+import { GameState } from '../types/GameStateTypes';
+import { EssenceState } from '../../features/Essence/EssenceInitialState';
+import { 
+  createNotification, 
+  addNotification, 
+  NotificationType 
+} from '../utils/notificationUtils';
 
 // Simplified essence payload type
 interface EssencePayload {
@@ -28,23 +33,26 @@ export const essenceReducer = (
       
       const modifiedAmount = Math.round(amount * multiplier);
       
-      // Only show notification for significant gains
-      const newState = modifiedAmount >= 10 ? 
-        withNotification(state, `Gained ${modifiedAmount} essence${source ? ` from ${source}` : ''}`, "info") : 
-        state;
+      // Create new essence state with updated values
+      const updatedEssence: EssenceState = {
+        ...state.essence,
+        amount: state.essence.amount + modifiedAmount,
+        totalCollected: state.essence.totalCollected + modifiedAmount,
+      };
       
-      // Update both current amount and statistics
+      // Only show notification for significant gains
+      let newState = state;
+      if (modifiedAmount >= 10) {
+        const notification = createNotification(
+          `Gained ${modifiedAmount} essence${source ? ` from ${source}` : ''}`,
+          'info'
+        );
+        newState = addNotification(state, notification);
+      }
+      
       return {
         ...newState,
-        essence: {
-          ...state.essence,
-          amount: state.essence.amount + modifiedAmount,
-          lifetimeEarned: (state.essence.lifetimeEarned || 0) + modifiedAmount,
-          sourceStats: {
-            ...(state.essence.sourceStats || {}),
-            [source || 'unknown']: ((state.essence.sourceStats || {})[source || 'unknown'] || 0) + modifiedAmount
-          }
-        }
+        essence: updatedEssence
       };
     }
     
@@ -52,20 +60,19 @@ export const essenceReducer = (
       const { amount, reason } = action.payload;
       
       if (state.essence.amount < amount) {
-        return withNotification(
-          state, 
+        const notification = createNotification(
           `Not enough essence to ${reason || 'perform this action'}`,
           'error',
           3000
         );
+        return addNotification(state, notification);
       }
       
       return {
         ...state,
         essence: {
           ...state.essence,
-          amount: state.essence.amount - amount,
-          lifetimeSpent: (state.essence.lifetimeSpent || 0) + amount
+          amount: state.essence.amount - amount
         }
       };
     }

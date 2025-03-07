@@ -18,7 +18,10 @@ import {
 } from './types/GameStateTypes';
 
 // Import player state from the feature module (fix case sensitivity in path)
-import { PlayerInitialState, resetPlayerState } from '../features/Player/PlayerInitialState';
+import { PlayerInitialState, resetPlayerState, DefaultPlayerAttributes } from '../features/Player/PlayerInitialState';
+
+// Import Essence initial state
+import EssenceInitialState from '../features/Essence/essenceInitialState';
 
 /**
  * Initial game state for a new player
@@ -28,7 +31,10 @@ export const InitialState: GameState = {
   /**
    * Player information and core statistics - imported from PlayerInitialState
    */
-  player: PlayerInitialState.player,
+  player: {
+    ...PlayerInitialState.player,
+    attributes: DefaultPlayerAttributes,
+  },
   
   /**
    * Game resources and currencies
@@ -180,7 +186,12 @@ export const InitialState: GameState = {
     version: '1.0.0',
     lastSaved: null,
     playingSince: null
-  }
+  },
+
+  /**
+   * Essence system state
+   */
+  essence: EssenceInitialState
 };
 
 // Export InitialState as default

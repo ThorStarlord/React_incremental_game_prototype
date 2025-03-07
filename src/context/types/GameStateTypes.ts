@@ -2,6 +2,9 @@
  * Consolidated type definitions for the game state
  */
 
+// Import EssenceState interface
+import { EssenceState } from '../../features/Essence/essenceInitialState';
+
 /**
  * Player attributes that affect game mechanics
  */
@@ -11,6 +14,12 @@ export interface PlayerAttributes {
   dexterity: number;     // Affects attack speed and dodge chance
   vitality: number;      // Affects health points and regeneration
   luck: number;          // Affects critical hit chance and item discovery
+  constitution: number;  // Affects total health and physical resistance
+  wisdom: number;        // Affects mana regeneration and spell effectiveness
+  charisma: number;      // Affects NPC interactions and prices
+  perception: number;    // Affects ability to find hidden objects and traps
+  agility: number;       // Affects movement speed and evasion
+  endurance: number;     // Affects stamina and resistance to fatigue
 }
 
 /**
@@ -364,7 +373,7 @@ export interface GameState {
   settings: SettingsState;
   statistics: StatisticsState;
   meta: MetaState;
-  essence?: number;
+  essence: EssenceState; // Changed from optional number to required EssenceState
   traits?: TraitSystem;
 
   // For backward compatibility

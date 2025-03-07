@@ -3,7 +3,7 @@
  * This serves as the starting point for a new player or when resetting the game.
  */
 
-import { PlayerState } from '../../context/types/GameStateTypes';
+import { PlayerState, PlayerAttributes } from '../../context/types/GameStateTypes';
 
 /**
  * Interface for the entire game state related to the player
@@ -11,6 +11,23 @@ import { PlayerState } from '../../context/types/GameStateTypes';
 export interface PlayerStateContainer {
   player: PlayerState;
 }
+
+/**
+ * Default set of player attributes for new characters
+ */
+export const DefaultPlayerAttributes: PlayerAttributes = {
+  strength: 5,      // Basic physical power
+  intelligence: 5,  // Magical aptitude
+  dexterity: 5,     // Hand-eye coordination
+  vitality: 5,      // Life force
+  luck: 1,          // Fortune and chance
+  constitution: 5,  // Physical toughness
+  wisdom: 3,        // Mental fortitude
+  charisma: 3,      // Social influence
+  perception: 3,    // Awareness of surroundings
+  agility: 3,       // Speed and reflexes
+  endurance: 4      // Stamina and persistence
+};
 
 /**
  * The default initial state for a new player character
@@ -21,13 +38,7 @@ export const PlayerInitialState: PlayerStateContainer = {
     level: 1,           // Players start at level 1
     experience: 0,
     experienceToNextLevel: 100,
-    attributes: {
-      strength: 5,
-      intelligence: 5,
-      dexterity: 5,
-      vitality: 5,
-      luck: 1
-    },
+    attributes: DefaultPlayerAttributes,
     stats: {
       health: 100,
       maxHealth: 100,

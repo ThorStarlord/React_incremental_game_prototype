@@ -1,5 +1,5 @@
 /**
- * @file essenceInitialState.ts
+ * @file EssenceInitialState.ts
  * @description Defines the initial state for the Essence feature in the game.
  * Essence is a core resource that players collect and use for progression.
  */
@@ -66,7 +66,7 @@ export interface EssenceState {
 /**
  * Initial state structure for the Essence feature
  */
-const essenceInitialState: EssenceState = {
+const EssenceInitialState: EssenceState = {
   // Core essence values
   amount: 0,
   totalCollected: 0,
@@ -134,4 +134,4 @@ const essenceInitialState: EssenceState = {
   }
 };
 
-export default essenceInitialState;
+export default EssenceInitialState;

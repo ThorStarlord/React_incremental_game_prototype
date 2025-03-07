@@ -19,7 +19,9 @@
  * );
  */
 
-import { GameState } from '../InitialState.ts';
+import { 
+  GameState,
+} from '../types/GameStateTypes';
 
 /**
  * Types of notifications
