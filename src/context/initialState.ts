@@ -10,7 +10,7 @@
  * - Game settings and configuration
  */
 
-import { 
+import type { 
   GameState, 
   PlayerState, 
   PlayerStats, 
@@ -21,7 +21,7 @@ import {
 import { PlayerInitialState, resetPlayerState, DefaultPlayerAttributes } from '../features/Player/PlayerInitialState';
 
 // Import Essence initial state
-import EssenceInitialState from '../features/Essence/essenceInitialState';
+import EssenceInitialState from '../features/Essence/EssenceInitialState';
 
 /**
  * Initial game state for a new player
@@ -255,10 +255,5 @@ export const recalculatePlayerStats = (
   return stats;
 };
 
-// Re-export types for convenience
-export { 
-  GameState,
-  PlayerState,
-  PlayerStats,
-  EquipmentState 
-};
+// Export types directly from their source instead of re-exporting
+export type { GameState, PlayerState, PlayerStats, EquipmentState } from './types/GameStateTypes';

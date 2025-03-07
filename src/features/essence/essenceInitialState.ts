@@ -4,64 +4,7 @@
  * Essence is a core resource that players collect and use for progression.
  */
 
-/**
- * Interface for a generator in the essence system
- */
-interface EssenceGenerator {
-  level: number;
-  baseCost: number;
-  costMultiplier: number;
-  baseProduction: number;
-  owned: number;
-  unlocked: boolean;
-  name: string;
-  description: string;
-}
-
-/**
- * Interface for an upgrade in the essence system
- */
-interface EssenceUpgrade {
-  level: number;
-  baseCost: number;
-  costMultiplier: number;
-  effect: number;
-  maxLevel: number;
-  unlocked: boolean;
-  name: string;
-  description: string;
-}
-
-/**
- * Interface for the essence system mechanics
- */
-interface EssenceMechanics {
-  autoCollectUnlocked: boolean;
-  resonanceUnlocked: boolean;
-}
-
-/**
- * Interface for the complete essence state
- */
-export interface EssenceState {
-  amount: number;
-  totalCollected: number;
-  perSecond: number;
-  perClick: number;
-  multiplier: number;
-  unlocked: boolean;
-  generators: {
-    basic: EssenceGenerator;
-    advanced: EssenceGenerator;
-    [key: string]: EssenceGenerator;
-  };
-  upgrades: {
-    clickPower: EssenceUpgrade;
-    autoGeneration: EssenceUpgrade;
-    [key: string]: EssenceUpgrade;
-  };
-  mechanics: EssenceMechanics;
-}
+import { EssenceState } from '../../context/types/EssenceGameStateTypes';
 
 /**
  * Initial state structure for the Essence feature
@@ -135,3 +78,6 @@ const EssenceInitialState: EssenceState = {
 };
 
 export default EssenceInitialState;
+
+// Re-export the EssenceState type for convenience
+

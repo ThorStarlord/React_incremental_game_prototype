@@ -1,18 +1,14 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
 import { GameState } from '../types/GameStateTypes';
-import { EssenceState } from '../../features/Essence/EssenceInitialState';
+import { 
+  EssenceState, 
+  EssencePayload 
+} from '../../features/Essence/EssenceGameStateTypes';
 import { 
   createNotification, 
   addNotification, 
   NotificationType 
 } from '../utils/notificationUtils';
-
-// Simplified essence payload type
-interface EssencePayload {
-  amount: number;
-  source?: string;
-  reason?: string;
-}
 
 /**
  * Essence Reducer - Manages the game's primary resource

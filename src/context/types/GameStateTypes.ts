@@ -2,75 +2,37 @@
  * Consolidated type definitions for the game state
  */
 
-// Import EssenceState interface
-import { EssenceState } from '../../features/Essence/essenceInitialState';
+// Import EssenceState interface from the feature directory
+import { EssenceState } from './EssenceGameStateTypes';
 
-/**
- * Player attributes that affect game mechanics
- */
-export interface PlayerAttributes {
-  strength: number;      // Affects physical damage and carrying capacity
-  intelligence: number;  // Affects magical abilities and mana pool
-  dexterity: number;     // Affects attack speed and dodge chance
-  vitality: number;      // Affects health points and regeneration
-  luck: number;          // Affects critical hit chance and item discovery
-  constitution: number;  // Affects total health and physical resistance
-  wisdom: number;        // Affects mana regeneration and spell effectiveness
-  charisma: number;      // Affects NPC interactions and prices
-  perception: number;    // Affects ability to find hidden objects and traps
-  agility: number;       // Affects movement speed and evasion
-  endurance: number;     // Affects stamina and resistance to fatigue
-}
+// Import player-related types from PlayerGameStateTypes
+import { 
+  PlayerState, 
+  PlayerAttributes, 
+  PlayerStats, 
+  Skill,
+  StatusEffect,
+  TraitEffect,
+  Trait,
+  InventoryItem as PlayerInventoryItem
+} from './PlayerGameStateTypes';
 
-/**
- * Player's derived statistics from attributes and equipment
- */
-export interface PlayerStats {
-  health: number;
-  maxHealth: number;
-  healthRegen: number;
-  mana: number;
-  maxMana: number;
-  manaRegen: number;
-  physicalDamage: number;
-  magicalDamage: number;
-  critChance: number;    // As percentage
-  critMultiplier: number;
-  
-  // Extended combat stats
-  attack?: number;
-  defense?: number;
-}
+// Re-export player types for backward compatibility
+export type {
+  PlayerState,
+  PlayerAttributes,
+  PlayerStats,
+  Skill,
+  StatusEffect,
+  TraitEffect,
+  Trait
+};
 
-/**
- * Player information and core statistics
- */
-export interface PlayerState {
-  name: string;
-  level: number;
-  experience: number;
-  experienceToNextLevel: number;
-  attributes: PlayerAttributes;
-  stats: PlayerStats;
-  totalPlayTime: number;
-  creationDate: string | null;  // ISO date string or null
-  
-  // Extended trait system
-  equippedTraits?: string[];    // Array of equipped trait IDs
-  permanentTraits?: string[];   // Array of permanent trait IDs
-  acquiredTraits?: string[];    // Array of all acquired trait IDs
-  traitSlots?: number;          // Number of available trait slots
-  
-  // Optional - for backward compatibility
-  gold?: number;
-  energy?: number;
-  maxEnergy?: number;
-  inventory?: InventoryItem[];
-  equippedItems?: Record<string, string>;
-  attributePoints?: number;
-  skills?: Skill[];
-  activeEffects?: StatusEffect[];
-}
+// Re-export essence types for backward compatibility
+export type { EssenceState };
+
+// Use the imported InventoryItem type to maintain compatibility
+export type InventoryItem = PlayerInventoryItem;
 
 /**
  * Game materials used for crafting and upgrades
@@ -190,22 +152,6 @@ export interface GameItem {
 }
 
 /**
- * Simplified inventory item for backward compatibility
- */
-export interface InventoryItem {
-  id: string;
-  name: string;
-  quantity: number;
-  quality?: string;
-  acquired?: {
-    timestamp: number;
-    source: string;
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
-
-/**
  * Player inventory
  */
 export interface InventoryState {
@@ -312,49 +258,6 @@ export interface MetaState {
   playingSince: string | null; // ISO date string or null
 }
 
-/**
- * Skill definition
- */
-export interface Skill {
-  id: string;
-  level: number;
-  experience: number;
-  [key: string]: any;
-}
-
-/**
- * Status Effect
- */
-export interface StatusEffect {
-  id: string;
-  name: string;
-  duration: number;
-  strength?: number;
-  [key: string]: any;
-}
-
-/**
- * Traits system
- */
-export interface TraitEffect {
-  attackBonus?: number;
-  defenseBonus?: number;
-  dodgeChance?: number;
-  criticalChance?: number;
-  criticalDamage?: number;
-  essenceSiphonChance?: number;
-  xpMultiplier?: number;
-  goldMultiplier?: number;
-  [key: string]: number | undefined;
-}
-
-export interface Trait {
-  id: string;
-  name: string;
-  effects?: TraitEffect;
-  [key: string]: any;
-}
-
 export interface TraitSystem {
   copyableTraits: Record<string, Trait>;
 }
@@ -373,7 +276,7 @@ export interface GameState {
   settings: SettingsState;
   statistics: StatisticsState;
   meta: MetaState;
-  essence: EssenceState; // Changed from optional number to required EssenceState
+  essence: EssenceState;
   traits?: TraitSystem;
 
   // For backward compatibility

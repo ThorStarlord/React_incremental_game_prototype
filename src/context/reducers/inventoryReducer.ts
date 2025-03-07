@@ -1,6 +1,5 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { GameState, InventoryItem } from './types';
-import { withNotification, updateInventoryQuantity } from './utils';
+import { GameState, InventoryItem } from '../types/GameStateTypes';
 
 // Helper functions
 const findItem = (inventory: InventoryItem[], itemId: string): number => 
@@ -9,6 +8,30 @@ const findItem = (inventory: InventoryItem[], itemId: string): number =>
 const getItemData = (state: GameState, itemId: string): any => 
   state.items?.find((item: any) => item.id === itemId) || 
   state.gameData?.items?.[itemId];
+
+// Helper to update item quantity, removing if quantity reaches 0
+const updateInventoryQuantity = (
+  inventory: InventoryItem[],
+  index: number,
+  changeAmount: number
+): InventoryItem[] => {
+  const newQuantity = inventory[index].quantity + changeAmount;
+  
+  if (newQuantity <= 0) {
+    // Remove item if quantity is 0 or less
+    return [
+      ...inventory.slice(0, index),
+      ...inventory.slice(index + 1)
+    ];
+  }
+  
+  // Update quantity
+  return [
+    ...inventory.slice(0, index),
+    { ...inventory[index], quantity: newQuantity },
+    ...inventory.slice(index + 1)
+  ];
+};
 
 /**
  * Inventory Reducer - Manages player's inventory of items and equipment
@@ -24,7 +47,8 @@ export const inventoryReducer = (
       const itemData = getItemData(state, itemId);
       
       if (!itemData) {
-        return withNotification(state, "Invalid item data. Cannot add to inventory.", "error");
+        // Invalid item data - return state unchanged
+        return state;
       }
       
       return {
@@ -67,12 +91,14 @@ export const inventoryReducer = (
       const existingItemIndex = findItem(state.player.inventory, itemId);
       
       if (existingItemIndex === -1) {
-        return withNotification(state, "You don't have this item.", "error");
+        // Item not found - return state unchanged
+        return state;
       }
       
       const itemData = getItemData(state, itemId);
       if (!itemData) {
-        return withNotification(state, "Unknown item type.", "error");
+        // Unknown item type - return state unchanged
+        return state;
       }
       
       // Apply item effects based on type
@@ -122,7 +148,7 @@ export const inventoryReducer = (
         }
       };
       
-      return withNotification(updatedState, `Used ${itemData.name}.`, "info");
+      return updatedState;
     }
     
     case ACTION_TYPES.SORT_INVENTORY: {
