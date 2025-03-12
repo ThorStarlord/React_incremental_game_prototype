@@ -14,7 +14,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EquipIcon from '@mui/icons-material/CheckCircle';
 import UseIcon from '@mui/icons-material/TouchApp';
-import { Item, ItemRarity } from '../../itemsInitialState';
+import { Item, ItemRarity } from '../../../../context/initialStates/itemsInitialState';
 import { getItemRarityDisplay } from '../../utils/inventoryUtils';
 
 /**

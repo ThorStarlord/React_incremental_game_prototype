@@ -21,7 +21,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import { useGameState, useGameDispatch } from '../../../../context/index';
 import Panel from '../../../../shared/components/layout/Panel';
 import useTraitEffects from '../../hooks/useTraitEffects';
-import { TRAIT_CATEGORIES, TraitDefinition } from '../../traitsInitialState';
+import { TRAIT_CATEGORIES, TraitDefinition } from '../../../../context/initialStates/traitsInitialState';
 import './TraitSlots.css';
 
 /**

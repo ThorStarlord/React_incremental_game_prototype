@@ -6,7 +6,7 @@ import Panel from './Panel';
 import useThemeUtils from '../../hooks/useThemeUtils';
 import TraitEffectDialog from './TraitEffectDialog';
 import TraitEffectAnimation from './TraitEffectAnimation';
-import CombatInitialState, { CombatState, CombatLogEntry } from '../../CombatInitialState';
+import CombatInitialState, { CombatState, CombatLogEntry } from '../../../../context/initialStates/CombatInitialState';
 import '../../../../constants/GameStateTypes'; // Import our type extensions
 
 /**

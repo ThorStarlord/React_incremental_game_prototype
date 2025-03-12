@@ -6,7 +6,7 @@
 
 import React from 'react';
 import './QuestItem.css'; // You'll need to create this CSS file
-import { Quest, QuestProgress, QuestObjective } from '../questsInitialState';
+import { Quest, QuestProgress, QuestObjective } from '../../../context/initialStates/questsInitialState';
 
 /**
  * Props for the QuestItem component

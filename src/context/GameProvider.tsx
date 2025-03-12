@@ -4,7 +4,7 @@ import { ACTION_TYPES } from './actions/actionTypes';
 import { GameAction } from './GameDispatchContext';
 import GameStateContext, { EnhancedGameState } from './GameStateContext';
 import GameDispatchContext from './GameDispatchContext';
-import { GameState, InitialState } from './InitialState.ts';
+import { GameState, InitialState } from './initialStates/InitialStateComposer';
 
 // Game version for save compatibility
 const GAME_VERSION = '0.1.0';

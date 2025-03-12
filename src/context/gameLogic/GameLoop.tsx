@@ -3,7 +3,7 @@ import { useGameState } from '../GameStateContext';
 import { useGameDispatch } from '../GameDispatchContext';
 import { ACTION_TYPES } from '../actions/actionTypes';
 import { getSimplifiedTier } from '../../config/relationshipConstants';
-import { GameState, PlayerState } from '../InitialState';
+import { GameState, PlayerState } from '../initialStates/InitialStateComposer';
 import { UpdateNpcRelationshipPayload } from '../actions/npcActions';
 import { AddNotificationPayload, NotificationType } from '../actions/notificationActions';
 

@@ -15,13 +15,13 @@ import type {
   PlayerState, 
   PlayerStats, 
   EquipmentState 
-} from './types/GameStateTypes';
+} from '../types/GameStateTypes';
 
 // Import player state from the feature module (fix case sensitivity in path)
-import { PlayerInitialState, resetPlayerState, DefaultPlayerAttributes } from '../features/Player/PlayerInitialState';
+import { PlayerInitialState, resetPlayerState, DefaultPlayerAttributes } from './PlayerInitialState';
 
 // Import Essence initial state
-import EssenceInitialState from '../features/Essence/EssenceInitialState';
+import EssenceInitialState from './EssenceInitialState';
 
 /**
  * Base Combat State interface definition
@@ -275,4 +275,4 @@ export const recalculatePlayerStats = (
 };
 
 // Export types directly from their source instead of re-exporting
-export type { GameState, PlayerState, PlayerStats, EquipmentState } from './types/GameStateTypes';
+export type { GameState, PlayerState, PlayerStats, EquipmentState } from '../types/GameStateTypes';

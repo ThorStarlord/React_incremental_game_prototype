@@ -29,7 +29,7 @@
  * );
  */
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { GameState, PlayerState } from '../InitialState';
+import { GameState, PlayerState } from '../initialStates/InitialStateComposer';
 
 /**
  * Interface for trait effects that can be applied to player

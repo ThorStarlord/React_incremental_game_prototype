@@ -1,4 +1,4 @@
-import { PlayerState } from '../PlayerInitialState';
+import { PlayerState } from '../../../context/initialStates/PlayerInitialState';
 
 /**
  * Type definition for player updates

@@ -1,4 +1,4 @@
-import { Item, ITEM_CATEGORIES, ITEM_RARITIES } from '../itemsInitialState';
+import { Item, ITEM_CATEGORIES, ITEM_RARITIES } from '../../../context/initialStates/itemsInitialState';
 
 /**
  * Collection of game items organized by category

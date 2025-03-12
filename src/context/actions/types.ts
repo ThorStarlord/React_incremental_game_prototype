@@ -1,4 +1,4 @@
-import { GameState } from '../InitialState';
+import { GameState } from '../initialStates/InitialStateComposer';
 
 /**
  * Base action interface

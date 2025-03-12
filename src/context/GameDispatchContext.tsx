@@ -15,7 +15,7 @@
  */
 
 import { createContext, useContext, Dispatch } from 'react';
-import { GameState } from './InitialState';
+import { GameState } from './initialStates/InitialStateComposer';
 import { ACTION_TYPES } from './actions/actionTypes';
 
 /**

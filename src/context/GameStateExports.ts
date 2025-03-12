@@ -22,7 +22,7 @@ import {
   StatisticsState,
   MetaState
 } from './types/GameStateTypes';
-import { PlayerInitialState, resetPlayerState } from '../features/Player/PlayerInitialState';
+import { PlayerInitialState, resetPlayerState } from './initialStates/PlayerInitialState';
 import { ThemeContext, useTheme, ThemeProviderWrapper } from './ThemeContext';
 
 // Export everything explicitly

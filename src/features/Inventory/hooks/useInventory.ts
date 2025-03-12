@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useInventoryContext } from '../../../context/InventoryContext';
-import { Item } from '../itemsInitialState';
+import { Item } from '../../../context/initialStates/itemsInitialState';
 
 /**
  * Interface for inventory state

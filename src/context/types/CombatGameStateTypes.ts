@@ -6,16 +6,7 @@
  * including combat state, skills, enemy data, and combat actions.
  */
 
-/**
- * Combat skills and levels
- */
-export interface CombatSkills {
-  swordplay: number;
-  archery: number;
-  defense: number;
-  dualWielding: number;
-  [key: string]: number; // Allow for additional skills
-}
+
 
 /**
  * Enemy data structure

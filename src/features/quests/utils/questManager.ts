@@ -1,6 +1,6 @@
 import { createAffinityAction } from '../../../context/GameStateContext';
 import quests, { QuestData } from '../data/quests';
-import { Quest, QuestProgress, QuestObjective, QuestRequirement, QuestsState } from '../questsInitialState';
+import { Quest, QuestProgress, QuestObjective, QuestRequirement, QuestsState } from '../../../context/initialStates/questsInitialState';
 
 /**
  * Game state interface for requirement checking

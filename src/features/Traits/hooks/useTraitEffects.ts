@@ -1,8 +1,8 @@
 import { useContext, useEffect } from 'react';
 import { useGameState } from '../../../context/index';
 import { calculateTraitEffect } from '../utils/traitUtils';
-import { TraitEffect } from '../traitsInitialState';
-import { PlayerState } from '../../Player/PlayerInitialState';
+import { TraitEffect } from '../../../context/initialStates/traitsInitialState';
+import { PlayerState } from '../../../context/initialStates/PlayerInitialState';
 
 /**
  * Interface for trait effects calculated from equipped traits

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGameState, useGameDispatch, ACTION_TYPES } from '../../context';
 import { calculateEssenceGeneration } from '../utils/soulResonanceUtils';
-import { GameState } from '../../context/InitialState';
+import { GameState } from '../../context/initialStates/InitialStateComposer';
 
 // Define types for the hook
 interface Player {

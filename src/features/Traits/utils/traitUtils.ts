@@ -1,6 +1,6 @@
 // This file contains utility functions related to traits in the game.
 
-import { TraitDefinition } from '../traitsInitialState';
+import { TraitDefinition } from '../../../context/initialStates/traitsInitialState';
 
 /**
  * Interface for a trait with active status

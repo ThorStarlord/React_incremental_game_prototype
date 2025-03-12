@@ -16,7 +16,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
-import { Item, ItemCategory, ITEM_CATEGORIES } from '../../itemsInitialState';
+import { Item, ItemCategory, ITEM_CATEGORIES } from '../../../../context/initialStates/itemsInitialState';
 import { sortItems, filterItemsByCategory } from '../../utils/inventoryUtils';
 import InventorySlot from '../presentation/InventorySlot';
 import ItemDetailsDialog from '../presentation/ItemDetailsDialog';

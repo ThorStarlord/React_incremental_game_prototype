@@ -1,4 +1,4 @@
-import { Faction } from '../factionsInitialState';
+import { Faction } from '../../../context/initialStates/factionsInitialState';
 
 /**
  * Interface for faction member

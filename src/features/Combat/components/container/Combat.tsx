@@ -3,7 +3,7 @@ import { Box, Typography, Button, CircularProgress, Fade } from '@mui/material';
 import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
 import Battle from './Battle';
 import Panel from './Panel';
-import CombatInitialState from '../../CombatInitialState';
+import CombatInitialState from '../../../../context/initialStates/CombatInitialState';
 
 /**
  * Interface for Combat component props

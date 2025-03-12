@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { PlayerStateContainer, PlayerInitialState } from '../PlayerInitialState';
+import { PlayerStateContainer, PlayerInitialState } from '../../../context/initialStates/PlayerInitialState';
 
 /**
  * Type defining all available player action types
