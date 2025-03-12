@@ -4,7 +4,7 @@
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import npcsInitialState, { NPCState, NPC } from '../../context/initialStates/npcsInitialState';
+import npcsInitialState, { NPCState, NPC } from '../../context/initialStates/NPCsInitialState';
 
 // Types for action payloads
 type DialogueParams = { npcId: string; dialogueType?: string };

@@ -15,7 +15,7 @@ import {
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SellIcon from '@mui/icons-material/Sell';
 
-import { Item, ItemCategory, ITEM_CATEGORIES } from '../../../../context/initialStates/itemsInitialState';
+import { Item, ItemCategory, ITEM_CATEGORIES } from '../../../../context/initialStates/ItemsInitialState';
 import useInventory from '../../hooks/useInventory';
 import InventoryList from './InventoryList';
 import ItemDetailsDialog from '../presentation/ItemDetailsDialog';

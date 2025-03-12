@@ -31,7 +31,6 @@ import {
   ItemEffect,
   ItemStats,
   InventoryState,
-  Materials,
   InventoryItem
 } from './InventoryGameStateTypes';
 
@@ -64,16 +63,12 @@ import {
   AccessibilitySettings
 } from './SettingsGameStateTypes';
 
+// Import notifications-related types
+import { NotificationsState } from './NotificationsGameStateTypes';
+
 // Import statistics-related types
 import {
   StatisticsState,
-  CombatStatistics,
-  ProgressionStatistics,
-  EconomyStatistics,
-  ProductionStatistics,
-  ExplorationStatistics,
-  TimeStatistics,
-  SocialStatistics,
   StatisticsSystem
 } from './StatisticsGameStateTypes';
 
@@ -94,13 +89,12 @@ import {
   SkillsState,
   MagicSkills,
   CraftingSkills,
-  GatheringSkills,
-  CombatSkills as SkillsCombatSkills
+  GatheringSkills
 } from './SkillsGameStateTypes';
 
 // Import trait-related types
 import {
-  TraitSystem as ExtendedTraitSystem,
+  TraitSystem,
   ExtendedTrait,
   ActiveTrait,
   TieredTrait,
@@ -137,7 +131,43 @@ import {
 // Import essence-related types
 import { EssenceState } from './EssenceGameStateTypes';
 
-// Re-export all types for backward compatibility
+// Import resource-related types
+import { ResourceState, Materials } from './ResourceGameStateTypes';
+
+/**
+ * Complete game state
+ */
+export interface GameState {
+  player: PlayerState;
+  resources: ResourceState;
+  skills: SkillsState;
+  inventory: InventoryState;
+  equipment: EquipmentState;
+  progression: ProgressionState;
+  combat: CombatState;
+  settings: SettingsState;
+  statistics: StatisticsSystem;
+  meta: MetaState;
+  essence: EssenceState;
+  traits: TraitSystem;
+  quests: QuestSystem;
+  world: WorldState;
+  notifications: NotificationsState;
+
+  // For backward compatibility (remove in v2.0)
+  gameData?: Record<string, unknown>;
+  stats?: Record<string, unknown>;
+}
+
+/**
+ * Action type for reducers
+ */
+export interface ActionType<T = unknown> {
+  type: string;
+  payload: T;
+}
+
+// Re-export types for convenience
 export type {
   // Player types
   PlayerState, PlayerAttributes, PlayerStats, Skill, StatusEffect, TraitEffect, Trait,
@@ -158,8 +188,7 @@ export type {
   SettingsState, NotificationSettings, AudioSettings, GameplaySettings, UISettings, AccessibilitySettings,
   
   // Statistics types
-  StatisticsState, CombatStatistics, ProgressionStatistics, EconomyStatistics, 
-  ProductionStatistics, ExplorationStatistics, TimeStatistics, SocialStatistics, StatisticsSystem,
+  StatisticsState, StatisticsSystem,
   
   // Meta types
   MetaState, SemanticVersion, SaveHistoryEntry, PlaySession, GameUpdate, FeatureFlags, DebugInfo, MigrationHistory,
@@ -168,7 +197,7 @@ export type {
   SkillsState, MagicSkills, CraftingSkills, GatheringSkills,
   
   // Trait types
-  ExtendedTraitSystem as TraitSystem, ExtendedTrait, ActiveTrait, TieredTrait, TraitSlots, TraitInteractionResult,
+  TraitSystem, ExtendedTrait, ActiveTrait, TieredTrait, TraitSlots, TraitInteractionResult,
   
   // Quest types
   QuestSystem, ExtendedQuest, ExtendedQuestObjective, QuestDifficulty, QuestType, QuestUpdateEvent,
@@ -178,51 +207,7 @@ export type {
   BiomeType, WeatherType, TimeOfDay, Season,
   
   // Essence types
-  EssenceState
+  EssenceState,
+  NotificationsState,
+  ResourceState
 };
-
-/**
- * Complete game state
- */
-export interface GameState {
-  player: PlayerState;
-  resources: ResourceState;
-  skills: SkillsState;
-  inventory: InventoryState;
-  equipment: EquipmentState;
-  progression: ProgressionState;
-  combat: CombatState;
-  settings: SettingsState;
-  statistics: StatisticsSystem;
-  meta: MetaState;
-  essence: EssenceState;
-  traits: ExtendedTraitSystem;
-  quests: QuestSystem;
-  world: WorldState;
-
-  // For backward compatibility
-  gameData?: {
-    [key: string]: any;
-  };
-  stats?: {
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
-
-/**
- * Game resources and currencies
- */
-export interface ResourceState {
-  gold: number;
-  gems: number;
-  materials: Materials;
-}
-
-/**
- * Action type for reducers
- */
-export interface ActionType<T = any> {
-  type: string;
-  payload: T;
-}

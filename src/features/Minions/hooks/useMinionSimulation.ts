@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useGameState, useGameDispatch } from '../../../context/GameStateContext';
-import { Minion, MinionTask } from '../../../context/initialStates/minionsInitialState';
+import { Minion, MinionTask } from '../../../context/initialStates/MinionsInitialState';
 
 /**
  * Type for task completion result

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Item } from '../../../../context/initialStates/itemsInitialState';
+import { Item } from '../../../../context/initialStates/ItemsInitialState';
 import InventoryItem from '../ui/InventoryItem';
 
 /**

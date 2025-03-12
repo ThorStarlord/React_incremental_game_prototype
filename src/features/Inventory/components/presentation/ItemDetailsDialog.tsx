@@ -11,7 +11,7 @@ import {
   Chip,
   Grid
 } from '@mui/material';
-import { Item, ItemStats } from '../../../../context/initialStates/itemsInitialState';
+import { Item, ItemStats } from '../../../../context/initialStates/ItemsInitialState';
 import { getItemRarityDisplay } from '../../utils/inventoryUtils';
 
 /**

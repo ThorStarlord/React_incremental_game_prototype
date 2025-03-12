@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGameState, useGameDispatch } from '../../../context/GameStateContext';
-import { Minion, MinionTask, MinionAssignment, MinionUpgrade } from '../../../context/initialStates/minionsInitialState';
+import { Minion, MinionTask, MinionAssignment, MinionUpgrade } from '../../../context/initialStates/MinionsInitialState';
 
 /**
  * Interface for the return value from useMinionSystem hook

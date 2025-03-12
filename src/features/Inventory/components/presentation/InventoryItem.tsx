@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Paper } from '@mui/material';
-import { Item } from '../../../../context/initialStates/itemsInitialState';
+import { Item } from '../../../../context/initialStates/ItemsInitialState';
 import InventoryItemUI from '../ui/InventoryItem';
 
 /**

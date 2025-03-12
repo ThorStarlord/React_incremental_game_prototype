@@ -24,47 +24,51 @@ export enum DamageType {
 /**
  * Resource types used in combat rewards and costs
  */
-export type ResourceType = 
-  | 'gold' 
-  | 'experience' 
-  | 'essence' 
-  | 'mana' 
-  | 'health' 
-  | 'stamina';
+export enum ResourceType {
+  Gold = 'gold',
+  Experience = 'experience',
+  Essence = 'essence',
+  Mana = 'mana',
+  Health = 'health',
+  Stamina = 'stamina'
+}
 
 /**
  * Environment types for combat locations
  */
-export type EnvironmentType = 
-  | 'forest' 
-  | 'desert' 
-  | 'mountain' 
-  | 'dungeon' 
-  | 'cave' 
-  | 'castle' 
-  | 'plains' 
-  | 'swamp' 
-  | 'ocean';
+export enum EnvironmentType {
+  Forest = 'forest',
+  Desert = 'desert',
+  Mountain = 'mountain',
+  Dungeon = 'dungeon',
+  Cave = 'cave',
+  Castle = 'castle',
+  Plains = 'plains',
+  Swamp = 'swamp',
+  Ocean = 'ocean'
+}
 
 // Define a type for combat sources to improve type safety
-export type CombatSource = 
-  | 'player' 
-  | 'enemy' 
-  | 'item' 
-  | 'ability' 
-  | 'environment' 
-  | 'trap'
-  | 'status_effect' 
-  | 'system';
+export enum CombatSource {
+  Player = 'player',
+  Enemy = 'enemy',
+  Item = 'item',
+  Ability = 'ability',
+  Environment = 'environment',
+  Trap = 'trap',
+  StatusEffect = 'status_effect',
+  System = 'system'
+}
 
 // Define a type for combat targets to improve type safety
-export type CombatTarget = 
-  | 'player'
-  | 'enemy'
-  | 'all'
-  | 'self'
-  | 'allies'
-  | 'enemies';
+export enum CombatTarget {
+  Player = 'player',
+  Enemy = 'enemy',
+  All = 'all',
+  Self = 'self',
+  Allies = 'allies',
+  Enemies = 'enemies'
+}
 
 /**
  * Status effect that can be applied during combat
@@ -105,12 +109,18 @@ export interface Skill {
   name: string;
   description: string;
   cooldown: number;
-  currentCooldown?: number;
   effect: Effect;
   manaCost?: number;
   requiredLevel?: number;
   targeting: 'single' | 'all' | 'self' | 'random';
   iconPath?: string;
+}
+
+/**
+ * Active skill with cooldown tracking
+ */
+export interface ActiveSkill extends Skill {
+  currentCooldown: number;
 }
 
 /**
@@ -148,17 +158,23 @@ export interface CombatActor {
   type: 'player' | 'enemy'; // Actor type (player or enemy)
   currentHealth: number;    // Current health points
   maxHealth: number;        // Maximum health points
-  mana?: number;            // Current mana points
-  maxMana?: number;         // Maximum mana points
   attack: number;           // Base attack power
   defense: number;          // Base defense power
   speed: number;            // Determines turn order
-  level?: number;           // Actor level
-  skills: Skill[];          // Skills available (empty array if none)
+  level: number;            // Actor level
+  skills: ActiveSkill[];    // Skills available (empty array if none)
   statusEffects: StatusEffect[]; // Active status effects
-  critChance?: number;      // Chance to land critical hits (0-1)
-  dodgeChance?: number;     // Chance to dodge attacks (0-1)
-  resistances?: Partial<Record<DamageType, number>>; // Damage resistances
+  critChance: number;       // Chance to land critical hits (0-1)
+  dodgeChance: number;      // Chance to dodge attacks (0-1)
+  resistances: Record<DamageType, number>; // Damage resistances
+}
+
+/**
+ * Interface for actors that use mana
+ */
+export interface ManaUser extends CombatActor {
+  mana: number;            // Current mana points
+  maxMana: number;         // Maximum mana points
 }
 
 /**
@@ -203,7 +219,7 @@ export interface CombatLogDamageEntry {
   source: CombatSource;
   target: CombatTarget;
   amount: number;
-  damageType: DamageType | string;
+  damageType: DamageType;
   critical: boolean;
 }
 
@@ -234,9 +250,9 @@ export interface CombatLogStatusEntry {
  */
 export interface CombatLogMiscEntry {
   type: 'misc';
-  source: CombatSource;    // Made required for consistency
-  target: CombatTarget;    // Made required for consistency
-  message: string;         // Description of the event
+  source: CombatSource;
+  target: CombatTarget;
+  message: string;
 }
 
 /**
@@ -249,6 +265,31 @@ export type CombatLogData =
   | CombatLogMiscEntry;
 
 /**
+ * Action type for combat actions
+ */
+export enum CombatActionType {
+  Attack = 'attack',
+  Skill = 'skill',
+  Defend = 'defend',
+  Item = 'item',
+  Flee = 'flee',
+  Special = 'special'
+}
+
+/**
+ * Possible results of a combat action
+ */
+export enum CombatActionResult {
+  Hit = 'hit',
+  Miss = 'miss',
+  Critical = 'critical',
+  Block = 'block',
+  Dodge = 'dodge',
+  Immune = 'immune',
+  Resisted = 'resisted'
+}
+
+/**
  * An entry in the combat log
  */
 export interface CombatLogEntry {
@@ -258,7 +299,7 @@ export interface CombatLogEntry {
   target: CombatTarget;    // Target of the action
   result: CombatActionResult; // Result of the action
   data: CombatLogData;     // Detailed data about the event
-  message: string;         // Human-readable description (now required)
+  message: string;         // Human-readable description
 }
 
 /**
@@ -272,18 +313,6 @@ export interface CombatRewards {
 }
 
 /**
- * Possible results of a combat action
- */
-export type CombatActionResult = 
-  | 'hit' 
-  | 'miss' 
-  | 'critical' 
-  | 'block' 
-  | 'dodge' 
-  | 'immune' 
-  | 'resisted';
-
-/**
  * Combat state object
  */
 export interface CombatState {
@@ -294,19 +323,19 @@ export interface CombatState {
   combatLog: CombatLogEntry[]; // History of combat actions
   rewards?: CombatRewards;   // Rewards for victory
   activeEffects: Record<'player' | 'enemy', StatusEffect[]>; // Active effects
-  lastUpdated: number;       // Timestamp of last update (made required)
-  difficulty: 'easy' | 'normal' | 'hard' | 'nightmare'; // Made required
-  environment: EnvironmentType; // Combat location (now typed and required)
-  isAutoMode: boolean;       // Whether auto-combat is enabled (made required)
+  lastUpdated: number;       // Timestamp of last update
+  difficulty: 'easy' | 'normal' | 'hard' | 'nightmare';
+  environment: EnvironmentType; // Combat location
+  isAutoMode: boolean;       // Whether auto-combat is enabled
 }
 
 /**
- * Action type for combat actions
+ * Combat state container interface
  */
-export type CombatActionType =
-  | 'attack'
-  | 'skill'
-  | 'defend'
-  | 'item'
-  | 'flee'
-  | 'special';
+export interface CombatStateContainer {
+  player: ManaUser;
+  enemies: Enemy[];
+  environment: EnvironmentType;
+  rewards: CombatRewards;
+  state: CombatState;
+}

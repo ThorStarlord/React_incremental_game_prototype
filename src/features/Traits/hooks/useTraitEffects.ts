@@ -1,7 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { useGameState } from '../../../context/index';
 import { calculateTraitEffect } from '../utils/traitUtils';
-import { TraitEffect } from '../../../context/initialStates/traitsInitialState';
+import { TraitEffect } from '../../../context/initialStates/TraitsInitialState';
 import { PlayerState } from '../../../context/initialStates/PlayerInitialState';
 
 /**

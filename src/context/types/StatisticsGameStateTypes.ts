@@ -1,161 +1,101 @@
 /**
- * Type definitions for game statistics and metrics
+ * Type definitions for statistics system
  */
 
 /**
- * Combat-related statistics
+ * Combat statistics
  */
 export interface CombatStatistics {
   enemiesDefeated: number;
+  criticalHits: number;
   damageDealt: number;
   damageTaken: number;
-  criticalHits: number;
-  highestDamageDealt: number;
-  deathCount: number;
-  bossesDefeated: number;
-  skillsUsed: Record<string, number>;
-  enemiesDefeatedByType: Record<string, number>;
+  healingDone: number;
 }
 
 /**
- * Progression-related statistics
+ * Progression statistics
  */
 export interface ProgressionStatistics {
   questsCompleted: number;
-  questsFailed: number;
   achievementsUnlocked: number;
-  locationsDiscovered: number;
   levelsGained: number;
-  highestLevel: number;
-  featuresUnlocked: number;
 }
 
 /**
- * Economy-related statistics
+ * Economy statistics
  */
 export interface EconomyStatistics {
   goldEarned: number;
   goldSpent: number;
-  itemsBought: number;
-  itemsSold: number;
-  highestGoldHeld: number;
-  gemsEarned: number;
-  gemsSpent: number;
+  itemsCrafted: number;
+  itemsPurchased: number;
 }
 
 /**
- * Crafting and gathering statistics
+ * Production statistics
  */
 export interface ProductionStatistics {
-  itemsCrafted: number;
   resourcesGathered: number;
-  itemsEnchanted: number;
-  recipesLearned: number;
-  highestQualityItem: number;
-  materialsByType: Record<string, number>;
-  itemsCraftedByType: Record<string, number>;
+  itemsProduced: number;
 }
 
 /**
- * Exploration-related statistics
+ * Exploration statistics
  */
 export interface ExplorationStatistics {
-  distanceTraveled: number;
-  areasExplored: number;
-  chestsOpened: number;
+  areasDiscovered: number;
   secretsFound: number;
-  dungeonRuns: number;
 }
 
 /**
- * Time-related statistics
+ * Time statistics
  */
 export interface TimeStatistics {
-  totalPlayTime: number; // in seconds
-  sessionCount: number;
-  longestSession: number; // in seconds
-  afkTime: number; // in seconds
-  activeDays: number;
+  totalPlayTime: number;
+  sessionPlayTime: number;
 }
 
 /**
- * Social interaction statistics
+ * Social statistics
  */
 export interface SocialStatistics {
-  npcInteractions: number;
-  questsAccepted: number;
-  relationshipLevelsGained: number;
-  giftsGiven: number;
-  highestRelationship: number;
+  npcsInteracted: number;
+  tradesMade: number;
 }
 
 /**
- * Time period for statistics tracking
- */
-export type StatisticsPeriod = 'daily' | 'weekly' | 'monthly' | 'allTime';
-
-/**
- * All game statistics and metrics
+ * Complete statistics state
  */
 export interface StatisticsState {
-  // Basic statistics (for backward compatibility)
-  enemiesDefeated: number;
-  questsCompleted: number;
-  itemsCrafted: number;
-  resourcesGathered: number;
-  goldEarned: number;
-  distanceTraveled: number;
-  totalPlayTime: number; // in seconds
-  
-  // Detailed statistics by category
-  combat?: CombatStatistics;
-  progression?: ProgressionStatistics;
-  economy?: EconomyStatistics;
-  production?: ProductionStatistics;
-  exploration?: ExplorationStatistics;
-  time?: TimeStatistics;
-  social?: SocialStatistics;
-  
-  // Historical data for trends
-  historicalData?: {
-    [key in StatisticsPeriod]?: Partial<StatisticsState>;
-  };
-  
-  // First occurrence timestamps
-  firstOccurrences?: Record<string, string>; // ISO date strings
-  
-  // Allow for additional statistics
-  [key: string]: any;
+  combatStatistics: CombatStatistics;
+  progressionStatistics: ProgressionStatistics;
+  economyStatistics: EconomyStatistics;
+  productionStatistics: ProductionStatistics;
+  explorationStatistics: ExplorationStatistics;
+  timeStatistics: TimeStatistics;
+  socialStatistics: SocialStatistics;
 }
 
 /**
- * Structure for a statistics milestone
+ * Historical statistics entry with timestamp
  */
-export interface StatisticsMilestone {
-  id: string;
-  name: string;
-  description: string;
-  statisticKey: string;
-  threshold: number;
-  isAchieved: boolean;
-  reward?: any;
+export interface HistoricalStatisticsEntry {
+  timestamp: number;
+  data: StatisticsState;
 }
 
 /**
- * Statistics event for tracking significant changes
- */
-export interface StatisticsEvent {
-  type: string;
-  value: number;
-  timestamp: string; // ISO date string
-  metadata?: Record<string, any>;
-}
-
-/**
- * Complete statistics tracking system
+ * Statistics system with current and historical data
  */
 export interface StatisticsSystem {
   current: StatisticsState;
-  milestones: StatisticsMilestone[];
-  recentEvents: StatisticsEvent[];
+  history: HistoricalStatisticsEntry[];
 }
+
+/**
+ * Utility type for aggregating statistics
+ */
+export type AggregatedStatistics = {
+  [K in keyof StatisticsState]: number;
+};

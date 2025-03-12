@@ -1,4 +1,4 @@
-import { Item, ItemCategory, ItemStats } from '../../../context/initialStates/itemsInitialState';
+import { Item, ItemCategory, ItemStats } from '../../../context/initialStates/ItemsInitialState';
 
 /**
  * Calculate the total weight of all items in the inventory

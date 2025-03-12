@@ -4,6 +4,7 @@
 
 // Import the original InventoryItem for compatibility
 import { InventoryItem as PlayerInventoryItem } from './PlayerGameStateTypes';
+import { Materials } from './ResourceGameStateTypes';
 
 // Re-export for backward compatibility
 export type InventoryItem = PlayerInventoryItem;
@@ -71,17 +72,4 @@ export interface EquipmentState {
   accessory1: GameItem | null;
   accessory2: GameItem | null;
   [key: string]: GameItem | null; // Allow for additional equipment slots
-}
-
-/**
- * Game materials used for crafting and upgrades
- */
-export interface Materials {
-  wood: number;
-  stone: number;
-  leather: number;
-  metal: number;
-  cloth: number;
-  herbs: number;
-  [key: string]: number; // Allow for additional materials
 }

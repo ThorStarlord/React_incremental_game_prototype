@@ -10,18 +10,21 @@
  * - Game settings and configuration
  */
 
-import type { 
+import { 
   GameState, 
   PlayerState, 
   PlayerStats, 
-  EquipmentState 
+  EquipmentState,
+  InventoryItem
 } from '../types/GameStateTypes';
 
 // Import player state from the feature module (fix case sensitivity in path)
-import { PlayerInitialState, resetPlayerState, DefaultPlayerAttributes } from './PlayerInitialState';
+import { PlayerInitialState, DefaultPlayerAttributes } from './PlayerInitialState';
 
 // Import Essence initial state
 import EssenceInitialState from './EssenceInitialState';
+
+import statisticsInitialState from './StatisticsInitialState';
 
 /**
  * Base Combat State interface definition
@@ -39,7 +42,7 @@ export interface CombatState {
   rewards?: {  // Optional, as it's only present after combat
     experience: number;
     gold: number;
-    items: any[]; // TODO: Replace 'any' with a proper Item type
+    items: InventoryItem[];
   };
 }
 
@@ -161,7 +164,12 @@ export const InitialState: GameState = {
     active: false,
     playerTurn: true, // Player goes first by default
     round: 1,
-    log: []
+    log: [],
+    rewards: {
+      experience: 0,
+      gold: 0,
+      items: [] as InventoryItem[]
+    }
   },
   
   /**
@@ -190,12 +198,8 @@ export const InitialState: GameState = {
    * Game statistics and metrics
    */
   statistics: {
-    enemiesDefeated: 0,
-    questsCompleted: 0,
-    itemsCrafted: 0,
-    resourcesGathered: 0,
-    goldEarned: 0,
-    distanceTraveled: 0
+    current: statisticsInitialState,
+    history: []
   },
   
   /**
@@ -210,7 +214,13 @@ export const InitialState: GameState = {
   /**
    * Essence system state
    */
-  essence: EssenceInitialState
+  essence: EssenceInitialState,
+
+  notifications: {
+    notifications: [],
+    unreadCount: 0,
+    maxNotifications: 100
+  }
 };
 
 // Export InitialState as default
@@ -221,13 +231,69 @@ export default InitialState;
  * @returns {GameState} A fresh copy of the initial state
  */
 export const resetGameState = (): GameState => {
-  const freshState = JSON.parse(JSON.stringify(InitialState)) as GameState;
+  const freshState = structuredClone(InitialState) as GameState;
   
   // Use the imported resetPlayerState function
   freshState.player = resetPlayerState(null);
   freshState.meta.playingSince = new Date().toISOString();
   return freshState;
 };
+
+/**
+ * Reset player state to initial values
+ */
+export function resetPlayerState(playerState: PlayerState | null): PlayerState {
+  if (!playerState) {
+    return {
+      name: '',
+      level: 1,
+      experience: 0,
+      experienceToNextLevel: 100,
+      attributes: {
+        strength: 10,
+        intelligence: 10,
+        dexterity: 10,
+        vitality: 10,
+        luck: 10,
+        constitution: 10,
+        wisdom: 10,
+        charisma: 10,
+        perception: 10,
+        agility: 10,
+        endurance: 10
+      },
+      stats: {
+        health: 100,
+        maxHealth: 100,
+        healthRegen: 1,
+        mana: 50,
+        maxMana: 50,
+        manaRegen: 1,
+        physicalDamage: 10,
+        magicalDamage: 10,
+        critChance: 0.1,
+        critMultiplier: 1.5,
+        attack: 10,
+        defense: 10
+      },
+      totalPlayTime: 0,
+      creationDate: new Date().toISOString(),
+      equippedTraits: [],
+      permanentTraits: [],
+      acquiredTraits: [],
+      traitSlots: 3,
+      gold: 0,
+      energy: 100,
+      maxEnergy: 100,
+      inventory: [],
+      equippedItems: {},
+      attributePoints: 0,
+      skills: [],
+      activeEffects: []
+    };
+  }
+  return playerState;
+}
 
 /**
  * Calculate experience required for a specific level
@@ -265,14 +331,33 @@ export const recalculatePlayerStats = (
   };
   
   // Add equipment bonuses (would be implemented based on equipped items)
-  // This would loop through equipment and add all stats bonuses
-  
-  // Ensure health and mana don't exceed maximums
-  stats.health = Math.min(playerState.stats.health || stats.maxHealth, stats.maxHealth);
-  stats.mana = Math.min(playerState.stats.mana || stats.maxMana, stats.maxMana);
-  
-  return stats;
+  const equipmentBonuses = calculateEquipmentBonuses(playerState.equippedItems);
+
+  return {
+    ...playerState,
+    stats: {
+      ...stats,
+      ...equipmentBonuses
+    }
+  };
 };
+
+/**
+ * Calculate equipment bonuses
+ */
+function calculateEquipmentBonuses(equippedItems: Record<string, string>): Partial<PlayerState['stats']> {
+  const bonuses: Partial<PlayerState['stats']> = {};
+  // Implement logic to calculate bonuses from equipped items
+  // This would loop through equipment and add all stats bonuses
+  return bonuses;
+}
+
+/**
+ * Deep clone the initial state
+ */
+export function cloneInitialState(): GameState {
+  return structuredClone(InitialState);
+}
 
 // Export types directly from their source instead of re-exporting
 export type { GameState, PlayerState, PlayerStats, EquipmentState } from '../types/GameStateTypes';
