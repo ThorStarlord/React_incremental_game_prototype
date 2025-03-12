@@ -43,8 +43,8 @@ export const PlayerInitialState: PlayerStateContainer = {
       health: 100,
       maxHealth: 100,
       healthRegen: 1,
-      mana: 50,         // Previously "energy"
-      maxMana: 50,      // Previously "maxEnergy"
+      mana: 50,         // Consistent naming
+      maxMana: 50,      // Consistent naming
       manaRegen: 0.5,
       physicalDamage: 5,
       magicalDamage: 2,

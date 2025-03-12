@@ -1,21 +1,12 @@
 /**
- * Type definitions for skill-related game state
+ * Type definitions for skills system
  */
 
-/**
- * Combat skills and levels
- */
-
-export interface CombatSkills {
-    swordplay: number;
-    archery: number;
-    defense: number;
-    dualWielding: number;
-    [key: string]: number; // Allow for additional skills
-  }
+// Import shared skill types
+import { CombatSkills } from './CombatGameStateTypes';
 
 /**
- * Magic skills and levels
+ * Magic skills
  */
 export interface MagicSkills {
   fireMagic: number;
@@ -26,7 +17,7 @@ export interface MagicSkills {
 }
 
 /**
- * Crafting skills and levels
+ * Crafting skills
  */
 export interface CraftingSkills {
   alchemy: number;
@@ -37,7 +28,7 @@ export interface CraftingSkills {
 }
 
 /**
- * Gathering skills and levels
+ * Gathering skills
  */
 export interface GatheringSkills {
   mining: number;
@@ -48,7 +39,7 @@ export interface GatheringSkills {
 }
 
 /**
- * All player skills categorized by type
+ * Complete skills state
  */
 export interface SkillsState {
   combat: CombatSkills;

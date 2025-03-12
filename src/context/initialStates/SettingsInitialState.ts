@@ -34,7 +34,8 @@ const audioSettings: AudioSettings = {
   ambientVolume: 0.3,
   uiSoundVolume: 0.5,
   masterVolume: 0.8,
-  muteAll: false
+  muteAll: false,
+  combatSoundsEnabled: true
 };
 
 /**
@@ -47,7 +48,10 @@ const gameplaySettings: GameplaySettings = {
   autoResumeQuests: true,
   combatSpeed: 1.0,
   confirmItemUse: true,
-  confirmItemSell: true
+  confirmItemSell: true,
+  autoEquipBetterItems: true,
+  confirmBeforeSelling: true,
+  showDamageNumbers: true
 };
 
 /**
@@ -61,7 +65,9 @@ const uiSettings: UISettings = {
   darkMode: false,
   showDamageNumbers: true,
   showCriticalHitEffects: true,
-  simplifiedUI: false
+  simplifiedUI: false,
+  minimapEnabled: true,
+  hideCompletedQuests: true
 };
 
 /**

@@ -5,20 +5,28 @@
 import { InventoryState, GameItem } from '../types/GameStateTypes';
 
 /**
- * Starting items for new players
+ * Create a game item with validation
  */
-export const STARTING_ITEMS: GameItem[] = [
-  {
-    id: 'health_potion_minor',
-    name: 'Minor Health Potion',
-    type: 'consumable',
-    effect: { health: 25 },
-    quantity: 3,
-    value: 10,
-    rarity: 'common',
-    description: 'A small vial containing a red liquid that restores a small amount of health.'
-  },
-  {
+export const createGameItem = (item: Partial<GameItem>): GameItem => {
+  if (!item.id || !item.name || !item.type) {
+    throw new Error(`Invalid item: missing required properties`);
+  }
+  
+  return {
+    quantity: 1, // Default quantity
+    value: 0, // Default value
+    rarity: 'common', // Default rarity
+    description: '', // Default description
+    ...item,
+    quantity: Math.max(1, item.quantity || 1) // Ensure positive quantity
+  };
+};
+
+/**
+ * Starting weapons for new players
+ */
+export const STARTING_WEAPONS: GameItem[] = [
+  createGameItem({
     id: 'wooden_sword',
     name: 'Wooden Sword',
     type: 'weapon',
@@ -27,8 +35,30 @@ export const STARTING_ITEMS: GameItem[] = [
     value: 15,
     rarity: 'common',
     description: 'A simple training sword made of wood. Better than nothing.'
-  },
-  {
+  })
+];
+
+/**
+ * Starting consumables for new players
+ */
+export const STARTING_CONSUMABLES: GameItem[] = [
+  createGameItem({
+    id: 'health_potion_minor',
+    name: 'Minor Health Potion',
+    type: 'consumable',
+    effect: { health: 25 },
+    quantity: 3,
+    value: 10,
+    rarity: 'common',
+    description: 'A small vial containing a red liquid that restores a small amount of health.'
+  })
+];
+
+/**
+ * Starting materials for new players
+ */
+export const STARTING_MATERIALS: GameItem[] = [
+  createGameItem({
     id: 'leather_scraps',
     name: 'Leather Scraps',
     type: 'material',
@@ -36,7 +66,7 @@ export const STARTING_ITEMS: GameItem[] = [
     value: 2,
     rarity: 'common',
     description: 'Small pieces of leather that can be used for basic crafting.'
-  }
+  })
 ];
 
 /**
@@ -49,7 +79,7 @@ export const INITIAL_CAPACITY = 20;
  */
 const inventoryInitialState: InventoryState = {
   capacity: INITIAL_CAPACITY,
-  items: STARTING_ITEMS
+  items: [...STARTING_WEAPONS, ...STARTING_CONSUMABLES, ...STARTING_MATERIALS]
 };
 
 export default inventoryInitialState;

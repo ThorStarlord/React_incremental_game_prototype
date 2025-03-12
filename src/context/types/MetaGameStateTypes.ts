@@ -1,101 +1,100 @@
 /**
- * Type definitions for game metadata
+ * Type definitions for game meta information
  */
 
 /**
- * Semantic version structure
+ * Semantic versioning structure
  */
 export interface SemanticVersion {
   major: number;
   minor: number;
   patch: number;
-  label?: string; // e.g., 'alpha', 'beta', 'rc'
+  label?: string;
 }
 
 /**
- * Save state entry structure
+ * Save history entry
  */
 export interface SaveHistoryEntry {
-  timestamp: string; // ISO date string
+  timestamp: string;
   version: string;
-  description?: string;
-  saveId: string;
-  autoSave: boolean;
+  notes?: string;
 }
 
 /**
- * Play session metadata
+ * Play session entry
  */
 export interface PlaySession {
-  startTime: string; // ISO date string
-  endTime?: string; // ISO date string
-  duration?: number; // in seconds
-  gameVersion: string;
-  achievements?: string[]; // IDs of achievements unlocked in this session
-  levelsGained?: number;
+  startTime: string;
+  endTime?: string;
+  duration: number; // in seconds
 }
 
 /**
- * Game update information
+ * Game update entry
  */
 export interface GameUpdate {
   version: string;
-  releaseDate: string; // ISO date string
+  releaseDate: string;
   notes: string;
-  viewed: boolean;
 }
 
 /**
- * Feature flags for toggling experimental features
- */
-export interface FeatureFlags {
-  [featureName: string]: boolean;
-}
-
-/**
- * Debug information
+ * Debug information structure
  */
 export interface DebugInfo {
   isDevMode: boolean;
-  debugLevel: 'none' | 'error' | 'warn' | 'info' | 'verbose';
-  lastError?: {
-    message: string;
-    stack?: string;
-    timestamp: string; // ISO date string
-  };
+  debugLevel: 'none' | 'low' | 'medium' | 'high';
+  lastError?: string;
+  errorCount: number;
+  performanceMetrics: PerformanceMetrics;
+  lastApiCall?: string;
 }
 
 /**
- * Migration history for save data
+ * Performance metrics structure
  */
-export interface MigrationHistory {
-  lastMigration?: string; // ISO date string
-  migratedFrom: string; // Previous version
-  migratedTo: string; // Current version
-  appliedMigrations: string[]; // IDs of applied migrations
+export interface PerformanceMetrics {
+  fps: number;
+  memoryUsage: number;
+  loadTime: number;
+  renderTime: number;
 }
 
 /**
- * Meta information about the game state
+ * Migration record structure
+ */
+export interface MigrationRecord {
+  fromVersion: string;
+  toVersion: string;
+  timestamp: string;
+  changes: string[];
+}
+
+/**
+ * Feature flags for enabling/disabling game features
+ */
+export interface FeatureFlags {
+  debugMode: boolean;
+  experimentalFeatures: boolean;
+  betaContent: boolean;
+  developerTools: boolean;
+}
+
+/**
+ * Meta state structure
  */
 export interface MetaState {
-  // Basic metadata (for backward compatibility)
   version: string;
-  lastSaved: string | null; // ISO date string or null
-  playingSince: string | null; // ISO date string or null
-  
-  // Extended metadata
-  versionDetails?: SemanticVersion;
-  saveHistory?: SaveHistoryEntry[];
-  playSessions?: PlaySession[];
-  currentSessionStart?: string; // ISO date string
-  buildId?: string;
-  platform?: 'web' | 'desktop' | 'mobile' | 'steam' | 'epic';
-  pendingUpdates?: GameUpdate[];
-  featureFlags?: FeatureFlags;
-  debug?: DebugInfo;
-  migrationHistory?: MigrationHistory;
-  instanceId?: string; // Unique identifier for this game instance
+  versionDetails: SemanticVersion;
+  lastSaved: string;
+  playingSince: string;
+  saveHistory: SaveHistoryEntry[];
+  playSessions: PlaySession[];
+  updates: GameUpdate[];
+  featureFlags: FeatureFlags;
+  debug: DebugInfo;
+  migrationHistory: MigrationRecord[];
 }
 
 /**

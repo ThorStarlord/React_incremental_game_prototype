@@ -17,21 +17,17 @@ export type {
 };
 
 /**
- * Equipment slot types
+ * Equipment slots for the player
  */
-export type EquipmentSlot = 
-  | 'weapon'
-  | 'offhand'
-  | 'head'
-  | 'body'
-  | 'hands'
-  | 'legs'
-  | 'feet'
-  | 'accessory1'
-  | 'accessory2';
+export const EQUIPMENT_SLOTS = [
+  'weapon', 'offhand', 'head', 'body', 
+  'hands', 'legs', 'feet', 'accessory1', 'accessory2'
+] as const;
+
+export type EquipmentSlot = typeof EQUIPMENT_SLOTS[number];
 
 /**
- * Equipment slots for the player
+ * Equipment state
  */
 export interface EquipmentState {
   weapon: GameItem | null;
@@ -47,34 +43,52 @@ export interface EquipmentState {
 }
 
 /**
- * Aggregated equipment bonuses
+ * Equipment bonuses
  */
 export interface EquipmentBonuses {
-  physicalDamage: number;
-  magicalDamage: number;
-  armor: number;
-  healthBonus: number;
-  manaBonus: number;
-  strengthBonus: number;
-  intelligenceBonus: number;
-  dexterityBonus: number;
-  vitalityBonus: number;
-  luckBonus: number;
-  [key: string]: number; // Allow for additional bonuses
+  physicalDamage?: number;
+  magicalDamage?: number;
+  armor?: number;
+  healthBonus?: number;
+  manaBonus?: number;
+  strengthBonus?: number;
+  intelligenceBonus?: number;
+  dexterityBonus?: number;
+  vitalityBonus?: number;
+  luckBonus?: number;
+  [key: string]: number | undefined; // Allow for additional bonuses
 }
 
 /**
- * Equipment requirements to wear or use an item
+ * Equipment requirements
  */
 export interface EquipmentRequirements {
   level?: number;
   strength?: number;
   intelligence?: number;
   dexterity?: number;
+  vitality?: number;
   skillRequirements?: {
     skillName: string;
     level: number;
   }[];
   questRequirements?: string[];
-  [key: string]: any; // Allow for additional requirements
+  [key: string]: number | undefined | any[]; // Improve this typing
+}
+
+/**
+ * Item-slot compatibility
+ */
+export interface ItemSlotCompatibility {
+  itemType: string;
+  compatibleSlots: EquipmentSlot[];
+}
+
+/**
+ * Derived equipment stats
+ */
+export interface DerivedEquipmentStats {
+  totalPhysicalDamage: number;
+  totalArmor: number;
+  // ...other derived stats
 }

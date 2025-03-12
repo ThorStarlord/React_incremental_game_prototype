@@ -11,7 +11,9 @@ export interface NotificationSettings {
   questUpdates: boolean;
   lootDrops: boolean;
   achievements: boolean;
-  resourceGain: boolean;
+  resourceCollection: boolean; // Changed from resourceGain
+  lowResources: boolean; // Added to match implementation
+  newItems: boolean; // Added to match implementation
 }
 
 /**
@@ -21,8 +23,10 @@ export interface AudioSettings {
   musicVolume: number;
   soundEffectsVolume: number;
   ambientVolume: number;
+  uiSoundVolume: number; // Added to match implementation
+  masterVolume: number; // Added to match implementation
   muteAll: boolean;
-  combatSoundsEnabled: boolean;
+  combatSoundsEnabled: boolean; // Added to match type definition
 }
 
 /**
@@ -30,23 +34,31 @@ export interface AudioSettings {
  */
 export interface GameplaySettings {
   difficultyLevel: 'easy' | 'normal' | 'hard' | 'nightmare';
-  autosaveInterval: number; // in seconds
-  relationshipDecayDisabled?: boolean; // Whether NPC relationships should decay over time
-  autoEquipBetterItems?: boolean;
-  confirmBeforeSelling?: boolean;
-  showDamageNumbers?: boolean;
+  autosaveInterval: number;
+  relationshipDecayDisabled: boolean;
+  autoResumeQuests: boolean; // Added to match implementation
+  combatSpeed: number; // Added to match implementation
+  confirmItemUse: boolean; // Added to match implementation
+  confirmItemSell: boolean; // Added to match implementation
+  autoEquipBetterItems: boolean; // Added to match type definition
+  confirmBeforeSelling: boolean; // Added to match type definition
+  showDamageNumbers: boolean; // Added to match type definition
 }
 
 /**
- * User interface settings
+ * UI settings
  */
 export interface UISettings {
   fontSize: 'small' | 'medium' | 'large';
-  colorTheme: 'light' | 'dark' | 'system';
+  showToolTips: boolean; // Changed from showTooltips
+  showTutorials: boolean; // Added to match implementation
   compactInventory: boolean;
-  showTooltips: boolean;
-  minimapEnabled: boolean;
-  hideCompletedQuests: boolean;
+  darkMode: boolean; // Changed from colorTheme
+  showDamageNumbers: boolean; // Added to match implementation
+  showCriticalHitEffects: boolean; // Added to match implementation
+  simplifiedUI: boolean; // Added to match implementation
+  minimapEnabled: boolean; // Added to match type definition
+  hideCompletedQuests: boolean; // Added to match type definition
 }
 
 /**
@@ -54,14 +66,15 @@ export interface UISettings {
  */
 export interface AccessibilitySettings {
   highContrastMode: boolean;
-  reduceMotion: boolean;
-  screenReaderMode: boolean;
-  textToSpeech: boolean;
-  colorBlindMode: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia';
+  reducedMotion: boolean; // Changed from reduceMotion
+  largeText: boolean; // Added to match implementation
+  screenReaderSupport: boolean; // Changed from screenReaderMode
+  colorblindMode: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia'; // Changed from colorBlindMode
+  autoTargeting: boolean; // Added to match implementation
 }
 
 /**
- * All game settings
+ * Complete settings state
  */
 export interface SettingsState {
   notifications: NotificationSettings;

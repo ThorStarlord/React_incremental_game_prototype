@@ -2,7 +2,7 @@
  * Initial state configuration for game meta information
  */
 
-import { MetaState, SemanticVersion } from '../types/MetaGameStateTypes';
+import { MetaState, SemanticVersion, SaveHistoryEntry, PlaySession, GameUpdate, DebugInfo } from '../types/MetaGameStateTypes';
 
 /**
  * Current game version
@@ -18,12 +18,13 @@ export const CURRENT_VERSION: SemanticVersion = {
  * Initial state for game meta information
  */
 const metaInitialState: MetaState = {
-  version: CURRENT_VERSION,
-  lastSaved: null,
-  playingSince: null,
-  saveHistory: [],
-  playSessions: [],
-  updates: [],
+  version: `${CURRENT_VERSION.major}.${CURRENT_VERSION.minor}.${CURRENT_VERSION.patch}${CURRENT_VERSION.label ? `-${CURRENT_VERSION.label}` : ''}`,
+  versionDetails: CURRENT_VERSION,
+  lastSaved: '', // Changed from null to empty string to avoid null reference errors
+  playingSince: '', // Changed from null to empty string to avoid null reference errors
+  saveHistory: [] as SaveHistoryEntry[], // Specify type for better documentation
+  playSessions: [] as PlaySession[], // Specify type for better documentation
+  updates: [] as GameUpdate[], // Specify type for better documentation
   featureFlags: {
     debugMode: false,
     experimentalFeatures: false,
@@ -31,12 +32,10 @@ const metaInitialState: MetaState = {
     developerTools: false
   },
   debug: {
-    lastError: null,
-    errorCount: 0,
-    performanceMetrics: {},
-    lastApiCall: null
-  },
-  migrationHistory: []
+    isDevMode: false,
+    debugLevel: 'none',
+  } as DebugInfo,
+  migrationHistory: [] // Specify type if needed
 };
 
 export default metaInitialState;

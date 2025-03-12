@@ -10,13 +10,11 @@ import {
   Skill,
   StatusEffect,
   TraitEffect,
-  Trait,
-  InventoryItem as PlayerInventoryItem 
+  Trait
 } from './PlayerGameStateTypes';
 
 // Import combat-related types
 import {
-  CombatState,
   CombatSkills,
   Enemy,
   CombatActionType,
@@ -81,7 +79,7 @@ import {
   GameUpdate,
   FeatureFlags,
   DebugInfo,
-  MigrationHistory
+  MigrationRecord
 } from './MetaGameStateTypes';
 
 // Import skills-related types
@@ -107,8 +105,6 @@ import {
   QuestSystem,
   ExtendedQuest,
   ExtendedQuestObjective,
-  QuestDifficulty,
-  QuestType,
   QuestUpdateEvent
 } from './QuestsGameStateTypes';
 
@@ -132,7 +128,7 @@ import {
 import { EssenceState } from './EssenceGameStateTypes';
 
 // Import resource-related types
-import { ResourceState, Materials } from './ResourceGameStateTypes';
+import { ResourceState } from './ResourceGameStateTypes';
 
 /**
  * Complete game state
@@ -154,59 +150,78 @@ export interface GameState {
   world: WorldState;
   notifications: NotificationsState;
 
-  // For backward compatibility (remove in v2.0)
+  /**
+   * @deprecated Since v1.5.0. Use specific state properties instead.
+   * Will be removed in v2.0.0
+   */
   gameData?: Record<string, unknown>;
+  /**
+   * @deprecated Since v1.5.0. Use specific state properties instead.
+   * Will be removed in v2.0.0
+   */
   stats?: Record<string, unknown>;
 }
+
+/**
+ * Specific action types for the game
+ */
+export type GameActionType = 
+  | 'PLAYER_UPDATE' 
+  | 'COMBAT_START' 
+  | 'INVENTORY_ADD'
+  | 'EQUIPMENT_UPDATE'
+  | 'QUEST_UPDATE'
+  | 'SKILL_UPDATE'
+  | 'RESOURCE_UPDATE'
+  | 'SETTINGS_UPDATE'
+  | 'STATISTICS_UPDATE'
+  | 'META_UPDATE'
+  | 'NOTIFICATION_ADD'
+  | 'NOTIFICATION_REMOVE';
 
 /**
  * Action type for reducers
  */
 export interface ActionType<T = unknown> {
-  type: string;
+  type: GameActionType;
   payload: T;
+}
+
+/**
+ * Combat state interface
+ */
+export interface CombatState {
+  active: boolean;
+  playerTurn: boolean;
+  round: number;
+  log: {
+    timestamp: string;
+    message: string;
+    type: string;
+    importance: 'normal' | 'high';
+  }[];
+  rewards?: {  // Optional, as it's only present after combat
+    experience: number;
+    gold: number;
+    items: InventoryItem[];
+  };
 }
 
 // Re-export types for convenience
 export type {
-  // Player types
   PlayerState, PlayerAttributes, PlayerStats, Skill, StatusEffect, TraitEffect, Trait,
-  
-  // Combat types
-  CombatState, CombatSkills, Enemy, CombatActionType, CombatActionResult, CombatLogEntry, CombatStateContainer,
-  
-  // Inventory and item types
-  GameItem, ItemEffect, ItemStats, InventoryState, InventoryItem, Materials,
-  
-  // Equipment types
+  CombatSkills, Enemy, CombatActionType, CombatActionResult, CombatLogEntry, CombatStateContainer,
+  GameItem, ItemEffect, ItemStats, InventoryState, InventoryItem,
   EquipmentState, EquipmentBonuses, EquipmentRequirements, EquipmentSlot,
-  
-  // Progression types
   ProgressionState, Quest, QuestObjective, QuestReward, Achievement, GameLocation, GameFeature,
-  
-  // Settings types
   SettingsState, NotificationSettings, AudioSettings, GameplaySettings, UISettings, AccessibilitySettings,
-  
-  // Statistics types
   StatisticsState, StatisticsSystem,
-  
-  // Meta types
-  MetaState, SemanticVersion, SaveHistoryEntry, PlaySession, GameUpdate, FeatureFlags, DebugInfo, MigrationHistory,
-  
-  // Skills types
+  MetaState, SemanticVersion, SaveHistoryEntry, PlaySession, GameUpdate, FeatureFlags, DebugInfo, MigrationRecord,
   SkillsState, MagicSkills, CraftingSkills, GatheringSkills,
-  
-  // Trait types
   TraitSystem, ExtendedTrait, ActiveTrait, TieredTrait, TraitSlots, TraitInteractionResult,
-  
-  // Quest types
-  QuestSystem, ExtendedQuest, ExtendedQuestObjective, QuestDifficulty, QuestType, QuestUpdateEvent,
-  
-  // World types
+  QuestSystem, ExtendedQuest, ExtendedQuestObjective, QuestUpdateEvent,
   WorldState, ExtendedLocation, Region, WorldNPC, Faction, Shop, WorldEvent, WorldTime,
   BiomeType, WeatherType, TimeOfDay, Season,
-  
-  // Essence types
   EssenceState,
   NotificationsState,
   ResourceState

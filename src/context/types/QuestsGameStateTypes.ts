@@ -1,157 +1,147 @@
 /**
- * Type definitions for quest system and related game state
+ * Type definitions for quests system
  */
-
-// Import from progression types for compatibility
-import { 
-  Quest as BaseQuest,
-  QuestObjective as BaseQuestObjective,
-  QuestReward as BaseQuestReward
-} from './ProgressionGameStateTypes';
-
-// Re-export basic types for backward compatibility
-export type Quest = BaseQuest;
-export type QuestObjective = BaseQuestObjective;
-export type QuestReward = BaseQuestReward;
 
 /**
  * Quest difficulty levels
  */
-export type QuestDifficulty = 
-  | 'trivial'
-  | 'easy'
-  | 'normal'
-  | 'challenging'
-  | 'hard'
-  | 'epic'
-  | 'legendary';
+export enum QuestDifficulty {
+  Trivial = 'trivial',
+  Easy = 'easy',
+  Medium = 'medium',
+  Hard = 'hard',
+  VeryHard = 'very_hard',
+  Impossible = 'impossible'
+}
 
 /**
- * Quest type categories
+ * Quest types
  */
-export type QuestType = 
-  | 'main'
-  | 'side'
-  | 'daily'
-  | 'weekly'
-  | 'repeatable'
-  | 'timed'
-  | 'hidden'
-  | 'achievement'
-  | 'tutorial';
+export enum QuestType {
+  Main = 'main',
+  Side = 'side',
+  Daily = 'daily',
+  Weekly = 'weekly',
+  Event = 'event'
+}
 
 /**
- * Extended quest structure with additional metadata
+ * Quest objective types
  */
-export interface ExtendedQuest extends BaseQuest {
+export enum QuestObjectiveType {
+  Kill = 'kill',
+  Gather = 'gather',
+  Explore = 'explore',
+  Escort = 'escort',
+  Deliver = 'deliver',
+  Talk = 'talk'
+}
+
+/**
+ * Quest reward types
+ */
+export enum QuestRewardType {
+  Experience = 'experience',
+  Gold = 'gold',
+  Item = 'item',
+  Reputation = 'reputation',
+  Skill = 'skill'
+}
+
+/**
+ * Quest reward definitions
+ */
+export type ExperienceReward = { type: QuestRewardType.Experience; amount: number };
+export type GoldReward = { type: QuestRewardType.Gold; amount: number };
+export type ItemReward = { type: QuestRewardType.Item; itemId: string; amount?: number };
+// ...other reward types
+
+export type QuestReward = ExperienceReward | GoldReward | ItemReward; // Union of reward types
+
+/**
+ * Quest objective
+ */
+export interface QuestObjective {
+  id: string;
+  type: QuestObjectiveType;
+  description: string;
+  targetId?: string;
+  quantity?: number;
+  locationId?: string;
+  completed: boolean;
+}
+
+/**
+ * Quest definition
+ */
+export interface Quest {
+  id: string;
+  name: string;
+  description: string;
   type: QuestType;
   difficulty: QuestDifficulty;
-  timeLimit?: number; // in seconds, for timed quests
-  timeRemaining?: number; // in seconds, for timed quests
-  expiresAt?: string; // ISO date string, for limited-time quests
-  giver: string; // NPC or source that gives the quest
-  turnInTarget?: string; // NPC to turn in the quest
-  location: string; // Where the quest takes place
-  tags: string[]; // For categorization/filtering ("combat", "crafting", etc)
-  failureConditions?: QuestFailureCondition[];
-  isHidden?: boolean; // Whether the quest is hidden until certain conditions are met
-  relevantItems?: string[]; // Item IDs related to this quest
-  relevantEnemies?: string[]; // Enemy IDs related to this quest
-  isFailed?: boolean;
-  priority?: number; // For sorting in the quest log
-  recommendedLevel?: number;
-  iconPath?: string;
+  objectives: QuestObjective[];
+  rewards: QuestReward[];
+  prerequisites?: string[];
+  repeatable: boolean;
+  cooldown?: number; // Cooldown in hours before quest can be repeated
+  expiration?: number; // Expiration time in hours
+  isActive: boolean;
+  isCompleted: boolean;
+  isFailed: boolean;
 }
 
 /**
- * Quest failure condition
+ * Extended quest with additional runtime properties
  */
-export interface QuestFailureCondition {
-  type: 'time-limit' | 'npc-death' | 'item-lost' | 'location-left' | 'custom';
-  description: string;
-  hasOccurred: boolean;
-  customCheck?: string;
+export interface ExtendedQuest extends Quest {
+  objectives: ExtendedQuestObjective[]; // Use extended objectives
+  progress: number; // Progress percentage
+  timeStarted: number; // Timestamp when quest was started
+  timeUpdated: number; // Timestamp of last update
+  availableUntil?: number; // Timestamp when quest expires
 }
 
 /**
- * Extended objective with more details
+ * Extended quest objective with additional runtime properties
  */
-export interface ExtendedQuestObjective extends BaseQuestObjective {
-  location?: string; // Where to complete this objective
-  hints?: string[]; // Optional hints for the player
-  isOptional?: boolean;
-  isBonus?: boolean; // Bonus objectives give extra rewards
-  visibilityRequirement?: { // This objective is only shown when requirement is met
-    objectiveId?: string; // Another objective must be completed
-    progress?: number; // Main quest progress percentage
-  };
-  entityId?: string; // ID of NPC, item, location, etc.
-  subObjectives?: BaseQuestObjective[]; // For complex objectives
+export interface ExtendedQuestObjective extends QuestObjective {
+  progress: number; // Current progress value
+  progressRequired: number; // Total progress required
 }
 
 /**
- * Quest update event structure
+ * Quest update event types
+ */
+export enum QuestUpdateEventType {
+  Started = 'started',
+  Updated = 'updated',
+  Completed = 'completed',
+  Failed = 'failed',
+  Expired = 'expired',
+  Abandoned = 'abandoned'
+}
+
+/**
+ * Quest update event
  */
 export interface QuestUpdateEvent {
   questId: string;
+  type: QuestUpdateEventType;
+  timestamp: number;
   objectiveId?: string;
-  type: 'started' | 'progressed' | 'completed' | 'failed' | 'abandoned' | 'expired';
   progress?: number;
-  timestamp: string; // ISO date string
 }
 
 /**
- * Quest log filtering options
- */
-export interface QuestLogFilter {
-  status: 'active' | 'completed' | 'failed' | 'all';
-  type?: QuestType[];
-  location?: string;
-  sortBy: 'priority' | 'level' | 'expiration' | 'progress' | 'recent';
-  searchTerm?: string;
-}
-
-/**
- * Complete quest system state
+ * Quest system interface
  */
 export interface QuestSystem {
-  activeQuests: Record<string, ExtendedQuest>;
-  completedQuests: Record<string, ExtendedQuest>;
-  failedQuests: Record<string, ExtendedQuest>;
-  availableQuests: Record<string, ExtendedQuest>;
-  questUpdateHistory: QuestUpdateEvent[];
-  currentFilter: QuestLogFilter;
-  trackedQuestId?: string; // Currently tracked quest
-  questsCompleted: number; // Total count for statistics
-  questsFailed: number; // Total count for statistics
-  dailyQuestsCompleted: number; // Resets daily
-  weeklyQuestsCompleted: number; // Resets weekly
-  dailyQuestResetTime?: string; // ISO date string
-  weeklyQuestResetTime?: string; // ISO date string
-}
-
-/**
- * Quest template for generating new quests
- */
-export interface QuestTemplate {
-  id: string;
-  name: string;
-  descriptionTemplate: string;
-  objectiveTemplates: {
-    type: QuestObjective['type'];
-    descriptionTemplate: string;
-    targetRange: [number, number]; // Min/max target values
-    potentialTargets?: string[]; // IDs of potential entities
-  }[];
-  rewardTemplates: {
-    type: QuestReward['type'];
-    amountRange?: [number, number]; // Min/max amounts
-    potentialItems?: string[]; // For item rewards
-  }[];
-  difficulty: QuestDifficulty;
-  type: QuestType;
-  levelRange: [number, number]; // Min/max player levels
-  tags: string[];
-  timeLimitRange?: [number, number]; // Min/max time limits in seconds
-  generateFunction?: string; // Reference to a function that generates this quest
+  activeQuests: ExtendedQuest[]; // Use extended quests
+  completedQuests: Quest[];
+  failedQuests: Quest[];
+  availableQuests: Quest[];
+  questLog: QuestUpdateEvent[];
+  dailyReset: number; // Timestamp of next daily quest reset
+  weeklyReset: number; // Timestamp of next weekly quest reset
 }

@@ -184,9 +184,9 @@ export interface BaseItem {
  */
 export interface WeaponItem extends BaseItem {
   type: ItemType.Weapon;
-  weaponType: WeaponType;
+  weaponType: string;
   stats: ItemStats;
-  requirements?: ItemRequirement;
+  requirements?: Record<string, number | undefined>;
   durability?: {
     current: number;
     maximum: number;
@@ -204,9 +204,9 @@ export interface WeaponItem extends BaseItem {
  */
 export interface ArmorItem extends BaseItem {
   type: ItemType.Armor;
-  armorType: ArmorType;
+  armorType: string;
   stats: ItemStats;
-  requirements?: ItemRequirement;
+  requirements?: Record<string, number | undefined>;
   durability?: {
     current: number;
     maximum: number;
@@ -220,9 +220,9 @@ export interface ArmorItem extends BaseItem {
  */
 export interface AccessoryItem extends BaseItem {
   type: ItemType.Accessory;
-  accessoryType: AccessoryType;
+  accessoryType: string;
   stats: ItemStats;
-  requirements?: ItemRequirement;
+  requirements?: Record<string, number | undefined>;
   level: number;          // Item level/tier
   uniqueEquip?: boolean;  // Only one of this accessory can be equipped
 }
@@ -232,10 +232,10 @@ export interface AccessoryItem extends BaseItem {
  */
 export interface ConsumableItem extends BaseItem {
   type: ItemType.Consumable;
-  consumableType: ConsumableType;
+  consumableType: string;
   effect: ItemEffect;
   cooldown?: number;      // Cooldown in seconds before using again
-  requirements?: ItemRequirement;
+  requirements?: Record<string, number | undefined>;
   charges?: number;       // Number of uses before depleted
   duration?: number;      // Effect duration in seconds
 }
@@ -245,7 +245,7 @@ export interface ConsumableItem extends BaseItem {
  */
 export interface MaterialItem extends BaseItem {
   type: ItemType.Material;
-  materialType: MaterialType;
+  materialType: string;
   tier: number;           // Quality tier of material
   refinementLevel?: number; // Level of refinement/processing
 }
