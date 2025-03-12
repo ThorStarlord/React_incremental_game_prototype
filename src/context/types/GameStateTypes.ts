@@ -207,6 +207,9 @@ export interface CombatState {
   };
 }
 
+// Clarify type relationships
+export type InventoryItem = GameItem;
+
 // Re-export types for convenience
 export type {
   PlayerState, PlayerAttributes, PlayerStats, Skill, StatusEffect, TraitEffect, Trait,

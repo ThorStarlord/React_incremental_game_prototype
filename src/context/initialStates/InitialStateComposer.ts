@@ -1,27 +1,19 @@
 /**
- * @file Initial state configuration for the incremental RPG game
+ * @file Central initial state configuration for the incremental RPG game
  * 
- * This file defines the starting state for a new game including:
- * - Player statistics and attributes (imported from PlayerInitialState)
- * - Resources and currencies
- * - Unlocked features and progression
- * - Skills, abilities and their levels
- * - Equipment slots and initial items
- * - Game settings and configuration
+ * This file serves as the single source of truth for all initial states in the game.
+ * It imports and re-exports all initial states and composes them into a unified GameState.
  */
 
 import { 
   GameState, 
   PlayerState, 
   PlayerStats, 
-  EquipmentState,
-  InventoryItem
+  EquipmentState
 } from '../types/GameStateTypes';
 
-// Import player state from the feature module
-import { PlayerInitialState, DefaultPlayerAttributes, resetPlayerState } from './PlayerInitialState';
-
-// Import other initial states
+// Import all initial states from their respective modules
+import { PlayerInitialState, resetPlayerState as resetPlayer } from './PlayerInitialState';
 import statisticsInitialState from './StatisticsInitialState';
 import notificationsInitialState from './NotificationsInitialState';
 import settingsInitialState from './SettingsInitialState';
@@ -29,28 +21,20 @@ import progressionInitialState from './ProgressionInitialState';
 import equipmentInitialState from './EquipmentInitialState';
 import inventoryInitialState from './InventoryInitialState';
 import metaInitialState from './MetaInitialState';
+import factionsInitialState from './FactionInitialState';
+import essenceInitialState from './EssenceInitialState';
+import traitsInitialState from './traitsInitialState';
+import itemsInitialState from './itemsInitialState';
+import resourceInitialState from './ResourceInitialState';
+
 
 /**
- * Initial game state for a new player
+ * Initial game state composed of all module states
  * @type {GameState}
  */
 export const InitialState: GameState = {
-  player: {
-    ...PlayerInitialState.player,
-    attributes: DefaultPlayerAttributes,
-  },
-  resources: {
-    gold: 50,
-    gems: 0,
-    materials: {
-      wood: 10,
-      stone: 5,
-      leather: 3,
-      metal: 0,
-      cloth: 5,
-      herbs: 2
-    }
-  },
+  player: PlayerInitialState.player,
+  resources: resourceInitialState,
   skills: {
     combat: {
       swordplay: 1,
@@ -93,7 +77,11 @@ export const InitialState: GameState = {
     history: []
   },
   meta: metaInitialState,
-  notifications: notificationsInitialState
+  notifications: notificationsInitialState,
+  factions: factionsInitialState,
+  essence: essenceInitialState,
+  traits: traitsInitialState,
+  items: itemsInitialState
 };
 
 /**
@@ -101,23 +89,15 @@ export const InitialState: GameState = {
  * @returns {GameState} A fresh copy of the initial state
  */
 export const resetGameState = (): GameState => {
-  const freshState = cloneInitialState();
-  freshState.player = resetPlayerState(null);
-  freshState.meta.playingSince = new Date().toISOString();
-  return freshState;
+  return structuredClone(InitialState);
 };
 
 /**
  * Reset player state to initial values
  */
-export function resetPlayerState(playerState: PlayerState | null): PlayerState {
-  if (!playerState) {
-    return {
-      // ...existing code...
-    };
-  }
-  return playerState;
-}
+export const resetPlayerState = (): PlayerState => {
+  return resetPlayer(); // Use the function from PlayerInitialState
+};
 
 /**
  * Calculate experience required for a specific level
@@ -134,59 +114,48 @@ export const calculateExperienceForLevel = (level: number): number => {
  * @param {EquipmentState} equipment - Currently equipped items
  * @returns {PlayerState} Updated player state
  */
-export const recalculatePlayerStats = (
-  playerState: PlayerState, 
-  equipment: EquipmentState
-): PlayerState => {
-  const { attributes } = playerState;
-  
-  // Base stats from attributes
-  const stats: PlayerStats = {
-    health: playerState.stats.health,
-    maxHealth: 50 + (attributes.vitality * 10),
-    healthRegen: 0.5 + (attributes.vitality * 0.1),
-    mana: playerState.stats.mana,
-    maxMana: 25 + (attributes.intelligence * 5),
-    manaRegen: 0.25 + (attributes.intelligence * 0.05),
-    physicalDamage: attributes.strength,
-    magicalDamage: attributes.intelligence * 0.8,
-    critChance: attributes.luck + (attributes.dexterity * 0.2),
-    critMultiplier: 1.5 + (attributes.luck * 0.05)
-  };
-  
-  // Add equipment bonuses (would be implemented based on equipped items)
-  const equipmentBonuses = calculateEquipmentBonuses(equipment);
-
+export const recalculatePlayerStats = (player: PlayerState): PlayerStats => {
+  // Placeholder for actual stat calculation logic
   return {
-    ...playerState,
-    stats: {
-      ...stats,
-      ...equipmentBonuses
-    }
+    ...player.stats,
+    // Add derived stats here
   };
 };
 
 /**
  * Calculate equipment bonuses
- * @todo Implement actual equipment bonus calculations
+ * @todo Implement actual equipment bonus calculations with priority
  */
-function calculateEquipmentBonuses(equippedItems: Record<string, string>): Partial<PlayerState['stats']> {
-  // Implementation pending
-  return {};
-}
+export const calculateEquipmentBonuses = (equipment: EquipmentState): PlayerStats => {
+  // Placeholder for actual equipment bonus calculation
+  return {
+    // Add equipment bonuses here
+  };
+};
 
 /**
  * Deep clone the initial state
  */
 export function cloneInitialState(): GameState {
-  // For better compatibility
-  try {
-    return structuredClone(InitialState);
-  } catch (e) {
-    // Fallback for environments without structuredClone
-    return JSON.parse(JSON.stringify(InitialState));
-  }
+  return structuredClone(InitialState);
 }
 
-// Export types directly from their source instead of re-exporting
+// Re-export all individual initial states for direct access when needed
+export { 
+  PlayerInitialState,
+  statisticsInitialState,
+  notificationsInitialState,
+  settingsInitialState,
+  progressionInitialState,
+  equipmentInitialState,
+  inventoryInitialState,
+  metaInitialState,
+  factionsInitialState,
+  essenceInitialState,
+  traitsInitialState,
+  itemsInitialState,
+  resourceInitialState
+};
+
+// Export types directly from their source
 export type { GameState, PlayerState, PlayerStats, EquipmentState } from '../types/GameStateTypes;
