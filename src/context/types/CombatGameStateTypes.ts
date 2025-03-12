@@ -6,114 +6,113 @@
  * including combat state, skills, enemy data, and combat actions.
  */
 
-
-
 /**
- * Enemy data structure
+ * Type definitions for combat-related game state
  */
-export interface Enemy {
+
+// Define structured types for skills, abilities, and effects
+export interface Skill {
   id: string;
   name: string;
-  level: number;
-  health: number;
-  maxHealth: number;
-  damage: number;
-  defense: number;
-  experience: number;
-  gold: number;
-  lootTable?: string[];
-  abilities?: string[];
+  description: string;
+  cooldown: number;
+  effect: Effect;
+}
+
+export interface Ability {
+  id: string;
+  name: string;
+  description: string;
+  effect: Effect;
+}
+
+export interface Effect {
+  id: string;
+  name: string;
+  duration: number;
+  strength: number;
+  type: 'buff' | 'debuff';
+}
+
+// Unified enemy representation
+export interface Enemy extends CombatActor {
+  lootTable?: LootItem[];
+  abilities?: Ability[];
   immunities?: string[];
   weaknesses?: string[];
 }
 
-/**
- * Combat action types
- */
-export type CombatActionType = 'attack' | 'skill' | 'item' | 'flee';
-
-/**
- * Combat action result data
- */
-export interface CombatActionResult {
-  success: boolean;
-  damage?: number;
-  critical?: boolean;
-  effectsApplied?: string[];
-  message?: string;
+// Structured type for loot items
+export interface LootItem {
+  id: string;
+  name: string;
+  quantity: number;
+  dropChance: number;
 }
 
-/**
- * Combat log entry
- */
-export interface CombatLogEntry {
-  timestamp: number;
-  source: 'player' | 'enemy' | 'system';
-  message: string;
-  type?: 'damage' | 'heal' | 'effect' | 'info' | 'critical';
-  data?: any;
-}
-
-/**
- * Combat actor base type shared by player and enemies during combat
- */
+// Combat actor with common properties
 export interface CombatActor {
+  id: string;
+  name: string;
   currentHealth: number;
   maxHealth: number;
-  currentMana: number;
-  maxMana: number;
   attack: number;
   defense: number;
+  speed: number;
+  skills?: Skill[];
 }
 
-/**
- * Extended enemy information for combat
- */
-export interface CombatEnemy extends CombatActor {
-  name: string;
-  level: number;
-  imageUrl: string;
-  experience: number;
-  gold: number;
+// Combat log entry with structured data
+export interface CombatLogEntry {
+  timestamp: string;
+  actor: string;
+  action: string;
+  target: string;
+  result: CombatActionResult;
+  data?: CombatLogData;
 }
 
-/**
- * Combat rewards structure
- */
+// Structured type for combat log data
+export interface CombatLogData {
+  damage?: number;
+  healing?: number;
+  effectApplied?: Effect;
+}
+
+// Combat rewards with structured item type
 export interface CombatRewards {
   experience: number;
   gold: number;
-  items: any[]; // Replace with proper item type
+  items: LootItem[];
 }
 
-/**
- * Combat state
- */
+// Combat state with separate initial state interface
 export interface CombatState {
   inCombat: boolean;
-  currentEnemy: Enemy | null;
-  autoAttack: boolean;
-  lastCombatResult: 'victory' | 'defeat' | 'escape' | null;
-  combatLog: CombatLogEntry[];
-  turnCounter?: number;
-  playerInitiative?: number;
-  enemyInitiative?: number;
-  activeEffects?: {
-    player: string[];
-    enemy: string[];
-  };
-  
-  // Additional properties used in CombatInitialState
   playerTurn?: boolean;
-  round?: number;
-  player?: CombatActor;
-  enemy?: CombatEnemy;
+  currentTurn: number;
+  combatants: CombatActor[];
+  combatLog: CombatLogEntry[];
   rewards?: CombatRewards;
+  activeEffects?: ActiveEffects;
 }
 
-/**
- * Container for combat state within game state
- */
+// Separate interface for initial combat state
+export interface CombatInitialState extends CombatState {
+  playerTurn: boolean;
+}
+
+// Structured type for active effects
+export interface ActiveEffects {
+  player: Effect[];
+  enemy: Effect[];
+}
+
+// Combat action result type
+export type CombatActionResult = 'hit' | 'miss' | 'critical' | 'block' | 'dodge';
+
+// Combat state container for managing combat state
 export interface CombatStateContainer {
-  combat: CombatState;
+  state: CombatState;
+  initialState: CombatInitialState;
 }

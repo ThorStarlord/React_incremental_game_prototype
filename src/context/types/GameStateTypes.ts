@@ -2,10 +2,7 @@
  * Consolidated type definitions for the game state
  */
 
-// Import EssenceState interface from the feature directory
-import { EssenceState } from './EssenceGameStateTypes';
-
-// Import player-related types from PlayerGameStateTypes
+// Import player-related types
 import { 
   PlayerState, 
   PlayerAttributes, 
@@ -14,10 +11,10 @@ import {
   StatusEffect,
   TraitEffect,
   Trait,
-  InventoryItem as PlayerInventoryItem
+  InventoryItem as PlayerInventoryItem 
 } from './PlayerGameStateTypes';
 
-// Import all combat-related types
+// Import combat-related types
 import {
   CombatState,
   CombatSkills,
@@ -28,239 +25,161 @@ import {
   CombatStateContainer
 } from './CombatGameStateTypes';
 
-// Re-export player types for backward compatibility
+// Import inventory and item-related types
+import {
+  GameItem,
+  ItemEffect,
+  ItemStats,
+  InventoryState,
+  Materials,
+  InventoryItem
+} from './InventoryGameStateTypes';
+
+// Import equipment-related types
+import {
+  EquipmentState,
+  EquipmentBonuses,
+  EquipmentRequirements,
+  EquipmentSlot
+} from './EquipmentGameStateTypes';
+
+// Import progression-related types
+import {
+  ProgressionState,
+  Quest,
+  QuestObjective,
+  QuestReward,
+  Achievement,
+  GameLocation,
+  GameFeature
+} from './ProgressionGameStateTypes';
+
+// Import settings-related types
+import {
+  SettingsState,
+  NotificationSettings,
+  AudioSettings,
+  GameplaySettings,
+  UISettings,
+  AccessibilitySettings
+} from './SettingsGameStateTypes';
+
+// Import statistics-related types
+import {
+  StatisticsState,
+  CombatStatistics,
+  ProgressionStatistics,
+  EconomyStatistics,
+  ProductionStatistics,
+  ExplorationStatistics,
+  TimeStatistics,
+  SocialStatistics,
+  StatisticsSystem
+} from './StatisticsGameStateTypes';
+
+// Import meta-related types
+import {
+  MetaState,
+  SemanticVersion,
+  SaveHistoryEntry,
+  PlaySession,
+  GameUpdate,
+  FeatureFlags,
+  DebugInfo,
+  MigrationHistory
+} from './MetaGameStateTypes';
+
+// Import skills-related types
+import {
+  SkillsState,
+  MagicSkills,
+  CraftingSkills,
+  GatheringSkills,
+  CombatSkills as SkillsCombatSkills
+} from './SkillsGameStateTypes';
+
+// Import trait-related types
+import {
+  TraitSystem as ExtendedTraitSystem,
+  ExtendedTrait,
+  ActiveTrait,
+  TieredTrait,
+  TraitSlots,
+  TraitInteractionResult
+} from './TraitsGameStateTypes';
+
+// Import quest-related types
+import {
+  QuestSystem,
+  ExtendedQuest,
+  ExtendedQuestObjective,
+  QuestDifficulty,
+  QuestType,
+  QuestUpdateEvent
+} from './QuestsGameStateTypes';
+
+// Import world-related types
+import {
+  WorldState,
+  ExtendedLocation,
+  Region,
+  WorldNPC,
+  Faction,
+  Shop,
+  WorldEvent,
+  WorldTime,
+  BiomeType,
+  WeatherType,
+  TimeOfDay,
+  Season
+} from './WorldGameStateTypes';
+
+// Import essence-related types
+import { EssenceState } from './EssenceGameStateTypes';
+
+// Re-export all types for backward compatibility
 export type {
-  PlayerState,
-  PlayerAttributes,
-  PlayerStats,
-  Skill,
-  StatusEffect,
-  TraitEffect,
-  Trait
+  // Player types
+  PlayerState, PlayerAttributes, PlayerStats, Skill, StatusEffect, TraitEffect, Trait,
+  
+  // Combat types
+  CombatState, CombatSkills, Enemy, CombatActionType, CombatActionResult, CombatLogEntry, CombatStateContainer,
+  
+  // Inventory and item types
+  GameItem, ItemEffect, ItemStats, InventoryState, InventoryItem, Materials,
+  
+  // Equipment types
+  EquipmentState, EquipmentBonuses, EquipmentRequirements, EquipmentSlot,
+  
+  // Progression types
+  ProgressionState, Quest, QuestObjective, QuestReward, Achievement, GameLocation, GameFeature,
+  
+  // Settings types
+  SettingsState, NotificationSettings, AudioSettings, GameplaySettings, UISettings, AccessibilitySettings,
+  
+  // Statistics types
+  StatisticsState, CombatStatistics, ProgressionStatistics, EconomyStatistics, 
+  ProductionStatistics, ExplorationStatistics, TimeStatistics, SocialStatistics, StatisticsSystem,
+  
+  // Meta types
+  MetaState, SemanticVersion, SaveHistoryEntry, PlaySession, GameUpdate, FeatureFlags, DebugInfo, MigrationHistory,
+  
+  // Skills types
+  SkillsState, MagicSkills, CraftingSkills, GatheringSkills,
+  
+  // Trait types
+  ExtendedTraitSystem as TraitSystem, ExtendedTrait, ActiveTrait, TieredTrait, TraitSlots, TraitInteractionResult,
+  
+  // Quest types
+  QuestSystem, ExtendedQuest, ExtendedQuestObjective, QuestDifficulty, QuestType, QuestUpdateEvent,
+  
+  // World types
+  WorldState, ExtendedLocation, Region, WorldNPC, Faction, Shop, WorldEvent, WorldTime,
+  BiomeType, WeatherType, TimeOfDay, Season,
+  
+  // Essence types
+  EssenceState
 };
-
-// Re-export essence types for backward compatibility
-export type { EssenceState };
-
-// Re-export all combat types for backward compatibility
-export type {
-  CombatState,
-  CombatSkills,
-  Enemy,
-  CombatActionType,
-  CombatActionResult,
-  CombatLogEntry,
-  CombatStateContainer
-};
-
-// Use the imported InventoryItem type to maintain compatibility
-export type InventoryItem = PlayerInventoryItem;
-
-/**
- * Game materials used for crafting and upgrades
- */
-export interface Materials {
-  wood: number;
-  stone: number;
-  leather: number;
-  metal: number;
-  cloth: number;
-  herbs: number;
-  [key: string]: number; // Allow for additional materials
-}
-
-/**
- * Game resources and currencies
- */
-export interface ResourceState {
-  gold: number;
-  gems: number;
-  materials: Materials;
-}
-
-/**
- * Magic skills and levels
- */
-export interface MagicSkills {
-  fireMagic: number;
-  iceMagic: number;
-  lightningMagic: number;
-  restoration: number;
-  [key: string]: number; // Allow for additional skills
-}
-
-/**
- * Crafting skills and levels
- */
-export interface CraftingSkills {
-  alchemy: number;
-  blacksmithing: number;
-  leatherworking: number;
-  enchanting: number;
-  [key: string]: number; // Allow for additional skills
-}
-
-/**
- * Gathering skills and levels
- */
-export interface GatheringSkills {
-  mining: number;
-  herbalism: number;
-  woodcutting: number;
-  fishing: number;
-  [key: string]: number; // Allow for additional skills
-}
-
-/**
- * All player skills categorized by type
- */
-export interface SkillsState {
-  combat: CombatSkills; // Using the imported CombatSkills type
-  magic: MagicSkills;
-  crafting: CraftingSkills;
-  gathering: GatheringSkills;
-}
-
-/**
- * Effect that can be applied by consumables or equipment
- */
-export interface ItemEffect {
-  health?: number;
-  mana?: number;
-  strength?: number;
-  intelligence?: number;
-  dexterity?: number;
-  vitality?: number;
-  luck?: number;
-  [key: string]: number | undefined; // Allow for additional effects
-}
-
-/**
- * Item statistics for weapons and armor
- */
-export interface ItemStats {
-  physicalDamage?: number;
-  magicalDamage?: number;
-  armor?: number;
-  healthBonus?: number;
-  manaBonus?: number;
-  [key: string]: number | undefined; // Allow for additional stats
-}
-
-/**
- * Game item structure
- */
-export interface GameItem {
-  id: string;
-  name: string;
-  type: 'weapon' | 'armor' | 'consumable' | 'material' | 'quest' | 'accessory';
-  effect?: ItemEffect;
-  stats?: ItemStats;
-  quantity: number;
-  value: number;
-  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  description?: string;
-}
-
-/**
- * Player inventory
- */
-export interface InventoryState {
-  capacity: number;
-  items: GameItem[];
-}
-
-/**
- * Equipment slots for the player
- */
-export interface EquipmentState {
-  weapon: GameItem | null;
-  offhand: GameItem | null;
-  head: GameItem | null;
-  body: GameItem | null;
-  hands: GameItem | null;
-  legs: GameItem | null;
-  feet: GameItem | null;
-  accessory1: GameItem | null;
-  accessory2: GameItem | null;
-  [key: string]: GameItem | null; // Allow for additional equipment slots
-}
-
-/**
- * Game progression tracking
- */
-export interface ProgressionState {
-  currentLocation: string;
-  unlockedLocations: string[];
-  completedQuests: string[];
-  activeQuests: string[];
-  achievements: string[];
-  unlockedFeatures: string[];
-}
-
-/**
- * Notification settings
- */
-export interface NotificationSettings {
-  combatResults: boolean;
-  levelUp: boolean;
-  questUpdates: boolean;
-  lootDrops: boolean;
-}
-
-/**
- * Audio settings
- */
-export interface AudioSettings {
-  musicVolume: number;
-  soundEffectsVolume: number;
-  ambientVolume: number;
-}
-
-/**
- * Gameplay settings
- */
-export interface GameplaySettings {
-  difficultyLevel: 'easy' | 'normal' | 'hard' | 'nightmare';
-  autosaveInterval: number; // in seconds
-  relationshipDecayDisabled?: boolean; // Whether NPC relationships should decay over time
-}
-
-/**
- * All game settings
- */
-export interface SettingsState {
-  notifications: NotificationSettings;
-  audio: AudioSettings;
-  gameplay: GameplaySettings;
-}
-
-/**
- * Game statistics and metrics
- */
-export interface StatisticsState {
-  enemiesDefeated: number;
-  questsCompleted: number;
-  itemsCrafted: number;
-  resourcesGathered: number;
-  goldEarned: number;
-  distanceTraveled: number;
-  totalPlayTime?: number;
-  [key: string]: number | undefined; // Allow for additional statistics
-}
-
-/**
- * Meta information about the game state
- */
-export interface MetaState {
-  version: string;
-  lastSaved: string | null; // ISO date string or null
-  playingSince: string | null; // ISO date string or null
-}
-
-export interface TraitSystem {
-  copyableTraits: Record<string, Trait>;
-}
 
 /**
  * Complete game state
@@ -272,12 +191,14 @@ export interface GameState {
   inventory: InventoryState;
   equipment: EquipmentState;
   progression: ProgressionState;
-  combat: CombatState; // Using the imported CombatState type
+  combat: CombatState;
   settings: SettingsState;
-  statistics: StatisticsState;
+  statistics: StatisticsSystem;
   meta: MetaState;
   essence: EssenceState;
-  traits?: TraitSystem;
+  traits: ExtendedTraitSystem;
+  quests: QuestSystem;
+  world: WorldState;
 
   // For backward compatibility
   gameData?: {
@@ -287,6 +208,15 @@ export interface GameState {
     [key: string]: any;
   };
   [key: string]: any;
+}
+
+/**
+ * Game resources and currencies
+ */
+export interface ResourceState {
+  gold: number;
+  gems: number;
+  materials: Materials;
 }
 
 /**
