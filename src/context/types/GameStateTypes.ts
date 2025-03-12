@@ -17,6 +17,17 @@ import {
   InventoryItem as PlayerInventoryItem
 } from './PlayerGameStateTypes';
 
+// Import all combat-related types
+import {
+  CombatState,
+  CombatSkills,
+  Enemy,
+  CombatActionType,
+  CombatActionResult,
+  CombatLogEntry,
+  CombatStateContainer
+} from './CombatGameStateTypes';
+
 // Re-export player types for backward compatibility
 export type {
   PlayerState,
@@ -30,6 +41,17 @@ export type {
 
 // Re-export essence types for backward compatibility
 export type { EssenceState };
+
+// Re-export all combat types for backward compatibility
+export type {
+  CombatState,
+  CombatSkills,
+  Enemy,
+  CombatActionType,
+  CombatActionResult,
+  CombatLogEntry,
+  CombatStateContainer
+};
 
 // Use the imported InventoryItem type to maintain compatibility
 export type InventoryItem = PlayerInventoryItem;
@@ -54,17 +76,6 @@ export interface ResourceState {
   gold: number;
   gems: number;
   materials: Materials;
-}
-
-/**
- * Combat skills and levels
- */
-export interface CombatSkills {
-  swordplay: number;
-  archery: number;
-  defense: number;
-  dualWielding: number;
-  [key: string]: number; // Allow for additional skills
 }
 
 /**
@@ -104,7 +115,7 @@ export interface GatheringSkills {
  * All player skills categorized by type
  */
 export interface SkillsState {
-  combat: CombatSkills;
+  combat: CombatSkills; // Using the imported CombatSkills type
   magic: MagicSkills;
   crafting: CraftingSkills;
   gathering: GatheringSkills;
@@ -188,17 +199,6 @@ export interface ProgressionState {
 }
 
 /**
- * Combat state
- */
-export interface CombatState {
-  inCombat: boolean;
-  currentEnemy: any | null; // We could define an Enemy interface later
-  autoAttack: boolean;
-  lastCombatResult: 'victory' | 'defeat' | 'escape' | null;
-  combatLog: string[];
-}
-
-/**
  * Notification settings
  */
 export interface NotificationSettings {
@@ -272,7 +272,7 @@ export interface GameState {
   inventory: InventoryState;
   equipment: EquipmentState;
   progression: ProgressionState;
-  combat: CombatState;
+  combat: CombatState; // Using the imported CombatState type
   settings: SettingsState;
   statistics: StatisticsState;
   meta: MetaState;

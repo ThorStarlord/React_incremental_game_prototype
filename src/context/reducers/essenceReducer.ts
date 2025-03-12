@@ -3,7 +3,7 @@ import { GameState } from '../types/GameStateTypes';
 import { 
   EssenceState, 
   EssencePayload 
-} from '../../features/Essence/EssenceGameStateTypes';
+} from '../types/EssenceGameStateTypes';
 import { 
   createNotification, 
   addNotification, 

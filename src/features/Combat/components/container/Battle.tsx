@@ -6,7 +6,7 @@ import Panel from './Panel';
 import useThemeUtils from '../../hooks/useThemeUtils';
 import TraitEffectDialog from './TraitEffectDialog';
 import TraitEffectAnimation from './TraitEffectAnimation';
-import combatInitialState, { CombatState, CombatLogEntry } from '../../combatInitialState';
+import CombatInitialState, { CombatState, CombatLogEntry } from '../../CombatInitialState';
 import '../../../../constants/GameStateTypes'; // Import our type extensions
 
 /**
@@ -50,18 +50,18 @@ const Battle: React.FC<BattleProps> = ({ dungeonId, onExplorationComplete }) => 
   
   // Initialize combat state
   const [combatState, setCombatState] = useState<CombatState>({
-    ...combatInitialState,
+    ...CombatInitialState,
     active: true,
     playerTurn: true,
     player: {
-      ...combatInitialState.player,
+      ...CombatInitialState.player,
       currentHealth: player.stats?.health || 100,
       maxHealth: player.stats?.maxHealth || 100,
       currentMana: player.stats?.mana || 50,
       maxMana: player.stats?.maxMana || 50
     },
     enemy: {
-      ...combatInitialState.enemy,
+      ...CombatInitialState.enemy,
       name: 'Goblin',
       level: 1,
       currentHealth: 50,

@@ -3,7 +3,7 @@ import { Box, Typography, Button, CircularProgress, Fade } from '@mui/material';
 import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
 import Battle from './Battle';
 import Panel from './Panel';
-import combatInitialState from '../../combatInitialState';
+import CombatInitialState from '../../CombatInitialState';
 
 /**
  * Interface for Combat component props
@@ -174,7 +174,7 @@ const Combat: React.FC<CombatProps> = ({
       
       // Create enemy instance with scaled stats
       const enemy: Enemy = {
-        ...combatInitialState.enemy,
+        ...CombatInitialState.enemy,
         id: enemyTemplate.id,
         name: enemyTemplate.name,
         level: enemyLevel,
