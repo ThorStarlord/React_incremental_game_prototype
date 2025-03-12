@@ -12,6 +12,9 @@ import {
 export type Trait = PlayerTrait;
 export type TraitEffect = PlayerTraitEffect;
 
+// Define a type-safe ID for traits
+export type TraitId = string & { readonly _brand: unique symbol };
+
 /**
  * Trait acquisition source
  */
@@ -53,7 +56,7 @@ export type TraitCategory =
  * Extended trait structure
  */
 export interface ExtendedTrait extends Trait {
-  id: string;
+  id: TraitId;
   name: string;
   description: string;
   effects: TraitEffect[];
@@ -62,9 +65,9 @@ export interface ExtendedTrait extends Trait {
   rarity: TraitRarity;
   category: TraitCategory;
   source: TraitSource;
-  mutuallyExclusive?: string[];
+  mutuallyExclusive?: TraitId[];
   prerequisites?: {
-    traits?: string[];
+    traits?: TraitId[];
     level?: number;
     stats?: Record<string, number>;
     skills?: Record<string, number>;
@@ -83,7 +86,10 @@ export interface TraitActivationCondition {
   threshold?: number;
   skillId?: string;
   enemyType?: string;
-  customCheck?: string;
+  customCheck?: {
+    checkFunction: string;
+    parameters?: Record<string, any>;
+  };
 }
 
 /**
@@ -133,15 +139,15 @@ export interface TraitSlots {
  * Complete trait system state
  */
 export interface TraitSystem {
-  copyableTraits: Record<string, ExtendedTrait>;
-  playerTraits: string[];
-  availableTraits: string[];
+  copyableTraits: Record<TraitId, ExtendedTrait>;
+  playerTraits: TraitId[];
+  availableTraits: TraitId[];
   traitSlots: TraitSlots;
-  discoveredTraits: Set<string>;
-  favoriteTraits: Set<string>;
+  discoveredTraits: TraitId[]; // Changed from Set to array for serialization
+  favoriteTraits: TraitId[]; // Changed from Set to array for serialization
   traitPoints: number;
   traitHistory: {
-    traitId: string;
+    traitId: TraitId;
     action: 'added' | 'removed' | 'upgraded';
     timestamp: string; // ISO date string
   }[];
@@ -153,7 +159,7 @@ export interface TraitSystem {
 export interface TraitInteractionResult {
   success: boolean;
   message: string;
-  affectedTraitIds: string[];
+  affectedTraitIds: TraitId[];
   cost?: number;
-  unlockedTraits?: string[];
+  unlockedTraits?: TraitId[];
 }
