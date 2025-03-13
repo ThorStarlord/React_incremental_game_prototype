@@ -339,3 +339,69 @@ export interface CombatStateContainer {
   rewards: CombatRewards;
   state: CombatState;
 }
+
+/**
+ * Combat status enum
+ */
+export enum CombatStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  PLAYER_VICTORY = 'PLAYER_VICTORY',
+  PLAYER_DEFEAT = 'PLAYER_DEFEAT',
+  FLED = 'FLED'
+}
+
+/**
+ * Status effect in combat
+ */
+export interface CombatEffect {
+  id: string;
+  name: string;
+  duration: number;
+  effect: {
+    type: string;
+    value: number;
+  };
+}
+
+/**
+ * Enemy in combat
+ */
+export interface Enemy {
+  id: string;
+  name: string;
+  level: number;
+  health: number;
+  maxHealth: number;
+  stats: {
+    attack: number;
+    defense: number;
+    speed: number;
+  };
+}
+
+/**
+ * Combat log entry
+ */
+export interface CombatLogEntry {
+  timestamp : number;
+  message: string;
+  type: string;
+  importance: 'normal' | 'high';
+}
+
+/**
+ * Combat state interface
+ */
+export interface CombatState {
+  active: boolean;
+  status: CombatStatus;
+  playerTurn: boolean;
+  round: number;
+  activeEnemy: Enemy | null;
+  playerEffects: CombatEffect[];
+  enemyEffects: CombatEffect[];
+  log: CombatLogEntry[];
+  rewards?: CombatRewards;
+  turnQueue: CombatActor[];
+}

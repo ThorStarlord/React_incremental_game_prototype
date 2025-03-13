@@ -41,20 +41,20 @@ export const PlayerInitialState: PlayerStateContainer = {
     attributes: DefaultPlayerAttributes,
     stats: {
       health: 100,
-      maxHealth: 100,
-      healthRegen: 1,
-      mana: 50,         // Consistent naming
-      maxMana: 50,      // Consistent naming
-      manaRegen: 0.5,
-      physicalDamage: 5,
-      magicalDamage: 2,
-      critChance: 5,
-      critMultiplier: 1.5
+      maxHealth: 100,    // Base health determined by vitality
+      healthRegen: 1,    // Health recovered per minute
+      mana: 50,          // Magical energy for casting spells
+      maxMana: 50,       // Base mana determined by intelligence
+      manaRegen: 0.5,    // Mana recovered per minute
+      physicalDamage: 5, // Base damage for physical attacks
+      magicalDamage: 2,  // Base damage for magical attacks
+      critChance: 5,     // Percentage chance for critical hits
+      critMultiplier: 1.5 // Damage multiplier for critical hits
     },
-    totalPlayTime: 0,
-    creationDate: null,
-    traitSlots: 3,      // Default starting trait slots
-    acquiredTraits: []  // Start with no acquired traits
+    totalPlayTime: 0,    // Total seconds played
+    creationDate: null,  // Will be set when character is created
+    // Remove traitSlots from here as it's managed by the trait system
+    acquiredTraits: []   // Start with no acquired traits
   },
 };
 

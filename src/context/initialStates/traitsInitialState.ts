@@ -6,7 +6,9 @@
 
 import { 
   TraitSystem,
-  SLOT_REQUIREMENT_TYPES
+  SLOT_REQUIREMENT_TYPES,
+  TraitId,
+  createTraitId
 } from '../types/TraitsGameStateTypes';
 
 /**
@@ -38,12 +40,45 @@ export const INITIAL_LOCKED_SLOTS = [
 ];
 
 /**
+ * Initial set of traits available in the game
+ */
+export const INITIAL_TRAITS: Record<string, any> = {
+  'quick_learner': {
+    id: createTraitId('quick_learner'),
+    name: 'Quick Learner',
+    description: 'Increases experience gain by 10%',
+    tier: 1,
+    effects: [{ type: 'expGain', value: 0.1 }],
+    requirements: { level: 1 },
+    cost: 1
+  },
+  'tough_skin': {
+    id: createTraitId('tough_skin'),
+    name: 'Tough Skin',
+    description: 'Reduces damage taken by 5%',
+    tier: 1,
+    effects: [{ type: 'damageReduction', value: 0.05 }],
+    requirements: { level: 1 },
+    cost: 1
+  },
+  'keen_eye': {
+    id: createTraitId('keen_eye'),
+    name: 'Keen Eye',
+    description: 'Increases critical hit chance by 2%',
+    tier: 1,
+    effects: [{ type: 'critChance', value: 2 }],
+    requirements: { level: 2 },
+    cost: 1
+  }
+};
+
+/**
  * Initial state for the trait system
  */
 const traitsInitialState: TraitSystem = {
-  copyableTraits: {},  // Will be populated with trait definitions from data files or API
+  copyableTraits: INITIAL_TRAITS,  // Populated with trait definitions
   playerTraits: [],
-  availableTraits: [],
+  availableTraits: Object.keys(INITIAL_TRAITS).slice(0, 2).map(id => createTraitId(id)), // First 2 traits available initially
   traitSlots: {
     maxTraits: 5,
     unlockedSlots: 2,

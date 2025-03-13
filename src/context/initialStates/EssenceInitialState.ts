@@ -4,7 +4,27 @@
  * Essence is a core resource that players collect and use for progression.
  */
 
-import { EssenceState } from '../types/EssenceGameStateTypes';
+import { EssenceState, EssenceGenerator, EssenceUpgrade } from '../types/EssenceGameStateTypes';
+
+/**
+ * Essence generator types
+ */
+export enum GENERATOR_TYPES {
+  BASIC = 'basic',
+  ADVANCED = 'advanced',
+  SUPERIOR = 'superior',
+  MYTHICAL = 'mythical'
+}
+
+/**
+ * Essence upgrade types
+ */
+export enum UPGRADE_TYPES {
+  CLICK_POWER = 'clickPower',
+  AUTO_GENERATION = 'autoGeneration',
+  MULTIPLIER = 'multiplier',
+  EFFICIENCY = 'efficiency'
+}
 
 /**
  * Initial state structure for the Essence feature
@@ -78,6 +98,4 @@ const EssenceInitialState: EssenceState = {
 };
 
 export default EssenceInitialState;
-
-// Re-export the EssenceState type for convenience
 

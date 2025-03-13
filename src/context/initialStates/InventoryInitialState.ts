@@ -19,7 +19,6 @@ export const createGameItem = (item: Partial<GameItem>): GameItem => {
     id: item.id!,
     name: item.name!,
     type: item.type!,
-    // Removed duplicate quantity property hereuplicate quantity property here
     value: 0,
     rarity: ItemRarity.Common,
     description: '',
@@ -27,7 +26,7 @@ export const createGameItem = (item: Partial<GameItem>): GameItem => {
     tradeable: true,
     sellable: true,
     ...item,
-    // Keep only this quantity definition
+    // Ensure quantity is at least 1
     quantity: item.quantity !== undefined ? Math.max(1, item.quantity) : 1
   };
   

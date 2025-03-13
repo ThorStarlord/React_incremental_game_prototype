@@ -10,6 +10,12 @@ import { GameItem, ItemType, ItemRarity } from './ItemGameStateTypes';
 export { GameItem, ItemEffect, ItemStats, ItemType, ItemRarity } from './ItemGameStateTypes';
 
 /**
+ * Alias for GameItem used in inventory context
+ * This helps maintain backward compatibility with code that uses InventoryItem
+ */
+export type InventoryItem = GameItem;
+
+/**
  * Equipment slot types for better type safety
  */
 export type EquipmentSlot =

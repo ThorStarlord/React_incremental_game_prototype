@@ -130,6 +130,9 @@ import { EssenceState } from './EssenceGameStateTypes';
 // Import resource-related types
 import { ResourceState } from './ResourceGameStateTypes';
 
+// Import faction-related types
+import { FactionSystem } from './FactionGameStateTypes';
+
 /**
  * Complete game state
  */
@@ -149,6 +152,7 @@ export interface GameState {
   quests: QuestSystem;
   world: WorldState;
   notifications: NotificationsState;
+  factions: FactionSystem; // Add this line to include the factions property
 
   /**
    * @deprecated Since v1.5.0. Use specific state properties instead.
@@ -195,7 +199,7 @@ export interface CombatState {
   playerTurn: boolean;
   round: number;
   log: {
-    timestamp: string;
+    timestamp: number;  // Changed from string to number to match CombatGameStateTypes
     message: string;
     type: string;
     importance: 'normal' | 'high';
@@ -206,9 +210,6 @@ export interface CombatState {
     items: InventoryItem[];
   };
 }
-
-// Clarify type relationships
-export type InventoryItem = GameItem;
 
 // Re-export types for convenience
 export type {
@@ -227,5 +228,6 @@ export type {
   BiomeType, WeatherType, TimeOfDay, Season,
   EssenceState,
   NotificationsState,
-  ResourceState
+  ResourceState,
+  FactionSystem // Add this line to re-export FactionSystem
 };
