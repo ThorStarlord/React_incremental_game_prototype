@@ -1,5 +1,6 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
-import { addNotification } from '../utils/notificationUtils';
+import { CRAFTING_ACTIONS } from '../types/ActionTypes'; // Correct import path
+import { addNotification, NotificationType } from '../utils/notificationUtils';
 
 /**
  * Crafting Reducer - Manages the crafting system of the game
@@ -98,12 +99,12 @@ const createItemUpdateFn = (component: {id: string; quantity: number}, operation
     ? { ...item, quantity: item.quantity + (operation === 'add' ? component.quantity : -component.quantity) }
     : item;
 
-const withNotification = (state: GameState, message: string, type: string = "info", duration: number = 3000) =>
+const withNotification = (state: GameState, message: string, type: NotificationType = "info", duration: number = 3000) =>
   addNotification(state, { message, type, duration });
 
 export const craftingReducer = (state: GameState, action: {type: string; payload: any}): GameState => {
   switch (action.type) {
-    case ACTION_TYPES.DISCOVER_RECIPE: {
+    case CRAFTING_ACTIONS.DISCOVER_RECIPE: {
       const { recipeId, source } = action.payload;
       
       // Check if recipe already discovered
@@ -129,12 +130,12 @@ export const craftingReducer = (state: GameState, action: {type: string; payload
           }
         },
         `Discovered new recipe: ${recipeName}`,
-        "discovery",
+        "info", // Changed from "discovery" to "info" which is a valid NotificationType
         4000
       );
     }
     
-    case ACTION_TYPES.CRAFT_ITEM: {
+    case CRAFTING_ACTIONS.CRAFT_ITEM: {
       const { recipeId, quantity = 1, stationId } = action.payload;
       const recipe = state.gameData?.recipes?.[recipeId];
       

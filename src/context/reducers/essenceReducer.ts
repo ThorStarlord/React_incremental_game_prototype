@@ -7,7 +7,9 @@ import {
 import { 
   createNotification, 
   addNotification, 
-  NotificationType 
+  NotificationType,
+  GameStateWithNotifications,
+  Notification
 } from '../utils/notificationUtils';
 
 /**
@@ -24,8 +26,8 @@ export const essenceReducer = (
       // Apply trait multipliers
       const traits = state.player.equippedTraits || [];
       const multiplier = 1 + 
-        (traits.includes?.('EssenceAffinity') ? 0.2 : 0) + 
-        (traits.includes?.('SpiritualConnection') ? 0.3 : 0);
+        (traits && traits.includes('EssenceAffinity') ? 0.2 : 0) + 
+        (traits && traits.includes('SpiritualConnection') ? 0.3 : 0);
       
       const modifiedAmount = Math.round(amount * multiplier);
       
@@ -36,32 +38,43 @@ export const essenceReducer = (
         totalCollected: state.essence.totalCollected + modifiedAmount,
       };
       
+      // Create the updated state with new essence values
+      const updatedState = {
+        ...state,
+        essence: updatedEssence,
+        // Ensure notifications property exists
+        notifications: state.notifications || []
+      };
+      
       // Only show notification for significant gains
-      let newState = state;
       if (modifiedAmount >= 10) {
-        const notification = createNotification(
-          `Gained ${modifiedAmount} essence${source ? ` from ${source}` : ''}`,
-          'info'
-        );
-        newState = addNotification(state, notification);
+        // First cast to GameStateWithNotifications, then back to GameState
+        const notificationState = updatedState as unknown as GameStateWithNotifications;
+        const resultState = addNotification(notificationState, {
+          message: `Gained ${modifiedAmount} essence${source ? ` from ${source}` : ''}`,
+          type: 'info'
+        });
+        return resultState as unknown as GameState;
       }
       
-      return {
-        ...newState,
-        essence: updatedEssence
-      };
+      return updatedState;
     }
     
     case ACTION_TYPES.SPEND_ESSENCE: {
       const { amount, reason } = action.payload;
       
       if (state.essence.amount < amount) {
+        const stateWithNotifications = {
+          ...state,
+          notifications: state.notifications || []
+        } as unknown as GameStateWithNotifications;
+        
         const notification = createNotification(
           `Not enough essence to ${reason || 'perform this action'}`,
           'error',
           3000
         );
-        return addNotification(state, notification);
+        return addNotification(stateWithNotifications, notification) as unknown as GameState;
       }
       
       return {

@@ -1,4 +1,4 @@
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { DISCOVERY_ACTIONS } from '../types/ActionTypes'; // Import the specific action types
 
 /**
  * Interface for the discovery state in the game
@@ -57,31 +57,31 @@ export const discoveryReducer = (state = InitialState, action: DiscoveryAction):
   const { type, payload } = action;
 
   switch (type) {
-    case ACTION_TYPES.DISCOVER_LOCATION:
+    case DISCOVERY_ACTIONS.DISCOVER_LOCATION:
       return {
         ...state,
         locations: { ...state.locations, [payload.locationId]: true }
       };
       
-    case ACTION_TYPES.DISCOVER_RESOURCE:
+    case DISCOVERY_ACTIONS.DISCOVER_RESOURCE:
       return {
         ...state,
         resources: { ...state.resources, [payload.resourceId]: true }
       };
       
-    case ACTION_TYPES.DISCOVER_RECIPE:
+    case DISCOVERY_ACTIONS.DISCOVER_RECIPE:
       return {
         ...state,
         recipes: { ...state.recipes, [payload.recipeId]: true }
       };
       
-    case ACTION_TYPES.DISCOVER_TECHNOLOGY:
+    case DISCOVERY_ACTIONS.DISCOVER_TECHNOLOGY:
       return {
         ...state,
         technologies: { ...state.technologies, [payload.technologyId]: true }
       };
       
-    case ACTION_TYPES.UPDATE_EXPLORATION_PROGRESS: {
+    case DISCOVERY_ACTIONS.UPDATE_EXPLORATION_PROGRESS: {
       const { locationId, progress } = payload;
       const currentProgress = state.explorationProgress[locationId] || 0;
       
@@ -94,7 +94,7 @@ export const discoveryReducer = (state = InitialState, action: DiscoveryAction):
       };
     }
       
-    case ACTION_TYPES.UNLOCK_ACHIEVEMENT:
+    case DISCOVERY_ACTIONS.UNLOCK_ACHIEVEMENT:
       // Only add if not already achieved
       return state.achievements.includes(payload.achievementId) 
         ? state 
@@ -103,13 +103,13 @@ export const discoveryReducer = (state = InitialState, action: DiscoveryAction):
             achievements: [...state.achievements, payload.achievementId]
           };
       
-    case ACTION_TYPES.COMPLETE_TUTORIAL_STEP:
+    case DISCOVERY_ACTIONS.COMPLETE_TUTORIAL_STEP:
       return {
         ...state,
         tutorialSteps: { ...state.tutorialSteps, [payload.stepId]: true }
       };
       
-    case ACTION_TYPES.RESET_DISCOVERY:
+    case DISCOVERY_ACTIONS.RESET_DISCOVERY:
       return InitialState;
       
     default:

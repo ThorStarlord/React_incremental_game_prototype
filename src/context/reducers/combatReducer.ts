@@ -1,5 +1,7 @@
 import { ACTION_TYPES } from '../actions/actionTypes';
+import { COMBAT_ACTIONS } from '../types/ActionTypes'; // Fixed import path
 import { addNotification } from '../utils/notificationUtils';
+import { Enemy } from '../types/CombatGameStateTypes';
 
 /**
  * Combat Reducer
@@ -169,7 +171,7 @@ interface CombatAction {
 
 export const combatReducer = (state: GameState, action: CombatAction): GameState => {
   switch (action.type) {
-    case ACTION_TYPES.START_COMBAT: {
+    case COMBAT_ACTIONS.START_COMBAT: {
       const { enemies, location, ambush = false } = action.payload;
       
       if (!enemies || enemies.length === 0) {
@@ -180,12 +182,12 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
       }
       
       // Process enemies to ensure they have proper stats
-      const processedEnemies: CombatEnemy[] = enemies.map(enemy => ({
+      const processedEnemies: CombatEnemy[] = enemies.map((enemy: Enemy) => ({
         ...enemy,
         currentHealth: enemy.maxHealth || 10,
         statusEffects: [],
         // Calculate initiative if not provided
-        initiative: enemy.initiative || Math.floor(Math.random() * 5) + 1
+        initiative: enemy.speed || Math.floor(Math.random() * 5) + 1
       }));
       
       // Calculate player initiative
@@ -219,12 +221,12 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
       
       return addNotification(combatState, {
         message: ambush ? "You've been ambushed by enemies!" : "Combat has begun!",
-        type: "danger",
+        type: "error",  // Changed from "danger" to "error" which is a valid NotificationType
         duration: 3000
       });
     }
     
-    case ACTION_TYPES.ATTACK_ACTION: {
+    case COMBAT_ACTIONS.ATTACK_ACTION: {
       const { targetId, skillId } = action.payload;
       
       // Ensure combat is active
@@ -294,7 +296,8 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
             ...state.combat,
             enemies: updatedEnemies,
             log: [...state.combat.log, logEntry],
-            result: 'victory'
+            result: 'victory',
+            active: false  // Add the required active property
           });
         }
         
@@ -365,7 +368,7 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
           
           return addNotification(defeatState, {
             message: "You have been defeated in combat!",
-            type: "danger",
+            type: "error",  // Changed from "danger" to "error"
             duration: 5000
           });
         }
@@ -387,7 +390,7 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
       }
     }
     
-    case ACTION_TYPES.USE_COMBAT_SKILL: {
+    case COMBAT_ACTIONS.USE_COMBAT_SKILL: {
       const { skillId, targetIds } = action.payload;
       
       // Ensure combat is active
@@ -461,10 +464,17 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
           
           if (allEnemiesDefeated) {
             return endCombat(updatedState, {
-              ...updatedState.combat,
+              ...updatedState.combat!,
               enemies: updatedEnemies,
               log: [...updatedState.combat!.log, logEntry],
-              result: 'victory'
+              result: 'victory',
+              active: false,
+              turns: updatedState.combat!.turns || 0, // Ensure turns is a number not undefined
+              currentTurn: updatedState.combat!.currentTurn || 'player', // Ensure currentTurn is set
+              location: updatedState.combat!.location, // Ensure location is set
+              startTime: updatedState.combat!.startTime, // Ensure startTime is set
+              player: updatedState.combat!.player, // Ensure player is set
+              endTime: Date.now() // Set end time
             });
           }
           
@@ -563,40 +573,47 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
       return updatedState;
     }
     
-    case ACTION_TYPES.END_TURN: {
+    case COMBAT_ACTIONS.END_TURN: {
       // Ensure combat is active
       if (!state.combat || !state.combat.active) {
         return state;
       }
       
-      // Process status effects durations
-      let updatedState: GameState = { ...state };
+      // Create a new state object with the combat property guaranteed to exist
+      const updatedState: GameState = { 
+        ...state,
+        combat: { ...state.combat } // Explicitly copy combat to ensure it's defined
+      };
       
-      // Process player status effects
-      const updatedPlayerEffects = updatedState.combat.player.statusEffects.map(effect => ({
-        ...effect,
-        duration: effect.duration - 1
-      })).filter(effect => effect.duration > 0);
-      
-      updatedState.combat.player.statusEffects = updatedPlayerEffects;
-      
-      // Process enemy status effects
-      updatedState.combat.enemies = updatedState.combat.enemies.map(enemy => ({
-        ...enemy,
-        statusEffects: enemy.statusEffects.map(effect => ({
+      // TypeScript still doesn't recognize that combat is always defined here,
+      // so we'll use a non-null assertion or check combat for each operation
+      if (updatedState.combat) {
+        // Process player status effects
+        const updatedPlayerEffects = updatedState.combat.player.statusEffects.map(effect => ({
           ...effect,
           duration: effect.duration - 1
-        })).filter(effect => effect.duration > 0)
-      }));
-      
-      // Toggle turn
-      updatedState.combat.currentTurn = updatedState.combat.currentTurn === 'player' ? 'enemy' : 'player';
-      updatedState.combat.turns += 1;
+        })).filter(effect => effect.duration > 0);
+        
+        updatedState.combat.player.statusEffects = updatedPlayerEffects;
+        
+        // Process enemy status effects
+        updatedState.combat.enemies = updatedState.combat.enemies.map(enemy => ({
+          ...enemy,
+          statusEffects: enemy.statusEffects.map(effect => ({
+            ...effect,
+            duration: effect.duration - 1
+          })).filter(effect => effect.duration > 0)
+        }));
+        
+        // Toggle turn
+        updatedState.combat.currentTurn = updatedState.combat.currentTurn === 'player' ? 'enemy' : 'player';
+        updatedState.combat.turns += 1;
+      }
       
       return updatedState;
     }
     
-    case ACTION_TYPES.FLEE_COMBAT: {
+    case COMBAT_ACTIONS.FLEE_COMBAT: {
       // Ensure combat is active
       if (!state.combat || !state.combat.active) {
         return state;
@@ -675,7 +692,7 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
           
           return addNotification(defeatState, {
             message: "You have been defeated while attempting to flee!",
-            type: "danger",
+            type: "error",  // Changed from "danger" to "error"
             duration: 5000
           });
         }
@@ -699,14 +716,17 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
       }
     }
     
-    case ACTION_TYPES.COLLECT_LOOT: {
+    case COMBAT_ACTIONS.COLLECT_LOOT: {
       // Ensure combat is over and player won
       if (!state.combat || state.combat.active || state.combat.result !== 'victory') {
         return state;
       }
       
+      // Store the combat object in a local variable to satisfy TypeScript
+      const combat = state.combat;
+      
       // Check if loot was already collected
-      if (state.combat.lootCollected) {
+      if (combat.lootCollected) {
         return addNotification(state, {
           message: "You've already collected the loot!",
           type: "warning"
@@ -718,7 +738,7 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
       let experienceGain = 0;
       const lootItems: LootItem[] = [];
       
-      state.combat.enemies.forEach(enemy => {
+      combat.enemies.forEach(enemy => {
         // Base essence and XP from enemy
         essenceGain += enemy.essenceReward || Math.floor(Math.random() * 5) + 1;
         experienceGain += enemy.experienceReward || Math.floor(Math.random() * 10) + 5;
@@ -733,7 +753,7 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
               id: selectedDrop.id,
               quantity: selectedDrop.quantity || 1,
               name: selectedDrop.name,
-              source: `combat_${state.combat.location}`
+              source: `combat_${combat.location}`
             });
           }
         }
@@ -751,7 +771,7 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
           amount: state.essence.amount + essenceGain
         },
         combat: {
-          ...state.combat,
+          ...combat,
           lootCollected: true,
           rewards: {
             essence: essenceGain,
@@ -810,7 +830,7 @@ export const combatReducer = (state: GameState, action: CombatAction): GameState
       });
     }
     
-    case ACTION_TYPES.END_COMBAT: {
+    case COMBAT_ACTIONS.END_COMBAT: {
       const { result } = action.payload;
       
       // Ensure combat is active

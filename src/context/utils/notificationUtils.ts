@@ -57,8 +57,9 @@ export interface Notification {
 /**
  * Extended game state with notifications
  */
-export interface GameStateWithNotifications extends GameState {
+export interface GameStateWithNotifications {
   notifications?: Notification[];
+  [key: string]: any; // Allow any other properties from the game state
 }
 
 /**
@@ -98,48 +99,40 @@ export const createNotification = (
  * Adds a notification to the game state
  * 
  * @param {GameStateWithNotifications} state - Current game state
- * @param {Notification} notification - Notification to add
+ * @param {Partial<Notification> & {message: string; type: NotificationType}} notification - Notification to add (partial allowed)
  * @returns {GameStateWithNotifications} Updated game state
- * 
- * @example
- * const newState = addNotification(
- *   currentState,
- *   createNotification('You gained 10 gold!', 'success')
- * );
- * dispatch({ type: 'UPDATE_STATE', payload: newState });
  */
-export const addNotification = (
-  state: GameStateWithNotifications,
-  notification: Notification
-): GameStateWithNotifications => {
+export const addNotification = <T extends GameStateWithNotifications>(
+  state: T,
+  notification: Partial<Notification> & {message: string; type?: NotificationType}
+): T => {
+  // Create a complete notification with missing properties filled with defaults
+  const completeNotification: Notification = {
+    id: notification.id || Date.now() + Math.floor(Math.random() * 1000),
+    message: notification.message,
+    type: notification.type || 'info',
+    duration: notification.duration || 3000,
+    icon: notification.icon,
+    category: notification.category,
+    count: notification.count
+  };
+  
   return {
     ...state,
     notifications: [
       ...(state.notifications || []),
-      notification
+      completeNotification
     ]
   };
 };
 
 /**
  * Adds multiple notifications at once
- * 
- * @param {GameStateWithNotifications} state - Current game state
- * @param {Notification[]} notifications - Array of notifications to add
- * @returns {GameStateWithNotifications} Updated game state
- * 
- * @example
- * const combatNotifications = [
- *   createNotification('Critical hit!', 'success', 2000),
- *   createNotification('Enemy defeated!', 'success', 3000),
- *   createNotification('You gained 50 XP', 'info', 3000)
- * ];
- * const newState = addMultipleNotifications(currentState, combatNotifications);
  */
-export const addMultipleNotifications = (
-  state: GameStateWithNotifications,
+export const addMultipleNotifications = <T extends GameStateWithNotifications>(
+  state: T,
   notifications: Notification[]
-): GameStateWithNotifications => {
+): T => {
   if (notifications.length === 0) return state;
   
   return {
@@ -153,19 +146,11 @@ export const addMultipleNotifications = (
 
 /**
  * Removes a notification from the game state
- * 
- * @param {GameStateWithNotifications} state - Current game state
- * @param {number} id - ID of the notification to remove
- * @returns {GameStateWithNotifications} Updated game state
- * 
- * @example
- * const newState = removeNotification(currentState, notificationId);
- * dispatch({ type: 'UPDATE_STATE', payload: newState });
  */
-export const removeNotification = (
-  state: GameStateWithNotifications,
+export const removeNotification = <T extends GameStateWithNotifications>(
+  state: T,
   id: number
-): GameStateWithNotifications => {
+): T => {
   if (!state.notifications) return state;
   
   return {
@@ -196,10 +181,10 @@ export const removeNotification = (
  *   return () => clearInterval(timer);
  * }, [currentState, dispatch]);
  */
-export const cleanupExpiredNotifications = (
-  state: GameStateWithNotifications,
+export const cleanupExpiredNotifications = <T extends GameStateWithNotifications>(
+  state: T,
   currentTime: number
-): GameStateWithNotifications => {
+): T => {
   if (!state.notifications || state.notifications.length === 0) return state;
 
   // Calculate expiration times for each notification
@@ -243,10 +228,10 @@ export const cleanupExpiredNotifications = (
  *   createNotification('Wolf defeated!', 'success', 3000, 'skull', 'combat.kill.wolf')
  * );
  */
-export const addOrGroupNotification = (
-  state: GameStateWithNotifications,
+export const addOrGroupNotification = <T extends GameStateWithNotifications>(
+  state: T,
   notification: Notification & { category: string }
-): GameStateWithNotifications => {
+): T => {
   if (!notification.category) {
     // No category, can't group
     return addNotification(state, notification);

@@ -39,7 +39,8 @@ export const COMBAT_ACTIONS = {
   ATTACK_ACTION: 'combat/attack' as const,
   USE_COMBAT_SKILL: 'combat/useSkill' as const,
   FLEE_COMBAT: 'combat/flee' as const,
-  COLLECT_LOOT: 'combat/collectLoot' as const
+  COLLECT_LOOT: 'combat/collectLoot' as const,
+  END_TURN: 'combat/endTurn' as const  // Add END_TURN action type
 };
 
 // Crafting related actions
@@ -98,8 +99,10 @@ export const TIME_ACTIONS = {
 
 // Discovery actions
 export const DISCOVERY_ACTIONS = {
+  DISCOVER_LOCATION: 'discovery/location' as const, // Add this missing action type
   DISCOVER_RESOURCE: 'discovery/resource' as const,
   DISCOVER_TECHNOLOGY: 'discovery/technology' as const,
+  DISCOVER_RECIPE: 'discovery/recipe' as const, // Add this missing action type
   UPDATE_EXPLORATION_PROGRESS: 'discovery/updateExploration' as const,
   UNLOCK_ACHIEVEMENT: 'discovery/unlockAchievement' as const,
   COMPLETE_TUTORIAL_STEP: 'discovery/completeTutorial' as const,
