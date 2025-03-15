@@ -16,7 +16,14 @@
 
 import { createContext, useContext, Dispatch } from 'react';
 import { GameState } from './initialStates/InitialStateComposer';
-import { ACTION_TYPES } from './actions/actionTypes';
+import { 
+  ESSENCE_ACTIONS, 
+  PLAYER_ACTIONS, 
+  COMBAT_ACTIONS, 
+  NOTIFICATION_ACTIONS,
+  Action,
+  ActionWithPayload
+} from './types/ActionTypes';
 
 /**
  * Generic Action interface with required payload
@@ -57,12 +64,12 @@ export const useGameDispatch = (): Dispatch<GameAction> => {
  */
 export const GameActions = {
   gainEssence: (amount: number, source?: string): GameAction => ({
-    type: ACTION_TYPES.GAIN_ESSENCE,
+    type: ESSENCE_ACTIONS.GAIN_ESSENCE,
     payload: { amount, source }
   }),
   
   gainExperience: (amount: number, source?: string): GameAction => ({
-    type: ACTION_TYPES.GAIN_EXPERIENCE,
+    type: PLAYER_ACTIONS.GAIN_EXPERIENCE,
     payload: { amount, source }
   }),
   
@@ -71,12 +78,12 @@ export const GameActions = {
     type: NotificationType = 'info',
     duration: number = 3000
   ): GameAction => ({
-    type: ACTION_TYPES.ADD_NOTIFICATION,
+    type: NOTIFICATION_ACTIONS.ADD_NOTIFICATION,
     payload: { message, type, duration }
   }),
   
   updatePlayer: (playerData: Partial<GameState['player']>): GameAction => ({
-    type: ACTION_TYPES.UPDATE_PLAYER,
+    type: PLAYER_ACTIONS.UPDATE_PLAYER,
     payload: playerData
   }),
   
@@ -85,7 +92,7 @@ export const GameActions = {
     location?: string, 
     ambush: boolean = false
   ): GameAction => ({
-    type: ACTION_TYPES.START_COMBAT,
+    type: COMBAT_ACTIONS.START_COMBAT,
     payload: { enemies, location, ambush }
   })
 };

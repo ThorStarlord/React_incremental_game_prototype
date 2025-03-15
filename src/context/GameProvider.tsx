@@ -1,6 +1,6 @@
 import React, { useReducer, useEffect, useCallback, ReactNode, Dispatch } from 'react';
 import { rootReducer } from './reducers/rootReducer';
-import { ACTION_TYPES } from './actions/actionTypes';
+import { GAME_INIT_ACTIONS } from './types/ActionTypes';
 import { GameAction } from './GameDispatchContext';
 import GameStateContext, { EnhancedGameState } from './GameStateContext';
 import GameDispatchContext from './GameDispatchContext';
@@ -36,7 +36,7 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
           name: gameState.player?.name || 'Unnamed Hero',
           timestamp: Date.now(),
           playerLevel: gameState.player?.level || 1,
-          playtime: gameState.statistics?.totalPlayTime || 0
+          playtime: gameState.statistics?.current?.timeStatistics?.totalPlayTime || 0 // Fixed: use correct path to totalPlayTime
         };
         
         // Update or add to saved games list
@@ -67,7 +67,7 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
         // Version check and potential migration logic could go here
         
         dispatch({
-          type: ACTION_TYPES.INITIALIZE_GAME_DATA,
+          type: GAME_INIT_ACTIONS.INITIALIZE_GAME_DATA,
           payload: saveData.state
         });
         return true;
@@ -81,7 +81,7 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
 
   // Reset game state to initial values
   const resetGame = useCallback(() => {
-    dispatch({ type: ACTION_TYPES.RESET_GAME, payload: {} });
+    dispatch({ type: GAME_INIT_ACTIONS.RESET_GAME, payload: {} });
   }, []);
 
   // Export save as string for backup
@@ -104,7 +104,7 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
       }
       
       dispatch({
-        type: ACTION_TYPES.INITIALIZE_GAME_DATA,
+        type: GAME_INIT_ACTIONS.INITIALIZE_GAME_DATA,
         payload: parsedData.state
       });
       return true;

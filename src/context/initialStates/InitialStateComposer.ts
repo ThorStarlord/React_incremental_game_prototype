@@ -24,7 +24,7 @@ import inventoryInitialState from './InventoryInitialState';
 import metaInitialState from './MetaInitialState';
 import factionsInitialState from './FactionInitialState';
 import essenceInitialState from './EssenceInitialState';
-import traitsInitialState from './traitsInitialState';
+import traitsInitialState from './TraitsInitialState';
 import resourceInitialState from './ResourceInitialState';
 import combatInitialState from './CombatInitialState';
 import worldInitialState from './WorldInitialState';
