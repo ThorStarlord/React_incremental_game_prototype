@@ -1,21 +1,10 @@
-import {
-  COLLECT_ESSENCE,
-  SPEND_ESSENCE,
-  UPGRADE_ESSENCE_RATE,
-  GAIN_EXPERIENCE,
-  LEVEL_UP,
-  LEARN_SKILL,
-  EQUIP_ITEM,
-  UNEQUIP_ITEM,
-  ADD_ITEM_TO_INVENTORY,
-  REMOVE_ITEM_FROM_INVENTORY
-} from './actionTypes';
-
-// Define action interfaces
-interface Action<T, P> {
-  type: T;
-  payload?: P;
-}
+import { 
+  ESSENCE_ACTIONS, 
+  PLAYER_ACTIONS, 
+  INVENTORY_ACTIONS,
+  SKILL_ACTIONS,
+  Action
+} from '../types/ActionTypes';
 
 // Essence action interfaces
 interface CollectEssencePayload {
@@ -58,52 +47,52 @@ interface RemoveItemPayload {
 }
 
 // Essence action creators
-export const collectEssence = (amount: number): Action<typeof COLLECT_ESSENCE, CollectEssencePayload> => ({
-  type: COLLECT_ESSENCE,
+export const collectEssence = (amount: number): Action<typeof ESSENCE_ACTIONS.GAIN_ESSENCE, CollectEssencePayload> => ({
+  type: ESSENCE_ACTIONS.GAIN_ESSENCE,
   payload: { amount }
 });
 
-export const spendEssence = (amount: number): Action<typeof SPEND_ESSENCE, SpendEssencePayload> => ({
-  type: SPEND_ESSENCE,
+export const spendEssence = (amount: number): Action<typeof ESSENCE_ACTIONS.SPEND_ESSENCE, SpendEssencePayload> => ({
+  type: ESSENCE_ACTIONS.SPEND_ESSENCE,
   payload: { amount }
 });
 
-export const upgradeEssenceRate = (cost: number, multiplier: number): Action<typeof UPGRADE_ESSENCE_RATE, UpgradeEssenceRatePayload> => ({
-  type: UPGRADE_ESSENCE_RATE,
+export const upgradeEssenceRate = (cost: number, multiplier: number): Action<typeof ESSENCE_ACTIONS.UPGRADE_ESSENCE_RATE, UpgradeEssenceRatePayload> => ({
+  type: ESSENCE_ACTIONS.UPGRADE_ESSENCE_RATE,
   payload: { cost, multiplier }
 });
 
 // Player action creators
-export const gainExperience = (amount: number): Action<typeof GAIN_EXPERIENCE, GainExperiencePayload> => ({
-  type: GAIN_EXPERIENCE,
+export const gainExperience = (amount: number): Action<typeof PLAYER_ACTIONS.GAIN_EXPERIENCE, GainExperiencePayload> => ({
+  type: PLAYER_ACTIONS.GAIN_EXPERIENCE,
   payload: { amount }
 });
 
-export const levelUp = (): Action<typeof LEVEL_UP, undefined> => ({
-  type: LEVEL_UP
+export const levelUp = (): Action<typeof PLAYER_ACTIONS.LEVEL_UP, undefined> => ({
+  type: PLAYER_ACTIONS.LEVEL_UP
 });
 
-export const learnSkill = (skillId: string): Action<typeof LEARN_SKILL, LearnSkillPayload> => ({
-  type: LEARN_SKILL,
+export const learnSkill = (skillId: string): Action<typeof SKILL_ACTIONS.LEARN_SKILL, LearnSkillPayload> => ({
+  type: SKILL_ACTIONS.LEARN_SKILL,
   payload: { skillId }
 });
 
-export const equipItem = (itemId: string, slot: string): Action<typeof EQUIP_ITEM, EquipItemPayload> => ({
-  type: EQUIP_ITEM,
+export const equipItem = (itemId: string, slot: string): Action<typeof PLAYER_ACTIONS.EQUIP_ITEM, EquipItemPayload> => ({
+  type: PLAYER_ACTIONS.EQUIP_ITEM,
   payload: { itemId, slot }
 });
 
-export const unequipItem = (slot: string): Action<typeof UNEQUIP_ITEM, UnequipItemPayload> => ({
-  type: UNEQUIP_ITEM,
+export const unequipItem = (slot: string): Action<typeof PLAYER_ACTIONS.UNEQUIP_ITEM, UnequipItemPayload> => ({
+  type: PLAYER_ACTIONS.UNEQUIP_ITEM,
   payload: { slot }
 });
 
-export const addItemToInventory = (item: any): Action<typeof ADD_ITEM_TO_INVENTORY, InventoryItemPayload> => ({
-  type: ADD_ITEM_TO_INVENTORY,
+export const addItemToInventory = (item: any): Action<typeof INVENTORY_ACTIONS.ADD_ITEM, InventoryItemPayload> => ({
+  type: INVENTORY_ACTIONS.ADD_ITEM,
   payload: { item }
 });
 
-export const removeItemFromInventory = (itemId: string): Action<typeof REMOVE_ITEM_FROM_INVENTORY, RemoveItemPayload> => ({
-  type: REMOVE_ITEM_FROM_INVENTORY,
+export const removeItemFromInventory = (itemId: string): Action<typeof INVENTORY_ACTIONS.REMOVE_ITEM, RemoveItemPayload> => ({
+  type: INVENTORY_ACTIONS.REMOVE_ITEM,
   payload: { itemId }
 });

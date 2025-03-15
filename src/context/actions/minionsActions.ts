@@ -29,6 +29,8 @@ export const MINION_ACTION_TYPES = {
   SET_MINIONS: 'minions/setminions',
   /** Update a minion's status */
   UPDATE_MINION_STATUS: 'minions/updatestatus',
+  /** Gain experience points for a minion */
+  GAIN_MINION_EXPERIENCE: 'minions/gainExperience' // Add missing action type
 };
 
 // Define interfaces for action payloads
@@ -168,6 +170,17 @@ export const setMinions = (minions: MinionData[]) => ({
 export const updateMinionStatus = (minionId: string, status: Record<string, any>) => ({
   type: MINION_ACTION_TYPES.UPDATE_MINION_STATUS,
   payload: { minionId, status }
+});
+
+/**
+ * Award experience points to a minion
+ * @param {string} minionId - The ID of the minion to award experience to
+ * @param {number} amount - The amount of experience points to award
+ * @returns {Object} The action object
+ */
+export const gainMinionExperience = (minionId: string, amount: number) => ({
+  type: MINION_ACTION_TYPES.GAIN_MINION_EXPERIENCE,
+  payload: { minionId, amount }
 });
 
 // Thunk Actions

@@ -1,224 +1,279 @@
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { createReducer } from '../utils/reducerUtils';
+import { 
+  GameTimeState, 
+  TimeCycle, 
+  Season, 
+  Weather, 
+  TimeChangeEvent 
+} from '../types/TimeGameStateTypes';
 import { addNotification } from '../utils/notificationUtils';
+import gameTimeInitialState from '../initialStates/GameTimeInitialState';
 
 /**
- * Game Time Reducer - Manages time progression in the game world
+ * Game time action types
  */
+export const GAME_TIME_ACTIONS = {
+  ADVANCE_TIME: 'gameTime/advance',
+  SET_TIME: 'gameTime/set',
+  SKIP_TO_PERIOD: 'gameTime/skipToPeriod',
+  CHANGE_SEASON: 'gameTime/changeSeason',
+  SET_WEATHER: 'gameTime/setWeather',
+  PAUSE_TIME: 'gameTime/pause',
+  RESUME_TIME: 'gameTime/resume',
+  SET_TIME_SPEED: 'gameTime/setSpeed'
+} as const;
 
-// Define interfaces for state
-interface GameState {
-  gameTime: GameTimeState;
-  [key: string]: any;
-}
+/**
+ * Game time action types with improved typing
+ */
+export type GameTimeAction = 
+  | { type: typeof GAME_TIME_ACTIONS.ADVANCE_TIME; payload: { minutes: number } }
+  | { type: typeof GAME_TIME_ACTIONS.SET_TIME; payload: { day: number; hour: number; minute: number } }
+  | { type: typeof GAME_TIME_ACTIONS.SKIP_TO_PERIOD; payload: { timeCycle: TimeCycle } }
+  | { type: typeof GAME_TIME_ACTIONS.CHANGE_SEASON; payload: { season: Season } }
+  | { type: typeof GAME_TIME_ACTIONS.SET_WEATHER; payload: { weather: Weather; duration?: number } }
+  | { type: typeof GAME_TIME_ACTIONS.PAUSE_TIME }
+  | { type: typeof GAME_TIME_ACTIONS.RESUME_TIME }
+  | { type: typeof GAME_TIME_ACTIONS.SET_TIME_SPEED; payload: { speed: number } };
 
-interface GameTimeState {
-  day: number;
-  period: TimePeriod;
-  season: Season;
-  weather?: Weather;
-  timestamp: number;
-  totalPeriodsPassed?: number;
-  weatherStart?: number;
-  weatherDuration?: number;
-  lastSeasonChange?: SeasonChange;
-}
-
-type TimePeriod = 'morning' | 'afternoon' | 'evening' | 'night';
-type Season = 'spring' | 'summer' | 'autumn' | 'winter';
-type Weather = 'clear' | 'cloudy' | 'rainy' | 'stormy' | 'foggy' | 'snowy';
-
-interface SeasonChange {
-  from: Season;
-  to: Season;
-  day: number;
-  timestamp: number;
-}
-
-// Constants
-const TIME_PERIODS: TimePeriod[] = ['morning', 'afternoon', 'evening', 'night'];
-const SEASONS: Season[] = ['spring', 'summer', 'autumn', 'winter'];
-const WEATHER_TYPES: Weather[] = ['clear', 'cloudy', 'rainy', 'stormy', 'foggy'];
-
-// Helper functions
-const getNextPeriod = (currentPeriod: TimePeriod): TimePeriod => {
-  const currentIndex = TIME_PERIODS.indexOf(currentPeriod);
-  return TIME_PERIODS[(currentIndex + 1) % TIME_PERIODS.length];
-};
-
+// Helper functions from TimeReducer.ts
 const getNextSeason = (currentSeason: Season): Season => {
-  const currentIndex = SEASONS.indexOf(currentSeason);
-  return SEASONS[(currentIndex + 1) % SEASONS.length];
+  const seasons = [Season.Spring, Season.Summer, Season.Autumn, Season.Winter];
+  const currentIndex = seasons.indexOf(currentSeason);
+  return seasons[(currentIndex + 1) % seasons.length];
 };
 
 const getSeasonalWeather = (season: Season): Weather[] => {
-  const baseWeather = [...WEATHER_TYPES];
-  if (season === 'winter') baseWeather.push('snowy', 'snowy');
-  if (season === 'summer') baseWeather.push('clear', 'clear');
-  return baseWeather as Weather[];
+  const baseWeather = [Weather.Clear, Weather.Cloudy, Weather.Rainy, Weather.Stormy, Weather.Foggy];
+  if (season === Season.Winter) baseWeather.push(Weather.Snowy, Weather.Snowy);
+  if (season === Season.Summer) baseWeather.push(Weather.Clear, Weather.Clear);
+  return baseWeather;
 };
 
-export const gameTimeReducer = (
-  state: GameState, 
-  action: { type: string; payload: any }
-): GameState => {
-  switch (action.type) {
-    case ACTION_TYPES.ADVANCE_TIME: {
-      const { period, day, season } = state.gameTime;
-      const currentPeriodIndex = TIME_PERIODS.indexOf(period);
+/**
+ * Helper function to narrow action types with improved type safety
+ */
+function isActionOfType<T extends typeof GAME_TIME_ACTIONS[keyof typeof GAME_TIME_ACTIONS]>(
+  action: GameTimeAction,
+  type: T
+): action is Extract<GameTimeAction, { type: T }> {
+  return action.type === type;
+}
+
+/**
+ * Game time reducer implementation using the createReducer utility
+ */
+export const gameTimeReducer = createReducer<GameTimeState, GameTimeAction>(
+  gameTimeInitialState,
+  {
+    [GAME_TIME_ACTIONS.ADVANCE_TIME]: (state, action) => {
+      // Type guard for ADVANCE_TIME action
+      if (!isActionOfType(action, GAME_TIME_ACTIONS.ADVANCE_TIME)) {
+        return state;
+      }
       
-      // Check if day changes (night -> morning transition)
-      const isLastPeriod = currentPeriodIndex === TIME_PERIODS.length - 1;
-      const nextPeriod = getNextPeriod(period);
-      const nextDay = isLastPeriod ? day + 1 : day;
+      const { minutes } = action.payload;
+      const totalMinutes = state.currentMinute + minutes;
+      const newHour = state.currentHour + Math.floor(totalMinutes / 60);
+      const newDay = state.currentDay + Math.floor(newHour / 24);
       
-      // Check for season change every 28 days
-      let nextSeason = season;
+      // Check for season change every 28 days (from TimeReducer.ts)
       let seasonChanged = false;
+      let nextSeason = state.currentSeason;
       
-      if (isLastPeriod && nextDay > 0 && nextDay % 28 === 0) {
-        nextSeason = getNextSeason(season);
+      if (newDay > state.currentDay && newDay % 28 === 0) {
+        nextSeason = getNextSeason(state.currentSeason);
         seasonChanged = true;
       }
       
-      // Update game time state
-      const newState: GameState = {
+      // Create new state with updated time values
+      const newState = {
         ...state,
-        gameTime: {
-          ...state.gameTime,
-          day: nextDay,
-          period: nextPeriod,
-          season: nextSeason,
-          timestamp: Date.now(),
-          totalPeriodsPassed: (state.gameTime.totalPeriodsPassed || 0) + 1
-        }
+        currentMinute: totalMinutes % 60,
+        currentHour: newHour % 24,
+        currentDay: newDay,
+        currentSeason: nextSeason,
+        totalPeriodsPassed: (state.totalPeriodsPassed || 0) + 1
       };
       
       // Record season change if it occurred
       if (seasonChanged) {
-        newState.gameTime.lastSeasonChange = {
-          from: season,
+        newState.lastSeasonChange = {
+          from: state.currentSeason,
           to: nextSeason,
-          day: nextDay,
+          day: newDay,
           timestamp: Date.now()
         };
         
         return addNotification(newState, {
           message: `The season has changed to ${nextSeason}.`,
-          type: "event"
+          type: "info"  // Using valid NotificationType
         });
       }
       
       // Add notification for day change
-      if (isLastPeriod) {
-        return addNotification(newState, {
-          message: `A new day (${nextDay}) dawns.`,
+      if (newDay > state.currentDay) {
+        // Create notification for new day
+        const dayState = addNotification(newState, {
+          message: `A new day (${newDay}) dawns.`,
           type: "info"
         });
-      }
-
-      // Handle weather changes (20% chance per period)
-      if (Math.random() < 0.2) {
-        const weatherTypes = getSeasonalWeather(nextSeason);
-        const newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
         
-        if (newWeather !== newState.gameTime.weather) {
-          newState.gameTime.weather = newWeather;
-          newState.gameTime.weatherStart = newState.gameTime.totalPeriodsPassed;
+        // Handle random weather changes (20% chance per day)
+        if (Math.random() < 0.2) {
+          const weatherTypes = getSeasonalWeather(nextSeason);
+          const newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
           
-          return addNotification(newState, {
-            message: `The weather has changed to ${newWeather}.`,
-            type: "info"
-          });
+          if (newWeather !== dayState.currentWeather) {
+            return {
+              ...dayState,
+              currentWeather: newWeather,
+              lastWeatherChange: {
+                from: dayState.currentWeather,
+                to: newWeather,
+                day: newDay,
+                timestamp: Date.now()
+              }
+            };
+          }
         }
+        
+        return dayState;
       }
-
-      return newState;
-    }
-    
-    case ACTION_TYPES.SET_TIME: {
-      const { period, day } = action.payload;
       
-      if (!TIME_PERIODS.includes(period)) return state;
+      return newState;
+    },
+    
+    [GAME_TIME_ACTIONS.SET_TIME]: (state, action) => {
+      // Type guard for SET_TIME action
+      if (!isActionOfType(action, GAME_TIME_ACTIONS.SET_TIME)) {
+        return state;
+      }
+      
+      const { day, hour, minute } = action.payload;
       
       return {
         ...state,
-        gameTime: {
-          ...state.gameTime,
-          day: day !== undefined ? day : state.gameTime.day,
-          period,
+        currentDay: day,
+        currentHour: hour,
+        currentMinute: minute
+      };
+    },
+    
+    [GAME_TIME_ACTIONS.SKIP_TO_PERIOD]: (state, action) => {
+      // Type guard for SKIP_TO_PERIOD action
+      if (!isActionOfType(action, GAME_TIME_ACTIONS.SKIP_TO_PERIOD)) {
+        return state;
+      }
+      
+      const { timeCycle } = action.payload;
+      
+      let newHour = state.currentHour;
+      switch (timeCycle) {
+        case TimeCycle.Day:
+          newHour = 6;
+          break;
+        case TimeCycle.Night:
+          newHour = 18;
+          break;
+        case TimeCycle.Morning:
+          newHour = 6;
+          break;
+        case TimeCycle.Afternoon:
+          newHour = 12;
+          break;
+        case TimeCycle.Evening:
+          newHour = 18;
+          break;
+        case TimeCycle.Midnight:
+          newHour = 0;
+          break;
+      }
+      
+      return {
+        ...state,
+        currentHour: newHour,
+        currentMinute: 0,
+        timeCycle
+      };
+    },
+    
+    [GAME_TIME_ACTIONS.CHANGE_SEASON]: (state, action) => {
+      // Type guard for CHANGE_SEASON action
+      if (!isActionOfType(action, GAME_TIME_ACTIONS.CHANGE_SEASON)) {
+        return state;
+      }
+      
+      const { season } = action.payload;
+      
+      const updatedState = {
+        ...state,
+        currentSeason: season,
+        lastSeasonChange: {
+          from: state.currentSeason,
+          to: season,
+          day: state.currentDay,
           timestamp: Date.now()
         }
       };
-    }
-    
-    case ACTION_TYPES.SKIP_TO_PERIOD: {
-      const { targetPeriod } = action.payload;
       
-      if (!TIME_PERIODS.includes(targetPeriod)) return state;
-      
-      // Calculate periods to advance
-      const currentPeriodIndex = TIME_PERIODS.indexOf(state.gameTime.period);
-      const targetPeriodIndex = TIME_PERIODS.indexOf(targetPeriod);
-      const periodsToAdvance = targetPeriodIndex <= currentPeriodIndex 
-        ? (TIME_PERIODS.length - currentPeriodIndex) + targetPeriodIndex
-        : targetPeriodIndex - currentPeriodIndex;
-      
-      // Update days if needed
-      const daysToAdd = Math.floor(periodsToAdvance / TIME_PERIODS.length);
-      
-      return {
-        ...state,
-        gameTime: {
-          ...state.gameTime,
-          day: state.gameTime.day + daysToAdd,
-          period: targetPeriod,
-          timestamp: Date.now(),
-          totalPeriodsPassed: (state.gameTime.totalPeriodsPassed || 0) + periodsToAdvance
-        }
-      };
-    }
-    
-    case ACTION_TYPES.CHANGE_SEASON: {
-      const { season } = action.payload;
-      
-      if (!SEASONS.includes(season)) return state;
-      
-      return addNotification({
-        ...state,
-        gameTime: {
-          ...state.gameTime,
-          season,
-          lastSeasonChange: {
-            from: state.gameTime.season,
-            to: season,
-            day: state.gameTime.day,
-            timestamp: Date.now()
-          }
-        }
-      }, {
+      // Add notification about season change (from TimeReducer.ts)
+      return addNotification(updatedState, {
         message: `The season has changed to ${season}.`,
-        type: "event"
+        type: "info" // Using valid NotificationType
       });
-    }
+    },
     
-    case ACTION_TYPES.SET_WEATHER: {
-      const { weather, duration = 1 } = action.payload;
-      const validWeatherTypes = [...WEATHER_TYPES, 'snowy'];
+    [GAME_TIME_ACTIONS.SET_WEATHER]: (state, action) => {
+      // Type guard for SET_WEATHER action
+      if (!isActionOfType(action, GAME_TIME_ACTIONS.SET_WEATHER)) {
+        return state;
+      }
       
-      if (!validWeatherTypes.includes(weather)) return state;
+      const { weather, duration = 1 } = action.payload;
       
       return {
         ...state,
-        gameTime: {
-          ...state.gameTime,
-          weather,
-          weatherDuration: duration,
-          weatherStart: state.gameTime.totalPeriodsPassed || 0
-        }
+        currentWeather: weather,
+        lastWeatherChange: {
+          from: state.currentWeather,
+          to: weather,
+          day: state.currentDay,
+          timestamp: Date.now()
+        },
+        weatherDuration: duration,
+        weatherStart: state.totalPeriodsPassed || 0
+      };
+    },
+    
+    [GAME_TIME_ACTIONS.PAUSE_TIME]: (state) => {
+      return {
+        ...state,
+        paused: true
+      };
+    },
+    
+    [GAME_TIME_ACTIONS.RESUME_TIME]: (state) => {
+      return {
+        ...state,
+        paused: false
+      };
+    },
+    
+    [GAME_TIME_ACTIONS.SET_TIME_SPEED]: (state, action) => {
+      // Type guard for SET_TIME_SPEED action
+      if (!isActionOfType(action, GAME_TIME_ACTIONS.SET_TIME_SPEED)) {
+        return state;
+      }
+      
+      const { speed } = action.payload;
+      
+      return {
+        ...state,
+        timeSpeed: speed
       };
     }
-    
-    default:
-      return state;
   }
-};
+);
+
+export default gameTimeReducer;

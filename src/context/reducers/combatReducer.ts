@@ -1,4 +1,4 @@
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { ACTION_TYPES } from '../types/ActionTypes';
 import { COMBAT_ACTIONS } from '../types/ActionTypes'; // Fixed import path
 import { addNotification } from '../utils/notificationUtils';
 import { Enemy } from '../types/CombatGameStateTypes';

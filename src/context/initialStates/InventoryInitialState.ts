@@ -3,7 +3,7 @@
  */
 
 import { InventoryState, EquipmentState } from '../types/InventoryGameStateTypes';
-import { GameItem, ItemType, ItemRarity } from '../types/ItemGameStateTypes';
+import { GameItem, ItemType, ItemRarity } from '../types/ItemsGameStateTypes';
 
 /**
  * Create a game item with validation

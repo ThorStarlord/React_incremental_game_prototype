@@ -1,4 +1,4 @@
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { ACTION_TYPES } from '../types/ActionTypes';
 import { CRAFTING_ACTIONS } from '../types/ActionTypes'; // Correct import path
 import { addNotification, NotificationType } from '../utils/notificationUtils';
 

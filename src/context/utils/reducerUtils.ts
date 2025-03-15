@@ -6,10 +6,98 @@
  * - Combine multiple reducers into one (similar to Redux's combineReducers)
  * - Create reducers from action type mapping objects
  * - Create reducer slices with built-in action creators
- * 
- * These utilities help organize complex state management logic and
- * reduce boilerplate code when working with reducers and actions.
+ * - Utility functions for common reducer operations
  */
+
+import { addNotification } from './notificationUtils';
+
+/**
+ * Base interface for objects with an id property
+ */
+export interface BaseState {
+  id?: string;
+  [key: string]: any;
+}
+
+/**
+ * Simple GameState interface for notification functionality
+ */
+export interface GameState {
+  notifications?: Array<{id: number, message: string, type: string, duration: number}>;
+  [key: string]: any;
+}
+
+/**
+ * Creates a notification and adds it to state
+ */
+export const withNotification = (
+  state: GameState, 
+  message: string, 
+  type: string = "info", 
+  duration: number = 3000
+): GameState => addNotification(state, { message, type, duration });
+
+/**
+ * Updates an object in an array by its id
+ */
+export const updateById = <T extends BaseState>(
+  array: T[], 
+  id: string, 
+  updates: Partial<T>
+): T[] => array.map(item => item.id === id ? { ...item, ...updates } : item);
+
+/**
+ * Update a nested property in state
+ */
+export const updateNested = (
+  state: Record<string, any>,
+  path: string[], 
+  value: any
+): Record<string, any> => {
+  if (path.length === 1) {
+    return { ...state, [path[0]]: value };
+  }
+  
+  const [current, ...rest] = path;
+  return {
+    ...state,
+    [current]: updateNested(state[current] || {}, rest, value)
+  };
+};
+
+/**
+ * Clamps a number between min and max values
+ */
+export const clamp = (value: number, min: number, max: number): number => 
+  Math.max(min, Math.min(max, value));
+
+/**
+ * Safely updates a quantity in an inventory
+ */
+export const updateInventoryQuantity = (
+  inventory: any[], 
+  itemIndex: number, 
+  change: number
+): any[] => {
+  if (itemIndex === -1) return inventory;
+  
+  if (inventory[itemIndex].quantity + change <= 0) {
+    return inventory.filter((_, idx) => idx !== itemIndex);
+  }
+  
+  return inventory.map((item, idx) => 
+    idx === itemIndex 
+      ? { ...item, quantity: item.quantity + change } 
+      : item
+  );
+};
+
+/**
+ * Creates a reducer action handler function
+ */
+export const createReducerHandler = <S, P>(
+  fn: (state: S, payload: P) => S
+) => (state: S, action: { payload: P }) => fn(state, action.payload);
 
 /**
  * Generic Action interface that follows Redux action pattern
@@ -17,7 +105,7 @@
 export interface Action<T = string, P = any> {
   type: T;
   payload?: P;
-  [key: string]: any; // Allow for additional properties
+  [key: string]: any;
 }
 
 /**
@@ -45,24 +133,30 @@ export type ReducersMapObject<S = any> = {
 };
 
 /**
- * Interface for slice definition options
+ * Creates a reducer from action type handlers
+ * 
+ * @template S - State type the reducer will manage
+ * @template A - Action type the reducer will handle
+ * @param {S} InitialState - The initial state
+ * @param {ReducerHandlers<S, A>} handlers - Map of action types to handler functions
+ * @returns {Reducer<S, A>} - A reducer function
+ * 
+ * @example
+ * const counterReducer = createReducer(0, {
+ *   'INCREMENT': (state) => state + 1,
+ *   'DECREMENT': (state) => state - 1,
+ *   'SET': (state, action) => action.payload
+ * });
  */
-export interface SliceOptions<S = any, A extends Action = Action> {
-  name: string;
-  InitialState: S;
-  reducers: {
-    [key: string]: (state: S, action: A) => S;
-  };
-}
-
-/**
- * Interface for a created slice object
- */
-export interface Slice<S = any, A = any> {
-  name: string;
-  reducer: Reducer<S, Action<string, A>>;
-  actions: {
-    [key: string]: (payload?: any) => Action<string, any>;
+export function createReducer<S = any, A extends Action = Action>(
+  InitialState: S, 
+  handlers: ReducerHandlers<S, A>
+): Reducer<S, A> {
+  return function reducer(state = InitialState, action: A): S {
+    if (Object.prototype.hasOwnProperty.call(handlers, action.type)) {
+      return handlers[action.type](state, action);
+    }
+    return state;
   };
 }
 

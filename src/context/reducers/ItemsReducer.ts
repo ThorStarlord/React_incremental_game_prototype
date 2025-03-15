@@ -66,6 +66,14 @@ export type ItemsAction =
   | { type: 'IMPORT_ITEMS'; payload: Record<string, Item> }
   | { type: 'RESET_ITEMS_STATE' };
 
+// Fix the type predicate function
+function isActionOfType<T extends ItemsAction['type']>(
+  action: ItemsAction,
+  actionType: T
+): action is Extract<ItemsAction, { type: T }> {
+  return action.type === actionType;
+}
+
 /**
  * Random item generation helper
  * 
@@ -185,6 +193,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
   initialItemsState,
   {
     ADD_ITEM_TEMPLATE: (state, action) => {
+      if (!isActionOfType(action, 'ADD_ITEM_TEMPLATE')) return state;
       const item = action.payload;
       return {
         ...state,
@@ -196,6 +205,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     DISCOVER_ITEM: (state, action) => {
+      if (!isActionOfType(action, 'DISCOVER_ITEM')) return state;
       const itemId = action.payload;
       return {
         ...state,
@@ -207,6 +217,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     DISCOVER_MULTIPLE_ITEMS: (state, action) => {
+      if (!isActionOfType(action, 'DISCOVER_MULTIPLE_ITEMS')) return state;
       const itemIds = action.payload;
       const newDiscoveries = itemIds.reduce<Record<string, boolean>>((acc, itemId) => {
         acc[itemId] = true;
@@ -223,6 +234,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     MODIFY_ITEM_TEMPLATE: (state, action) => {
+      if (!isActionOfType(action, 'MODIFY_ITEM_TEMPLATE')) return state;
       const { itemId, changes } = action.payload;
       const existingItem = state.availableItems[itemId];
       
@@ -243,6 +255,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     RESTOCK_SHOP: (state, action) => {
+      if (!isActionOfType(action, 'RESTOCK_SHOP')) return state;
       const { shopId, items } = action.payload;
       
       return {
@@ -255,6 +268,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     ADD_TO_SHOP: (state, action) => {
+      if (!isActionOfType(action, 'ADD_TO_SHOP')) return state;
       const { shopId, item } = action.payload;
       const shopItems = state.shopInventory[shopId] || [];
       
@@ -268,6 +282,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     REMOVE_FROM_SHOP: (state, action) => {
+      if (!isActionOfType(action, 'REMOVE_FROM_SHOP')) return state;
       const { shopId, itemId } = action.payload;
       const shopItems = state.shopInventory[shopId] || [];
       
@@ -281,6 +296,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     UPDATE_SHOP_ITEM: (state, action) => {
+      if (!isActionOfType(action, 'UPDATE_SHOP_ITEM')) return state;
       const { shopId, itemId, changes } = action.payload;
       const shopItems = state.shopInventory[shopId] || [];
       const itemIndex = shopItems.findIndex(shopItem => shopItem.item.id === itemId);
@@ -308,6 +324,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     ADD_CRAFTED_ITEM: (state, action) => {
+      if (!isActionOfType(action, 'ADD_CRAFTED_ITEM')) return state;
       const item = action.payload;
       
       return {
@@ -317,6 +334,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     REMOVE_CRAFTED_ITEM: (state, action) => {
+      if (!isActionOfType(action, 'REMOVE_CRAFTED_ITEM')) return state;
       const itemId = action.payload;
       
       return {
@@ -326,6 +344,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     SET_BOOSTED_DROP: (state, action) => {
+      if (!isActionOfType(action, 'SET_BOOSTED_DROP')) return state;
       const { itemId, multiplier } = action.payload;
       
       return {
@@ -338,6 +357,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     CLEAR_BOOSTED_DROPS: (state) => {
+      // No need to check type for actions without payload
       return {
         ...state,
         boostedDrops: {}
@@ -345,6 +365,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     GENERATE_RANDOM_ITEM: (state, action) => {
+      if (!isActionOfType(action, 'GENERATE_RANDOM_ITEM')) return state;
       const { baseItem: baseItemId, level, qualityModifier } = action.payload;
       const baseItem = state.availableItems[baseItemId];
       
@@ -361,6 +382,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     IMPORT_ITEMS: (state, action) => {
+      if (!isActionOfType(action, 'IMPORT_ITEMS')) return state;
       const newItems = action.payload;
       
       return {
@@ -373,6 +395,7 @@ export const itemsReducer = createReducer<ItemsState, ItemsAction>(
     },
     
     RESET_ITEMS_STATE: () => {
+      // No need to check for payload since this action doesn't have one
       return initialItemsState;
     }
   }

@@ -1,6 +1,25 @@
-import { ACTION_TYPES } from '../actions/actionTypes';
-import { GameState, Skill } from './types';
-import { withNotification } from './utils';
+import { ACTION_TYPES, SKILL_ACTIONS } from '../types/ActionTypes';
+import { GameState } from '../types/GameStateTypes';
+import { addNotification } from '../utils/notificationUtils';
+import { Notification, NotificationsState } from '../types/NotificationsGameStateTypes';
+
+/**
+ * Interface for a skill with all required properties
+ */
+interface Skill {
+  id: string;
+  name: string;
+  description: string;
+  level: number;
+  experience: number;
+  unlockedAt?: number;
+  unlockedFrom?: string;
+  usageCount?: number;
+  perks?: string[];
+  specialty?: string;
+  levelHistory?: { level: number; timestamp: number }[];
+  [key: string]: any;
+}
 
 /**
  * Skill progression calculation constants
@@ -16,14 +35,15 @@ const getXpForLevel = (level: number): number =>
 
 /**
  * Check if a skill should level up
+ * Modified to only require level and experience properties
  */
-const checkLevelUp = (skill: Skill): { 
+const checkLevelUp = (skillData: { level: number; experience: number }): { 
   newLevel: number; 
   remainingXp: number; 
   leveledUp: boolean;
 } => {
-  let currentLevel = skill.level;
-  let remainingXp = skill.experience;
+  let currentLevel = skillData.level;
+  let remainingXp = skillData.experience;
   let leveledUp = false;
   
   while (remainingXp >= getXpForLevel(currentLevel)) {
@@ -35,9 +55,77 @@ const checkLevelUp = (skill: Skill): {
   return { newLevel: currentLevel, remainingXp, leveledUp };
 };
 
+/**
+ * Extended GameState type to include the notification durations property
+ */
+interface ExtendedGameState extends GameState {
+  _notificationDurations?: Record<string, number>;
+}
+
+/**
+ * Helper function that wraps addNotification to handle type compatibility
+ */
+const addGameNotification = (state: GameState, message: string, type: string, duration: number): GameState => {
+  // Create notification object with proper type assertion
+  const notificationType = validateNotificationType(type);
+  
+  const notification: Notification = {
+    id: Date.now().toString(),
+    message,
+    type: notificationType,
+    timestamp: Date.now(),
+    read: false
+  };
+  
+  // Get current notification state or create a new one with proper structure
+  const currentNotificationsState: NotificationsState = state.notifications || {
+    notifications: [],
+    unreadCount: 0,
+    maxNotifications: 100
+  };
+  
+  // First cast to ExtendedGameState to allow _notificationDurations property
+  const extendedState: ExtendedGameState = state;
+  
+  // Create the updated state with the notification durations
+  const updatedExtendedState: ExtendedGameState = {
+    ...extendedState,
+    notifications: {
+      notifications: [...currentNotificationsState.notifications, notification],
+      unreadCount: currentNotificationsState.unreadCount + 1,
+      maxNotifications: currentNotificationsState.maxNotifications
+    },
+    // Now we can safely use _notificationDurations
+    _notificationDurations: {
+      ...(extendedState._notificationDurations || {}),
+      [notification.id]: duration
+    }
+  };
+
+  // Cast back to GameState to match the function return type
+  return updatedExtendedState as GameState;
+};
+
+/**
+ * Validate and convert a string to a valid notification type
+ */
+function validateNotificationType(type: string): "info" | "warning" | "error" | "success" {
+  switch (type) {
+    case "info":
+    case "warning":
+    case "error":
+    case "success":
+      return type;
+    default:
+      // Default to info for unknown types
+      console.warn(`Invalid notification type: ${type}, defaulting to "info"`);
+      return "info";
+  }
+}
+
 export const skillsReducer = (state: GameState, action: { type: string; payload: any }): GameState => {
   switch (action.type) {
-    case ACTION_TYPES.GAIN_SKILL_XP: {
+    case SKILL_ACTIONS.GAIN_SKILL_XP: {
       const { skillId, amount, source } = action.payload;
       
       // Find skill in player's skills
@@ -62,7 +150,7 @@ export const skillsReducer = (state: GameState, action: { type: string; payload:
       const newXp = skill.experience + modifiedAmount;
       
       // Check for level up
-      const { newLevel, remainingXp, leveledUp } = checkLevelUp({ ...skill, experience: newXp });
+      const { newLevel, remainingXp, leveledUp } = checkLevelUp({ level: skill.level, experience: newXp });
       
       // Update skill
       const updatedSkills = [...state.player.skills];
@@ -102,21 +190,22 @@ export const skillsReducer = (state: GameState, action: { type: string; payload:
       
       // Update stats if leveled up
       if (leveledUp) {
+        const currentStats = state.stats || {};
+        const skillsLeveled = typeof currentStats.skillsLeveled === 'number' ? currentStats.skillsLeveled : 0;
+        const highestSkillLevel = typeof currentStats.highestSkillLevel === 'number' ? currentStats.highestSkillLevel : 0;
+        
         updatedState.stats = {
-          ...updatedState.stats,
-          skillsLeveled: (updatedState.stats?.skillsLeveled || 0) + 1,
-          highestSkillLevel: Math.max(
-            newLevel,
-            updatedState.stats?.highestSkillLevel || 0
-          ),
+          ...currentStats,
+          skillsLeveled: skillsLeveled + 1,
+          highestSkillLevel: Math.max(newLevel, highestSkillLevel),
           totalSkillLevels: updatedSkills.reduce((sum, s) => sum + s.level, 0)
         };
         
-        // Add notification for level up
-        return withNotification(
+        // Use our wrapper function instead of direct addNotification call
+        return addGameNotification(
           updatedState,
           `${skill.name} skill leveled up to ${newLevel}!`,
-          'achievement',
+          "success",
           5000
         );
       }
@@ -124,7 +213,7 @@ export const skillsReducer = (state: GameState, action: { type: string; payload:
       return updatedState;
     }
     
-    case ACTION_TYPES.UNLOCK_SKILL: {
+    case SKILL_ACTIONS.UNLOCK_SKILL: {
       const { skillData, source } = action.payload;
       
       // Check if skill already exists
@@ -145,7 +234,8 @@ export const skillsReducer = (state: GameState, action: { type: string; payload:
         perks: []
       };
       
-      return withNotification(
+      // Use our wrapper function here too
+      return addGameNotification(
         {
           ...state,
           player: {
@@ -154,12 +244,12 @@ export const skillsReducer = (state: GameState, action: { type: string; payload:
           }
         },
         `Unlocked new skill: ${skillData.name}!`,
-        'discovery',
+        "info",
         4000
       );
     }
     
-    case ACTION_TYPES.USE_SKILL: {
+    case SKILL_ACTIONS.USE_SKILL: {
       const { skillId } = action.payload;
       
       const skillIndex = state.player.skills?.findIndex(s => s.id === skillId);

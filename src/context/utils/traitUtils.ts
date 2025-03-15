@@ -145,17 +145,6 @@ interface AddTraitPayload {
  * 
  * @param state Current game state
  * @returns Updated game state with applied trait effects
- * 
- * @example
- * // Apply trait effects after equipping a new trait
- * useEffect(() => {
- *   if (traitsChanged) {
- *     dispatch({
- *       type: 'UPDATE_STATE',
- *       payload: applyTraitEffects(currentState)
- *     });
- *   }
- * }, [player.equippedTraits, player.permanentTraits]);
  */
 export const applyTraitEffects = (state: GameStateWithTraits): GameStateWithTraits => {
   // Reset player to base stats first
@@ -168,50 +157,74 @@ export const applyTraitEffects = (state: GameStateWithTraits): GameStateWithTrai
   };
   
   // Get all equipped trait IDs
-  let equippedTraitIds: string[] = [];
+  let equippedTraitIds: string[] = [...(state.player.equippedTraits || [])];
   
-  // Handle different possible structures for equippedTraits
-  if (Array.isArray(player.equippedTraits)) {
-    equippedTraitIds = player.equippedTraits;
-  } else if (player.equippedTraits && typeof player.equippedTraits === 'object') {
-    equippedTraitIds = Object.values(player.equippedTraits);
+  // Add permanent trait IDs
+  if (state.player.permanentTraits) {
+    equippedTraitIds = [...equippedTraitIds, ...state.player.permanentTraits];
   }
   
-  // Add permanent traits
-  const allTraits = [
-    ...equippedTraitIds,
-    ...(player.permanentTraits || [])
-  ];
+  // Apply effects from all equipped traits
+  let updatedPlayer = { ...player };
   
-  // Apply each trait's effects
-  allTraits.forEach(traitId => {
-    const trait = state.traits?.copyableTraits[traitId]; // Use optional chaining
-    if (!trait || !trait.effects) return;
-    
-    // Apply specific effects
-    if (trait.effects.maxHealthBonus) {
-      player.maxHealth += trait.effects.maxHealthBonus;
+  // Get trait data for all equipped traits
+  const traitDataMap: Record<string, Trait | undefined> = {};
+  
+  // Get trait data from state.traits.copyableTraits
+  equippedTraitIds.forEach(traitId => {
+    if (state.traits?.copyableTraits?.[traitId]) {
+      traitDataMap[traitId] = state.traits.copyableTraits[traitId];
     }
-    
-    if (trait.effects.maxHealthMultiplier) {
-      player.maxHealth = Math.round(player.maxHealth * trait.effects.maxHealthMultiplier);
-    }
-    
-    if (trait.effects.damageBonus) {
-      player.damageMultiplier += trait.effects.damageBonus;
-    }
-    
-    if (trait.effects.defenseBonus) {
-      player.defenseMultiplier += trait.effects.defenseBonus;
-    }
-    
-    // Other effect types can be added here
   });
   
-  // Ensure health doesn't exceed new max
-  player.health = Math.min(player.health || 100, player.maxHealth);
+  // Apply effects from each trait
+  equippedTraitIds.forEach(traitId => {
+    const traitData = traitDataMap[traitId];
+    if (!traitData || !traitData.effects) return;
+    
+    // Apply trait effects to player stats
+    const effects = traitData.effects;
+    
+    // Handle maxHealth effects
+    if (effects.maxHealthBonus) {
+      updatedPlayer.maxHealth += effects.maxHealthBonus;
+    }
+    
+    if (effects.maxHealthMultiplier) {
+      updatedPlayer.maxHealth = Math.floor(updatedPlayer.maxHealth * effects.maxHealthMultiplier);
+    }
+    
+    // Handle damage and defense multipliers
+    if (effects.damageBonus) {
+      updatedPlayer.damageMultiplier += effects.damageBonus;
+    }
+    
+    if (effects.defenseBonus) {
+      updatedPlayer.defenseMultiplier += effects.defenseBonus;
+    }
+    
+    // Handle other effects by using proper type for dynamic properties
+    Object.entries(effects).forEach(([key, value]) => {
+      // Skip already processed effects
+      if (['maxHealthBonus', 'maxHealthMultiplier', 'damageBonus', 'defenseBonus'].includes(key)) return;
+      
+      if (typeof value === 'number') {
+        // Use type assertion to ensure TypeScript understands this is a valid property
+        (updatedPlayer as any)[key] = ((updatedPlayer as any)[key] || 0) + value;
+      }
+    });
+  });
   
-  return { ...state, player };
+  // Ensure health doesn't exceed new maximum
+  if (updatedPlayer.health && updatedPlayer.maxHealth) {
+    updatedPlayer.health = Math.min(updatedPlayer.health, updatedPlayer.maxHealth);
+  }
+  
+  // Return updated state
+  return {
+    ...state,
+    player: updatedPlayer
+  };
 };
 
 /**

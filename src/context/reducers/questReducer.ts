@@ -1,4 +1,4 @@
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { ACTION_TYPES, QUEST_ACTIONS } from '../types/ActionTypes';
 import { addNotification } from '../utils/notificationUtils';
 
 /**
@@ -11,6 +11,9 @@ interface GameState {
     completedQuests?: string[];
     acquiredTraits?: string[];
     questStats?: Record<string, any>;
+    experience?: number; // Add experience property to fix type error
+    gold?: number; // Add gold property to fix type error
+    level?: number; // Add level for requirement checks
     [key: string]: any;
   };
   npcs?: Array<{
@@ -63,7 +66,7 @@ interface QuestData {
 
 export const questReducer = (state: GameState, action: { type: string; payload: any }): GameState => {
   switch (action.type) {
-    case ACTION_TYPES.START_QUEST: {
+    case QUEST_ACTIONS.START_QUEST: {
       const { questId, npcId } = action.payload;
       
       // Check if quest already active
@@ -85,7 +88,9 @@ export const questReducer = (state: GameState, action: { type: string; payload: 
       
       // Check requirements
       if (questData.requirements) {
-        if (questData.requirements.level && state.player.level < questData.requirements.level) {
+        // Fix the undefined level check by providing a default value
+        const playerLevel = state.player.level || 0;
+        if (questData.requirements.level && playerLevel < questData.requirements.level) {
           return addNotification(state, {
             message: `You need to be level ${questData.requirements.level} to start this quest.`,
             type: "warning"
@@ -135,7 +140,7 @@ export const questReducer = (state: GameState, action: { type: string; payload: 
       });
     }
     
-    case ACTION_TYPES.COMPLETE_QUEST: {
+    case QUEST_ACTIONS.COMPLETE_QUEST: {
       const { questId } = action.payload;
       
       // Find active quest
@@ -224,7 +229,7 @@ export const questReducer = (state: GameState, action: { type: string; payload: 
       });
     }
     
-    case ACTION_TYPES.ABANDON_QUEST: {
+    case QUEST_ACTIONS.ABANDON_QUEST: {
       const { questId } = action.payload;
       
       return {
@@ -240,7 +245,7 @@ export const questReducer = (state: GameState, action: { type: string; payload: 
       };
     }
     
-    case ACTION_TYPES.UPDATE_QUEST_PROGRESS: {
+    case QUEST_ACTIONS.UPDATE_QUEST_PROGRESS: {
       const { questId, progress } = action.payload;
       
       const questIndex = state.player.activeQuests.findIndex(q => q.id === questId);
@@ -259,7 +264,7 @@ export const questReducer = (state: GameState, action: { type: string; payload: 
       };
     }
     
-    case ACTION_TYPES.UPDATE_QUEST_OBJECTIVE: {
+    case QUEST_ACTIONS.UPDATE_QUEST_OBJECTIVE: {
       const { questId, objectiveId, value, completed } = action.payload;
       
       const questIndex = state.player.activeQuests.findIndex(q => q.id === questId);

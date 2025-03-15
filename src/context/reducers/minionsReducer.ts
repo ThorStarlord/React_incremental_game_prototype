@@ -54,7 +54,13 @@ const minionsReducer = (
         level: 1,
         experience: 0,
         assigned: null,
-        status: 'idle'
+        status: 'idle',
+        stats: {
+          strength: 1,
+          speed: 1,
+          efficiency: 1,
+          ...action.payload.stats
+        }
       };
       return [...state, newMinion];
     }
@@ -64,9 +70,12 @@ const minionsReducer = (
     
     case MINION_ACTION_TYPES.UPGRADE_MINION: {
       const { minionId, upgrades } = action.payload;
+      const minion = state.find(m => m.id === minionId);
+      if (!minion) return state;
+      
       return updateMinionById(state, minionId, { 
         stats: {
-          ...(state.find(m => m.id === minionId)?.stats || {}),
+          ...minion.stats,
           ...upgrades
         } 
       });
@@ -111,7 +120,7 @@ const minionsReducer = (
     
     case MINION_ACTION_TYPES.UPDATE_MINION_STATUS: {
       const { minionId, status } = action.payload;
-      return updateMinionById(state, minionId, status);
+      return updateMinionById(state, minionId, { status });
     }
     
     case MINION_ACTION_TYPES.GAIN_MINION_EXPERIENCE: {

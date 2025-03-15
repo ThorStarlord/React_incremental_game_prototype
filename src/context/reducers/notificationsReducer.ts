@@ -10,6 +10,7 @@ interface Notification {
   read?: boolean;
   category?: string;
   icon?: string;
+  count?: number; // Add the missing count property for notification grouping
 }
 
 interface NotificationsState {
@@ -66,7 +67,8 @@ export const notificationsReducer = (
         duration: action.payload.duration || state.settings.defaultDuration,
         timestamp: Date.now(),
         category: action.payload.category,
-        icon: action.payload.icon
+        icon: action.payload.icon,
+        count: 1 // Initialize count to 1 for new notifications
       };
       
       // Optional grouping of similar notifications

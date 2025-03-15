@@ -3,11 +3,11 @@
  */
 
 // Import item types from ItemGameStateTypes for use in this file
-import { GameItem, ItemType, ItemRarity } from './ItemGameStateTypes';
+import { GameItem, ItemType, ItemRarity } from './ItemsGameStateTypes';
 
 // Re-export these for backward compatibility
 // TODO: Remove these re-exports when possible and update imports in other files
-export { GameItem, ItemEffect, ItemStats, ItemType, ItemRarity } from './ItemGameStateTypes';
+export { GameItem, ItemEffect, ItemStats, ItemType, ItemRarity } from './ItemsGameStateTypes';
 
 /**
  * Alias for GameItem used in inventory context

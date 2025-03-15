@@ -1,4 +1,4 @@
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { ACTION_TYPES, WORLD_ACTIONS } from '../types/ActionTypes';
 import { addNotification } from '../utils/notificationUtils';
 
 // Define interfaces
@@ -80,16 +80,27 @@ interface PlayerState {
   activeBuffs?: any[];
 }
 
+// Helper functions for safer array handling
+const ensureArray = <T>(arr: T[] | undefined): T[] => arr || [];
+
+// Interface for resource operation payloads with improved type safety
+interface ResourceOperationPayload {
+  regionId: string;
+  resourceId: string;
+  amount: number;
+}
+
 /**
  * World Reducer - Manages game world state and environmental systems
  */
 export const worldReducer = (state: GameState, action: {type: string; payload: any}): GameState => {
   switch (action.type) {
-    case ACTION_TYPES.DISCOVER_LOCATION: {
+    case WORLD_ACTIONS.DISCOVER_LOCATION: {
       const { locationId, locationData, silent = false } = action.payload;
       
-      // Check if already discovered
-      if (state.world.discoveredLocations?.some(loc => loc.id === locationId)) {
+      // Check if already discovered - use the helper function to ensure we have an array
+      const discoveredLocations = ensureArray(state.world.discoveredLocations);
+      if (discoveredLocations.some(loc => loc.id === locationId)) {
         return state;
       }
       
@@ -105,30 +116,28 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
         visited: false
       };
       
-      // Update state
+      // Update state - ensure we always have proper arrays even if undefined
       const newState = {
         ...state,
         world: {
           ...state.world,
-          discoveredLocations: [
-            ...(state.world.discoveredLocations || []),
-            newLocation
-          ]
+          discoveredLocations: [...discoveredLocations, newLocation]
         }
       };
       
       return silent ? newState : addNotification(newState, {
         message: `New location discovered: ${locationData.name}`,
-        type: 'discovery',
+        type: 'info',
         duration: 5000
       });
     }
     
-    case ACTION_TYPES.UNLOCK_REGION: {
+    case WORLD_ACTIONS.UNLOCK_REGION: {
       const { regionId, regionData, requirementsMet = true } = action.payload;
       
-      // Check if already unlocked
-      if (state.world.unlockedRegions?.includes(regionId)) {
+      // Check if already unlocked - ensure we have an array
+      const unlockedRegions = ensureArray(state.world.unlockedRegions);
+      if (unlockedRegions.includes(regionId)) {
         return state;
       }
       
@@ -145,7 +154,8 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
         }
         
         // Quest completion check
-        if (questCompleted && !state.player.completedQuests?.includes(questCompleted)) {
+        const completedQuests = ensureArray(state.player.completedQuests);
+        if (questCompleted && !completedQuests.includes(questCompleted)) {
           return addNotification(state, {
             message: `You need to complete a specific quest to unlock ${regionData.name}`,
             type: 'warning'
@@ -153,7 +163,8 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
         }
         
         // Required item check
-        if (itemRequired && !state.player.inventory?.some(item => item.id === itemRequired)) {
+        const inventory = ensureArray(state.player.inventory);
+        if (itemRequired && !inventory.some(item => item.id === itemRequired)) {
           return addNotification(state, {
             message: `You need a specific item to unlock ${regionData.name}`,
             type: 'warning'
@@ -161,46 +172,52 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
         }
       }
       
-      // Create updated state with new region
-      let newState = {
+      // Create a new state with guaranteed non-null values
+      const regions = state.world.regions || {};
+      
+      const newState: GameState = {
         ...state,
         world: {
           ...state.world,
-          unlockedRegions: [...(state.world.unlockedRegions || []), regionId],
+          unlockedRegions: [...unlockedRegions, regionId],
           regions: {
-            ...(state.world.regions || {}),
+            ...regions,
             [regionId]: {
               ...regionData,
               unlockedAt: Date.now(),
               explorationPercentage: 0,
               visitedLocations: []
             }
-          }
+          },
+          discoveredLocations: ensureArray(state.world.discoveredLocations)
         }
       };
       
       // Discover initial locations if provided
-      if (regionData.initialLocations) {
+      let updatedState = newState;
+      if (regionData.initialLocations && Array.isArray(regionData.initialLocations)) {
         for (const location of regionData.initialLocations) {
-          newState = worldReducer(newState, {
-            type: ACTION_TYPES.DISCOVER_LOCATION,
-            payload: {
-              locationId: location.id,
-              locationData: location,
-              silent: true
-            }
-          });
+          if (location && location.id) {
+            updatedState = worldReducer(updatedState, {
+              type: WORLD_ACTIONS.DISCOVER_LOCATION,
+              payload: {
+                locationId: location.id,
+                locationData: location,
+                silent: true
+              }
+            });
+          }
         }
       }
       
-      return addNotification(newState, {
+      return addNotification(updatedState, {
         message: `New region unlocked: ${regionData.name}`,
-        type: 'achievement',
+        type: 'success',
         duration: 6000
       });
     }
     
-    case ACTION_TYPES.TRIGGER_WORLD_EVENT: {
+    case WORLD_ACTIONS.TRIGGER_WORLD_EVENT: {
       const { eventId, eventData } = action.payload;
       
       // Set up event properties
@@ -221,19 +238,21 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
         isActive: true
       };
       
-      // Add event to active events
+      // Add event to active events - use ensureArray to guarantee we have arrays
+      const activeEvents = ensureArray(state.world.activeEvents);
+      const eventHistory = ensureArray(state.world.eventHistory);
+      
       let newState = {
         ...state,
         world: {
           ...state.world,
-          activeEvents: [
-            ...(state.world.activeEvents || []).filter(e => e.id !== eventId),
-            newEvent
-          ],
-          eventHistory: [
-            ...(state.world.eventHistory || []),
-            { id: eventId, name: eventData.name, type: eventData.type, startTime }
-          ]
+          activeEvents: [...activeEvents.filter(e => e.id !== eventId), newEvent],
+          eventHistory: [...eventHistory, { 
+            id: eventId, 
+            name: eventData.name, 
+            type: eventData.type, 
+            startTime 
+          }]
         }
       };
       
@@ -265,7 +284,10 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
             for (const regionId of eventData.affectedRegions) {
               if (!updatedResources[regionId]) continue;
               
-              for (const [resourceId, amount] of Object.entries(eventData.effects.resourceDepletion)) {
+              for (const [resourceId, rawAmount] of Object.entries(eventData.effects.resourceDepletion)) {
+                // Add explicit type assertion to fix the 'unknown' type error
+                const amount = Number(rawAmount);
+                
                 if (updatedResources[regionId][resourceId]) {
                   updatedResources[regionId][resourceId] = Math.max(
                     0, updatedResources[regionId][resourceId] - amount
@@ -320,12 +342,12 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
       
       return addNotification(newState, {
         message: `${eventData.name} has begun affecting the world!`,
-        type: 'event',
+        type: 'warning',
         duration: 7000
       });
     }
     
-    case ACTION_TYPES.UPDATE_TIME_CYCLE: {
+    case WORLD_ACTIONS.UPDATE_TIME_CYCLE: {
       const { increment, setTime } = action.payload;
       
       // Get current time
@@ -358,7 +380,7 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
       };
     }
     
-    case ACTION_TYPES.CHANGE_ENVIRONMENT: {
+    case WORLD_ACTIONS.CHANGE_ENVIRONMENT: {
       const { regionId, changes } = action.payload;
       
       if (!state.world.regions?.[regionId]) {
@@ -380,22 +402,49 @@ export const worldReducer = (state: GameState, action: {type: string; payload: a
       };
     }
     
-    case ACTION_TYPES.ESTABLISH_SETTLEMENT: {
+    case WORLD_ACTIONS.ESTABLISH_SETTLEMENT: {
       // Settlement logic would be implemented here
       return state;
     }
     
-    case ACTION_TYPES.DEPLETE_RESOURCE:
-    case ACTION_TYPES.REGENERATE_RESOURCE: {
-      const { regionId, resourceId, amount } = action.payload;
+    case WORLD_ACTIONS.DEPLETE_RESOURCE: {
+      // Safely parse the payload with proper type casting
+      const payload = action.payload as ResourceOperationPayload;
+      const { regionId, resourceId, amount } = payload;
       
       if (!state.world.regionalResources?.[regionId]?.[resourceId]) {
         return state;
       }
       
       const currentAmount = state.world.regionalResources[regionId][resourceId];
-      const isDepletion = action.type === ACTION_TYPES.DEPLETE_RESOURCE;
-      const newAmount = Math.max(0, currentAmount + (isDepletion ? -amount : amount));
+      const newAmount = Math.max(0, currentAmount - amount);
+      
+      return {
+        ...state,
+        world: {
+          ...state.world,
+          regionalResources: {
+            ...state.world.regionalResources,
+            [regionId]: {
+              ...state.world.regionalResources[regionId],
+              [resourceId]: newAmount
+            }
+          }
+        }
+      };
+    }
+    
+    case WORLD_ACTIONS.REGENERATE_RESOURCE: {
+      // Safely parse the payload with proper type casting
+      const payload = action.payload as ResourceOperationPayload;
+      const { regionId, resourceId, amount } = payload;
+      
+      if (!state.world.regionalResources?.[regionId]?.[resourceId]) {
+        return state;
+      }
+      
+      const currentAmount = state.world.regionalResources[regionId][resourceId];
+      const newAmount = currentAmount + amount;
       
       return {
         ...state,

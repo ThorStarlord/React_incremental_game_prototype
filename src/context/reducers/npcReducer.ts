@@ -1,4 +1,4 @@
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { ACTION_TYPES, NPC_ACTIONS } from '../types/ActionTypes';
 import { addNotification } from '../utils/notificationUtils';
 
 /**
@@ -76,7 +76,7 @@ interface InventoryItem {
  */
 export const npcReducer = (state: GameState, action: { type: string, payload: any }): GameState => {
   switch (action.type) {
-    case ACTION_TYPES.UPDATE_NPC_RELATIONSHIP: {
+    case NPC_ACTIONS.UPDATE_NPC_RELATIONSHIP: {
       const { npcId, changeAmount, reason } = action.payload;
       
       return {
@@ -92,7 +92,7 @@ export const npcReducer = (state: GameState, action: { type: string, payload: an
       };
     }
     
-    case ACTION_TYPES.COMPLETE_NPC_FAVOR: {
+    case NPC_ACTIONS.COMPLETE_NPC_FAVOR: {
       const { npcId, favorId, success = true } = action.payload;
       
       // Find NPC and active favor
@@ -199,6 +199,49 @@ export const npcReducer = (state: GameState, action: { type: string, payload: an
         type: success ? "success" : "warning",
         duration: 4000
       });
+    }
+    
+    case NPC_ACTIONS.ADD_NPC_FAVOR: {
+      const { npcId, favor } = action.payload;
+      
+      const npc = state.npcs.find(n => n.id === npcId);
+      if (!npc) return state;
+      
+      return {
+        ...state,
+        npcs: state.npcs.map(n => 
+          n.id === npcId
+            ? { 
+                ...n, 
+                activeFavors: [...(n.activeFavors || []), favor]
+              }
+            : n
+        )
+      };
+    }
+    
+    case NPC_ACTIONS.DECLINE_NPC_FAVOR: {
+      const { npcId, favorId } = action.payload;
+      
+      // Find NPC
+      const npc = state.npcs.find(n => n.id === npcId);
+      if (!npc) return state;
+      
+      // Small relationship penalty for declining
+      const relationshipChange = -1;
+      
+      return {
+        ...state,
+        npcs: state.npcs.map(n => 
+          n.id === npcId
+            ? { 
+                ...n,
+                relationship: Math.max(-100, (n.relationship || 0) + relationshipChange),
+                activeFavors: n.activeFavors?.filter(f => f.id !== favorId) || []
+              }
+            : n
+        )
+      };
     }
     
     // Additional NPC-related actions would be handled here
