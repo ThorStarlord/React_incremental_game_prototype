@@ -18,17 +18,22 @@ import {
 import LockIcon from '@mui/icons-material/Lock';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-import { useGameState, useGameDispatch } from '../../../../context/index';
+import { useGameState, useGameDispatch } from '../../../../context/GameStateExports';
+// Import TraitsInitialState explicitly
+import * as TraitsInitialState from '../../../../context/initialStates/TraitsInitialState';
+// Import ExtendedTrait, TraitId and TRAIT_CATEGORIES from TraitsGameStateTypes
+import { ExtendedTrait, TraitId, TRAIT_CATEGORIES, createTraitId } from '../../../../context/types/TraitsGameStateTypes';
 import Panel from '../../../../shared/components/layout/Panel';
 import useTraitEffects from '../../hooks/useTraitEffects';
-import { TRAIT_CATEGORIES, TraitDefinition } from '../../../../context/initialStates/TraitsInitialState';
 import './TraitSlots.css';
 
 /**
- * Interface for the trait with ID
+ * Interface for the trait with ID that's compatible with ExtendedTrait
  */
-interface Trait extends TraitDefinition {
-  id: string;
+interface Trait extends Omit<ExtendedTrait, 'id'> {
+  id: string;  // Use string for easier handling in the component
+  level: number; // Add the missing level property
+  icon?: string; // Add the missing icon property
 }
 
 /**
@@ -39,7 +44,7 @@ interface TraitSlotProps {
   trait: Trait | null;
   onRemove: (id: string) => void;
   onMakePermanent: (id: string) => void;
-  essence: number;
+  essence: { amount: number }; // Updated to accept an object with amount property
 }
 
 /**
@@ -66,9 +71,32 @@ interface SlotDefinition {
 // Simplified TraitSlot component without drag-and-drop
 const TraitSlot: React.FC<TraitSlotProps> = ({ traitId, trait, onRemove, onMakePermanent, essence }) => {
   const [showDetails, setShowDetails] = useState<boolean>(false);
-  const canMakePermanent = essence >= 150;
+  const canMakePermanent = essence.amount >= 150;
 
   if (!trait) return null;
+
+  // Helper function to safely render effect values
+  const renderEffectValue = (value: any): React.ReactNode => {
+    if (typeof value === 'number') {
+      // Format numbers properly
+      return (value > 0 ? "+" : "") + (value < 1 ? `${value * 100}%` : value);
+    } else if (typeof value === 'string') {
+      // Strings can be rendered directly
+      return value;
+    } else if (value === null || value === undefined) {
+      // Handle null/undefined values
+      return '';
+    } else if (typeof value === 'object') {
+      // Convert objects to readable string
+      try {
+        return JSON.stringify(value);
+      } catch (e) {
+        return '[Complex Object]';
+      }
+    } 
+    // Default fallback
+    return String(value);
+  };
 
   return (
     <>
@@ -130,7 +158,7 @@ const TraitSlot: React.FC<TraitSlotProps> = ({ traitId, trait, onRemove, onMakeP
               <Box component="ul" sx={{ pl: 2 }}>
                 {Object.entries(trait.effects).map(([key, value]) => (
                   <Typography component="li" key={key} variant="body2">
-                    {key}: {value > 0 ? "+" : ""}{typeof value === 'number' && value < 1 ? `${value * 100}%` : value}
+                    {key}: {renderEffectValue(value)}
                   </Typography>
                 ))}
               </Box>
@@ -156,41 +184,43 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
 }) => {
   const { player, traits, essence } = useGameState();
   const dispatch = useGameDispatch();
-  const { modifiers } = useTraitEffects();
+  // Remove the destructuring of modifiers as it's not being used
+  // and doesn't exist on the returned type
+  const traitEffects = useTraitEffects();
   const [selectedTrait, setSelectedTrait] = useState<Trait | null>(null);
   const [showTraitSelector, setShowTraitSelector] = useState<boolean>(false);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
 
-  // Define slot structure based on trait categories
+  // Define slot structure based on trait categories - using correct TRAIT_CATEGORIES constants
   const slotStructure: SlotDefinition[] = [
     { 
       id: 'physical_slot_1', 
-      category: TRAIT_CATEGORIES.PHYSICAL, 
+      category: TRAIT_CATEGORIES.COMBAT, // Changed from PHYSICAL to COMBAT
       unlockLevel: slotUnlockLevels.physical1 || 3 
     },
     { 
       id: 'mental_slot_1', 
-      category: TRAIT_CATEGORIES.MENTAL, 
+      category: TRAIT_CATEGORIES.PERSONALITY, // Changed from MENTAL to PERSONALITY
       unlockLevel: slotUnlockLevels.mental1 || 5 
     },
     { 
       id: 'magical_slot_1', 
-      category: TRAIT_CATEGORIES.MAGICAL, 
+      category: TRAIT_CATEGORIES.MAGIC, // Changed from MAGICAL to MAGIC
       unlockLevel: slotUnlockLevels.magical1 || 8 
     },
     { 
       id: 'physical_slot_2', 
-      category: TRAIT_CATEGORIES.PHYSICAL, 
+      category: TRAIT_CATEGORIES.COMBAT, // Changed from PHYSICAL to COMBAT
       unlockLevel: slotUnlockLevels.physical2 || 10 
     },
     { 
       id: 'mental_slot_2', 
-      category: TRAIT_CATEGORIES.MENTAL, 
+      category: TRAIT_CATEGORIES.PERSONALITY, // Changed from MENTAL to PERSONALITY
       unlockLevel: slotUnlockLevels.mental2 || 15 
     },
     { 
       id: 'special_slot_1', 
-      category: TRAIT_CATEGORIES.SPECIAL, 
+      category: TRAIT_CATEGORIES.SPECIAL,  // No change needed
       unlockLevel: slotUnlockLevels.special1 || 20 
     },
   ];
@@ -236,7 +266,7 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
 
   // Determine if a trait is compatible with a slot
   const isTraitCompatibleWithSlot = (trait: Trait, slotCategory: string): boolean => {
-    return trait.category === slotCategory && trait.level > 0;
+    return trait.category === slotCategory && (trait.level ?? 0) > 0;
   };
 
   // Filter available traits for current active slot
@@ -252,7 +282,7 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
   };
 
   // Render a trait slot
-  const renderSlot = (slot: SlotDefinition): JSX.Element => {
+  const renderSlot = (slot: SlotDefinition): React.ReactElement => {
     const isUnlocked = playerLevel >= slot.unlockLevel;
     const activeTrait = getActiveTraitForSlot(slot.id);
     
@@ -270,7 +300,7 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
                 </div>
                 <div className="trait-slot-details">
                   <h4>{activeTrait.name}</h4>
-                  <p>Level {activeTrait.level}</p>
+                  <p>Level {activeTrait.level ?? 1}</p>
                 </div>
                 <button 
                   className="slot-action-button remove"
@@ -302,7 +332,7 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
   };
 
   // Render the trait selector modal
-  const renderTraitSelector = (): JSX.Element | null => {
+  const renderTraitSelector = (): React.ReactElement | null => {
     if (!showTraitSelector) return null;
     
     const compatibleTraits = getCompatibleTraits();
@@ -333,7 +363,7 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
                   </div>
                   <div className="trait-selector-details">
                     <h4>{trait.name}</h4>
-                    <p>Level {trait.level}</p>
+                    <p>Level {trait.level ?? 1}</p>
                   </div>
                 </div>
               ))
@@ -374,9 +404,14 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
 
   // Handle making a trait permanent
   const handleMakePermanent = (traitId: string): void => {
-    if (essence >= 150) {
+    if (essence.amount >= 150) {
+      // Convert string traitId to TraitId type
+      const typedTraitId = createTraitId(traitId);
+      // Now we can safely access traits.copyableTraits with the typed ID
+      const traitName = traits.copyableTraits[typedTraitId]?.name || 'Unknown trait';
+      
       // Show confirmation dialog (optional)
-      if (window.confirm(`Make ${traits.copyableTraits[traitId]?.name} permanent? This will cost 150 Essence.`)) {
+      if (window.confirm(`Make ${traitName} permanent? This will cost 150 Essence.`)) {
         dispatch({ 
           type: 'ADD_PERMANENT_TRAIT', 
           payload: { traitId } 
@@ -386,7 +421,7 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
         dispatch({
           type: 'SHOW_NOTIFICATION',
           payload: {
-            message: `${traits.copyableTraits[traitId]?.name} is now a permanent trait!`,
+            message: `${traitName} is now a permanent trait!`,
             severity: 'success',
             duration: 3000
           }
@@ -417,7 +452,9 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
             <Typography variant="h6" sx={{ mb: 1 }}>Permanent Traits</Typography>
             <Grid container spacing={2}>
               {player?.permanentTraits?.map(traitId => {
-                const trait = traits?.copyableTraits?.[traitId];
+                // Convert string traitId to TraitId type
+                const typedTraitId = createTraitId(traitId);
+                const trait = traits?.copyableTraits?.[typedTraitId];
                 if (!trait) return null;
                 
                 return (
@@ -449,16 +486,26 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
         <Typography variant="h6" sx={{ mb: 1 }}>Equipped Traits</Typography>
         {(player?.equippedTraits?.length || 0) > 0 ? (
           <Box>
-            {player?.equippedTraits?.map((traitId: string) => (
-              <TraitSlot
-                key={traitId}
-                traitId={traitId}
-                trait={traits?.copyableTraits?.[traitId] ? { id: traitId, ...traits.copyableTraits[traitId] } : null}
-                onRemove={handleRemoveTraitOld}
-                onMakePermanent={handleMakePermanent}
-                essence={essence || 0}
-              />
-            ))}
+            {player?.equippedTraits?.map((traitId: string) => {
+              // Convert string traitId to TraitId type
+              const typedTraitId = createTraitId(traitId);
+              const traitData = traits?.copyableTraits?.[typedTraitId];
+              
+              return (
+                <TraitSlot
+                  key={traitId}
+                  traitId={traitId}
+                  trait={traitData ? { 
+                    ...traitData,
+                    id: traitId, // Order fixed: spread first, then override
+                    level: traitData.level ?? 1 // Ensure level exists with default fallback
+                  } : null}
+                  onRemove={handleRemoveTraitOld}
+                  onMakePermanent={handleMakePermanent}
+                  essence={essence || { amount: 0 }} // Fix the fallback to provide a compatible object
+                />
+              );
+            })}
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
@@ -516,12 +563,17 @@ const TraitSlots: React.FC<TraitSlotsProps> = ({
                 const trait = availableTraits.find(t => t.id === traitId);
                 if (!trait) return null;
                 
+                // Get the first effect from effects array or a suitable effect
+                const mainEffect = trait.effects && trait.effects.length > 0 
+                  ? trait.effects[0] 
+                  : null;
+                
                 return (
                   <li key={slotId} className="bonus-item">
                     <span className="bonus-name">{trait.name}:</span>
                     <span className="bonus-value">
-                      {trait.effect ? 
-                        `+${(trait.effect.value * trait.level * 0.5 * 100).toFixed(1)}% ${trait.effect.type.toLowerCase().replace(/_/g, ' ')}` 
+                      {mainEffect ? 
+                        `+${(mainEffect.magnitude * (trait.level ?? 1) * 0.5 * 100).toFixed(1)}% ${mainEffect.type.toLowerCase().replace(/_/g, ' ')}` 
                         : 'Special bonus'}
                     </span>
                   </li>

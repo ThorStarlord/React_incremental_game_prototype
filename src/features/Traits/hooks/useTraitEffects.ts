@@ -1,8 +1,8 @@
 import { useContext, useEffect } from 'react';
-import { useGameState } from '../../../context/index';
+import { useGameState } from '../../../context/GameStateExports';
 import { calculateTraitEffect } from '../utils/traitUtils';
-import { TraitEffect } from '../../../context/initialStates/TraitsInitialState';
-import { PlayerState } from '../../../context/initialStates/PlayerInitialState';
+import { TraitEffect } from '../../../context/types/TraitsGameStateTypes';
+import { PlayerState } from '../../../context/types/PlayerGameStateTypes';
 
 /**
  * Interface for trait effects calculated from equipped traits
@@ -42,11 +42,28 @@ const useTraitEffects = (): UseTraitEffectsResult => {
       
       if (player?.equippedTraits) {
         player.equippedTraits.forEach((traitId: string) => {
-          const trait = traits?.copyableTraits?.[traitId];
+          // Convert string to TraitId using createTraitId from TraitsGameStateTypes
+          const trait = traits?.copyableTraits?.[traitId as any]; // Using type assertion to fix indexing
           if (trait?.effects) {
-            Object.entries(trait.effects).forEach(([key, value]) => {
+            Object.entries(trait.effects).forEach(([key, effectValue]) => {
               if (!traitEffects[key]) traitEffects[key] = 0;
-              traitEffects[key] += calculateTraitEffect(key, value, player as PlayerState);
+              
+              // Extract magnitude from TraitEffect object or use the number directly
+              let magnitude: number;
+              if (typeof effectValue === 'object' && 'magnitude' in effectValue) {
+                // It's a TraitEffect object, extract the magnitude
+                magnitude = effectValue.magnitude;
+              } else if (typeof effectValue === 'number') {
+                // It's already a number
+                magnitude = effectValue;
+              } else {
+                // Skip if we can't determine the value
+                return;
+              }
+              
+              // Fix: Call calculateTraitEffect with both required parameters
+              // 1.0 is used as a base value, and magnitude as the modifier
+              traitEffects[key] += calculateTraitEffect(1.0, magnitude);
             });
           }
         });

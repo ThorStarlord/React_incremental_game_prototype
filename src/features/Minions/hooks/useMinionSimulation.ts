@@ -1,6 +1,20 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useGameState, useGameDispatch } from '../../../context/GameStateContext';
-import { Minion, MinionTask } from '../../../context/initialStates/MinionsInitialState';
+import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../context/GameStateExports';
+import { Minion, MinionTask, MinionAssignment } from '../../../context/initialStates/MinionsInitialState';
+import { MINION_ACTION_TYPES } from '../../../context/actions/minionsActions';
+
+/**
+ * Interface for the minions state structure
+ */
+interface MinionsState {
+  minions: Record<string, Minion>;
+  availableTasks: MinionTask[];
+  config: {
+    autoAssign?: boolean;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
 
 /**
  * Type for task completion result
@@ -46,10 +60,13 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
   const gameState = useGameState();
   const dispatch = useGameDispatch();
   
-  // Get minion-related state
-  const minions = gameState?.minions?.minions || {};
-  const availableTasks = gameState?.minions?.availableTasks || [];
-  const config = gameState?.minions?.config || {};
+  // Safely access minion-related state with type assertions
+  const minionsState = (gameState as any).minions as MinionsState | undefined;
+  
+  // Get minion-related state with proper fallbacks
+  const minions = minionsState?.minions || {};
+  const availableTasks = minionsState?.availableTasks || [];
+  const config = minionsState?.config || {};
   
   // Track simulation state
   const simulationRef = useRef<NodeJS.Timeout | null>(null);
@@ -175,7 +192,7 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
             // Add resources
             if (Object.keys(result.rewards.resources).length > 0) {
               dispatch({
-                type: 'ADD_RESOURCES',
+                type: ACTION_TYPES.ADD_RESOURCES,
                 payload: result.rewards.resources
               });
             }
@@ -183,7 +200,7 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
             // Add items
             if (Object.keys(result.rewards.items).length > 0) {
               dispatch({
-                type: 'ADD_ITEMS',
+                type: ACTION_TYPES.ADD_ITEM,
                 payload: result.rewards.items
               });
             }
@@ -196,7 +213,8 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
     if (updatedMinions.length > 0) {
       updatedMinions.forEach(minion => {
         dispatch({
-          type: 'UPDATE_MINION',
+          // Use the correct action type from MINION_ACTION_TYPES
+          type: MINION_ACTION_TYPES.UPDATE_MINION_STATUS,
           payload: minion
         });
       });
@@ -206,7 +224,7 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
     if (notifications.length > 0) {
       notifications.forEach(message => {
         dispatch({
-          type: 'SHOW_NOTIFICATION',
+          type: ACTION_TYPES.ADD_NOTIFICATION,
           payload: {
             message,
             type: 'minion',
@@ -264,11 +282,17 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
       // Randomly select one of the suitable tasks
       const randomTask = suitableTasks[Math.floor(Math.random() * suitableTasks.length)];
       
-      // Create assignment
-      const assignment = {
+      // Create assignment with proper type assertion
+      const assignmentType = ((): "gathering" | "crafting" | "exploration" | "combat" | "idle" => {
+        if (randomTask.id.includes('gather')) return "gathering";
+        if (randomTask.id.includes('craft')) return "crafting";
+        return "exploration"; // default type
+      })();
+      
+      // Create assignment with the correct type
+      const assignment: MinionAssignment = {
         id: `${minion.id}-${randomTask.id}-${Date.now()}`,
-        type: randomTask.id.includes('gather') ? 'gathering' : 
-              randomTask.id.includes('craft') ? 'crafting' : 'exploration',
+        type: assignmentType,
         taskId: randomTask.id,
         startTime: Date.now(),
         duration: randomTask.duration,
@@ -282,7 +306,8 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
       };
       
       dispatch({
-        type: 'UPDATE_MINION',
+        // Use the correct action type from MINION_ACTION_TYPES
+        type: MINION_ACTION_TYPES.UPDATE_MINION_STATUS,
         payload: updatedMinion
       });
     });

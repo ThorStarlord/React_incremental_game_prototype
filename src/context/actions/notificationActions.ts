@@ -3,7 +3,7 @@ import { ACTION_TYPES } from './actionTypes';
 /**
  * Type definitions for notification actions
  */
-export type NotificationType = 'success' | 'error' | 'info' | 'warning' | 'positive' | 'negative' | 'event' | 'achievement';
+export type NotificationType = 'success' | 'error' | 'info' | 'warning' | 'positive' | 'negative' | 'event' | 'achievement' | 'dialogue';
 
 export interface Notification {
   id: number;
@@ -11,6 +11,12 @@ export interface Notification {
   type: NotificationType;
   duration?: number;
   dismissable?: boolean;
+  category?: string;
+  npcId?: string;
+  npcName?: string;
+  isPlayerResponse?: boolean;
+  emotion?: string;
+  timestamp?: number;
 }
 
 export interface AddNotificationPayload {
@@ -52,4 +58,28 @@ export const removeNotification = (id: number) => ({
  */
 export const clearNotifications = () => ({
   type: ACTION_TYPES.CLEAR_NOTIFICATIONS
+});
+
+/**
+ * Add a dialogue message to the notification system
+ * 
+ * @param message The dialogue text
+ * @param npcName Name of the speaking NPC
+ * @param npcId ID of the speaking NPC
+ * @param isPlayerResponse Whether this is a player response
+ * @param emotion Optional emotional tone
+ */
+export const addDialogueMessage = (message: string, npcName: string, npcId: string, isPlayerResponse: boolean = false, emotion?: string) => ({
+  type: ACTION_TYPES.ADD_DIALOGUE,
+  payload: {
+    id: Date.now(), // Add unique ID
+    message,
+    type: 'dialogue' as NotificationType,
+    npcId,
+    npcName,
+    isPlayerResponse,
+    emotion,
+    timestamp: Date.now(),
+    category: 'dialogue'
+  }
 });

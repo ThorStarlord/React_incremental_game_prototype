@@ -7,7 +7,7 @@
 import GameProvider from './GameProvider';
 import GameStateContext, { useGameState, useGameStateSelector, EnhancedGameState } from './GameStateContext';
 import GameDispatchContext, { useGameDispatch, GameAction } from './GameDispatchContext';
-import { ACTION_TYPES } from './actions/actionTypes';
+import { ACTION_TYPES } from './types/ActionTypes';
 import { 
   GameState, 
   PlayerState, 

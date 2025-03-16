@@ -20,7 +20,7 @@ import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import BreadcrumbNav from '../../../shared/components/ui/BreadcrumbNav';
 import NPCPanel from './container/NPCPanel';
 import DialogueHistory from '../dialogue/DialogueHistory';
-import { useGameState, useGameDispatch } from '../../../context/index';
+import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../context/GameStateExports';
 
 /**
  * Interface for a response option in dialogue
@@ -54,28 +54,6 @@ interface NPC {
   canTrade?: boolean;
   /** Additional NPC properties */
   [key: string]: any;
-}
-
-/**
- * Interface for a player object
- */
-interface Player {
-  /** Player's name */
-  name?: string;
-  /** Additional player properties */
-  [key: string]: any;
-}
-
-/**
- * Interface for game state
- */
-interface GameState {
-  /** Array of all NPCs in the game */
-  npcs: NPC[];
-  /** Player data */
-  player?: Player;
-  /** Function to add dialogue message to history */
-  addDialogueMessage: (message: DialogueMessage) => void;
 }
 
 /**
@@ -118,8 +96,14 @@ interface NPCEncounterProps {
 const NPCEncounter: React.FC<NPCEncounterProps> = ({ npcId }) => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const gameState = useGameState() as GameState;
-  const { npcs, player, addDialogueMessage } = gameState;
+  const gameState = useGameState();
+  const dispatch = useGameDispatch();
+  
+  // Safely access player and NPCs from the game state
+  const player = gameState.player || {};
+  const npcs = Array.isArray((gameState as any).npcs) 
+    ? (gameState as any).npcs as NPC[] 
+    : [];
   
   // Component state
   const [activeTab, setActiveTab] = useState<'talk' | 'trade' | 'relationship'>('talk');
@@ -127,10 +111,28 @@ const NPCEncounter: React.FC<NPCEncounterProps> = ({ npcId }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Find the current NPC from the game state
-  // Add proper guard to prevent "Cannot read properties of undefined (reading 'find')" error
-  const currentNpc = Array.isArray(npcs) 
-    ? npcs.find(npc => npc && npc.id === npcId)
-    : null;
+  const currentNpc = npcs.find(npc => npc && npc.id === npcId) || null;
+  
+  /**
+   * Add a dialogue message to the history using dispatch
+   */
+  const addDialogueMessage = (message: DialogueMessage) => {
+    dispatch({
+      type: ACTION_TYPES.ADD_NOTIFICATION,
+      payload: {
+        id: message.id,
+        message: message.message,
+        type: 'dialogue',
+        npcId: message.npcId,
+        npcName: message.npcName,
+        timestamp: message.timestamp,
+        isPlayerResponse: message.isPlayerResponse,
+        emotion: message.emotion,
+        duration: 0, // Persistent dialogue, not auto-dismissed
+        category: 'dialogue'
+      }
+    });
+  };
   
   // Initialize encounter when component mounts
   useEffect(() => {
@@ -165,7 +167,7 @@ const NPCEncounter: React.FC<NPCEncounterProps> = ({ npcId }) => {
         }
       ]);
     }
-  }, [currentNpc, player, addDialogueMessage]);
+  }, [currentNpc, player]);
 
   /**
    * Handle player dialogue response selection

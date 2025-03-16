@@ -1,5 +1,5 @@
-import { useContext, useMemo, useEffect, useCallback } from 'react';
-import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../context/index';
+import { useMemo } from 'react';
+import { useGameState } from '../../../context/GameStateExports';
 
 /**
  * Interface for an NPC object
@@ -52,7 +52,11 @@ interface Skill {
  * Interface for player stats
  */
 interface PlayerStats {
-  skills?: Skill[];
+  skills: Skill[]; // Changed from optional to required property
+  health?: number;
+  maxHealth?: number;
+  mana?: number;
+  maxMana?: number;
   [key: string]: any;
 }
 
@@ -87,6 +91,23 @@ interface EssenceGenerationData {
 }
 
 /**
+ * Interface for a settlement object with buildings
+ */
+interface Settlement {
+  id: string;
+  name?: string;
+  buildings?: Building[];
+  [key: string]: any;
+}
+
+/**
+ * Type guard to check if an object is a valid Settlement
+ */
+function isSettlement(obj: any): obj is Settlement {
+  return obj && typeof obj === 'object' && 'buildings' in obj && Array.isArray(obj.buildings);
+}
+
+/**
  * @function useEssenceGeneration
  * @description Custom hook that calculates and manages essence generation from various sources.
  * This hook determines the total generation rate and provides detailed information about
@@ -99,8 +120,116 @@ interface EssenceGenerationData {
  *   - modifiers: Applied modifiers to essence generation
  */
 const useEssenceGeneration = (): EssenceGenerationData => {
-  // Access the game state through context
-  const { npcs = [], research = [], playerStats = {}, buildings = [] } = useGameState();
+  // Access the game state through context with proper property paths
+  const gameState = useGameState();
+  
+  // Access NPCs with proper property path and safe fallback
+  const npcs = gameState.world?.npcs || [];
+  
+  // Access buildings with safer property access methods
+  const buildings = (() => {
+    // Check for buildings in different possible locations
+    if (gameState.world && 'buildings' in gameState.world) {
+      return (gameState.world as any).buildings || [];
+    }
+    
+    // Check for buildings in settlements - with proper type handling
+    const worldState = gameState.world as any;
+    if (worldState && typeof worldState === 'object') {
+      // Check if settlements property exists
+      if ('settlements' in worldState && worldState.settlements) {
+        // Type-safe approach to get buildings from settlements
+        try {
+          // Convert settlements object to array and extract buildings with proper typing
+          return Object.values(worldState.settlements)
+            // Use type guard to ensure we're working with valid settlement objects
+            .filter(isSettlement)
+            // Now TypeScript knows these are valid Settlement objects with buildings array
+            .flatMap(settlement => settlement.buildings || []);
+        } catch (error) {
+          console.error('Error accessing buildings from settlements:', error);
+          return [];
+        }
+      }
+    }
+    
+    // Check for buildings in regions
+    if (gameState.world?.regions) {
+      // Try to collect buildings from all regions
+      const buildingsFromRegions: Building[] = [];
+      
+      Object.values(gameState.world.regions).forEach(region => {
+        if (region && typeof region === 'object' && 'buildings' in region) {
+          const regionBuildings = (region as any).buildings;
+          if (Array.isArray(regionBuildings)) {
+            buildingsFromRegions.push(...regionBuildings);
+          }
+        }
+      });
+      
+      if (buildingsFromRegions.length > 0) {
+        return buildingsFromRegions;
+      }
+    }
+    
+    // Check for buildings in player property
+    if (gameState.player && 'buildings' in gameState.player) {
+      return (gameState.player as any).buildings || [];
+    }
+    
+    // Default to empty array if buildings are not found
+    return [];
+  })();
+  
+  // Fix: Get research data using the correct path with proper type safety
+  const research = (() => {
+    // Use different approaches to find research data with proper type assertions
+    
+    // Try direct research access
+    if ('research' in gameState && Array.isArray((gameState as any).research)) {
+      return (gameState as any).research;
+    }
+    
+    // Try player research with proper type assertion
+    const player = gameState.player as any;
+    if (player && 'research' in player && Array.isArray(player.research)) {
+      return player.research;
+    }
+    
+    // Try progression research
+    const progression = gameState.progression as any;
+    if (progression && 'research' in progression && Array.isArray(progression.research)) {
+      return progression.research;
+    }
+    
+    // Check traits for research-related ones
+    if (gameState.traits?.copyableTraits) {
+      const traits = gameState.traits.copyableTraits;
+      const researchTraits = Object.values(traits)
+        .filter(trait => 
+          // Fix: Use correct trait category check with proper type handling
+          trait.category === 'magic' || // Magic traits often affect essence
+          trait.category === 'special' || // Special traits may affect essence
+          (trait.effects && 
+           typeof trait.effects === 'object' && 
+           'essenceGenerationMultiplier' in trait.effects)
+        );
+      
+      if (researchTraits.length > 0) {
+        return researchTraits;
+      }
+    }
+    
+    // Default to empty array
+    return [];
+  })();
+  
+  // Use a safe type assertion to handle potentially missing skills property
+  const playerStats = gameState.player?.stats || {};
+  // Get skills safely with runtime checking
+  const playerSkills = Array.isArray((playerStats as any).skills) 
+    ? (playerStats as any).skills 
+    : [];
   
   // Calculate all essence generation data with memoization for performance
   const essenceGenerationData = useMemo<EssenceGenerationData>(() => {
@@ -153,11 +282,11 @@ const useEssenceGeneration = (): EssenceGenerationData => {
       }
     }
     
-    // Apply building modifiers
-    if (Array.isArray(buildings)) {
+    // Apply building modifiers with type safety
+    if (Array.isArray(buildings) && buildings.length > 0) {
       // Example: Buildings that improve essence generation
       const essenceBuildings = buildings.filter((b: Building) => 
-        b.built && b.effects && b.effects.essenceGenerationMultiplier
+        b && b.built && b.effects && b.effects.essenceGenerationMultiplier
       );
       
       if (essenceBuildings.length > 0) {
@@ -170,10 +299,10 @@ const useEssenceGeneration = (): EssenceGenerationData => {
       }
     }
     
-    // Apply player skill modifiers
-    if (playerStats && playerStats.skills) {
+    // Apply player skill modifiers with type safety for skills
+    if (playerSkills.length > 0) {
       // Example: Skills that improve essence generation
-      const essenceSkills = playerStats.skills.filter((s: Skill) => 
+      const essenceSkills = playerSkills.filter((s: Skill) => 
         s.level > 0 && s.effects && s.effects.essenceGenerationMultiplier
       );
       
@@ -205,7 +334,7 @@ const useEssenceGeneration = (): EssenceGenerationData => {
       npcContributions: modifiedContributions,
       modifiers,
     };
-  }, [npcs, research, playerStats, buildings]);
+  }, [npcs, research, playerStats, buildings, playerSkills]);
   
   return essenceGenerationData;
 };

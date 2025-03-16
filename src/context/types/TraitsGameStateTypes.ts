@@ -167,6 +167,7 @@ export interface ExtendedTrait extends BaseTrait {
   isRemovable: boolean;
   removalCost?: number;
   lore?: string;
+  level?: number;  // Add the missing level property
 }
 
 /**

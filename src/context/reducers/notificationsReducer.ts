@@ -4,13 +4,17 @@
 interface Notification {
   id: string;
   message: string;
-  type: 'info' | 'success' | 'warning' | 'error' | 'event' | 'discovery' | 'achievement';
+  type: 'info' | 'success' | 'warning' | 'error' | 'event' | 'discovery' | 'achievement' | 'dialogue';
   duration: number;
   timestamp: number;
   read?: boolean;
   category?: string;
   icon?: string;
   count?: number; // Add the missing count property for notification grouping
+  npcId?: string;
+  npcName?: string;
+  isPlayerResponse?: boolean;
+  emotion?: string;
 }
 
 interface NotificationsState {
@@ -163,6 +167,29 @@ export const notificationsReducer = (
           ...action.payload
         }
       };
+    
+    case 'notification/addDialogue': {
+      const notification: Notification = {
+        id: action.payload.id || `notification-${Date.now()}`,
+        message: action.payload.message,
+        type: 'dialogue',
+        duration: 0, // Dialogue messages are persistent in history
+        timestamp: Date.now(),
+        category: 'dialogue',
+        npcId: action.payload.npcId,
+        npcName: action.payload.npcName,
+        isPlayerResponse: action.payload.isPlayerResponse,
+        emotion: action.payload.emotion
+      };
+      
+      return {
+        ...state,
+        history: trimHistory([
+          ...state.history,
+          notification
+        ], state.settings.maxHistorySize)
+      };
+    }
     
     default:
       return state;

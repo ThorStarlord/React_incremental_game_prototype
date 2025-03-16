@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -14,7 +14,7 @@ import {
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import PersonIcon from '@mui/icons-material/Person';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import { GameStateContext } from '../../../context/GameStateContext';
+import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../context/GameStateExports';
 import Panel from '../../../shared/components/layout/Panel';
 
 /**
@@ -22,29 +22,23 @@ import Panel from '../../../shared/components/layout/Panel';
  */
 interface DialogueMessage {
   /** Unique identifier for the message */
-  id: string;
+  id: string | number;
   /** ID of the NPC who spoke this message */
-  npcId: string;
+  npcId?: string;
   /** Name of the NPC who spoke */
-  npcName: string;
+  npcName?: string;
   /** Content of the dialogue message */
   message: string;
   /** Unix timestamp when the message was spoken */
   timestamp: number;
   /** Whether this message was a player response */
-  isPlayerResponse: boolean;
+  isPlayerResponse?: boolean;
   /** Optional emotion/tone of the message */
   emotion?: string;
-}
-
-/**
- * Interface for the game state context
- */
-interface GameState {
-  /** Array of dialogue messages */
-  dialogueHistory: DialogueMessage[];
-  /** Function to clear dialogue history */
-  clearDialogueHistory: () => void;
+  /** Type of notification */
+  type?: string;
+  /** Category of notification */
+  category?: string;
 }
 
 /**
@@ -71,14 +65,6 @@ interface DialogueHistoryProps {
  * @param props.filterNpcId - Optional NPC ID to filter conversation by specific NPC
  * @param props.maxMessages - Maximum number of messages to display
  * 
- * @example
- * // Basic usage
- * <DialogueHistory />
- * 
- * @example
- * // Compact view with specific NPC filter
- * <DialogueHistory compact={true} filterNpcId="npc-123" maxMessages={10} />
- * 
  * @returns Rendered DialogueHistory component
  */
 const DialogueHistory: React.FC<DialogueHistoryProps> = ({ 
@@ -87,8 +73,37 @@ const DialogueHistory: React.FC<DialogueHistoryProps> = ({
   maxMessages = 50 
 }) => {
   const theme = useTheme();
-  const { dialogueHistory, clearDialogueHistory } = useContext<GameState>(GameStateContext);
+  const gameState = useGameState();
+  const dispatch = useGameDispatch();
+  
+  // Access dialogue history from game state with safer type conversion
+  const dialogueHistory = 
+    ((gameState.notifications?.notifications || [])
+    // Use a safer type check that prioritizes category
+    .filter(n => n.category === 'dialogue' || n.type === 'dialogue')
+    .map(notification => ({
+      id: notification.id || Date.now(),
+      npcId: notification.npcId || '',
+      npcName: notification.npcName || 'Unknown',
+      message: notification.message,
+      timestamp: notification.timestamp || Date.now(),
+      isPlayerResponse: notification.isPlayerResponse || false,
+      emotion: notification.emotion,
+      type: notification.type,
+      category: notification.category
+    })) as DialogueMessage[]);
+    
   const [filteredHistory, setFilteredHistory] = useState<DialogueMessage[]>([]);
+
+  /**
+   * Clear dialogue history
+   */
+  const clearDialogueHistory = (): void => {
+    dispatch({
+      type: ACTION_TYPES.CLEAR_NOTIFICATIONS,
+      payload: { category: 'dialogue' }
+    });
+  };
 
   /**
    * Format timestamp to a readable time

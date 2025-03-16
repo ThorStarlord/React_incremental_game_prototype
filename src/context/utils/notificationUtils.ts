@@ -26,7 +26,7 @@ import {
 /**
  * Types of notifications
  */
-export type NotificationType = 'success' | 'warning' | 'error' | 'info';
+export type NotificationType = 'success' | 'warning' | 'error' | 'info' | 'dialogue' | 'event' | 'achievement' | 'discovery';
 
 /**
  * Notification object structure
@@ -52,6 +52,24 @@ export interface Notification {
   
   /** Optional count for stacking multiple similar notifications */
   count?: number;
+
+  /** Timestamp when the notification was created */
+  timestamp?: number;
+
+  /** Optional NPC ID for dialogue notifications */
+  npcId?: string;
+  
+  /** Optional NPC name for dialogue notifications */
+  npcName?: string;
+  
+  /** Whether this is a player response for dialogue notifications */
+  isPlayerResponse?: boolean;
+  
+  /** Optional emotion for dialogue notifications */
+  emotion?: string;
+  
+  /** Whether the notification has been read */
+  read?: boolean;
 }
 
 /**
@@ -336,5 +354,47 @@ export const createQuestNotification = (
     duration: 5000,
     icon: 'scroll',
     category: `quest.${status}`
+  };
+};
+
+/**
+ * Creates a dialogue notification representing an NPC or player message
+ * 
+ * @param {string} message - The dialogue message content
+ * @param {string} npcName - Name of the NPC speaking (or "Player" for player responses)
+ * @param {string} npcId - ID of the NPC speaking
+ * @param {boolean} isPlayerResponse - Whether this is a player response
+ * @param {string} [emotion] - Optional emotional tone of the message
+ * @returns {Notification} Formatted dialogue notification
+ * 
+ * @example
+ * const notification = createDialogueNotification(
+ *   "Hello traveler, welcome to our village!",
+ *   "Village Elder",
+ *   "npc_elder_01",
+ *   false,
+ *   "friendly"
+ * );
+ * const newState = addNotification(currentState, notification);
+ */
+export const createDialogueNotification = (
+  message: string,
+  npcName: string,
+  npcId: string,
+  isPlayerResponse: boolean = false,
+  emotion?: string
+): Notification => {
+  return {
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    message,
+    type: 'dialogue',
+    duration: 0, // Persistent in history
+    icon: 'dialogue',
+    category: 'dialogue',
+    npcId,
+    npcName,
+    isPlayerResponse,
+    emotion,
+    timestamp: Date.now()
   };
 };

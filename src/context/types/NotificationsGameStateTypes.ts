@@ -8,9 +8,14 @@
 export interface Notification {
   id: string;
   message: string;
-  type: 'info' | 'warning' | 'error' | 'success';
+  type: 'info' | 'warning' | 'error' | 'success' | 'dialogue' | 'event' | 'discovery' | 'achievement';
   timestamp: number; // Unix timestamp
   read: boolean;
+  npcId?: string;      // For dialogue notifications
+  npcName?: string;    // For dialogue notifications
+  isPlayerResponse?: boolean; // For dialogue notifications
+  emotion?: string;    // For dialogue notifications
+  category?: string;   // For categorizing notifications
 }
 
 /**

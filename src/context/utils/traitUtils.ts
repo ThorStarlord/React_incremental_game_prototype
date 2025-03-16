@@ -28,7 +28,7 @@
  *   { traitId: 'persuasion', essenceCost: 25, npcId: 'merchant' }
  * );
  */
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { ACTION_TYPES } from '../types/ActionTypes';
 import { GameState, PlayerState } from '../initialStates/InitialStateComposer';
 
 /**

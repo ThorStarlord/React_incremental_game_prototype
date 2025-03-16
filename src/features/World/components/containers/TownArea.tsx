@@ -5,7 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Panel from '../../../../shared/components/layout/Panel';
 import BreadcrumbNav from '../../../../shared/components/ui/BreadcrumbNav';
 import useThemeUtils from '../../../../shared/hooks/useThemeUtils';
-import { useGameState } from '../../../../context/GameContext';
+import { useGameState } from '../../../../context/GameStateExports';
 
 /**
  * Interface for a town

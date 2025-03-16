@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useInventoryContext } from '../../../context/InventoryContext';
+import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../context/GameStateExports';
 import { Item } from '../../../context/initialStates/ItemsInitialState';
+import { GameItem } from '../../../context/types/ItemsGameStateTypes';
 
 /**
  * Interface for inventory state
@@ -23,23 +24,39 @@ interface UseInventoryReturn {
 }
 
 /**
+ * Converts a GameItem to an Item with required category property
+ */
+const convertToItem = (gameItem: GameItem): Item => {
+  return {
+    ...gameItem,
+    // Map item type to category - by default use the type as category
+    category: (gameItem as any).category || gameItem.type || 'misc'
+  } as Item;
+};
+
+/**
  * Custom hook for inventory management
  * @returns {UseInventoryReturn} Inventory state and functions
  */
 const useInventory = (): UseInventoryReturn => {
-  const { inventory, setInventory } = useInventoryContext();
+  const gameState = useGameState();
+  const dispatch = useGameDispatch();
+  
+  // Get inventory from game state and map to our interface
+  // Convert GameItem[] to Item[] by adding the missing category property
+  const inventory: Inventory = {
+    items: (gameState.inventory?.items || []).map(convertToItem),
+    maxSlots: gameState.inventory?.capacity || 20, // Map capacity to maxSlots
+    gold: gameState.inventory?.gold || 0
+  };
+  
   const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
     const fetchItems = async (): Promise<void> => {
-      // Fetch items logic would go here
-      // This is a placeholder for the async fetch
       try {
-        // Example: const response = await fetchItemsFromAPI();
-        // setItems(response.data);
-        
-        // For now, just use the items from inventory
-        setItems(inventory.items || []);
+        // Use inventory items from game state, already converted in the inventory object
+        setItems(inventory.items);
       } catch (error) {
         console.error('Error fetching items:', error);
       }
@@ -74,19 +91,28 @@ const useInventory = (): UseInventoryReturn => {
           quantity: (existingItem.quantity || 1) + (item.quantity || 1)
         };
         
-        setInventory({
-          ...inventory,
-          items: updatedItems
+        // Dispatch action to update inventory
+        dispatch({
+          type: ACTION_TYPES.SORT_INVENTORY,
+          payload: {
+            items: updatedItems
+          }
         });
         
         return true;
       }
     }
     
-    // Otherwise add as new item
-    setInventory({
-      ...inventory,
-      items: [...inventory.items, item]
+    // Otherwise add as new item - ensure it's converted back to GameItem when dispatching
+    dispatch({
+      type: ACTION_TYPES.ADD_ITEM,
+      payload: {
+        item: {
+          ...item,
+          // Remove category property if it doesn't exist in GameItem
+          ...(item.type ? { type: item.type } : { type: item.category })
+        }
+      }
     });
     
     return true;
@@ -114,15 +140,19 @@ const useInventory = (): UseInventoryReturn => {
         quantity: (item.quantity || 0) - 1
       };
       
-      setInventory({
-        ...inventory,
-        items: updatedItems
+      dispatch({
+        type: ACTION_TYPES.SORT_INVENTORY,
+        payload: {
+          items: updatedItems
+        }
       });
     } else {
       // Remove the item completely
-      setInventory({
-        ...inventory,
-        items: inventory.items.filter(i => i.id !== itemId)
+      dispatch({
+        type: ACTION_TYPES.REMOVE_ITEM,
+        payload: {
+          itemId
+        }
       });
     }
     

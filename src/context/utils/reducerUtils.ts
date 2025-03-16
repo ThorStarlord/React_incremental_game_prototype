@@ -9,7 +9,7 @@
  * - Utility functions for common reducer operations
  */
 
-import { addNotification, GameStateWithNotifications } from './notificationUtils';
+import { addNotification, GameStateWithNotifications, createDialogueNotification } from './notificationUtils';
 
 /**
  * Base interface for objects with an id property
@@ -36,6 +36,27 @@ export const withNotification = (
   type: 'info' | 'success' | 'warning' | 'error' = 'info', 
   duration: number = 3000
 ): GameState => addNotification(state, { message, type, duration });
+
+/**
+ * Adds a dialogue message notification to state
+ */
+export const withDialogueMessage = (
+  state: GameState, 
+  message: string,
+  npcName: string,
+  npcId: string,
+  isPlayerResponse: boolean = false,
+  emotion?: string
+): GameState => {
+  const notification = createDialogueNotification(
+    message,
+    npcName,
+    npcId,
+    isPlayerResponse,
+    emotion
+  );
+  return addNotification(state, notification);
+};
 
 /**
  * Updates an object in an array by its id
