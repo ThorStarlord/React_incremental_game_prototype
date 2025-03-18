@@ -33,7 +33,7 @@ button {
 }
 
 button:hover {
-    background-color: darken(var(--secondary-color), 10%);
+    background-color: #27ae60; /* replaced darken(...) */
 }
 
 .panel {

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { 
   Box, 
   Typography, 
@@ -6,8 +6,29 @@ import {
   Grid, 
   Divider
 } from '@mui/material';
-import { GameStateContext } from '../../../../context/GameStateContext';
-import Panel from './Panel';
+import { useGameState } from '../../../../context/GameStateExports';
+import Panel from '../../../../shared/components/layout/Panel';
+
+/**
+ * Extended player interface with additional properties used in this component
+ */
+interface ExtendedPlayer {
+  totalEssenceEarned?: number;
+  learnedSkills?: any[];
+  level?: number;
+  acquiredTraits?: string[];
+  equippedTraits?: string[];
+  traitSlots?: number;
+  [key: string]: any;
+}
+
+/**
+ * Extended stats interface with relationship properties
+ */
+interface ExtendedStats {
+  relationshipGrowthFromTraits?: number;
+  [key: string]: any;
+}
 
 /**
  * StatisticsPanel component
@@ -18,8 +39,10 @@ import Panel from './Panel';
  * @returns {JSX.Element} The rendered StatisticsPanel component
  */
 const StatisticsPanel: React.FC = () => {
-  const gameState = useContext(GameStateContext);
-  const { player, stats } = gameState;
+  const gameState = useGameState();
+  // Use type assertion to work with extended player and stats objects
+  const player = gameState.player as ExtendedPlayer;
+  const stats = gameState.stats as ExtendedStats;
   
   /**
    * Formats large numbers with commas for better readability
@@ -27,8 +50,10 @@ const StatisticsPanel: React.FC = () => {
    * @param num - The number to format
    * @returns Formatted number string with commas as thousand separators
    */
-  const formatNumber = (num: number): string => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const formatNumber = (num: number | undefined): string => {
+    // Handle undefined or non-numeric values
+    const value = typeof num === 'number' ? num : 0;
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
   
   return (
@@ -49,7 +74,7 @@ const StatisticsPanel: React.FC = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" fontWeight="medium">
-                  {formatNumber(player.totalEssenceEarned || 0)}
+                  {formatNumber(player.totalEssenceEarned)}
                 </Typography>
               </Grid>
               
@@ -115,7 +140,7 @@ const StatisticsPanel: React.FC = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" fontWeight="medium">
-                  {formatNumber(stats?.relationshipGrowthFromTraits || 0)} points
+                  {formatNumber(stats?.relationshipGrowthFromTraits)} points
                 </Typography>
               </Grid>
               

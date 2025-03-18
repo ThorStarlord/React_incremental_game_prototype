@@ -31,7 +31,7 @@
  * // Switching active characters
  * dispatch(setActiveCharacter('char-002'));
  */
-import { ACTION_TYPES } from './actionTypes';
+import { ACTION_TYPES } from '../types/actionTypes';
 
 /**
  * Character data interface

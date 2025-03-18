@@ -1,10 +1,17 @@
 import React, { useEffect, ReactNode } from 'react';
 import { useGameState } from '../GameStateContext';
 import { useGameDispatch } from '../GameDispatchContext';
-import { ACTION_TYPES } from '../actions/actionTypes';
+import { ACTION_TYPES } from '../types/ActionTypes'; // Fixed casing in import path
 import { getSimplifiedTier } from '../../config/relationshipConstants';
 import { GameState, PlayerState } from '../initialStates/InitialStateComposer';
-import { UpdateNpcRelationshipPayload } from '../actions/npcActions';
+
+// Define the missing interface
+interface UpdateNpcRelationshipPayload {
+  npcId: string;
+  changeAmount: number;
+  source: string;
+}
+
 import { AddNotificationPayload, NotificationType } from '../actions/notificationActions';
 
 /**
@@ -124,7 +131,10 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
   useEffect(() => {
     const relationshipInterval = setInterval(() => {
       // Apply natural relationship decay over time
-      dispatch({ type: ACTION_TYPES.DECAY_RELATIONSHIPS });
+      dispatch({ 
+        type: ACTION_TYPES.DECAY_RELATIONSHIPS, 
+        payload: {} // Add required empty payload
+      });
       
       // Apply trait effects that modify relationships
       const hasGrowingAffinity = gameState.player.equippedTraits?.includes('GrowingAffinity');
@@ -228,7 +238,10 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
   useEffect(() => {
     const timeInterval = setInterval(() => {
       // Advance game time
-      dispatch({ type: ACTION_TYPES.ADVANCE_TIME });
+      dispatch({ 
+        type: ACTION_TYPES.ADVANCE_TIME,
+        payload: {} // Add required empty payload
+      });
       
       // Check for time-based events
       const { day, period } = gameState.gameTime || { day: 1, period: 'DAY' };
@@ -388,7 +401,7 @@ const GameLoop: React.FC<GameLoopProps> = ({ children }) => {
         const newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
         
         dispatch({
-          type: ACTION_TYPES.UPDATE_WEATHER,
+          type: ACTION_TYPES.SET_WEATHER, // Use correct action type
           payload: { weather: newWeather }
         });
         

@@ -13,8 +13,8 @@ import {
     Stack
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { dungeons } from '../../../../modules/data/dungeons';
-import { regions } from '../../../../modules/data/regions';
+import { dungeons } from '../../../World/data/dungeons';
+import { regions } from '../../../World/data/regions'; 
 import './DungeonPanel.css';
 
 /**

@@ -1,4 +1,4 @@
-import { ACTION_TYPES } from './actionTypes';
+import { ACTION_TYPES } from '../types/actionTypes';
 
 /**
  * Type definitions for notification actions
