@@ -9,7 +9,7 @@
  * @module npcActions
  */
 
-import { NPC_ACTIONS } from '../types/actionTypes';
+import { NPC_ACTIONS } from '../types/ActionTypes';
 
 /**
  * Update relationship with an NPC

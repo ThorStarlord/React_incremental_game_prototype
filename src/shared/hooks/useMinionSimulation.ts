@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useGameState, useGameDispatch } from '../../context';
+import { useGameState, useGameDispatch, ACTION_TYPES } from '../../context/GameStateExports';
 
 interface Minion {
   id: string;

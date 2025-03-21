@@ -1,4 +1,4 @@
-import { Item, ItemCategory, ItemRarity, BASE_ITEMS } from '../initialStates/itemsInitialState';
+import { Item, ItemCategory, ItemRarity, BASE_ITEMS } from '../initialStates/ItemsInitialState';
 import { createReducer } from '../utils/reducerUtils';
 
 /**

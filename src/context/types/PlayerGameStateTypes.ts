@@ -1,144 +1,165 @@
 /**
- * @file PlayerGameStateTypes.ts
- * @description Type definitions specifically related to the player character
- * 
- * This file contains all the interfaces and types that define the player's
- * attributes, stats, state, skills, effects, and traits. These types are used
- * across the player-related features of the game.
+ * Type definitions for player-related game state
  */
 
 /**
- * Player attributes that affect game mechanics
+ * Player attributes that can be increased through leveling
  */
 export interface PlayerAttributes {
-  strength: number;      // Affects physical damage and carrying capacity
-  intelligence: number;  // Affects magical abilities and mana pool
-  dexterity: number;     // Affects attack speed and dodge chance
-  vitality: number;      // Affects health points and regeneration
-  luck: number;          // Affects critical hit chance and item discovery
-  constitution: number;  // Affects total health and physical resistance
-  wisdom: number;        // Affects mana regeneration and spell effectiveness
-  charisma: number;      // Affects NPC interactions and prices
-  perception: number;    // Affects ability to find hidden objects and traps
-  agility: number;       // Affects movement speed and evasion
-  endurance: number;     // Affects stamina and resistance to fatigue
+  strength: number;     // Physical power
+  dexterity: number;    // Agility and reflexes
+  intelligence: number; // Mental acuity
+  vitality: number;     // Physical resilience
+  wisdom: number;       // Mental resilience
+  charisma: number;     // Social influence
+  luck: number;         // Fortune
+  perception: number;   // Awareness
+  [key: string]: number; // Allow for custom attributes
 }
 
 /**
- * Player's derived statistics from attributes and equipment
+ * Player stats derived from attributes, equipment, and effects
  */
 export interface PlayerStats {
   health: number;
   maxHealth: number;
-  healthRegen: number;
   mana: number;
   maxMana: number;
+  healthRegen: number;
   manaRegen: number;
   physicalDamage: number;
   magicalDamage: number;
-  critChance: number;    // As percentage
+  armor: number;
+  magicResistance: number;
+  critChance: number;
   critMultiplier: number;
-  
-  // Extended combat stats
-  attack?: number;
-  defense?: number;
+  evasion: number;
+  accuracy: number;
+  speed: number;
+  // Make these required instead of optional for consistency
+  attack: number;
+  defense: number;
+  // Allow for extensibility with a more specific type
+  [key: string]: number;
 }
 
 /**
- * Simplified inventory item for player inventory
+ * Types of status effects
  */
-export interface InventoryItem {
-  id: string;
-  name: string;
-  quantity: number;
-  quality?: string;
-  acquired?: {
-    timestamp: number;
-    source: string;
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
+export type StatusEffectType = 'buff' | 'debuff' | 'mixed' | 'neutral';
 
 /**
- * Skill definition for player skills
+ * Types of visual representations for effects
  */
-export interface Skill {
+export type VisualEffectType = 'glow' | 'particles' | 'aura' | 'icon' | 'animation' | 'none';
+
+/**
+ * Source that applied a status effect
+ */
+export interface StatusEffectSource {
+  type: 'item' | 'skill' | 'trait' | 'environment' | 'npc' | 'event' | 'system';
   id: string;
-  level: number;
-  experience: number;
-  [key: string]: any;
+  name?: string;
 }
 
 /**
- * Status Effect applied to the player
+ * Single stat modification applied by an effect
+ */
+export interface StatModifier {
+  stat: string;
+  value: number;
+  isPercentage?: boolean;
+}
+
+/**
+ * Status effect applied to the player
  */
 export interface StatusEffect {
+  /** Unique identifier for the effect */
   id: string;
+  
+  /** Display name of the effect */
   name: string;
+  
+  /** Detailed description of what the effect does */
+  description: string;
+  
+  /** Duration in seconds (0 for permanent effects) */
   duration: number;
-  strength?: number;
-  [key: string]: any;
+  
+  /** Timestamp when effect was applied */
+  startTime: number;
+  
+  /** Classification of the effect's nature */
+  type: StatusEffectType;
+  
+  /** Stat modifications applied by this effect */
+  effects: {
+    [statName: string]: number;
+  };
+  
+  /** Alternative way to specify stat modifications */
+  statModifiers?: StatModifier[];
+  
+  /** Source that applied this effect */
+  source?: StatusEffectSource;
+  
+  /** Whether multiple instances of this effect can be active simultaneously */
+  stackable?: boolean;
+  
+  /** Maximum number of stacks allowed (if stackable) */
+  maxStacks?: number;
+  
+  /** Current number of stacks (if stackable) */
+  currentStacks?: number;
+  
+  /** Visual representation in UI */
+  visualEffect?: VisualEffectType;
+  
+  /** Custom effect handler (for special effects that aren't just stat modifications) */
+  customHandler?: string;
+  
+  /** Whether the effect should be displayed in the UI */
+  hidden?: boolean;
+  
+  /** Tooltip text to show on hover */
+  tooltip?: string;
+  
+  /** Whether the effect can be removed by "dispel" actions */
+  isDispellable?: boolean;
+  
+  /** Unique ID of another effect this effect counters */
+  counters?: string[];
 }
 
 /**
- * Traits system effects
- */
-export interface TraitEffect {
-  attackBonus?: number;
-  defenseBonus?: number;
-  dodgeChance?: number;
-  criticalChance?: number;
-  criticalDamage?: number;
-  essenceSiphonChance?: number;
-  xpMultiplier?: number;
-  goldMultiplier?: number;
-  [key: string]: number | undefined;
-}
-
-/**
- * Player trait definition
- */
-export interface Trait {
-  id: string;
-  name: string;
-  effects?: TraitEffect;
-  [key: string]: any;
-}
-
-/**
- * Player information and core statistics
+ * Complete player state
  */
 export interface PlayerState {
   name: string;
-  level: number;
-  experience: number;
-  experienceToNextLevel: number;
   attributes: PlayerAttributes;
   stats: PlayerStats;
-  totalPlayTime: number;
-  creationDate: string | null;  // ISO date string or null
-  
-  // Extended trait system
-  equippedTraits?: string[];    // Array of equipped trait IDs
-  permanentTraits?: string[];   // Array of permanent trait IDs
-  acquiredTraits?: string[];    // Array of all acquired trait IDs
-  traitSlots?: number;          // Number of available trait slots
-  
-  // Optional - for backward compatibility
-  gold?: number;
+  gold: number;
   energy?: number;
   maxEnergy?: number;
-  inventory?: InventoryItem[];
-  equippedItems?: Record<string, string>;
+  inventory?: any[]; // Simplified from InventoryItem[]
   attributePoints?: number;
-  skills?: Skill[];
+  skills?: any[]; // Simplified from Skill[]
   activeEffects?: StatusEffect[];
-}
-
-/**
- * Container for the player state within the game state
- */
-export interface PlayerStateContainer {
-  player: PlayerState;
+  
+  // Trait system
+  equippedTraits: string[];
+  permanentTraits: string[];
+  traitSlots: number;
+  acquiredTraits: string[];
+  
+  // Time tracking
+  creationDate: string;
+  lastSaved: string;
+  totalPlayTime: number;
+  
+  // Additional fields with more specific types
+  activeCharacterId?: string;
+  lastRestLocation?: string;
+  lastRestTime?: number;
 }

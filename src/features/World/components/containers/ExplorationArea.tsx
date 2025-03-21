@@ -1,60 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Paper, Button } from '@mui/material';
-// import NPCEncounter from '../NPCEncounter'; // Commented out - module not found
-// import DungeonPanel from '../panels/DungeonPanel'; // Commented out - module not found
+// Import types
+import { BattleResult } from '../../../../context/types/BattleGameStateTypes';
+import { Enemy as DungeonEnemy } from '../../data/dungeonEnemies';
+import { CombatEnemy } from '../../../../context/types/combat';
+// Import the combat components
+import Battle from '../../../Combat/components/containers/Battle';
+import { adaptToCombatEnemy } from '../../../Combat/adapters/enemyAdapter';
 
 /**
  * Interface for the ExplorationArea component props
  */
 interface ExplorationAreaProps {
   dungeonId?: string;
-  onExplorationComplete: () => void;
+  onExplorationComplete: (result: BattleResult) => void;
   onBack: () => void;
   onStartBattle: (dungeonId: string) => void;
 }
-
-// Temporary Battle placeholder component until the real one is available
-const BattlePlaceholder: React.FC<{dungeonId?: string, onExplorationComplete: () => void}> = ({
-  dungeonId,
-  onExplorationComplete
-}) => (
-  <Paper sx={{ p: 3, textAlign: 'center' }}>
-    <Typography variant="h5">Combat System</Typography>
-    <Typography variant="body1">
-      Battle component is being developed. This is a placeholder.
-    </Typography>
-    <Typography variant="body2" sx={{ mt: 2 }}>
-      Dungeon ID: {dungeonId || 'None'}
-    </Typography>
-    <Box sx={{ mt: 3 }}>
-      <button onClick={onExplorationComplete}>
-        Complete Exploration
-      </button>
-    </Box>
-  </Paper>
-);
-
-// Temporary DungeonPanel placeholder component until the real one is available
-const DungeonPanelPlaceholder: React.FC<{
-  dungeonId: string;
-  onBack: () => void;
-  onStartBattle: (dungeonId: string) => void;
-}> = ({ dungeonId, onBack, onStartBattle }) => (
-  <Paper sx={{ p: 3, textAlign: 'center' }}>
-    <Typography variant="h5">Dungeon {dungeonId}</Typography>
-    <Typography variant="body1">
-      DungeonPanel component is being developed. This is a placeholder.
-    </Typography>
-    <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
-      <Button variant="outlined" onClick={onBack}>
-        Go Back
-      </Button>
-      <Button variant="contained" color="primary" onClick={() => onStartBattle(dungeonId)}>
-        Start Battle
-      </Button>
-    </Box>
-  </Paper>
-);
 
 /**
  * ExplorationArea Component
@@ -71,19 +33,91 @@ const ExplorationArea: React.FC<ExplorationAreaProps> = ({
   onBack, 
   onStartBattle 
 }) => {
+  // State to track combat status
+  const [isInCombat, setIsInCombat] = useState(false);
+  const [currentEnemy, setCurrentEnemy] = useState<DungeonEnemy | null>(null);
+  const [currentEncounter, setCurrentEncounter] = useState(1);
+  const [maxEncounters, setMaxEncounters] = useState(1);
+  const [difficulty, setDifficulty] = useState<'easy' | 'normal' | 'hard' | 'nightmare'>('normal');
+
+  // Function to handle starting a battle
+  const handleStartBattle = (dungeonId: string) => {
+    // In a real implementation, you'd load the enemy data from the dungeon
+    // For now, using a sample enemy
+    const sampleEnemy: DungeonEnemy = {
+      id: 'sample-1',
+      name: 'Test Enemy',
+      hp: 50,
+      attack: 5,
+      defense: 3,
+      essenceDrop: 10,
+      goldDrop: 15,
+      portrait: 'default_enemy',
+      traits: []
+    };
+    
+    setCurrentEnemy(sampleEnemy);
+    setIsInCombat(true);
+    onStartBattle(dungeonId);
+  };
+
+  // Function to handle retreat
+  const handleRetreat = () => {
+    setIsInCombat(false);
+    setCurrentEnemy(null);
+  };
+
+  // Function to handle exploration completion
+  const handleExplorationComplete = (result: BattleResult) => {
+    setIsInCombat(false);
+    setCurrentEnemy(null);
+    onExplorationComplete(result);
+  };
+
   return (
     <Box id="main-content" className="game-area">
-      {dungeonId ? (
-        <DungeonPanelPlaceholder
-          dungeonId={dungeonId}
-          onBack={onBack}
-          onStartBattle={onStartBattle}
+      {!isInCombat && dungeonId ? (
+        // Show dungeon info when not in combat
+        <Paper sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="h5">Dungeon {dungeonId}</Typography>
+          <Typography variant="body1">
+            Select an action below.
+          </Typography>
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+            <Button variant="outlined" onClick={onBack}>
+              Go Back
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => handleStartBattle(dungeonId)}
+            >
+              Start Battle
+            </Button>
+          </Box>
+        </Paper>
+      ) : isInCombat && currentEnemy ? (
+        // Show battle component when in combat
+        <Battle
+          enemy={adaptToCombatEnemy(currentEnemy)}
+          dungeonId={dungeonId || "unknown"}
+          encounter={currentEncounter}
+          totalEncounters={maxEncounters}
+          onExplorationComplete={handleExplorationComplete}
+          onRetreat={handleRetreat}
+          difficulty={difficulty}
         />
       ) : (
-        <BattlePlaceholder
-          dungeonId={dungeonId}
-          onExplorationComplete={onExplorationComplete}
-        />
+        // Default view when no dungeon is selected or in transition
+        <Paper sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="h5">Exploration Area</Typography>
+          <Typography variant="body1">
+            Select a dungeon from the world map to begin exploring.
+          </Typography>
+          <Button sx={{ mt: 2 }} variant="outlined" onClick={onBack}>
+            Return to Map
+          </Button>
+        </Paper>
       )}
     </Box>
   );

@@ -1,20 +1,15 @@
 /**
- * @file Central initial state configuration for the incremental RPG game
+ * Central initial state composition for the incremental RPG game.
  * 
- * This file serves as the single source of truth for all initial states in the game.
- * It imports and re-exports all initial states and composes them into a unified GameState.
+ * This file composes all module-specific initial states into a unified GameState
+ * that serves as the single source of truth for the game.
  */
 
-import { 
-  GameState, 
-  PlayerState, 
-  PlayerStats, 
-  EquipmentState,
-  InventoryItem
-} from '../types/GameStateTypes';
+import { GameState } from '../types/GameStateTypes';
+import { createImmutableState, validateInitialState } from '../utils/stateUtils';
 
-// Import all initial states from their respective modules
-import { PlayerInitialState, resetPlayerState as resetPlayer, DefaultPlayerAttributes } from './PlayerInitialState';
+// Import all initial states - using explicit imports for better readability and control
+import { PlayerInitialState } from './PlayerInitialState';
 import statisticsInitialState from './StatisticsInitialState';
 import notificationsInitialState from './NotificationsInitialState';
 import settingsInitialState from './SettingsInitialState';
@@ -28,158 +23,81 @@ import traitsInitialState from './TraitsInitialState';
 import resourceInitialState from './ResourceInitialState';
 import combatInitialState from './CombatInitialState';
 import worldInitialState from './WorldInitialState';
+import skillsInitialState from './SkillsInitialState';
+import questsInitialState from './QuestsInitialState';
 
 /**
- * Initial game state composed of all module states
- * @type {GameState}
+ * State module definition with key and validation function
  */
-export const InitialState: GameState = {
-  player: {
-    ...PlayerInitialState.player,
-    attributes: {
-      ...PlayerInitialState.player.attributes,
-      ...DefaultPlayerAttributes
+interface StateModule {
+  key: keyof GameState;
+  state: any;
+}
+
+/**
+ * Array of all state modules to be composed into the initial state
+ */
+const stateModules: StateModule[] = [
+  { key: 'player', state: PlayerInitialState },
+  { key: 'statistics', state: { current: statisticsInitialState, history: [] } },
+  { key: 'notifications', state: notificationsInitialState },
+  { key: 'settings', state: settingsInitialState },
+  { key: 'progression', state: progressionInitialState },
+  { key: 'equipment', state: equipmentInitialState },
+  { key: 'inventory', state: inventoryInitialState },
+  { key: 'meta', state: metaInitialState },
+  { key: 'factions', state: factionsInitialState },
+  { key: 'essence', state: essenceInitialState },
+  { key: 'traits', state: traitsInitialState },
+  { key: 'resources', state: resourceInitialState },
+  { key: 'combat', state: combatInitialState },
+  { key: 'world', state: worldInitialState },
+  { key: 'skills', state: skillsInitialState },
+  { key: 'quests', state: questsInitialState }
+];
+
+/**
+ * Validate all initial state modules
+ */
+const validateAllModules = () => {
+  console.log('Validating initial state modules...');
+  
+  for (const module of stateModules) {
+    try {
+      // Validate individual module
+      validateInitialState(module.state, module.key.toString());
+    } catch (error) {
+      console.error(`Error validating ${module.key} state:`, error);
+      throw new Error(`Invalid initial state for ${module.key}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  },
-  resources: resourceInitialState,
-  skills: {
-    combat: {
-      swordplay: 1,
-      archery: 0,
-      defense: 1,
-      dualWielding: 0
-    },
-    magic: {
-      fireMagic: 0,
-      iceMagic: 0,
-      lightningMagic: 0,
-      restoration: 1
-    },
-    crafting: {
-      alchemy: 0,
-      blacksmithing: 0,
-      leatherworking: 0,
-      enchanting: 0
-    },
-    gathering: {
-      mining: 0,
-      herbalism: 1,
-      woodcutting: 1,
-      fishing: 0
-    }
-  },
-  inventory: inventoryInitialState,
-  equipment: equipmentInitialState,
-  progression: progressionInitialState,
-  combat: combatInitialState,
-  settings: settingsInitialState,
-  statistics: {
-    current: statisticsInitialState,
-    history: []
-  },
-  meta: metaInitialState,
-  notifications: notificationsInitialState,
-  factions: factionsInitialState,
-  essence: essenceInitialState,
-  traits: traitsInitialState,
-  // Removed the 'items: itemsInitialState' property as it's not in the GameState interface
-  world: worldInitialState,
-  // Keep any other valid properties
-  quests: { 
-    activeQuests: [], 
-    completedQuests: [], 
-    failedQuests: [], 
-    availableQuests: [], 
-    questLog: [],
-    dailyReset: 0,
-    weeklyReset: 0
   }
-};
-
-/**
- * Reset the game state to initial values
- * @returns {GameState} A fresh copy of the initial state
- */
-export const resetGameState = (): GameState => {
-  return structuredClone(InitialState);
-};
-
-/**
- * Reset player state to initial values
- */
-export const resetPlayerState = (): PlayerState => {
-  return resetPlayer(); // Use the function from PlayerInitialState
-};
-
-/**
- * Calculate experience required for a specific level
- * @param {number} level - The level to calculate for
- * @returns {number} Experience points required
- * @todo Consider moving this to src/features/player/utils/experienceUtils.ts
- */
-export const calculateExperienceForLevel = (level: number): number => {
-  return Math.floor(100 * Math.pow(level, 1.5));
-};
-
-/**
- * Helper function to recalculate derived stats based on attributes and equipment
- * @param {PlayerState} playerState - Current player state
- * @param {EquipmentState} equipment - Currently equipped items
- * @returns {PlayerState} Updated player state
- * @todo Consider moving this to src/features/player/utils/playerUtils.ts
- */
-export const recalculatePlayerStats = (player: PlayerState): PlayerStats => {
-  // Calculate derived stats from player attributes
-  const derivedStats: Partial<PlayerStats> = {
-    maxHealth: 100 + (player.attributes.vitality * 10),
-    healthRegen: 0.5 + (player.attributes.vitality * 0.1),
-    maxMana: 50 + (player.attributes.intelligence * 10),
-    manaRegen: 0.5 + (player.attributes.intelligence * 0.1),
-    physicalDamage: 5 + (player.attributes.strength * 0.5),
-    magicalDamage: 2 + (player.attributes.intelligence * 0.5),
-    critChance: 5 + (player.attributes.luck * 0.5),
-    critMultiplier: 1.5 + (player.attributes.luck * 0.05),
-  };
   
-  return {
-    ...player.stats,
-    ...derivedStats
-  };
+  console.log('All initial state modules validated successfully');
+};
+
+// Run validation during development but not in production
+if (process.env.NODE_ENV !== 'production') {
+  validateAllModules();
+}
+
+/**
+ * Compose all state modules into a complete GameState
+ */
+const composeInitialState = (): GameState => {
+  const state: Partial<GameState> = {};
+  
+  // Combine all modules into a single state object
+  for (const module of stateModules) {
+    state[module.key] = module.state;
+  }
+  
+  return state as GameState;
 };
 
 /**
- * Calculate equipment bonuses
- * @param {EquipmentState} equipment - Currently equipped items
- * @returns {PlayerStats} Stat bonuses from equipment
+ * The composed initial game state - frozen to prevent unintended modifications
+ * This is the single source of truth for the game's initial state.
  */
-export const calculateEquipmentBonuses = (equipment: EquipmentState): Partial<PlayerStats> => {
-  // Initialize empty stat bonuses
-  const bonuses: Partial<PlayerStats> = {
-    maxHealth: 0,
-    healthRegen: 0,
-    maxMana: 0,
-    manaRegen: 0,
-    physicalDamage: 0,
-    magicalDamage: 0,
-    critChance: 0,
-    critMultiplier: 0
-  };
-  
-  // Iterate through each equipment slot
-  Object.values(equipment).forEach(item => {
-    if (item && item.stats) {
-      // Add each stat bonus from the item
-      Object.entries(item.stats).forEach(([key, value]) => {
-        if (key in bonuses && typeof value === 'number') {
-          bonuses[key as keyof PlayerStats] = 
-            (bonuses[key as keyof PlayerStats] as number) + value;
-        }
-      });
-    }
-  });
-  
-  return bonuses;
-};
+export const InitialState: Readonly<GameState> = createImmutableState(composeInitialState());
 
-// Export types directly from their source
-export type { GameState, PlayerState, PlayerStats, EquipmentState, InventoryItem } from '../types/GameStateTypes';
+export default InitialState;

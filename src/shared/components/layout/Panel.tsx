@@ -1,102 +1,47 @@
-import React, { useState, ReactNode } from 'react';
-import { Card, Typography, Accordion, AccordionSummary, AccordionDetails, useTheme, Box, SxProps, Theme } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import styles from './Panel.module.css';
+import React, { ReactNode } from 'react';
+import { Box, Paper, Typography } from '@mui/material';
 
 /**
- * Interface for Panel component props
+ * Props for Panel component
  */
 interface PanelProps {
-  /** The title displayed in the panel header */
-  title: string | ReactNode;
-  /** Optional icon to display before the title */
-  icon?: ReactNode;
-  /** Content to display inside the panel */
+  /** Panel title */
+  title?: string;
+  /** Panel content */
   children: ReactNode;
-  /** Whether the panel is expanded by default */
-  defaultExpanded?: boolean;
-  /** Additional MUI styling to apply to the Card component */
-  sx?: SxProps<Theme>;
+  /** Additional styling */
+  sx?: any;
 }
 
 /**
- * Panel Component
- * 
- * A collapsible container with a header that can be expanded or collapsed.
- * Used to organize and section content in the UI.
- * 
- * @component
- * @param props - Component props
- * @returns Rendered Panel component
+ * Panel component for consistent UI containers
  */
-const Panel: React.FC<PanelProps> = ({ 
-  title, 
-  icon, 
-  children, 
-  defaultExpanded = true, 
-  sx = {} 
-}) => {
-  const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
-  const theme = useTheme();
-
+const Panel: React.FC<PanelProps> = ({ title, children, sx = {} }) => {
   return (
-    <Card 
-      sx={{ 
-        width: '100%', 
+    <Paper 
+      elevation={2}
+      sx={{
+        p: 2,
         height: '100%',
-        backgroundColor: theme.palette.background.paper,
-        ...sx 
+        display: 'flex',
+        flexDirection: 'column',
+        ...sx
       }}
-      className={styles.panel}
     >
-      <Accordion
-        expanded={expanded}
-        onChange={() => setExpanded(!expanded)}
-        sx={{
-          background: 'transparent',
-          '&:before': {
-            display: 'none',
-          },
-        }}
-        className={expanded ? styles.expanded : styles.collapsed}
-      >
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel-content"
-          id="panel-header"
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            '& .MuiAccordionSummary-expandIconWrapper': {
-              color: theme.palette.primary.contrastText,
-            },
-          }}
-          className={styles.panelHeader}
+      {title && (
+        <Typography 
+          variant="h6" 
+          component="h2" 
+          sx={{ mb: 2, borderBottom: '1px solid', borderColor: 'divider', pb: 1 }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center' }} className={styles.panelHeaderIcon}>
-            {icon && <Box sx={{ mr: 1 }}>{icon}</Box>}
-            <Typography variant="h6">{title}</Typography>
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails
-          sx={{
-            p: 2,
-            borderRadius: 1,
-            bgcolor: theme.palette.background.default,
-            boxShadow: theme.shadows[1],
-            width: '100%'
-          }}
-          className={styles.panelContent}
-        >
-          {children}
-        </AccordionDetails>
-      </Accordion>
-    </Card>
+          {title}
+        </Typography>
+      )}
+      <Box sx={{ flexGrow: 1 }}>
+        {children}
+      </Box>
+    </Paper>
   );
 };
 
 export default Panel;
-
-// Make sure this file is recognized as an ES module
-// This helps TypeScript recognize the file as a proper module
-export {};

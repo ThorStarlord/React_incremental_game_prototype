@@ -59,7 +59,7 @@ import DragHandleIcon from '@mui/icons-material/DragHandle';
 import MaximizeIcon from '@mui/icons-material/Maximize';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 // Fix imports by using type assertions
-import Battle from '../../features/Combat/components/container/Battle';
+import Battle from '../../features/Combat/components/containers/Battle';
 // Fix WorldMap import by using explicit require with type assertion
 const WorldMap = require('../../features/World/components/containers/WorldMap').default as React.FC<WorldMapProps>;
 import MainContent from '../../shared/components/layout/MainContent';

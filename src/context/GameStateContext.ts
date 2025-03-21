@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
-import { GameState, InitialState } from './initialStates/InitialStateComposer';
+import { GameState } from './types/GameStateTypes';
+import { InitialState } from './initialStates/InitialStateComposer';
 
 // Extended state interface with utility methods
 export interface EnhancedGameState extends GameState {
@@ -8,10 +9,26 @@ export interface EnhancedGameState extends GameState {
   resetGame: () => void;
   exportSave: () => string;
   importSave: (saveData: string) => Promise<boolean>;
+  // Add calculated stats property
+  calculatedStats?: {
+    maxHealth?: number;
+    maxMana?: number;
+    attack?: number;
+    defense?: number;
+    critChance?: number;
+    [key: string]: number | undefined;
+  };
 }
 
 // Create the context with the proper type and default value
-const GameStateContext = createContext<EnhancedGameState>(InitialState as unknown as EnhancedGameState);
+const GameStateContext = createContext<EnhancedGameState>({
+  ...InitialState,
+  saveGame: async () => false,
+  loadGame: async () => false,
+  resetGame: () => {},
+  exportSave: () => '',
+  importSave: async () => false
+});
 
 /**
  * Custom hook for accessing the game state with proper typing
