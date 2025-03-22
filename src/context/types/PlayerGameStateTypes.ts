@@ -147,6 +147,9 @@ export interface PlayerState {
   skills?: any[]; // Simplified from Skill[]
   activeEffects?: StatusEffect[];
   
+  // Add experience property for player progression
+  experience?: number;
+  
   // Trait system
   equippedTraits: string[];
   permanentTraits: string[];

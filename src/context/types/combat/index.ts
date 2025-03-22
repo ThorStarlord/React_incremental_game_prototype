@@ -2,6 +2,9 @@
  * Root export file for combat types
  */
 
+// Import needed for the CombatEnemy type alias
+import { Enemy } from './actors';
+
 // Re-export all types from their respective modules
 export * from './basic';
 export * from './actors';
@@ -13,5 +16,4 @@ export * from './state';
 export * from './hooks';
 
 // Add this type alias so Enemy can be imported as CombatEnemy
-import { Enemy } from './actors';
 export type CombatEnemy = Enemy;

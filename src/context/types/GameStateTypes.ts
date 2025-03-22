@@ -2,15 +2,26 @@
  * Consolidated type definitions for the game state
  */
 
+// Import game loop state types
+import { 
+  NPC, 
+  GameArea, 
+  GameTime, 
+  // Import with aliases to avoid conflicts
+  QuestObjective as GameLoopQuestObjective, 
+  Quest as GameLoopQuest,
+  ExtendedPlayerState,
+  ExtendedGameState 
+} from './gameLoopStateTypes';
+
 // Import player-related types
 import { 
   PlayerState, 
   PlayerAttributes, 
   PlayerStats, 
-  Skill,
-  StatusEffect,
-  TraitEffect,
-  Trait
+  StatusEffect
+  // Remove imports for types that don't exist:
+  // Skill, TraitEffect, Trait
 } from './PlayerGameStateTypes';
 
 // Import combat-related types
@@ -43,8 +54,8 @@ import {
 // Import progression-related types
 import {
   ProgressionState,
-  Quest,
-  QuestObjective,
+  Quest as ProgressionQuest,
+  QuestObjective as ProgressionQuestObjective,
   QuestReward,
   Achievement,
   GameLocation,
@@ -211,13 +222,13 @@ export interface CombatState {
   };
 }
 
-// Re-export types for convenience
+// Re-export types for convenience, fixing the duplicates
 export type {
-  PlayerState, PlayerAttributes, PlayerStats, Skill, StatusEffect, TraitEffect, Trait,
+  PlayerState, PlayerAttributes, PlayerStats, StatusEffect, // Remove Skill, TraitEffect, Trait
   CombatSkills, Enemy, CombatActionType, CombatActionResult, CombatLogEntry, CombatStateContainer,
   GameItem, ItemEffect, ItemStats, InventoryState, InventoryItem,
   EquipmentState, EquipmentBonuses, EquipmentRequirements, EquipmentSlot,
-  ProgressionState, Quest, QuestObjective, QuestReward, Achievement, GameLocation, GameFeature,
+  ProgressionState, QuestReward, Achievement, GameLocation, GameFeature,
   SettingsState, NotificationSettings, AudioSettings, GameplaySettings, UISettings, AccessibilitySettings,
   StatisticsState, StatisticsSystem,
   MetaState, SemanticVersion, SaveHistoryEntry, PlaySession, GameUpdate, FeatureFlags, DebugInfo, MigrationRecord,
@@ -229,5 +240,18 @@ export type {
   EssenceState,
   NotificationsState,
   ResourceState,
-  FactionSystem // Add this line to re-export FactionSystem
+  FactionSystem, // Add this line to re-export FactionSystem
+  
+  // Re-export game loop types with aliases
+  NPC,
+  GameArea,
+  GameTime,
+  GameLoopQuestObjective,
+  GameLoopQuest,
+  ExtendedPlayerState,
+  ExtendedGameState,
+  
+  // Export progression types with aliases
+  ProgressionQuest as Quest,
+  ProgressionQuestObjective as QuestObjective
 };

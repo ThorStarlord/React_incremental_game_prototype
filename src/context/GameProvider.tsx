@@ -4,7 +4,8 @@ import { GAME_INIT_ACTIONS } from './types/ActionTypes';
 import { GameAction } from './GameDispatchContext';
 import GameStateContext, { EnhancedGameState } from './GameStateContext';
 import GameDispatchContext from './GameDispatchContext';
-import { GameState, InitialState } from './initialStates/InitialStateComposer';
+import { GameState } from './types/GameStateTypes'; // Fix import location for GameState
+import { InitialState } from './initialStates/InitialStateComposer';
 
 // Game version for save compatibility
 const GAME_VERSION = '0.1.0';
@@ -35,7 +36,7 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
           id: slotId,
           name: gameState.player?.name || 'Unnamed Hero',
           timestamp: Date.now(),
-          playerLevel: gameState.player?.level || 1,
+          playerLevel: (gameState.player as any)?.level || 1, // Use type assertion for level property
           playtime: gameState.statistics?.current?.timeStatistics?.totalPlayTime || 0 // Fixed: use correct path to totalPlayTime
         };
         
