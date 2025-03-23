@@ -10,7 +10,7 @@ import {
   PLAYER_ACTIONS, 
   PlayerAction,
   ModificationReason
-} from '../../types/playerActionTypes';
+} from '../../types/actions/playerActionTypes';
 import { validatePositive } from './utils';
 
 /**

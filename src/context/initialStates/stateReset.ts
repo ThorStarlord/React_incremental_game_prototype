@@ -6,9 +6,9 @@
  */
 
 import { deepClone } from '../utils/stateUtils';
-import { GameState } from '../types/GameStateTypes';
+import { GameState } from '../types/gameStates/GameStateTypes';
 import { InitialState } from './InitialStateComposer';
-import { PlayerState } from '../types/PlayerGameStateTypes';
+import { PlayerState } from '../types/gameStates/PlayerGameStateTypes';
 import { resetPlayerState as resetPlayer } from './PlayerInitialState';
 
 /**

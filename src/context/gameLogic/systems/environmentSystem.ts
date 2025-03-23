@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ACTION_TYPES } from '../../types/ActionTypes';
 import { createNotification } from '../utils/notificationHelpers';
-import { ExtendedGameState } from '../../types/gameLoopStateTypes';
+import { ExtendedGameState } from '../../types/gameStates/gameLoopStateTypes';
 import { GameAction } from '../../GameDispatchContext';
 
 /**

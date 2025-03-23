@@ -9,7 +9,7 @@ import {
   SLOT_REQUIREMENT_TYPES,
   TraitId,
   createTraitId
-} from '../types/TraitsGameStateTypes';
+} from '../types/gameStates/TraitsGameStateTypes';
 
 /**
  * Initial configuration for locked trait slots

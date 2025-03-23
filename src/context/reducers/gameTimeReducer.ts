@@ -5,7 +5,7 @@ import {
   Season, 
   Weather, 
   TimeChangeEvent 
-} from '../types/TimeGameStateTypes';
+} from '../types/gameStates/TimeGameStateTypes';
 import { addNotification } from '../utils/notificationUtils';
 import gameTimeInitialState from '../initialStates/GameTimeInitialState';
 

@@ -15,6 +15,9 @@ import { useCombatFlow } from '../../hooks/useCombatFlow';
 // Import types
 import { CombatResult } from '../../types/combatTypes';
 
+// Import adapter
+import { adaptEnemy } from '../../utils/enemyAdapter';
+
 /**
  * Interface for Combat component props
  */
@@ -118,7 +121,7 @@ const Combat: React.FC<CombatProps> = ({
       {/* Main battle component */}
       {currentEnemy && (
         <Battle 
-          enemy={currentEnemy}
+          enemy={adaptEnemy(currentEnemy)}
           dungeonId={areaId}
           encounter={currentEncounter + 1}
           totalEncounters={totalEncounters}

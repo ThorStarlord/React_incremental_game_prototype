@@ -72,64 +72,29 @@ export interface StatModifier {
 }
 
 /**
- * Status effect applied to the player
+ * Interface for status effects that can be applied to entities
  */
 export interface StatusEffect {
   /** Unique identifier for the effect */
   id: string;
-  
   /** Display name of the effect */
   name: string;
-  
-  /** Detailed description of what the effect does */
-  description: string;
-  
-  /** Duration in seconds (0 for permanent effects) */
+  /** How long the effect lasts (in turns, seconds, etc.) */
   duration: number;
-  
-  /** Timestamp when effect was applied */
-  startTime: number;
-  
-  /** Classification of the effect's nature */
-  type: StatusEffectType;
-  
-  /** Stat modifications applied by this effect */
-  effects: {
-    [statName: string]: number;
-  };
-  
-  /** Alternative way to specify stat modifications */
-  statModifiers?: StatModifier[];
-  
-  /** Source that applied this effect */
-  source?: StatusEffectSource;
-  
-  /** Whether multiple instances of this effect can be active simultaneously */
-  stackable?: boolean;
-  
-  /** Maximum number of stacks allowed (if stackable) */
-  maxStacks?: number;
-  
-  /** Current number of stacks (if stackable) */
-  currentStacks?: number;
-  
-  /** Visual representation in UI */
-  visualEffect?: VisualEffectType;
-  
-  /** Custom effect handler (for special effects that aren't just stat modifications) */
-  customHandler?: string;
-  
-  /** Whether the effect should be displayed in the UI */
-  hidden?: boolean;
-  
-  /** Tooltip text to show on hover */
-  tooltip?: string;
-  
-  /** Whether the effect can be removed by "dispel" actions */
-  isDispellable?: boolean;
-  
-  /** Unique ID of another effect this effect counters */
-  counters?: string[];
+  /** Description of what the effect does */
+  description: string;
+  /** When the effect started */
+  startTime?: number;
+  /** When the effect was applied (for sorting) */
+  timestamp?: number;
+  /** Type of effect (buff, debuff, etc.) */
+  type?: string;
+  /** Strength/magnitude of the effect */
+  strength?: number;
+  /** Specific effect modifiers and values */
+  effects?: Record<string, any>;
+  /** Additional metadata for the effect */
+  [key: string]: any;
 }
 
 /**

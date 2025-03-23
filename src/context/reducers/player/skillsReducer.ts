@@ -1,126 +1,206 @@
-import { PlayerState } from '../../types/GameStateTypes';
+import { PlayerState } from '../../types/gameStates/GameStateTypes';
 import { PlayerAction } from '../playerReducer';
 import { PLAYER_ACTIONS } from '../../types/ActionTypes';
-import { Skill } from '../../types/combat/skills';
 import { isActionOfType } from '../playerReducer';
 
 /**
- * Skills reducer - manages player skills and skill progression
+ * Interface for properly typed payloads
+ */
+interface UpdateSkillPayload {
+  skillId: string;
+  experience: number;
+}
+
+interface LearnSkillPayload {
+  skillId: string;
+  timestamp?: number;
+}
+
+interface UpgradeSkillPayload {
+  skillId: string;
+  level: number;
+  cost: number;
+  timestamp?: number;
+}
+
+/**
+ * Calculate skill level based on experience
+ * @param experience - Current experience points
+ * @returns Calculated skill level
+ */
+function calculateSkillLevel(experience: number): number {
+  // Simple skill level formula: Level = sqrt(experience/100) + 1
+  return Math.floor(Math.sqrt(experience / 100)) + 1;
+}
+
+/**
+ * Create a new skill object with default values
+ * @param skillId - Unique identifier for the skill
+ * @returns New skill object
+ */
+function createNewSkill(skillId: string) {
+  return {
+    id: skillId,
+    level: 1,
+    experience: 0
+  };
+}
+
+/**
+ * Skills reducer - manages player skills and their progression
  * 
  * Responsible for:
- * - Tracking skill experience and levels
+ * - Tracking skill experience and level progression
  * - Learning new skills
  * - Upgrading existing skills
  */
 export const skillsReducer = (state: PlayerState, action: PlayerAction): PlayerState => {
   switch (action.type) {
-    case PLAYER_ACTIONS.UPDATE_SKILL:
-      // Use type assertion for action.payload
-      const payload = action.payload as { skillId: string, experience: number };
-      const { skillId, experience } = payload;
+    case PLAYER_ACTIONS.UPDATE_SKILL: {
+      // Type guard for UPDATE_SKILL action
+      if (!isActionOfType(action, PLAYER_ACTIONS.UPDATE_SKILL)) {
+        return state;
+      }
+
+      // Validate payload structure
+      if (!action.payload || 
+          typeof action.payload !== 'object' ||
+          typeof action.payload.skillId !== 'string' ||
+          typeof action.payload.experience !== 'number') {
+        console.warn('Invalid UPDATE_SKILL payload:', action.payload);
+        return state;
+      }
+
+      const { skillId, experience } = action.payload as UpdateSkillPayload;
       
-      // Find skill if it exists
+      // Handle negative experience values
+      if (experience <= 0) {
+        console.warn('Ignoring negative or zero skill experience update');
+        return state;
+      }
+
+      // Initialize skills array if undefined
       const skills = state.skills || [];
       const existingSkillIndex = skills.findIndex(skill => skill.id === skillId);
-      
-      // Create a new skills array using slice instead of spread
-      const updatedSkills = skills.slice();
       
       if (existingSkillIndex >= 0) {
         // Update existing skill
         const currentSkill = skills[existingSkillIndex];
-        if (currentSkill) {
-          const newExperience = currentSkill.experience + experience;
-          const newLevel = Math.floor(Math.pow(newExperience / 100, 0.8)) + 1;
-          
-          // Create a new skill object explicitly
-          updatedSkills[existingSkillIndex] = {
-            id: currentSkill.id,
+        const newExperience = (currentSkill?.experience || 0) + experience;
+        const newLevel = calculateSkillLevel(newExperience);
+        
+        // Create a new skills array with the updated skill
+        const updatedSkills = [
+          ...skills.slice(0, existingSkillIndex),
+          {
+            ...currentSkill,
             level: newLevel,
             experience: newExperience
-          };
-        }
-      } else {
-        // Add new skill
-        const newSkill: Skill = {
-          id: skillId,
-          level: 1,
-          experience
+          },
+          ...skills.slice(existingSkillIndex + 1)
+        ];
+        
+        return {
+          ...state,
+          skills: updatedSkills
         };
-        updatedSkills.push(newSkill);
+      } else {
+        // Add new skill with initial experience
+        return {
+          ...state,
+          skills: [
+            ...skills,
+            {
+              id: skillId,
+              level: calculateSkillLevel(experience),
+              experience
+            }
+          ]
+        };
       }
-      
-      return {
-        ...state,
-        skills: updatedSkills
-      };
+    }
 
-    case PLAYER_ACTIONS.LEARN_SKILL:
+    case PLAYER_ACTIONS.LEARN_SKILL: {
       // Type guard for LEARN_SKILL action
       if (!isActionOfType(action, PLAYER_ACTIONS.LEARN_SKILL)) {
         return state;
       }
       
-      // Check payload shape
-      if (!action.payload || typeof action.payload !== 'object' || !('skillId' in action.payload)) {
+      // Validate payload
+      if (!action.payload || 
+          typeof action.payload !== 'object' ||
+          typeof action.payload.skillId !== 'string') {
+        console.warn('Invalid LEARN_SKILL payload:', action.payload);
         return state;
       }
       
-      const learnSkillId = action.payload.skillId;
-      if (state.skills?.some(skill => skill.id === learnSkillId)) {
+      const { skillId } = action.payload as LearnSkillPayload;
+      
+      // Check if skill already exists
+      const skills = state.skills || [];
+      if (skills.some(skill => skill.id === skillId)) {
+        console.info(`Skill ${skillId} already learned, skipping.`);
         return state;
       }
-      const newSkill: Skill = {
-        id: learnSkillId,
-        level: 1,
-        experience: 0
-      };
+      
+      // Create a new skill
       return {
         ...state,
-        skills: [...(state.skills || []), newSkill]
+        skills: [
+          ...skills,
+          createNewSkill(skillId)
+        ]
       };
+    }
 
-    case PLAYER_ACTIONS.UPGRADE_SKILL:
-      type UpgradeSkillPayload = { 
-        skillId: string;
-        level: number;
-        cost: number;
-        timestamp?: number;
-      };
+    case PLAYER_ACTIONS.UPGRADE_SKILL: {
+      // Type guard for UPGRADE_SKILL action
+      if (!isActionOfType(action, PLAYER_ACTIONS.UPGRADE_SKILL)) {
+        return state;
+      }
       
-      if (!action.payload) return state;
-      const upgradePayload = action.payload as UpgradeSkillPayload;
+      // Validate payload
+      if (!action.payload || 
+          typeof action.payload !== 'object' ||
+          typeof action.payload.skillId !== 'string' ||
+          typeof action.payload.level !== 'number') {
+        console.warn('Invalid UPGRADE_SKILL payload:', action.payload);
+        return state;
+      }
       
-      // Safely access the payload properties without spreading
-      const upgradeSkillId = upgradePayload.skillId;
-      const level = upgradePayload.level;
+      const { skillId, level } = action.payload as UpgradeSkillPayload;
       
-      const existingSkills = state.skills || [];
-      const skillIndex = existingSkills.findIndex(skill => skill.id === upgradeSkillId);
+      // Find the skill to upgrade
+      const skills = state.skills || [];
+      const skillIndex = skills.findIndex(skill => skill.id === skillId);
       
       if (skillIndex === -1) {
+        console.warn(`Cannot upgrade skill ${skillId}: skill not found`);
         return state;
       }
       
-      // Create a new skills array without using spread on potentially undefined values
-      const skillsAfterUpgrade = existingSkills.slice();
-      
-      // Get the current skill object
-      const currentSkill = existingSkills[skillIndex];
-      if (currentSkill) {
-        // Create a new skill object with updated properties
-        skillsAfterUpgrade[skillIndex] = {
-          id: currentSkill.id,
-          level: level,
-          experience: currentSkill.experience
-        };
+      // Safety check for level validity (can't downgrade)
+      const currentSkill = skills[skillIndex];
+      if (level <= (currentSkill?.level || 0)) {
+        console.warn(`Cannot downgrade skill ${skillId} from level ${currentSkill?.level} to ${level}`);
+        return state;
       }
       
-      // Return the updated state
+      // Create updated skills array
+      const updatedSkills = [
+        ...skills.slice(0, skillIndex),
+        {
+          ...skills[skillIndex],
+          level
+        },
+        ...skills.slice(skillIndex + 1)
+      ];
+      
       return {
         ...state,
-        skills: skillsAfterUpgrade
+        skills: updatedSkills
       };
+    }
 
     default:
       return state;

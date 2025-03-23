@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useGameState } from '../../../context';
+import { useGameState } from '../../../context/GameStateExports';
 import '../../../constants/GameStateTypes'; // Import our type extensions
 
 /**
@@ -34,7 +34,8 @@ const useTraitEffects = () => {
     
     // Process each trait
     allTraits.forEach(traitId => {
-      const trait = traits.copyableTraits[traitId];
+      // Fix the type by using a type assertion or indexing with a safe approach
+      const trait = traits.copyableTraits[traitId as keyof typeof traits.copyableTraits];
       if (!trait) return;
       
       // Apply effects from trait

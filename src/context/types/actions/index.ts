@@ -1,105 +1,175 @@
 /**
  * Action Types Index
+ * =================
  * 
- * This file re-exports all action types from their respective modules to maintain
- * backward compatibility while providing a more modular structure.
+ * Central hub for all action type definitions across the application.
+ * This module provides:
+ * 
+ * 1. A unified export of all domain-specific action types
+ * 2. Utility types for working with actions
+ * 3. Type-safe action creation helpers
+ * 
+ * @module actions
  */
 
-// Import all domain-specific action types first
-import { PLAYER_ACTIONS } from './playerActions';
-import { INVENTORY_ACTIONS } from './inventoryActions';
-import { ESSENCE_ACTIONS } from './essenceActions';
-import { COMBAT_ACTIONS } from './combatActions';
-import { CRAFTING_ACTIONS } from './craftingActions';
-import { QUEST_ACTIONS } from './questActions';
-import { TRAIT_ACTIONS } from './traitActions';
-import { SKILL_ACTIONS } from './skillActions';
-import { WORLD_ACTIONS } from './worldActions';
-import { TIME_ACTIONS } from './timeActions';
-import { DISCOVERY_ACTIONS } from './discoveryActions';
-import { RESOURCE_ACTIONS } from './resourceActions';
-import { SETTINGS_ACTIONS } from './settingsActions';
-import { GAME_INIT_ACTIONS } from './gameInitActions';
-import { CHARACTER_ACTIONS } from './characterActions';
-import { NPC_ACTIONS } from './npcActions';
-import { NOTIFICATION_ACTIONS } from './notificationActions';
-import { ENCOUNTER_ACTIONS } from './encounterActions';
+// Import action types from all domain-specific modules
+import { PLAYER_ACTIONS, PlayerAction, PlayerActionType, TypedPlayerAction } from './playerActionTypes';
+import { COMBAT_ACTIONS, CombatAction, CombatActionType, TypedCombatAction } from './combatActionTypes';
+import { INVENTORY_ACTIONS, InventoryAction, InventoryActionType } from './inventoryActionTypes';
+import { QUEST_ACTIONS, QuestAction, QuestActionType } from './questActionTypes';
+import { NOTIFICATION_ACTIONS, NotificationAction, NotificationActionType } from './notificationActionTypes';
+import { NPC_ACTIONS, NpcAction, NpcActionType } from './npcActionTypes';
+import { CHARACTER_ACTIONS, CharacterAction, CharacterActionType } from './characterActionTypes';
+import { TRAIT_ACTIONS, TraitAction, TraitActionType } from './traitActionTypes';
+import { SKILL_ACTIONS, SkillAction, SkillActionType } from './skillActionTypes';
+import { WORLD_ACTIONS, WorldAction, WorldActionType } from './worldActionTypes';
+import { GAME_INIT_ACTIONS, GameInitAction, GameInitActionType } from './gameInitActionTypes';
+import { ESSENCE_ACTIONS, EssenceAction, EssenceActionType } from './essenceActionTypes';
+import { CRAFTING_ACTIONS, CraftingAction, CraftingActionType } from './craftingActionTypes';
+import { DISCOVERY_ACTIONS, DiscoveryAction, DiscoveryActionType } from './discoveryActionTypes';
+import { RESOURCE_ACTIONS, ResourceAction, ResourceActionType } from './resourceActionTypes';
+import { ENVIRONMENT_ACTIONS, EnvironmentAction, EnvironmentActionType } from './environmentActionTypes';
+import { TIME_ACTIONS, TimeAction, TimeActionType } from './timeActionTypes';
 
-// Re-export all domain-specific action types
-export * from './playerActions';
-export * from './inventoryActions';
-export * from './essenceActions';
-export * from './combatActions';
-export * from './craftingActions';
-export * from './questActions';
-export * from './traitActions';
-export * from './skillActions';
-export * from './worldActions';
-export * from './timeActions';
-export * from './discoveryActions';
-export * from './resourceActions';
-export * from './settingsActions';
-export * from './gameInitActions';
-export * from './characterActions';
-export * from './npcActions';
-export * from './notificationActions';
-export * from './encounterActions';
+// Re-export all action types
+export {
+  PLAYER_ACTIONS,
+  COMBAT_ACTIONS,
+  INVENTORY_ACTIONS,
+  QUEST_ACTIONS,
+  NOTIFICATION_ACTIONS,
+  NPC_ACTIONS,
+  CHARACTER_ACTIONS,
+  TRAIT_ACTIONS,
+  SKILL_ACTIONS,
+  WORLD_ACTIONS,
+  GAME_INIT_ACTIONS,
+  ESSENCE_ACTIONS,
+  CRAFTING_ACTIONS,
+  DISCOVERY_ACTIONS,
+  RESOURCE_ACTIONS,
+  ENVIRONMENT_ACTIONS,
+  TIME_ACTIONS,
+};
 
-// Re-export action interfaces
-export * from './actionInterfaces';
+// Re-export domain-specific action interfaces
+export type {
+  PlayerAction,
+  CombatAction,
+  InventoryAction,
+  QuestAction,
+  NotificationAction,
+  NpcAction,
+  CharacterAction,
+  TraitAction,
+  SkillAction,
+  WorldAction,
+  GameInitAction,
+  EssenceAction,
+  CraftingAction,
+  DiscoveryAction,
+  ResourceAction,
+  EnvironmentAction,
+  TimeAction,
+};
 
-/**
- * Combine all action types into a single export for convenience
- */
-export const ACTION_TYPES = {
-  ...PLAYER_ACTIONS,
-  ...INVENTORY_ACTIONS,
-  ...ESSENCE_ACTIONS,
-  ...COMBAT_ACTIONS,
-  ...CRAFTING_ACTIONS,
-  ...QUEST_ACTIONS,
-  ...TRAIT_ACTIONS,
-  ...SKILL_ACTIONS,
-  ...WORLD_ACTIONS,
-  ...TIME_ACTIONS,
-  ...DISCOVERY_ACTIONS,
-  ...RESOURCE_ACTIONS,
-  ...SETTINGS_ACTIONS,
-  ...GAME_INIT_ACTIONS,
-  ...CHARACTER_ACTIONS,
-  ...NPC_ACTIONS,
-  ...NOTIFICATION_ACTIONS,
-  ...ENCOUNTER_ACTIONS
+// Re-export domain-specific action type unions
+export type {
+  PlayerActionType,
+  CombatActionType,
+  InventoryActionType,
+  QuestActionType,
+  NotificationActionType,
+  NpcActionType,
+  CharacterActionType,
+  TraitActionType,
+  SkillActionType,
+  WorldActionType,
+  GameInitActionType,
+  EssenceActionType,
+  CraftingActionType,
+  DiscoveryActionType,
+  ResourceActionType,
+  EnvironmentActionType,
+  TimeActionType,
+};
+
+// Re-export typed action unions when available
+export type {
+  TypedPlayerAction,
+  TypedCombatAction,
 };
 
 /**
- * Create a union type of all action types
+ * Comprehensive union of all action types across the application
  */
-export type ActionType = typeof ACTION_TYPES[keyof typeof ACTION_TYPES];
+export type ActionType =
+  | PlayerActionType
+  | CombatActionType
+  | InventoryActionType
+  | QuestActionType
+  | NotificationActionType
+  | NpcActionType
+  | CharacterActionType
+  | TraitActionType
+  | SkillActionType
+  | WorldActionType
+  | GameInitActionType
+  | EssenceActionType
+  | CraftingActionType
+  | DiscoveryActionType
+  | ResourceActionType
+  | EnvironmentActionType
+  | TimeActionType;
 
 /**
- * Helper function to create an action creator for a specific action type
+ * Generic action interface for the entire application
  * 
- * @param {string} type - The action type from ACTION_TYPES
- * @returns {function} Action creator function that accepts a payload
- * 
- * @example
- * const gainExp = createAction(ACTION_TYPES.GAIN_EXPERIENCE);
- * dispatch(gainExp({ amount: 100 }));
+ * @template T - The action type
+ * @template P - The payload type
  */
-export function createAction<P = any>(type: string) {
-  return (payload?: P) => ({
-    type,
-    payload
-  });
+export interface Action<T extends ActionType, P = any> {
+  type: T;
+  payload: P;
 }
 
 /**
- * Get all action types as an array of strings
- * Useful for debugging or dynamic action handling
- * 
- * @returns {string[]} Array of all action type strings
+ * Type for actions with no payload
  */
-export function getAllActionTypes(): string[] {
-  return Object.values(ACTION_TYPES);
+export type SimpleAction<T extends ActionType> = Action<T, void>;
+
+/**
+ * Union of all possible actions in the application
+ */
+export type AnyAction = Action<ActionType>;
+
+/**
+ * Type guard to check if an action is of a specific type
+ * 
+ * @param action - The action to check
+ * @param type - The action type to test for
+ * @returns Whether the action matches the specified type
+ * 
+ * @example
+ * if (isActionOfType(action, PLAYER_ACTIONS.MODIFY_HEALTH)) {
+ *   // TypeScript now knows this is a health modification action
+ *   const amount = action.payload.amount;
+ * }
+ */
+export function isActionOfType<T extends ActionType>(action: AnyAction, type: T): action is Action<T> {
+  return action.type === type;
+}
+
+/**
+ * Helper to create a typed action
+ * 
+ * @param type - The action type
+ * @param payload - The action payload
+ * @returns A properly typed action object
+ * 
+ * @example
+ * const action = createAction(PLAYER_ACTIONS.MODIFY_HEALTH, { amount: 10 });
+ */
+export function createAction<T extends ActionType, P>(type: T, payload: P): Action<T, P> {
+  return { type, payload };
 }

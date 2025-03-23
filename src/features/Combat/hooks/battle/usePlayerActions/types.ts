@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { 
   ExtendedCombatState, 
   BattleResult 
-} from '../../../../../context/types/BattleGameStateTypes';
+} from '../../../../../context/types/gameStates/BattleGameStateTypes';
 
 /**
  * Props shared across all player action hooks

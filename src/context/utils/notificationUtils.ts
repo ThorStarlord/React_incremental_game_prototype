@@ -21,7 +21,7 @@
 
 import { 
   GameState,
-} from '../types/GameStateTypes';
+} from '../types/gameStates/GameStateTypes';
 
 /**
  * Types of notifications
@@ -396,5 +396,81 @@ export const createDialogueNotification = (
     isPlayerResponse,
     emotion,
     timestamp: Date.now()
+  };
+};
+
+/**
+ * Helper function that wraps addNotification to handle type compatibility for game states
+ * 
+ * @param {GameState | GameStateWithNotifications} state - Current game state
+ * @param {string} message - The message to display
+ * @param {string} type - The type of notification
+ * @param {number} duration - How long to show the notification in milliseconds
+ * @returns {GameState | GameStateWithNotifications} Updated game state
+ */
+export const addGameNotification = <T extends Record<string, any>>(
+  state: T,
+  message: string, 
+  type: string = 'info',
+  duration: number = 3000
+): T => {
+  // Convert the string type to a valid NotificationType
+  const validType: NotificationType = (
+    ['success', 'warning', 'error', 'info', 'dialogue', 'event', 'achievement', 'discovery'].includes(type) 
+      ? type as NotificationType 
+      : 'info'
+  );
+  
+  // Check for the structure of notifications in the state
+  // If notifications is an array (GameStateWithNotifications structure)
+  if (Array.isArray(state.notifications)) {
+    return {
+      ...state,
+      notifications: [
+        ...(state.notifications || []),
+        {
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          message,
+          type: validType,
+          duration,
+          timestamp: Date.now()
+        }
+      ]
+    };
+  }
+  
+  // If notifications is a NotificationsState object (GameState structure)
+  // with a notifications array inside it
+  if (state.notifications && typeof state.notifications === 'object' && 'notifications' in state.notifications) {
+    return {
+      ...state,
+      notifications: {
+        ...state.notifications,
+        notifications: [
+          ...(state.notifications.notifications || []),
+          {
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            message,
+            type: validType,
+            duration,
+            timestamp: Date.now()
+          }
+        ],
+        // Increment unread count if present
+        unreadCount: (state.notifications.unreadCount || 0) + 1
+      }
+    };
+  }
+  
+  // If no notifications structure exists yet, create one
+  return {
+    ...state,
+    notifications: [{
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      message,
+      type: validType,
+      duration,
+      timestamp: Date.now()
+    }]
   };
 };

@@ -15,15 +15,16 @@
  */
 
 import { createContext, useContext, Dispatch } from 'react';
-import { GameState } from './types/GameStateTypes';
+import { GameState } from './types/gameStates/GameStateTypes';
 import { 
-  ESSENCE_ACTIONS, 
   PLAYER_ACTIONS, 
   COMBAT_ACTIONS, 
-  NOTIFICATION_ACTIONS,
-  Action,
-  ActionWithPayload
-} from './types/ActionTypes';
+  NOTIFICATION_ACTIONS
+} from './types/actions/index';
+import { Action } from './types/actions';
+
+// Import essence actions from where they are defined
+import { ESSENCE_ACTIONS } from './types/actions/essenceActionTypes';
 
 /**
  * Generic Action interface with required payload
@@ -65,11 +66,6 @@ export const useGameDispatch = (): Dispatch<GameAction> => {
 export const GameActions = {
   gainEssence: (amount: number, source?: string): GameAction => ({
     type: ESSENCE_ACTIONS.GAIN_ESSENCE,
-    payload: { amount, source }
-  }),
-  
-  gainExperience: (amount: number, source?: string): GameAction => ({
-    type: PLAYER_ACTIONS.GAIN_EXPERIENCE,
     payload: { amount, source }
   }),
   

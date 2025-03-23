@@ -18,10 +18,8 @@ import {
 import { 
   PlayerState, 
   PlayerAttributes, 
-  PlayerStats, 
-  StatusEffect
-  // Remove imports for types that don't exist:
-  // Skill, TraitEffect, Trait
+  PlayerStats
+  // Remove StatusEffect from import since it's defined locally
 } from './PlayerGameStateTypes';
 
 // Import combat-related types
@@ -222,9 +220,29 @@ export interface CombatState {
   };
 }
 
+/**
+ * Interface for status effects that can be applied to entities
+ */
+export interface StatusEffect {
+  /** Unique identifier for the effect */
+  id: string;
+  /** Display name of the effect */
+  name: string;
+  /** How long the effect lasts (in turns, seconds, etc.) */
+  duration: number;
+  /** Type of effect (buff, debuff, etc.) */
+  type?: string;
+  /** Strength/magnitude of the effect */
+  strength?: number;
+  /** When the effect was applied */
+  timestamp?: number;
+  /** Additional metadata for the effect */
+  [key: string]: any;
+}
+
 // Re-export types for convenience, fixing the duplicates
 export type {
-  PlayerState, PlayerAttributes, PlayerStats, StatusEffect, // Remove Skill, TraitEffect, Trait
+  PlayerState, PlayerAttributes, PlayerStats,
   CombatSkills, Enemy, CombatActionType, CombatActionResult, CombatLogEntry, CombatStateContainer,
   GameItem, ItemEffect, ItemStats, InventoryState, InventoryItem,
   EquipmentState, EquipmentBonuses, EquipmentRequirements, EquipmentSlot,
@@ -240,7 +258,7 @@ export type {
   EssenceState,
   NotificationsState,
   ResourceState,
-  FactionSystem, // Add this line to re-export FactionSystem
+  FactionSystem,
   
   // Re-export game loop types with aliases
   NPC,

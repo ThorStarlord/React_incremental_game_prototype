@@ -7,7 +7,7 @@ import {
 import { 
   ExtendedCombatState, 
   BattleResult 
-} from '../../../../context/types/BattleGameStateTypes';
+} from '../../../../context/types/gameStates/BattleGameStateTypes';
 
 /**
  * Hook for player combat actions
@@ -81,9 +81,9 @@ export const usePlayerActions = (
           importance: 'high' as const  // Add type assertion
         });
         
-        // Generate rewards with experience property
+        // Generate rewards with zero experience
         const gold = 25; // Fixed gold reward
-        const experience = 0; // No experience given since levels were removed
+        const experience = 0;
         
         // Trigger victory callback after a delay
         setTimeout(() => {
@@ -91,7 +91,7 @@ export const usePlayerActions = (
           onComplete({
             victory: true,
             rewards: {
-              experience, // Add required experience property
+              experience,
               gold,
               items: []
             },
@@ -109,7 +109,7 @@ export const usePlayerActions = (
           log: newLog,
           turnHistory: newHistory,
           rewards: {
-            experience, // Add required experience property
+            experience,
             gold,
             items: []
           }

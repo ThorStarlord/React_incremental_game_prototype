@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../context/GameStateExports';
+import { useGameState, useGameDispatch } from '../../../context/GameStateExports';
 import { Minion, MinionTask, MinionAssignment } from '../../../context/initialStates/MinionsInitialState';
 import { MINION_ACTION_TYPES } from '../../../context/actions/minionsActions';
 
@@ -192,7 +192,7 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
             // Add resources
             if (Object.keys(result.rewards.resources).length > 0) {
               dispatch({
-                type: ACTION_TYPES.ADD_RESOURCES,
+                type: 'ADD_RESOURCES',
                 payload: result.rewards.resources
               });
             }
@@ -200,7 +200,7 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
             // Add items
             if (Object.keys(result.rewards.items).length > 0) {
               dispatch({
-                type: ACTION_TYPES.ADD_ITEM,
+                type: 'ADD_ITEM',
                 payload: result.rewards.items
               });
             }
@@ -224,7 +224,7 @@ const useMinionSimulation = (): UseMinionSimulationReturn => {
     if (notifications.length > 0) {
       notifications.forEach(message => {
         dispatch({
-          type: ACTION_TYPES.ADD_NOTIFICATION,
+          type: 'ADD_NOTIFICATION',
           payload: {
             message,
             type: 'minion',

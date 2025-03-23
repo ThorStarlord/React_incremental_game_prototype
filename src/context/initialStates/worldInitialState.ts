@@ -20,7 +20,7 @@ import {
   Season,
   TimeOfDay,
   LocationResource
-} from '../types/WorldGameStateTypes';
+} from '../types/gameStates/WorldGameStateTypes';
 
 /**
  * Interface for a world resource

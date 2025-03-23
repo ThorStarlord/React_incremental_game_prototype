@@ -2,7 +2,7 @@
  * Initial state configuration for player equipment
  */
 
-import { EquipmentState } from '../types/GameStateTypes';
+import { EquipmentState } from '../types/gameStates/GameStateTypes';
 
 /**
  * Default equipment slots that the player can use

@@ -177,14 +177,6 @@ export const questReducer = (state: GameState, action: { type: string; payload: 
         }
       };
       
-      // Process experience reward
-      if (questData.reward?.experience) {
-        newState.player = {
-          ...newState.player,
-          experience: (newState.player.experience || 0) + questData.reward.experience
-        };
-      }
-      
       // Process gold reward
       if (questData.reward?.gold) {
         newState.player = {

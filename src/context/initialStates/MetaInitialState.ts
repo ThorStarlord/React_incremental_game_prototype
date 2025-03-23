@@ -2,7 +2,7 @@
  * Initial state configuration for game meta information
  */
 
-import { MetaState, SemanticVersion, SaveHistoryEntry, PlaySession, GameUpdate, DebugInfo } from '../types/MetaGameStateTypes';
+import { MetaState, SemanticVersion, SaveHistoryEntry, PlaySession, GameUpdate, DebugInfo } from '../types/gameStates/MetaGameStateTypes';
 
 /**
  * Current game version

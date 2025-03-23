@@ -1,56 +1,97 @@
 /**
- * Player Actions
- * ==============
+ * Player Action System
+ * ===================
  * 
- * This file exports all actions related to the player character in the incremental RPG.
- * It serves as the public API for player actions, aggregating them from specialized modules.
+ * Central hub for all player-related actions in the game.
+ * This module re-exports action creators from specialized modules
+ * organized by function, providing a clean API for the rest of the application.
  * 
  * @module playerActions
  */
 
-// Export from each module directly instead of importing from playerActions
-export {
-  updatePlayer,
-  setPlayerName,
-  resetPlayer
-} from './stateActions';
+// Import action type definitions from types folder
+import { 
+  PLAYER_ACTIONS, 
+  PlayerAction,
+  PlayerActionType,
+  ModificationReason
+} from '../../types/actions/playerActionTypes';
 
-export {
-  modifyHealth,
-  modifyEnergy,
-  rest
-} from './healthActions';
+// Re-export all action creators by domain
+// =======================================
 
-export {
-  acquireTrait,
-  equipTrait,
-  unequipTrait
-} from './traitActions';
+// Core player state actions
+export { updatePlayer, setPlayerName, resetPlayer } from './stateActions';
 
-export {
-  allocateAttribute,
-  addAttributePoints,
+// Character management
+export { setActiveCharacter, switchCharacter } from './characterActions';
+
+// Health and energy
+export { modifyHealth, modifyEnergy, rest } from './healthActions';
+
+// Skills and progression
+export { updateSkill, learnSkill, upgradeSkill } from './skillActions';
+
+// Attributes and stats
+export { 
+  allocateAttribute, 
+  addAttributePoints, 
   spendAttributePoints
 } from './attributeActions';
 
+// Re-export stats action creators
 export {
-  updateSkill,
-  learnSkill,
-  upgradeSkill
-} from './skillActions';
+  updateStat,
+  updateStats
+} from './statsActions';
 
-export {
-  setActiveCharacter,
-  updatePlayTime
-} from './characterActions';
+// Traits and perks
+export { 
+  acquireTrait, 
+  equipTrait, 
+  unequipTrait
+} from './traitActions';
 
-// Export types
+// Status effects
 export {
-  ModificationReason,
-  PLAYER_ACTIONS
-} from '../../types/playerActionTypes';
+  addStatusEffect,
+  removeStatusEffect
+} from './statusActions';
 
-// Export utils
+// Equipment
 export {
-  playerActionValidation
-} from './utils';
+  equipItem,
+  unequipItem
+} from './equipmentActions';
+
+// Statistics
+export {
+  updateTotalPlayTime
+} from './statsActions'
+
+// Re-export common constants and enums
+// ====================================
+export { 
+  PLAYER_ACTIONS,
+  ModificationReason
+};
+
+// Re-export TypeScript types
+// =========================
+export type { 
+  PlayerAction,
+  PlayerActionType
+};
+
+// Re-export utilities and helpers
+// ==============================
+
+// Validation utilities
+export { playerActionValidation } from './utils';
+
+// Action creator factories
+export {
+  createActionWithTimestamp,
+  createPlayerAction,
+  createResourceAction
+} from './actionCreators';

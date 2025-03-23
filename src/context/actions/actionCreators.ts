@@ -1,98 +1,206 @@
-import { 
-  ESSENCE_ACTIONS, 
-  PLAYER_ACTIONS, 
-  INVENTORY_ACTIONS,
-  SKILL_ACTIONS,
-  Action
-} from '../types/ActionTypes';
+/**
+ * Action Creators
+ * ===============
+ * 
+ * This module provides factory functions for creating standardized actions
+ * across different domains of the application. It serves as a centralized hub
+ * for common action creation patterns and utilities.
+ * 
+ * @module actionCreators
+ */
 
-// Essence action interfaces
-interface CollectEssencePayload {
+// Import action types from domain-specific files
+import { PLAYER_ACTIONS, PlayerAction } from '../types/actions/playerActionTypes';
+import { INVENTORY_ACTIONS } from '../types/actions/inventoryActionTypes';
+import { SKILL_ACTIONS } from '../types/actions/skillActionTypes';
+import { COMBAT_ACTIONS } from '../types/actions/combatActionTypes';
+import { NOTIFICATION_ACTIONS } from '../types/actions/notificationActionTypes';
+import { Action } from '../types/actions';
+
+// Define essence actions directly since they're not exported elsewhere
+const ESSENCE_ACTIONS = {
+  GAIN_ESSENCE: 'essence/gain',
+  SPEND_ESSENCE: 'essence/spend',
+  UPGRADE_ESSENCE_RATE: 'essence/upgradeRate'
+};
+
+// Type definitions for common payloads
+interface ResourcePayload {
   amount: number;
+  source?: string;
+  timestamp?: number;
 }
 
-interface SpendEssencePayload {
-  amount: number;
-}
-
-interface UpgradeEssenceRatePayload {
-  cost: number;
-  multiplier: number;
-}
-
-// Player action interfaces
-interface GainExperiencePayload {
-  amount: number;
-}
-
-interface LearnSkillPayload {
+interface SkillPayload {
   skillId: string;
+  timestamp?: number;
 }
 
-interface EquipItemPayload {
+interface ItemPayload {
   itemId: string;
+  timestamp?: number;
+}
+
+interface EquipmentPayload extends ItemPayload {
   slot: string;
 }
 
-interface UnequipItemPayload {
-  slot: string;
+// Define a type for our action literals
+type ActionLiteral = string;
+
+/**
+ * Creates a resource action (essence, gold, etc.)
+ * 
+ * @param type - The action type
+ * @param amount - Amount to modify
+ * @param source - Optional source of the change
+ * @returns Properly formatted action
+ */
+export function createResourceAction<T extends ActionLiteral>(
+  type: T,
+  amount: number,
+  source?: string
+): { type: T, payload: ResourcePayload } {
+  return {
+    type,
+    payload: { 
+      amount,
+      source,
+      timestamp: Date.now()
+    }
+  };
 }
 
-interface InventoryItemPayload {
-  item: any; // Replace with proper item type when available
+/**
+ * Creates a skill-related action
+ * 
+ * @param type - The action type
+ * @param skillId - ID of the skill
+ * @param additionalData - Any additional payload data
+ * @returns Properly formatted action
+ */
+export function createSkillAction<T extends ActionLiteral>(
+  type: T,
+  skillId: string,
+  additionalData?: Record<string, any>
+): { type: T, payload: SkillPayload & Record<string, any> } {
+  return {
+    type,
+    payload: {
+      skillId,
+      ...additionalData,
+      timestamp: Date.now()
+    }
+  };
 }
 
-interface RemoveItemPayload {
-  itemId: string;
+/**
+ * Creates an item-related action
+ * 
+ * @param type - The action type
+ * @param itemId - ID of the item
+ * @param additionalData - Any additional payload data
+ * @returns Properly formatted action
+ */
+export function createItemAction<T extends ActionLiteral>(
+  type: T,
+  itemId: string,
+  additionalData?: Record<string, any>
+): { type: T, payload: ItemPayload & Record<string, any> } {
+  return {
+    type,
+    payload: {
+      itemId,
+      ...additionalData,
+      timestamp: Date.now()
+    }
+  };
 }
 
-// Essence action creators
-export const collectEssence = (amount: number): Action<typeof ESSENCE_ACTIONS.GAIN_ESSENCE, CollectEssencePayload> => ({
-  type: ESSENCE_ACTIONS.GAIN_ESSENCE,
-  payload: { amount }
+/**
+ * Creates a notification action
+ * 
+ * @param message - Notification message
+ * @param type - Notification type
+ * @param duration - Display duration in ms
+ * @returns ADD_NOTIFICATION action
+ */
+export function createNotification(
+  message: string,
+  type: 'success' | 'error' | 'info' | 'warning' = 'info',
+  duration: number = 3000
+): { type: typeof NOTIFICATION_ACTIONS.ADD_NOTIFICATION, payload: any } {
+  return {
+    type: NOTIFICATION_ACTIONS.ADD_NOTIFICATION,
+    payload: {
+      message,
+      type,
+      duration,
+      id: Date.now(),
+      timestamp: Date.now()
+    }
+  };
+}
+
+// Domain-specific action creators
+// These should generally be moved to their respective domain files
+
+// Essence actions
+export const collectEssence = (amount: number) => 
+  createResourceAction(ESSENCE_ACTIONS.GAIN_ESSENCE, amount, 'collection');
+
+export const spendEssence = (amount: number) => 
+  createResourceAction(ESSENCE_ACTIONS.SPEND_ESSENCE, amount, 'purchase');
+
+// Player actions
+export const gainExperience = (amount: number): PlayerAction => ({
+  type: PLAYER_ACTIONS.UPDATE_PLAYER,
+  payload: { experience: amount }
 });
 
-export const spendEssence = (amount: number): Action<typeof ESSENCE_ACTIONS.SPEND_ESSENCE, SpendEssencePayload> => ({
-  type: ESSENCE_ACTIONS.SPEND_ESSENCE,
-  payload: { amount }
+export const levelUp = (): PlayerAction => ({
+  type: PLAYER_ACTIONS.UPDATE_PLAYER,
+  payload: { 
+    level: (currentLevel: number) => currentLevel + 1,
+    timestamp: Date.now() 
+  }
 });
 
-export const upgradeEssenceRate = (cost: number, multiplier: number): Action<typeof ESSENCE_ACTIONS.UPGRADE_ESSENCE_RATE, UpgradeEssenceRatePayload> => ({
-  type: ESSENCE_ACTIONS.UPGRADE_ESSENCE_RATE,
-  payload: { cost, multiplier }
-});
+// Skill actions
+export const learnSkill = (skillId: string) => 
+  createSkillAction(SKILL_ACTIONS.LEARN_SKILL, skillId);
 
-// Player action creators
-export const gainExperience = (amount: number): Action<typeof PLAYER_ACTIONS.GAIN_EXPERIENCE, GainExperiencePayload> => ({
-  type: PLAYER_ACTIONS.GAIN_EXPERIENCE,
-  payload: { amount }
-});
+export const gainSkillExperience = (skillId: string, amount: number) => 
+  createSkillAction(SKILL_ACTIONS.GAIN_SKILL_XP, skillId, { amount });
 
-export const levelUp = (): Action<typeof PLAYER_ACTIONS.LEVEL_UP, undefined> => ({
-  type: PLAYER_ACTIONS.LEVEL_UP
-});
-
-export const learnSkill = (skillId: string): Action<typeof SKILL_ACTIONS.LEARN_SKILL, LearnSkillPayload> => ({
-  type: SKILL_ACTIONS.LEARN_SKILL,
-  payload: { skillId }
-});
-
-export const equipItem = (itemId: string, slot: string): Action<typeof PLAYER_ACTIONS.EQUIP_ITEM, EquipItemPayload> => ({
+// Equipment actions
+export const equipItem = (itemId: string, slot: string): PlayerAction => ({
   type: PLAYER_ACTIONS.EQUIP_ITEM,
   payload: { itemId, slot }
 });
 
-export const unequipItem = (slot: string): Action<typeof PLAYER_ACTIONS.UNEQUIP_ITEM, UnequipItemPayload> => ({
+export const unequipItem = (slot: string): PlayerAction => ({
   type: PLAYER_ACTIONS.UNEQUIP_ITEM,
   payload: { slot }
 });
 
-export const addItemToInventory = (item: any): Action<typeof INVENTORY_ACTIONS.ADD_ITEM, InventoryItemPayload> => ({
-  type: INVENTORY_ACTIONS.ADD_ITEM,
-  payload: { item }
-});
+// Inventory actions
+export const addItemToInventory = (itemId: string, quantity: number = 1) => 
+  createItemAction(INVENTORY_ACTIONS.ADD_ITEM, itemId, { quantity });
 
-export const removeItemFromInventory = (itemId: string): Action<typeof INVENTORY_ACTIONS.REMOVE_ITEM, RemoveItemPayload> => ({
-  type: INVENTORY_ACTIONS.REMOVE_ITEM,
-  payload: { itemId }
-});
+export const removeItemFromInventory = (itemId: string, quantity: number = 1) => 
+  createItemAction(INVENTORY_ACTIONS.REMOVE_ITEM, itemId, { quantity });
+
+// Export a general createAction utility
+export function createAction<T extends ActionLiteral, P extends Record<string, any>>(
+  type: T, 
+  payload: P
+): { type: T, payload: P & { timestamp?: number } } {
+  return {
+    type,
+    payload: {
+      ...payload,
+      timestamp: payload.timestamp || Date.now()
+    }
+  };
+}

@@ -7,7 +7,7 @@ import {
   TieredTrait,
   TraitSlots,
   TraitHistoryEntry
-} from '../types/TraitsGameStateTypes';
+} from '../types/gameStates/TraitsGameStateTypes';
 
 /**
  * Initial trait system state

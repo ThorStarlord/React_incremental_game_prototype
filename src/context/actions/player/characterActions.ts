@@ -1,50 +1,85 @@
 /**
- * Character management actions
+ * Character action type definitions
  * 
- * Actions for managing multiple characters and character profile information
+ * These constants define the action types for character management operations
  */
-import { 
-  ActiveCharacterPayload, 
-  PLAYER_ACTIONS, 
-  PlayerAction 
-} from '../../types/playerActionTypes';
-import { validateString, validatePositive } from './utils';
 
 /**
- * Set the currently active character in a multi-character party
- * 
- * @param {string} characterId - ID of the character to make active
- * @returns {PlayerAction} The SET_ACTIVE_CHARACTER action
- * 
- * @example
- * // Switch to another character in party
- * setActiveCharacter("char-042")
+ * Action types for character management
  */
-export const setActiveCharacter = (characterId: string): PlayerAction => {
-  validateString(characterId, 'Character ID');
+export const CHARACTER_ACTION_TYPES = {
+  /**
+   * Set the active character in a multi-character party
+   */
+  SET_ACTIVE_CHARACTER: 'character/setActive',
+
+  /**
+   * Update the total play time for tracking purposes
+   */
+  UPDATE_PLAYTIME: 'character/updatePlaytime',
+
+  /**
+   * Create a new character in the roster
+   */
+  CREATE_CHARACTER: 'character/create',
+
+  /**
+   * Delete a character from the roster
+   */
+  DELETE_CHARACTER: 'character/delete',
+
+  /**
+   * Update character properties like name, appearance, etc.
+   */
+  UPDATE_CHARACTER: 'character/update'
+};
+
+/**
+ * Character Management Actions
+ * ===========================
+ * 
+ * Action creators for managing characters in a multi-character system
+ */
+
+import { 
+  PLAYER_ACTIONS, 
+  PlayerAction,
+  ActiveCharacterPayload
+} from '../../types/actions/playerActionTypes';
+import { validateId, getTimestamp } from './utils';
+
+/**
+ * Set a character as the active one
+ * 
+ * @param id - Character ID to activate
+ * @returns SET_ACTIVE_CHARACTER action
+ */
+export function setActiveCharacter(id: string): PlayerAction {
+  validateId(id, 'Character ID');
+  
   return {
     type: PLAYER_ACTIONS.SET_ACTIVE_CHARACTER,
-    payload: { 
-      characterId,
-      timestamp: Date.now() 
+    payload: {
+      characterId: id,
+      timestamp: getTimestamp()
     } as ActiveCharacterPayload
   };
-};
+}
 
 /**
- * Update the player's total play time
+ * Switch to another character (with potential state handling)
  * 
- * @param {number} seconds - Seconds to add to play time
- * @returns {PlayerAction} The UPDATE_TOTAL_PLAYTIME action
- * 
- * @example
- * // Add 300 seconds (5 minutes) of playtime
- * updatePlayTime(300)
+ * @param id - Character ID to switch to
+ * @returns SWITCH_CHARACTER action
  */
-export const updatePlayTime = (seconds: number): PlayerAction => {
-  validatePositive(seconds, 'Play time seconds');
+export function switchCharacter(id: string): PlayerAction {
+  validateId(id, 'Character ID');
+  
   return {
-    type: PLAYER_ACTIONS.UPDATE_TOTAL_PLAYTIME,
-    payload: seconds
+    type: PLAYER_ACTIONS.SWITCH_CHARACTER,
+    payload: {
+      characterId: id,
+      timestamp: getTimestamp()
+    }
   };
-};
+}

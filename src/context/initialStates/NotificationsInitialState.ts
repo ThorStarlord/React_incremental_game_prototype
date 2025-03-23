@@ -2,7 +2,7 @@
  * Initial state configuration for the notifications system
  */
 
-import { NotificationsState } from '../types/NotificationsGameStateTypes';
+import { NotificationsState } from '../types/gameStates/NotificationsGameStateTypes';
 
 /**
  * Initial state for the notifications system

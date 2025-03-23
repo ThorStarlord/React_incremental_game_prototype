@@ -2,7 +2,7 @@
  * Initial state configuration for game progression
  */
 
-import { ProgressionState } from '../types/GameStateTypes';
+import { ProgressionState } from '../types/gameStates/GameStateTypes';
 
 /**
  * Initial game locations available to new players

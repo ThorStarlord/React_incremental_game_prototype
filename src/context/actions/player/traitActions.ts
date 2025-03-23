@@ -1,55 +1,54 @@
 /**
- * Player trait actions
- * 
- * Actions for managing player traits including acquiring, equipping, and removing
+ * Trait-related action creators
  */
-import { 
-  TraitPayload, 
-  EquipTraitPayload, 
-  PLAYER_ACTIONS, 
-  PlayerAction 
-} from '../../types/playerActionTypes';
-import { validateString, validateNonNegative } from './utils';
+import {
+  PLAYER_ACTIONS,
+  PlayerAction,
+  TraitPayload,
+  EquipTraitPayload
+} from '../../types/actions/playerActionTypes';
+import { validateString, validateId, getTimestamp } from './utils';
 
 /**
- * Add a new trait to the player's acquired traits
+ * Acquire a new trait
  * 
  * @param {string} traitId - ID of the trait to acquire
- * @returns {PlayerAction} The ADD_TRAIT action
+ * @returns {PlayerAction} The ACQUIRE_TRAIT action
  * 
  * @example
  * // Acquire a trait
- * acquireTrait("trait_firestarter")
+ * acquireTrait("trait_quickthinking")
  */
 export const acquireTrait = (traitId: string): PlayerAction => {
-  validateString(traitId, 'Trait ID');
+  validateId(traitId, 'Trait ID');
   return {
-    type: PLAYER_ACTIONS.ADD_TRAIT,
-    payload: traitId
+    type: PLAYER_ACTIONS.ACQUIRE_TRAIT,
+    payload: { 
+      traitId,
+      timestamp: getTimestamp()
+    }
   };
 };
 
 /**
- * Equip a trait in one of the player's trait slots
+ * Equip a trait to an active slot
  * 
  * @param {string} traitId - ID of the trait to equip
- * @param {number} [slotIndex] - Slot index to equip the trait in (auto-assigns if omitted)
+ * @param {number} [slotIndex] - Optional slot index to equip to
  * @returns {PlayerAction} The EQUIP_TRAIT action
  * 
  * @example
- * // Equip a trait in a specific slot
- * equipTrait("trait_quickthinking", 2)
+ * // Equip a trait
+ * equipTrait("trait_quickthinking")
  */
 export const equipTrait = (traitId: string, slotIndex?: number): PlayerAction => {
-  validateString(traitId, 'Trait ID');
-  if (slotIndex !== undefined) validateNonNegative(slotIndex, 'Slot index');
-  
+  validateId(traitId, 'Trait ID');
   return {
     type: PLAYER_ACTIONS.EQUIP_TRAIT,
     payload: { 
-      traitId, 
+      traitId,
       slotIndex,
-      timestamp: Date.now()
+      timestamp: getTimestamp()
     } as EquipTraitPayload
   };
 };
@@ -70,7 +69,35 @@ export const unequipTrait = (traitId: string): PlayerAction => {
     type: PLAYER_ACTIONS.UNEQUIP_TRAIT,
     payload: { 
       traitId,
-      timestamp: Date.now()
+      timestamp: getTimestamp()
     } as TraitPayload
+  };
+};
+
+/**
+ * Add a trait to the player's collection
+ * 
+ * @param {string} traitId - ID of the trait to add
+ * @returns {PlayerAction} The ADD_TRAIT action
+ */
+export const addTrait = (traitId: string): PlayerAction => {
+  validateId(traitId, 'Trait ID');
+  return {
+    type: PLAYER_ACTIONS.ADD_TRAIT,
+    payload: traitId
+  };
+};
+
+/**
+ * Remove a trait from the player's collection
+ * 
+ * @param {string} traitId - ID of the trait to remove
+ * @returns {PlayerAction} The REMOVE_TRAIT action
+ */
+export const removeTrait = (traitId: string): PlayerAction => {
+  validateId(traitId, 'Trait ID');
+  return {
+    type: PLAYER_ACTIONS.REMOVE_TRAIT,
+    payload: traitId
   };
 };

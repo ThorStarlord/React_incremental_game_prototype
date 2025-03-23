@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { GameState } from './types/GameStateTypes';
+import { GameState } from './types/gameStates/GameStateTypes';
 import { InitialState } from './initialStates/InitialStateComposer';
 
 // Extended state interface with utility methods

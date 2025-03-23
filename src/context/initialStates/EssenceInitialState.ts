@@ -4,7 +4,7 @@
  * Essence is a core resource that players collect and use for progression.
  */
 
-import { EssenceState, EssenceGenerator, EssenceUpgrade } from '../types/EssenceGameStateTypes';
+import { EssenceState, EssenceGenerator, EssenceUpgrade } from '../types/gameStates/EssenceGameStateTypes';
 
 /**
  * Essence generator types

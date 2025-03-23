@@ -15,7 +15,7 @@ import {
   TraitSystem,
   TRAIT_SOURCES,
   TRAIT_RARITIES
-} from '../../../../context/types/TraitsGameStateTypes';
+} from '../../../../context/types/gameStates/TraitsGameStateTypes';
 
 // Define our own SlotTrait interface that matches the needs of TraitSlots component
 interface SlotTrait {

@@ -10,4 +10,4 @@
  */
 
 // Re-export everything from the modular structure
-export * from './combat';
+export * from '../combat';

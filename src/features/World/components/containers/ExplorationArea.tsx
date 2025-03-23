@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, Paper, Button } from '@mui/material';
 // Import types
-import { BattleResult } from '../../../../context/types/BattleGameStateTypes';
+import { BattleResult } from '../../../../context/types/gameStates/BattleGameStateTypes';
 import { Enemy as DungeonEnemy } from '../../data/dungeonEnemies';
 import { CombatEnemy } from '../../../../context/types/combat';
 // Import the combat components

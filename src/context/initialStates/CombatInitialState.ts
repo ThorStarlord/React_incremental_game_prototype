@@ -9,7 +9,7 @@ import {
   EnvironmentType,
   CombatStatus,
   CombatLogEntry 
-} from '../types/CombatGameStateTypes';
+} from '../types/gameStates/CombatGameStateTypes';
 
 const combatInitialState: CombatState = {
   // Core combat state properties

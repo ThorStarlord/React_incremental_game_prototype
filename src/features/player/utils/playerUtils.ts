@@ -1,4 +1,4 @@
-import { PlayerState, PlayerStats, EquipmentState } from '../../../context/types/GameStateTypes';
+import { PlayerState, PlayerStats, EquipmentState } from '../../../context/types/gameStates/GameStateTypes';
 
 /**
  * Constants for player stat calculations

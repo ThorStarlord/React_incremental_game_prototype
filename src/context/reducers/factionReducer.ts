@@ -10,7 +10,7 @@ import {
   FactionStanding,
   MembershipStatus,
   PlayerFactionStanding
-} from '../types/FactionGameStateTypes';
+} from '../types/gameStates/FactionGameStateTypes';
 
 interface FactionAction {
   type: string;

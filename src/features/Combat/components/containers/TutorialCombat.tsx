@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import SportsKabaddiIcon from '@mui/icons-material/SportsKabaddi';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
-import { GameStateContext, GameDispatchContext } from '../../../../context/GameStateContext';
+import { useGameState, useGameDispatch } from '../../../../context/GameStateExports';
 
 /**
  * Interface for Monster in tutorial
@@ -76,14 +76,16 @@ interface CombatLogEntry {
 }
 
 /**
- * TutorialCombat component for the combat tutorial
+ * TutorialCombat component
  * 
- * @returns {JSX.Element} The tutorial combat component
+ * Provides a guided introduction to the combat system for new players
+ * 
+ * @returns {React.ReactElement} The tutorial combat component
  */
-const TutorialCombat: React.FC = (): JSX.Element => {
-  const gameState = useContext(GameStateContext) as GameState;
+const TutorialCombat: React.FC = (): React.ReactElement => {
+  const gameState = useGameState() as GameState;
   const { player, tutorial, traits } = gameState;
-  const dispatch = useContext(GameDispatchContext);
+  const dispatch = useGameDispatch();
   const navigate = useNavigate();
   
   // Local state
@@ -181,7 +183,8 @@ const TutorialCombat: React.FC = (): JSX.Element => {
         
         // Complete tutorial
         dispatch({
-          type: 'COMPLETE_TUTORIAL'
+          type: 'COMPLETE_TUTORIAL',
+          payload: {} // Add empty payload to match GameAction type requirement
         });
         
         // Give rewards

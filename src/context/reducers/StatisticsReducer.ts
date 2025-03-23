@@ -1,8 +1,4 @@
 export interface StatisticsState {
-  level: number;
-  experience: number;
-  experienceToNextLevel: number;
-  totalExperienceGained: number;
   timePlayed: number;
   monstersDefeated: number;
   bossesDefeated: number;
@@ -16,10 +12,6 @@ export interface StatisticsState {
 }
 
 export const initialStatisticsState: StatisticsState = {
-  level: 1,
-  experience: 0,
-  experienceToNextLevel: 100,
-  totalExperienceGained: 0,
   timePlayed: 0,
   monstersDefeated: 0,
   bossesDefeated: 0,
@@ -33,8 +25,6 @@ export const initialStatisticsState: StatisticsState = {
 };
 
 export type StatisticsAction =
-  | { type: 'GAIN_EXPERIENCE'; payload: number }
-  | { type: 'LEVEL_UP' }
   | { type: 'INCREMENT_TIME_PLAYED'; payload: number }
   | { type: 'MONSTER_DEFEATED' }
   | { type: 'BOSS_DEFEATED' }
@@ -51,24 +41,6 @@ export const statisticsReducer = (
   action: StatisticsAction
 ): StatisticsState => {
   switch (action.type) {
-    case 'GAIN_EXPERIENCE':
-      const newExperience = state.experience + action.payload;
-      const totalExperienceGained = state.totalExperienceGained + action.payload;
-      
-      return {
-        ...state,
-        experience: newExperience,
-        totalExperienceGained
-      };
-
-    case 'LEVEL_UP':
-      return {
-        ...state,
-        level: state.level + 1,
-        experience: state.experience - state.experienceToNextLevel,
-        experienceToNextLevel: Math.floor(state.experienceToNextLevel * 1.5)
-      };
-
     case 'INCREMENT_TIME_PLAYED':
       return {
         ...state,

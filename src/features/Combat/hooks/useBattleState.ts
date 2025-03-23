@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useGameState } from '../../../context/GameStateExports';
 import { InitialState } from '../../../context/initialStates';
-import { CombatStatus, ExtendedCombatState } from '../../../context/types/CombatGameStateTypes';
-import { PlayerState } from '../../../context/types/PlayerGameStateTypes';
-import { GameState } from '../../../context/types/GameStateTypes';
+import { CombatStatus, ExtendedCombatState } from '../../../context/types/gameStates/CombatGameStateTypes';
+import { PlayerState } from '../../../context/types/gameStates/PlayerGameStateTypes';
+import { GameState } from '../../../context/types/gameStates/GameStateTypes';
 import useEnemyGeneration from './useEnemyGeneration';
 
 /**

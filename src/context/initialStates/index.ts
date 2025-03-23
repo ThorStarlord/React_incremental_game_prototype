@@ -41,7 +41,7 @@ export { experienceUtils } from '../../features/Player';
 export { playerUtils } from '../../features/Player';
 
 // Export types from game state
-export type { GameState } from '../types/GameStateTypes';
-export type { PlayerState, PlayerStats } from '../types/PlayerGameStateTypes';
-export type { EquipmentState } from '../types/EquipmentGameStateTypes';
-export type { InventoryItem } from '../types/InventoryGameStateTypes';
+export type { GameState } from '../types/gameStates/GameStateTypes';
+export type { PlayerState, PlayerStats } from '../types/gameStates/PlayerGameStateTypes';
+export type { EquipmentState } from '../types/gameStates/EquipmentGameStateTypes';
+export type { InventoryItem } from '../types/gameStates/InventoryGameStateTypes';

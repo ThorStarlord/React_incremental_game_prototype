@@ -5,7 +5,7 @@
  * that serves as the single source of truth for the game.
  */
 
-import { GameState } from '../types/GameStateTypes';
+import { GameState } from '../types/gameStates/GameStateTypes';
 import { createImmutableState, validateInitialState } from '../utils/stateUtils';
 
 // Import all initial states - using explicit imports for better readability and control

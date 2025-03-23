@@ -2,7 +2,7 @@
  * Combat rewards and loot
  */
 
-import { GameItem } from '../InventoryGameStateTypes';
+import { GameItem } from '../gameStates/InventoryGameStateTypes';
 
 /**
  * Item that can be dropped by enemies

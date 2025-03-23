@@ -1,4 +1,4 @@
-import { PlayerState, PlayerAttributes } from '../../types/GameStateTypes';
+import { PlayerState, PlayerAttributes } from '../../types/gameStates/GameStateTypes';
 import { PlayerAction } from '../playerReducer';
 import { PLAYER_ACTIONS } from '../../types/ActionTypes';
 import { isActionOfType } from '../playerReducer';

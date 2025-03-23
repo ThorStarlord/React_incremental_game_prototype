@@ -11,7 +11,7 @@ import {
   MembershipStatus,
   FactionRelationship,
   PlayerFactionStanding 
-} from '../types/FactionGameStateTypes';
+} from '../types/gameStates/FactionGameStateTypes';
 
 /**
  * Initial factions that exist in the game world

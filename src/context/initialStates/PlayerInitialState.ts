@@ -3,7 +3,7 @@
  * This serves as the starting point for a new player or when resetting the game.
  */
 
-import { PlayerState, PlayerAttributes, PlayerStats } from '../types/PlayerGameStateTypes';
+import { PlayerState, PlayerAttributes, PlayerStats } from '../types/gameStates/PlayerGameStateTypes';
 
 /**
  * Default player attributes for new characters

@@ -2,7 +2,7 @@
  * Initial state configuration for game statistics
  */
 
-import { StatisticsState } from '../types/StatisticsGameStateTypes';
+import { StatisticsState } from '../types/gameStates/StatisticsGameStateTypes';
 
 /**
  * Initial state for the statistics system

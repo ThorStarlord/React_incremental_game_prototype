@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useGameState, useGameDispatch } from '../../context/GameStateExports';
 import { calculateTraitEffect } from '../../features/Traits/utils/traitUtils';
-import { TraitEffect, ExtendedTrait, createTraitId } from '../../context/types/TraitsGameStateTypes';
+import { TraitEffect, ExtendedTrait, createTraitId } from '../../context/types/gameStates/TraitsGameStateTypes';
 
 /**
  * Interface for trait effects calculated from equipped traits

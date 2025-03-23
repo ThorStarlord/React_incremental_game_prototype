@@ -61,10 +61,10 @@ export const traits: TraitsCollection = {
     'QuickLearner': {
       name: 'Quick Learner',
       type: 'Knowledge',
-      description: 'You gain 10% more experience from all sources.',
+      description: 'You gain 15% more skill experience from all sources.',
       essenceCost: 75,
       effects: {
-        xpMultiplier: 0.1
+        skillXpMultiplier: 0.15
       }
     },
     'MentorsInsight': {

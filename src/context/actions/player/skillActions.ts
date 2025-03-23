@@ -8,7 +8,7 @@ import {
   SkillUpgradePayload, 
   PLAYER_ACTIONS, 
   PlayerAction 
-} from '../../types/playerActionTypes';
+} from '../../types/actions/playerActionTypes';
 import { validateString, validatePositive, validateNonNegative } from './utils';
 
 /**

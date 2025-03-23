@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { ACTION_TYPES } from '../../../context/GameStateExports';
-import { ExtendedCombatState, UseCombatLogicProps } from '../../../context/types/CombatGameStateTypes';
+import { ExtendedCombatState, UseCombatLogicProps } from '../../../context/types/gameStates/CombatGameStateTypes';
 
 /**
  * Hook to handle combat logic

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Tooltip, Typography, Box, SxProps, Theme } from '@mui/material';
-import { useGameDispatch } from '../../../../context/GameStateContext';
-import { ACTION_TYPES } from '../../../../context/actions/actionTypes';
+// Fix import paths to use the correct location
+import { useGameDispatch } from '../../../../context/GameStateExports';
+import { ACTION_TYPES } from '../../../../context/types/ActionTypes';
 
 /**
  * Interface for BasicEssenceButton component props
@@ -28,7 +29,7 @@ const BasicEssenceButton: React.FC<BasicEssenceButtonProps> = ({
   tooltip = "Click to gain essence", 
   sx = {},
   cooldown = 1000 // Cooldown in milliseconds
-}): JSX.Element => {
+}): React.ReactElement => {
   const dispatch = useGameDispatch();
   const [isOnCooldown, setIsOnCooldown] = useState<boolean>(false);
   

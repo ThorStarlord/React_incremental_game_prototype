@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { ACTION_TYPES } from '../../types/ActionTypes';
-import { ExtendedGameState, Quest, QuestObjective } from '../../types/gameLoopStateTypes';
+import { ExtendedGameState, Quest, QuestObjective } from '../../types/gameStates/gameLoopStateTypes';
 import { GameAction } from '../../GameDispatchContext';
 
 /**

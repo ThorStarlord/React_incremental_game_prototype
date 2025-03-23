@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Box, LinearProgress, Typography } from '@mui/material';
-import { UPDATE_INTERVALS } from '../../../../constants/gameConstants';
+// Fix the import or define the constant locally
+// import { UPDATE_INTERVALS } from '../../../../constants/gameConstants';
+
+// Define locally if the import cannot be resolved
+const UPDATE_INTERVALS = {
+  ESSENCE_GENERATION: 10000 // 10 seconds
+};
 
 /**
  * Interface for EssenceGenerationTimer component props

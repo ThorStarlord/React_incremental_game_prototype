@@ -2,8 +2,8 @@
  * Initial state configuration for player inventory
  */
 
-import { InventoryState, EquipmentState } from '../types/InventoryGameStateTypes';
-import { GameItem, ItemType, ItemRarity } from '../types/ItemsGameStateTypes';
+import { InventoryState, EquipmentState } from '../types/gameStates/InventoryGameStateTypes';
+import { GameItem, ItemType, ItemRarity } from '../types/gameStates/ItemsGameStateTypes';
 
 /**
  * Create a game item with validation

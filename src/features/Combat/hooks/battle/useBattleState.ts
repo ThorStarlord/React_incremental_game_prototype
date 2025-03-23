@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
   ExtendedCombatState 
-} from '../../../../context/types/BattleGameStateTypes';
+} from '../../../../context/types/gameStates/BattleGameStateTypes';
 
 /**
  * Initial combat state

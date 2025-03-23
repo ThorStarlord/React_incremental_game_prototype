@@ -3,7 +3,7 @@ import { CombatActionType, CombatActionResult } from '../../../../context/types/
 import { 
   ExtendedCombatState, 
   BattleResult 
-} from '../../../../context/types/BattleGameStateTypes';
+} from '../../../../context/types/gameStates/BattleGameStateTypes';
 
 /**
  * Hook for enemy AI and actions

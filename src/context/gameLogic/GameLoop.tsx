@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { useGameState } from '../GameStateContext';
 import { useGameDispatch } from '../GameDispatchContext';
 import { useGameSystems } from './hooks/useGameSystems';
-import { ExtendedGameState } from '../types/gameLoopStateTypes';
+import { ExtendedGameState } from '../types/gameStates/gameLoopStateTypes';
 
 /**
  * Props for GameLoop component

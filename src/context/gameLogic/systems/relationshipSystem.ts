@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ACTION_TYPES } from '../../types/ActionTypes';
 import { getSimplifiedTier } from '../../../config/relationshipConstants';
 import { createNotification } from '../utils/notificationHelpers';
-import { ExtendedGameState, NPC } from '../../types/gameLoopStateTypes';
+import { ExtendedGameState, NPC } from '../../types/gameStates/gameLoopStateTypes';
 import { GameAction } from '../../GameDispatchContext';
 
 /**

@@ -2,7 +2,7 @@
  * Initial state configuration for game resources and currencies
  */
 
-import { ResourceState } from '../types/ResourceGameStateTypes';
+import { ResourceState } from '../types/gameStates/ResourceGameStateTypes';
 
 /**
  * Starting material quantities for new players

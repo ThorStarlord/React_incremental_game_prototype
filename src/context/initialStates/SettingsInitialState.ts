@@ -9,7 +9,7 @@ import {
   GameplaySettings,
   UISettings,
   AccessibilitySettings
-} from '../types/SettingsGameStateTypes';
+} from '../types/gameStates/SettingsGameStateTypes';
 
 /**
  * Default notification settings

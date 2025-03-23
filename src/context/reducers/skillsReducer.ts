@@ -1,7 +1,8 @@
-import { ACTION_TYPES, SKILL_ACTIONS } from '../types/ActionTypes';
-import { GameState } from '../types/GameStateTypes';
-import { addNotification } from '../utils/notificationUtils';
-import { Notification, NotificationsState } from '../types/NotificationsGameStateTypes';
+import { ACTION_TYPES } from '../types/ActionTypes';
+import { SKILL_ACTIONS } from '../types/actions';
+import { GameState } from '../types/gameStates/GameStateTypes';
+import { addGameNotification } from '../utils/notificationUtils';
+import { Notification, NotificationsState } from '../types/gameStates/NotificationsGameStateTypes';
 
 /**
  * Interface for a skill with all required properties
@@ -61,50 +62,6 @@ const checkLevelUp = (skillData: { level: number; experience: number }): {
 interface ExtendedGameState extends GameState {
   _notificationDurations?: Record<string, number>;
 }
-
-/**
- * Helper function that wraps addNotification to handle type compatibility
- */
-const addGameNotification = (state: GameState, message: string, type: string, duration: number): GameState => {
-  // Create notification object with proper type assertion
-  const notificationType = validateNotificationType(type);
-  
-  const notification: Notification = {
-    id: Date.now().toString(),
-    message,
-    type: notificationType,
-    timestamp: Date.now(),
-    read: false
-  };
-  
-  // Get current notification state or create a new one with proper structure
-  const currentNotificationsState: NotificationsState = state.notifications || {
-    notifications: [],
-    unreadCount: 0,
-    maxNotifications: 100
-  };
-  
-  // First cast to ExtendedGameState to allow _notificationDurations property
-  const extendedState: ExtendedGameState = state;
-  
-  // Create the updated state with the notification durations
-  const updatedExtendedState: ExtendedGameState = {
-    ...extendedState,
-    notifications: {
-      notifications: [...currentNotificationsState.notifications, notification],
-      unreadCount: currentNotificationsState.unreadCount + 1,
-      maxNotifications: currentNotificationsState.maxNotifications
-    },
-    // Now we can safely use _notificationDurations
-    _notificationDurations: {
-      ...(extendedState._notificationDurations || {}),
-      [notification.id]: duration
-    }
-  };
-
-  // Cast back to GameState to match the function return type
-  return updatedExtendedState as GameState;
-};
 
 /**
  * Validate and convert a string to a valid notification type

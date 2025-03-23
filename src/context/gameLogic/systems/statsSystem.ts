@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { ACTION_TYPES } from '../../types/ActionTypes';
+import { SKILL_ACTIONS } from '../../types/actions';
 import { createNotification } from '../utils/notificationHelpers';
-import { ExtendedGameState } from '../../types/gameLoopStateTypes';
+import { ExtendedGameState } from '../../types/gameStates/gameLoopStateTypes';
 import { GameAction } from '../../GameDispatchContext';
 
 /**
@@ -36,7 +36,7 @@ function handlePassiveSkillGain(
     
     if (passiveSkillGain > 0 && gameState.player.activeSkill) {
       dispatch({
-        type: ACTION_TYPES.GAIN_SKILL_EXPERIENCE,
+        type: SKILL_ACTIONS.GAIN_SKILL_EXPERIENCE,
         payload: {
           skillId: gameState.player.activeSkill,
           amount: passiveSkillGain
@@ -50,7 +50,7 @@ function handlePassiveSkillGain(
       
       if (currentSkill && Math.floor(currentSkill.experience) % 100 === 0) {
         dispatch({
-          type: ACTION_TYPES.ADD_NOTIFICATION,
+          type: 'ADD_NOTIFICATION',
           payload: createNotification(
             `You've gained experience in ${currentSkill.name}!`,
             'positive',
@@ -73,7 +73,7 @@ function handleHealthRegeneration(
   if (healthRegen > 0 && 
       (gameState.player.health || 0) < (gameState.player.maxHealth || 100)) {
     dispatch({
-      type: ACTION_TYPES.UPDATE_PLAYER,
+      type: 'UPDATE_PLAYER',
       payload: {
         health: Math.min(
           (gameState.player.health || 0) + healthRegen, 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGameState, useGameDispatch, ACTION_TYPES } from '../../../context/GameStateExports';
 import { Item } from '../../../context/initialStates/ItemsInitialState';
-import { GameItem } from '../../../context/types/ItemsGameStateTypes';
+import { GameItem } from '../../../context/types/gameStates/ItemsGameStateTypes';
 
 /**
  * Interface for inventory state

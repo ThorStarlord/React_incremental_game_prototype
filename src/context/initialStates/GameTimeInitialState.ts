@@ -8,7 +8,7 @@ import {
   TimeCycle, 
   Season, 
   Weather 
-} from '../types/TimeGameStateTypes';
+} from '../types/gameStates/TimeGameStateTypes';
 
 /**
  * Initial state for game time

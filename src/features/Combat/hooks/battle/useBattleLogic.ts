@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { UseBattleHookProps, ExtendedCombatState, BattleResult } from '../../../../context/types/BattleGameStateTypes';
+import { UseBattleHookProps, ExtendedCombatState, BattleResult } from '../../../../context/types/gameStates/BattleGameStateTypes';
 
 // Import all specialized battle hooks
 import { useBattleState } from './useBattleState';

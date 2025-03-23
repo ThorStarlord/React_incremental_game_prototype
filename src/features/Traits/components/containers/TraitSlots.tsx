@@ -22,7 +22,7 @@ import { useGameState, useGameDispatch } from '../../../../context/GameStateExpo
 // Import TraitsInitialState explicitly
 import * as TraitsInitialState from '../../../../context/initialStates/TraitsInitialState';
 // Import ExtendedTrait, TraitId and TRAIT_CATEGORIES from TraitsGameStateTypes
-import { ExtendedTrait, TraitId, TRAIT_CATEGORIES, createTraitId } from '../../../../context/types/TraitsGameStateTypes';
+import { ExtendedTrait, TraitId, TRAIT_CATEGORIES, createTraitId } from '../../../../context/types/gameStates/TraitsGameStateTypes';
 import Panel from '../../../../shared/components/layout/Panel';
 import useTraitEffects from '../../hooks/useTraitEffects';
 import './TraitSlots.css';

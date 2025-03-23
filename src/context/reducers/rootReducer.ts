@@ -1,4 +1,4 @@
-import { GameState } from '../types/GameStateTypes';
+import { GameState } from '../types/gameStates/GameStateTypes';
 import { combatReducer } from './combatReducer';
 import { craftingReducer } from './craftingReducer';
 import { discoveryReducer } from './discoveryReducer';

@@ -8,9 +8,9 @@ import React, { useState } from 'react';
 import { Box, Typography, Paper, LinearProgress } from '@mui/material';
 import { useGameState, useGameDispatch } from '../../../../context/GameStateExports';
 import { ACTION_TYPES } from '../../../../context/types/ActionTypes';
-import { Region as WorldRegion } from '../../../../context/types/WorldGameStateTypes';
+import { Region as WorldRegion } from '../../../../context/types/gameStates/WorldGameStateTypes';
 // Fix import path to use an actual type that exists
-import { Quest } from '../../../../context/types/ProgressionGameStateTypes';
+import { Quest } from '../../../../context/types/gameStates/ProgressionGameStateTypes';
 
 /**
  * Define missing action type

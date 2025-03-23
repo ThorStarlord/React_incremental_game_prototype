@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { ExtendedCombatState } from '../../../../context/types/BattleGameStateTypes';
+import { ExtendedCombatState } from '../../../../context/types/gameStates/BattleGameStateTypes';
 
 /**
  * Hook for processing combat effects and turn transitions

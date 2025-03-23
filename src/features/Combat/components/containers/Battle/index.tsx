@@ -14,7 +14,7 @@ import useBattleLogic from './useBattleLogic';
 
 // Import the proper Enemy type directly from combat types
 import { Enemy } from '../../../../../context/types/combat/actors';
-import { BattleResult } from '../../../../../context/types/BattleGameStateTypes';
+import { BattleResult } from '../../../../../context/types/gameStates/BattleGameStateTypes';
 
 interface BattleProps {
   enemy: Enemy;  // This will now match the correct Enemy type

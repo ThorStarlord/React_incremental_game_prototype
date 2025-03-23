@@ -4,21 +4,22 @@ import { GAME_INIT_ACTIONS } from './types/ActionTypes';
 import { GameAction } from './GameDispatchContext';
 import GameStateContext, { EnhancedGameState } from './GameStateContext';
 import GameDispatchContext from './GameDispatchContext';
-import { GameState } from './types/GameStateTypes'; // Fix import location for GameState
+import { GameState } from './types/gameStates/GameStateTypes';
 import { InitialState } from './initialStates/InitialStateComposer';
 
-// Game version for save compatibility
+// Constants
 const GAME_VERSION = '0.1.0';
+const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
 
-// Main provider component
-const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
-  // Use InitialState with the correct type casting
-  const [gameState, dispatch] = useReducer(
-    rootReducer, 
-    InitialState as GameState
-  );
-
-  // Save game to specific slot (or default)
+/**
+ * Custom hook for game persistence operations
+ */
+const useGamePersistence = (gameState: GameState, dispatch: Dispatch<GameAction>) => {
+  /**
+   * Save game to localStorage
+   * @param slotId - Slot identifier (defaults to auto)
+   * @returns Promise resolving to success status
+   */
   const saveGame = useCallback(async (slotId = 'auto'): Promise<boolean> => {
     try {
       const saveData = {
@@ -27,17 +28,18 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
         state: gameState
       };
       
+      // Save the game state
       localStorage.setItem(`game_save_${slotId}`, JSON.stringify(saveData));
       
-      // If this is not an auto-save, also update the save list
+      // Update the save list if this is not an auto-save
       if (slotId !== 'auto') {
         const savedGames = JSON.parse(localStorage.getItem('saved_games') || '[]');
+        
         const saveInfo = {
           id: slotId,
           name: gameState.player?.name || 'Unnamed Hero',
           timestamp: Date.now(),
-          playerLevel: (gameState.player as any)?.level || 1, // Use type assertion for level property
-          playtime: gameState.statistics?.current?.timeStatistics?.totalPlayTime || 0 // Fixed: use correct path to totalPlayTime
+          playtime: gameState.statistics?.current?.timeStatistics?.totalPlayTime || 0
         };
         
         // Update or add to saved games list
@@ -58,45 +60,68 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
     }
   }, [gameState]);
 
-  // Load game from specific slot
+  /**
+   * Load game from localStorage
+   * @param slotId - Slot identifier to load
+   * @returns Promise resolving to success status
+   */
   const loadGame = useCallback(async (slotId: string): Promise<boolean> => {
     try {
       const savedGame = localStorage.getItem(`game_save_${slotId}`);
-      if (savedGame) {
-        const saveData = JSON.parse(savedGame);
-        
-        // Version check and potential migration logic could go here
-        
-        dispatch({
-          type: GAME_INIT_ACTIONS.INITIALIZE_GAME_DATA,
-          payload: saveData.state
-        });
-        return true;
+      if (!savedGame) {
+        console.warn(`No save found with id: ${slotId}`);
+        return false;
       }
-      return false;
+      
+      const saveData = JSON.parse(savedGame);
+      
+      // Version compatibility check could be added here
+      // e.g., if (saveData.version !== GAME_VERSION) { ... }
+      
+      dispatch({
+        type: GAME_INIT_ACTIONS.INITIALIZE_GAME_DATA,
+        payload: saveData.state
+      });
+      
+      return true;
     } catch (error) {
       console.error('Failed to load game:', error);
       return false;
     }
-  }, []);
+  }, [dispatch]);
 
-  // Reset game state to initial values
+  /**
+   * Reset game state to initial values
+   */
   const resetGame = useCallback(() => {
     dispatch({ type: GAME_INIT_ACTIONS.RESET_GAME, payload: {} });
-  }, []);
+  }, [dispatch]);
 
-  // Export save as string for backup
+  /**
+   * Export save as base64 string for backup
+   */
   const exportSave = useCallback((): string => {
-    return btoa(JSON.stringify({
-      version: GAME_VERSION,
-      timestamp: Date.now(),
-      state: gameState
-    }));
+    try {
+      return btoa(JSON.stringify({
+        version: GAME_VERSION,
+        timestamp: Date.now(),
+        state: gameState
+      }));
+    } catch (error) {
+      console.error('Failed to export save:', error);
+      return '';
+    }
   }, [gameState]);
 
-  // Import save from string backup
+  /**
+   * Import save from base64 string backup
+   */
   const importSave = useCallback(async (saveData: string): Promise<boolean> => {
     try {
+      if (!saveData) {
+        throw new Error("Empty save data");
+      }
+      
       const parsedData = JSON.parse(atob(saveData));
       
       // Validate the imported data structure
@@ -108,42 +133,69 @@ const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
         type: GAME_INIT_ACTIONS.INITIALIZE_GAME_DATA,
         payload: parsedData.state
       });
+      
       return true;
     } catch (error) {
       console.error('Failed to import save:', error);
       return false;
     }
-  }, []);
+  }, [dispatch]);
 
-  // Handle auto-saving
+  // Setup auto-save mechanism
   useEffect(() => {
     const saveInterval = setInterval(() => {
       saveGame('auto').catch(error => {
         console.error('Auto-save failed:', error);
       });
-    }, 30000);
+    }, AUTO_SAVE_INTERVAL);
     
     return () => clearInterval(saveInterval);
   }, [saveGame]);
 
-  // Load last auto-save on mount
+  // Load auto-save on initial mount
   useEffect(() => {
-    loadGame('auto').catch(error => {
-      console.error('Failed to load auto-save:', error);
-    });
+    // Only load if auto-save exists
+    const autoSaveExists = localStorage.getItem('game_save_auto');
+    if (autoSaveExists) {
+      loadGame('auto').catch(error => {
+        console.error('Failed to load auto-save:', error);
+      });
+    }
   }, [loadGame]);
 
-  // Create the context value with game state and utility functions
-  const contextValue: EnhancedGameState = {
-    ...gameState,
+  return {
     saveGame,
     loadGame,
     resetGame,
     exportSave,
     importSave
   };
+};
 
-  // Cast the dispatch function to match the expected type in GameDispatchContext
+/**
+ * GameProvider component
+ * 
+ * Main context provider for the game state management system.
+ * Provides game state and dispatch function to the application,
+ * along with utility methods for managing game data.
+ */
+const GameProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+  // Initialize state with type casting
+  const [gameState, dispatch] = useReducer(
+    rootReducer, 
+    InitialState as GameState
+  );
+
+  // Setup game persistence functionality
+  const persistenceUtils = useGamePersistence(gameState, dispatch);
+
+  // Create complete context value with enhanced game state
+  const contextValue: EnhancedGameState = {
+    ...gameState,
+    ...persistenceUtils
+  };
+
+  // Properly type the dispatch function
   const typedDispatch = dispatch as Dispatch<GameAction>;
 
   return (

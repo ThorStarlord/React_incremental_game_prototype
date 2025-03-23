@@ -5,11 +5,13 @@
  */
 import { 
   AttributeAllocationPayload, 
+  UpdateAttributePayload,
+  UpdateAttributesPayload,
   PLAYER_ACTIONS, 
   PlayerAction
-} from '../../types/playerActionTypes';
-import { validateString, validatePositive } from './utils';
-import { PlayerAttributes } from '../../types/PlayerGameStateTypes';
+} from '../../types/actions/playerActionTypes';
+import { validateString, validatePositive, getTimestamp } from './utils';
+import { PlayerAttributes } from '../../types/gameStates/PlayerGameStateTypes';
 
 /**
  * Allocate attribute points to a specific attribute
@@ -31,7 +33,7 @@ export const allocateAttribute = (attributeName: string, amount: number): Player
     payload: { 
       attributeName, 
       amount,
-      timestamp: Date.now()
+      timestamp: getTimestamp()
     } as AttributeAllocationPayload
   };
 };
@@ -75,5 +77,42 @@ export const spendAttributePoints = (
   return {
     type: PLAYER_ACTIONS.SPEND_ATTRIBUTE_POINTS,
     payload: { attribute, points }
+  };
+};
+
+/**
+ * Update a single attribute value
+ * 
+ * @param {string} attribute - Attribute to update
+ * @param {number} value - New value for the attribute
+ * @returns {PlayerAction} The UPDATE_ATTRIBUTE action
+ */
+export const updateAttribute = (
+  attribute: keyof PlayerAttributes,
+  value: number
+): PlayerAction => {
+  validateString(attribute as string, 'Attribute');
+
+  return {
+    type: PLAYER_ACTIONS.UPDATE_ATTRIBUTE,
+    payload: {
+      attribute,
+      value
+    } as UpdateAttributePayload
+  };
+};
+
+/**
+ * Update multiple attributes at once
+ * 
+ * @param {Record<string, number>} attributes - Attributes to update
+ * @returns {PlayerAction} The UPDATE_ATTRIBUTES action
+ */
+export const updateAttributes = (
+  attributes: Record<string, number>
+): PlayerAction => {
+  return {
+    type: PLAYER_ACTIONS.UPDATE_ATTRIBUTES,
+    payload: attributes as UpdateAttributesPayload
   };
 };

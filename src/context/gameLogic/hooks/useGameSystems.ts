@@ -5,7 +5,7 @@ import { useStatsSystem } from '../systems/statsSystem';
 import { useEncounterSystem } from '../systems/encounterSystem';
 import { useQuestSystem } from '../systems/questSystem';
 import { useEnvironmentSystem } from '../systems/environmentSystem';
-import { ExtendedGameState } from '../../types/gameLoopStateTypes';
+import { ExtendedGameState } from '../../types/gameStates/gameLoopStateTypes';
 import { GameAction } from '../../GameDispatchContext';
 
 /**

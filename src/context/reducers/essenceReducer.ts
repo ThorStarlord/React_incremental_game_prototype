@@ -1,9 +1,9 @@
-import { ACTION_TYPES } from '../types/ActionTypes';
-import { GameState } from '../types/GameStateTypes';
+import { ESSENCE_ACTIONS } from '../types/actions/essenceActionTypes';
+import { GameState } from '../types/gameStates/GameStateTypes';
 import { 
   EssenceState, 
   EssencePayload 
-} from '../types/EssenceGameStateTypes';
+} from '../types/gameStates/EssenceGameStateTypes';
 import { 
   createNotification, 
   addNotification, 
@@ -20,7 +20,7 @@ export const essenceReducer = (
   action: { type: string; payload: EssencePayload }
 ): GameState => {
   switch (action.type) {
-    case ACTION_TYPES.GAIN_ESSENCE: {
+    case ESSENCE_ACTIONS.GAIN_ESSENCE: {
       const { amount, source } = action.payload;
       
       // Apply trait multipliers
@@ -60,7 +60,7 @@ export const essenceReducer = (
       return updatedState;
     }
     
-    case ACTION_TYPES.SPEND_ESSENCE: {
+    case ESSENCE_ACTIONS.SPEND_ESSENCE: {
       const { amount, reason } = action.payload;
       
       if (state.essence.amount < amount) {
