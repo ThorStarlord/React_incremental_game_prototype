@@ -6,7 +6,7 @@ import { Enemy as DungeonEnemy } from '../../data/dungeonEnemies';
 import { CombatEnemy } from '../../../../context/types/combat';
 // Import the combat components
 import Battle from '../../../Combat/components/containers/Battle';
-import { adaptToCombatEnemy } from '../../../Combat/adapters/enemyAdapter';
+import { adaptToCombatEnemy } from '../../../Combat/utils/enemyAdapter';  // Use the unified adapter
 
 /**
  * Interface for the ExplorationArea component props
@@ -56,6 +56,8 @@ const ExplorationArea: React.FC<ExplorationAreaProps> = ({
       traits: []
     };
     
+    // Use the unified adapter
+    const enemy = adaptToCombatEnemy(sampleEnemy);
     setCurrentEnemy(sampleEnemy);
     setIsInCombat(true);
     onStartBattle(dungeonId);

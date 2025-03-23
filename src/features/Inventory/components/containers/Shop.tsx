@@ -64,7 +64,7 @@ interface TabPanelProps {
 /**
  * TabPanel component for shop tabs
  */
-const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }): JSX.Element => {
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }): React.ReactElement => {
   return (
     <div
       role="tabpanel"
@@ -97,7 +97,7 @@ const Shop: React.FC<ShopProps> = ({
   hasLimitedStock = true,
   sx,
   onExit
-}): JSX.Element => {
+}): React.ReactElement => {
   // Get inventory from context
   const { inventory, addItem, removeItem } = useInventory();
   
@@ -258,7 +258,7 @@ const Shop: React.FC<ShopProps> = ({
   };
   
   // Render buy button for shop items
-  const renderBuyButton = (item: ShopItem): JSX.Element => {
+  const renderBuyButton = (item: ShopItem): React.ReactElement => {
     const canBuy = inventory.gold >= item.buyPrice && (!hasLimitedStock || item.stock > 0);
     
     return (
@@ -276,7 +276,7 @@ const Shop: React.FC<ShopProps> = ({
   };
   
   // Render sell button for inventory items
-  const renderSellButton = (item: Item): JSX.Element => {
+  const renderSellButton = (item: Item): React.ReactElement => {
     const shopItem = shopItems.find(si => si.id === item.id);
     const sellPrice = shopItem?.sellPrice || Math.floor((item.value || 0) / 2);
     
@@ -418,17 +418,7 @@ const Shop: React.FC<ShopProps> = ({
           item={selectedItem}
           open={showItemDetails}
           onClose={() => setShowItemDetails(false)}
-          onUse={undefined} // No using items in shop
-          onDrop={undefined} // No dropping items in shop
-          onEquip={undefined} // No equipping items in shop
-        >
-          {/* Custom action buttons based on active tab */}
-          {activeTab === 0 ? (
-            renderBuyButton(selectedItem as ShopItem)
-          ) : (
-            renderSellButton(selectedItem)
-          )}
-        </ItemDetailsDialog>
+        />
       )}
       
       {/* Notifications */}

@@ -73,7 +73,7 @@ const SlotContainer = styled(Box, {
  * InventorySlot component displays a single inventory slot that can contain an item
  * 
  * @param {InventorySlotProps} props Component props
- * @returns {JSX.Element} Rendered component
+ * @returns {React.ReactElement} Rendered component
  */
 const InventorySlot: React.FC<InventorySlotProps> = ({
   item,
@@ -86,7 +86,7 @@ const InventorySlot: React.FC<InventorySlotProps> = ({
   onDropItem,
   slotIndex,
   sx
-}): JSX.Element => {
+}): React.ReactElement => {
   
   /**
    * Handle slot click

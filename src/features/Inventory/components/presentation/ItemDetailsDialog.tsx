@@ -38,7 +38,7 @@ interface ItemDetailsDialogProps {
  * ItemDetailsDialog component displays detailed information about an item
  * 
  * @param {ItemDetailsDialogProps} props Component props
- * @returns {JSX.Element} Rendered component
+ * @returns {React.ReactElement} Rendered component
  */
 const ItemDetailsDialog: React.FC<ItemDetailsDialogProps> = ({ 
   item, 
@@ -48,7 +48,7 @@ const ItemDetailsDialog: React.FC<ItemDetailsDialogProps> = ({
   onUse,
   onEquip,
   onDrop
-}): JSX.Element => {
+}): React.ReactElement => {
   
   // If no item is provided, don't render the dialog content
   if (!item) {
@@ -74,7 +74,7 @@ const ItemDetailsDialog: React.FC<ItemDetailsDialogProps> = ({
   const renderStats = (stats?: ItemStats) => {
     if (!stats) return null;
     
-    const statEntries = Object.entries(stats).filter(([_, value]) => value && value !== 0);
+    const statEntries = Object.entries(stats).filter(([_, value]) => value !== undefined && value !== 0);
     
     if (statEntries.length === 0) return null;
     
@@ -87,10 +87,10 @@ const ItemDetailsDialog: React.FC<ItemDetailsDialogProps> = ({
               <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ textTransform: 'capitalize' }}>{key}:</span>
                 <span style={{ 
-                  color: value > 0 ? 'green' : 'red', 
+                  color: value !== undefined && value > 0 ? 'green' : 'red', 
                   fontWeight: 'bold' 
                 }}>
-                  {value > 0 ? `+${value}` : value}
+                  {value !== undefined && value > 0 ? `+${value}` : value}
                 </span>
               </Typography>
             </Grid>

@@ -50,7 +50,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
   defaultCategory,
   fullFeatures = true,
   sx 
-}): JSX.Element => {
+}): React.ReactElement => {
   // Get inventory data from hook
   const { items, inventory, removeItem } = useInventory();
   

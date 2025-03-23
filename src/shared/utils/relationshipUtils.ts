@@ -1,11 +1,12 @@
-import { RELATIONSHIP_TIERS } from '../../constants/gameConstants';
+import { RELATIONSHIP_TIERS } from '../../config/relationshipConstants';
 
 /**
  * Interface for relationship tier
  */
 interface RelationshipTier {
   name: string;
-  threshold: number;
+  min: number;    // Changed from threshold to min
+  max: number;    // Added max property
   color: string;
   benefits?: string[];
   [key: string]: any; // Additional tier properties
@@ -27,13 +28,12 @@ interface NextTierInfo {
 export const getRelationshipTier = (value: number = 0): RelationshipTier => {
   // Default to lowest relationship tier if no value provided
   if (value === null || value === undefined) {
-    return RELATIONSHIP_TIERS.NEMESIS;
+    return RELATIONSHIP_TIERS.HOSTILE;
   }
   
-  // Find the highest tier that the relationship value qualifies for
+  // Find the tier that the relationship value falls within
   return Object.values(RELATIONSHIP_TIERS)
-    .sort((a, b) => b.threshold - a.threshold)
-    .find(tier => value >= tier.threshold) || RELATIONSHIP_TIERS.NEMESIS;
+    .find((tier: any) => value >= tier.min && value <= tier.max) || RELATIONSHIP_TIERS.HOSTILE;
 };
 
 /**
@@ -54,19 +54,18 @@ export const meetsRelationshipRequirement = (currentValue: number = 0, requiredV
 export const getPointsToNextTier = (value: number = 0): NextTierInfo => {
   const currentTier = getRelationshipTier(value);
   
-  // Get all tiers sorted by threshold
+  // Get all tiers sorted by min threshold
   const sortedTiers = Object.values(RELATIONSHIP_TIERS)
-    .sort((a, b) => a.threshold - b.threshold);
+    .sort((a: any, b: any) => a.min - b.min);
   
-  // Find the next tier
-  const currentIndex = sortedTiers.findIndex(tier => tier.name === currentTier.name);
+  const currentIndex = sortedTiers.findIndex((tier: any) => tier.name === currentTier.name);
   const nextTier = currentIndex < sortedTiers.length - 1 ? sortedTiers[currentIndex + 1] : null;
   
   if (!nextTier) {
     return { nextTier: null, pointsNeeded: 0 };
   }
   
-  const pointsNeeded = nextTier.threshold - value;
+  const pointsNeeded = nextTier.min - value;
   return { nextTier, pointsNeeded };
 };
 
@@ -98,7 +97,7 @@ export const calculateProgressToNextTier = (
   nextTier: RelationshipTier | null
 ): number => {
   if (!nextTier) return 100; // Max progress if no next tier
-  return ((relationship - currentTier.threshold) / (nextTier.threshold - currentTier.threshold)) * 100;
+  return ((relationship - currentTier.min) / (nextTier.min - currentTier.min)) * 100;
 };
 
 /**

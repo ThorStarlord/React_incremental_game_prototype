@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
-import { useGameDispatch } from '../../../context/GameStateContext';
-import { ACTION_TYPES } from '../../../context/actions/actionTypes';
+// Fix imports to use correct exports
+import { useGameDispatch } from '../../../context/GameStateExports';
+import { ACTION_TYPES } from '../../../context/types/ActionTypes';
 
 /**
  * Interface for useEssenceButton hook return value

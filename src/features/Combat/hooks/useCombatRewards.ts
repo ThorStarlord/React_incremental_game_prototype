@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Rewards } from '../types/combatTypes';
+import { Rewards } from '../../../context/types/combat/combatTypes';
 
 /**
  * Hook for managing combat rewards

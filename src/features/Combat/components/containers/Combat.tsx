@@ -13,7 +13,9 @@ import CombatProgress from '../presentation/CombatProgress';
 import { useCombatFlow } from '../../hooks/useCombatFlow';
 
 // Import types
-import { CombatResult } from '../../types/combatTypes';
+import { CombatResult } from '../../../../context/types/combat/combatTypes';
+import { Enemy as CombatEnemy } from '../../../../context/types/combat/combatTypes';
+import { Enemy as SimpleEnemy } from '../../../../context/types/combat/baseEnemyTypes';
 
 // Import adapter
 import { adaptEnemy } from '../../utils/enemyAdapter';
@@ -121,7 +123,13 @@ const Combat: React.FC<CombatProps> = ({
       {/* Main battle component */}
       {currentEnemy && (
         <Battle 
-          enemy={adaptEnemy(currentEnemy)}
+          enemy={adaptEnemy({
+            ...currentEnemy,
+            // Ensure required properties exist for SimpleEnemy
+            health: currentEnemy.maxHealth || currentEnemy.currentHealth || 100,
+            maxHealth: currentEnemy.maxHealth || 100,
+            currentHealth: currentEnemy.currentHealth || currentEnemy.maxHealth || 100
+          } as SimpleEnemy)}
           dungeonId={areaId}
           encounter={currentEncounter + 1}
           totalEncounters={totalEncounters}

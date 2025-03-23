@@ -6,7 +6,7 @@
  * and area difficulty.
  */
 
-import { EnemyTemplate, AreaEnemies } from '../types/combatTypes';
+import { EnemyTemplate, AreaEnemies } from '../../../context/types/combat/combatTypes';
 
 /**
  * Common loot items that can drop from any enemy

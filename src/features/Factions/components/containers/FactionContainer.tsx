@@ -1,140 +1,130 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { GameStateContext } from '../../../../context/GameStateContext';
+import { useGameState } from '../../../../context/GameStateExports';
+import { Faction as SystemFaction } from '../../../../context/types/gameStates/FactionGameStateTypes';
 import './FactionContainer.css';
 
 /**
- * Interface for a faction's reputation tier
+ * Props for the FactionContainer component
  */
-interface ReputationTier {
-  name: string;
-  threshold: number;
-  benefits?: string[];
+interface FactionContainerProps {
+  factionId: string;
+  position?: { x: number; y: number };
+  onSelect?: (factionId: string) => void;
+  isSelected?: boolean;
 }
 
 /**
- * Interface for Faction object
+ * Interface for Faction data with the properties we need
  */
 interface Faction {
   id: string;
   name: string;
   description: string;
-  reputation: number;
-  unlocked: boolean;
-  reputationTiers?: ReputationTier[];
-  specialCurrency?: string;
-  specialCurrencyAmount?: number;
-  [key: string]: any; // For additional faction properties
+  relationship: number;
+  reputationTiers?: {
+    threshold: number;
+    name: string;
+    benefits?: string[];
+  }[];
+  // Other faction properties
+  [key: string]: any;
 }
 
 /**
- * Interface for the game state
+ * FactionContainer component displays faction information in a draggable container
  */
-interface GameState {
-  factions: {
-    factions: Record<string, Faction>;
-  };
-  [key: string]: any; // For other state properties
-}
+const FactionContainer: React.FC<FactionContainerProps> = ({
+  factionId,
+  position = { x: 0, y: 0 },
+  onSelect,
+  isSelected = false,
+}) => {
+  // Use useGameState hook instead of useContext
+  const gameState = useGameState();
+  const [isExpanded, setIsExpanded] = useState(false);
 
-const FactionContainer: React.FC = () => {
-  const { gameState } = useContext(GameStateContext) as { gameState: GameState };
-  const [selectedFaction, setSelectedFaction] = useState<string | null>(null);
+  // Get faction data from state - fix accessing factions from the system
+  const systemFaction = gameState.factions?.factions?.[factionId] as SystemFaction | undefined;
   
-  // Get factions from the updated structure
-  const factionsData = gameState?.factions?.factions || {};
-  const factionsList = Object.values(factionsData).filter(faction => faction.unlocked);
-
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: 'faction-window',
-    data: { type: 'window', windowType: 'faction' }
-  });
-
-  const draggableStyle = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  // Convert the system faction to our component's faction type - fix property duplication
+  const faction: Faction | undefined = systemFaction ? {
+    ...systemFaction, // Spread first to get all properties
+    relationship: 0, // Default value since relationship doesn't exist in SystemFaction 
+    // Add any missing required fields
   } : undefined;
 
-  // Get the current reputation tier for a faction
-  const getCurrentTier = (faction: Faction): ReputationTier | null => {
-    if (!faction.reputationTiers) return null;
-    
-    for (let i = faction.reputationTiers.length - 1; i >= 0; i--) {
-      if (faction.reputation >= faction.reputationTiers[i].threshold) {
-        return faction.reputationTiers[i];
-      }
-    }
-    return faction.reputationTiers[0];
+  // Set up draggable functionality
+  const {attributes, listeners, setNodeRef, transform} = useDraggable({
+    id: `faction-${factionId}`,
+    data: {
+      type: 'faction',
+      id: factionId,
+    },
+  });
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x + position.x}px, ${transform.y + position.y}px, 0)`,
+  } : {
+    transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
   };
 
-  const renderFactionDetails = (faction: Faction) => {
-    const currentTier = getCurrentTier(faction);
-    
-    return (
-      <div className="faction-details">
-        <h3>{faction.name}</h3>
-        <p className="faction-description">{faction.description}</p>
-        <div className="reputation-info">
-          <p>Reputation: {faction.reputation}</p>
-          <p>Status: {currentTier?.name || 'Unknown'}</p>
-        </div>
-        {currentTier?.benefits?.length > 0 && (
-          <div className="faction-benefits">
-            <h4>Current Benefits:</h4>
-            <ul>
-              {currentTier.benefits.map((benefit, index) => (
-                <li key={index}>{benefit}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {faction.specialCurrency && (
-          <p>{faction.specialCurrency}: {faction.specialCurrencyAmount}</p>
-        )}
-      </div>
-    );
+  // If faction not found, return null
+  if (!faction) return null;
+
+  // Calculate current reputation tier
+  const currentTier = faction.reputationTiers
+    ? [...faction.reputationTiers]
+        .sort((a, b) => b.threshold - a.threshold)
+        .find(tier => faction.relationship >= tier.threshold) || null
+    : null;
+
+  const handleClick = () => {
+    setIsExpanded(!isExpanded);
+    if (onSelect) {
+      onSelect(factionId);
+    }
   };
 
   return (
     <div
       ref={setNodeRef}
-      style={draggableStyle}
-      {...listeners}
+      style={style}
+      className={`faction-container ${isSelected ? 'selected' : ''} ${isExpanded ? 'expanded' : ''}`}
+      onClick={handleClick}
       {...attributes}
-      className="faction-container"
+      {...listeners}
     >
       <div className="faction-header">
-        <h2>Factions</h2>
-        <span className="close-button">✕</span>
-      </div>
-      
-      <div className="factions-content">
-        <div className="factions-list">
-          {factionsList.length > 0 ? (
-            factionsList.map(faction => (
-              <div 
-                key={faction.id} 
-                className={`faction-item ${selectedFaction === faction.id ? 'selected' : ''}`}
-                onClick={() => setSelectedFaction(faction.id)}
-              >
-                <h4>{faction.name}</h4>
-                <div className="reputation-bar">
-                  <div 
-                    className="reputation-fill" 
-                    style={{width: `${Math.max(0, faction.reputation)}%`}}
-                  />
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="no-factions">No factions discovered yet.</p>
-          )}
+        <h3>{faction.name}</h3>
+        <div className="faction-relationship">
+          <div className="relationship-bar">
+            <div
+              className="relationship-value"
+              style={{ width: `${Math.max(0, Math.min(100, (faction.relationship + 100) / 2))}%` }}
+            />
+          </div>
+          <p>Status: {currentTier?.name || 'Unknown'}</p>
         </div>
-        
-        <div className="faction-detail-panel">
-          {selectedFaction && renderFactionDetails(factionsData[selectedFaction])}
-          {!selectedFaction && <p className="faction-hint">Select a faction to view details</p>}
-        </div>
+        {/* Add proper null checking */}
+        {currentTier?.benefits && currentTier.benefits.length > 0 && (
+          <div className="faction-benefits">
+            <h4>Current Benefits:</h4>
+            <ul>
+              {currentTier?.benefits?.map((benefit: string, index: number) => (
+                <li key={index}>{benefit}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
+
+      {isExpanded && (
+        <div className="faction-details">
+          <p>{faction.description}</p>
+          {/* Additional faction details... */}
+        </div>
+      )}
     </div>
   );
 };

@@ -2,6 +2,19 @@ import { useMemo } from 'react';
 import { useGameState } from '../../../context/GameStateExports';
 import '../../../constants/GameStateTypes'; // Import our type extensions
 
+// Add interface for trait effects
+interface TraitEffect {
+  attackBonus?: number;
+  defenseBonus?: number;
+  dodgeChance?: number;
+  criticalChance?: number;
+  criticalDamage?: number;
+  essenceSiphonChance?: number;
+  xpMultiplier?: number;
+  goldMultiplier?: number;
+  [key: string]: number | undefined;
+}
+
 /**
  * Hook to calculate trait effects for combat
  */
@@ -40,14 +53,20 @@ const useTraitEffects = () => {
       
       // Apply effects from trait
       if (trait.effects) {
-        if (trait.effects.attackBonus) mods.attackBonus += trait.effects.attackBonus;
-        if (trait.effects.defenseBonus) mods.defenseBonus += trait.effects.defenseBonus;
-        if (trait.effects.dodgeChance) mods.dodgeChance += trait.effects.dodgeChance;
-        if (trait.effects.criticalChance) mods.criticalChance += trait.effects.criticalChance;
-        if (trait.effects.criticalDamage) mods.criticalDamage += trait.effects.criticalDamage;
-        if (trait.effects.essenceSiphonChance) mods.essenceSiphonChance += trait.effects.essenceSiphonChance;
-        if (trait.effects.xpMultiplier) mods.xpMultiplier *= trait.effects.xpMultiplier;
-        if (trait.effects.goldMultiplier) mods.goldMultiplier *= trait.effects.goldMultiplier;
+        // Convert trait.effects to the correct type - could be an array or object
+        const effectsObj: TraitEffect = Array.isArray(trait.effects) 
+          ? trait.effects.reduce((acc, effect) => ({ ...acc, ...effect }), {})
+          : trait.effects as TraitEffect;
+        
+        // Now access properties from the correctly typed object
+        if (effectsObj.attackBonus) mods.attackBonus += effectsObj.attackBonus;
+        if (effectsObj.defenseBonus) mods.defenseBonus += effectsObj.defenseBonus;
+        if (effectsObj.dodgeChance) mods.dodgeChance += effectsObj.dodgeChance;
+        if (effectsObj.criticalChance) mods.criticalChance += effectsObj.criticalChance;
+        if (effectsObj.criticalDamage) mods.criticalDamage += effectsObj.criticalDamage;
+        if (effectsObj.essenceSiphonChance) mods.essenceSiphonChance += effectsObj.essenceSiphonChance;
+        if (effectsObj.xpMultiplier) mods.xpMultiplier *= effectsObj.xpMultiplier;
+        if (effectsObj.goldMultiplier) mods.goldMultiplier *= effectsObj.goldMultiplier;
       }
     });
     

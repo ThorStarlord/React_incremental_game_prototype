@@ -1,6 +1,26 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useGameState, useGameDispatch } from '../../../context/GameStateContext';
+// Fix the import path to use the correct exports file
+import { useGameState, useGameDispatch } from '../../../context/GameStateExports';
 import { Minion, MinionTask, MinionAssignment, MinionUpgrade } from '../../../context/initialStates/MinionsInitialState';
+
+/**
+ * Interface for minions system structure
+ */
+interface MinionsSystem {
+  minions?: Record<string, Minion>;
+  availableTasks?: MinionTask[];
+  upgrades?: Record<string, MinionUpgrade>;
+  maxMinionSlots?: number;
+  unlockedMinionSlots?: number;
+  nextSlotCost?: number;
+  config?: {
+    autoAssign?: boolean;
+    notifyOnCompletion?: boolean;
+    defaultAssignment?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
 
 /**
  * Interface for the return value from useMinionSystem hook
@@ -54,39 +74,41 @@ interface UseMinionSystemReturn {
  * @returns {UseMinionSystemReturn} Object with minion data and functions
  */
 const useMinionSystem = (): UseMinionSystemReturn => {
-  const { minions: gameMinions = {} } = useGameState();
+  // Use optional chaining and default to an empty object
+  const gameState = useGameState();
+  const minionsSystem = (gameState.minionsSystem || {}) as MinionsSystem;
   const dispatch = useGameDispatch();
   
-  const [minions, setMinions] = useState<Record<string, Minion>>(gameMinions.minions || {});
-  const [availableTasks, setAvailableTasks] = useState<MinionTask[]>(gameMinions.availableTasks || []);
-  const [upgrades, setUpgrades] = useState<Record<string, MinionUpgrade>>(gameMinions.upgrades || {});
-  const [maxMinionSlots, setMaxMinionSlots] = useState<number>(gameMinions.maxMinionSlots || 10);
-  const [unlockedMinionSlots, setUnlockedMinionSlots] = useState<number>(gameMinions.unlockedMinionSlots || 1);
-  const [nextSlotCost, setNextSlotCost] = useState<number>(gameMinions.nextSlotCost || 100);
+  const [minions, setMinions] = useState<Record<string, Minion>>(minionsSystem.minions || {});
+  const [availableTasks, setAvailableTasks] = useState<MinionTask[]>(minionsSystem.availableTasks || []);
+  const [upgrades, setUpgrades] = useState<Record<string, MinionUpgrade>>(minionsSystem.upgrades || {});
+  const [maxMinionSlots, setMaxMinionSlots] = useState<number>(minionsSystem.maxMinionSlots || 10);
+  const [unlockedMinionSlots, setUnlockedMinionSlots] = useState<number>(minionsSystem.unlockedMinionSlots || 1);
+  const [nextSlotCost, setNextSlotCost] = useState<number>(minionsSystem.nextSlotCost || 100);
   const [config, setConfig] = useState({
-    autoAssign: gameMinions.config?.autoAssign || false,
-    notifyOnCompletion: gameMinions.config?.notifyOnCompletion || true,
-    defaultAssignment: gameMinions.config?.defaultAssignment || 'idle'
+    autoAssign: minionsSystem.config?.autoAssign || false,
+    notifyOnCompletion: minionsSystem.config?.notifyOnCompletion !== false, // Ensure this is always true unless explicitly set to false
+    defaultAssignment: minionsSystem.config?.defaultAssignment || 'idle'
   });
   
   /**
    * Synchronize local state with game state when it changes
    */
   useEffect(() => {
-    if (gameMinions) {
-      setMinions(gameMinions.minions || {});
-      setAvailableTasks(gameMinions.availableTasks || []);
-      setUpgrades(gameMinions.upgrades || {});
-      setMaxMinionSlots(gameMinions.maxMinionSlots || 10);
-      setUnlockedMinionSlots(gameMinions.unlockedMinionSlots || 1);
-      setNextSlotCost(gameMinions.nextSlotCost || 100);
+    if (minionsSystem) {
+      setMinions(minionsSystem.minions || {});
+      setAvailableTasks(minionsSystem.availableTasks || []);
+      setUpgrades(minionsSystem.upgrades || {});
+      setMaxMinionSlots(minionsSystem.maxMinionSlots || 10);
+      setUnlockedMinionSlots(minionsSystem.unlockedMinionSlots || 1);
+      setNextSlotCost(minionsSystem.nextSlotCost || 100);
       setConfig({
-        autoAssign: gameMinions.config?.autoAssign || false,
-        notifyOnCompletion: gameMinions.config?.notifyOnCompletion || true,
-        defaultAssignment: gameMinions.config?.defaultAssignment || 'idle'
+        autoAssign: minionsSystem.config?.autoAssign || false,
+        notifyOnCompletion: minionsSystem.config?.notifyOnCompletion !== false, // Ensure this is always true unless explicitly set to false
+        defaultAssignment: minionsSystem.config?.defaultAssignment || 'idle'
       });
     }
-  }, [gameMinions]);
+  }, [minionsSystem]);
   
   /**
    * Assign a task to a minion
@@ -296,7 +318,9 @@ const useMinionSystem = (): UseMinionSystemReturn => {
   }>) => {
     const updatedConfig = {
       ...config,
-      ...newConfig
+      ...newConfig,
+      // Ensure notifyOnCompletion is true when updating config
+      notifyOnCompletion: newConfig.notifyOnCompletion !== false ? true : config.notifyOnCompletion
     };
     
     dispatch({

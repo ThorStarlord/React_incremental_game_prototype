@@ -1,344 +1,396 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Grid,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Paper,
-  Snackbar,
-  Alert
+  Grid,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { GameStateContext, GameDispatchContext } from '../context/GameStateContext';
-import Panel from './Panel';
-import MinionCard from './MinionCard';
+import { useGameState, useGameDispatch } from '../../../../context/GameStateExports';
+import MinionCard from '../ui/MinionCard';
+import Panel from '../ui/Panel';
 
 /**
  * Interface representing a trait object
  */
 interface Trait {
-  /** Unique identifier for the trait */
   id: string;
-  /** Display name of the trait */
   name: string;
-  /** Description of the trait's effects */
-  description?: string;
-}
-
-/**
- * Interface for a relationship tier configuration
- */
-interface RelationshipTier {
-  /** Name of the relationship tier */
-  name: string;
-  /** Minimum threshold value for this tier */
-  threshold: number;
-  /** Color representation for this tier */
-  color: string;
+  description: string;
+  type: string;
+  stats?: Record<string, number>;
 }
 
 /**
  * Interface representing a minion object
  */
 interface Minion {
-  /** Unique identifier for the minion */
   id: string;
-  /** Display name of the minion */
   name: string;
-  /** Description or type of minion */
-  description?: string;
-  /** Type of minion */
-  type?: string;
-  /** URL to the minion's avatar image */
-  avatar?: string;
-  /** Relationship value with player (-100 to 100) */
-  relationship: number;
-  /** Number of trait slots this minion has */
-  traitSlots: number;
-  /** Array of trait IDs assigned to this minion */
-  traits: string[];
-  /** Growth type of the minion ('normal', 'accelerated', etc.) */
-  growthType?: 'normal' | 'accelerated'; 
-  /** Current maturity level (percentage 0-100) */
-  maturity: number;
-}
-
-/**
- * Interface for player data
- */
-interface Player {
-  /** Number of trait slots the player has available */
-  traitSlots: number;
-  /** Other player properties */
-  [key: string]: any;
-}
-
-/**
- * Interface for game state
- */
-interface GameState {
-  /** Array of player's minions */
-  minions: Minion[];
-  /** Player data */
-  player: Player;
-  /** Other game state properties */
-  [key: string]: any;
-}
-
-/**
- * Interface for dispatch action
- */
-interface GameAction {
-  /** Type of action being dispatched */
   type: string;
-  /** Payload data for the action */
-  payload: any;
+  level: number;
+  experience: number;
+  traits: string[];
+  stats: {
+    strength: number;
+    agility: number;
+    intelligence: number;
+    endurance: number;
+    [key: string]: number;
+  };
+  skills: {
+    [key: string]: number;
+  };
+  tasks: string[];
+  relationship: number;
+  maturity: number;
+  happiness: number;
+  energy: number;
+  lastFed?: number;
+  createdAt: number;
 }
 
 /**
- * Interface for notification state
+ * Interface representing a relationship tier
  */
-interface NotificationState {
-  /** Whether the notification is open */
-  open: boolean;
-  /** Notification message text */
-  message: string;
-  /** Severity level of notification */
-  severity: 'success' | 'info' | 'warning' | 'error';
+interface RelationshipTier {
+  name: string;
+  threshold: number;
+  color: string;
+  description: string;
 }
 
 /**
- * Interface for MinionCard component props
+ * Constants for relationship tiers
  */
-interface MinionCardProps {
-  /** Minion object to display */
-  minion: Minion;
-  /** Player data for comparison and validation */
-  player: Player;
-  /** Callback when sharing trait slots */
-  onShareSlot: (minionId: string, slotsToShare: number) => void;
-  /** Callback when assigning a trait */
-  onAssignTrait: (minionId: string) => void;
-  /** Callback when removing a trait */
-  onRemoveTrait: (traitId: string) => void;
-  /** Callback when deleting a minion */
-  onDelete: () => void;
-  /** Whether minion is immature (not fully grown) */
-  isImmature: boolean;
+const RELATIONSHIP_TIERS: Record<string, RelationshipTier> = {
+  NEMESIS: {
+    name: 'Nemesis',
+    threshold: -75,
+    color: '#FF0000',
+    description: 'Hostile and refuses most commands'
+  },
+  HOSTILE: {
+    name: 'Hostile',
+    threshold: -50,
+    color: '#FF4500',
+    description: 'Disobedient and may sabotage tasks'
+  },
+  WARY: {
+    name: 'Wary',
+    threshold: -25,
+    color: '#FFA500',
+    description: 'Cautious and reluctant'
+  },
+  NEUTRAL: {
+    name: 'Neutral',
+    threshold: 0,
+    color: '#FFFF00',
+    description: 'Will follow orders but no initiative'
+  },
+  FRIENDLY: {
+    name: 'Friendly',
+    threshold: 25,
+    color: '#90EE90',
+    description: 'Helpful and occasionally brings gifts'
+  },
+  LOYAL: {
+    name: 'Loyal',
+    threshold: 50,
+    color: '#32CD32',
+    description: 'Dedicated and works efficiently'
+  },
+  DEVOTED: {
+    name: 'Devoted',
+    threshold: 75,
+    color: '#008000',
+    description: 'Extremely loyal with occasional bonuses'
+  }
+};
+
+/**
+ * Props for the MinionPanel component
+ */
+interface MinionPanelProps {
+  title?: string;
 }
 
 /**
- * Helper function to determine relationship tier based on value
- * @param value - Relationship value (-100 to 100)
- * @returns The appropriate relationship tier object
+ * Get the appropriate relationship tier based on the relationship value
  */
 const getRelationshipTier = (value: number): RelationshipTier => {
   return Object.values(RELATIONSHIP_TIERS).find(tier => value >= tier.threshold) || RELATIONSHIP_TIERS.NEMESIS;
 };
 
 /**
- * MinionPanel component displays all player's minions and allows interaction with them
- * @returns The minion panel interface
+ * MinionPanel component to manage minions
  */
-const MinionPanel: React.FC = () => {
-  const { minions, player } = useContext<GameState>(GameStateContext);
-  const dispatch = useContext<React.Dispatch<GameAction>>(GameDispatchContext);
+const MinionPanel: React.FC<MinionPanelProps> = ({ title = "Minions" }) => {
+  // Get game state and dispatch
+  const gameState = useGameState();
+  const dispatch = useGameDispatch();
   
-  // State for dialogs and notifications
-  const [assignTraitDialogOpen, setAssignTraitDialogOpen] = useState<boolean>(false);
+  // Local state
+  const [minions, setMinions] = useState<Minion[]>([]);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [assignTraitDialogOpen, setAssignTraitDialogOpen] = useState(false);
   const [selectedMinionId, setSelectedMinionId] = useState<string | null>(null);
-  const [notification, setNotification] = useState<NotificationState>({ 
-    open: false, 
-    message: '', 
-    severity: 'info' 
-  });
-
+  const [newMinionName, setNewMinionName] = useState('');
+  const [newMinionType, setNewMinionType] = useState('');
+  const [selectedTraitId, setSelectedTraitId] = useState<string>('');
+  
+  // Dummy data for development
+  const minionTypes = ['Worker', 'Guard', 'Harvester', 'Scout'];
+  const availableTraits: Trait[] = [
+    { id: 'trait1', name: 'Strong', description: 'Increased strength', type: 'physical', stats: { strength: 5 } },
+    { id: 'trait2', name: 'Quick', description: 'Increased agility', type: 'physical', stats: { agility: 5 } },
+    { id: 'trait3', name: 'Smart', description: 'Increased intelligence', type: 'mental', stats: { intelligence: 5 } },
+    { id: 'trait4', name: 'Tough', description: 'Increased endurance', type: 'physical', stats: { endurance: 5 } }
+  ];
+  
+  // Initialize or load minions from state
+  useEffect(() => {
+    // Access minions through minionsSystem instead of directly from gameState
+    if (gameState.minionsSystem?.minions) {
+      // Convert from Record<string, Minion> to Minion[] to match state type
+      const minionsArray = Object.values(gameState.minionsSystem.minions);
+      setMinions(minionsArray);
+    } else {
+      // Create empty minions array if none exists
+      setMinions([]);
+    }
+  }, [gameState.minionsSystem?.minions]);
+  
   /**
-   * Handles sharing trait slots with a minion
-   * @param minionId - ID of the minion to share slots with
-   * @param slotsToShare - Number of slots to share
+   * Handle creating a new minion
    */
-  const handleShareSlot = (minionId: string, slotsToShare: number): void => {
-    if (slotsToShare <= 0) return;
+  const handleCreateMinion = () => {
+    if (!newMinionName || !newMinionType) return;
+    
+    const newMinion: Minion = {
+      id: `minion-${Date.now()}`,
+      name: newMinionName,
+      type: newMinionType,
+      level: 1,
+      experience: 0,
+      traits: [],
+      stats: {
+        strength: 5,
+        agility: 5,
+        intelligence: 5,
+        endurance: 5
+      },
+      skills: {},
+      tasks: [],
+      relationship: 0,
+      maturity: 0,
+      happiness: 50,
+      energy: 100,
+      createdAt: Date.now()
+    };
     
     dispatch({
-      type: 'SHARE_TRAIT_SLOTS',
-      payload: {
-        minionId,
-        slots: slotsToShare
-      }
+      type: 'ADD_MINION',
+      payload: newMinion
     });
     
-    setNotification({
-      open: true,
-      message: `Shared ${slotsToShare} trait slot${slotsToShare > 1 ? 's' : ''} with minion`,
-      severity: 'success'
+    setCreateDialogOpen(false);
+    setNewMinionName('');
+    setNewMinionType('');
+  };
+  
+  /**
+   * Handle sharing a trait with a minion
+   */
+  const handleShareTrait = (minionId: string, traitId: string) => {
+    dispatch({
+      type: 'SHARE_TRAIT',
+      payload: { minionId, traitId }
     });
   };
-
+  
   /**
-   * Opens the trait assignment dialog for a minion
-   * @param minionId - ID of the minion to assign traits to
+   * Handle removing a trait from a minion
    */
-  const handleAssignTraitClick = (minionId: string): void => {
+  const handleRemoveTrait = (minionId: string, traitId: string) => {
+    dispatch({
+      type: 'REMOVE_MINION_TRAIT',
+      payload: { minionId, traitId }
+    });
+  };
+  
+  /**
+   * Handle deleting a minion
+   */
+  const handleDeleteMinion = (minionId: string) => {
+    dispatch({
+      type: 'REMOVE_MINION',
+      payload: { minionId }
+    });
+  };
+  
+  /**
+   * Handle assigning a task to a minion
+   */
+  const handleAssignTask = (minionId: string, taskId: string) => {
+    dispatch({
+      type: 'ASSIGN_MINION_TASK',
+      payload: { minionId, taskId }
+    });
+  };
+  
+  /**
+   * Open the assign trait dialog for a specific minion
+   */
+  const handleAssignTraitClick = (minionId: string) => {
     setSelectedMinionId(minionId);
     setAssignTraitDialogOpen(true);
   };
-
+  
   /**
-   * Handles assigning a trait to a minion from the dialog
-   * @param traitId - ID of the trait to assign
+   * Share a skill between minions
    */
-  const handleAssignTrait = (traitId: string): void => {
-    if (!selectedMinionId) return;
+  const handleShareSlot = (sourceId: string, targetId: string) => {
+    console.log(`Sharing slots between ${sourceId} and ${targetId}`);
+    // Implement sharing logic here
+  };
+  
+  /**
+   * Assign selected trait to the minion
+   */
+  const handleAssignTrait = (traitId: string) => {
+    if (!selectedMinionId || !traitId) return;
     
-    dispatch({
-      type: 'ASSIGN_TRAIT_TO_MINION',
-      payload: {
-        minionId: selectedMinionId,
-        traitId
-      }
-    });
-    
+    handleShareTrait(selectedMinionId, traitId);
     setAssignTraitDialogOpen(false);
-    setNotification({
-      open: true,
-      message: 'Trait assigned successfully',
-      severity: 'success'
-    });
+    setSelectedTraitId('');
   };
-
-  /**
-   * Handles removing a trait from a minion
-   * @param minionId - ID of the minion
-   * @param traitId - ID of the trait to remove
-   */
-  const handleRemoveTrait = (minionId: string, traitId: string): void => {
-    dispatch({
-      type: 'REMOVE_TRAIT_FROM_MINION',
-      payload: {
-        minionId,
-        traitId
-      }
-    });
-    
-    setNotification({
-      open: true,
-      message: 'Trait removed',
-      severity: 'info'
-    });
-  };
-
-  /**
-   * Handles deleting a minion
-   * @param minionId - ID of the minion to delete
-   */
-  const handleDeleteMinion = (minionId: string): void => {
-    dispatch({
-      type: 'DELETE_MINION',
-      payload: {
-        minionId
-      }
-    });
-    
-    setNotification({
-      open: true,
-      message: 'Minion dismissed',
-      severity: 'warning'
-    });
-  };
-
-  /**
-   * Closes the notification snackbar
-   */
-  const handleCloseNotification = (): void => {
-    setNotification({
-      ...notification,
-      open: false
-    });
-  };
-
+  
   return (
-    <Panel title="Your Minions">
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
-          Manage your minions and assign them traits to increase their effectiveness
+    <Panel title={title}>
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant="body1">
+          Manage your minions, assign them tasks, and share traits.
         </Typography>
-        
         <Button
           variant="contained"
-          color="primary"
           startIcon={<PersonAddIcon />}
-          onClick={() => {
-            /* Logic for recruiting new minions */
-          }}
+          onClick={() => setCreateDialogOpen(true)}
         >
-          Recruit Minion
+          New Minion
         </Button>
       </Box>
       
-      {minions && minions.length > 0 ? (
-        <Grid container spacing={3}>
-          {minions.map(minion => (
-            <Grid item xs={12} md={6} lg={4} key={minion.id}>
-              <MinionCard 
-                minion={minion} 
-                player={player}
-                onShareSlot={handleShareSlot}
-                onAssignTrait={handleAssignTraitClick}
-                onRemoveTrait={(traitId) => handleRemoveTrait(minion.id, traitId)}
-                onDelete={() => handleDeleteMinion(minion.id)}
-                isImmature={minion.maturity < 100}
-              />
-            </Grid>
-          ))}
+      {minions.length > 0 ? (
+        <Grid container spacing={2}>
+          {minions.map(minion => {
+            const relationshipTier = getRelationshipTier(minion.relationship);
+            
+            return (
+              <Grid item xs={12} sm={6} md={4} key={minion.id}>
+                <MinionCard
+                  minion={minion}
+                  relationshipTier={relationshipTier}
+                  assignedTasks={minion.tasks}
+                  onAssignTask={(taskId) => handleAssignTask(minion.id, taskId)}
+                  onShareTrait={(traitId) => handleShareTrait(minion.id, traitId)}
+                  onShareSlot={handleShareSlot}
+                  onAssignTrait={handleAssignTraitClick}
+                  onRemoveTrait={(traitId: string) => handleRemoveTrait(minion.id, traitId)}
+                  onDelete={() => handleDeleteMinion(minion.id)}
+                  isImmature={minion.maturity < 100}
+                />
+              </Grid>
+            );
+          })}
         </Grid>
       ) : (
-        <Paper sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="body1" color="text.secondary">
-            You don't have any minions yet. Recruit some to help with your tasks!
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography variant="h6" color="text.secondary">
+            You don't have any minions yet
           </Typography>
-        </Paper>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Create your first minion to help with tasks
+          </Typography>
+          <Button
+            variant="outlined"
+            startIcon={<PersonAddIcon />}
+            onClick={() => setCreateDialogOpen(true)}
+          >
+            Create Minion
+          </Button>
+        </Box>
       )}
       
-      {/* Dialog for assigning traits (implementation details omitted for brevity) */}
-      <Dialog 
-        open={assignTraitDialogOpen} 
-        onClose={() => setAssignTraitDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Assign Trait</DialogTitle>
+      {/* Create Minion Dialog */}
+      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)}>
+        <DialogTitle>Create New Minion</DialogTitle>
         <DialogContent>
-          {/* Trait selection UI would go here */}
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Minion Name"
+            fullWidth
+            value={newMinionName}
+            onChange={(e) => setNewMinionName(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <FormControl fullWidth>
+            <InputLabel>Minion Type</InputLabel>
+            <Select
+              value={newMinionType}
+              label="Minion Type"
+              onChange={(e) => setNewMinionType(e.target.value)}
+            >
+              {minionTypes.map(type => (
+                <MenuItem key={type} value={type}>{type}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAssignTraitDialogOpen(false)}>Cancel</Button>
-          <Button onClick={() => handleAssignTrait(/* selected trait id */)}>
-            Assign
+          <Button onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleCreateMinion} variant="contained" color="primary">
+            Create
           </Button>
         </DialogActions>
       </Dialog>
       
-      {/* Notification snackbar */}
-      <Snackbar 
-        open={notification.open} 
-        autoHideDuration={4000} 
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleCloseNotification} 
-          severity={notification.severity}
-          variant="filled"
-        >
-          {notification.message}
-        </Alert>
-      </Snackbar>
+      {/* Assign Trait Dialog */}
+      <Dialog open={assignTraitDialogOpen} onClose={() => setAssignTraitDialogOpen(false)}>
+        <DialogTitle>Assign Trait</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth sx={{ mt: 1 }}>
+            <InputLabel>Select Trait</InputLabel>
+            <Select
+              value={selectedTraitId}
+              label="Select Trait"
+              onChange={(e) => setSelectedTraitId(e.target.value)}
+            >
+              {availableTraits.map(trait => (
+                <MenuItem key={trait.id} value={trait.id}>
+                  {trait.name} - {trait.description}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAssignTraitDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => handleAssignTrait(selectedTraitId)}>
+            Assign
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Panel>
   );
 };

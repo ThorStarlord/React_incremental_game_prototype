@@ -150,10 +150,12 @@ const DialogueHistory: React.FC<DialogueHistoryProps> = ({
   return (
     <Panel
       title="Dialogue History"
-      icon={<AutoStoriesIcon />}
       defaultExpanded={!compact}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <AutoStoriesIcon />
+        </Box>
         <Badge badgeContent={filteredHistory.length} color="primary">
           <Typography variant="subtitle1">
             {filterNpcId ? 'Conversation' : 'Recent Dialogues'}

@@ -162,6 +162,12 @@ export interface GameState {
   world: WorldState;
   notifications: NotificationsState;
   factions: FactionSystem; // Add this line to include the factions property
+  minionsSystem?: {
+    minions: Record<string, any>;
+    tasks?: Record<string, any>;
+    upgrades?: Record<string, any>;
+    [key: string]: any;
+  };
 
   /**
    * @deprecated Since v1.5.0. Use specific state properties instead.

@@ -86,7 +86,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
                 <Badge badgeContent={tab.badgeCount} color="primary" max={99}>
                   {tab.icon}
                 </Badge>
-              ) : tab.icon
+              ) : (tab.icon || undefined)  // Explicitly return undefined instead of null/false
             }
             iconPosition={iconPosition}
           />

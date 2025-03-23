@@ -1,50 +1,27 @@
 import React from 'react';
-import { useGameState } from '../../../../context/GameStateContext';
-import { Typography, Box } from '@mui/material';
-
-/**
- * Interface for Faction data in game state
- */
-interface Faction {
-    name: string;
-    level: number;
-    members: string[];
-    [key: string]: any; // For additional faction properties
-}
-
-/**
- * Interface for the game state
- */
-interface GameState {
-    faction: Faction;
-    [key: string]: any; // For other game state properties
-}
+import { useGameState } from '../../../../context/GameStateExports';
+import { GameState } from '../../../../context/types/gameStates/GameStateTypes';
+import './FactionSummaryPanel.css';
 
 /**
  * FactionSummaryPanel component
- * Displays a summary of the player's faction information on the dashboard
  * 
- * @returns {JSX.Element} The faction summary panel component
+ * Displays a summary of the player's standing with various factions
+ * 
+ * @returns The faction summary panel component
  */
-const FactionSummaryPanel: React.FC = (): JSX.Element => {
-    const { gameState } = useGameState() as { gameState: GameState };
+const FactionSummaryPanel: React.FC = () => {
+    const gameState = useGameState();
 
     return (
         <div className="dashboard-panel">
-            <Typography variant="h5" gutterBottom>
-                Faction Summary
-            </Typography>
-            <Box sx={{ display: 'grid', gap: 2 }}>
-                <Typography>
-                    Faction Name: {gameState.faction.name || 'Your Faction'}
-                </Typography>
-                <Typography>
-                    Level: {gameState.faction.level || 1}
-                </Typography>
-                <Typography>
-                    Members: {gameState.faction.members?.length || 0}
-                </Typography>
-            </Box>
+            <div className="panel-header">
+                <h3>Faction Standing</h3>
+            </div>
+            <div className="panel-content">
+                {/* Display faction data here */}
+                <p>Your standing with various factions will be displayed here.</p>
+            </div>
         </div>
     );
 };

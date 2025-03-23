@@ -56,7 +56,7 @@ const ItemCard = styled(Card)<{ rarity: ItemRarity }>(({ theme, rarity }) => {
  * InventoryItem component displays a single item in the inventory
  * 
  * @param {InventoryItemProps} props Component props
- * @returns {JSX.Element} Rendered component
+ * @returns {React.ReactElement} Rendered component
  */
 const InventoryItem: React.FC<InventoryItemProps> = ({
   item,
@@ -66,7 +66,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
   onEquip,
   onDrop,
   sx
-}): JSX.Element => {
+}): React.ReactElement => {
   const { text: rarityText, color: rarityColor } = getItemRarityDisplay(item);
   
   // Handle item click

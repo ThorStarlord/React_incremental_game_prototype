@@ -43,7 +43,7 @@ const InventoryItem: React.FC<InventoryItemProps> = ({
   onEquip,
   onDrop,
   sx
-}): JSX.Element => {
+}): React.ReactElement => {
   // Handle any presentation-specific behavior here
   
   return (

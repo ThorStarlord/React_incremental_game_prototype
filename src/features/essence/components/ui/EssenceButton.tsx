@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Tooltip, Typography, Box, SxProps, Theme } from '@mui/material';
-import { useGameDispatch } from '../../../../context/GameStateContext';
-import { ACTION_TYPES } from '../../../../context/actions/actionTypes';
+// Fix imports to use correct exports
+import { useGameDispatch } from '../../../../context/GameStateExports';
+import { ACTION_TYPES } from '../../../../context/types/ActionTypes';
 
 /**
  * Interface for EssenceButton component props
@@ -11,6 +12,8 @@ interface EssenceButtonProps {
   amount?: number;
   /** Tooltip text to display */
   tooltip?: string;
+  /** Button text */
+  text?: string;
   /** Additional styles for the button */
   sx?: SxProps<Theme>;
   /** Cooldown time in milliseconds */
@@ -18,23 +21,27 @@ interface EssenceButtonProps {
   /** Button variant */
   variant?: 'text' | 'outlined' | 'contained';
   /** Button color */
-  color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
+  color?: 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
   /** Button size */
   size?: 'small' | 'medium' | 'large';
 }
 
 /**
- * A button component for gaining essence
+ * A styled button component for gaining essence
+ * 
+ * @param {EssenceButtonProps} props Component props
+ * @returns {React.ReactElement} EssenceButton component
  */
 const EssenceButton: React.FC<EssenceButtonProps> = ({ 
   amount = 10, 
   tooltip = "Click to gain essence", 
+  text = "Gather Essence",
   sx = {},
-  cooldown = 1000,
+  cooldown = 1000, // Cooldown in milliseconds
   variant = "contained",
   color = "primary",
   size = "medium"
-}): JSX.Element => {
+}): React.ReactElement => {
   const dispatch = useGameDispatch();
   const [isOnCooldown, setIsOnCooldown] = useState<boolean>(false);
   
@@ -72,7 +79,7 @@ const EssenceButton: React.FC<EssenceButtonProps> = ({
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-            <Typography variant="button">Gain Essence</Typography>
+            <Typography variant="button">{text}</Typography>
             <Typography variant="caption" sx={{ opacity: 0.8 }}>+{amount}</Typography>
           </Box>
         </Button>

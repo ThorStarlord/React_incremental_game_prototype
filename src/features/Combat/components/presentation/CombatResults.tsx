@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Box, Typography, Button, Fade } from '@mui/material';
 import Panel from '../../../../shared/components/layout/Panel';
-import { Rewards, CombatResult } from '../../types/combatTypes';
+import { Rewards, CombatResult } from '../../../../context/types/combat/combatTypes';
 
 interface CombatResultsProps {
   combatResult: CombatResult;

@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useGameDispatch } from '../../../context/GameStateExports';
 import { useCombatEncounters } from './useCombatEncounters';
 import { useCombatRewards } from './useCombatRewards';
-import { CombatResult, BattleResult } from '../types/combatTypes';
+import { CombatResult, BattleResult } from '../../../context/types/combat/combatTypes';
 import { COMBAT_CONSTANTS } from '../data/enemyData';
 
 /**

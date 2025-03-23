@@ -213,7 +213,8 @@ const DialogueTab: React.FC<DialogueTabProps> = ({
         
         // If string, it's a dialogue key
         if (typeof option.nextDialogue === 'string') {
-          setCurrentDialogue(npc.dialogue?.[option.nextDialogue]);
+          const nextDialogue = npc.dialogue?.[option.nextDialogue] || null;
+          setCurrentDialogue(nextDialogue);
           
           // Update dialogue state in game state
           dispatch({ 
@@ -222,7 +223,7 @@ const DialogueTab: React.FC<DialogueTabProps> = ({
           });
         } else {
           // If object, it's an inline dialogue
-          setCurrentDialogue(option.nextDialogue);
+          setCurrentDialogue(option.nextDialogue || null);
         }
       }, 1000);
     }
@@ -290,7 +291,7 @@ const DialogueTab: React.FC<DialogueTabProps> = ({
           return (
             <Box key={index}>
               <DialogueOption
-                option={option}
+                option={option as any} // Type assertion as a temporary workaround
                 onSelect={() => {
                   // Mark trait as seen if it's newly available
                   if (isNewlyAvailable && option.traitId) {
@@ -324,7 +325,7 @@ const DialogueTab: React.FC<DialogueTabProps> = ({
           <Button 
             fullWidth 
             variant="outlined" 
-            onClick={() => setCurrentDialogue(npc.dialogue?.initial)}
+            onClick={() => setCurrentDialogue(npc.dialogue?.initial || null)}
             sx={{ mt: 2 }}
           >
             End conversation

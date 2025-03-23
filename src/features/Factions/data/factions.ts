@@ -1,34 +1,45 @@
-import { Faction } from '../../../context/initialStates/FactionInitialState';
+// Import FactionType from the correct location instead of Faction
+import { FactionType } from '../../../context/types/gameStates/FactionGameStateTypes';
 
 /**
  * Interface for faction member
  */
 interface FactionMember {
-  name: string;
-  role: string;
+    name: string;
+    role: string;
 }
 
 /**
  * Interface for faction resources
  */
 interface FactionResources {
-  gold: number;
-  food: number;
-  supplies: number;
-  [key: string]: number;
+    gold: number;
+    food: number;
+    supplies: number;
+    [key: string]: number;
 }
 
 /**
- * Extended faction interface with members and resources
+ * Extended faction interface for our data
  */
-interface ExtendedFaction extends Faction {
-  members: FactionMember[];
-  resources: FactionResources;
+interface ExtendedFaction {
+    id: string; // Add this property to match the usage below
+    name: string;
+    description: string;
+    members: FactionMember[];
+    resources: FactionResources;
+    reputation: number;
+    unlocked: boolean;
+    unlockRequirements: Record<string, any>;
+    reputationTiers: Array<{
+        threshold: number;
+        name: string;
+        benefits: string[];
+    }>;
+    allies: string[];
+    enemies: string[];
 }
 
-/**
- * Predefined factions data
- */
 const factions: ExtendedFaction[] = [
     {
         id: '1',
@@ -96,3 +107,4 @@ const factions: ExtendedFaction[] = [
 ];
 
 export default factions;
+export type { ExtendedFaction, FactionMember, FactionResources };

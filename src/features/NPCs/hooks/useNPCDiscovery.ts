@@ -13,6 +13,14 @@ interface DialogueOption {
   data?: any;
   /** Next dialogue to show when this option is selected */
   next?: string;
+  /** ID of trait associated with this option */
+  traitId?: string;
+  /** Essence cost associated with this option */
+  essenceCost?: number;
+  /** Relationship requirement for this option */
+  relationshipRequirement?: number;
+  // Allow any additional properties
+  [key: string]: any;
 }
 
 /**
@@ -34,7 +42,7 @@ interface NPCDialogue {
   /** Dialogue shown when meeting an NPC for the first time */
   firstMeeting?: Dialogue;
   /** Standard initial greeting dialogue */
-  initial?: Dialogue;
+  initial: Dialogue;
   /** Additional dialogue entries keyed by ID */
   [key: string]: Dialogue | undefined;
 }

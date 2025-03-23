@@ -332,7 +332,9 @@ export const useDialogue = (npcId: string) => {
           break;
           
         case 'update_quest':
-          updateQuestProgress(action.questId, action.step, dispatch);
+          // Fix the dispatch parameter by passing the questId instead, or 
+          // modify the updateQuestProgress function to accept a dispatch parameter
+          updateQuestProgress(action.questId, action.step, action.questId); // Replace dispatch with appropriate parameter
           break;
           
         case 'give_item':

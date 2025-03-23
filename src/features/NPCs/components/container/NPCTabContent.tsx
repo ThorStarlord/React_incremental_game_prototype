@@ -5,7 +5,7 @@ import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import HistoryIcon from '@mui/icons-material/History';
-import { GameStateContext } from '../../../../context/GameStateContext';
+import { useGameState, useGameDispatch, EnhancedGameState } from '../../../../context/GameStateExports';
 
 import TabContent from './TabContent';
 import DialogueTab from '../../dialogue/DialogueTab';
@@ -13,6 +13,14 @@ import RelationshipTab from '../../relationship/RelationshipTab';
 import TradeTab from '../../trade/TradeTab';
 import QuestsTab from '../../quests/QuestsTab';
 import HistoryTab from '../../history/HistoryTab';
+
+// Extended GameState to include the properties we need
+interface ExtendedGameState extends EnhancedGameState {
+  npcs: NPC[];
+  tutorial: TutorialState;
+  traits: TraitSystem;
+  showNotification: (message: string, type?: string) => void;
+}
 
 /**
  * Interface for an NPC object
@@ -31,6 +39,24 @@ interface NPC {
   /** NPC traits available */
   traits?: Record<string, any>;
   /** Additional NPC properties */
+  [key: string]: any;
+}
+
+/**
+ * Interface for a trait in the game
+ */
+interface Trait {
+  id: string;
+  name: string;
+  description?: string;
+  [key: string]: any;
+}
+
+/**
+ * Interface for the trait system
+ */
+interface TraitSystem {
+  copyableTraits: Record<string, Trait>;
   [key: string]: any;
 }
 
@@ -103,8 +129,9 @@ const NPCTabContent: React.FC<NPCTabContentProps> = ({ npcId, initialTab = 0 }) 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  const gameState = useContext<GameState>(GameStateContext);
-  const { player, npcs, tutorial, traits, showNotification, dispatch } = gameState;
+  const gameState = useGameState() as unknown as ExtendedGameState;
+  const dispatch = useGameDispatch();
+  const { player, npcs, tutorial, traits, showNotification } = gameState;
   
   // Find the NPC data
   const npc = npcs.find(n => n.id === npcId);
@@ -130,14 +157,14 @@ const NPCTabContent: React.FC<NPCTabContentProps> = ({ npcId, initialTab = 0 }) 
   };
   
   // Handle relationship change
-  const handleRelationshipChange = (amount: number, source: string) => {
+  const handleRelationshipChange = (npcId: string, amount: number) => {
     if (npcId) {
       dispatch({
         type: 'UPDATE_NPC_RELATIONSHIP',
         payload: {
           npcId,
           amount,
-          source
+          source: 'interaction'  // Default source
         }
       });
       
@@ -200,20 +227,27 @@ const NPCTabContent: React.FC<NPCTabContentProps> = ({ npcId, initialTab = 0 }) 
               player={player}
               dispatch={dispatch}
               essence={player.essence || 0}
-              onRelationshipChange={handleRelationshipChange}
+              onRelationshipChange={(amount, source) => {
+                // Adapt our function to match the expected signature
+                handleRelationshipChange(npcId, amount);
+              }}
               traits={traits}
             />
           </TabContent>
           
           <TabContent value={activeTab} index={1}>
             <RelationshipTab 
-              npc={npc as NPC}
+              npc={{
+                ...npc,
+                // Ensure relationship is a number, not undefined
+                relationship: npc.relationship || 0
+              }}
               player={player}
               onRelationshipChange={handleRelationshipChange}
               playerTraits={player.acquiredTraits || []}
               dispatch={dispatch}
               tutorial={tutorial}
-              traits={traits}
+              traits={traits.copyableTraits || {}}
             />
           </TabContent>
           
@@ -225,7 +259,12 @@ const NPCTabContent: React.FC<NPCTabContentProps> = ({ npcId, initialTab = 0 }) 
             {npc?.canTrade ? (
               <TradeTab 
                 npc={npc as NPC}
-                player={player}
+                player={{
+                  ...player,
+                  // Fix inventory format to match the expected InventoryItem[] type
+                  inventory: player.inventory || [],
+                  gold: player.gold || 0
+                }}
                 dispatch={dispatch}
                 currentRelationship={npc.relationship}
                 essence={player.essence}

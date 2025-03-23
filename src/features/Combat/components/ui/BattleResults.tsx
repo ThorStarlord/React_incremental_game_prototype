@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Typography, Fade } from '@mui/material';
-import { BattleResult } from '../../types/combatTypes';
+import { BattleResult } from '../../../../context/types/combat/combatTypes';
 
 interface BattleResultsProps {
   /** Whether combat is currently active */

@@ -1,5 +1,5 @@
 import { COMBAT_CONSTANTS } from '../data/enemyData';
-import { CombatResult, BattleResult, Rewards } from '../types/combatTypes';
+import { CombatResult, BattleResult, Rewards } from '../../../context/types/combat/combatTypes';
 
 /**
  * Calculate retreat success chance based on player stats

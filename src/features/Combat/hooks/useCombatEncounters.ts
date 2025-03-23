@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import AREA_ENEMIES, { COMMON_LOOT, SPECIFIC_LOOT, COMBAT_CONSTANTS } from '../data/enemyData';
-import { Enemy, LootItem, EnemyTemplate } from '../types/combatTypes';
+import { Enemy, LootItem, EnemyTemplate } from '../../../context/types/combat/combatTypes';
 
 /**
  * Hook for managing combat encounters
