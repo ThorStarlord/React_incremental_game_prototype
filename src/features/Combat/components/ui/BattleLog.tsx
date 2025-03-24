@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Paper, Divider } from '@mui/material';
-import { SimpleLogEntry } from '../../../../context/types/combat/logging';
+import { SimpleLogEntry } from '../../../../context/types/combat/simpleLogging';
 
 /**
  * Interface for BattleLog component props

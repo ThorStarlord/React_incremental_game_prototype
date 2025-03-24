@@ -10,6 +10,9 @@ import {
   DamageType 
 } from './basic';
 
+// Import SimpleLogEntry from the dedicated file
+import { SimpleLogEntry } from './simpleLogging';
+
 /**
  * Combat log entry for damage events
  */
@@ -64,26 +67,17 @@ export type CombatLogData =
   | CombatLogMiscEntry;
 
 /**
- * An entry in the combat log
+ * Combat log entry with additional information
  */
 export interface CombatLogEntry {
-  timestamp: number;       // Unix timestamp for easy sorting
-  source: CombatSource;    // Source of the action
-  action: CombatActionType; // Type of action performed
-  target: CombatTarget;    // Target of the action
-  result: CombatActionResult; // Result of the action
-  data: CombatLogData;     // Detailed data about the event
-  message: string;         // Human-readable description
-}
-
-/**
- * Simple log entry for hooks
- */
-export interface SimpleLogEntry {
   timestamp: number;
   message: string;
   type: string;
-  importance: "normal" | "high";
+  importance: 'normal' | 'high';
+  source?: string;
+  target?: string;
+  value?: number;
+  metadata?: Record<string, any>;
 }
 
 /**
@@ -102,4 +96,5 @@ export function isSimpleLogEntry(entry: any): entry is SimpleLogEntry {
  */
 export type AnyLogEntry = SimpleLogEntry | CombatLogEntry;
 
+// Re-export SimpleLogEntry for backward compatibility
 export { SimpleLogEntry };

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
-import { SimpleLogEntry } from '../../../../../context/types/combat/logging';
+import { SimpleLogEntry } from '../../../../../context/types/combat/simpleLogging';
 
 interface BattleLogProps {
   log: SimpleLogEntry[];

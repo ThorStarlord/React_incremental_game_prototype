@@ -1,8 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
 import { useGameDispatch } from '../../../../context/GameStateExports';
 import { BattleResult, UseBattleHookProps } from '../../../../context/types/gameStates/BattleGameStateTypes';
-import { ExtendedCombatState } from '../../../../context/types/combat';
-import { CombatStateWithRound } from '../../../../context/types/gameStates/CombatStateTypes';
 import { UnifiedCombatState } from '../../../../context/types/combat/unifiedTypes';
 import { CombatStatus } from '../../../../context/types/combat/basic';
 import { Dispatch, SetStateAction } from 'react';
@@ -12,10 +10,16 @@ import { useCombatLog } from './useCombatLog';
 import { usePlayerActions } from './usePlayerActions';
 import { useEnemyAI } from './useEnemyAI';
 import { useEffects } from './useEffects';
-import { useCombatInitializer } from './useCombatInitializer';
 
 /**
  * Main hook for battle logic
+ * 
+ * This hook brings together all the combat-related functionality like:
+ * - Player actions (attack, defend, use skills/items)
+ * - Enemy AI behavior
+ * - Combat state management
+ * - Effect processing
+ * - Combat log entries
  */
 const useBattleLogic = ({ 
   player,
@@ -23,6 +27,7 @@ const useBattleLogic = ({
   dispatch: gameDispatch,
   difficulty = 'normal',
   calculatedStats = { attack: 10, defense: 5, critChance: 0.05 },
+  modifiers = { criticalChance: 0, criticalDamage: 0 },
   onComplete,
   onVictory = () => {},
   onDefeat = () => {},
@@ -56,11 +61,33 @@ const useBattleLogic = ({
   // Set up effects processing
   const {
     processStartOfTurnEffects,
-    processEndOfTurnEffects
+    processEndOfTurnEffects,
+    applyStatusEffect
   } = useEffects(combatState, setCombatState);
   
-  // Initialize combat state
-  useCombatInitializer(player, combatState, setCombatState, calculatedStats);
+  // Initialize combat state when component mounts
+  useEffect(() => {
+    // Check if enemy is already set
+    if (!combatState.enemyStats) {
+      // Here we would normally call generateEnemy from useEnemyGeneration
+      // But for now, we'll just set some reasonable defaults
+      setCombatState(prev => ({
+        ...prev,
+        enemyStats: {
+          id: `enemy-${Date.now()}`,
+          name: `${dungeonId.charAt(0).toUpperCase() + dungeonId.slice(1)} Enemy`,
+          level: Math.max(1, Math.floor((calculatedStats.attack || 10) / 5)),
+          currentHealth: 50,
+          maxHealth: 50,
+          attack: 8,
+          defense: 3
+        }
+      }));
+
+      // Add initial log entry
+      addLogEntry('Combat begins!', 'info', 'high');
+    }
+  }, [combatState.enemyStats, dungeonId, calculatedStats, setCombatState, addLogEntry]);
   
   // Set up player actions
   const {
@@ -104,6 +131,12 @@ const useBattleLogic = ({
       return () => clearTimeout(timer);
     }
   }, [combatState.active, combatState.playerTurn, runEnemyTurn]);
+
+  // Callback to handle trait effects display
+  const handleShowTraitEffect = useCallback((traitId: string, x: number, y: number) => {
+    // Call the provided showTraitEffect function with proper parameters
+    showTraitEffect(traitId, x, y);
+  }, [showTraitEffect]);
   
   // Return combat state and actions
   return {
@@ -116,7 +149,7 @@ const useBattleLogic = ({
     handleFlee,
     handlePlayerTurnEnd,
     addLogEntry,
-    showTraitEffect
+    showTraitEffect: handleShowTraitEffect
   };
 };
 
