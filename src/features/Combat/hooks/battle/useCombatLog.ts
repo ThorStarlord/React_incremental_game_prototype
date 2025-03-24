@@ -1,35 +1,32 @@
 import { useCallback } from 'react';
-import { ExtendedCombatState } from '../../../../context/types/gameStates/BattleGameStateTypes';
+import { SimpleLogEntry } from '../../../../context/types/combat/logging';
+import { createLogEntry } from './usePlayerActions/utils/logEntryFormatters';
+import { UnifiedCombatState } from '../../../../context/types/combat/unifiedTypes';
+import { Dispatch, SetStateAction } from 'react';
 
 /**
  * Hook for managing combat log entries
  */
 export const useCombatLog = (
-  setCombatState: React.Dispatch<React.SetStateAction<ExtendedCombatState>>
+  setCombatState: Dispatch<SetStateAction<UnifiedCombatState>>
 ) => {
   /**
-   * Add an entry to the combat log
-   * @param message The message to display in the log
-   * @param type The type of log entry (damage, heal, etc.)
-   * @param importance The importance level of the entry (normal or high)
+   * Add a log entry to the combat log
    */
   const addLogEntry = useCallback((
     message: string, 
-    type = 'normal', 
+    type: string = 'info', 
     importance: 'normal' | 'high' = 'normal'
   ) => {
-    setCombatState(prev => ({
-      ...prev,
-      log: [
-        ...prev.log,
-        {
-          timestamp: Date.now(),
-          message,
-          type,
-          importance
-        }
-      ]
-    }));
+    setCombatState(prev => {
+      // Create a properly typed log entry
+      const newEntry: SimpleLogEntry = createLogEntry(message, type, importance);
+      
+      return {
+        ...prev,
+        log: [...prev.log, newEntry]
+      };
+    });
   }, [setCombatState]);
 
   return { addLogEntry };

@@ -1,135 +1,147 @@
 import { useCallback } from 'react';
-import { CombatActionType, CombatActionResult } from '../../../../context/types/combat';
-import { 
-  ExtendedCombatState, 
-  BattleResult 
-} from '../../../../context/types/gameStates/BattleGameStateTypes';
+import { BattleResult } from '../../../../context/types/gameStates/BattleGameStateTypes';
+import { UnifiedCombatState } from '../../../../context/types/combat/unifiedTypes';
+import { CombatActionType, CombatActionResult } from '../../../../context/types/combat/basic';
+import { createLogEntry } from './usePlayerActions/utils/logEntryFormatters';
+import { createTurnHistoryEntry } from './usePlayerActions/utils/turnHistoryHelpers';
+import { calculateDamage } from './usePlayerActions/utils/combatCalculations';
+import { Dispatch, SetStateAction } from 'react';
 
 /**
- * Hook for enemy AI and actions
+ * Props for enemy AI hook
  */
-export const useEnemyAI = (
-  combatState: ExtendedCombatState,
-  setCombatState: React.Dispatch<React.SetStateAction<ExtendedCombatState>>,
-  calculatedStats: any,
-  onComplete: (result: BattleResult) => void,
-  onDefeat: () => void,
-  processEndOfTurnEffects: () => void,
-  processStartOfTurnEffects: () => void
-) => {
+interface EnemyAIProps {
+  combatState: UnifiedCombatState;
+  setCombatState: Dispatch<SetStateAction<UnifiedCombatState>>;
+  calculatedStats: any;
+  onComplete: (result: BattleResult) => void;
+  onDefeat: () => void;
+  processEndOfTurnEffects: () => void;
+  processStartOfTurnEffects: () => void;
+}
+
+/**
+ * Hook for enemy AI actions in combat
+ */
+export const useEnemyAI = ({
+  combatState,
+  setCombatState,
+  calculatedStats,
+  onComplete,
+  onDefeat,
+  processEndOfTurnEffects,
+  processStartOfTurnEffects
+}: EnemyAIProps) => {
   /**
-   * Process enemy turn
+   * Process the enemy's turn
    */
   const processEnemyTurn = useCallback(() => {
-    // Check that enemyStats exists before proceeding
-    if (!combatState.enemyStats) {
-      console.warn('Enemy stats not available for processing turn');
-      return;
-    }
+    if (!combatState.active || combatState.playerTurn || !combatState.enemyStats) return;
     
-    // Simple enemy AI logic
-    setTimeout(() => {
-      // Safely access enemy attack value with fallback
-      const enemyAttack = combatState.enemyStats?.attack || 5;
+    // Process any start-of-turn effects first
+    processStartOfTurnEffects();
+    
+    // Calculate enemy attack damage
+    const { finalDamage, isCritical } = calculateDamage(
+      combatState.enemyStats.attack || 5,
+      0.05, // Base 5% crit chance for enemies
+      calculatedStats?.defense || 0
+    );
+    
+    // Apply damage to player
+    setCombatState(prev => {
+      // Calculate player's new health
+      const newHealth = Math.max(0, prev.playerStats.currentHealth - finalDamage);
       
-      const enemyDamage = Math.max(1, 
-        Math.floor(enemyAttack) - 
-        Math.floor(calculatedStats?.defense || 0) / 4
-      );
+      // Create log entry for enemy attack
+      const newLog = [
+        ...prev.log,
+        createLogEntry(
+          isCritical 
+            ? `${prev.enemyStats?.name || 'Enemy'} lands a critical hit for ${finalDamage} damage!` 
+            : `${prev.enemyStats?.name || 'Enemy'} attacks for ${finalDamage} damage.`,
+          isCritical ? 'critical' : 'damage',
+          isCritical ? 'high' : 'normal'
+        )
+      ];
       
-      setCombatState(prev => {
-        // Ensure enemy stats exist in the previous state
-        if (!prev.enemyStats) {
-          return prev;
-        }
+      // Create turn history entry
+      const newHistory = [
+        ...(prev.turnHistory || []),
+        createTurnHistoryEntry(
+          'enemy',
+          CombatActionType.Attack,
+          isCritical ? CombatActionResult.Critical : CombatActionResult.Hit
+        )
+      ];
+      
+      // Check for player defeat
+      if (newHealth <= 0) {
+        // Player is defeated
+        newLog.push(createLogEntry(
+          'You have been defeated!',
+          'defeat',
+          'high'
+        ));
         
-        // Calculate new player health
-        const newHealth = Math.max(0, prev.playerStats.currentHealth - enemyDamage);
-        
-        // Add log entry with proper literal type assertions
-        const newLog = [
-          ...prev.log,
-          {
-            timestamp: Date.now(),
-            message: `${prev.enemyStats.name || 'Enemy'} attacks you for ${enemyDamage} damage!`,
-            type: 'damage',
-            importance: 'normal' as const  // Add type assertion
-          }
-        ];
-        
-        // Record turn history with proper type assertion
-        const newHistory = [
-          ...(prev.turnHistory || []),
-          {
-            actor: 'enemy' as const, // Type assertion to ensure it's treated as a literal
-            action: CombatActionType.Attack,
-            result: newHealth > 0 ? CombatActionResult.Hit : CombatActionResult.Critical, // Fix: use Critical instead of Defeat
-            timestamp: Date.now()
-          }
-        ];
-        
-        // Check for player defeat
-        if (newHealth <= 0) {
-          // Player is defeated
-          newLog.push({
-            timestamp: Date.now(),
-            message: 'You have been defeated!',
-            type: 'defeat',
-            importance: 'high' as const  // Add type assertion
-          });
-          
-          // Trigger defeat callback after a delay
-          setTimeout(() => {
-            onDefeat();
-            onComplete({
-              victory: false,
-              rewards: {},
-              retreat: false
-            });
-          }, 1500);
-          
-          return {
-            ...prev,
-            active: false,
-            playerStats: {
-              ...prev.playerStats,
-              currentHealth: 0
+        // Trigger defeat callback after a delay
+        setTimeout(() => {
+          onDefeat();
+          onComplete({
+            victory: false,
+            rewards: {
+              experience: 0,
+              gold: 0,
+              items: []
             },
-            log: newLog,
-            turnHistory: newHistory
-          };
-        }
+            retreat: false
+          });
+        }, 1500);
         
         return {
           ...prev,
-          playerTurn: true,
+          active: false,
           playerStats: {
             ...prev.playerStats,
-            currentHealth: newHealth
+            currentHealth: 0
           },
           log: newLog,
           turnHistory: newHistory
         };
-      });
-    }, 1000); // Delay for effect
-  }, [combatState.enemyStats, calculatedStats, onComplete, onDefeat, setCombatState]);
-
-  /**
-   * Handle running enemy turn logic when it's not player's turn
-   */
-  const runEnemyTurn = useCallback(() => {
-    if (combatState.active && !combatState.playerTurn) {
-      processStartOfTurnEffects();
-      processEnemyTurn();
-      processEndOfTurnEffects();
-    }
+      }
+      
+      // Continue battle - update player health and return to player turn
+      return {
+        ...prev,
+        playerTurn: true,
+        playerStats: {
+          ...prev.playerStats,
+          currentHealth: newHealth
+        },
+        round: prev.round + 1, // Increment round counter
+        log: newLog,
+        turnHistory: newHistory
+      };
+    });
+    
+    // Process end of turn effects
+    processEndOfTurnEffects();
   }, [
-    combatState.active, 
-    combatState.playerTurn, 
-    processEnemyTurn, 
-    processStartOfTurnEffects, 
+    combatState,
+    calculatedStats,
+    processStartOfTurnEffects,
+    setCombatState,
+    onDefeat,
+    onComplete,
     processEndOfTurnEffects
   ]);
+
+  /**
+   * Run the enemy turn after a delay
+   */
+  const runEnemyTurn = useCallback(() => {
+    processEnemyTurn();
+  }, [processEnemyTurn]);
 
   return {
     processEnemyTurn,

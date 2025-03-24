@@ -1,10 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useGameState } from '../../../context/GameStateExports';
 import { InitialState } from '../../../context/initialStates';
-import { CombatStatus, ExtendedCombatState } from '../../../context/types/gameStates/CombatGameStateTypes';
 import { PlayerState } from '../../../context/types/gameStates/PlayerGameStateTypes';
 import { GameState } from '../../../context/types/gameStates/GameStateTypes';
+import { ExtendedCombatState } from '../../../context/types/combat/hooks'; // Fixed import path
+import { CombatStatus } from '../../../context/types/combat/basic'; // Import directly from basic
+import { SimpleLogEntry } from '../../../context/types/combat/logging';
+import { UnifiedCombatState } from '../../../context/types/combat/unifiedTypes';
+import { createLogEntry } from './battle/usePlayerActions/utils/logEntryFormatters';
 import useEnemyGeneration from './useEnemyGeneration';
+
+// Define default battle state with all required properties
+const DEFAULT_BATTLE_STATE: UnifiedCombatState = {
+  active: true,
+  playerTurn: true,
+  round: 1,
+  playerStats: {
+    currentHealth: 100,
+    maxHealth: 100,
+    currentMana: 50,
+    maxMana: 50
+  },
+  log: [],
+  enemyId: '',
+  status: CombatStatus.NOT_STARTED
+};
 
 /**
  * Hook to manage battle state initialization and management
@@ -16,19 +36,7 @@ const useBattleState = (dungeonId?: string) => {
   const player = (gameState as unknown as GameState).player || {};
   const { generateEnemy } = useEnemyGeneration();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [combatState, setCombatState] = useState<ExtendedCombatState>({
-    active: true,
-    playerTurn: true,
-    round: 1,
-    playerStats: {
-      currentHealth: player.stats?.health ?? 100,
-      maxHealth: player.stats?.maxHealth ?? 100,
-      currentMana: player.stats?.mana ?? 50,
-      maxMana: player.stats?.maxMana ?? 50
-    },
-    log: [],
-    enemyId: dungeonId
-  });
+  const [combatState, setCombatState] = useState<ExtendedCombatState>(DEFAULT_BATTLE_STATE);
 
   // Initialize enemy when component mounts or dungeonId changes
   useEffect(() => {
@@ -61,12 +69,11 @@ const useBattleState = (dungeonId?: string) => {
     setCombatState(prevState => ({
       ...prevState,
       playerTurn: playerInitiative >= enemyInitiative,
-      log: [...(prevState.log || []), {
-        timestamp: Date.now(),
-        message: `A ${enemy.name} (Level ${enemy.level}) appears!`,
-        type: 'encounter',
-        importance: 'high'
-      }]
+      log: [...(prevState.log || []), createLogEntry(
+        `A ${enemy.name} (Level ${enemy.level}) appears!`,
+        'encounter',
+        'high'
+      )]
     }));
   }, [dungeonId, player, generateEnemy]);
 

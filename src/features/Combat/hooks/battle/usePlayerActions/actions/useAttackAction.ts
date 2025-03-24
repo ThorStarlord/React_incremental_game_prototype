@@ -64,7 +64,10 @@ export const useAttackAction = ({
         
         // Trigger victory callback after a delay
         setTimeout(() => {
-          onVictory();
+          // Safely call onVictory with null check
+          if (typeof onVictory === 'function') {
+            onVictory();
+          }
           onComplete({
             victory: true,
             rewards: {

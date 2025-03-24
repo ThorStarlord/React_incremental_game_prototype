@@ -1,15 +1,9 @@
 import React, { useRef, useEffect } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
-
-interface LogEntry {
-  timestamp: number;
-  message: string;
-  type: string;
-  importance: "normal" | "high";
-}
+import { SimpleLogEntry } from '../../../../../context/types/combat/logging';
 
 interface BattleLogProps {
-  log: LogEntry[];
+  log: SimpleLogEntry[];
 }
 
 /**

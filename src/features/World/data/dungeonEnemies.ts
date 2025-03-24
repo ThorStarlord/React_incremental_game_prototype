@@ -1,4 +1,4 @@
-import { DungeonEnemy } from '../../../context/types/combat/EnemyTypes';
+import { DungeonEnemy } from '../../../context/types/combat/enemyTypes';
 
 /**
  * Dungeon Enemies data file

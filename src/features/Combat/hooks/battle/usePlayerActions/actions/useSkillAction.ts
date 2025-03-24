@@ -47,6 +47,6 @@ export const useSkillAction = ({
     processEndOfTurnEffects,
     setCombatState
   ]);
-
+  
   return { handleUseSkill };
 };

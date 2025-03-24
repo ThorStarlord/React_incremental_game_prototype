@@ -5,11 +5,13 @@
  */
 
 import { 
-  CombatState, 
+  CombatState
+} from '../types/combat/state';
+import {
   EnvironmentType,
-  CombatStatus,
-  CombatLogEntry 
-} from '../types/gameStates/CombatGameStateTypes';
+  CombatStatus
+} from '../types/combat/basic';
+import { CombatLogEntry } from '../types/combat/logging';
 
 const combatInitialState: CombatState = {
   // Core combat state properties

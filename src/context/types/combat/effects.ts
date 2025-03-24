@@ -5,20 +5,41 @@
 import { DamageType } from './basic';
 
 /**
- * Status effect that can be applied during combat
+ * Status effect that can be applied to a combatant
  */
 export interface StatusEffect {
-  id: string;               // Unique identifier
-  name: string;             // Display name
-  description: string;      // Description of effect
-  duration: number;         // Number of turns effect lasts
-  strength?: number;        // Power/magnitude of the effect
-  type: 'buff' | 'debuff';  // Whether it's beneficial or harmful
-  damageOverTime?: number;  // Damage applied each turn
-  damageType?: DamageType;  // Type of damage dealt
-  statsModifier?: Record<string, number>; // Stat modifications
-  sourceId?: string;        // ID of the entity that applied this effect
-  iconPath?: string;        // Path to icon for UI display
+  /** Unique identifier for the effect */
+  id: string;
+  
+  /** Display name of the effect */
+  name: string;
+  
+  /** Description of what the effect does */
+  description: string;
+  
+  /** How long the effect lasts (turns) */
+  duration: number;
+  
+  /** Strength/magnitude of the effect (e.g. 0.5 for 50% damage reduction) */
+  strength?: number;
+  
+  /** Type of effect (buff or debuff) */
+  type: 'buff' | 'debuff';
+  
+  /** Periodic damage applied by the effect */
+  damageOverTime?: number;
+  
+  /** Type of damage for DoT effects */
+  damageType?: DamageType;
+  
+  /** Changes to stats applied by the effect */
+  statsModifier?: Record<string, number>;
+  
+  /** ID of the source that applied this effect */
+  sourceId?: string;
+  
+  /** Path to the icon representing this effect */
+  iconPath?: string;
 }
 
 /**

@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { ACTION_TYPES } from '../../../context/GameStateExports';
 import { ExtendedCombatState, UseCombatLogicProps } from '../../../context/types/gameStates/CombatGameStateTypes';
+import { SimpleLogEntry } from '../../../context/types/combat/logging';
+import { createLogEntry } from './battle/usePlayerActions/utils/logEntryFormatters';
 
 /**
  * Hook to handle combat logic
@@ -32,12 +34,7 @@ export const useCombatLogic = ({
       ...prevState,
       log: [
         ...prevState.log,
-        {
-          timestamp: Date.now(),
-          message,
-          type,
-          importance
-        }
+        createLogEntry(message, type, importance)
       ]
     }));
   }, [setCombatState]);
@@ -127,7 +124,7 @@ export const useCombatLogic = ({
         currentHealth: newPlayerHealth
       },
       playerTurn: true, // Return to player turn
-      round: prevState.round + 1 // Increment round counter
+      round: prevState.round + 1 // Now this will work since we added round to ExtendedCombatState
     }));
     
     // Add log entry for enemy attack

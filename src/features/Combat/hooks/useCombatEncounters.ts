@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import AREA_ENEMIES, { COMMON_LOOT, SPECIFIC_LOOT, COMBAT_CONSTANTS } from '../data/enemyData';
-import { Enemy, LootItem, EnemyTemplate } from '../../../context/types/combat/combatTypes';
+import { Enemy, LootItem } from '../../../context/types/combat';
+import { EnemyTemplate } from '../data/enemyData';
 
 /**
  * Hook for managing combat encounters
@@ -23,7 +24,12 @@ export const useCombatEncounters = (
    */
   const generateLoot = useCallback((enemyId: string): LootItem[] => {
     const specificEnemyLoot = SPECIFIC_LOOT[enemyId as keyof typeof SPECIFIC_LOOT] || [];
-    return [...COMMON_LOOT, ...specificEnemyLoot];
+    // Convert LootDrop to LootItem by adding required rarity property
+    return [...COMMON_LOOT, ...specificEnemyLoot].map(item => ({
+      ...item,
+      rarity: item.quality || 'common',
+      type: item.type || 'material'
+    }));
   }, []);
 
   /**
@@ -99,8 +105,21 @@ export const useCombatEncounters = (
         (COMBAT_CONSTANTS.MAX_ENEMY_SPEED - COMBAT_CONSTANTS.MIN_ENEMY_SPEED)),
       experience: Math.floor(template.baseExperience * levelMultiplier * difficultyMultiplier),
       gold: Math.floor(template.baseGold * levelMultiplier * difficultyMultiplier),
-      imageUrl: `/assets/enemies/${template.id}.png`,
-      loot: generateLoot(template.id)
+      type: 'enemy',
+      enemyType: 'normal',
+      baseHealth: template.baseHealth,
+      baseAttack: template.baseAttack,
+      baseDefense: template.baseDefense,
+      lootTable: generateLoot(template.id),
+      abilities: [],
+      immunities: [],
+      weaknesses: [],
+      critChance: 0.05,
+      dodgeChance: 0.05,
+      resistances: {},
+      statusEffects: [],
+      skills: [],
+      imageUrl: `/assets/enemies/${template.id}.png`
     };
   }, [generateLoot]);
 

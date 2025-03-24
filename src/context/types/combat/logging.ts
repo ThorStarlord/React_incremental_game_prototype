@@ -85,3 +85,21 @@ export interface SimpleLogEntry {
   type: string;
   importance: "normal" | "high";
 }
+
+/**
+ * Type guard to check if an object is a SimpleLogEntry
+ */
+export function isSimpleLogEntry(entry: any): entry is SimpleLogEntry {
+  return entry && 
+    typeof entry.timestamp === 'number' &&
+    typeof entry.message === 'string' &&
+    typeof entry.type === 'string' &&
+    (entry.importance === 'normal' || entry.importance === 'high');
+}
+
+/**
+ * Union type for all log entry types in the system
+ */
+export type AnyLogEntry = SimpleLogEntry | CombatLogEntry;
+
+export { SimpleLogEntry };

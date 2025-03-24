@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useGameDispatch } from '../../../context/GameStateExports';
 import { useCombatEncounters } from './useCombatEncounters';
 import { useCombatRewards } from './useCombatRewards';

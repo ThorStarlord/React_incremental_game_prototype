@@ -1,7 +1,7 @@
-import { CombatActionType, CombatActionResult } from '../../../../../../context/types/combat';
+import { CombatActionType, CombatActionResult } from '../../../../../../context/types/combat/basic';
 
 /**
- * Create a turn history entry with the correct format
+ * Create a standardized turn history entry
  */
 export const createTurnHistoryEntry = (
   actor: 'player' | 'enemy',
@@ -9,7 +9,7 @@ export const createTurnHistoryEntry = (
   result: CombatActionResult
 ) => {
   return {
-    actor, // The parameter is already of type 'player' | 'enemy', so no need for 'as const'
+    actor,
     action,
     result,
     timestamp: Date.now()

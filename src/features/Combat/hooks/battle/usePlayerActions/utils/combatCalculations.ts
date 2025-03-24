@@ -1,20 +1,47 @@
 /**
- * Calculate damage with critical hit possibilities
+ * Calculate damage with critical hit chance
  */
 export const calculateDamage = (
-  baseAttack: number,
+  attackValue: number,
   critChance: number,
-  targetDefense: number
-): { finalDamage: number; isCritical: boolean } => {
+  defenseValue: number
+) => {
+  // Determine if it's a critical hit
   const isCritical = Math.random() < critChance;
-  let damage = baseAttack;
   
-  if (isCritical) {
-    damage = Math.floor(baseAttack * 1.5);
-  }
+  // Calculate base damage
+  let baseDamage = Math.max(1, attackValue - Math.floor(defenseValue / 2));
   
-  // Apply defense reduction
-  const finalDamage = Math.max(1, damage - Math.floor(targetDefense / 3));
+  // Apply critical multiplier if necessary
+  const finalDamage = isCritical
+    ? Math.floor(baseDamage * 1.5)
+    : baseDamage;
+    
+  return {
+    finalDamage,
+    isCritical,
+    baseDamage
+  };
+};
+
+/**
+ * Calculate healing amount
+ */
+export const calculateHealing = (
+  healingPower: number,
+  bonusHealPercent: number = 0
+) => {
+  const baseHealing = healingPower;
+  const bonusHealing = Math.floor(baseHealing * bonusHealPercent);
   
-  return { finalDamage, isCritical };
+  return baseHealing + bonusHealing;
+};
+
+/**
+ * Calculate if an attack hits or misses based on dodge chance
+ */
+export const calculateHitSuccess = (
+  dodgeChance: number
+) => {
+  return Math.random() >= dodgeChance;
 };

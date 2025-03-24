@@ -1,9 +1,9 @@
 /**
  * Unified Enemy Type System
  * 
- * This file provides a cohesive type hierarchy for all enemy-related interfaces
- * in the game. It resolves redundancies and naming conflicts between different
- * parts of the codebase.
+ * This file provides core data models for enemies in the game.
+ * It focuses on static/persistent properties of enemies rather than
+ * runtime combat state which belongs in actors.ts.
  */
 
 // Basic shared types
@@ -96,64 +96,9 @@ export interface EnemyBase {
   
   /** Enemy type/species (goblin, skeleton, etc.) */
   enemyType?: string;
-}
-
-/**
- * Extended enemy interface with reward-related properties
- */
-export interface RewardableEnemy extends EnemyBase {
-  /** Experience points awarded when defeated */
-  experienceValue: number;
-  
-  /** Gold awarded when defeated */
-  goldValue: number;
-  
-  /** Essence awarded when defeated */
-  essenceValue: number;
-}
-
-/**
- * Combat-ready enemy interface with combat-specific properties
- */
-export interface CombatEnemy extends RewardableEnemy {
-  /** Actor type, always 'enemy' for enemies */
-  type: 'enemy';
-  
-  /** Speed stat for turn order calculation */
-  speed: number;
-  
-  /** Chance to critically hit (0-1) */
-  critChance: number;
-  
-  /** Critical hit damage multiplier */
-  critMultiplier: number;
-  
-  /** Chance to dodge attacks (0-1) */
-  dodgeChance: number;
-  
-  /** Items that can drop from this enemy */
-  lootTable: LootDrop[];
-  
-  /** Special abilities this enemy can use */
-  abilities: Ability[];
   
   /** URL to enemy image */
   imageUrl?: string;
-  
-  /** Active status effects */
-  statusEffects: any[];
-  
-  /** Available skills */
-  skills: any[];
-  
-  /** Damage type resistances */
-  resistances: Record<string, number>;
-  
-  /** Damage types this enemy is immune to */
-  immunities: string[];
-  
-  /** Damage types this enemy is weak against */
-  weaknesses: string[];
   
   /** Base health for scaling calculations */
   baseHealth: number;
@@ -163,6 +108,23 @@ export interface CombatEnemy extends RewardableEnemy {
   
   /** Base defense for scaling calculations */
   baseDefense: number;
+}
+
+/**
+ * Extended enemy interface with reward-related properties
+ */
+export interface RewardableEnemy extends EnemyBase {
+  /** Experience points awarded when defeated */
+  experience: number;
+  
+  /** Gold awarded when defeated */
+  gold: number;
+  
+  /** Essence awarded when defeated */
+  essence: number;
+  
+  /** Items that can drop from this enemy */
+  lootTable: LootDrop[];
 }
 
 /**
@@ -187,6 +149,18 @@ export function createDefaultEnemy(): EnemyBase {
     maxHealth: 10,
     currentHealth: 10,
     attack: 1,
-    defense: 0
+    defense: 0,
+    baseHealth: 10,
+    baseAttack: 1,
+    baseDefense: 0
   };
 }
+
+/**
+ * NOTE: Combat-specific enemy properties are now defined in actors.ts.
+ * The Enemy interface there should extend both BaseEnemy and CombatActor:
+ * 
+ * export interface Enemy extends RewardableEnemy, CombatActor {
+ *   // Combat-specific properties only
+ * }
+ */

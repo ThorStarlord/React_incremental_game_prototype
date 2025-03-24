@@ -1,203 +1,129 @@
+/**
+ * Enemy Adapter Module
+ * 
+ * Provides utility functions to adapt core enemy data models (from enemyTypes.ts)
+ * into combat-ready enemy instances with combat-specific properties.
+ * This adapter decouples the data representation from combat mechanics.
+ */
+
+import { EnemyBase, LootDrop } from '../../../context/types/combat';
+import { COMBAT_CONSTANTS } from '../data/enemyData';
 import { DamageType } from '../../../context/types/combat/basic';
-import { Enemy as CompleteEnemy } from '../../../context/types/gameStates/CombatGameStateTypes';
-import { Effect } from '../../../context/types/combat';
-import { 
-  EnemyBase, 
-  CombatEnemy, 
-  DungeonEnemy, 
-  Ability, 
-  LootDrop 
-} from '../../../context/types/combat/EnemyTypes';
 
 // Map of enemy traits to resistances
 const TRAIT_RESISTANCE_MAP: Record<string, Partial<Record<DamageType, number>>> = {
-  'fireResistant': { fire: 0.5 },
-  'freezeResistant': { ice: 0.5 },
-  'poisonResistant': { poison: 0.5 },
-  'armored': { physical: 0.3 },
-  'magical': { magical: 0.2 },
+  'fireResistant': { [DamageType.Fire]: 0.5 },
+  'freezeResistant': { [DamageType.Ice]: 0.5 },
+  'poisonResistant': { [DamageType.Poison]: 0.5 },
+  'armored': { [DamageType.Physical]: 0.3 },
+  'magical': { [DamageType.Magical]: 0.2 },
 };
 
 /**
- * Enum of enemy types for better type safety
- */
-export enum EnemyType {
-  DUNGEON = 'dungeon',
-  SIMPLE = 'simple',
-  UNKNOWN = 'unknown'
-}
-
-/**
- * Main adapter function that detects enemy type and routes to the appropriate adapter
+ * Adapts a base enemy model to a combat-ready enemy with combat-specific properties
  * 
- * @param enemy Any enemy object with appropriate properties
- * @returns A combat-ready enemy object
+ * @param baseEnemy The core enemy data to adapt
+ * @param difficultyMultiplier Optional difficulty scaling factor
+ * @returns A combat-ready enemy with necessary combat properties
  */
-export function adaptToCombatEnemy(enemy: Record<string, any>): CombatEnemy {
-  // Guard against null or non-object inputs
-  if (!enemy || typeof enemy !== 'object') {
-    throw new Error('Invalid enemy object provided to adaptToCombatEnemy');
-  }
+export function adaptToCombatEnemy(
+  baseEnemy: any,
+  difficultyMultiplier: number = 1.0
+): any {
+  // Calculate combat stats based on base values
+  const combatHealth = Math.ceil(baseEnemy.maxHealth * difficultyMultiplier);
+  const combatAttack = Math.ceil(baseEnemy.attack * difficultyMultiplier);
+  const combatDefense = Math.ceil(baseEnemy.defense * difficultyMultiplier);
   
-  // Detect enemy type and route to appropriate adapter
-  const enemyType = detectEnemyType(enemy);
+  // Generate combat-specific properties
+  const speed = generateSpeed();
   
-  switch (enemyType) {
-    case EnemyType.DUNGEON:
-      return adaptDungeonTypeEnemy(enemy as DungeonEnemy);
-    case EnemyType.SIMPLE:
-      return adaptSimpleEnemy(enemy as EnemyBase) as CombatEnemy;
-    default:
-      // Create a minimal valid enemy from the input
-      return createMinimalEnemy(enemy as EnemyBase);
-  }
-}
-
-/**
- * Create a minimal valid enemy from base properties
- */
-function createMinimalEnemy(baseEnemy: EnemyBase): CombatEnemy {
+  // Create base combat enemy with all required properties
   return {
+    // Core properties from the base enemy
     id: baseEnemy.id,
     name: baseEnemy.name,
     level: baseEnemy.level || 1,
-    maxHealth: baseEnemy.maxHealth || baseEnemy.currentHealth || 100,
-    currentHealth: baseEnemy.currentHealth || baseEnemy.maxHealth || 100,
+    maxHealth: combatHealth,
+    currentHealth: combatHealth,
+    attack: combatAttack,
+    defense: combatDefense,
     type: 'enemy',
-    enemyType: 'unknown',
-    attack: baseEnemy.attack,
-    defense: baseEnemy.defense,
-    speed: 5,
-    critChance: 0.05,
-    critMultiplier: 1.5,
-    lootTable: [],
-    abilities: [],
-    experienceValue: 10,
-    goldValue: 5,
-    essenceValue: 1,
+    
+    // Required properties for Combat component
+    enemyType: baseEnemy.enemyType || 'generic',
+    experience: baseEnemy.experience || 0,
+    gold: baseEnemy.gold || 0,
+    
+    // Required base properties
+    baseHealth: baseEnemy.baseHealth || combatHealth,
+    baseAttack: baseEnemy.baseAttack || combatAttack,
+    baseDefense: baseEnemy.baseDefense || combatDefense,
+    
+    // Combat-specific properties
+    speed,
+    critChance: 0.05, // Base 5% critical chance
+    dodgeChance: 0.05, // Base 5% dodge chance
+    resistances: {},
     statusEffects: [],
     skills: [],
-    dodgeChance: 0.05,
-    resistances: {} as Record<DamageType, number>,
-    immunities: [],
-    weaknesses: [],
-    baseHealth: baseEnemy.maxHealth || 100,
-    baseAttack: baseEnemy.attack,
-    baseDefense: baseEnemy.defense
+    
+    // Other required properties
+    lootTable: baseEnemy.lootTable || [],
+    abilities: baseEnemy.abilities || [],
+    immunities: baseEnemy.immunities || [],
+    weaknesses: baseEnemy.weaknesses || [],
+    
+    // Optional image properties
+    imageUrl: baseEnemy.imageUrl,
   };
 }
 
 /**
- * Adapts a dungeon-type enemy to the combat system's enemy format
+ * Generates a random speed value for an enemy within the defined range
  */
-function adaptDungeonTypeEnemy(enemy: DungeonEnemy): CombatEnemy {
-  const traits = enemy.traits || [];
-  const resistances = createResistancesFromTraits(traits);
-  const lootItems = transformToLootItems(createTraitDrops(traits));
-
-  return {
-    id: enemy.id,
-    name: enemy.name,
-    level: enemy.level || 1,
-    maxHealth: enemy.maxHealth,
-    currentHealth: enemy.currentHealth,
-    type: 'enemy',
-    enemyType: 'monster',
-    attack: enemy.attack,
-    defense: enemy.defense,
-    speed: 5, 
-    critChance: 0.05,
-    critMultiplier: 1.5,
-    lootTable: lootItems,
-    abilities: [],
-    experienceValue: enemy.experienceValue || 10,
-    goldValue: enemy.goldValue || 5,
-    essenceValue: enemy.essenceValue || 1,
-    statusEffects: [],
-    skills: [],
-    dodgeChance: 0.05,
-    resistances,
-    immunities: [],
-    weaknesses: [],
-    baseHealth: enemy.maxHealth,
-    baseAttack: enemy.attack,
-    baseDefense: enemy.defense,
-    imageUrl: enemy.portrait ? `/assets/enemies/${enemy.portrait}.png` : undefined
-  };
+function generateSpeed(): number {
+  return Math.floor(
+    COMBAT_CONSTANTS.MIN_ENEMY_SPEED + 
+    Math.random() * (COMBAT_CONSTANTS.MAX_ENEMY_SPEED - COMBAT_CONSTANTS.MIN_ENEMY_SPEED)
+  );
 }
 
 /**
- * Adapts a simple enemy to the complete combat state format
+ * Creates a resistance record based on enemy traits
  */
-export function adaptSimpleEnemy(enemy: EnemyBase): CompleteEnemy {
-  // Apply defaults for required properties
-  const baseEnemy = {
-    ...enemy,
-    maxHealth: enemy.maxHealth || 100,
-    currentHealth: enemy.currentHealth || enemy.maxHealth || 100
-  };
+function createResistancesFromTraits(traits: string[]): Record<string, number> {
+  const resistances: Record<string, number> = {};
   
-  // Extract or generate default abilities and loot if they exist
-  const lootTable = 'lootTable' in baseEnemy ? baseEnemy.lootTable as any[] : [];
-  const abilities = 'abilities' in baseEnemy ? baseEnemy.abilities as any[] : [];
+  traits.forEach(trait => {
+    if (TRAIT_RESISTANCE_MAP[trait]) {
+      Object.entries(TRAIT_RESISTANCE_MAP[trait]).forEach(([damageType, value]) => {
+        resistances[damageType] = Math.max(
+          resistances[damageType] || 0,
+          value
+        );
+      });
+    }
+  });
   
-  const lootItems = Array.isArray(lootTable) ? 
-    transformToLootItems(lootTable) : [];
-  
-  const abilityItems = Array.isArray(abilities) ? 
-    transformToAbilities(abilities) : [];
-
-  return {
-    ...baseEnemy,
-    type: 'enemy',
-    enemyType: (baseEnemy as any).enemyType || 'monster',
-    lootTable: lootItems,
-    abilities: abilityItems,
-    defense: baseEnemy.defense || 0,
-    attack: baseEnemy.attack || 0,
-    speed: (baseEnemy as any).speed || 1,
-    critChance: (baseEnemy as any).critChance || (baseEnemy as any).criticalChance || 0.05,
-    critMultiplier: (baseEnemy as any).critMultiplier || (baseEnemy as any).criticalDamage || 1.5,
-    essenceValue: (baseEnemy as any).essenceValue || 0,
-    experienceValue: (baseEnemy as any).experienceValue || 10,
-    goldValue: (baseEnemy as any).goldValue || 5,
-    health: baseEnemy.currentHealth,
-    experience: (baseEnemy as any).experienceValue || 10,
-    gold: (baseEnemy as any).goldValue || 5
-  };
+  return resistances;
 }
 
 /**
- * Detects enemy type based on its properties
+ * Adapts a loot table based on difficulty
  */
-function detectEnemyType(enemy: Record<string, any>): EnemyType {
-  // Check for dungeon-type enemy (has traits array)
-  if (enemy.traits && Array.isArray(enemy.traits)) {
-    return EnemyType.DUNGEON;
-  } 
-  
-  // Check for simple enemy type (has basic required properties)
-  if (enemy.id && enemy.name && 
-      (enemy.maxHealth !== undefined || enemy.currentHealth !== undefined)) {
-    return EnemyType.SIMPLE;
-  }
-  
-  return EnemyType.UNKNOWN;
-}
-
-// Helper functions
-
-/**
- * Calculate consistent health values based on available data
- */
-function normalizeHealthValues(enemy: Record<string, any>): { maxHealth: number, currentHealth: number } {
-  const maxHealth = enemy.maxHealth || enemy.health || 100;
-  const currentHealth = enemy.currentHealth || enemy.health || maxHealth;
-  return { maxHealth, currentHealth };
+function adaptLootTable(lootTable: LootDrop[], difficultyMultiplier: number): LootDrop[] {
+  // Clone the loot table to avoid modifying the original
+  return lootTable.map(loot => ({
+    ...loot,
+    // Adjust drop chances or quantities based on difficulty
+    dropChance: Math.min(1.0, loot.dropChance * difficultyMultiplier),
+    quantity: Math.ceil(loot.quantity * (difficultyMultiplier > 1.5 ? 1.2 : 1.0))
+  }));
 }
 
 /**
- * Creates drops from enemy traits
+ * Transforms trait info into potential loot drops
  */
 function createTraitDrops(traits: string[]): LootDrop[] {
   return traits.map(trait => ({
@@ -209,68 +135,52 @@ function createTraitDrops(traits: string[]): LootDrop[] {
 }
 
 /**
- * Creates a resistance record based on enemy traits
+ * Converts any combat enemy back to its base form for storage
+ * (removes runtime properties, keeps only persistent data)
+ * 
+ * @param combatEnemy The combat enemy instance to convert
+ * @returns A base enemy data object suitable for storage
  */
-function createResistancesFromTraits(traits: string[]): Record<DamageType, number> {
-  const resistances: Partial<Record<DamageType, number>> = {};
-  
-  traits.forEach(trait => {
-    if (TRAIT_RESISTANCE_MAP[trait]) {
-      Object.entries(TRAIT_RESISTANCE_MAP[trait]).forEach(([damageType, value]) => {
-        const damageTypeKey = damageType as DamageType;
-        resistances[damageTypeKey] = Math.max(
-          resistances[damageTypeKey] || 0,
-          value
-        );
-      });
-    }
-  });
-  
-  return resistances as Record<DamageType, number>;
+export function adaptToBaseEnemy(combatEnemy: any): EnemyBase {
+  // Extract only the essential properties that should be stored
+  return {
+    id: combatEnemy.id,
+    name: combatEnemy.name,
+    level: combatEnemy.level,
+    maxHealth: combatEnemy.maxHealth,
+    currentHealth: combatEnemy.currentHealth,
+    attack: combatEnemy.attack,
+    defense: combatEnemy.defense,
+    imageUrl: combatEnemy.imageUrl,
+    baseHealth: combatEnemy.baseHealth || combatEnemy.maxHealth,
+    baseAttack: combatEnemy.baseAttack || combatEnemy.attack,
+    baseDefense: combatEnemy.baseDefense || combatEnemy.defense,
+    category: combatEnemy.category,
+    enemyType: combatEnemy.enemyType
+  };
 }
 
 /**
- * Transforms LootDrop[] to LootItem[]
+ * Creates a reward-ready enemy from a base enemy by adding reward properties
+ * 
+ * @param baseEnemy The core enemy data
+ * @param gold Gold reward
+ * @param essence Essence reward
+ * @param lootTable Optional loot table
+ * @returns A RewardableEnemy ready for combat
  */
-function transformToLootItems(drops: LootDrop[] = []): any[] {
-  return drops.map(drop => ({
-    id: drop.id,
-    name: drop.name,
-    quantity: drop.quantity,
-    dropChance: drop.dropChance || 0.1,
-    quality: drop.quality || 'common',
-    type: drop.type || 'material',
-    value: drop.value || 1
-  }));
-}
-
-/**
- * Transforms any ability array to Ability[]
- */
-function transformToAbilities(abilities: any[] = []): Ability[] {
-  return abilities.map(ability => ({
-    id: ability.id || 'unknown-ability',
-    name: ability.name || 'Unknown Ability',
-    description: ability.description || '',
-    cooldown: ability.cooldown || 0,
-    effect: ability.effect || {
-      id: `${ability.id || 'unknown'}_effect`,
-      name: `${ability.name || 'Unknown'} Effect`,
-      type: 'damage',
-      value: ability.damageMultiplier || 1.0,
-      duration: 1,
-      strength: ability.damageMultiplier || 1.0
-    },
-    isAoE: ability.isAoE || false,
-    manaCost: ability.manaCost || 0,
-    level: ability.level || 1
-  }));
-}
-
-/**
- * @deprecated Use adaptToCombatEnemy instead
- */
-export function adaptEnemy(enemy: unknown): CombatEnemy | CompleteEnemy {
-  console.warn('adaptEnemy is deprecated, use adaptToCombatEnemy instead');
-  return adaptToCombatEnemy(enemy as Record<string, any>);
+export function createRewardableEnemy(
+  baseEnemy: EnemyBase,
+  gold: number = 5,
+  essence: number = 1,
+  lootTable: LootDrop[] = []
+): RewardableEnemy {
+  return {
+    ...baseEnemy,
+    // Remove experience-based calculations 
+    experience: 0, // Set to zero as we're removing experience but need to satisfy the interface
+    gold,
+    essence,
+    lootTable
+  };
 }

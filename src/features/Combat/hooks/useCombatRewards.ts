@@ -5,27 +5,26 @@ import { Rewards } from '../../../context/types/combat/combatTypes';
  * Hook for managing combat rewards
  */
 export const useCombatRewards = () => {
-  // State for rewards
+  // Initialize an empty rewards object
   const [totalRewards, setTotalRewards] = useState<Rewards>({
     experience: 0,
     gold: 0,
     items: []
   });
-
+  
   /**
-   * Add rewards from a completed encounter
-   * @param encounterRewards - Rewards from the current encounter
+   * Add rewards from a single encounter to the total
    */
-  const addEncounterRewards = useCallback((encounterRewards: Rewards) => {
-    setTotalRewards(prev => ({
-      experience: prev.experience + encounterRewards.experience,
-      gold: prev.gold + encounterRewards.gold,
-      items: [...prev.items, ...encounterRewards.items]
+  const addEncounterRewards = useCallback((encounterRewards: Partial<Rewards>) => {
+    setTotalRewards((prev: Rewards) => ({
+      experience: prev.experience + (encounterRewards.experience || 0),
+      gold: prev.gold + (encounterRewards.gold || 0),
+      items: [...prev.items, ...(encounterRewards.items || [])]
     }));
   }, []);
-
+  
   /**
-   * Reset rewards for a new combat
+   * Reset all rewards to zero
    */
   const resetRewards = useCallback(() => {
     setTotalRewards({
@@ -34,7 +33,7 @@ export const useCombatRewards = () => {
       items: []
     });
   }, []);
-
+  
   return {
     totalRewards,
     addEncounterRewards,

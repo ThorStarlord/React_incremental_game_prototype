@@ -1,40 +1,66 @@
-import { useCallback, useEffect } from 'react';
-import { UseBattleHookProps, ExtendedCombatState, BattleResult } from '../../../../context/types/gameStates/BattleGameStateTypes';
+import { useCallback, useState, useEffect } from 'react';
+import { useGameDispatch } from '../../../../context/GameStateExports';
+import { BattleResult, UseBattleHookProps } from '../../../../context/types/gameStates/BattleGameStateTypes';
+import { ExtendedCombatState } from '../../../../context/types/combat';
+import { CombatStateWithRound } from '../../../../context/types/gameStates/CombatStateTypes';
+import { UnifiedCombatState } from '../../../../context/types/combat/unifiedTypes';
+import { CombatStatus } from '../../../../context/types/combat/basic';
+import { Dispatch, SetStateAction } from 'react';
 
-// Import all specialized battle hooks
-import { useBattleState } from './useBattleState';
+// Import combat hooks
 import { useCombatLog } from './useCombatLog';
-import { useEffectsProcessor } from './useEffectsProcessor';
-import { useEnemyAI } from './useEnemyAI';
 import { usePlayerActions } from './usePlayerActions';
+import { useEnemyAI } from './useEnemyAI';
+import { useEffects } from './useEffects';
+import { useCombatInitializer } from './useCombatInitializer';
 
 /**
- * Main battle logic hook that combines various specialized hooks
- * to provide a complete interface for battle management
+ * Main hook for battle logic
  */
-const useBattleLogic = ({
+const useBattleLogic = ({ 
   player,
   dungeonId,
-  dispatch,
+  dispatch: gameDispatch,
   difficulty = 'normal',
-  calculatedStats = {},
+  calculatedStats = { attack: 10, defense: 5, critChance: 0.05 },
   onComplete,
   onVictory = () => {},
   onDefeat = () => {},
   showTraitEffect = () => {}
 }: UseBattleHookProps) => {
-  // Initialize battle state with player stats
-  const { combatState, setCombatState } = useBattleState(player, calculatedStats);
+  // Initialize combat state with proper defaults
+  const [combatState, setCombatState] = useState<UnifiedCombatState>(() => ({
+    active: true,
+    playerTurn: true,
+    round: 1,
+    status: CombatStatus.IN_PROGRESS,
+    playerStats: {
+      currentHealth: player?.stats?.health || 100,
+      maxHealth: player?.stats?.maxHealth || 100,
+      currentMana: player?.stats?.mana || 50,
+      maxMana: player?.stats?.maxMana || 50
+    },
+    log: [],
+    turnHistory: [],
+    skills: [],
+    items: [],
+    effects: []
+  }));
+  
+  // Use the global dispatch for game-level actions
+  const dispatch = useGameDispatch();
   
   // Set up combat log management
   const { addLogEntry } = useCombatLog(setCombatState);
   
   // Set up effects processing
   const {
-    endTurn,
     processStartOfTurnEffects,
     processEndOfTurnEffects
-  } = useEffectsProcessor(setCombatState);
+  } = useEffects(combatState, setCombatState);
+  
+  // Initialize combat state
+  useCombatInitializer(player, combatState, setCombatState, calculatedStats);
   
   // Set up player actions
   const {
@@ -44,91 +70,42 @@ const useBattleLogic = ({
     handleDefend,
     handleFlee,
     handlePlayerTurnEnd
-  } = usePlayerActions(
+  } = usePlayerActions({
     combatState,
     setCombatState,
     calculatedStats,
     onComplete,
     onVictory,
+    onDefeat: onDefeat || (() => {}),
     processEndOfTurnEffects,
     addLogEntry
-  );
+  });
   
   // Set up enemy AI
   const {
     processEnemyTurn,
     runEnemyTurn
-  } = useEnemyAI(
+  } = useEnemyAI({
     combatState,
     setCombatState,
     calculatedStats,
     onComplete,
-    onDefeat,
+    onDefeat: onDefeat || (() => {}),
     processEndOfTurnEffects,
     processStartOfTurnEffects
-  );
+  });
   
   // Run enemy turn when it's not player's turn
   useEffect(() => {
     if (combatState.active && !combatState.playerTurn) {
-      runEnemyTurn();
+      const timer = setTimeout(() => {
+        runEnemyTurn();
+      }, 1000);
+      return () => clearTimeout(timer);
     }
   }, [combatState.active, combatState.playerTurn, runEnemyTurn]);
   
-  // Check for battle completion conditions
-  useEffect(() => {
-    // Check if battle is over (player or enemy defeated)
-    if (combatState.active) {
-      const playerHealth = combatState.playerStats?.currentHealth || 0;
-      const enemyHealth = combatState.enemyStats?.currentHealth || 0;
-      
-      if (playerHealth <= 0) {
-        // Player defeated
-        setCombatState(prev => ({ ...prev, active: false }));
-        addLogEntry('You have been defeated!', 'defeat', 'high');
-        
-        setTimeout(() => {
-          onDefeat();
-          onComplete({
-            victory: false,
-            rewards: {},
-            retreat: false
-          });
-        }, 1500);
-      } else if (enemyHealth <= 0) {
-        // Enemy defeated
-        setCombatState(prev => ({ ...prev, active: false }));
-        addLogEntry('You are victorious!', 'victory', 'high');
-        
-        const experience = combatState.enemyStats?.level ? combatState.enemyStats.level * 10 : 10;
-        const gold = combatState.enemyStats?.level ? combatState.enemyStats.level * 5 : 5;
-        
-        setTimeout(() => {
-          onVictory();
-          onComplete({
-            victory: true,
-            rewards: {
-              experience,
-              gold,
-              items: []
-            },
-            retreat: false
-          });
-        }, 1500);
-      }
-    }
-  }, [
-    combatState.active, 
-    combatState.playerStats?.currentHealth, 
-    combatState.enemyStats?.currentHealth,
-    combatState.enemyStats?.level,
-    addLogEntry,
-    setCombatState,
-    onVictory,
-    onDefeat,
-    onComplete
-  ]);
-
+  // Return combat state and actions
   return {
     combatState,
     setCombatState,

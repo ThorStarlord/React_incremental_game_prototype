@@ -1,23 +1,13 @@
 import React from 'react';
 import { Box, Typography, Paper, Divider } from '@mui/material';
-
-/**
- * Interface for a simplified combat log entry
- * This matches the actual structure passed from combatState.log
- */
-interface SimpleCombatLogEntry {
-  timestamp: number;
-  message: string;
-  type: string;
-  importance: "normal" | "high";
-}
+import { SimpleLogEntry } from '../../../../context/types/combat/logging';
 
 /**
  * Interface for BattleLog component props
  */
 interface BattleLogProps {
   /** Array of log entries to display */
-  logEntries: SimpleCombatLogEntry[];
+  logEntries: SimpleLogEntry[];
   /** Ref to the log container for scrolling */
   logRef: React.RefObject<HTMLDivElement | null>;
 }

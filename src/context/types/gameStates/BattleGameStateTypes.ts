@@ -22,25 +22,23 @@ import {
   Skill,
   ActiveSkill,
   Ability,
-  CombatSkills,
   CombatActor,
   ManaUser,
   Enemy,
   LootItem,
   CombatLogEntry,
   CombatLogData,
-  CombatLogDamageEntry,
-  CombatLogHealEntry,
-  CombatLogStatusEntry,
-  CombatLogMiscEntry,
   CombatRewards,
   CombatState,
   CombatStateContainer,
   CombatEffect,
   HookCombatState,
-  ExtendedCombatState, // Import the ExtendedCombatState from combat/hooks
-  UseCombatLogicProps
-} from './CombatGameStateTypes';
+  ExtendedCombatState // Import the ExtendedCombatState from combat/hooks
+} from '../combat';
+
+// Import specific types from their source modules
+import { CombatSkills } from '../combat/skills';
+import { UseCombatLogicProps } from '../combat/hooks';
 
 // Re-export types for use in battle components
 export {
@@ -60,7 +58,6 @@ export {
   Skill,
   ActiveSkill,
   Ability,
-  CombatSkills,
   CombatActor,
   ManaUser,
   Enemy,
@@ -72,7 +69,11 @@ export {
   CombatStateContainer,
   CombatEffect,
   HookCombatState,
-  ExtendedCombatState // Re-export ExtendedCombatState
+  ExtendedCombatState,
+  
+  // Types from specific modules
+  CombatSkills,
+  UseCombatLogicProps
 };
 
 /**
@@ -122,4 +123,19 @@ export interface UseBattleHookProps {
   onVictory?: () => void;
   onDefeat?: () => void;
   showTraitEffect?: (traitId: string, x: number, y: number) => void;
+}
+
+/**
+ * Extended battle result with more detailed information
+ */
+export interface DetailedBattleResult extends BattleResult {
+  playerStats?: Record<string, number>;
+  enemyStats?: Record<string, number>;
+  turns: number;
+  logEntries: CombatLogEntry[];
+  damageDealt: number;
+  damageTaken: number;
+  healingDone: number;
+  effectsApplied: number;
+  criticalHits: number;
 }

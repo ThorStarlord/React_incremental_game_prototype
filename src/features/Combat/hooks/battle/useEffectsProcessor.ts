@@ -1,5 +1,14 @@
 import { useCallback } from 'react';
-import { ExtendedCombatState } from '../../../../context/types/gameStates/BattleGameStateTypes';
+import { ExtendedCombatState } from '../../../../context/types/combat/hooks'; // Fixed import path
+import { StatusEffect } from '../../../../context/types/combat/effects';
+
+// Define a type for skill items
+interface SkillWithCooldown {
+  id: string;
+  name: string;
+  currentCooldown: number;
+  [key: string]: any;
+}
 
 /**
  * Hook for processing combat effects and turn transitions
@@ -32,18 +41,18 @@ export const useEffectsProcessor = (
   const processEndOfTurnEffects = useCallback(() => {
     // Reduce cooldowns on skills
     setCombatState(prev => {
-      const updatedSkills = prev.skills?.map(skill => ({
+      const updatedSkills = prev.skills?.map((skill: SkillWithCooldown) => ({
         ...skill,
         currentCooldown: Math.max(0, skill.currentCooldown - 1)
       }));
       
       // Reduce duration of status effects
       const updatedEffects = prev.effects
-        ?.map(effect => ({
+        ?.map((effect: StatusEffect) => ({
           ...effect,
           duration: effect.duration - 1
         }))
-        .filter(effect => effect.duration > 0);
+        .filter((effect: StatusEffect) => effect.duration > 0);
         
       return {
         ...prev,

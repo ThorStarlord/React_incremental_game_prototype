@@ -24,13 +24,22 @@ import {
 
 // Import combat-related types
 import {
-  CombatSkills,
   Enemy,
   CombatActionType,
   CombatActionResult,
+  DamageType,
+  EnvironmentType,
+  ResourceType,
+  CombatStatus,
+  CombatEffect,
+  // Remove StatusEffect from import to avoid conflict with local declaration
   CombatLogEntry,
-  CombatStateContainer
+  CombatRewards,
+  CombatStateContainer // Add this import
 } from './CombatGameStateTypes';
+
+// Import CombatSkills directly from the skills module
+import { CombatSkills } from '../combat/skills';
 
 // Import inventory and item-related types
 import {

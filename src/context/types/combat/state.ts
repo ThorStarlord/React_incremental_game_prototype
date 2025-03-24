@@ -3,7 +3,7 @@
  */
 
 import { EnvironmentType, CombatStatus } from './basic';
-import { CombatActor, ManaUser, Enemy } from './actors';
+import { CombatActor, Enemy } from './actors';
 import { StatusEffect, CombatEffect } from './effects';
 import { CombatLogEntry } from './logging';
 import { CombatRewards } from './rewards';
@@ -31,14 +31,14 @@ export interface CombatState {
   playerEffects: CombatEffect[]; // Player-specific effects
   enemyEffects: CombatEffect[]; // Enemy-specific effects
   turnQueue: CombatActor[];  // Turn order queue
-  log: any[];                // Simplified log for backward compatibility
+  log: CombatLogEntry[];     // Simplified log for backward compatibility
 }
 
 /**
  * Combat state container interface
  */
 export interface CombatStateContainer {
-  player: ManaUser;
+  player: CombatActor;
   enemies: Enemy[];
   environment: EnvironmentType;
   rewards: CombatRewards;

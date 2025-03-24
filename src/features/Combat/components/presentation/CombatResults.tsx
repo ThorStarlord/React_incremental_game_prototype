@@ -1,18 +1,35 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { Box, Typography, Button, Fade } from '@mui/material';
 import Panel from '../../../../shared/components/layout/Panel';
-import { Rewards, CombatResult } from '../../../../context/types/combat/combatTypes';
+import { CombatRewards } from '../../../../context/types/combat'; // Import from main combat module
+
+// Create the CombatResult type to match what we expect
+interface CombatResult {
+  victory: boolean;
+  message?: string;
+  rewards?: Partial<CombatRewards>;
+  retreat?: boolean;
+}
 
 interface CombatResultsProps {
   combatResult: CombatResult;
-  totalRewards: Rewards;
+  totalRewards: {
+    experience: number;
+    gold: number;
+    items: Array<{
+      id: string;
+      name: string;
+      quantity: number;
+      [key: string]: any;
+    }>;
+  };
   onFinish: () => void;
 }
 
 /**
  * Component to display combat results
  */
-const CombatResults: React.FC<CombatResultsProps> = memo(({ 
+const CombatResults: React.FC<CombatResultsProps> = ({ 
   combatResult, 
   totalRewards, 
   onFinish 
@@ -43,7 +60,7 @@ const CombatResults: React.FC<CombatResultsProps> = memo(({
                       Items:
                     </Typography>
                     <ul style={{ marginTop: 4 }}>
-                      {totalRewards.items.map((item, index) => (
+                      {totalRewards.items.map((item: { name: string; quantity: number }, index: number) => (
                         <li key={index}>
                           {item.name} x{item.quantity}
                         </li>
@@ -67,8 +84,6 @@ const CombatResults: React.FC<CombatResultsProps> = memo(({
       </Box>
     </Fade>
   );
-});
-
-CombatResults.displayName = 'CombatResults';
+};
 
 export default CombatResults;

@@ -2,8 +2,8 @@
  * Type definitions for skills system
  */
 
-// Import shared skill types
-import { CombatSkills } from './CombatGameStateTypes';
+// Import CombatSkills from the correct location
+import { CombatSkills } from '../combat/skills';
 
 /**
  * Magic skills

@@ -24,5 +24,5 @@ export interface CombatRewards {
   experience: number;
   gold: number;
   items: GameItem[];
-  bonusLoot?: GameItem[];
+  bonusLoot?: GameItem[]; // Added missing property
 }

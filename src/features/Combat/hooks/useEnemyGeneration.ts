@@ -1,19 +1,6 @@
 import { useCallback } from 'react';
 import { getDungeonById } from '../../World/data/dungeons';
-
-interface Enemy {
-  id: string;
-  name: string;
-  level: number;
-  currentHealth: number;
-  maxHealth: number;
-  attack: number;
-  defense: number;
-  speed: number;
-  imageUrl?: string;
-  experience: number;
-  gold: number;
-}
+import { CombatEnemy } from '../../../context/types/combat/enemyTypes';
 
 interface PlayerData {
   level: number;
@@ -32,7 +19,7 @@ const useEnemyGeneration = () => {
   /**
    * Generate appropriate enemy for the dungeon
    */
-  const generateEnemy = useCallback((dungeonId: string, player: PlayerData): Enemy => {
+  const generateEnemy = useCallback((dungeonId: string, player: PlayerData): CombatEnemy => {
     // Get dungeon data
     const dungeon = getDungeonById(dungeonId);
     
@@ -83,19 +70,37 @@ const useEnemyGeneration = () => {
     // Scale stats based on level
     const levelMultiplier = 1 + (enemyLevel - 1) * 0.2; // 20% increase per level
     
-    // Generate the enemy with scaled stats
+    // Generate the enemy with scaled stats as a CombatEnemy
     return {
       id: selectedEnemy.id,
       name: selectedEnemy.name,
       level: enemyLevel,
       currentHealth: Math.round(selectedEnemy.baseHealth * levelMultiplier),
       maxHealth: Math.round(selectedEnemy.baseHealth * levelMultiplier),
+      baseHealth: selectedEnemy.baseHealth,
       attack: Math.round(selectedEnemy.baseAttack * levelMultiplier),
+      baseAttack: selectedEnemy.baseAttack,
       defense: Math.round(selectedEnemy.baseDefense * levelMultiplier),
+      baseDefense: selectedEnemy.baseDefense,
       speed: Math.round(5 + Math.random() * 5), // Random speed between 5-10
+      type: 'enemy',
+      enemyType: 'normal',
       imageUrl: `/assets/enemies/${selectedEnemy.id}.png`,
       experience: Math.round(selectedEnemy.baseExp * levelMultiplier),
-      gold: Math.round(selectedEnemy.baseGold * levelMultiplier)
+      experienceValue: Math.round(selectedEnemy.baseExp * levelMultiplier),
+      gold: Math.round(selectedEnemy.baseGold * levelMultiplier),
+      goldValue: Math.round(selectedEnemy.baseGold * levelMultiplier),
+      essenceValue: Math.round((selectedEnemy.baseExp / 2) * levelMultiplier),
+      critChance: 0.05,
+      critMultiplier: 1.5,
+      dodgeChance: 0.05,
+      lootTable: [],
+      abilities: [],
+      statusEffects: [],
+      skills: [],
+      resistances: {} as Record<string, number>,
+      immunities: [],
+      weaknesses: []
     };
   }, []);
   

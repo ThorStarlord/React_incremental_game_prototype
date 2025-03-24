@@ -6,12 +6,30 @@
  * and area difficulty.
  */
 
-import { EnemyTemplate, AreaEnemies } from '../../../context/types/combat/combatTypes';
+import { EnemyBase, LootDrop } from '../../../context/types/combat/index';
+
+/**
+ * Type for enemy templates
+ */
+export interface EnemyTemplate {
+  id: string;
+  name: string;
+  baseHealth: number;
+  baseAttack: number;
+  baseDefense: number;
+  baseExperience: number;
+  baseGold: number;
+}
+
+/**
+ * Type for area-organized enemies
+ */
+export type AreaEnemies = Record<string, EnemyTemplate[]>;
 
 /**
  * Common loot items that can drop from any enemy
  */
-export const COMMON_LOOT = [
+export const COMMON_LOOT: LootDrop[] = [
   { id: 'herb', name: 'Healing Herb', dropChance: 0.5, quantity: 1 },
   { id: 'cloth', name: 'Cloth Scrap', dropChance: 0.7, quantity: 1 }
 ];
@@ -19,7 +37,7 @@ export const COMMON_LOOT = [
 /**
  * Enemy-specific loot tables
  */
-export const SPECIFIC_LOOT = {
+export const SPECIFIC_LOOT: Record<string, LootDrop[]> = {
   goblin: [
     { id: 'dagger', name: 'Rusty Dagger', dropChance: 0.1, quantity: 1 }
   ],

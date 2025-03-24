@@ -6,6 +6,10 @@ import { Dispatch, SetStateAction } from 'react';
 import { SimpleLogEntry } from './logging';
 import { StatusEffect } from './effects';
 import { ActiveSkill } from './skills';
+import { CombatLogEntry } from './logging';
+import { CombatRewards } from './rewards';
+import { CombatActionType, CombatActionResult, CombatStatus } from './basic';
+import { CombatState } from './state';
 
 /**
  * Interface for basic combat state in hooks
@@ -29,45 +33,56 @@ export interface HookCombatState {
     defense?: number;
     level?: number;
   };
-  log: SimpleLogEntry[];
+  log: SimpleLogEntry[] | CombatLogEntry[];
+  rewards?: CombatRewards;
+}
+
+/**
+ * Extended combat state used in battle system
+ */
+export interface ExtendedCombatState {
+  active: boolean;
+  playerTurn: boolean;
+  round: number;
+  playerStats: {
+    currentHealth: number;
+    maxHealth: number;
+    currentMana: number;
+    maxMana: number;
+  };
+  enemyStats?: {
+    currentHealth: number;
+    maxHealth: number;
+    [key: string]: any;
+  };
+  log: SimpleLogEntry[] | CombatLogEntry[];
+  turnHistory?: Array<{
+    actor: 'player' | 'enemy';
+    action: any;
+    result: any;
+    timestamp: number;
+  }>;
   rewards?: {
     experience: number;
     gold: number;
     items: any[];
   };
+  status: CombatStatus;
+  effects?: Array<StatusEffect>;
+  skills?: Array<any>;
+  items?: Array<any>;
+  [key: string]: any;
 }
 
 /**
- * Extended combat state with additional properties needed for battle hooks
- */
-export interface ExtendedCombatState extends HookCombatState {
-  enemyId?: string;
-  skills?: ActiveSkill[];
-  items?: {
-    id: string;
-    name: string;
-    effect: any;
-    quantity: number;
-  }[];
-  effects?: StatusEffect[];
-  turnHistory?: {
-    actor: 'player' | 'enemy';
-    action: any;
-    result: any;
-    timestamp: number;
-  }[];
-}
-
-/**
- * Props for combat logic hook
+ * Props for combat logic hook - simplified now that we have better types
  */
 export interface UseCombatLogicProps {
-  combatState: ExtendedCombatState;
-  setCombatState: Dispatch<SetStateAction<ExtendedCombatState>>;
-  player: any;
-  dispatch: any;
-  calculatedStats: any;
-  modifiers: any;
+  combatState: CombatState;
+  setCombatState: Dispatch<SetStateAction<CombatState>>;
+  player: Record<string, any>; // Consider using a more specific type
+  dispatch: Dispatch<any>; // Consider using a more specific action type
+  calculatedStats: Record<string, number>;
   showTraitEffect: (traitId: string, x: number, y: number) => void;
   onVictory: () => void;
   onDefeat: () => void;
