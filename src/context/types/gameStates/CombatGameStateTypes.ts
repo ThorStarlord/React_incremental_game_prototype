@@ -9,7 +9,7 @@
  * import { CombatActor, Enemy } from '../types/combat/actors';
  */
 
-// Add this import at the top of the file
+// Import SimpleLogEntry from the simpleLogging file
 import { SimpleLogEntry } from '../combat/simpleLogging';
 
 // Re-export everything from the modular structure

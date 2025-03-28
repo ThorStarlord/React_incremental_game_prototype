@@ -55,7 +55,8 @@ export interface ExtendedCombatState {
     maxHealth: number;
     [key: string]: any;
   };
-  log: SimpleLogEntry[] | CombatLogEntry[];
+  // Fix the log typing to be explicitly SimpleLogEntry[]
+  log: SimpleLogEntry[];
   turnHistory?: Array<{
     actor: 'player' | 'enemy';
     action: any;

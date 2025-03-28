@@ -1,4 +1,4 @@
-import { SimpleLogEntry } from '../../../../../../context/types/combat/simpleLogging';
+import { SimpleLogEntry } from '../../../../../../context/types/combat/logging';
 
 /**
  * Create a log entry with the correct format

@@ -1,107 +1,114 @@
 import React from 'react';
-import { Box, Typography, Chip } from '@mui/material';
-import { hexToRgb } from '../../../utils/relationshipUtils';
+import { Box, Typography, Chip, Paper, List, ListItem, ListItemText } from '@mui/material';
 
 /**
- * Interface for relationship tier information
- */
-interface RelationshipTier {
-  /** Name of this relationship tier */
-  name: string;
-  /** Color for visually representing this tier */
-  color: string;
-  /** Minimum threshold to reach this tier */
-  threshold: number;
-}
-
-/**
- * Interface for NPC trait requirement details
+ * Interface for NPC trait requirements
  */
 interface TraitRequirement {
-  /** Relationship level required for this trait */
   relationship: number;
-  /** Other trait properties */
+  name?: string;
+  description?: string;
   [key: string]: any;
 }
 
 /**
- * Interface for an NPC with traits
+ * Interface for NPC data
  */
 interface NPC {
-  /** Unique identifier */
   id: string;
-  /** Available trait IDs this NPC offers */
+  name: string;
   availableTraits?: string[];
-  /** Requirements for each trait, indexed by trait ID */
   traitRequirements?: Record<string, TraitRequirement>;
+  [key: string]: any;
 }
 
 /**
- * Interface for a player's trait data
+ * Interface for relationship tier info
+ */
+interface RelationshipTier {
+  name: string;
+  color: string;
+  threshold: number;
+  benefits: string[];
+  [key: string]: any;
+}
+
+/**
+ * Interface for player data
  */
 interface Player {
-  /** List of trait IDs the player has acquired */
   acquiredTraits: string[];
+  [key: string]: any;
 }
 
 /**
- * Interface for UpcomingTraits component props
+ * Interface for component props
  */
 interface UpcomingTraitsProps {
-  /** NPC to check for upcoming traits */
   npc: NPC;
-  /** The next relationship tier */
-  nextTier: RelationshipTier;
-  /** Player data for comparing acquired traits */
+  nextTier: RelationshipTier | null;
   player: Player;
 }
 
 /**
- * Component that displays the traits that will be available at the next relationship tier
- * 
- * @param npc - The NPC to check for traits
- * @param nextTier - The next relationship tier info
- * @param player - Current player data
- * @returns Component displaying upcoming traits or null if none available
+ * Displays traits that will become available at the next relationship tier
  */
 const UpcomingTraits: React.FC<UpcomingTraitsProps> = ({ npc, nextTier, player }) => {
-  // Get traits available from this NPC that require the next tier
-  const upcomingTraits = npc.availableTraits?.filter(traitId => {
-    const traitConfig = npc.traitRequirements?.[traitId] || {};
-    const requiredRelationship = traitConfig.relationship || 0;
+  if (!nextTier || !npc.availableTraits || npc.availableTraits.length === 0) {
+    return null;
+  }
+
+  // Make sure traitRequirements is defined
+  const traitRequirements = npc.traitRequirements || {};
+  
+  // Filter traits that will be available at the next tier
+  const upcomingTraits = npc.availableTraits.filter(traitId => {
+    // Use proper type for the requirement with default values
+    const traitConfig: TraitRequirement = traitRequirements[traitId] || { relationship: 0 };
+    const requiredRelationship = traitConfig.relationship;
     
-    return requiredRelationship >= nextTier?.threshold && 
+    return requiredRelationship >= nextTier.threshold && 
            !player.acquiredTraits.includes(traitId);
-  }) || [];
-  
-  if (upcomingTraits.length === 0) return null;
-  
+  });
+
+  if (upcomingTraits.length === 0) {
+    return null;
+  }
+
   return (
     <Box sx={{ mt: 2 }}>
-      <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-        Traits Available at Next Tier:
+      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+        Traits Unlocked at {nextTier.name} Tier:
       </Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-        {upcomingTraits.map(traitId => (
-          <Chip
-            key={traitId}
-            label={traitId}
-            variant="outlined"
-            color="primary"
-            size="small"
-            sx={{ 
-              borderColor: nextTier.color,
-              color: nextTier.color,
-              animation: 'pulse 1.5s infinite ease-in-out',
-              '@keyframes pulse': {
-                '0%': { boxShadow: `0 0 0 0 rgba(${hexToRgb(nextTier.color)}, 0.4)` },
-                '70%': { boxShadow: `0 0 0 6px rgba(${hexToRgb(nextTier.color)}, 0)` },
-                '100%': { boxShadow: `0 0 0 0 rgba(${hexToRgb(nextTier.color)}, 0)` }
-              }
-            }}
-          />
-        ))}
-      </Box>
+      
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <List dense disablePadding>
+          {upcomingTraits.map(traitId => {
+            const traitConfig = traitRequirements[traitId] || { relationship: 0 };
+            
+            return (
+              <ListItem key={traitId} divider sx={{ py: 1 }}>
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography variant="body2" fontWeight="medium">
+                        {traitConfig.name || traitId}
+                      </Typography>
+                      <Chip 
+                        label="New" 
+                        size="small" 
+                        color="primary" 
+                        sx={{ ml: 1, height: 20 }} 
+                      />
+                    </Box>
+                  }
+                  secondary={traitConfig.description || "A trait that can be learned from this NPC."}
+                />
+              </ListItem>
+            );
+          })}
+        </List>
+      </Paper>
     </Box>
   );
 };

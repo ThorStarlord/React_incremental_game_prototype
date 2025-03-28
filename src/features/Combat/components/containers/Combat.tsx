@@ -17,6 +17,7 @@ import { CombatRewards, EnemyBase } from '../../../../context/types/combat'; // 
 
 // Import adapter
 import { adaptToCombatEnemy } from '../../utils/enemyAdapter';
+import { adaptRewards } from '../../utils/rewardHelpers';
 
 // Define missing type locally
 interface CombatResult {
@@ -83,7 +84,7 @@ const Combat: React.FC<CombatProps> = ({
     if (onComplete) {
       onComplete({
         victory: combatResult?.victory || false,
-        rewards: totalRewards
+        rewards: adaptRewards(totalRewards)
       });
     }
   };
@@ -110,7 +111,10 @@ const Combat: React.FC<CombatProps> = ({
   if (combatResult !== null) {
     return (
       <CombatResults 
-        combatResult={combatResult}
+        combatResult={{
+          ...combatResult,
+          rewards: combatResult?.rewards ? adaptRewards(combatResult.rewards) : undefined
+        }}
         totalRewards={totalRewards}
         onFinish={handleFinish}
       />

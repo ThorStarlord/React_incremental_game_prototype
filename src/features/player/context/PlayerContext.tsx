@@ -50,7 +50,10 @@ const playerReducer = (state: PlayerStateContainer, action: PlayerAction): Playe
         ...state,
         player: {
           ...state.player,
-          health: Math.max(0, Math.min(action.payload, state.player.maxHealth))
+          stats: {
+            ...state.player.stats,
+            health: Math.max(0, Math.min(action.payload, state.player.stats.maxHealth || 100))
+          }
         }
       };
     case PLAYER_ACTIONS.UPDATE_ENERGY:
@@ -58,7 +61,10 @@ const playerReducer = (state: PlayerStateContainer, action: PlayerAction): Playe
         ...state,
         player: {
           ...state.player,
-          energy: Math.max(0, Math.min(action.payload, state.player.maxEnergy))
+          stats: {
+            ...state.player.stats,
+            mana: Math.max(0, Math.min(action.payload, state.player.stats.maxMana || 100))
+          }
         }
       };
     case PLAYER_ACTIONS.LEVEL_UP:
@@ -66,11 +72,14 @@ const playerReducer = (state: PlayerStateContainer, action: PlayerAction): Playe
         ...state,
         player: {
           ...state.player,
-          level: state.player.level + 1,
-          maxHealth: state.player.maxHealth + 10,
-          health: state.player.maxHealth + 10, // Full health on level up
-          maxEnergy: state.player.maxEnergy + 5,
-          energy: state.player.maxEnergy + 5 // Full energy on level up
+          attributePoints: (state.player.attributePoints || 0) + 5, // 5 attribute points per level
+          stats: {
+            ...state.player.stats,
+            health: (state.player.stats.maxHealth || 100) + 10, // Full health on level up
+            maxHealth: (state.player.stats.maxHealth || 100) + 10,
+            mana: (state.player.stats.maxMana || 50) + 5, // Full energy on level up
+            maxMana: (state.player.stats.maxMana || 50) + 5,
+          }
         }
       };
     case PLAYER_ACTIONS.UPDATE_NAME:

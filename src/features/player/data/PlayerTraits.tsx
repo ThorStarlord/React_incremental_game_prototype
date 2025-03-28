@@ -1,368 +1,298 @@
-import React, { useContext, useState, useMemo } from 'react';
-import { Box, Typography, Paper, Chip, Stack, Tooltip, Divider, Grid } from '@mui/material';
-import { useDraggable } from '@dnd-kit/core';
-import { GameStateContext } from '../../../context/GameStateContext';
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Paper, Chip, Stack, Grid } from '@mui/material';
+import { useGameState } from '../../../context/GameStateExports';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
+import { getUITraitById, calculateTraitStatBonuses, UITrait } from '../../../shared/utils/traitUtils';
+
+// Remove the local module declaration since we now have a proper declaration file
 
 /**
- * Interface for trait stat bonuses
- */
-interface TraitStatBonuses {
-  strength: number;
-  dexterity: number; 
-  intelligence: number;
-  vitality: number;
-  luck: number;
-  damage: number;
-  critChance: number;
-  critDamage: number;
-  health: number;
-  defense: number;
-  [key: string]: number; // Allow other stat properties
-}
-
-/**
- * Interface for a trait
- */
-interface Trait {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  rarity?: string;
-  level?: number;
-  effect?: string;
-  statBonuses?: {
-    [key: string]: number;
-  };
-}
-
-/**
- * Interface for traits data
- */
-interface TraitsData {
-  copyableTraits: {
-    [key: string]: Trait;
-  };
-}
-
-/**
- * Active tab options
+ * Type for active tab in the traits panel
  */
 type ActiveTab = 'traits' | 'stats';
 
 /**
- * PlayerTraits Component
- * 
- * @description Displays all traits acquired by the player in a draggable and resizable window.
- * Each trait shows its name, description, type, and rarity (if available).
- * Also displays cumulative stat bonuses from all traits and how they affect the player.
+ * Props for TraitCard component
  */
-const PlayerTraits: React.FC = () => {
-  const { player, traits } = useContext(GameStateContext);
-  const [width, setWidth] = useState<number>(250);
-  const [height, setHeight] = useState<number>(350);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('traits');
+interface TraitCardProps {
+  trait: UITrait;
+  isEquipped: boolean;
+  canEquip: boolean;
+}
 
-  // Configure draggable behavior for the window
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: 'player-traits-window',
-    data: { type: 'window', windowType: 'player-traits' }
-  });
-
-  /**
-   * Calculate cumulative stat bonuses from all traits
-   * @returns Object containing stat bonuses
-   */
-  const traitStatBonuses = useMemo<TraitStatBonuses>(() => {
-    const bonuses: TraitStatBonuses = {
-      strength: 0,
-      dexterity: 0, 
-      intelligence: 0,
-      vitality: 0,
-      luck: 0,
-      damage: 0,
-      critChance: 0,
-      critDamage: 0,
-      health: 0,
-      defense: 0,
-    };
-
-    if (player.acquiredTraits && traits?.copyableTraits) {
-      player.acquiredTraits.forEach((traitId: string) => {
-        const trait = traits.copyableTraits[traitId];
-        if (trait?.statBonuses) {
-          Object.entries(trait.statBonuses).forEach(([stat, value]) => {
-            if (stat in bonuses) {
-              bonuses[stat] += value;
-            }
-          });
-        }
-      });
-    }
-
-    return bonuses;
-  }, [player.acquiredTraits, traits?.copyableTraits]);
-
-  /**
-   * Renders a summary of stat bonuses from all traits
-   * @returns Rendered summary of stat bonuses
-   */
-  const renderStatBonuses = (): JSX.Element => {
-    const hasAnyBonus = Object.values(traitStatBonuses).some(value => value !== 0);
-
-    if (!hasAnyBonus) {
-      return (
-        <Typography color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-          No stat bonuses from traits yet
+/**
+ * A card displaying a single trait
+ */
+const TraitCard: React.FC<TraitCardProps> = ({ trait, isEquipped, canEquip }) => {
+  return (
+    <Paper 
+      elevation={isEquipped ? 3 : 1}
+      sx={{
+        p: 1.5,
+        borderLeft: '4px solid',
+        borderColor: isEquipped ? 'primary.main' : 'divider',
+        backgroundColor: isEquipped ? 'action.selected' : 'background.paper',
+        cursor: 'pointer'
+      }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Typography variant="subtitle2" component="div" sx={{ fontWeight: 'bold' }}>
+          {trait.name}
         </Typography>
-      );
-    }
+        <Chip 
+          size="small" 
+          color={isEquipped ? 'primary' : 'default'}
+          label={isEquipped ? 'Equipped' : (canEquip ? 'Available' : 'Inactive')}
+          variant={isEquipped ? 'filled' : 'outlined'}
+        />
+      </Box>
+      
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1 }}>
+        {trait.description}
+      </Typography>
+      
+      {trait.statBonuses && Object.keys(trait.statBonuses).length > 0 && (
+        <Box sx={{ mt: 1 }}>
+          <StatBonusChips statBonuses={trait.statBonuses} />
+        </Box>
+      )}
+    </Paper>
+  );
+};
 
+/**
+ * Props for StatBonusChips component
+ */
+interface StatBonusChipsProps {
+  statBonuses: Record<string, number>;
+}
+
+/**
+ * Displays stat bonuses as chips
+ */
+const StatBonusChips: React.FC<StatBonusChipsProps> = ({ statBonuses }) => {
+  return (
+    <Stack direction="row" spacing={0.5} flexWrap="wrap">
+      {Object.entries(statBonuses).map(([stat, value]) => {
+        const numValue = Number(value);
+        if (numValue === 0) return null;
+        
+        return (
+          <Chip
+            key={stat}
+            size="small"
+            label={`${stat}: ${numValue > 0 ? '+' : ''}${numValue}`}
+            color={numValue > 0 ? 'success' : 'error'}
+            variant="outlined"
+            sx={{ mb: 0.5 }}
+          />
+        );
+      })}
+    </Stack>
+  );
+};
+
+/**
+ * Tab content for trait stats
+ */
+const TraitStatBonusesTab: React.FC<{ bonuses: Record<string, number> }> = ({ bonuses }) => {
+  const hasAnyBonus = Object.values(bonuses).some(value => value !== 0);
+
+  if (!hasAnyBonus) {
     return (
+      <Typography color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+        No stat bonuses from equipped traits
+      </Typography>
+    );
+  }
+
+  return (
+    <>
+      <Typography variant="subtitle2">
+        Stat Bonuses from Traits
+      </Typography>
       <Grid container spacing={1} sx={{ mt: 1 }}>
-        {Object.entries(traitStatBonuses).map(([stat, value]) => {
+        {Object.entries(bonuses).map(([stat, value]) => {
           if (value === 0) return null;
-          
           return (
             <Grid item xs={6} key={stat}>
-              <Tooltip title={`${stat.charAt(0).toUpperCase() + stat.slice(1)} bonus from traits`}>
-                <Paper sx={{ p: 1, textAlign: 'center' }}>
-                  <Typography variant="caption" display="block" sx={{ textTransform: 'capitalize' }}>
-                    {stat}
-                  </Typography>
-                  <Typography variant="body2" color={value > 0 ? 'success.main' : 'error.main'}>
-                    {value > 0 ? '+' : ''}{value}
-                  </Typography>
-                </Paper>
-              </Tooltip>
+              <Chip
+                label={`${stat}: ${value > 0 ? '+' : ''}${value}`}
+                color={value > 0 ? 'success' : 'error'}
+                size="small"
+                variant="outlined"
+              />
             </Grid>
           );
         })}
       </Grid>
-    );
-  };
+    </>
+  );
+};
 
-  /**
-   * Renders all acquired traits or an empty state message if none are found
-   * @returns Rendered trait list or empty state message
-   */
-  const renderAcquiredTraits = (): JSX.Element => {
-    if (!player.acquiredTraits || !player.acquiredTraits.length) {
-      return (
-        <Typography color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-          No traits acquired yet
-        </Typography>
-      );
-    }
-
+/**
+ * Tab content for acquired traits
+ */
+const AcquiredTraitsTab: React.FC<{ 
+  acquiredTraits: string[],
+  equippedTraits: string[],
+  traitSlots: number,
+  traitsData: Record<string, any>
+}> = ({ acquiredTraits, equippedTraits, traitSlots, traitsData }) => {
+  if (!acquiredTraits || !acquiredTraits.length) {
     return (
-      <>
-        {player.acquiredTraits.map((traitId: string) => {
-          const trait = traits.copyableTraits[traitId];
+      <Typography color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+        No traits acquired yet
+      </Typography>
+    );
+  }
+
+  return (
+    <>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="subtitle2">
+          Trait Slots: {equippedTraits?.length || 0}/{traitSlots || 0}
+        </Typography>
+      </Box>
+      <Stack spacing={1} sx={{ mt: 1 }}>
+        {acquiredTraits.map(traitId => {
+          // Use our new utility function to get a UI-compatible trait
+          const trait = getUITraitById(traitsData, traitId);
           if (!trait) return null;
           
-          // Determine trait rarity color (if trait has rarity property)
-          const rarityColor = trait.rarity ? getRarityColor(trait.rarity) : 'primary';
+          const isEquipped = equippedTraits?.includes(traitId);
+          const canEquip = traitSlots > (equippedTraits?.length || 0);
           
           return (
-            <Paper
+            <TraitCard 
               key={traitId}
-              elevation={1}
-              sx={{
-                p: 1.5,
-                mb: 1,
-                '&:last-child': { mb: 0 },
-                border: '1px solid',
-                borderColor: 'divider',
-                position: 'relative',
-                transition: 'transform 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: 2
-                }
-              }}
-            >
-              <Typography variant="subtitle1" sx={{ mb: 0.5 }}>
-                {trait.name}
-                {trait.level && trait.level > 1 && (
-                  <Typography component="span" color="primary.main" sx={{ ml: 1 }}>
-                    Lv. {trait.level}
-                  </Typography>
-                )}
-              </Typography>
-              
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {trait.description}
-              </Typography>
-              
-              {/* Render trait stat bonuses if available */}
-              {trait.statBonuses && Object.keys(trait.statBonuses).length > 0 && (
-                <Box sx={{ mb: 1.5 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                    Provides:
-                  </Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    {Object.entries(trait.statBonuses).map(([stat, value]) => (
-                      <Chip
-                        key={stat}
-                        size="small"
-                        label={`${stat}: ${value > 0 ? '+' : ''}${value}`}
-                        color={value > 0 ? 'success' : 'error'}
-                        variant="outlined"
-                        sx={{ mb: 0.5 }}
-                      />
-                    ))}
-                  </Stack>
-                </Box>
-              )}
-              
-              <Stack direction="row" spacing={1}>
-                <Tooltip title={`Type: ${trait.type}`}>
-                  <Chip
-                    size="small"
-                    label={trait.type}
-                    color="primary"
-                    variant="outlined"
-                  />
-                </Tooltip>
-                
-                {trait.rarity && (
-                  <Tooltip title={`Rarity: ${trait.rarity}`}>
-                    <Chip 
-                      size="small"
-                      label={trait.rarity}
-                      color={rarityColor}
-                      variant="outlined"
-                    />
-                  </Tooltip>
-                )}
-                
-                {trait.effect && (
-                  <Tooltip title={`Effect: ${trait.effect}`}>
-                    <Chip
-                      size="small"
-                      label="Effect"
-                      color="secondary"
-                      variant="outlined"
-                    />
-                  </Tooltip>
-                )}
-              </Stack>
-            </Paper>
+              trait={trait}
+              isEquipped={isEquipped}
+              canEquip={canEquip}
+            />
           );
         })}
-      </>
-    );
+      </Stack>
+    </>
+  );
+};
+
+/**
+ * Custom tab selector component
+ */
+const TabSelector: React.FC<{
+  activeTab: ActiveTab,
+  onChange: (tab: ActiveTab) => void
+}> = ({ activeTab, onChange }) => {
+  return (
+    <Box sx={{ display: 'flex', mt: 1 }}>
+      <Box 
+        onClick={() => onChange('traits')} 
+        sx={{ 
+          flex: 1, 
+          textAlign: 'center', 
+          p: 0.5, 
+          borderBottom: '2px solid',
+          borderColor: activeTab === 'traits' ? 'primary.main' : 'transparent',
+          cursor: 'pointer'
+        }}
+      >
+        <Typography variant="body2">Traits</Typography>
+      </Box>
+      <Box 
+        onClick={() => onChange('stats')} 
+        sx={{ 
+          flex: 1, 
+          textAlign: 'center', 
+          p: 0.5, 
+          borderBottom: '2px solid',
+          borderColor: activeTab === 'stats' ? 'primary.main' : 'transparent',
+          cursor: 'pointer'
+        }}
+      >
+        <Typography variant="body2">Stats</Typography>
+      </Box>
+    </Box>
+  );
+};
+
+/**
+ * PlayerTraits Component
+ * 
+ * Displays the player's acquired traits and allows equipping them
+ * Also shows stat bonuses provided by traits
+ */
+const PlayerTraits: React.FC = () => {
+  const gameState = useGameState();
+  const player = gameState.player;
+  const traits = gameState.traits;
+  
+  const [width, setWidth] = useState<number>(250);
+  const [height, setHeight] = useState<number>(350);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('traits');
+
+  /**
+   * Handle resize events for the resizable box
+   */
+  const handleResize = (_e: React.SyntheticEvent, data: any) => {
+    setWidth(data.size.width);
+    setHeight(data.size.height);
   };
 
   /**
-   * Determines the MUI color to use based on trait rarity
-   * @param rarity - The rarity level of the trait
-   * @returns MUI color name to use for the rarity chip
+   * Calculate the total stat bonuses from equipped traits
+   * @returns Record of stat bonuses
    */
-  const getRarityColor = (rarity: string): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
-    switch(rarity.toLowerCase()) {
-      case 'common': return 'default';
-      case 'uncommon': return 'success';
-      case 'rare': return 'primary';
-      case 'epic': return 'secondary';
-      case 'legendary': return 'warning';
-      case 'mythic': return 'error';
-      default: return 'default';
-    }
-  };
+  const traitStatBonuses = useMemo(() => {
+    // Use our new utility function to calculate trait stat bonuses
+    return calculateTraitStatBonuses(player?.equippedTraits, traits?.copyableTraits);
+  }, [player?.equippedTraits, traits?.copyableTraits]);
 
   return (
     <ResizableBox
       width={width}
       height={height}
-      minConstraints={[200, 200]}
+      minConstraints={[200, 300]}
       maxConstraints={[500, 600]}
-      onResize={(e: React.SyntheticEvent, data: { size: { width: number; height: number }}) => {
-        setWidth(data.size.width);
-        setHeight(data.size.height);
-      }}
+      onResize={handleResize}
+      resizeHandles={['se']}
     >
-      <Box
-        ref={setNodeRef}
-        {...listeners}
-        {...attributes}
+      <Paper 
+        elevation={3} 
         sx={{
-          p: 2,
-          bgcolor: 'background.paper',
-          borderRadius: 1,
-          width: '100%',
-          height: '100%',
-          transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-          transition: 'transform 0.2s ease',
+          width: '100%', 
+          height: '100%', 
           overflow: 'hidden',
           display: 'flex',
-          flexDirection: 'column',
-          boxShadow: 3
+          flexDirection: 'column'
         }}
       >
-        {/* Window title */}
-        <Typography variant="h6" gutterBottom sx={{ 
-          textAlign: 'center',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          pb: 1
-        }}>
-          Acquired Traits ({player.acquiredTraits?.length || 0})
-        </Typography>
-        
-        {/* Tab navigation */}
-        <Stack 
-          direction="row" 
-          spacing={1} 
-          sx={{ 
-            borderBottom: '1px solid', 
-            borderColor: 'divider', 
-            pb: 0.5 
-          }}
-        >
-          <Typography 
-            variant="button" 
-            sx={{ 
-              cursor: 'pointer', 
-              color: activeTab === 'traits' ? 'primary.main' : 'text.secondary',
-              borderBottom: activeTab === 'traits' ? '2px solid' : 'none',
-              borderColor: 'primary.main',
-              pb: 0.5,
-              fontWeight: activeTab === 'traits' ? 'bold' : 'normal'
-            }}
-            onClick={() => setActiveTab('traits')}
-          >
-            Traits
+        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Typography variant="h6" component="h2">
+            Character Traits
           </Typography>
-          <Typography 
-            variant="button" 
-            sx={{ 
-              cursor: 'pointer', 
-              color: activeTab === 'stats' ? 'primary.main' : 'text.secondary',
-              borderBottom: activeTab === 'stats' ? '2px solid' : 'none',
-              borderColor: 'primary.main',
-              pb: 0.5,
-              fontWeight: activeTab === 'stats' ? 'bold' : 'normal'
-            }}
-            onClick={() => setActiveTab('stats')}
-          >
-            Stat Bonuses
-          </Typography>
-        </Stack>
-        
-        {/* Scrollable content container */}
-        <Box sx={{ 
-          mt: 2,
-          flexGrow: 1,
-          overflow: 'auto',
-          pr: 1
-        }}>
-          {activeTab === 'traits' ? renderAcquiredTraits() : renderStatBonuses()}
+          <TabSelector 
+            activeTab={activeTab} 
+            onChange={setActiveTab} 
+          />
         </Box>
-      </Box>
+        
+        <Box sx={{ p: 2, overflowY: 'auto', flex: 1 }}>
+          {activeTab === 'traits' && (
+            <AcquiredTraitsTab
+              acquiredTraits={player?.acquiredTraits || []}
+              equippedTraits={player?.equippedTraits || []}
+              traitSlots={player?.traitSlots || 0}
+              traitsData={traits?.copyableTraits || {}}
+            />
+          )}
+          
+          {activeTab === 'stats' && (
+            <TraitStatBonusesTab bonuses={traitStatBonuses} />
+          )}
+        </Box>
+      </Paper>
     </ResizableBox>
   );
 };

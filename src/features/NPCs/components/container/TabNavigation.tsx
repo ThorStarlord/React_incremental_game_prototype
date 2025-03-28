@@ -10,7 +10,7 @@ interface TabItem {
   /** Display label for the tab */
   label: string;
   /** Icon component to show in the tab */
-  icon?: ReactNode;
+  icon?: string | React.ReactElement;  // Changed from ReactNode to match Tab requirements
   /** Whether the tab is disabled */
   disabled?: boolean;
   /** Number to show in badge (if > 0) */
@@ -86,7 +86,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
                 <Badge badgeContent={tab.badgeCount} color="primary" max={99}>
                   {tab.icon}
                 </Badge>
-              ) : (tab.icon || undefined)  // Explicitly return undefined instead of null/false
+              ) : tab.icon
             }
             iconPosition={iconPosition}
           />

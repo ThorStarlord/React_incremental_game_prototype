@@ -1,136 +1,95 @@
 import { useCallback } from 'react';
-import { Dispatch, SetStateAction } from 'react';
 import { UnifiedCombatState } from '../../../../context/types/combat/unifiedTypes';
-import { StatusEffect } from '../../../../context/types/combat/basic';
-import { createLogEntry } from './usePlayerActions/utils/logEntryFormatters';
+import { StatusEffect } from '../../../../context/types/combat/effects';
+import { Dispatch, SetStateAction } from 'react';
+
+// Define a type for skill items with cooldown
+interface SkillWithCooldown {
+  id: string;
+  name: string;
+  description: string; // Required by ActiveSkill
+  cooldown: number;    // Required by ActiveSkill
+  currentCooldown: number;
+  targeting: 'single' | 'aoe' | 'self'; // Required by ActiveSkill
+  [key: string]: any;
+}
 
 /**
- * Hook for managing combat effects
+ * Hook for processing combat effects and status changes
  */
 export const useEffects = (
   combatState: UnifiedCombatState,
   setCombatState: Dispatch<SetStateAction<UnifiedCombatState>>
 ) => {
   /**
-   * Process effects at the start of a turn
+   * Process effects that happen at the start of a turn
    */
   const processStartOfTurnEffects = useCallback(() => {
-    if (!combatState.effects || combatState.effects.length === 0) return;
-
-    // Make a copy of the effects array to work with
-    const effects = [...combatState.effects];
-    const newLogEntries = [];
-    
-    // Process effects that trigger at the start of a turn
-    for (const effect of effects) {
-      if (effect.type === 'buff' && effect.triggerTiming === 'start') {
-        // Process buff effect
-        newLogEntries.push({
-          message: `${effect.name} is active.`,
-          type: 'buff',
-          importance: 'normal'
-        });
-      } else if (effect.type === 'debuff' && effect.triggerTiming === 'start') {
-        // Process debuff effect
-        newLogEntries.push({
-          message: `${effect.name} is affecting you.`,
-          type: 'debuff',
-          importance: 'normal'
-        });
-      }
-    }
-
-    // Update state with processed effects
-    if (newLogEntries.length > 0) {
-      setCombatState(prev => ({
-        ...prev,
-        log: [
-          ...prev.log,
-          ...newLogEntries.map(entry => 
-            createLogEntry(entry.message, entry.type, entry.importance)
-          )
-        ]
-      }));
-    }
-  }, [combatState.effects, setCombatState]);
+    // Process ongoing effects like DoTs, HoTs, etc.
+    // This is a placeholder for future implementation
+    // Could include status effect damage, healing over time, etc.
+  }, []);
 
   /**
-   * Process effects at the end of a turn
+   * Process effects that happen at the end of a turn
    */
   const processEndOfTurnEffects = useCallback(() => {
-    if (!combatState.effects || combatState.effects.length === 0) return;
-
-    // Make a copy of the effects array to work with
-    let effects = [...combatState.effects];
-    const newLogEntries = [];
-    
-    // Process each effect
-    effects = effects.map(effect => {
-      // Decrease duration
-      const updatedEffect = {
-        ...effect,
-        duration: effect.duration - 1
-      };
-
-      // Add log entry for expiring effects
-      if (updatedEffect.duration === 0) {
-        newLogEntries.push({
-          message: `${effect.name} has worn off.`,
-          type: effect.type,
-          importance: 'normal'
-        });
-      }
-      
-      return updatedEffect;
-    }).filter(effect => effect.duration > 0); // Remove expired effects
-
-    // Update state with processed effects
-    setCombatState(prev => ({
-      ...prev,
-      effects,
-      log: [
-        ...prev.log,
-        ...newLogEntries.map(entry => 
-          createLogEntry(entry.message, entry.type, entry.importance)
-        )
-      ]
-    }));
-  }, [combatState.effects, setCombatState]);
-
-  /**
-   * Apply a new status effect
-   */
-  const applyStatusEffect = useCallback((effect: StatusEffect) => {
-    // Check if effect already exists
-    const existingEffectIndex = combatState.effects?.findIndex(e => e.id === effect.id) ?? -1;
-    
+    // Reduce duration of status effects
     setCombatState(prev => {
-      const currentEffects = prev.effects || [];
-      let updatedEffects;
+      // Reduce duration on effects and filter out expired ones
+      const updatedEffects = prev.effects
+        ?.map((effect: StatusEffect) => ({
+          ...effect,
+          duration: effect.duration - 1
+        }))
+        .filter((effect: StatusEffect) => effect.duration > 0) || [];
       
-      if (existingEffectIndex >= 0) {
-        // Update existing effect
-        updatedEffects = [...currentEffects];
-        updatedEffects[existingEffectIndex] = {
-          ...updatedEffects[existingEffectIndex],
-          duration: Math.max(updatedEffects[existingEffectIndex].duration, effect.duration),
-          strength: Math.max(updatedEffects[existingEffectIndex].strength, effect.strength || 0)
-        };
-      } else {
-        // Add new effect
-        updatedEffects = [...currentEffects, effect];
-      }
+      // Reduce cooldowns on skills, ensuring we maintain all required ActiveSkill properties
+      const updatedSkills = prev.skills?.map((skill: SkillWithCooldown) => ({
+        ...skill,
+        currentCooldown: Math.max(0, skill.currentCooldown - 1),
+        // Make sure all required ActiveSkill properties are preserved
+        description: skill.description,
+        cooldown: skill.cooldown,
+        targeting: skill.targeting
+      })) || [];
       
       return {
         ...prev,
-        effects: updatedEffects,
-        log: [
-          ...prev.log,
-          createLogEntry(`${effect.name} applied.`, effect.type, 'normal')
-        ]
+        skills: updatedSkills,
+        effects: updatedEffects
       };
     });
-  }, [combatState.effects, setCombatState]);
+  }, [setCombatState]);
+
+  /**
+   * Apply a status effect to a combatant
+   */
+  const applyStatusEffect = useCallback((effect: StatusEffect) => {
+    setCombatState(prev => {
+      // Check if effect already exists
+      const existingEffect = prev.effects?.find(e => e.id === effect.id);
+      
+      if (existingEffect) {
+        // Replace with longer duration if applicable
+        const updatedEffects = prev.effects?.map(e => 
+          e.id === effect.id 
+            ? { ...e, duration: Math.max(e.duration, effect.duration) }
+            : e
+        );
+        
+        return {
+          ...prev,
+          effects: updatedEffects
+        };
+      } else {
+        return {
+          ...prev,
+          effects: [...(prev.effects || []), effect]
+        };
+      }
+    });
+  }, [setCombatState]);
 
   return {
     processStartOfTurnEffects,

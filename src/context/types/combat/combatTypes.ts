@@ -27,15 +27,23 @@ export interface BattleResult {
 }
 
 /**
- * Rewards gained from combat
+ * Rewards from combat
  */
 export interface Rewards {
   experience: number;
   gold: number;
-  items: Array<{
-    id: string;
-    name: string;
-    quantity: number;
-    [key: string]: any;
-  }>;
+  items: RewardItem[];
+}
+
+/**
+ * Item received as a reward
+ * Includes required properties for compatibility with LootItem
+ */
+export interface RewardItem {
+  id: string;
+  name: string;
+  quantity: number;
+  rarity?: string;  // Make optional but add it for compatibility
+  type?: string;    // Make optional but add it for compatibility
+  [key: string]: any;
 }

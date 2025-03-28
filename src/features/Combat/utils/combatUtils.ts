@@ -49,11 +49,11 @@ export const processBattleResult = (
     };
   }
   
-  // Calculate updated rewards
+  // Calculate updated rewards with null/undefined checks
   const updatedRewards = {
-    experience: currentRewards.experience + result.rewards.experience,
-    gold: currentRewards.gold + result.rewards.gold,
-    items: [...currentRewards.items, ...result.rewards.items]
+    experience: currentRewards.experience + (result.rewards?.experience || 0),
+    gold: currentRewards.gold + (result.rewards?.gold || 0),
+    items: [...currentRewards.items, ...(result.rewards?.items || [])]
   };
   
   // Check if this was the last encounter

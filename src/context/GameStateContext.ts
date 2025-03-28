@@ -18,6 +18,22 @@ export interface EnhancedGameState extends GameState {
     critChance?: number;
     [key: string]: number | undefined;
   };
+  // Add missing properties from the NPCTabContent component
+  npcs?: Array<{
+    id?: string;
+    name: string;
+    relationship?: number;
+    canTrade?: boolean;
+    hasQuests?: boolean;
+    traits?: string[];
+    [key: string]: any;
+  }>;
+  tutorial?: {
+    completed: string[];
+    currentStep?: string;
+    [key: string]: any;
+  };
+  showNotification?: (message: string, type?: string) => void;
 }
 
 // Create the context with the proper type and default value

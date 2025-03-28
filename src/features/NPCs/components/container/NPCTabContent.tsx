@@ -1,11 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Tabs, Tab, CircularProgress, Alert, Typography } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import HistoryIcon from '@mui/icons-material/History';
-import { useGameState, useGameDispatch, EnhancedGameState } from '../../../../context/GameStateExports';
+import { useGameState, useGameDispatch } from '../../../../context/GameStateExports';
 
 import TabContent from './TabContent';
 import DialogueTab from '../../dialogue/DialogueTab';
@@ -14,31 +14,89 @@ import TradeTab from '../../trade/TradeTab';
 import QuestsTab from '../../quests/QuestsTab';
 import HistoryTab from '../../history/HistoryTab';
 
-// Extended GameState to include the properties we need
-interface ExtendedGameState extends EnhancedGameState {
-  npcs: NPC[];
-  tutorial: TutorialState;
-  traits: TraitSystem;
-  showNotification: (message: string, type?: string) => void;
+/**
+ * Interface for a trade item in a shop
+ */
+interface TradeItem {
+  /** Unique identifier for the item */
+  id: string;
+  /** Display name of the item */
+  name: string;
+  /** Description of what the item does */
+  description?: string;
+  /** Base price of the item in essence */
+  price: number;
+  /** Path to the item's icon image */
+  icon?: string;
+  /** Rarity classification (common, rare, etc.) */
+  rarity?: string;
+  /** Price when selling this item back to NPCs */
+  sellPrice?: number;
+  /** Whether this item can be sold */
+  sellable?: boolean;
+  /** Quantity of item when dealing with inventory */
+  quantity?: number;
 }
 
 /**
- * Interface for an NPC object
+ * Interface for a player's inventory item
+ */
+interface InventoryItem extends TradeItem {
+  /** Quantity of the item in player's inventory */
+  quantity: number;
+}
+
+/**
+ * Interface for an NPC in the game
  */
 interface NPC {
-  /** Unique identifier */
-  id: string;
-  /** Display name */
+  /** Unique identifier of the NPC */
+  id: string; // Changed from optional to required
+  /** Display name of the NPC */
   name: string;
-  /** Relationship level with player (0-100) */
+  /** Relationship level with the player */
   relationship?: number;
-  /** Whether this NPC offers trading */
+  /** Whether this NPC can trade with the player */
   canTrade?: boolean;
-  /** Whether this NPC offers quests */
+  /** Whether this NPC has quests available */
   hasQuests?: boolean;
-  /** NPC traits available */
-  traits?: Record<string, any>;
-  /** Additional NPC properties */
+  /** NPC traits/characteristics */
+  traits?: string[];
+  /** Other properties */
+  [key: string]: any;
+}
+
+/**
+ * Interface for an NPC that trades
+ */
+interface TradingNPC {
+  /** Unique identifier of the NPC */
+  id?: string;
+  /** Display name of the NPC */
+  name: string;
+  /** Items this NPC sells */
+  trades?: TradeItem[];
+  /** Dialogue options for different trading scenarios */
+  dialogues?: Record<string, string>;
+  /** Relationship level with the player */
+  relationship?: number;
+  /** Other properties */
+  [key: string]: any;
+}
+
+/**
+ * Interface for a simplified player object
+ */
+interface Player {
+  /** Player's inventory items */
+  inventory?: InventoryItem[];
+  /** Player's gold currency */
+  gold?: number;
+  /** Player's acquired traits */
+  acquiredTraits: string[];
+  /** Player's seen traits */
+  seenTraits?: string[];
+  /** Additional player properties */
   [key: string]: any;
 }
 
@@ -64,47 +122,8 @@ interface TraitSystem {
  * Interface for tutorial state
  */
 interface TutorialState {
-  /** Whether NPCs have been introduced */
-  npcIntroShown?: boolean;
-  /** Whether relationship system has been explained */
-  relationshipShown?: boolean;
-  /** Whether trading system has been explained */
-  tradingShown?: boolean;
-  /** Whether quest system has been explained */
-  questShown?: boolean;
-  /** Additional tutorial flags */
-  [key: string]: boolean | undefined;
-}
-
-/**
- * Interface for player state
- */
-interface PlayerState {
-  /** Player essence currency */
-  essence?: number;
-  /** Player acquired traits */
-  acquiredTraits: string[];
-  /** Player seen traits */
-  seenTraits?: string[];
-  /** Additional player properties */
-  [key: string]: any;
-}
-
-/**
- * Interface for game state context
- */
-interface GameState {
-  /** Player data */
-  player: PlayerState;
-  /** NPC data */
-  npcs: NPC[];
-  /** Current tutorial state */
-  tutorial: TutorialState;
-  /** Trait definitions */
-  traits: Record<string, any>;
-  /** Function to show notifications */
-  showNotification: (message: string, type?: string) => void;
-  /** Additional game state properties */
+  completed: string[];
+  currentStep?: string;
   [key: string]: any;
 }
 
@@ -129,12 +148,19 @@ const NPCTabContent: React.FC<NPCTabContentProps> = ({ npcId, initialTab = 0 }) 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  const gameState = useGameState() as unknown as ExtendedGameState;
+  const gameState = useGameState();
   const dispatch = useGameDispatch();
-  const { player, npcs, tutorial, traits, showNotification } = gameState;
+  
+  // Safely access state properties
+  const player = gameState.player || {};
+  const npcs = Array.isArray(gameState.npcs) ? gameState.npcs : [];
+  const tutorial = gameState.tutorial || { completed: [] };
+  const traits = gameState.traits || { copyableTraits: {} };
+  const essence = gameState.essence?.amount || 0;
+  const showNotification = gameState.showNotification || (() => {});
   
   // Find the NPC data
-  const npc = npcs.find(n => n.id === npcId);
+  const npc = npcs.find(n => n?.id === npcId);
   
   // Load NPC data
   useEffect(() => {
@@ -178,6 +204,94 @@ const NPCTabContent: React.FC<NPCTabContentProps> = ({ npcId, initialTab = 0 }) 
     }
   };
   
+  // Handle rendering for NPC tabs safely
+  const renderTabContent = () => {
+    if (!npc) return null;
+    
+    return (
+      <>
+        <TabContent value={activeTab} index={0}>
+          <DialogueTab 
+            npc={{
+              id: npcId, // Ensure id is always a string (not undefined)
+              name: npc.name,
+              relationship: npc.relationship || 0,
+              ...(npc as Omit<typeof npc, 'id'>), // Spread the rest of npc properties
+            }}
+            player={player}
+            dispatch={dispatch}
+            essence={essence}
+            onRelationshipChange={(amount, source) => {
+              // Adapt our function to match the expected signature
+              handleRelationshipChange(npcId, amount);
+            }}
+            traits={traits.copyableTraits || {}} // Pass just the copyableTraits to match Record<string, Trait>
+          />
+        </TabContent>
+          
+        <TabContent value={activeTab} index={1}>
+          <RelationshipTab 
+            npc={{
+              id: npcId, // Ensure id is always defined
+              name: npc.name || "Unknown",
+              relationship: npc.relationship || 0
+              // Removed 'traits' property as it doesn't exist in the expected NPC interface
+            }}
+            player={player}
+            onRelationshipChange={handleRelationshipChange}
+            playerTraits={player.acquiredTraits || []}
+            dispatch={dispatch}
+            tutorial={tutorial}
+            traits={traits.copyableTraits || {}} // Pass just the copyableTraits to match Record<string, Trait>
+          />
+        </TabContent>
+        
+        <TabContent value={activeTab} index={2}>
+          <HistoryTab npcId={npcId} />
+        </TabContent>
+          
+        <TabContent value={activeTab} index={3}>
+          {npc.canTrade ? (
+            <TradeTab 
+              npc={{
+                id: npcId, // Ensure id is always defined
+                name: npc.name || "Unknown",
+                trades: npc.trades || []
+              }}
+              player={{
+                // Fix inventory format to match the expected InventoryItem[] type
+                inventory: player.inventory || []
+                // Removed 'acquiredTraits' as it doesn't exist in the expected Player interface
+              }}
+              dispatch={dispatch}
+              currentRelationship={npc.relationship || 0} // Pass as separate prop instead
+              essence={essence}
+            />
+          ) : (
+            <Typography variant="body1" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+              This NPC doesn't trade.
+            </Typography>
+          )}
+        </TabContent>
+          
+        <TabContent value={activeTab} index={4}>
+          {npc.hasQuests ? (
+            <QuestsTab 
+              npcId={npcId}
+              essence={essence}
+              showNotification={showNotification}
+              dispatch={dispatch}
+            />
+          ) : (
+            <Typography variant="body1" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+              This NPC doesn't have quests.
+            </Typography>
+          )}
+        </TabContent>
+      </>
+    );
+  };
+
   // If NPC data not found after loading
   if (!isLoading && !npc) {
     return (
@@ -221,76 +335,8 @@ const NPCTabContent: React.FC<NPCTabContentProps> = ({ npcId, initialTab = 0 }) 
             </Tabs>
           </Box>
           
-          <TabContent value={activeTab} index={0}>
-            <DialogueTab 
-              npc={npc as NPC}
-              player={player}
-              dispatch={dispatch}
-              essence={player.essence || 0}
-              onRelationshipChange={(amount, source) => {
-                // Adapt our function to match the expected signature
-                handleRelationshipChange(npcId, amount);
-              }}
-              traits={traits}
-            />
-          </TabContent>
-          
-          <TabContent value={activeTab} index={1}>
-            <RelationshipTab 
-              npc={{
-                ...npc,
-                // Ensure relationship is a number, not undefined
-                relationship: npc.relationship || 0
-              }}
-              player={player}
-              onRelationshipChange={handleRelationshipChange}
-              playerTraits={player.acquiredTraits || []}
-              dispatch={dispatch}
-              tutorial={tutorial}
-              traits={traits.copyableTraits || {}}
-            />
-          </TabContent>
-          
-          <TabContent value={activeTab} index={2}>
-            <HistoryTab npcId={npcId} />
-          </TabContent>
-          
-          <TabContent value={activeTab} index={3}>
-            {npc?.canTrade ? (
-              <TradeTab 
-                npc={npc as NPC}
-                player={{
-                  ...player,
-                  // Fix inventory format to match the expected InventoryItem[] type
-                  inventory: player.inventory || [],
-                  gold: player.gold || 0
-                }}
-                dispatch={dispatch}
-                currentRelationship={npc.relationship}
-                essence={player.essence}
-              />
-            ) : (
-              <Typography variant="body1" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
-                {npc?.name} doesn't have any items to trade.
-              </Typography>
-            )}
-          </TabContent>
-          
-          <TabContent value={activeTab} index={4}>
-            {npc?.hasQuests ? (
-              <QuestsTab 
-                npcId={npcId}
-                playerLevel={player.level || 1}
-                essence={player.essence || 0}
-                showNotification={showNotification}
-                dispatch={dispatch}
-              />
-            ) : (
-              <Typography variant="body1" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
-                {npc?.name} doesn't have any quests available.
-              </Typography>
-            )}
-          </TabContent>
+          {/* Use the safe rendering method */}
+          {renderTabContent()}
         </>
       )}
     </Box>

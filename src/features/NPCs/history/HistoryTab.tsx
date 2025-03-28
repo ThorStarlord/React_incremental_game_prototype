@@ -1,23 +1,23 @@
-import React, { useContext, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Tabs,
-  Tab,
-  Divider,
-  List,
-  ListItem,
+import React, { useState } from 'react';
+import { 
+  useTheme, 
+  Tabs, 
+  Tab, 
+  Typography, 
+  List, 
+  ListItem, 
+  ListItemAvatar, 
   ListItemText,
-  ListItemAvatar,
   Avatar,
+  Box,
   Chip,
-  useTheme
+  Divider
 } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import { GameStateContext } from '../../../context/GameStateContext';
+import { useGameState } from '../../../context/GameStateExports';
 import Panel from '../../../shared/components/layout/Panel';
 import DialogueHistory from '../dialogue/DialogueHistory';
 
@@ -72,17 +72,12 @@ interface DiscoveryEntry {
 }
 
 /**
- * Interface for the game state context with history data
+ * Interface for the history data in game state
  */
-interface GameStateWithHistory {
-  /** Player's interaction history with NPCs */
+interface GameHistory {
   interactionHistory: InteractionHistoryEntry[];
-  /** History of quests */
   questHistory: QuestHistoryEntry[];
-  /** History of discoveries */
   discoveryHistory: DiscoveryEntry[];
-  /** Dialogue message history */
-  dialogueHistory: any[];
 }
 
 /**
@@ -120,21 +115,27 @@ const formatTimestamp = (timestamp: number): string => {
  */
 const HistoryTab: React.FC<HistoryTabProps> = ({ npcId }) => {
   const theme = useTheme();
-  const gameState = useContext<GameStateWithHistory>(GameStateContext);
+  const gameState = useGameState();
   const [activeTab, setActiveTab] = useState<number>(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number): void => {
     setActiveTab(newValue);
   };
 
+  // Get history data with safeguards for missing properties
+  // Access history data from the appropriate location in gameState
+  const historyData = (gameState as any).history as GameHistory || {};
+  const interactionHistory = historyData?.interactionHistory || [];
+  const questHistory = historyData?.questHistory || [];
+
   // Filter histories based on npcId if provided
   const filteredInteractions = npcId 
-    ? gameState.interactionHistory.filter(entry => entry.npcId === npcId)
-    : gameState.interactionHistory;
+    ? interactionHistory.filter((entry: InteractionHistoryEntry) => entry?.npcId === npcId)
+    : interactionHistory;
     
   const filteredQuests = npcId
-    ? gameState.questHistory.filter(entry => entry.givenBy === npcId)
-    : gameState.questHistory;
+    ? questHistory.filter((entry: QuestHistoryEntry) => entry?.givenBy === npcId)
+    : questHistory;
 
   return (
     <Panel title="History" icon={<HistoryIcon />}>
@@ -170,7 +171,7 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ npcId }) => {
             </Typography>
           ) : (
             <List sx={{ bgcolor: theme.palette.background.paper, borderRadius: 1 }}>
-              {filteredInteractions.map((entry, index) => (
+              {filteredInteractions.map((entry: InteractionHistoryEntry, index: number) => (
                 <React.Fragment key={index}>
                   <ListItem alignItems="flex-start">
                     <ListItemAvatar>
@@ -180,7 +181,7 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ npcId }) => {
                     </ListItemAvatar>
                     <ListItemText 
                       primary={entry.npcName}
-                      secondary={
+                      secondary={(
                         <>
                           <Typography component="span" variant="body2" color="text.primary">
                             {entry.interactionType} at {entry.location}
@@ -194,7 +195,7 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ npcId }) => {
                             </Typography>
                           )}
                         </>
-                      }
+                      )}
                     />
                   </ListItem>
                   {index < filteredInteractions.length - 1 && <Divider component="li" />}
@@ -217,7 +218,7 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ npcId }) => {
             </Typography>
           ) : (
             <List sx={{ bgcolor: theme.palette.background.paper, borderRadius: 1 }}>
-              {filteredQuests.map((quest, index) => (
+              {filteredQuests.map((quest: QuestHistoryEntry, index: number) => (
                 <React.Fragment key={quest.questId}>
                   <ListItem alignItems="flex-start">
                     <ListItemAvatar>
@@ -226,7 +227,7 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ npcId }) => {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText 
-                      primary={
+                      primary={(
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           {quest.title}
                           <Chip 
@@ -235,8 +236,8 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ npcId }) => {
                             color={quest.status === 'completed' ? 'success' : quest.status === 'active' ? 'primary' : 'error'}
                           />
                         </Box>
-                      }
-                      secondary={
+                      )}
+                      secondary={(
                         <>
                           <Typography component="span" variant="body2" color="text.primary">
                             Given by: {quest.givenBy}
@@ -250,7 +251,7 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ npcId }) => {
                             </Typography>
                           )}
                         </>
-                      }
+                      )}
                     />
                   </ListItem>
                   {index < filteredQuests.length - 1 && <Divider component="li" />}

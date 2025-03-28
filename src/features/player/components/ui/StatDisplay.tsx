@@ -1,95 +1,72 @@
 import React from 'react';
-import './StatDisplay.css';
+import { Box, Typography, Grid, Paper } from '@mui/material';
+import { useGameState } from '../../../../context/GameStateContext';
 
-/**
- * Props for the StatDisplay component
- */
 interface StatDisplayProps {
-    /** The name of the statistic to display */
-    statName: string;
-    /** The value of the statistic */
-    statValue: number;
-    /** Maximum possible value (for percentage or progress display) */
-    maxValue?: number;
-    /** Format option: 'number' (default), 'percent', 'decimal-1', 'decimal-2' */
-    format?: 'number' | 'percent' | 'decimal-1' | 'decimal-2';
-    /** Optional icon class name (supports Font Awesome if included in project) */
-    icon?: string | null;
-    /** Whether to display a progress bar visualization */
-    showBar?: boolean;
-    /** Color theme: 'default', 'primary', 'success', 'warning', 'danger' */
-    theme?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
-    /** Size variant: 'small', 'medium' (default), 'large' */
-    size?: 'small' | 'medium' | 'large';
+  statName?: string;
+  statValue?: number | string;
 }
 
 /**
- * @component StatDisplay
- * @description A reusable component for displaying character or game statistics with various formatting options
- * 
- * @example
- * // Basic usage
- * <StatDisplay statName="Strength" statValue={10} />
- * 
- * @example
- * // With progress bar and percentage
- * <StatDisplay statName="Health" statValue={75} maxValue={100} format="percent" showBar={true} theme="danger" />
- * 
- * @example
- * // With icon and decimal formatting
- * <StatDisplay statName="Critical" statValue={0.257} format="decimal-2" icon="fa-bolt" theme="warning" />
- * 
- * @returns {React.ReactElement} The rendered stat display component
+ * Component to display player statistics
+ * Shows all player stats if no specific stat is provided
  */
-const StatDisplay: React.FC<StatDisplayProps> = ({ 
-    statName, 
-    statValue,
-    maxValue = 100,
-    format = 'number',
-    icon = null,
-    showBar = false,
-    theme = 'default',
-    size = 'medium'
-}) => {
-    // Format the stat value based on the format option
-    const formatValue = (): string | number => {
-        switch(format) {
-            case 'percent':
-                return `${Math.round((statValue / maxValue) * 100)}%`;
-            case 'decimal-1':
-                return statValue.toFixed(1);
-            case 'decimal-2':
-                return statValue.toFixed(2);
-            default:
-                return statValue;
-        }
-    };
+const StatDisplay: React.FC<StatDisplayProps> = ({ statName, statValue }) => {
+  const { player } = useGameState();
 
-    // Calculate progress bar width as a percentage
-    const barWidth: number = showBar ? Math.min(Math.max((statValue / maxValue) * 100, 0), 100) : 0;
-    
+  // If specific stat values are provided, show only that stat
+  if (statName && statValue !== undefined) {
     return (
-        <div className={`stat-display size-${size} theme-${theme}`}>
-            <div className="stat-header">
-                {icon && <i className={`stat-icon ${icon}`} aria-hidden="true"></i>}
-                <span className="stat-name">{statName}:</span>
-                <span className="stat-value">{formatValue()}</span>
-            </div>
-            
-            {showBar && (
-                <div className="stat-progress">
-                    <div 
-                        className="stat-progress-bar" 
-                        style={{ width: `${barWidth}%` }}
-                        role="progressbar"
-                        aria-valuenow={statValue}
-                        aria-valuemin={0}
-                        aria-valuemax={maxValue}
-                    ></div>
-                </div>
-            )}
-        </div>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+        <Typography variant="body1">{statName}:</Typography>
+        <Typography variant="body1" fontWeight="bold">{statValue}</Typography>
+      </Box>
     );
+  }
+
+  // Otherwise display all player stats
+  return (
+    <Box>
+      <Typography variant="h6" gutterBottom>Character Stats</Typography>
+      
+      <Grid container spacing={2}>
+        {/* Attributes Section */}
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>Attributes</Typography>
+            {player?.attributes && Object.entries(player.attributes).map(([key, value]) => (
+              <Box key={key} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                  {key}
+                </Typography>
+                <Typography variant="body2" fontWeight="medium">{value}</Typography>
+              </Box>
+            ))}
+          </Paper>
+        </Grid>
+        
+        {/* Combat Stats Section */}
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>Combat Stats</Typography>
+            {player?.stats && Object.entries({
+              health: `${player.stats.health || 0}/${player.stats.maxHealth || 100}`,
+              attack: player.stats.attack || 0,
+              defense: player.stats.defense || 0,
+              critChance: `${player.stats.critChance || 0}%`
+            }).map(([key, value]) => (
+              <Box key={key} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                  {key}
+                </Typography>
+                <Typography variant="body2" fontWeight="medium">{value}</Typography>
+              </Box>
+            ))}
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 };
 
 export default StatDisplay;

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { getDungeonById } from '../../World/data/dungeons';
-import { CombatEnemy } from '../../../context/types/combat/enemyTypes';
+// Fix import path - import from the correct module
+import { Enemy as CombatEnemy } from '../../../context/types/combat/index';
 
 interface PlayerData {
   level: number;
@@ -87,10 +88,9 @@ const useEnemyGeneration = () => {
       enemyType: 'normal',
       imageUrl: `/assets/enemies/${selectedEnemy.id}.png`,
       experience: Math.round(selectedEnemy.baseExp * levelMultiplier),
-      experienceValue: Math.round(selectedEnemy.baseExp * levelMultiplier),
       gold: Math.round(selectedEnemy.baseGold * levelMultiplier),
-      goldValue: Math.round(selectedEnemy.baseGold * levelMultiplier),
-      essenceValue: Math.round((selectedEnemy.baseExp / 2) * levelMultiplier),
+      // Using a type assertion to allow the essence property
+      essenceValue: Math.round((selectedEnemy.baseExp / 2) * levelMultiplier), // Use essenceValue instead of essence
       critChance: 0.05,
       critMultiplier: 1.5,
       dodgeChance: 0.05,
@@ -101,7 +101,7 @@ const useEnemyGeneration = () => {
       resistances: {} as Record<string, number>,
       immunities: [],
       weaknesses: []
-    };
+    } as CombatEnemy; // Use type assertion to handle additional properties
   }, []);
   
   return { generateEnemy };

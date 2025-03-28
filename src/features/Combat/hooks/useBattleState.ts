@@ -22,7 +22,6 @@ const DEFAULT_BATTLE_STATE: UnifiedCombatState = {
     maxMana: 50
   },
   log: [],
-  enemyId: '',
   status: CombatStatus.NOT_STARTED
 };
 
@@ -65,16 +64,25 @@ const useBattleState = (dungeonId?: string) => {
     const playerInitiative = Math.floor(Math.random() * 10) + playerDexterity;
     const enemyInitiative = Math.floor(Math.random() * 10) + (enemy.speed || 5);
     
-    // Update player turn based on initiative
-    setCombatState(prevState => ({
-      ...prevState,
-      playerTurn: playerInitiative >= enemyInitiative,
-      log: [...(prevState.log || []), createLogEntry(
-        `A ${enemy.name} (Level ${enemy.level}) appears!`,
-        'encounter',
-        'high'
-      )]
-    }));
+    // Create a properly typed log entry first
+    const encounterLogEntry: SimpleLogEntry = createLogEntry(
+      `A ${enemy.name} (Level ${enemy.level}) appears!`,
+      'encounter',
+      'high'
+    );
+    
+    // Update player turn based on initiative - fix the typing issue
+    setCombatState(prevState => {
+      // Ensure the log is treated as SimpleLogEntry[] to avoid type mismatches
+      const currentLog = prevState.log as SimpleLogEntry[];
+      
+      return {
+        ...prevState,
+        playerTurn: playerInitiative >= enemyInitiative,
+        // Explicitly type the combined log array
+        log: [...currentLog, encounterLogEntry] as SimpleLogEntry[]
+      };
+    });
   }, [dungeonId, player, generateEnemy]);
 
   // Helper function to calculate player level from attributes or other stats

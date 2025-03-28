@@ -15,7 +15,7 @@ interface TabDefinition {
   /** Label to display on tab */
   label: string;
   /** Icon component to display */
-  icon: React.ReactNode;
+  icon?: React.ReactElement | string; // Updated to match Tab requirements
   /** Whether the tab is disabled */
   disabled?: boolean;
   /** Optional badge count to show */
@@ -117,13 +117,11 @@ const NPCTabNav: React.FC<NPCTabNavProps> = ({
             value={tab.id}
             label={tab.label}
             icon={
-              tab.badgeCount ? (
+              tab.icon && tab.badgeCount ? (
                 <Badge badgeContent={tab.badgeCount} color="primary">
                   {tab.icon}
                 </Badge>
-              ) : (
-                tab.icon
-              )
+              ) : tab.icon || undefined // Ensure we pass undefined, not null
             }
             iconPosition="start"
             disabled={tab.disabled}

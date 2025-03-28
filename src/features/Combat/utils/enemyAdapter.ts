@@ -6,7 +6,7 @@
  * This adapter decouples the data representation from combat mechanics.
  */
 
-import { EnemyBase, LootDrop } from '../../../context/types/combat';
+import { EnemyBase, LootDrop, RewardableEnemy } from '../../../context/types/combat';
 import { COMBAT_CONSTANTS } from '../data/enemyData';
 import { DamageType } from '../../../context/types/combat/basic';
 

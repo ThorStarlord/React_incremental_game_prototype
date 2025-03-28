@@ -44,6 +44,13 @@ export const DefaultPlayerStats: PlayerStats = {
 };
 
 /**
+ * Container interface for player state within the game state
+ */
+export interface PlayerStateContainer {
+  player: PlayerState;
+}
+
+/**
  * Player initial state for new game start
  */
 export const PlayerInitialState = {
@@ -59,6 +66,10 @@ export const PlayerInitialState = {
     attributePoints: 0,
     skills: [],
     activeEffects: [],
+    // Add level and experience properties
+    level: 1,
+    experience: 0,
+    experienceToNextLevel: 100,
     // Trait system initialization
     equippedTraits: [],
     permanentTraits: [], 

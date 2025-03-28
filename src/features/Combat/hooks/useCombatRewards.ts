@@ -15,11 +15,11 @@ export const useCombatRewards = () => {
   /**
    * Add rewards from a single encounter to the total
    */
-  const addEncounterRewards = useCallback((encounterRewards: Partial<Rewards>) => {
+  const addEncounterRewards = useCallback((encounterRewards: Rewards) => {
     setTotalRewards((prev: Rewards) => ({
-      experience: prev.experience + (encounterRewards.experience || 0),
-      gold: prev.gold + (encounterRewards.gold || 0),
-      items: [...prev.items, ...(encounterRewards.items || [])]
+      experience: prev.experience + encounterRewards.experience,
+      gold: prev.gold + encounterRewards.gold,
+      items: [...prev.items, ...encounterRewards.items]
     }));
   }, []);
   

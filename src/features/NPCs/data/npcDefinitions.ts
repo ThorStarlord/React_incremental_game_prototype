@@ -12,6 +12,14 @@ interface DialogueOption {
   relationshipChange?: number;
   /** ID of the next dialogue to display */
   nextDialogue?: string;
+  /** Special action for this option (copyTrait, giveItem, etc.) */
+  action?: string;
+  /** ID of the trait for trait-related actions */
+  traitId?: string;
+  /** Cost in essence for trait acquisition */
+  essenceCost?: number;
+  /** Minimum relationship level required */
+  relationshipRequirement?: number;
 }
 
 /**
@@ -24,6 +32,18 @@ interface Dialogue {
   text: string;
   /** Available response options */
   options: DialogueOption[];
+}
+
+/**
+ * Interface for the NPC dialogue collection
+ */
+interface NPCDialogue {
+  /** First meeting dialogue */
+  firstMeeting?: Dialogue;
+  /** Standard greeting dialogue */
+  initial: Dialogue;
+  /** Other dialogues keyed by ID */
+  [key: string]: Dialogue | undefined;
 }
 
 /**
@@ -43,14 +63,7 @@ interface NPCDefinition {
   /** Short description of the NPC */
   description: string;
   /** Collection of dialogues for this NPC */
-  dialogue: {
-    /** First meeting dialogue */
-    firstMeeting?: Dialogue;
-    /** Standard greeting dialogue */
-    initial: Dialogue;
-    /** Other dialogues keyed by ID */
-    [key: string]: Dialogue;
-  };
+  dialogue: NPCDialogue;
 }
 
 /**

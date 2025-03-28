@@ -43,7 +43,7 @@ export interface UnifiedCombatState {
     quantity: number;
   }[];
   effects?: StatusEffect[];
-  log: SimpleLogEntry[];
+  log: SimpleLogEntry[]; // Ensure this is strictly SimpleLogEntry[] to avoid type issues
   turnHistory?: {
     actor: 'player' | 'enemy';
     action: CombatActionType;

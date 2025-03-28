@@ -1,4 +1,5 @@
 import React from 'react';
+import { SvgIconProps } from '@mui/material';
 import ExploreIcon from '@mui/icons-material/Explore';
 import SecurityIcon from '@mui/icons-material/Security';
 import InventoryIcon from '@mui/icons-material/Inventory';
@@ -104,7 +105,7 @@ interface Player {
 /**
  * Icon component for quest types
  */
-type QuestIconComponent = React.ComponentType<{ color?: string; fontSize?: 'small' | 'medium' | 'large' | 'inherit' }>;
+type QuestIconComponent = React.ComponentType<SvgIconProps>;
 
 /**
  * Calculate the completion percentage for a quest
@@ -146,7 +147,8 @@ export const isQuestAvailable = (quest: Quest, playerRelationship: number): bool
  */
 export const meetsQuestPrerequisites = (quest: Quest, player: Player): boolean => {
   // Check relationship requirement
-  if (player.npcRelationships?.[quest.sourceNpc || ''] < (quest.relationshipRequirement || 0)) {
+  const relationshipValue = player.npcRelationships?.[quest.sourceNpc || ''] || 0;
+  if (relationshipValue < (quest.relationshipRequirement || 0)) {
     return false;
   }
   
@@ -250,15 +252,15 @@ export const getRemainingObjectives = (
 export const getQuestTypeIcon = (type: string): QuestIconComponent => {
   switch (type.toLowerCase()) {
     case 'exploration':
-      return ExploreIcon;
+      return ExploreIcon as QuestIconComponent;
     case 'combat':
-      return SecurityIcon;
+      return SecurityIcon as QuestIconComponent;
     case 'collection':
-      return InventoryIcon;
+      return InventoryIcon as QuestIconComponent;
     case 'achievement':
-      return EmojiEventsIcon;
+      return EmojiEventsIcon as QuestIconComponent;
     default:
-      return HelpIcon;
+      return HelpIcon as QuestIconComponent;
   }
 };
 

@@ -115,6 +115,10 @@ export interface PlayerState {
   // Add experience property for player progression
   experience?: number;
   
+  // Add the missing properties
+  level?: number;
+  experienceToNextLevel?: number;
+  
   // Trait system
   equippedTraits: string[];
   permanentTraits: string[];

@@ -2,8 +2,19 @@ import { useState, useCallback, useEffect } from 'react';
 import { useGameDispatch } from '../../../context/GameStateExports';
 import { useCombatEncounters } from './useCombatEncounters';
 import { useCombatRewards } from './useCombatRewards';
-import { CombatResult, BattleResult } from '../../../context/types/combat/combatTypes';
+import { CombatResult, BattleResult, Rewards } from '../../../context/types/combat/combatTypes';
 import { COMBAT_CONSTANTS } from '../data/enemyData';
+
+/**
+ * Ensures a Partial<CombatRewards> has all required properties for Rewards
+ */
+const ensureCompleteRewards = (partialRewards: Partial<any>): Rewards => {
+  return {
+    experience: partialRewards.experience || 0,
+    gold: partialRewards.gold || 0,
+    items: partialRewards.items || []
+  };
+};
 
 /**
  * Hook for managing the flow of combat - from start to completion
@@ -48,8 +59,8 @@ export const useCombatFlow = (
    */
   const handleBattleComplete = useCallback((result: BattleResult) => {
     if (result.victory) {
-      // Add rewards from this encounter
-      addEncounterRewards(result.rewards);
+      // Add rewards from this encounter - ensure complete rewards
+      addEncounterRewards(ensureCompleteRewards(result.rewards));
       
       // Check if there are more encounters
       if (hasMoreEncounters) {

@@ -1,7 +1,7 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { ACTION_TYPES } from '../../../context/GameStateExports';
 import { ExtendedCombatState, UseCombatLogicProps } from '../../../context/types/gameStates/CombatGameStateTypes';
-import { SimpleLogEntry } from '../../../context/types/combat/simpleLogging';
+import { SimpleLogEntry } from '../../../context/types/combat/logging';
 import { createLogEntry } from './battle/usePlayerActions/utils/logEntryFormatters';
 
 /**
@@ -39,39 +39,6 @@ export const useCombatLogic = ({
     }));
   }, [setCombatState]);
 
-  // Process end of turn effects
-  const processEndOfTurnEffects = useCallback(() => {
-    // Implement effect processing logic here, e.g.:
-    // - Decrease effect durations
-    // - Apply effects like DoT or HoT
-    // - Remove expired effects
-    
-    // This is a simplified version, in real implementation you'd want to handle
-    // more sophisticated effect processing
-    if (combatState.effects && combatState.effects.length > 0) {
-      setCombatState(prevState => {
-        // Process and update effects here
-        const updatedEffects = prevState.effects?.map(effect => ({
-          ...effect,
-          duration: effect.duration > 0 ? effect.duration - 1 : 0
-        })).filter(effect => effect.duration > 0);
-
-        return {
-          ...prevState,
-          effects: updatedEffects
-        };
-      });
-    }
-    
-    // If player's turn is over, trigger enemy turn
-    if (!combatState.playerTurn) {
-      // Schedule enemy turn after effects are processed
-      setTimeout(() => {
-        enemyTurn();
-      }, 1000);
-    }
-  }, [combatState.effects, combatState.playerTurn]);
-
   // Handle attack action
   const handleAttack = useCallback(() => {
     // Only allow actions on player's turn when combat is active
@@ -105,17 +72,7 @@ export const useCombatLogic = ({
           ...prevState.enemyStats!,
           currentHealth: newEnemyHealth
         },
-        playerTurn: false, // End player turn
-        turnHistory: [
-          ...(prevState.turnHistory || []),
-          {
-            actor: 'player',
-            action: 'attack',
-            result: isCritical ? 'critical' : 'hit',
-            damage: finalDamage,
-            timestamp: Date.now()
-          }
-        ]
+        playerTurn: false // End player turn
       }));
       
       // Add log entry for the attack
@@ -138,10 +95,12 @@ export const useCombatLogic = ({
         return;
       }
       
-      // Process end of turn effects
-      processEndOfTurnEffects();
+      // Schedule enemy turn
+      setTimeout(() => {
+        enemyTurn();
+      }, 1000);
     }
-  }, [combatState, calculatedStats, modifiers, addLogEntry, setCombatState, onVictory, showTraitEffect, processEndOfTurnEffects]);
+  }, [combatState, calculatedStats, modifiers, addLogEntry, setCombatState, onVictory, showTraitEffect]);
 
   // Handle enemy turn logic
   const enemyTurn = useCallback(() => {
@@ -165,22 +124,12 @@ export const useCombatLogic = ({
         currentHealth: newPlayerHealth
       },
       playerTurn: true, // Return to player turn
-      round: prevState.round + 1, // Increment round counter
-      turnHistory: [
-        ...(prevState.turnHistory || []),
-        {
-          actor: 'enemy',
-          action: 'attack',
-          result: 'hit',
-          damage: enemyDamage,
-          timestamp: Date.now()
-        }
-      ]
+      round: prevState.round + 1 // Now this will work since we added round to ExtendedCombatState
     }));
     
     // Add log entry for enemy attack
     addLogEntry(
-      `${combatState.enemyStats?.name || 'Enemy'} attacks for ${enemyDamage} damage.`, 
+      `Enemy attacks for ${enemyDamage} damage.`, 
       'damage', 
       'normal'
     );
@@ -197,149 +146,19 @@ export const useCombatLogic = ({
   }, [combatState, calculatedStats, addLogEntry, setCombatState, onDefeat]);
 
   // Handle skill usage
-  const handleUseSkill = useCallback((skill: { name: string, id: string }) => {
-    if (!combatState.active || !combatState.playerTurn) return;
-    
+  const handleUseSkill = useCallback((skill: { name: string }) => {
     addLogEntry(`You use ${skill.name}, but it's not fully implemented yet.`, 'skill', 'normal');
-    
-    setCombatState(prevState => ({
-      ...prevState,
-      playerTurn: false, // End player turn
-      turnHistory: [
-        ...(prevState.turnHistory || []),
-        {
-          actor: 'player',
-          action: 'skill',
-          skillId: skill.id,
-          result: 'used',
-          timestamp: Date.now()
-        }
-      ]
-    }));
-    
-    // Process end of turn effects
-    processEndOfTurnEffects();
-  }, [combatState, addLogEntry, setCombatState, processEndOfTurnEffects]);
+  }, [addLogEntry]);
 
   // Handle item usage
-  const handleUseItem = useCallback((item: { name: string, id: string }) => {
-    if (!combatState.active || !combatState.playerTurn) return;
-    
+  const handleUseItem = useCallback((item: { name: string }) => {
     addLogEntry(`You use ${item.name}, but items aren't fully implemented yet.`, 'item', 'normal');
-    
-    setCombatState(prevState => ({
-      ...prevState,
-      playerTurn: false, // End player turn
-      turnHistory: [
-        ...(prevState.turnHistory || []),
-        {
-          actor: 'player',
-          action: 'item',
-          itemId: item.id,
-          result: 'used',
-          timestamp: Date.now()
-        }
-      ]
-    }));
-    
-    // Process end of turn effects
-    processEndOfTurnEffects();
-  }, [combatState, addLogEntry, setCombatState, processEndOfTurnEffects]);
-
-  // Handle defend action
-  const handleDefend = useCallback(() => {
-    if (!combatState.active || !combatState.playerTurn) return;
-    
-    // Apply defense buff for next enemy turn
-    const defenseEffect = {
-      id: 'defend',
-      name: 'Defending',
-      description: 'Increased defense for one turn',
-      duration: 1,
-      strength: 0.5, // Reduce damage by 50%
-      type: 'buff'
-    };
-    
-    setCombatState(prevState => ({
-      ...prevState,
-      playerTurn: false, // End player turn
-      effects: [...(prevState.effects || []), defenseEffect],
-      turnHistory: [
-        ...(prevState.turnHistory || []),
-        {
-          actor: 'player',
-          action: 'defend',
-          result: 'applied',
-          timestamp: Date.now()
-        }
-      ]
-    }));
-    
-    addLogEntry('You take a defensive stance.', 'defend', 'normal');
-    
-    // Process end of turn effects
-    processEndOfTurnEffects();
-  }, [combatState, addLogEntry, setCombatState, processEndOfTurnEffects]);
-
-  // Handle flee action
-  const handleFlee = useCallback(() => {
-    if (!combatState.active || !combatState.playerTurn) return;
-    
-    // Implement flee chance calculation
-    const fleeChance = 0.5; // 50% chance to flee
-    const isSuccessful = Math.random() < fleeChance;
-    
-    if (isSuccessful) {
-      setCombatState(prevState => ({
-        ...prevState,
-        active: false // End combat
-      }));
-      
-      addLogEntry('You successfully fled from combat!', 'flee', 'high');
-      // You might want to call a specific onFlee callback here
-    } else {
-      setCombatState(prevState => ({
-        ...prevState,
-        playerTurn: false, // End player turn but stay in combat
-        turnHistory: [
-          ...(prevState.turnHistory || []),
-          {
-            actor: 'player',
-            action: 'flee',
-            result: 'failed',
-            timestamp: Date.now()
-          }
-        ]
-      }));
-      
-      addLogEntry('You failed to flee!', 'flee', 'normal');
-      
-      // Process end of turn effects
-      processEndOfTurnEffects();
-    }
-  }, [combatState, addLogEntry, setCombatState, processEndOfTurnEffects]);
-
-  // Handle end of player turn
-  const handlePlayerTurnEnd = useCallback(() => {
-    if (!combatState.active || !combatState.playerTurn) return;
-    
-    setCombatState(prevState => ({
-      ...prevState,
-      playerTurn: false
-    }));
-    
-    // Process end of turn effects
-    processEndOfTurnEffects();
-  }, [combatState, setCombatState, processEndOfTurnEffects]);
+  }, [addLogEntry]);
 
   return {
     handleAttack,
     handleUseSkill,
     handleUseItem,
-    handleDefend,
-    handleFlee,
-    handlePlayerTurnEnd,
-    addLogEntry,
-    processEndOfTurnEffects
+    addLogEntry
   };
 };

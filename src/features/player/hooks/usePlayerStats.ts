@@ -1,40 +1,41 @@
-import { useContext } from 'react';
-import { GameStateContext } from '../../context/GameStateContext';
+import { useGameState } from '../../../context/GameStateContext';
+import { useGameDispatch } from '../../../context/GameDispatchContext';
 
 /**
  * Interface for player stat update payload
  */
-interface UpdatePlayerStatPayload {
-    statName: string;
-    value: number;
+interface StatUpdatePayload {
+    [key: string]: number;
 }
 
 /**
- * Custom hook for accessing and updating player stats
+ * Hook for accessing and updating player stats
  * 
- * @returns Object containing player stats and a function to update them
+ * Provides a way to read and modify player statistics directly
+ * 
+ * @returns Object with player stats and update function
  */
 const usePlayerStats = () => {
-    const { state, dispatch } = useContext(GameStateContext);
+    const gameState = useGameState();
+    const dispatch = useGameDispatch();
     
-    const playerStats = state.player.stats;
-
+    const playerStats = gameState.player?.stats || {};
+    
     /**
-     * Updates a specific player stat
+     * Update player stats with new values
      * 
-     * @param statName - The name of the stat to update
-     * @param value - The new value for the stat
+     * @param stats - Object with stat keys and their new values
      */
-    const updatePlayerStat = (statName: string, value: number): void => {
+    const updateStats = (stats: StatUpdatePayload) => {
         dispatch({
-            type: 'UPDATE_PLAYER_STAT',
-            payload: { statName, value } as UpdatePlayerStatPayload,
+            type: 'UPDATE_PLAYER_STATS',
+            payload: stats
         });
     };
-
+    
     return {
-        playerStats,
-        updatePlayerStat,
+        stats: playerStats,
+        updateStats
     };
 };
 
