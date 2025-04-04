@@ -20,7 +20,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 // Import the actions (to be created in worldSlice)
-import { selectRegion, visitLocation } from '../../worldSlice';
+import { selectRegion, visitLocation } from '../../state/WorldSlice';
 import './RegionsPanel.css';
 import { RootState } from '../../../../app/store';
 

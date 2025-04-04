@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../../../app/hooks';
 import {
   Box,
   Typography,
@@ -14,7 +15,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,13 +30,13 @@ import {
 } from '../../state/TraitsTypes';
 import {
   unequipTrait,
-  makePermanent,
   equipTrait,
   selectTraits,
   selectTraitSlots,
   selectEquippedTraitIds,
   selectPermanentTraits
 } from '../../state/TraitsSlice';
+import { makeTraitPermanentThunk } from '../../state/traitThunks';
 import './TraitSlots.css';
 
 /**
@@ -167,7 +170,7 @@ const TraitSlot: React.FC<TraitSlotProps> = ({ traitId, trait, onRemove, onMakeP
  * Main TraitSlots component using Redux state
  */
 const TraitSlots: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch(); // Use typed dispatch instead
   
   // Select data from Redux store
   const traitsData = useSelector(selectTraits);
@@ -179,6 +182,15 @@ const TraitSlots: React.FC = () => {
   const [showTraitSelector, setShowTraitSelector] = useState<boolean>(false);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
   const [selectedTraitId, setSelectedTraitId] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    message: string;
+    severity: 'success' | 'error' | 'info';
+  }>({
+    show: false,
+    message: '',
+    severity: 'info'
+  });
 
   // Filter traits that can be equipped (acquired but not permanent)
   const availableTraits = useSelector((state: RootState) => {
@@ -230,11 +242,25 @@ const TraitSlots: React.FC = () => {
   const handleMakePermanent = (traitId: string): void => {
     if (essence >= 150) {
       // Show confirmation dialog
-      if (window.confirm(`Make this trait permanent? This will cost 150 Essence.`)) {
-        dispatch(makePermanent(traitId));
-        
-        // You would also need to handle essence spending somewhere else
-        // This would typically be in a saga or thunk
+      if (window.confirm(`Make ${traitsData[traitId]?.name || 'this trait'} permanent? This will cost 150 Essence.`)) {
+        dispatch(makeTraitPermanentThunk(traitId))
+          .unwrap()
+          .then(result => {
+            // Show success notification
+            setNotification({
+              show: true,
+              message: result.message,
+              severity: result.success ? 'success' : 'info'
+            });
+          })
+          .catch(error => {
+            // Show error notification
+            setNotification({
+              show: true,
+              message: error || 'Failed to make trait permanent',
+              severity: 'error'
+            });
+          });
       }
     }
   };
@@ -450,6 +476,21 @@ const TraitSlots: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Add notification component */}
+      <Snackbar
+        open={notification.show}
+        autoHideDuration={3000}
+        onClose={() => setNotification({ ...notification, show: false })}
+      >
+        <Alert 
+          severity={notification.severity} 
+          variant="filled"
+          onClose={() => setNotification({ ...notification, show: false })}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Panel>
   );
 };

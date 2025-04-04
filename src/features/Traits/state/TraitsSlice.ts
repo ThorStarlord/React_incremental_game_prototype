@@ -25,6 +25,7 @@ const initialState: TraitsState = {
   maxTraitSlots: 5,
   presets: [],
   discoveredTraits: [],
+  equippedTraits: [],
   loading: false,
   error: null
 };

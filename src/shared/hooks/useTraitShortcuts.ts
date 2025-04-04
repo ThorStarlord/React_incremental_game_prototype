@@ -37,6 +37,14 @@ interface TraitPreset {
 }
 
 /**
+ * Interface for hook parameters
+ */
+interface UseTraitShortcutsProps {
+  onUnequip?: (traitId: string) => void;
+  equippedTraits?: Trait[] | string[];
+}
+
+/**
  * Interface for hook return value
  */
 interface UseTraitShortcutsReturn {
@@ -54,12 +62,16 @@ interface UseTraitShortcutsReturn {
 /**
  * Hook for managing trait shortcuts and preset configurations
  * 
+ * @param props - Optional configuration for the hook
  * @returns {UseTraitShortcutsReturn} Functions to manage trait loadouts and shortcuts
  */
-const useTraitShortcuts = (): UseTraitShortcutsReturn => {
+const useTraitShortcuts = (props?: UseTraitShortcutsProps): UseTraitShortcutsReturn => {
   const { traits = [], traitSlots = [], traitPresets = [] } = useGameState();
   const dispatch = useGameDispatch();
   const [presets, setPresets] = useState<TraitPreset[]>(traitPresets);
+  
+  // Extract callback functions from props
+  const { onUnequip } = props || {};
   
   /**
    * Quickly equip a trait to the first available slot
@@ -101,7 +113,14 @@ const useTraitShortcuts = (): UseTraitShortcutsReturn => {
    */
   const quickUnequipTrait = useCallback((traitId: string): boolean => {
     const trait = traits.find(t => t.id === traitId);
-    if (!trait || !trait.isActive || !trait.slotId) return false;
+    if (!trait || !trait.isActive || !trait.slotId) {
+      // Use the provided onUnequip callback if available
+      if (onUnequip) {
+        onUnequip(traitId);
+        return true;
+      }
+      return false;
+    }
     
     dispatch({
       type: 'UNEQUIP_TRAIT',
@@ -112,7 +131,7 @@ const useTraitShortcuts = (): UseTraitShortcutsReturn => {
     });
     
     return true;
-  }, [traits, dispatch]);
+  }, [traits, dispatch, onUnequip]);
   
   /**
    * Swap positions of two traits, or move one trait to the slot of another

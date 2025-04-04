@@ -1,17 +1,22 @@
 import React from 'react';
-import { Box, Typography, Paper, Divider } from '@mui/material';
-import { useGameState } from '../../../../context/GameStateContext';
+import { Box, Typography, Paper } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../../../app/hooks';
+import { RootState } from '../../../../app/store';
+import { selectTraitSlots } from '../../../../features/Traits/state/TraitsSlice';
 
 /**
  * Displays player progression information
- * Focuses on trait slots, attribute points, and other non-level based progression
+ * Focuses on trait slots and other non-level based progression
  */
 const Progression: React.FC = () => {
-  const { player } = useGameState();
-  
-  // Get trait slots data
-  const traitSlots = player?.traitSlots || 0;
-  const equippedTraits = player?.equippedTraits?.length || 0;
+  // Use typed selectors to access state from slices
+  const traitSlots = useSelector((state: RootState) => state.player.traitSlots || 0);
+  const equippedTraits = useSelector(
+    (state: RootState) => state.traits.slots
+      .filter(slot => slot.isUnlocked && slot.traitId)
+      .map(slot => slot.traitId as string)
+  );
   
   return (
     <Box>
@@ -22,33 +27,9 @@ const Progression: React.FC = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
           <Typography variant="body1">Trait Slots:</Typography>
           <Typography variant="body1" fontWeight="bold">
-            {equippedTraits} / {traitSlots} used
+            {equippedTraits.length} / {traitSlots} used
           </Typography>
         </Box>
-        
-        <Divider sx={{ my: 1.5 }} />
-        
-        {/* Attribute points section */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body1">Attribute Points:</Typography>
-          <Typography variant="body1" fontWeight="bold">
-            {player?.attributePoints || 0}
-          </Typography>
-        </Box>
-        
-        {(player?.attributePoints ?? 0) > 0 && (
-          <Box sx={{ 
-            p: 1.5, 
-            bgcolor: 'primary.light', 
-            color: 'primary.contrastText',
-            borderRadius: 1,
-            mt: 2
-          }}>
-            <Typography variant="body2" fontWeight="medium">
-              You have attribute points to spend! Improve your character's abilities.
-            </Typography>
-          </Box>
-        )}
       </Paper>
     </Box>
   );

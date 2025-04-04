@@ -27,7 +27,7 @@ import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import SecurityIcon from '@mui/icons-material/Security';
 
 // Import actions from worldSlice (to be created)
-import { completeLocationActivity } from '../../worldSlice';
+import { completeLocationActivity } from '../../state/WorldSlice';
 import './TownPanel.css';
 import { RootState } from '../../../../app/store';
 

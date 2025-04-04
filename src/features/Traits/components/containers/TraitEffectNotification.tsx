@@ -10,48 +10,22 @@ import {
 } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CloseIcon from '@mui/icons-material/Close';
-import useTraitNotifications from '../../hooks/useTraitNotifications';
-
-/**
- * Types for notification types
- */
-type NotificationType = 'equip' | 'unequip' | 'effect' | string;
-
-/**
- * Interface for a notification
- * 
- * @interface Notification
- * @property {string} id - Unique identifier for the notification
- * @property {string} message - The main notification message
- * @property {string} [description] - Optional detailed description
- * @property {NotificationType} type - The type of notification
- */
-interface Notification {
-  id: string;
-  message: string;
-  description?: string;
-  type: NotificationType;
-}
+import { TraitNotification } from '../../../../shared/hooks/useTraitNotifications';
 
 /**
  * Interface for TraitEffectNotification props
  * 
  * @interface TraitEffectNotificationProps
- * @property {Notification[]} [notifications] - Array of notification objects to display
+ * @property {TraitNotification[]} [notifications] - Array of notification objects to display
  * @property {(id: string) => void} onDismiss - Function to call when dismissing a notification
  */
 interface TraitEffectNotificationProps {
-  notifications?: Notification[];
+  notifications?: TraitNotification[];
   onDismiss: (id: string) => void;
 }
 
 /**
  * Interface for style settings
- * 
- * @interface StyleSetting
- * @property {React.ReactNode} icon - Icon element to display
- * @property {string} color - Text color for the notification
- * @property {string} bgColor - Background color for the notification
  */
 interface StyleSetting {
   icon: React.ReactNode;
@@ -63,9 +37,6 @@ interface StyleSetting {
  * TraitEffectNotification Component
  * 
  * Displays notifications for trait effects with appropriate styling based on type.
- * 
- * @param {TraitEffectNotificationProps} props - Component props
- * @returns {JSX.Element | null} The rendered component or null if no notifications
  */
 const TraitEffectNotification: React.FC<TraitEffectNotificationProps> = ({ 
   notifications = [],
@@ -83,23 +54,20 @@ const TraitEffectNotification: React.FC<TraitEffectNotificationProps> = ({
   
   /**
    * Determine styles based on notification type
-   * 
-   * @param {NotificationType} type - The notification type
-   * @returns {StyleSetting} Object containing style settings
    */
-  const getStyles = (type: NotificationType): StyleSetting => {
+  const getStyles = (type: TraitNotification['type']): StyleSetting => {
     switch (type) {
-      case 'equip':
+      case 'positive':
         return {
           icon: <AutoAwesomeIcon />,
           color: theme.palette.success.main,
           bgColor: theme.palette.success.light,
         };
-      case 'unequip':
+      case 'negative':
         return {
           icon: <AutoAwesomeIcon />,
-          color: theme.palette.info.main,
-          bgColor: theme.palette.info.light,
+          color: theme.palette.error.main,
+          bgColor: theme.palette.error.light,
         };
       default:
         return {
@@ -146,13 +114,11 @@ const TraitEffectNotification: React.FC<TraitEffectNotificationProps> = ({
       >
         <Box>
           <Typography variant="subtitle2">
-            {currentNotification?.message || 'Trait effect activated'}
+            {currentNotification?.title || 'Trait Effect'}
           </Typography>
-          {currentNotification?.description && (
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
-              {currentNotification.description}
-            </Typography>
-          )}
+          <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {currentNotification?.message || 'A trait effect has been activated'}
+          </Typography>
         </Box>
       </Alert>
     </Snackbar>

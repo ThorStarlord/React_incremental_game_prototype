@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface TraitNotification {
   id: string;
@@ -7,11 +8,12 @@ export interface TraitNotification {
   traitId: string;
   traitName: string;
   type: 'positive' | 'negative' | 'neutral';
+  timestamp?: number;
 }
 
 interface UseTraitNotificationsReturn {
   notifications: TraitNotification[];
-  addNotification: (notification: Omit<TraitNotification, 'id'>) => void;
+  addNotification: (notification: Omit<TraitNotification, 'id' | 'timestamp'>) => void;
   dismissNotification: (id: string) => void;
   clearAllNotifications: () => void;
 }
@@ -24,9 +26,16 @@ const useTraitNotifications = (): UseTraitNotificationsReturn => {
   const [notifications, setNotifications] = useState<TraitNotification[]>([]);
 
   // Add a new notification
-  const addNotification = useCallback((notification: Omit<TraitNotification, 'id'>) => {
-    const id = `trait-notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    setNotifications(prev => [...prev, { ...notification, id }]);
+  const addNotification = useCallback((notification: Omit<TraitNotification, 'id' | 'timestamp'>) => {
+    const id = uuidv4();
+    setNotifications(prev => [
+      {
+        ...notification,
+        id,
+        timestamp: Date.now()
+      },
+      ...prev // Add to beginning for newest-first order
+    ]);
   }, []);
 
   // Dismiss a notification by ID
