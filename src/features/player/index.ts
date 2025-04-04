@@ -30,7 +30,44 @@ export const experienceUtils = expUtils;
 export const playerUtils = plrUtils;
 export const getPlayerStatsUtils = getStatsUtils;
 
-// For any Redux actions that might have been exported from playerSlice.ts,
-// consider using the action creators from context/actions/player/ instead
-// For example:
-// export { modifyHealth, equipTrait } from '../../context/actions/player';
+// Redux Toolkit exports
+export {
+  // Actions
+  updatePlayer,
+  setName,
+  resetPlayer,
+  rest,
+  modifyHealth,
+  modifyEnergy,
+  updateAttribute,
+  updateAttributes,
+  allocateAttribute,
+  updateSkill,
+  learnSkill,
+  upgradeSkill,
+  equipTrait,
+  unequipTrait,
+  acquireTrait,
+  unlockTraitSlot,
+  addStatusEffect,
+  removeStatusEffect,
+  updateStat,
+  updateStats,
+  
+  // Selectors
+  selectPlayer,
+  selectPlayerName,
+  selectPlayerLevel,
+  selectPlayerHealth,
+  selectPlayerMaxHealth,
+  selectPlayerMana,
+  selectPlayerAttribute,
+  selectPlayerSkills,
+  selectPlayerTraits,
+  selectPlayerStatusEffects,
+  
+  // Reducer (as default)
+} from './state/PlayerSlice';
+
+// Export the reducer
+export { default as playerReducer } from './state/PlayerSlice';
