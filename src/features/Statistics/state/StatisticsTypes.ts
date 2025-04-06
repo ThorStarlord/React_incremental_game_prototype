@@ -98,3 +98,17 @@ export interface UpdateStatisticPayload {
   value: number;
   operation?: 'add' | 'set' | 'subtract'; // default is 'add'
 }
+
+/**
+ * Payload for resetting a category
+ */
+export interface ResetCategoryPayload {
+  category: StatisticsCategory;
+}
+
+/**
+ * Payload for updating session time
+ */
+export interface UpdateSessionTimePayload {
+  seconds: number;
+}

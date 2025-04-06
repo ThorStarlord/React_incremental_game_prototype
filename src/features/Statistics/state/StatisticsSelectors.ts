@@ -1,4 +1,5 @@
 import { RootState } from '../../../app/store';
+import { createSelector } from '@reduxjs/toolkit';
 import { 
   StatisticsState, 
   CombatStatistics,
@@ -77,28 +78,72 @@ export const selectSpecificStatistic =
  * Select the top statistics (most impressive values)
  * Used for displaying achievements and progress summaries
  */
-export const selectTopStatistics = (state: RootState) => {
-  const stats = state.statistics;
-  
-  return {
-    enemiesDefeated: stats.combatStatistics.enemiesDefeated,
-    damageDealt: stats.combatStatistics.damageDealt,
-    questsCompleted: stats.progressionStatistics.questsCompleted,
-    goldEarned: stats.economyStatistics.goldEarned,
-    areasDiscovered: stats.explorationStatistics.areasDiscovered,
-    totalPlayTime: stats.timeStatistics.totalPlayTime,
-  };
-};
+export const selectTopStatistics = createSelector(
+  [selectStatistics],
+  (stats) => {
+    return {
+      enemiesDefeated: stats.combatStatistics.enemiesDefeated,
+      damageDealt: stats.combatStatistics.damageDealt,
+      questsCompleted: stats.progressionStatistics.questsCompleted,
+      goldEarned: stats.economyStatistics.goldEarned,
+      areasDiscovered: stats.explorationStatistics.areasDiscovered,
+      totalPlayTime: stats.timeStatistics.totalPlayTime,
+    };
+  }
+);
 
 /**
  * Format play time into readable string (hh:mm:ss)
  */
-export const getFormattedPlayTime = (state: RootState): string => {
-  const seconds = state.statistics.timeStatistics.totalPlayTime;
-  
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-  
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
+export const getFormattedPlayTime = createSelector(
+  [selectTimeStatistics],
+  (timeStats) => {
+    const seconds = timeStats.totalPlayTime;
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+);
+
+/**
+ * Get session play time in formatted string
+ */
+export const getFormattedSessionTime = createSelector(
+  [selectTimeStatistics],
+  (timeStats) => {
+    const seconds = timeStats.sessionPlayTime;
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+);
+
+/**
+ * Get combat efficiency ratio (damage dealt vs taken)
+ */
+export const getCombatEfficiencyRatio = createSelector(
+  [selectCombatStatistics],
+  (combatStats) => {
+    if (combatStats.damageTaken === 0) return combatStats.damageDealt;
+    return combatStats.damageDealt / combatStats.damageTaken;
+  }
+);
+
+/**
+ * Get economy efficiency (gold earned vs spent)
+ */
+export const getEconomyEfficiency = createSelector(
+  [selectEconomyStatistics],
+  (economyStats) => {
+    return {
+      netGold: economyStats.goldEarned - economyStats.goldSpent,
+      ratio: economyStats.goldSpent > 0 ? economyStats.goldEarned / economyStats.goldSpent : economyStats.goldEarned
+    };
+  }
+);

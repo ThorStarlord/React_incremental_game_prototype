@@ -1,6 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { updateStatistic, updateSessionPlayTime } from './StatisticsSlice';
+import { 
+  updateStatistic, 
+  updateSessionPlayTime,
+  addToTotalPlayTime 
+} from './StatisticsSlice';
+import { StatisticsCategory } from './StatisticsTypes';
 
 /**
  * Track enemies defeated and update related statistics
@@ -63,13 +68,14 @@ export const trackQuestCompleted = createAsyncThunk(
  */
 export const trackPlayTime = createAsyncThunk(
   'statistics/trackPlayTime',
-  async (_, { dispatch, getState }) => {
+  async (elapsedSeconds: number, { dispatch, getState }) => {
     // This would be called periodically to update session time
     const state = getState() as RootState;
     const currentSessionTime = state.statistics.timeStatistics.sessionPlayTime;
     
-    // Add 1 minute (60 seconds) to the session time
-    dispatch(updateSessionPlayTime(currentSessionTime + 60));
+    // Update both session time and total play time
+    dispatch(updateSessionPlayTime(currentSessionTime + elapsedSeconds));
+    dispatch(addToTotalPlayTime(elapsedSeconds));
   }
 );
 
@@ -114,5 +120,48 @@ export const trackCriticalHit = createAsyncThunk(
       statistic: 'damageDealt',
       value: payload.damage
     }));
+  }
+);
+
+/**
+ * Track damage taken in combat
+ */
+export const trackDamageTaken = createAsyncThunk(
+  'statistics/trackDamageTaken',
+  async (payload: { damage: number }, { dispatch }) => {
+    dispatch(updateStatistic({
+      category: 'combat',
+      statistic: 'damageTaken',
+      value: payload.damage
+    }));
+  }
+);
+
+/**
+ * Track healing received
+ */
+export const trackHealing = createAsyncThunk(
+  'statistics/trackHealing',
+  async (payload: { amount: number }, { dispatch }) => {
+    dispatch(updateStatistic({
+      category: 'combat',
+      statistic: 'healingDone',
+      value: payload.amount
+    }));
+  }
+);
+
+/**
+ * Generic statistic tracker for any category and statistic
+ */
+export const trackGenericStat = createAsyncThunk(
+  'statistics/trackGenericStat',
+  async (payload: { 
+    category: StatisticsCategory, 
+    statistic: string, 
+    value: number,
+    operation?: 'add' | 'set' | 'subtract'
+  }, { dispatch }) => {
+    dispatch(updateStatistic(payload));
   }
 );

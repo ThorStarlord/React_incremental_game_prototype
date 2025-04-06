@@ -11,7 +11,7 @@ export { default as PlayerTraits } from './data/PlayerTraits';
 export { default as CharacterPanel } from './components/layout/CharacterPanel';
 export { default as StatDisplay } from './components/ui/StatDisplay';
 export { default as ProgressBar } from './components/ui/ProgressBar';
-export { default as AchievementsList } from './components/ui/AchievementsList';
+export { default as AchievementsList } from '../Achivements/components/AchievementsList';
 
 // Container components
 export { default as PlayerTraitsContainer } from './components/containers/PlayerTraits';

@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { StatisticsState, UpdateStatisticPayload } from './StatisticsTypes';
+import { 
+  StatisticsState, 
+  UpdateStatisticPayload, 
+  ResetCategoryPayload,
+  UpdateSessionTimePayload
+} from './StatisticsTypes';
 
 /**
  * Initial state for the statistics system
@@ -97,7 +102,20 @@ const statisticsSlice = createSlice({
      */
     updateSessionPlayTime: (state, action: PayloadAction<number>) => {
       state.timeStatistics.sessionPlayTime = action.payload;
+    },
+    
+    /**
+     * Add time to total play time
+     */
+    addToTotalPlayTime: (state, action: PayloadAction<number>) => {
       state.timeStatistics.totalPlayTime += action.payload;
+    },
+    
+    /**
+     * Set specific total play time
+     */
+    setTotalPlayTime: (state, action: PayloadAction<number>) => {
+      state.timeStatistics.totalPlayTime = action.payload;
     },
     
     /**
@@ -114,6 +132,8 @@ export const {
   resetStatistics, 
   resetCategoryStatistics,
   updateSessionPlayTime,
+  addToTotalPlayTime,
+  setTotalPlayTime,
   importStatistics
 } = statisticsSlice.actions;
 
