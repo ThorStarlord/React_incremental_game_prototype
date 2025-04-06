@@ -7,7 +7,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true, // Changed to true for more reliable file resolution
+    "forceConsistentCasingInFileNames": false, 
     "resolveJsonModule": true, // Added to support JSON imports
     "allowSyntheticDefaultImports": true, // Added to improve library compatibility
     "typeRoots": [
@@ -15,7 +15,5 @@
       "./src/types"
     ]
   },
-  "include": [
-    "src"
-  ]
+  
 }

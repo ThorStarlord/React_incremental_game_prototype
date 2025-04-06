@@ -30,7 +30,7 @@ export const experienceUtils = expUtils;
 export const playerUtils = plrUtils;
 export const getPlayerStatsUtils = getStatsUtils;
 
-// Redux Toolkit exports
+// Redux Toolkit exports - actions from slice
 export {
   // Actions
   updatePlayer,
@@ -53,8 +53,10 @@ export {
   removeStatusEffect,
   updateStat,
   updateStats,
-  
-  // Selectors
+} from './state/PlayerSlice';
+
+// Selectors from dedicated file
+export {
   selectPlayer,
   selectPlayerName,
   selectPlayerLevel,
@@ -65,9 +67,12 @@ export {
   selectPlayerSkills,
   selectPlayerTraits,
   selectPlayerStatusEffects,
-  
-  // Reducer (as default)
-} from './state/PlayerSlice';
+  selectPlayerExperience,
+  selectPlayerTraitSlots
+} from './state/playerSelectors';
 
 // Export the reducer
 export { default as playerReducer } from './state/PlayerSlice';
+
+// Export thunks if you have them
+export * from './state/playerThunks';

@@ -36,7 +36,7 @@ import {
   selectEquippedTraitIds,
   selectPermanentTraits
 } from '../../state/TraitsSlice';
-import { makeTraitPermanentThunk } from '../../state/traitThunks';
+import { makeTraitPermanentThunk } from '../../state/TraitThunks';
 import './TraitSlots.css';
 
 /**

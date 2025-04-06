@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../../app/store';
 import {
   PlayerState,
   PlayerInitialState,
@@ -22,7 +21,7 @@ import {
   UpdateAttributesPayload,
   UpdateStatsPayload,
   UpdateTotalPlayTimePayload
-} from './PlayerTypes';
+} from '../state/PlayerTypes';
 
 // Use the initial state from the types file
 const initialState: PlayerState = PlayerInitialState;
@@ -301,17 +300,5 @@ export const {
   updateStats
 } = playerSlice.actions;
 
-// Selectors
-export const selectPlayer = (state: RootState) => state.player;
-export const selectPlayerName = (state: RootState) => state.player.name;
-export const selectPlayerLevel = (state: RootState) => state.player.level;
-export const selectPlayerHealth = (state: RootState) => state.player.stats.health;
-export const selectPlayerMaxHealth = (state: RootState) => state.player.stats.maxHealth;
-export const selectPlayerMana = (state: RootState) => state.player.stats.mana;
-export const selectPlayerAttribute = (state: RootState, attributeId: string) => 
-  state.player.attributes[attributeId]?.value || 0;
-export const selectPlayerSkills = (state: RootState) => state.player.skills;
-export const selectPlayerTraits = (state: RootState) => state.player.equippedTraits;
-export const selectPlayerStatusEffects = (state: RootState) => state.player.statusEffects;
-
+// Export the reducer as default (no selectors here anymore)
 export default playerSlice.reducer;

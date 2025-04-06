@@ -14,9 +14,21 @@ import {
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { useGameState } from '../../../../context/GameStateContext';
-import { useGameDispatch } from '../../../../context/GameDispatchContext';
-import { createTraitId } from '../../../../context/types/gameStates/TraitsGameStateTypes';
+import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+
+// Import from Traits slice
+import { 
+  selectTraits,
+  selectAcquiredTraits,
+  equipTrait as equipTraitAction, 
+  unequipTrait as unequipTraitAction
+} from '../../../Traits/state/TraitsSlice';
+
+// Import from player selectors file instead of PlayerSlice
+import { 
+  selectPlayerTraitSlots,
+  selectPlayerAcquiredTraits 
+} from '../../state/playerSelectors';
 
 /**
  * Interface for the extended trait with possible missing properties
@@ -37,13 +49,14 @@ interface TraitData {
  * them based on available trait slots.
  */
 const PlayerTraits: React.FC = () => {
-  const { player, traits } = useGameState();
-  const dispatch = useGameDispatch();
+  // Use Redux hooks
+  const dispatch = useAppDispatch();
   
-  // Get lists of traits
-  const acquiredTraits = player?.acquiredTraits || [];
-  const equippedTraits = player?.equippedTraits || [];
-  const traitSlots = player?.traitSlots || 0;
+  // Select relevant state from Redux store
+  const allTraits = useAppSelector(selectTraits);
+  const acquiredTraits = useAppSelector(selectAcquiredTraits);
+  const equippedTraits = useAppSelector(selectPlayerAcquiredTraits);
+  const traitSlots = useAppSelector(selectPlayerTraitSlots);
   
   // Calculate if player can equip more traits
   const canEquipMore = equippedTraits.length < traitSlots;
@@ -52,26 +65,18 @@ const PlayerTraits: React.FC = () => {
   const handleEquipTrait = (traitId: string) => {
     if (!canEquipMore) return;
     
-    dispatch({
-      type: 'player/equipTrait',
-      payload: { traitId: createTraitId(traitId) }
-    });
+    dispatch(equipTraitAction({ traitId }));
   };
   
   // Handle unequipping a trait
   const handleUnequipTrait = (traitId: string) => {
-    dispatch({
-      type: 'player/unequipTrait',
-      payload: { traitId: createTraitId(traitId) }
-    });
+    dispatch(unequipTraitAction(traitId));
   };
   
   // Get trait details with memoization to avoid recalculation
   const getTraitDetails = useMemo(() => {
     return (traitId: string): TraitData => {
-      // Convert string traitId to TraitId type before accessing
-      const typedTraitId = createTraitId(traitId);
-      const trait = traits?.copyableTraits?.[typedTraitId];
+      const trait = allTraits[traitId];
       
       // Handle possibly different trait data structures with category or type
       if (trait) {
@@ -98,7 +103,7 @@ const PlayerTraits: React.FC = () => {
         };
       }
     };
-  }, [traits]);
+  }, [allTraits]);
   
   // Get color for trait types
   const getTraitTypeColor = (type: string): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
