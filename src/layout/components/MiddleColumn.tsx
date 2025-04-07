@@ -38,7 +38,7 @@
  * />
  */
 
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, memo, useCallback } from 'react';
 import { 
   Box, 
   Typography, 
@@ -59,7 +59,7 @@ import DragHandleIcon from '@mui/icons-material/DragHandle';
 import MaximizeIcon from '@mui/icons-material/Maximize';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 // Fix imports by using type assertions
-import Battle from '../../features/Combat/components/containers/Battle';
+//import Battle from '../../features/Combat/components/containers/Battle';
 // Fix WorldMap import by using explicit require with type assertion
 const WorldMap = require('../../features/World/components/containers/WorldMap').default as React.FC<WorldMapProps>;
 import MainContent from '../../shared/components/layout/MainContent';
@@ -67,9 +67,6 @@ import styles from './styles/MiddleColumn.module.css';
 
 /**
  * Component registry item with metadata
- * 
- * Defines the structure for components that can be displayed in the middle column.
- * Each component is registered with a title, description, and default expanded state.
  */
 interface ComponentRegistryItem {
   /** React component to render */
@@ -87,9 +84,6 @@ interface ComponentRegistryItem {
 
 /**
  * Props for a collapsible section
- * 
- * Defines the interface for the inner CollapsibleSection component
- * that wraps each main content area.
  */
 interface CollapsibleSectionProps {
   /** Unique identifier for the section */
@@ -101,6 +95,24 @@ interface CollapsibleSectionProps {
   /** React node(s) to display inside the section */
   content: ReactNode;
   
+  /** Whether the section is expanded */
+  isExpanded: boolean;
+  
+  /** Whether the section is in configuration mode */
+  isConfiguring: boolean;
+  
+  /** Whether the section is maximized */
+  isMaximized: boolean;
+  
+  /** Function to toggle expanded state */
+  onToggleExpand: (id: string) => void;
+  
+  /** Function to toggle configuration mode */
+  onToggleConfig: (id: string, event: React.MouseEvent) => void;
+  
+  /** Function to toggle maximized state */
+  onToggleMaximize: (id: string, event: React.MouseEvent) => void;
+  
   /** Optional CSS class name for the section container */
   className?: string;
   
@@ -110,8 +122,6 @@ interface CollapsibleSectionProps {
 
 /**
  * Props for the MiddleColumn component
- * 
- * Defines all available configuration options for the middle column layout.
  */
 interface MiddleColumnProps {
   /** Array of component IDs to render from the component registry */
@@ -177,15 +187,247 @@ interface WorldMapProps {
 }
 
 /**
+ * Props for the config panel component
+ */
+interface ConfigPanelProps {
+  /** Title of the section being configured */
+  title: string;
+  
+  /** Function to close the config panel */
+  onClose: (event: React.MouseEvent) => void;
+}
+
+/**
+ * Props for the section header component
+ */
+interface SectionHeaderProps {
+  /** Title to display in the header */
+  title: string;
+  
+  /** Whether the section is expanded */
+  isExpanded: boolean;
+  
+  /** Whether the section is in configuration mode */
+  isConfiguring: boolean;
+  
+  /** Whether the section is maximized */
+  isMaximized: boolean;
+  
+  /** Function to toggle expanded state */
+  onToggleExpand: () => void;
+  
+  /** Function to toggle configuration mode */
+  onToggleConfig: (event: React.MouseEvent) => void;
+  
+  /** Function to toggle maximized state */
+  onToggleMaximize: (event: React.MouseEvent) => void;
+}
+
+/**
+ * ConfigPanel Component
+ * 
+ * Displays a configuration overlay for sections with editable options
+ */
+const ConfigPanel = memo<ConfigPanelProps>(({ title, onClose }) => {
+  return (
+    <Box 
+      sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        bgcolor: 'background.paper',
+        opacity: 0.9,
+        zIndex: 1,
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      <Typography variant="h6">Configure {title}</Typography>
+      <Divider sx={{ my: 1 }} />
+      <Box sx={{ flexGrow: 1 }}>
+        <Typography variant="body2" color="text.secondary">
+          Configuration options for {title}
+        </Typography>
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <IconButton 
+          color="primary" 
+          onClick={onClose}
+        >
+          Done
+        </IconButton>
+      </Box>
+    </Box>
+  );
+});
+
+/**
+ * SectionHeader Component
+ * 
+ * Displays the header for each collapsible section with controls
+ */
+const SectionHeader = memo<SectionHeaderProps>(({
+  title,
+  isExpanded,
+  isConfiguring,
+  isMaximized,
+  onToggleExpand,
+  onToggleConfig,
+  onToggleMaximize
+}) => {
+  const theme = useTheme();
+  
+  return (
+    <Box 
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        p: 1,
+        bgcolor: theme.palette.mode === 'dark' 
+          ? 'background.paper' 
+          : 'grey.100',
+        cursor: 'pointer',
+        '&:hover': {
+          bgcolor: theme.palette.mode === 'dark' 
+            ? 'action.hover' 
+            : 'grey.200',
+        }
+      }}
+      onClick={onToggleExpand}
+      className={styles['section-header']}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <DragHandleIcon 
+          sx={{ 
+            color: 'text.secondary', 
+            mr: 1,
+            cursor: 'grab'
+          }} 
+        />
+        <Typography variant="subtitle1" fontWeight="medium">
+          {title}
+        </Typography>
+      </Box>
+      
+      <Box>
+        <Tooltip title="Configure">
+          <IconButton 
+            size="small" 
+            onClick={onToggleConfig}
+            color={isConfiguring ? "primary" : "default"}
+          >
+            <SettingsIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Refresh">
+          <IconButton size="small">
+            <RefreshIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={isMaximized ? "Restore" : "Maximize"}>
+          <IconButton 
+            size="small"
+            onClick={onToggleMaximize}
+          >
+            {isMaximized ? 
+              <MinimizeIcon fontSize="small" /> : 
+              <MaximizeIcon fontSize="small" />
+            }
+          </IconButton>
+        </Tooltip>
+        <IconButton size="small">
+          {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </IconButton>
+      </Box>
+    </Box>
+  );
+});
+
+/**
+ * CollapsibleSection Component
+ * 
+ * A reusable section with collapsible content, configuration overlay,
+ * and maximization capabilities.
+ */
+const CollapsibleSection = memo<CollapsibleSectionProps>(({
+  id,
+  title,
+  content,
+  isExpanded,
+  isConfiguring,
+  isMaximized,
+  onToggleExpand,
+  onToggleConfig,
+  onToggleMaximize,
+  className = '',
+  contentClassName = ''
+}) => {
+  const theme = useTheme();
+  
+  // Combine dynamic classes
+  const sectionClasses = [
+    className,
+    isMaximized ? styles['maximized-section'] : ''
+  ].filter(Boolean).join(' ');
+  
+  // Hide other sections if a section is maximized
+  if (isMaximized === false && Boolean(isMaximized)) {
+    return null;
+  }
+  
+  return (
+    <Paper
+      elevation={2}
+      sx={{
+        mb: 2,
+        overflow: 'hidden',
+        border: isConfiguring 
+          ? `2px dashed ${theme.palette.primary.main}` 
+          : 'none',
+        flex: isMaximized ? 1 : 'none'
+      }}
+      className={sectionClasses}
+    >
+      <SectionHeader 
+        title={title}
+        isExpanded={isExpanded}
+        isConfiguring={isConfiguring}
+        isMaximized={isMaximized}
+        onToggleExpand={() => onToggleExpand(id)}
+        onToggleConfig={(e) => onToggleConfig(id, e)}
+        onToggleMaximize={(e) => onToggleMaximize(id, e)}
+      />
+      
+      <Collapse in={isExpanded}>
+        <Box 
+          className={[styles['section-content'], contentClassName].filter(Boolean).join(' ')}
+          sx={{ 
+            position: 'relative',
+            height: isMaximized ? 'calc(100% - 48px)' : undefined
+          }}
+        >
+          {isConfiguring && (
+            <ConfigPanel 
+              title={title}
+              onClose={(e) => onToggleConfig(id, e)}
+            />
+          )}
+          {content}
+        </Box>
+      </Collapse>
+    </Paper>
+  );
+});
+
+/**
  * MiddleColumn Component
  * 
  * The central layout component for the game interface, displaying the main game content,
- * world map, battle interface, and other dynamic content sections. Supports collapsible 
- * panels, configuration options, and responsive layout.
- * 
- * Each section (MainContent, WorldMap, Battle, etc.) is wrapped in a collapsible panel
- * with a standard header providing expand/collapse, configure, refresh, and maximize
- * functionality.
+ * world map, battle interface, and other dynamic content sections.
  * 
  * @component
  */
@@ -202,67 +444,38 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
 }) => {
   const theme = useTheme();
   
-  /**
-   * State for tracking which sections are expanded/collapsed
-   * Default to all sections being expanded
-   */
+  // State for tracking expanded, configuration mode, and maximized sections
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     mainContent: true,
     worldMap: true,
     battle: true
   });
   
-  /**
-   * State for tracking which sections are in configuration mode
-   */
   const [configMode, setConfigMode] = useState<Record<string, boolean>>({});
-  
-  /**
-   * State for tracking which section (if any) is maximized to fill the column
-   */
   const [maximized, setMaximized] = useState<string | null>(null);
 
-  /**
-   * Toggle the expanded/collapsed state of a section
-   * 
-   * @param sectionId - ID of the section to toggle
-   */
-  const toggleExpand = (sectionId: string): void => {
+  // Event handlers with useCallback to prevent unnecessary re-renders
+  const toggleExpand = useCallback((sectionId: string): void => {
     setExpanded(prev => ({
       ...prev,
       [sectionId]: !prev[sectionId]
     }));
-  };
+  }, []);
 
-  /**
-   * Toggle configuration mode for a section
-   * 
-   * @param sectionId - ID of the section to configure
-   * @param event - Click event (stopped from propagating to prevent toggling expand)
-   */
-  const toggleConfig = (sectionId: string, event: React.MouseEvent): void => {
+  const toggleConfig = useCallback((sectionId: string, event: React.MouseEvent): void => {
     event.stopPropagation();
     setConfigMode(prev => ({
       ...prev,
       [sectionId]: !prev[sectionId]
     }));
-  };
+  }, []);
 
-  /**
-   * Toggle maximized state for a section
-   * 
-   * @param sectionId - ID of the section to maximize/restore
-   * @param event - Click event (stopped from propagating to prevent toggling expand)
-   */
-  const toggleMaximize = (sectionId: string, event: React.MouseEvent): void => {
+  const toggleMaximize = useCallback((sectionId: string, event: React.MouseEvent): void => {
     event.stopPropagation();
     setMaximized(prev => prev === sectionId ? null : sectionId);
-  };
+  }, []);
 
-  /**
-   * Registry of available components that can be rendered in the column
-   * Each component is registered with metadata like title and description
-   */
+  // Registry of available components
   const componentRegistry: Record<string, ComponentRegistryItem> = {
     Battle: {
       component: Battle,
@@ -284,175 +497,8 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
     }
   };
 
-  /**
-   * CollapsibleSection Component
-   * 
-   * Inner component that wraps each content section with a collapsible header
-   * and provides functionality like expand/collapse, configure, etc.
-   * 
-   * @param props - CollapsibleSection props
-   * @returns JSX for the collapsible section
-   */
-  const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ 
-    id, 
-    title, 
-    content, 
-    className = '', 
-    contentClassName = '' 
-  }) => {
-    const isExpanded = expanded[id] !== false;
-    const isConfiguring = configMode[id] || false;
-    const isMaximized = maximized === id;
-    
-    // Combine dynamic classes
-    const sectionClasses = [
-      className,
-      isMaximized ? styles['maximized-section'] : ''
-    ].filter(Boolean).join(' ');
-    
-    // Hide other sections if a section is maximized
-    if (maximized && maximized !== id) {
-      return null;
-    }
-    
-    return (
-      <Paper
-        elevation={2}
-        sx={{
-          mb: 2,
-          overflow: 'hidden',
-          border: isConfiguring 
-            ? `2px dashed ${theme.palette.primary.main}` 
-            : 'none',
-          flex: isMaximized ? 1 : 'none'
-        }}
-        className={sectionClasses}
-      >
-        {/* Section header */}
-        <Box 
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 1,
-            bgcolor: theme.palette.mode === 'dark' 
-              ? 'background.paper' 
-              : 'grey.100',
-            cursor: 'pointer',
-            '&:hover': {
-              bgcolor: theme.palette.mode === 'dark' 
-                ? 'action.hover' 
-                : 'grey.200',
-            }
-          }}
-          onClick={() => toggleExpand(id)}
-          className={styles['section-header']}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <DragHandleIcon 
-              sx={{ 
-                color: 'text.secondary', 
-                mr: 1,
-                cursor: 'grab'
-              }} 
-            />
-            <Typography variant="subtitle1" fontWeight="medium">
-              {title}
-            </Typography>
-          </Box>
-          
-          <Box>
-            <Tooltip title="Configure">
-              <IconButton 
-                size="small" 
-                onClick={(e) => toggleConfig(id, e)}
-                color={isConfiguring ? "primary" : "default"}
-              >
-                <SettingsIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Refresh">
-              <IconButton size="small">
-                <RefreshIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={isMaximized ? "Restore" : "Maximize"}>
-              <IconButton 
-                size="small"
-                onClick={(e) => toggleMaximize(id, e)}
-              >
-                {isMaximized ? 
-                  <MinimizeIcon fontSize="small" /> : 
-                  <MaximizeIcon fontSize="small" />
-                }
-              </IconButton>
-            </Tooltip>
-            <IconButton size="small">
-              {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-          </Box>
-        </Box>
-        
-        {/* Section content */}
-        <Collapse in={isExpanded}>
-          <Box 
-            className={[styles['section-content'], contentClassName].filter(Boolean).join(' ')}
-            sx={{ 
-              position: 'relative',
-              height: isMaximized ? 'calc(100% - 48px)' : undefined
-            }}
-          >
-            {/* Config panel overlay */}
-            {isConfiguring && (
-              <Box 
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  bgcolor: 'background.paper',
-                  opacity: 0.9,
-                  zIndex: 1,
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}
-              >
-                <Typography variant="h6">Configure {title}</Typography>
-                <Divider sx={{ my: 1 }} />
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Configuration options for {title}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <IconButton 
-                    color="primary" 
-                    onClick={(e) => toggleConfig(id, e)}
-                  >
-                    Done
-                  </IconButton>
-                </Box>
-              </Box>
-            )}
-            {content}
-          </Box>
-        </Collapse>
-      </Paper>
-    );
-  };
-  
-  /**
-   * Renders a registered component based on its ID
-   * 
-   * Looks up the component in the registry and renders it with
-   * appropriate metadata and wrapper.
-   * 
-   * @param componentId - ID of the component to render
-   * @returns JSX for the rendered component or null if not found
-   */
-  const renderComponent = (componentId: string): React.ReactNode => {
+  // Memoized function to render a registered component
+  const renderComponent = useCallback((componentId: string): React.ReactNode => {
     const metadata = componentRegistry[componentId] || {
       title: componentId,
       description: 'Unknown component'
@@ -462,6 +508,10 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
     const ComponentToRender = metadata.component;
     if (!ComponentToRender) return null;
 
+    const isExpanded = expanded[componentId.toLowerCase()] !== false;
+    const isConfiguring = configMode[componentId.toLowerCase()] || false;
+    const isMaximized = maximized === componentId.toLowerCase();
+
     return (
       <CollapsibleSection
         key={componentId}
@@ -469,9 +519,15 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
         title={metadata.title}
         className={styles['battle-module']}
         content={<ComponentToRender />}
+        isExpanded={isExpanded}
+        isConfiguring={isConfiguring}
+        isMaximized={isMaximized}
+        onToggleExpand={toggleExpand}
+        onToggleConfig={toggleConfig}
+        onToggleMaximize={toggleMaximize}
       />
     );
-  };
+  }, [expanded, configMode, maximized, componentRegistry, toggleExpand, toggleConfig, toggleMaximize]);
 
   // Prepare props for specific components
   const mainContentProps: MainContentProps = {
@@ -488,6 +544,15 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
       console.log("Dungeon Selected:", dungeonId, regionId);
     }
   };
+
+  // Calculate state values for predefined sections
+  const mainContentExpanded = expanded['maincontent'] !== false;
+  const mainContentConfiguring = configMode['maincontent'] || false;
+  const mainContentMaximized = maximized === 'maincontent';
+  
+  const worldMapExpanded = expanded['worldmap'] !== false;
+  const worldMapConfiguring = configMode['worldmap'] || false;
+  const worldMapMaximized = maximized === 'worldmap';
 
   return (
     <Box 
@@ -527,9 +592,15 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
         
         {/* Game Content Section */}
         <CollapsibleSection
-          id="mainContent"
+          id="maincontent"
           title="Game Content"
           className={styles['main-content-container']}
+          isExpanded={mainContentExpanded}
+          isConfiguring={mainContentConfiguring}
+          isMaximized={mainContentMaximized}
+          onToggleExpand={toggleExpand}
+          onToggleConfig={toggleConfig}
+          onToggleMaximize={toggleMaximize}
           content={
             <Box className={styles['section-content']}>
               <MainContent>
@@ -552,9 +623,15 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
 
         {/* World Map Section */}
         <CollapsibleSection
-          id="worldMap"
+          id="worldmap"
           title="World Map"
           className={styles['world-map-wrapper']}
+          isExpanded={worldMapExpanded}
+          isConfiguring={worldMapConfiguring}
+          isMaximized={worldMapMaximized}
+          onToggleExpand={toggleExpand}
+          onToggleConfig={toggleConfig}
+          onToggleMaximize={toggleMaximize}
           content={
             <Box className={styles['section-content']}>
               <WorldMap {...worldMapProps} />
@@ -578,4 +655,4 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
   );
 };
 
-export default MiddleColumn;
+export default memo(MiddleColumn);

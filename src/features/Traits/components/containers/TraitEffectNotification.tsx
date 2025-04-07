@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CloseIcon from '@mui/icons-material/Close';
-import { TraitNotification } from '../../../../shared/hooks/useTraitNotifications';
+import { TraitNotification } from '../../hooks/useTraitNotifications';
 
 /**
  * Interface for TraitEffectNotification props

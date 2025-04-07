@@ -3,9 +3,9 @@
  * @description Left sidebar component for the incremental RPG game interface.
  *
  * This component provides a flexible container for character-related panels and
- * information that appears on the left side of the game interface. It renders
- * various sub-components in a configurable, collapsible format, including:
+ * information that appears on the left side of the game interface.
  * 
+ * This component renders various sub-components in a configurable, collapsible format, including:
  * - Player statistics and attributes
  * - Inventory management
  * - Character selection and management
@@ -36,7 +36,7 @@
  * />
  */
 
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, memo, useCallback } from 'react';
 import { 
   Box, 
   Paper, 
@@ -58,7 +58,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import PlayerStats from '../../features/Player/data/PlayerStats';
-import InventoryList from '../../features/Inventory/components/containers/InventoryList';
+//import InventoryList from '../../features/Inventory/components/containers/InventoryList';
 import EssenceDisplay from '../../features/Essence/components/ui/EssenceDisplay';
 import CompactCharacterPanel from '../../features/Minions/components/ui/CompactCharacterPanel';
 
@@ -99,14 +99,211 @@ interface LeftColumnProps {
 }
 
 /**
+ * Props for the ConfigPanel component
+ */
+interface ConfigPanelProps {
+  /** Component title being configured */
+  title: string;
+  /** Function to call when closing the config panel */
+  onClose: (event: React.MouseEvent) => void;
+}
+
+/**
+ * Props for the CollapsibleSection component
+ */
+interface CollapsibleSectionProps {
+  /** Unique component ID */
+  componentId: string;
+  /** Component title */
+  title: string;
+  /** Description of the component */
+  description: string;
+  /** Whether the section should be expanded */
+  isExpanded: boolean;
+  /** Whether the section is in configuration mode */
+  isConfiguring: boolean;
+  /** Function to toggle expand state */
+  onToggleExpand: (componentId: string) => void;
+  /** Function to toggle configuration mode */
+  onToggleConfig: (componentId: string, event: React.MouseEvent) => void;
+  /** Component to render inside the section */
+  children: ReactNode;
+}
+
+/**
+ * ConfigPanel Component
+ * 
+ * Displays configuration options for a component in an overlay panel
+ */
+const ConfigPanel = memo<ConfigPanelProps>(({ title, onClose }) => {
+  return (
+    <Box 
+      sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        bgcolor: 'background.paper',
+        opacity: 0.9,
+        zIndex: 1,
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      <Typography variant="h6">Configure {title}</Typography>
+      <Divider sx={{ my: 1 }} />
+      <List dense>
+        <ListItemButton>
+          <ListItemText 
+            primary="Auto refresh" 
+            secondary="Automatically refresh data" 
+          />
+        </ListItemButton>
+        
+        <ListItemButton>
+          <ListItemText 
+            primary="Show details" 
+            secondary="Display additional information" 
+          />
+        </ListItemButton>
+        
+        <ListItemButton>
+          <ListItemText 
+            primary="Visual style" 
+            secondary="Change how this component looks" 
+          />
+        </ListItemButton>
+      </List>
+      <Box sx={{ flexGrow: 1 }} />
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <IconButton 
+          color="primary" 
+          onClick={onClose}
+        >
+          Done
+        </IconButton>
+      </Box>
+    </Box>
+  );
+});
+
+/**
+ * CollapsibleSection Component
+ * 
+ * Renders an individual collapsible section with header controls
+ * and configuration overlay
+ */
+const CollapsibleSection = memo<CollapsibleSectionProps>(({
+  componentId,
+  title,
+  description,
+  isExpanded,
+  isConfiguring,
+  onToggleExpand,
+  onToggleConfig,
+  children
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Paper
+      elevation={2}
+      sx={{
+        mb: 2,
+        overflow: 'hidden',
+        border: isConfiguring 
+          ? `2px dashed ${theme.palette.primary.main}` 
+          : 'none'
+      }}
+    >
+      {/* Section header */}
+      <Box 
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 1,
+          bgcolor: theme.palette.mode === 'dark' 
+            ? 'background.paper' 
+            : 'grey.100',
+          cursor: 'pointer',
+          '&:hover': {
+            bgcolor: theme.palette.mode === 'dark' 
+              ? 'action.hover' 
+              : 'grey.200',
+          }
+        }}
+        onClick={() => onToggleExpand(componentId)}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <DragHandleIcon 
+            sx={{ 
+              color: 'text.secondary', 
+              mr: 1,
+              cursor: 'grab'
+            }} 
+          />
+          <Typography variant="subtitle1" fontWeight="medium">
+            {title}
+          </Typography>
+        </Box>
+        
+        <Box>
+          {/* Configuration button */}
+          <Tooltip title="Configure">
+            <IconButton 
+              size="small" 
+              onClick={(e) => onToggleConfig(componentId, e)}
+              color={isConfiguring ? "primary" : "default"}
+            >
+              <SettingsIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          
+          {/* Refresh button */}
+          <Tooltip title="Refresh">
+            <IconButton size="small">
+              <RefreshIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          
+          {/* Expand/collapse button */}
+          <IconButton size="small">
+            {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Box>
+      </Box>
+      
+      {/* Section content */}
+      <Collapse in={isExpanded}>
+        <Box 
+          sx={{ 
+            p: 2,
+            position: 'relative'
+          }}
+        >
+          {/* Config panel overlay */}
+          {isConfiguring && (
+            <ConfigPanel 
+              title={title} 
+              onClose={(e) => onToggleConfig(componentId, e)} 
+            />
+          )}
+          
+          {children}
+        </Box>
+      </Collapse>
+    </Paper>
+  );
+});
+
+/**
  * LeftColumn Component
  * 
  * A flexible side panel for displaying character information, inventory, and
- * other player-related components. Each sub-component is wrapped in a collapsible
- * panel with a standard header and configuration options.
- * 
- * The component dynamically renders the requested components from a registry,
- * allowing for easy customization of the sidebar content.
+ * other player-related components.
  * 
  * @component
  */
@@ -119,45 +316,37 @@ const LeftColumn: React.FC<LeftColumnProps> = ({
   
   /**
    * State for tracking which components are expanded/collapsed
-   * Each key is a component ID and each value is a boolean indicating expansion state
    */
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   
   /**
    * State for tracking which components are in configuration mode
-   * Each key is a component ID and each value is a boolean indicating configuration state
    */
   const [configMode, setConfigMode] = useState<Record<string, boolean>>({});
 
   /**
    * Toggle the expanded/collapsed state of a component
-   * 
-   * @param componentId - ID of the component to toggle
    */
-  const toggleExpand = (componentId: string): void => {
+  const toggleExpand = useCallback((componentId: string): void => {
     setExpanded(prev => ({
       ...prev,
       [componentId]: !prev[componentId]
     }));
-  };
+  }, []);
 
   /**
    * Toggle configuration mode for a component
-   * 
-   * @param componentId - ID of the component to configure
-   * @param event - Click event (stopped from propagating to prevent toggling expand)
    */
-  const toggleConfig = (componentId: string, event: React.MouseEvent): void => {
+  const toggleConfig = useCallback((componentId: string, event: React.MouseEvent): void => {
     event.stopPropagation();
     setConfigMode(prev => ({
       ...prev,
       [componentId]: !prev[componentId]
     }));
-  };
+  }, []);
 
   /**
    * Registry of available components that can be rendered in the column
-   * Each component is registered with metadata like title and description
    */
   const componentRegistry: Record<string, ComponentRegistryItem> = {
     PlayerStats: {
@@ -188,15 +377,8 @@ const LeftColumn: React.FC<LeftColumnProps> = ({
 
   /**
    * Renders a component based on its ID
-   * 
-   * Looks up the component in the registry and renders it with appropriate
-   * metadata, header, and configuration options.
-   * 
-   * @param componentId - ID of the component to render
-   * @param index - Index position of component in array
-   * @returns JSX for the rendered component or null if not found
    */
-  const renderComponent = (componentId: string, index: number): React.ReactNode => {
+  const renderComponent = useCallback((componentId: string, index: number): React.ReactNode => {
     // Get component metadata or use default values if not found
     const metadata = componentRegistry[componentId] || {
       title: componentId,
@@ -220,142 +402,20 @@ const LeftColumn: React.FC<LeftColumnProps> = ({
     const isConfiguring = configMode[componentId] || false;
 
     return (
-      <Paper
+      <CollapsibleSection
         key={`${componentId}-${index}`}
-        elevation={2}
-        sx={{
-          mb: 2,
-          overflow: 'hidden',
-          border: isConfiguring 
-            ? `2px dashed ${theme.palette.primary.main}` 
-            : 'none'
-        }}
+        componentId={componentId}
+        title={metadata.title}
+        description={metadata.description}
+        isExpanded={isExpanded}
+        isConfiguring={isConfiguring}
+        onToggleExpand={toggleExpand}
+        onToggleConfig={toggleConfig}
       >
-        {/* Component header */}
-        <Box 
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 1,
-            bgcolor: theme.palette.mode === 'dark' 
-              ? 'background.paper' 
-              : 'grey.100',
-            cursor: 'pointer',
-            '&:hover': {
-              bgcolor: theme.palette.mode === 'dark' 
-                ? 'action.hover' 
-                : 'grey.200',
-            }
-          }}
-          onClick={() => toggleExpand(componentId)}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <DragHandleIcon 
-              sx={{ 
-                color: 'text.secondary', 
-                mr: 1,
-                cursor: 'grab'
-              }} 
-            />
-            <Typography variant="subtitle1" fontWeight="medium">
-              {metadata.title}
-            </Typography>
-          </Box>
-          
-          <Box>
-            {/* Configuration button */}
-            <Tooltip title="Configure">
-              <IconButton 
-                size="small" 
-                onClick={(e) => toggleConfig(componentId, e)}
-                color={isConfiguring ? "primary" : "default"}
-              >
-                <SettingsIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            
-            {/* Refresh button */}
-            <Tooltip title="Refresh">
-              <IconButton size="small">
-                <RefreshIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            
-            {/* Expand/collapse button */}
-            <IconButton size="small">
-              {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-          </Box>
-        </Box>
-        
-        {/* Component content */}
-        <Collapse in={isExpanded}>
-          <Box 
-            sx={{ 
-              p: 2,
-              position: 'relative'
-            }}
-          >
-            {/* Config panel overlay */}
-            {isConfiguring && (
-              <Box 
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  bgcolor: 'background.paper',
-                  opacity: 0.9,
-                  zIndex: 1,
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}
-              >
-                <Typography variant="h6">Configure {metadata.title}</Typography>
-                <Divider sx={{ my: 1 }} />
-                <List dense>
-                  <ListItemButton>
-                    <ListItemText 
-                      primary="Auto refresh" 
-                      secondary="Automatically refresh data" 
-                    />
-                  </ListItemButton>
-                  
-                  <ListItemButton>
-                    <ListItemText 
-                      primary="Show details" 
-                      secondary="Display additional information" 
-                    />
-                  </ListItemButton>
-                  
-                  <ListItemButton>
-                    <ListItemText 
-                      primary="Visual style" 
-                      secondary="Change how this component looks" 
-                    />
-                  </ListItemButton>
-                </List>
-                <Box sx={{ flexGrow: 1 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <IconButton 
-                    color="primary" 
-                    onClick={(e) => toggleConfig(componentId, e)}
-                  >
-                    Done
-                  </IconButton>
-                </Box>
-              </Box>
-            )}
-            
-            <ComponentToRender />
-          </Box>
-        </Collapse>
-      </Paper>
+        <ComponentToRender />
+      </CollapsibleSection>
     );
-  };
+  }, [expanded, configMode, componentRegistry, toggleExpand, toggleConfig]);
 
   return (
     <Box 
@@ -397,4 +457,4 @@ const LeftColumn: React.FC<LeftColumnProps> = ({
   );
 };
 
-export default LeftColumn;
+export default memo(LeftColumn);

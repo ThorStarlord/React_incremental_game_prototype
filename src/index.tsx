@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { store } from './app/store';
-import { ThemeProviderWrapper } from './context/ThemeContext';
+import { ThemeProviderWrapper } from './theme/ThemeContext';
 import App from './App';
 
 const root = ReactDOM.createRoot(
