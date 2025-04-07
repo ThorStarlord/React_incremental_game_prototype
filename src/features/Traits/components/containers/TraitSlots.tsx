@@ -40,7 +40,7 @@ import { makeTraitPermanentThunk } from '../../state/TraitThunks';
 import './TraitSlots.css';
 
 /**
- * Props for the TraitSlot component
+ * Props for the TraitSlotItem component
  */
 interface TraitSlotProps {
   traitId: string;
@@ -51,9 +51,9 @@ interface TraitSlotProps {
 }
 
 /**
- * Simplified TraitSlot component without drag-and-drop
+ * Simplified TraitSlotItem component without drag-and-drop
  */
-const TraitSlot: React.FC<TraitSlotProps> = ({ traitId, trait, onRemove, onMakePermanent, essence }) => {
+const TraitSlotItem: React.FC<TraitSlotProps> = ({ traitId, trait, onRemove, onMakePermanent, essence }) => {
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const canMakePermanent = essence >= 150;
 
@@ -372,7 +372,7 @@ const TraitSlots: React.FC = () => {
               const trait = traitsData[traitId];
               
               return (
-                <TraitSlot
+                <TraitSlotItem
                   key={traitId}
                   traitId={traitId}
                   trait={trait ? { ...trait, id: traitId } : null}

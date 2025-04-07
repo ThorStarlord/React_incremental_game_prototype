@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Grid, Alert, Snackbar } from '@mui/material';
 import TraitList from './TraitList';
 import TraitSlots from './TraitSlots';
 import TraitSlotsFallback from './TraitSlotsFallback';
 import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
-import { useGameState, useGameDispatch } from '../../../../context/GameStateExports';
-import { traits, TraitsCollection as ImportedTraitsCollection } from '../../data/traits';
+
+// Import from Redux store
+import { RootState } from '../../../../app/store';
+
+// Import from local types - using our new types file
 import { 
   ExtendedTrait, 
   TraitId, 
   TRAIT_CATEGORIES,
   TraitEffect,
   createTraitId,
-  TraitSystem,
   TRAIT_SOURCES,
   TRAIT_RARITIES
-} from '../../../../context/types/gameStates/TraitsGameStateTypes';
+} from '../../types/TraitTypes';
+
+// Import trait data
+import { traits, TraitsCollection as ImportedTraitsCollection } from '../../data/traits';
 
 // Define our own SlotTrait interface that matches the needs of TraitSlots component
 interface SlotTrait {
@@ -77,25 +83,6 @@ interface InternalTrait {
 }
 
 /**
- * Interface for Player object in the game state that matches our usage
- */
-interface PlayerWithTraits {
-  traitSlots: number;
-  equippedTraits: string[];
-  acquiredTraits: string[];
-  level?: number;
-}
-
-/**
- * Interface for the actual structure of the traits data
- */
-interface TraitsCollection {
-  copyableTraits: {
-    [traitId: string]: ExtendedTrait;
-  };
-}
-
-/**
  * TraitSystemWrapper Component
  * 
  * Manages the trait system UI, handling fallbacks for missing dependencies
@@ -105,10 +92,18 @@ interface TraitsCollection {
  */
 const TraitSystemWrapper: React.FC = () => {
   const [dndKitError, setDndKitError] = useState<boolean>(false);
-  const gameState = useGameState();
-  const { player, essence } = gameState;
-  const dispatch = useGameDispatch();
-  const traitPoints = (gameState.traits?.traitPoints || 0);
+
+  // Replace context with Redux
+  const dispatch = useDispatch();
+  
+  // Get data from Redux store
+  const playerLevel = useSelector((state: RootState) => state.player.level || 1);
+  const acquiredTraits = useSelector((state: RootState) => state.traits.acquiredTraits || []);
+  const equippedTraits = useSelector((state: RootState) => state.traits.equippedTraits || []);
+  const traitSlots = useSelector((state: RootState) => state.player.traitSlots || 1);
+  const allTraits = useSelector((state: RootState) => state.traits.traits || {});
+  const essence = useSelector((state: RootState) => state.essence?.amount || 0);
+  const traitPoints = useSelector((state: RootState) => state.traits.traitPoints || 0);
 
   useEffect(() => {
     // Check if @dnd-kit is available
@@ -131,9 +126,10 @@ const TraitSystemWrapper: React.FC = () => {
    * @param {string} traitId - ID of the trait to equip
    */
   const handleEquipTrait = (traitId: string): void => {
-    if ((player?.equippedTraits?.length || 0) < (player?.traitSlots || 0)) {
-      dispatch({ type: 'TRAIT_ACTIONS.EQUIP_TRAIT', payload: { traitId: createTraitId(traitId) } });
-    }
+    dispatch({
+      type: 'traits/equipTrait',
+      payload: { traitId }
+    });
   };
 
   /**
@@ -141,7 +137,10 @@ const TraitSystemWrapper: React.FC = () => {
    * @param {string} traitId - ID of the trait to unequip
    */
   const handleUnequipTrait = (traitId: string): void => {
-    dispatch({ type: 'TRAIT_ACTIONS.UNEQUIP_TRAIT', payload: { traitId: createTraitId(traitId) } });
+    dispatch({
+      type: 'traits/unequipTrait',
+      payload: { traitId }
+    });
   };
 
   /**
@@ -149,10 +148,9 @@ const TraitSystemWrapper: React.FC = () => {
    * @param {number} cost - Cost in essence to upgrade
    */
   const handleUpgradeSlot = (cost: number): void => {
-    const essenceAmount = (essence?.amount || 0);
-    if (essenceAmount >= cost) {
-      dispatch({ type: 'ESSENCE_ACTIONS.SPEND_ESSENCE', payload: cost });
-      dispatch({ type: 'TRAIT_ACTIONS.UNLOCK_TRAIT_SLOT', payload: { slotIndex: (player?.traitSlots || 0) } });
+    if (essence >= cost) {
+      dispatch({ type: 'essence/spendEssence', payload: cost });
+      dispatch({ type: 'traits/unlockTraitSlot', payload: { slotIndex: traitSlots } });
     }
   };
 
@@ -161,15 +159,10 @@ const TraitSystemWrapper: React.FC = () => {
    * @returns {InternalTrait[]} Array of equipped traits with complete data
    */
   const getEquippedTraits = (): InternalTrait[] => {
-    if (!player?.equippedTraits) return [];
-    
-    return player.equippedTraits
+    return equippedTraits
       .filter(id => id !== '') // Filter out empty slot placeholders
       .map(id => {
-        const traitsData = gameState.traits as TraitSystem || {};
-        // Convert string id to TraitId type before accessing copyableTraits
-        const traitId = createTraitId(id);
-        const traitData = traitsData.copyableTraits?.[traitId] || {};
+        const traitData = allTraits[id] || {};
         
         // Create a new object with our expected structure
         const trait: InternalTrait = {
@@ -204,13 +197,8 @@ const TraitSystemWrapper: React.FC = () => {
    * @returns {InternalTrait[]} Array of acquired traits with complete data
    */
   const getAvailableTraits = (): InternalTrait[] => {
-    if (!player?.acquiredTraits) return [];
-    
-    return player.acquiredTraits.map(id => {
-      const traitsData = gameState.traits as TraitSystem || {};
-      // Convert string id to TraitId type before accessing copyableTraits
-      const traitId = createTraitId(id);
-      const traitData = traitsData.copyableTraits?.[traitId] || {};
+    return acquiredTraits.map(id => {
+      const traitData = allTraits[id] || {};
       
       // Create a new object with our expected structure
       const trait: InternalTrait = {
@@ -252,8 +240,8 @@ const TraitSystemWrapper: React.FC = () => {
     })),
     onTraitLevelUp: (traitId: string) => {
       dispatch({ 
-        type: 'TRAIT_ACTIONS.UPGRADE_TRAIT', 
-        payload: { traitId: createTraitId(traitId), newTier: 2 } 
+        type: 'traits/upgradeTrait', 
+        payload: { traitId, newTier: 2 } 
       });
     },
     pointsAvailable: traitPoints
@@ -302,38 +290,29 @@ const TraitSystemWrapper: React.FC = () => {
   const traitSlotsProps: TraitSlotsProps = {
     availableTraits: getAvailableTraits().map(convertToSlotTrait),
     equippedTraits: getEquippedTraits().map(convertToSlotTrait),
-    maxSlots: player?.traitSlots || 0,
+    maxSlots: traitSlots,
     onAssignTrait: (slotId: string, traitId: string) => {
-      // Convert slotId from string to number since our dispatch expects a number
       const slotIndex = parseInt(slotId, 10);
       if (!isNaN(slotIndex)) {
         dispatch({ 
-          type: 'TRAIT_ACTIONS.EQUIP_TRAIT', 
-          payload: { traitId: createTraitId(traitId), slotIndex } 
+          type: 'traits/equipTrait', 
+          payload: { traitId, slotIndex } 
         });
       }
     },
     onRemoveTrait: (traitId: string) => {
       dispatch({ 
-        type: 'TRAIT_ACTIONS.UNEQUIP_TRAIT', 
-        payload: { traitId: createTraitId(traitId) } 
+        type: 'traits/unequipTrait', 
+        payload: { traitId } 
       });
     },
-    playerLevel: player?.level || 1,
-    activeSlots: (player?.equippedTraits || []).reduce((acc, traitId, index) => {
+    playerLevel: playerLevel,
+    activeSlots: equippedTraits.reduce((acc, traitId, index) => {
       if (traitId) {
         acc[index] = traitId;
       }
       return acc;
     }, {} as Record<number, string>)
-  };
-
-  // Create player object with only the properties we need
-  const playerForFallback: PlayerWithTraits = {
-    traitSlots: player?.traitSlots || 0,
-    equippedTraits: player?.equippedTraits || [],
-    acquiredTraits: player?.acquiredTraits || [],
-    level: player?.level || 1
   };
 
   return (
@@ -356,8 +335,13 @@ const TraitSystemWrapper: React.FC = () => {
         <Grid item xs={12} md={5}>
           {dndKitError ? (
             <TraitSlotsFallback 
-              player={playerForFallback}
-              essence={(essence?.amount || 0)}
+              player={{
+                traitSlots,
+                equippedTraits,
+                acquiredTraits,
+                level: playerLevel
+              }}
+              essence={essence}
               equippedTraits={getEquippedTraits()}
               availableTraits={getAvailableTraits()}
               onEquip={handleEquipTrait}

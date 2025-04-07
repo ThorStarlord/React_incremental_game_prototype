@@ -1,38 +1,47 @@
-import { configureStore } from '@reduxjs/toolkit';
-// Use consistent casing for imports (lowercase feature folders)
-import playerReducer from '../features/player/state/PlayerSlice';
-import traitsReducer from '../features/traits/state/TraitsSlice';
-import essenceReducer from '../features/essence/state/EssenceSlice';
-import worldReducer from '../features/world/state/worldSlice';
-import notificationsReducer from '../features/notifications/state/NotificationsSlice';
-import skillsReducer from '../features/skills/state/SkillsSlice';
-import questsReducer from '../features/quests/state/QuestsSlice';
-import combatReducer from '../features/combat/state/CombatSlice';
-// Import other reducers as needed
+import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
 
+// Import slices with correct file paths
+import playerReducer from '../features/Player/state/PlayerSlice';
+import traitsReducer from '../features/Traits/state/TraitsSlice';
+import essenceReducer from '../features/Essence/state/EssenceSlice';
+import npcsReducer from '../features/NPCs/state/NPCsSlice';
+
+// Configure the Redux store
 export const store = configureStore({
   reducer: {
     player: playerReducer,
     traits: traitsReducer,
-    notifications: notificationsReducer,
-    world: worldReducer,
     essence: essenceReducer,
-    skills: skillsReducer,
-    quests: questsReducer,
-    combat: combatReducer,
-    // Add other reducers here
+    npcs: npcsReducer,
+    // Add other reducers as they become available
+    // world: worldReducer,
+    // notifications: notificationsReducer,
+    // skills: skillsReducer,
+    // quests: questsReducer,
+    // combat: combatReducer,
   },
-  middleware: (getDefaultMiddleware) => 
+  // Add middleware and other store enhancers here if needed
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore these action types
-        ignoredActions: ['combat/startCombat/fulfilled'],
-        // Ignore these field paths in state
-        ignoredPaths: ['combat.log'],
+        // Ignore certain action types that might include non-serializable data
+        ignoredActions: ['persist/PERSIST'],
       },
     }),
 });
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
+// Enable refetchOnFocus and other optional features
+setupListeners(store.dispatch);
+
+// Infer the RootState and AppDispatch types from the store
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+
+// Useful type for thunks
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;

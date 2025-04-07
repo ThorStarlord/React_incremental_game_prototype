@@ -1,142 +1,52 @@
-import { useContext, useCallback, useState, useEffect } from 'react';
-import { useGameState, useGameDispatch, ACTION_TYPES } from '../../context/GameStateExports';
-// Remove unused imports
-import { GameState } from '../../context/initialStates/InitialStateComposer';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../app/store';
+import { useGameState, useGameDispatch } from '../../context/GameStateExports';
 
-// Define types for the hook
-interface Player {
-  equippedTraits?: string[];
-  // Add other player properties as needed
-}
-
-interface NPC {
-  id: string;
-  name: string;
-  relationship?: number;
-  // Add other NPC properties as needed
-}
-
-// Extended game state with npcs property
-interface ExtendedGameState {
-  player?: Player;
-  npcs?: NPC[];
-  essence?: {
-    amount?: number;
-    maxAmount?: number;
-  };
-}
-
-interface UseEssenceGenerationReturn {
-  isGenerating: boolean;
-  generateEssence: (amount?: number) => number;
-  startGenerating: () => void;
-  stopGenerating: () => void;
-  toggleGenerating: () => void;
-  essenceRate?: number; // Add essenceRate to the interface
-}
-
-const useEssenceGeneration = (baseAmount = 1, interval = 10000): UseEssenceGenerationReturn => {
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  // Cast to ExtendedGameState to resolve the TypeScript error
-  const gameState = useGameState() as unknown as ExtendedGameState;
-  const { player, npcs = [] } = gameState;
-  const dispatch = useGameDispatch();
+/**
+ * Hook for generating essence over time
+ * 
+ * This is a compatibility version that works with both context and Redux approaches
+ */
+export function useEssenceGeneration(baseRate: number = 1) {
+  const dispatch = useDispatch();
+  const gameDispatch = useGameDispatch(); // For backward compatibility
   
-  // Add the missing generateEssence function that's being called elsewhere
-  const generateEssence = useCallback((amount = baseAmount): number => {
-    const finalAmount = calculateFinalAmount(amount, player as Player);
-    dispatch({ 
-      type: ACTION_TYPES.GAIN_ESSENCE, 
-      payload: { 
-        amount: finalAmount,
-        source: 'essence_generation'
-      }
-    });
-    return finalAmount;
-  }, [baseAmount, player, dispatch]);
+  // Get state from Redux
+  const essence = useSelector((state: RootState) => state.essence?.amount || 0);
+  const essenceMultiplier = useSelector((state: RootState) => state.essence?.multiplier || 1);
+  
+  // Also use the compatibility layer for backward compatibility
+  const gameState = useGameState();
+  
+  // Local state for the hook
+  const [rate, setRate] = useState(baseRate);
   
   useEffect(() => {
-    let essenceTimer: NodeJS.Timeout;
-    let relationshipTimer: NodeJS.Timeout | undefined;
+    // Calculate actual rate based on multipliers and bonuses
+    const calculatedRate = baseRate * essenceMultiplier;
+    setRate(calculatedRate);
     
-    if (isGenerating) {
-      // Essence generation timer
-      essenceTimer = setInterval(() => {
-        generateEssence(baseAmount);
-      }, interval);
+    // Set up interval for essence generation
+    const interval = setInterval(() => {
+      // Dispatch to both Redux and the compatibility layer
+      dispatch({ type: 'essence/addEssence', payload: calculatedRate });
       
-      // Relationship growth timer - runs every 60 seconds
-      // Guard against undefined player or equippedTraits
-      const equippedTraits = (player as Player)?.equippedTraits || [];
-      if (equippedTraits.includes && equippedTraits.includes('GrowingAffinity')) {
-        relationshipTimer = setInterval(() => {
-          // Apply relationship growth to all NPCs
-          // Guard against undefined or non-array npcs
-          if (Array.isArray(npcs)) {
-            npcs.forEach((npc: NPC) => {
-              // Skip undefined NPCs
-              if (!npc) return;
-              
-              // Only improve relationship if not already at max (100)
-              if ((npc.relationship || 0) < 100) {
-                dispatch({ 
-                  type: 'UPDATE_NPC_RELATIONSHIP', 
-                  payload: { 
-                    npcId: npc.id, 
-                    changeAmount: 1,  // Modest gain per minute
-                    source: 'GrowingAffinity'  // Add source for stat tracking
-                  } 
-                });
-                
-                // Occasionally show notifications about relationship growth
-                // This runs with a 10% chance each time to avoid spamming notifications
-                if (Math.random() < 0.1) {
-                  dispatch({
-                    type: 'SHOW_NOTIFICATION',
-                    payload: {
-                      message: `Your relationship with ${npc.name} is growing thanks to Growing Affinity`,
-                      severity: 'info',
-                      duration: 3000
-                    }
-                  });
-                }
-              }
-            });
-          }
-        }, 60000); // Run every minute
-      }
-    }
+      // For backward compatibility, if needed
+      gameDispatch({ 
+        type: 'UPDATE_ESSENCE', 
+        payload: { amount: calculatedRate } 
+      });
+    }, 10000); // Generate essence every 10 seconds
     
-    // Cleanup timers on component unmount or when generating state changes
-    return () => {
-      clearInterval(essenceTimer);
-      if (relationshipTimer) clearInterval(relationshipTimer);
-    };
-  }, [isGenerating, baseAmount, interval, player, npcs, dispatch, generateEssence]);
-  
-  // Calculate final essence amount based on traits and other factors
-  const calculateFinalAmount = (base: number, player: Player): number => {
-    let amount = base;
-    
-    // Guard against undefined player or equippedTraits
-    const equippedTraits = player?.equippedTraits || [];
-    
-    // Apply trait effects
-    if (equippedTraits.includes && equippedTraits.includes('EssenceAttunement')) {
-      amount *= 1.5; // 50% more essence
-    }
-    
-    return Math.floor(amount);
-  };
+    return () => clearInterval(interval);
+  }, [baseRate, essenceMultiplier, dispatch, gameDispatch]);
   
   return {
-    isGenerating,
-    generateEssence, // Export the function to be used by other components
-    startGenerating: () => setIsGenerating(true),
-    stopGenerating: () => setIsGenerating(false),
-    toggleGenerating: () => setIsGenerating(prev => !prev),
-    essenceRate: baseAmount // Add essenceRate to the returned object
+    currentEssence: essence,
+    generationRate: rate,
+    essencePerHour: rate * 360 // 10 seconds * 360 = 1 hour
   };
-};
+}
 
 export default useEssenceGeneration;
