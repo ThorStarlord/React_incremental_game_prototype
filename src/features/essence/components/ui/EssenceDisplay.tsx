@@ -1,6 +1,12 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { 
+  selectEssenceAmount,
+  selectTotalEarned
+} from '../../state/EssenceSlice';
+import { RootState } from '../../../../app/store';
 
-// Define interface for the component props
+// Define interface for the component props - now making all props optional
 interface EssenceDisplayProps {
   currentEssence?: number;
   maxEssence?: number;
@@ -11,28 +17,35 @@ interface EssenceDisplayProps {
     color?: string;
   }>;
   onEssenceClick?: (essenceId: string) => void;
-  essenceRate?: number; // Add essenceRate property
+  essenceRate?: number;
 }
 
 /**
  * EssenceDisplay Component
  * 
  * Displays the player's essence amounts and types.
+ * Component gets data from Redux store but allows prop overrides.
  * 
- * @param {number} currentEssence - The current amount of essence the player has
- * @param {number} maxEssence - The maximum amount of essence the player can have
- * @param {Array} essenceTypes - Array of different essence types with their amounts
- * @param {Function} onEssenceClick - Handler for when an essence type is clicked
- * @param {number} essenceRate - Rate at which essence is generated
  * @returns {JSX.Element} - Rendered component
  */
 const EssenceDisplay: React.FC<EssenceDisplayProps> = ({
-  currentEssence = 0,
-  maxEssence = 100,
+  currentEssence: providedEssence,
+  maxEssence: providedMaxEssence = 1000,
   essenceTypes = [],
   onEssenceClick,
-  essenceRate
+  essenceRate: providedEssenceRate
 }) => {
+  // Get essence data from Redux store
+  const storeEssence = useSelector(selectEssenceAmount);
+  const generationRate = useSelector((state: RootState) => 
+    state.essence.generationRate || 1
+  );
+  
+  // Use provided values or fall back to store values
+  const currentEssence = providedEssence !== undefined ? providedEssence : storeEssence;
+  const maxEssence = providedMaxEssence;
+  const essenceRate = providedEssenceRate !== undefined ? providedEssenceRate : generationRate;
+  
   return (
     <div className="essence-display">
       <h3>Essence</h3>

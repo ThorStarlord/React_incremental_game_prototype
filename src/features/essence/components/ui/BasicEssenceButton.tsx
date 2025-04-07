@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Tooltip, Typography, Box, SxProps, Theme } from '@mui/material';
-// Fix import paths to use the correct location
-import { useGameDispatch } from '../../../../context/GameStateExports';
-import { ACTION_TYPES } from '../../../../context/types/ActionTypes';
+import { useDispatch } from 'react-redux';
+import { earnEssence } from '../../state/EssenceSlice';
 
 /**
  * Interface for BasicEssenceButton component props
@@ -30,7 +29,7 @@ const BasicEssenceButton: React.FC<BasicEssenceButtonProps> = ({
   sx = {},
   cooldown = 1000 // Cooldown in milliseconds
 }): React.ReactElement => {
-  const dispatch = useGameDispatch();
+  const dispatch = useDispatch();
   const [isOnCooldown, setIsOnCooldown] = useState<boolean>(false);
   
   /**
@@ -40,14 +39,11 @@ const BasicEssenceButton: React.FC<BasicEssenceButtonProps> = ({
     // Prevent spam clicking
     if (isOnCooldown) return;
     
-    // Dispatch essence gain action directly instead of using createEssenceAction
-    dispatch({
-      type: ACTION_TYPES.GAIN_ESSENCE,
-      payload: { 
-        amount,
-        source: 'button_click'
-      }
-    });
+    // Dispatch earnEssence action from EssenceSlice
+    dispatch(earnEssence({ 
+      amount,
+      source: 'button_click'
+    }));
     
     // Apply cooldown
     setIsOnCooldown(true);

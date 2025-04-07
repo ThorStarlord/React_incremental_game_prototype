@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, LinearProgress, Typography } from '@mui/material';
-// Fix the import or define the constant locally
-// import { UPDATE_INTERVALS } from '../../../../constants/gameConstants';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../../app/store';
+import { earnEssence } from '../../state/EssenceSlice';
 
 // Define locally if the import cannot be resolved
 const UPDATE_INTERVALS = {
@@ -13,24 +14,30 @@ const UPDATE_INTERVALS = {
  */
 interface EssenceGenerationTimerProps {
   /** The rate of essence generation. If rate is 0 or negative, the timer is not displayed */
-  rate: number;
-  /** Optional callback function that is called when essence is generated (timer completes) */
-  onGenerate?: (rate: number) => void;
+  rate?: number;
 }
 
 /**
  * @component EssenceGenerationTimer
  * @description Displays a progress bar that visualizes the time remaining until the next essence generation occurs.
  * The component updates every 100ms to provide a smooth animation effect. When the timer completes, it resets and
- * can trigger an optional callback function.
+ * dispatches an earnEssence action.
  * 
  * @param {EssenceGenerationTimerProps} props - Component props
  * @returns {React.ReactElement|null} - Returns the timer component or null if rate is <= 0
  */
 const EssenceGenerationTimer: React.FC<EssenceGenerationTimerProps> = ({ 
-  rate, 
-  onGenerate 
+  rate 
 }): React.ReactElement | null => {
+  const dispatch = useDispatch();
+  
+  // Get essence generation rate from Redux store if not provided via props
+  const generationRate = rate ?? useSelector((state: RootState) => 
+    // Assuming there's a generationRate field in the essence state
+    // If it doesn't exist, you can calculate it based on your game logic
+    state.essence.generationRate || 1
+  );
+  
   // Track the progress percentage (0-100)
   const [progress, setProgress] = useState<number>(0);
   // Get the interval duration from game constants
@@ -38,7 +45,7 @@ const EssenceGenerationTimer: React.FC<EssenceGenerationTimerProps> = ({
 
   useEffect(() => {
     // Skip timer setup if rate is not positive
-    if (rate <= 0) return;
+    if (generationRate <= 0) return;
     
     // Record the start time to calculate elapsed time
     let startTime = Date.now();
@@ -52,10 +59,11 @@ const EssenceGenerationTimer: React.FC<EssenceGenerationTimerProps> = ({
         startTime = Date.now();
         setProgress(0);
         
-        // Call the onGenerate callback if provided
-        if (typeof onGenerate === 'function') {
-          onGenerate(rate);
-        }
+        // Dispatch earnEssence action with the generation rate
+        dispatch(earnEssence({
+          amount: generationRate,
+          source: 'passive generation'
+        }));
       } else {
         setProgress(newProgress);
       }
@@ -63,10 +71,10 @@ const EssenceGenerationTimer: React.FC<EssenceGenerationTimerProps> = ({
 
     // Clean up interval on component unmount
     return () => clearInterval(timer);
-  }, [interval, rate, onGenerate]);
+  }, [interval, generationRate, dispatch]);
 
   // Don't render anything if rate is not positive
-  if (rate <= 0) return null;
+  if (generationRate <= 0) return null;
 
   // Calculate seconds remaining until next essence gain
   const secondsRemaining = Math.ceil((100 - progress) / 100 * (interval / 1000));
@@ -74,7 +82,7 @@ const EssenceGenerationTimer: React.FC<EssenceGenerationTimerProps> = ({
   return (
     <Box sx={{ width: '100%', mt: 1 }}>
       <Typography variant="caption" color="text.secondary">
-        Next essence gain in {secondsRemaining}s
+        Next essence gain in {secondsRemaining}s ({generationRate} essence)
       </Typography>
       <LinearProgress 
         variant="determinate" 

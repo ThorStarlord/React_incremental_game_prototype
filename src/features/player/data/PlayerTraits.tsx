@@ -1,30 +1,55 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Paper, Chip, Stack, Grid } from '@mui/material';
-import { useGameState } from '../../../context/GameStateExports';
+import { Box, Typography, Paper, Chip, Stack, Grid, Tooltip, IconButton } from '@mui/material';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 import { getUITraitById, calculateTraitStatBonuses, UITrait } from '../../../shared/utils/traitUtils';
+import InfoIcon from '@mui/icons-material/Info';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../../app/store';
+import { equipTrait, unequipTrait } from '../state/PlayerSlice';
+import { selectPlayerTraits, selectPlayerTraitSlots, selectPlayerAttribute } from '../state/playerSelectors';
 
-// Remove the local module declaration since we now have a proper declaration file
-
-/**
- * Type for active tab in the traits panel
- */
+// Types
 type ActiveTab = 'traits' | 'stats';
 
-/**
- * Props for TraitCard component
- */
+// Component interfaces
 interface TraitCardProps {
   trait: UITrait;
   isEquipped: boolean;
   canEquip: boolean;
+  onToggle?: (traitId: string) => void;
 }
 
-/**
- * A card displaying a single trait
- */
-const TraitCard: React.FC<TraitCardProps> = ({ trait, isEquipped, canEquip }) => {
+interface StatBonusChipsProps {
+  statBonuses: Record<string, number>;
+  compact?: boolean;
+}
+
+interface TabSelectorProps {
+  activeTab: ActiveTab;
+  onChange: (tab: ActiveTab) => void;
+}
+
+interface TraitTabProps {
+  acquiredTraits: string[];
+  equippedTraits: string[];
+  traitSlots: number;
+  traitsData: Record<string, any>;
+  onToggleTrait?: (traitId: string) => void;
+}
+
+interface StatTabProps {
+  bonuses: Record<string, number>;
+}
+
+// Trait card component
+const TraitCard: React.FC<TraitCardProps> = ({ trait, isEquipped, canEquip, onToggle }) => {
+  const handleClick = () => {
+    if (onToggle) {
+      onToggle(trait.id);
+    }
+  };
+
   return (
     <Paper 
       elevation={isEquipped ? 3 : 1}
@@ -33,8 +58,14 @@ const TraitCard: React.FC<TraitCardProps> = ({ trait, isEquipped, canEquip }) =>
         borderLeft: '4px solid',
         borderColor: isEquipped ? 'primary.main' : 'divider',
         backgroundColor: isEquipped ? 'action.selected' : 'background.paper',
-        cursor: 'pointer'
+        cursor: onToggle ? 'pointer' : 'default',
+        transition: 'all 0.2s',
+        '&:hover': onToggle ? {
+          backgroundColor: isEquipped ? 'action.hover' : 'action.hover',
+          transform: 'translateY(-2px)'
+        } : {}
       }}
+      onClick={handleClick}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Typography variant="subtitle2" component="div" sx={{ fontWeight: 'bold' }}>
@@ -61,17 +92,8 @@ const TraitCard: React.FC<TraitCardProps> = ({ trait, isEquipped, canEquip }) =>
   );
 };
 
-/**
- * Props for StatBonusChips component
- */
-interface StatBonusChipsProps {
-  statBonuses: Record<string, number>;
-}
-
-/**
- * Displays stat bonuses as chips
- */
-const StatBonusChips: React.FC<StatBonusChipsProps> = ({ statBonuses }) => {
+// Stat bonus display as chips
+const StatBonusChips: React.FC<StatBonusChipsProps> = ({ statBonuses, compact = false }) => {
   return (
     <Stack direction="row" spacing={0.5} flexWrap="wrap">
       {Object.entries(statBonuses).map(([stat, value]) => {
@@ -85,7 +107,7 @@ const StatBonusChips: React.FC<StatBonusChipsProps> = ({ statBonuses }) => {
             label={`${stat}: ${numValue > 0 ? '+' : ''}${numValue}`}
             color={numValue > 0 ? 'success' : 'error'}
             variant="outlined"
-            sx={{ mb: 0.5 }}
+            sx={{ mb: 0.5, fontSize: compact ? '0.7rem' : '0.75rem' }}
           />
         );
       })}
@@ -93,76 +115,143 @@ const StatBonusChips: React.FC<StatBonusChipsProps> = ({ statBonuses }) => {
   );
 };
 
-/**
- * Tab content for trait stats
- */
-const TraitStatBonusesTab: React.FC<{ bonuses: Record<string, number> }> = ({ bonuses }) => {
+// Stats tab content
+const TraitStatBonusesTab: React.FC<StatTabProps> = ({ bonuses }) => {
   const hasAnyBonus = Object.values(bonuses).some(value => value !== 0);
 
   if (!hasAnyBonus) {
     return (
-      <Typography color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-        No stat bonuses from equipped traits
-      </Typography>
+      <Box sx={{ textAlign: 'center', py: 2 }}>
+        <Typography color="text.secondary">
+          No stat bonuses from equipped traits
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+          Equip traits to receive stat bonuses
+        </Typography>
+      </Box>
     );
   }
 
+  // Group bonuses by positive and negative
+  const positiveBonuses: Record<string, number> = {};
+  const negativeBonuses: Record<string, number> = {};
+  
+  Object.entries(bonuses).forEach(([stat, value]) => {
+    if (value > 0) positiveBonuses[stat] = value;
+    else if (value < 0) negativeBonuses[stat] = value;
+  });
+
   return (
     <>
-      <Typography variant="subtitle2">
-        Stat Bonuses from Traits
-      </Typography>
-      <Grid container spacing={1} sx={{ mt: 1 }}>
-        {Object.entries(bonuses).map(([stat, value]) => {
-          if (value === 0) return null;
-          return (
-            <Grid item xs={6} key={stat}>
-              <Chip
-                label={`${stat}: ${value > 0 ? '+' : ''}${value}`}
-                color={value > 0 ? 'success' : 'error'}
-                size="small"
-                variant="outlined"
-              />
-            </Grid>
-          );
-        })}
-      </Grid>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="subtitle2">
+          Trait Bonuses
+        </Typography>
+        <Tooltip title="These bonuses are applied to your base stats">
+          <IconButton size="small">
+            <InfoIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      
+      {Object.keys(positiveBonuses).length > 0 && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" color="success.main" gutterBottom>
+            Positive Effects
+          </Typography>
+          <Grid container spacing={1}>
+            {Object.entries(positiveBonuses).map(([stat, value]) => (
+              <Grid item xs={6} key={stat}>
+                <Chip
+                  label={`${stat}: +${value}`}
+                  color="success"
+                  size="small"
+                  variant="outlined"
+                  sx={{ width: '100%' }}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
+      
+      {Object.keys(negativeBonuses).length > 0 && (
+        <Box>
+          <Typography variant="body2" color="error.main" gutterBottom>
+            Negative Effects
+          </Typography>
+          <Grid container spacing={1}>
+            {Object.entries(negativeBonuses).map(([stat, value]) => (
+              <Grid item xs={6} key={stat}>
+                <Chip
+                  label={`${stat}: ${value}`}
+                  color="error"
+                  size="small"
+                  variant="outlined"
+                  sx={{ width: '100%' }}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
     </>
   );
 };
 
-/**
- * Tab content for acquired traits
- */
-const AcquiredTraitsTab: React.FC<{ 
-  acquiredTraits: string[],
-  equippedTraits: string[],
-  traitSlots: number,
-  traitsData: Record<string, any>
-}> = ({ acquiredTraits, equippedTraits, traitSlots, traitsData }) => {
+// Traits tab content
+const AcquiredTraitsTab: React.FC<TraitTabProps> = ({ 
+  acquiredTraits,
+  equippedTraits,
+  traitSlots,
+  traitsData,
+  onToggleTrait
+}) => {
   if (!acquiredTraits || !acquiredTraits.length) {
     return (
-      <Typography color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-        No traits acquired yet
-      </Typography>
+      <Box sx={{ textAlign: 'center', py: 2 }}>
+        <Typography color="text.secondary">
+          No traits acquired yet
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+          Complete quests to earn traits
+        </Typography>
+      </Box>
     );
   }
 
+  // Sort traits: equipped first, then alphabetically
+  const sortedTraits = [...acquiredTraits].sort((a, b) => {
+    const aEquipped = equippedTraits?.includes(a) || false;
+    const bEquipped = equippedTraits?.includes(b) || false;
+    
+    if (aEquipped && !bEquipped) return -1;
+    if (!aEquipped && bEquipped) return 1;
+    
+    const aName = traitsData[a]?.name || '';
+    const bName = traitsData[b]?.name || '';
+    return aName.localeCompare(bName);
+  });
+
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="subtitle2">
           Trait Slots: {equippedTraits?.length || 0}/{traitSlots || 0}
         </Typography>
+        <Tooltip title="Click on a trait to equip or unequip it">
+          <IconButton size="small">
+            <InfoIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </Box>
-      <Stack spacing={1} sx={{ mt: 1 }}>
-        {acquiredTraits.map(traitId => {
-          // Use our new utility function to get a UI-compatible trait
+      <Stack spacing={1}>
+        {sortedTraits.map(traitId => {
           const trait = getUITraitById(traitsData, traitId);
           if (!trait) return null;
           
           const isEquipped = equippedTraits?.includes(traitId);
-          const canEquip = traitSlots > (equippedTraits?.length || 0);
+          const canEquip = !isEquipped && traitSlots > (equippedTraits?.length || 0);
           
           return (
             <TraitCard 
@@ -170,6 +259,7 @@ const AcquiredTraitsTab: React.FC<{
               trait={trait}
               isEquipped={isEquipped}
               canEquip={canEquip}
+              onToggle={onToggleTrait}
             />
           );
         })}
@@ -178,76 +268,96 @@ const AcquiredTraitsTab: React.FC<{
   );
 };
 
-/**
- * Custom tab selector component
- */
-const TabSelector: React.FC<{
-  activeTab: ActiveTab,
-  onChange: (tab: ActiveTab) => void
-}> = ({ activeTab, onChange }) => {
+// Tab selector component
+const TabSelector: React.FC<TabSelectorProps> = ({ activeTab, onChange }) => {
   return (
-    <Box sx={{ display: 'flex', mt: 1 }}>
+    <Box sx={{ display: 'flex', mt: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
       <Box 
         onClick={() => onChange('traits')} 
         sx={{ 
           flex: 1, 
           textAlign: 'center', 
-          p: 0.5, 
+          p: 1,
           borderBottom: '2px solid',
           borderColor: activeTab === 'traits' ? 'primary.main' : 'transparent',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          '&:hover': {
+            backgroundColor: 'action.hover'
+          }
         }}
       >
-        <Typography variant="body2">Traits</Typography>
+        <Typography variant="body2" sx={{ fontWeight: activeTab === 'traits' ? 'bold' : 'normal' }}>
+          Traits
+        </Typography>
       </Box>
       <Box 
         onClick={() => onChange('stats')} 
         sx={{ 
           flex: 1, 
           textAlign: 'center', 
-          p: 0.5, 
+          p: 1,
           borderBottom: '2px solid',
           borderColor: activeTab === 'stats' ? 'primary.main' : 'transparent',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          '&:hover': {
+            backgroundColor: 'action.hover'
+          }
         }}
       >
-        <Typography variant="body2">Stats</Typography>
+        <Typography variant="body2" sx={{ fontWeight: activeTab === 'stats' ? 'bold' : 'normal' }}>
+          Stats
+        </Typography>
       </Box>
     </Box>
   );
 };
 
-/**
- * PlayerTraits Component
- * 
- * Displays the player's acquired traits and allows equipping them
- * Also shows stat bonuses provided by traits
- */
+// Main component
 const PlayerTraits: React.FC = () => {
-  const gameState = useGameState();
-  const player = gameState.player;
-  const traits = gameState.traits;
+  // Replace gameState context with Redux selectors
+  const dispatch = useDispatch();
+  
+  // Get player traits data from Redux store
+  const acquiredTraits = useSelector(state => selectPlayerTraits(state).acquiredTraits);
+  const equippedTraits = useSelector(state => selectPlayerTraits(state).equipped);
+  const traitSlots = useSelector(selectPlayerTraitSlots);
+  
+  // Get traits data
+  const allTraits = useSelector((state: RootState) => state.traits?.traits || {});
   
   const [width, setWidth] = useState<number>(250);
   const [height, setHeight] = useState<number>(350);
   const [activeTab, setActiveTab] = useState<ActiveTab>('traits');
 
-  /**
-   * Handle resize events for the resizable box
-   */
+  // Handle resize events
   const handleResize = (_e: React.SyntheticEvent, data: any) => {
     setWidth(data.size.width);
     setHeight(data.size.height);
   };
 
-  /**
-   * Calculate the total stat bonuses from equipped traits
-   * @returns Record of stat bonuses
-   */
+  // Toggle equipping/unequipping a trait
+  const handleToggleTrait = (traitId: string) => {
+    const isEquipped = equippedTraits?.includes(traitId);
+    
+    if (isEquipped) {
+      dispatch(unequipTrait({ traitId }));
+    } else {
+      dispatch(equipTrait({ traitId }));
+    }
+  };
+
+  // Calculate trait stat bonuses
   const traitStatBonuses = useMemo(() => {
-    // Use our new utility function to calculate trait stat bonuses
-    return calculateTraitStatBonuses(player?.equippedTraits, traits?.copyableTraits);
-  }, [player?.equippedTraits, traits?.copyableTraits]);
+    return calculateTraitStatBonuses(equippedTraits, allTraits);
+  }, [equippedTraits, allTraits]);
+
+  // Get the current stat values for comparison
+  const strength = useSelector((state: RootState) => selectPlayerAttribute(state, 'strength')?.value);
+  const dexterity = useSelector((state: RootState) => selectPlayerAttribute(state, 'dexterity')?.value);
+  const intelligence = useSelector((state: RootState) => selectPlayerAttribute(state, 'intelligence')?.value);
+  const vitality = useSelector((state: RootState) => selectPlayerAttribute(state, 'vitality')?.value);
 
   return (
     <ResizableBox
@@ -265,10 +375,12 @@ const PlayerTraits: React.FC = () => {
           height: '100%', 
           overflow: 'hidden',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          border: '1px solid',
+          borderColor: 'divider'
         }}
       >
-        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.default' }}>
           <Typography variant="h6" component="h2">
             Character Traits
           </Typography>
@@ -278,13 +390,14 @@ const PlayerTraits: React.FC = () => {
           />
         </Box>
         
-        <Box sx={{ p: 2, overflowY: 'auto', flex: 1 }}>
+        <Box sx={{ p: 2, overflowY: 'auto', flex:1 }}>
           {activeTab === 'traits' && (
             <AcquiredTraitsTab
-              acquiredTraits={player?.acquiredTraits || []}
-              equippedTraits={player?.equippedTraits || []}
-              traitSlots={player?.traitSlots || 0}
-              traitsData={traits?.copyableTraits || {}}
+              acquiredTraits={acquiredTraits || []}
+              equippedTraits={equippedTraits || []}
+              traitSlots={traitSlots || 0}
+              traitsData={allTraits || {}}
+              onToggleTrait={handleToggleTrait}
             />
           )}
           

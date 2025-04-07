@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Tooltip, Typography, Box, SxProps, Theme } from '@mui/material';
-// Fix imports to use correct exports
-import { useGameDispatch } from '../../../../context/GameStateExports';
-import { ACTION_TYPES } from '../../../../context/types/ActionTypes';
+import { useDispatch } from 'react-redux';
+import { earnEssence } from '../../state/EssenceSlice';
 
 /**
  * Interface for EssenceButton component props
@@ -42,7 +41,7 @@ const EssenceButton: React.FC<EssenceButtonProps> = ({
   color = "primary",
   size = "medium"
 }): React.ReactElement => {
-  const dispatch = useGameDispatch();
+  const dispatch = useDispatch();
   const [isOnCooldown, setIsOnCooldown] = useState<boolean>(false);
   
   /**
@@ -51,14 +50,11 @@ const EssenceButton: React.FC<EssenceButtonProps> = ({
   const handleBasicEssenceGain = (): void => {
     if (isOnCooldown) return;
     
-    // Dispatch an action directly instead of using createEssenceAction.gain
-    dispatch({
-      type: ACTION_TYPES.GAIN_ESSENCE,
-      payload: { 
-        amount,
-        source: 'essence_button'
-      }
-    });
+    // Dispatch earnEssence action from EssenceSlice
+    dispatch(earnEssence({ 
+      amount,
+      source: 'essence_button'
+    }));
     
     setIsOnCooldown(true);
     setTimeout(() => setIsOnCooldown(false), cooldown);
