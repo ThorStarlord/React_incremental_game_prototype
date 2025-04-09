@@ -1,0 +1,24 @@
+.panel {
+  transition: all 0.3s ease;
+}
+
+.panelHeader {
+  cursor: pointer;
+}
+
+.panelHeaderIcon {
+  display: flex;
+  align-items: center;
+}
+
+.panelContent {
+  overflow: auto;
+}
+
+.collapsed {
+  height: auto;
+}
+
+.expanded {
+  height: 100%;
+}

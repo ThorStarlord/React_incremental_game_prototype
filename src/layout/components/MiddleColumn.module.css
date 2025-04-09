@@ -1,0 +1,54 @@
+.column {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.column-paper {
+    height: 100%;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 800px; /* Add max-width to the paper container */
+    margin: 0 auto; /* Center the container */
+}
+
+.world-map-wrapper {
+    height: 300px; /* Reduced fixed height for world map */
+    max-height: 300px;
+    overflow: hidden;
+    margin-top: 20px; /* Add spacing between Battle and WorldMap */
+    max-width: 700px; /* Add max-width to world map */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#middle-column {
+    flex: 2; /* Makes middle column take up more space */
+}
+
+.main-content-container {
+    height: 300px; /* Reduced fixed height for main content */
+    max-height: 300px;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-width: 700px; /* Add max-width to main content */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.battle-module {
+    height: 200px; /* Reduced fixed height for battle module */
+    max-height: 200px;
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-width: 700px; /* Add max-width to battle module */
+    margin-left: auto;
+    margin-right: auto;
+}
+

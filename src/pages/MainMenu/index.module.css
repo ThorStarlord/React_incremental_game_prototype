@@ -1,0 +1,150 @@
+/*
+ * Main Menu Styles
+ * CSS module for the main menu component
+ */
+
+/* CSS Variables */
+:root {
+  /* Colors */
+  --menu-bg-color: #121212;
+  --menu-overlay-from: rgba(12, 24, 36, 0.8);
+  --menu-overlay-to: rgba(6, 12, 24, 0.95);
+  --title-gradient-from: #64b5f6;
+  --title-gradient-to: #1976d2;
+  --button-hover-color: rgba(255, 255, 255, 0.1);
+  --border-color: rgba(255, 255, 255, 0.1);
+  
+  /* Sizes */
+  --content-max-width: 800px;
+  --title-size-desktop: 5rem;
+  --title-size-mobile: 3rem;
+  --content-padding: 2rem;
+  --content-padding-mobile: 1rem;
+  --button-padding: 0.8rem 1.5rem;
+  --button-padding-mobile: 0.6rem 1rem;
+  
+  /* Effects */
+  --hover-translate-y: -5px;
+  --hover-translate-x: 5px;
+  --card-blur: blur(10px);
+  --transition-speed: 0.3s;
+  --button-transition-speed: 0.2s;
+}
+
+/* Layout Components */
+.mainContainer {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--menu-bg-color);
+  overflow: hidden;
+}
+
+.overlayGradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--menu-overlay-from) 0%, var(--menu-overlay-to) 100%);
+  z-index: 1;
+}
+
+.contentContainer {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--content-max-width);
+  padding: var(--content-padding);
+}
+
+/* Title Styling */
+.gameTitle {
+  font-size: clamp(var(--title-size-mobile), 8vw, var(--title-size-desktop));
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--title-gradient-from) 0%, var(--title-gradient-to) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(25, 118, 210, 0.3);
+}
+
+/* Menu Components */
+.menuCard {
+  backdrop-filter: var(--card-blur);
+  transition: transform var(--transition-speed) ease, 
+              box-shadow var(--transition-speed) ease;
+  border: 1px solid var(--border-color);
+}
+
+.menuCard:hover {
+  transform: translateY(var(--hover-translate-y));
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Button Styling */
+.menuButton {
+  transition: transform var(--button-transition-speed) ease,
+              background-color var(--button-transition-speed) ease;
+  text-transform: none;
+  font-size: 1.1rem;
+  padding: var(--button-padding);
+  margin-bottom: 0.8rem;
+}
+
+.menuButton:hover {
+  transform: translateX(var(--hover-translate-x));
+}
+
+.menuButton:focus-visible {
+  outline: 2px solid var(--title-gradient-from);
+  outline-offset: 2px;
+}
+
+/* Save Game Items */
+.saveItem {
+  transition: transform var(--button-transition-speed) ease,
+              background-color var(--button-transition-speed) ease;
+  margin-bottom: 0.8rem;
+  border-radius: 8px;
+}
+
+.saveItem:hover {
+  background-color: var(--button-hover-color);
+  transform: translateY(var(--hover-translate-y));
+}
+
+/* Footer Elements */
+.versionText {
+  opacity: 0.7;
+  font-size: 0.8rem;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.shortcutKey {
+  display: inline-block;
+  padding: 0.2rem 0.4rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-right: 0.4rem;
+  font-family: monospace;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .contentContainer {
+    padding: var(--content-padding-mobile);
+  }
+  
+  .menuButton {
+    padding: var(--button-padding-mobile);
+  }
+  
+  .versionText {
+    margin-top: 1rem;
+  }
+}
