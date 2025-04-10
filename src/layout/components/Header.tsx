@@ -15,7 +15,6 @@ import {
   Box, 
   Drawer,
   List,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
@@ -28,6 +27,9 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SaveIcon from '@mui/icons-material/Save'; // Import Save icon
+import { useAppDispatch } from '../../app/hooks'; // Import Redux hooks
+import { saveGameThunk } from '../../features/Meta/state/MetaThunks'; // Import thunk
 import './styles/Header.css';
 
 /**
@@ -72,6 +74,7 @@ const Header: React.FC<HeaderProps> = ({
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const location = useLocation();
+    const dispatch = useAppDispatch(); // Get dispatch function
     
     // State for mobile drawer
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -109,6 +112,28 @@ const Header: React.FC<HeaderProps> = ({
     
     const isActive = (path: string): boolean => {
         return location.pathname === path;
+    };
+
+    /**
+     * Handles the save game button click.
+     */
+    const handleSaveGame = () => {
+      // Dispatch the save game thunk with a default name
+      dispatch(saveGameThunk('Manual Save')) // Dispatching the thunk
+        .unwrap()
+        .then((result) => {
+          if (result.success) {
+            console.log('Game saved via header button.');
+            // Optionally show a success notification
+          } else {
+            console.error('Failed to save game via header button.');
+            // Optionally show an error notification
+          }
+        })
+        .catch((error) => {
+          console.error('Error saving game:', error);
+          // Optionally show an error notification
+        });
     };
     
     // Mobile drawer content
@@ -174,8 +199,20 @@ const Header: React.FC<HeaderProps> = ({
                         </Box>
                     )}
                     
-                    {/* Notifications */}
+                    {/* Icons Section */}
                     <Box sx={{ display: 'flex' }}>
+                        {/* Save Game Button */}
+                        <Tooltip title="Save Game">
+                            <IconButton
+                                color="inherit"
+                                onClick={handleSaveGame} // Button triggers the handler
+                                aria-label="save game"
+                            >
+                                <SaveIcon />
+                            </IconButton>
+                        </Tooltip>
+
+                        {/* Notifications */}
                         <Tooltip title="Notifications">
                             <IconButton 
                                 color="inherit" 

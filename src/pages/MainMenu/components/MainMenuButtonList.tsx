@@ -1,6 +1,25 @@
 import React from 'react';
 import { type SavedGame } from '../../../hooks/useSavedGames';
-import { formatPlaytime, formatSaveDate } from '../../../utils/saveGameUtils';
+// Update import path for formatting functions
+import { formatPlaytime, formatSaveDate } from '../../../shared/utils/formatUtils';
+
+// Internal reusable button component
+interface MenuButtonProps {
+  onClick: () => void;
+  disabled: boolean;
+  className?: string;
+  children: React.ReactNode;
+}
+
+const MenuButton: React.FC<MenuButtonProps> = ({ onClick, disabled, className = '', children }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`px-4 py-2 rounded disabled:opacity-50 transition-colors ${className}`}
+  >
+    {children}
+  </button>
+);
 
 interface MainMenuButtonListProps {
   mostRecentSave: SavedGame | null;
@@ -25,18 +44,18 @@ export function MainMenuButtonList({
 }: MainMenuButtonListProps) {
   return (
     <div className="flex flex-col space-y-3 w-64 mx-auto">
-      <button
+      <MenuButton
         onClick={onNewGame}
         disabled={isLoading}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+        className="bg-blue-600 text-white hover:bg-blue-700"
       >
         New Game
-      </button>
-      
-      <button
+      </MenuButton>
+
+      <MenuButton
         onClick={onContinue}
         disabled={isLoading || !mostRecentSave}
-        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+        className="bg-green-600 text-white hover:bg-green-700"
       >
         {mostRecentSave ? (
           <>
@@ -50,41 +69,41 @@ export function MainMenuButtonList({
         ) : (
           'Continue (No Saves)'
         )}
-      </button>
-      
-      <button
+      </MenuButton>
+
+      <MenuButton
         onClick={onLoadGame}
         disabled={isLoading}
-        className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50"
+        className="bg-indigo-600 text-white hover:bg-indigo-700"
       >
         Load Game
-      </button>
-      
+      </MenuButton>
+
       <div className="flex space-x-2">
-        <button
+        <MenuButton
           onClick={onImport}
           disabled={isLoading}
-          className="flex-1 px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+          className="flex-1 px-3 py-2 bg-purple-600 text-white hover:bg-purple-700" // Adjusted padding for flex items
         >
           Import
-        </button>
-        
-        <button
+        </MenuButton>
+
+        <MenuButton
           onClick={onExport}
           disabled={isLoading || !mostRecentSave}
-          className="flex-1 px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+          className="flex-1 px-3 py-2 bg-purple-600 text-white hover:bg-purple-700" // Adjusted padding for flex items
         >
           Export
-        </button>
+        </MenuButton>
       </div>
-      
-      <button
+
+      <MenuButton
         onClick={onAbout}
         disabled={isLoading}
-        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+        className="bg-gray-600 text-white hover:bg-gray-700"
       >
         About
-      </button>
+      </MenuButton>
     </div>
   );
 }

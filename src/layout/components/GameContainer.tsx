@@ -51,21 +51,20 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import { Box, Typography, useMediaQuery, useTheme, Drawer, IconButton, Tooltip, Paper, styled } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import PersonIcon from '@mui/icons-material/Person';
-import styles from './GameContainer.module.css';
 
 // Core UI Panels & Shared Components
 import Panel from '../../shared/components/layout/Panel';
 import BreadcrumbNav from '../../shared/components/ui/BreadcrumbNav';
 import CharacterManagementDrawer from '../../shared/components/ui/CharacterManagementDrawer';
+import LeftColumn from './LeftColumn';
+import RightColumn from './RightColumn';
 
 // Feature Components & Hooks
 import EssenceDisplay from '../../features/Essence/components/ui/EssenceDisplay';
 import useEssenceGeneration from '../../features/Essence/hooks/useEssenceGeneration';
-import CompactTraitPanel from '../../features/Traits/components/containers/CompactTraitPanel';
 import TraitEffectNotification from '../../features/Traits/components/containers/TraitEffectNotification';
 import useTraitNotifications from '../../features/Traits/hooks/useTraitNotifications';
-import TraitSystemWrapper from '../../features/Traits/components/containers/TraitFeatureView';
+import { useAutosaveSystem } from '../../gameLogic/systems/autosaveSystem';
 
 const GameWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -81,42 +80,10 @@ interface GameContainerProps {
   children?: ReactNode;
 }
 
-const LeftColumnContent: React.FC<{ onToggleCharacterDrawer: () => void }> =
-  ({ onToggleCharacterDrawer }) => {
-    return (
-      <>
-        <Box sx={{ mt: 2 }}>
-          <Panel title="Traits">
-            <CompactTraitPanel traits={[]} />
-          </Panel>
-        </Box>
-        <Box sx={{ mt: 2 }}>
-          <Tooltip title="Open Character Management">
-            <IconButton
-              onClick={onToggleCharacterDrawer}
-              color="primary"
-              sx={{ width: '100%', border: '1px dashed', borderColor: 'divider' }}
-            >
-              <PersonIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </>
-    );
-};
-
 const MiddleColumnContent: React.FC = () => {
   return (
     <Panel title="Game World">
       <Typography>Main Game Area</Typography>
-    </Panel>
-  );
-};
-
-const RightColumnContent: React.FC = () => {
-  return (
-    <Panel title="System">
-      <TraitSystemWrapper />
     </Panel>
   );
 };
@@ -132,8 +99,10 @@ const GameContainer: React.FC<GameContainerProps> = ({
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [characterDrawerOpen, setCharacterDrawerOpen] = useState<boolean>(false);
 
+  // Initialize game system hooks
   const { generateEssence } = useEssenceGeneration();
   const { notifications, dismissNotification } = useTraitNotifications();
+  useAutosaveSystem(); // Call the autosave system hook
 
   const toggleCharacterDrawer = (): void => {
     setCharacterDrawerOpen(!characterDrawerOpen);
@@ -154,11 +123,43 @@ const GameContainer: React.FC<GameContainerProps> = ({
     );
   }
 
+  const columnSx = {
+    bgcolor: 'background.paper',
+    p: 2,
+    borderRadius: 2,
+    border: `1px solid ${theme.palette.divider}`,
+    overflowY: 'auto',
+    height: '100%',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+  };
+
   return (
     <GameWrapper sx={sx}>
-      <Box className={styles.gameContainer}>
-        <Box className={styles.header} sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          width: '100%',
+          bgcolor: 'background.default',
+        }}
+      >
+        <Box
+          sx={{
+            flexShrink: 0,
+            p: theme.spacing(1, 2),
+            background: theme.palette.background.paper,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            boxSizing: 'border-box',
+            height: 64,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <BreadcrumbNav />
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
               <EssenceDisplay
@@ -174,18 +175,53 @@ const GameContainer: React.FC<GameContainerProps> = ({
             </Box>
           </Box>
         </Box>
-        <Box className={styles.bottomWindows}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            p: 2,
+            flex: 1,
+            width: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            flexDirection: { xs: 'column', md: 'row' },
+            height: { xs: 'auto', md: 'calc(100vh - 64px)' },
+            overflowY: { xs: 'auto', md: 'hidden' },
+          }}
+        >
           {!isSmallScreen && showLeftColumn && (
-            <Box className={`${styles.column} ${styles.leftColumn}`}>
-              <LeftColumnContent onToggleCharacterDrawer={toggleCharacterDrawer} />
+            <Box
+              sx={{
+                ...columnSx,
+                width: 250,
+                flexShrink: 0,
+                display: { xs: 'none', md: 'flex' },
+              }}
+            >
+              <LeftColumn />
             </Box>
           )}
-          <Box className={`${styles.column} ${styles.middleColumn}`}>
+          <Box
+            sx={{
+              ...columnSx,
+              flex: { xs: '1 1 auto', md: 1 },
+              minWidth: 0,
+              maxHeight: { xs: '60vh', md: 'none' },
+              width: { xs: '100%', md: 'auto' },
+            }}
+          >
             <MiddleColumnContent />
           </Box>
           {!isSmallScreen && showRightColumn && (
-            <Box className={`${styles.column} ${styles.rightColumn}`}>
-              <RightColumnContent />
+            <Box
+              sx={{
+                ...columnSx,
+                width: 250,
+                flexShrink: 0,
+                display: { xs: 'none', md: 'flex' },
+              }}
+            >
+              <RightColumn />
             </Box>
           )}
         </Box>
@@ -194,6 +230,11 @@ const GameContainer: React.FC<GameContainerProps> = ({
             anchor="left"
             open={drawerOpen && isSmallScreen}
             onClose={() => setDrawerOpen(false)}
+            ModalProps={{ keepMounted: true }}
+            sx={{
+              display: { xs: 'block', md: 'none' },
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 },
+            }}
           >
             <Box sx={{ width: 280, p: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
@@ -201,7 +242,7 @@ const GameContainer: React.FC<GameContainerProps> = ({
                   <CloseIcon />
                 </IconButton>
               </Box>
-              <LeftColumnContent onToggleCharacterDrawer={toggleCharacterDrawer} />
+              <LeftColumn />
             </Box>
           </Drawer>
         )}

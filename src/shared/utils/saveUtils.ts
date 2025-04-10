@@ -9,7 +9,7 @@
  * - Importing/exporting save files
  */
 
-import { GameState } from '../../context/GameStateExports';
+import type { RootState } from '../../app/store';
 
 /**
  * Interface for saved game metadata
@@ -41,15 +41,15 @@ export const getSavedGames = (): SavedGame[] => {
 /**
  * Load a specific saved game by ID
  * @param saveId The ID of the save to load
- * @returns The loaded game state or null if loading failed
+ * @returns The loaded game state (RootState) or null if loading failed
  */
-export const loadSavedGame = async (saveId: string): Promise<GameState | null> => {
+export const loadSavedGame = async (saveId: string): Promise<RootState | null> => {
   try {
     const savedGameString = localStorage.getItem(`game_save_${saveId}`);
     if (!savedGameString) return null;
-    
+
     const saveData = JSON.parse(savedGameString);
-    return saveData.state;
+    return saveData.state as RootState;
   } catch (error) {
     console.error('Failed to load saved game:', error);
     return null;
@@ -79,22 +79,22 @@ export const deleteSavedGame = (saveId: string): boolean => {
 };
 
 /**
- * Create a new save from the current game state
- * @param gameState The current game state
+ * Create a new save from the current game state (RootState)
+ * @param gameState The current game state (RootState)
  * @param saveName Optional name for the save
  * @param screenshot Optional screenshot data URL
  * @returns The ID of the new save or null if saving failed
  */
 export const createSave = (
-  gameState: GameState, 
+  gameState: RootState, 
   saveName?: string, 
   screenshot?: string
 ): string | null => {
   try {
     const saveId = `save_${Date.now()}`;
-    const playerName = gameState.player?.name || 'Unnamed Hero';
-    const playerLevel = gameState.player?.level || 1;
-    const playtime = gameState.statistics?.current?.timeStatistics?.totalPlayTime || 0;
+    const playerName = gameState.player.name || 'Unnamed Hero';
+    const playerLevel = gameState.player.level || 1;
+    const playtime = gameState.player.totalPlayTime || 0; 
     
     // Create save metadata
     const saveInfo: SavedGame = {
@@ -103,12 +103,13 @@ export const createSave = (
       timestamp: Date.now(),
       playerLevel,
       playtime,
-      screenshot
+      screenshot,
+      version: gameState.meta?.gameVersion || '1.0.0'
     };
     
     // Store the actual save data
     const saveData = {
-      version: gameState.meta?.version || '1.0.0',
+      version: gameState.meta?.gameVersion || '1.0.0',
       timestamp: Date.now(),
       state: gameState
     };
@@ -134,10 +135,10 @@ export const createSave = (
  */
 export const exportSaveToFile = async (saveId: string): Promise<boolean> => {
   try {
-    const saveData = await loadSavedGame(saveId);
-    if (!saveData) return false;
+    const stateToExport = await loadSavedGame(saveId);
+    if (!stateToExport) return false;
     
-    const saveBlob = new Blob([JSON.stringify(saveData)], { type: 'application/json' });
+    const saveBlob = new Blob([JSON.stringify(stateToExport)], { type: 'application/json' });
     const url = URL.createObjectURL(saveBlob);
     
     // Create download link
@@ -159,9 +160,9 @@ export const exportSaveToFile = async (saveId: string): Promise<boolean> => {
 /**
  * Import a save from a file
  * @param file The file containing the save data
- * @returns The imported game state or null if import failed
+ * @returns The imported game state (RootState) or null if import failed
  */
-export const importSaveFromFile = async (file: File): Promise<GameState | null> => {
+export const importSaveFromFile = async (file: File): Promise<RootState | null> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
@@ -173,7 +174,7 @@ export const importSaveFromFile = async (file: File): Promise<GameState | null> 
         }
         
         const saveData = JSON.parse(event.target.result as string);
-        resolve(saveData);
+        resolve(saveData as RootState);
       } catch (error) {
         console.error('Failed to parse save file:', error);
         resolve(null);

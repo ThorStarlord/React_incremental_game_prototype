@@ -31,31 +31,29 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
   showAttributes = true,
   showStats = true
 }) => {
-  // Get player data from Redux store
+  // Get player data from Redux store - Call all hooks unconditionally at the top level
   const playerName = useSelector(selectPlayerName);
   const currentHealth = useSelector(selectPlayerHealth);
   const maxHealth = useSelector(selectPlayerMaxHealth);
   const mana = useSelector((state: RootState) => selectPlayerMana(state));
+  const maxMana = useSelector((state: RootState) => state.player.stats.maxMana || 100);
   
-  // Get player attributes if needed
-  const strength = useSelector((state: RootState) => 
-    showAttributes ? selectPlayerAttribute(state, 'strength') : null
-  );
-  const dexterity = useSelector((state: RootState) => 
-    showAttributes ? selectPlayerAttribute(state, 'dexterity') : null
-  );
-  const intelligence = useSelector((state: RootState) => 
-    showAttributes ? selectPlayerAttribute(state, 'intelligence') : null
-  );
-  const vitality = useSelector((state: RootState) => 
-    showAttributes ? selectPlayerAttribute(state, 'vitality') : null
-  );
-  
+  // Attributes (conditionally fetched based on prop, but hook called always)
+  const strength = useSelector((state: RootState) => selectPlayerAttribute(state, 'strength'));
+  const dexterity = useSelector((state: RootState) => selectPlayerAttribute(state, 'dexterity'));
+  const intelligence = useSelector((state: RootState) => selectPlayerAttribute(state, 'intelligence'));
+  const vitality = useSelector((state: RootState) => selectPlayerAttribute(state, 'vitality'));
+
+  // Stats (conditionally fetched based on prop, but hook called always)
+  const healthRegen = useSelector((state: RootState) => state.player.stats.healthRegen);
+  const manaRegen = useSelector((state: RootState) => state.player.stats.manaRegen);
+  const critChance = useSelector((state: RootState) => state.player.stats.critChance);
+  const dodgeChance = useSelector((state: RootState) => (state.player.stats as any).dodgeChance); 
+
   // Calculate health percentage
   const healthPercentage = maxHealth ? Math.floor((currentHealth / maxHealth) * 100) : 0;
   
   // Calculate mana percentage
-  const maxMana = useSelector((state: RootState) => state.player.stats.maxMana || 100);
   const manaPercentage = maxMana ? Math.floor((mana / maxMana) * 100) : 0;
   
   if (compact) {
@@ -191,28 +189,28 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
               <Box sx={{ mb: 0.5, display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="body2">Health Regen</Typography>
                 <Typography variant="body2">
-                  {useSelector((state: RootState) => state.player.stats.healthRegen || 1)}/min
+                  {healthRegen || 1}/min
                 </Typography>
               </Box>
               
               <Box sx={{ mb: 0.5, display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="body2">Mana Regen</Typography>
                 <Typography variant="body2">
-                  {useSelector((state: RootState) => state.player.stats.manaRegen || 1)}/min
+                  {manaRegen || 1}/min
                 </Typography>
               </Box>
               
               <Box sx={{ mb: 0.5, display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="body2">Critical Chance</Typography>
                 <Typography variant="body2">
-                  {useSelector((state: RootState) => state.player.stats.critChance || 5)}%
+                  {critChance || 5}%
                 </Typography>
               </Box>
               
               <Box sx={{ mb: 0.5, display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="body2">Dodge Chance</Typography>
                 <Typography variant="body2">
-                  {useSelector((state: RootState) => state.player.stats.dodgeChance || 2)}%
+                  {dodgeChance || 2}%
                 </Typography>
               </Box>
             </Grid>

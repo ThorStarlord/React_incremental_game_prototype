@@ -4,7 +4,6 @@ import styles from './index.module.css';
 // Custom hooks
 import { useSavedGames } from '../../hooks/useSavedGames';
 import { useGameImportExport } from '../../hooks/useGameImportExport';
-import { useMenuNotifications } from '../../hooks/useMenuNotifications';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useDialogManager } from './hooks/useDialogManager';
 import { useGameActions } from './hooks/useGameActions';
@@ -14,7 +13,6 @@ import { useMenuShortcuts } from './hooks/useMenuShortcuts';
 import { MainMenuTitle } from './components/MainMenuTitle';
 import { MainMenuButtonList } from './components/MainMenuButtonList';
 import { VersionFooter } from './components/VersionFooter';
-import { NotificationSystem } from '../../components/shared/NotificationSystem';
 import { DialogsContainer } from './components/DialogsContainer';
 
 const APP_VERSION = '0.1.0';
@@ -48,12 +46,6 @@ const MainMenu: React.FC = () => {
     importSave 
   } = useGameImportExport();
 
-  const { 
-    notification, 
-    showNotification, 
-    dismissNotification 
-  } = useMenuNotifications();
-
   const { registerShortcut } = useKeyboardShortcuts();
   
   // Dialog management
@@ -85,7 +77,6 @@ const MainMenu: React.FC = () => {
     importSave,
     deleteSave,
     loadSavedGames,
-    showNotification,
     openDialog,
     closeDialog,
     clearDeleteTarget
@@ -145,12 +136,6 @@ const MainMenu: React.FC = () => {
         onImport={handleImport}
         onCopyToClipboard={handleCopyToClipboard}
         clearDeleteTarget={clearDeleteTarget}
-      />
-      
-      {/* Notification System */}
-      <NotificationSystem 
-        notification={notification}
-        onDismiss={dismissNotification}
       />
     </div>
   );

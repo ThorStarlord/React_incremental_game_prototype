@@ -82,6 +82,7 @@ interface HotkeyHelpTooltipProps {
  * @param {HotkeyHelpTooltipProps} props - Component props
  * @returns {JSX.Element} The hotkey help tooltip component
  */
+// Remove explicit return type annotation
 const HotkeyHelpTooltip: React.FC<HotkeyHelpTooltipProps> = ({ 
   title = "Keyboard Controls", 
   placement = "top",
@@ -89,7 +90,7 @@ const HotkeyHelpTooltip: React.FC<HotkeyHelpTooltipProps> = ({
   triggerElement = null,
   hotkeyCategories = null,
   sx = {}
-}): JSX.Element => {
+}) => {
   // Default hotkey categories if none provided
   const defaultHotkeyCategories: HotkeyCategory[] = [
     {
@@ -129,7 +130,8 @@ const HotkeyHelpTooltip: React.FC<HotkeyHelpTooltipProps> = ({
    * @param {number} total - Total number of keys in the combination
    * @returns {JSX.Element} The styled keyboard key
    */
-  const renderKeyboardKey = (keyText: string, index: number, total: number): JSX.Element => (
+  // Remove explicit return type annotation
+  const renderKeyboardKey = (keyText: string, index: number, total: number) => (
     <React.Fragment key={`${keyText}-${index}`}>
       <Box 
         component="span"
@@ -166,7 +168,8 @@ const HotkeyHelpTooltip: React.FC<HotkeyHelpTooltipProps> = ({
    * @param {Hotkey[]} hotkeys - Array of hotkey objects with keys and descriptions
    * @returns {JSX.Element} Grid of hotkey information
    */
-  const renderHotkeys = (hotkeys: Hotkey[]): JSX.Element => (
+  // Remove explicit return type annotation
+  const renderHotkeys = (hotkeys: Hotkey[]) => (
     <Grid container spacing={1} sx={{ mt: 0.5 }}>
       {hotkeys.map((hotkey, index) => (
         <Grid item xs={12} key={index} sx={{ 

@@ -4,17 +4,7 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 // Import icons correctly from @mui/icons-material
 import HomeIcon from '@mui/icons-material/Home';
 import SettingsIcon from '@mui/icons-material/Settings';
-import LocationCityIcon from '@mui/icons-material/LocationCity';
-import PersonIcon from '@mui/icons-material/Person';
 import BugReportIcon from '@mui/icons-material/BugReport';
-
-/**
- * Interface for a town data object
- */
-interface Town {
-  id: string;
-  name: string;
-}
 
 /**
  * Interface for a sample path with description
@@ -41,14 +31,6 @@ interface BreadcrumbNavProps {
   testMode?: boolean;
 }
 
-// Sample town data since the modules/data import doesn't exist
-const towns: Town[] = [
-  { id: 'windhelm', name: 'Windhelm' },
-  { id: 'riverwood', name: 'Riverwood' },
-  { id: 'whiterun', name: 'Whiterun' },
-  { id: 'solitude', name: 'Solitude' }
-];
-
 /**
  * @component BreadcrumbNav
  * @description An enhanced navigation breadcrumb component that shows the current location path
@@ -73,8 +55,8 @@ const towns: Town[] = [
  * @param {BreadcrumbNavProps} props - Component props
  * @returns {JSX.Element} The styled breadcrumb navigation component
  */
-const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ testMode = false }): JSX.Element => {
-  // Always call hooks at the top level of your component
+// Remove explicit return type annotation
+const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ testMode = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -87,10 +69,7 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ testMode = false }): JSX.
    */
   const samplePaths: SamplePath[] = [
     { path: '/game', description: 'Simple single level' },
-    { path: '/game/town/windhelm', description: 'Town example with dynamic name' },
-    { path: '/game/npc/merchant', description: 'NPC example' },
     { path: '/settings/audio', description: 'Settings submenu' },
-    { path: '/game/town/windhelm/npc/blacksmith/quest/fetch', description: 'Deep nested path' },
   ];
 
   /**
@@ -108,13 +87,9 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ testMode = false }): JSX.
   const breadcrumbNameMap: BreadcrumbNameMap = {
     'game': { name: 'Game World', icon: <HomeIcon fontSize="small" /> },
     'settings': { name: 'Settings', icon: <SettingsIcon fontSize="small" /> },
-    'town': { name: 'Town', icon: <LocationCityIcon fontSize="small" /> },
-    'npc': { name: 'NPC', icon: <PersonIcon fontSize="small" /> },
     'audio': { name: 'Audio Settings', icon: null },
     'quest': { name: 'Quest', icon: null },
     'fetch': { name: 'Fetch Quest', icon: null },
-    'merchant': { name: 'Merchant', icon: <PersonIcon fontSize="small" /> },
-    'blacksmith': { name: 'Blacksmith', icon: <PersonIcon fontSize="small" /> },
   };
 
   /**
@@ -152,7 +127,6 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ testMode = false }): JSX.
    * @returns {boolean} - Whether to display the breadcrumb
    */
   const shouldShowBreadcrumb = (index: number): boolean => {
-    // On mobile, only show the first and last two breadcrumbs if there are more than 3
     if (isMobile && pathnames.length > 3) {
       return index === 0 || index >= pathnames.length - 2;
     }
@@ -238,32 +212,11 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ testMode = false }): JSX.
               return index === 1 && <Typography key="ellipsis" color="textSecondary">...</Typography>;
             }
 
-            /**
-             * Determines if this segment is the last item in the breadcrumb path
-             * @type {boolean}
-             */
             const last = index === pathnames.length - 1;
-
-            /**
-             * Constructs the navigation path for this breadcrumb item
-             * @type {string}
-             */
             const to = `/${pathnames.slice(0, index + 1).join('/')}`;
 
-            /**
-             * Determine the display name for this path segment
-             * First check if it's in our mapping, otherwise use the raw segment
-             */
             let displayName = breadcrumbNameMap[value]?.name || value;
             const icon = getRouteIcon(value);
-            
-            /**
-             * Special case for town IDs - look up the town name from data
-             */
-            const town = towns.find(t => t.id === value);
-            if (town) {
-              displayName = town.name;
-            }
 
             return last ? (
               <Box 

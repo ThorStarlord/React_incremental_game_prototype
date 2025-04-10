@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { type SavedGame } from '../../../hooks/useSavedGames';
-import { formatPlaytime, formatSaveDate } from '../../../utils/saveGameUtils';
+import { formatPlaytime, formatSaveDate } from '../../../shared/utils/formatUtils';
 
 interface LoadGameDialogProps {
   isOpen: boolean;

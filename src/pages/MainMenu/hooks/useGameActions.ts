@@ -2,6 +2,9 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SavedGame } from '../../../hooks/useSavedGames';
 import { DialogState } from './useDialogManager';
+import { loadSavedGame } from '../../../shared/utils/saveUtils'; // Import load function
+import { useAppDispatch } from '../../../app/hooks'; // Import typed dispatch
+import { replaceState, RootState } from '../../../app/store'; // Import action creator and RootState type
 
 interface GameActionsProps {
   mostRecentSave: SavedGame | null;
@@ -9,7 +12,6 @@ interface GameActionsProps {
   importSave: () => Promise<boolean>;
   deleteSave: (saveId: string) => Promise<boolean>;
   loadSavedGames: () => Promise<void>;
-  showNotification: (message: string, type: "success" | "error" | "info" | "warning", timeout?: number) => void;
   openDialog: (dialogName: keyof DialogState) => void;
   closeDialog: (dialogName: keyof DialogState) => void;
   clearDeleteTarget: () => void;
@@ -21,75 +23,86 @@ export function useGameActions({
   importSave,
   deleteSave,
   loadSavedGames,
-  showNotification,
   openDialog,
   closeDialog,
   clearDeleteTarget
 }: GameActionsProps) {
   const navigate = useNavigate();
-  
+  const dispatch = useAppDispatch(); // Use typed dispatch
+
   const handleNewGame = useCallback(() => {
     navigate('/game');
   }, [navigate]);
 
+  const handleLoadGame = useCallback(async (saveId: string) => {
+    console.log('Attempting to load game:', saveId);
+    try {
+      const loadedState = await loadSavedGame(saveId); // Load the full state
+      if (loadedState) {
+        dispatch(replaceState(loadedState as RootState)); // Dispatch the action to replace the entire Redux state
+        closeDialog('loadDialog');
+        navigate('/game'); // Navigate after successful load and state replacement
+        console.log('Game loaded successfully!');
+      } else {
+        console.error('Failed to load game data.');
+      }
+    } catch (error) {
+      console.error('Error loading game:', error);
+      console.error('An error occurred while loading the game.');
+    }
+  }, [navigate, closeDialog, dispatch]);
+
   const handleContinue = useCallback(() => {
     if (mostRecentSave) {
-      // In a real implementation, we would load the save data here
-      console.log('Continuing with save:', mostRecentSave.id);
-      navigate('/game');
+      handleLoadGame(mostRecentSave.id); // Call handleLoadGame with the most recent save ID
+    } else {
+      console.info('No recent save game found to continue.');
     }
-  }, [navigate, mostRecentSave]);
+  }, [mostRecentSave, handleLoadGame]);
 
-  const handleLoadGame = useCallback((saveId: string) => {
-    // In a real implementation, we would load the specific save here
-    console.log('Loading game:', saveId);
-    closeDialog('loadDialog');
-    navigate('/game');
-  }, [navigate, closeDialog]);
-  
   const handleShowExport = useCallback(async () => {
     if (!mostRecentSave) return;
-    
+
     const success = await exportSave(mostRecentSave.id);
     if (success) {
       openDialog('exportDialog');
     } else {
-      showNotification('Failed to export save', 'error');
+      console.error('Failed to export save');
     }
-  }, [mostRecentSave, exportSave, openDialog, showNotification]);
+  }, [mostRecentSave, exportSave, openDialog]);
 
   const handleCopyToClipboard = useCallback((exportCode: string) => {
     navigator.clipboard.writeText(exportCode)
       .then(() => {
-        showNotification('Export code copied to clipboard', 'success');
+        console.log('Export code copied to clipboard');
       })
       .catch(() => {
-        showNotification('Failed to copy to clipboard', 'error');
+        console.error('Failed to copy to clipboard');
       });
-  }, [showNotification]);
+  }, []);
 
   const handleImport = useCallback(async () => {
     const success = await importSave();
     if (success) {
-      showNotification('Game imported successfully', 'success');
+      console.log('Game imported successfully as a new save slot.');
       closeDialog('importDialog');
-      loadSavedGames(); // Refresh saved games list
+      await loadSavedGames(); // Refresh saved games list - ensure await if loadSavedGames is async
     } else {
-      showNotification('Failed to import save. Invalid code format.', 'error');
+      console.error('Failed to import save. Invalid code or format.');
     }
-  }, [importSave, showNotification, closeDialog, loadSavedGames]);
+  }, [importSave, closeDialog, loadSavedGames]);
 
   const handleDeleteConfirm = useCallback(async (saveId: string, saveName: string) => {
     const success = await deleteSave(saveId);
     if (success) {
-      showNotification(`Deleted "${saveName}"`, 'success');
+      console.log(`Deleted "${saveName}"`);
     } else {
-      showNotification('Failed to delete save', 'error');
+      console.error('Failed to delete save');
     }
-    
+
     closeDialog('deleteDialog');
     clearDeleteTarget();
-  }, [deleteSave, showNotification, closeDialog, clearDeleteTarget]);
+  }, [deleteSave, closeDialog, clearDeleteTarget]);
 
   return {
     handleNewGame,

@@ -4,14 +4,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 // Page Components
 import MainMenu from '../pages/MainMenu';
 import Settings from '../pages/MainMenu';
-import WorldMap from '../features/World/components/containers/WorldMap';
 
-// Route Wrappers
-import { 
-  TownAreaWrapper, 
-  NPCEncounterWrapper, 
-  NPCPanelWrapper 
-} from './components/RouteWrappers';
+
 
 // Layout Components
 import { GameLayout } from './components/Layouts';
@@ -29,10 +23,8 @@ const AppRouter: React.FC = () => (
       
       {/* Game routes with common layout */}
       <Route path="/game" element={<GameLayout />}>
-        <Route index element={<WorldMap />} />
-        <Route path="town/:townId" element={<TownAreaWrapper />} />
-        <Route path="npc/:npcId" element={<NPCPanelWrapper />} />
-        <Route path="encounter/:npcId" element={<NPCEncounterWrapper />} />
+
+        <Route index element={<Navigate to="/" replace />} />
       </Route>
       
       {/* Fallback for undefined routes */}

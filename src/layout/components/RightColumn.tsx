@@ -57,7 +57,6 @@ import MaximizeIcon from '@mui/icons-material/Maximize';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 
 import PlayerTraits from '../../features/Traits/components/containers/CompactTraitPanel';
-import styles from './RightColumn.module.css';
 
 /**
  * Component registry item with metadata
@@ -150,11 +149,8 @@ interface CollapsibleSectionProps {
   /** Function to toggle maximized state */
   onToggleMaximize: (id: string, event: React.MouseEvent) => void;
   
-  /** Optional CSS class name for the section container */
-  className?: string;
-  
-  /** Optional CSS class name for the content area */
-  contentClassName?: string;
+  /** Optional Material-UI style props for the section container */
+  sx?: SxProps<Theme>;
 }
 
 /**
@@ -312,16 +308,21 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
   onToggleExpand,
   onToggleConfig,
   onToggleMaximize,
-  className = '',
-  contentClassName = ''
+  sx = {}
 }) => {
   const theme = useTheme();
   
-  // Combine dynamic classes
-  const sectionClasses = [
-    className,
-    isCurrentlyMaximized ? styles['maximized-section'] : ''
-  ].filter(Boolean).join(' ');
+  // Apply maximized styles directly via sx
+  const maximizedSx: SxProps<Theme> = isCurrentlyMaximized ? {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10,
+    height: '100%',
+    mb: 0,
+  } : {};
 
   return (
     <Paper
@@ -332,9 +333,10 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
         border: isConfiguring 
           ? `2px dashed ${theme.palette.primary.main}` 
           : 'none',
-        flex: isCurrentlyMaximized ? 1 : 'none'
+        flex: isCurrentlyMaximized ? 1 : 'none',
+        ...maximizedSx,
+        ...sx
       }}
-      className={sectionClasses}
     >
       <SectionHeader 
         title={title}
@@ -348,11 +350,10 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
       
       <Collapse in={isExpanded}>
         <Box 
-          className={contentClassName}
           sx={{ 
             position: 'relative',
             p: 2,
-            height: isCurrentlyMaximized ? 'calc(100% - 48px)' : undefined
+            height: isCurrentlyMaximized ? 'calc(100% - 48px)' : undefined 
           }}
         >
           {isConfiguring && (
@@ -450,7 +451,7 @@ const RightColumn: React.FC<RightColumnProps> = ({
     const isConfiguring = configMode[id] || false;
     const isCurrentlyMaximized = maximized === id;
 
-    const className = componentId === 'PlayerTraits' ? styles['player-traits'] : '';
+    const sectionSx: SxProps<Theme> = componentId === 'PlayerTraits' ? { mt: 2 } : {};
 
     return (
       <CollapsibleSection
@@ -464,25 +465,24 @@ const RightColumn: React.FC<RightColumnProps> = ({
         onToggleExpand={toggleExpand}
         onToggleConfig={toggleConfig}
         onToggleMaximize={toggleMaximize}
-        className={className}
+        sx={sectionSx}
       />
     );
   }, [expanded, configMode, maximized, componentRegistry, toggleExpand, toggleConfig, toggleMaximize]);
 
   return (
     <Box 
-      className={styles.column}
       id="right-column"
       sx={{ 
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column',
         flex: 1,
+        overflowY: 'auto',
         ...sx
       }}
     >
       <Paper 
-        className={styles['column-paper']}
         sx={{ 
           p: 2,
           height: '100%',

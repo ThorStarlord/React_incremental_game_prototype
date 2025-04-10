@@ -1,653 +1,298 @@
-import React, { useState, useEffect } from 'react';
-import { useGameState } from '../context';
-import { UI_ACTION_TYPES } from '../context/actions/uiActions';
-import styled from 'styled-components';
+import React, { useState, useCallback } from 'react';
 import {
-  Panel,
-  Button,
-  Slider,
-  Toggle,
-  Select,
-  Tabs,
-  Tab,
-  Icon
-} from '../components/ui';
+    Box,
+    Typography,
+    Button,
+    Slider,
+    Switch, // Use MUI Switch instead of custom Toggle
+    Select,
+    MenuItem, // Needed for MUI Select
+    Tabs,
+    Tab,
+    Paper, // Use Paper or Card instead of custom Panel
+    Container, // Use MUI Container for layout
+    useTheme // Access theme for spacing/colors if needed
+} from '@mui/material';
+// Import specific MUI icons
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'; // Graphics icon
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports'; // Gameplay icon
+import WindowIcon from '@mui/icons-material/Window'; // UI icon
+import SaveIcon from '@mui/icons-material/Save';
+import RestoreIcon from '@mui/icons-material/Restore'; // Reset icon
 
-// Define interfaces for various settings
-interface AudioSettings {
-  masterVolume: number;
-  musicVolume: number;
-  effectsVolume: number;
-  ambientVolume: number;
-  dialogueVolume: number;
-  muteWhenInactive: boolean;
-}
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import {
+    selectAudioSettings,
+    selectGraphicsSettings,
+    selectGameplaySettings,
+    selectUISettings
+} from '../features/Settings/state/SettingsSelectors';
+import {
+    updateSetting,
+    resetSettings
+} from '../features/Settings/state/SettingsSlice';
+import { saveSettingsThunk } from '../features/Settings/state/SettingsThunks';
+import { SettingsState } from '../features/Settings/state/SettingsTypes'; // Keep SettingsState type
 
-interface GraphicsSettings {
-  quality: 'low' | 'medium' | 'high' | 'ultra';
-  particleEffects: boolean;
-  animations: boolean;
-  showFPS: boolean;
-  darkMode: boolean;
-}
-
-interface GameplaySettings {
-  difficulty: 'easy' | 'normal' | 'hard' | 'expert';
-  autosaveInterval: number;
-  showTutorials: boolean;
-  combatSpeed: number;
-  notificationDuration: number;
-}
-
-interface UISettings {
-  fontSize: 'small' | 'medium' | 'large';
-  theme: string;
-  showResourceNotifications: boolean;
-  showLevelUpAnimations: boolean;
-  compactInventory: boolean;
-}
-
-interface SettingsState {
-  audio: AudioSettings;
-  graphics: GraphicsSettings;
-  gameplay: GameplaySettings;
-  ui: UISettings;
-  [key: string]: any; // Allow indexing with category string
-}
-
-// Define interface for dropdown options
+// SelectOption remains the same
 interface SelectOption {
-  value: string;
-  label: string;
+    value: string;
+    label: string;
 }
 
+// --- Settings Component ---
 const Settings: React.FC = () => {
-  const { state, dispatch } = useGameState();
-  const [activeTab, setActiveTab] = useState<string>('audio');
-  const [settingsState, setSettingsState] = useState<SettingsState>({
-    audio: {
-      masterVolume: 80,
-      musicVolume: 70,
-      effectsVolume: 80,
-      ambientVolume: 60,
-      dialogueVolume: 100,
-      muteWhenInactive: true
-    },
-    graphics: {
-      quality: 'high',
-      particleEffects: true,
-      animations: true,
-      showFPS: false,
-      darkMode: true
-    },
-    gameplay: {
-      difficulty: 'normal',
-      autosaveInterval: 5,
-      showTutorials: true,
-      combatSpeed: 1,
-      notificationDuration: 3
-    },
-    ui: {
-      fontSize: 'medium',
-      theme: 'dark',
-      showResourceNotifications: true,
-      showLevelUpAnimations: true,
-      compactInventory: false
-    }
-  });
-  
-  const [hasChanges, setHasChanges] = useState<boolean>(false);
-  const [hasSaved, setHasSaved] = useState<boolean>(false);
-  
-  // Options for select dropdowns
-  const qualityOptions: SelectOption[] = [
-    { value: 'low', label: 'Low' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'high', label: 'High' },
-    { value: 'ultra', label: 'Ultra' }
-  ];
-  
-  const difficultyOptions: SelectOption[] = [
-    { value: 'easy', label: 'Easy' },
-    { value: 'normal', label: 'Normal' },
-    { value: 'hard', label: 'Hard' },
-    { value: 'expert', label: 'Expert' }
-  ];
-  
-  const fontSizeOptions: SelectOption[] = [
-    { value: 'small', label: 'Small' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'large', label: 'Large' }
-  ];
-  
-  const themeOptions: SelectOption[] = [
-    { value: 'dark', label: 'Dark' },
-    { value: 'light', label: 'Light' },
-    { value: 'blue', label: 'Blue' },
-    { value: 'green', label: 'Green' },
-    { value: 'purple', label: 'Purple' }
-  ];
-  
-  // Load settings from game state on component mount
-  useEffect(() => {
-    if (state.settings) {
-      const newSettings = { ...settingsState };
-      
-      // Merge saved settings with default settings
-      Object.keys(newSettings).forEach(category => {
-        if (state.settings[category]) {
-          newSettings[category] = {
-            ...newSettings[category],
-            ...state.settings[category]
-          };
+    const dispatch = useAppDispatch();
+    const theme = useTheme(); // Get theme for spacing, etc.
+
+    // Select settings state from Redux
+    const audioSettings = useAppSelector(selectAudioSettings);
+    const graphicsSettings = useAppSelector(selectGraphicsSettings);
+    const gameplaySettings = useAppSelector(selectGameplaySettings);
+    const uiSettings = useAppSelector(selectUISettings);
+
+    const [activeTab, setActiveTab] = useState<string>('audio'); // Use string IDs for tabs
+
+    // --- Options remain the same ---
+    const qualityOptions: SelectOption[] = [
+        { value: 'low', label: 'Low' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'high', label: 'High' },
+        { value: 'ultra', label: 'Ultra' }
+    ];
+    const difficultyOptions: SelectOption[] = [
+        { value: 'easy', label: 'Easy' },
+        { value: 'normal', label: 'Normal' },
+        { value: 'hard', label: 'Hard' },
+        { value: 'expert', label: 'Expert' }
+    ];
+    const fontSizeOptions: SelectOption[] = [
+        { value: 'small', label: 'Small' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'large', label: 'Large' }
+    ];
+    const themeOptions: SelectOption[] = [
+        { value: 'dark', label: 'Dark' },
+        { value: 'light', label: 'Light' },
+        { value: 'blue', label: 'Blue' },
+        { value: 'green', label: 'Green' },
+        { value: 'purple', label: 'Purple' }
+    ];
+
+
+    // --- Handlers remain largely the same ---
+    const handleSettingChange = useCallback((
+        category: keyof Omit<SettingsState, 'isLoading' | 'lastSaved'>, // Type category correctly
+        setting: string,
+        value: string | number | boolean
+    ): void => {
+        dispatch(updateSetting({ category, setting, value }));
+    }, [dispatch]);
+
+    const handleSaveSettings = useCallback((): void => {
+        dispatch(saveSettingsThunk());
+        // Consider adding success feedback (e.g., Snackbar)
+    }, [dispatch]);
+
+    const handleResetSettings = useCallback((): void => {
+        if (window.confirm('Are you sure you want to reset all settings to defaults?')) {
+            dispatch(resetSettings());
+            // Dispatch save *after* reset is processed
+            setTimeout(() => dispatch(saveSettingsThunk()), 0);
         }
-      });
-      
-      setSettingsState(newSettings);
-    }
-  }, [state.settings]);
-  
-  // Handle setting changes
-  const handleSettingChange = (
-    category: string, 
-    setting: string, 
-    value: string | number | boolean
-  ): void => {
-    setSettingsState(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [setting]: value
-      }
-    }));
-    
-    setHasChanges(true);
-    setHasSaved(false);
-    
-    // Apply theme change immediately if changed
-    if (category === 'ui' && setting === 'theme') {
-      dispatch({
-        type: UI_ACTION_TYPES.SET_UI_THEME,
-        payload: { theme: value }
-      });
-    }
-  };
-  
-  // Save settings
-  const handleSaveSettings = (): void => {
-    dispatch({
-      type: UI_ACTION_TYPES.UPDATE_SETTINGS,
-      payload: settingsState
-    });
-    
-    // Update specific settings that need immediate effect
-    dispatch({
-      type: UI_ACTION_TYPES.SET_UI_THEME,
-      payload: { theme: settingsState.ui.theme }
-    });
-    
-    setHasChanges(false);
-    setHasSaved(true);
-    
-    // Reset saved message after a delay
-    setTimeout(() => {
-      setHasSaved(false);
-    }, 3000);
-  };
-  
-  // Reset settings to defaults
-  const handleResetSettings = (): void => {
-    if (window.confirm('Are you sure you want to reset all settings to defaults?')) {
-      const defaultSettings: SettingsState = {
-        audio: {
-          masterVolume: 80,
-          musicVolume: 70,
-          effectsVolume: 80,
-          ambientVolume: 60,
-          dialogueVolume: 100,
-          muteWhenInactive: true
-        },
-        graphics: {
-          quality: 'high',
-          particleEffects: true,
-          animations: true,
-          showFPS: false,
-          darkMode: true
-        },
-        gameplay: {
-          difficulty: 'normal',
-          autosaveInterval: 5,
-          showTutorials: true,
-          combatSpeed: 1,
-          notificationDuration: 3
-        },
-        ui: {
-          fontSize: 'medium',
-          theme: 'dark',
-          showResourceNotifications: true,
-          showLevelUpAnimations: true,
-          compactInventory: false
-        }
-      };
-      
-      setSettingsState(defaultSettings);
-      setHasChanges(true);
-      setHasSaved(false);
-    }
-  };
-  
-  // Render audio settings tab
-  const renderAudioSettings = (): JSX.Element => (
-    <SettingsSection>
-      <SettingItem>
-        <SettingLabel>Master Volume</SettingLabel>
-        <SettingControl>
-          <Slider
-            min={0}
-            max={100}
-            value={settingsState.audio.masterVolume}
-            onChange={(value) => handleSettingChange('audio', 'masterVolume', value)}
-            showValue
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Music Volume</SettingLabel>
-        <SettingControl>
-          <Slider
-            min={0}
-            max={100}
-            value={settingsState.audio.musicVolume}
-            onChange={(value) => handleSettingChange('audio', 'musicVolume', value)}
-            showValue
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Sound Effects</SettingLabel>
-        <SettingControl>
-          <Slider
-            min={0}
-            max={100}
-            value={settingsState.audio.effectsVolume}
-            onChange={(value) => handleSettingChange('audio', 'effectsVolume', value)}
-            showValue
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Ambient Sounds</SettingLabel>
-        <SettingControl>
-          <Slider
-            min={0}
-            max={100}
-            value={settingsState.audio.ambientVolume}
-            onChange={(value) => handleSettingChange('audio', 'ambientVolume', value)}
-            showValue
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Dialogue Volume</SettingLabel>
-        <SettingControl>
-          <Slider
-            min={0}
-            max={100}
-            value={settingsState.audio.dialogueVolume}
-            onChange={(value) => handleSettingChange('audio', 'dialogueVolume', value)}
-            showValue
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Mute when tab is inactive</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.audio.muteWhenInactive}
-            onChange={(checked) => handleSettingChange('audio', 'muteWhenInactive', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-    </SettingsSection>
-  );
-  
-  // Render graphics settings tab
-  const renderGraphicsSettings = (): JSX.Element => (
-    <SettingsSection>
-      <SettingItem>
-        <SettingLabel>Quality Preset</SettingLabel>
-        <SettingControl>
-          <Select
-            options={qualityOptions}
-            value={settingsState.graphics.quality}
-            onChange={(value) => handleSettingChange('graphics', 'quality', value)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Particle Effects</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.graphics.particleEffects}
-            onChange={(checked) => handleSettingChange('graphics', 'particleEffects', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Animations</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.graphics.animations}
-            onChange={(checked) => handleSettingChange('graphics', 'animations', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Show FPS Counter</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.graphics.showFPS}
-            onChange={(checked) => handleSettingChange('graphics', 'showFPS', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Dark Mode</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.graphics.darkMode}
-            onChange={(checked) => handleSettingChange('graphics', 'darkMode', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-    </SettingsSection>
-  );
-  
-  // Render gameplay settings tab
-  const renderGameplaySettings = (): JSX.Element => (
-    <SettingsSection>
-      <SettingItem>
-        <SettingLabel>Game Difficulty</SettingLabel>
-        <SettingControl>
-          <Select
-            options={difficultyOptions}
-            value={settingsState.gameplay.difficulty}
-            onChange={(value) => handleSettingChange('gameplay', 'difficulty', value)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Autosave Interval (minutes)</SettingLabel>
-        <SettingControl>
-          <Slider
-            min={1}
-            max={15}
-            step={1}
-            value={settingsState.gameplay.autosaveInterval}
-            onChange={(value) => handleSettingChange('gameplay', 'autosaveInterval', value)}
-            showValue
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Show Tutorials</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.gameplay.showTutorials}
-            onChange={(checked) => handleSettingChange('gameplay', 'showTutorials', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Combat Animation Speed</SettingLabel>
-        <SettingControl>
-          <Slider
-            min={0.5}
-            max={2}
-            step={0.1}
-            value={settingsState.gameplay.combatSpeed}
-            onChange={(value) => handleSettingChange('gameplay', 'combatSpeed', value)}
-            showValue
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Notification Duration (seconds)</SettingLabel>
-        <SettingControl>
-          <Slider
-            min={1}
-            max={10}
-            step={0.5}
-            value={settingsState.gameplay.notificationDuration}
-            onChange={(value) => handleSettingChange('gameplay', 'notificationDuration', value)}
-            showValue
-          />
-        </SettingControl>
-      </SettingItem>
-    </SettingsSection>
-  );
-  
-  // Render UI settings tab
-  const renderUISettings = (): JSX.Element => (
-    <SettingsSection>
-      <SettingItem>
-        <SettingLabel>Font Size</SettingLabel>
-        <SettingControl>
-          <Select
-            options={fontSizeOptions}
-            value={settingsState.ui.fontSize}
-            onChange={(value) => handleSettingChange('ui', 'fontSize', value)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Theme</SettingLabel>
-        <SettingControl>
-          <Select
-            options={themeOptions}
-            value={settingsState.ui.theme}
-            onChange={(value) => handleSettingChange('ui', 'theme', value)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Show Resource Gain Notifications</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.ui.showResourceNotifications}
-            onChange={(checked) => handleSettingChange('ui', 'showResourceNotifications', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Show Level-Up Animations</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.ui.showLevelUpAnimations}
-            onChange={(checked) => handleSettingChange('ui', 'showLevelUpAnimations', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-      
-      <SettingItem>
-        <SettingLabel>Compact Inventory View</SettingLabel>
-        <SettingControl>
-          <Toggle
-            checked={settingsState.ui.compactInventory}
-            onChange={(checked) => handleSettingChange('ui', 'compactInventory', checked)}
-          />
-        </SettingControl>
-      </SettingItem>
-    </SettingsSection>
-  );
-  
-  return (
-    <Container>
-      <SettingsHeader>
-        <h1>Settings</h1>
-        <HeaderButtons>
-          <Button onClick={handleResetSettings}>
-            <Icon name="arrow-counterclockwise" /> Reset to Default
-          </Button>
-          <Button 
-            primary 
-            disabled={!hasChanges}
-            onClick={handleSaveSettings}
-          >
-            <Icon name="save" /> Save Settings
-          </Button>
-        </HeaderButtons>
-      </SettingsHeader>
-      
-      {hasSaved && (
-        <SavedMessage>
-          <Icon name="check-circle-fill" /> Settings saved successfully!
-        </SavedMessage>
-      )}
-      
-      <TabsContainer>
-        <Tabs activeTab={activeTab} onChange={setActiveTab}>
-          <Tab id="audio">
-            <Icon name="volume-up" /> Audio
-          </Tab>
-          <Tab id="graphics">
-            <Icon name="display" /> Graphics
-          </Tab>
-          <Tab id="gameplay">
-            <Icon name="controller" /> Gameplay
-          </Tab>
-          <Tab id="ui">
-            <Icon name="window" /> UI
-          </Tab>
-        </Tabs>
-      </TabsContainer>
-      
-      <SettingsPanel>
-        {activeTab === 'audio' && renderAudioSettings()}
-        {activeTab === 'graphics' && renderGraphicsSettings()}
-        {activeTab === 'gameplay' && renderGameplaySettings()}
-        {activeTab === 'ui' && renderUISettings()}
-      </SettingsPanel>
-      
-      <ButtonBar>
-        <Button onClick={() => window.history.back()}>
-          <Icon name="arrow-left" /> Back
-        </Button>
-        <Button 
-          primary 
-          disabled={!hasChanges}
-          onClick={handleSaveSettings}
+    }, [dispatch]);
+
+    // MUI Tabs onChange handler
+    const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+        setActiveTab(newValue);
+    };
+
+    // --- Reusable Setting Item Component using MUI ---
+    const SettingItem: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                py: 1.5, // Use theme spacing
+                borderBottom: `1px solid ${theme.palette.divider}`,
+                '&:last-child': { borderBottom: 'none' },
+                flexDirection: { xs: 'column', sm: 'row' }, // Stack on small screens
+                alignItems: { xs: 'flex-start', sm: 'center' }, // Align start on small screens
+                gap: { xs: 1, sm: 2 }
+            }}
         >
-          <Icon name="save" /> Save Settings
-        </Button>
-      </ButtonBar>
-    </Container>
-  );
+            <Typography variant="body1" sx={{ flexShrink: 0, minWidth: '200px' }}>{label}</Typography>
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                {children}
+            </Box>
+        </Box>
+    );
+
+    // --- Render functions using MUI components and sx prop ---
+    const renderAudioSettings = (): React.ReactNode => (
+        <Box>
+            <SettingItem label="Master Volume">
+                <Slider
+                    aria-label="Master Volume"
+                    valueLabelDisplay="auto"
+                    value={audioSettings.masterVolume}
+                    onChange={(e, value) => handleSettingChange('audio', 'masterVolume', value as number)}
+                    min={0} max={100} step={1} sx={{ width: { xs: '100%', sm: 200 } }}
+                />
+            </SettingItem>
+            <SettingItem label="Music Volume">
+                <Slider valueLabelDisplay="auto" value={audioSettings.musicVolume} onChange={(e, value) => handleSettingChange('audio', 'musicVolume', value as number)} min={0} max={100} step={1} sx={{ width: { xs: '100%', sm: 200 } }}/>
+            </SettingItem>
+            <SettingItem label="Sound Effects">
+                 <Slider valueLabelDisplay="auto" value={audioSettings.effectsVolume} onChange={(e, value) => handleSettingChange('audio', 'effectsVolume', value as number)} min={0} max={100} step={1} sx={{ width: { xs: '100%', sm: 200 } }}/>
+            </SettingItem>
+             <SettingItem label="Ambient Sounds">
+                 <Slider valueLabelDisplay="auto" value={audioSettings.ambientVolume} onChange={(e, value) => handleSettingChange('audio', 'ambientVolume', value as number)} min={0} max={100} step={1} sx={{ width: { xs: '100%', sm: 200 } }}/>
+            </SettingItem>
+             <SettingItem label="Dialogue Volume">
+                 <Slider valueLabelDisplay="auto" value={audioSettings.dialogueVolume} onChange={(e, value) => handleSettingChange('audio', 'dialogueVolume', value as number)} min={0} max={100} step={1} sx={{ width: { xs: '100%', sm: 200 } }}/>
+            </SettingItem>
+            <SettingItem label="Mute when tab is inactive">
+                <Switch
+                    checked={audioSettings.muteWhenInactive}
+                    onChange={(e, checked) => handleSettingChange('audio', 'muteWhenInactive', checked)}
+                />
+            </SettingItem>
+        </Box>
+    );
+
+    const renderGraphicsSettings = (): React.ReactNode => (
+        <Box>
+            <SettingItem label="Quality Preset">
+                <Select
+                    size="small"
+                    value={graphicsSettings.quality}
+                    onChange={(e) => handleSettingChange('graphics', 'quality', e.target.value)}
+                    sx={{ minWidth: 120 }}
+                >
+                    {qualityOptions.map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}
+                </Select>
+            </SettingItem>
+             <SettingItem label="Particle Effects">
+                <Switch checked={graphicsSettings.particleEffects} onChange={(e, checked) => handleSettingChange('graphics', 'particleEffects', checked)} />
+            </SettingItem>
+            <SettingItem label="Animations">
+                <Switch checked={graphicsSettings.animations} onChange={(e, checked) => handleSettingChange('graphics', 'animations', checked)} />
+            </SettingItem>
+             <SettingItem label="Show FPS Counter">
+                <Switch checked={graphicsSettings.showFPS} onChange={(e, checked) => handleSettingChange('graphics', 'showFPS', checked)} />
+            </SettingItem>
+            <SettingItem label="Dark Mode">
+                {/* Note: Dark mode might also be controlled by ThemeContext */}
+                <Switch checked={graphicsSettings.darkMode} onChange={(e, checked) => handleSettingChange('graphics', 'darkMode', checked)} />
+            </SettingItem>
+        </Box>
+    );
+
+    const renderGameplaySettings = (): React.ReactNode => (
+       <Box>
+            <SettingItem label="Game Difficulty">
+                <Select size="small" value={gameplaySettings.difficulty} onChange={(e) => handleSettingChange('gameplay', 'difficulty', e.target.value)} sx={{ minWidth: 120 }}>
+                    {difficultyOptions.map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}
+                </Select>
+            </SettingItem>
+            <SettingItem label="Autosave Interval (minutes)">
+                 <Slider valueLabelDisplay="auto" value={gameplaySettings.autosaveInterval} onChange={(e, value) => handleSettingChange('gameplay', 'autosaveInterval', value as number)} min={1} max={15} step={1} sx={{ width: { xs: '100%', sm: 200 } }}/>
+            </SettingItem>
+            <SettingItem label="Show Tutorials">
+                <Switch checked={gameplaySettings.showTutorials} onChange={(e, checked) => handleSettingChange('gameplay', 'showTutorials', checked)} />
+            </SettingItem>
+            <SettingItem label="Combat Animation Speed">
+                <Slider valueLabelDisplay="auto" value={gameplaySettings.combatSpeed} onChange={(e, value) => handleSettingChange('gameplay', 'combatSpeed', value as number)} min={0.5} max={2} step={0.1} sx={{ width: { xs: '100%', sm: 200 } }}/>
+            </SettingItem>
+            <SettingItem label="Notification Duration (seconds)">
+                <Slider valueLabelDisplay="auto" value={gameplaySettings.notificationDuration} onChange={(e, value) => handleSettingChange('gameplay', 'notificationDuration', value as number)} min={1} max={10} step={0.5} sx={{ width: { xs: '100%', sm: 200 } }}/>
+            </SettingItem>
+       </Box>
+    );
+
+    const renderUISettings = (): React.ReactNode => (
+        <Box>
+             <SettingItem label="Font Size">
+                <Select size="small" value={uiSettings.fontSize} onChange={(e) => handleSettingChange('ui', 'fontSize', e.target.value)} sx={{ minWidth: 120 }}>
+                    {fontSizeOptions.map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}
+                </Select>
+            </SettingItem>
+            <SettingItem label="Theme">
+                <Select size="small" value={uiSettings.theme} onChange={(e) => handleSettingChange('ui', 'theme', e.target.value)} sx={{ minWidth: 120 }}>
+                    {themeOptions.map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}
+                </Select>
+            </SettingItem>
+             <SettingItem label="Show Resource Gain Notifications">
+                <Switch checked={uiSettings.showResourceNotifications} onChange={(e, checked) => handleSettingChange('ui', 'showResourceNotifications', checked)} />
+            </SettingItem>
+            <SettingItem label="Show Level-Up Animations">
+                 <Switch checked={uiSettings.showLevelUpAnimations} onChange={(e, checked) => handleSettingChange('ui', 'showLevelUpAnimations', checked)} />
+            </SettingItem>
+            <SettingItem label="Compact Inventory View">
+                 <Switch checked={uiSettings.compactInventory} onChange={(e, checked) => handleSettingChange('ui', 'compactInventory', checked)} />
+            </SettingItem>
+        </Box>
+    );
+
+    return (
+        // Use MUI Container for max-width and centering
+        <Container maxWidth="lg" sx={{ py: 3 }}>
+            <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 } }}>
+                {/* Header using Box with sx */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        mb: 3,
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'center' },
+                        gap: { xs: 2, sm: 0 }
+                    }}
+                >
+                    <Typography variant="h4" component="h1">Settings</Typography>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button onClick={handleResetSettings} startIcon={<RestoreIcon />} variant="outlined">
+                            Reset Defaults
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSaveSettings}
+                            startIcon={<SaveIcon />}
+                        >
+                            Save Settings
+                        </Button>
+                    </Box>
+                </Box>
+
+                {/* Tabs using MUI Tabs */}
+                <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+                    <Tabs
+                        value={activeTab}
+                        onChange={handleTabChange}
+                        aria-label="Settings categories"
+                        variant="scrollable"
+                        scrollButtons="auto"
+                    >
+                        <Tab icon={<VolumeUpIcon />} iconPosition="start" label="Audio" value="audio" />
+                        <Tab icon={<DisplaySettingsIcon />} iconPosition="start" label="Graphics" value="graphics" />
+                        <Tab icon={<SportsEsportsIcon />} iconPosition="start" label="Gameplay" value="gameplay" />
+                        <Tab icon={<WindowIcon />} iconPosition="start" label="UI" value="ui" />
+                    </Tabs>
+                </Box>
+
+                {/* Use Box for content area */}
+                <Box>
+                    {activeTab === 'audio' && renderAudioSettings()}
+                    {activeTab === 'graphics' && renderGraphicsSettings()}
+                    {activeTab === 'gameplay' && renderGameplaySettings()}
+                    {activeTab === 'ui' && renderUISettings()}
+                </Box>
+            </Paper>
+        </Container>
+    );
 };
-
-// Styled components
-const Container = styled.div`
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const SettingsHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-`;
-
-const HeaderButtons = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const TabsContainer = styled.div`
-  margin-bottom: 20px;
-`;
-
-const SettingsPanel = styled(Panel)`
-  margin-bottom: 20px;
-`;
-
-const SettingsSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-`;
-
-const SettingItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid ${props => props.theme.colors.border};
-  
-  &:last-child {
-    border-bottom: none;
-  }
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-`;
-
-const SettingLabel = styled.div`
-  flex: 1;
-  font-weight: 500;
-`;
-
-const SettingControl = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-  
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: flex-start;
-  }
-`;
-
-const ButtonBar = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const SavedMessage = styled.div`
-  background-color: ${props => props.theme.colors.success};
-  color: white;
-  padding: 10px 15px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
 
 export default Settings;
