@@ -6,7 +6,7 @@ import {
   selectPlayerAttribute,
   selectPlayerHealth,
   selectPlayerMaxHealth
-} from '../../state/playerSelectors';
+} from '../../state/PlayerSelectors';
 
 interface StatDisplayProps {
   statName?: string;

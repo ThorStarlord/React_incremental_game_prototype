@@ -5,14 +5,17 @@ import {
   Tooltip,
   Paper
 } from '@mui/material';
-import { CopyableTrait } from '../../data/traits';
+// Import the Trait type from the slice and the selector
+import { Trait } from '../../state/TraitsTypes';
+import { selectTraitById } from '../../state/TraitsSelectors';
+import { useAppSelector } from '../../../../app/hooks';
 
 /**
  * Props for the CompactTraitCard component
  */
 interface CompactTraitCardProps {
-  /** The trait to display in the card */
-  trait: CopyableTrait | null;
+  /** The ID of the trait to display */
+  traitId: string | null;
 }
 
 /**
@@ -49,16 +52,20 @@ const getTraitTypeColor = (type?: TraitType): string => {
  * @param props - Component props
  * @returns React component or null if no trait is provided
  */
-const CompactTraitCard: React.FC<CompactTraitCardProps> = ({ trait }) => {
-  if (!trait) return null;
+const CompactTraitCard: React.FC<CompactTraitCardProps> = ({ traitId }) => {
+  // Fetch the trait data from Redux store using the ID
+  const trait = useAppSelector((state) => traitId ? selectTraitById(state, traitId) : null);
+
+  // Render nothing if the trait ID is null or the trait data is not found
+  if (!traitId || !trait) return null;
   
   return (
     <Tooltip 
       title={
         <>
           <Typography variant="subtitle2">{trait.name}</Typography>
-          <Typography variant="caption">{trait.type}</Typography>
-          <Typography variant="body2">{trait.description}</Typography>
+          <Typography variant="caption">{trait.category}</Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>{trait.description}</Typography>
         </>
       }
     >
@@ -71,7 +78,7 @@ const CompactTraitCard: React.FC<CompactTraitCardProps> = ({ trait }) => {
           pl: 1.5,
           pr: 0.5,
           borderLeft: '3px solid',
-          borderColor: `${getTraitTypeColor(trait.type)}.main`,
+          borderColor: `${getTraitTypeColor(trait.category)}.main`, // Use category from Trait type
           overflow: 'hidden',
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis'

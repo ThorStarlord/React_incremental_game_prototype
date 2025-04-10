@@ -1,7 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
+// Import makePermanent action and Trait type
 import { makePermanent } from './TraitsSlice';
+import { Trait } from './TraitsTypes';
 
 const MAKE_PERMANENT_COST = 150;
 
@@ -52,9 +54,10 @@ export const makeTraitPermanentThunk = createAsyncThunk<
     
     try {
       // Step 1: Spend essence
-      dispatch(spendEssence({ 
-        amount: MAKE_PERMANENT_COST, 
-        reason: `Made ${trait.name} permanent` 
+      // This call should now be valid with the updated SpendEssencePayload type
+      dispatch(spendEssence({
+        amount: MAKE_PERMANENT_COST,
+        reason: `Made ${trait.name} permanent`
       }));
       
       // Step 2: Make the trait permanent
@@ -73,6 +76,46 @@ export const makeTraitPermanentThunk = createAsyncThunk<
         errorMessage = error.message;
       }
       return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Thunk for fetching initial trait data
+ * This simulates fetching data from an API or local source
+ */
+export const fetchTraitsThunk = createAsyncThunk<
+  // Return type on success: the fetched traits
+  Record<string, Trait>,
+  // Argument type: void (no arguments needed)
+  void,
+  // ThunkAPI config
+  { rejectValue: string }
+>(
+  'traits/fetchTraits',
+  async (_, { rejectWithValue }) => {
+    try {
+      // Fetch from the public folder (path relative to the domain root)
+      const response = await fetch('/data/traits.json');
+
+      if (!response.ok) {
+        // Throw an error if the network response is bad
+        throw new Error(`Failed to fetch traits.json: ${response.status} ${response.statusText}`);
+      }
+
+      // Parse the JSON response
+      const data: Record<string, Trait> = await response.json();
+
+      // Return the fetched data - the 'fulfilled' extraReducer will handle setting the state
+      return data;
+    } catch (error) {
+      let message = 'Unknown error fetching traits';
+      if (error instanceof Error) {
+        message = error.message;
+      }
+      console.error('Fetch Traits Error:', message);
+      // Reject the thunk with an error message
+      return rejectWithValue(message);
     }
   }
 );

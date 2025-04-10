@@ -62,6 +62,26 @@ export interface Trait {
     quest?: string;
     [key: string]: any;
   };
+
+  /** Level of the trait if traits can be leveled up */
+  level?: number;
+}
+
+/**
+ * Interface for a trait with active status (used potentially in UI state, not core state)
+ */
+export interface ActiveTrait extends Trait {
+  isActive: boolean;
+}
+
+/**
+ * Interface for trait filtering criteria
+ */
+export interface TraitFilters {
+  type?: string; // Corresponds to trait.category
+  maxCost?: number; // Corresponds to trait.essenceCost
+  searchTerm?: string;
+  // Add other potential filters like rarity, source, etc.
 }
 
 /**

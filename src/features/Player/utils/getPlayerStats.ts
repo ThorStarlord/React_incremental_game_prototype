@@ -1,5 +1,7 @@
-// Change the import to get PlayerState from the central exports
-import { PlayerState } from '../../../context/GameStateExports';
+// Import PlayerState from the local PlayerTypes file
+import { PlayerState } from '../state/PlayerTypes';
+// Import LEVEL_REQUIREMENTS or calculation logic if needed
+import { LEVEL_REQUIREMENTS, calculateExperienceForLevel } from '../../../constants/gameConstants';
 
 /**
  * Type definition for player updates
@@ -72,25 +74,25 @@ export const getPlayerMaxHealth = (player: PlayerState): number => {
 };
 
 /**
- * Gets the player's current energy (assuming energy maps to mana)
+ * Gets the player's current energy (mana)
  *
  * @param player - The player state object
  * @returns The player's current energy/mana
  */
 export const getPlayerEnergy = (player: PlayerState): number => {
-    // Use mana if energy isn't directly on PlayerState, or provide fallback
-    return player.stats?.mana ?? player.energy ?? 0;
+    // Use mana from stats, remove fallback to non-existent 'energy'
+    return player.stats?.mana ?? 0;
 };
 
 /**
- * Gets the player's maximum energy (assuming energy maps to mana)
+ * Gets the player's maximum energy (mana)
  *
  * @param player - The player state object
  * @returns The player's maximum energy/mana
  */
 export const getPlayerMaxEnergy = (player: PlayerState): number => {
-    // Use maxMana if maxEnergy isn't directly on PlayerState, or provide fallback
-    return player.stats?.maxMana ?? player.maxEnergy ?? 100;
+    // Use maxMana from stats, remove fallback to non-existent 'maxEnergy'
+    return player.stats?.maxMana ?? 100;
 };
 
 /**
@@ -111,6 +113,11 @@ export const getPlayerExperience = (player: PlayerState): number => {
  * @returns The experience required for the next level
  */
 export const getPlayerMaxExperience = (player: PlayerState): number => {
-    // Add fallback for potentially missing experienceToNextLevel
-    return player.experienceToNextLevel ?? 100;
+    // Calculate the experience needed for the *next* level
+    const nextLevel = (player.level ?? 1) + 1;
+    // Use the same calculation logic as in PlayerSelectors or gameConstants
+    // Example using calculateExperienceForLevel from gameConstants:
+    return calculateExperienceForLevel(nextLevel);
+    // Or if using LEVEL_REQUIREMENTS directly:
+    // return LEVEL_REQUIREMENTS[nextLevel]?.xp ?? calculateExperienceForLevel(nextLevel);
 };

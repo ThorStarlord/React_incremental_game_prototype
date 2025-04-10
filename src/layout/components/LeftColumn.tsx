@@ -7,8 +7,6 @@
  * 
  * This component renders various sub-components in a configurable, collapsible format, including:
  * - Player statistics and attributes
- * - Inventory management
- * - Character selection and management
  * - Resource displays (essence, currencies)
  * - Other character-related functionality
  * 
@@ -32,7 +30,7 @@
  * // With custom component selection
  * <LeftColumn 
  *   title="My Character" 
- *   components={['PlayerStats', 'InventoryList', 'EssenceDisplay']} 
+ *   components={['PlayerStats', 'EssenceDisplay']} 
  * />
  */
 
@@ -58,9 +56,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import PlayerStats from '../../features/Player/components/containers/PlayerStats';
-//import InventoryList from '../../features/Inventory/components/containers/InventoryList';
 import EssenceDisplay from '../../features/Essence/components/ui/EssenceDisplay';
-import CompactCharacterPanel from '../../features/Minions/components/ui/CompactCharacterPanel';
 
 /**
  * Component registry item with metadata
@@ -302,13 +298,13 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
 /**
  * LeftColumn Component
  * 
- * A flexible side panel for displaying character information, inventory, and
- * other player-related components.
+ * A flexible side panel for displaying character information, player stats,
+ * and essence display.
  * 
  * @component
  */
 const LeftColumn: React.FC<LeftColumnProps> = ({ 
-  components = ['PlayerStats'], 
+  components = ['PlayerStats', 'EssenceDisplay'], 
   title = 'Character',
   sx = {}
 }) => {
@@ -355,22 +351,10 @@ const LeftColumn: React.FC<LeftColumnProps> = ({
       description: 'Shows player statistics and attributes',
       defaultExpanded: true
     },
-    InventoryList: {
-      component: InventoryList,
-      title: 'Inventory',
-      description: 'Displays player inventory items',
-      defaultExpanded: true
-    },
     EssenceDisplay: {
       component: EssenceDisplay,
       title: 'Essence',
       description: 'Shows accumulated essence and generation rate',
-      defaultExpanded: true
-    },
-    CompactCharacterPanel: {
-      component: CompactCharacterPanel,
-      title: 'Characters',
-      description: 'Shows brief overview of characters',
       defaultExpanded: true
     }
   };

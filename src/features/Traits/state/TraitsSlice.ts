@@ -6,6 +6,8 @@ import {
   TraitPreset,
   TraitsState
 } from './TraitsTypes';
+// Import the thunks
+import { makeTraitPermanentThunk, fetchTraitsThunk } from './TraitThunks';
 
 // Initial trait slots
 const initialSlots: TraitSlot[] = [
@@ -18,7 +20,7 @@ const initialSlots: TraitSlot[] = [
 
 // Initial state
 const initialState: TraitsState = {
-  traits: {},
+  traits: {}, // Ensure traits is initialized as an empty object
   acquiredTraits: [],
   permanentTraits: [],
   slots: initialSlots,
@@ -210,6 +212,39 @@ const traitsSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     }
+  },
+  // Add extra reducers for handling thunk lifecycle actions
+  extraReducers: (builder) => {
+    builder
+      // Make Permanent Thunk
+      .addCase(makeTraitPermanentThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(makeTraitPermanentThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        // The actual state changes (making permanent) are handled by the dispatched 'makePermanent' action within the thunk.
+        // We might log success or update UI state here if needed.
+        console.log(action.payload.message); // Example logging
+      })
+      .addCase(makeTraitPermanentThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string || 'Failed to make trait permanent';
+      })
+      // Fetch Traits Thunk
+      .addCase(fetchTraitsThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTraitsThunk.fulfilled, (state, action: PayloadAction<Record<string, Trait>>) => {
+        state.loading = false;
+        state.traits = action.payload; // Set the fetched traits
+        state.error = null;
+      })
+      .addCase(fetchTraitsThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to fetch traits'; // Use rejectValue
+      });
   }
 });
 

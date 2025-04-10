@@ -16,7 +16,7 @@ import {
   addStatusEffect,
   removeStatusEffect
 } from './PlayerSlice';
-import { recalculatePlayerStats } from '../utils/playerUtils';
+import { recalculatePlayerStats } from '../utils/playerStatCalculations';
 import { 
   Attribute, 
   PlayerState, 

@@ -37,6 +37,7 @@ import {
   selectPermanentTraits
 } from '../../state/TraitsSlice';
 import { makeTraitPermanentThunk } from '../../state/TraitThunks';
+import { selectEssenceAmount } from '../../../Essence/state/EssenceSlice';
 import './TraitSlots.css';
 
 /**
@@ -177,7 +178,7 @@ const TraitSlots: React.FC = () => {
   const slots = useSelector(selectTraitSlots);
   const equippedTraitIds = useSelector(selectEquippedTraitIds);
   const permanentTraitIds = useSelector(selectPermanentTraits);
-  const essence = useSelector((state: RootState) => state.player.essence || 0);
+  const essence = useSelector(selectEssenceAmount);
   
   const [showTraitSelector, setShowTraitSelector] = useState<boolean>(false);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);

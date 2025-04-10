@@ -8,7 +8,6 @@
  * 
  * - Main game content area (interactions, dialogs, etc.)
  * - World map for navigation and exploration
- * - Battle interface for combat encounters
  * - Other dynamic game components
  * 
  * Features:
@@ -31,7 +30,7 @@
  * @example
  * // With specific components and active content
  * <MiddleColumn 
- *   components={['Battle', 'Inventory']}
+ *   components={['Inventory']}
  *   selectedTownId="northshire"
  *   onTownSelect={handleTownSelect}
  *   onBackToWorldMap={handleBackToMap}
@@ -58,8 +57,6 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import MaximizeIcon from '@mui/icons-material/Maximize';
 import MinimizeIcon from '@mui/icons-material/Minimize';
-// Fix imports by using type assertions
-//import Battle from '../../features/Combat/components/containers/Battle';
 // Fix WorldMap import by using explicit require with type assertion
 const WorldMap = require('../../features/World/components/containers/WorldMap').default as React.FC<WorldMapProps>;
 import MainContent from '../../shared/components/layout/MainContent';
@@ -133,9 +130,6 @@ interface MiddleColumnProps {
   /** ID of currently selected town (for MainContent and related views) */
   selectedTownId?: string;
   
-  /** ID of currently selected NPC (for dialogue and interaction) */
-  selectedNpcId?: string;
-  
   /** Currently selected dungeon data (for dungeon exploration) */
   selectedDungeon?: any;
   
@@ -158,9 +152,6 @@ interface MiddleColumnProps {
 interface MainContentProps {
   /** ID of currently selected town */
   selectedTownId?: string;
-  
-  /** ID of currently selected NPC */
-  selectedNpcId?: string;
   
   /** Selected dungeon data */
   selectedDungeon?: any;
@@ -427,15 +418,14 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
  * MiddleColumn Component
  * 
  * The central layout component for the game interface, displaying the main game content,
- * world map, battle interface, and other dynamic content sections.
+ * world map, and other dynamic content sections.
  * 
  * @component
  */
 const MiddleColumn: React.FC<MiddleColumnProps> = ({ 
-  components = ['Battle'],
+  components = [],
   title = 'Game World',
   selectedTownId, 
-  selectedNpcId, 
   selectedDungeon, 
   isExploring, 
   onTownSelect, 
@@ -447,8 +437,7 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
   // State for tracking expanded, configuration mode, and maximized sections
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     mainContent: true,
-    worldMap: true,
-    battle: true
+    worldMap: true
   });
   
   const [configMode, setConfigMode] = useState<Record<string, boolean>>({});
@@ -477,12 +466,6 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
 
   // Registry of available components
   const componentRegistry: Record<string, ComponentRegistryItem> = {
-    Battle: {
-      component: Battle,
-      title: 'Battle',
-      description: 'Combat interface for engaging enemies',
-      defaultExpanded: true
-    },
     MainContent: {
       component: MainContent,
       title: 'Game Content',
@@ -517,7 +500,7 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
         key={componentId}
         id={componentId.toLowerCase()}
         title={metadata.title}
-        className={styles['battle-module']}
+        className=""
         content={<ComponentToRender />}
         isExpanded={isExpanded}
         isConfiguring={isConfiguring}
@@ -532,7 +515,6 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
   // Prepare props for specific components
   const mainContentProps: MainContentProps = {
     selectedTownId,
-    selectedNpcId,
     selectedDungeon,
     isExploring,
     onBackToWorldMap
@@ -603,11 +585,10 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
           onToggleMaximize={toggleMaximize}
           content={
             <Box className={styles['section-content']}>
-              <MainContent>
+              <MainContent {...mainContentProps}>
                 {/* Render content based on props */}
                 <Box>
                   {selectedTownId && <Typography>Selected town: {selectedTownId}</Typography>}
-                  {selectedNpcId && <Typography>Speaking with: {selectedNpcId}</Typography>}
                   {selectedDungeon && <Typography>Exploring dungeon</Typography>}
                   {isExploring && <Typography>Exploring area...</Typography>}
                   {onBackToWorldMap && (
@@ -639,7 +620,7 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
           }
         />
 
-        {/* Battle and other components */}
+        {/* Render dynamically added components (if any) */}
         <Box 
           sx={{ 
             flex: 1, 

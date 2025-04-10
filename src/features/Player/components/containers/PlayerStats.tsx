@@ -1,13 +1,13 @@
 import React from 'react';
 import { Box, Typography, Grid, LinearProgress, Paper } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { 
-  selectPlayerName, 
-  selectPlayerHealth, 
-  selectPlayerMaxHealth, 
+import {
+  selectPlayerName,
+  selectPlayerHealth,
+  selectPlayerMaxHealth,
   selectPlayerMana,
   selectPlayerAttribute
-} from '../../state/playerSelectors';
+} from '../../state/PlayerSelectors';
 import { RootState } from '../../../../app/store';
 
 interface PlayerStatsProps {

@@ -1,39 +1,19 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { useGameState, useGameDispatch } from '../../context';
+import { useEffect, useCallback, useRef, useMemo } from 'react';
+import { useAppSelector, useAppDispatch } from '../../../app/hooks';
+import { RootState } from '../../../app/store';
+import {
+  selectTraits,
+  selectTraitSlots,
+  equipTrait,
+  unequipTrait
+} from '../state/TraitsSlice';
+import { Trait, TraitSlot } from '../state/TraitsTypes';
 
-/**
- * Interface for a trait object
- */
-interface Trait {
-  id: string;
-  name: string;
-  slotId?: string | null;
-  hotkey?: string;
-  isActive?: boolean;
-  [key: string]: any; // Other trait properties
-}
-
-/**
- * Interface for a trait slot
- */
-interface TraitSlot {
-  id: string;
-  index: number;
-  isUnlocked: boolean;
-  traitId?: string | null;
-}
-
-/**
- * Interface for shortcut configuration
- */
 interface ShortcutConfig {
   enabled: boolean;
   showNotifications: boolean;
 }
 
-/**
- * Interface for hook return value
- */
 interface UseTraitHotkeysReturn {
   registerTraitHotkey: (traitId: string, key: string) => void;
   unregisterTraitHotkey: (traitId: string) => void;
@@ -46,270 +26,136 @@ interface UseTraitHotkeysReturn {
 }
 
 /**
- * Hook for managing trait keyboard hotkeys
- * 
+ * Hook for managing trait keyboard hotkeys using Redux state
+ *
  * @returns {UseTraitHotkeysReturn} Functions to manage trait hotkeys
  */
 const useTraitHotkeys = (): UseTraitHotkeysReturn => {
-  const { traits = [], traitSlots = [], settings = {} } = useGameState();
-  const dispatch = useGameDispatch();
-  
-  // Reference to store hotkey mappings that persists across renders
-  const hotkeyMapRef = useRef<Record<string, string>>({}); // key -> traitId
-  
-  // Get configuration from settings or use defaults
-  const config = {
-    enabled: settings.traitHotkeysEnabled ?? true,
-    showNotifications: settings.traitHotkeyNotifications ?? true
+  const dispatch = useAppDispatch();
+  const allTraits = useAppSelector(selectTraits);
+  const traitSlots = useAppSelector(selectTraitSlots);
+
+  const traitsArray: Trait[] = useMemo(() => Object.values(allTraits), [allTraits]);
+
+  const hotkeyMapRef = useRef<Record<string, string>>({});
+
+  const config: ShortcutConfig = {
+    enabled: true,
+    showNotifications: true
   };
-  
-  /**
-   * Set or update hotkey configuration
-   * 
-   * @param {Partial<ShortcutConfig>} newConfig - New configuration options
-   */
+
   const setConfig = useCallback((newConfig: Partial<ShortcutConfig>): void => {
-    dispatch({
-      type: 'UPDATE_SETTINGS',
-      payload: {
-        traitHotkeysEnabled: newConfig.enabled !== undefined ? newConfig.enabled : config.enabled,
-        traitHotkeyNotifications: newConfig.showNotifications !== undefined ? 
-          newConfig.showNotifications : config.showNotifications
-      }
-    });
+    console.warn("setConfig is not fully implemented. Settings persistence requires a Redux action.");
   }, [dispatch, config]);
-  
-  /**
-   * Register a hotkey for a trait
-   * 
-   * @param {string} traitId - ID of the trait to assign hotkey to
-   * @param {string} key - The key to use as hotkey
-   */
+
   const registerTraitHotkey = useCallback((traitId: string, key: string): void => {
-    // Remove any existing assignments for this key
     Object.keys(hotkeyMapRef.current).forEach(existingKey => {
       if (existingKey.toLowerCase() === key.toLowerCase()) {
         delete hotkeyMapRef.current[existingKey];
       }
     });
-    
-    // Add new hotkey mapping
+
     hotkeyMapRef.current[key.toLowerCase()] = traitId;
-    
-    // Save to persistent storage
-    dispatch({
-      type: 'SET_TRAIT_HOTKEY',
-      payload: {
-        traitId,
-        hotkey: key.toLowerCase()
-      }
-    });
-    
-    // Show notification if enabled
+
     if (config.showNotifications) {
-      const trait = traits.find(t => t.id === traitId);
-      dispatch({
-        type: 'SHOW_NOTIFICATION',
-        payload: {
-          message: `Hotkey ${key} assigned to ${trait?.name || 'trait'}`,
-          severity: 'success',
-          duration: 2000
-        }
-      });
+      const trait = traitsArray.find((t: Trait) => t.id === traitId);
+      console.log(`Hotkey ${key} assigned to ${trait?.name || 'trait'}`);
     }
-  }, [traits, dispatch, config.showNotifications]);
-  
-  /**
-   * Remove hotkey assignment for a trait
-   * 
-   * @param {string} traitId - ID of the trait to unassign hotkey from
-   */
+  }, [traitsArray, dispatch, config.showNotifications]);
+
   const unregisterTraitHotkey = useCallback((traitId: string): void => {
-    // Find and remove hotkey for this trait
     Object.keys(hotkeyMapRef.current).forEach(key => {
       if (hotkeyMapRef.current[key] === traitId) {
         delete hotkeyMapRef.current[key];
       }
     });
-    
-    // Update persistent storage
-    dispatch({
-      type: 'SET_TRAIT_HOTKEY',
-      payload: {
-        traitId,
-        hotkey: null
-      }
-    });
+
+    console.log(`Hotkey for trait ${traitId} unregistered.`);
   }, [dispatch]);
-  
-  /**
-   * Remove all hotkey assignments
-   */
+
   const clearAllHotkeys = useCallback((): void => {
     hotkeyMapRef.current = {};
-    
-    dispatch({
-      type: 'CLEAR_ALL_TRAIT_HOTKEYS'
-    });
-    
+
     if (config.showNotifications) {
-      dispatch({
-        type: 'SHOW_NOTIFICATION',
-        payload: {
-          message: 'All trait hotkeys cleared',
-          severity: 'info',
-          duration: 2000
-        }
-      });
+      console.log('All trait hotkeys cleared');
     }
   }, [dispatch, config.showNotifications]);
-  
-  /**
-   * Check if a key is already registered as a hotkey
-   * 
-   * @param {string} key - The key to check
-   * @returns {boolean} Whether the key is already registered
-   */
+
   const isHotkeyRegistered = useCallback((key: string): boolean => {
     return Object.keys(hotkeyMapRef.current).some(
       existingKey => existingKey.toLowerCase() === key.toLowerCase()
     );
   }, []);
-  
-  /**
-   * Get the hotkey assigned to a trait
-   * 
-   * @param {string} traitId - ID of the trait to check
-   * @returns {string|null} The assigned hotkey or null if none
-   */
+
   const getKeyForTrait = useCallback((traitId: string): string | null => {
     const entries = Object.entries(hotkeyMapRef.current);
     const found = entries.find(([_, id]) => id === traitId);
     return found ? found[0] : null;
   }, []);
-  
-  /**
-   * Get the trait assigned to a hotkey
-   * 
-   * @param {string} key - The hotkey to check
-   * @returns {Trait|null} The trait object or null if none found
-   */
+
   const getTraitForKey = useCallback((key: string): Trait | null => {
     const traitId = hotkeyMapRef.current[key.toLowerCase()];
     if (!traitId) return null;
-    
-    return traits.find(t => t.id === traitId) || null;
-  }, [traits]);
-  
-  /**
-   * Handle keyboard events for trait hotkeys
-   * 
-   * @param {KeyboardEvent} event - The keyboard event
-   */
+    return traitsArray.find((t: Trait) => t.id === traitId) || null;
+  }, [traitsArray]);
+
   const handleKeyDown = useCallback((event: KeyboardEvent): void => {
-    // Ignore if hotkeys are disabled
     if (!config.enabled) return;
-    
-    // Ignore if user is typing in an input
-    if (event.target instanceof HTMLInputElement || 
-        event.target instanceof HTMLTextAreaElement) {
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
       return;
     }
-    
+
     const key = event.key.toLowerCase();
-    // Skip if no mapping for this key
-    if (!hotkeyMapRef.current[key]) return;
-    
     const traitId = hotkeyMapRef.current[key];
-    const trait = traits.find(t => t.id === traitId);
-    
+    if (!traitId) return;
+
+    const trait = traitsArray.find((t: Trait) => t.id === traitId);
     if (!trait) return;
-    
-    // If trait is active (in a slot), remove it
-    if (trait.isActive && trait.slotId) {
-      dispatch({
-        type: 'UNEQUIP_TRAIT',
-        payload: {
-          traitId,
-          slotId: trait.slotId
-        }
-      });
-      
+
+    const equippedSlot = traitSlots.find((slot: TraitSlot) => slot.traitId === traitId);
+
+    if (equippedSlot) {
+      dispatch(unequipTrait(traitId));
+
       if (config.showNotifications) {
-        dispatch({
-          type: 'SHOW_NOTIFICATION',
-          payload: {
-            message: `Unequipped ${trait.name} with hotkey ${key}`,
-            severity: 'info',
-            duration: 1500
-          }
-        });
+        console.log(`Unequipped ${trait.name} with hotkey ${key}`);
       }
-      
       return;
     }
-    
-    // If trait is not active, try to equip it to first available slot
-    const availableSlot = traitSlots.find(slot => 
-      slot.isUnlocked && !slot.traitId
-    );
-    
+
+    const availableSlot = traitSlots.find((slot: TraitSlot) => slot.isUnlocked && !slot.traitId);
+
     if (availableSlot) {
-      dispatch({
-        type: 'EQUIP_TRAIT',
-        payload: {
-          traitId,
-          slotId: availableSlot.id
-        }
-      });
-      
+      dispatch(equipTrait({ traitId, slotIndex: availableSlot.index }));
+
       if (config.showNotifications) {
-        dispatch({
-          type: 'SHOW_NOTIFICATION',
-          payload: {
-            message: `Equipped ${trait.name} to slot ${availableSlot.index + 1} with hotkey ${key}`,
-            severity: 'success',
-            duration: 1500
-          }
-        });
+        console.log(`Equipped ${trait.name} to slot ${availableSlot.index + 1} with hotkey ${key}`);
       }
     } else if (config.showNotifications) {
-      // No slots available
-      dispatch({
-        type: 'SHOW_NOTIFICATION',
-        payload: {
-          message: 'No available trait slots',
-          severity: 'warning',
-          duration: 1500
-        }
-      });
+      console.log('No available trait slots');
     }
-  }, [traits, traitSlots, dispatch, config]);
-  
-  // Initialize hotkey mappings from traits
+  }, [traitsArray, traitSlots, dispatch, config]);
+
   useEffect(() => {
     const initialHotkeys: Record<string, string> = {};
-    
-    traits.forEach(trait => {
-      if (trait.hotkey) {
-        initialHotkeys[trait.hotkey.toLowerCase()] = trait.id;
+    traitsArray.forEach((trait: Trait) => {
+      const savedHotkey = (trait as any).hotkey;
+      if (savedHotkey) {
+        initialHotkeys[savedHotkey.toLowerCase()] = trait.id;
       }
     });
-    
     hotkeyMapRef.current = initialHotkeys;
-  }, []);
-  
-  // Set up keyboard event listener
+  }, [traitsArray]);
+
   useEffect(() => {
     if (config.enabled) {
       window.addEventListener('keydown', handleKeyDown);
     }
-    
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [config.enabled, handleKeyDown]);
-  
+
   return {
     registerTraitHotkey,
     unregisterTraitHotkey,

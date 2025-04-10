@@ -56,9 +56,6 @@ import DragHandleIcon from '@mui/icons-material/DragHandle';
 import MaximizeIcon from '@mui/icons-material/Maximize';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 
-// Fix imports by using correct paths
-//import InventoryList from '../../features/Inventory/components/containers/InventoryList';
-//import FactionInfo from '../../features/Factions/components/ui/FactionSummaryPanel';
 import PlayerTraits from '../../features/Traits/components/containers/CompactTraitPanel';
 import styles from './RightColumn.module.css';
 
@@ -106,8 +103,8 @@ interface SectionHeaderProps {
   /** Whether the section is in configuration mode */
   isConfiguring: boolean;
   
-  /** Whether the section is maximized */
-  isMaximized: boolean;
+  /** Whether this section is currently maximized */
+  isCurrentlyMaximized: boolean;
   
   /** Function to toggle expanded state */
   onToggleExpand: () => void;
@@ -141,8 +138,8 @@ interface CollapsibleSectionProps {
   /** Whether the section is in configuration mode */
   isConfiguring: boolean;
   
-  /** Whether the section is maximized */
-  isMaximized: boolean;
+  /** Whether this section is currently maximized */
+  isCurrentlyMaximized: boolean;
   
   /** Function to toggle expanded state */
   onToggleExpand: (id: string) => void;
@@ -226,7 +223,7 @@ const SectionHeader = memo<SectionHeaderProps>(({
   title,
   isExpanded,
   isConfiguring,
-  isMaximized,
+  isCurrentlyMaximized,
   onToggleExpand,
   onToggleConfig,
   onToggleMaximize
@@ -280,12 +277,12 @@ const SectionHeader = memo<SectionHeaderProps>(({
             <RefreshIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title={isMaximized ? "Restore" : "Maximize"}>
+        <Tooltip title={isCurrentlyMaximized ? "Restore" : "Maximize"}>
           <IconButton 
             size="small"
             onClick={onToggleMaximize}
           >
-            {isMaximized ? 
+            {isCurrentlyMaximized ? 
               <MinimizeIcon fontSize="small" /> : 
               <MaximizeIcon fontSize="small" />
             }
@@ -311,7 +308,7 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
   content,
   isExpanded,
   isConfiguring,
-  isMaximized,
+  isCurrentlyMaximized,
   onToggleExpand,
   onToggleConfig,
   onToggleMaximize,
@@ -323,13 +320,8 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
   // Combine dynamic classes
   const sectionClasses = [
     className,
-    isMaximized ? styles['maximized-section'] : ''
+    isCurrentlyMaximized ? styles['maximized-section'] : ''
   ].filter(Boolean).join(' ');
-  
-  // Hide other sections if a section is maximized
-  if (isMaximized && isMaximized !== id) {
-    return null;
-  }
 
   return (
     <Paper
@@ -340,7 +332,7 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
         border: isConfiguring 
           ? `2px dashed ${theme.palette.primary.main}` 
           : 'none',
-        flex: isMaximized ? 1 : 'none'
+        flex: isCurrentlyMaximized ? 1 : 'none'
       }}
       className={sectionClasses}
     >
@@ -348,7 +340,7 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
         title={title}
         isExpanded={isExpanded}
         isConfiguring={isConfiguring}
-        isMaximized={isMaximized}
+        isCurrentlyMaximized={isCurrentlyMaximized}
         onToggleExpand={() => onToggleExpand(id)}
         onToggleConfig={(e) => onToggleConfig(id, e)}
         onToggleMaximize={(e) => onToggleMaximize(id, e)}
@@ -360,7 +352,7 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
           sx={{ 
             position: 'relative',
             p: 2,
-            height: isMaximized ? 'calc(100% - 48px)' : undefined
+            height: isCurrentlyMaximized ? 'calc(100% - 48px)' : undefined
           }}
         >
           {isConfiguring && (
@@ -379,22 +371,19 @@ const CollapsibleSection = memo<CollapsibleSectionProps>(({
 /**
  * RightColumn Component
  * 
- * A flexible side panel for displaying inventory, faction information, player traits,
- * and other supplementary game information.
+ * A flexible side panel for displaying player traits and other supplementary game information.
  * 
  * @component
  */
 const RightColumn: React.FC<RightColumnProps> = ({ 
-  components = ['InventoryList', 'FactionInfo', 'PlayerTraits'], 
-  title = 'Inventory & Traits',
+  components = ['PlayerTraits'], 
+  title = 'Traits & Status',
   sx = {}
 }) => {
   const theme = useTheme();
   
   // State management with hooks
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    inventoryList: true,
-    factionInfo: true,
     playerTraits: true
   });
   
@@ -424,18 +413,6 @@ const RightColumn: React.FC<RightColumnProps> = ({
 
   // Component registry
   const componentRegistry: Record<string, ComponentRegistryItem> = {
-    InventoryList: {
-      component: InventoryList,
-      title: 'Inventory',
-      description: 'Displays player inventory items',
-      defaultExpanded: true
-    },
-    FactionInfo: {
-      component: FactionInfo,
-      title: 'Faction Status',
-      description: 'Shows faction relationships and reputation',
-      defaultExpanded: true
-    },
     PlayerTraits: {
       component: PlayerTraits,
       title: 'Character Traits',
@@ -457,20 +434,23 @@ const RightColumn: React.FC<RightColumnProps> = ({
     if (!ComponentToRender) return null;
 
     // Initialize expansion state if not already set
-    if (expanded[componentId.toLowerCase()] === undefined) {
+    const id = componentId.toLowerCase();
+    if (maximized && maximized !== id) {
+      return null;
+    }
+
+    if (expanded[id] === undefined) {
       setExpanded(prev => ({
         ...prev,
-        [componentId.toLowerCase()]: metadata.defaultExpanded
+        [id]: metadata.defaultExpanded
       }));
     }
 
-    const id = componentId.toLowerCase();
     const isExpanded = expanded[id] !== false;
     const isConfiguring = configMode[id] || false;
-    const isMaximized = maximized === id;
+    const isCurrentlyMaximized = maximized === id;
 
-    const className = componentId === 'FactionInfo' ? styles['faction-info'] : 
-                      componentId === 'PlayerTraits' ? styles['player-traits'] : '';
+    const className = componentId === 'PlayerTraits' ? styles['player-traits'] : '';
 
     return (
       <CollapsibleSection
@@ -480,7 +460,7 @@ const RightColumn: React.FC<RightColumnProps> = ({
         content={<ComponentToRender />}
         isExpanded={isExpanded}
         isConfiguring={isConfiguring}
-        isMaximized={isMaximized}
+        isCurrentlyMaximized={isCurrentlyMaximized}
         onToggleExpand={toggleExpand}
         onToggleConfig={toggleConfig}
         onToggleMaximize={toggleMaximize}

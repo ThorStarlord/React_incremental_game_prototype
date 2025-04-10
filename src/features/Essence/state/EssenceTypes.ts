@@ -166,6 +166,8 @@ export interface GainEssencePayload {
 export interface SpendEssencePayload {
   /** Amount of essence to spend */
   amount: number;
+  /** What the essence was spent on (optional) */
+  reason?: string; // Add the optional reason property
   /** What the essence was spent on */
   purpose?: string;
 }

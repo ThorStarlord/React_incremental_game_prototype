@@ -47,6 +47,34 @@ export interface Attribute {
 }
 
 /**
+ * Represents an item that can be equipped
+ */
+export interface EquipmentItem {
+  id: string;
+  name: string;
+  type: string; // e.g., 'weapon', 'armor', 'accessory'
+  slot: string; // e.g., 'head', 'chest', 'mainHand'
+  stats?: Partial<PlayerStats>; // Optional stats provided by the item
+  // Add other item properties as needed (e.g., description, value, rarity)
+}
+
+/**
+ * Represents the player's equipped items
+ */
+export interface EquipmentState {
+  head?: EquipmentItem | null;
+  chest?: EquipmentItem | null;
+  legs?: EquipmentItem | null;
+  feet?: EquipmentItem | null;
+  mainHand?: EquipmentItem | null;
+  offHand?: EquipmentItem | null;
+  accessory1?: EquipmentItem | null;
+  accessory2?: EquipmentItem | null;
+  // Add other slots as needed
+  [key: string]: EquipmentItem | null | undefined; // Allow dynamic access
+}
+
+/**
  * Player's complete state
  */
 export interface PlayerState {
@@ -72,6 +100,7 @@ export interface PlayerState {
   totalPlayTime: number;
   isAlive: boolean;
   activeCharacterId: string;
+  equipment: EquipmentState; // Add equipment to PlayerState
 }
 
 /**
@@ -203,4 +232,14 @@ export const PlayerInitialState: PlayerState = {
   totalPlayTime: 0,
   isAlive: true,
   activeCharacterId: "player",
+  equipment: { // Add initial empty equipment
+    head: null,
+    chest: null,
+    legs: null,
+    feet: null,
+    mainHand: null,
+    offHand: null,
+    accessory1: null,
+    accessory2: null,
+  },
 };

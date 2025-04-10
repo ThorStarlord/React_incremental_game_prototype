@@ -65,7 +65,7 @@ import useEssenceGeneration from '../../features/Essence/hooks/useEssenceGenerat
 import CompactTraitPanel from '../../features/Traits/components/containers/CompactTraitPanel';
 import TraitEffectNotification from '../../features/Traits/components/containers/TraitEffectNotification';
 import useTraitNotifications from '../../features/Traits/hooks/useTraitNotifications';
-import TraitSystemWrapper from '../../features/Traits/components/containers/TraitSystemWrapper';
+import TraitSystemWrapper from '../../features/Traits/components/containers/TraitFeatureView';
 
 const GameWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',

@@ -7,8 +7,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
  * Props for Panel component
  */
 interface PanelProps {
-  /** Panel title */
-  title?: string;
+  /** Panel title - can be a string or React node */
+  title?: ReactNode; // Changed from string to ReactNode
   /** Panel content */
   children: ReactNode;
   /** Whether the panel should be expanded by default */

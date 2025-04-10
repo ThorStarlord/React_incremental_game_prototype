@@ -28,7 +28,7 @@ import {
 import { 
   selectPlayerTraitSlots,
   selectPlayerAcquiredTraits 
-} from '../../state/playerSelectors';
+} from '../../state/PlayerSelectors';
 
 /**
  * Interface for the extended trait with possible missing properties

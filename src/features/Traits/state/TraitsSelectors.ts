@@ -1,7 +1,8 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { Trait, TraitSlot } from './TraitsTypes';
-import { UITrait, convertToUITrait } from '../../../shared/utils/traitUtils';
+// Update import path from shared utils to local feature utils
+import { UITrait, convertToUITrait } from '../utils/traitUtils';
 
 /**
  * Basic selectors
@@ -67,6 +68,22 @@ export const selectEquippedTraitObjects = createSelector(
 );
 
 /**
+ * Selects full trait objects for available traits (acquired but not equipped or permanent)
+ */
+export const selectAvailableTraitObjects = createSelector(
+  [selectTraits, selectAcquiredTraits, selectEquippedTraitIds, selectPermanentTraits],
+  (traits, acquiredIds, equippedIds, permanentIds): Trait[] => {
+    const availableIds = acquiredIds.filter(
+      id => !equippedIds.includes(id) && !permanentIds.includes(id)
+    );
+
+    return availableIds
+      .map(id => traits[id])
+      .filter((trait): trait is Trait => Boolean(trait)); // Type guard ensures we only return valid Trait objects
+  }
+);
+
+/**
  * Selects UI-ready trait objects for equipped traits
  */
 export const selectEquippedUITraits = createSelector(
@@ -85,7 +102,7 @@ export const selectAvailableUITraits = createSelector(
     const availableIds = acquiredIds.filter(
       id => !equippedIds.includes(id) && !permanentIds.includes(id)
     );
-    
+
     return availableIds
       .map(id => traits[id])
       .filter(Boolean)
