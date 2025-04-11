@@ -31,7 +31,7 @@ import {
   selectAvailableTraitObjects
 } from '../../state/TraitsSelectors';
 import { selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
-import { Trait as StateTrait } from '../../state/TraitsTypes';
+import { Trait } from '../../state/TraitsTypes';
 
 /**
  * Props for the IntegratedTraitsPanel component
@@ -39,6 +39,15 @@ import { Trait as StateTrait } from '../../state/TraitsTypes';
 interface IntegratedTraitsPanelProps {
   /** Function to close the panel */
   onClose: () => void;
+}
+
+/**
+ * Props for the TraitItem component
+ */
+interface TraitItemProps {
+  trait: Trait;
+  isEquipped?: boolean;
+  isPermanent?: boolean;
 }
 
 /**
@@ -50,7 +59,7 @@ interface IntegratedTraitsPanelProps {
 const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<number>(0);
-  const [selectedTrait, setSelectedTrait] = useState<StateTrait | null>(null);
+  const [selectedTrait, setSelectedTrait] = useState<Trait | null>(null);
 
   // Select state including loading and error
   const allTraitsData = useAppSelector(selectTraits);
@@ -70,11 +79,7 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
     setSelectedTrait(null);
   };
 
-  const TraitItem: React.FC<{
-    trait: StateTrait;
-    isEquipped?: boolean;
-    isPermanent?: boolean;
-  }> = ({ trait, isEquipped = false, isPermanent = false }) => (
+  const TraitItem: React.FC<TraitItemProps> = ({ trait, isEquipped = false, isPermanent = false }) => (
     <Paper 
       elevation={1}
       sx={{ 

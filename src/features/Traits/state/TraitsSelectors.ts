@@ -1,189 +1,123 @@
+/**
+ * Trait Selectors Module
+ * 
+ * This module contains memoized selectors for the Traits feature.
+ */
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { Trait, TraitSlot } from './TraitsTypes';
-// Update import path from shared utils to local feature utils
-import { UITrait, convertToUITrait } from '../utils/traitUtils';
+// Import Trait type from TraitsTypes
+import { Trait } from './TraitsTypes'; 
+// Import UITrait and convertToUITrait from traitUIUtils
+import { UITrait, convertToUITrait } from '../utils/traitUIUtils';
 
-/**
- * Basic selectors
- */
+// Basic selectors (re-exports from TraitsSlice for consistency)
 export const selectTraits = (state: RootState) => state.traits.traits;
-export const selectAcquiredTraits = (state: RootState) => state.traits.acquiredTraits;
+export const selectEquippedTraitIds = (state: RootState) => state.traits.equippedTraits;
 export const selectPermanentTraits = (state: RootState) => state.traits.permanentTraits;
+export const selectAcquiredTraits = (state: RootState) => state.traits.acquiredTraits;
 export const selectTraitSlots = (state: RootState) => state.traits.slots;
-export const selectTraitPresets = (state: RootState) => state.traits.presets;
 export const selectTraitLoading = (state: RootState) => state.traits.loading;
 export const selectTraitError = (state: RootState) => state.traits.error;
 export const selectDiscoveredTraits = (state: RootState) => state.traits.discoveredTraits;
-export const selectMaxTraitSlots = (state: RootState) => state.traits.maxTraitSlots;
+export const selectTraitPresets = (state: RootState) => state.traits.presets;
 
 /**
- * Memoized selectors
+ * Selects a single trait object by its ID.
  */
-
-/**
- * Selects full trait objects for all acquired traits
- */
-export const selectAcquiredTraitObjects = createSelector(
-  [selectTraits, selectAcquiredTraits],
-  (traits, acquiredIds) => {
-    return acquiredIds
-      .map(id => traits[id])
-      .filter(Boolean);
-  }
+export const selectTraitById = createSelector(
+  [selectTraits, (_, traitId: string) => traitId],
+  (traits, traitId): Trait | undefined => traits[traitId]
 );
 
 /**
- * Selects full trait objects for permanent traits
- */
-export const selectPermanentTraitObjects = createSelector(
-  [selectTraits, selectPermanentTraits],
-  (traits, permanentIds) => {
-    return permanentIds
-      .map(id => traits[id])
-      .filter(Boolean);
-  }
-);
-
-/**
- * Selects IDs of traits currently equipped in trait slots
- */
-export const selectEquippedTraitIds = createSelector(
-  [selectTraitSlots],
-  (slots) => slots
-    .filter(slot => slot.isUnlocked && slot.traitId)
-    .map(slot => slot.traitId as string)
-);
-
-/**
- * Selects full trait objects for equipped traits
+ * Selects trait objects that are currently equipped
  */
 export const selectEquippedTraitObjects = createSelector(
   [selectTraits, selectEquippedTraitIds],
-  (traits, equippedIds) => {
+  (traits, equippedIds): Trait[] => {
     return equippedIds
       .map(id => traits[id])
-      .filter(Boolean);
+      .filter(Boolean); // Filter out undefined values
   }
 );
 
 /**
- * Selects full trait objects for available traits (acquired but not equipped or permanent)
+ * Selects trait objects that are permanently acquired
+ */
+export const selectPermanentTraitObjects = createSelector(
+  [selectTraits, selectPermanentTraits],
+  (traits, permanentIds): Trait[] => {
+    return permanentIds
+      .map(id => traits[id])
+      .filter(Boolean); // Filter out undefined values
+  }
+);
+
+/**
+ * Selects trait objects that are available but not equipped
  */
 export const selectAvailableTraitObjects = createSelector(
   [selectTraits, selectAcquiredTraits, selectEquippedTraitIds, selectPermanentTraits],
   (traits, acquiredIds, equippedIds, permanentIds): Trait[] => {
+    // Get trait IDs that are acquired but not equipped or permanent
     const availableIds = acquiredIds.filter(
       id => !equippedIds.includes(id) && !permanentIds.includes(id)
     );
-
+    
     return availableIds
       .map(id => traits[id])
-      .filter((trait): trait is Trait => Boolean(trait)); // Type guard ensures we only return valid Trait objects
+      .filter(Boolean); // Filter out undefined values
   }
 );
 
 /**
- * Selects UI-ready trait objects for equipped traits
+ * Selects all equipped traits converted to UITrait format
  */
 export const selectEquippedUITraits = createSelector(
   [selectEquippedTraitObjects],
-  (traitObjects) => {
-    return traitObjects.map(trait => convertToUITrait(trait));
+  (equippedTraits): UITrait[] => {
+    return equippedTraits.map(convertToUITrait);
   }
 );
 
 /**
- * Selects UI-ready trait objects for acquired but not equipped traits
+ * Selects all permanent traits converted to UITrait format
+ */
+export const selectPermanentUITraits = createSelector(
+  [selectPermanentTraitObjects],
+  (permanentTraits): UITrait[] => {
+    return permanentTraits.map(convertToUITrait);
+  }
+);
+
+/**
+ * Selects all available traits converted to UITrait format
  */
 export const selectAvailableUITraits = createSelector(
-  [selectTraits, selectAcquiredTraits, selectEquippedTraitIds, selectPermanentTraits],
-  (traits, acquiredIds, equippedIds, permanentIds) => {
-    const availableIds = acquiredIds.filter(
-      id => !equippedIds.includes(id) && !permanentIds.includes(id)
-    );
+  [selectAvailableTraitObjects],
+  (availableTraits): UITrait[] => {
+    return availableTraits.map(convertToUITrait);
+  }
+);
 
-    return availableIds
+/**
+ * Selects all acquired traits (equipped + available + permanent) as Trait objects
+ */
+export const selectAcquiredTraitObjects = createSelector(
+  [selectEquippedTraitObjects, selectAvailableTraitObjects, selectPermanentTraitObjects],
+  (equipped, available, permanent): Trait[] => {
+    return [...equipped, ...available, ...permanent];
+  }
+);
+
+/**
+ * Selects all discovered trait objects
+ */
+export const selectDiscoveredTraitObjects = createSelector(
+  [selectTraits, selectDiscoveredTraits],
+  (traits, discoveredIds): Trait[] => {
+    return discoveredIds
       .map(id => traits[id])
-      .filter(Boolean)
-      .map(trait => convertToUITrait(trait));
+      .filter(Boolean); // Filter out undefined values
   }
 );
-
-/**
- * Selects the number of unlocked trait slots
- */
-export const selectUnlockedTraitSlotCount = createSelector(
-  [selectTraitSlots],
-  (slots) => slots.filter(slot => slot.isUnlocked).length
-);
-
-/**
- * Selects the number of available (empty and unlocked) trait slots
- */
-export const selectAvailableTraitSlotCount = createSelector(
-  [selectTraitSlots],
-  (slots) => slots.filter(slot => slot.isUnlocked && !slot.traitId).length
-);
-
-/**
- * Selects the next trait slot that can be unlocked
- */
-export const selectNextLockedTraitSlot = createSelector(
-  [selectTraitSlots],
-  (slots) => {
-    const lockedSlots = slots.filter(slot => !slot.isUnlocked);
-    return lockedSlots.length > 0 ? lockedSlots[0] : null;
-  }
-);
-
-/**
- * Select combined stat bonuses from all equipped and permanent traits
- */
-export const selectTraitStatBonuses = createSelector(
-  [selectEquippedTraitObjects, selectPermanentTraitObjects],
-  (equippedTraits, permanentTraits) => {
-    const allTraits = [...equippedTraits, ...permanentTraits];
-    const statBonuses: Record<string, number> = {};
-    
-    allTraits.forEach(trait => {
-      if (!trait.effects) return;
-      
-      // Handle effects as array
-      if (Array.isArray(trait.effects)) {
-        trait.effects.forEach(effect => {
-          if ('type' in effect && 'magnitude' in effect) {
-            const statName = effect.type;
-            statBonuses[statName] = (statBonuses[statName] || 0) + effect.magnitude;
-          }
-        });
-      } 
-      // Handle effects as object
-      else if (typeof trait.effects === 'object') {
-        Object.entries(trait.effects).forEach(([key, value]) => {
-          if (typeof value === 'number') {
-            statBonuses[key] = (statBonuses[key] || 0) + value;
-          }
-        });
-      }
-    });
-    
-    return statBonuses;
-  }
-);
-
-/**
- * Select trait objects by IDs with filtering for valid traits
- */
-export const selectTraitsByIds = (state: RootState, traitIds: string[]) => {
-  return traitIds
-    .map(id => state.traits.traits[id])
-    .filter(Boolean);
-};
-
-/**
- * Select a single trait by ID
- */
-export const selectTraitById = (state: RootState, traitId: string) => {
-  return state.traits.traits[traitId];
-};

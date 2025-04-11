@@ -1,14 +1,21 @@
 import React from 'react';
-import GameLayout from './layout/components/GameLayout';
+// Update to named import
+import { AppRouter } from './routes/AppRouter'; 
+import { ThemeProviderWrapper as ThemeProvider } from './theme/provider'; 
 
 /**
  * Main App Component
  * 
- * The application providers (Redux, Router, Theme) are now in index.tsx
- * This component simply renders the main layout
+ * Renders the main application router wrapped in necessary providers.
+ * The Redux provider is in index.tsx
  */
 const App: React.FC = () => {
-  return <GameLayout />;
+  return (
+    <ThemeProvider>
+      {/* AppRouter usage remains the same */}
+      <AppRouter /> 
+    </ThemeProvider>
+  );
 };
 
 export default App;

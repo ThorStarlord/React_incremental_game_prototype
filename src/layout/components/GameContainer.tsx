@@ -48,20 +48,21 @@
  */
 
 import React, { useState, useEffect, ReactNode } from 'react';
-import { Box, Typography, useMediaQuery, useTheme, Drawer, IconButton, Tooltip, Paper, styled } from '@mui/material';
+import { Box, useMediaQuery, useTheme, Drawer, IconButton, Paper, styled } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 
 // Core UI Panels & Shared Components
-import Panel from '../../shared/components/layout/Panel';
 import BreadcrumbNav from '../../shared/components/ui/BreadcrumbNav';
 import CharacterManagementDrawer from '../../shared/components/ui/CharacterManagementDrawer';
 import LeftColumn from './LeftColumn';
+import MiddleColumn from './MiddleColumn';
 import RightColumn from './RightColumn';
 
 // Feature Components & Hooks
 import EssenceDisplay from '../../features/Essence/components/ui/EssenceDisplay';
-import useEssenceGeneration from '../../features/Essence/hooks/useEssenceGeneration';
+import { useAppSelector } from '../../app/hooks';
+import { selectEssenceAmount, selectEssenceMaxAmount, selectEssenceGenerationRate } from '../../features/Essence/state/EssenceSlice';
 import TraitEffectNotification from '../../features/Traits/components/containers/TraitEffectNotification';
 import useTraitNotifications from '../../features/Traits/hooks/useTraitNotifications';
 import { useAutosaveSystem } from '../../gameLogic/systems/autosaveSystem';
@@ -80,14 +81,6 @@ interface GameContainerProps {
   children?: ReactNode;
 }
 
-const MiddleColumnContent: React.FC = () => {
-  return (
-    <Panel title="Game World">
-      <Typography>Main Game Area</Typography>
-    </Panel>
-  );
-};
-
 const GameContainer: React.FC<GameContainerProps> = ({
   showLeftColumn = true,
   showRightColumn = true,
@@ -100,9 +93,13 @@ const GameContainer: React.FC<GameContainerProps> = ({
   const [characterDrawerOpen, setCharacterDrawerOpen] = useState<boolean>(false);
 
   // Initialize game system hooks
-  const { generateEssence } = useEssenceGeneration();
   const { notifications, dismissNotification } = useTraitNotifications();
   useAutosaveSystem(); // Call the autosave system hook
+
+  // Fetch data needed for components within GameContainer (e.g., header EssenceDisplay)
+  const currentEssence = useAppSelector(selectEssenceAmount);
+  const maxEssence = useAppSelector(selectEssenceMaxAmount); // This might be undefined
+  const essenceRate = useAppSelector(selectEssenceGenerationRate);
 
   const toggleCharacterDrawer = (): void => {
     setCharacterDrawerOpen(!characterDrawerOpen);
@@ -110,11 +107,12 @@ const GameContainer: React.FC<GameContainerProps> = ({
 
   useEffect(() => {
     const essenceInterval = setInterval(() => {
-      generateEssence();
+      // Passive essence generation logic can be added here
     }, 10000);
     return () => clearInterval(essenceInterval);
-  }, [generateEssence]);
+  }, []);
 
+  // If children are provided, render them directly (overrides default layout)
   if (children) {
     return (
       <GameWrapper sx={sx}>
@@ -123,17 +121,13 @@ const GameContainer: React.FC<GameContainerProps> = ({
     );
   }
 
+  // Define common column styles
   const columnSx = {
-    bgcolor: 'background.paper',
-    p: 2,
-    borderRadius: 2,
-    border: `1px solid ${theme.palette.divider}`,
     overflowY: 'auto',
     height: '100%',
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    gap: 2,
   };
 
   return (
@@ -147,25 +141,30 @@ const GameContainer: React.FC<GameContainerProps> = ({
           bgcolor: 'background.default',
         }}
       >
-        <Box
+        {/* Header */}
+        <Paper
+          elevation={1}
+          square
           sx={{
             flexShrink: 0,
             p: theme.spacing(1, 2),
-            background: theme.palette.background.paper,
             borderBottom: `1px solid ${theme.palette.divider}`,
             boxSizing: 'border-box',
             height: 64,
             display: 'flex',
             alignItems: 'center',
+            zIndex: theme.zIndex.appBar,
+            bgcolor: 'background.paper',
           }}
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <BreadcrumbNav />
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
               <EssenceDisplay
-                currentEssence={0}
-                maxEssence={100}
-                essenceTypes={[{ id: 'regular', name: 'Essence', amount: 0, color: '#3a7ca5' }]}
+                currentEssence={currentEssence}
+                // Provide a default value if maxEssence is undefined
+                maxEssence={maxEssence ?? 1000} 
+                essenceRate={essenceRate}
               />
               {isSmallScreen && (
                 <IconButton onClick={() => setDrawerOpen(true)} color="primary">
@@ -174,8 +173,10 @@ const GameContainer: React.FC<GameContainerProps> = ({
               )}
             </Box>
           </Box>
-        </Box>
-        <Box
+        </Paper>
+
+        {/* Columns Container */}
+        <Box 
           sx={{
             display: 'flex',
             gap: 2,
@@ -184,47 +185,33 @@ const GameContainer: React.FC<GameContainerProps> = ({
             width: '100%',
             boxSizing: 'border-box',
             overflow: 'hidden',
-            flexDirection: { xs: 'column', md: 'row' },
-            height: { xs: 'auto', md: 'calc(100vh - 64px)' },
-            overflowY: { xs: 'auto', md: 'hidden' },
+            flexDirection: { xs: 'column', md: 'row' }, // Stacks on small screens
+            height: { xs: 'auto', md: 'calc(100vh - 64px)' }, // Full height on desktop
+            overflowY: { xs: 'auto', md: 'hidden' }, // Scroll control
           }}
         >
+          {/* Left Column (Desktop) */}
           {!isSmallScreen && showLeftColumn && (
-            <Box
-              sx={{
-                ...columnSx,
-                width: 250,
-                flexShrink: 0,
-                display: { xs: 'none', md: 'flex' },
-              }}
-            >
+            <Box sx={{ ...columnSx, width: 250, flexShrink: 0, display: { xs: 'none', md: 'flex' } }}>
               <LeftColumn />
+              {/* Character Drawer Toggle Button could go here */}
             </Box>
           )}
-          <Box
-            sx={{
-              ...columnSx,
-              flex: { xs: '1 1 auto', md: 1 },
-              minWidth: 0,
-              maxHeight: { xs: '60vh', md: 'none' },
-              width: { xs: '100%', md: 'auto' },
-            }}
-          >
-            <MiddleColumnContent />
+
+          {/* Middle Column */}
+          <Box sx={{ ...columnSx, flex: { xs: '1 1 auto', md: 1 }, minWidth: 0 }}>
+            <MiddleColumn />
           </Box>
+
+          {/* Right Column (Desktop) */}
           {!isSmallScreen && showRightColumn && (
-            <Box
-              sx={{
-                ...columnSx,
-                width: 250,
-                flexShrink: 0,
-                display: { xs: 'none', md: 'flex' },
-              }}
-            >
+            <Box sx={{ ...columnSx, width: 250, flexShrink: 0, display: { xs: 'none', md: 'flex' } }}>
               <RightColumn />
             </Box>
           )}
         </Box>
+
+        {/* Mobile Drawer (for Left Column) */}
         {showLeftColumn && (
           <Drawer
             anchor="left"
@@ -246,6 +233,8 @@ const GameContainer: React.FC<GameContainerProps> = ({
             </Box>
           </Drawer>
         )}
+
+        {/* Other Drawers/Notifications */}
         <CharacterManagementDrawer
           isOpen={characterDrawerOpen}
           onClose={() => setCharacterDrawerOpen(false)}

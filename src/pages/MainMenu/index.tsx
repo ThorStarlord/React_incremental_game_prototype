@@ -1,5 +1,8 @@
 import React from 'react';
-import styles from './index.module.css';
+// Remove CSS module import
+// import styles from './index.module.css'; 
+// Import MUI components
+import { Box, Container, CssBaseline } from '@mui/material'; 
 
 // Custom hooks
 import { useSavedGames } from '../../hooks/useSavedGames';
@@ -95,14 +98,50 @@ const MainMenu: React.FC = () => {
 
   // This file must remain .tsx since it contains JSX like:
   return (
-    <div className={styles.mainContainer}>
-      <div className={styles.overlayGradient} />
+    <Box 
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(135deg, #2d3748 0%, #1a202c 100%)', 
+        color: 'white',
+        p: 2,
+      }}
+    >
+      <CssBaseline />
       
-      <div className={styles.contentContainer}>
+      <Box 
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7))', 
+          zIndex: 1,
+        }} 
+      />
+      
+      <Container 
+        maxWidth="sm"
+        sx={{
+          position: 'relative',
+          zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+        }}
+      >
         {/* Main UI Components */}
         <MainMenuTitle 
           title="Incremental RPG" 
           subtitle="Build your character, explore the world" 
+          sx={{ mb: 4 }} 
         />
         
         <MainMenuButtonList
@@ -116,10 +155,13 @@ const MainMenu: React.FC = () => {
           onAbout={() => openDialog('aboutDialog')}
         />
         
-        <VersionFooter version={APP_VERSION} shortcuts={shortcutInfo} />
-      </div>
+        <VersionFooter 
+          version={APP_VERSION} 
+          shortcuts={shortcutInfo} 
+          sx={{ mt: 4, width: '100%' }} 
+        />
+      </Container>
       
-      {/* Dialog Components */}
       <DialogsContainer 
         dialogState={dialogState}
         savedGames={savedGames}
@@ -137,7 +179,7 @@ const MainMenu: React.FC = () => {
         onCopyToClipboard={handleCopyToClipboard}
         clearDeleteTarget={clearDeleteTarget}
       />
-    </div>
+    </Box>
   );
 };
 

@@ -27,7 +27,8 @@ import {
   selectAvailableTraitObjects,
   selectAcquiredTraitObjects // Need this for TraitList if it shows all acquired
 } from '../../state/TraitsSelectors';
-import { Trait, TraitSlot as StateTraitSlot } from '../../state/TraitsTypes'; // Import Trait type
+// Import Trait and TraitEffect types
+import { Trait, TraitSlot as StateTraitSlot, TraitEffect } from '../../state/TraitsTypes'; 
 
 /**
  * TraitSystemWrapper Component (Renamed from TraitFeatureView)
@@ -87,12 +88,15 @@ const TraitSystemWrapper: React.FC = () => {
       name: trait.name,
       level: trait.level || 1,
       description: trait.description,
+      // Add type annotation for 'e' and type check for 'v'
       effect: Array.isArray(trait.effects)
-        ? trait.effects.map(e => `${e.type}: ${e.magnitude > 0 ? '+' : ''}${e.magnitude}`).join(', ')
+        ? trait.effects.map((e: TraitEffect) => `${e.type}: ${e.magnitude > 0 ? '+' : ''}${e.magnitude}`).join(', ')
         : typeof trait.effects === 'object'
-        ? Object.entries(trait.effects).map(([k, v]) => `${k}: ${v > 0 ? '+' : ''}${v}`).join(', ')
+        ? Object.entries(trait.effects).map(([k, v]) => `${k}: ${typeof v === 'number' && v > 0 ? '+' : ''}${v}`).join(', ')
         : 'No effects',
       cost: trait.essenceCost || 0,
+      // Pass the category as 'type' for TraitList/TraitPanel if needed
+      type: trait.category 
     })),
     onTraitLevelUp: handleTraitLevelUp,
     pointsAvailable: traitPoints,
@@ -102,6 +106,7 @@ const TraitSystemWrapper: React.FC = () => {
     <TraitSystemErrorBoundary>
       <Grid container spacing={2}>
         <Grid item xs={12} md={7}>
+          {/* Pass the correctly typed props */}
           <TraitList {...traitListProps} />
         </Grid>
         <Grid item xs={12} md={5}>

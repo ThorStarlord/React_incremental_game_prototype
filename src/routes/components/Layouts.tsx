@@ -1,7 +1,7 @@
 // src/routes/components/Layouts.tsx (Refactored GameLayout - minor changes)
 import React, { useState } from 'react'; // Import useState for CharacterLayout
 import { Outlet } from 'react-router-dom';
-import { Box, Tabs, Tab, AppBar, Button, Typography } from '@mui/material'; // Ensure necessary MUI imports
+import { Box, Tabs, Tab, AppBar, Button, Typography, Toolbar } from '@mui/material'; // Ensure necessary MUI imports
 import GameContainer from '../../layout/components/GameContainer'; // Assuming this uses MUI now
 
 // Assuming these components are now MUI-based or compatible
@@ -65,19 +65,20 @@ export const CharacterLayout: React.FC = () => {
     // This might live in its own component file
     const RenderMuiCharacterTabBar = () => (
         <AppBar position="static" color="default" elevation={1}>
-            {/* You might want a Toolbar here too */}
-            <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                indicatorColor="primary"
-                textColor="primary"
-                variant="fullWidth" // or "standard" / "scrollable"
-                aria-label="Character Management Tabs"
-            >
-                <Tab icon={<AssessmentIcon />} iconPosition="start" label="Stats" value="stats" />
-                <Tab icon={<Inventory2Icon />} iconPosition="start" label="Inventory" value="inventory" />
-                <Tab icon={<AutoAwesomeIcon />} iconPosition="start" label="Skills" value="skills" />
-            </Tabs>
+            <Toolbar variant="dense">
+                <Tabs
+                    value={activeTab}
+                    onChange={handleTabChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    variant="fullWidth" // or "standard" / "scrollable"
+                    aria-label="Character Management Tabs"
+                >
+                    <Tab icon={<AssessmentIcon />} iconPosition="start" label="Stats" value="stats" />
+                    <Tab icon={<Inventory2Icon />} iconPosition="start" label="Inventory" value="inventory" />
+                    <Tab icon={<AutoAwesomeIcon />} iconPosition="start" label="Skills" value="skills" />
+                </Tabs>
+            </Toolbar>
         </AppBar>
     );
 
@@ -97,19 +98,60 @@ export const CharacterLayout: React.FC = () => {
         // Assume the parent route provides the main layout (like GameContainer)
         // This layout component adds the specific Character UI on top
         <>
-            {/* Render the MUI-based Tab Bar */}
-            {RenderMuiCharacterTabBar()}
+            {/* Main character management interface */}
+            <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                height: '100%', 
+                overflow: 'hidden' 
+            }}>
+                {/* Tab navigation */}
+                {RenderMuiCharacterTabBar()}
 
-            {/* Button to open the drawer (example) */}
-            {/* <Button onClick={() => setDrawerOpen(true)}>Manage Character</Button> */}
+                {/* Content area that displays based on selected tab */}
+                <Box sx={{ 
+                    flex: 1, 
+                    overflow: 'auto', 
+                    p: 2,
+                    bgcolor: 'background.default' 
+                }}>
+                    {activeTab === 'stats' && (
+                        <Box>
+                            {/* Stats content would go here */}
+                            <Typography variant="h6">Character Statistics</Typography>
+                            <Outlet />
+                        </Box>
+                    )}
+                    {activeTab === 'inventory' && (
+                        <Box>
+                            {/* Inventory content would go here */}
+                            <Typography variant="h6">Character Inventory</Typography>
+                            <Outlet />
+                        </Box>
+                    )}
+                    {activeTab === 'skills' && (
+                        <Box>
+                            {/* Skills content would go here */}
+                            <Typography variant="h6">Character Skills</Typography>
+                            <Outlet />
+                        </Box>
+                    )}
+                </Box>
 
-            {/* Render the MUI-based Drawer */}
-            {RenderMuiCharacterDrawer()}
-
-            {/* The actual page content (Stats, Inventory, Skills) */}
-            <Box sx={{ p: 2 }}> {/* Add some padding for content */}
-                <Outlet />
+                {/* Character management button */}
+                <Box sx={{ position: 'absolute', bottom: 16, right: 16 }}>
+                    <Button 
+                        variant="contained" 
+                        color="primary"
+                        onClick={() => setDrawerOpen(true)}
+                    >
+                        Character Details
+                    </Button>
+                </Box>
             </Box>
+
+            {/* Character management drawer */}
+            {RenderMuiCharacterDrawer()}
         </>
     );
 };

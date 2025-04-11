@@ -1,15 +1,33 @@
 import React from 'react';
+import { Box, Typography, SxProps, Theme } from '@mui/material';
 
 interface MainMenuTitleProps {
   title: string;
   subtitle?: string;
+  /** Optional MUI sx prop for custom styling */
+  sx?: SxProps<Theme>;
 }
 
-export function MainMenuTitle({ title, subtitle }: MainMenuTitleProps) {
+export function MainMenuTitle({ title, subtitle, sx }: MainMenuTitleProps) {
   return (
-    <div className="text-center mb-8">
-      <h1 className="text-4xl font-bold text-primary mb-2">{title}</h1>
-      {subtitle && <p className="text-xl text-gray-600">{subtitle}</p>}
-    </div>
+    <Box sx={{ textAlign: 'center', mb: 8, ...sx }}>
+      <Typography
+        variant="h2"
+        component="h1"
+        fontWeight="bold"
+        color="primary.main"
+        gutterBottom
+      >
+        {title}
+      </Typography>
+      {subtitle && (
+        <Typography
+          variant="h6"
+          color="text.secondary"
+        >
+          {subtitle}
+        </Typography>
+      )}
+    </Box>
   );
 }

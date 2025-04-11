@@ -57,10 +57,37 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import MaximizeIcon from '@mui/icons-material/Maximize';
 import MinimizeIcon from '@mui/icons-material/Minimize';
-// Fix WorldMap import by using explicit require with type assertion
-const WorldMap = require('../../features/World/components/containers/WorldMap').default as React.FC<WorldMapProps>;
 import MainContent from '../../shared/components/layout/MainContent';
 import styles from './styles/MiddleColumn.module.css';
+
+/**
+ * Props for the WorldMap component
+ */
+interface WorldMapProps {
+  /** Callback when a town is selected */
+  onTownSelect?: (townId: string) => void;
+  
+  /** Callback when a dungeon is selected */
+  onDungeonSelect?: (dungeonId: string, regionId: string) => void;
+}
+
+// Temporary WorldMap component until the actual one is created
+const WorldMap: React.FC<WorldMapProps> = ({ onTownSelect, onDungeonSelect }) => {
+  return (
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h6">World Map</Typography>
+      <Typography variant="body2" color="text.secondary">
+        This is a placeholder for the World Map component.
+        The real component will be implemented in features/World/components/containers/WorldMap.
+      </Typography>
+      <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+        <button onClick={() => onTownSelect && onTownSelect('town1')}>Town 1</button>
+        <button onClick={() => onTownSelect && onTownSelect('town2')}>Town 2</button>
+        <button onClick={() => onDungeonSelect && onDungeonSelect('dungeon1', 'region1')}>Dungeon 1</button>
+      </Box>
+    </Box>
+  );
+};
 
 /**
  * Component registry item with metadata
@@ -164,17 +191,6 @@ interface MainContentProps {
   
   /** Content to display in the component */
   children?: React.ReactNode;
-}
-
-/**
- * Props for the WorldMap component
- */
-interface WorldMapProps {
-  /** Callback when a town is selected */
-  onTownSelect?: (townId: string) => void;
-  
-  /** Callback when a dungeon is selected */
-  onDungeonSelect?: (dungeonId: string, regionId: string) => void;
 }
 
 /**
