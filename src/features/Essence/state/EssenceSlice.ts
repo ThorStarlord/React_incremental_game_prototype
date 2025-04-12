@@ -66,11 +66,19 @@ const essenceSlice = createSlice({
       state.generationRate = Math.max(0, action.payload);
       state.lastUpdated = Date.now();
     },
+
+    // New reducer for manual addition
+    addManualEssence: (state, action: PayloadAction<number>) => {
+      const amountToAdd = action.payload;
+      // Provide a default value (e.g., Infinity or a large number) if maxAmount is undefined
+      const maxAmount = state.maxAmount ?? Infinity; 
+      state.amount = Math.min(state.amount + amountToAdd, maxAmount);
+    },
   },
 });
 
 // Update exports to match the new reducer names if changed
-export const { gainEssence, spendEssence, setEssenceAmount, setGenerationRate } = essenceSlice.actions;
+export const { gainEssence, spendEssence, setEssenceAmount, setGenerationRate, addManualEssence } = essenceSlice.actions;
 
 // Selectors - Update to use the correct state structure from EssenceTypes.ts
 export const selectEssenceAmount = (state: RootState) => state.essence.amount;

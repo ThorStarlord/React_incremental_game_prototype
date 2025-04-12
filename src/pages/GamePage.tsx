@@ -10,6 +10,7 @@ import { selectPlayerName, selectPlayerLevel } from '../features/Player/state/Pl
 
 // For thunks, use the typed useAppDispatch
 import { useAppDispatch } from '../app/hooks';
+import { addManualEssence } from '../features/Essence/state/EssenceSlice';
 
 // Shared components
 import Panel from '../shared/components/layout/Panel';
@@ -36,6 +37,10 @@ const GamePage: React.FC = () => {
     dispatch({ type: 'essence/gainEssence', payload: { amount: 5, source: 'manual_click' } }); 
   };
 
+  const handleAddEssenceClick = () => {
+    dispatch(addManualEssence(10)); // Dispatch action to add 10 essence
+  };
+
   return (
     <> 
       <Typography variant="h4" component="h1" gutterBottom>
@@ -53,6 +58,11 @@ const GamePage: React.FC = () => {
                 Gather Small Essence (+5)
               </Button>
             </Box>
+            <Box sx={{ mt: 2 }}>
+              <Button variant="contained" onClick={handleAddEssenceClick}>
+                Add 10 Essence (Test)
+              </Button>
+            </Box>
           </Panel>
         </Grid>
         
@@ -64,6 +74,12 @@ const GamePage: React.FC = () => {
           </Panel>
         </Grid>
       </Grid>
+
+      <Box sx={{ mt: 3 }}>
+        <Typography>
+          Placeholder for future game content.
+        </Typography>
+      </Box>
     </>
   );
 };

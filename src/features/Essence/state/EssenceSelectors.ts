@@ -7,6 +7,8 @@ import { RootState } from '../../../app/store';
 export const selectEssenceAmount = (state: RootState) => state.essence.amount;
 // Use totalCollected instead of totalEarned
 export const selectTotalCollected = (state: RootState) => state.essence.totalCollected;
+// Add export for maxAmount
+export const selectEssenceMaxAmount = (state: RootState) => state.essence.maxAmount;
 
 // Generator selectors
 export const selectAllGenerators = (state: RootState) => state.essence.generators;

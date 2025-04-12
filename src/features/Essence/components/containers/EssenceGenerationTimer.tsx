@@ -31,12 +31,13 @@ const EssenceGenerationTimer: React.FC<EssenceGenerationTimerProps> = ({
 }): React.ReactElement | null => {
   const dispatch = useDispatch();
   
-  // Get essence generation rate from Redux store if not provided via props
-  const generationRate = rate ?? useSelector((state: RootState) => 
-    // Assuming there's a generationRate field in the essence state
-    // If it doesn't exist, you can calculate it based on your game logic
+  // Get essence generation rate from Redux store unconditionally
+  const generationRateFromStore = useSelector((state: RootState) => 
     state.essence.generationRate || 1
   );
+  
+  // Use the prop if provided, otherwise use the value from the store
+  const generationRate = rate ?? generationRateFromStore;
   
   // Track the progress percentage (0-100)
   const [progress, setProgress] = useState<number>(0);

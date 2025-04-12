@@ -25,20 +25,26 @@ interface EssenceDisplayProps {
  */
 const EssenceDisplay: React.FC<EssenceDisplayProps> = ({
   currentEssence,
-  maxEssence = 1000,
+  maxEssence,
   essenceTypes = [],
   onEssenceClick,
   essenceRate
 }) => {
   const theme = useTheme();
-  const progress = Math.min(100, (currentEssence / maxEssence) * 100);
+  
+  // Ensure values are numbers before calculations/display
+  const current = currentEssence ?? 0;
+  const max = maxEssence ?? 1000; // Default max essence if undefined
+  
+  const progress = max > 0 ? Math.min(100, (current / max) * 100) : 0;
   
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
         <Typography variant="subtitle1" fontWeight="medium">Essence</Typography>
         <Typography variant="body2" color="text.secondary">
-          {currentEssence.toLocaleString()} / {maxEssence.toLocaleString()}
+          {/* Use the defaulted values */}
+          {current.toLocaleString()} / {max.toLocaleString()}
         </Typography>
       </Box>
       
@@ -64,7 +70,8 @@ const EssenceDisplay: React.FC<EssenceDisplayProps> = ({
           color="text.secondary"
           sx={{ display: 'block', textAlign: 'right', mb: 1 }}
         >
-          +{essenceRate}/min
+          {/* Ensure essenceRate is a number before formatting */}
+          +{(essenceRate ?? 0).toLocaleString()}/min 
         </Typography>
       )}
       

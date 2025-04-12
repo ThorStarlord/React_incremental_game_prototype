@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Tooltip, Typography, Box, SxProps, Theme } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../../../app/hooks';
 import { gainEssence } from '../../state/EssenceSlice';
 
 /**
@@ -23,6 +23,8 @@ interface EssenceButtonProps {
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
   /** Button size */
   size?: 'small' | 'medium' | 'large';
+  /** Optional callback after essence is gained */
+  onEssenceGained?: (amount: number) => void;
 }
 
 /**
@@ -39,15 +41,17 @@ const EssenceButton: React.FC<EssenceButtonProps> = ({
   cooldown = 1000, // Cooldown in milliseconds
   variant = "contained",
   color = "primary",
-  size = "medium"
+  size = "medium",
+  onEssenceGained
 }): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [isOnCooldown, setIsOnCooldown] = useState<boolean>(false);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
   
   /**
    * Handle gaining essence when the button is clicked
    */
-  const handleBasicEssenceGain = (): void => {
+  const handleEssenceGain = (): void => {
     if (isOnCooldown) return;
     
     // Dispatch gainEssence action from EssenceSlice
@@ -56,8 +60,20 @@ const EssenceButton: React.FC<EssenceButtonProps> = ({
       source: 'essence_button'
     }));
     
+    // Start cooldown
     setIsOnCooldown(true);
+    
+    // Trigger animation
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
+    
+    // Reset cooldown after delay
     setTimeout(() => setIsOnCooldown(false), cooldown);
+    
+    // Call optional callback
+    if (onEssenceGained) {
+      onEssenceGained(amount);
+    }
   };
   
   return (
@@ -67,16 +83,27 @@ const EssenceButton: React.FC<EssenceButtonProps> = ({
           variant={variant}
           color={color}
           size={size}
-          onClick={handleBasicEssenceGain}
+          onClick={handleEssenceGain}
           disabled={isOnCooldown}
           sx={{
             my: 1,
+            position: 'relative',
+            transition: 'transform 0.1s',
+            transform: isAnimating ? 'scale(1.05)' : 'scale(1)',
             ...sx
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
             <Typography variant="button">{text}</Typography>
-            <Typography variant="caption" sx={{ opacity: 0.8 }}>+{amount}</Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                opacity: isOnCooldown ? 0.5 : 0.8,
+                transition: 'opacity 0.3s'
+              }}
+            >
+              +{amount}
+            </Typography>
           </Box>
         </Button>
       </span>
