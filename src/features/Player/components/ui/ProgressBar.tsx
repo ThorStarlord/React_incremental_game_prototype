@@ -1,5 +1,4 @@
 import React from 'react';
-import './ProgressBar.css';
 
 /**
  * Props for the ProgressBar component
@@ -11,8 +10,6 @@ interface ProgressBarProps {
     label?: string;
     /** Optional color for the progress bar */
     color?: string;
-    /** Additional CSS classes */
-    className?: string;
 }
 
 /**
@@ -24,14 +21,13 @@ interface ProgressBarProps {
 const ProgressBar: React.FC<ProgressBarProps> = ({ 
     progress, 
     label, 
-    color = '#4CAF50', 
-    className = '' 
+    color = '#4CAF50'
 }) => {
     // Ensure progress is within valid range
     const validProgress: number = Math.min(100, Math.max(0, progress));
     
     return (
-        <div className={`progress-bar-container ${className}`}>
+        <div className="progress-bar-container">
             <div 
                 className="progress-bar-fill" 
                 style={{ 

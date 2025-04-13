@@ -11,9 +11,10 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 
 import Panel from '../../../../shared/components/layout/Panel';
-import TraitPanel from './TraitPanel';
+import { TraitEffect } from '../../state/TraitsTypes';
 
 /**
  * Interface representing the props for the TraitList component
@@ -39,8 +40,8 @@ interface TraitListProps {
 /**
  * TraitList Component
  * 
- * Displays a list of character traits that can be leveled up.
- * Each trait is rendered as a TraitPanel component.
+ * Displays a list of traits, allowing interaction like leveling up.
+ * Uses the shared Panel component for its container.
  * 
  * @param {TraitListProps} props - The component props
  * @returns {JSX.Element} The rendered component
@@ -74,7 +75,7 @@ const TraitList: React.FC<TraitListProps> = ({ traits, onTraitLevelUp, pointsAva
   };
   
   return (
-    <Panel title="Character Traits">
+    <Panel title="Available Traits" defaultExpanded={true}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="subtitle1" color="primary" gutterBottom>
           Available Points: <strong>{pointsAvailable}</strong>
@@ -128,12 +129,36 @@ const TraitList: React.FC<TraitListProps> = ({ traits, onTraitLevelUp, pointsAva
       }}>
         {filteredTraits.length > 0 ? (
           filteredTraits.map((trait) => (
-            <TraitPanel
+            <Panel
               key={trait.id}
-              trait={trait}
-              onLevelUp={() => onTraitLevelUp(trait.id)}
-              canLevelUp={pointsAvailable >= trait.cost}
-            />
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography variant="h6" component="span">{trait.name}</Typography>
+                  <Chip label={trait.type} size="small" sx={{ ml: 1 }} />
+                </Box>
+              }
+              defaultExpanded={false} // Start collapsed
+              icon={<AutoFixHighIcon />} // Example icon
+            >
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {trait.description}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Effect: {trait.effect}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Cost: {trait.cost}
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Chip
+                  label="Level Up"
+                  clickable
+                  color={pointsAvailable >= trait.cost ? 'primary' : 'default'}
+                  onClick={() => pointsAvailable >= trait.cost && onTraitLevelUp(trait.id)}
+                  size="small"
+                />
+              </Box>
+            </Panel>
           ))
         ) : (
           <Box sx={{ 

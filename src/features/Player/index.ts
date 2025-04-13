@@ -5,6 +5,9 @@
  * exporting components, hooks, and utilities.
  */
 
+// Utilities
+import * as plrUtils from './utils/playerStatCalculations';
+
 // Components
 export { default as PlayerStats } from './components/containers/PlayerStats';
 export { default as PlayerTraits } from './components/containers/PlayerTraits';
@@ -20,8 +23,6 @@ export { default as ProgressionContainer } from './components/containers/Progres
 export { default as usePlayerStats } from './hooks/usePlayerStats';
 
 // Utilities
-import * as plrUtils from './utils/playerStatCalculations';
-
 export const playerUtils = plrUtils;
 
 // Redux Toolkit exports - actions from slice

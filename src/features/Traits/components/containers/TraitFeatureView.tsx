@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux'; // Use useSelector directly
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks'; // Use typed hooks
 import { Grid } from '@mui/material';
-import TraitList from './TraitList';
+import TraitList from '../ui/TraitList';
 import TraitSlots from './TraitSlots';
 import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
 

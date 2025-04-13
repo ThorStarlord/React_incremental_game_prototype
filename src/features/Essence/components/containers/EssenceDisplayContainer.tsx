@@ -5,7 +5,8 @@
  */
 import React from 'react';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectCurrentEssence, selectMaxEssence } from '../../state/EssenceSelectors'; // Assuming these selectors exist
+// Correct the imported selector names
+import { selectEssenceAmount, selectEssenceMaxAmount } from '../../state/EssenceSelectors'; 
 import EssenceDisplay from '../ui/EssenceDisplay'; // Import the UI component
 
 /**
@@ -16,12 +17,13 @@ import EssenceDisplay from '../ui/EssenceDisplay'; // Import the UI component
  */
 const EssenceDisplayContainer: React.FC = () => {
   // Select the necessary data from the Redux store
-  // Ensure these selectors are correctly defined in EssenceSelectors.ts
-  const currentEssence = useAppSelector(selectCurrentEssence);
-  const maxEssence = useAppSelector(selectMaxEssence);
+  // Use the corrected selector names
+  const currentEssence = useAppSelector(selectEssenceAmount);
+  const maxEssence = useAppSelector(selectEssenceMaxAmount);
 
   // Render the UI component, passing the data as props
-  return <EssenceDisplay currentEssence={currentEssence} maxEssence={maxEssence} />;
+  // Provide a default value (e.g., 1000) for maxEssence if it's undefined
+  return <EssenceDisplay currentEssence={currentEssence} maxEssence={maxEssence ?? 1000} />;
 };
 
 export default EssenceDisplayContainer;

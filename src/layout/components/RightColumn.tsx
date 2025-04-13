@@ -11,6 +11,8 @@ import {
   SxProps,
   Theme
 } from '@mui/material';
+import TraitDisplayContainer from '../../features/Traits/components/containers/TraitDisplayContainer';
+import TraitSlots from '../../features/Traits/components/containers/TraitSlots';
 
 /**
  * Props for the RightColumn component
@@ -53,6 +55,10 @@ const RightColumn: React.FC<RightColumnProps> = ({
         borderColor: { md: 'divider' }
       }}
     >
+      {/* Add the TraitDisplayContainer */}
+      <TraitDisplayContainer />
+      <TraitSlots />
+      
       {/* Render children passed from MainGameLayout */}
       {children}
     </Box>

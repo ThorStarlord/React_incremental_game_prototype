@@ -11,7 +11,6 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectEssenceAmount, selectTotalCollected } from '../../state/EssenceSelectors';
 import EssenceDisplay from '../ui/EssenceDisplay';
 import EssenceButton from '../ui/EssenceButton';
-import BasicEssenceButton from '../ui/BasicEssenceButton';
 import EssenceGenerationTimer from './EssenceGenerationTimer';
 
 /**
@@ -20,8 +19,6 @@ import EssenceGenerationTimer from './EssenceGenerationTimer';
 interface EssencePanelProps {
   /** Optional title override */
   title?: string;
-  /** Whether to show the basic essence button */
-  showBasicButton?: boolean;
   /** Whether to show the essence generation timer */
   showTimer?: boolean;
 }
@@ -35,7 +32,6 @@ interface EssencePanelProps {
  */
 const EssencePanel: React.FC<EssencePanelProps> = ({
   title = 'Essence',
-  showBasicButton = true,
   showTimer = true
 }) => {
   // Get data from Redux store using typed selectors
@@ -64,13 +60,6 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
       
       {/* Action buttons */}
       <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'center' }}>
-        {showBasicButton && (
-          <BasicEssenceButton 
-            amount={10}
-            tooltip="Gather some essence"
-            cooldown={1000} 
-          />
-        )}
         <EssenceButton 
           amount={25}
           text="Focus Mind"

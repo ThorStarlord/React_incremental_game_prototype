@@ -38,7 +38,6 @@ import {
 } from '../../state/TraitsSlice';
 import { makeTraitPermanentThunk } from '../../state/TraitThunks';
 import { selectEssenceAmount } from '../../../Essence/state/EssenceSlice';
-import './TraitSlots.css';
 
 /**
  * Props for the TraitSlotItem component

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Grid, Container, Typography } from '@mui/material'; // Import Container and Typography
-import TraitList from '../features/Traits/components/containers/TraitList';
+import TraitList from '../features/Traits/components/ui/TraitList';
 import TraitSlots from '../features/Traits/components/containers/TraitSlots';
 // Import hooks and selectors
 import { useAppSelector, useAppDispatch } from '../app/hooks';

@@ -5,9 +5,9 @@
  */
 import React from 'react';
 import { Box } from '@mui/material';
-// Corrected import paths based on error messages and container pattern
-import PlayerStats from '../../features/player/components/containers/PlayerStats';
-import EssenceDisplayContainer from '../../features/essence/components/containers/EssenceDisplayContainer'; // Updated import
+// Corrected import paths based on the actual file structure
+import { PlayerStats } from '../../features/Player/index';
+import EssenceDisplayContainer from '../../features/Essence/components/containers/EssenceDisplayContainer';
 
 /**
  * LeftColumn Component
