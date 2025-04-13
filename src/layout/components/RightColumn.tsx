@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import TraitDisplayContainer from '../../features/Traits/components/containers/TraitDisplayContainer';
 import TraitSlots from '../../features/Traits/components/containers/TraitSlots';
+import IntegratedTraitsPanel from '../../features/Traits/components/containers/IntegratedTraitsPanel';
 
 /**
  * Props for the RightColumn component
@@ -58,6 +59,7 @@ const RightColumn: React.FC<RightColumnProps> = ({
       {/* Add the TraitDisplayContainer */}
       <TraitDisplayContainer />
       <TraitSlots />
+      <IntegratedTraitsPanel onClose={() => {}} />
       
       {/* Render children passed from MainGameLayout */}
       {children}
