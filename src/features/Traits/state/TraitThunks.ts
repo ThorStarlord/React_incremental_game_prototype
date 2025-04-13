@@ -1,8 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
-// Import makePermanent action and Trait type
-import { makePermanent } from './TraitsSlice';
+import { makePermanent, setTraits } from './TraitsSlice';
 import { Trait } from './TraitsTypes';
 
 const MAKE_PERMANENT_COST = 150;
@@ -95,15 +94,11 @@ export const fetchTraitsThunk = createAsyncThunk<
   'traits/fetchTraits',
   async (_, { rejectWithValue }) => {
     try {
-      // Fetch from the public folder (path relative to the domain root)
+      // Fetch trait data from the public JSON file
       const response = await fetch('/data/traits.json');
-
       if (!response.ok) {
-        // Throw an error if the network response is bad
-        throw new Error(`Failed to fetch traits.json: ${response.status} ${response.statusText}`);
+        throw new Error('Failed to fetch traits');
       }
-
-      // Parse the JSON response
       const data: Record<string, Trait> = await response.json();
 
       // Return the fetched data - the 'fulfilled' extraReducer will handle setting the state
