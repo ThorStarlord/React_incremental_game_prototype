@@ -1,18 +1,18 @@
-import React from 'react';
-// Update to named import
+import React, { useEffect } from 'react';
+import { useAppDispatch } from './app/hooks';
+import { fetchTraitsThunk } from './features/Traits/state/TraitThunks';
 import { AppRouter } from './routes/AppRouter'; 
 import { ThemeProviderWrapper as ThemeProvider } from './theme/provider'; 
 
-/**
- * Main App Component
- * 
- * Renders the main application router wrapped in necessary providers.
- * The Redux provider is in index.tsx
- */
 const App: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchTraitsThunk());
+  }, [dispatch]);
+
   return (
     <ThemeProvider>
-      {/* AppRouter usage remains the same */}
       <AppRouter /> 
     </ThemeProvider>
   );
