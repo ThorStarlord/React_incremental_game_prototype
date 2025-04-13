@@ -11,7 +11,7 @@ import { Trait } from './TraitsTypes';
 import { UITrait, convertToUITrait } from '../utils/traitUIUtils';
 
 // Basic selectors (re-exports from TraitsSlice for consistency)
-export const selectTraits = (state: RootState) => state.traits.traits;
+export const selectTraits = (state: RootState) => state.traits.traits; // Ensure this points to state.traits.traits
 export const selectEquippedTraitIds = (state: RootState) => state.traits.equippedTraits;
 export const selectPermanentTraits = (state: RootState) => state.traits.permanentTraits;
 export const selectAcquiredTraits = (state: RootState) => state.traits.acquiredTraits;
@@ -25,7 +25,7 @@ export const selectTraitPresets = (state: RootState) => state.traits.presets;
  * Selects a single trait object by its ID.
  */
 export const selectTraitById = createSelector(
-  [selectTraits, (_, traitId: string) => traitId],
+  [selectTraits, (_, traitId: string) => traitId], // selectTraits now correctly points to the traits object
   (traits, traitId): Trait | undefined => traits[traitId]
 );
 
@@ -33,7 +33,7 @@ export const selectTraitById = createSelector(
  * Selects trait objects that are currently equipped
  */
 export const selectEquippedTraitObjects = createSelector(
-  [selectTraits, selectEquippedTraitIds],
+  [selectTraits, selectEquippedTraitIds], // Uses the correct selectTraits
   (traits, equippedIds): Trait[] => {
     return equippedIds
       .map(id => traits[id])
@@ -45,7 +45,7 @@ export const selectEquippedTraitObjects = createSelector(
  * Selects trait objects that are permanently acquired
  */
 export const selectPermanentTraitObjects = createSelector(
-  [selectTraits, selectPermanentTraits],
+  [selectTraits, selectPermanentTraits], // Uses the correct selectTraits
   (traits, permanentIds): Trait[] => {
     return permanentIds
       .map(id => traits[id])
@@ -57,7 +57,7 @@ export const selectPermanentTraitObjects = createSelector(
  * Selects trait objects that are available but not equipped
  */
 export const selectAvailableTraitObjects = createSelector(
-  [selectTraits, selectAcquiredTraits, selectEquippedTraitIds, selectPermanentTraits],
+  [selectTraits, selectAcquiredTraits, selectEquippedTraitIds, selectPermanentTraits], // Uses the correct selectTraits
   (traits, acquiredIds, equippedIds, permanentIds): Trait[] => {
     // Get trait IDs that are acquired but not equipped or permanent
     const availableIds = acquiredIds.filter(
@@ -114,7 +114,7 @@ export const selectAcquiredTraitObjects = createSelector(
  * Selects all discovered trait objects
  */
 export const selectDiscoveredTraitObjects = createSelector(
-  [selectTraits, selectDiscoveredTraits],
+  [selectTraits, selectDiscoveredTraits], // Uses the correct selectTraits
   (traits, discoveredIds): Trait[] => {
     return discoveredIds
       .map(id => traits[id])

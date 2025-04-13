@@ -28,8 +28,8 @@ export const makeTraitPermanentThunk = createAsyncThunk<
     // Get the current essence amount from player
     const currentEssence = state.player.totalEssenceEarned || 0;
     
-    // Get the trait details and permanent traits list
-    const trait = state.traits.traits[traitId];
+    // Get the trait details and permanent traits list from state.traits.traits
+    const trait = state.traits.traits[traitId]; 
     const permanentTraits = state.traits.permanentTraits;
     
     // Validation step 1: Check if trait exists
@@ -53,10 +53,11 @@ export const makeTraitPermanentThunk = createAsyncThunk<
     
     try {
       // Step 1: Spend essence
-      // This call should now be valid with the updated SpendEssencePayload type
+      // Ensure trait.name is accessed safely
+      const traitName = trait?.name || traitId; 
       dispatch(spendEssence({
         amount: MAKE_PERMANENT_COST,
-        reason: `Made ${trait.name} permanent`
+        reason: `Made ${traitName} permanent`
       }));
       
       // Step 2: Make the trait permanent
@@ -65,7 +66,7 @@ export const makeTraitPermanentThunk = createAsyncThunk<
       // Return success result
       return {
         success: true,
-        message: `${trait.name} is now permanent!`,
+        message: `${traitName} is now permanent!`,
         traitId
       };
     } catch (error) {
