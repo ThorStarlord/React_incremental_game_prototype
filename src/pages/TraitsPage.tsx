@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Grid, Container, Typography } from '@mui/material'; // Import Container and Typography
 import TraitList from '../features/Traits/components/ui/TraitList';
 import TraitSlots from '../features/Traits/components/containers/TraitSlots';
+import AvailableTraitList from '../features/Traits/components/containers/AvailableTraitList'; // Import AvailableTraitList
 // Import hooks and selectors
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAcquiredTraitObjects } from '../features/Traits/state/TraitsSelectors';
@@ -101,7 +102,7 @@ const TraitsPage: React.FC = () => {
               Select traits to equip from your collection of acquired traits.
             </Typography>
           </Box>
-          <TraitList {...traitListProps} />
+          <AvailableTraitList />
         </Grid>
       </Grid>
     </Container>

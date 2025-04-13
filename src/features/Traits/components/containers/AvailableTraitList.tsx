@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { Box, Typography, Button, Grid, Paper, Chip } from '@mui/material';
-import { selectAvailableTraitObjects } from '../../state/TraitsSelectors';
+import { selectAvailableTraitObjects, selectTraitSlots } from '../../state/TraitsSelectors';
 import { equipTrait } from '../../state/TraitsSlice';
 import { Trait } from '../../state/TraitsTypes';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
@@ -9,13 +9,19 @@ import { fetchTraitsThunk } from '../../state/TraitThunks';
 const AvailableTraitList: React.FC = () => {
   const dispatch = useAppDispatch();
   const availableTraits = useAppSelector(selectAvailableTraitObjects);
+  const slots = useAppSelector(selectTraitSlots);
 
   useEffect(() => {
     dispatch(fetchTraitsThunk());
   }, [dispatch]);
 
   const handleEquipTrait = (traitId: string) => {
-    dispatch(equipTrait({ traitId }));
+    const canEquip = slots.some(s => s.isUnlocked && !s.traitId);
+    if (canEquip) {
+      dispatch(equipTrait({ traitId }));
+    } else {
+      alert("No slots available!");
+    }
   };
 
   return (

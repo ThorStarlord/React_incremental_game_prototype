@@ -65,8 +65,8 @@ const traitsSlice = createSlice({
     },
     
     // Equip a trait to a specific slot
-    equipTrait: (state, action: PayloadAction<{ traitId: string, slotIndex?: number }>) => {
-      const { traitId, slotIndex } = action.payload;
+    equipTrait: (state, action: PayloadAction<{ traitId: string }>) => {
+      const { traitId } = action.payload;
       
       // Validate trait exists and is acquired
       if (!state.acquiredTraits.includes(traitId)) {
@@ -78,22 +78,13 @@ const traitsSlice = createSlice({
         return;
       }
       
-      // Find available slot or use specified one
-      let targetSlot: TraitSlot | undefined;
-      
-      if (slotIndex !== undefined) {
-        // Use specified slot if valid
-        targetSlot = state.slots.find(
-          slot => slot.index === slotIndex && slot.isUnlocked
-        );
-      } else {
-        // Find first available slot
-        targetSlot = state.slots.find(
-          slot => slot.isUnlocked && !slot.traitId
-        );
-      }
+      // Find first available slot
+      const targetSlot = state.slots.find(
+        slot => slot.isUnlocked && !slot.traitId
+      );
       
       if (!targetSlot) {
+        console.warn(`No available trait slots to equip ${traitId}.`);
         return;
       }
       
