@@ -1,7 +1,8 @@
 import { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../app/store';
-import { gainEssence, updateGenerationRate } from '../state/EssenceSlice';
+// Import setGenerationRate instead of updateGenerationRate
+import { gainEssence, setGenerationRate } from '../state/EssenceSlice'; 
 import { selectEquippedTraitIds } from '../../Traits/state/TraitsSelectors'; // Adjust path if needed
 
 /**
@@ -63,11 +64,15 @@ const useEssenceGeneration = () => {
       const finalMultiplier = calculateBonuses();
       const finalRate = baseRate * finalMultiplier;
       
+      // Dispatch action to update the perSecond rate in the store
       if (finalRate !== perSecond) {
-        dispatch(updateGenerationRate(finalRate));
+        // Use setGenerationRate action
+        dispatch(setGenerationRate(finalRate)); 
       }
     } else if (perSecond !== 0) {
-      dispatch(updateGenerationRate(0));
+      // Reset rate if essence becomes locked
+      // Use setGenerationRate action
+      dispatch(setGenerationRate(0)); 
     }
   }, [unlocked, calculateBaseRate, calculateBonuses, dispatch, perSecond]);
 

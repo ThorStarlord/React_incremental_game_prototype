@@ -56,7 +56,6 @@ export {
   selectPlayerMana,
   selectPlayerAttribute,
   selectPlayerSkills,
-  selectPlayerTraits,
   selectPlayerStatusEffects,
   selectPlayerTraitSlots
 } from './state/PlayerSelectors';

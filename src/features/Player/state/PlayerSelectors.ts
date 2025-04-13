@@ -17,7 +17,6 @@ export const selectPlayerAttributePoints = (state: RootState) => state.player.at
 export const selectPlayerSkills = (state: RootState) => state.player.skills;
 export const selectPlayerSkillPoints = (state: RootState) => state.player.skillPoints;
 export const selectPlayerStats = (state: RootState) => state.player.stats;
-export const selectPlayerTraits = (state: RootState) => state.player.equippedTraits;
 export const selectPlayerAcquiredTraits = (state: RootState) => state.player.acquiredTraits;
 export const selectPlayerPermanentTraits = (state: RootState) => state.player.permanentTraits;
 export const selectPlayerTraitSlots = (state: RootState) => state.player.traitSlots;
@@ -113,28 +112,11 @@ export const selectPlayerHasTrait = createSelector(
 );
 
 /**
- * Selector for whether player has a specific trait equipped
- */
-export const selectPlayerHasTraitEquipped = createSelector(
-  [selectPlayerTraits, (_, traitId: string) => traitId],
-  (equippedTraits, traitId): boolean => equippedTraits.includes(traitId)
-);
-
-/**
  * Selector for whether player has a specific trait permanent
  */
 export const selectPlayerHasTraitPermanent = createSelector(
   [selectPlayerPermanentTraits, (_, traitId: string) => traitId],
   (permanentTraits, traitId): boolean => permanentTraits.includes(traitId)
-);
-
-/**
- * Selector for player's available trait slots (total slots - used slots)
- */
-export const selectPlayerAvailableTraitSlots = createSelector(
-  [selectPlayerTraitSlots, selectPlayerTraits],
-  (totalSlots, equippedTraits): number => 
-    Math.max(0, totalSlots - equippedTraits.length)
 );
 
 /**
