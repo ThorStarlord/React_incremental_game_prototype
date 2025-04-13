@@ -15,6 +15,7 @@ import TraitDisplayContainer from '../../features/Traits/components/containers/T
 import TraitSlots from '../../features/Traits/components/containers/TraitSlots';
 import IntegratedTraitsPanel from '../../features/Traits/components/containers/IntegratedTraitsPanel';
 import TraitAcquisitionPanel from '../../features/Traits/components/containers/TraitAcquisitionPanel';
+import TraitsPage from '../../pages/TraitsPage'; // Pf3f0
 
 /**
  * Props for the RightColumn component
@@ -62,6 +63,7 @@ const RightColumn: React.FC<RightColumnProps> = ({
       <TraitSlots />
       <IntegratedTraitsPanel onClose={() => {}} />
       <TraitAcquisitionPanel />
+      <TraitsPage /> {/* Pbabb */}
       
       {/* Render children passed from MainGameLayout */}
       {children}
