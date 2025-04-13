@@ -20,7 +20,7 @@ const initialSlots: TraitSlot[] = [
 
 // Initial state
 const initialState: TraitsState = {
-  traits: {}, // Use 'traits' as defined in TraitsState interface
+  traits: {}, // Ensure traits is initialized as an empty object
   acquiredTraits: [],
   permanentTraits: [],
   slots: initialSlots,
@@ -29,7 +29,8 @@ const initialState: TraitsState = {
   discoveredTraits: [],
   equippedTraits: [],
   loading: false,
-  error: null
+  error: null,
+  allTraits: {} // Add allTraits to the initial state
 };
 
 // Create the traits slice
@@ -39,7 +40,7 @@ const traitsSlice = createSlice({
   reducers: {
     // Set all traits when loading game data
     setTraits: (state, action: PayloadAction<Record<string, Trait>>) => {
-      state.traits = action.payload; // Store data in 'traits'
+      state.allTraits = action.payload; // Store data in allTraits instead of traits
     },
     
     // Track when a trait is discovered
@@ -64,43 +65,24 @@ const traitsSlice = createSlice({
       }
     },
     
-    // Equip a trait to a specific slot or the first available one
-    // Ensure the payload type includes the optional slotIndex
-    equipTrait: (state, action: PayloadAction<{ traitId: string; slotIndex?: number }>) => {
-      const { traitId, slotIndex } = action.payload;
+    // Equip a trait to a specific slot
+    equipTrait: (state, action: PayloadAction<{ traitId: string }>) => {
+      const { traitId } = action.payload;
       
       // Validate trait exists and is acquired
       if (!state.acquiredTraits.includes(traitId)) {
-        console.warn(`Trait ${traitId} not acquired.`);
         return;
       }
       
       // Check if trait is already equipped in any slot
       if (state.slots.some(slot => slot.traitId === traitId)) {
-        console.warn(`Trait ${traitId} is already equipped.`);
         return;
       }
-
-      let targetSlot: TraitSlot | undefined;
-
-      // Try equipping to a specific slot if index is provided
-      if (typeof slotIndex === 'number' && slotIndex >= 0 && slotIndex < state.slots.length) {
-        const specificSlot = state.slots[slotIndex];
-        if (specificSlot.isUnlocked && !specificSlot.traitId) {
-          targetSlot = specificSlot;
-        } else {
-          console.warn(`Slot index ${slotIndex} is not available or locked.`);
-          // Optionally fall through to find the first available slot, or return
-          // return; // Uncomment this line to strictly enforce the specified slot
-        }
-      }
-
-      // If no specific slot targeted or the specific slot was invalid, find the first available
-      if (!targetSlot) {
-        targetSlot = state.slots.find(
-          slot => slot.isUnlocked && !slot.traitId
-        );
-      }
+      
+      // Find first available slot
+      const targetSlot = state.slots.find(
+        slot => slot.isUnlocked && !slot.traitId
+      );
       
       if (!targetSlot) {
         console.warn(`No available trait slots to equip ${traitId}.`);
@@ -109,10 +91,6 @@ const traitsSlice = createSlice({
       
       // Equip the trait
       targetSlot.traitId = traitId;
-      // Update equippedTraits array for consistency
-      state.equippedTraits = state.slots
-        .filter(slot => slot.isUnlocked && slot.traitId)
-        .map(slot => slot.traitId as string);
     },
     
     // Unequip a trait
@@ -252,7 +230,7 @@ const traitsSlice = createSlice({
       })
       .addCase(fetchTraitsThunk.fulfilled, (state, action: PayloadAction<Record<string, Trait>>) => {
         state.loading = false;
-        state.traits = action.payload; // Set the fetched traits in 'traits'
+        state.allTraits = action.payload; // Set the fetched traits in allTraits
         state.error = null;
       })
       .addCase(fetchTraitsThunk.rejected, (state, action) => {

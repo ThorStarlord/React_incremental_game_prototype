@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../../../app/hooks';
 import {
@@ -36,7 +36,7 @@ import {
   selectEquippedTraitIds,
   selectPermanentTraits
 } from '../../state/TraitsSlice';
-import { makeTraitPermanentThunk } from '../../state/TraitThunks';
+import { makeTraitPermanentThunk, fetchTraitsThunk } from '../../state/TraitThunks';
 import { selectEssenceAmount } from '../../../Essence/state/EssenceSlice';
 
 /**
@@ -191,6 +191,10 @@ const TraitSlots: React.FC = () => {
     message: '',
     severity: 'info'
   });
+
+  useEffect(() => {
+    dispatch(fetchTraitsThunk());
+  }, [dispatch]);
 
   // Filter traits that can be equipped (acquired but not permanent)
   const availableTraits = useSelector((state: RootState) => {

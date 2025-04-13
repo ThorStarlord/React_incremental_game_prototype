@@ -3,10 +3,11 @@
  * @description Container component for displaying player traits in the right sidebar.
  * Connects to the Redux store to fetch trait data and passes it to the UI component.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Paper, Chip, Divider } from '@mui/material';
-import { useAppSelector } from '../../../../app/hooks';
+import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectAcquiredTraits, selectEquippedTraitIds, selectTraits } from '../../state/TraitsSlice';
+import { fetchTraitsThunk } from '../../state/TraitThunks';
 
 /**
  * TraitDisplayContainer Component
@@ -15,6 +16,12 @@ import { selectAcquiredTraits, selectEquippedTraitIds, selectTraits } from '../.
  * for the sidebar. Shows equipped traits and available traits.
  */
 const TraitDisplayContainer: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchTraitsThunk());
+  }, [dispatch]);
+
   // Select the necessary data from the Redux store
   const allTraits = useAppSelector(selectTraits);
   const acquiredTraitIds = useAppSelector(selectAcquiredTraits);

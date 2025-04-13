@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -32,6 +32,7 @@ import {
 } from '../../state/TraitsSelectors';
 import { selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
 import { Trait } from '../../state/TraitsTypes';
+import { fetchTraitsThunk } from '../../state/TraitThunks';
 
 /**
  * Props for the IntegratedTraitsPanel component
@@ -73,6 +74,10 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   const availableTraits = useAppSelector(selectAvailableTraitObjects);
 
   const usedSlots = equippedTraits.length;
+
+  useEffect(() => {
+    dispatch(fetchTraitsThunk());
+  }, [dispatch]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number): void => {
     setActiveTab(newValue);
