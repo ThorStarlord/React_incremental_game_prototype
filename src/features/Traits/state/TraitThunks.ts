@@ -19,14 +19,14 @@ export const makeTraitPermanentThunk = createAsyncThunk<
   // Argument type: the ID of the trait to make permanent
   string,
   // ThunkAPI config
-  { state: RootState }
+  { state: RootState; rejectValue: string }
 >(
   'traits/makePermanentThunk',
   async (traitId: string, { getState, dispatch, rejectWithValue }) => {
     const state = getState();
     
     // Get the current essence amount from player
-    const currentEssence = state.player.totalEssenceEarned || 0;
+    const currentEssence = state.player?.totalEssenceEarned ?? 0;
     
     // Get the trait details and permanent traits list
     const trait = state.traits.traits[traitId];
@@ -53,7 +53,6 @@ export const makeTraitPermanentThunk = createAsyncThunk<
     
     try {
       // Step 1: Spend essence
-      // This call should now be valid with the updated SpendEssencePayload type
       dispatch(spendEssence({
         amount: MAKE_PERMANENT_COST,
         reason: `Made ${trait.name} permanent`

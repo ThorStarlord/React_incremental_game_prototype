@@ -148,10 +148,10 @@ export interface TraitPreset {
  * Interface for the traits state
  */
 export interface TraitsState {
-  /** All available traits in the game */
+  /** All available trait definitions in the game, keyed by ID. */
   traits: Record<string, Trait>;
   
-  /** Traits the player has acquired */
+  /** IDs of traits the player has acquired */
   acquiredTraits: string[];
   
   /** Traits the player has permanently unlocked (always active) */
