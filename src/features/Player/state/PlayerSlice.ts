@@ -15,7 +15,6 @@ import {
   SkillIdPayload,
   SkillUpgradePayload,
   TraitPayload,
-  EquipTraitPayload,
   StatusEffectIdPayload,
   StatUpdatePayload,
   UpdateAttributesPayload,
@@ -181,59 +180,6 @@ const playerSlice = createSlice({
       }
     },
     
-    // Trait actions
-    equipTrait: (state, action: PayloadAction<EquipTraitPayload>) => {
-      const { traitId, slotIndex } = action.payload;
-      
-      // Ensure player has the trait
-      if (!state.acquiredTraits.includes(traitId)) return;
-      
-      // Check if already equipped
-      if (state.equippedTraits.includes(traitId)) return;
-      
-      // Check if we have available slots
-      if (state.equippedTraits.length >= state.traitSlots) return;
-      
-      // Add to equipped traits at the specified index or at the end
-      if (typeof slotIndex === 'number' && slotIndex >= 0 && slotIndex < state.traitSlots) {
-        // If a slot index is specified, make sure there's room for all traits
-        const newEquippedTraits = [...state.equippedTraits];
-        while (newEquippedTraits.length <= slotIndex) {
-          newEquippedTraits.push('');  // Pad with empty slots
-        }
-        newEquippedTraits[slotIndex] = traitId;
-        // Filter out empty strings when assigning back
-        state.equippedTraits = newEquippedTraits.filter(id => id !== '');
-      } else {
-        // Add to the end
-        state.equippedTraits.push(traitId);
-      }
-    },
-    
-    unequipTrait: (state, action: PayloadAction<TraitPayload>) => {
-      const { traitId } = action.payload;
-      
-      // Remove from equipped traits
-      state.equippedTraits = state.equippedTraits.filter(id => id !== traitId);
-    },
-    
-    acquireTrait: (state, action: PayloadAction<TraitPayload>) => {
-      const { traitId } = action.payload;
-      
-      // Check if player already has the trait
-      if (state.acquiredTraits.includes(traitId)) return;
-      
-      // Add to acquired traits
-      state.acquiredTraits.push(traitId);
-    },
-    
-    unlockTraitSlot: (state) => {
-      // Increase trait slots (with a maximum limit)
-      if (state.traitSlots < 8) {
-        state.traitSlots += 1;
-      }
-    },
-    
     // Status effects
     addStatusEffect: (state, action: PayloadAction<StatusEffect>) => {
       const effect = action.payload;
@@ -290,10 +236,6 @@ export const {
   updateSkill,
   learnSkill,
   upgradeSkill,
-  equipTrait,
-  unequipTrait,
-  acquireTrait,
-  unlockTraitSlot,
   addStatusEffect,
   removeStatusEffect,
   updateStat,

@@ -9,13 +9,16 @@ import {
   allocateAttribute,
   updateSkill,
   learnSkill,
-  equipTrait,
-  unequipTrait,
-  acquireTrait,
-  unlockTraitSlot,
   addStatusEffect,
   removeStatusEffect
 } from './PlayerSlice';
+import {
+  equipTrait,
+  unequipTrait,
+  makePermanent as makeTraitPermanentAction,
+  unlockTraitSlot as unlockTraitSlotAction
+} from '../../Traits/state/TraitsSlice';
+import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { recalculatePlayerStats } from '../utils/playerStatCalculations';
 import { 
   Attribute, 
@@ -209,15 +212,17 @@ export const learnOrUpgradeSkillThunk = createAsyncThunk(
 
 /**
  * Thunk for making a trait permanent (always active)
+ * Now dispatches actions to TraitsSlice and EssenceSlice
  */
 export const makeTraitPermanentThunk = createAsyncThunk(
   'player/makeTraitPermanent',
   async (traitId: string, { getState, dispatch }) => {
     const state = getState() as RootState;
     const { player } = state;
+    const traitsState = state.traits;
     
     // Check if player has the trait
-    if (!player.acquiredTraits.includes(traitId)) {
+    if (!traitsState.acquiredTraits.includes(traitId)) {
       return {
         success: false,
         message: 'You do not have this trait'
@@ -225,16 +230,16 @@ export const makeTraitPermanentThunk = createAsyncThunk(
     }
     
     // Check if trait is already permanent
-    if (player.permanentTraits.includes(traitId)) {
+    if (traitsState.permanentTraits.includes(traitId)) {
       return {
         success: false,
         message: 'This trait is already permanent'
       };
     }
     
-    // Check if player has enough essence (150 as defined in your components)
+    // Check if player has enough essence
     const requiredEssence = 150;
-    const playerEssence = state.player.totalEssenceEarned || 0;
+    const playerEssence = player.totalEssenceEarned || 0;
     
     if (playerEssence < requiredEssence) {
       return {
@@ -243,20 +248,19 @@ export const makeTraitPermanentThunk = createAsyncThunk(
       };
     }
     
-    // Remove from equipped traits if it's currently equipped
-    if (player.equippedTraits.includes(traitId)) {
-      dispatch(unequipTrait({ traitId }));
-    }
-    
-    // Make the trait permanent
-    dispatch(updatePlayer({
-      permanentTraits: [...player.permanentTraits, traitId],
-      totalEssenceEarned: playerEssence - requiredEssence
+    // Spend essence
+    const traitName = traitsState.traits[traitId]?.name || traitId;
+    dispatch(spendEssence({
+      amount: requiredEssence,
+      reason: `Made ${traitName} permanent`
     }));
+
+    // Make the trait permanent
+    dispatch(makeTraitPermanentAction(traitId));
     
     return {
       success: true,
-      message: 'Trait is now permanent!',
+      message: `${traitName} is now permanent!`,
       essenceCost: requiredEssence
     };
   }
@@ -300,6 +304,7 @@ export const applyStatusEffectThunk = createAsyncThunk(
 
 /**
  * Thunk for handling trait equipment with slot management
+ * Now dispatches actions to TraitsSlice
  */
 export const manageTraitSlotThunk = createAsyncThunk(
   'player/manageTraitSlot',
@@ -309,11 +314,11 @@ export const manageTraitSlotThunk = createAsyncThunk(
     { dispatch, getState }
   ) => {
     const state = getState() as RootState;
-    const { player } = state;
+    const traitsState = state.traits;
     
     if (action === 'equip') {
       // Check if trait is available
-      if (!player.acquiredTraits.includes(traitId)) {
+      if (!traitsState.acquiredTraits.includes(traitId)) {
         return {
           success: false,
           message: 'You do not have this trait'
@@ -321,7 +326,7 @@ export const manageTraitSlotThunk = createAsyncThunk(
       }
       
       // Check if already equipped
-      if (player.equippedTraits.includes(traitId)) {
+      if (traitsState.slots.some(slot => slot.traitId === traitId)) {
         return {
           success: false,
           message: 'This trait is already equipped'
@@ -329,11 +334,16 @@ export const manageTraitSlotThunk = createAsyncThunk(
       }
       
       // Check if there's available space
-      if (player.equippedTraits.length >= player.traitSlots) {
-        return {
-          success: false,
-          message: 'No available trait slots'
-        };
+      const availableSlots = traitsState.slots.filter(slot => slot.isUnlocked && !slot.traitId).length;
+      if (availableSlots <= 0) {
+         if (typeof slotIndex === 'number') {
+            const targetSlot = traitsState.slots.find(s => s.index === slotIndex);
+            if (!targetSlot || !targetSlot.isUnlocked || targetSlot.traitId) {
+               return { success: false, message: 'Specified slot is invalid or occupied' };
+            }
+         } else {
+            return { success: false, message: 'No available trait slots' };
+         }
       }
       
       // Equip the trait
@@ -345,7 +355,7 @@ export const manageTraitSlotThunk = createAsyncThunk(
       };
     } else if (action === 'unequip') {
       // Check if trait is equipped
-      if (!player.equippedTraits.includes(traitId)) {
+      if (!traitsState.slots.some(slot => slot.traitId === traitId)) {
         return {
           success: false,
           message: 'This trait is not equipped'
@@ -353,7 +363,7 @@ export const manageTraitSlotThunk = createAsyncThunk(
       }
       
       // Unequip the trait
-      dispatch(unequipTrait({ traitId }));
+      dispatch(unequipTrait(traitId));
       
       return {
         success: true,
@@ -370,12 +380,14 @@ export const manageTraitSlotThunk = createAsyncThunk(
 
 /**
  * Thunk for unlocking a new trait slot
+ * Now dispatches actions to TraitsSlice and EssenceSlice
  */
 export const unlockTraitSlotThunk = createAsyncThunk(
   'player/unlockTraitSlot',
   async (essenceCost: number, { dispatch, getState }) => {
     const state = getState() as RootState;
     const { player } = state;
+    const traitsState = state.traits;
     
     // Check if player has enough essence
     const playerEssence = player.totalEssenceEarned || 0;
@@ -386,19 +398,28 @@ export const unlockTraitSlotThunk = createAsyncThunk(
         message: `Not enough essence. Need ${essenceCost}, have ${playerEssence}`
       };
     }
+
+    // Find the next slot index to unlock
+    const lastUnlockedIndex = traitsState.slots.reduce((maxIndex, slot) => slot.isUnlocked ? Math.max(maxIndex, slot.index) : maxIndex, -1);
+    const nextSlotIndex = lastUnlockedIndex + 1;
+
+    if (nextSlotIndex >= traitsState.slots.length) {
+        return { success: false, message: 'All slots already unlocked or no more slots defined.' };
+    }
     
-    // Unlock the trait slot
-    dispatch(unlockTraitSlot());
-    
-    // Deduct essence
-    dispatch(updatePlayer({
-      totalEssenceEarned: playerEssence - essenceCost
+    // Spend essence
+    dispatch(spendEssence({
+      amount: essenceCost,
+      reason: `Unlocked trait slot ${nextSlotIndex + 1}`
     }));
+
+    // Unlock the trait slot
+    dispatch(unlockTraitSlotAction(nextSlotIndex));
     
     return {
       success: true,
-      message: 'New trait slot unlocked!',
-      newTotalSlots: player.traitSlots + 1,
+      message: `Trait slot ${nextSlotIndex + 1} unlocked!`,
+      newTotalSlots: traitsState.slots.filter(s => s.isUnlocked).length,
       essenceCost
     };
   }
@@ -410,7 +431,6 @@ export const unlockTraitSlotThunk = createAsyncThunk(
  * Calculate player level based on total experience
  */
 function calculateLevelFromExperience(experience: number): number {
-  // This formula should match your game's level progression
   return Math.floor(Math.pow(experience / 100, 1/1.5)) + 1;
 }
 
@@ -425,21 +445,17 @@ function calculateSkillLevel(experience: number): number {
  * Update player stats based on level up
  */
 function handleLevelUpStats(player: PlayerState, newLevel: number): PlayerStats {
-  // Base stat increases per level
   const healthPerLevel = 10;
   const manaPerLevel = 5;
   
-  // Calculate level difference
   const levelDifference = newLevel - player.level;
   
-  // Create a copy of current stats
   const newStats: PlayerStats = {
     ...player.stats,
     maxHealth: player.stats.maxHealth + (healthPerLevel * levelDifference),
     maxMana: player.stats.maxMana + (manaPerLevel * levelDifference)
   };
   
-  // Fully heal on level up
   newStats.health = newStats.maxHealth;
   newStats.mana = newStats.maxMana;
   

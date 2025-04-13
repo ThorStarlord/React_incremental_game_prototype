@@ -8,6 +8,7 @@ import {
 } from './TraitsTypes';
 // Import the thunks
 import { makeTraitPermanentThunk, fetchTraitsThunk } from './TraitThunks';
+import { spendEssence } from '../../Essence/state/EssenceSlice'; // Assuming spendEssence exists
 
 // Initial trait slots
 const initialSlots: TraitSlot[] = [
@@ -64,24 +65,40 @@ const traitsSlice = createSlice({
       }
     },
     
-    // Equip a trait to a specific slot
-    equipTrait: (state, action: PayloadAction<{ traitId: string }>) => {
-      const { traitId } = action.payload;
+    // Equip a trait to a specific slot or the first available one
+    equipTrait: (state, action: PayloadAction<{ traitId: string; slotIndex?: number }>) => {
+      const { traitId, slotIndex } = action.payload;
       
       // Validate trait exists and is acquired
       if (!state.acquiredTraits.includes(traitId)) {
+        console.warn(`Trait ${traitId} not acquired.`);
         return;
       }
       
       // Check if trait is already equipped in any slot
       if (state.slots.some(slot => slot.traitId === traitId)) {
+        console.warn(`Trait ${traitId} is already equipped.`);
         return;
       }
-      
-      // Find first available slot
-      const targetSlot = state.slots.find(
-        slot => slot.isUnlocked && !slot.traitId
-      );
+
+      let targetSlot: TraitSlot | undefined;
+
+      // Try equipping to a specific slot if index is provided
+      if (typeof slotIndex === 'number' && slotIndex >= 0 && slotIndex < state.slots.length) {
+        const specificSlot = state.slots[slotIndex];
+        if (specificSlot.isUnlocked && !specificSlot.traitId) {
+          targetSlot = specificSlot;
+        } else {
+          console.warn(`Slot index ${slotIndex} is not available or locked.`);
+        }
+      }
+
+      // If no specific slot targeted or the specific slot was invalid, find the first available
+      if (!targetSlot) {
+        targetSlot = state.slots.find(
+          slot => slot.isUnlocked && !slot.traitId
+        );
+      }
       
       if (!targetSlot) {
         console.warn(`No available trait slots to equip ${traitId}.`);
@@ -90,6 +107,10 @@ const traitsSlice = createSlice({
       
       // Equip the trait
       targetSlot.traitId = traitId;
+      // Update equippedTraits array for consistency
+      state.equippedTraits = state.slots
+        .filter(slot => slot.isUnlocked && slot.traitId)
+        .map(slot => slot.traitId as string);
     },
     
     // Unequip a trait
@@ -101,6 +122,10 @@ const traitsSlice = createSlice({
       if (slot) {
         slot.traitId = null;
       }
+      // Update equippedTraits array for consistency
+      state.equippedTraits = state.slots
+        .filter(slot => slot.isUnlocked && slot.traitId)
+        .map(slot => slot.traitId as string);
     },
     
     // Make a trait permanent (always active)
@@ -109,6 +134,7 @@ const traitsSlice = createSlice({
       
       // Ensure trait is acquired
       if (!state.acquiredTraits.includes(traitId)) {
+        console.warn(`Cannot make unacquired trait ${traitId} permanent.`);
         return;
       }
       
@@ -122,15 +148,21 @@ const traitsSlice = createSlice({
       if (slot) {
         slot.traitId = null;
       }
+      // Update equippedTraits array for consistency
+      state.equippedTraits = state.slots
+        .filter(slot => slot.isUnlocked && slot.traitId)
+        .map(slot => slot.traitId as string);
     },
     
-    // Unlock a trait slot
+    // Unlock a trait slot by index
     unlockTraitSlot: (state, action: PayloadAction<number>) => {
       const slotIndex = action.payload;
       const slot = state.slots.find(s => s.index === slotIndex);
       
       if (slot && !slot.isUnlocked) {
         slot.isUnlocked = true;
+      } else {
+        console.warn(`Slot index ${slotIndex} not found or already unlocked.`);
       }
     },
     
@@ -214,8 +246,6 @@ const traitsSlice = createSlice({
       })
       .addCase(makeTraitPermanentThunk.fulfilled, (state, action) => {
         state.loading = false;
-        // The actual state changes (making permanent) are handled by the dispatched 'makePermanent' action within the thunk.
-        // We might log success or update UI state here if needed.
         console.log(action.payload.message); // Example logging
       })
       .addCase(makeTraitPermanentThunk.rejected, (state, action) => {
@@ -244,10 +274,10 @@ export const {
   setTraits,
   discoverTrait,
   acquireTrait,
-  equipTrait,
+  equipTrait, // Signature updated
   unequipTrait,
   makePermanent,
-  unlockTraitSlot,
+  unlockTraitSlot, // Now unlocks by index
   saveTraitPreset,
   loadTraitPreset,
   deleteTraitPreset,
@@ -269,13 +299,8 @@ export const selectTraitsByIds = (state: RootState, traitIds: string[]) => {
   return traitIds.map(id => state.traits.traits[id]).filter(Boolean);
 };
 
-// Add a memoized selector for equipped traits
-export const selectEquippedTraitIds = createSelector(
-  [selectTraitSlots],
-  (slots) => slots
-    .filter(slot => slot.isUnlocked && slot.traitId)
-    .map(slot => slot.traitId as string)
-);
+// Use the state array directly for equipped traits
+export const selectEquippedTraitIds = (state: RootState) => state.traits.equippedTraits;
 
 // Export reducer
 export default traitsSlice.reducer;

@@ -1,98 +1,85 @@
-import { useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../app/store';
+import { gainEssence, updateGenerationRate } from '../state/EssenceSlice';
+import { selectEquippedTraitIds } from '../../Traits/state/TraitsSelectors'; // Adjust path if needed
 
 /**
- * Interface for the return value of the useEssenceGeneration hook
+ * Custom hook to manage essence generation based on game state.
+ *
+ * @returns An object containing the generateEssence function.
  */
-interface EssenceGenerationHook {
-  /** Current essence amount */
-  essence: number;
-  /** Maximum essence capacity */
-  maxEssence: number;
-  /** Rate of essence generation per minute */
-  generationRate: number;
-  /** Function to generate essence based on time elapsed */
-  generateEssence: (timeElapsed?: number) => void;
-  /** Function to spend essence */
-  spendEssence: (amount: number) => boolean;
-}
-
-/**
- * Custom hook for essence generation and management
- * 
- * Provides access to essence values and functions to generate/spend essence
- * 
- * @returns Essence data and management functions
- */
-export default function useEssenceGeneration(): EssenceGenerationHook {
-  // Use Redux selectors to get essence data from the store
-  const essence = useSelector((state: RootState) => state.essence?.amount || 0);
-  const maxEssence = useSelector((state: RootState) => state.essence?.maxAmount || 100);
-  const generationRate = useSelector((state: RootState) => state.essence?.generationRate || 1);
+const useEssenceGeneration = () => {
+  // Get necessary state from Redux store
+  const { perSecond, multiplier, unlocked } = useSelector((state: RootState) => state.essence);
+  const { generators, upgrades } = useSelector((state: RootState) => state.essence);
   
   // Get player level and traits that might affect essence generation
   const playerLevel = useSelector((state: RootState) => state.player?.level || 1);
-  const playerTraits = useSelector((state: RootState) => state.player?.equippedTraits || []);
+  const equippedTraitIds = useSelector(selectEquippedTraitIds); 
   
   // Get the Redux dispatch function
   const dispatch = useDispatch();
 
-  /**
-   * Generate essence based on elapsed time
-   * @param timeElapsed - Time elapsed in milliseconds (defaults to 1 minute)
-   */
-  const generateEssence = useCallback((timeElapsed: number = 60000) => {
-    // Calculate base amount to generate (timeElapsed is in ms, convert to minutes)
-    const timeInMinutes = timeElapsed / 60000;
-    let amount = generationRate * timeInMinutes;
-    
-    // Apply level bonus (1% per level)
-    amount *= (1 + (playerLevel - 1) * 0.01);
-    
-    // Apply trait bonuses if needed
-    // This would check for traits that boost essence generation
-    // Simplified implementation for now
-    const traitBonus = playerTraits.reduce((bonus, traitId) => {
-      // Example: If trait 'essence_boost' exists, add 10% bonus
-      if (traitId === 'essence_boost') return bonus + 0.1;
+  // Calculate the base generation rate from generators
+  const calculateBaseRate = useCallback(() => {
+    let rate = 0;
+    Object.values(generators).forEach(gen => {
+      if (gen.unlocked && gen.owned > 0) {
+        rate += gen.baseProduction * gen.owned * (1 + (gen.level - 1) * 0.1); // Simple level bonus
+      }
+    });
+    return rate;
+  }, [generators]);
+
+  // Calculate bonuses from upgrades and traits
+  const calculateBonuses = useCallback(() => {
+    let totalMultiplier = multiplier; // Start with global multiplier
+
+    // Add upgrade bonuses (example: autoGeneration upgrade)
+    const autoGenUpgrade = upgrades.autoGeneration;
+    if (autoGenUpgrade?.unlocked && autoGenUpgrade.level > 0) {
+      totalMultiplier += autoGenUpgrade.effect * autoGenUpgrade.level;
+    }
+
+    // Add trait bonuses
+    const traitBonus = equippedTraitIds.reduce((bonus: number, traitId: string) => {
+      if (traitId === 'essence_boost') return bonus + 0.1; // Assuming 0.1 represents 10%
       return bonus;
-    }, 0);
-    
-    amount *= (1 + traitBonus);
-    
-    // Round to 2 decimal places
-    amount = Math.round(amount * 100) / 100;
-    
-    // Dispatch action to update essence in the Redux store
-    dispatch({ 
-      type: 'essence/generateEssence', 
-      payload: amount 
-    });
-  }, [dispatch, generationRate, playerLevel, playerTraits]);
+    }, 1.0); // Start bonus multiplier at 1.0
 
-  /**
-   * Spend essence if player has enough
-   * @param amount - Amount of essence to spend
-   * @returns Whether the transaction was successful
-   */
-  const spendEssence = useCallback((amount: number): boolean => {
-    if (essence < amount) return false;
-    
-    // Dispatch action to spend essence in Redux store
-    dispatch({ 
-      type: 'essence/spendEssence', 
-      payload: amount 
-    });
-    
-    return true;
-  }, [essence, dispatch]);
+    totalMultiplier *= traitBonus; // Apply trait multiplier
 
-  return {
-    essence,
-    maxEssence,
-    generationRate,
-    generateEssence,
-    spendEssence
-  };
-}
+    // Add player level bonus (example: 1% per level)
+    totalMultiplier *= (1 + (playerLevel - 1) * 0.01);
+
+    return totalMultiplier;
+  }, [multiplier, upgrades, equippedTraitIds, playerLevel]);
+
+  // Update the generation rate whenever dependencies change
+  useEffect(() => {
+    if (unlocked) {
+      const baseRate = calculateBaseRate();
+      const finalMultiplier = calculateBonuses();
+      const finalRate = baseRate * finalMultiplier;
+      
+      if (finalRate !== perSecond) {
+        dispatch(updateGenerationRate(finalRate));
+      }
+    } else if (perSecond !== 0) {
+      dispatch(updateGenerationRate(0));
+    }
+  }, [unlocked, calculateBaseRate, calculateBonuses, dispatch, perSecond]);
+
+  // Function to manually trigger essence gain (e.g., from clicking)
+  const generateEssence = useCallback((amount: number, source: string = 'manual') => {
+    if (unlocked) {
+      dispatch(gainEssence({ amount, source }));
+    }
+  }, [dispatch, unlocked]);
+
+  // Return the manual generation function
+  return { generateEssence };
+};
+
+export default useEssenceGeneration;

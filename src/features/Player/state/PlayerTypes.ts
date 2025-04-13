@@ -88,7 +88,6 @@ export interface PlayerState {
   skills: Skill[];
   statusEffects: StatusEffect[];
   acquiredTraits: string[];
-  equippedTraits: string[];
   permanentTraits: string[];
   traitSlots: number;
   totalEssenceEarned: number;
@@ -161,11 +160,6 @@ export interface TraitPayload {
   traitId: string;
 }
 
-export interface EquipTraitPayload {
-  traitId: string;
-  slotIndex?: number;
-}
-
 export interface StatusEffectIdPayload {
   effectId: string;
 }
@@ -220,7 +214,6 @@ export const PlayerInitialState: PlayerState = {
   skills: [],
   statusEffects: [],
   acquiredTraits: [],
-  equippedTraits: [],
   permanentTraits: [],
   traitSlots: 1,
   totalEssenceEarned: 0,
