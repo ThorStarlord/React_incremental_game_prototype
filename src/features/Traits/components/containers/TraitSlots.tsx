@@ -36,8 +36,9 @@ import {
   selectEquippedTraitIds,
   selectPermanentTraits
 } from '../../state/TraitsSlice';
-import { makeTraitPermanentThunk, fetchTraitsThunk } from '../../state/TraitThunks';
-import { selectEssenceAmount } from '../../../Essence/state/EssenceSlice';
+import { makeTraitPermanentThunk } from '../../state/TraitThunks';
+import { selectEssenceAmount } from '../../../Essence/state/EssenceSelectors';
+import { selectAvailableTraitObjects } from '../../state/TraitsSelectors';
 
 /**
  * Props for the TraitSlotItem component
@@ -178,6 +179,7 @@ const TraitSlots: React.FC = () => {
   const equippedTraitIds = useSelector(selectEquippedTraitIds);
   const permanentTraitIds = useSelector(selectPermanentTraits);
   const essence = useSelector(selectEssenceAmount);
+  const availableTraits = useSelector(selectAvailableTraitObjects);
   
   const [showTraitSelector, setShowTraitSelector] = useState<boolean>(false);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
@@ -190,24 +192,6 @@ const TraitSlots: React.FC = () => {
     show: false,
     message: '',
     severity: 'info'
-  });
-
-  useEffect(() => {
-    dispatch(fetchTraitsThunk());
-  }, [dispatch]);
-
-  // Filter traits that can be equipped (acquired but not permanent)
-  const availableTraits = useSelector((state: RootState) => {
-    const acquiredTraits = state.traits.acquiredTraits;
-    const permanentTraits = state.traits.permanentTraits;
-    
-    return acquiredTraits
-      .filter(id => !permanentTraits.includes(id))
-      .map(id => ({
-        ...state.traits.traits[id],
-        id
-      }))
-      .filter(Boolean);
   });
 
   // Handle opening the trait selector for a slot
@@ -246,26 +230,11 @@ const TraitSlots: React.FC = () => {
   const handleMakePermanent = (traitId: string): void => {
     if (essence >= 150) {
       // Show confirmation dialog
-      if (window.confirm(`Make ${traitsData[traitId]?.name || 'this trait'} permanent? This will cost 150 Essence.`)) {
-        dispatch(makeTraitPermanentThunk(traitId))
-          .unwrap()
-          .then(result => {
-            // Show success notification
-            setNotification({
-              show: true,
-              message: result.message,
-              severity: result.success ? 'success' : 'info'
-            });
-          })
-          .catch(error => {
-            // Show error notification
-            setNotification({
-              show: true,
-              message: error || 'Failed to make trait permanent',
-              severity: 'error'
-            });
-          });
-      }
+      setNotification({
+        show: true,
+        message: `Make ${traitsData[traitId]?.name || 'this trait'} permanent? This will cost 150 Essence.`,
+        severity: 'info'
+      });
     }
   };
 
