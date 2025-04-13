@@ -13,7 +13,7 @@ import {
   removeStatusEffect
 } from './PlayerSlice';
 import {
-  equipTrait,
+  equipTrait, // <-- Make sure this is imported from TraitsSlice
   unequipTrait,
   makePermanent as makeTraitPermanentAction,
   unlockTraitSlot as unlockTraitSlotAction
@@ -346,8 +346,8 @@ export const manageTraitSlotThunk = createAsyncThunk(
          }
       }
       
-      // Equip the trait
-      dispatch(equipTrait({ traitId, slotIndex }));
+      // Equip the trait - This call should match the definition in TraitsSlice
+      dispatch(equipTrait({ traitId, slotIndex })); // Passing both traitId and optional slotIndex
       
       return {
         success: true,
