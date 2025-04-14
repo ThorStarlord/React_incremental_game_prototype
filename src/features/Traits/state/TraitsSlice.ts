@@ -18,16 +18,16 @@ const initialSlots: TraitSlot[] = [
   { id: 'slot-5', index: 4, isUnlocked: false, unlockRequirements: { type: 'quest', value: 'master-of-traits' } },
 ];
 
-// Initial state
+// Initial state - ensure traits starts empty
 const initialState: TraitsState = {
-  traits: {}, // Holds all trait definitions
+  traits: {}, // Start with an empty traits object
   acquiredTraits: [],
   permanentTraits: [],
   slots: initialSlots,
   maxTraitSlots: 5,
   presets: [],
   discoveredTraits: [],
-  equippedTraits: [], // Consider removing later if slots are the source of truth
+  equippedTraits: [],
   loading: false,
   error: null
 };
@@ -228,7 +228,7 @@ const traitsSlice = createSlice({
       state.error = action.payload;
     }
   },
-  // Add extra reducers for handling thunk lifecycle actions
+  // Verify extraReducers for fetchTraitsThunk
   extraReducers: (builder) => {
     builder
       // Make Permanent Thunk
@@ -253,14 +253,13 @@ const traitsSlice = createSlice({
       })
       .addCase(fetchTraitsThunk.fulfilled, (state, action: PayloadAction<Record<string, Trait>>) => {
         state.loading = false;
-        state.traits = action.payload; // Store the processed data
-        // Populate discoveredTraits based on loaded keys
+        state.traits = action.payload; // Correctly assign payload to state.traits
         state.discoveredTraits = Object.keys(action.payload);
         state.error = null;
       })
       .addCase(fetchTraitsThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to fetch traits'; // Use rejectValue
+        state.error = typeof action.payload === 'string' ? action.payload : action.error.message || 'Failed to fetch traits';
       });
   }
 });

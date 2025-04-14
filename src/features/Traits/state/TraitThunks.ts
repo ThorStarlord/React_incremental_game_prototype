@@ -81,46 +81,36 @@ export const makeTraitPermanentThunk = createAsyncThunk<
 
 /**
  * Thunk for fetching initial trait data
- * This simulates fetching data from an API or local source
+ * Fetches data from public/data/traits.json
  */
 export const fetchTraitsThunk = createAsyncThunk<
-  // Return type on success: the fetched traits
   Record<string, Trait>,
-  // Argument type: void (no arguments needed)
   void,
-  // ThunkAPI config
   { rejectValue: string }
 >(
   'traits/fetchTraits',
   async (_, { rejectWithValue }) => {
     try {
-      // Fetch trait data from the public JSON file
       const response = await fetch('/data/traits.json');
       if (!response.ok) {
         throw new Error(`Failed to fetch traits: ${response.statusText}`);
       }
-      // Assuming the JSON structure is { "copyableTraits": { ... } }
-      const jsonData: { copyableTraits: Record<string, Omit<Trait, 'id'>> } = await response.json();
+      // The JSON is now expected to be the root dictionary: Record<string, Omit<Trait, 'id'>>
+      const rawTraitsData: Record<string, Omit<Trait, 'id'>> = await response.json();
 
-      // Process the data: Extract the nested object and add the ID to each trait
       const processedTraits: Record<string, Trait> = {};
-      if (jsonData && jsonData.copyableTraits) {
-        for (const [id, traitData] of Object.entries(jsonData.copyableTraits)) {
-          processedTraits[id] = {
-            ...traitData,
-            id: id, // Add the ID property
-            // Ensure category is set, potentially mapping from 'type' if needed
-            category: traitData.category || (traitData as any).type || 'General',
-          };
-        }
-      } else {
-        console.warn("Fetched traits data is not in the expected format { copyableTraits: { ... } }");
-        // Return empty object or throw error depending on desired behavior
-        // throw new Error("Invalid trait data format");
+      for (const [id, rawData] of Object.entries(rawTraitsData)) {
+        processedTraits[id] = {
+          ...rawData, // Spread the raw data
+          id: id, // Add the ID property from the key
+          // Ensure required fields have defaults if potentially missing in JSON
+          category: rawData.category || (rawData as any).type || 'General', // Normalize category/type
+          rarity: rawData.rarity || 'Common',
+          effects: rawData.effects || {}, // Ensure effects is at least an empty object
+          // Add other defaults as needed based on the Trait interface
+        };
       }
 
-
-      // Return the processed data
       return processedTraits;
     } catch (error) {
       let message = 'Unknown error fetching traits';
@@ -128,7 +118,6 @@ export const fetchTraitsThunk = createAsyncThunk<
         message = error.message;
       }
       console.error('Fetch Traits Error:', message);
-      // Reject the thunk with an error message
       return rejectWithValue(message);
     }
   }

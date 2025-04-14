@@ -1,111 +1,118 @@
 {
-  "copyableTraits": {
-    "BargainingMaster": {
-      "name": "Bargaining Master",
-      "type": "Knowledge",
-      "description": "Your keen business sense allows you to get better deals from merchants.",
-      "essenceCost": 50,
-      "effects": {
-        "shopDiscount": 0.05
-      }
+  "BargainingMaster": {
+    "name": "Bargaining Master",
+    "category": "Knowledge",
+    "description": "Your keen business sense allows you to get better deals from merchants.",
+    "essenceCost": 50,
+    "effects": {
+      "shopDiscount": 0.05
     },
-    "QuickLearner": {
-      "name": "Quick Learner",
-      "type": "Knowledge",
-      "description": "You gain 15% more skill experience from all sources.",
-      "essenceCost": 75,
-      "effects": {
-        "skillXpMultiplier": 0.15
-      }
+    "rarity": "Common"
+  },
+  "QuickLearner": {
+    "name": "Quick Learner",
+    "category": "Knowledge",
+    "description": "You gain 15% more skill experience from all sources.",
+    "essenceCost": 75,
+    "effects": {
+      "skillXpMultiplier": 0.15
     },
-    "MentorsInsight": {
-      "name": "Mentor's Insight",
-      "type": "Mental",
-      "description": "Increases essence gained from all sources by 10%",
-      "essenceCost": 50,
-      "effects": {
-        "essenceGainMultiplier": 1.1
-      },
-      "tier": 1,
-      "rarity": "Uncommon",
-      "icon": "school"
+    "rarity": "Uncommon"
+  },
+  "MentorsInsight": {
+    "name": "Mentor's Insight",
+    "category": "Mental",
+    "description": "Increases essence gained from all sources by 10%",
+    "essenceCost": 50,
+    "effects": {
+      "essenceGainMultiplier": 1.1
     },
-    "BattleHardened": {
-      "name": "Battle Hardened",
-      "type": "Combat",
-      "description": "Your combat experience grants you increased attack and defense capabilities.",
-      "essenceCost": 80,
-      "effects": {
-        "attackBonus": 0.10,
-        "defenseBonus": 0.05
-      }
+    "tier": 1,
+    "rarity": "Uncommon",
+    "iconPath": "school"
+  },
+  "BattleHardened": {
+    "name": "Battle Hardened",
+    "category": "Combat",
+    "description": "Your combat experience grants you increased attack and defense capabilities.",
+    "essenceCost": 80,
+    "effects": {
+      "attackBonus": 0.10,
+      "defenseBonus": 0.05
     },
-    "EssenceSiphon": {
-      "name": "Essence Siphon",
-      "type": "Combat",
-      "description": "You have a chance to gain essence when landing hits in combat.",
-      "essenceCost": 120,
-      "effects": {
-        "essenceSiphonChance": 0.05
-      }
+    "rarity": "Uncommon"
+  },
+  "EssenceSiphon": {
+    "name": "Essence Siphon",
+    "category": "Combat",
+    "description": "You have a chance to gain essence when landing hits in combat.",
+    "essenceCost": 120,
+    "effects": {
+      "essenceSiphonChance": 0.05
     },
-    "RelationshipSage": {
-      "name": "Relationship Sage",
-      "type": "Social",
-      "description": "Your actions have a greater impact on NPC relationships.",
-      "essenceCost": 90,
-      "effects": {
-        "relationshipGainMultiplier": 1.2
-      }
+    "rarity": "Rare"
+  },
+  "RelationshipSage": {
+    "name": "Relationship Sage",
+    "category": "Social",
+    "description": "Your actions have a greater impact on NPC relationships.",
+    "essenceCost": 90,
+    "effects": {
+      "relationshipGainMultiplier": 1.2
     },
-    "EssenceFlow": {
-      "name": "Essence Flow",
-      "type": "Knowledge",
-      "description": "Increases your essence generation rate from all sources.",
-      "essenceCost": 150,
-      "effects": {
-        "essenceGenerationMultiplier": 1.15
-      }
+    "rarity": "Uncommon"
+  },
+  "EssenceFlow": {
+    "name": "Essence Flow",
+    "category": "Knowledge",
+    "description": "Increases your essence generation rate from all sources.",
+    "essenceCost": 150,
+    "effects": {
+      "essenceGenerationMultiplier": 1.15
     },
-    "CombatReflexes": {
-      "name": "Combat Reflexes",
-      "type": "Combat",
-      "description": "Increases your chance to dodge enemy attacks.",
-      "essenceCost": 100,
-      "effects": {
-        "dodgeChance": 0.1
-      }
+    "rarity": "Rare"
+  },
+  "CombatReflexes": {
+    "name": "Combat Reflexes",
+    "category": "Combat",
+    "description": "Increases your chance to dodge enemy attacks.",
+    "essenceCost": 100,
+    "effects": {
+      "dodgeChance": 0.1
     },
-    "GrowingAffinity": {
-      "id": "GrowingAffinity",
-      "name": "Growing Affinity",
-      "description": "Automatically increases relationships with all NPCs by 1 point every minute",
-      "essenceCost": 20,
-      "type": "Social",
-      "effect": "relationshipGrowth",
-      "effects": {}
+    "rarity": "Uncommon"
+  },
+  "GrowingAffinity": {
+    "name": "Growing Affinity",
+    "category": "Social",
+    "description": "Automatically increases relationships with all NPCs by 1 point every minute",
+    "essenceCost": 20,
+    "effect": "relationshipGrowth",
+    "effects": {},
+    "rarity": "Common"
+  },
+  "WillowsWisdom": {
+    "name": "Willow's Wisdom",
+    "category": "Knowledge",
+    "description": "Elder Willow's ancient knowledge increases your learning speed by 15%",
+    "essenceCost": 40,
+    "sourceNpc": "npc1",
+    "requiredRelationship": 50,
+    "effects": {
+      "learningSpeed": 0.15
     },
-    "WillowsWisdom": {
-      "name": "Willow's Wisdom",
-      "type": "Knowledge",
-      "description": "Elder Willow's ancient knowledge increases your learning speed by 15%",
-      "essenceCost": 40,
-      "sourceNpc": "npc1",
-      "requiredRelationship": 50,
-      "effects": {
-        "learningSpeed": 0.15
-      }
+    "rarity": "Uncommon"
+  },
+  "ScholarlyInsight": {
+    "name": "Scholarly Insight",
+    "category": "Knowledge",
+    "description": "Scholar Elara's teachings help you gain 10% more essence from knowledge-based activities",
+    "essenceCost": 30,
+    "sourceNpc": "npc2",
+    "requiredRelationship": 40,
+    "effects": {
+      "knowledgeEssence": 0.1
     },
-    "ScholarlyInsight": {
-      "name": "Scholarly Insight",
-      "type": "Knowledge",
-      "description": "Scholar Elara's teachings help you gain 10% more essence from knowledge-based activities",
-      "essenceCost": 30,
-      "sourceNpc": "npc2",
-      "requiredRelationship": 40,
-      "effects": {
-        "knowledgeEssence": 0.1
-      }
-    }
+    "rarity": "Uncommon"
   }
 }

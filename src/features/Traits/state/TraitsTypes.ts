@@ -20,10 +20,11 @@ export interface TraitEffectValues {
 }
 
 /**
- * Interface defining a trait in the game
+ * Interface defining a trait in the game (Stored in Redux state)
+ * Ensure this matches the structure produced by fetchTraitsThunk
  */
 export interface Trait {
-  /** Unique identifier for the trait */
+  /** Unique identifier for the trait (matches the key in the JSON) */
   id: string;
   
   /** Display name of the trait */
@@ -32,28 +33,28 @@ export interface Trait {
   /** Description of what the trait does */
   description: string;
   
-  /** Category/type of the trait */
-  category: string;
+  /** Category/type of the trait (e.g., Combat, Knowledge, Social) */
+  category: string; // Standardize on 'category'
   
-  /** Effects provided by this trait */
+  /** Effects provided by this trait (can be array or object) */
   effects: TraitEffect[] | TraitEffectValues;
   
-  /** Rarity classification (common, uncommon, rare, etc.) */
-  rarity: string;
+  /** Rarity classification (Common, Uncommon, Rare, etc.) */
+  rarity: string; // Ensure this is always present (add default in thunk if needed)
   
-  /** Tier level of the trait (higher means more powerful) */
+  /** Tier level of the trait (optional) */
   tier?: number;
   
-  /** Source where the trait can be obtained */
+  /** Source where the trait can be obtained (optional) */
   source?: string;
   
-  /** Cost in essence to acquire the trait */
+  /** Cost in essence to acquire the trait (optional) */
   essenceCost?: number;
   
-  /** Optional icon identifier for UI */
-  iconPath?: string;
+  /** Optional icon identifier for UI (optional) */
+  iconPath?: string; // Use iconPath if that's the field name
   
-  /** Requirements for obtaining this trait */
+  /** Requirements for obtaining this trait (optional) */
   requirements?: {
     level?: number;
     relationshipLevel?: string;
@@ -63,7 +64,7 @@ export interface Trait {
     [key: string]: any;
   };
 
-  /** Level of the trait if traits can be leveled up */
+  /** Level of the trait if traits can be leveled up (optional) */
   level?: number;
 }
 
