@@ -149,7 +149,7 @@ const PlayerTraits: React.FC = () => {
       
       {acquiredTraits.length === 0 ? (
         <Alert severity="info" sx={{ mt: 2 }}>
-          You haven't acquired any traits yet. Complete quests and interact with NPCs to gain traits.
+          You have no traits available to equip right now.
         </Alert>
       ) : (
         <>
