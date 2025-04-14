@@ -1,27 +1,21 @@
 import React, { useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { Box, Typography, Button, Grid, Paper, Chip } from '@mui/material';
-import { selectAvailableTraitObjects, selectTraitSlots } from '../../state/TraitsSelectors';
+import { Box, Typography, Button, Grid, Paper, Chip, Alert, CircularProgress } from '@mui/material';
+import { selectAvailableTraitObjectsForEquip, selectAvailableTraitSlotCount } from '../../state/TraitsSelectors';
 import { equipTrait } from '../../state/TraitsSlice';
-import { Trait } from '../../state/TraitsTypes';
-import { fetchTraitsThunk } from '../../state/TraitThunks';
+import TraitCard from '../ui/TraitCard';
 
 const AvailableTraitList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const availableTraits = useAppSelector(selectAvailableTraitObjects);
-  const slots = useAppSelector(selectTraitSlots);
+  const availableTraits = useAppSelector(selectAvailableTraitObjectsForEquip);
+  const availableSlotCount = useAppSelector(selectAvailableTraitSlotCount);
 
   useEffect(() => {
     dispatch(fetchTraitsThunk());
   }, [dispatch]);
 
-  const handleEquipTrait = (traitId: string) => {
-    const canEquip = slots.some(s => s.isUnlocked && !s.traitId);
-    if (canEquip) {
-      dispatch(equipTrait({ traitId }));
-    } else {
-      alert("No slots available!");
-    }
+  const handleEquip = (traitId: string) => {
+    dispatch(equipTrait({ traitId }));
   };
 
   return (
@@ -30,24 +24,14 @@ const AvailableTraitList: React.FC = () => {
         Available Traits
       </Typography>
       <Grid container spacing={2}>
-        {availableTraits.map((trait: Trait) => (
+        {availableTraits.map((trait) => (
           <Grid item xs={12} sm={6} md={4} key={trait.id}>
-            <Paper elevation={1} sx={{ p: 2 }}>
-              <Typography variant="subtitle1" fontWeight="medium">
-                {trait.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {trait.description}
-              </Typography>
-              <Chip label={trait.category} size="small" sx={{ mb: 1 }} />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleEquipTrait(trait.id)}
-              >
-                Equip
-              </Button>
-            </Paper>
+            <TraitCard
+              trait={trait}
+              canEquip={availableSlotCount > 0}
+              showEquipButton={true}
+              onEquip={() => handleEquip(trait.id)}
+            />
           </Grid>
         ))}
       </Grid>

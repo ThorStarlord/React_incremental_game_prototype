@@ -33,6 +33,7 @@ import {
 import { selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
 import { Trait } from '../../state/TraitsTypes';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
+import AvailableTraitList from './AvailableTraitList';
 
 /**
  * Props for the IntegratedTraitsPanel component
@@ -237,19 +238,7 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
       <Box role="tabpanel" hidden={activeTab !== 1}>
         {activeTab === 1 && (
           <>
-            {availableTraits.length > 0 ? (
-              <Grid container spacing={2}>
-                {availableTraits.map(trait => (
-                  <Grid item xs={12} sm={6} md={4} key={trait.id}>
-                    <TraitItem trait={trait} />
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <Alert severity="info">
-                You don't have any additional traits to equip. Discover more traits through gameplay.
-              </Alert>
-            )}
+            <AvailableTraitList />
           </>
         )}
       </Box>
