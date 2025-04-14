@@ -4,13 +4,15 @@
  * Provides the basic responsive 3-column structure.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react'; // Import useEffect
 import { Box, CssBaseline, useTheme, useMediaQuery } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import LeftColumn from './LeftColumn';
 import MiddleColumn from './MiddleColumn';
 import RightColumn from './RightColumn';
+import { useAppDispatch } from '../../app/hooks'; // Import useAppDispatch
+import { fetchTraitsThunk } from '../../features/Traits/state/TraitThunks'; // Import the thunk
 
 /**
  * MainGameLayout Component
@@ -24,6 +26,13 @@ const MainGameLayout: React.FC = () => {
   const theme = useTheme();
   // Determine if the screen is medium size or smaller
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const dispatch = useAppDispatch(); // Get the dispatch function
+
+  // Load traits when this layout mounts
+  useEffect(() => {
+    // Dispatch the thunk action to load traits
+    dispatch(fetchTraitsThunk());
+  }, [dispatch]); // Dependency array ensures it runs only once on mount
 
   return (
     // Root container: Removed fixed height and overflow

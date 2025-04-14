@@ -16,6 +16,7 @@ import TraitSlots from '../../features/Traits/components/containers/TraitSlots';
 import IntegratedTraitsPanel from '../../features/Traits/components/containers/IntegratedTraitsPanel';
 import TraitAcquisitionPanel from '../../features/Traits/components/containers/TraitAcquisitionPanel';
 import TraitsPage from '../../pages/TraitsPage'; // Pf3f0
+import AvailableTraitList from '../../features/Traits/components/containers/AvailableTraitList'; // Import AvailableTraitList
 
 /**
  * Props for the RightColumn component
@@ -59,7 +60,8 @@ const RightColumn: React.FC<RightColumnProps> = ({
       }}
     >
       {/* Add the TraitDisplayContainer */}
-      <TraitDisplayContainer />
+      <AvailableTraitList /> {/* Add AvailableTraitList here */}
+      <TraitDisplayContainer /> 
       <TraitSlots />
       <IntegratedTraitsPanel onClose={() => {}} />
       <TraitAcquisitionPanel />

@@ -124,11 +124,13 @@ export const selectDiscoveredTraitObjects = createSelector(
 
 /**
  * Selects available trait objects for equip
+ * (Traits that are acquired but not equipped and not permanent)
  */
 export const selectAvailableTraitObjectsForEquip = createSelector(
-  [selectAvailableTraitObjects],
+  [selectAvailableTraitObjects], // Depends on the selector that already filters permanent traits
   (availableTraits): Trait[] => {
-    return availableTraits.filter(trait => !trait.isPermanent);
+    // No need for further filtering here, as selectAvailableTraitObjects already excludes permanent traits.
+    return availableTraits; 
   }
 );
 

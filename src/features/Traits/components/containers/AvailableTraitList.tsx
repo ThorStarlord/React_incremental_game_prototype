@@ -1,7 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react'; // Removed useEffect
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { Box, Typography, Button, Grid, Paper, Chip, Alert, CircularProgress } from '@mui/material';
-import { selectAvailableTraitObjectsForEquip, selectAvailableTraitSlotCount } from '../../state/TraitsSelectors';
+import { Box, Typography, Grid, Alert, CircularProgress } from '@mui/material'; // Added Alert, CircularProgress
+import { 
+    selectAvailableTraitObjectsForEquip, 
+    selectAvailableTraitSlotCount,
+    selectTraitLoading, // Assuming this selector exists
+    selectTraitError    // Assuming this selector exists
+} from '../../state/TraitsSelectors'; 
 import { equipTrait } from '../../state/TraitsSlice';
 import TraitCard from '../ui/TraitCard';
 
@@ -10,18 +15,58 @@ const AvailableTraitList: React.FC = () => {
   const availableTraits = useAppSelector(selectAvailableTraitObjectsForEquip);
   const availableSlotCount = useAppSelector(selectAvailableTraitSlotCount);
 
-  useEffect(() => {
-    dispatch(fetchTraitsThunk());
-  }, [dispatch]);
+  // Select loading and error states
+  const isLoading = useAppSelector(selectTraitLoading); // Use the selector
+  const error = useAppSelector(selectTraitError);       // Use the selector
 
   const handleEquip = (traitId: string) => {
-    dispatch(equipTrait({ traitId }));
+    // Optional: Add check here based on availableSlotCount before dispatching
+    if (availableSlotCount > 0) {
+       dispatch(equipTrait({ traitId }));
+    } else {
+       console.warn("Attempted to equip trait with no available slots.");
+       // Optionally show a user notification
+    }
   };
 
+  // --- Add Loading State ---
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3 }}>
+        <CircularProgress size={24} sx={{ mr: 1 }} />
+        <Typography color="text.secondary">Loading Available Traits...</Typography>
+      </Box>
+    );
+  }
+
+  // --- Add Error State ---
+  if (error) {
+    return (
+      <Alert severity="error" sx={{ m: 1 }}>
+        Error loading traits: {error}
+      </Alert>
+    );
+  }
+
+  // --- Add Empty State (after loading/error checks) ---
+  if (!isLoading && !error && availableTraits.length === 0) {
+     return (
+        <Box>
+            <Typography variant="h6" gutterBottom>
+                Available Traits
+            </Typography>
+            <Alert severity="info" sx={{ mt: 1 }}>
+               You have no traits available to equip right now.
+            </Alert>
+        </Box>
+     )
+  }
+
+  // --- Original Render Logic (only runs if not loading, no error, and traits exist) ---
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Available Traits
+        Available Traits ({availableTraits.length})
       </Typography>
       <Grid container spacing={2}>
         {availableTraits.map((trait) => (

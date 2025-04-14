@@ -13,11 +13,11 @@ import {
   removeStatusEffect
 } from './PlayerSlice';
 import {
-  equipTrait, // <-- Make sure this is imported from TraitsSlice
+  equipTrait, // <-- Verify this import path is correct
   unequipTrait,
   makePermanent as makeTraitPermanentAction,
   unlockTraitSlot as unlockTraitSlotAction
-} from '../../Traits/state/TraitsSlice';
+} from '../../Traits/state/TraitsSlice'; // <-- Should point to the Traits slice file
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { recalculatePlayerStats } from '../utils/playerStatCalculations';
 import { 
@@ -346,8 +346,8 @@ export const manageTraitSlotThunk = createAsyncThunk(
          }
       }
       
-      // Equip the trait - This call should match the definition in TraitsSlice
-      dispatch(equipTrait({ traitId, slotIndex })); // Passing both traitId and optional slotIndex
+      // Equip the trait - Verify this call passes the object with optional slotIndex
+      dispatch(equipTrait({ traitId, slotIndex })); // <-- Verify this line
       
       return {
         success: true,
