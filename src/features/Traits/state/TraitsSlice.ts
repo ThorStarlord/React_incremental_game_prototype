@@ -253,7 +253,9 @@ const traitsSlice = createSlice({
       })
       .addCase(fetchTraitsThunk.fulfilled, (state, action: PayloadAction<Record<string, Trait>>) => {
         state.loading = false;
-        state.traits = action.payload; // Use state.traits
+        state.traits = action.payload; // Store the processed data
+        // Populate discoveredTraits based on loaded keys
+        state.discoveredTraits = Object.keys(action.payload);
         state.error = null;
       })
       .addCase(fetchTraitsThunk.rejected, (state, action) => {
@@ -287,6 +289,7 @@ export const selectTraitSlots = (state: RootState) => state.traits.slots;
 export const selectTraitPresets = (state: RootState) => state.traits.presets;
 export const selectTraitLoading = (state: RootState) => state.traits.loading;
 export const selectTraitError = (state: RootState) => state.traits.error;
+export const selectDiscoveredTraits = (state: RootState) => state.traits.discoveredTraits; // Ensure this selector is exported
 
 // Helper selector to get details for an array of trait IDs
 export const selectTraitsByIds = (state: RootState, traitIds: string[]) => {

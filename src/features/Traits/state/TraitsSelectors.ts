@@ -9,20 +9,29 @@ import { RootState } from '../../../app/store';
 import { Trait } from './TraitsTypes'; 
 // Import UITrait and convertToUITrait from traitUIUtils
 import { UITrait, convertToUITrait } from '../utils/traitUIUtils';
-// Import the correct memoized selector for equipped IDs from the slice
-import { selectEquippedTraitIds as selectEquippedTraitIdsFromSlice } from './TraitsSlice';
+// Import selectors from the slice file
+import { 
+  selectTraits as selectTraitsFromSlice,
+  selectEquippedTraitIds as selectEquippedTraitIdsFromSlice,
+  selectPermanentTraits as selectPermanentTraitsFromSlice,
+  selectAcquiredTraits as selectAcquiredTraitsFromSlice,
+  selectTraitSlots as selectTraitSlotsFromSlice,
+  selectTraitLoading as selectTraitLoadingFromSlice, // Import loading selector
+  selectTraitError as selectTraitErrorFromSlice,     // Import error selector
+  selectDiscoveredTraits as selectDiscoveredTraitsFromSlice, // Import discovered selector
+  selectTraitPresets as selectTraitPresetsFromSlice
+} from './TraitsSlice';
 
 // Basic selectors (re-exports from TraitsSlice for consistency)
-export const selectTraits = (state: RootState) => state.traits.traits;
-// Use the correct selector from the slice:
+export const selectTraits = selectTraitsFromSlice;
 export const selectEquippedTraitIds = selectEquippedTraitIdsFromSlice;
-export const selectPermanentTraits = (state: RootState) => state.traits.permanentTraits;
-export const selectAcquiredTraits = (state: RootState) => state.traits.acquiredTraits;
-export const selectTraitSlots = (state: RootState) => state.traits.slots;
-export const selectTraitLoading = (state: RootState) => state.traits.loading;
-export const selectTraitError = (state: RootState) => state.traits.error;
-export const selectDiscoveredTraits = (state: RootState) => state.traits.discoveredTraits;
-export const selectTraitPresets = (state: RootState) => state.traits.presets;
+export const selectPermanentTraits = selectPermanentTraitsFromSlice;
+export const selectAcquiredTraits = selectAcquiredTraitsFromSlice;
+export const selectTraitSlots = selectTraitSlotsFromSlice;
+export const selectTraitLoading = selectTraitLoadingFromSlice; // Re-export loading selector
+export const selectTraitError = selectTraitErrorFromSlice;     // Re-export error selector
+export const selectDiscoveredTraits = selectDiscoveredTraitsFromSlice; // Re-export discovered selector
+export const selectTraitPresets = selectTraitPresetsFromSlice;
 
 /**
  * Selects a single trait object by its ID.
@@ -120,7 +129,7 @@ export const selectDiscoveredTraitObjects = createSelector(
   [selectTraits, selectDiscoveredTraits],
   (traits, discoveredIds): Trait[] => {
     return discoveredIds
-      .map(id => traits[id])
+      .map((id: string) => traits[id]) // Add string type annotation for id
       .filter(Boolean); // Filter out undefined values
   }
 );

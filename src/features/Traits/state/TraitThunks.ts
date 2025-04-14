@@ -97,12 +97,31 @@ export const fetchTraitsThunk = createAsyncThunk<
       // Fetch trait data from the public JSON file
       const response = await fetch('/data/traits.json');
       if (!response.ok) {
-        throw new Error('Failed to fetch traits');
+        throw new Error(`Failed to fetch traits: ${response.statusText}`);
       }
-      const data: Record<string, Trait> = await response.json();
+      // Assuming the JSON structure is { "copyableTraits": { ... } }
+      const jsonData: { copyableTraits: Record<string, Omit<Trait, 'id'>> } = await response.json();
 
-      // Return the fetched data - the 'fulfilled' extraReducer will handle setting the state
-      return data;
+      // Process the data: Extract the nested object and add the ID to each trait
+      const processedTraits: Record<string, Trait> = {};
+      if (jsonData && jsonData.copyableTraits) {
+        for (const [id, traitData] of Object.entries(jsonData.copyableTraits)) {
+          processedTraits[id] = {
+            ...traitData,
+            id: id, // Add the ID property
+            // Ensure category is set, potentially mapping from 'type' if needed
+            category: traitData.category || (traitData as any).type || 'General',
+          };
+        }
+      } else {
+        console.warn("Fetched traits data is not in the expected format { copyableTraits: { ... } }");
+        // Return empty object or throw error depending on desired behavior
+        // throw new Error("Invalid trait data format");
+      }
+
+
+      // Return the processed data
+      return processedTraits;
     } catch (error) {
       let message = 'Unknown error fetching traits';
       if (error instanceof Error) {

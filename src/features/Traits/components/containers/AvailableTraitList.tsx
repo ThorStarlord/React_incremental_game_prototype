@@ -4,8 +4,8 @@ import { Box, Typography, Grid, Alert, CircularProgress } from '@mui/material'; 
 import { 
     selectAvailableTraitObjectsForEquip, 
     selectAvailableTraitSlotCount,
-    selectTraitLoading, // Assuming this selector exists
-    selectTraitError    // Assuming this selector exists
+    selectTraitLoading, // Import loading selector
+    selectTraitError    // Import error selector
 } from '../../state/TraitsSelectors'; 
 import { equipTrait } from '../../state/TraitsSlice';
 import TraitCard from '../ui/TraitCard';
@@ -56,7 +56,7 @@ const AvailableTraitList: React.FC = () => {
                 Available Traits
             </Typography>
             <Alert severity="info" sx={{ mt: 1 }}>
-               You have no traits available to equip right now.
+               You have no traits available to equip right now. Discover or acquire more traits.
             </Alert>
         </Box>
      )
