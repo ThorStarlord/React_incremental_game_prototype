@@ -31,7 +31,7 @@ const LeftColumn: React.FC = () => {
     >
       {/* Render Player Stats and Essence Display Container */}
       <PlayerStats />
-      <EssenceDisplayContainer /> {/* Use the container component */}
+      <EssenceDisplayContainer />
     </Box>
   );
 };

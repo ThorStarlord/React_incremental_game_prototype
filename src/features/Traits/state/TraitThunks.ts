@@ -2,7 +2,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { makePermanent, setTraits } from './TraitsSlice';
-import { Trait } from './TraitsTypes';
+// Import TraitEffectValues as well if needed for RawTraitJsonData
+import { Trait, TraitEffect, TraitEffectValues } from './TraitsTypes';
 
 const MAKE_PERMANENT_COST = 150;
 
@@ -25,8 +26,8 @@ export const makeTraitPermanentThunk = createAsyncThunk<
   async (traitId: string, { getState, dispatch, rejectWithValue }) => {
     const state = getState();
     
-    // Get the current essence amount from player
-    const currentEssence = state.player.totalEssenceEarned || 0;
+    // Get the current essence amount from essence slice
+    const currentEssence = state.essence.amount;
     
     // Get the trait details and permanent traits list
     const trait = state.traits.traits[traitId];
@@ -80,6 +81,31 @@ export const makeTraitPermanentThunk = createAsyncThunk<
 );
 
 /**
+ * Interface defining the expected raw structure of a trait object in traits.json
+ */
+interface RawTraitJsonData {
+  name: string;
+  description: string;
+  category?: string; // Explicitly optional category
+  type?: string;     // Explicitly optional type field from older format
+  effects?: TraitEffect[] | TraitEffectValues;
+  rarity?: string;
+  essenceCost?: number;
+  tier?: number;
+  iconPath?: string; // Use iconPath if that's the field name in JSON
+  requirements?: {
+    level?: number;
+    relationshipLevel?: string;
+    npcId?: string;
+    prerequisiteTrait?: string;
+    quest?: string;
+    [key: string]: any;
+  };
+  level?: number;
+  // Add any other fields expected directly from the JSON
+}
+
+/**
  * Thunk for fetching initial trait data
  * Fetches data from public/data/traits.json
  */
@@ -93,20 +119,30 @@ export const fetchTraitsThunk = createAsyncThunk<
     try {
       const response = await fetch('/data/traits.json');
       if (!response.ok) {
-        throw new Error(`Failed to fetch traits: ${response.statusText}`);
+        // Add more context to the error message
+        throw new Error(`Failed to fetch traits from /data/traits.json: ${response.status} ${response.statusText}`);
       }
-      // The JSON is now expected to be the root dictionary: Record<string, Omit<Trait, 'id'>>
-      const rawTraitsData: Record<string, Omit<Trait, 'id'>> = await response.json();
+      // Use the stricter RawTraitJsonData interface for parsing
+      const rawTraitsData: Record<string, RawTraitJsonData> = await response.json();
 
       const processedTraits: Record<string, Trait> = {};
       for (const [id, rawData] of Object.entries(rawTraitsData)) {
         processedTraits[id] = {
-          ...rawData, // Spread the raw data
-          id: id, // Add the ID property from the key
-          // Ensure required fields have defaults if potentially missing in JSON
-          category: rawData.category || (rawData as any).type || 'General', // Normalize category/type
-          rarity: rawData.rarity || 'Common',
+          // Spread known properties explicitly or use rawData if RawTraitJsonData is very close to Trait
+          name: rawData.name,
+          description: rawData.description,
           effects: rawData.effects || {}, // Ensure effects is at least an empty object
+          essenceCost: rawData.essenceCost,
+          tier: rawData.tier,
+          iconPath: rawData.iconPath,
+          requirements: rawData.requirements,
+          level: rawData.level,
+          // Add the ID property from the key
+          id: id, 
+          // Ensure required fields have defaults if potentially missing in JSON
+          // Use the stricter types - no 'as any' needed
+          category: rawData.category || rawData.type || 'General', 
+          rarity: rawData.rarity || 'Common',
           // Add other defaults as needed based on the Trait interface
         };
       }

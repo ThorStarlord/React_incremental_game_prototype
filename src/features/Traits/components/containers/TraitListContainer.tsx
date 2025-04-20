@@ -3,29 +3,27 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { Box, CircularProgress, Typography, Alert } from '@mui/material';
 import TraitListUI from '../ui/TraitList'; // Renamed import to avoid naming conflict
 import {
-  selectAcquiredTraitObjects,
+  selectTraits, // Changed selector
   selectTraitLoading,
   selectTraitError,
 } from '../../state/TraitsSelectors';
-import { selectPlayerSkillPoints } from '../../../Player/state/PlayerSelectors';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
-import { TraitEffect } from '../../state/TraitsTypes'; // Import TraitEffect if needed
+import { TraitEffect, Trait } from '../../state/TraitsTypes'; // Import Trait type
 
 /**
- * Container component for displaying the list of acquired traits.
+ * Container component for displaying the list of all defined traits.
  * Fetches data, handles loading/error states, and passes props to the UI component.
  */
 const TraitListContainer: React.FC = () => {
   const dispatch = useAppDispatch();
 
   // Select data from Redux store
-  const acquiredTraitsObjects = useAppSelector(selectAcquiredTraitObjects);
-  const traitPoints = useAppSelector(selectPlayerSkillPoints); // Assuming skill points are used for leveling
+  const allTraitsData = useAppSelector(selectTraits); // Use selectTraits
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   const allTraitsLoaded = useAppSelector(
     (state) => Object.keys(state.traits.traits).length > 0,
-  ); // Check if base traits are loaded
+  );
 
   // Fetch traits if not already loaded
   useEffect(() => {
@@ -34,20 +32,20 @@ const TraitListContainer: React.FC = () => {
     }
   }, [dispatch, allTraitsLoaded, isLoading]);
 
-  // Handler for leveling up a trait (placeholder logic)
+  // Handler for leveling up a trait (placeholder logic, less relevant here)
   const handleTraitLevelUp = (traitId: string) => {
-    console.log(`Level up requested for trait: ${traitId}`);
-    // TODO: Dispatch a thunk or action to handle trait leveling
-    // Example: dispatch(levelUpTraitThunk({ traitId, cost: calculatedCost }));
+    console.log(`Level up action triggered for trait (display only): ${traitId}`);
+    // This container primarily displays all traits; leveling logic might belong elsewhere.
   };
 
   // Prepare props for TraitListUI
-  // Map the core Trait objects to the structure expected by TraitListUI
+  // Map the core Trait objects from the Record<string, Trait>
   const traitListProps = {
-    traits: acquiredTraitsObjects.map((trait) => ({
+    // Iterate over Object.values to get an array of Trait objects
+    traits: Object.values(allTraitsData).map((trait: Trait) => ({
       id: trait.id,
       name: trait.name,
-      level: trait.level || 1,
+      level: trait.level || 1, // Default level if not present
       description: trait.description,
       // Format effects based on their structure
       effect: Array.isArray(trait.effects)
@@ -57,24 +55,23 @@ const TraitListContainer: React.FC = () => {
                 `${e.type}: ${e.magnitude > 0 ? '+' : ''}${e.magnitude}`,
             )
             .join(', ')
-        : typeof trait.effects === 'object'
+        : typeof trait.effects === 'object' && trait.effects !== null // Check if it's a non-null object
           ? Object.entries(trait.effects)
               .map(
                 ([k, v]) =>
                   `${k}: ${typeof v === 'number' && v > 0 ? '+' : ''}${v}`,
               )
               .join(', ')
-          : 'No effects',
-      cost: trait.essenceCost || 0, // Or a specific level-up cost if defined
+          : 'No effects', // Handle cases where effects might be missing or not an array/object
+      cost: trait.essenceCost || 0, // Use essenceCost or a default
       type: trait.category,
     })),
     onTraitLevelUp: handleTraitLevelUp,
-    pointsAvailable: traitPoints,
+    pointsAvailable: 0, // Set pointsAvailable to 0 as leveling isn't the focus here
   };
 
   // --- Loading State ---
   if (isLoading && !allTraitsLoaded) {
-    // Show loading only if base traits aren't loaded yet
     return (
       <Box
         sx={{

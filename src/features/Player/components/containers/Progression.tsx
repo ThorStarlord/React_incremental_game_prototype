@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { useAppDispatch } from '../../../../app/hooks';
+import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { RootState } from '../../../../app/store';
 import { selectTraitSlots } from '../../../Traits/state/TraitsSlice';
 
@@ -11,9 +10,9 @@ import { selectTraitSlots } from '../../../Traits/state/TraitsSlice';
  */
 const Progression: React.FC = () => {
   // Use typed selectors to access state from slices
-  const traitSlots = useSelector((state: RootState) => state.player.traitSlots || 0);
-  const equippedTraits = useSelector(
-    (state: RootState) => state.traits.slots
+  const traitSlots = useAppSelector(state => state.player.traitSlots || 0);
+  const equippedTraits = useAppSelector(state =>
+    state.traits.slots
       .filter(slot => slot.isUnlocked && slot.traitId)
       .map(slot => slot.traitId as string)
   );

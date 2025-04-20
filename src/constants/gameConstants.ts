@@ -220,3 +220,9 @@ export const SEASONAL_EFFECTS: Record<Season, Record<string, number>> = {
     weatherChangeChance: 0.25
   }
 };
+
+// Trait system constants
+export const TRAIT_PERMANENT_ESSENCE_COST = 150;
+
+// Essence gained per second per NPC connection
+export const NPC_ESSENCE_GAIN_PER_CONNECTION = 0.5;

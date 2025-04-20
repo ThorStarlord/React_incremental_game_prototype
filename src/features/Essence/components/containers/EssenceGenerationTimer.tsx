@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, LinearProgress, Typography } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../../app/store';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { gainEssence } from '../../state/EssenceSlice';
 
 // Define locally if the import cannot be resolved
@@ -29,10 +28,10 @@ interface EssenceGenerationTimerProps {
 const EssenceGenerationTimer: React.FC<EssenceGenerationTimerProps> = ({ 
   rate 
 }): React.ReactElement | null => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   
   // Get essence generation rate from Redux store unconditionally
-  const generationRateFromStore = useSelector((state: RootState) => 
+  const generationRateFromStore = useAppSelector(state => 
     state.essence.generationRate || 1
   );
   

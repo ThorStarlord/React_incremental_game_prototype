@@ -8,6 +8,7 @@ import { useAppSelector } from '../../../../app/hooks';
 // Correct the imported selector names
 import { selectEssenceAmount, selectEssenceMaxAmount } from '../../state/EssenceSelectors'; 
 import EssenceDisplay from '../ui/EssenceDisplay'; // Import the UI component
+import useEssenceGeneration, { useAutoGenerateEssence } from '../../hooks/useEssenceGeneration';
 
 /**
  * EssenceDisplayContainer Component
@@ -16,8 +17,11 @@ import EssenceDisplay from '../ui/EssenceDisplay'; // Import the UI component
  * EssenceDisplay component with the fetched data.
  */
 const EssenceDisplayContainer: React.FC = () => {
+  // Sync generation rate and start auto-generation interval
+  useEssenceGeneration();
+  useAutoGenerateEssence();
+  
   // Select the necessary data from the Redux store
-  // Use the corrected selector names
   const currentEssence = useAppSelector(selectEssenceAmount);
   const maxEssence = useAppSelector(selectEssenceMaxAmount);
 

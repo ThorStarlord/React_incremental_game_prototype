@@ -24,6 +24,7 @@ const initialState: EssenceState = {
   decayRate: 0,
   lastUpdated: Date.now(),
   generationRate: 1, // Example initial generation rate
+  npcConnections: 0, // Initialize NPC connections
 };
 
 const essenceSlice = createSlice({
@@ -74,16 +75,21 @@ const essenceSlice = createSlice({
       const maxAmount = state.maxAmount ?? Infinity; 
       state.amount = Math.min(state.amount + amountToAdd, maxAmount);
     },
+
+    addNpcConnection: state => {
+      state.npcConnections += 1;
+    },
   },
 });
 
 // Update exports to match the new reducer names if changed
-export const { gainEssence, spendEssence, setEssenceAmount, setGenerationRate, addManualEssence } = essenceSlice.actions;
+export const { gainEssence, spendEssence, setEssenceAmount, setGenerationRate, addManualEssence, addNpcConnection } = essenceSlice.actions;
 
 // Selectors - Update to use the correct state structure from EssenceTypes.ts
 export const selectEssenceAmount = (state: RootState) => state.essence.amount;
 export const selectTotalCollected = (state: RootState) => state.essence.totalCollected; // Use totalCollected
 export const selectEssenceMaxAmount = (state: RootState) => state.essence.maxAmount;
 export const selectEssenceGenerationRate = (state: RootState) => state.essence.generationRate;
+export const selectNpcConnections = (state: RootState) => state.essence.npcConnections;
 
 export default essenceSlice.reducer;

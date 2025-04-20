@@ -3,8 +3,7 @@
  * @description A drawer component for displaying a list of Traits with filtering and sorting.
  */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useAppDispatch } from '../../../../app/hooks';
+import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import {
   Drawer,
   Box,
@@ -70,13 +69,12 @@ interface FilterOptions {
 
 const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focusedId }) => {
   const dispatch = useAppDispatch();
-
-  const allTraits = useSelector(selectTraits);
-  const acquiredTraitIds = useSelector(selectAcquiredTraits);
-  const permanentTraitIds = useSelector(selectPermanentTraits);
-  const isLoading = useSelector(selectTraitLoading);
-  const error = useSelector(selectTraitError);
-  const playerEssence = useSelector(selectEssenceAmount);
+  const allTraits = useAppSelector(selectTraits);
+  const acquiredTraitIds = useAppSelector(selectAcquiredTraits);
+  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const isLoading = useAppSelector(selectTraitLoading);
+  const error = useAppSelector(selectTraitError);
+  const playerEssence = useAppSelector(selectEssenceAmount);
 
   useEffect(() => {
     if (open && Object.keys(allTraits).length === 0 && !isLoading) {

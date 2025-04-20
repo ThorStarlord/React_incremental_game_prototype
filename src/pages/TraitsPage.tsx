@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Grid, Container, Typography } from '@mui/material'; // Import Container and Typography
-import TraitSlots from '../features/Traits/components/containers/TraitSlots';
+import TraitSlotsContainer from '../features/Traits/components/containers/TraitSlotsContainer';
 // Add TraitListContainer import
 import TraitListContainer from '../features/Traits/components/containers/TraitListContainer';
 
@@ -52,7 +52,7 @@ const TraitsPage: React.FC = () => {
               These traits are currently active and affecting your character.
             </Typography>
           </Box>
-          <TraitSlots />
+          <TraitSlotsContainer />
         </Grid>
         
         {/* Right column: Acquired Traits List */}

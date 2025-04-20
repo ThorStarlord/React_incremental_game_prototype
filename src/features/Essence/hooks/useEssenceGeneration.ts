@@ -1,9 +1,10 @@
 import { useEffect, useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import { RootState } from '../../../app/store';
-// Import setGenerationRate instead of updateGenerationRate
-import { gainEssence, setGenerationRate } from '../state/EssenceSlice'; 
+import { NPC_ESSENCE_GAIN_PER_CONNECTION } from '../../../constants/gameConstants';
+import { gainEssence, setGenerationRate, selectNpcConnections } from '../state/EssenceSlice'; 
 import { selectEquippedTraitIds } from '../../Traits/state/TraitsSelectors'; // Adjust path if needed
+import { generateEssence } from '../state/EssenceThunks';
 
 /**
  * Custom hook to manage essence generation based on game state.
@@ -12,15 +13,16 @@ import { selectEquippedTraitIds } from '../../Traits/state/TraitsSelectors'; // 
  */
 const useEssenceGeneration = () => {
   // Get necessary state from Redux store
-  const { perSecond, multiplier, unlocked } = useSelector((state: RootState) => state.essence);
-  const { generators, upgrades } = useSelector((state: RootState) => state.essence);
+  const { perSecond, multiplier, unlocked } = useAppSelector((state: RootState) => state.essence);
+  const { generators, upgrades } = useAppSelector((state: RootState) => state.essence);
   
   // Get player level and traits that might affect essence generation
-  const playerLevel = useSelector((state: RootState) => state.player?.level || 1);
-  const equippedTraitIds = useSelector(selectEquippedTraitIds); 
+  const playerLevel = useAppSelector((state: RootState) => state.player?.level || 1);
+  const equippedTraitIds = useAppSelector(selectEquippedTraitIds); 
+  const npcConnections = useAppSelector(selectNpcConnections);
   
   // Get the Redux dispatch function
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // Calculate the base generation rate from generators
   const calculateBaseRate = useCallback(() => {
@@ -61,20 +63,19 @@ const useEssenceGeneration = () => {
   useEffect(() => {
     if (unlocked) {
       const baseRate = calculateBaseRate();
+      const npcBonus = npcConnections * NPC_ESSENCE_GAIN_PER_CONNECTION;
       const finalMultiplier = calculateBonuses();
-      const finalRate = baseRate * finalMultiplier;
+      const finalRate = (baseRate + npcBonus) * finalMultiplier;
       
       // Dispatch action to update the perSecond rate in the store
       if (finalRate !== perSecond) {
-        // Use setGenerationRate action
         dispatch(setGenerationRate(finalRate)); 
       }
     } else if (perSecond !== 0) {
       // Reset rate if essence becomes locked
-      // Use setGenerationRate action
       dispatch(setGenerationRate(0)); 
     }
-  }, [unlocked, calculateBaseRate, calculateBonuses, dispatch, perSecond]);
+  }, [unlocked, calculateBaseRate, calculateBonuses, dispatch, perSecond, npcConnections]);
 
   // Function to manually trigger essence gain (e.g., from clicking)
   const generateEssence = useCallback((amount: number, source: string = 'manual') => {
@@ -85,6 +86,19 @@ const useEssenceGeneration = () => {
 
   // Return the manual generation function
   return { generateEssence };
+};
+
+// Kick off auto-generation interval based on mechanics.autoCollectUnlocked
+export const useAutoGenerateEssence = () => {
+  const dispatch = useAppDispatch();
+  const autoCollectEnabled = useAppSelector((state: RootState) => state.essence.mechanics.autoCollectUnlocked);
+  useEffect(() => {
+    if (!autoCollectEnabled) return;
+    const id = setInterval(() => {
+      dispatch(generateEssence());
+    }, 1000);
+    return () => clearInterval(id);
+  }, [dispatch, autoCollectEnabled]);
 };
 
 export default useEssenceGeneration;

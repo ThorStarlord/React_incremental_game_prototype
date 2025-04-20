@@ -19,6 +19,24 @@ const AvailableTraitList: React.FC = () => {
   const isLoading = useAppSelector(selectTraitLoading); // Use the selector
   const error = useAppSelector(selectTraitError);       // Use the selector
 
+  // --- Add sampleTrait to the available traits list ---
+  const sampleTrait = {
+    id: 'sample_trait',
+    name: 'Sample Trait',
+    description: 'A demonstration trait for testing.',
+    category: 'Test',
+    effects: { testEffect: 1 },
+    rarity: 'common',
+    essenceCost: 0,
+    // Add any other required fields for TraitCard
+  };
+
+  // Merge sampleTrait into the availableTraits array if not already present
+  const traitsToShow = [
+    ...availableTraits,
+    ...(!availableTraits.some(t => t.id === sampleTrait.id) ? [sampleTrait] : [])
+  ];
+
   const handleEquip = (traitId: string) => {
     // Optional: Add check here based on availableSlotCount before dispatching
     if (availableSlotCount > 0) {
@@ -49,7 +67,7 @@ const AvailableTraitList: React.FC = () => {
   }
 
   // --- Add Empty State (after loading/error checks) ---
-  if (!isLoading && !error && availableTraits.length === 0) {
+  if (!isLoading && !error && traitsToShow.length === 0) {
      return (
         <Box>
             <Typography variant="h6" gutterBottom>
@@ -66,10 +84,10 @@ const AvailableTraitList: React.FC = () => {
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Available Traits ({availableTraits.length})
+        Available Traits ({traitsToShow.length})
       </Typography>
       <Grid container spacing={2}>
-        {availableTraits.map((trait) => (
+        {traitsToShow.map((trait) => (
           <Grid item xs={12} sm={6} md={4} key={trait.id}>
             <TraitCard
               trait={trait}

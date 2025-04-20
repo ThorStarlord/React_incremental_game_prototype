@@ -2,6 +2,7 @@
  * Redux selectors for Essence-related state
  */
 import { RootState } from '../../../app/store';
+import { createSelector } from '@reduxjs/toolkit';
 
 // Basic selectors
 export const selectEssenceAmount = (state: RootState) => state.essence.amount;
@@ -25,6 +26,12 @@ export const selectUnlockedUpgrades = (state: RootState) =>
   Object.values(state.essence.upgrades).filter(upgrade => upgrade.unlocked);
 
 // Calculation selectors
-export const selectEssencePerSecond = (state: RootState) => state.essence.perSecond;
+export const selectEssencePerSecond = createSelector(
+  (state: RootState) => state.essence.perSecond,
+  perSecond => Math.floor(perSecond)
+);
 export const selectEssenceMultiplier = (state: RootState) => state.essence.multiplier;
 export const selectEssenceGenerationRate = (state: RootState) => state.essence.generationRate;
+
+// Export the number of active NPC connections
+export const selectNpcConnections = (state: RootState) => state.essence.npcConnections;

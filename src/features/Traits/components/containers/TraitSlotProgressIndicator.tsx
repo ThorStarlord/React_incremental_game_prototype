@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Typography, LinearProgress, Tooltip } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../../app/store';
+import { useAppSelector } from '../../../../app/hooks';
 import {
   selectPlayerTotalEssenceEarned,
   selectPlayerTraitSlots
@@ -17,8 +16,8 @@ import {
  */
 const TraitSlotProgressIndicator: React.FC = () => {
   // Use Redux selectors to get player data
-  const totalEssenceEarned = useSelector(selectPlayerTotalEssenceEarned);
-  const traitSlots = useSelector(selectPlayerTraitSlots);
+  const totalEssenceEarned = useAppSelector(selectPlayerTotalEssenceEarned);
+  const traitSlots = useAppSelector(selectPlayerTraitSlots);
 
   // Calculate the next essence threshold for a slot unlock
   const currentUnlocks: number = Math.floor(totalEssenceEarned / 1000);

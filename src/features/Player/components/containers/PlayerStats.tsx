@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Grid, LinearProgress, Paper } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../../../app/hooks';
 import {
   selectPlayerName,
   selectPlayerHealth,
@@ -8,7 +8,6 @@ import {
   selectPlayerMana,
   selectPlayerAttribute
 } from '../../state/PlayerSelectors';
-import { RootState } from '../../../../app/store';
 
 interface PlayerStatsProps {
   compact?: boolean;
@@ -32,23 +31,23 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
   showStats = true
 }) => {
   // Get player data from Redux store - Call all hooks unconditionally at the top level
-  const playerName = useSelector(selectPlayerName);
-  const currentHealth = useSelector(selectPlayerHealth);
-  const maxHealth = useSelector(selectPlayerMaxHealth);
-  const mana = useSelector((state: RootState) => selectPlayerMana(state));
-  const maxMana = useSelector((state: RootState) => state.player.stats.maxMana || 100);
+  const playerName = useAppSelector(selectPlayerName);
+  const currentHealth = useAppSelector(selectPlayerHealth);
+  const maxHealth = useAppSelector(selectPlayerMaxHealth);
+  const mana = useAppSelector(selectPlayerMana);
+  const maxMana = useAppSelector(state => state.player.stats.maxMana || 100);
   
   // Attributes (conditionally fetched based on prop, but hook called always)
-  const strength = useSelector((state: RootState) => selectPlayerAttribute(state, 'strength'));
-  const dexterity = useSelector((state: RootState) => selectPlayerAttribute(state, 'dexterity'));
-  const intelligence = useSelector((state: RootState) => selectPlayerAttribute(state, 'intelligence'));
-  const vitality = useSelector((state: RootState) => selectPlayerAttribute(state, 'vitality'));
+  const strength = useAppSelector(state => selectPlayerAttribute(state, 'strength'));
+  const dexterity = useAppSelector(state => selectPlayerAttribute(state, 'dexterity'));
+  const intelligence = useAppSelector(state => selectPlayerAttribute(state, 'intelligence'));
+  const vitality = useAppSelector(state => selectPlayerAttribute(state, 'vitality'));
 
   // Stats (conditionally fetched based on prop, but hook called always)
-  const healthRegen = useSelector((state: RootState) => state.player.stats.healthRegen);
-  const manaRegen = useSelector((state: RootState) => state.player.stats.manaRegen);
-  const critChance = useSelector((state: RootState) => state.player.stats.critChance);
-  const dodgeChance = useSelector((state: RootState) => (state.player.stats as any).dodgeChance); 
+  const healthRegen = useAppSelector(state => state.player.stats.healthRegen);
+  const manaRegen = useAppSelector(state => state.player.stats.manaRegen);
+  const critChance = useAppSelector(state => state.player.stats.critChance);
+  const dodgeChance = useAppSelector(state => (state.player.stats as any).dodgeChance); 
 
   // Calculate health percentage
   const healthPercentage = maxHealth ? Math.floor((currentHealth / maxHealth) * 100) : 0;

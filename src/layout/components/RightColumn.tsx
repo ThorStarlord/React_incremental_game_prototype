@@ -12,7 +12,7 @@ import {
   Theme
 } from '@mui/material';
 import TraitDisplayContainer from '../../features/Traits/components/containers/TraitDisplayContainer';
-import TraitSlots from '../../features/Traits/components/containers/TraitSlots';
+import TraitSlotsContainer from '../../features/Traits/components/containers/TraitSlotsContainer';
 import IntegratedTraitsPanel from '../../features/Traits/components/containers/IntegratedTraitsPanel';
 import TraitAcquisitionPanel from '../../features/Traits/components/containers/TraitAcquisitionPanel';
 import TraitsPage from '../../pages/TraitsPage'; // Pf3f0
@@ -61,10 +61,7 @@ const RightColumn: React.FC<RightColumnProps> = ({
       }}
     >
       {/* Add the TraitDisplayContainer */}
-      <TraitListContainer /> {/* Add TraitListContainer */}
-      <AvailableTraitList /> {/* Add AvailableTraitList here */}
-      <TraitDisplayContainer /> 
-      <TraitSlots />
+      <TraitSlotsContainer />
       <IntegratedTraitsPanel onClose={() => {}} />
       <TraitAcquisitionPanel />
       

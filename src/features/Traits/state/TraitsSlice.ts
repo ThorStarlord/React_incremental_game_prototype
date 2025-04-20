@@ -114,6 +114,10 @@ const traitsSlice = createSlice({
       // Equip the trait to the target slot
       targetSlot.traitId = traitId;
       console.log(`Equipped trait ${traitId} to slot index ${targetSlot.index}.`);
+      // Also record in equippedTraits array
+      if (!state.equippedTraits.includes(traitId)) {
+        state.equippedTraits.push(traitId);
+      }
     },
     
     // Unequip a trait
@@ -125,6 +129,8 @@ const traitsSlice = createSlice({
       if (slot) {
         slot.traitId = null;
       }
+      // Remove from equippedTraits array
+      state.equippedTraits = state.equippedTraits.filter(id => id !== traitId);
     },
     
     // Make a trait permanent (always active)
@@ -226,40 +232,51 @@ const traitsSlice = createSlice({
     // Set error state
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
+    },
+
+    // Add a new trait definition
+    addTraitDefinition: (state, action: PayloadAction<Trait>) => {
+      state.traits[action.payload.id] = action.payload;
     }
   },
-  // Verify extraReducers for fetchTraitsThunk
+  // Add extraReducers to handle async thunk lifecycle actions
   extraReducers: (builder) => {
     builder
-      // Make Permanent Thunk
-      .addCase(makeTraitPermanentThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(makeTraitPermanentThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        // The actual state changes (making permanent) are handled by the dispatched 'makePermanent' action within the thunk.
-        // We might log success or update UI state here if needed.
-        console.log(action.payload.message); // Example logging
-      })
-      .addCase(makeTraitPermanentThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string || 'Failed to make trait permanent';
-      })
-      // Fetch Traits Thunk
+      // Handle fetchTraitsThunk lifecycle
       .addCase(fetchTraitsThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loading = true; // Use boolean for loading state
+        state.error = null; // Clear previous errors on new request
       })
       .addCase(fetchTraitsThunk.fulfilled, (state, action: PayloadAction<Record<string, Trait>>) => {
         state.loading = false;
-        state.traits = action.payload; // Correctly assign payload to state.traits
+        state.traits = action.payload; // Store the fetched traits
         state.discoveredTraits = Object.keys(action.payload);
         state.error = null;
       })
       .addCase(fetchTraitsThunk.rejected, (state, action) => {
         state.loading = false;
+        // Store error message, preferring payload if available
         state.error = typeof action.payload === 'string' ? action.payload : action.error.message || 'Failed to fetch traits';
+      })
+      // Handle makeTraitPermanentThunk lifecycle
+      .addCase(makeTraitPermanentThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null; // Clear errors specific to this operation
+      })
+      .addCase(makeTraitPermanentThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        // The core state change (adding to permanentTraits) is handled
+        // by the synchronous `makePermanent` reducer dispatched *within* the thunk.
+        // Log success or handle UI feedback if needed.
+        console.log(action.payload.message); // Example logging
+      })
+      .addCase(makeTraitPermanentThunk.rejected, (state, action) => {
+        state.loading = false;
+        // Handle failure state, ensuring payload is treated as string or fallback
+        state.error = typeof action.payload === 'string' 
+          ? action.payload 
+          : action.error.message || 'Failed to make trait permanent';
+        console.error('Failed to make trait permanent:', state.error);
       });
   }
 });
@@ -277,7 +294,8 @@ export const {
   loadTraitPreset,
   deleteTraitPreset,
   setLoading,
-  setError
+  setError,
+  addTraitDefinition
 } = traitsSlice.actions;
 
 // Selectors
@@ -295,13 +313,10 @@ export const selectTraitsByIds = (state: RootState, traitIds: string[]) => {
   return traitIds.map(id => state.traits.traits[id]).filter(Boolean);
 };
 
-// Add a memoized selector for equipped traits
-export const selectEquippedTraitIds = createSelector(
-  [selectTraitSlots],
-  (slots) => slots
-    .filter(slot => slot.isUnlocked && slot.traitId)
-    .map(slot => slot.traitId as string)
-);
+/**
+ * Selector for equipped trait IDs stored in state.equippedTraits
+ */
+export const selectEquippedTraitIds = (state: RootState) => state.traits.equippedTraits;
 
 // Export reducer
 export default traitsSlice.reducer;

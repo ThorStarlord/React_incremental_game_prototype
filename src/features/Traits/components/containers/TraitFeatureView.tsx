@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux'; // Use useSelector directly
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks'; // Use typed hooks
 import { Grid } from '@mui/material';
 import TraitList from '../ui/TraitList';
-import TraitSlots from './TraitSlots';
+import TraitSlotsContainer from './TraitSlotsContainer';
 import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
 
 // Import from Redux store
@@ -110,7 +109,7 @@ const TraitSystemWrapper: React.FC = () => {
           <TraitList {...traitListProps} />
         </Grid>
         <Grid item xs={12} md={5}>
-          <TraitSlots />
+          <TraitSlotsContainer />
         </Grid>
       </Grid>
     </TraitSystemErrorBoundary>

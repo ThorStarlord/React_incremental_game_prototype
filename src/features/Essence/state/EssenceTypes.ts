@@ -148,6 +148,8 @@ export interface EssenceState {
   lastUpdated?: number;
   /** Rate at which essence is generated per interval */
   generationRate?: number;
+  /** Number of established NPC connections influencing essence gain */
+  npcConnections: number;
 }
 
 /**
