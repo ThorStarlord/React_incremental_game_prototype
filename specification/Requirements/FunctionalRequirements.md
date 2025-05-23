@@ -97,3 +97,5 @@ This document lists the functional requirements for the React Incremental RPG Pr
 *   **FR-UI-006:** The system shall provide interfaces for managing quests (Quest Log).
 *   **FR-UI-007:** The system shall provide interfaces for saving, loading, importing, and exporting game progress.
 *   **FR-UI-008:** The system shall provide interfaces for configuring game settings.
+*   **FR-UI-009:** The system shall use standardized tab components for consistent navigation and behavior across all features.
+*   **FR-UI-010:** The system shall provide accessible tab navigation with keyboard support and proper ARIA attributes.

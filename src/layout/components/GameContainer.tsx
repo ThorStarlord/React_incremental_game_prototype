@@ -11,13 +11,14 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
+import PeopleIcon from '@mui/icons-material/People'; // For NPCs
 import SettingsIcon from '@mui/icons-material/Settings';
 import PublicIcon from '@mui/icons-material/Public'; // For World Map
 
 // --- Import Global Components & Hooks ---
 import EssenceDisplay from '../../features/Essence/components/containers/EssenceDisplayContainer'; // Use container if it fetches data
-import RelationshipNotification from '../../features/NPCs/components/RelationshipNotification'; // Assuming this exists
-import TraitEffectNotification from '../../features/Traits/components/containers/TraitEffectNotification'; // Assuming this exists
+// import RelationshipNotification from '../../features/NPCs/components/RelationshipNotification'; // TODO: Create this component
+// import TraitEffectNotification from '../../features/Traits/components/containers/TraitEffectNotification'; // TODO: Create this component
 import useTraitNotifications from '../../features/Traits/hooks/useTraitNotifications';
 import useEssenceGeneration from '../../features/Essence/hooks/useEssenceGeneration'; // Add global hooks
 
@@ -31,6 +32,7 @@ const navItems: NavItem[] = [
   { id: 'character', label: 'Character', icon: <PersonIcon /> },
   { id: 'inventory', label: 'Inventory', icon: <InventoryIcon /> },
   { id: 'traits', label: 'Traits', icon: <AutoFixHighIcon /> },
+  { id: 'npcs', label: 'NPCs', icon: <PeopleIcon /> }, // Add NPCs navigation
   { id: 'quests', label: 'Quests', icon: <AssignmentIcon /> },
   { id: 'minions', label: 'Minions', icon: <GroupWorkIcon /> },
   { id: 'world', label: 'World Map', icon: <PublicIcon /> }, // Optional separate world map view

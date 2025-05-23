@@ -10,6 +10,8 @@ import metaReducer from '../features/Meta/state/MetaSlice';
 import settingsReducer from '../features/Settings/state/SettingsSlice';
 // Import the game loop reducer
 import gameLoopReducer from '../features/GameLoop/state/GameLoopSlice';
+// Import the NPCs reducer
+import npcsReducer from '../features/NPCs/state/NPCSlice';
 
 // Combine the slice reducers into a single reducer function
 const combinedReducer = combineReducers({
@@ -21,6 +23,8 @@ const combinedReducer = combineReducers({
   settings: settingsReducer,
   // Add the game loop reducer
   gameLoop: gameLoopReducer,
+  // Add the NPCs reducer
+  npcs: npcsReducer,
   // Add other reducers here
 });
 

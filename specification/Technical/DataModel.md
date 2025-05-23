@@ -297,7 +297,7 @@ interface CopyTraitSlot {
 }
 ```
 
-## 8. `NpcsState` (`features/Npcs/state/NpcTypes.ts` - *New/Proposed*)
+## 8. `NpcsState` (`features/Npcs/state/NpcTypes.ts` - ✅ Implemented)
 
 ```typescript
 interface NpcsState {

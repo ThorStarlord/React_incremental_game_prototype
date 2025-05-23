@@ -46,7 +46,7 @@ The global state (`RootState`) is composed of multiple slices, each managing a s
 *   **`copies` (`CopySlice.ts` - *New/Proposed*):**
     *   Manages the state of player-created Copies: list of copies, individual copy stats, loyalty, assigned tasks, growth progress, shared traits.
     *   *Potential Actions:* `createCopy`, `updateCopy`, `assignTaskToCopy`, `shareTraitWithCopy`, `removeCopy`.
-*   **`npcs` (`NpcSlice.ts` - *New/Proposed*):**
+*   **`npcs` (`NpcSlice.ts` - ✅ Implemented):**
     *   Manages the state of Non-Player Characters: locations, relationship levels/connection depth with the player, current status, potentially traits.
     *   *Potential Actions:* `updateNpcRelationship`, `setNpcStatus`, `addNpcTrait`.
 *   **`quests` (`QuestSlice.ts` - *New/Proposed*):**
@@ -75,6 +75,7 @@ The global state (`RootState`) is composed of multiple slices, each managing a s
 *   **Implementation:** Defined alongside their respective slices (`FeatureSelectors.ts` or within the slice file).
 *   **Memoization:** `createSelector` is used for derived data or computations to avoid recalculating on every state change if the input state parts haven't changed.
 *   **Usage:** Components use `useAppSelector` with these selectors to subscribe to state updates.
+*   **Tab State Management:** Use shared `useTabs` hook for consistent tab state management across features rather than individual component state.
 
 ## 7. State Persistence
 

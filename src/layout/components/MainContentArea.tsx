@@ -6,6 +6,8 @@ import CharacterPanel from '../../features/Player/components/layout/CharacterPan
 // Placeholder for Inventory - Create or import your actual component
 // import InventoryList from '../../features/Inventory/components/containers/InventoryList';
 import TraitSystemWrapper from '../../features/Traits/components/containers/TraitSystemWrapper';
+// Import NPCs page
+import NPCsPage from '../../pages/NPCsPage';
 // Placeholder for Quests - Create or import your actual component
 // import QuestsPage from '../../pages/QuestsPage';
 // Placeholder for Minions - Create or import your actual component
@@ -19,8 +21,7 @@ interface MainContentAreaProps {
   activeTabId: string;
 }
 
-const MainContentArea: React.FC<MainContentAreaProps> = ({ activeTabId }) => {
-  const renderContent = () => {
+const MainContentArea: React.FC<MainContentAreaProps> = ({ activeTabId }) => {  const renderContent = () => {
     switch (activeTabId) {
       case 'game': // Changed 'world' to 'game' to match nav item
         return <GamePage />; // Render GamePage for the main view
@@ -31,6 +32,8 @@ const MainContentArea: React.FC<MainContentAreaProps> = ({ activeTabId }) => {
          return <Typography>Inventory Component Placeholder</Typography>;
       case 'traits':
         return <TraitSystemWrapper />;
+      case 'npcs':
+        return <NPCsPage />; // Add NPCs page
       case 'quests':
         // return <QuestsPage />; // Replace with your actual Quests component
         return <Typography>Quests Component Placeholder</Typography>;

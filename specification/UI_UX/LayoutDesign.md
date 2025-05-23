@@ -1,114 +1,195 @@
-# UI Layout Design Specification
+# Layout Design Specification
 
-This document outlines the primary layout structure for the game's user interface.
+This document defines the overall layout structure, navigation patterns, and UI organization for the React Incremental RPG Prototype.
 
-## 1. Core Layout: Vertical Side Tabs
+## 1. Overall Layout Strategy
 
-The main game interface utilizes a **vertical side tab navigation** structure, implemented via the `VerticalNavBar` component, positioned on the left side. This organizes core management sections of the game. The main content corresponding to the selected tab is displayed in the `MainContentArea` component. A persistent header is currently omitted, with global elements like Essence potentially placed within the `MainContentArea`'s header or the `VerticalNavBar`.
+### Primary Layout: Three-Column Design
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Header (GameControlPanel)                                   │
+├───────────────┬─────────────────────┬───────────────────────┤
+│ Left Column   │ Middle Column       │ Right Column          │
+│ (Status &     │ (Main Content)      │ (Logs & Info)         │
+│ Navigation)   │                     │                       │
+│               │                     │                       │
+│               │                     │                       │
+│               │                     │                       │
+│               │                     │                       │
+└───────────────┴─────────────────────┴───────────────────────┘
+```
 
-*   **Layout Wireframe:**
+### Column Specifications
 
-    ```
-    +-------+---------------------------+
-    | Tabs  |                           |
-    |-------|  Main Content Area        |
-    | Game  |  (Header: Optional Title,|
-    |-------|   Essence Display)        |
-    | Traits|  -------------------------|
-    |-------|  (Content for active tab)|
-    | NPCs  |                           |
-    |-------|                           |
-    | Sett. |                           |
-    |-------|                           |
-    | ...   |                           |
-    +-------+---------------------------+
-    ```
+#### Left Column (Status & Navigation)
+- **Purpose**: Player status, quick stats, primary navigation
+- **Width**: Fixed (~300px)
+- **Components**:
+  - Player health/mana bars
+  - Essence counter
+  - Experience/level display
+  - Primary navigation tabs (vertical)
 
-*   **Side Tabs (Implemented in `VerticalNavBar`):**
-    *   **Game:** The primary view for interacting with the game world (map, location view, combat). This is the default active tab.
-    *   **Character:** Displays player stats, attributes, and potentially equipped items summary.
-    *   **Inventory:** Section for managing player inventory. *(Placeholder)*
-    *   **Traits:** Dedicated section for viewing acquired traits, managing equipped traits in slots, etc.
-    *   **Quests:** Section for viewing active and completed quests. *(Placeholder)*
-    *   **Minions/Copies:** Section for managing player-controlled minions or copies. *(Placeholder)*
-    *   **World Map:** Displays the game world map. *(Placeholder)*
-    *   **Settings:** Access to game settings (Audio, Graphics, Gameplay, UI).
+#### Middle Column (Main Content)
+- **Purpose**: Primary interaction area, detailed interfaces
+- **Width**: Flexible (remaining space)
+- **Components**:
+  - Feature-specific content areas
+  - Tabbed interfaces using standardized components
+  - Interactive game elements
 
-*   **Collapsibility:** The `VerticalNavBar` **can be made collapsible** (controlled by a `collapsed` prop, currently defaulting to `false`) to maximize the space available for the `MainContentArea`.
+#### Right Column (Logs & Info)
+- **Purpose**: Secondary information, logs, notifications
+- **Width**: Fixed (~300px)
+- **Components**:
+  - Activity logs
+  - Notifications
+  - Secondary information panels
 
-*   **Tab Content (`MainContentArea`):** (Content appears in the Main Content Area when a tab is active)
-    *   **Game Tab Active:** Displays the `GamePage` component.
-    *   **Character Tab Active:** Displays the `CharacterPanel` component.
-    *   **Traits Tab Active:** Displays the `TraitSystemWrapper` component.
-    *   **Settings Tab Active:** Displays the `SettingsPage` component.
-    *   *(Placeholders for Inventory, Quests, Minions, World Map)*
+## 2. Navigation Strategy
 
-## 2. Rationale for Vertical Side Tab Layout
+### Tab-Based Navigation
+**Decision**: Universal adoption of MUI `<Tabs>` and `<Tab>` components
 
-*   **Focused Views:** Each tab activates a dedicated view in the main content area, reducing clutter.
-*   **Clear Navigation:** Provides an explicit way for users to switch between major game systems.
-*   **Scalability:** Easy to add new major features as additional tabs in the vertical list.
-*   **Content Space:** Allows the main content area to potentially utilize more horizontal space compared to a top-tab layout, especially when the side panel is collapsed.
+#### Primary Tabs (Left Column - Vertical)
+```typescript
+const primaryTabs = [
+  { id: 'game', label: 'Game', icon: <GamepadIcon /> },
+  { id: 'traits', label: 'Traits', icon: <StarIcon /> },
+  { id: 'npcs', label: 'NPCs', icon: <PeopleIcon /> }, // Added NPCs tab
+  { id: 'copies', label: 'Copies', icon: <ContentCopyIcon /> },
+  { id: 'quests', label: 'Quests', icon: <AssignmentIcon /> },
+  { id: 'settings', label: 'Settings', icon: <SettingsIcon /> }
+];
+```
 
-## 3. Responsiveness
+#### Secondary Tabs (Middle Column - Horizontal)
+Feature-specific sub-navigation within each primary tab area.
 
-*   **Desktop:** Side tabs (`VerticalNavBar`) are displayed vertically. The `MainContentArea` sits alongside it. The side panel can be collapsed/expanded.
-*   **Tablet/Mobile:** *(Current implementation primarily uses MUI's responsive features within components. Explicit layout changes like collapsing the sidebar by default or transforming to bottom navigation are not yet implemented but could be added.)*
-    *   The side tab panel might be collapsed by default, requiring a tap on a menu icon (e.g., hamburger menu) to reveal it.
-    *   Alternatively, on very small screens, the tabs could transform into a bottom navigation bar or remain behind a menu icon.
-    *   Content within the main area must adapt to the viewport width.
+### Standardized Tab Components
 
-## 4. Key UI Panels/Components (Placement Examples)
+#### Core Components
+- **`StandardTabs`**: Base MUI-wrapped tab navigation
+- **`TabPanel`**: Content container with accessibility
+- **`TabContainer`**: Combined tabs + content layout
+- **`useTabs`**: Hook for consistent state management
 
-*   **Player Panel (Summary):** Part of `CharacterPanel` (Character Tab)
-*   **Essence Display:** Header within `MainContentArea` (or potentially `VerticalNavBar`)
-*   **Trait Slots Panel:** Part of `TraitSystemWrapper` (Traits Tab)
-*   **Acquired Traits List:** Part of `TraitSystemWrapper` (Traits Tab)
-*   **NPC List:** Main Content Area (when NPCs tab is active - *Placeholder*)
-*   **NPC Details:** Main Content Area (when NPCs tab is active - *Placeholder*)
-*   **Quest Log (Full):** Main Content Area (when Quests tab is active - *Placeholder*)
-*   **Inventory:** Main Content Area (when Inventory tab is active - *Placeholder*)
-*   **Combat Log:** Part of `GamePage` (Game Tab)
-*   **Game Menu (Save/Load/Settings):** Settings accessed via Settings Tab. Save/Load typically accessed via Main Menu or potentially a button within the Settings tab or a dedicated menu.
+#### Features
+- **Accessibility**: Full keyboard navigation, ARIA attributes
+- **Consistency**: Unified styling and behavior
+- **Flexibility**: Support for icons, orientation, variants
+- **Performance**: Memoized callbacks, efficient re-renders
 
-## 5. Persistent Elements
+## 3. Responsive Considerations
 
-*   **Side Tab Bar (`VerticalNavBar`):** Persists within the main game view (`GameContainer`), though potentially collapsible.
+### Desktop (Primary Target)
+- Full three-column layout
+- Vertical tabs in left column
+- Horizontal secondary tabs in content areas
 
-## Game Control Panel (✅ Implemented)
+### Tablet (Secondary)
+- Collapsible left column
+- Tab navigation moves to header area
+- Content areas remain tabbed
 
-**Location:** Top of the main game interface  
-**Component:** `GameControlPanel` from `src/features/GameLoop/components/ui/`
+### Mobile (Future)
+- Single column layout
+- Bottom navigation for primary tabs
+- Simplified secondary navigation
 
-**Layout Structure:**
-- Horizontal arrangement of control elements
-- Material-UI Paper component with subtle elevation
-- Responsive design adapting to screen sizes
+## 4. Theme Integration
 
-**Elements:**
-1. **Game State Controls:**
-   - Start button (PlayArrow icon, green color)
-   - Pause button (Pause icon, orange color) 
-   - Stop button (Stop icon, red color)
+### MUI Theme Usage
+- **Primary Colors**: Define game-appropriate color scheme
+- **Typography**: Consistent font hierarchy
+- **Spacing**: Standardized spacing units
+- **Components**: Customized MUI component variants
 
-2. **Speed Control:**
-   - Speed icon with slider component
-   - Range: 0.1x to 5.0x in 0.1x increments
-   - Real-time speed display (e.g., "2.5x")
-   - Disabled when game not running
+### Dark Mode Support
+- Toggle available in settings
+- Consistent theme application
+- High contrast accessibility compliance
 
-3. **Time Display:**
-   - Current game time in human-readable format
-   - Format: "XhXmXs" (e.g., "1h 23m 45s")
-   - Real-time updates during gameplay
+## 5. Component Organization
 
-4. **Debug Information:**
-   - Current tick counter
-   - Useful for development and advanced users
+### Layout Components (`src/layout/`)
+- **`AppLayout.tsx`**: Root layout wrapper
+- **`GameLayout.tsx`**: Main three-column game layout
+- **`Header.tsx`**: Top navigation and game controls
 
-**Accessibility:**
-- Proper ARIA labels for all interactive elements
-- Keyboard navigation support
-- Sufficient color contrast for all text
+### Shared Components (`src/shared/components/`)
+- **`Tabs/`**: Standardized tab system
+  - `StandardTabs.tsx`
+  - `TabPanel.tsx`
+  - `TabContainer.tsx`
+- **`Navigation/`**: Navigation helpers
+- **`Layout/`**: Reusable layout utilities
 
-*(This document focuses on the main game screen layout. Menus like the Main Menu might use different layouts.)*
+### Feature Components (`src/features/*/components/`)
+- **`containers/`**: Smart components with Redux connections
+- **`ui/`**: Presentational components
+- **`layout/`**: Feature-specific layout components
+
+## 6. Navigation State Management
+
+### Tab State Strategy
+```typescript
+// Global navigation state (primary tabs)
+const useAppNavigation = () => {
+  const [activeTab, setActiveTab] = useTabs({
+    defaultTab: 'game',
+    tabs: primaryTabs,
+    persistKey: 'primary_navigation'
+  });
+  // ...
+};
+
+// Feature-specific tab state
+const useFeatureTabs = (featureName: string) => {
+  const [activeTab, setActiveTab] = useTabs({
+    defaultTab: 'overview',
+    tabs: featureTabs,
+    persistKey: `${featureName}_tabs`
+  });
+  // ...
+};
+```
+
+### State Persistence
+- **Primary Navigation**: Persisted to localStorage
+- **Feature Tabs**: Persisted per feature
+- **Session State**: Maintained during page refresh
+
+## 7. Accessibility Standards
+
+### Keyboard Navigation
+- **Tab Order**: Logical tab sequence
+- **Arrow Keys**: Navigate within tab groups
+- **Enter/Space**: Activate tabs
+- **Escape**: Exit tab navigation
+
+### Screen Reader Support
+- **ARIA Labels**: Descriptive tab labels
+- **Role Attributes**: Proper ARIA roles
+- **State Announcements**: Active tab indication
+- **Content Association**: Tab/panel relationships
+
+### Visual Design
+- **Color Contrast**: WCAG AA compliance
+- **Focus Indicators**: Clear focus states
+- **Text Sizing**: Scalable font sizes
+- **Motion**: Respectful of motion preferences
+
+## 8. Performance Considerations
+
+### Optimization Strategies
+- **Lazy Loading**: Load tab content on demand
+- **Memoization**: Prevent unnecessary re-renders
+- **Virtual Scrolling**: For large lists in tabs
+- **Bundle Splitting**: Feature-based code splitting
+
+### Memory Management
+- **Component Cleanup**: Proper useEffect cleanup
+- **Event Listeners**: Remove on unmount
+- **Large Data Sets**: Efficient data handling
+- **Resource Loading**: Progressive enhancement

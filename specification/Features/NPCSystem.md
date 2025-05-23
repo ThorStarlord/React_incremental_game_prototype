@@ -15,6 +15,6 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 
 ### 6.1. UI Context
 
-Information about known NPCs and management of relationships is primarily handled within the dedicated **"NPCs" tab** in the main game interface. Direct interaction (dialogue, trade) might occur within this tab or navigate the player to the "Game/World" tab when interacting with an NPC in the game environment.
+Information about known NPCs and management of relationships is primarily handled within the dedicated **"NPCs" tab** in the main game interface, located in the left navigation column. This tab utilizes the `NPCsPage` component, which contains the `NPCListView` for browsing NPCs and the `NPCPanel` for viewing details of a selected NPC. Direct interaction (dialogue, trade) might occur within this tab or navigate the player to the "Game/World" tab when interacting with an NPC in the game environment.
 
 <!-- ... existing sections ... -->
