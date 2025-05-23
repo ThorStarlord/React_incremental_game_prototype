@@ -8,6 +8,8 @@ import essenceReducer from '../features/Essence/state/EssenceSlice';
 import metaReducer from '../features/Meta/state/MetaSlice';
 // Import the settings reducer
 import settingsReducer from '../features/Settings/state/SettingsSlice';
+// Import the game loop reducer
+import gameLoopReducer from '../features/GameLoop/state/GameLoopSlice';
 
 // Combine the slice reducers into a single reducer function
 const combinedReducer = combineReducers({
@@ -17,6 +19,8 @@ const combinedReducer = combineReducers({
   meta: metaReducer,
   // Add the settings reducer
   settings: settingsReducer,
+  // Add the game loop reducer
+  gameLoop: gameLoopReducer,
   // Add other reducers here
 });
 

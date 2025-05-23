@@ -2,6 +2,16 @@
 
 This document lists the functional requirements for the React Incremental RPG Prototype, describing *what* the system should do.
 
+## FR-GAMELOOP: Game Loop System
+
+*   **FR-GAMELOOP-001:** The system shall provide a fixed timestep game loop running at configurable tick rates (default 10 TPS).
+*   **FR-GAMELOOP-002:** The system shall allow variable game speed control with multipliers ranging from 0.1x to 5.0x.
+*   **FR-GAMELOOP-003:** The system shall provide pause and resume functionality for the game state.
+*   **FR-GAMELOOP-004:** The system shall implement automatic saving at configurable intervals (default 30 seconds).
+*   **FR-GAMELOOP-005:** The system shall track total game time and current tick count.
+*   **FR-GAMELOOP-006:** The system shall provide integration hooks for other systems to receive tick-based updates.
+*   **FR-GAMELOOP-007:** The system shall maintain consistent performance using requestAnimationFrame with accumulator pattern.
+
 ## FR-CORE: Core Gameplay Loop
 
 *   **FR-CORE-001:** The system shall allow the player to establish "Emotional Connections" with target NPCs through interaction.

@@ -55,6 +55,10 @@ The global state (`RootState`) is composed of multiple slices, each managing a s
 *   **`notifications` (`NotificationsSlice.ts` - *New/Proposed*):**
     *   Manages transient UI notifications (e.g., "Game Saved", "Trait Acquired", error messages).
     *   *Potential Actions:* `addNotification`, `removeNotification`.
+*   **`gameLoop` (`GameLoopSlice.ts`):**
+    *   Manages core game timing and state: running status, pause state, tick count, game speed, total game time, auto-save configuration.
+    *   *Key Actions:* `startGame`, `pauseGame`, `resumeGame`, `stopGame`, `setGameSpeed`, `incrementTick`, `updateGameTime`, `triggerAutoSave`.
+    *   *Integration:* Provides tick-based updates to other systems via custom hooks and callbacks.
 
 ## 5. Handling Asynchronous Operations
 

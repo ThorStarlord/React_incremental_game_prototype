@@ -2,6 +2,32 @@
 
 This document details common user interaction flows within the game, reflecting the **vertical side-tab layout**.
 
+## Game Control Flow (✅ Implemented)
+
+**Starting the Game:**
+1. User clicks Start button in GameControlPanel
+2. Game loop begins ticking at configured rate
+3. All time-based systems start receiving updates
+4. Auto-save timer begins
+
+**Pausing the Game:**
+1. User clicks Pause button during gameplay
+2. Game loop pauses (retains state)
+3. All progression stops
+4. Resume button becomes available
+
+**Speed Control:**
+1. User adjusts speed slider during gameplay
+2. Game speed multiplier updates in real-time
+3. All time-based calculations scale accordingly
+4. Visual feedback shows current speed
+
+**Auto-save:**
+1. Game tracks elapsed time since last save
+2. When interval reached, auto-save triggers
+3. Game state persists to localStorage
+4. User receives subtle confirmation feedback
+
 ## 1. Core Gameplay Loop
 
 1.  **User starts the game/loads a save.** -> Main Game view is displayed (`GameContainer` loads with the 'Game' tab content active in `MainContentArea`).

@@ -4,11 +4,12 @@ This document lists the non-functional requirements for the React Incremental RP
 
 ## NFR-PERF: Performance
 
-*   **NFR-PERF-001:** The main game loop (tick system) should execute reliably at the defined tick rate (e.g., 100ms) without significant frame drops under typical load.
+*   **NFR-PERF-001:** The GameLoop system should execute reliably at the defined tick rate (10 TPS default) without significant frame drops under typical load.
 *   **NFR-PERF-002:** UI interactions (button clicks, opening menus, equipping items) should feel responsive, ideally completing visual feedback within 200ms.
 *   **NFR-PERF-003:** Loading a saved game should complete within a reasonable timeframe (e.g., < 5 seconds for typical save sizes).
 *   **NFR-PERF-004:** Autosave operations should run in the background with minimal noticeable impact on gameplay performance.
 *   **NFR-PERF-005:** Redux state updates and selector computations should be efficient, avoiding unnecessary re-renders of unrelated components. Memoized selectors should be used for derived data.
+*   **NFR-PERF-006:** The GameLoop should maintain 60fps rendering while executing fixed timestep logic independently.
 
 ## NFR-MAINT: Maintainability
 

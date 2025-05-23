@@ -9,6 +9,7 @@ This document defines the structure of key data objects used within the applicat
 ```typescript
 // Defined implicitly by combining reducers in app/store.ts
 interface RootState {
+  gameLoop: GameLoopState; // NEW: Game timing and state management
   player: PlayerState;
   traits: TraitsState;
   essence: EssenceState;
@@ -18,6 +19,21 @@ interface RootState {
   npcs?: NpcsState;     // Optional/New
   quests?: QuestsState;   // Optional/New
   // ... other slices
+}
+```
+
+## 1.5. `GameLoopState` (`features/GameLoop/state/GameLoopTypes.ts`)
+
+```typescript
+interface GameLoopState {
+  isRunning: boolean;         // Is the game loop active
+  isPaused: boolean;          // Is the game temporarily paused
+  currentTick: number;        // Current tick number since start
+  tickRate: number;           // Ticks per second (default 10)
+  totalGameTime: number;      // Total elapsed time in milliseconds
+  gameSpeed: number;          // Speed multiplier (0.1x to 5.0x)
+  autoSaveInterval: number;   // Auto-save interval in seconds
+  lastAutoSave: number;       // Timestamp of last auto-save
 }
 ```
 

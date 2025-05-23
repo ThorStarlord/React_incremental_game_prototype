@@ -1,6 +1,13 @@
 # Project Specifications
 
-This folder contains design documents, technical specifications, and other planning materials for the **React Incremental RPG Prototype**. Its purpose is to centralize documentation related to the game's design, architecture, and features.
+This folder contains comprehensive documentation for the React Incremental RPG Prototype, organized by functional areas and implementation details.
+
+## Core Systems Implemented ✅
+
+### GameLoop System
+- **Location**: `features/GameLoopSystem.md`
+- **Status**: ✅ Complete
+- **Description**: Foundational timing system providing consistent game progression, speed control, and auto-save functionality
 
 ## Folder Structure
 
@@ -23,6 +30,7 @@ The `specification` folder is organized as follows:
     *   `SaveLoadSystem.md`: Specification for saving and loading game progress. *(New)*
     *   `npc_interaction.md`: Design for dialogue, relationship building, quests, and trading with NPCs.
     *   `combat_system.md`: Details on turn-based or real-time combat mechanics, stats, skills, and enemy AI.
+    *   `GameLoopSystem.md`: Foundational timing system providing consistent game progression, speed control, and auto-save functionality. *(New)*
 *   **/UI_UX**: Contains documents specifically related to User Interface and User Experience design. *(New Folder)*
     *   `LayoutDesign.md`: Rationale and description of the main UI layout (e.g., 3-column). *(New)*
     *   `UserFlows.md`: Step-by-step descriptions of key user interactions. *(New/Updated)*
@@ -30,5 +38,14 @@ The `specification` folder is organized as follows:
     *   `FunctionalRequirements.md`: List of what the system must do. *(New)*
     *   `NonFunctionalRequirements.md`: List of system qualities (performance, maintainability, etc.). *(New)*
 *   **/assets**: Lists or descriptions of required art, sound, or other media assets (though the assets themselves might be stored elsewhere).
+
+## Recent Updates
+
+### GameLoop System Implementation
+- Added comprehensive timing system with fixed timestep architecture
+- Implemented game speed control and pause/resume functionality  
+- Created GameControlPanel UI for intuitive game state management
+- Integrated auto-save system with configurable intervals
+- Updated all relevant specification documents
 
 This structure helps keep related documents together and makes it easier to find specific information about the project's design and implementation.

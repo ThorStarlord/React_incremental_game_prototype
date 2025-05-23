@@ -75,4 +75,40 @@ The main game interface utilizes a **vertical side tab navigation** structure, i
 
 *   **Side Tab Bar (`VerticalNavBar`):** Persists within the main game view (`GameContainer`), though potentially collapsible.
 
+## Game Control Panel (✅ Implemented)
+
+**Location:** Top of the main game interface  
+**Component:** `GameControlPanel` from `src/features/GameLoop/components/ui/`
+
+**Layout Structure:**
+- Horizontal arrangement of control elements
+- Material-UI Paper component with subtle elevation
+- Responsive design adapting to screen sizes
+
+**Elements:**
+1. **Game State Controls:**
+   - Start button (PlayArrow icon, green color)
+   - Pause button (Pause icon, orange color) 
+   - Stop button (Stop icon, red color)
+
+2. **Speed Control:**
+   - Speed icon with slider component
+   - Range: 0.1x to 5.0x in 0.1x increments
+   - Real-time speed display (e.g., "2.5x")
+   - Disabled when game not running
+
+3. **Time Display:**
+   - Current game time in human-readable format
+   - Format: "XhXmXs" (e.g., "1h 23m 45s")
+   - Real-time updates during gameplay
+
+4. **Debug Information:**
+   - Current tick counter
+   - Useful for development and advanced users
+
+**Accessibility:**
+- Proper ARIA labels for all interactive elements
+- Keyboard navigation support
+- Sufficient color contrast for all text
+
 *(This document focuses on the main game screen layout. Menus like the Main Menu might use different layouts.)*
