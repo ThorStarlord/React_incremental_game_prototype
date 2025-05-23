@@ -1,261 +1,269 @@
 # User Flows Specification
 
-This document outlines key user interaction patterns and workflows within the React Incremental RPG Prototype, focusing on how users navigate and interact with the standardized MUI tabs system.
+This document outlines the key user flows and interaction patterns within the React Incremental RPG Prototype.
 
-## 1. Primary Navigation Flow
+**Implementation Status**: ✅ **CORE FLOWS IMPLEMENTED** - Primary navigation and trait management flows completed with accessibility compliance.
 
-### Initial Game Load
+## 1. Application Entry and Navigation ✅ IMPLEMENTED
+
+### 1.1. Initial Application Load ✅ IMPLEMENTED
+1. **Application Start**: User opens the application
+2. **Layout Initialization**: Three-column layout loads with GameLayout
+3. **Default Route**: Application navigates to `/game` route
+4. **State Hydration**: Redux store initializes with default or saved state
+5. **UI Rendering**: Column components render with appropriate content
+
+**Implementation Notes**:
+- ✅ **GameLayout**: Three-column responsive layout implemented
+- ✅ **Route Management**: React Router handles navigation and content loading
+- ✅ **State Persistence**: Settings and game state persist across sessions
+
+### 1.2. Primary Navigation Flow ✅ IMPLEMENTED
 ```
-1. User opens application
-2. System loads last saved tab state (or defaults to 'Game')
-3. Left column shows vertical primary tabs
-4. Middle column displays selected tab content
-5. Right column shows relevant logs/info
-```
-
-### Tab Navigation Pattern
-```
-User Action → Tab State Update → Content Transition → UI Feedback
-```
-
-#### Primary Tab Switch (Left Column)
-1. **User clicks primary tab** (Game, Traits, NPCs, etc.)
-2. **System updates active tab state** (persisted to localStorage)
-3. **Content area transitions** with fade animation
-4. **Right column updates** with relevant contextual information
-5. **URL updates** to reflect current view (optional)
-
-#### Secondary Tab Navigation (Content Area)
-1. **User navigates within feature area** using horizontal tabs
-2. **Local tab state updates** (persisted per feature)
-3. **Content panel switches** with smooth transition
-4. **Breadcrumb updates** showing current location
-
-## 2. Feature-Specific Workflows
-
-### Trait Management Flow
-```
-Primary Tab: Traits → Secondary Tabs: [Codex, Equipped, Permanent, Shared]
-
-Codex Tab:
-1. Browse available traits
-2. View trait details in right panel
-3. Check acquisition requirements
-4. Initiate acquisition (if eligible)
-
-Equipped Tab:
-1. View current trait loadout
-2. Drag/drop to reorder
-3. Unequip traits
-4. Save as preset
-
-Permanent Tab:
-1. View permanent traits
-2. See permanence costs
-3. Make traits permanent (essence cost)
-
-Shared Tab:
-1. View NPCs/Copies with shared traits
-2. Manage shared trait slots
-3. Add/remove shared traits
+Main Navigation (Left Column) → Feature Selection → Content Display (Middle Column)
 ```
 
-### NPC Interaction Flow
+**Route-Based Navigation**:
+- `/game/traits` → Trait System (TraitSystemWrapper)
+- `/game/npcs` → NPC Management (Planned)
+- `/game/quests` → Quest Log (Planned)
+- `/game/copies` → Copy Management (Planned)
+- `/game/character/*` → Character Management (Left Column Outlet)
+
+**Navigation Features**:
+- ✅ **Persistent Layout**: Left and right columns remain stable during navigation
+- ✅ **Dynamic Content**: Middle column updates based on current route
+- ✅ **State Preservation**: Feature states persist during navigation
+- ✅ **Performance**: Efficient loading with on-demand feature rendering
+
+## 2. Trait System Flows ✅ IMPLEMENTED
+
+### 2.1. Trait Management Navigation ✅ COMPLETED
 ```
-Primary Tab: NPCs → Secondary Tabs: [Known NPCs, Relationships, Interactions] (Note: Current implementation focuses on Known NPCs and basic details within the NPCPanel)
-
-Known NPCs Tab:
-1. Browse discovered NPCs using the NPCListView.
-2. Select an NPC from the list.
-3. View NPC details (name, basic info) in the NPCPanel.
-4. (Future) Filter by location/relationship.
-
-Relationships Tab: (Future Implementation)
-1. See connection depths
-2. Track loyalty levels
-3. View shared traits
-4. Manage trait slots
-
-Interactions Tab: (Future Implementation)
-1. Available dialogues
-2. Quest opportunities
-3. Relationship actions
-4. Seduction attempts (for Copy creation)
+Trait System Entry → Tab Selection → Specific Actions
 ```
 
-### Copy Management Flow
+**Tab Structure** (Implemented):
+1. **Equipped Traits** (`slots`) - Manage currently equipped traits
+2. **Manage Traits** (`manage`) - Acquire and make traits permanent  
+3. **Trait Codex** (`codex`) - Browse all discovered traits
+
+**User Experience**:
+- ✅ **Tab Persistence**: Selected tab remembered across sessions
+- ✅ **Keyboard Navigation**: Full arrow key and Tab key support
+- ✅ **Visual Feedback**: Clear active tab indicators and hover states
+- ✅ **Accessibility**: ARIA labels and screen reader support
+
+### 2.2. Trait Slot Interaction Flow ✅ IMPLEMENTED
+
+#### Empty Slot Interaction:
 ```
-Primary Tab: Copies → Secondary Tabs: [Active Copies, Creation, Tasks, Loyalty]
-
-Active Copies Tab:
-1. View all created copies
-2. Check status and location
-3. Review inheritance and shared traits
-4. Quick task assignment
-
-Creation Tab:
-1. Review seduction opportunities
-2. Choose growth method (Normal/Accelerated)
-3. Set initial parameters
-4. Confirm creation (essence cost)
-
-Tasks Tab:
-1. Assign specific tasks to copies
-2. Monitor task progress
-3. Review task results
-4. Plan long-term assignments
-
-Loyalty Tab:
-1. Monitor loyalty levels
-2. See loyalty influences
-3. Take loyalty maintenance actions
-4. Address loyalty issues
+Click Empty Slot → Trait Selection Dialog → Confirm Selection → Trait Equipped
 ```
 
-## 3. Keyboard Navigation Patterns
+**Implementation Details**:
+- ✅ **Selection Dialog**: Modal displays available traits with filtering
+- ✅ **Trait Information**: Description, effects, and requirements shown
+- ✅ **Validation**: Only equippable traits displayed as options
+- ✅ **Confirmation**: Clear action with cancel option
 
-### Tab Navigation Shortcuts
+#### Equipped Trait Interaction:
 ```
-Ctrl + Tab        → Next primary tab
-Ctrl + Shift + Tab → Previous primary tab
-Tab               → Navigate within current tab area
-Arrow Keys        → Navigate tab headers
-Enter/Space       → Activate focused tab
-Escape            → Return focus to primary navigation
-```
-
-### Accessibility Flow
-1. **Screen reader announces** current tab and content
-2. **Keyboard users can navigate** without mouse
-3. **Focus management** maintains logical order
-4. **Skip links** allow bypassing repetitive content
-
-## 4. State Persistence Patterns
-
-### Session Continuity
-```
-1. User navigates to Traits > Equipped tab
-2. System saves: primaryTab='traits', traitsTab='equipped'
-3. User refreshes page or returns later
-4. System restores exact navigation state
-5. User continues from where they left off
+Click Equipped Trait → Confirmation Dialog → Confirm Unequip → Slot Emptied
 ```
 
-### Cross-Feature Integration
+**User Experience**:
+- ✅ **Direct Unequip**: Single click with confirmation prevents accidents
+- ✅ **Trait Information**: Currently equipped trait details displayed
+- ✅ **Visual Feedback**: Hover states indicate interactive elements
+- ✅ **Error Prevention**: Confirmation required for state changes
+
+#### Locked Slot Interaction:
 ```
-Scenario: User wants to share trait with NPC
-1. Start in Traits > Equipped (view available traits)
-2. Navigate to NPCs > Relationships (select target NPC)
-3. Right-click trait in Traits tab → "Share with [NPC Name]"
-4. System shows sharing interface
-5. Complete action, return to previous state
+Click Locked Slot → Information Display → Unlock Requirements Shown
 ```
 
-## 5. Error and Edge Case Handling
+**Features**:
+- ✅ **Requirement Display**: Clear indication of unlock conditions
+- ✅ **Progress Tracking**: Current progress toward requirements
+- ✅ **Visual Design**: Locked slots clearly distinguished from available slots
+- ✅ **User Guidance**: Helpful text explains how to unlock slots
 
-### Missing or Invalid Tabs
-```
-If persisted tab no longer exists:
-1. Fall back to default tab for that level
-2. Show user notification about navigation change
-3. Log issue for debugging
-4. Update persistence with valid state
-```
+### 2.3. Trait Acquisition Flow 🔄 UI READY
 
-### Loading States
+#### Discovery and Acquisition:
 ```
-During async content loading:
-1. Show skeleton loading animation in tab content
-2. Maintain tab navigation functionality
-3. Display loading indicator in relevant areas
-4. Handle loading errors gracefully
+Browse Available Traits → Select Trait → Confirm Cost → Trait Acquired
 ```
 
-### Disabled Tabs
+**Planned Implementation**:
+- 🔄 **Cost Display**: Essence cost and affordability indicators
+- 🔄 **Requirement Validation**: Prerequisites checked before acquisition
+- 🔄 **Resource Management**: Automatic essence deduction
+- 🔄 **Success Feedback**: Confirmation of successful acquisition
+
+### 2.4. Trait Permanence Flow 🔄 UI READY
+
+#### Making Traits Permanent:
 ```
-For locked/unavailable features:
-1. Show tab in disabled state
-2. Display tooltip explaining unlock conditions
-3. Update state dynamically when conditions met
-4. Provide clear path to unlock
+Select Acquired Trait → Choose Permanence → Confirm High Cost → Trait Made Permanent
 ```
 
-## 6. Mobile and Responsive Flows
+**Planned Features**:
+- 🔄 **Cost Transparency**: High essence cost clearly displayed
+- 🔄 **Benefit Explanation**: Permanence advantages explained
+- 🔄 **Confirmation Process**: Multi-step confirmation for expensive actions
+- 🔄 **Resource Validation**: Prevent action if insufficient resources
 
-### Mobile Navigation Pattern
-```
-1. Primary tabs move to bottom navigation bar
-2. Secondary tabs become dropdown/accordion
-3. Content takes full screen width
-4. Swipe gestures for tab switching
-```
+## 3. Character Management Flows ✅ STATE MANAGEMENT READY
 
-### Tablet Experience
+### 3.1. Character Information Access ✅ IMPLEMENTED
 ```
-1. Collapsible left sidebar with primary tabs
-2. Secondary tabs remain horizontal
-3. Touch-friendly tap targets
-4. Gesture support for navigation
+Left Column → Character Panels → Detailed Information Display
 ```
 
-## 7. Performance Optimization Flows
+**Persistent Displays**:
+- ✅ **CompactCharacterPanel**: Basic character information always visible
+- ✅ **EssenceDisplay**: Current essence amount and generation rate
+- ✅ **GameControlPanel**: Game state controls (play/pause/speed)
 
-### Lazy Loading Pattern
-```
-1. User switches to new primary tab
-2. System checks if content is loaded
-3. If not loaded: Show loading state, fetch content
-4. If loaded: Immediate content display
-5. Cache content for subsequent visits
-```
+**Detailed Views** (Planned via Left Column Outlet):
+- 📋 **Character Stats**: `/game/character/stats` - Detailed stat breakdown
+- 📋 **Attribute Management**: `/game/character/attributes` - Attribute allocation
+- 📋 **Equipment Panel**: `/game/character/equipment` - Equipment management
 
-### Memory Management
+### 3.2. Resource Management Flow ✅ IMPLEMENTED
+
+#### Essence Management:
 ```
-1. System tracks active and recently used tabs
-2. Unloads content from unused tabs after threshold
-3. Maintains navigation state and metadata
-4. Reloads content on demand when revisited
+View Current Essence → Understand Generation Rate → Plan Spending → Execute Actions
 ```
 
-## 8. Notification and Feedback Flows
+**Features**:
+- ✅ **Real-time Display**: Current essence amount updated continuously
+- ✅ **Generation Tracking**: Rate of essence generation visible
+- ✅ **Cost Awareness**: Action costs displayed before confirmation
+- ✅ **Resource Validation**: Prevent actions exceeding available resources
 
-### Visual Feedback Pattern
-```
-User Action → Immediate Visual Response → State Update → Async Confirmation
+## 4. Save/Load System Flows ✅ IMPLEMENTED
 
-Example - Equipping Trait:
-1. User clicks "Equip" button
-2. Button shows loading state
-3. Trait moves to equipped section
-4. Success notification appears
-5. Related stats update visually
+### 4.1. Game Saving Flow ✅ IMPLEMENTED
 ```
-
-### Error Handling Flow
-```
-1. User attempts invalid action
-2. System validates action
-3. If invalid: Show inline error message
-4. Provide corrective guidance
-5. Maintain user's current context
-6. Allow retry or alternative actions
+Manual Save Trigger → Save Name Input → Confirmation → Save Created
 ```
 
-## 9. Integration Points
+**Features**:
+- ✅ **Manual Saves**: Player-initiated save creation
+- ✅ **Auto-saves**: Automatic saves at configured intervals
+- ✅ **Save Naming**: Optional custom names for saves
+- ✅ **Metadata**: Save information includes timestamp, level, playtime
 
-### Redux State Coordination
+### 4.2. Game Loading Flow ✅ IMPLEMENTED
 ```
-1. Tab navigation updates URL state
-2. Feature components subscribe to relevant state
-3. Cross-feature actions update multiple slices
-4. State changes trigger UI updates
-5. Persistence layer saves changes
+Load Menu Access → Save Selection → Confirmation → Game State Loaded
 ```
 
-### Component Communication
+**Implementation**:
+- ✅ **Save Browser**: List of available saves with metadata
+- ✅ **Save Information**: Preview save details before loading
+- ✅ **Load Confirmation**: Prevent accidental overwrites
+- ✅ **State Replacement**: Complete game state restoration
+
+### 4.3. Import/Export Flow ✅ IMPLEMENTED
 ```
-1. Parent tab container manages overall state
-2. Child tab panels receive props/state
-3. Events bubble up through component hierarchy
-4. Shared state updates propagate down
-5. Side effects handled in appropriate components
+Export: Select Save → Generate Code → Copy/Download
+Import: Provide Code → Validation → New Save Created
+```
+
+**Features**:
+- ✅ **Export Options**: Clipboard copy or file download
+- ✅ **Import Validation**: Code structure verification
+- ✅ **Safe Import**: Creates new save without overwriting current game
+- ✅ **Error Handling**: Clear messages for invalid import codes
+
+## 5. Accessibility Flow Patterns ✅ IMPLEMENTED
+
+### 5.1. Keyboard Navigation ✅ IMPLEMENTED
+```
+Tab Navigation → Feature Entry → Arrow Key Navigation → Action Execution
+```
+
+**Implementation**:
+- ✅ **Logical Tab Order**: Follows visual layout and importance
+- ✅ **Focus Indicators**: Clear visual focus indicators
+- ✅ **Tab System Navigation**: Arrow keys for tab switching
+- ✅ **Action Triggers**: Enter/Space for action activation
+
+### 5.2. Screen Reader Flow ✅ IMPLEMENTED
+```
+Page Navigation → Content Discovery → Detail Exploration → Action Confirmation
+```
+
+**Accessibility Features**:
+- ✅ **ARIA Landmarks**: Clear page regions for navigation
+- ✅ **Content Announcements**: State changes announced appropriately
+- ✅ **Action Descriptions**: Clear descriptions of available actions
+- ✅ **Error Communication**: Validation errors clearly communicated
+
+## 6. Error Handling Flows ✅ IMPLEMENTED
+
+### 6.1. Validation Error Flow ✅ IMPLEMENTED
+```
+User Action → Validation Check → Error Display → Guidance Provided
+```
+
+**Error Prevention**:
+- ✅ **Pre-validation**: Actions disabled when not available
+- ✅ **Clear Messaging**: Specific error messages with context
+- ✅ **Recovery Guidance**: Instructions for resolving errors
+- ✅ **Visual Indicators**: Color and icon coding for error states
+
+### 6.2. System Error Flow ✅ IMPLEMENTED
+```
+Error Occurrence → Error Boundary Activation → Fallback UI → Recovery Options
+```
+
+**Error Handling**:
+- ✅ **Error Boundaries**: Graceful error containment
+- ✅ **Fallback UI**: User-friendly error displays
+- ✅ **Recovery Actions**: Options to retry or reset
+- ✅ **Error Reporting**: Console logging for debugging
+
+## 7. Future Flow Enhancements 📋 PLANNED
+
+### 7.1. NPC Interaction Flows 📋 PLANNED
+```
+NPC Selection → Relationship Check → Interaction Options → Outcome Resolution
+```
+
+### 7.2. Copy Management Flows 📋 PLANNED
+```
+Copy Creation → Growth Management → Task Assignment → Loyalty Maintenance
+```
+
+### 7.3. Quest System Flows 📋 PLANNED
+```
+Quest Discovery → Acceptance Decision → Progress Tracking → Completion Rewards
+```
+
+## 8. Flow Implementation Status
+
+### ✅ Completed Flows
+1. **Application Navigation** - Route-based content loading with three-column layout
+2. **Trait System Management** - Complete trait slot interaction and tab navigation
+3. **Character Information** - Persistent character data display
+4. **Save/Load Operations** - Full save/load system with import/export
+5. **Accessibility Navigation** - Keyboard and screen reader support
+6. **Error Handling** - Validation and system error management
+
+### 🔄 UI Ready (Backend Integration Pending)
+1. **Trait Acquisition** - UI framework ready for backend integration
+2. **Trait Permanence** - Cost calculation and confirmation flows ready
+
+### 📋 Planned for Future Implementation
+1. **NPC Interactions** - Complete NPC relationship and dialogue flows
+2. **Copy Management** - Copy creation, management, and deployment flows
+3. **Quest System** - Quest discovery, tracking, and completion flows
+4. **Advanced Character Management** - Attribute allocation and equipment flows
+
+The implemented user flows provide a solid foundation for intuitive game interaction while maintaining excellent accessibility and user experience standards.

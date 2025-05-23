@@ -7,10 +7,10 @@ export interface PlayerStats {
   mana: number;
   maxMana: number;
   attack: number;
+  defense: number;
   speed: number;
   healthRegen: number;
   manaRegen: number;
-  defense: number;
   critChance: number;
   critDamage: number;
   [key: string]: number; // For dynamic stats
@@ -22,10 +22,12 @@ export interface PlayerStats {
 export interface StatusEffect {
   id: string;
   name: string;
+  type: string;
   duration: number;
-  magnitude: number;
+  magnitude?: number;
   source?: string;
-  timestamp?: number;
+  timestampApplied: number;
+  effects: Partial<PlayerStats>;
 }
 
 /**
@@ -55,7 +57,7 @@ export interface EquipmentItem {
   type: string; // e.g., 'weapon', 'armor', 'accessory'
   slot: string; // e.g., 'head', 'chest', 'mainHand'
   stats?: Partial<PlayerStats>; // Optional stats provided by the item
-  // Add other item properties as needed (e.g., description, value, rarity)
+  rarity?: string;
 }
 
 /**
@@ -85,21 +87,11 @@ export interface PlayerState {
   attributes: Record<string, Attribute>;
   attributePoints: number;
   skillPoints: number;
-  skills: Skill[];
   statusEffects: StatusEffect[];
-  acquiredTraits: string[];
-  permanentTraits: string[];
-  traitSlots: number;
-  totalEssenceEarned: number;
+  equipment: EquipmentState;
   gold: number;
-  lastRestLocation: string;
-  lastRestTime: number;
-  creationDate: string;
-  lastSaved: string;
   totalPlayTime: number;
   isAlive: boolean;
-  activeCharacterId: string;
-  equipment: EquipmentState; // Add equipment to PlayerState
 }
 
 /**
@@ -195,10 +187,10 @@ export const PlayerInitialState: PlayerState = {
     mana: 50,
     maxMana: 50,
     attack: 10,
+    defense: 5,
     speed: 1,
     healthRegen: 0.5,
     manaRegen: 0.5,
-    defense: 5,
     critChance: 0.05,
     critDamage: 1.5
   },

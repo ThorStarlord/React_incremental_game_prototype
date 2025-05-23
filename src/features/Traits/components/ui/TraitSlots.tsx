@@ -1,184 +1,279 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Box,
+  Paper,
   Typography,
   Grid,
-  Card,
-  CardContent,
-  Divider,
+  Chip,
+  IconButton,
+  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  Divider,
   Button,
-  Snackbar,
   Alert,
-  CircularProgress
 } from '@mui/material';
-import LockIcon from '@mui/icons-material/Lock';
-import { Trait, TraitSlot } from '../../state/TraitsTypes';
-import TraitSlotItem from './TraitSlotItem';
-import TraitSelectDialog from './TraitSelectDialog';
-import { TRAIT_PERMANENT_ESSENCE_COST } from '../../../../constants/gameConstants';
-import Panel from '../../../../shared/components/layout/Panel';
+import {
+  Add as AddIcon,
+  Remove as RemoveIcon,
+  Lock as LockIcon,
+  Star as StarIcon,
+} from '@mui/icons-material';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
+import { equipTrait, unequipTrait } from '../../state/TraitsSlice';
+import { 
+  selectEquippedTraits, 
+  selectAcquiredTraits, 
+  selectTraitSlots,
+  selectAllTraits 
+} from '../../state/TraitsSelectors';
 
-export interface TraitSlotsProps {
-  slots: TraitSlot[];
-  traitsData: Record<string, Trait>;
-  equippedTraitIds: string[];
-  permanentTraitIds: string[];
-  essence: number;
-  eligibleTraits: Trait[];
-  isLoading: boolean;
-  error: string | null;
-  showSelector: boolean;
-  confirmPermanent: { open: boolean; traitId: string | null };
-  notification: { show: boolean; message: string; severity: 'success' | 'error' | 'info' };
-  onOpenSelector: (slotId: string) => void;
-  onCloseSelector: () => void;
-  onSelectTrait: (traitId: string) => void;
-  onConfirmAssign: () => void;
-  onRemove: (traitId: string) => void;
-  onMakePermanent: (traitId: string) => void;
-  onConfirmPermanent: () => void;
-  onCancelPermanent: () => void; // handler to close confirm dialog
-  onCloseNotification: () => void;
-  selectedTraitId: string | null; // selected trait when assigning
+interface TraitSlotsProps {
+  className?: string;
 }
 
-const TraitSlots: React.FC<TraitSlotsProps> = ({
-  slots,
-  traitsData,
-  equippedTraitIds,
-  permanentTraitIds,
-  essence,
-  eligibleTraits,
-  isLoading,
-  error,
-  showSelector,
-  confirmPermanent,
-  notification,
-  onOpenSelector,
-  onCloseSelector,
-  onSelectTrait,
-  onConfirmAssign,
-  onRemove,
-  onMakePermanent,
-  onConfirmPermanent,
-  onCancelPermanent,
-  onCloseNotification,
-  selectedTraitId
-}) => {
-  const unlocked = slots.filter(s => s.isUnlocked);
-  const empty = unlocked.filter(s => !s.traitId);
+export const TraitSlots: React.FC<TraitSlotsProps> = ({ className }) => {
+  const dispatch = useAppDispatch();
+  const equippedTraits = useAppSelector(selectEquippedTraits);
+  const acquiredTraits = useAppSelector(selectAcquiredTraits);
+  const traitSlots = useAppSelector(selectTraitSlots);
+  const allTraits = useAppSelector(selectAllTraits);
 
-  if (isLoading) {
+  const [isEquipDialogOpen, setIsEquipDialogOpen] = useState(false);
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
+
+  // Get available traits for equipping (acquired but not currently equipped)
+  const availableTraits = acquiredTraits.filter(traitId => 
+    !equippedTraits.includes(traitId)
+  ).map(traitId => allTraits[traitId]).filter(Boolean);
+
+  const handleSlotClick = useCallback((slotIndex: number) => {
+    const slot = traitSlots[slotIndex];
+    
+    if (!slot?.isUnlocked) {
+      // Show unlock requirements or do nothing for locked slots
+      return;
+    }
+
+    if (slot.traitId) {
+      // Slot has a trait - unequip it
+      handleUnequipTrait(slot.traitId);
+    } else {
+      // Empty slot - show equip dialog
+      setSelectedSlotIndex(slotIndex);
+      setIsEquipDialogOpen(true);
+    }
+  }, [traitSlots]);
+
+  const handleEquipTrait = useCallback((traitId: string) => {
+    if (selectedSlotIndex !== null) {
+      dispatch(equipTrait({ traitId, slotIndex: selectedSlotIndex }));
+    }
+    setIsEquipDialogOpen(false);
+    setSelectedSlotIndex(null);
+  }, [dispatch, selectedSlotIndex]);
+
+  const handleUnequipTrait = useCallback((traitId: string) => {
+    dispatch(unequipTrait(traitId));
+  }, [dispatch]);
+
+  const handleCloseEquipDialog = useCallback(() => {
+    setIsEquipDialogOpen(false);
+    setSelectedSlotIndex(null);
+  }, []);
+
+  const getTraitById = useCallback((traitId: string) => {
+    return allTraits[traitId];
+  }, [allTraits]);
+
+  const renderSlot = useCallback((slot: any, index: number) => {
+    const trait = slot.traitId ? getTraitById(slot.traitId) : null;
+    const isEmpty = !trait;
+    const isLocked = !slot.isUnlocked;
+
     return (
-      <Panel title="Trait Slots">
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3, height: 200 }}>
-          <CircularProgress />
-          <Typography sx={{ ml: 2 }} color="text.secondary">Loading Trait Data...</Typography>
-        </Box>
-      </Panel>
+      <Paper
+        key={`slot-${index}`}
+        elevation={2}
+        sx={{
+          p: 2,
+          minHeight: 120,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: isLocked ? 'not-allowed' : 'pointer',
+          border: theme => {
+            if (isLocked) return `1px solid ${theme.palette.divider}`;
+            if (isEmpty) return `2px dashed ${theme.palette.divider}`;
+            return 'none';
+          },
+          bgcolor: theme => {
+            if (isLocked) return theme.palette.action.disabled;
+            if (isEmpty) return theme.palette.action.hover;
+            return theme.palette.background.paper;
+          },
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            ...((!isLocked) && {
+              elevation: 4,
+              transform: 'translateY(-2px)',
+            }),
+          },
+        }}
+        onClick={() => handleSlotClick(index)}
+      >
+        {isLocked ? (
+          <Box textAlign="center">
+            <LockIcon color="disabled" sx={{ fontSize: 40, mb: 1 }} />
+            <Typography variant="caption" color="text.disabled">
+              Slot Locked
+            </Typography>
+            {slot.unlockRequirements && (
+              <Typography variant="caption" color="text.disabled" display="block">
+                {slot.unlockRequirements.type === 'level' && `Level ${slot.unlockRequirements.value}`}
+                {slot.unlockRequirements.type === 'essence' && `${slot.unlockRequirements.value} Essence`}
+              </Typography>
+            )}
+          </Box>
+        ) : isEmpty ? (
+          <Box textAlign="center">
+            <AddIcon color="action" sx={{ fontSize: 40, mb: 1 }} />
+            <Typography variant="caption" color="text.secondary">
+              Click to Equip Trait
+            </Typography>
+          </Box>
+        ) : (
+          <Box textAlign="center" sx={{ width: '100%' }}>
+            <Typography variant="subtitle2" gutterBottom noWrap>
+              {trait?.name}
+            </Typography>
+            <Chip
+              label={trait?.category}
+              size="small"
+              color="primary"
+              variant="outlined"
+              sx={{ mb: 1 }}
+            />
+            <Typography variant="caption" color="text.secondary" display="block">
+              Click to Unequip
+            </Typography>
+            <Tooltip title="Unequip Trait">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUnequipTrait(trait.id);
+                }}
+                sx={{ mt: 1 }}
+                aria-label={`Unequip ${trait?.name}`}
+              >
+                <RemoveIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
+      </Paper>
     );
-  }
-  if (error) {
-    return (
-      <Panel title="Trait Slots">
-        <Alert severity="error" sx={{ m: 1 }}>Error loading Trait Data: {error}</Alert>
-      </Panel>
-    );
-  }
+  }, [getTraitById, handleSlotClick, handleUnequipTrait]);
+
+  const unlockedSlots = traitSlots.filter(slot => slot.isUnlocked);
 
   return (
-    <Panel title="Trait Slots">
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography>Available Slots: {empty.length}/{unlocked.length}</Typography>
-          <Typography color="secondary">Permanent Traits: {permanentTraitIds.length}</Typography>
-        </Box>
+    <Box className={className}>
+      <Typography variant="h6" gutterBottom>
+        Trait Slots ({equippedTraits.length}/{unlockedSlots.length})
+      </Typography>
+      
+      <Grid container spacing={2}>
+        {traitSlots.map((slot, index) => (
+          <Grid item xs={12} sm={6} md={4} key={`grid-${index}`}>
+            {renderSlot(slot, index)}
+          </Grid>
+        ))}
+      </Grid>
 
-        {permanentTraitIds.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>Permanent Traits</Typography>
-            <Grid container spacing={2}>
-              {permanentTraitIds.map(id => {
-                const t = traitsData[id]; if (!t) return null;
-                return (
-                  <Grid item key={id} xs={12} sm={6} md={4}>
-                    <Card sx={{ border: '2px solid', borderColor: 'secondary.main' }}>
-                      <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography>{t.name}</Typography><LockIcon color="secondary" />
-                        </Box>
-                        <Typography variant="body2">{t.description}</Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
-            </Grid>
-            <Divider sx={{ my: 2 }} />
-          </Box>
-        )}
-
-        <Typography variant="h6" sx={{ mb: 1 }}>Equipped Traits</Typography>
-        {equippedTraitIds.length > 0 ? (
-          equippedTraitIds.map(id => (
-            <TraitSlotItem
-              key={id}
-              traitId={id}
-              trait={traitsData[id] ? { ...traitsData[id], id } : null}
-              onRemove={onRemove}
-              onMakePermanent={onMakePermanent}
-              essence={essence}
-            />
-          ))
-        ) : (
-          <Typography color="text.secondary" align="center">No traits equipped.</Typography>
-        )}
-
-        {empty.length > 0 && (
-          <Box sx={{ mt: 2 }}>
-            <Typography>Empty Slots: {empty.length}</Typography>
-            <Grid container spacing={1}>
-              {empty.map(s => (
-                <Grid item key={s.id} xs={12} sm={6} md={4}>
-                  <Box
-                    sx={{ p: 2, border: '1px dashed', borderColor: 'grey.400', borderRadius: 1, textAlign: 'center', cursor: 'pointer' }}
-                    onClick={() => onOpenSelector(s.id)}
-                  >Assign Trait</Box>
-                </Grid>
+      {/* Equip Trait Dialog */}
+      <Dialog
+        open={isEquipDialogOpen}
+        onClose={handleCloseEquipDialog}
+        maxWidth="md"
+        fullWidth
+        aria-labelledby="equip-trait-dialog-title"
+      >
+        <DialogTitle id="equip-trait-dialog-title">
+          Select Trait to Equip
+        </DialogTitle>
+        <DialogContent>
+          {availableTraits.length === 0 ? (
+            <Alert severity="info" sx={{ mt: 1 }}>
+              No traits available to equip. Acquire more traits first.
+            </Alert>
+          ) : (
+            <List>
+              {availableTraits.map((trait, index) => (
+                <React.Fragment key={trait.id}>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      onClick={() => handleEquipTrait(trait.id)}
+                      sx={{ borderRadius: 1 }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Typography variant="subtitle1">
+                              {trait.name}
+                            </Typography>
+                            <Chip 
+                              label={trait.rarity} 
+                              size="small" 
+                              color="secondary" 
+                              variant="outlined" 
+                            />
+                          </Box>
+                        }
+                        secondary={
+                          <Box>
+                            <Typography variant="caption" display="block">
+                              Category: {trait.category}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                              {trait.description}
+                            </Typography>
+                            {trait.effects && typeof trait.effects === 'object' && (
+                              <Box sx={{ mt: 1 }}>
+                                <Typography variant="caption" color="primary">
+                                  Effects: {Object.entries(trait.effects).map(([key, value]) => 
+                                    `${key}: ${typeof value === 'number' && value > 0 ? '+' : ''}${value}`
+                                  ).join(', ')}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+                        }
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                  {index < availableTraits.length - 1 && <Divider />}
+                </React.Fragment>
               ))}
-            </Grid>
-          </Box>
-        )}
-      </Box>
-
-      <TraitSelectDialog
-        open={showSelector}
-        onClose={onCloseSelector}
-        onConfirm={onConfirmAssign}
-        traits={eligibleTraits}
-        selectedTraitId={selectedTraitId}
-        setSelectedTraitId={onSelectTrait}
-      />
-
-      <Dialog open={confirmPermanent.open} onClose={onCancelPermanent}>
-        <DialogTitle>Make Trait Permanent?</DialogTitle>
-        <DialogContent><Typography>This will cost {TRAIT_PERMANENT_ESSENCE_COST} Essence.</Typography></DialogContent>
+            </List>
+          )}
+        </DialogContent>
         <DialogActions>
-          <Button onClick={onConfirmPermanent}>Confirm</Button>
+          <Button onClick={handleCloseEquipDialog}>
+            Cancel
+          </Button>
         </DialogActions>
       </Dialog>
-
-      <Snackbar open={notification.show} autoHideDuration={3000} onClose={onCloseNotification}>
-        <Alert severity={notification.severity} variant="filled" onClose={onCloseNotification}>
-          {notification.message}
-        </Alert>
-      </Snackbar>
-    </Panel>
+    </Box>
   );
 };
 
-export default React.memo(TraitSlots);
+export default TraitSlots;

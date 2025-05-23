@@ -1,46 +1,66 @@
-import React, { Suspense, lazy } from 'react';
-// Use HashRouter or BrowserRouter based on deployment needs
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material'; // Import for fallback UI
-
-// Layout Component
-import GameContainer from '../layout/components/GameContainer'; // Import the refactored GameContainer
-
-// Lazily load Page Components
-const MainMenu = lazy(() => import('../pages/MainMenu'));
-const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
-// Other pages like Settings, TraitsPage etc. are now loaded *within* GameContainer/MainContentArea
+import React from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { GameLayout } from './components/GameLayout';
+import { TraitSystemWrapper } from '../features/Traits/components/containers/TraitSystemWrapper';
 
 /**
- * @component AppRouter
- * @description Main application router defining top-level routes.
- * The '/game' route renders the main GameContainer which handles internal tab navigation.
- *
- * @returns {JSX.Element} The router component tree wrapped in Suspense.
+ * Application router configuration with route-based content loading
+ * for the three-column game layout
  */
-export const AppRouter: React.FC = () => (
-  <Router>
-    <Suspense fallback={
-      // Simple fallback UI while pages load
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    }>
-      <Routes>
-        {/* Public route for the main menu */}
-        <Route path="/" element={<MainMenu />} />
-
-        {/* Single route for the entire game interface */}
-        {/* GameContainer now handles the internal layout and content switching */}
-        <Route path="/game" element={<GameContainer />} />
-
-        {/* Fallback for undefined routes */}
-        <Route path="*" element={<NotFoundPage />} />
-        {/* Or redirect to main menu: <Route path="*" element={<Navigate to="/" replace />} /> */}
-      </Routes>
-    </Suspense>
-  </Router>
-);
-
-// Default export if this is the main export of the file
-// export default AppRouter;
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Navigate to="/game/traits" replace />
+  },
+  {
+    path: '/game',
+    element: <GameLayout />,
+    children: [
+      // Default route
+      {
+        index: true,
+        element: <Navigate to="traits" replace />
+      },
+      // Primary feature routes (middle column)
+      {
+        path: 'traits',
+        element: <TraitSystemWrapper />
+      },
+      {
+        path: 'npcs',
+        element: <div>NPC Interaction Panel (Placeholder)</div> // Replace with actual component
+      },
+      {
+        path: 'quests',
+        element: <div>Quest Log Panel (Placeholder)</div> // Replace with actual component
+      },
+      {
+        path: 'copies',
+        element: <div>Copy Management Panel (Placeholder)</div> // Replace with actual component
+      },
+      // Character management routes (can appear in left column outlet)
+      {
+        path: 'character',
+        children: [
+          {
+            path: 'stats',
+            element: <div>Player Stats Panel (Placeholder)</div> // Replace with actual component
+          },
+          {
+            path: 'attributes',
+            element: <div>Attribute Allocation Panel (Placeholder)</div> // Replace with actual component
+          }
+        ]
+      }
+    ]
+  },
+  // Other top-level routes
+  {
+    path: '/menu',
+    element: <div>Main Menu (Placeholder)</div> // Replace with actual component
+  },
+  {
+    path: '*',
+    element: <Navigate to="/game/traits" replace />
+  }
+]);

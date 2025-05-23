@@ -29,6 +29,10 @@ export { default as TraitSlotsContainer } from './components/containers/TraitSlo
 export { default as TraitListContainer } from './components/containers/TraitListContainer';
 export { default as TraitAcquisitionPanel } from './components/containers/TraitAcquisitionPanel';
 export { default as TraitSystemErrorBoundary } from './components/containers/TraitSystemErrorBoundary';
+export { TraitSystemWrapper } from './components/containers/TraitSystemWrapper';
 
 export { default as TraitList } from './components/ui/TraitList';
 export { default as TraitSlots } from './components/ui/TraitSlots';
+export { TraitSlots } from './components/ui/TraitSlots';
+export { TraitCodex } from './components/ui/TraitCodex';
+export { TraitManagement } from './components/ui/TraitManagement';
