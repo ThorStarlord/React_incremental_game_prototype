@@ -2,7 +2,7 @@
 
 This document provides a high-level overview of the technical architecture, technology stack, and project structure for the React Incremental RPG Prototype.
 
-**Architecture Status**: ✅ **MATURE** - Core architecture implemented with Feature-Sliced Design, Redux Toolkit state management, and comprehensive UI framework.
+**Architecture Status**: ✅ **MATURE** - Core architecture implemented with Feature-Sliced Design, Redux Toolkit state management, comprehensive UI framework, and complete NPC interaction system.
 
 ## 1. Technology Stack ✅ IMPLEMENTED
 
@@ -34,38 +34,17 @@ The project follows a Feature-Sliced Design approach to promote modularity, scal
         *   **`Essence/`**: ✅ **STATE IMPLEMENTED** - Core metaphysical resource management
         *   **`Settings/`**: ✅ **IMPLEMENTED** - User configuration management
         *   **`Meta/`**: ✅ **IMPLEMENTED** - Application metadata and save/load functionality
-        *   **`Npcs/`**: ✅ **STATE IMPLEMENTED** - NPC relationship and state management
+        *   **`Npcs/`**: ✅ **UI IMPLEMENTED** - Complete NPC interaction system with tabbed interface and relationship progression
         *   **Future Features**: `Copy/`, `Quest/` (planned)
     *   **`gameLogic/`**: Core game logic, systems, and calculations not tied to a specific UI feature.
     *   **`hooks/`**: Global/shared custom React hooks.
     *   **`layout/`**: ✅ **IMPLEMENTED** - Global layout components and column structures.
-        *   **`columns/`**: ✅ **IMPLEMENTED** - Column-specific layout components
-            *   `LeftColumnLayout.tsx`: Persistent status displays and character controls
-            *   `MiddleColumnLayout.tsx`: Primary feature content via routing
-            *   `RightColumnLayout.tsx`: System feedback and contextual information
-            *   `ContextualRightContent.tsx`: State-aware conditional rendering
-        *   `GameContainer.tsx`: ✅ **REFACTORED** - Simplified layout structure focus
     *   **`pages/`**: Top-level page components assembling features and layouts for specific routes.
     *   **`routes/`**: ✅ **IMPLEMENTED** - Routing configuration with layout routes.
-        *   **`components/`**: Layout route components
-            *   `GameLayout.tsx`: ✅ **IMPLEMENTED** - Three-column layout implementation
     *   **`shared/`**: ✅ **IMPLEMENTED** - Reusable components, utilities, hooks, or types used across multiple features.
         *   `components/`
-            *   **`Tabs/`**: ✅ **IMPLEMENTED** - Standardized MUI-based tab component system
-                *   `StandardTabs.tsx`: Core MUI tabs wrapper
-                *   `TabPanel.tsx`: Accessible content panels
-                *   `TabContainer.tsx`: Combined tabs + content layout
-                *   `index.ts`: Public API exports
-        *   `hooks/`
-            *   **`useTabs.ts`**: ✅ **IMPLEMENTED** - Custom hook for tab state management
-        *   `utils/`
-        *   `styles/`
+            *   **`Tabs/`**: ✅ **IMPLEMENTED** - Standardized MUI-based tab component system used by Traits and NPCs
     *   **`theme/`**: MUI theme configuration and custom theme context/provider.
-    *   **`types/`**: Global or shared type definitions (though prefer co-location within features).
-    *   **`index.tsx`**: Application entry point.
-    *   **`index.css`**: Global CSS styles.
-    *   **`react-app-env.d.ts` / `vite-env.d.ts`**: TypeScript environment definitions.
-    *   **`css.d.ts`**: Type definitions for CSS Modules.
 
 ## 3. Layout Architecture ✅ IMPLEMENTED
 
@@ -163,10 +142,11 @@ import type { RootState } from '../../../app/store';
 **Decision:** Universal adoption of MUI `<Tabs>` and `<Tab>` components across all features.
 
 #### Benefits Achieved:
-- **Consistency:** Uniform behavior and styling across the application
+- **Consistency:** Uniform behavior and styling across Trait and NPC systems
 - **Accessibility:** Built-in keyboard navigation and ARIA support
 - **Performance:** Optimized rendering with memoization
 - **Maintainability:** Single source of truth for tab behavior
+- **Scalability:** Proven extensible pattern for new features
 
 #### Implementation Status: ✅ COMPLETE
 - **`StandardTabs`**: Base component wrapping MUI Tabs with enhanced features
@@ -174,44 +154,23 @@ import type { RootState } from '../../../app/store';
 - **`TabContainer`**: Complete solution combining tabs with content layout
 - **`useTabs`**: Custom hook for consistent state management and persistence
 
+#### Feature Integration ✅ EXPANDED
+**Trait System Implementation**: ✅ **COMPLETE**
+- Slots, Management, and Codex tabs with click-based interactions
+- Complete accessibility compliance and performance optimization
+
+**NPC System Implementation**: ✅ **COMPLETE**
+- Overview, Dialogue, Trade, Quests, and Traits tabs
+- Relationship-gated content access with progressive disclosure
+- Visual relationship progress indicators and unlock requirements
+- Comprehensive interaction systems (dialogue, commerce, quest management, trait sharing)
+
 #### Layout Integration ✅ IMPLEMENTED
-The column layout system seamlessly integrates with the tab navigation strategy:
-- **Feature-Level Tabs**: Each major feature (Traits, NPCs, Quests) uses standardized tabs
+The column layout system seamlessly integrates with the expanded tab navigation strategy:
+- **Feature-Level Tabs**: Both Trait and NPC systems use standardized tabs for consistent UX
 - **Column-Aware Routing**: Routes respect column boundaries and content allocation
-- **Consistent UX**: Tab behavior remains uniform across different layout contexts
-
-#### Usage Pattern (Implemented):
-```typescript
-// Feature-level tab implementation within column layout
-const TraitSystemWrapper = () => {
-  const { activeTab, setActiveTab } = useTabs({
-    defaultTab: 'slots',
-    tabs: traitTabs,
-    persistKey: 'trait_system_tabs'
-  });
-
-  return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <StandardTabs
-        tabs={traitTabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        aria-label="Trait System Navigation"
-      />
-      <TabPanel tabId="slots" activeTab={activeTab}>
-        <TraitSlots />
-      </TabPanel>
-      {/* Additional tab panels */}
-    </Box>
-  );
-};
-```
-
-#### Interaction Improvements: ✅ IMPLEMENTED
-- **Removed Drag & Drop**: Replaced with accessible click-based interactions
-- **TraitSlots Enhancement**: Click empty slot → opens selection dialog, click equipped trait → unequips
-- **Component Cleanup**: Removed `TraitSlotsFallback` component (no longer needed)
-- **Performance Optimization**: Added React.memo, useCallback, and memoized selectors
+- **Progressive Disclosure**: NPC tabs demonstrate contextual content revelation
+- **Consistent UX**: Tab behavior remains uniform across different feature contexts
 
 ## 6. Data Flow ✅ OPTIMIZED
 
@@ -266,29 +225,18 @@ const TraitSystemWrapper = () => {
 
 ## 9. Accessibility Standards ✅ IMPLEMENTED
 
-### Layout Accessibility:
-- **Landmark Regions:** Clear column structure with proper ARIA landmarks
-- **Focus Management:** Logical focus order across column boundaries
-- **Screen Reader Support:** Column content properly announced and navigable
-- **Responsive Design:** Layout adapts to different screen sizes and orientations
+### Universal Tab Accessibility ✅ EXPANDED
+- **Keyboard Support:** Full arrow key and tab navigation across Trait and NPC systems
+- **Screen Reader Support:** Proper ARIA labels and announcements for all tab content
+- **Focus Management:** Logical focus order and visible indicators throughout
+- **Conditional Access:** Clear indication of disabled content and unlock requirements
+- **Standards Compliance:** WCAG 2.1 AA guidelines maintained across all implementations
 
-### Tab Navigation:
-- **Keyboard Support:** Full arrow key and tab navigation
-- **Screen Reader Support:** Proper ARIA labels and announcements
-- **Focus Management:** Logical focus order and visible indicators
-- **Standards Compliance:** WCAG 2.1 AA guidelines
-
-### Interaction Accessibility:
-- **Click-Based Actions:** All trait slot interactions accessible via keyboard and screen readers
-- **Visual Feedback:** Clear hover states and action indicators
-- **Error Prevention:** Locked slots clearly indicate unlock requirements
-- **Confirmation Dialogs:** Important actions require explicit confirmation
-
-### General Accessibility:
-- **Semantic HTML:** Proper element usage throughout
-- **Color Contrast:** High contrast theme support
-- **Motion Preferences:** Respectful of user motion settings
-- **Alternative Navigation:** Multiple ways to access content
+### NPC System Accessibility ✅ IMPLEMENTED
+- **Relationship Progress:** Screen reader accessible progress indicators and status updates
+- **Progressive Disclosure:** Clear announcement of newly available content
+- **Interactive Elements:** All dialogue, trade, and quest interfaces fully keyboard accessible
+- **Error Prevention:** Clear validation and confirmation for all NPC interactions
 
 ## 10. Future Extensibility ✅ READY
 
@@ -325,14 +273,15 @@ const TraitSystemWrapper = () => {
 - Column-specific content management (static, dynamic, contextual)
 - Universal MUI tabs system with StandardTabs, TabPanel, TabContainer
 - useTabs hook for consistent state management
-- Click-based trait slot interactions (removed drag & drop)
-- TraitSystemWrapper with tabbed navigation
+- **Complete NPC interaction system** with tabbed interface and relationship progression
+- **Trait System UI** with click-based interactions (removed drag & drop)
+- **TraitSystemWrapper** and **NPCPanel** with comprehensive tabbed navigation
 - Performance optimizations with React.memo and useCallback
 - Full accessibility implementation with ARIA support
-- Component cleanup (removed TraitSlotsFallback)
-- **Context system resolution** - Eliminated competing state management
-- **Type safety improvements** - Feature-Sliced type organization
-- **Import pattern standardization** - Consistent, maintainable imports
+- Component cleanup (removed obsolete components)
+- Context system resolution - Eliminated competing state management
+- Type safety improvements - Feature-Sliced type organization
+- Import pattern standardization - Consistent, maintainable imports
 
 ### 🔄 In Progress:
 - Feature integration with new routing structure
@@ -340,9 +289,17 @@ const TraitSystemWrapper = () => {
 - Mobile responsive enhancements
 
 ### 📋 Planned:
+- **Copy System UI** - Complete copy management interface following established patterns
 - Advanced column content management
 - Nested routing for complex feature hierarchies
 - Advanced tab features (badges, icons, nested tabs)
 - Cross-platform PWA capabilities
 
-This architecture provides a solid foundation for scalable game development while maintaining excellent user experience and accessibility standards. The elimination of context-based state management and implementation of proper Feature-Sliced Design patterns ensures long-term maintainability and consistent development practices.
+### ✅ NPC System Architecture Achievements:
+- **Progressive Content Disclosure:** Relationship-based tab unlocking demonstrates sophisticated state-aware UI
+- **Universal Pattern Validation:** NPC system proves the scalability and effectiveness of the universal tab strategy
+- **Complex Interaction Management:** Successfully handles dialogue, commerce, quest management, and trait sharing in unified interface
+- **Performance at Scale:** Efficient rendering of complex tabbed content with proper memoization
+- **Accessibility Excellence:** Comprehensive screen reader support for complex interactive content
+
+This architecture now demonstrates mature Feature-Sliced Design patterns with comprehensive UI systems for both Trait and NPC management, proving the scalability and maintainability of the established patterns while delivering excellent user experience and accessibility standards.
