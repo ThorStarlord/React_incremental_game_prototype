@@ -1,16 +1,41 @@
 import React from 'react';
-import { PlayerTraits as PlayerTraitsUI } from '../ui/PlayerTraitsUI';
+import { useAppSelector } from '../../../../app/hooks';
+import { 
+  selectTraitSlots,
+  selectEquippedTraitObjects,
+  selectAvailableTraitObjectsForEquip
+} from '../../../Traits/state/TraitsSelectors';
+import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
 
 /**
- * PlayerTraitsContainer component provides a wrapper around the PlayerTraits UI
- * component, handling any additional logic, state management, or side effects
- * needed for trait management within the character context.
+ * Container component for player traits management
+ * 
+ * Connects PlayerTraitsUI to Redux state and provides:
+ * - Player trait slots from Traits state
+ * - Currently equipped traits with full trait objects
+ * - Available traits for equipping
+ * - Integration with trait system actions
+ * 
+ * This container follows the Feature-Sliced Design pattern by:
+ * - Using typed Redux hooks (useAppSelector)
+ * - Cross-feature imports via barrel exports
+ * - Separating data logic from UI presentation
+ * - Providing efficient state subscriptions
  */
 export const PlayerTraitsContainer: React.FC = React.memo(() => {
-  // Additional container logic can be added here if needed
-  // For now, this serves as a clean separation between UI and container logic
-  
-  return <PlayerTraitsUI />;
+  const traitSlots = useAppSelector(selectTraitSlots);
+  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
+  const availableTraits = useAppSelector(selectAvailableTraitObjectsForEquip);
+
+  return (
+    <PlayerTraitsUI 
+      traitSlots={traitSlots}
+      equippedTraits={equippedTraits}
+      availableTraits={availableTraits}
+    />
+  );
 });
 
 PlayerTraitsContainer.displayName = 'PlayerTraitsContainer';
+
+export default PlayerTraitsContainer;

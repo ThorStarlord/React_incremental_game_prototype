@@ -1,40 +1,18 @@
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  LinearProgress,
-  useTheme,
-} from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { RootState } from '../../../../app/store';
-import { selectTraitSlots } from '../../../Traits/state/TraitsSlice';
-import { selectPlayerStats } from '../../state/PlayerSelectors';
+import { Card, CardContent, Typography, Alert } from '@mui/material';
 
 /**
- * Displays player progression information
- * Focuses on trait slots and other non-level based progression
+ * Placeholder component for player progression management
+ * 
+ * This component will handle:
+ * - Experience and leveling system
+ * - Attribute point allocation
+ * - Skill point distribution
+ * - Character advancement tracking
+ * 
+ * Currently serves as a placeholder for future implementation.
  */
-const Progression: React.FC = () => {
-  const theme = useTheme();
-  const dispatch = useAppDispatch();
-
-  // Use typed selectors to access state from slices
-  const traitSlots = useAppSelector(state => state.player.traitSlots || 0);
-  const equippedTraits = useAppSelector(state =>
-    state.traits.slots
-      .filter(slot => slot.isUnlocked && slot.traitId)
-      .map(slot => slot.traitId as string)
-  );
-  const playerStats = useAppSelector(selectPlayerStats);
-
-  // Mock progression data - replace with actual selectors when implemented
-  const level = 1;
-  const currentXP = 150;
-  const xpToNextLevel = 1000;
-  const xpProgress = (currentXP / xpToNextLevel) * 100;
-
+export const Progression: React.FC = React.memo(() => {
   return (
     <Card>
       <CardContent>
@@ -42,37 +20,20 @@ const Progression: React.FC = () => {
           Character Progression
         </Typography>
         
-        <Box sx={{ marginBottom: 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              Level {level}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {currentXP} / {xpToNextLevel} XP
-            </Typography>
-          </Box>
-          
-          <LinearProgress
-            variant="determinate"
-            value={xpProgress}
-            sx={{
-              height: 8,
-              borderRadius: 1,
-              backgroundColor: theme.palette.grey[300],
-            }}
-          />
-          
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center', marginTop: 0.5 }}>
-            {Math.round(xpProgress)}% to next level
+        <Alert severity="info" sx={{ mt: 2 }}>
+          <Typography variant="body2">
+            <strong>Coming Soon:</strong> Character progression system including experience tracking, 
+            level advancement, attribute point allocation, and skill development.
           </Typography>
-        </Box>
-
-        <Typography variant="body2" color="text.secondary">
-          Continue playing to gain experience and level up!
+        </Alert>
+        
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+          This interface will provide comprehensive character advancement controls once the 
+          progression mechanics are implemented.
         </Typography>
       </CardContent>
     </Card>
   );
-};
+});
 
-export default Progression;
+Progression.displayName = 'Progression';

@@ -129,6 +129,7 @@
 }
 
 .progressBar {
+  height: 8px;
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.1);
 }
@@ -173,6 +174,44 @@
 
 .vitalStat:hover::before {
   left: 100%;
+}
+
+.statContainer {
+  margin-bottom: 16px;
+}
+
+.statLabel {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.statIcon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.health {
+  background-color: #4caf50;
+}
+
+.mana {
+  background-color: #2196f3;
+}
+
+.warning {
+  background-color: #ff9800;
+}
+
+.error {
+  background-color: #f44336;
 }
 
 @media (max-width: 768px) {

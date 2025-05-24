@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Grid, Paper } from '@mui/material';
+import { Box, Typography, Grid, Paper, LinearProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../app/store';
 import {
@@ -7,9 +7,6 @@ import {
   selectPlayerHealth,
   selectPlayerMaxHealth
 } from '../../state/PlayerSelectors';
-import {
-  StatDisplay as StatDisplayComponent
-} from './StatDisplay';
 
 interface StatDisplayProps {
   statName?: string;
@@ -300,4 +297,45 @@ export const StatDisplay: React.FC<StatDisplayProps> = React.memo(({
 
 StatDisplay.displayName = 'StatDisplay';
 
-export default StatDisplay;
+/**
+ * Reusable component for displaying player statistics
+ * 
+ * Features:
+ * - Optional progress bar for current/max values
+ * - Color coding for different stat types
+ * - Icon support for visual identification
+ * - Flexible display options for various stat types
+ */
+export const StatDisplay: React.FC<StatDisplayProps> = React.memo(({
+  label,
+  current,
+  max,
+  color = 'primary',
+  showProgress = false,
+  unit = '',
+  icon
+}) => {
+  const percentage = max ? (current / max) * 100 : 100;
+
+  return (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+        {icon && <Box sx={{ mr: 1 }}>{icon}</Box>}
+        <Typography variant="body2">
+          {label}: {current}{max ? ` / ${max}` : ''}{unit && ` ${unit}`}
+          {max && ` (${percentage.toFixed(1)}%)`}
+        </Typography>
+      </Box>
+      {showProgress && max && (
+        <LinearProgress 
+          variant="determinate" 
+          value={percentage} 
+          color={color}
+          sx={{ height: 6, borderRadius: 3 }}
+        />
+      )}
+    </Box>
+  );
+});
+
+StatDisplay.displayName = 'StatDisplay';
