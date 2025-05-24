@@ -1,8 +1,10 @@
 import React from 'react';
-import { Box, Grid, Container, Typography } from '@mui/material'; // Import Container and Typography
-import TraitSlotsContainer from '../features/Traits/components/containers/TraitSlotsContainer';
-// Add TraitListContainer import
-import TraitListContainer from '../features/Traits/components/containers/TraitListContainer';
+import {
+  Box,
+  Typography,
+  useTheme,
+} from '@mui/material';
+import { TraitSystemWrapper } from '../features/Traits';
 
 /**
  * @fileoverview TraitsPage Component - Manages and displays character traits
@@ -29,46 +31,35 @@ import TraitListContainer from '../features/Traits/components/containers/TraitLi
  * @returns {JSX.Element} A page displaying trait management interface using MUI
  */
 const TraitsPage: React.FC = () => {
+  const theme = useTheme();
+
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Character Traits
+    <Box sx={{ p: 3 }}>
+      {/* Page Header */}
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        sx={{
+          fontWeight: 600,
+          color: theme.palette.text.primary,
+          mb: 3,
+        }}
+      >
+        Trait Management
       </Typography>
-      
-      <Typography variant="body1" paragraph sx={{ mb: 4 }}>
-        Manage your character's traits. Equip traits to gain special abilities and
-        stat bonuses. Your character's unique combination of traits defines their
-        strengths and playstyle.
-      </Typography>
-      
-      <Grid container spacing={4}>
-        {/* Left column: Trait Slots */}
-        <Grid item xs={12} md={5}>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="h6" component="h2" gutterBottom>
-              Equipped Traits
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              These traits are currently active and affecting your character.
-            </Typography>
-          </Box>
-          <TraitSlotsContainer />
-        </Grid>
-        
-        {/* Right column: Acquired Traits List */}
-        <Grid item xs={12} md={7}>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="h6" component="h2" gutterBottom>
-              Acquired Traits
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              View your collection of acquired traits. Some traits may be leveled up.
-            </Typography>
-          </Box>
-          <TraitListContainer />
-        </Grid>
-      </Grid>
-    </Container>
+
+      {/* Trait System Integration */}
+      <Box
+        sx={{
+          '& .MuiPaper-root': {
+            backgroundColor: theme.palette.background.paper,
+          },
+        }}
+      >
+        <TraitSystemWrapper />
+      </Box>
+    </Box>
   );
 };
 

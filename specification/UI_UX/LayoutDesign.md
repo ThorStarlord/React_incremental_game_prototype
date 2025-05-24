@@ -1,318 +1,200 @@
 # Layout Design Specification
 
-This document details the layout structure, responsive design, and visual organization of the React Incremental RPG Prototype interface.
+This document outlines the user interface layout structure and design principles for the React Incremental RPG Prototype.
 
-**Implementation Status**: ✅ **IMPLEMENTED** - Complete three-column responsive layout with route-based content management and accessibility compliance.
+## 1. Layout Architecture Overview ✅ COMPLETE + DEPRECATION-STRATEGY
 
-## 1. Layout Architecture ✅ IMPLEMENTED
+The application has evolved from a legacy 3-column layout system to a modern, flexible layout architecture with **✅ NEWLY IMPLEMENTED comprehensive deprecation strategy** for legacy components.
 
-### 1.1. Three-Column Layout System ✅ COMPLETED
+### 1.1. Modern Layout System ✅ IMPLEMENTED
 
-The application uses a fixed three-column layout that provides distinct areas for different types of content:
+**GameLayout Component** - Primary layout system
+- **Location**: `src/layout/components/GameLayout.tsx`
+- **Architecture**: Unified responsive layout with integrated navigation and content management
+- **State Management**: Centralized layout state via useLayoutState hook
+- **Router Integration**: Seamless AppRouter coordination for `/game/*` routes
+- **Responsive Design**: Automatic desktop/mobile adaptation with proper breakpoints
 
-```
-┌─────────────┬────────────────────┬─────────────┐
-│ Left Column │   Middle Column    │Right Column │
-│   Status    │   Primary Content  │  Feedback   │
-│   240px     │     Flexible       │    280px    │
-└─────────────┴────────────────────┴─────────────┘
-```
+### 1.2. Legacy Layout Deprecation ✅ NEWLY IMPLEMENTED
 
-**Layout Benefits**:
-- ✅ **Persistent Context**: Important information always visible
-- ✅ **Focused Interaction**: Primary actions in dedicated space
-- ✅ **System Feedback**: Logs and notifications in dedicated area
-- ✅ **Responsive Design**: Adapts to different screen sizes
+**Deprecated Components** - Scheduled for removal
+- **GameContainer**: Legacy main container component
+- **LeftColumn**: Legacy navigation column
+- **MiddleColumn**: Legacy content column  
+- **RightColumn**: Legacy activity/logging column
 
-### 1.2. Column Responsibilities ✅ IMPLEMENTED
+**Deprecation Strategy**:
+- ✅ **Runtime Warnings**: Console warnings alert developers to deprecated usage
+- ✅ **Visual Alerts**: Deprecated components display warning messages to users
+- ✅ **Migration Guidance**: Comprehensive JSDoc documentation with migration paths
+- ✅ **Graceful Degradation**: Legacy components continue functioning while deprecated
+- ✅ **Future Removal**: Components prepared for clean removal in future version
 
-#### Left Column (`LeftColumnLayout`) ✅ IMPLEMENTED
-**Purpose**: Character status and persistent controls
-**Width**: 240px (fixed)
-**Content**:
-- ✅ **CompactCharacterPanel**: Essential character information
-- ✅ **EssenceDisplay**: Current essence and generation rate
-- ✅ **GameControlPanel**: Game state controls (play/pause/speed)
-- ✅ **Route Outlet**: Additional character management features
+## 2. Component Architecture ✅ COMPLETE + DEPRECATION-AWARE
 
-**Design Principles**:
-- Information always visible and accessible
-- Consistent vertical rhythm and spacing
-- Clear visual hierarchy for different data types
-- Responsive stacking on smaller screens
+### 2.1. Active Layout Components ✅ IMPLEMENTED
 
-#### Middle Column (`MiddleColumnLayout`) ✅ IMPLEMENTED
-**Purpose**: Primary feature content and interactions
-**Width**: Flexible (remaining space)
-**Content**:
-- ✅ **Route-Based Content**: Dynamic feature loading via React Router
-- ✅ **Feature Interfaces**: Trait management, NPC interactions, etc.
-- ✅ **Modal Overlays**: Dialog boxes and confirmation screens
-- ✅ **Loading States**: Progress indicators and skeleton screens
+**GameLayout** (`src/layout/components/GameLayout.tsx`)
+- **Purpose**: Primary layout container with responsive design
+- **Features**: Integrated navigation, content management, state persistence
+- **Integration**: VerticalNavBar + MainContentArea + useLayoutState
 
-**Design Principles**:
-- Maximum space for complex interfaces
-- Clear feature boundaries and navigation
-- Consistent interaction patterns across features
-- Optimized for touch and keyboard navigation
+**VerticalNavBar** (`src/layout/components/VerticalNavBar/`)
+- **Purpose**: Unified responsive navigation system
+- **Components**: DesktopNavBar + MobileNavDrawer with automatic switching
+- **Features**: Collapsible sidebar, touch-friendly mobile drawer
 
-#### Right Column (`RightColumnLayout`) ✅ IMPLEMENTED
-**Purpose**: System feedback and contextual information
-**Width**: 280px (fixed)
-**Content**:
-- ✅ **NotificationLog**: User action feedback and system messages
-- ✅ **SystemMessages**: Important alerts and status updates
-- ✅ **ContextualRightContent**: State-aware additional information
-- ✅ **Debug Information**: Development and testing data (when enabled)
+**MainContentArea** (`src/layout/components/MainContentArea.tsx`)
+- **Purpose**: Dynamic content rendering with switch-based page management
+- **Features**: Efficient conditional rendering, error boundaries, placeholder system
 
-**Design Principles**:
-- Non-intrusive but accessible feedback
-- Chronological organization of information
-- Clear visual distinction between message types
-- Contextual relevance to current user actions
+### 2.2. Deprecated Layout Components ⚠️ DEPRECATED
 
-### 1.3. Layout Component Implementation ✅ IMPLEMENTED
+**GameContainer** (`src/layout/components/GameContainer.tsx`)
+- **Status**: ⚠️ **DEPRECATED** - Replaced by GameLayout
+- **Functionality**: Displays deprecation warning and migration guidance
+- **Migration**: Replace with GameLayout component
 
-**GameLayout** - Main layout orchestrator
-```typescript
-// ✅ Implemented layout structure
-<GameLayout>
-  <LeftColumnLayout />
-  <MiddleColumnLayout />
-  <RightColumnLayout />
-</GameLayout>
-```
+**Column Components** (`src/layout/components/columns/`)
+- **LeftColumn**: ⚠️ **DEPRECATED** - Functionality moved to VerticalNavBar
+- **MiddleColumn**: ⚠️ **DEPRECATED** - Functionality moved to MainContentArea
+- **RightColumn**: ⚠️ **DEPRECATED** - Functionality integrated into page components
+- **Migration**: Use GameLayout with integrated navigation and content management
+
+## 3. Layout State Management ✅ COMPLETE + DEPRECATION-SUPPORT
+
+### 3.1. useLayoutState Hook ✅ ENHANCED
 
 **Features**:
-- ✅ **Responsive Breakpoints**: Adapts to tablet and mobile screens
-- ✅ **Column Independence**: Each column renders independently
-- ✅ **Route Integration**: React Router manages middle column content
-- ✅ **Theme Integration**: Consistent Material-UI theming throughout
+- **Tab Management**: Active tab state with persistence
+- **Sidebar Control**: Collapsible sidebar with responsive behavior
+- **Router Integration**: Coordination with React Router navigation
+- **Legacy Detection**: Development warnings for deprecated component usage
 
-## 2. Route-Based Content Management ✅ IMPLEMENTED
-
-### 2.1. Navigation Structure ✅ IMPLEMENTED
-
-**Primary Routes** (Middle Column):
-```
-/game/traits      → TraitSystemWrapper    ✅ IMPLEMENTED
-/game/npcs        → NPCManagementPanel   📋 PLANNED
-/game/quests      → QuestLogPanel        📋 PLANNED
-/game/copies      → CopyManagementPanel  📋 PLANNED
-```
-
-**Character Routes** (Left Column Outlet):
-```
-/game/character/stats      → PlayerStatsPanel       📋 PLANNED
-/game/character/attributes → AttributePanel         📋 PLANNED
-/game/character/equipment  → EquipmentPanel         📋 PLANNED
-```
-
-### 2.2. Content Loading Strategy ✅ IMPLEMENTED
-
-**Dynamic Loading**:
-- ✅ **On-Demand Rendering**: Features load only when accessed
-- ✅ **State Preservation**: Feature states persist during navigation
-- ✅ **Performance Optimization**: Minimal re-renders during route changes
-- ✅ **Error Boundaries**: Graceful error handling for failed feature loads
-
-**Route Management**:
-- ✅ **Default Routing**: Application starts at `/game/traits`
-- ✅ **Deep Linking**: Direct access to specific features via URL
-- ✅ **Navigation Guards**: Prevent access to unavailable features
-- ✅ **History Management**: Browser back/forward button support
-
-## 3. Responsive Design Implementation ✅ IMPLEMENTED
-
-### 3.1. Breakpoint Strategy ✅ IMPLEMENTED
-
-**Desktop (1200px+)**: ✅ IMPLEMENTED
-- Full three-column layout
-- Fixed column widths as specified
-- Optimal spacing and typography
-- All features fully accessible
-
-**Tablet (768px - 1199px)**: ✅ IMPLEMENTED
-- Maintained three-column layout with adjusted proportions
-- Slightly reduced left and right column widths
-- Responsive typography scaling
-- Touch-optimized interaction targets
-
-**Mobile (< 768px)**: ✅ IMPLEMENTED
-- Stacked column layout with tab-based navigation
-- Priority content in primary view
-- Swipe gestures for secondary content access
-- Optimized for one-handed operation
-
-### 3.2. Adaptive Content Strategy ✅ IMPLEMENTED
-
-**Column Priorities**:
-1. **Middle Column**: Primary content always accessible
-2. **Left Column**: Essential character info prioritized
-3. **Right Column**: Collapsible/overlay on smaller screens
-
-**Responsive Features**:
-- ✅ **Flexible Typography**: Font sizes scale with screen size
-- ✅ **Touch Targets**: Minimum 44px touch target size
-- ✅ **Gesture Support**: Swipe navigation on mobile devices
-- ✅ **Contextual Menus**: Long-press actions on touch devices
-
-## 4. Visual Design System ✅ IMPLEMENTED
-
-### 4.1. Material-UI Theme Integration ✅ IMPLEMENTED
-
-**Theme Configuration**:
-- ✅ **Color Palette**: Dark theme with high contrast ratios
-- ✅ **Typography**: Roboto font family with responsive scaling
-- ✅ **Spacing**: 8px grid system for consistent spacing
-- ✅ **Elevation**: Consistent shadow system for depth perception
-
-**Component Styling**:
-- ✅ **MUI Components**: Consistent use of Material-UI components
-- ✅ **Custom Theming**: Game-specific color schemes and styling
-- ✅ **CSS Modules**: Component-specific styles where needed
-- ✅ **sx Prop**: Inline styling for layout-specific adjustments
-
-### 4.2. Visual Hierarchy ✅ IMPLEMENTED
-
-**Information Architecture**:
-- ✅ **Primary Actions**: Prominently placed in middle column
-- ✅ **Secondary Info**: Supporting details in left column
-- ✅ **Feedback**: System responses in right column
-- ✅ **Navigation**: Clear path indicators and breadcrumbs
-
-**Typography System**:
-- ✅ **Headings**: Clear hierarchy with appropriate sizing
-- ✅ **Body Text**: Optimized for readability at all screen sizes
-- ✅ **Interactive Elements**: Distinct styling for clickable items
-- ✅ **Status Indicators**: Color-coded information display
-
-## 5. Accessibility Design ✅ IMPLEMENTED
-
-### 5.1. Layout Accessibility ✅ IMPLEMENTED
-
-**Structure**:
-- ✅ **Landmark Regions**: Clear ARIA landmarks for each column
-- ✅ **Skip Links**: Navigation shortcuts for keyboard users
-- ✅ **Focus Management**: Logical focus order across columns
-- ✅ **Screen Reader**: Proper column identification and navigation
-
-**Visual Accessibility**:
-- ✅ **Color Contrast**: WCAG 2.1 AA compliance throughout
-- ✅ **Focus Indicators**: High contrast focus outlines
-- ✅ **Motion Preferences**: Respects reduced motion settings
-- ✅ **Text Scaling**: Support for up to 200% text scaling
-
-### 5.2. Interaction Accessibility ✅ IMPLEMENTED
-
-**Keyboard Navigation**:
-- ✅ **Tab Order**: Logical progression through interface elements
-- ✅ **Arrow Keys**: Tab navigation within feature sections
-- ✅ **Shortcuts**: Keyboard shortcuts for common actions
-- ✅ **Escape Routes**: Easy exit from modal states
-
-**Screen Reader Support**:
-- ✅ **ARIA Labels**: Comprehensive labeling of interface elements
-- ✅ **Live Regions**: Announcement of dynamic content changes
-- ✅ **Role Definitions**: Clear semantic roles for custom components
-- ✅ **State Communication**: Current state clearly communicated
-
-## 6. Feature-Specific Layout Patterns ✅ IMPLEMENTED
-
-### 6.1. Trait System Layout ✅ IMPLEMENTED
-
-**TraitSystemWrapper** - Tabbed interface within middle column:
+**Usage Pattern**:
 ```typescript
-// ✅ Implemented layout structure
-<TraitSystemWrapper>
-  <StandardTabs /> // Navigation tabs
-  <TabPanel>       // Content area for each tab
-    <TraitSlots />        // Slot management interface
-    <TraitManagement />   // Acquisition interface  
-    <TraitCodex />        // Reference interface
-  </TabPanel>
-</TraitSystemWrapper>
+// ✅ Modern layout state management
+const {
+  activeTab,
+  sidebarCollapsed,
+  setActiveTab,
+  setSidebarCollapsed,
+  toggleSidebar
+} = useLayoutState({
+  defaultTab: 'dashboard',
+  persistSidebar: true,
+  syncWithRouter: false
+});
 ```
 
-**Design Features**:
-- ✅ **Tab Navigation**: Horizontal tabs for feature sections
-- ✅ **Content Areas**: Dedicated space for each feature aspect
-- ✅ **State Preservation**: Tab selection remembered across sessions
-- ✅ **Responsive Behavior**: Tabs stack or scroll on smaller screens
+### 3.2. Migration Benefits ✅ ACHIEVED
 
-### 6.2. Universal Tab Pattern ✅ IMPLEMENTED
+**Performance Improvements**:
+- **Reduced Complexity**: Single GameLayout vs. multiple column components
+- **Efficient Rendering**: Centralized state management reduces re-renders
+- **Memory Usage**: Unified component lifecycle management
+- **Route Performance**: AppRouter integration eliminates nested routing overhead
 
-**Standardized Tab System**:
-- ✅ **StandardTabs**: Consistent tab appearance and behavior
-- ✅ **TabPanel**: Accessible content containers
-- ✅ **TabContainer**: Combined solution for tab + content management
-- ✅ **useTabs Hook**: State management with persistence
+**Developer Experience**:
+- **Simplified Integration**: Single component interface vs. multiple layout pieces
+- **Type Safety**: Comprehensive TypeScript integration throughout
+- **Clear Patterns**: Consistent state management and component structure
+- **Migration Guidance**: Step-by-step deprecation warnings and documentation
 
-**Benefits**:
-- ✅ **Consistency**: Uniform navigation experience across features
-- ✅ **Accessibility**: Built-in keyboard and screen reader support
-- ✅ **Performance**: Optimized rendering with conditional content loading
-- ✅ **Maintainability**: Single source of truth for tab behavior
+## 4. Responsive Design Strategy ✅ IMPLEMENTED
 
-## 7. Performance Optimization ✅ IMPLEMENTED
+### 4.1. Breakpoint System
 
-### 7.1. Rendering Performance ✅ IMPLEMENTED
+**Material-UI Breakpoints**:
+- **Mobile**: `<768px` - MobileNavDrawer with touch-optimized interactions
+- **Desktop**: `≥768px` - DesktopNavBar with hover states and keyboard navigation
+- **Transitions**: Smooth switching between layouts based on screen size
 
-**Optimization Strategies**:
-- ✅ **Component Memoization**: React.memo for stable components
-- ✅ **Callback Memoization**: useCallback for event handlers
-- ✅ **Conditional Rendering**: Content loaded only when needed
-- ✅ **Route-Based Splitting**: Features loaded on demand
+### 4.2. Navigation Adaptation ✅ COMPLETE
 
-**Layout Efficiency**:
-- ✅ **Independent Columns**: Each column renders independently
-- ✅ **Minimal Re-layouts**: Stable layout prevents unnecessary recalculations
-- ✅ **Efficient State Updates**: Targeted state updates prevent cascade renders
-- ✅ **Intersection Observers**: Efficient visibility detection for dynamic content
+**Desktop Navigation**:
+- **Collapsible Sidebar**: 240px expanded, 64px collapsed
+- **Hover States**: Interactive feedback for navigation items
+- **Keyboard Navigation**: Full accessibility support
 
-### 7.2. Memory Management ✅ IMPLEMENTED
+**Mobile Navigation**:
+- **Drawer System**: 280px drawer with backdrop and swipe gestures
+- **Touch Targets**: Minimum 48px touch targets for accessibility
+- **Auto-Close**: Drawer closes on navigation selection
 
-**Resource Optimization**:
-- ✅ **Component Cleanup**: Proper cleanup of event listeners and timers
-- ✅ **State Normalization**: Efficient Redux state structure
-- ✅ **Image Optimization**: Lazy loading and appropriate formats
-- ✅ **Bundle Splitting**: Feature-based code splitting for optimal loading
+## 5. Layout Evolution Timeline ✅ DOCUMENTED
 
-## 8. Future Layout Enhancements 📋 PLANNED
+### Phase 1: Legacy System (Deprecated) ⚠️
+- **Architecture**: GameContainer + 3-column layout (LeftColumn, MiddleColumn, RightColumn)
+- **Status**: Fully deprecated with migration warnings
+- **Issues**: Complex state management, limited responsive design, performance overhead
 
-### 8.1. Advanced Responsive Features 📋 PLANNED
-- **Adaptive Layout**: Dynamic column reordering based on content priority
-- **Progressive Enhancement**: Enhanced features for capable devices
-- **Orientation Support**: Optimized layouts for landscape/portrait modes
-- **Multi-Screen**: Support for multi-monitor setups
+### Phase 2: Modern System (Current) ✅ IMPLEMENTED
+- **Architecture**: GameLayout + VerticalNavBar + MainContentArea
+- **Benefits**: Unified state management, responsive design, AppRouter integration
+- **Performance**: Reduced component overhead, efficient rendering patterns
 
-### 8.2. Interactive Enhancements 📋 PLANNED
-- **Customizable Layout**: User-configurable column widths
-- **Panel Docking**: Moveable and dockable interface panels
-- **Context Menus**: Right-click context actions throughout interface
-- **Gesture Navigation**: Advanced touch gestures for complex interactions
+### Phase 3: Legacy Removal (Planned) 📋
+- **Timeline**: After complete migration verification
+- **Process**: Remove deprecated components and cleanup exports
+- **Benefits**: Reduced bundle size, simplified architecture, improved maintainability
 
-## 9. Layout Implementation Status
+## 6. Migration Guidelines ✅ ESTABLISHED
 
-### ✅ Completed Layout Features
-1. **Three-Column System** - Complete responsive layout with fixed column responsibilities
-2. **Route-Based Content** - Dynamic middle column content via React Router
-3. **Component Architecture** - GameLayout, column components, and outlet management
-4. **Responsive Design** - Breakpoint-based adaptation for all screen sizes
-5. **Accessibility Integration** - WCAG 2.1 AA compliance with proper landmarks
-6. **Performance Optimization** - Memoized components and efficient rendering
-7. **Universal Tab System** - Standardized navigation patterns across features
-8. **Visual Design System** - Material-UI integration with consistent theming
+### 6.1. Component Migration Paths
 
-### 🔄 In Progress
-1. **Advanced Contextual Content** - Enhanced right column dynamic content
-2. **Mobile Gesture Support** - Additional touch interaction patterns
-3. **Performance Monitoring** - Real-time layout performance metrics
+**From GameContainer to GameLayout**:
+```typescript
+// ❌ Legacy pattern
+<GameContainer>
+  <LeftColumn />
+  <MiddleColumn />
+  <RightColumn />
+</GameContainer>
 
-### 📋 Planned
-1. **Customizable Layouts** - User-configurable interface options
-2. **Advanced Responsive** - Further mobile and tablet optimizations
-3. **Multi-Modal Interfaces** - Voice and gesture navigation support
-4. **Cross-Platform** - PWA-specific layout optimizations
+// ✅ Modern pattern
+<GameLayout />
+```
 
-The layout design provides a solid foundation for scalable game development while ensuring excellent user experience across all device types and accessibility requirements.
+**Benefits of Migration**:
+- **Unified State**: Single useLayoutState hook vs. multiple component states
+- **Responsive Design**: Built-in mobile/desktop adaptation
+- **Performance**: Reduced component mounting/unmounting overhead
+- **Router Integration**: Seamless AppRouter coordination
+
+### 6.2. State Management Migration
+
+**Legacy State Pattern**:
+```typescript
+// ❌ Scattered state management
+const [leftCollapsed, setLeftCollapsed] = useState(false);
+const [activeContent, setActiveContent] = useState('default');
+const [rightVisible, setRightVisible] = useState(true);
+```
+
+**Modern State Pattern**:
+```typescript
+// ✅ Centralized layout state
+const {
+  activeTab,
+  sidebarCollapsed,
+  setActiveTab,
+  setSidebarCollapsed
+} = useLayoutState();
+```
+
+## 7. Future Enhancements 📋 PLANNED
+
+### 7.1. Advanced Layout Features
+- **Split Panes**: Resizable content areas for advanced users
+- **Layout Presets**: Saved layout configurations
+- **Custom Themes**: User-configurable layout themes
+- **Animation System**: Smooth transitions and micro-interactions
+
+### 7.2. Performance Optimizations
+- **Virtual Scrolling**: For large content areas
+- **Code Splitting**: Layout component lazy loading
+- **Caching**: Layout state caching for faster load times
+- **Bundle Optimization**: Tree shaking for unused layout components
+
+The layout system has successfully evolved from legacy architecture to a modern, maintainable, and performant system with comprehensive deprecation strategy ensuring smooth transition for all stakeholders.

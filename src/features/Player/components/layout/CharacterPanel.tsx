@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Paper, Divider } from '@mui/material';
 import StatDisplay from '../ui/StatDisplay';
-import PlayerTraits from '../containers/PlayerTraits';
+import PlayerTraits from '../ui/PlayerTraitsUI';
 import Progression from '../containers/Progression';
 
 /**

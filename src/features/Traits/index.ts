@@ -31,8 +31,8 @@ export { default as TraitAcquisitionPanel } from './components/containers/TraitA
 export { default as TraitSystemErrorBoundary } from './components/containers/TraitSystemErrorBoundary';
 export { TraitSystemWrapper } from './components/containers/TraitSystemWrapper';
 
+// UI Components
 export { default as TraitList } from './components/ui/TraitList';
 export { default as TraitSlots } from './components/ui/TraitSlots';
-export { TraitSlots } from './components/ui/TraitSlots';
 export { TraitCodex } from './components/ui/TraitCodex';
 export { TraitManagement } from './components/ui/TraitManagement';

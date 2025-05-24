@@ -16,6 +16,8 @@ import TraitAcquisitionPanel from '../features/Traits/components/containers/Trai
 
 // Shared components
 import Panel from '../shared/components/layout/Panel';
+import { GameControlPanel } from '../features/GameLoop';
+import { PlaceholderPage } from '../shared/components/PlaceholderPage';
 
 /**
  * Main Game Page Content Component
@@ -64,67 +66,37 @@ const GamePage: React.FC = () => {
   return (
     <> 
       <Typography variant="h4" component="h1" gutterBottom>
-        Game World - {playerName} (Level {playerLevel})
+        Game Control Center
       </Typography>
       
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Panel title="Player Actions">
-            <Typography>
-              Welcome, {playerName}! You are level {playerLevel}.
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-              {/* Essence auto-generated via container; manual gather removed */}
-            </Box>
-            {/* Manual essence controls removed */}
-            {/* Add NPC Connection UI */}
-            <Box sx={{ mt: 2 }}>
-              <Typography>NPC Connections: {npcConnections}</Typography>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => dispatch(addNpcConnection())}
-                aria-label="Add NPC connection" // Add aria-label
-              >
-                Add NPC Connection
-              </Button>
-            </Box>
-            {/* Add Trait Button */}
-            <Box sx={{ mt: 2 }}>
-              <Button variant="contained" color="secondary" onClick={handleAddTraitClick}>
-                Add Sample Trait (Test)
-              </Button>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-              <Button
-                variant="outlined"
-                onClick={() => setShowAcquisition(true)}
-              >
-                Acquire Traits…
-              </Button>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-              <Button variant="outlined" color="error" onClick={handleResetGame}>
-                Reset Game
-              </Button>
-            </Box>
+        {/* Game Controls Section */}
+        <Grid item xs={12}>
+          <Panel title="Game Loop Controls">
+            {/* Game Control Panel Integration */}
+            <GameControlPanel />
           </Panel>
         </Grid>
-        
-        <Grid item xs={12} md={6}>
-          <Panel title="World Events">
-            <Typography>
-              No major events currently happening. Explore the world!
-            </Typography>
+
+        {/* World Content Placeholder */}
+        <Grid item xs={12}>
+          <Panel title="Game World Interface">
+            <PlaceholderPage
+              title="Game World Interface"
+              description="This section will contain the main game world interactions, including character status, current location, and active game elements."
+              status="planned"
+              features={[
+                'Real-time game world display',
+                'Character status overview',
+                'Current location information',
+                'Active effects and status indicators',
+                'Quick action buttons',
+                'Resource displays integration',
+              ]}
+            />
           </Panel>
         </Grid>
       </Grid>
-
-      <Box sx={{ mt: 3 }}>
-        <Typography>
-          Placeholder for future game content.
-        </Typography>
-      </Box>
 
       {showAcquisition && (
         <TraitAcquisitionPanel />

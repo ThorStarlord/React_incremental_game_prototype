@@ -67,129 +67,55 @@ export interface EssenceUpgrade {
 }
 
 /**
- * Interface for essence generation source
- */
-export interface EssenceSource {
-  /** Source identifier */
-  id: string;
-  /** Display name */
-  name: string;
-  /** Amount generated per cycle */
-  amount: number;
-  /** Whether this source is active */
-  active: boolean;
-  /** Multiplier applied to this source */
-  multiplier?: number;
-}
-
-/**
- * Interface for essence generation notification
- */
-export interface EssenceNotification {
-  /** Unique notification ID */
-  id: string;
-  /** Message text */
-  message: string;
-  /** Essence amount */
-  amount: number;
-  /** Source of the essence */
-  source?: string;
-  /** Timestamp when generated */
-  timestamp: number;
-}
-
-/**
- * Interface for essence mechanics
- */
-export interface EssenceMechanics {
-  /** Whether auto-collection is unlocked */
-  autoCollectUnlocked: boolean;
-  /** Whether resonance feature is unlocked */
-  resonanceUnlocked: boolean;
-}
-
-/**
- * Interface for the essence state
+ * Essence system state interface
  */
 export interface EssenceState {
   /** Current essence amount */
   amount: number;
-  /** Total essence collected lifetime */
+  /** Total essence collected over all time */
   totalCollected: number;
-  /** Essence generated per second */
-  perSecond: number;
-  /** Essence generated per click */
+  /** Passive generation rate per second */
+  generationRate: number;
+  /** Essence gained per manual click */
   perClick: number;
-  /** Global multiplier for all essence generation */
+  /** Global multiplier for all essence gains */
   multiplier: number;
-  /** Whether essence is unlocked */
-  unlocked: boolean;
-  /** Essence generators */
-  generators: {
-    [key: string]: EssenceGenerator;
-  };
-  /** Essence upgrades */
-  upgrades: {
-    [key: string]: EssenceUpgrade;
-  };
-  /** Feature flags and mechanics */
-  mechanics: EssenceMechanics;
-  /** Active essence generation sources */
-  sources?: EssenceSource[];
-  /** Recent essence notifications */
-  notifications?: EssenceNotification[];
-  /** Max essence that can be stored */
-  maxAmount?: number;
-  /** Resonance level (if unlocked) */
-  resonanceLevel?: number;
-  /** Rate at which essence decays (if applicable) */
-  decayRate?: number;
-  /** Timestamp of last update */
-  lastUpdated?: number;
-  /** Rate at which essence is generated per interval */
-  generationRate?: number;
-  /** Number of established NPC connections influencing essence gain */
+  /** Number of active NPC connections */
   npcConnections: number;
+  /** Timestamp of last update */
+  lastUpdated: number;
+  /** Optional maximum essence capacity */
+  maxAmount?: number;
 }
 
 /**
- * Interface for essence gain payload
+ * Payload for updating generation configuration
  */
-export interface GainEssencePayload {
-  /** Amount of essence to gain */
+export interface UpdateGenerationConfigPayload {
+  generationRate?: number;
+  multiplier?: number;
+  npcConnections?: number;
+}
+
+/**
+ * Essence generation source information
+ */
+export interface EssenceSource {
+  id: string;
+  name: string;
+  type: 'npc' | 'manual' | 'passive' | 'quest' | 'other';
+  rate: number;
+  isActive: boolean;
+}
+
+/**
+ * Essence transaction record
+ */
+export interface EssenceTransaction {
+  id: string;
+  timestamp: number;
   amount: number;
-  /** Source of the essence gain */
-  source?: string;
-}
-
-/**
- * Interface for essence spend payload
- */
-export interface SpendEssencePayload {
-  /** Amount of essence to spend */
-  amount: number;
-  /** What the essence was spent on (optional) */
-  reason?: string; // Add the optional reason property
-  /** What the essence was spent on */
-  purpose?: string;
-}
-
-/**
- * Interface for generator purchase payload
- */
-export interface PurchaseGeneratorPayload {
-  /** Type of generator to purchase */
-  generatorType: string;
-  /** Quantity to purchase */
-  quantity?: number;
-}
-
-/**
- * Interface for upgrade purchase payload
- */
-export interface PurchaseUpgradePayload {
-  /** Type of upgrade to purchase */
-  upgradeType: string;
-  /** Number of levels to purchase */
-  levels?: number;
+  type: 'gain' | 'spend';
+  source: string;
+  description?: string;
 }

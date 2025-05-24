@@ -1,95 +1,168 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../../app/store';
-// Import the shared EssenceState and payload types
-import { EssenceState, GainEssencePayload, SpendEssencePayload } from './EssenceTypes';
+import type { EssenceState } from './EssenceTypes';
 
-// Define the initial state based on the imported EssenceState
+/**
+ * Initial state for the Essence system
+ */
 const initialState: EssenceState = {
   amount: 0,
-  totalCollected: 0, // Use totalCollected from EssenceTypes
-  perSecond: 0,
-  perClick: 1, // Default click value
-  multiplier: 1,
-  unlocked: true, // Assuming essence is unlocked initially
-  generators: {},
-  upgrades: {},
-  mechanics: {
-    autoCollectUnlocked: false,
-    resonanceUnlocked: false,
-  },
-  sources: [],
-  notifications: [],
-  maxAmount: 1000, // Example max amount
-  resonanceLevel: 0,
-  decayRate: 0,
+  totalCollected: 0,
+  generationRate: 0.1, // Per second
+  perClick: 1,
+  multiplier: 1.0,
+  npcConnections: 0,
   lastUpdated: Date.now(),
-  generationRate: 1, // Example initial generation rate
-  npcConnections: 0, // Initialize NPC connections
 };
 
+/**
+ * Essence slice managing the core metaphysical resource system
+ */
 const essenceSlice = createSlice({
   name: 'essence',
   initialState,
   reducers: {
-    // Use GainEssencePayload from EssenceTypes.ts
-    gainEssence: (state, action: PayloadAction<GainEssencePayload>) => {
-      const { amount, source = 'unknown' } = action.payload;
-
-      if (amount <= 0) return;
-
+    /**
+     * Add essence to the current amount and total collected
+     */
+    gainEssence: (state, action: PayloadAction<number>) => {
+      const amount = Math.max(0, action.payload);
       state.amount += amount;
-      state.totalCollected += amount; // Use totalCollected
+      state.totalCollected += amount;
       state.lastUpdated = Date.now();
     },
 
-    // Use SpendEssencePayload from EssenceTypes.ts
-    spendEssence: (state, action: PayloadAction<SpendEssencePayload>) => {
-      const { amount, purpose } = action.payload;
-
-      if (amount <= 0) return;
-      if (state.amount < amount) {
-        console.error(`Not enough essence. Required: ${amount}, Available: ${state.amount}`);
-        return;
-      }
-
-      state.amount -= amount;
+    /**
+     * Remove essence from the current amount
+     */
+    spendEssence: (state, action: PayloadAction<number>) => {
+      const amount = Math.max(0, action.payload);
+      state.amount = Math.max(0, state.amount - amount);
       state.lastUpdated = Date.now();
     },
 
-    // Keep setEssenceAmount if needed for loading state
-    setEssenceAmount: (state, action: PayloadAction<number>) => {
-      state.amount = Math.max(0, action.payload);
+    /**
+     * Add manual essence (e.g., from clicking)
+     */
+    addManualEssence: (state) => {
+      const amount = state.perClick * state.multiplier;
+      state.amount += amount;
+      state.totalCollected += amount;
       state.lastUpdated = Date.now();
     },
 
-    // Add a reducer to update generationRate if necessary
+    /**
+     * Set the passive generation rate
+     */
     setGenerationRate: (state, action: PayloadAction<number>) => {
       state.generationRate = Math.max(0, action.payload);
+    },
+
+    /**
+     * Set the per-click generation amount
+     */
+    setPerClick: (state, action: PayloadAction<number>) => {
+      state.perClick = Math.max(0, action.payload);
+    },
+
+    /**
+     * Set the global multiplier
+     */
+    setMultiplier: (state, action: PayloadAction<number>) => {
+      state.multiplier = Math.max(0.1, action.payload);
+    },
+
+    /**
+     * Add an NPC connection for generation
+     */
+    addNpcConnection: (state) => {
+      state.npcConnections += 1;
+      // Recalculate generation rate based on connections
+      state.generationRate = state.npcConnections * 0.1;
+    },
+
+    /**
+     * Remove an NPC connection
+     */
+    removeNpcConnection: (state) => {
+      state.npcConnections = Math.max(0, state.npcConnections - 1);
+      // Recalculate generation rate based on connections
+      state.generationRate = state.npcConnections * 0.1;
+    },
+
+    /**
+     * Update the last updated timestamp
+     */
+    updateLastUpdated: (state) => {
       state.lastUpdated = Date.now();
     },
 
-    // New reducer for manual addition
-    addManualEssence: (state, action: PayloadAction<number>) => {
-      const amountToAdd = action.payload;
-      // Provide a default value (e.g., Infinity or a large number) if maxAmount is undefined
-      const maxAmount = state.maxAmount ?? Infinity; 
-      state.amount = Math.min(state.amount + amountToAdd, maxAmount);
+    /**
+     * Reset essence state to initial values
+     */
+    resetEssence: (state) => {
+      Object.assign(state, initialState);
     },
 
-    addNpcConnection: state => {
-      state.npcConnections += 1;
+    /**
+     * Process passive generation based on time elapsed
+     */
+    processPassiveGeneration: (state, action: PayloadAction<number>) => {
+      const deltaTime = action.payload; // Time in seconds
+      if (state.generationRate > 0 && deltaTime > 0) {
+        const generated = state.generationRate * deltaTime * state.multiplier;
+        state.amount += generated;
+        state.totalCollected += generated;
+      }
+      state.lastUpdated = Date.now();
+    },
+
+    /**
+     * Update generation configuration
+     */
+    updateGenerationConfig: (state, action: PayloadAction<{
+      generationRate?: number;
+      multiplier?: number;
+      npcConnections?: number;
+    }>) => {
+      const { generationRate, multiplier, npcConnections } = action.payload;
+      
+      if (generationRate !== undefined) {
+        state.generationRate = Math.max(0, generationRate);
+      }
+      
+      if (multiplier !== undefined) {
+        state.multiplier = Math.max(0.1, multiplier);
+      }
+      
+      if (npcConnections !== undefined) {
+        state.npcConnections = Math.max(0, npcConnections);
+        // Recalculate generation rate based on new connection count
+        state.generationRate = state.npcConnections * 0.1;
+      }
+      
+      state.lastUpdated = Date.now();
     },
   },
 });
 
-// Update exports to match the new reducer names if changed
-export const { gainEssence, spendEssence, setEssenceAmount, setGenerationRate, addManualEssence, addNpcConnection } = essenceSlice.actions;
+// Export actions
+export const {
+  gainEssence,
+  spendEssence,
+  addManualEssence,
+  setGenerationRate,
+  setPerClick,
+  setMultiplier,
+  addNpcConnection,
+  removeNpcConnection,
+  updateLastUpdated,
+  resetEssence,
+  processPassiveGeneration,
+  updateGenerationConfig,
+} = essenceSlice.actions;
 
-// Selectors - Update to use the correct state structure from EssenceTypes.ts
-export const selectEssenceAmount = (state: RootState) => state.essence.amount;
-export const selectTotalCollected = (state: RootState) => state.essence.totalCollected; // Use totalCollected
-export const selectEssenceMaxAmount = (state: RootState) => state.essence.maxAmount;
-export const selectEssenceGenerationRate = (state: RootState) => state.essence.generationRate;
-export const selectNpcConnections = (state: RootState) => state.essence.npcConnections;
-
+// Export reducer
 export default essenceSlice.reducer;
+
+// Export the slice for potential additional usage
+export { essenceSlice };

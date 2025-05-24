@@ -1,14 +1,21 @@
-export { default as essenceReducer, gainEssence, spendEssence, setEssenceAmount, setGenerationRate, addManualEssence, addNpcConnection } from './state/EssenceSlice';
-export * from './state/EssenceThunks';
+// Essence System Feature Exports
+
+// Redux State Management
+export { default as essenceReducer } from './state/EssenceSlice';
+export { essenceSlice } from './state/EssenceSlice';
+export * from './state/EssenceSlice';
+
+// Types
+export type * from './state/EssenceTypes';
+
+// Selectors
 export * from './state/EssenceSelectors';
-export * from './state/EssenceTypes';
 
-export { default as useEssenceGeneration } from './hooks/useEssenceGeneration';
-export { useAutoGenerateEssence } from './hooks/useEssenceGeneration';
+// Components (if they exist)
+// export * from './components';
 
-export { default as EssenceDisplayContainer } from './components/containers/EssenceDisplayContainer';
-export { default as EssencePanel } from './components/containers/EssencePanel';
-export { default as EssenceGenerationTimer } from './components/containers/EssenceGenerationTimer';
+// Hooks (if they exist)
+// export * from './hooks';
 
-export { default as EssenceButton } from './components/ui/EssenceButton';
-export { default as EssenceDisplay } from './components/ui/EssenceDisplay';
+// Utils (if they exist)
+// export * from './utils';

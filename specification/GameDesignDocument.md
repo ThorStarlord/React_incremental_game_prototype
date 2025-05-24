@@ -1,311 +1,241 @@
-# Game Design Document: React Incremental RPG Prototype
-
-## 1. Game Vision & Overview
-
-**Project Status**: ✅ **CORE FOUNDATION IMPLEMENTED** - Essential systems operational with solid architecture for future expansion.
-
-### 1.1. Core Concept
-An incremental RPG focusing on **Emotional Resonance** - the player's unique ability to form deep connections with NPCs, acquire their traits, and eventually create loyal Copies. The game emphasizes relationship building, character customization, and strategic resource management over traditional combat.
-
-### 1.2. Key Pillars
-- **Emotional Connection**: Build meaningful relationships that drive mechanical progression
-- **Trait Customization**: ✅ **IMPLEMENTED** - Deep character customization through acquired traits
-- **Strategic Resource Management**: ✅ **IMPLEMENTED** - Essence as the core metaphysical currency
-- **Incremental Progression**: ✅ **IMPLEMENTED** - Time-based advancement with active engagement rewards
-- **Accessibility**: ✅ **IMPLEMENTED** - Fully accessible design with WCAG 2.1 AA compliance
-
-### 1.3. Target Experience
-Players should feel a sense of growing influence and connection within a living world, where every relationship matters and character growth is both meaningful and visually represented through trait acquisition and Copy creation.
-
-## 2. Core Gameplay Loop ✅ FOUNDATION IMPLEMENTED
-
-### 2.1. Primary Loop Structure
-```
-Discover NPCs → Build Relationships → Generate Essence → Acquire Traits → Enhance Capabilities → Expand Influence
-```
-
-**Current Implementation Status**:
-- ✅ **Essence System**: Core resource tracking and basic generation
-- ✅ **Trait System**: Complete acquisition, equipping, and permanence mechanics
-- ✅ **Save/Load System**: Full progression persistence
-- ✅ **GameLoop System**: Time-based progression with configurable speeds
-- 📋 **NPC Interactions**: State management ready, relationship building planned
-- 📋 **Copy Creation**: System designed, implementation planned
-
-### 2.2. Secondary Loops ✅ SUPPORTING SYSTEMS IMPLEMENTED
-
-**Character Progression**:
-- ✅ **Stat Management**: Comprehensive player state tracking
-- ✅ **Equipment System**: Full gear management framework
-- ✅ **Attribute Allocation**: Point-based character development
-- 🔄 **Skill Progression**: Framework established, mechanics pending
-
-**Resource Management**:
-- ✅ **Essence Generation**: Passive and active accumulation
-- ✅ **Trait Costs**: Balanced acquisition and permanence pricing
-- ✅ **Save Management**: Multiple save slots with import/export
-- 📋 **Copy Maintenance**: Loyalty and task management planned
-
-## 3. Core Systems Implementation Status
-
-### 3.1. Trait System ✅ FULLY IMPLEMENTED
-
-**Vision**: A flexible character customization system where players can acquire, equip, and permanently integrate traits from NPCs and other sources.
-
-**Implementation Achievement**:
-- ✅ **Complete UI**: TraitSystemWrapper with tabbed navigation
-- ✅ **Slot Management**: Click-based trait equipping/unequipping
-- ✅ **Trait Codex**: Comprehensive trait reference and discovery tracking
-- ✅ **Permanence System**: Essence-based permanent trait acquisition
-- ✅ **Accessibility**: Full keyboard navigation and screen reader support
-- ✅ **Performance**: Optimized rendering with memoization
-
-**Key Features Delivered**:
-- Intuitive click-based interactions replacing complex drag-and-drop
-- Three-tab organization: Equipped Traits, Manage Traits, Trait Codex
-- Visual feedback for slot states (empty, equipped, locked)
-- Cost transparency for trait acquisition and permanence
-- Comprehensive accessibility compliance
-
-### 3.2. GameLoop System ✅ FULLY IMPLEMENTED
-
-**Vision**: Provide consistent time-based progression for all game systems with player control over pacing.
-
-**Implementation Achievement**:
-- ✅ **Fixed Timestep Logic**: Consistent 10 TPS game logic with 60 FPS rendering
-- ✅ **Speed Control**: Variable speed from 0.1x to 5.0x with real-time adjustment
-- ✅ **Pause/Resume**: Full game state control with persistent settings
-- ✅ **Auto-save**: Configurable automatic saving system
-- ✅ **Performance**: Efficient requestAnimationFrame with accumulator pattern
-
-**Integration Points**:
-- ✅ **State Management**: Redux integration with typed actions and selectors
-- ✅ **UI Controls**: Material-UI control panel with intuitive interface
-- ✅ **System Hooks**: Framework for other systems to register for tick updates
-
-### 3.3. State Management Architecture ✅ FULLY IMPLEMENTED
-
-**Vision**: Robust, scalable state management supporting complex game interactions.
-
-**Implementation Achievement**:
-- ✅ **Redux Toolkit**: Single source of truth with comprehensive type safety
-- ✅ **Feature-Sliced Design**: Modular architecture with clear boundaries
-- ✅ **Performance Optimization**: Memoized selectors and efficient updates
-- ✅ **Persistence**: Complete save/load system with version management
-
-**Architectural Benefits**:
-- ✅ **Type Safety**: Full TypeScript integration eliminating runtime errors
-- ✅ **Maintainability**: Clear patterns and consistent structure
-- ✅ **Scalability**: Easy addition of new features and systems
-- ✅ **Testing**: Predictable state management for comprehensive testing
-
-### 3.4. UI/UX Framework ✅ CORE IMPLEMENTED
-
-**Vision**: Accessible, intuitive interface that scales across devices and user abilities.
-
-**Implementation Achievement**:
-- ✅ **Three-Column Layout**: Responsive design with clear content separation
-- ✅ **Universal Tab System**: Consistent navigation patterns across all features
-- ✅ **Accessibility Compliance**: WCAG 2.1 AA standards met throughout
-- ✅ **Material-UI Integration**: Consistent theming and component usage
-- ✅ **Performance**: Optimized rendering with route-based code splitting
-
-**User Experience Benefits**:
-- ✅ **Intuitive Navigation**: Click-based interactions with clear feedback
-- ✅ **Keyboard Accessibility**: Full keyboard navigation support
-- ✅ **Screen Reader Support**: Comprehensive ARIA labeling and announcements
-- ✅ **Mobile Compatibility**: Touch-optimized interactions and responsive design
-
-### 3.5. Save/Load System ✅ FULLY IMPLEMENTED
-
-**Vision**: Reliable game progress persistence with sharing capabilities.
-
-**Implementation Achievement**:
-- ✅ **Multiple Save Slots**: Named saves with metadata tracking
-- ✅ **Auto-save**: Configurable automatic backup system
-- ✅ **Import/Export**: Base64 encoded game state sharing
-- ✅ **Version Management**: Save compatibility and migration framework
-- ✅ **Data Integrity**: Validation and error handling for corrupted saves
-
-## 4. Planned Systems (Design Complete, Implementation Pending)
-
-### 4.1. NPC System 📋 STATE READY
-
-**Vision**: Rich, personality-driven NPCs with meaningful relationship progression.
-
-**Design Status**: ✅ **COMPLETE** - Comprehensive specification with state management implemented
-
-**Planned Features**:
-- Deep relationship tracking with multiple metrics
-- Personality-based interaction outcomes
-- Trait sharing mechanics for mutual benefit
-- Dynamic NPC behavior based on world state
-- Emotional connection depth affecting essence generation
-
-### 4.2. Copy System 📋 DESIGN COMPLETE
-
-**Vision**: Player-created entities that extend the player's influence and capabilities.
-
-**Design Status**: ✅ **COMPLETE** - Full system specification with clear mechanics
-
-**Planned Features**:
-- Seduction-based Copy creation with moral complexity
-- Growth path choice: Normal (time-based) vs Accelerated (essence-cost)
-- Trait inheritance from parent NPCs
-- Loyalty management requiring ongoing attention
-- Task assignment and autonomous operation
-
-### 4.3. Quest System 📋 DESIGN COMPLETE
-
-**Vision**: Narrative-driven objectives that guide exploration and provide meaningful rewards.
-
-**Design Status**: ✅ **COMPLETE** - Comprehensive quest framework designed
-
-**Planned Features**:
-- Multiple quest types: Main story, side quests, repeatable tasks
-- Dynamic objective tracking with clear progression indicators
-- Relationship-gated content based on NPC connections
-- Meaningful rewards including traits, essence, and story progression
-
-## 5. Technical Excellence ✅ ACHIEVED
-
-### 5.1. Architecture Quality ✅ IMPLEMENTED
-
-**Performance Standards**:
-- ✅ **60 FPS Rendering**: Smooth visual experience with efficient updates
-- ✅ **Fast Load Times**: Optimized asset loading and state hydration
-- ✅ **Memory Efficiency**: Proper cleanup and minimal memory leaks
-- ✅ **Bundle Optimization**: Tree-shaking and code splitting implemented
-
-**Code Quality Standards**:
-- ✅ **TypeScript Strict Mode**: Comprehensive type safety
-- ✅ **Consistent Patterns**: Established architectural guidelines
-- ✅ **Comprehensive Documentation**: JSDoc comments and specification docs
-- ✅ **Testing Framework**: Structure ready for comprehensive test coverage
-
-### 5.2. Accessibility Excellence ✅ IMPLEMENTED
-
-**WCAG 2.1 AA Compliance**:
-- ✅ **Keyboard Navigation**: Complete keyboard accessibility
-- ✅ **Screen Reader Support**: Comprehensive ARIA implementation
-- ✅ **Color Independence**: Functionality works without color dependence
-- ✅ **Focus Management**: Logical focus order and visible indicators
-- ✅ **Motion Sensitivity**: Respectful of motion preference settings
-
-**Inclusive Design Benefits**:
-- ✅ **Universal Usability**: Accessible to users with diverse abilities
-- ✅ **Multiple Input Methods**: Keyboard, mouse, and touch support
-- ✅ **Clear Visual Hierarchy**: Consistent and predictable interface design
-- ✅ **Error Prevention**: Clear feedback and confirmation patterns
-
-## 6. Player Progression Framework ✅ FOUNDATION READY
-
-### 6.1. Character Development ✅ IMPLEMENTED
-
-**Trait-Based Progression**:
-- ✅ **Acquisition Mechanics**: Essence-based trait learning from NPCs
-- ✅ **Slot Management**: Limited active traits requiring strategic choices
-- ✅ **Permanence System**: High-cost permanent trait integration
-- ✅ **Visual Representation**: Clear trait effects and descriptions
-
-**Statistical Growth**:
-- ✅ **Attribute System**: Six core attributes affecting various capabilities
-- ✅ **Equipment Integration**: Gear-based stat modifications
-- ✅ **Derived Stats**: Complex calculations for combat and interaction effectiveness
-- 🔄 **Level Progression**: Framework established, experience mechanics pending
-
-### 6.2. Resource Management ✅ CORE IMPLEMENTED
-
-**Essence Economy**:
-- ✅ **Generation Tracking**: Multiple sources with clear rate calculation
-- ✅ **Spending Priorities**: Balanced costs for different progression paths
-- ✅ **Visual Feedback**: Clear indication of generation rates and affordability
-- 📋 **Connection-Based Generation**: NPC relationship integration planned
-
-**Strategic Choices**:
-- ✅ **Trait Prioritization**: Limited slots requiring careful selection
-- ✅ **Permanence Decisions**: High-cost permanent benefits
-- 📋 **Copy Investment**: Essence allocation for accelerated growth
-- 📋 **NPC Relationships**: Time and resource investment in connections
-
-## 7. Quality Assurance Framework ✅ ESTABLISHED
-
-### 7.1. Performance Monitoring ✅ IMPLEMENTED
-
-**Technical Metrics**:
-- ✅ **Frame Rate Stability**: Consistent 60 FPS rendering
-- ✅ **Memory Usage**: Efficient resource management
-- ✅ **Load Time Optimization**: Fast application startup
-- ✅ **Bundle Size Monitoring**: Optimized asset delivery
-
-**User Experience Metrics**:
-- ✅ **Interaction Responsiveness**: <200ms feedback for all actions
-- ✅ **Accessibility Compliance**: WCAG 2.1 AA validation
-- ✅ **Cross-Platform Consistency**: Uniform experience across devices
-- ✅ **Error Recovery**: Graceful handling of edge cases
-
-### 7.2. Testing Strategy ✅ FRAMEWORK READY
-
-**Automated Testing**:
-- ✅ **Component Testing**: React Testing Library integration
-- ✅ **State Management Testing**: Redux slice and selector testing
-- ✅ **Accessibility Testing**: Automated a11y validation
-- 🔄 **Integration Testing**: Cross-feature interaction validation
-
-**Manual Testing**:
-- ✅ **Accessibility Testing**: Screen reader and keyboard navigation
-- ✅ **Cross-Browser Compatibility**: Consistent behavior across browsers
-- ✅ **Performance Testing**: Real-world usage scenarios
-- ✅ **User Experience Testing**: Intuitive interaction validation
-
-## 8. Future Expansion Roadmap 📋 PLANNED
-
-### 8.1. Short-Term Goals (Next Phase)
-1. **NPC Interaction System**: Complete relationship building mechanics
-2. **Essence Generation**: Implement connection-based passive generation
-3. **Player UI Enhancement**: Character stats and attribute allocation interfaces
-4. **Copy System MVP**: Basic Copy creation and management
-
-### 8.2. Medium-Term Goals
-1. **Quest System**: Full narrative progression framework
-2. **Advanced NPC Behaviors**: Dynamic personality-based interactions
-3. **Copy Advanced Features**: Task assignment and loyalty management
-4. **Performance Optimization**: Advanced rendering and state management
-
-### 8.3. Long-Term Vision
-1. **Procedural Content**: Dynamic quest and NPC generation
-2. **Advanced AI**: Sophisticated NPC personality simulation
-3. **Multiplayer Elements**: Shared world or competitive features
-4. **Platform Expansion**: Mobile PWA and desktop distribution
-
-## 9. Success Metrics ✅ FOUNDATION ACHIEVED
-
-### 9.1. Technical Excellence ✅ ACHIEVED
-- ✅ **Architecture Quality**: Clean, maintainable, scalable codebase
-- ✅ **Performance**: Smooth 60 FPS with efficient resource usage
-- ✅ **Accessibility**: Full WCAG 2.1 AA compliance
-- ✅ **Reliability**: Robust error handling and data persistence
-
-### 9.2. User Experience ✅ CORE DELIVERED
-- ✅ **Intuitive Interface**: Clear, learnable interaction patterns
-- ✅ **Accessibility**: Usable by players with diverse abilities
-- ✅ **Performance**: Responsive interactions with immediate feedback
-- ✅ **Progression**: Meaningful advancement with clear goals
-
-### 9.3. Development Efficiency ✅ ESTABLISHED
-- ✅ **Maintainable Code**: Clear patterns and comprehensive documentation
-- ✅ **Scalable Architecture**: Easy addition of new features and systems
-- ✅ **Testing Framework**: Structure for comprehensive quality assurance
-- ✅ **Development Experience**: Efficient workflows and clear guidelines
-
-## 10. Conclusion
-
-The React Incremental RPG Prototype has successfully established a robust foundation with core systems implemented and operating at production quality. The trait system, state management, UI framework, and architectural patterns provide an excellent base for the planned NPC interactions, Copy system, and quest mechanics.
-
-**Key Achievements**:
-- ✅ **Solid Technical Foundation**: Redux Toolkit, TypeScript, accessibility compliance
-- ✅ **Complete Core Systems**: GameLoop, Traits, Save/Load, UI framework
-- ✅ **Excellent User Experience**: Intuitive interactions with comprehensive accessibility
-- ✅ **Scalable Architecture**: Ready for rapid expansion with new features
-
-The project demonstrates strong technical execution while maintaining focus on accessibility and user experience, positioning it well for continued development toward the full vision of an emotionally engaging incremental RPG.
+# Game Design Document
+## React Incremental RPG Prototype
+
+**Version:** 1.0  
+**Date:** Current  
+**Status:** Living Document  
+
+---
+
+## 🎯 Executive Summary
+
+The React Incremental RPG Prototype is an experimental incremental game that explores emotional connection mechanics as the core progression driver. Unlike traditional incremental games focused on numerical growth, this prototype emphasizes building meaningful relationships with NPCs to unlock character abilities and create allied entities.
+
+### Core Innovation
+The game replaces traditional "clicking for numbers" with "connecting for growth," where players invest time and emotional intelligence to build relationships that yield both mechanical benefits and narrative depth.
+
+## 🌟 Game Concept
+
+### Vision Statement
+Create an incremental RPG where emotional intelligence and relationship building drive progression, allowing players to acquire abilities through understanding and connecting with diverse characters rather than grinding resources.
+
+### Target Experience
+Players should feel like they're building a network of meaningful relationships while gradually becoming more capable through the wisdom and abilities gained from these connections.
+
+### Unique Selling Points
+1. **Emotional Connection Mechanics** - Relationships as primary progression currency
+2. **Trait Acquisition System** - Learn abilities from NPCs through understanding
+3. **Copy Creation** - Transform deep connections into allied entities
+4. **Essence Economy** - Metaphysical resource generated from emotional bonds
+5. **Character Customization** - Build unique character combinations through relationship choices
+
+## 🎮 Core Gameplay Loop
+
+### Primary Loop (5-10 minutes)
+1. **Discover NPCs** - Encounter new characters with unique traits and personalities
+2. **Build Relationships** - Engage in dialogue and activities to deepen connections
+3. **Generate Essence** - Passive resource generation from active emotional connections
+4. **Acquire Traits** - Spend Essence to learn abilities from connected NPCs
+5. **Customize Character** - Equip and manage acquired traits for desired build
+
+### Secondary Loop (30-60 minutes)
+1. **Deepen Existing Connections** - Strengthen relationships for better Essence generation
+2. **Make Traits Permanent** - Invest significant Essence to free up trait slots
+3. **Create Copies** - Transform deepest connections into allied entities
+4. **Manage Copy Network** - Direct and develop allied entities for various tasks
+5. **Explore New Areas** - Unlock regions with unique NPCs and opportunities
+
+### Meta Loop (Multiple Sessions)
+1. **Character Mastery** - Develop specialized character builds through trait combinations
+2. **Relationship Portfolio** - Build diverse network of connections for varied benefits
+3. **Copy Empire** - Manage multiple allied entities with specialized roles
+4. **Narrative Discovery** - Uncover deeper stories through long-term NPC relationships
+5. **System Mastery** - Optimize Essence generation and trait acquisition strategies
+
+## 🧠 Core Mechanics
+
+### Emotional Connection System
+**Concept**: The foundation of all progression, representing the depth of understanding and bond between player and NPCs.
+
+**Implementation**:
+- **Connection Depth** - Numerical representation of relationship strength (0-100)
+- **Connection Quality** - Categorical assessment of relationship type (friendship, mentorship, rivalry)
+- **Essence Generation** - Passive resource production based on active connections
+- **Unlock Gates** - Deeper connections unlock new interaction options and content
+
+**Player Actions**:
+- Engage in meaningful dialogue choices that resonate with NPC personalities
+- Complete personal quests or favors that matter to the NPC
+- Share beneficial traits to demonstrate care and investment
+- Spend time in activities the NPC enjoys or values
+
+### Essence System
+**Concept**: Metaphysical currency representing emotional energy and potential for growth.
+
+**Generation**:
+- **Passive Income** - Continuous generation from all active emotional connections
+- **Quality Multipliers** - Deeper and more diverse connections generate more Essence
+- **NPC Uniqueness** - More complex or powerful NPCs provide higher base generation
+- **Manual Actions** - Limited direct generation through focused meditation/resonance
+
+**Consumption**:
+- **Trait Acquisition** - Primary Essence sink for learning new abilities
+- **Trait Permanence** - Major investment to make traits always active
+- **Copy Acceleration** - Speed up entity creation and development
+- **Emotional Influence** - Direct manipulation of NPC emotional states
+
+### Trait System
+**Concept**: Abilities, characteristics, and passive bonuses that define character capabilities.
+
+**Acquisition Methods**:
+- **Resonance** - Primary method using Essence to copy observed traits from NPCs
+- **Quest Rewards** - Direct grants from significant achievements
+- **Research** - Future system for discovering abstract or unique traits
+- **Copy Inheritance** - Traits passed to created entities
+
+**Management**:
+- **Limited Slots** - Players start with few trait slots, unlock more through progression
+- **Permanent Traits** - Expensive option to make traits always active without slot usage
+- **Trait Categories** - Combat, Social, Physical, Mental traits with different applications
+- **Synergy Systems** - Future combinations and interactions between traits
+
+### NPC Interaction System
+**Concept**: Rich interaction framework supporting diverse relationship types and progression paths.
+
+**Relationship Progression**:
+- **Discovery Phase** - Initial NPC encounter and basic information gathering
+- **Acquaintance Level** - Basic dialogue and simple trait observation
+- **Friend Level** - Deeper conversations, quest access, trait acquisition options
+- **Close Bond** - Advanced interactions, trait sharing, emotional influence
+- **Deep Connection** - Copy creation potential, permanent trait options, unique content
+
+**Interaction Types**:
+- **Dialogue Systems** - Branching conversations with personality-aware responses
+- **Activity Participation** - Join NPCs in activities they enjoy or need help with
+- **Gift Systems** - Share resources, traits, or assistance meaningful to the NPC
+- **Conflict Resolution** - Help NPCs overcome personal challenges or problems
+
+### Copy Creation System
+**Concept**: Transform the deepest emotional connections into allied entities that assist the player.
+
+**Creation Process**:
+- **Seduction Outcome** - Successful deep relationship interaction creates Copy opportunity
+- **Growth Options** - Choose between time-intensive natural growth or Essence-accelerated development
+- **Trait Inheritance** - New Copy inherits traits shared with the parent NPC at creation time
+- **Loyalty System** - Ongoing relationship maintenance required for reliable Copy behavior
+
+**Copy Management**:
+- **Task Assignment** - Direct Copies to perform specific activities or goals
+- **Trait Sharing** - Grant additional abilities to Copies for specialized roles
+- **Loyalty Maintenance** - Ongoing investment required to prevent Copy independence or rebellion
+- **Capability Limits** - Maximum number of active Copies based on player progression
+
+## 🎨 Aesthetic & Narrative Direction
+
+### Visual Style
+- **Clean Interface Design** - Material-UI components with consistent theming
+- **Relationship Visualization** - Clear progress indicators and connection strength displays
+- **Character Representation** - Avatar systems with personality expression
+- **Responsive Design** - Seamless experience across desktop, tablet, and mobile devices
+
+### Narrative Themes
+- **Emotional Intelligence** - Understanding others as a form of power and growth
+- **Connection vs. Isolation** - Benefits of building relationships vs. self-reliance
+- **Personal Growth** - Learning from others while maintaining individual identity
+- **Responsibility** - Managing relationships and created entities with care
+- **Diversity of Perspective** - Value in connecting with different types of people
+
+### Tone
+- **Optimistic** - Focus on positive relationship building and mutual benefit
+- **Thoughtful** - Encourage reflection on relationship dynamics and emotional intelligence
+- **Empowering** - Players feel capable of growth through understanding others
+- **Inclusive** - NPCs represent diverse backgrounds, personalities, and perspectives
+
+## 🚀 Progression Systems
+
+### Character Development
+- **Attribute Growth** - Strength, Charisma, Intelligence affect various game systems
+- **Skill Advancement** - Specialized abilities improve through use and training
+- **Trait Mastery** - Growing expertise with equipped traits through consistent use
+- **Equipment Progression** - Items that enhance character capabilities and appearance
+
+### Relationship Portfolio
+- **Connection Diversity** - Benefits from building relationships with different NPC types
+- **Depth vs. Breadth** - Balance between many shallow connections vs. few deep bonds
+- **Network Effects** - NPCs who know each other provide synergistic benefits
+- **Relationship Maintenance** - Ongoing attention required to maintain connection strength
+
+### Copy Network Development
+- **Specialization** - Develop Copies for specific roles (combat, social, resource gathering)
+- **Coordination** - Manage multiple Copies working together on complex tasks
+- **Evolution** - Copies grow and change based on their experiences and assignments
+- **Independence** - Advanced Copies develop their own goals and relationships
+
+### Essence Economy Mastery
+- **Generation Optimization** - Maximize Essence income through strategic relationship building
+- **Efficient Spending** - Learn optimal investment patterns for trait acquisition and permanence
+- **Market Dynamics** - Understand relative value of different traits and abilities
+- **Resource Planning** - Long-term strategy for major Essence investments
+
+## 🎯 Success Metrics
+
+### Player Engagement
+- **Session Length** - Average time spent per play session
+- **Return Rate** - Percentage of players returning after first session
+- **Progression Satisfaction** - Player feedback on growth feeling meaningful
+- **Relationship Investment** - Time and effort players spend on individual NPCs
+
+### Mechanical Balance
+- **Essence Generation Rates** - Ensure progression feels rewarding but not trivial
+- **Trait Acquisition Costs** - Balance between accessibility and meaningful investment
+- **Copy Creation Frequency** - Rate that feels special but achievable
+- **Relationship Progression Speed** - Pacing that maintains engagement without frustration
+
+### Technical Performance
+- **Load Times** - Responsive application startup and navigation
+- **State Management** - Clean Redux patterns with efficient updates
+- **Cross-Platform Compatibility** - Consistent experience across devices
+- **Accessibility Compliance** - WCAG 2.1 AA standards throughout application
+
+## 🔮 Future Vision
+
+### Planned Expansions
+- **Quest System** - Narrative-driven objectives that deepen NPC relationships
+- **World Exploration** - Multiple locations with unique NPCs and opportunities
+- **Advanced Copy Mechanics** - Complex task systems and Copy-to-Copy relationships
+- **Trait Combinations** - Synergy systems for combining compatible traits
+- **Multiplayer Elements** - Shared world where players can interact and compare progress
+
+### Long-term Goals
+- **Educational Value** - Teach emotional intelligence and relationship skills
+- **Therapeutic Applications** - Explore game's potential for social skill development
+- **Community Building** - Foster player community around relationship-building themes
+- **Research Platform** - Gather insights about human relationship preferences and patterns
+- **Commercial Viability** - Develop sustainable monetization that aligns with game values
+
+## 📋 Implementation Roadmap
+
+### Phase 1: Core Foundation ✅ **COMPLETE**
+- ✅ Redux Toolkit state management architecture
+- ✅ Feature-Sliced Design organization
+- ✅ Basic Player, Trait, Essence, and NPC systems
+- ✅ Responsive navigation and layout system
+- ✅ Save/load functionality with import/export
+
+### Phase 2: Enhanced Interactions 🔄 **IN PROGRESS**
+- 🔄 Advanced NPC dialogue systems
+- 🔄 Trait acquisition and permanence mechanics
+- 🔄 Enhanced Essence generation from relationships
+- 📋 Copy creation system implementation
+- 📋 Quest system foundation
+
+### Phase 3: Polish & Expansion 📋 **PLANNED**
+- 📋 Advanced Copy management and task systems
+- 📋 Multiple locations and world exploration
+- 📋 Trait combination and synergy systems
+- 📋 Enhanced narrative content and character development
+- 📋 Performance optimization and mobile experience refinement
+
+---
+
+This Game Design Document serves as the guiding vision for the React Incremental RPG Prototype, establishing the core concept while remaining flexible enough to evolve based on implementation discoveries and player feedback.
