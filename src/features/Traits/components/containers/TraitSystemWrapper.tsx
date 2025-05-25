@@ -1,88 +1,174 @@
-import React from 'react';
-import { Box, Alert, CircularProgress } from '@mui/material';
-import { useAppSelector } from '../../../../app/hooks';
-import { selectTraitsError, selectTraitsLoading } from '../../state/TraitsSelectors';
-import { TraitSlots } from '../ui/TraitSlots';
-import { TraitCodex } from '../ui/TraitCodex';
-import { TraitManagement } from '../ui/TraitManagement';
-import { StandardTabs } from '../../../../shared/components/Tabs';
-import { TabPanel } from '../../../../shared/components/Tabs/TabPanel';
-import { useTabs } from '../../../../shared/hooks/useTabs';
+import React, { useCallback, useMemo } from 'react';
+import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+import {
+  selectTraits,
+  selectTraitSlots,
+  selectEquippedTraitObjects,
+  selectPermanentTraitObjects,
+  selectAcquiredTraitObjects,
+  selectDiscoveredTraitObjects,
+  selectTraitLoading,
+  selectTraitError
+} from '../../state/TraitsSelectors';
+import { selectEssenceAmount } from '../../../Essence/state/EssenceSelectors';
+import {
+  equipTrait,
+  unequipTrait,
+  acquireTrait,
+  makePermanent,
+  discoverTrait
+} from '../../state/TraitsSlice';
+import { TraitSystemUI, type TraitSystemUIProps } from '../ui/TraitSystemUI';
+import type { Trait } from '../../state/TraitsTypes';
 
-const traitTabs = [
-  { id: 'slots', label: 'Equipped Traits' },
-  { id: 'management', label: 'Manage Traits' },
-  { id: 'codex', label: 'Trait Codex' },
-];
+/**
+ * Props for the TraitSystemWrapper container component
+ */
+export interface TraitSystemWrapperProps {
+  /** Additional class name */
+  className?: string;
+  /** Initial active tab */
+  defaultTab?: string;
+}
 
-export const TraitSystemWrapper: React.FC = () => {
-  const loading = useAppSelector(selectTraitsLoading);
-  const error = useAppSelector(selectTraitsError);
-  
-  const { activeTab, setActiveTab } = useTabs({
-    defaultTab: 'slots',
-    tabs: traitTabs,
-    persistKey: 'trait_system_tabs'
-  });
+/**
+ * Container component that manages trait system state and provides data to the UI layer
+ * Handles all Redux interactions and business logic for the trait management system
+ */
+export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(({
+  className,
+  defaultTab = 'slots'
+}) => {
+  const dispatch = useAppDispatch();
 
-  if (loading) {
-    return (
-      <Box 
-        sx={{ 
-          p: 3, 
-          textAlign: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 2
-        }}
-      >
-        <CircularProgress />
-        <Alert severity="info">Loading traits...</Alert>
-      </Box>
-    );
-  }
+  // Fetch all necessary data from Redux store
+  const allTraits = useAppSelector(selectTraits);
+  const traitSlots = useAppSelector(selectTraitSlots);
+  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
+  const permanentTraits = useAppSelector(selectPermanentTraitObjects);
+  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects);
+  const loading = useAppSelector(selectTraitLoading);
+  const error = useAppSelector(selectTraitError);
+  const currentEssence = useAppSelector(selectEssenceAmount);
 
-  if (error) {
-    return (
-      <Box sx={{ p: 2 }}>
-        <Alert severity="error">
-          Error loading traits: {error}
-        </Alert>
-      </Box>
-    );
-  }
-
-  return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <StandardTabs
-        tabs={traitTabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        aria-label="Trait System Navigation"
-      />
-      
-      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-        <TabPanel tabId="slots" activeTab={activeTab}>
-          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-            <TraitSlots />
-          </Box>
-        </TabPanel>
-        
-        <TabPanel tabId="management" activeTab={activeTab}>
-          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-            <TraitManagement />
-          </Box>
-        </TabPanel>
-        
-        <TabPanel tabId="codex" activeTab={activeTab}>
-          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-            <TraitCodex />
-          </Box>
-        </TabPanel>
-      </Box>
-    </Box>
+  // Memoized data derivations for UI
+  const availableTraitsForEquip = useMemo(() => 
+    acquiredTraits.filter(trait => 
+      !equippedTraits.some(equipped => equipped.id === trait.id)
+    ),
+    [acquiredTraits, equippedTraits]
   );
-};
+
+  const equippedTraitIds = useMemo(() => 
+    equippedTraits.map(trait => trait.id),
+    [equippedTraits]
+  );
+
+  const permanentTraitIds = useMemo(() => 
+    permanentTraits.map(trait => trait.id),
+    [permanentTraits]
+  );
+
+  const discoveredTraitIds = useMemo(() => 
+    discoveredTraits.map(trait => trait.id),
+    [discoveredTraits]
+  );
+
+  const acquiredTraitIds = useMemo(() => 
+    acquiredTraits.map(trait => trait.id),
+    [acquiredTraits]
+  );
+
+  // Action handlers
+  const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
+    dispatch(equipTrait({ traitId, slotIndex }));
+  }, [dispatch]);
+
+  const handleUnequipTrait = useCallback((slotId: string) => {
+    dispatch(unequipTrait(slotId));
+  }, [dispatch]);
+
+  const handleAcquireTrait = useCallback((traitId: string) => {
+    dispatch(acquireTrait(traitId));
+  }, [dispatch]);
+
+  const handleMakeTraitPermanent = useCallback((traitId: string) => {
+    dispatch(makePermanent(traitId));
+  }, [dispatch]);
+
+  const handleDiscoverTrait = useCallback((traitId: string) => {
+    dispatch(discoverTrait(traitId));
+  }, [dispatch]);
+
+  // Check if a trait can be made permanent
+  const canMakePermanent = useCallback((trait: Trait): boolean => {
+    if (!trait.permanenceCost) return false;
+    if (permanentTraitIds.includes(trait.id)) return false;
+    if (!acquiredTraitIds.includes(trait.id)) return false;
+    return currentEssence >= trait.permanenceCost;
+  }, [permanentTraitIds, acquiredTraitIds, currentEssence]);
+
+  // Check if a trait can be acquired
+  const canAcquireTrait = useCallback((trait: Trait): boolean => {
+    if (acquiredTraitIds.includes(trait.id)) return false;
+    if (!discoveredTraitIds.includes(trait.id)) return false;
+    if (!trait.essenceCost) return true;
+    return currentEssence >= trait.essenceCost;
+  }, [acquiredTraitIds, discoveredTraitIds, currentEssence]);
+
+  // Get affordability information for a trait
+  const getTraitAffordability = useCallback((trait: Trait, action: 'acquire' | 'permanent') => {
+    const cost = action === 'acquire' ? trait.essenceCost : trait.permanenceCost;
+    if (!cost) return { canAfford: true, cost: 0, currentEssence };
+    
+    return {
+      canAfford: currentEssence >= cost,
+      cost,
+      currentEssence
+    };
+  }, [currentEssence]);
+
+  // Props for the presentational component
+  const uiProps: TraitSystemUIProps = {
+    // Data
+    allTraits,
+    traitSlots,
+    equippedTraits,
+    permanentTraits,
+    acquiredTraits,
+    discoveredTraits,
+    availableTraitsForEquip,
+    currentEssence,
+    
+    // Status
+    loading,
+    error,
+    equippedTraitIds,
+    permanentTraitIds,
+    discoveredTraitIds,
+    acquiredTraitIds,
+    
+    // Actions
+    onEquipTrait: handleEquipTrait,
+    onUnequipTrait: handleUnequipTrait,
+    onAcquireTrait: handleAcquireTrait,
+    onMakeTraitPermanent: handleMakeTraitPermanent,
+    onDiscoverTrait: handleDiscoverTrait,
+    
+    // Utilities
+    canMakePermanent,
+    canAcquireTrait,
+    getTraitAffordability,
+    
+    // Configuration
+    className,
+    defaultTab
+  };
+
+  return <TraitSystemUI {...uiProps} />;
+});
+
+TraitSystemWrapper.displayName = 'TraitSystemWrapper';
 
 export default TraitSystemWrapper;

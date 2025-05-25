@@ -47,7 +47,7 @@ import {
 } from '../../state/TraitsSlice';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
-import { selectEssenceAmount } from '../../../Essence/state/EssenceSlice';
+import { selectEssenceAmount } from '../../../Essence/state/EssenceSelectors';
 
 interface TraitCodexDrawerProps {
     open: boolean;

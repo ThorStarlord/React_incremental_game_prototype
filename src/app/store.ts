@@ -11,20 +11,17 @@ import settingsReducer from '../features/Settings/state/SettingsSlice';
 // Import the game loop reducer
 import gameLoopReducer from '../features/GameLoop/state/GameLoopSlice';
 // Import the NPCs reducer
-import npcsReducer from '../features/NPCs/state/NPCSlice';
+import { npcReducer } from '../features/Npcs';
 
 // Combine the slice reducers into a single reducer function
 const combinedReducer = combineReducers({
+  gameLoop: gameLoopReducer,
   player: playerReducer,
   traits: traitsReducer,
   essence: essenceReducer,
-  meta: metaReducer,
-  // Add the settings reducer
   settings: settingsReducer,
-  // Add the game loop reducer
-  gameLoop: gameLoopReducer,
-  // Add the NPCs reducer
-  npcs: npcsReducer,
+  meta: metaReducer,
+  npcs: npcReducer, // Add the npcs reducer
   // Add other reducers here
 });
 

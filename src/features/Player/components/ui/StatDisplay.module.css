@@ -128,10 +128,159 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 }
 
+/* Enhanced StatDisplay component styles */
+.statDisplay {
+  margin-bottom: 8px;
+  transition: all 0.2s ease-in-out;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--mui-palette-background-paper);
+  border: 1px solid var(--mui-palette-divider);
+}
+
+.statDisplay:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.progressContainer {
+  position: relative;
+  margin-top: 8px;
+}
+
+.percentageLabel {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  font-size: 0.75rem;
+}
+
+/* Progress bar enhancements */
+.progressContainer {
+  width: 100%;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
 .progressBar {
   height: 8px;
   border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Card mode specific styles */
+.cardMode {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardContent {
+  text-align: center;
+}
+
+.cardIcon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.cardValue {
+  font-weight: bold;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.cardLabel {
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+/* Chip mode styles */
+.chipMode {
+  margin: 2px;
+}
+
+/* Accessibility enhancements */
+.statDisplay:focus-within {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .statDisplay {
+    font-size: 0.875rem;
+    padding: 8px;
+  }
+  
+  .cardValue {
+    font-size: 1.125rem;
+  }
+  
+  .cardIcon {
+    font-size: 1.75rem;
+  }
+  
+  .statHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .percentageLabel {
+    position: static;
+    text-align: right;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 768px) {
+  .combatStat {
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .statIcon {
+    font-size: 24px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .combatStat {
+    padding: 8px;
+  }
+  
+  .statIcon {
+    font-size: 20px !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .statDisplay:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .statDisplay {
+    transition: none;
+  }
 }
 
 .healthProgress {
@@ -212,25 +361,4 @@
 
 .error {
   background-color: #f44336;
-}
-
-@media (max-width: 768px) {
-  .combatStat {
-    padding: 12px;
-    text-align: center;
-  }
-  
-  .statIcon {
-    font-size: 24px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .combatStat {
-    padding: 8px;
-  }
-  
-  .statIcon {
-    font-size: 20px !important;
-  }
 }

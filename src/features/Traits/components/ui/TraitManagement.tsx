@@ -1,322 +1,299 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   Box,
-  Typography,
-  Grid,
   Card,
   CardContent,
-  CardActions,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
   Button,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Alert,
   Divider,
+  Grid,
   IconButton,
-  Tooltip,
+  Tooltip
 } from '@mui/material';
 import {
   Star as StarIcon,
   Lock as LockIcon,
   CheckCircle as CheckCircleIcon,
-  Info as InfoIcon,
+  AttachMoney as EssenceIcon,
+  Info as InfoIcon
 } from '@mui/icons-material';
-import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { acquireTrait, makeTraitPermanentThunk } from '../../state/TraitsSlice';
-import { 
-  selectAcquiredTraits, 
-  selectPermanentTraits, 
-  selectDiscoveredTraits,
-  selectAllTraits 
-} from '../../state/TraitsSelectors';
-import { selectEssenceAmount } from '../../../Essence/state/EssenceSelectors';
+import type { Trait } from '../../state/TraitsTypes';
 
-interface ConfirmDialogState {
-  isOpen: boolean;
-  action: 'acquire' | 'permanent' | null;
-  trait: any | null;
+/**
+ * Props for the TraitManagement component
+ */
+export interface TraitManagementProps {
+  // Data
+  acquiredTraits: Trait[];
+  permanentTraits: Trait[];
+  currentEssence: number;
+  
+  // Status arrays
+  equippedTraitIds: string[];
+  permanentTraitIds: string[];
+  
+  // Actions
+  onAcquireTrait: (traitId: string) => void;
+  onMakeTraitPermanent: (traitId: string) => void;
+  
+  // Utilities
+  canMakePermanent: (trait: Trait) => boolean;
+  getTraitAffordability: (trait: Trait, action: 'acquire' | 'permanent') => {
+    canAfford: boolean;
+    cost: number;
+    currentEssence: number;
+  };
 }
 
-export const TraitManagement: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const allTraits = useAppSelector(selectAllTraits);
-  const acquiredTraitIds = useAppSelector(selectAcquiredTraits);
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
-  const discoveredTraitIds = useAppSelector(selectDiscoveredTraits);
-  const currentEssence = useAppSelector(selectEssenceAmount);
+/**
+ * Trait management interface for acquired traits and permanence actions
+ * Handles displaying acquired traits and allowing permanence conversion
+ */
+export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
+  acquiredTraits,
+  permanentTraits,
+  currentEssence,
+  equippedTraitIds,
+  permanentTraitIds,
+  onAcquireTrait,
+  onMakeTraitPermanent,
+  canMakePermanent,
+  getTraitAffordability
+}) => {
+  const handleMakePermanent = useCallback((trait: Trait) => {
+    if (!canMakePermanent(trait)) return;
+    
+    const affordability = getTraitAffordability(trait, 'permanent');
+    if (!affordability.canAfford) return;
+    
+    // TODO: Add confirmation dialog
+    onMakeTraitPermanent(trait.id);
+  }, [canMakePermanent, getTraitAffordability, onMakeTraitPermanent]);
 
-  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
-    isOpen: false,
-    action: null,
-    trait: null,
-  });
-
-  // Convert trait IDs to trait objects
-  const acquiredTraits = acquiredTraitIds.map(id => allTraits[id]).filter(Boolean);
-  const permanentTraits = permanentTraitIds.map(id => allTraits[id]).filter(Boolean);
-  const discoveredTraits = discoveredTraitIds.map(id => allTraits[id]).filter(Boolean);
-
-  // Get traits by status
-  const discoveredNotAcquired = discoveredTraits.filter(trait => 
-    !acquiredTraitIds.includes(trait.id)
-  );
-  
-  const acquiredNotPermanent = acquiredTraits.filter(trait => 
-    !permanentTraitIds.includes(trait.id)
-  );
-
-  const handleAcquireTrait = useCallback((trait: any) => {
-    if (trait.essenceCost && currentEssence >= trait.essenceCost) {
-      setConfirmDialog({
-        isOpen: true,
-        action: 'acquire',
-        trait: trait,
-      });
+  const getRarityColor = (rarity: string) => {
+    switch (rarity.toLowerCase()) {
+      case 'legendary': return 'error';
+      case 'epic': return 'secondary';
+      case 'rare': return 'primary';
+      default: return 'default';
     }
-  }, [currentEssence]);
+  };
 
-  const handleMakePermanent = useCallback((trait: any) => {
-    if (trait.permanenceCost && currentEssence >= trait.permanenceCost) {
-      setConfirmDialog({
-        isOpen: true,
-        action: 'permanent',
-        trait: trait,
-      });
+  const getStatusChip = (trait: Trait) => {
+    if (permanentTraitIds.includes(trait.id)) {
+      return (
+        <Chip
+          icon={<CheckCircleIcon />}
+          label="Permanent"
+          color="success"
+          size="small"
+          variant="filled"
+        />
+      );
     }
-  }, [currentEssence]);
-
-  const handleConfirmAction = useCallback(() => {
-    if (!confirmDialog.trait) return;
-
-    if (confirmDialog.action === 'acquire') {
-      dispatch(acquireTrait(confirmDialog.trait.id));
-    } else if (confirmDialog.action === 'permanent') {
-      dispatch(makeTraitPermanentThunk(confirmDialog.trait.id));
+    
+    if (equippedTraitIds.includes(trait.id)) {
+      return (
+        <Chip
+          icon={<StarIcon />}
+          label="Equipped"
+          color="primary"
+          size="small"
+          variant="outlined"
+        />
+      );
     }
+    
+    return (
+      <Chip
+        label="Available"
+        color="default"
+        size="small"
+        variant="outlined"
+      />
+    );
+  };
 
-    setConfirmDialog({ isOpen: false, action: null, trait: null });
-  }, [dispatch, confirmDialog]);
-
-  const handleCloseDialog = useCallback(() => {
-    setConfirmDialog({ isOpen: false, action: null, trait: null });
-  }, []);
-
-  const renderTraitCard = useCallback((trait: any, actionType: 'acquire' | 'permanent') => {
-    const cost = actionType === 'acquire' ? trait.essenceCost : trait.permanenceCost;
-    const canAfford = cost ? currentEssence >= cost : false;
+  const renderTraitItem = (trait: Trait) => {
     const isPermanent = permanentTraitIds.includes(trait.id);
+    const canMakePerm = canMakePermanent(trait);
+    const affordability = trait.permanenceCost ? getTraitAffordability(trait, 'permanent') : null;
 
     return (
-      <Grid item xs={12} sm={6} md={4} key={trait.id}>
-        <Card
-          elevation={2}
-          sx={{
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            border: theme => isPermanent ? `2px solid ${theme.palette.warning.main}` : 'none',
-            position: 'relative',
-          }}
-        >
-          {isPermanent && (
-            <Box 
-              sx={{ 
-                position: 'absolute', 
-                top: 8, 
-                right: 8, 
-                zIndex: 1 
-              }}
-            >
-              <Tooltip title="Permanent Trait">
-                <StarIcon color="warning" />
-              </Tooltip>
-            </Box>
-          )}
-          
-          <CardContent sx={{ flexGrow: 1 }}>
-            <Box display="flex" alignItems="center" gap={1} mb={1}>
-              <Typography variant="h6" component="h3" noWrap>
-                {trait.name}
-              </Typography>
-            </Box>
-            
-            <Box display="flex" gap={1} mb={2} flexWrap="wrap">
-              <Chip 
-                label={trait.category} 
-                size="small" 
-                color="primary" 
-                variant="outlined" 
-              />
-              <Chip 
-                label={trait.rarity} 
-                size="small" 
-                color="secondary" 
-                variant="outlined" 
-              />
-            </Box>
-            
-            <Typography variant="body2" color="text.secondary" mb={2}>
-              {trait.description}
+      <ListItem
+        key={trait.id}
+        sx={{
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          mb: 1,
+          bgcolor: 'background.paper'
+        }}
+      >
+        <Box sx={{ width: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              {trait.name}
             </Typography>
-            
-            {trait.effects && typeof trait.effects === 'object' && (
-              <Box mb={2}>
-                <Typography variant="caption" color="primary" display="block" gutterBottom>
-                  Effects:
-                </Typography>
-                {Object.entries(trait.effects).map(([key, value]) => (
-                  <Typography key={key} variant="caption" display="block">
-                    {key}: {typeof value === 'number' && value > 0 ? '+' : ''}{value}
-                  </Typography>
-                ))}
-              </Box>
-            )}
-            
-            {cost && (
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography 
-                  variant="subtitle2" 
-                  color={canAfford ? 'primary' : 'error'}
-                >
-                  Cost: {cost.toLocaleString()} Essence
-                </Typography>
-                {!canAfford && (
-                  <Tooltip title="Insufficient Essence">
-                    <InfoIcon fontSize="small" color="error" />
-                  </Tooltip>
-                )}
-              </Box>
-            )}
-          </CardContent>
+            <Chip
+              label={trait.rarity}
+              color={getRarityColor(trait.rarity)}
+              size="small"
+            />
+            {getStatusChip(trait)}
+          </Box>
           
-          <CardActions>
-            {actionType === 'acquire' ? (
-              <Button
-                size="small"
-                variant="contained"
-                onClick={() => handleAcquireTrait(trait)}
-                disabled={!canAfford || !cost}
-                startIcon={cost ? undefined : <CheckCircleIcon />}
-                fullWidth
-              >
-                {cost ? 'Acquire' : 'Free'}
-              </Button>
-            ) : (
-              <Button
-                size="small"
-                variant="contained"
-                color="warning"
-                onClick={() => handleMakePermanent(trait)}
-                disabled={!canAfford || !cost || isPermanent}
-                startIcon={isPermanent ? <StarIcon /> : <LockIcon />}
-                fullWidth
-              >
-                {isPermanent ? 'Permanent' : 'Make Permanent'}
-              </Button>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {trait.description}
+          </Typography>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="caption" color="text.secondary">
+                Category: {trait.category}
+              </Typography>
+              {trait.source && (
+                <Typography variant="caption" color="text.secondary">
+                  • Source: {trait.source}
+                </Typography>
+              )}
+            </Box>
+            
+            {!isPermanent && trait.permanenceCost && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {affordability && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <EssenceIcon fontSize="small" />
+                    <Typography
+                      variant="body2"
+                      color={affordability.canAfford ? 'success.main' : 'error.main'}
+                    >
+                      {trait.permanenceCost}
+                    </Typography>
+                  </Box>
+                )}
+                <Tooltip
+                  title={
+                    !canMakePerm
+                      ? "Requirements not met or already permanent"
+                      : !affordability?.canAfford
+                      ? `Need ${trait.permanenceCost} Essence (have ${currentEssence})`
+                      : "Make this trait permanently active"
+                  }
+                >
+                  <span>
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      size="small"
+                      disabled={!canMakePerm}
+                      onClick={() => handleMakePermanent(trait)}
+                      startIcon={<StarIcon />}
+                    >
+                      Make Permanent
+                    </Button>
+                  </span>
+                </Tooltip>
+              </Box>
             )}
-          </CardActions>
-        </Card>
-      </Grid>
+          </Box>
+        </Box>
+      </ListItem>
     );
-  }, [currentEssence, permanentTraitIds, handleAcquireTrait, handleMakePermanent]);
+  };
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom>
-        Trait Management
-      </Typography>
-      
-      <Alert severity="info" sx={{ mb: 3 }}>
-        Current Essence: {currentEssence.toLocaleString()}
-      </Alert>
+      <Grid container spacing={3}>
+        {/* Acquired Traits Section */}
+        <Grid item xs={12} md={8}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <Typography variant="h5" component="h2">
+                  Acquired Traits
+                </Typography>
+                <Tooltip title="Traits you have learned and can equip or make permanent">
+                  <IconButton size="small">
+                    <InfoIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
-      {/* Available to Acquire */}
-      {discoveredNotAcquired.length > 0 && (
-        <Box mb={4}>
-          <Typography variant="h6" gutterBottom>
-            Available to Acquire ({discoveredNotAcquired.length})
-          </Typography>
-          <Grid container spacing={2}>
-            {discoveredNotAcquired.map(trait => renderTraitCard(trait, 'acquire'))}
-          </Grid>
-        </Box>
-      )}
+              {acquiredTraits.length === 0 ? (
+                <Alert severity="info">
+                  No traits acquired yet. Discover and acquire traits from NPCs or other sources.
+                </Alert>
+              ) : (
+                <List sx={{ width: '100%' }}>
+                  {acquiredTraits.map(renderTraitItem)}
+                </List>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
 
-      {discoveredNotAcquired.length > 0 && acquiredNotPermanent.length > 0 && (
-        <Divider sx={{ my: 3 }} />
-      )}
+        {/* Permanent Traits Section */}
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <Typography variant="h6" component="h3">
+                  Permanent Traits
+                </Typography>
+                <CheckCircleIcon color="success" fontSize="small" />
+              </Box>
 
-      {/* Available for Permanence */}
-      {acquiredNotPermanent.length > 0 && (
-        <Box mb={4}>
-          <Typography variant="h6" gutterBottom>
-            Make Permanent ({acquiredNotPermanent.length})
-          </Typography>
-          <Grid container spacing={2}>
-            {acquiredNotPermanent.map(trait => renderTraitCard(trait, 'permanent'))}
-          </Grid>
-        </Box>
-      )}
+              {permanentTraits.length === 0 ? (
+                <Alert severity="info">
+                  No permanent traits yet. Make acquired traits permanent with Essence.
+                </Alert>
+              ) : (
+                <List dense>
+                  {permanentTraits.map((trait) => (
+                    <ListItem key={trait.id} sx={{ pl: 0 }}>
+                      <ListItemText
+                        primary={trait.name}
+                        secondary={trait.category}
+                        primaryTypographyProps={{ variant: 'body2' }}
+                        secondaryTypographyProps={{ variant: 'caption' }}
+                      />
+                      <Chip
+                        label={trait.rarity}
+                        color={getRarityColor(trait.rarity)}
+                        size="small"
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
 
-      {/* No actions available */}
-      {discoveredNotAcquired.length === 0 && acquiredNotPermanent.length === 0 && (
-        <Alert severity="info">
-          No traits available for acquisition or permanence at this time.
-          Discover more traits by interacting with NPCs and exploring the world.
-        </Alert>
-      )}
+              <Divider sx={{ my: 2 }} />
 
-      {/* Confirmation Dialog */}
-      <Dialog
-        open={confirmDialog.isOpen}
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {confirmDialog.action === 'acquire' ? 'Acquire Trait' : 'Make Trait Permanent'}
-        </DialogTitle>
-        <DialogContent>
-          {confirmDialog.trait && (
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                {confirmDialog.trait.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                {confirmDialog.trait.description}
-              </Typography>
-              <Typography variant="subtitle1" color="primary" mb={1}>
-                Cost: {(confirmDialog.action === 'acquire' 
-                  ? confirmDialog.trait.essenceCost 
-                  : confirmDialog.trait.permanenceCost
-                )?.toLocaleString()} Essence
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Remaining after action: {(currentEssence - (confirmDialog.action === 'acquire' 
-                  ? confirmDialog.trait.essenceCost 
-                  : confirmDialog.trait.permanenceCost
-                )).toLocaleString()} Essence
-              </Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmAction}
-            variant="contained"
-            color={confirmDialog.action === 'permanent' ? 'warning' : 'primary'}
-          >
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  Current Essence
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                  <EssenceIcon color="primary" />
+                  <Typography variant="h6" color="primary">
+                    {currentEssence.toLocaleString()}
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </Box>
   );
-};
+});
+
+TraitManagement.displayName = 'TraitManagement';
 
 export default TraitManagement;

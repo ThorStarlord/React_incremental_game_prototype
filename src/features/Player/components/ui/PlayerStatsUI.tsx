@@ -1,196 +1,163 @@
-import React from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  LinearProgress,
-  Box,
-  Chip,
-} from '@mui/material';
-import {
-  Favorite as HealthIcon,
-  AutoAwesome as ManaIcon,
-  Security as DefenseIcon,
-  Speed as SpeedIcon,
-} from '@mui/icons-material';
-import type { PlayerStats } from '../../state/PlayerTypes';
+/**
+ * @file PlayerStatsUI.tsx
+ * @description UI component for displaying player statistics with visual progress indicators
+ */
 
-interface PlayerStatsUIProps {
+import React from 'react';
+import { Grid, Paper, Typography, Box } from '@mui/material';
+import { Favorite, Shield, Speed, FlashOn } from '@mui/icons-material';
+import type { PlayerStats } from '../../state/PlayerTypes';
+import { StatDisplay } from './StatDisplay';
+import { ProgressBar } from './ProgressBar';
+
+/**
+ * Props interface for PlayerStatsUI component
+ */
+export interface PlayerStatsUIProps {
+  /** Player statistics data */
   stats: PlayerStats;
-  health: {
-    current: number;
-    max: number;
-    percentage: number;
-  };
-  mana: {
-    current: number;
-    max: number;
-    percentage: number;
-  };
+  /** Show detailed breakdown */
+  showDetails?: boolean;
 }
 
 /**
- * UI component for displaying player statistics
- *
- * Features:
- * - Vital stats with progress bars and color coding
- * - Combat statistics in organized grid layout
- * - Visual indicators for health/mana status
- * - Responsive design with Material-UI components
- * - Semantic color usage for quick status assessment
+ * PlayerStatsUI component for displaying player statistics with visual indicators
  */
-export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(
-  ({ stats, health, mana }) => {
-    const getHealthColor = (percentage: number) => {
-      if (percentage > 75) return 'success';
-      if (percentage > 25) return 'warning';
-      return 'error';
-    };
-
-    const getManaColor = (percentage: number) => {
-      if (percentage > 75) return 'primary';
-      if (percentage > 25) return 'info';
-      return 'warning';
-    };
-
-    return (
-      <Grid container spacing={3}>
-        {/* Vital Stats Card */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Vital Statistics
-              </Typography>
-
-              {/* Health */}
-              <Box sx={{ mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <HealthIcon color="error" sx={{ mr: 1 }} />
-                  <Typography variant="body2">
-                    Health: {health.current} / {health.max} (
-                    {health.percentage.toFixed(1)}%)
-                  </Typography>
-                </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={health.percentage}
-                  color={getHealthColor(health.percentage)}
-                  sx={{ height: 8, borderRadius: 4 }}
-                />
-              </Box>
-
-              {/* Mana */}
-              <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <ManaIcon color="primary" sx={{ mr: 1 }} />
-                  <Typography variant="body2">
-                    Mana: {mana.current} / {mana.max} ({mana.percentage.toFixed(1)}
-                    %)
-                  </Typography>
-                </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={mana.percentage}
-                  color={getManaColor(mana.percentage)}
-                  sx={{ height: 8, borderRadius: 4 }}
-                />
-              </Box>
-            </CardContent>
-          </Card>
+export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
+  stats,
+  showDetails = true
+}) => {
+  return (
+    <Box>
+      {/* Vital Stats with Progress Bars */}
+      <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
+        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Favorite color="error" />
+          Vital Statistics
+        </Typography>
+        
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <ProgressBar
+              current={stats.health}
+              max={stats.maxHealth}
+              label="Health"
+              color="error"
+              height={12}
+              showValues
+              showPercentage
+            />
+          </Grid>
+          
+          <Grid item xs={12} md={6}>
+            <ProgressBar
+              current={stats.mana}
+              max={stats.maxMana}
+              label="Mana"
+              color="primary"
+              height={12}
+              showValues
+              showPercentage
+            />
+          </Grid>
         </Grid>
+      </Paper>
 
-        {/* Combat Stats Card */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Combat Statistics
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Attack
-                    </Typography>
-                    <Chip
-                      label={stats.attack}
-                      color="error"
-                      variant="outlined"
-                      size="small"
-                    />
-                  </Box>
-                </Grid>
-
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Defense
-                    </Typography>
-                    <Chip
-                      label={stats.defense}
-                      color="info"
-                      variant="outlined"
-                      size="small"
-                    />
-                  </Box>
-                </Grid>
-
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Speed
-                    </Typography>
-                    <Chip
-                      label={stats.speed}
-                      color="success"
-                      variant="outlined"
-                      size="small"
-                    />
-                  </Box>
-                </Grid>
-
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Crit Chance
-                    </Typography>
-                    <Chip
-                      label={`${(stats.critChance * 100).toFixed(1)}%`}
-                      color="warning"
-                      variant="outlined"
-                      size="small"
-                    />
-                  </Box>
-                </Grid>
-              </Grid>
-
-              {/* Regeneration Stats */}
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Regeneration
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Health Regen: {stats.healthRegen}/sec
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Mana Regen: {stats.manaRegen}/sec
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Box>
-            </CardContent>
-          </Card>
+      {/* Combat Stats */}
+      <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
+        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Shield color="primary" />
+          Combat Statistics
+        </Typography>
+        
+        <Grid container spacing={2}>
+          <Grid item xs={6} md={3}>
+            <StatDisplay
+              label="Attack"
+              value={stats.attack}
+              color="error"
+            />
+          </Grid>
+          
+          <Grid item xs={6} md={3}>
+            <StatDisplay
+              label="Defense"
+              value={stats.defense}
+              color="primary"
+            />
+          </Grid>
+          
+          <Grid item xs={6} md={3}>
+            <StatDisplay
+              label="Crit Chance"
+              value={stats.critChance * 100}
+              unit="%"
+              color="warning"
+              asPercentage
+            />
+          </Grid>
+          
+          <Grid item xs={6} md={3}>
+            <StatDisplay
+              label="Crit Damage"
+              value={stats.critDamage * 100}
+              unit="%"
+              color="success"
+              asPercentage
+            />
+          </Grid>
         </Grid>
-      </Grid>
-    );
-  }
-);
+      </Paper>
+
+      {/* Regeneration & Speed */}
+      {showDetails && (
+        <Paper elevation={1} sx={{ p: 2 }}>
+          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Speed color="success" />
+            Performance Statistics
+          </Typography>
+          
+          <Grid container spacing={2}>
+            <Grid item xs={6} md={3}>
+              <StatDisplay
+                label="Speed"
+                value={stats.speed}
+                color="success"
+              />
+            </Grid>
+            
+            <Grid item xs={6} md={3}>
+              <StatDisplay
+                label="Health Regen"
+                value={stats.healthRegen}
+                unit="/sec"
+                color="error"
+              />
+            </Grid>
+            
+            <Grid item xs={6} md={3}>
+              <StatDisplay
+                label="Mana Regen"
+                value={stats.manaRegen}
+                unit="/sec"
+                color="primary"
+              />
+            </Grid>
+            
+            <Grid item xs={6} md={3}>
+              <StatDisplay
+                label="Total Power"
+                value={stats.attack + stats.defense + stats.speed}
+                color="warning"
+              />
+            </Grid>
+          </Grid>
+        </Paper>
+      )}
+    </Box>
+  );
+});
 
 PlayerStatsUI.displayName = 'PlayerStatsUI';
+
+export default PlayerStatsUI;

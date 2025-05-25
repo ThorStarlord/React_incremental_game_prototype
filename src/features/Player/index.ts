@@ -14,42 +14,39 @@ export type {
   PlayerStats, 
   Attribute, 
   StatusEffect, 
-  EquipmentItem, 
-  EquipmentState,
   UpdatePlayerPayload,
   ModifyHealthPayload,
-  AllocateAttributePayload,
-  EquipItemPayload
+  AllocateAttributePayload
 } from './state/PlayerTypes';
 
 // Redux State Management
 export { default as playerReducer } from './state/PlayerSlice';
-export { 
-  playerSlice, 
+export {  
   updatePlayer, 
   setName, 
   resetPlayer, 
   modifyHealth, 
-  allocateAttribute, 
-  equipItem 
+  allocateAttribute
 } from './state/PlayerSlice';
 
 // Selectors
 export { 
   selectPlayer, 
   selectPlayerStats, 
-  selectPlayerLevel, 
   selectPlayerHealth, 
   selectPlayerMana 
 } from './state/PlayerSelectors';
+
+// Thunks
+export * from './state/PlayerThunks';
 
 // Container Components (primary exports)
 export { PlayerStatsContainer } from './components/containers/PlayerStatsContainer';
 export { PlayerTraitsContainer } from './components/containers/PlayerTraitsContainer';
 
 // UI Components (for direct use if needed)
-export { PlayerStatsUI as PlayerStatsUI } from './components/ui/PlayerStatsUI';
-export { PlayerTraitsUI as PlayerTraitsUI } from './components/ui/PlayerTraitsUI';
+export { PlayerStatsUI } from './components/ui/PlayerStatsUI';
+export { PlayerTraitsUI } from './components/ui/PlayerTraitsUI';
 
 // Utilities
 export { 

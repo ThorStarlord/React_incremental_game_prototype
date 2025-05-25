@@ -1,37 +1,33 @@
+/**
+ * @file PlayerStatsContainer.tsx
+ * @description Container component connecting PlayerStatsUI to Redux state
+ */
+
 import React from 'react';
 import { useAppSelector } from '../../../../app/hooks';
-import { 
-  selectPlayerStats, 
-  selectPlayerHealth, 
-  selectPlayerMana 
-} from '../../state/PlayerSelectors';
+import { selectPlayerStats } from '../../state/PlayerSelectors';
 import { PlayerStatsUI } from '../ui/PlayerStatsUI';
 
 /**
- * Container component for player statistics management
- * 
- * Connects PlayerStatsUI to Redux state and provides:
- * - Current player statistics from Redux store
- * - Calculated vital stats with percentages
- * - Loading state management
- * - Additional derived stats
- * 
- * This container follows the Feature-Sliced Design pattern by:
- * - Using typed Redux hooks (useAppSelector)
- * - Importing from feature-local selectors
- * - Separating concerns between data fetching and UI rendering
- * - Providing memoized data to prevent unnecessary re-renders
+ * Props interface for PlayerStatsContainer
  */
-export const PlayerStatsContainer: React.FC = React.memo(() => {
-  const stats = useAppSelector(selectPlayerStats);
-  const health = useAppSelector(selectPlayerHealth);
-  const mana = useAppSelector(selectPlayerMana);
+export interface PlayerStatsContainerProps {
+  /** Show detailed stat breakdown */
+  showDetails?: boolean;
+}
+
+/**
+ * Container component that connects PlayerStatsUI to Redux state
+ */
+export const PlayerStatsContainer: React.FC<PlayerStatsContainerProps> = React.memo(({
+  showDetails = true
+}) => {
+  const playerStats = useAppSelector(selectPlayerStats);
 
   return (
     <PlayerStatsUI 
-      stats={stats}
-      health={health}
-      mana={mana}
+      stats={playerStats}
+      showDetails={showDetails}
     />
   );
 });

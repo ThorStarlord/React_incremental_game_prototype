@@ -7,6 +7,7 @@
 export { default as NPCPanel } from './components/containers/NPCPanel';
 
 // State exports
-export * from './state/NPCTypes';
-export { npcActions } from './state/NPCSlice';
-export { default as npcReducer } from './state/NPCSlice';
+export * from './state/NpcSlice';
+export * from './state/NpcSelectors';
+export * from './state/NpcTypes';
+export { default as npcReducer } from './state/NpcSlice';

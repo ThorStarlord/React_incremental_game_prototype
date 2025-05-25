@@ -8,15 +8,19 @@
  * Using string literal types for type safety and autocomplete
  */
 export type TabId = 
-  | 'character'    // Character management (stats, attributes, equipment)
-  | 'traits'       // Trait system (slots, management, codex)
-  | 'npcs'         // NPC interactions and relationships
-  | 'quests'       // Quest log and management
-  | 'copies'       // Copy management (future implementation)
-  | 'inventory'    // Item and equipment management (future)
-  | 'crafting'     // Crafting system (future)
-  | 'settings'     // Game settings and configuration
-  | 'save-load';   // Save/load functionality
+  | 'dashboard'     // Dashboard overview and analytics
+  | 'character'     // Character management (stats, attributes, equipment)
+  | 'traits'        // Trait system (slots, management, codex)
+  | 'skills'        // Skills management and progression
+  | 'npcs'          // NPC interactions and relationships
+  | 'quests'        // Quest log and management
+  | 'copies'        // Copy management (future implementation)
+  | 'essence'       // Essence management (future)
+  | 'inventory'     // Item and equipment management (future)
+  | 'settings'      // Game settings and configuration
+  | 'saves'         // Save management interface
+  | 'crafting'      // Crafting system (recipes, materials, management)
+  | 'save-load';    // Save and load game interface
 
 /**
  * Navigation item configuration

@@ -16,7 +16,8 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import Panel from '../../../../shared/components/layout/Panel';
-import { selectEssenceAmount, spendEssence } from '../../../Essence/state/EssenceSlice';
+import { selectEssenceAmount } from '../../../Essence/state/EssenceSelectors';
+import { spendEssence } from '../../../Essence/state/EssenceSlice';
 import { acquireTrait } from '../../state/TraitsSlice';
 import { 
   selectAvailableTraitObjects, 

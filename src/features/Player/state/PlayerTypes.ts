@@ -1,4 +1,11 @@
 /**
+ * Player System Type Definitions
+ * 
+ * This file contains all TypeScript type definitions for the Player feature,
+ * following Feature-Sliced Design principles with comprehensive type safety.
+ */
+
+/**
  * Represents a player's stats in the game
  */
 export interface PlayerStats {
@@ -26,7 +33,7 @@ export interface StatusEffect {
   duration: number;
   magnitude?: number;
   source?: string;
-  timestampApplied: number;
+  timestamp: number;
   effects: Partial<PlayerStats>;
 }
 
@@ -49,49 +56,45 @@ export interface Attribute {
 }
 
 /**
- * Represents an item that can be equipped
- */
-export interface EquipmentItem {
-  id: string;
-  name: string;
-  type: string; // e.g., 'weapon', 'armor', 'accessory'
-  slot: string; // e.g., 'head', 'chest', 'mainHand'
-  stats?: Partial<PlayerStats>; // Optional stats provided by the item
-  rarity?: string;
-}
-
-/**
- * Represents the player's equipped items
- */
-export interface EquipmentState {
-  head?: EquipmentItem | null;
-  chest?: EquipmentItem | null;
-  legs?: EquipmentItem | null;
-  feet?: EquipmentItem | null;
-  mainHand?: EquipmentItem | null;
-  offHand?: EquipmentItem | null;
-  accessory1?: EquipmentItem | null;
-  accessory2?: EquipmentItem | null;
-  // Add other slots as needed
-  [key: string]: EquipmentItem | null | undefined; // Allow dynamic access
-}
-
-/**
  * Player's complete state
  */
 export interface PlayerState {
+  // Basic Identity
   name: string;
   level: number;
   experience: number;
+  
+  // Core Stats
   stats: PlayerStats;
+  
+  // Character Attributes
   attributes: Record<string, Attribute>;
   attributePoints: number;
+  
+  // Skills and Progression
+  skills: Skill[];
   skillPoints: number;
+  
+  // Temporary Effects
   statusEffects: StatusEffect[];
-  equipment: EquipmentState;
+  
+  // Trait System Integration
+  acquiredTraits: string[];
+  permanentTraits: string[];
+  traitSlots: number;
+  totalEssenceEarned: number;
+  
+  // Resources
   gold: number;
+  
+  // Game State
+  lastRestLocation: string;
+  lastRestTime: number;
+  creationDate: string;
+  lastSaved: string;
   totalPlayTime: number;
   isAlive: boolean;
+  activeCharacterId: string;
 }
 
 /**
@@ -161,7 +164,6 @@ export interface StatUpdatePayload {
   value: number;
 }
 
-// New payload types for consistent typing
 export interface UpdateAttributesPayload {
   [attributeId: string]: number;
 }
@@ -174,13 +176,31 @@ export interface UpdateTotalPlayTimePayload {
   amount: number;
 }
 
+// Legacy payload types for backward compatibility
+export interface UpdatePlayerPayload {
+  updates: Partial<PlayerState>;
+}
+
+export interface ModifyHealthPayload {
+  amount: number;
+  type?: 'damage' | 'heal';
+}
+
+export interface AllocateAttributePayload {
+  attributeName: string;
+  points: number;
+}
+
 /**
  * Initial state for the player
  */
 export const PlayerInitialState: PlayerState = {
+  // Basic Identity
   name: "Adventurer",
   level: 1,
   experience: 0,
+  
+  // Core Stats
   stats: {
     health: 100,
     maxHealth: 100,
@@ -194,37 +214,40 @@ export const PlayerInitialState: PlayerState = {
     critChance: 0.05,
     critDamage: 1.5
   },
+  
+  // Character Attributes
   attributes: {
     strength: { name: "Strength", value: 5, baseValue: 5 },
     dexterity: { name: "Dexterity", value: 5, baseValue: 5 },
     intelligence: { name: "Intelligence", value: 5, baseValue: 5 },
     wisdom: { name: "Wisdom", value: 5, baseValue: 5 },
-    constitution: { name: "Constitution", value: 5, baseValue: 5 }
+    constitution: { name: "Constitution", value: 5, baseValue: 5 },
+    charisma: { name: "Charisma", value: 5, baseValue: 5 }
   },
   attributePoints: 0,
-  skillPoints: 0,
+  
+  // Skills and Progression
   skills: [],
+  skillPoints: 0,
+  
+  // Temporary Effects
   statusEffects: [],
+  
+  // Trait System Integration
   acquiredTraits: [],
   permanentTraits: [],
   traitSlots: 1,
   totalEssenceEarned: 0,
+  
+  // Resources
   gold: 50,
+  
+  // Game State
   lastRestLocation: "village",
   lastRestTime: Date.now(),
   creationDate: new Date().toISOString(),
   lastSaved: new Date().toISOString(),
   totalPlayTime: 0,
   isAlive: true,
-  activeCharacterId: "player",
-  equipment: { // Add initial empty equipment
-    head: null,
-    chest: null,
-    legs: null,
-    feet: null,
-    mainHand: null,
-    offHand: null,
-    accessory1: null,
-    accessory2: null,
-  },
+  activeCharacterId: "player"
 };
