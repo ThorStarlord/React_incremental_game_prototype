@@ -4,8 +4,18 @@
  */
 
 import React from 'react';
-import { Grid, Paper, Typography, Box } from '@mui/material';
-import { Favorite, Shield, Speed, FlashOn } from '@mui/icons-material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+} from '@mui/material';
+import {
+  Favorite as HeartIcon,
+  Shield as DefenseIcon,
+  Speed as SpeedIcon,
+} from '@mui/icons-material';
 import type { PlayerStats } from '../../state/PlayerTypes';
 import { StatDisplay } from './StatDisplay';
 import { ProgressBar } from './ProgressBar';
@@ -25,100 +35,85 @@ export interface PlayerStatsUIProps {
  */
 export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
   stats,
-  showDetails = true
+  showDetails = true,
 }) => {
+  const healthPercentage = Math.round((stats.health / stats.maxHealth) * 100);
+  const manaPercentage = Math.round((stats.mana / stats.maxMana) * 100);
+
   return (
     <Box>
-      {/* Vital Stats with Progress Bars */}
-      <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Favorite color="error" />
-          Vital Statistics
-        </Typography>
-        
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <ProgressBar
-              current={stats.health}
-              max={stats.maxHealth}
-              label="Health"
-              color="error"
-              height={12}
-              showValues
-              showPercentage
-            />
-          </Grid>
-          
-          <Grid item xs={12} md={6}>
-            <ProgressBar
-              current={stats.mana}
-              max={stats.maxMana}
-              label="Mana"
-              color="primary"
-              height={12}
-              showValues
-              showPercentage
-            />
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Combat Stats */}
-      <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Shield color="primary" />
-          Combat Statistics
-        </Typography>
-        
-        <Grid container spacing={2}>
-          <Grid item xs={6} md={3}>
-            <StatDisplay
-              label="Attack"
-              value={stats.attack}
-              color="error"
-            />
-          </Grid>
-          
-          <Grid item xs={6} md={3}>
-            <StatDisplay
-              label="Defense"
-              value={stats.defense}
-              color="primary"
-            />
-          </Grid>
-          
-          <Grid item xs={6} md={3}>
-            <StatDisplay
-              label="Crit Chance"
-              value={stats.critChance * 100}
-              unit="%"
-              color="warning"
-              asPercentage
-            />
-          </Grid>
-          
-          <Grid item xs={6} md={3}>
-            <StatDisplay
-              label="Crit Damage"
-              value={stats.critDamage * 100}
-              unit="%"
-              color="success"
-              asPercentage
-            />
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Regeneration & Speed */}
-      {showDetails && (
-        <Paper elevation={1} sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Speed color="success" />
-            Performance Statistics
-          </Typography>
+      {/* Vital Stats */}
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" mb={2}>
+            <HeartIcon color="error" sx={{ mr: 1 }} />
+            <Typography variant="h6">Vital Stats</Typography>
+          </Box>
           
           <Grid container spacing={2}>
-            <Grid item xs={6} md={3}>
+            <Grid item xs={12} sm={6}>
+              <Box mb={2}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Health
+                </Typography>
+                <ProgressBar
+                  value={stats.health}
+                  max={stats.maxHealth}
+                  color="error"
+                  height={8}
+                  showValue
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {healthPercentage}%
+                </Typography>
+              </Box>
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <Box mb={2}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Mana
+                </Typography>
+                <ProgressBar
+                  value={stats.mana}
+                  max={stats.maxMana}
+                  color="primary"
+                  height={8}
+                  showValue
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {manaPercentage}%
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Combat Stats */}
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" mb={2}>
+            <DefenseIcon color="primary" sx={{ mr: 1 }} />
+            <Typography variant="h6">Combat Stats</Typography>
+          </Box>
+          
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={4}>
+              <StatDisplay
+                label="Attack"
+                value={stats.attack}
+                color="error"
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <StatDisplay
+                label="Defense"
+                value={stats.defense}
+                color="primary"
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
               <StatDisplay
                 label="Speed"
                 value={stats.speed}
@@ -126,33 +121,59 @@ export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
               />
             </Grid>
             
-            <Grid item xs={6} md={3}>
-              <StatDisplay
-                label="Health Regen"
-                value={stats.healthRegen}
-                unit="/sec"
-                color="error"
-              />
-            </Grid>
-            
-            <Grid item xs={6} md={3}>
-              <StatDisplay
-                label="Mana Regen"
-                value={stats.manaRegen}
-                unit="/sec"
-                color="primary"
-              />
-            </Grid>
-            
-            <Grid item xs={6} md={3}>
-              <StatDisplay
-                label="Total Power"
-                value={stats.attack + stats.defense + stats.speed}
-                color="warning"
-              />
-            </Grid>
+            {showDetails && (
+              <>
+                <Grid item xs={12} sm={6}>
+                  <StatDisplay
+                    label="Critical Hit Chance"
+                    value={stats.critChance * 100}
+                    unit="%"
+                    color="warning"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <StatDisplay
+                    label="Critical Hit Damage"
+                    value={stats.critDamage}
+                    unit="x"
+                    color="warning"
+                  />
+                </Grid>
+              </>
+            )}
           </Grid>
-        </Paper>
+        </CardContent>
+      </Card>
+
+      {/* Performance Stats */}
+      {showDetails && (
+        <Card>
+          <CardContent>
+            <Box display="flex" alignItems="center" mb={2}>
+              <SpeedIcon color="success" sx={{ mr: 1 }} />
+              <Typography variant="h6">Performance Stats</Typography>
+            </Box>
+            
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <StatDisplay
+                  label="Health Regeneration"
+                  value={stats.healthRegen}
+                  unit="/sec"
+                  color="success"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <StatDisplay
+                  label="Mana Regeneration"
+                  value={stats.manaRegen}
+                  unit="/sec"
+                  color="info"
+                />
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
       )}
     </Box>
   );

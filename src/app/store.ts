@@ -1,19 +1,16 @@
-import { configureStore, ThunkAction, Action, combineReducers, PayloadAction } from '@reduxjs/toolkit'; // Import combineReducers and PayloadAction
-import { setupListeners } from '@reduxjs/toolkit/query';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
-// Import slices with correct file paths
+// Import default exports (reducers) from each slice
+import gameLoopReducer from '../features/GameLoop/state/GameLoopSlice';
 import playerReducer from '../features/Player/state/PlayerSlice';
 import traitsReducer from '../features/Traits/state/TraitsSlice';
 import essenceReducer from '../features/Essence/state/EssenceSlice';
-import metaReducer from '../features/Meta/state/MetaSlice';
-// Import the settings reducer
 import settingsReducer from '../features/Settings/state/SettingsSlice';
-// Import the game loop reducer
-import gameLoopReducer from '../features/GameLoop/state/GameLoopSlice';
-// Import the NPCs reducer
-import { npcReducer } from '../features/Npcs';
+import metaReducer from '../features/Meta/state/MetaSlice';
+import npcsReducer from '../features/NPCs/state/NPCSlice';
 
-// Combine the slice reducers into a single reducer function
+// Combine all feature reducers
 const combinedReducer = combineReducers({
   gameLoop: gameLoopReducer,
   player: playerReducer,
@@ -21,55 +18,61 @@ const combinedReducer = combineReducers({
   essence: essenceReducer,
   settings: settingsReducer,
   meta: metaReducer,
-  npcs: npcReducer, // Add the npcs reducer
-  // Add other reducers here
+  npcs: npcsReducer,
 });
 
-// Define the action type for replacing the state
-const REPLACE_STATE = 'root/REPLACE_STATE';
+// Root state type from combined reducers
+export type RootState = ReturnType<typeof combinedReducer>;
 
-// Define the action creator for replacing the state
-// The payload will be the entire new RootState
-export const replaceState = (newState: RootState): PayloadAction<RootState> => ({
-  type: REPLACE_STATE,
-  payload: newState,
-});
+// Special action for replacing entire state during save/load operations
+interface ReplaceStateAction {
+  type: 'meta/replaceState';
+  payload: RootState;
+}
 
-// Create a root reducer that handles the REPLACE_STATE action
+/**
+ * Root reducer that handles the combined reducers and special actions
+ *
+ * Handles the special 'meta/replaceState' action for save/load operations
+ * by completely replacing the current state with the provided payload.
+ * All other actions are delegated to the combined reducer.
+ */
 const rootReducer = (state: RootState | undefined, action: PayloadAction<any>): RootState => {
-  if (action.type === REPLACE_STATE) {
-    // If the action is REPLACE_STATE, return the payload as the new state
-    // Ensure the payload structure matches RootState
-    return action.payload as RootState;
+  // Handle the special replaceState action for save/load operations
+  if (action.type === 'meta/replaceState') {
+    const replaceAction = action as ReplaceStateAction;
+    return replaceAction.payload;
   }
+
   // Otherwise, delegate to the combined reducer
   return combinedReducer(state, action);
 };
 
-// Configure the Redux store using the rootReducer
+/**
+ * Configure the Redux store with proper middleware and dev tools
+ */
 export const store = configureStore({
-  reducer: rootReducer, // Use the rootReducer wrapper
-  // Add middleware and other store enhancers here if needed
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore certain action types that might include non-serializable data
-        ignoredActions: ['persist/PERSIST', REPLACE_STATE], // Ignore REPLACE_STATE for serializable check if needed
+        // Ignore the replaceState action as it contains the entire state tree
+        ignoredActions: ['meta/replaceState'],
+        // Allow functions in state for thunks and selectors
+        ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
       },
     }),
+  devTools: process.env.NODE_ENV !== 'production',
 });
 
-// Enable refetchOnFocus and other optional features
-setupListeners(store.dispatch);
-
-// Infer the RootState and AppDispatch types from the store
-export type RootState = ReturnType<typeof combinedReducer>; // Infer RootState from the combined reducer
+// Export store types for use in components
 export type AppDispatch = typeof store.dispatch;
+export type AppStore = typeof store;
 
-// Useful type for thunks
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
->;
+// Export the replaceState action creator for save/load operations
+export const replaceState = (newState: RootState): ReplaceStateAction => ({
+  type: 'meta/replaceState',
+  payload: newState,
+});
+
+export default store;

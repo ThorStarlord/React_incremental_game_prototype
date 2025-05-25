@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { Box, Alert, AlertTitle, CircularProgress } from '@mui/material';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectPlayerStats } from '../../state/PlayerSelectors';
 import { PlayerStatsUI } from '../ui/PlayerStatsUI';
@@ -14,21 +15,57 @@ import { PlayerStatsUI } from '../ui/PlayerStatsUI';
 export interface PlayerStatsContainerProps {
   /** Show detailed stat breakdown */
   showDetails?: boolean;
+  className?: string;
 }
 
 /**
  * Container component that connects PlayerStatsUI to Redux state
+ * Handles state subscription and provides computed player statistics
  */
 export const PlayerStatsContainer: React.FC<PlayerStatsContainerProps> = React.memo(({
-  showDetails = true
+  showDetails = true,
+  className,
 }) => {
-  const playerStats = useAppSelector(selectPlayerStats);
+  const stats = useAppSelector(selectPlayerStats);
+  const isLoading = false; // Replace with actual loading state
+  const error = null; // Replace with actual error state
+
+  if (error) {
+    return (
+      <Box className={className} role="alert">
+        <Alert severity="error">
+          <AlertTitle>Player Stats Error</AlertTitle>
+          {error}
+        </Alert>
+      </Box>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Box
+        className={className}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 200,
+        }}
+        role="status"
+        aria-label="Loading player stats"
+      >
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
 
   return (
-    <PlayerStatsUI 
-      stats={playerStats}
-      showDetails={showDetails}
-    />
+    <Box className={className}>
+      <PlayerStatsUI
+        stats={stats}
+        showDetails={showDetails}
+      />
+    </Box>
   );
 });
 

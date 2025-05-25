@@ -1,246 +1,248 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
+import type {
   PlayerState,
-  PlayerInitialState,
+  PlayerStats,
+  Attribute,
   StatusEffect,
-  SetNamePayload,
-  ResetPlayerPayload,
-  RestPayload,
-  HealthModificationPayload,
-  EnergyModificationPayload,
-  ActiveCharacterPayload,
-  AttributeUpdatePayload,
-  AttributeAllocationPayload,
-  SkillUpdatePayload,
-  SkillIdPayload,
-  SkillUpgradePayload,
-  TraitPayload,
-  StatusEffectIdPayload,
-  StatUpdatePayload,
-  UpdateAttributesPayload,
-  UpdateStatsPayload,
-  UpdateTotalPlayTimePayload
+  EquipmentItem,
+  UpdatePlayerPayload,
+  ModifyHealthPayload,
+  AllocateAttributePayload,
+  EquipItemPayload
 } from './PlayerTypes';
 
-// Use the initial state from the types file
-const initialState: PlayerState = PlayerInitialState;
+// Initial player stats following specification defaults
+const initialStats: PlayerStats = {
+  health: 100,
+  maxHealth: 100,
+  mana: 50,
+  maxMana: 50,
+  attack: 10,
+  defense: 5,
+  speed: 10,
+  healthRegen: 1,
+  manaRegen: 2,
+  critChance: 0.05, // 5%
+  critDamage: 1.5   // 150%
+};
 
-// Helper functions
-function calculateSkillLevel(experience: number): number {
-  return Math.floor(Math.sqrt(experience / 100)) + 1;
-}
+// Initial attributes with base RPG stats
+const initialAttributes: Record<string, Attribute> = {
+  strength: { name: 'Strength', value: 10, baseValue: 10 },
+  dexterity: { name: 'Dexterity', value: 10, baseValue: 10 },
+  intelligence: { name: 'Intelligence', value: 10, baseValue: 10 },
+  constitution: { name: 'Constitution', value: 10, baseValue: 10 },
+  wisdom: { name: 'Wisdom', value: 10, baseValue: 10 },
+  charisma: { name: 'Charisma', value: 10, baseValue: 10 }
+};
 
-// Create slice
+// Initial player state
+const initialState: PlayerState = {
+  name: 'Player',
+  stats: initialStats,
+  attributes: initialAttributes,
+  attributePoints: 0,
+  skillPoints: 0,
+  statusEffects: [],
+  equipment: {
+    head: null,
+    chest: null,
+    legs: null,
+    feet: null,
+    mainHand: null,
+    offHand: null,
+    accessory1: null,
+    accessory2: null
+  },
+  gold: 0,
+  totalPlayTime: 0,
+  isAlive: true
+};
+
 const playerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {
-    // Core player actions
-    updatePlayer: (state, action: PayloadAction<Partial<PlayerState>>) => {
-      return { ...state, ...action.payload };
+    // Update player with partial state
+    updatePlayer: (state, action: PayloadAction<UpdatePlayerPayload>) => {
+      Object.assign(state, action.payload.updates);
     },
-    
-    setName: (state, action: PayloadAction<SetNamePayload>) => {
-      if (action.payload.name.trim() !== '') {
-        state.name = action.payload.name;
-      }
+
+    // Set player name
+    setName: (state, action: PayloadAction<string>) => {
+      state.name = action.payload;
     },
-    
-    resetPlayer: (state, action: PayloadAction<ResetPlayerPayload>) => {
-      const keepName = action.payload?.keepName === true;
-      const currentName = keepName ? state.name : '';
-      const creationDate = state.creationDate;
-      
-      // Reset state to initial values
-      Object.assign(state, initialState);
-      
-      // Preserve name and creation date if needed
-      if (keepName) {
-        state.name = currentName;
-      }
-      state.creationDate = creationDate || new Date().toISOString();
-    },
-    
-    rest: (state, action: PayloadAction<RestPayload>) => {
-      const { duration, location } = action.payload;
-      
-      // Calculate recovery amounts
-      const healthRecovery = Math.min(
-        state.stats.maxHealth - state.stats.health,
-        Math.floor((state.stats.healthRegen || 1) * duration)
-      );
-      
-      const manaRecovery = Math.min(
-        state.stats.maxMana - state.stats.mana,
-        Math.floor((state.stats.manaRegen || 1) * duration)
-      );
-      
-      // Apply recovery
-      state.stats.health += healthRecovery;
-      state.stats.mana += manaRecovery;
-      state.lastRestLocation = location || state.lastRestLocation;
-      state.lastRestTime = Date.now();
-    },
-    
-    modifyHealth: (state, action: PayloadAction<HealthModificationPayload>) => {
-      const { amount } = action.payload;
-      state.stats.health = Math.max(0, Math.min(state.stats.maxHealth, state.stats.health + amount));
-    },
-    
-    modifyEnergy: (state, action: PayloadAction<EnergyModificationPayload>) => {
-      const { amount } = action.payload;
-      state.stats.mana = Math.max(0, Math.min(state.stats.maxMana, state.stats.mana + amount));
-    },
-    
-    setActiveCharacter: (state, action: PayloadAction<ActiveCharacterPayload>) => {
-      state.activeCharacterId = action.payload.characterId;
-    },
-    
-    updateTotalPlayTime: (state, action: PayloadAction<UpdateTotalPlayTimePayload>) => {
-      if (action.payload.amount > 0) {
-        state.totalPlayTime += action.payload.amount;
-      }
-    },
-    
-    // Attribute actions
-    updateAttribute: (state, action: PayloadAction<AttributeUpdatePayload>) => {
-      const { attributeId, value } = action.payload;
-      
-      if (state.attributes[attributeId]) {
-        state.attributes[attributeId].value = value;
-      }
-    },
-    
-    updateAttributes: (state, action: PayloadAction<UpdateAttributesPayload>) => {
-      Object.entries(action.payload).forEach(([attributeId, value]) => {
-        if (state.attributes[attributeId]) {
-          state.attributes[attributeId].value = value;
+
+    // Reset player to initial state
+    resetPlayer: () => initialState,
+
+    // Modify health (damage or healing)
+    modifyHealth: (state, action: PayloadAction<ModifyHealthPayload>) => {
+      const { amount, type } = action.payload;
+      if (type === 'damage') {
+        state.stats.health = Math.max(0, state.stats.health - amount);
+        if (state.stats.health === 0) {
+          state.isAlive = false;
         }
-      });
+      } else if (type === 'heal') {
+        state.stats.health = Math.min(state.stats.maxHealth, state.stats.health + amount);
+      }
     },
-    
-    allocateAttribute: (state, action: PayloadAction<AttributeAllocationPayload>) => {
-      const { attributeId, amount } = action.payload;
-      
-      // Only proceed if there are enough attribute points
-      if (state.attributePoints >= amount && amount > 0 && state.attributes[attributeId]) {
-        // Decrease available points
-        state.attributePoints -= amount;
+
+    // Modify mana
+    modifyMana: (state, action: PayloadAction<{ amount: number; type: 'spend' | 'restore' }>) => {
+      const { amount, type } = action.payload;
+      if (type === 'spend') {
+        state.stats.mana = Math.max(0, state.stats.mana - amount);
+      } else if (type === 'restore') {
+        state.stats.mana = Math.min(state.stats.maxMana, state.stats.mana + amount);
+      }
+    },
+
+    // Allocate attribute points
+    allocateAttribute: (state, action: PayloadAction<AllocateAttributePayload>) => {
+      const { attributeName, points } = action.payload;
+      if (state.attributePoints >= points && state.attributes[attributeName]) {
+        state.attributePoints -= points;
+        state.attributes[attributeName].baseValue += points;
+        state.attributes[attributeName].value += points;
         
-        // Increase the attribute
-        state.attributes[attributeId].baseValue += amount;
-        state.attributes[attributeId].value += amount;
+        // Update derived stats based on attributes
+        playerSlice.caseReducers.recalculateStats(state);
       }
     },
-    
-    // Skill actions
-    updateSkill: (state, action: PayloadAction<SkillUpdatePayload>) => {
-      const { skillId, experience } = action.payload;
-      
-      if (experience <= 0) return;
-      
-      const skillIndex = state.skills.findIndex(skill => skill.id === skillId);
-      
-      if (skillIndex >= 0) {
-        // Update existing skill
-        const newExperience = state.skills[skillIndex].experience + experience;
-        state.skills[skillIndex].experience = newExperience;
-        state.skills[skillIndex].level = calculateSkillLevel(newExperience);
-      } else {
-        // Add new skill
-        state.skills.push({
-          id: skillId,
-          level: calculateSkillLevel(experience),
-          experience
-        });
-      }
+
+    // Update skill points
+    updateSkillPoints: (state, action: PayloadAction<number>) => {
+      state.skillPoints = Math.max(0, action.payload);
     },
-    
-    learnSkill: (state, action: PayloadAction<SkillIdPayload>) => {
-      const { skillId } = action.payload;
+
+    // Equip item
+    equipItem: (state, action: PayloadAction<EquipItemPayload>) => {
+      const { slot, item } = action.payload;
+      state.equipment[slot] = item;
       
-      // Check if skill already exists
-      if (state.skills.some(skill => skill.id === skillId)) return;
-      
-      // Create a new skill
-      state.skills.push({
-        id: skillId,
-        level: 1,
-        experience: 0
-      });
+      // Recalculate stats with new equipment
+      playerSlice.caseReducers.recalculateStats(state);
     },
-    
-    upgradeSkill: (state, action: PayloadAction<SkillUpgradePayload>) => {
-      const { skillId, level } = action.payload;
+
+    // Unequip item
+    unequipItem: (state, action: PayloadAction<string>) => {
+      const slot = action.payload;
+      state.equipment[slot] = null;
       
-      const skillIndex = state.skills.findIndex(skill => skill.id === skillId);
-      
-      if (skillIndex >= 0 && level > state.skills[skillIndex].level) {
-        state.skills[skillIndex].level = level;
-      }
+      // Recalculate stats without the item
+      playerSlice.caseReducers.recalculateStats(state);
     },
-    
-    // Status effects
+
+    // Add status effect
     addStatusEffect: (state, action: PayloadAction<StatusEffect>) => {
-      const effect = action.payload;
+      // Remove existing effect with same ID if present
+      state.statusEffects = state.statusEffects.filter(
+        effect => effect.id !== action.payload.id
+      );
+      state.statusEffects.push(action.payload);
       
-      // Remove any existing effect with same id
-      state.statusEffects = state.statusEffects.filter(e => e.id !== effect.id);
-      
-      // Add the new effect
-      state.statusEffects.push({
-        ...effect,
-        timestamp: effect.timestamp || Date.now()
-      });
+      // Recalculate stats with new effect
+      playerSlice.caseReducers.recalculateStats(state);
     },
-    
-    removeStatusEffect: (state, action: PayloadAction<StatusEffectIdPayload>) => {
-      const { effectId } = action.payload;
+
+    // Remove status effect
+    removeStatusEffect: (state, action: PayloadAction<string>) => {
+      state.statusEffects = state.statusEffects.filter(
+        effect => effect.id !== action.payload
+      );
       
-      // Remove effect
-      state.statusEffects = state.statusEffects.filter(e => e.id !== effectId);
+      // Recalculate stats without the effect
+      playerSlice.caseReducers.recalculateStats(state);
     },
-    
-    // Stat updates
-    updateStat: (state, action: PayloadAction<StatUpdatePayload>) => {
-      const { statId, value } = action.payload;
-      
-      if (statId in state.stats) {
-        state.stats[statId] = value;
+
+    // Update total play time
+    updatePlayTime: (state, action: PayloadAction<number>) => {
+      state.totalPlayTime = action.payload;
+    },
+
+    // Add gold
+    addGold: (state, action: PayloadAction<number>) => {
+      state.gold = Math.max(0, state.gold + action.payload);
+    },
+
+    // Spend gold
+    spendGold: (state, action: PayloadAction<number>) => {
+      if (state.gold >= action.payload) {
+        state.gold -= action.payload;
       }
     },
-    
-    updateStats: (state, action: PayloadAction<UpdateStatsPayload>) => {
-      Object.entries(action.payload).forEach(([statId, value]) => {
-        if (statId in state.stats) {
-          state.stats[statId] = value;
+
+    // Recalculate all derived stats
+    recalculateStats: (state) => {
+      // Start with base stats influenced by attributes
+      const str = state.attributes.strength?.value || 10;
+      const dex = state.attributes.dexterity?.value || 10;
+      const int = state.attributes.intelligence?.value || 10;
+      const con = state.attributes.constitution?.value || 10;
+      const wis = state.attributes.wisdom?.value || 10;
+
+      // Calculate base stats from attributes
+      state.stats.maxHealth = 100 + (con - 10) * 10;
+      state.stats.maxMana = 50 + (int - 10) * 5 + (wis - 10) * 3;
+      state.stats.attack = 10 + Math.floor((str - 10) * 1.5);
+      state.stats.defense = 5 + Math.floor((con - 10) * 1.2);
+      state.stats.speed = 10 + Math.floor((dex - 10) * 1.3);
+      state.stats.healthRegen = 1 + Math.floor((con - 10) * 0.2);
+      state.stats.manaRegen = 2 + Math.floor((wis - 10) * 0.3);
+      state.stats.critChance = Math.min(0.5, 0.05 + (dex - 10) * 0.005);
+
+      // Apply equipment bonuses
+      Object.values(state.equipment).forEach(item => {
+        if (item?.stats) {
+          Object.entries(item.stats).forEach(([stat, value]) => {
+            if (typeof value === 'number' && stat in state.stats) {
+              (state.stats as any)[stat] += value;
+            }
+          });
         }
       });
+
+      // Apply status effect bonuses
+      state.statusEffects.forEach(effect => {
+        Object.entries(effect.effects).forEach(([stat, value]) => {
+          if (typeof value === 'number' && stat in state.stats) {
+            (state.stats as any)[stat] += value;
+          }
+        });
+      });
+
+      // Ensure health and mana don't exceed new maximums
+      state.stats.health = Math.min(state.stats.health, state.stats.maxHealth);
+      state.stats.mana = Math.min(state.stats.mana, state.stats.maxMana);
+
+      // Ensure stats don't go below minimums
+      state.stats.health = Math.max(0, state.stats.health);
+      state.stats.mana = Math.max(0, state.stats.mana);
+      state.stats.attack = Math.max(1, state.stats.attack);
+      state.stats.defense = Math.max(0, state.stats.defense);
+      state.stats.speed = Math.max(1, state.stats.speed);
     }
   }
 });
 
-// Export actions
-export const { 
-  updatePlayer, 
-  setName, 
-  resetPlayer, 
-  rest, 
-  modifyHealth, 
-  modifyEnergy,
-  setActiveCharacter,
-  updateTotalPlayTime,
-  updateAttribute,
-  updateAttributes,
+export const {
+  updatePlayer,
+  setName,
+  resetPlayer,
+  modifyHealth,
+  modifyMana,
   allocateAttribute,
-  updateSkill,
-  learnSkill,
-  upgradeSkill,
+  updateSkillPoints,
+  equipItem,
+  unequipItem,
   addStatusEffect,
   removeStatusEffect,
-  updateStat,
-  updateStats
+  updatePlayTime,
+  addGold,
+  spendGold,
+  recalculateStats
 } = playerSlice.actions;
 
-// Export the reducer as default (no selectors here anymore)
 export default playerSlice.reducer;

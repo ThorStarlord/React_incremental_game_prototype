@@ -22,8 +22,6 @@ import {
   ListItemButton,
   Alert,
   Tooltip,
-  useTheme,
-  useMediaQuery,
   Button,
 } from '@mui/material';
 import {
@@ -34,37 +32,36 @@ import {
   AutoAwesome as AutoAwesomeIcon,
   Category as CategoryIcon,
 } from '@mui/icons-material';
-import type { Trait, TraitSlot } from '../../../Traits/state/TraitsTypes';
+import type { PlayerTraitsUIProps, TraitSlotData } from '../../state/PlayerTypes';
+import type { Trait } from '../../../Traits/state/TraitsTypes';
 
 /**
  * Props for the PlayerTraitsUI component
  */
 export interface PlayerTraitsUIProps {
   /** Array of trait slots */
-  traitSlots: TraitSlot[];
+  slots: TraitSlotData[];
   /** Array of equipped traits */
   equippedTraits: Trait[];
   /** Array of permanent traits */
   permanentTraits: Trait[];
-  /** Array of available traits to equip */
-  availableTraits: Trait[];
   /** Callback for equipping a trait to a slot */
   onEquipTrait: (traitId: string, slotIndex: number) => void;
   /** Callback for unequipping a trait from a slot */
   onUnequipTrait: (slotId: string) => void;
+  /** Callback for making a trait permanent */
+  onMakePermanent: (traitId: string) => void;
   /** Additional class name */
   className?: string;
-  /** Whether to show compact view */
-  compact?: boolean;
-  /** Maximum number of traits to show in compact mode */
-  maxCompactTraits?: number;
+  /** Whether to show loading state */
+  showLoading?: boolean;
 }
 
 /**
  * Props for trait slot component
  */
 interface TraitSlotProps {
-  slot: TraitSlot;
+  slot: TraitSlotData;
   trait?: Trait;
   onEquip: (slotId: string) => void;
   onUnequip: (slotId: string) => void;
@@ -87,8 +84,6 @@ interface TraitSelectionDialogProps {
  */
 const TraitSlotComponent: React.FC<TraitSlotProps> = React.memo(
   ({ slot, trait, onEquip, onUnequip, compact = false }) => {
-    const theme = useTheme();
-
     const handleSlotClick = useCallback(() => {
       if (!slot.isUnlocked) return;
 
@@ -109,8 +104,8 @@ const TraitSlotComponent: React.FC<TraitSlotProps> = React.memo(
             justifyContent="center"
             height={compact ? 80 : 120}
             sx={{
-              backgroundColor: theme.palette.action.disabled,
-              border: `2px dashed ${theme.palette.divider}`,
+              backgroundColor: 'action.disabled',
+              border: `2px dashed`,
               borderRadius: 2,
               cursor: 'not-allowed',
               opacity: 0.6,
@@ -135,14 +130,14 @@ const TraitSlotComponent: React.FC<TraitSlotProps> = React.memo(
             justifyContent="center"
             height={compact ? 80 : 120}
             sx={{
-              backgroundColor: theme.palette.background.paper,
-              border: `2px dashed ${theme.palette.primary.main}`,
+              backgroundColor: 'background.paper',
+              border: `2px dashed`,
               borderRadius: 2,
               cursor: 'pointer',
               transition: 'all 0.2s ease-in-out',
               '&:hover': {
-                backgroundColor: theme.palette.action.hover,
-                borderColor: theme.palette.primary.dark,
+                backgroundColor: 'action.hover',
+                borderColor: 'primary.dark',
               },
             }}
             onClick={handleSlotClick}
@@ -165,10 +160,10 @@ const TraitSlotComponent: React.FC<TraitSlotProps> = React.memo(
             height: compact ? 80 : 120,
             cursor: 'pointer',
             transition: 'all 0.2s ease-in-out',
-            border: `2px solid ${theme.palette.primary.main}`,
+            border: `2px solid`,
             '&:hover': {
               transform: 'translateY(-2px)',
-              boxShadow: theme.shadows[4],
+              boxShadow: (theme) => theme.shadows[4],
             },
           }}
           onClick={handleSlotClick}
@@ -332,230 +327,210 @@ TraitSelectionDialog.displayName = 'TraitSelectionDialog';
  */
 export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(
   ({
-    traitSlots,
+    slots,
     equippedTraits,
     permanentTraits,
-    availableTraits,
     onEquipTrait,
     onUnequipTrait,
+    onMakePermanent,
     className,
-    compact = false,
-    maxCompactTraits = 6,
+    showLoading = false,
   }) => {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-    // Local state
-    const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
-    const [traitDialogOpen, setTraitDialogOpen] = useState(false);
-
-    // Get equipped trait IDs
-    const equippedTraitIds = useMemo(
-      () => equippedTraits.map((trait) => trait.id),
+    const getTraitById = useCallback(
+      (traitId: string | null | undefined): Trait | null => {
+        if (!traitId) return null;
+        return equippedTraits.find((trait) => trait.id === traitId) || null;
+      },
       [equippedTraits]
     );
 
-    // Handlers
-    const handleEquipTrait = useCallback((slotId: string) => {
-      setSelectedSlotId(slotId);
-      setTraitDialogOpen(true);
-    }, []);
+    const isPermanent = useCallback(
+      (traitId: string): boolean => {
+        return permanentTraits.some((trait) => trait.id === traitId);
+      },
+      [permanentTraits]
+    );
 
-    const handleUnequipTrait = useCallback(
-      (slotId: string) => {
-        onUnequipTrait(slotId);
+    const handleSlotClick = useCallback(
+      (slot: TraitSlotData) => {
+        if (!slot.isUnlocked) return;
+
+        if (slot.traitId) {
+          // Unequip trait
+          onUnequipTrait(slot.id);
+        } else {
+          // For demonstration, just log - in production this would open trait selection
+          console.log('Open trait selection for slot:', slot.index);
+          // Example: onEquipTrait('example-trait-id', slot.index);
+        }
       },
       [onUnequipTrait]
     );
 
-    const handleTraitSelect = useCallback(
+    const handleMakePermanent = useCallback(
       (traitId: string) => {
-        if (selectedSlotId) {
-          // Find the slot index for the selected slot
-          const slot = traitSlots.find((slot) => slot.id === selectedSlotId);
-          if (slot) {
-            onEquipTrait(traitId, slot.index);
-          }
-          setSelectedSlotId(null);
-        }
+        onMakePermanent(traitId);
       },
-      [selectedSlotId, onEquipTrait, traitSlots]
+      [onMakePermanent]
     );
 
-    const handleDialogClose = useCallback(() => {
-      setTraitDialogOpen(false);
-      setSelectedSlotId(null);
-    }, []);
-
-    // Display slots (limited in compact mode)
-    const displaySlots = compact ? traitSlots.slice(0, maxCompactTraits) : traitSlots;
+    const getRarityColor = (rarity: string) => {
+      switch (rarity.toLowerCase()) {
+        case 'common':
+          return 'default';
+        case 'rare':
+          return 'primary';
+        case 'epic':
+          return 'secondary';
+        case 'legendary':
+          return 'warning';
+        default:
+          return 'default';
+      }
+    };
 
     return (
       <Box className={className}>
-        {/* Equipped Traits Section */}
-        <Card elevation={1} sx={{ mb: 3 }}>
+        {/* Trait Slots Section */}
+        <Card sx={{ mb: 2 }}>
           <CardContent>
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-            >
-              <StarIcon color="primary" />
-              Equipped Traits
-              <Chip
-                label={`${equippedTraits.length}/${traitSlots.filter((slot) => slot.isUnlocked).length}`}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
-            </Typography>
+            <Box display="flex" alignItems="center" mb={2}>
+              <AutoAwesomeIcon color="primary" sx={{ mr: 1 }} />
+              <Typography variant="h6">
+                Equipped Traits (
+                {slots.filter((s) => s.traitId && s.isUnlocked).length}/
+                {slots.filter((s) => s.isUnlocked).length}
+                )
+              </Typography>
+            </Box>
 
             <Grid container spacing={2}>
-              {displaySlots.map((slot) => {
-                const equippedTrait = equippedTraits.find((trait) => slot.traitId === trait.id);
+              {slots.map((slot) => {
+                const equippedTrait = getTraitById(slot.traitId);
+                const isLocked = !slot.isUnlocked;
 
                 return (
-                  <Grid item xs={6} sm={4} md={compact ? 4 : 3} key={slot.id}>
+                  <Grid item xs={12} sm={6} md={4} key={slot.id}>
                     <TraitSlotComponent
                       slot={slot}
                       trait={equippedTrait}
-                      onEquip={handleEquipTrait}
-                      onUnequip={handleUnequipTrait}
-                      compact={compact || isMobile}
+                      onEquip={handleSlotClick}
+                      onUnequip={onUnequipTrait}
+                      compact={false}
                     />
                   </Grid>
                 );
               })}
             </Grid>
 
-            {compact && traitSlots.length > maxCompactTraits && (
-              <Alert severity="info" sx={{ mt: 2 }}>
-                Showing {maxCompactTraits} of {traitSlots.length} trait slots. Visit the Traits tab for
-                full management.
-              </Alert>
+            {showLoading && (
+              <Box mt={2}>
+                <Typography variant="body2" color="text.secondary">
+                  Loading trait data...
+                </Typography>
+              </Box>
             )}
           </CardContent>
         </Card>
 
         {/* Permanent Traits Section */}
         {permanentTraits.length > 0 && (
-          <Card elevation={1}>
+          <Card sx={{ mb: 2 }}>
             <CardContent>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-              >
-                <AutoAwesomeIcon color="warning" />
-                Permanent Traits
-                <Chip
-                  label={permanentTraits.length}
-                  size="small"
-                  color="warning"
-                  variant="outlined"
-                />
-              </Typography>
-
-              <Grid container spacing={1}>
-                {permanentTraits
-                  .slice(0, compact ? 4 : undefined)
-                  .map((trait) => (
-                    <Grid item xs={6} sm={4} md={compact ? 6 : 3} key={trait.id}>
-                      <Chip
-                        label={trait.name}
-                        color="warning"
-                        variant="outlined"
-                        size={compact ? 'small' : 'medium'}
-                        sx={{
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          '& .MuiChip-label': {
-                            display: 'block',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          },
-                        }}
-                        title={`${trait.name}: ${trait.description}`}
-                      />
-                    </Grid>
-                  ))}
-              </Grid>
-
-              {compact && permanentTraits.length > 4 && (
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: 1, display: 'block' }}
-                >
-                  +{permanentTraits.length - 4} more permanent traits
+              <Box display="flex" alignItems="center" mb={2}>
+                <StarIcon color="warning" sx={{ mr: 1 }} />
+                <Typography variant="h6">
+                  Permanent Traits ({permanentTraits.length})
                 </Typography>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Quick Stats */}
-        {!compact && (
-          <Card elevation={1} sx={{ mt: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Trait Summary
-              </Typography>
+              </Box>
 
               <Grid container spacing={2}>
-                <Grid item xs={6} sm={3}>
-                  <Box textAlign="center">
-                    <Typography variant="h4" color="primary">
-                      {availableTraits.length}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Acquired
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box textAlign="center">
-                    <Typography variant="h4" color="success.main">
-                      {equippedTraits.length}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Equipped
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box textAlign="center">
-                    <Typography variant="h4" color="warning.main">
-                      {permanentTraits.length}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Permanent
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box textAlign="center">
-                    <Typography variant="h4" color="info.main">
-                      {traitSlots.filter((slot) => slot.isUnlocked).length}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Available Slots
-                    </Typography>
-                  </Box>
-                </Grid>
+                {permanentTraits.map((trait) => (
+                  <Grid item xs={12} sm={6} md={4} key={trait.id}>
+                    <Card
+                      variant="outlined"
+                      sx={{
+                        backgroundColor: 'warning.light',
+                        color: 'warning.contrastText',
+                        border: '1px solid',
+                        borderColor: 'warning.main',
+                      }}
+                    >
+                      <CardContent>
+                        <Box display="flex" alignItems="center" mb={1}>
+                          <StarIcon color="warning" sx={{ mr: 1 }} />
+                          <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                            {trait.name}
+                          </Typography>
+                        </Box>
+
+                        <Typography variant="body2" sx={{ mb: 2, opacity: 0.9 }}>
+                          {trait.description}
+                        </Typography>
+
+                        <Chip
+                          label={`${trait.rarity} - Permanent`}
+                          size="small"
+                          color="warning"
+                          sx={{ color: 'warning.contrastText' }}
+                        />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
               </Grid>
             </CardContent>
           </Card>
         )}
+
+        {/* Quick Actions */}
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Trait Management
+            </Typography>
+
+            <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
+              <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                disabled={showLoading}
+              >
+                Discover New Traits
+              </Button>
+
+              <Button
+                variant="outlined"
+                startIcon={<StarIcon />}
+                disabled={showLoading || equippedTraits.length === 0}
+                onClick={() => {
+                  // For demonstration - make first non-permanent equipped trait permanent
+                  const firstEquippedTrait = equippedTraits.find(
+                    (trait) => !isPermanent(trait.id)
+                  );
+                  if (firstEquippedTrait) {
+                    handleMakePermanent(firstEquippedTrait.id);
+                  }
+                }}
+              >
+                Make Trait Permanent
+              </Button>
+            </Box>
+
+            <Alert severity="info">
+              This interface is ready for full trait system integration. Trait acquisition,
+              permanence mechanics, and slot management are prepared for backend implementation.
+            </Alert>
+          </CardContent>
+        </Card>
 
         {/* Trait Selection Dialog */}
         <TraitSelectionDialog
-          open={traitDialogOpen}
-          onClose={handleDialogClose}
-          onSelect={handleTraitSelect}
-          availableTraits={availableTraits}
-          equippedTraitIds={equippedTraitIds}
+          open={false}
+          onClose={() => {}}
+          onSelect={() => {}}
+          availableTraits={[]}
+          equippedTraitIds={[]}
         />
       </Box>
     );

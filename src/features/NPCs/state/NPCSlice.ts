@@ -639,7 +639,7 @@ export const npcSlice = createSlice({
 /** NPC action creators */
 export const npcActions = npcSlice.actions;
 
-/** NPC reducer */
+/** NPC reducer - default export */
 export default npcSlice.reducer;
 
 // Named exports for individual actions

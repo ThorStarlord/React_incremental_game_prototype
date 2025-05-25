@@ -4,96 +4,100 @@
  */
 
 import React from 'react';
-import { Box, LinearProgress, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import {
+  Box,
+  LinearProgress,
+  Typography,
+  useTheme,
+} from '@mui/material';
 
-/**
- * Props interface for ProgressBar component
- */
 export interface ProgressBarProps {
-  /** Current progress value */
-  current: number;
-  /** Maximum progress value */
+  /** Current value */
+  value: number;
+  /** Maximum value */
   max: number;
-  /** Display label */
-  label?: string;
-  /** Color variant */
-  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
-  /** Height of the progress bar */
+  /** Custom color */
+  color?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+  /** Custom height in pixels */
   height?: number;
+  /** Show value text */
+  showValue?: boolean;
   /** Show percentage text */
   showPercentage?: boolean;
-  /** Show current/max values */
-  showValues?: boolean;
-  /** Animation duration in ms */
-  animationDuration?: number;
+  /** Animated progress */
+  animated?: boolean;
+  /** Additional styling */
+  className?: string;
 }
 
 /**
- * ProgressBar component for displaying player progression with customizable appearance
+ * Reusable progress bar component for player progression visualization
+ * Supports customizable colors, heights, animations, and value displays
  */
 export const ProgressBar: React.FC<ProgressBarProps> = React.memo(({
-  current,
+  value,
   max,
-  label,
   color = 'primary',
-  height = 8,
+  height = 6,
+  showValue = false,
   showPercentage = false,
-  showValues = false,
-  animationDuration = 500
+  animated = false,
+  className,
 }) => {
   const theme = useTheme();
-
-  // Ensure values are valid
-  const safeCurrent = Math.max(0, current);
+  
+  // Ensure safe calculations
+  const safeValue = Math.max(0, Math.min(value, max));
   const safeMax = Math.max(1, max);
-  const percentage = Math.min((safeCurrent / safeMax) * 100, 100);
+  const percentage = Math.round((safeValue / safeMax) * 100);
+  const normalizedValue = (safeValue / safeMax) * 100;
+
+  const progressColor = theme.palette[color]?.main || theme.palette.primary.main;
 
   return (
-    <Box>
-      {(label || showValues || showPercentage) && (
-        <Box 
-          display="flex" 
-          justifyContent="space-between" 
-          alignItems="center" 
-          mb={1}
-        >
-          {label && (
-            <Typography variant="body2" color="text.secondary">
-              {label}
-            </Typography>
-          )}
-          
-          <Box display="flex" gap={2}>
-            {showValues && (
-              <Typography variant="body2" color="text.primary">
-                {safeCurrent.toLocaleString()} / {safeMax.toLocaleString()}
-              </Typography>
-            )}
-            
-            {showPercentage && (
-              <Typography variant="body2" color="text.secondary">
-                {Math.round(percentage)}%
-              </Typography>
-            )}
-          </Box>
-        </Box>
-      )}
-      
-      <LinearProgress
-        variant="determinate"
-        value={percentage}
-        color={color}
-        sx={{
-          height,
-          borderRadius: height / 2,
-          backgroundColor: theme.palette.grey[200],
-          '& .MuiLinearProgress-bar': {
+    <Box className={className} width="100%">
+      <Box position="relative">
+        <LinearProgress
+          variant="determinate"
+          value={normalizedValue}
+          color={color}
+          sx={{
+            height: height,
             borderRadius: height / 2,
-            transition: `transform ${animationDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`,
-          },
-        }}
-      />
+            backgroundColor: theme.palette.grey[200],
+            '& .MuiLinearProgress-bar': {
+              borderRadius: height / 2,
+              transition: animated ? 'transform 0.3s ease' : 'none',
+            },
+          }}
+        />
+        
+        {(showValue || showPercentage) && (
+          <Box
+            position="absolute"
+            top="50%"
+            left="50%"
+            sx={{
+              transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none',
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: percentage > 50 ? 'white' : progressColor,
+                fontWeight: 600,
+                textShadow: percentage > 50 ? '1px 1px 2px rgba(0,0,0,0.8)' : 'none',
+                fontSize: height > 16 ? '0.75rem' : '0.625rem',
+              }}
+            >
+              {showValue && `${safeValue.toLocaleString()}/${safeMax.toLocaleString()}`}
+              {showValue && showPercentage && ' '}
+              {showPercentage && `(${percentage}%)`}
+            </Typography>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 });

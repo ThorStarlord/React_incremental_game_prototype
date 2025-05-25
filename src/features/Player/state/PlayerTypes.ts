@@ -1,13 +1,23 @@
 /**
- * Player System Type Definitions
- * 
- * This file contains all TypeScript type definitions for the Player feature,
- * following Feature-Sliced Design principles with comprehensive type safety.
+ * Player state type definitions following Feature-Sliced Design
+ * Based on specification in DataModel.md
  */
 
-/**
- * Represents a player's stats in the game
- */
+// Core Player State Interface
+export interface PlayerState {
+  name: string;
+  stats: PlayerStats;
+  attributes: Record<string, Attribute>;
+  attributePoints: number;
+  skillPoints: number;
+  statusEffects: StatusEffect[];
+  equipment: EquipmentState;
+  gold: number;
+  totalPlayTime: number; // In milliseconds
+  isAlive: boolean;
+}
+
+// Player Statistics Interface
 export interface PlayerStats {
   health: number;
   maxHealth: number;
@@ -18,172 +28,60 @@ export interface PlayerStats {
   speed: number;
   healthRegen: number;
   manaRegen: number;
-  critChance: number;
-  critDamage: number;
-  [key: string]: number; // For dynamic stats
+  critChance: number; // 0.0 to 1.0
+  critDamage: number; // Multiplier (e.g., 1.5 for +50%)
+  [key: string]: number; // Allow dynamic stats
 }
 
-/**
- * Represents a status effect applied to a player
- */
+// Player Attributes Interface
+export interface Attribute {
+  name: string;
+  value: number; // Current value including bonuses
+  baseValue: number; // Value from allocated points
+}
+
+// Status Effects Interface
 export interface StatusEffect {
   id: string;
   name: string;
-  type: string;
-  duration: number;
+  type: string; // e.g., 'buff', 'debuff'
+  duration: number; // Remaining duration in seconds or ticks
   magnitude?: number;
   source?: string;
-  timestamp: number;
+  timestampApplied: number;
   effects: Partial<PlayerStats>;
 }
 
-/**
- * Represents a player skill
- */
-export interface Skill {
+// Equipment Interfaces
+export interface EquipmentItem {
   id: string;
-  level: number;
-  experience: number;
-}
-
-/**
- * Represents a player attribute
- */
-export interface Attribute {
   name: string;
-  value: number;
-  baseValue: number;
+  type: string; // e.g., 'weapon', 'armor', 'accessory'
+  slot: string; // e.g., 'head', 'chest', 'mainHand'
+  stats?: Partial<PlayerStats>;
+  rarity?: string; // e.g., 'common', 'rare'
 }
 
-/**
- * Player's complete state
- */
-export interface PlayerState {
-  // Basic Identity
-  name: string;
-  level: number;
-  experience: number;
-  
-  // Core Stats
-  stats: PlayerStats;
-  
-  // Character Attributes
-  attributes: Record<string, Attribute>;
-  attributePoints: number;
-  
-  // Skills and Progression
-  skills: Skill[];
-  skillPoints: number;
-  
-  // Temporary Effects
-  statusEffects: StatusEffect[];
-  
-  // Trait System Integration
-  acquiredTraits: string[];
-  permanentTraits: string[];
-  traitSlots: number;
-  totalEssenceEarned: number;
-  
-  // Resources
-  gold: number;
-  
-  // Game State
-  lastRestLocation: string;
-  lastRestTime: number;
-  creationDate: string;
-  lastSaved: string;
-  totalPlayTime: number;
-  isAlive: boolean;
-  activeCharacterId: string;
+export interface EquipmentState {
+  head?: EquipmentItem | null;
+  chest?: EquipmentItem | null;
+  legs?: EquipmentItem | null;
+  feet?: EquipmentItem | null;
+  mainHand?: EquipmentItem | null;
+  offHand?: EquipmentItem | null;
+  accessory1?: EquipmentItem | null;
+  accessory2?: EquipmentItem | null;
+  [key: string]: EquipmentItem | null | undefined;
 }
 
-/**
- * Payload types for player actions
- */
-export interface SetNamePayload {
-  name: string;
-}
-
-export interface ResetPlayerPayload {
-  keepName?: boolean;
-}
-
-export interface RestPayload {
-  duration: number;
-  location?: string;
-}
-
-export interface HealthModificationPayload {
-  amount: number; 
-  reason?: string;
-}
-
-export interface EnergyModificationPayload {
-  amount: number;
-  reason?: string;
-}
-
-export interface ActiveCharacterPayload {
-  characterId: string;
-}
-
-export interface AttributeUpdatePayload {
-  attributeId: string;
-  value: number;
-}
-
-export interface AttributeAllocationPayload {
-  attributeId: string;
-  amount: number;
-}
-
-export interface SkillUpdatePayload {
-  skillId: string;
-  experience: number;
-}
-
-export interface SkillIdPayload {
-  skillId: string;
-}
-
-export interface SkillUpgradePayload {
-  skillId: string;
-  level: number;
-}
-
-export interface TraitPayload {
-  traitId: string;
-}
-
-export interface StatusEffectIdPayload {
-  effectId: string;
-}
-
-export interface StatUpdatePayload {
-  statId: string;
-  value: number;
-}
-
-export interface UpdateAttributesPayload {
-  [attributeId: string]: number;
-}
-
-export interface UpdateStatsPayload {
-  [statId: string]: number;
-}
-
-export interface UpdateTotalPlayTimePayload {
-  amount: number;
-}
-
-// Legacy payload types for backward compatibility
+// Action Payload Types
 export interface UpdatePlayerPayload {
   updates: Partial<PlayerState>;
 }
 
 export interface ModifyHealthPayload {
   amount: number;
-  type?: 'damage' | 'heal';
+  type: 'damage' | 'heal';
 }
 
 export interface AllocateAttributePayload {
@@ -191,63 +89,118 @@ export interface AllocateAttributePayload {
   points: number;
 }
 
-/**
- * Initial state for the player
- */
-export const PlayerInitialState: PlayerState = {
-  // Basic Identity
-  name: "Adventurer",
-  level: 1,
-  experience: 0,
-  
-  // Core Stats
-  stats: {
-    health: 100,
-    maxHealth: 100,
-    mana: 50,
-    maxMana: 50,
-    attack: 10,
-    defense: 5,
-    speed: 1,
-    healthRegen: 0.5,
-    manaRegen: 0.5,
-    critChance: 0.05,
-    critDamage: 1.5
-  },
-  
-  // Character Attributes
-  attributes: {
-    strength: { name: "Strength", value: 5, baseValue: 5 },
-    dexterity: { name: "Dexterity", value: 5, baseValue: 5 },
-    intelligence: { name: "Intelligence", value: 5, baseValue: 5 },
-    wisdom: { name: "Wisdom", value: 5, baseValue: 5 },
-    constitution: { name: "Constitution", value: 5, baseValue: 5 },
-    charisma: { name: "Charisma", value: 5, baseValue: 5 }
-  },
-  attributePoints: 0,
-  
-  // Skills and Progression
-  skills: [],
-  skillPoints: 0,
-  
-  // Temporary Effects
-  statusEffects: [],
-  
-  // Trait System Integration
-  acquiredTraits: [],
-  permanentTraits: [],
-  traitSlots: 1,
-  totalEssenceEarned: 0,
-  
-  // Resources
-  gold: 50,
-  
-  // Game State
-  lastRestLocation: "village",
-  lastRestTime: Date.now(),
-  creationDate: new Date().toISOString(),
-  lastSaved: new Date().toISOString(),
-  totalPlayTime: 0,
-  isAlive: true,
-  activeCharacterId: "player"
-};
+export interface EquipItemPayload {
+  slot: string;
+  item: EquipmentItem | null;
+}
+
+export interface EquipTraitPayload {
+  slotIndex: number;
+  traitId: string;
+}
+
+export interface UnequipTraitPayload {
+  slotId: string;
+}
+
+// Enhanced Data Interfaces for Selectors
+export interface PlayerHealthData {
+  current: number;
+  max: number;
+  percentage: number;
+}
+
+export interface PlayerManaData {
+  current: number;
+  max: number;
+  percentage: number;
+}
+
+export interface CombatStats {
+  attack: number;
+  defense: number;
+  speed: number;
+  critChance: number;
+  critDamage: number;
+}
+
+export interface PerformanceStats {
+  totalPlayTime: number;
+  powerLevel: number;
+}
+
+// Equipment Category Interfaces
+export interface ArmorEquipment {
+  head?: EquipmentItem | null;
+  chest?: EquipmentItem | null;
+  legs?: EquipmentItem | null;
+  feet?: EquipmentItem | null;
+}
+
+export interface WeaponEquipment {
+  mainHand?: EquipmentItem | null;
+  offHand?: EquipmentItem | null;
+}
+
+export interface AccessoryEquipment {
+  accessory1?: EquipmentItem | null;
+  accessory2?: EquipmentItem | null;
+}
+
+// Component Props Interfaces
+export interface PlayerStatsContainerProps {
+  showDetails?: boolean;
+  className?: string;
+}
+
+export interface PlayerTraitsContainerProps {
+  showLoading?: boolean;
+  onTraitChange?: (action: 'equip' | 'unequip' | 'permanent', traitId: string) => void;
+  className?: string;
+}
+
+export interface TraitSlotData {
+  id: string;
+  index: number;
+  isUnlocked: boolean;
+  traitId?: string | null;
+}
+
+export interface PlayerStatsUIProps {
+  stats: PlayerStats;
+  showDetails?: boolean;
+}
+
+export interface StatDisplayProps {
+  label: string;
+  value: number | string;
+  unit?: string;
+  showProgress?: boolean;
+  maxValue?: number;
+  color?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+  size?: 'small' | 'medium' | 'large';
+}
+
+export interface ProgressBarProps {
+  value: number;
+  maxValue: number;
+  height?: number;
+  color?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+  showValue?: boolean;
+  showPercentage?: boolean;
+  animate?: boolean;
+  className?: string;
+}
+
+export interface PlayerEquipmentProps {
+  equipment: EquipmentState;
+  onEquipItem?: (slot: string, item: EquipmentItem | null) => void;
+  onUnequipItem?: (slot: string) => void;
+  showQuickActions?: boolean;
+  className?: string;
+}
+
+export interface ProgressionProps {
+  showAdvancedStats?: boolean;
+  className?: string;
+}

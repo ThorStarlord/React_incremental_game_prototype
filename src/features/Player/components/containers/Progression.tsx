@@ -4,129 +4,152 @@
  */
 
 import React from 'react';
-import { Paper, Typography, Box, Grid } from '@mui/material';
-import { TrendingUp, Timer, Star } from '@mui/icons-material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Divider,
+} from '@mui/material';
+import {
+  Schedule as TimeIcon,
+  Star as PointsIcon,
+  Psychology as SkillIcon,
+} from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectPlayer } from '../../state/PlayerSelectors';
-import { ProgressBar } from '../ui/ProgressBar';
+import { selectPlayerProgression } from '../../state/PlayerSelectors';
 import { StatDisplay } from '../ui/StatDisplay';
 
+interface ProgressionProps {
+  showDetails?: boolean;
+  className?: string;
+}
+
 /**
- * Container component for displaying player progression information
+ * Player progression and advancement tracking component
+ * Displays playtime, attribute points, and skill points
  */
-export const Progression: React.FC = React.memo(() => {
-  const player = useAppSelector(selectPlayer);
+export const Progression: React.FC<ProgressionProps> = React.memo(({
+  showDetails = true,
+  className,
+}) => {
+  const progression = useAppSelector(selectPlayerProgression);
 
-  // Calculate experience needed for next level (mock calculation)
-  const experienceForNextLevel = player.level * 1000;
-  const currentLevelExperience = player.experience % experienceForNextLevel;
-
-  // Format playtime
+  // Format total playtime for display
   const formatPlaytime = (milliseconds: number): string => {
     const hours = Math.floor(milliseconds / (1000 * 60 * 60));
     const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
+    }
   };
 
+  const formattedPlaytime = formatPlaytime(progression.totalPlayTime);
+
   return (
-    <Box>
-      {/* Experience Progress */}
-      <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TrendingUp color="primary" />
-          Level Progression
-        </Typography>
-        
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={8}>
-            <ProgressBar
-              current={currentLevelExperience}
-              max={experienceForNextLevel}
-              label={`Level ${player.level} Experience`}
-              color="success"
-              height={16}
-              showValues
-              showPercentage
-            />
-          </Grid>
+    <Box className={className}>
+      {/* Character Status */}
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" mb={2}>
+            <TimeIcon color="primary" sx={{ mr: 1 }} />
+            <Typography variant="h6">Character Progress</Typography>
+          </Box>
           
-          <Grid item xs={12} md={4}>
-            <StatDisplay
-              label="Current Level"
-              value={player.level}
-              color="success"
-            />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <StatDisplay
+                label="Total Playtime"
+                value={formattedPlaytime}  // String value is now properly supported
+                color="primary"
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <StatDisplay
+                label="Status"
+                value={progression.isAlive ? 'Alive' : 'Defeated'}  // String value is now properly supported
+                color={progression.isAlive ? 'success' : 'error'}
+              />
+            </Grid>
           </Grid>
-        </Grid>
-      </Paper>
+        </CardContent>
+      </Card>
 
-      {/* Character Stats */}
-      <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Star color="warning" />
-          Character Statistics
-        </Typography>
-        
-        <Grid container spacing={2}>
-          <Grid item xs={6} md={3}>
-            <StatDisplay
-              label="Total Experience"
-              value={player.experience}
-              color="primary"
-            />
-          </Grid>
+      {/* Available Points */}
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" mb={2}>
+            <PointsIcon color="warning" sx={{ mr: 1 }} />
+            <Typography variant="h6">Available Points</Typography>
+          </Box>
           
-          <Grid item xs={6} md={3}>
-            <StatDisplay
-              label="Attribute Points"
-              value={player.attributePoints}
-              color="success"
-            />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <StatDisplay
+                label="Attribute Points"
+                value={progression.attributePoints}  // Number value works as before
+                color="warning"
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <StatDisplay
+                label="Skill Points"
+                value={progression.skillPoints}  // Number value works as before
+                color="info"
+              />
+            </Grid>
           </Grid>
-          
-          <Grid item xs={6} md={3}>
-            <StatDisplay
-              label="Skill Points"
-              value={player.skillPoints}
-              color="info"
-            />
-          </Grid>
-          
-          <Grid item xs={6} md={3}>
-            <StatDisplay
-              label="Gold"
-              value={player.gold}
-              unit=" gold"
-              color="warning"
-            />
-          </Grid>
-        </Grid>
-      </Paper>
+        </CardContent>
+      </Card>
 
-      {/* Playtime Stats */}
-      <Paper elevation={1} sx={{ p: 2 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Timer color="info" />
-          Session Information
-        </Typography>
-        
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <StatDisplay
-              label="Total Playtime"
-              value={formatPlaytime(player.totalPlayTime)}
-            />
-          </Grid>
-          
-          <Grid item xs={12} md={6}>
-            <StatDisplay
-              label="Character Status"
-              value={player.isAlive ? 'Alive' : 'Dead'}
-              color={player.isAlive ? 'success' : 'error'}
-            />
-          </Grid>
-        </Grid>
-      </Paper>
+      {/* Character Statistics */}
+      {showDetails && (
+        <Card>
+          <CardContent>
+            <Box display="flex" alignItems="center" mb={2}>
+              <SkillIcon color="secondary" sx={{ mr: 1 }} />
+              <Typography variant="h6">Character Statistics</Typography>
+            </Box>
+            
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Session Statistics
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <StatDisplay
+                  label="Unspent Attribute Points"
+                  value={progression.attributePoints}
+                  color={progression.attributePoints > 0 ? 'warning' : 'secondary'} // Changed from 'default' to 'secondary'
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <StatDisplay
+                  label="Unspent Skill Points"
+                  value={progression.skillPoints}
+                  color={progression.skillPoints > 0 ? 'info' : 'secondary'} // Changed from 'default' to 'secondary'
+                />
+              </Grid>
+              
+              <Grid item xs={12}>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                  Time Played: {formattedPlaytime}
+                </Typography>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      )}
     </Box>
   );
 });
