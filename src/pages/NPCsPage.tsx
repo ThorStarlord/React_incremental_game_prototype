@@ -27,7 +27,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectAllNPCs, selectNPCById } from '../features/NPCs/state/NPCSelectors';
 import { NPCListView } from '../features/NPCs/components/containers/NPCListView';
-import NPCPanel from '../features/NPCs/components/containers/NPCPanel';
 
 /**
  * NPCsPage - Main page for NPC interactions
@@ -119,7 +118,11 @@ const NPCsPage: React.FC = () => {
         {selectedNPCId && selectedNPC ? (
           <Fade in={true} timeout={300}>
             <Box>
-              <NPCPanel npcId={selectedNPCId} />
+              <NPCListView
+                onSelectNPC={handleSelectNPC}
+                selectedNPCId={selectedNPCId || undefined}
+                viewMode={viewMode}
+              />
             </Box>
           </Fade>
         ) : (
@@ -222,7 +225,7 @@ const NPCsPage: React.FC = () => {
             {selectedNPCId && selectedNPC ? (
               <Fade in={true} timeout={300} key={selectedNPCId}>
                 <Box sx={{ height: '100%' }}>
-                  <NPCPanel npcId={selectedNPCId} />
+                  <NPCListView npcId={selectedNPCId} />
                 </Box>
               </Fade>
             ) : (

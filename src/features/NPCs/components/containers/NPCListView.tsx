@@ -409,3 +409,5 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
     </Box>
   );
 };
+
+export default React.memo(NPCListView);

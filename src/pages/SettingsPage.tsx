@@ -1,377 +1,138 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Container,
-  Grid,
-  Card,
-  CardContent,
   Typography,
   Box,
-  Divider,
   Alert,
-  AlertTitle,
-  Slider,
-  Switch,
-  FormControlLabel,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-  Chip
+  AlertTitle
 } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
-  Settings as SettingsIcon,
-  VolumeUp as AudioIcon,
-  Palette as GraphicsIcon,
-  Gamepad2 as GameplayIcon,
-  ViewQuilt as UIIcon,
-  Save as SaveIcon,
-  RestoreFromTrash as ResetIcon
-} from '@mui/icons-material';
-import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { selectSettings } from '../features/Settings';
-import { updateSetting, updateCategorySettings, resetSettings } from '../features/Settings/state/SettingsSlice';
+  selectSettings,
+  selectAudioSettings,
+  selectGraphicsSettings,
+  selectGameplaySettings,
+  selectUISettings,
+  updateCategorySettings,
+  resetSettings,
+  loadSettingsThunk,
+  saveSettingsThunk
+} from '../features/Settings';
+
+import { AudioSettingsPanel } from '../features/Settings/components/ui/AudioSettingsPanel.ts';
+import { GraphicsSettingsPanel } from '../features/Settings/components/ui/GraphicsSettingsPanel';
+import { GameplaySettingsPanel } from '../features/Settings/components/ui/GameplaySettingsPanel';
+import { UISettingsPanel } from '../features/Settings/components/ui/UISettingsPanel';
+import { SettingsActions } from '../features/Settings/components/ui/SettingsActions';
 
 /**
- * SettingsPage - Comprehensive game settings management interface
- * 
- * Provides organized settings management including:
- * - Audio settings (volumes, preferences)
- * - Graphics settings (quality, effects)
- * - Gameplay settings (difficulty, autosave)
- * - UI settings (theme, accessibility)
+ * SettingsPage - Complete settings management interface
+ *
+ * Features:
+ * - Audio, Graphics, Gameplay, and UI settings management
+ * - Real-time settings persistence via Redux thunks
+ * - Settings reset functionality with confirmation
+ * - Organized category-based interface
+ * - Material-UI integration with responsive design
  */
-export const SettingsPage: React.FC = React.memo(() => {
+const SettingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const settings = useAppSelector(selectSettings);
 
-  const handleSettingChange = (category: string, setting: string, value: any) => {
-    dispatch(updateSetting({ category, setting, value }));
+  // Settings selectors
+  const settings = useAppSelector(selectSettings);
+  const audioSettings = useAppSelector(selectAudioSettings);
+  const graphicsSettings = useAppSelector(selectGraphicsSettings);
+  const gameplaySettings = useAppSelector(selectGameplaySettings);
+  const uiSettings = useAppSelector(selectUISettings);
+
+  // Load settings on component mount
+  useEffect(() => {
+    dispatch(loadSettingsThunk());
+  }, [dispatch]);
+
+  // Category update handlers using the generic updateCategorySettings action
+  const handleAudioUpdate = (newSettings: any) => {
+    dispatch(updateCategorySettings({ category: 'audio', settings: newSettings }));
+    dispatch(saveSettingsThunk());
   };
 
-  const handleResetSettings = () => {
-    if (window.confirm('Are you sure you want to reset all settings to defaults?')) {
-      dispatch(resetSettings());
-    }
+  const handleGraphicsUpdate = (newSettings: any) => {
+    dispatch(updateCategorySettings({ category: 'graphics', settings: newSettings }));
+    dispatch(saveSettingsThunk());
+  };
+
+  const handleGameplayUpdate = (newSettings: any) => {
+    dispatch(updateCategorySettings({ category: 'gameplay', settings: newSettings }));
+    dispatch(saveSettingsThunk());
+  };
+
+  const handleUIUpdate = (newSettings: any) => {
+    dispatch(updateCategorySettings({ category: 'ui', settings: newSettings }));
+    dispatch(saveSettingsThunk());
+  };
+
+  // Reset handler using the correct resetSettings action
+  const handleReset = () => {
+    dispatch(resetSettings());
+    dispatch(saveSettingsThunk());
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      {/* Page Header */}
+    <Container maxWidth="md" sx={{ py: 3 }}>
       <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          gutterBottom
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 2,
-            fontWeight: 600
-          }}
-        >
-          <SettingsIcon color="primary" sx={{ fontSize: 40 }} />
-          Game Settings
+        <Typography variant="h4" component="h1" gutterBottom>
+          Settings
         </Typography>
-        <Typography variant="h6" color="text.secondary">
-          Configure your game experience with audio, graphics, gameplay, and interface preferences.
+        <Typography variant="body1" color="text.secondary">
+          Configure your game preferences and experience
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <AlertTitle>Settings Auto-Save</AlertTitle>
+        Settings changes are automatically saved and will persist across game sessions.
+      </Alert>
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {/* Audio Settings */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography 
-                variant="h5" 
-                gutterBottom
-                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-              >
-                <AudioIcon color="primary" />
-                Audio Settings
-              </Typography>
-              
-              <Box sx={{ mt: 3 }}>
-                <Typography gutterBottom>
-                  Master Volume: {settings.audio.masterVolume}%
-                </Typography>
-                <Slider
-                  value={settings.audio.masterVolume}
-                  onChange={(_, value) => handleSettingChange('audio', 'masterVolume', value)}
-                  valueLabelDisplay="auto"
-                  min={0}
-                  max={100}
-                  sx={{ mb: 3 }}
-                />
-                
-                <Typography gutterBottom>
-                  Music Volume: {settings.audio.musicVolume}%
-                </Typography>
-                <Slider
-                  value={settings.audio.musicVolume}
-                  onChange={(_, value) => handleSettingChange('audio', 'musicVolume', value)}
-                  valueLabelDisplay="auto"
-                  min={0}
-                  max={100}
-                  sx={{ mb: 3 }}
-                />
-                
-                <Typography gutterBottom>
-                  Effects Volume: {settings.audio.effectsVolume}%
-                </Typography>
-                <Slider
-                  value={settings.audio.effectsVolume}
-                  onChange={(_, value) => handleSettingChange('audio', 'effectsVolume', value)}
-                  valueLabelDisplay="auto"
-                  min={0}
-                  max={100}
-                  sx={{ mb: 3 }}
-                />
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.audio.muteWhenInactive}
-                      onChange={(e) => handleSettingChange('audio', 'muteWhenInactive', e.target.checked)}
-                    />
-                  }
-                  label="Mute when window inactive"
-                />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        <AudioSettingsPanel
+          settings={audioSettings}
+          onUpdate={handleAudioUpdate}
+        />
 
         {/* Graphics Settings */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography 
-                variant="h5" 
-                gutterBottom
-                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-              >
-                <GraphicsIcon color="primary" />
-                Graphics Settings
-              </Typography>
-              
-              <Box sx={{ mt: 3 }}>
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>Graphics Quality</InputLabel>
-                  <Select
-                    value={settings.graphics.quality}
-                    label="Graphics Quality"
-                    onChange={(e) => handleSettingChange('graphics', 'quality', e.target.value)}
-                  >
-                    <MenuItem value="low">Low</MenuItem>
-                    <MenuItem value="medium">Medium</MenuItem>
-                    <MenuItem value="high">High</MenuItem>
-                    <MenuItem value="ultra">Ultra</MenuItem>
-                  </Select>
-                </FormControl>
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.graphics.particleEffects}
-                      onChange={(e) => handleSettingChange('graphics', 'particleEffects', e.target.checked)}
-                    />
-                  }
-                  label="Enable particle effects"
-                  sx={{ mb: 2, display: 'block' }}
-                />
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.graphics.darkMode}
-                      onChange={(e) => handleSettingChange('graphics', 'darkMode', e.target.checked)}
-                    />
-                  }
-                  label="Dark mode theme"
-                />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        <GraphicsSettingsPanel
+          settings={graphicsSettings}
+          onUpdate={handleGraphicsUpdate}
+        />
 
         {/* Gameplay Settings */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography 
-                variant="h5" 
-                gutterBottom
-                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-              >
-                <GameplayIcon color="primary" />
-                Gameplay Settings
-              </Typography>
-              
-              <Box sx={{ mt: 3 }}>
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>Difficulty Level</InputLabel>
-                  <Select
-                    value={settings.gameplay.difficulty}
-                    label="Difficulty Level"
-                    onChange={(e) => handleSettingChange('gameplay', 'difficulty', e.target.value)}
-                  >
-                    <MenuItem value="easy">Easy</MenuItem>
-                    <MenuItem value="normal">Normal</MenuItem>
-                    <MenuItem value="hard">Hard</MenuItem>
-                    <MenuItem value="expert">Expert</MenuItem>
-                  </Select>
-                </FormControl>
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.gameplay.autosaveEnabled}
-                      onChange={(e) => handleSettingChange('gameplay', 'autosaveEnabled', e.target.checked)}
-                    />
-                  }
-                  label="Enable autosave"
-                  sx={{ mb: 2, display: 'block' }}
-                />
-                
-                <Typography gutterBottom>
-                  Autosave Interval: {settings.gameplay.autosaveInterval} minutes
-                </Typography>
-                <Slider
-                  value={settings.gameplay.autosaveInterval}
-                  onChange={(_, value) => handleSettingChange('gameplay', 'autosaveInterval', value)}
-                  valueLabelDisplay="auto"
-                  min={1}
-                  max={60}
-                  disabled={!settings.gameplay.autosaveEnabled}
-                  sx={{ mb: 3 }}
-                />
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.gameplay.showTutorials}
-                      onChange={(e) => handleSettingChange('gameplay', 'showTutorials', e.target.checked)}
-                    />
-                  }
-                  label="Show tutorial hints"
-                />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        <GameplaySettingsPanel
+          settings={gameplaySettings}
+          onUpdate={handleGameplayUpdate}
+        />
 
         {/* UI Settings */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography 
-                variant="h5" 
-                gutterBottom
-                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-              >
-                <UIIcon color="primary" />
-                Interface Settings
-              </Typography>
-              
-              <Box sx={{ mt: 3 }}>
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>Font Size</InputLabel>
-                  <Select
-                    value={settings.ui.fontSize}
-                    label="Font Size"
-                    onChange={(e) => handleSettingChange('ui', 'fontSize', e.target.value)}
-                  >
-                    <MenuItem value="small">Small</MenuItem>
-                    <MenuItem value="medium">Medium</MenuItem>
-                    <MenuItem value="large">Large</MenuItem>
-                  </Select>
-                </FormControl>
-                
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Current Theme
-                  </Typography>
-                  <Chip 
-                    label={settings.ui.theme || 'Default'} 
-                    color="primary" 
-                    variant="outlined"
-                  />
-                </Box>
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.ui.showResourceNotifications}
-                      onChange={(e) => handleSettingChange('ui', 'showResourceNotifications', e.target.checked)}
-                    />
-                  }
-                  label="Show resource change notifications"
-                />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        <UISettingsPanel
+          settings={uiSettings}
+          onUpdate={handleUIUpdate}
+        />
 
         {/* Settings Actions */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Settings Management
-              </Typography>
-              
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Button
-                  variant="contained"
-                  startIcon={<SaveIcon />}
-                  color="primary"
-                >
-                  Save Settings
-                </Button>
-                
-                <Button
-                  variant="outlined"
-                  startIcon={<ResetIcon />}
-                  color="warning"
-                  onClick={handleResetSettings}
-                >
-                  Reset to Defaults
-                </Button>
-              </Box>
-              
-              <Divider sx={{ my: 2 }} />
-              
-              <Alert severity="info">
-                <AlertTitle>Settings Information</AlertTitle>
-                Settings are automatically saved to your browser's local storage. 
-                Changes take effect immediately and persist between sessions.
-              </Alert>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Advanced Settings Preview */}
-        <Grid item xs={12}>
-          <Alert severity="info">
-            <AlertTitle>Planned Features</AlertTitle>
-            <Typography variant="body2">
-              <strong>Additional settings coming soon:</strong>
-            </Typography>
-            <Box component="ul" sx={{ mt: 1, mb: 0 }}>
-              <li>Advanced graphics options (shadows, anti-aliasing)</li>
-              <li>Keybinding customization</li>
-              <li>Advanced audio options (environmental sounds, voice)</li>
-              <li>Accessibility enhancements (high contrast, motion reduction)</li>
-              <li>Import/export settings profiles</li>
-              <li>Cloud settings synchronization</li>
-            </Box>
-          </Alert>
-        </Grid>
-      </Grid>
+        <SettingsActions
+          onReset={handleReset}
+          onExport={() => {
+            // Future: Export settings functionality
+            console.log('Export settings:', settings);
+          }}
+          onImport={() => {
+            // Future: Import settings functionality
+            console.log('Import settings functionality coming soon');
+          }}
+        />
+      </Box>
     </Container>
   );
-});
+};
 
-SettingsPage.displayName = 'SettingsPage';
+export default SettingsPage;

@@ -1,96 +1,153 @@
-import React from 'react';
-import { Box, Typography, Avatar, LinearProgress } from '@mui/material';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+/**
+ * @file NPCHeader.tsx
+ * @description Header component displaying NPC basic information and relationship status
+ */
 
-import type { NpcState } from '../../state/NpcTypes';
+import React from 'react';
+import {
+  Box,
+  Typography,
+  Avatar,
+  Chip,
+  LinearProgress,
+  Paper
+} from '@mui/material';
+import {
+  Person as PersonIcon,
+  LocationOn as LocationIcon,
+  Favorite as FavoriteIcon
+} from '@mui/icons-material';
+import type { NPC } from '../../state/NPCTypes';
 
 interface NPCHeaderProps {
-  npc: NpcState;
+  npc: NPC;
 }
 
 const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
-  // Calculate relationship progress to next level
-  const currentLevel = Math.floor(npc.relationshipValue);
-  const nextLevel = currentLevel + 1;
-  const progressToNext = npc.relationshipValue - currentLevel;
-
   const getRelationshipColor = (value: number) => {
-    if (value >= 4) return 'success';
-    if (value >= 2) return 'warning';
-    if (value >= 1) return 'info';
-    return 'inherit';
+    if (value >= 75) return 'success';
+    if (value >= 50) return 'info';
+    if (value >= 25) return 'warning';
+    return 'default';
+  };
+
+  const getRelationshipLabel = (value: number) => {
+    if (value >= 90) return 'Beloved';
+    if (value >= 75) return 'Trusted';
+    if (value >= 50) return 'Ally';
+    if (value >= 25) return 'Friend';
+    if (value >= 10) return 'Acquaintance';
+    return 'Neutral';
   };
 
   return (
-    <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-        {/* NPC Avatar */}
+    <Paper 
+      elevation={2} 
+      sx={{ 
+        p: 3, 
+        mb: 2,
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3 }}>
+        {/* Avatar */}
         <Avatar
-          sx={{
-            width: 64,
-            height: 64,
+          sx={{ 
+            width: 80, 
+            height: 80,
             bgcolor: 'primary.main',
-            fontSize: '1.5rem'
+            fontSize: '2rem'
           }}
         >
-          {npc.name.charAt(0).toUpperCase()}
+          {npc.avatar ? (
+            <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} />
+          ) : (
+            <PersonIcon fontSize="large" />
+          )}
         </Avatar>
 
-        {/* NPC Info */}
-        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography variant="h6" component="h2" noWrap>
+        {/* Main Info */}
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
             {npc.name}
           </Typography>
           
+          {npc.description && (
+            <Typography variant="body1" color="text.secondary" paragraph>
+              {npc.description}
+            </Typography>
+          )}
+
           {/* Location */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-            <LocationOnIcon fontSize="small" color="action" />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <LocationIcon color="action" />
             <Typography variant="body2" color="text.secondary">
               {npc.location}
             </Typography>
           </Box>
 
-          {/* Status */}
-          {npc.status && (
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Status: {npc.status}
-            </Typography>
-          )}
-
-          {/* Relationship Progress */}
-          <Box sx={{ mt: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <FavoriteIcon 
-                fontSize="small" 
-                color={getRelationshipColor(npc.relationshipValue)}
+          {/* Status Chips */}
+          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+            <Chip
+              label={npc.isAvailable ? 'Available' : 'Busy'}
+              color={npc.isAvailable ? 'success' : 'default'}
+              size="small"
+            />
+            <Chip
+              label={npc.status}
+              variant="outlined"
+              size="small"
+            />
+            {npc.faction && (
+              <Chip
+                label={npc.faction}
+                variant="outlined"
+                size="small"
+                color="primary"
               />
-              <Typography variant="body2">
-                Relationship: {npc.relationshipValue.toFixed(1)}
-              </Typography>
-            </Box>
-            
-            {/* Progress bar to next level */}
-            {currentLevel < 5 && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="caption" color="text.secondary">
-                  Lv {currentLevel}
-                </Typography>
-                <LinearProgress
-                  variant="determinate"
-                  value={progressToNext * 100}
-                  sx={{ flexGrow: 1, height: 6, borderRadius: 3 }}
-                  color={getRelationshipColor(npc.relationshipValue)}
-                />
-                <Typography variant="caption" color="text.secondary">
-                  Lv {nextLevel}
-                </Typography>
-              </Box>
             )}
           </Box>
         </Box>
+
+        {/* Relationship Info */}
+        <Box sx={{ minWidth: 200 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <FavoriteIcon color="action" />
+            <Typography variant="subtitle2">
+              Relationship
+            </Typography>
+          </Box>
+          
+          <Box sx={{ mb: 1 }}>
+            <Chip
+              label={getRelationshipLabel(npc.relationshipValue)}
+              color={getRelationshipColor(npc.relationshipValue)}
+              size="small"
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Level {npc.relationshipValue}/100
+            </Typography>
+          </Box>
+
+          <LinearProgress
+            variant="determinate"
+            value={npc.relationshipValue}
+            color={getRelationshipColor(npc.relationshipValue)}
+            sx={{ 
+              height: 8, 
+              borderRadius: 4,
+              backgroundColor: 'rgba(0,0,0,0.1)'
+            }}
+          />
+
+          {npc.connectionDepth !== undefined && (
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              Connection Depth: {npc.connectionDepth.toFixed(1)}
+            </Typography>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </Paper>
   );
 };
 

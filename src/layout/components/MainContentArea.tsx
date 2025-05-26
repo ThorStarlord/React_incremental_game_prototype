@@ -11,9 +11,9 @@ import { useTheme } from '@mui/material/styles';
 // Page imports
 import { CharacterPage } from '../../pages/CharacterPage';
 import { TraitSystemWrapper } from '../../features/Traits/components/containers/TraitSystemWrapper';
-import { NPCPage } from '../../pages/NPCPage';
-import { EssencePage } from '../../pages/EssencePage';
-import { SettingsPage } from '../../pages/SettingsPage';
+import NPCsPage from '../../pages/NPCsPage'; // Updated from NPCPage
+import EssencePage from '../../pages/EssencePage';
+import SettingsPage from '../../pages/SettingsPage';
 import { DashboardPage } from '../../pages/DashboardPage';
 
 // Shared components
@@ -160,7 +160,7 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
 
     // World Interaction Section
     npcs: {
-      component: NPCPage,
+      component: NPCsPage,
       showContainer: true,
       maxWidth: 'lg',
       loadingText: 'Loading NPC data...',
@@ -231,6 +231,24 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
       loadingText: 'Loading inventory...',
       enableSuspense: false
     },
+    crafting: {
+      component: PlaceholderPage,
+      props: {
+        title: 'Crafting System',
+        message: 'Item creation and enhancement interface',
+        status: 'planned' as const,
+        timeline: 'Phase 3 Development',
+        features: [
+          'Recipe management',
+          'Material collection',
+          'Quality enhancement',
+          'Advanced crafting'
+        ]
+      },
+      showContainer: true,
+      loadingText: 'Loading crafting system...',
+      enableSuspense: false
+    },
 
     // System Section
     settings: {
@@ -257,6 +275,24 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
       },
       showContainer: true,
       loadingText: 'Loading save management...',
+      enableSuspense: false
+    },
+    'save-load': {
+      component: PlaceholderPage,
+      props: {
+        title: 'Save/Load System',
+        message: 'Advanced save and load management',
+        status: 'in-development' as const,
+        timeline: 'Current Development',
+        features: [
+          'Multiple save slots',
+          'Quick save/load',
+          'Export/Import saves',
+          'Version compatibility'
+        ]
+      },
+      showContainer: true,
+      loadingText: 'Loading save/load system...',
       enableSuspense: false
     }
   }), []);

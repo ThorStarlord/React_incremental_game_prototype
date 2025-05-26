@@ -16,7 +16,7 @@ export interface NPC {
   // Basic identification and presentation
   id: string;
   name: string;
-  description: string;
+  description?: string;
   location: string;
   avatar?: string;
   faction?: string;
@@ -24,7 +24,7 @@ export interface NPC {
   // Relationship and connection data
   relationshipValue: number;
   connectionDepth: number;
-  loyalty: number; // Added to match slice implementation
+  loyalty: number;
   
   // Interaction tracking
   availableDialogues: string[];
@@ -33,21 +33,21 @@ export interface NPC {
   completedQuests: string[];
   
   // Trait system integration
-  traits: Record<string, NPCTrait>;
+  traits?: Record<string, NPCTraitInfo>;
   teachableTraits: string[];
-  sharedTraitSlots: NPCSharedTraitSlot[];
+  sharedTraitSlots?: NPCSharedTraitSlot[];
   
   // Commerce and services
   inventory?: NPCInventory;
   services?: NPCService[];
   
   // Behavioral characteristics
-  personality: NPCPersonality;
+  personality?: NPCPersonality;
   schedule?: NPCSchedule;
   
   // State management
-  status: string; // Added to match slice implementation
-  lastInteraction?: Date;
+  status: NPCStatus;
+  lastInteraction?: number;
   isDiscovered?: boolean;
   isAvailable?: boolean;
 }
@@ -55,11 +55,11 @@ export interface NPC {
 /**
  * Trait information specific to NPCs including acquisition requirements
  */
-export interface NPCTrait {
+export interface NPCTraitInfo {
   id: string;
-  name: string;
+  name?: string;
   relationshipRequirement: number;
-  essenceCost: number;
+  essenceCost?: number;
   prerequisites?: string[];
   isVisible?: boolean; // Added for discovery tracking
 }
@@ -71,6 +71,8 @@ export interface NPCSharedTraitSlot {
   id: string;
   index: number;
   traitId?: string | null;
+  isUnlocked: boolean;
+  unlockRequirement?: number;
 }
 
 // ============================================================================
@@ -81,23 +83,23 @@ export interface NPCSharedTraitSlot {
  * NPC inventory system for trading and commerce
  */
 export interface NPCInventory {
-  items: NPCInventoryItem[];
+  items: TradeItem[];
   currency: number;
-  restockInterval: number;
-  lastRestock?: Date;
 }
 
 /**
  * Individual item in NPC inventory with pricing and availability
  */
-export interface NPCInventoryItem {
+export interface TradeItem {
   id: string;
   name: string;
+  description: string;
+  category: string;
+  rarity: string;
+  basePrice: number;
+  currentPrice: number;
   quantity: number;
-  price: number;
-  basePrice?: number; // Added for relationship discount calculations
-  relationshipDiscount?: number;
-  category?: string; // Added for item organization
+  effects?: Record<string, number>;
 }
 
 /**
@@ -107,10 +109,10 @@ export interface NPCService {
   id: string;
   name: string;
   description: string;
-  cost: number;
-  relationshipRequirement: number;
-  type: NPCServiceType;
-  isAvailable?: boolean; // Added for dynamic availability
+  basePrice: number;
+  currentPrice: number;
+  isAvailable: boolean;
+  requirements?: Record<string, any>;
 }
 
 /**
@@ -133,11 +135,8 @@ export type NPCServiceType =
  */
 export interface NPCPersonality {
   traits: string[];
-  likes: string[];
-  dislikes: string[];
-  conversationStyle: NPCConversationStyle;
-  temperament?: string; // Added for more personality depth
-  motivations?: string[]; // Added for quest and interaction design
+  preferences: Record<string, number>;
+  dislikes: Record<string, number>;
 }
 
 /**
@@ -299,95 +298,60 @@ export interface DialogueMetadata {
 // ============================================================================
 
 /**
- * Record of interaction between player and NPC
+ * Result of an NPC interaction
+ */
+export interface InteractionResult {
+  success: boolean;
+  relationshipChange?: number;
+  essenceGained?: number;
+  unlockRewards?: string[];
+  message: string;
+}
+
+/**
+ * Dialogue entry in conversation history
+ */
+export interface DialogueEntry {
+  id: string;
+  npcId: string;
+  timestamp: number;
+  playerChoice: string;
+  npcResponse: string;
+  relationshipChange: number;
+}
+
+/**
+ * Record of relationship changes over time
+ */
+export interface RelationshipChangeEntry {
+  id: string;
+  npcId: string;
+  timestamp: number;
+  change: number;
+  reason: string;
+  newValue: number;
+}
+
+/**
+ * Current interaction session data
  */
 export interface NPCInteraction {
   npcId: string;
-  type: NPCInteractionType;
-  timestamp: Date;
-  data: NPCInteractionData;
-  relationshipChange?: number;
-  duration?: number; // Added for interaction tracking
+  startTime: number;
+  interactionType: 'dialogue' | 'trade' | 'quest' | 'trait_sharing';
 }
 
 /**
- * Types of interactions possible with NPCs
- */
-export type NPCInteractionType = 
-  | 'dialogue' 
-  | 'trade' 
-  | 'quest' 
-  | 'service' 
-  | 'gift'
-  | 'combat'
-  | 'training';
-
-/**
- * Flexible data structure for interaction-specific information
- */
-export interface NPCInteractionData {
-  [key: string]: any;
-  dialogueId?: string;
-  currentNodeId?: string;
-  itemsTraded?: TradeItem[];
-  questId?: string;
-  serviceId?: string;
-  giftItem?: string;
-}
-
-/**
- * Item involved in trading interaction
- */
-export interface TradeItem {
-  itemId: string;
-  quantity: number;
-  price?: number; // Added for transaction tracking
-}
-
-/**
- * Relationship change tracking for analytics and display
- */
-export interface NPCRelationshipChange {
-  npcId: string;
-  oldValue: number;
-  newValue: number;
-  reason: string;
-  timestamp: Date;
-  category?: string; // Added for change categorization
-  impact?: 'positive' | 'negative' | 'neutral'; // Added for UI styling
-}
-
-// ============================================================================
-// STATE MANAGEMENT
-// ============================================================================
-
-/**
- * Complete NPC system state for Redux store
+ * Enhanced NPC state for the Redux store
  */
 export interface NPCState {
   npcs: Record<string, NPC>;
   discoveredNPCs: string[];
   currentInteraction: NPCInteraction | null;
-  dialogueHistory: Record<string, string[]>;
-  relationshipChanges: NPCRelationshipChange[];
+  dialogueHistory: Record<string, DialogueEntry[]>;
+  relationshipChanges: RelationshipChangeEntry[];
   loading: boolean;
   error: string | null;
-  
-  // Additional state tracking
-  lastInteractionTime?: number;
-  totalInteractions?: number;
-  relationshipStats?: NPCRelationshipStats;
-}
-
-/**
- * Statistics about player's relationships with NPCs
- */
-export interface NPCRelationshipStats {
-  averageRelationship: number;
-  highestRelationship: number;
-  totalNPCsDiscovered: number;
-  totalNPCsAtMaxRelationship: number;
-  relationshipDistribution: Record<string, number>;
 }
 
 // ============================================================================
@@ -400,8 +364,7 @@ export interface NPCRelationshipStats {
 export interface UpdateRelationshipPayload {
   npcId: string;
   change: number;
-  reason: string;
-  category?: string;
+  reason?: string;
 }
 
 /**
@@ -449,7 +412,6 @@ export interface ShareTraitPayload {
   npcId: string;
   traitId: string;
   slotIndex: number;
-  essenceCost?: number;
 }
 
 /**
@@ -573,6 +535,105 @@ export interface NPCFilterCriteria {
 export interface NPCSortOptions {
   field: 'name' | 'relationshipValue' | 'location' | 'lastInteraction';
   direction: 'asc' | 'desc';
+}
+
+// ============================================================================
+// STATE CONSTANTS
+// ============================================================================
+
+/**
+ * Default initial state for the NPC system
+ */
+export const DEFAULT_NPC_STATE: NPCState = {
+  npcs: {},
+  discoveredNPCs: [],
+  currentInteraction: null,
+  dialogueHistory: [],
+  relationshipChanges: [],
+  loading: false,
+  error: null
+};
+
+/**
+ * Relationship thresholds for UI and gameplay logic
+ */
+export const RELATIONSHIP_THRESHOLDS = {
+  HOSTILE: -50,
+  SUSPICIOUS: -10,
+  NEUTRAL: 0,
+  ACQUAINTANCE: 10,
+  FRIEND: 25,
+  ALLY: 50,
+  TRUSTED: 75,
+  BELOVED: 90
+} as const;
+
+// ============================================================================
+// ADDITIONAL MISSING TYPES
+// ============================================================================
+
+/**
+ * NPC status enumeration
+ */
+export type NPCStatus = 
+  | 'available'
+  | 'busy' 
+  | 'traveling'
+  | 'sleeping'
+  | 'hostile'
+  | 'dead'
+  | 'unknown';
+
+/**
+ * Types of interactions possible with NPCs
+ */
+export type InteractionType = 
+  | 'dialogue'
+  | 'trade'
+  | 'quest'
+  | 'trait_sharing'
+  | 'gift'
+  | 'challenge';
+
+/**
+ * Result of dialogue interaction
+ */
+export interface DialogueResult {
+  success: boolean;
+  npcResponse: string;
+  relationshipChange?: number;
+  rewards?: string[];
+}
+
+/**
+ * Player dialogue choice
+ */
+export interface DialogueChoice {
+  id: string;
+  text: string;
+  emotionalTone?: 'friendly' | 'neutral' | 'aggressive' | 'flirty' | 'formal';
+  requirements?: DialogueRequirement[];
+}
+
+/**
+ * Updated payload interfaces to match slice expectations
+ */
+export interface UpdateNPCRelationshipPayload {
+  npcId: string;
+  change: number;
+  reason?: string;
+}
+
+export interface StartInteractionPayload {
+  npcId: string;
+  type: InteractionType;
+  context?: Record<string, any>;
+}
+
+export interface ProcessDialoguePayload {
+  npcId: string;
+  choiceId: string;
+  playerText: string;
 }
 
 // ============================================================================

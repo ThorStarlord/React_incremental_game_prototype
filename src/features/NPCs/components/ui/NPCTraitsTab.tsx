@@ -1,6 +1,6 @@
 /**
  * @file NPCTraitsTab.tsx
- * @description Trait sharing and learning interface for NPC interactions
+ * @description Trait sharing and acquisition tab for NPC interactions
  */
 
 import React, { useState, useMemo } from 'react';
@@ -41,6 +41,9 @@ import {
   Bolt,
   Remove,
   Add,
+  AutoFixHigh as TraitIcon,
+  Visibility as VisibleIcon,
+  VisibilityOff as HiddenIcon,
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectNPCById } from '../../state/NPCSelectors';
@@ -62,6 +65,12 @@ interface PlayerTrait {
   canShare: boolean;
 }
 
+interface TraitAcquisitionDialog {
+  open: boolean;
+  trait: NPCTrait | PlayerTrait | null;
+  traitId: string | null;
+}
+
 export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
   const npc = useAppSelector(selectNPCById(npcId)) as NPC;
@@ -69,6 +78,11 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   const [selectedTrait, setSelectedTrait] = useState<NPCTrait | PlayerTrait | null>(null);
   const [showTraitDialog, setShowTraitDialog] = useState(false);
   const [actionType, setActionType] = useState<'learn' | 'share'>('learn');
+  const [acquisitionDialog, setAcquisitionDialog] = useState<TraitAcquisitionDialog>({
+    open: false,
+    trait: null,
+    traitId: null,
+  });
 
   // Mock player traits - this would come from player state
   const mockPlayerTraits: PlayerTrait[] = [
@@ -161,6 +175,15 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
 
     setShowTraitDialog(false);
     setSelectedTrait(null);
+  };
+
+  // Confirm trait acquisition from dialog
+  const confirmTraitAcquisition = () => {
+    if (acquisitionDialog.traitId) {
+      console.log(`Learning trait: ${acquisitionDialog.traitId}`);
+      // Here you would dispatch the trait acquisition action
+    }
+    setAcquisitionDialog({ open: false, trait: null, traitId: null });
   };
 
   // Remove shared trait
@@ -291,96 +314,220 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     </ListItem>
   );
 
-  return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Trait Exchange with {npc.name}
+  const currentRelationship = 0; // Placeholder for current relationship value
+
+  const getTraitVisibilityIcon = (traitInfo: NPCTrait) => {
+    return traitInfo.isVisible ? (
+      <VisibleIcon color="primary" />
+    ) : (
+      <HiddenIcon color="disabled" />
+    );
+  };
+
+  const isTraitAvailable = (traitInfo: NPCTrait) => {
+    return currentRelationship >= traitInfo.relationshipRequirement;
+  };
+
+  const getTraitDetails = (traitId: string) => {
+    return {
+      name: traitId.charAt(0).toUpperCase() + traitId.slice(1),
+      description: 'No description available.',
+      category: 'Unknown',
+      effects: {},
+    };
+  };
+
+  if (!npc.traits || Object.keys(npc.traits).length === 0) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <TraitIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+        <Typography variant="h6" color="text.secondary">
+          No traits available
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Learn traits from {npc.name} or share your own to deepen your relationship
+          {npc.name} doesn't have any traits you can learn.
         </Typography>
       </Box>
+    );
+  }
 
-      {/* Shared Traits Summary */}
-      <Card sx={{ mb: 3, bgcolor: 'background.default' }}>
+  return (
+    <Box sx={{ p: 2 }}>
+      {/* Traits Header */}
+      <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Shared Trait Slots ({usedSharedSlots}/{npc.sharedTraitSlots})
+          <Typography variant="h6" gutterBottom>
+            {npc.name}'s Traits
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Learn traits from {npc.name} by building your relationship and spending Essence.
           </Typography>
           
-          {usedSharedSlots > 0 ? (
-            <List dense>
-              {Object.entries(npc.traits).map(([traitId, trait]) =>
-                renderSharedTrait(traitId, trait)
-              )}
-            </List>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              No traits shared yet. Share traits to strengthen your bond!
-            </Typography>
-          )}
-
-          {availableSlots <= 0 && usedSharedSlots > 0 && (
-            <Alert severity="warning" sx={{ mt: 2 }}>
-              All trait slots are full. Remove a shared trait to add new ones.
-            </Alert>
-          )}
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Chip
+              label={`Relationship: ${currentRelationship}`}
+              color="primary"
+            />
+            <Chip
+              label={`Traits Available: ${Object.values(npc.traits).filter(t => t.isVisible).length}`}
+              color="secondary"
+            />
+          </Box>
         </CardContent>
       </Card>
 
-      {/* Trait Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={selectedTab} onChange={(_, newValue) => setSelectedTab(newValue)}>
-          <Tab label={`Learn from ${npc.name} (${teachableTraits.length})`} />
-          <Tab label={`Share with ${npc.name} (${shareableTraits.length})`} />
-        </Tabs>
-      </Box>
+      {/* Visible Traits */}
+      <Typography variant="h6" gutterBottom>
+        Discoverable Traits
+      </Typography>
+      
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        {Object.entries(npc.traits)
+          .filter(([_, traitInfo]) => traitInfo.isVisible)
+          .map(([traitId, traitInfo]) => {
+            const details = getTraitDetails(traitId);
+            const isAvailable = isTraitAvailable(traitInfo);
+            
+            return (
+              <Grid item xs={12} md={6} key={traitId}>
+                <Card 
+                  variant="outlined"
+                  sx={{ 
+                    height: '100%',
+                    opacity: isAvailable ? 1 : 0.7,
+                    border: isAvailable ? 2 : 1,
+                    borderColor: isAvailable ? 'primary.main' : 'divider'
+                  }}
+                >
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                      <Typography variant="h6">
+                        {details.name}
+                      </Typography>
+                      <Chip
+                        label={details.category}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    </Box
+                    
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                      {details.description}
+                    </Typography>
+                    
+                    {/* Effects */}
+                    {Object.keys(details.effects).length > 0 && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="caption" color="text.secondary" display="block">
+                          Effects:
+                        </Typography>
+                        {Object.entries(details.effects).map(([effect, value]) => (
+                          <Chip
+                            key={effect}
+                            label={`${effect.replace('_', ' ')}: +${value}`}
+                            size="small"
+                            sx={{ mr: 0.5, mb: 0.5 }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                    
+                    {/* Requirements and Cost */}
+                    <List dense>
+                      <ListItem>
+                        <ListItemText
+                          primary="Relationship Required"
+                          secondary={traitInfo.relationshipRequirement}
+                        />
+                        <ListItemIcon>
+                          {currentRelationship >= traitInfo.relationshipRequirement ? (
+                            <Chip label="✓" color="success" size="small" />
+                          ) : (
+                            <Chip 
+                              label={`Need ${traitInfo.relationshipRequirement - currentRelationship} more`}
+                              color="warning" 
+                              size="small" 
+                            />
+                          )}
+                        </ListItemIcon>
+                      </ListItem>
+                      
+                      {traitInfo.essenceCost && (
+                        <ListItem>
+                          <ListItemText
+                            primary="Essence Cost"
+                            secondary={`${traitInfo.essenceCost} Essence`}
+                          />
+                        </ListItem>
+                      )}
+                    </List>
+                    
+                    <Button
+                      fullWidth
+                      variant={isAvailable ? "contained" : "outlined"}
+                      onClick={() => handleLearnTrait(traitId, traitInfo)}
+                      disabled={!isAvailable}
+                      startIcon={<LearnIcon />}
+                      sx={{ mt: 2 }}
+                    >
+                      {isAvailable ? 'Learn Trait' : `Requires Relationship ${traitInfo.relationshipRequirement}`}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
+      </Grid>
 
-      {/* Learn Traits Tab */}
-      {selectedTab === 0 && (
-        <Box>
-          {teachableTraits.length > 0 ? (
-            teachableTraits.map(renderNPCTrait)
-          ) : (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <School sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h6" color="text.secondary">
-                No traits available to learn
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Build your relationship to unlock new traits
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      )}
-
-      {/* Share Traits Tab */}
-      {selectedTab === 1 && (
-        <Box>
-          {availableSlots <= 0 && (
-            <Alert severity="warning" sx={{ mb: 2 }}>
-              No available trait slots. Remove a shared trait first.
-            </Alert>
-          )}
+      {/* Hidden Traits */}
+      {Object.values(npc.traits).some(t => !t.isVisible) && (
+        <>
+          <Divider sx={{ my: 3 }} />
           
-          {shareableTraits.length > 0 ? (
-            shareableTraits.map(renderPlayerTrait)
-          ) : (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Share sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h6" color="text.secondary">
-                No traits available to share
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Develop your traits to share them with others
-              </Typography>
-            </Box>
-          )}
-        </Box>
+          <Typography variant="h6" gutterBottom>
+            Undiscovered Traits
+          </Typography>
+          
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Some traits remain hidden. Continue building your relationship with {npc.name} to discover them.
+          </Alert>
+          
+          <List>
+            {Object.entries(npc.traits)
+              .filter(([_, traitInfo]) => !traitInfo.isVisible)
+              .map(([traitId, traitInfo], index) => (
+                <ListItem key={traitId}>
+                  <ListItemText
+                    primary="Hidden Trait"
+                    secondary={`Unlock at relationship level ${traitInfo.relationshipRequirement}`}
+                  />
+                  <ListItemIcon>
+                    <HiddenIcon color="disabled" />
+                  </ListItemIcon>
+                </ListItem>
+              ))}
+          </List>
+        </>
       )}
+
+      {/* Trait Sharing Slots (Future Feature) */}
+      <Divider sx={{ my: 3 }} />
+      
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Trait Sharing
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Share your traits with {npc.name} to strengthen your bond and unlock new possibilities.
+          </Typography>
+          
+          <Alert severity="info">
+            Trait sharing feature coming soon! This will allow you to share your acquired traits with NPCs.
+          </Alert>
+        </CardContent>
+      </Card>
 
       {/* Trait Action Dialog */}
       <Dialog open={showTraitDialog} onClose={() => setShowTraitDialog(false)} maxWidth="sm" fullWidth>
@@ -432,6 +579,51 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
             disabled={actionType === 'share' && availableSlots <= 0}
           >
             {actionType === 'learn' ? 'Learn Trait' : 'Share Trait'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Trait Acquisition Dialog */}
+      <Dialog
+        open={acquisitionDialog.open}
+        onClose={() => setAcquisitionDialog({ open: false, trait: null, traitId: null })}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          Learn Trait: {acquisitionDialog.traitId ? getTraitDetails(acquisitionDialog.traitId).name : ''}
+        </DialogTitle>
+        
+        <DialogContent>
+          {acquisitionDialog.trait && acquisitionDialog.traitId && (
+            <Box>
+              <Typography variant="body1" paragraph>
+                Are you sure you want to learn this trait from {npc.name}?
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary" paragraph>
+                {getTraitDetails(acquisitionDialog.traitId).description}
+              </Typography>
+              
+              {acquisitionDialog.trait.essenceCost && (
+                <Alert severity="warning">
+                  This will cost {acquisitionDialog.trait.essenceCost} Essence.
+                </Alert>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={() => setAcquisitionDialog({ open: false, trait: null, traitId: null })}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={confirmTraitAcquisition}
+            variant="contained"
+            autoFocus
+          >
+            Learn Trait
           </Button>
         </DialogActions>
       </Dialog>

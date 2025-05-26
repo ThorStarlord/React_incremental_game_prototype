@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TabId } from '../types/NavigationTypes';
-import { navigationItems } from '../constants/navigationItems';
+import { getImplementedItems } from '../constants/navigationConfig';
 
 /**
  * Interface for layout state management
@@ -93,6 +93,7 @@ const tabToRouteMap: Record<TabId, string> = {
  * Validates if a given string is a valid TabId
  */
 const isValidTabId = (tabId: string): tabId is TabId => {
+  const navigationItems = getImplementedItems();
   return navigationItems.some(item => item.id === tabId);
 };
 

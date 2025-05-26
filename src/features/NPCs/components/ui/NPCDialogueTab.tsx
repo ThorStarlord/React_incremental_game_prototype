@@ -1,418 +1,310 @@
 /**
  * @file NPCDialogueTab.tsx
- * @description Tab component for NPC dialogue interactions
+ * @description Dialogue interaction tab for conversations with NPCs
  */
 
 import React, { useState, useCallback } from 'react';
 import {
   Box,
-  Typography,
   Card,
   CardContent,
+  Typography,
+  TextField,
   Button,
   List,
   ListItem,
   ListItemText,
+  Avatar,
+  Chip,
   Divider,
   Paper,
-  Chip,
-  Alert,
+  Alert
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import ChatIcon from '@mui/icons-material/Chat';
-import PersonIcon from '@mui/icons-material/Person';
-import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
-
-import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectNPCById, selectDialogueHistory } from '../state/NPCSelectors';
-import { npcActions } from '../state/NPCSlice';
-
-// Mock dialogue data - this would come from game data in a real implementation
-const MOCK_DIALOGUES = {
-  'greeting': {
-    id: 'greeting',
-    text: "Hello there! I haven't seen you around these parts before.",
-    speaker: 'npc' as const,
-    options: [
-      {
-        id: 'introduce',
-        text: "I'm new here. What can you tell me about this place?",
-        nextNodeId: 'introduction',
-        effects: [{ type: 'relationship', target: 'relationship', operation: 'add', value: 1 }],
-      },
-      {
-        id: 'business',
-        text: "I'm just passing through. What do you do here?",
-        nextNodeId: 'business_talk',
-        effects: [],
-      },
-      {
-        id: 'goodbye',
-        text: "Sorry, I can't chat right now.",
-        nextNodeId: 'goodbye',
-        effects: [],
-      },
-    ],
-  },
-  'introduction': {
-    id: 'introduction',
-    text: "Welcome to our village! We're a peaceful community of farmers and artisans. I'm always happy to help newcomers settle in.",
-    speaker: 'npc' as const,
-    options: [
-      {
-        id: 'ask_help',
-        text: "What kind of help do you offer?",
-        nextNodeId: 'help_options',
-        effects: [{ type: 'relationship', target: 'relationship', operation: 'add', value: 2 }],
-      },
-      {
-        id: 'thank',
-        text: "Thank you for the warm welcome!",
-        nextNodeId: 'end_positive',
-        effects: [{ type: 'relationship', target: 'relationship', operation: 'add', value: 1 }],
-      },
-    ],
-  },
-  'business_talk': {
-    id: 'business_talk',
-    text: "I run the local general store. We have supplies for travelers and tools for those settling down.",
-    speaker: 'npc' as const,
-    options: [
-      {
-        id: 'interested',
-        text: "I might be interested in browsing your wares.",
-        nextNodeId: 'trade_introduction',
-        effects: [],
-      },
-      {
-        id: 'not_now',
-        text: "Maybe another time.",
-        nextNodeId: 'end_neutral',
-        effects: [],
-      },
-    ],
-  },
-  'help_options': {
-    id: 'help_options',
-    text: "I can share knowledge about local customs, point you toward work opportunities, or even teach you some useful skills if we become good friends!",
-    speaker: 'npc' as const,
-    options: [
-      {
-        id: 'customs',
-        text: "Tell me about the local customs.",
-        nextNodeId: 'customs_explanation',
-        effects: [],
-      },
-      {
-        id: 'work',
-        text: "What kind of work is available?",
-        nextNodeId: 'work_opportunities',
-        effects: [],
-      },
-      {
-        id: 'skills',
-        text: "What skills could you teach me?",
-        nextNodeId: 'skills_tease',
-        effects: [],
-      },
-    ],
-  },
-  'end_positive': {
-    id: 'end_positive',
-    text: "It was a pleasure meeting you! Feel free to visit anytime.",
-    speaker: 'npc' as const,
-    options: [],
-  },
-  'end_neutral': {
-    id: 'end_neutral',
-    text: "Safe travels, then.",
-    speaker: 'npc' as const,
-    options: [],
-  },
-  'goodbye': {
-    id: 'goodbye',
-    text: "Of course, no worries. See you around!",
-    speaker: 'npc' as const,
-    options: [],
-  },
-};
-
-// Styled components
-const DialogueContainer = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  background: theme.palette.background.default,
-}));
-
-const NPCSpeechBubble = styled(Card)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  backgroundColor: theme.palette.primary.light,
-  color: theme.palette.primary.contrastText,
-}));
-
-const PlayerSpeechBubble = styled(Card)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  backgroundColor: theme.palette.secondary.light,
-  color: theme.palette.secondary.contrastText,
-  marginLeft: theme.spacing(4),
-}));
+import {
+  Send as SendIcon,
+  Person as PlayerIcon,
+  Chat as NPCIcon
+} from '@mui/icons-material';
+import type { NPC, NPCInteraction } from '../../state/NpcTypes';
 
 interface NPCDialogueTabProps {
-  npcId: string;
+  npc: NPC;
+  onStartInteraction?: (type: 'dialogue' | 'trade' | 'quest' | 'trait_sharing') => void;
+  onEndInteraction?: () => void;
+  onRelationshipChange?: (change: number, reason?: string) => void;
+  onProcessInteraction?: (interactionType: string, options?: Record<string, any>) => void;
+  onDialogueChoice?: (choiceId: string, playerText: string) => void;
+  currentInteraction?: NPCInteraction | null;
+  interactionData?: any;
 }
 
-/**
- * NPCDialogueTab - Interactive dialogue system for NPCs
- * 
- * Features:
- * - Branching conversation trees
- * - Relationship effects from dialogue choices
- * - Dialogue history tracking
- * - Contextual options based on relationship level
- */
-const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
-  const dispatch = useAppDispatch();
-  const npc = useAppSelector((state) => selectNPCById(state, npcId));
-  const dialogueHistory = useAppSelector(selectDialogueHistory);
-  
-  const [currentDialogueId, setCurrentDialogueId] = useState<string | null>(null);
-  const [conversationHistory, setConversationHistory] = useState<Array<{
-    speaker: 'npc' | 'player';
-    text: string;
-    timestamp: Date;
-  }>>([]);
+interface DialogueMessage {
+  id: string;
+  speaker: 'player' | 'npc';
+  text: string;
+  timestamp: number;
+  relationshipChange?: number;
+}
 
-  const npcHistory = dialogueHistory[npcId] || [];
-
-  const handleStartDialogue = useCallback((dialogueId: string) => {
-    setCurrentDialogueId(dialogueId);
-    setConversationHistory([]);
-    
-    const dialogue = MOCK_DIALOGUES[dialogueId as keyof typeof MOCK_DIALOGUES];
-    if (dialogue) {
-      setConversationHistory([{
-        speaker: dialogue.speaker,
-        text: dialogue.text,
-        timestamp: new Date(),
-      }]);
-      
-      dispatch(npcActions.startDialogue({ npcId, dialogueId }));
+const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({
+  npc,
+  onStartInteraction,
+  onDialogueChoice,
+  currentInteraction,
+  interactionData
+}) => {
+  const [messages, setMessages] = useState<DialogueMessage[]>([
+    {
+      id: '1',
+      speaker: 'npc',
+      text: `Hello! It's nice to see you. How can I help you today?`,
+      timestamp: Date.now() - 60000
     }
-  }, [dispatch, npcId]);
+  ]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
-  const handleDialogueChoice = useCallback((optionId: string, optionText: string, nextNodeId: string, effects: any[]) => {
-    // Add player response to conversation
-    setConversationHistory(prev => [...prev, {
+  const handleSendMessage = useCallback(() => {
+    if (!currentMessage.trim()) return;
+
+    const playerMessage: DialogueMessage = {
+      id: Date.now().toString(),
       speaker: 'player',
-      text: optionText,
-      timestamp: new Date(),
-    }]);
+      text: currentMessage,
+      timestamp: Date.now()
+    };
 
-    // Apply effects
-    effects.forEach(effect => {
-      if (effect.type === 'relationship') {
-        dispatch(npcActions.updateRelationship({
-          npcId,
-          change: effect.value,
-          reason: 'Dialogue choice',
-        }));
+    setMessages(prev => [...prev, playerMessage]);
+    setCurrentMessage('');
+    setIsTyping(true);
+
+    // Simulate NPC response
+    setTimeout(() => {
+      const responses = [
+        "That's very interesting! Tell me more.",
+        "I understand your perspective on that.",
+        "You raise a good point there.",
+        "I appreciate you sharing that with me.",
+        "That reminds me of something similar I experienced."
+      ];
+
+      const npcResponse: DialogueMessage = {
+        id: (Date.now() + 1).toString(),
+        speaker: 'npc',
+        text: responses[Math.floor(Math.random() * responses.length)],
+        timestamp: Date.now(),
+        relationshipChange: Math.random() > 0.7 ? 1 : 0
+      };
+
+      setMessages(prev => [...prev, npcResponse]);
+      setIsTyping(false);
+
+      // Process dialogue choice if handler provided
+      if (onDialogueChoice && npcResponse.relationshipChange) {
+        onDialogueChoice('positive', currentMessage);
       }
-    });
+    }, 1000 + Math.random() * 2000);
+  }, [currentMessage, onDialogueChoice]);
 
-    // Move to next dialogue node or end conversation
-    if (nextNodeId && MOCK_DIALOGUES[nextNodeId as keyof typeof MOCK_DIALOGUES]) {
-      const nextDialogue = MOCK_DIALOGUES[nextNodeId as keyof typeof MOCK_DIALOGUES];
-      
-      setTimeout(() => {
-        setConversationHistory(prev => [...prev, {
-          speaker: nextDialogue.speaker,
-          text: nextDialogue.text,
-          timestamp: new Date(),
-        }]);
-        
-        setCurrentDialogueId(nextNodeId);
-      }, 1000);
-    } else {
-      // End conversation
-      setTimeout(() => {
-        setCurrentDialogueId(null);
-        dispatch(npcActions.completeDialogue({
-          npcId,
-          dialogueId: currentDialogueId!,
-          effects,
-        }));
-      }, 1000);
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSendMessage();
     }
-  }, [dispatch, npcId, currentDialogueId]);
+  };
 
-  const handleEndConversation = useCallback(() => {
-    setCurrentDialogueId(null);
-    setConversationHistory([]);
-  }, []);
-
-  if (!npc) {
-    return (
-      <Typography variant="body1" color="text.secondary">
-        NPC not found.
-      </Typography>
-    );
-  }
-
-  // Get available dialogue options
-  const availableDialogues = npc.availableDialogues.filter(id => 
-    !npcHistory.includes(id) || id === 'greeting' // Greeting can always be repeated
-  );
-
-  const currentDialogue = currentDialogueId ? 
-    MOCK_DIALOGUES[currentDialogueId as keyof typeof MOCK_DIALOGUES] : null;
+  const formatTimestamp = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
 
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        <ChatIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-        Conversation with {npc.name}
-      </Typography>
-
-      {/* Active Conversation */}
-      {currentDialogue ? (
-        <DialogueContainer>
-          {/* Conversation History */}
-          <Box mb={2}>
-            {conversationHistory.map((entry, index) => (
-              entry.speaker === 'npc' ? (
-                <NPCSpeechBubble key={index}>
-                  <CardContent sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <PersonIcon />
-                    <Box>
-                      <Typography variant="body1">
-                        {entry.text}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </NPCSpeechBubble>
-              ) : (
-                <PlayerSpeechBubble key={index}>
-                  <CardContent sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <RecordVoiceOverIcon />
-                    <Box>
-                      <Typography variant="body1">
-                        {entry.text}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </PlayerSpeechBubble>
-              )
-            ))}
-          </Box>
-
-          {/* Dialogue Options */}
-          {currentDialogue.options.length > 0 ? (
+    <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* Dialogue Header */}
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar src={npc.avatar}>
+              {npc.name.charAt(0)}
+            </Avatar>
             <Box>
-              <Typography variant="subtitle2" gutterBottom>
-                Choose your response:
+              <Typography variant="h6">
+                Conversation with {npc.name}
               </Typography>
-              <List>
-                {currentDialogue.options.map((option, index) => (
-                  <ListItem 
-                    key={option.id}
-                    sx={{ p: 0, mb: 1 }}
-                  >
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      sx={{ 
-                        justifyContent: 'flex-start',
-                        textAlign: 'left',
-                        py: 1.5,
-                        px: 2,
-                      }}
-                      onClick={() => handleDialogueChoice(
-                        option.id, 
-                        option.text, 
-                        option.nextNodeId, 
-                        option.effects || []
-                      )}
-                    >
-                      <Typography variant="body2">
-                        {option.text}
-                      </Typography>
-                    </Button>
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          ) : (
-            <Box textAlign="center">
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Conversation ended.
-              </Typography>
-              <Button 
-                variant="contained" 
-                onClick={handleEndConversation}
-                sx={{ mt: 1 }}
-              >
-                Continue
-              </Button>
-            </Box>
-          )}
-        </DialogueContainer>
-      ) : (
-        /* Dialogue Selection */
-        <Box>
-          {availableDialogues.length > 0 ? (
-            <Box>
-              <Typography variant="body1" gutterBottom>
-                What would you like to talk about?
-              </Typography>
-              <List>
-                {availableDialogues.map((dialogueId) => (
-                  <ListItem key={dialogueId} sx={{ p: 0, mb: 1 }}>
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      sx={{ 
-                        justifyContent: 'flex-start',
-                        py: 1.5,
-                        px: 2,
-                      }}
-                      onClick={() => handleStartDialogue(dialogueId)}
-                    >
-                      <ChatIcon sx={{ mr: 1 }} />
-                      {dialogueId === 'greeting' ? 'Start Conversation' : dialogueId}
-                    </Button>
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          ) : (
-            <Alert severity="info">
-              <Typography variant="body2">
-                {npc.name} doesn't have anything new to say right now. 
-                Try improving your relationship or completing some tasks to unlock new conversations.
-              </Typography>
-            </Alert>
-          )}
-
-          {/* Dialogue History */}
-          {npcHistory.length > 0 && (
-            <Box mt={3}>
-              <Typography variant="subtitle2" gutterBottom>
-                Previous Conversations:
-              </Typography>
-              <Box display="flex" flexWrap="wrap" gap={1}>
-                {npcHistory.map((dialogueId, index) => (
-                  <Chip
-                    key={index}
-                    label={dialogueId}
+              <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                <Chip 
+                  label={`Relationship: ${interactionData?.relationship || 0}`}
+                  color="primary"
+                  size="small"
+                />
+                {currentInteraction?.interactionType === 'dialogue' && (
+                  <Chip 
+                    label="In Conversation"
+                    color="success"
                     size="small"
-                    variant="outlined"
                   />
-                ))}
+                )}
               </Box>
             </Box>
+          </Box>
+        </CardContent>
+      </Card>
+
+      <Alert severity="info" sx={{ mb: 2 }}>
+        Build your relationship through meaningful conversations. Current relationship: {interactionData?.relationship || 0}/100
+      </Alert>
+
+      {/* Messages Area */}
+      <Paper 
+        variant="outlined" 
+        sx={{ 
+          flexGrow: 1, 
+          overflow: 'auto', 
+          mb: 2,
+          maxHeight: '400px',
+          backgroundColor: 'grey.50'
+        }}
+      >
+        <List sx={{ p: 1 }}>
+          {messages.map((message, index) => (
+            <React.Fragment key={message.id}>
+              <ListItem
+                sx={{
+                  flexDirection: 'column',
+                  alignItems: message.speaker === 'player' ? 'flex-end' : 'flex-start',
+                  px: 1,
+                  py: 0.5
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    mb: 0.5,
+                    alignSelf: message.speaker === 'player' ? 'flex-end' : 'flex-start'
+                  }}
+                >
+                  {message.speaker === 'npc' && (
+                    <Avatar size="small" src={npc.avatar}>
+                      <NPCIcon fontSize="small" />
+                    </Avatar>
+                  )}
+                  <Typography variant="caption" color="text.secondary">
+                    {message.speaker === 'player' ? 'You' : npc.name}
+                  </Typography>
+                  {message.speaker === 'player' && (
+                    <Avatar size="small">
+                      <PlayerIcon fontSize="small" />
+                    </Avatar>
+                  )}
+                </Box>
+                
+                <Paper
+                  elevation={1}
+                  sx={{
+                    p: 1.5,
+                    maxWidth: '80%',
+                    backgroundColor: message.speaker === 'player' 
+                      ? 'primary.light' 
+                      : 'grey.100'
+                  }}
+                >
+                  <Typography variant="body2">
+                    {message.text}
+                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatTimestamp(message.timestamp)}
+                    </Typography>
+                    {message.relationshipChange && (
+                      <Chip
+                        label={`+${message.relationshipChange} relationship`}
+                        color="success"
+                        size="small"
+                        sx={{ ml: 1 }}
+                      />
+                    )}
+                  </Box>
+                </Paper>
+              </ListItem>
+              {index < messages.length - 1 && <Divider variant="middle" />}
+            </React.Fragment>
+          ))}
+          
+          {isTyping && (
+            <ListItem sx={{ justifyContent: 'flex-start', px: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Avatar size="small" src={npc.avatar}>
+                  <NPCIcon fontSize="small" />
+                </Avatar>
+                <Paper elevation={1} sx={{ p: 1.5, backgroundColor: 'grey.100' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {npc.name} is typing...
+                  </Typography>
+                </Paper>
+              </Box>
+            </ListItem>
           )}
-        </Box>
-      )}
+        </List>
+      </Paper>
+
+      {/* Message Input */}
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <TextField
+          fullWidth
+          multiline
+          maxRows={3}
+          placeholder={`Type your message to ${npc.name}...`}
+          value={currentMessage}
+          onChange={(e) => setCurrentMessage(e.target.value)}
+          onKeyPress={handleKeyPress}
+          disabled={isTyping}
+          size="small"
+        />
+        <Button
+          variant="contained"
+          onClick={handleSendMessage}
+          disabled={!currentMessage.trim() || isTyping}
+          sx={{ minWidth: 'auto', px: 2 }}
+        >
+          <SendIcon />
+        </Button>
+      </Box>
+
+      {/* Quick Actions */}
+      <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => setCurrentMessage("How are you doing today?")}
+          disabled={isTyping}
+        >
+          Ask about their day
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => setCurrentMessage("Tell me about yourself.")}
+          disabled={isTyping}
+        >
+          Learn more
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => setCurrentMessage("Thank you for your time.")}
+          disabled={isTyping}
+        >
+          Express gratitude
+        </Button>
+      </Box>
+
+      <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+        Press Enter to send, Shift+Enter for new line
+      </Typography>
     </Box>
   );
 };

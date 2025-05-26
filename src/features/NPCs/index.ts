@@ -1,13 +1,57 @@
 /**
- * @file index.ts
- * @description Barrel export file for the NPCs feature
+ * @file NPCs Feature Barrel Export
+ * @description Public API for the NPCs feature following Feature-Sliced Design
  */
 
-// Essential exports for NPCsPage functionality
-export { default as NPCPanel } from './components/containers/NPCPanel';
+// Types - Using correct file name
+export type {
+  NPC,
+  NPCState,
+  NPCTraitInfo,
+  NPCSharedTraitSlot,
+  TradeItem,
+  NPCService,
+  NPCPersonality,
+  NPCInteraction,
+  DialogueEntry,
+  RelationshipChangeEntry,
+  NPCStatus,
+  InteractionType,
+  UpdateNPCRelationshipPayload,
+  DiscoverNPCPayload,
+  StartInteractionPayload,
+  ProcessDialoguePayload,
+  ShareTraitPayload,
+  TradeWithNPCPayload,
+  NPCFilterCriteria,
+  NPCSortOptions,
+  InteractionResult,
+  DialogueResult,
+  DialogueChoice
+} from './state/NPCTypes';
 
-// State exports
-export * from './state/NpcSlice';
-export * from './state/NpcSelectors';
-export * from './state/NpcTypes';
-export { default as npcReducer } from './state/NpcSlice';
+// State management - Using correct file name
+export { default as npcReducer } from './state/NPCSlice';
+export {
+  updateNpcRelationship,
+  setNpcStatus,
+  setNpcAvailability,
+  startInteraction,
+  endInteraction,
+  addDialogueEntry,
+  clearError,
+  initializeNPCsThunk,
+  updateNPCRelationshipThunk,
+  processNPCInteractionThunk,
+  discoverNPCThunk,
+  processDialogueChoiceThunk
+} from './state/NPCSlice';
+
+// Selectors - Using correct file name
+export * from './state/NPCSelectors';
+
+// Components - Export the container component that exists
+export { default as NPCListView } from './components/containers/NPCListView';
+
+// Data
+export { getMockNPCs, getMockTradeItems } from './data/mockNPCData';

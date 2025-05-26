@@ -105,3 +105,18 @@ This specification represents the current state of the React Incremental RPG Pro
 - ⚠️ **DEPRECATED** - Legacy components with migration guidance
 
 The specification serves as both documentation of current capabilities and roadmap for future development.
+
+## Documentation Structure
+
+### Feature Specifications
+- **Naming Convention**: Each feature follows consistent file and folder naming patterns
+  - Feature folders: Plural names (`NPCs/`, `Traits/`, `Settings/`)
+  - Component files: Singular entity prefixes (`NPCPanel.tsx`, `TraitSlot.tsx`)
+  - Page files: Plural for collection management (`NPCsPage.tsx`, `TraitsPage.tsx`)
+  - State files: Match component patterns (`NPCSlice.ts`, `TraitsSelectors.ts`)
+
+### Implementation Status Tracking
+- ✅ **IMPLEMENTED**: Feature is complete and functional
+- 🔄 **IN PROGRESS**: Feature is actively being developed  
+- 📋 **PLANNED**: Feature is designed but not yet implemented
+- ⚠️ **NEEDS REVIEW**: Feature requires design or implementation review

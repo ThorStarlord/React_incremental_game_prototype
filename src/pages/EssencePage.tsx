@@ -1,186 +1,210 @@
 import React from 'react';
-import { 
-  Container, 
-  Typography, 
-  Card, 
-  CardContent, 
-  Grid, 
+import {
+  Container,
+  Grid,
+  Paper,
+  Typography,
   Box,
-  Button,
-  Alert,
-  AlertTitle,
-  Chip
+  Card,
+  CardContent,
+  Alert
 } from '@mui/material';
-import { 
+import {
   AutoAwesome as EssenceIcon,
-  TouchApp as ClickIcon,
-  Speed as GenerationIcon,
-  Group as ConnectionIcon
+  TrendingUp as GenerationIcon,
+  Speed as RateIcon,
+  TouchApp as ClickIcon
 } from '@mui/icons-material';
+
 import { useAppSelector } from '../app/hooks';
-import { selectEssence } from '../features/Essence/state/EssenceSelectors';
-import { EssenceDisplay } from '../features/Essence';
+import { 
+  selectEssence, 
+  selectEssenceDisplayStats,
+  selectEssenceGenerationRate,
+  selectEssencePerClick,
+  selectTotalEssence
+} from '../features/Essence';
 
-/**
- * EssencePage component provides a comprehensive interface for Essence management
- * 
- * Features:
- * - Current Essence display with visual representation
- * - Statistics dashboard with generation metrics
- * - Integration points for future Essence features
- * - Clear development status communication
- */
-const EssencePage: React.FC = React.memo(() => {
-  const essenceState = useAppSelector(selectEssence);
+const EssencePage: React.FC = () => {
+  const essence = useAppSelector(selectEssence);
+  const displayStats = useAppSelector(selectEssenceDisplayStats);
+  const generationRate = useAppSelector(selectEssenceGenerationRate);
+  const perClickValue = useAppSelector(selectEssencePerClick);
+  const totalCollected = useAppSelector(selectTotalEssence);
 
-  // Placeholder for manual essence generation (development/testing)
-  const handleManualGeneration = () => {
-    // TODO: Implement manual essence generation
-    console.log('Manual essence generation clicked');
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString();
+  };
+
+  const formatDecimal = (num: number): string => {
+    return num.toFixed(2);
   };
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
-      {/* Page Header */}
-      <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Typography variant="h3" component="h1" gutterBottom>
-          Essence Management
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
-          Core metaphysical resource for trait acquisition and Copy enhancement
-        </Typography>
-      </Box>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Essence Management
+      </Typography>
+
+      <Alert severity="info" sx={{ mb: 3 }}>
+        Essence is the core metaphysical resource that fuels your abilities. 
+        Future updates will include emotional connections with NPCs for passive generation.
+      </Alert>
 
       <Grid container spacing={3}>
-        {/* Main Essence Display */}
+        {/* Current Essence Display */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <EssenceIcon sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h5" component="h2">
-                  Current Essence
-                </Typography>
+                <EssenceIcon color="secondary" sx={{ mr: 1, fontSize: '2rem' }} />
+                <Typography variant="h6">Current Essence</Typography>
               </Box>
-              <EssenceDisplay />
+              
+              <Typography variant="h3" color="secondary" gutterBottom>
+                {formatNumber(essence.current)}
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary">
+                Your available Essence for spending on traits, abilities, and upgrades.
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Statistics Dashboard */}
+        {/* Generation Rate */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Essence Statistics
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <GenerationIcon color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6">Generation Rate</Typography>
+              </Box>
+              
+              <Typography variant="h4" color="primary" gutterBottom>
+                {formatDecimal(generationRate)}/sec
               </Typography>
               
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Current Amount
-                </Typography>
-                <Typography variant="h6">
-                  {essenceState.amount.toLocaleString()}
-                </Typography>
-              </Box>
-
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Total Collected
-                </Typography>
-                <Typography variant="h6">
-                  {essenceState.totalCollected.toLocaleString()}
-                </Typography>
-              </Box>
-
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Generation Rate
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <GenerationIcon sx={{ fontSize: 20, color: 'success.main' }} />
-                  <Typography variant="h6">
-                    {essenceState.generationRate.toFixed(2)}/sec
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Per Click Value
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ClickIcon sx={{ fontSize: 20, color: 'info.main' }} />
-                  <Typography variant="h6">
-                    {essenceState.perClick}
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Active Connections
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ConnectionIcon sx={{ fontSize: 20, color: 'warning.main' }} />
-                  <Typography variant="h6">
-                    {essenceState.npcConnections}
-                  </Typography>
-                </Box>
-              </Box>
+              <Typography variant="body2" color="text.secondary">
+                Passive Essence generation from emotional connections and relationships.
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Manual Generation (Development/Testing) */}
-        <Grid item xs={12} md={6}>
+        {/* Statistics Overview */}
+        <Grid item xs={12} md={4}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Manual Generation
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                For development and testing purposes
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <RateIcon color="success" sx={{ mr: 1 }} />
+                <Typography variant="h6">Total Collected</Typography>
+              </Box>
+              
+              <Typography variant="h5" color="success.main" gutterBottom>
+                {formatNumber(totalCollected)}
               </Typography>
               
-              <Button
-                variant="contained"
-                startIcon={<TouchApp />}
-                onClick={handleManualGeneration}
-                fullWidth
-                sx={{ mb: 1 }}
-              >
-                Generate Essence (+{essenceState.perClick})
-              </Button>
+              <Typography variant="body2" color="text.secondary">
+                Lifetime Essence accumulation across all sources.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <ClickIcon color="warning" sx={{ mr: 1 }} />
+                <Typography variant="h6">Per Click</Typography>
+              </Box>
               
-              <Chip 
-                label="Development Feature" 
-                size="small" 
-                color="secondary"
-                sx={{ mt: 1 }}
-              />
+              <Typography variant="h5" color="warning.main" gutterBottom>
+                {formatNumber(perClickValue)}
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary">
+                Manual Essence generation for testing and development.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <EssenceIcon color="info" sx={{ mr: 1 }} />
+                <Typography variant="h6">Active Connections</Typography>
+              </Box>
+              
+              <Typography variant="h5" color="info.main" gutterBottom>
+                {displayStats.activeConnections || 0}
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary">
+                NPCs contributing to your Essence generation.
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
 
         {/* Future Features Preview */}
-        <Grid item xs={12} md={6}>
-          <Alert severity="info">
-            <AlertTitle>Upcoming Essence Features</AlertTitle>
-            <Typography variant="body2" component="div" sx={{ mt: 1 }}>
-              • Emotional connections with NPCs for passive generation<br/>
-              • Trait acquisition costs and mechanics<br/>
-              • Copy system acceleration and enhancement<br/>
-              • Advanced Essence generation multipliers<br/>
-              • Connection depth tracking and management
-            </Typography>
-          </Alert>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Planned Features
+              </Typography>
+              
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Emotional Connections
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    Form deep emotional bonds with NPCs through meaningful interactions. 
+                    Stronger connections generate more Essence over time.
+                  </Typography>
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Trait Acquisition
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    Spend Essence to acquire traits from NPCs and make them permanent. 
+                    Cost scales with trait power and rarity.
+                  </Typography>
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Copy System Integration
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    Use Essence for accelerated Copy growth and enhanced capabilities. 
+                    Create powerful extensions of your will.
+                  </Typography>
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Advanced Abilities
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    Unlock unique abilities and upgrades through Essence investment. 
+                    Influence emotions and enhance your social capabilities.
+                  </Typography>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
     </Container>
   );
-});
+};
 
-EssencePage.displayName = 'EssencePage';
-
-export { EssencePage };
+export default React.memo(EssencePage);

@@ -155,3 +155,7 @@ export const selectAvailableTraitSlotCount = createSelector(
     return slots.filter(slot => slot.isUnlocked && !slot.traitId).length;
   }
 );
+
+// Additional convenience selectors for Player UI integration
+export const selectTraitsState = (state: RootState) => state.traits;
+export const selectAllTraits = (state: RootState) => state.traits.traits;

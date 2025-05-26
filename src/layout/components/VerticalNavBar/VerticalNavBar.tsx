@@ -1,140 +1,28 @@
-import React, { useState, useCallback } from 'react';
-import { useMediaQuery, useTheme } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
-
+import React, { useMemo, useCallback, useState } from 'react';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import { DesktopNavBar } from './DesktopNavBar';
 import { MobileNavDrawer } from './MobileNavDrawer';
-import { NAVIGATION_ITEMS, getImplementedNavItems } from '../../constants/navigationConfig';
-import type { TabId, NavItem } from '../../types/NavigationTypes';
+import { getImplementedItems } from '../../constants/navigationConfig';
+import type { NavItem, TabId } from '../../types/NavigationTypes';
 
-/**
- * Props interface for the main VerticalNavBar component
- */
 export interface VerticalNavBarProps {
-  /** Whether the desktop navigation should be collapsed */
+  /** Whether the navigation is collapsed (desktop only) */
   collapsed?: boolean;
-  /** Callback when desktop collapse state should change */
+  /** Function called when collapse state changes */
   onCollapseChange?: (collapsed: boolean) => void;
-  /** Override navigation items (defaults to implemented items) */
+  /** Currently active tab */
+  activeTab?: TabId;
+  /** Function called when tab changes */
+  onTabChange?: (tabId: TabId) => void;
+  /** Navigation items to display (optional override) */
   navItems?: NavItem[];
   /** Additional CSS class name */
   className?: string;
 }
 
 /**
- * Main responsive navigation component that conditionally renders
- * DesktopNavBar or MobileNavDrawer based on screen size
- */
-export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
-  collapsed = false,
-  onCollapseChange,
-  navItems,
-  className
-}) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  // Mobile drawer state
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-
-  // Get navigation items (use provided or default to implemented items)
-  const navigationItems = navItems || getImplementedNavItems();
-
-  // Determine active tab based on current route
-  const getActiveTabFromRoute = useCallback((): TabId | undefined => {
-    const path = location.pathname;
-    
-    // Map routes to TabIds
-    const routeToTabMap: Record<string, TabId> = {
-      '/game': 'character',
-      '/game/character': 'character',
-      '/game/traits': 'traits',
-      '/game/npcs': 'npcs',
-      '/game/quests': 'quests',
-      '/game/copies': 'copies',
-      '/game/inventory': 'inventory',
-      '/game/crafting': 'crafting',
-      '/game/settings': 'settings',
-      '/game/save-load': 'save-load'
-    };
-
-    return routeToTabMap[path] || 'character';
-  }, [location.pathname]);
-
-  const activeTabId = getActiveTabFromRoute();
-
-  // Navigation handler
-  const handleTabChange = useCallback((tabId: TabId) => {
-    // Navigate to the appropriate route
-    const routeMap: Record<TabId, string> = {
-      'character': '/game/character',
-      'traits': '/game/traits',
-      'npcs': '/game/npcs',
-      'quests': '/game/quests',
-      'copies': '/game/copies',
-      'inventory': '/game/inventory',
-      'crafting': '/game/crafting',
-      'settings': '/game/settings',
-      'save-load': '/game/save-load'
-    };
-
-    const route = routeMap[tabId] || '/game';
-    navigate(route);
-
-    // Close mobile drawer after navigation
-    if (isMobile) {
-      setMobileDrawerOpen(false);
-    }
-  }, [navigate, isMobile]);
-
-  // Mobile drawer handlers
-  const handleMobileDrawerOpen = useCallback(() => {
-    setMobileDrawerOpen(true);
-  }, []);
-
-  const handleMobileDrawerClose = useCallback(() => {
-    setMobileDrawerOpen(false);
-  }, []);
-
-  // Desktop collapse handler
-  const handleCollapseToggle = useCallback(() => {
-    const newCollapsed = !collapsed;
-    onCollapseChange?.(newCollapsed);
-  }, [collapsed, onCollapseChange]);
-
-  // Render mobile navigation
-  if (isMobile) {
-    return (
-      <>
-        {/* Mobile trigger could be rendered by parent component */}
-        <MobileNavDrawer
-          isOpen={mobileDrawerOpen}
-          onClose={handleMobileDrawerClose}
-          activeTabId={activeTabId}
-          onTabChange={handleTabChange}
-          navItems={navigationItems}
-        />
-      </>
-    );
-  }
-
-  // Render desktop navigation
-  return (
-    <DesktopNavBar
-      navItems={navigationItems}
-      activeTabId={activeTabId}
-      onTabChange={handleTabChange}
-      collapsed={collapsed}
-      onCollapseToggle={handleCollapseToggle}
-      className={className}
-    />
-  );
-};
-
-/**
- * Hook to control mobile navigation drawer from parent components
+ * Custom hook for mobile navigation state management
  */
 export const useMobileNavigation = () => {
   const theme = useTheme();
@@ -142,17 +30,11 @@ export const useMobileNavigation = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const openDrawer = useCallback(() => {
-    if (isMobile) {
-      setIsDrawerOpen(true);
-    }
-  }, [isMobile]);
+    setIsDrawerOpen(true);
+  }, []);
 
   const closeDrawer = useCallback(() => {
     setIsDrawerOpen(false);
-  }, []);
-
-  const toggleDrawer = useCallback(() => {
-    setIsDrawerOpen(prev => !prev);
   }, []);
 
   return {
@@ -160,8 +42,83 @@ export const useMobileNavigation = () => {
     isDrawerOpen,
     openDrawer,
     closeDrawer,
-    toggleDrawer
   };
+};
+
+/**
+ * Unified responsive vertical navigation bar component
+ * Automatically switches between desktop and mobile navigation patterns
+ */
+export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
+  collapsed = false,
+  onCollapseChange,
+  activeTab,
+  onTabChange,
+  navItems,
+  className,
+}) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const location = useLocation();
+  
+  // Use custom nav items or get implemented items from config
+  const navigationItems = useMemo(() => {
+    return navItems || getImplementedItems();
+  }, [navItems]);
+
+  // Extract current tab from route if not provided
+  const currentTab = useMemo(() => {
+    if (activeTab) return activeTab;
+    
+    const path = location.pathname;
+    if (path.startsWith('/game/')) {
+      const segments = path.split('/');
+      return segments[2] as TabId || 'dashboard';
+    }
+    return 'dashboard';
+  }, [activeTab, location.pathname]);
+
+  // Mobile navigation state
+  const { isDrawerOpen, openDrawer, closeDrawer } = useMobileNavigation();
+
+  // Handle tab changes
+  const handleTabChange = useCallback((tabId: TabId) => {
+    if (onTabChange) {
+      onTabChange(tabId);
+    }
+    // Close mobile drawer on navigation
+    if (isMobile) {
+      closeDrawer();
+    }
+  }, [onTabChange, isMobile, closeDrawer]);
+
+  // Handle collapse changes (desktop only)
+  const handleCollapseChange = useCallback((newCollapsed: boolean) => {
+    if (!isMobile && onCollapseChange) {
+      onCollapseChange(newCollapsed);
+    }
+  }, [isMobile, onCollapseChange]);
+
+  return (
+    <Box className={className}>
+      {isMobile ? (
+        <MobileNavDrawer
+          isOpen={isDrawerOpen}
+          onClose={closeDrawer}
+          activeTabId={currentTab}
+          onTabChange={handleTabChange}
+          navItems={navigationItems}
+        />
+      ) : (
+        <DesktopNavBar
+          navItems={navigationItems}
+          activeTabId={currentTab}
+          onTabChange={handleTabChange}
+          collapsed={collapsed}
+        />
+      )}
+    </Box>
+  );
 };
 
 export default VerticalNavBar;

@@ -58,9 +58,11 @@ The global state (`RootState`) is composed of multiple slices, each managing a s
     *   *Key Actions:* `updateLastSaved`, `updateGameMetadata`, `setGameVersion`.
     *   *Thunks:* `saveGameThunk`, `loadGameThunk`, `importGameThunk`.
 
-*   **`npcs` (`NpcSlice.ts`):** ✅ **IMPLEMENTED**
+*   **`npcs` (`NpcSlice.ts`):** ✅ **IMPLEMENTED + THUNKS**
     *   Manages the state of Non-Player Characters: locations, relationship levels/connection depth with the player, current status, potentially traits.
-    *   *Actions:* `updateNpcRelationship`, `setNpcStatus`, `addNpcTrait`.
+    *   *Actions:* `updateNpcRelationship`, `setNpcStatus`, `addNpcTrait`, `discoverNPC`, `startInteraction`, `endInteraction`.
+    *   *Thunks:* ✅ **NEWLY IMPLEMENTED** - `initializeNPCsThunk`, `updateNPCRelationshipThunk`, `processNPCInteractionThunk`, `discoverNPCThunk`, `startNPCInteractionThunk`, `endNPCInteractionThunk`, `processDialogueChoiceThunk`, `shareTraitWithNPCThunk`.
+    *   *Integration:* Cross-system coordination with Essence and Trait systems through async thunk operations.
 
 *   **Future Slices (Planned):**
     *   `copies` (`CopySlice.ts` - *Planned*): For player-created Copies management
@@ -98,14 +100,41 @@ import type { RootState } from '../../../app/store';
 - **Implemented**: Direct feature-based type imports
 - **Result**: Single source of truth maintained through Redux only
 
-## 6. Handling Asynchronous Operations ✅ IMPLEMENTED
+## 6. Handling Asynchronous Operations ✅ IMPLEMENTED + **NPC-ENHANCED**
 
 *   **Thunks (`createAsyncThunk`):** Used for:
     *   Saving/Loading game state to/from `localStorage` via `MetaThunks.ts`
     *   Importing/Exporting save data  
     *   Fetching initial game data (e.g., trait definitions from static files)
+    *   ✅ **NPC Operations** - Complex NPC interactions, relationship calculations, and cross-system integration via `NPCThunks.ts`
     *   Complex actions requiring access to `getState` or dispatching multiple actions
 *   **Lifecycle Actions:** Thunks automatically dispatch `pending`, `fulfilled`, and `rejected` actions, allowing slices to update loading and error states accordingly in their `extraReducers`.
+
+### 6.1. NPC Thunk Architecture ✅ **NEWLY DOCUMENTED**
+
+**NPCThunks.ts Implementation**: Comprehensive async operations for NPC system
+```typescript
+// ✅ Core thunk patterns implemented
+export const processNPCInteractionThunk = createAsyncThunk<
+  InteractionResult,
+  { npcId: string; interactionType: string; options?: Record<string, any> },
+  { state: RootState }
+>(
+  'npcs/processInteraction',
+  async ({ npcId, interactionType, options }, { getState, dispatch, rejectWithValue }) => {
+    // Complex interaction processing with relationship effects
+    // Cross-system integration with Essence and Trait systems
+    // Comprehensive error handling and validation
+  }
+);
+```
+
+**Key Benefits Achieved**:
+- **Cross-System Coordination**: NPCs, Essence, and Trait systems work together seamlessly
+- **Complex State Logic**: Multi-step operations handled cleanly through thunks
+- **Error Management**: Robust error handling with user-friendly feedback
+- **Type Safety**: Full TypeScript integration throughout async operations
+- **Performance**: Efficient state updates with minimal overhead
 
 ## 7. Selectors ✅ IMPLEMENTED
 

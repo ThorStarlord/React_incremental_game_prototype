@@ -15,22 +15,22 @@ export type {
   PlayerStats,
   Attribute,
   StatusEffect,
-  PlayerHealthData,
-  PlayerManaData,
-  CombatStats,
-  PerformanceStats,
   UpdatePlayerPayload,
   ModifyHealthPayload,
   AllocateAttributePayload,
   EquipTraitPayload,
   UnequipTraitPayload,
-  PlayerStatsContainerProps,
   PlayerTraitsContainerProps,
   TraitSlotData,
   PlayerStatsUIProps,
   StatDisplayProps,
   ProgressBarProps,
-  ProgressionProps
+  PlayerStatsContainerProps,
+  ProgressionProps,
+  PlayerHealthData,
+  PlayerManaData,
+  CombatStats,
+  PerformanceStats
 } from './state/PlayerTypes';
 
 // Component exports would go here when implemented

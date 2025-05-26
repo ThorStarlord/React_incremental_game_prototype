@@ -35,11 +35,11 @@ import { useAppSelector } from '../app/hooks';
 import { selectPlayer } from '../features/Player';
 import { selectEssence } from '../features/Essence';
 import { selectGameLoop } from '../features/GameLoop';
-import { selectTraits } from '../features/Traits';
-import { selectNpcs } from '../features/Npcs';
+import { selectEquippedTraitObjects } from '../features/Traits'; // Fixed import
+import { selectAllNPCs } from '../features/NPCs';
 
 // Feature components
-import { GameControlPanel } from '../features/GameLoop/components/containers/GameControlPanel';
+import { GameControlPanel } from '../features/GameLoop/components/ui/GameControlPanel';
 
 /**
  * Interface for dashboard stat cards
@@ -81,18 +81,11 @@ export const DashboardPage: React.FC = React.memo(() => {
   const player = useAppSelector(selectPlayer);
   const essence = useAppSelector(selectEssence);
   const gameLoop = useAppSelector(selectGameLoop);
-  const traits = useAppSelector(selectTraits);
-  const npcs = useAppSelector(selectNpcs);
+  const traits = useAppSelector(selectEquippedTraitObjects); // Fixed usage
+  const npcs = useAppSelector(selectAllNPCs);
 
   // Computed dashboard statistics
   const dashboardStats = useMemo((): DashboardStatCard[] => [
-    {
-      title: 'Character Level',
-      value: player.level,
-      subtitle: 'Current Level',
-      color: 'primary',
-      icon: PersonIcon
-    },
     {
       title: 'Current Essence',
       value: essence.amount.toLocaleString(),
@@ -102,14 +95,14 @@ export const DashboardPage: React.FC = React.memo(() => {
     },
     {
       title: 'Active Traits',
-      value: traits.equippedTraits.length,
-      subtitle: `${traits.permanentTraits.length} permanent`,
+      value: traits.length,
+      subtitle: `${traits.length} equipped`,
       color: 'success',
       icon: StarIcon
     },
     {
       title: 'NPC Relationships',
-      value: Object.keys(npcs.npcs).length,
+      value: Object.keys(npcs).length,
       subtitle: `${essence.npcConnections} connections`,
       color: 'warning',
       icon: GroupIcon
@@ -211,7 +204,7 @@ export const DashboardPage: React.FC = React.memo(() => {
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    <strong>{player.name || 'Unnamed Character'}</strong> • Level {player.level}
+                    <strong>{player.name || 'Unnamed Character'}</strong>
                   </Typography>
                   
                   <Box sx={{ mb: 1 }}>

@@ -32,7 +32,7 @@ import {
   AutoAwesome as AutoAwesomeIcon,
   Category as CategoryIcon,
 } from '@mui/icons-material';
-import type { PlayerTraitsUIProps, TraitSlotData } from '../../state/PlayerTypes';
+import type { TraitSlotData } from '../../state/PlayerTypes';
 import type { Trait } from '../../../Traits/state/TraitsTypes';
 
 /**
@@ -46,7 +46,7 @@ export interface PlayerTraitsUIProps {
   /** Array of permanent traits */
   permanentTraits: Trait[];
   /** Callback for equipping a trait to a slot */
-  onEquipTrait: (traitId: string, slotIndex: number) => void;
+  onEquipTrait: (slotIndex: number, traitId: string) => void;
   /** Callback for unequipping a trait from a slot */
   onUnequipTrait: (slotId: string) => void;
   /** Callback for making a trait permanent */
@@ -74,9 +74,8 @@ interface TraitSlotProps {
 interface TraitSelectionDialogProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (traitId: string) => void;
   availableTraits: Trait[];
-  equippedTraitIds: string[];
+  onSelectTrait: (traitId: string) => void;
 }
 
 /**
@@ -242,19 +241,13 @@ TraitSlotComponent.displayName = 'TraitSlotComponent';
  * Trait selection dialog component
  */
 const TraitSelectionDialog: React.FC<TraitSelectionDialogProps> = React.memo(
-  ({ open, onClose, onSelect, availableTraits, equippedTraitIds }) => {
+  ({ open, onClose, onSelectTrait, availableTraits }) => {
     const handleTraitSelect = useCallback(
       (traitId: string) => {
-        onSelect(traitId);
+        onSelectTrait(traitId);
         onClose();
       },
-      [onSelect, onClose]
-    );
-
-    const unequippedTraits = useMemo(
-      () =>
-        availableTraits.filter((trait) => !equippedTraitIds.includes(trait.id)),
-      [availableTraits, equippedTraitIds]
+      [onSelectTrait, onClose]
     );
 
     return (
@@ -267,13 +260,13 @@ const TraitSelectionDialog: React.FC<TraitSelectionDialogProps> = React.memo(
       >
         <DialogTitle id="trait-selection-dialog-title">Select Trait to Equip</DialogTitle>
         <DialogContent>
-          {unequippedTraits.length === 0 ? (
+          {availableTraits.length === 0 ? (
             <Alert severity="info" sx={{ mt: 1 }}>
-              No available traits to equip. Acquire more traits to expand your options.
+              No traits available to equip. Discover new traits through NPC interactions.
             </Alert>
           ) : (
             <List sx={{ mt: 1 }}>
-              {unequippedTraits.map((trait) => (
+              {availableTraits.map((trait) => (
                 <ListItem key={trait.id} disablePadding>
                   <ListItemButton
                     onClick={() => handleTraitSelect(trait.id)}
@@ -352,19 +345,11 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(
     );
 
     const handleSlotClick = useCallback(
-      (slot: TraitSlotData) => {
-        if (!slot.isUnlocked) return;
-
-        if (slot.traitId) {
-          // Unequip trait
-          onUnequipTrait(slot.id);
-        } else {
-          // For demonstration, just log - in production this would open trait selection
-          console.log('Open trait selection for slot:', slot.index);
-          // Example: onEquipTrait('example-trait-id', slot.index);
-        }
+      (slotId: string) => {
+        // Mock implementation - replace with actual trait selection logic
+        console.log('Opening trait selection for slot:', slotId);
       },
-      [onUnequipTrait]
+      []
     );
 
     const handleMakePermanent = useCallback(
@@ -407,13 +392,12 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(
             <Grid container spacing={2}>
               {slots.map((slot) => {
                 const equippedTrait = getTraitById(slot.traitId);
-                const isLocked = !slot.isUnlocked;
 
                 return (
                   <Grid item xs={12} sm={6} md={4} key={slot.id}>
                     <TraitSlotComponent
                       slot={slot}
-                      trait={equippedTrait}
+                      trait={equippedTrait || undefined}
                       onEquip={handleSlotClick}
                       onUnequip={onUnequipTrait}
                       compact={false}
@@ -528,9 +512,8 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(
         <TraitSelectionDialog
           open={false}
           onClose={() => {}}
-          onSelect={() => {}}
+          onSelectTrait={() => {}}
           availableTraits={[]}
-          equippedTraitIds={[]}
         />
       </Box>
     );

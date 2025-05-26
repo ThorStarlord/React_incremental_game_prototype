@@ -2,7 +2,7 @@
 
 This document lists the functional requirements for the React Incremental RPG Prototype, describing *what* the system should do.
 
-**Implementation Status**: Several core requirements have been ✅ **IMPLEMENTED** with full functionality, including comprehensive NPC interaction systems, **complete page shell architecture**, **Phase 2 Layout State Management**, **✅ NEWLY IMPLEMENTED Character Page Integration**, and **✅ COMPLETE Player UI Component System**.
+**Implementation Status**: Several core requirements have been ✅ **IMPLEMENTED** with full functionality, including comprehensive NPC interaction systems, **complete page shell architecture**, **Phase 2 Layout State Management**, **✅ COMPLETE Character Page Integration**, and **✅ COMPLETE Player UI Component System**.
 
 ## FR-GAMELOOP: Game Loop System ✅ IMPLEMENTED
 
@@ -26,36 +26,37 @@ This document lists the functional requirements for the React Incremental RPG Pr
 
 *   **FR-PLAYER-001:** ✅ **IMPLEMENTED** - The system shall represent the player character with defined stats (e.g., Health, Mana, Attack, Defense). *Complete UI implementation with PlayerStatsUI component featuring visual progress bars, color-coded indicators, and comprehensive stat display using StatDisplay and ProgressBar reusable components.*
 *   **FR-PLAYER-002:** ✅ **IMPLEMENTED** - The system shall represent the player character with defined attributes (e.g., Strength, Dexterity, Intelligence) that influence stats. *State management and enhanced selector implementation complete with memoized health/mana percentage calculations.*
-*   **FR-PLAYER-003:** 🔄 **UI SHELL READY** - The system shall allow the player to allocate attribute points gained through leveling or other means. *Architecture prepared for point allocation interface with Progression container component.*
-*   **FR-PLAYER-004:** ✅ **UI IMPLEMENTED** - The system shall allow the player to equip items into defined equipment slots (Head, Chest, MainHand, etc.). *Complete equipment visualization with PlayerEquipment component featuring 8 equipment slots organized by category (armor, weapons, accessories) with quick actions and rarity indicators.*
-*   **FR-PLAYER-005:** ✅ **IMPLEMENTED** - The system shall calculate final player stats based on base stats, attribute contributions, and bonuses from equipped items and active traits. *Enhanced selectors provide computed stat values with memoized calculations including combat stats and equipment category access.*
-*   **FR-PLAYER-006:** ✅ **IMPLEMENTED** - The system shall track player playtime. *Integrated into progression tracking selectors with formatted display in Progression container.*
-*   **FR-PLAYER-007:** ✅ **NEWLY IMPLEMENTED** - The system shall provide a comprehensive character management interface with tabbed navigation for stats, traits, equipment, and skills. *Complete CharacterPage implementation with Material-UI tabs, responsive design, and smooth transitions.*
-*   **FR-PLAYER-008:** ✅ **NEWLY IMPLEMENTED** - The system shall display player vital stats with visual progress indicators and color-coded health/mana bars. *PlayerStatsUI component with ProgressBar integration, semantic color coding, and vital stats section.*
-*   **FR-PLAYER-009:** ✅ **NEWLY IMPLEMENTED** - The system shall provide equipment slot visualization organized by category (armor, weapons, accessories) with quick action support. *PlayerEquipment component with categorized Paper cards, semantic icons, and interactive equip/unequip buttons.*
-*   **FR-PLAYER-010:** ✅ **NEWLY IMPLEMENTED** - The system shall integrate player trait management with visual slot representation and quick equip/unequip actions. *PlayerTraitsUI component with grid-based slot display, Material-UI integration, and trait management actions.*
-*   **FR-PLAYER-011:** ✅ **NEWLY IMPLEMENTED** - The system shall provide reusable UI components for displaying individual statistics with customizable appearance and progress indicators. *StatDisplay component with configurable props, CSS Modules styling, hover effects, and accessibility support.*
-*   **FR-PLAYER-012:** ✅ **NEWLY IMPLEMENTED** - The system shall provide reusable progress bar components with customizable colors, heights, and value displays for player progression indicators. *ProgressBar component with Material-UI LinearProgress integration, animation support, and percentage calculations.*
-*   **FR-PLAYER-013:** ✅ **NEWLY IMPLEMENTED** - The system shall implement container/component separation pattern for clean architecture and efficient state management. *PlayerStatsContainer, PlayerTraitsContainer, and Progression components providing Redux integration with memoized selectors.*
-*   **FR-PLAYER-014:** ✅ **NEWLY IMPLEMENTED** - The system shall provide comprehensive progression tracking including experience, level advancement, and character statistics. *Progression container component with experience calculations, playtime formatting, and advancement indicators.*
-*   **FR-PLAYER-015:** ✅ **NEWLY IMPLEMENTED** - The system shall implement responsive character interface that adapts to different screen sizes with mobile-optimized layouts. *Material-UI Grid system with proper breakpoints, mobile-first design approach, and responsive tab navigation.*
-*   **FR-PLAYER-016:** ✅ **NEWLY IMPLEMENTED** - The system shall provide full accessibility compliance with keyboard navigation, screen reader support, and WCAG 2.1 AA standards. *Comprehensive ARIA labeling, semantic HTML, keyboard navigation, and progress semantics throughout all Player UI components.*
-*   **FR-PLAYER-017:** ✅ **NEWLY IMPLEMENTED** - The system shall provide enhanced state management with memoized selectors for efficient data access and performance optimization. *Advanced selectors for health/mana percentages, combat stats, equipment categories, and performance stats with createSelector memoization.*
-*   **FR-PLAYER-018:** ✅ **NEWLY IMPLEMENTED** - The system shall implement CSS Modules integration for component-specific styling with responsive design patterns and hover effects. *StatDisplay.module.css providing scoped styles, mobile optimizations, and maintainable component-level styling.*
-*   **FR-PLAYER-019:** ✅ **NEWLY IMPLEMENTED** - The system shall provide comprehensive Material-UI integration with consistent theming, semantic colors, and responsive grid systems throughout player interfaces. *Complete Material-UI theme integration with semantic icons, color coding, spacing system, and typography consistency.*
-*   **FR-PLAYER-020:** ✅ **NEWLY IMPLEMENTED** - The system shall implement performance optimization through React.memo, memoized callbacks, efficient selectors, and conditional rendering patterns. *Comprehensive performance patterns preventing unnecessary re-renders and optimizing state subscriptions for responsive user experience.*
+*   **FR-PLAYER-003:** 🔄 **UI SHELL READY** - The system shall allow the player to allocate attribute points gained through gameplay achievements and milestones. *Architecture prepared for point allocation interface with Progression container component.*
+*   **FR-PLAYER-004:** ✅ **IMPLEMENTED** - The system shall calculate final player stats based on base stats, attribute contributions, and bonuses from active traits and status effects. *Enhanced selectors provide computed stat values with memoized calculations including combat stats and performance metrics.*
+*   **FR-PLAYER-005:** ✅ **IMPLEMENTED** - The system shall track player playtime. *Integrated into progression tracking selectors with formatted display in Progression container.*
+*   **FR-PLAYER-006:** ✅ **IMPLEMENTED** - The system shall provide a comprehensive character management interface with tabbed navigation for stats, traits, and skills. *Complete CharacterPage implementation with Material-UI tabs, responsive design, and smooth transitions.*
+*   **FR-PLAYER-007:** ✅ **IMPLEMENTED** - The system shall display player vital stats with visual progress indicators and color-coded health/mana bars. *PlayerStatsUI component with ProgressBar integration, semantic color coding, and vital stats section.*
+*   **FR-PLAYER-008:** ✅ **IMPLEMENTED** - The system shall integrate player trait management with visual slot representation and quick equip/unequip actions. *PlayerTraitsUI component with grid-based slot display, Material-UI integration, and trait management actions.*
+*   **FR-PLAYER-009:** ✅ **IMPLEMENTED** - The system shall provide reusable UI components for displaying individual statistics with customizable appearance and progress indicators. *StatDisplay component with configurable props, CSS Modules styling, hover effects, and accessibility support.*
+*   **FR-PLAYER-010:** ✅ **IMPLEMENTED** - The system shall provide reusable progress bar components with customizable colors, heights, and value displays for player progression indicators. *ProgressBar component with Material-UI LinearProgress integration, animation support, and percentage calculations.*
+*   **FR-PLAYER-011:** ✅ **IMPLEMENTED** - The system shall implement container/component separation pattern for clean architecture and efficient state management. *PlayerStatsContainer, PlayerTraitsContainer, and Progression components providing Redux integration with memoized selectors.*
+*   **FR-PLAYER-012:** ✅ **IMPLEMENTED** - The system shall provide comprehensive progression tracking including playtime and character statistics. *Progression container component with playtime formatting and character status indicators.*
+*   **FR-PLAYER-013:** ✅ **IMPLEMENTED** - The system shall implement responsive character interface that adapts to different screen sizes with mobile-optimized layouts. *Material-UI Grid system with proper breakpoints, mobile-first design approach, and responsive tab navigation.*
+*   **FR-PLAYER-014:** ✅ **IMPLEMENTED** - The system shall provide full accessibility compliance with keyboard navigation, screen reader support, and WCAG 2.1 AA standards. *Comprehensive ARIA labeling, semantic HTML, keyboard navigation, and progress semantics throughout all Player UI components.*
+*   **FR-PLAYER-015:** ✅ **IMPLEMENTED** - The system shall provide enhanced state management with memoized selectors for efficient data access and performance optimization. *Advanced selectors for health/mana percentages, combat stats, and performance stats with createSelector memoization.*
+*   **FR-PLAYER-016:** ✅ **IMPLEMENTED** - The system shall implement CSS Modules integration for component-specific styling with responsive design patterns and hover effects. *StatDisplay.module.css providing scoped styles, mobile optimizations, and maintainable component-level styling.*
+*   **FR-PLAYER-017:** ✅ **IMPLEMENTED** - The system shall provide comprehensive Material-UI integration with consistent theming, semantic colors, and responsive grid systems throughout player interfaces. *Complete Material-UI theme integration with semantic icons, color coding, spacing system, and typography consistency.*
+*   **FR-PLAYER-018:** ✅ **IMPLEMENTED** - The system shall implement performance optimization through React.memo, memoized callbacks, efficient selectors, and conditional rendering patterns. *Comprehensive performance patterns preventing unnecessary re-renders and optimizing state subscriptions for responsive user experience.*
+*   **FR-PLAYER-019:** ✅ **IMPLEMENTED** - The system shall manage status effects that temporarily modify player statistics with duration tracking and visual indicators. *Complete status effect system with automatic processing, expiration handling, and stat recalculation.*
+*   **FR-PLAYER-020:** ✅ **IMPLEMENTED** - The system shall provide attribute-based stat calculation where base attributes influence derived statistics. *Complete attribute system with Strength, Dexterity, Intelligence, Constitution, Wisdom, and Charisma affecting various derived stats.*
 
 **Implementation Notes**: 
-- ✅ **Complete UI Component System**: Comprehensive player interface with StatDisplay, ProgressBar, PlayerStatsUI, PlayerTraitsUI, and PlayerEquipment components
+- ✅ **Complete UI Component System**: Comprehensive player interface with StatDisplay, ProgressBar, PlayerStatsUI, PlayerTraitsUI, and container components
 - ✅ **Container Pattern Implementation**: Clean separation between UI presentation and state management through PlayerStatsContainer, PlayerTraitsContainer, and Progression containers
-- ✅ **Enhanced State Management**: Advanced memoized selectors for health/mana percentages, equipment access, combat stats, and performance calculations
+- ✅ **Enhanced State Management**: Advanced memoized selectors for health/mana percentages, combat stats, and performance calculations
 - ✅ **Reusable Component Library**: StatDisplay and ProgressBar components providing consistent UI patterns across Player system and application-wide reuse
 - ✅ **Character Page Integration**: Complete tabbed character management interface with responsive design and smooth navigation transitions
 - ✅ **CSS Modules Architecture**: Component-specific styling with StatDisplay.module.css providing responsive design patterns and hover effects
 - ✅ **Accessibility Compliance**: Full WCAG 2.1 AA compliance with keyboard navigation, screen reader support, ARIA labeling, and semantic HTML throughout
 - ✅ **Performance Optimization**: React.memo, memoized callbacks, efficient selectors, and conditional rendering for optimal user experience
 - ✅ **Material-UI Integration**: Comprehensive theming with semantic colors, responsive grids, typography consistency, and semantic iconography
-- ✅ **Integration Readiness**: Architecture prepared for attribute allocation, equipment system backend, trait actions, and progression logic implementation
+- ✅ **Progression System**: Character advancement through attribute points, skill points, and playtime tracking without traditional leveling
+- ✅ **Integration Readiness**: Architecture prepared for attribute allocation, trait actions, and progression logic implementation
 
 ## FR-TRAIT: Trait System ✅ UI IMPLEMENTED
 
@@ -112,18 +113,23 @@ This document lists the functional requirements for the React Incremental RPG Pr
 *   **FR-COPY-007:** 📋 **PLANNED** - The system shall model Copy loyalty, influenced by shared traits and task outcomes.
 *   **FR-COPY-008:** 📋 **PLANNED** - The system shall limit the number of active Copies the player can maintain.
 
-## FR-NPC: Non-Player Characters ✅ UI IMPLEMENTED
+## FR-NPC: Non-Player Characters ✅ UI IMPLEMENTED + **THUNKS**
 
 *   **FR-NPC-001:** ✅ **IMPLEMENTED** - The system shall represent NPCs with basic state (location, name, relationship status).
-*   **FR-NPC-002:** ✅ **IMPLEMENTED** - The system shall track the player's relationship value and connection depth with individual NPCs.
-*   **FR-NPC-003:** ✅ **UI IMPLEMENTED** - NPC relationship/connection shall influence interactions (dialogue availability, trade pricing, quest access, trait acquisition). *UI framework fully implemented, backend integration ready.*
-*   **FR-NPC-004:** ✅ **IMPLEMENTED** - NPCs shall possess traits that the player can potentially acquire.
+*   **FR-NPC-002:** ✅ **IMPLEMENTED + THUNKS** - The system shall track the player's relationship value and connection depth with individual NPCs. *Enhanced with updateNPCRelationshipThunk for validated relationship updates with boundary checking and side effect management.*
+*   **FR-NPC-003:** ✅ **UI IMPLEMENTED + THUNKS** - NPC relationship/connection shall influence interactions (dialogue availability, trade pricing, quest access, trait acquisition). *UI framework fully implemented with processNPCInteractionThunk handling complex interaction processing and unlock rewards.*
+*   **FR-NPC-004:** ✅ **IMPLEMENTED + THUNKS** - NPCs shall possess traits that the player can potentially acquire. *Enhanced with shareTraitWithNPCThunk for relationship-gated trait sharing operations.*
 *   **FR-NPC-005:** ✅ **IMPLEMENTED** - The system shall provide a tabbed interface for NPC interactions including Overview, Dialogue, Trade, Quests, and Traits.
-*   **FR-NPC-006:** ✅ **IMPLEMENTED** - The system shall implement relationship-gated content access where interactions unlock progressively based on relationship levels.
+*   **FR-NPC-006:** ✅ **IMPLEMENTED + THUNKS** - The system shall implement relationship-gated content access where interactions unlock progressively based on relationship levels. *processNPCInteractionThunk handles progressive unlocks and reward distribution.*
 *   **FR-NPC-007:** ✅ **IMPLEMENTED** - The system shall provide visual relationship progress indicators with clear unlock requirements.
-*   **FR-NPC-008:** ✅ **IMPLEMENTED** - The system shall support interactive dialogue with context-aware NPC responses.
+*   **FR-NPC-008:** ✅ **IMPLEMENTED + THUNKS** - The system shall support interactive dialogue with context-aware NPC responses. *processDialogueChoiceThunk handles dynamic dialogue processing with relationship consequences.*
 *   **FR-NPC-009:** ✅ **IMPLEMENTED** - The system shall provide commerce interfaces with relationship-based pricing discounts.
-*   **FR-NPC-010:** ✅ **IMPLEMENTED** - The system shall allow trait sharing between player and NPCs through dedicated slot systems.
+*   **FR-NPC-010:** ✅ **IMPLEMENTED + THUNKS** - The system shall allow trait sharing between player and NPCs through dedicated slot systems. *shareTraitWithNPCThunk provides relationship validation and trait transfer operations.*
+*   **FR-NPC-011:** ✅ **NEWLY IMPLEMENTED** - The system shall provide async operations for NPC initialization with mock data loading and error handling through initializeNPCsThunk.
+*   **FR-NPC-012:** ✅ **NEWLY IMPLEMENTED** - The system shall handle NPC discovery operations with validation and duplicate prevention through discoverNPCThunk.
+*   **FR-NPC-013:** ✅ **NEWLY IMPLEMENTED** - The system shall manage interaction sessions with availability checking and state tracking through startNPCInteractionThunk and endNPCInteractionThunk.
+*   **FR-NPC-014:** ✅ **NEWLY IMPLEMENTED** - The system shall provide comprehensive error handling for all NPC operations with graceful degradation and user feedback.
+*   **FR-NPC-015:** ✅ **NEWLY IMPLEMENTED** - The system shall coordinate cross-system integration between NPC, Essence, and Trait systems through async thunk operations.
 
 **Implementation Notes**:
 - ✅ **Complete Tabbed Interface**: NPCPanel with Overview, Dialogue, Trade, Quests, and Traits tabs
@@ -132,6 +138,12 @@ This document lists the functional requirements for the React Incremental RPG Pr
 - ✅ **Universal Tab Integration**: Consistent with Trait System using standardized MUI tab components
 - ✅ **Accessibility Compliance**: Full keyboard navigation, ARIA support, and screen reader compatibility
 - ✅ **Performance Optimized**: Memoized components, conditional rendering, and efficient state management
+- ✅ **Async Operations**: ✅ **NEWLY IMPLEMENTED** - Comprehensive NPCThunks.ts providing sophisticated async operations for relationship management, interaction processing, dialogue handling, trait sharing, and cross-system integration
+- ✅ **Error Management**: Robust error handling patterns with rejectWithValue and graceful degradation
+- ✅ **Type Safety**: Full TypeScript integration throughout async operations
+- ✅ **Cross-System Coordination**: Clean integration between NPC, Essence, and Trait systems through thunk operations
+- ✅ **State Validation**: Comprehensive input validation and boundary checking in all thunk operations
+- ✅ **Mock Data Integration**: NPCs initialization supports both provided data and mock data loading for development
 
 ## FR-QUEST: Quest System 📋 PLANNED
 
@@ -242,9 +254,9 @@ This document lists the functional requirements for the React Incremental RPG Pr
 
 ### ✅ Fully Implemented Systems
 1. **GameLoop System** - Complete timing and control framework
-2. **Player State Management** - Comprehensive data model and Redux integration
-3. **Player UI Component System** - ✅ **NEWLY COMPLETE** - Comprehensive character interface with StatDisplay, ProgressBar, PlayerStatsUI, PlayerTraitsUI, PlayerEquipment, and container components
-4. **Character Page Integration** - ✅ **NEWLY COMPLETE** - Complete tabbed character management interface with responsive design and accessibility compliance
+2. **Player State Management** - Comprehensive data model and Redux integration without levels/experience/equipment
+3. **Player UI Component System** - ✅ **COMPLETE** - Comprehensive character interface with StatDisplay, ProgressBar, PlayerStatsUI, PlayerTraitsUI, and container components
+4. **Character Page Integration** - ✅ **COMPLETE** - Complete tabbed character management interface with responsive design and accessibility compliance
 5. **Traits System UI** - Complete user interface with accessibility
 6. **NPCs System UI** - Complete tabbed interaction interface with relationship progression
 7. **Save/Load System** - Full persistence functionality
@@ -273,8 +285,6 @@ This document lists the functional requirements for the React Incremental RPG Pr
 6. **Skills System** - Complete skill trees and progression (comprehensive shell ready)
 7. **Legacy Component Removal** - ✅ **SCHEDULED** - Complete removal of deprecated layout components after migration verification
 
-**Deprecation Implementation Success**: ✅ **COMPLETE** - The layout deprecation strategy demonstrates mature software architecture practices including comprehensive component lifecycle management, migration planning, developer communication systems, and graceful degradation patterns. This implementation provides a clear template for future architectural evolution while maintaining development productivity and code quality throughout transition periods.
+**Player System Success**: ✅ **COMPLETE** - The Player system demonstrates comprehensive React component architecture with progression mechanics focused on attribute development, skill advancement, and trait integration rather than traditional leveling systems. The implementation provides complete character management without equipment dependency, offering flexible progression through attribute points, trait acquisition, and playtime-based advancement. This architecture supports the game's focus on relationship building and essence-based progression rather than traditional RPG leveling mechanics.
 
-**Player UI Implementation Success**: ✅ **COMPLETE** - The Player UI component system demonstrates comprehensive React component architecture including reusable components (StatDisplay, ProgressBar), feature-specific components (PlayerStatsUI, PlayerTraitsUI, PlayerEquipment), container pattern implementation, CSS Modules integration, Material-UI theming, accessibility compliance, and performance optimization. This implementation provides a complete foundation for character management with modern React patterns and maintainable architecture.
-
-The application now has **complete Player UI implementation** alongside comprehensive page architecture, demonstrating mature React development practices for component design, state management integration, accessibility compliance, and performance optimization throughout the character management system.
+The application now has **complete Player UI implementation** with attribute-based progression, comprehensive character management interface, and trait integration system, demonstrating mature React development practices for component design, state management integration, accessibility compliance, and performance optimization throughout the character management system.

@@ -6,5 +6,4 @@ export * from './state/SettingsSelectors';
 export * from './state/SettingsThunks';
 export * from './state/SettingsTypes';
 
-// Components
-export { default as SettingsPage } from '../../pages/Settings';
+// Note: SettingsPage removed from exports as pages should be imported directly from src/pages/

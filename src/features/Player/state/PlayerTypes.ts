@@ -159,11 +159,24 @@ export interface PlayerTraitsContainerProps {
   className?: string;
 }
 
+/**
+ * Unlock requirement definition for trait slots
+ */
+export interface SlotUnlockRequirement {
+  type: 'level' | 'essence' | 'achievement' | 'quest';
+  value: number | string;
+  description?: string;
+}
+
+/**
+ * Trait slot data structure for UI components
+ */
 export interface TraitSlotData {
   id: string;
   index: number;
   isUnlocked: boolean;
   traitId?: string | null;
+  unlockRequirements?: SlotUnlockRequirement;
 }
 
 export interface PlayerStatsUIProps {
@@ -204,3 +217,25 @@ export interface ProgressionProps {
   showAdvancedStats?: boolean;
   className?: string;
 }
+
+/**
+ * Props interface for PlayerTraitsUI component
+ * Provides trait management data and statistical information
+ */
+export interface PlayerTraitsUIProps {
+  slots: TraitSlotData[];
+  equippedTraits: Trait[];
+  permanentTraits: Trait[];
+  onEquipTrait: (slotIndex: number, traitId: string) => void;
+  onUnequipTrait: (slotId: string) => void;
+  onMakePermanent: (traitId: string) => void;
+  showLoading?: boolean;
+  className?: string;
+  // Statistical props for enhanced UI functionality
+  totalSlots?: number;
+  unlockedSlots?: number;
+  equippedCount?: number;
+  permanentCount?: number;
+}
+
+import type { Trait } from '../../Traits';

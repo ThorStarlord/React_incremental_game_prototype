@@ -2,8 +2,6 @@ import React, { useMemo } from 'react';
 import { Box, Typography, Chip } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import ChatIcon from '@mui/icons-material/Chat';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import ExtensionIcon from '@mui/icons-material/Extension';
 
 import { TabContainer } from '../../../../shared/components/Tabs';
@@ -14,15 +12,13 @@ import type { NpcState } from '../../state/NpcTypes';
 import NPCHeader from './NPCHeader';
 import NPCOverviewTab from './tabs/NPCOverviewTab';
 import NPCDialogueTab from './tabs/NPCDialogueTab';
-import NPCTradeTab from './tabs/NPCTradeTab';
-import NPCQuestsTab from './tabs/NPCQuestsTab';
 import NPCTraitsTab from './tabs/NPCTraitsTab';
 
-interface NPCPanelProps {
+interface NPCPanelUIProps {
   npc: NpcState;
 }
 
-const NPCPanel: React.FC<NPCPanelProps> = ({ npc }) => {
+const NPCPanelUI: React.FC<NPCPanelUIProps> = ({ npc }) => {
   const playerLevel = useAppSelector(state => state.player.level);
 
   // Define available tabs based on relationship level
@@ -41,20 +37,6 @@ const NPCPanel: React.FC<NPCPanelProps> = ({ npc }) => {
         icon: ChatIcon,
         disabled: npc.relationshipValue < 1,
         tooltip: npc.relationshipValue < 1 ? 'Requires relationship level 1+' : 'Conversation interface'
-      },
-      {
-        id: 'trade',
-        label: 'Trade',
-        icon: ShoppingCartIcon,
-        disabled: npc.relationshipValue < 2,
-        tooltip: npc.relationshipValue < 2 ? 'Requires relationship level 2+' : 'Commerce and trading'
-      },
-      {
-        id: 'quests',
-        label: 'Quests',
-        icon: AssignmentIcon,
-        disabled: npc.relationshipValue < 3,
-        tooltip: npc.relationshipValue < 3 ? 'Requires relationship level 3+' : 'Quest-related interactions'
       },
       {
         id: 'traits',
@@ -118,16 +100,6 @@ const NPCPanel: React.FC<NPCPanelProps> = ({ npc }) => {
           <NPCDialogueTab npc={npc} />
         )}
         
-        {/* Trade Tab - Relationship 2+ */}
-        {activeTab === 'trade' && npc.relationshipValue >= 2 && (
-          <NPCTradeTab npc={npc} />
-        )}
-        
-        {/* Quests Tab - Relationship 3+ */}
-        {activeTab === 'quests' && npc.relationshipValue >= 3 && (
-          <NPCQuestsTab npc={npc} />
-        )}
-        
         {/* Traits Tab - Relationship 4+ */}
         {activeTab === 'traits' && npc.relationshipValue >= 4 && (
           <NPCTraitsTab npc={npc} />
@@ -137,4 +109,4 @@ const NPCPanel: React.FC<NPCPanelProps> = ({ npc }) => {
   );
 };
 
-export default React.memo(NPCPanel);
+export default React.memo(NPCPanelUI);

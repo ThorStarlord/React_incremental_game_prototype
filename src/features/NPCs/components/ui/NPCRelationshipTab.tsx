@@ -9,212 +9,233 @@ import {
   Typography,
   Card,
   CardContent,
-  Button,
   Grid,
-  Alert,
+  LinearProgress,
+  Button,
+  Chip,
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
-  LinearProgress,
+  ListItemIcon
 } from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import GiftIcon from '@mui/icons-material/CardGiftcard';
-import HandshakeIcon from '@mui/icons-material/Handshake';
-import ChatIcon from '@mui/icons-material/Chat';
-
-import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectNPCById } from '../state/NPCSelectors';
-import { npcActions } from '../state/NPCSlice';
-import RelationshipProgress from './RelationshipProgress';
+import {
+  Favorite,
+  TrendingUp,
+  History,
+  EmojiEvents,
+  Schedule
+} from '@mui/icons-material';
+import type { NPC, RelationshipChange } from '../../state/NpcTypes';
+import { getRelationshipTier, RELATIONSHIP_THRESHOLDS } from '../../state/NpcTypes';
 
 interface NPCRelationshipTabProps {
-  npcId: string;
+  npc: NPC;
+  relationshipChanges?: RelationshipChange[];
+  onImproveRelationship?: (npcId: string) => void;
 }
 
-/**
- * NPCRelationshipTab - Manage relationship building activities
- * 
- * Features:
- * - Relationship status overview
- * - Available relationship-building activities
- * - Shared trait slot management
- * - Gift giving (future feature)
- * - Relationship history
- */
-const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({ npcId }) => {
-  const dispatch = useAppDispatch();
-  const npc = useAppSelector((state) => selectNPCById(state, npcId));
-
-  if (!npc) {
-    return (
-      <Typography variant="body1" color="text.secondary">
-        NPC not found.
-      </Typography>
-    );
-  }
-
-  const handleRelationshipActivity = (activityType: string, change: number) => {
-    dispatch(npcActions.updateRelationship({
-      npcId,
-      change,
-      reason: `${activityType} activity`,
-    }));
+const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({ 
+  npc, 
+  relationshipChanges = [],
+  onImproveRelationship 
+}) => {
+  const currentTier = getRelationshipTier(npc.relationshipValue);
+  const percentage = Math.max(0, (npc.relationshipValue + 100) / 2);
+  
+  const getNextThreshold = () => {
+    const thresholds = Object.values(RELATIONSHIP_THRESHOLDS).sort((a, b) => a - b);
+    return thresholds.find(threshold => threshold > npc.relationshipValue) || 100;
   };
 
-  // Mock activities based on relationship level
-  const getAvailableActivities = () => {
-    const activities = [];
-    
-    if (npc.relationshipValue >= 10) {
-      activities.push({
-        id: 'chat',
-        name: 'Have a friendly chat',
-        description: 'Spend some time talking with them',
-        relationshipGain: 2,
-        cooldown: 'Once per day',
-        icon: <ChatIcon />,
-      });
-    }
-    
-    if (npc.relationshipValue >= 25) {
-      activities.push({
-        id: 'help',
-        name: 'Offer to help',
-        description: 'Assist them with their daily tasks',
-        relationshipGain: 3,
-        cooldown: 'Once per day',
-        icon: <HandshakeIcon />,
-      });
-    }
-    
-    if (npc.relationshipValue >= 50) {
-      activities.push({
-        id: 'gift',
-        name: 'Give a thoughtful gift',
-        description: 'Present them with something they might like',
-        relationshipGain: 5,
-        cooldown: 'Once per week',
-        icon: <GiftIcon />,
-      });
-    }
-    
-    return activities;
-  };
+  const nextThreshold = getNextThreshold();
+  const progressToNext = nextThreshold ? Math.max(0, (npc.relationshipValue - (nextThreshold - 25)) / 25 * 100) : 100;
 
-  const availableActivities = getAvailableActivities();
+  const recentChanges = relationshipChanges
+    .filter(change => change.npcId === npc.id)
+    .slice(-5)
+    .reverse();
+
+  const getUnlockAtLevel = (level: number) => {
+    const unlocks = [];
+    if (level >= 25) unlocks.push('Advanced Dialogue', 'Basic Quest Access');
+    if (level >= 50) unlocks.push('Trade Discounts', 'Personal Stories', 'Trait Acquisition');
+    if (level >= 75) unlocks.push('Deep Conversations', 'Major Quests', 'Trait Sharing');
+    if (level >= 100) unlocks.push('Intimate Bond', 'Exclusive Content', 'Maximum Benefits');
+    return unlocks;
+  };
 
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        <FavoriteIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-        Relationship Management
-      </Typography>
-
-      {/* Relationship Overview */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="subtitle1" gutterBottom>
-            Current Relationship Status
-          </Typography>
-          <RelationshipProgress 
-            npcId={npcId} 
-            showDetails={true} 
-          />
-        </CardContent>
-      </Card>
-
-      {/* Available Activities */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="subtitle1" gutterBottom>
-            Relationship Building Activities
-          </Typography>
-          
-          {availableActivities.length > 0 ? (
-            <Grid container spacing={2}>
-              {availableActivities.map((activity) => (
-                <Grid item xs={12} sm={6} key={activity.id}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Box display="flex" alignItems="center" gap={1} mb={1}>
-                        {activity.icon}
-                        <Typography variant="h6">
-                          {activity.name}
-                        </Typography>
-                      </Box>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {activity.description}
-                      </Typography>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                        <Typography variant="body2" color="primary">
-                          +{activity.relationshipGain} relationship
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {activity.cooldown}
-                        </Typography>
-                      </Box>
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        onClick={() => handleRelationshipActivity(activity.name, activity.relationshipGain)}
-                      >
-                        Perform Activity
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          ) : (
-            <Alert severity="info">
-              <Typography variant="body2">
-                No relationship activities are currently available. 
-                Improve your relationship through dialogue and other interactions 
-                to unlock new activities.
+    <Box sx={{ p: 2 }}>
+      <Grid container spacing={3}>
+        {/* Current Relationship Status */}
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <Favorite sx={{ mr: 1 }} />
+                Relationship Status
               </Typography>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Shared Trait Slots */}
-      {npc.relationshipValue >= 50 && (
-        <Card>
-          <CardContent>
-            <Typography variant="subtitle1" gutterBottom>
-              Shared Trait Slots
-            </Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              You can share traits with {npc.name} to enhance their abilities.
-            </Typography>
-            
-            <Box mt={2}>
-              {Array.from({ length: npc.sharedTraitSlots }, (_, index) => (
-                <Box key={index} mb={1}>
-                  <Typography variant="body2">
-                    Slot {index + 1}: <em>Empty</em>
+              <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body1" fontWeight="medium">
+                    {currentTier}
                   </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={0} 
-                    sx={{ mt: 0.5, mb: 1 }} 
-                  />
+                  <Typography variant="h5" color="primary">
+                    {npc.relationshipValue}/100
+                  </Typography>
                 </Box>
-              ))}
-              
-              {npc.sharedTraitSlots === 0 && (
-                <Typography variant="body2" color="text.secondary">
-                  No shared trait slots available yet. Increase your relationship further 
-                  to unlock the ability to share traits.
+                
+                <LinearProgress
+                  variant="determinate"
+                  value={percentage}
+                  sx={{ height: 8, borderRadius: 4, mb: 2 }}
+                />
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Progress: {Math.round(percentage)}%
+                  </Typography>
+                  {nextThreshold < 100 && (
+                    <Typography variant="caption" color="text.secondary">
+                      Next: {nextThreshold} ({nextThreshold - npc.relationshipValue} to go)
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" color="secondary">
+                      {npc.connectionDepth || 0}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Connection Depth
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" color="primary">
+                      {npc.loyalty || 0}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Loyalty
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+
+              <Box sx={{ mt: 3 }}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  startIcon={<TrendingUp />}
+                  onClick={() => onImproveRelationship?.(npc.id)}
+                  disabled={npc.relationshipValue >= 100}
+                >
+                  {npc.relationshipValue >= 100 ? 'Maximum Relationship' : 'Spend Time Together'}
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Relationship Milestones */}
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <EmojiEvents sx={{ mr: 1 }} />
+                Relationship Milestones
+              </Typography>
+
+              <List dense>
+                {Object.entries(RELATIONSHIP_THRESHOLDS).map(([tierName, threshold]) => {
+                  const isUnlocked = npc.relationshipValue >= threshold;
+                  const unlocks = getUnlockAtLevel(threshold);
+
+                  return (
+                    <ListItem 
+                      key={tierName}
+                      sx={{ 
+                        pl: 0,
+                        opacity: isUnlocked ? 1 : 0.6,
+                        bgcolor: isUnlocked ? 'success.light' : 'transparent',
+                        borderRadius: 1,
+                        mb: 1
+                      }}
+                    >
+                      <ListItemIcon>
+                        <Chip
+                          label={threshold}
+                          size="small"
+                          color={isUnlocked ? 'success' : 'default'}
+                          variant={isUnlocked ? 'filled' : 'outlined'}
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={tierName.replace('_', ' ').toLowerCase()}
+                        secondary={unlocks.join(', ')}
+                        primaryTypographyProps={{
+                          textTransform: 'capitalize',
+                          fontWeight: isUnlocked ? 'medium' : 'normal'
+                        }}
+                      />
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Recent Activity */}
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <History sx={{ mr: 1 }} />
+                Recent Relationship Changes
+              </Typography>
+
+              {recentChanges.length === 0 ? (
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+                  No recent relationship changes
                 </Typography>
+              ) : (
+                <List>
+                  {recentChanges.map((change) => (
+                    <ListItem key={change.id} divider>
+                      <ListItemIcon>
+                        <Schedule />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2">
+                              {change.reason}
+                            </Typography>
+                            <Chip
+                              label={change.newValue > change.oldValue ? `+${change.newValue - change.oldValue}` : `${change.newValue - change.oldValue}`}
+                              size="small"
+                              color={change.newValue > change.oldValue ? 'success' : 'error'}
+                            />
+                          </Box>
+                        }
+                        secondary={`${change.oldValue} → ${change.newValue} • ${new Date(change.timestamp).toLocaleString()}`}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
               )}
-            </Box>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
 
-export default NPCRelationshipTab;
+export default React.memo(NPCRelationshipTab);

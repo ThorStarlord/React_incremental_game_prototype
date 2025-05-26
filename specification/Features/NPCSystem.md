@@ -4,7 +4,50 @@
 
 The Non-Player Character (NPC) System governs the behavior, interaction, and relationships between the player and the game's inhabitants. NPCs populate the world, offer quests, provide services, and react to the player's actions.
 
-<!-- ... existing sections ... -->
+## 1.1. Naming Conventions ✅ ESTABLISHED
+
+**Feature Folder Structure**: The NPC system follows a specific naming pattern for consistency and clarity:
+
+- **Feature Folder**: `src/features/NPCs/` (plural)
+- **Component Files**: Use singular `NPC` prefix (e.g., `NPCPanel.tsx`, `NPCHeader.tsx`, `NPCListView.tsx`)
+- **State Files**: Use singular `NPC` prefix (e.g., `NPCTypes.ts`, `NPCSlice.ts`, `NPCSelectors.ts`)
+- **Interface Names**: Use singular `NPC` for types (e.g., `NPC`, `NPCState`, `NPCTraitInfo`)
+- **Page Components**: Use plural for page-level components (e.g., `NPCsPage.tsx`, `NpcsPage.tsx`)
+
+**Rationale**: 
+- **Folder**: `NPCs` 
+- **Files**: `NPC` prefix maintains clear semantic meaning for individual entity components
+- **Types**: Singular interfaces represent individual entities consistently
+- **Pages**: Plural pages indicate management of multiple NPCs
+
+**Implementation Status**: ✅ **CONSISTENTLY APPLIED** across the entire NPC feature following Feature-Sliced Design principles.
+
+## 2. Features
+
+*   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions.
+*   **Emotional Connections:** NPCs exhibit a range of emotions and can form deep connections with the player, affecting their behavior and dialogue.
+*   **Trait Sharing and Acquisition:** Players can acquire traits from NPCs, which can then be used to influence other NPCs or enhance the player's abilities.
+*   **Social Interactions:** NPCs can interact with each other and the player in a variety of social contexts, including trading, gifting, and collaborative activities.
+
+## 3. Technical Specifications
+
+*   **Engine:** Built on top of the existing player and trait systems, leveraging Redux for state management and Material-UI for the interface.
+*   **Data Structure:** NPC data includes fields for relationship status, emotional state, traits, and quest information.
+*   **Async Operations:** Utilizes Redux Thunks for asynchronous operations, such as fetching NPC data, updating relationships, and processing interactions.
+
+## 4. Implementation Phases
+
+1. **Core NPC System:** Basic NPC creation, deletion, and static interaction implementation.
+2. **Dynamic Relationships:** Introduction of relationship metrics, emotional states, and their impact on interactions.
+3. **Trait System Integration:** Enabling trait sharing and acquisition between players and NPCs.
+4. **Quest and Activity System:** Dynamic quest generation and activity participation between NPCs and players.
+5. **Polish and Optimization:** Enhancements based on testing feedback, performance optimization, and bug fixing.
+
+## 5. Testing and Validation
+
+*   **Unit Tests:** Comprehensive tests for all NPC-related functions, including relationship calculations, trait sharing, and async operations.
+*   **Integration Tests:** Ensure NPC system works seamlessly with player, trait, and quest systems.
+*   **User Acceptance Testing:** Feedback from real users to validate the system meets design goals and is fun to use.
 
 ## 6. UI Integration ✅ IMPLEMENTED
 
@@ -108,4 +151,154 @@ Comprehensive NPC information display:
 *   **Trait System:** Seamless trait acquisition and sharing workflows
 *   **Essence System:** Integrated cost calculations and affordability checks
 
-<!-- ... existing sections ... -->
+## 7. State Management
+
+### 7.1. NPCSlice.ts
+
+The NPC slice manages the state of NPCs in the game, including their relationships with the player, their emotional states, and the quests they are involved in.
+
+#### State Structure
+```typescript
+interface NPCState {
+  npcs: Record<string, NPC>;
+  relationships: Record<string, Relationship>;
+  interactions: Interaction[];
+  // ... other state fields
+}
+```
+
+#### Reducers
+*   **initializeNPCs:** Sets up the NPCs in the game, either from provided data or mock data.
+*   **updateNPCRelationship:** Updates the relationship value between the player and an NPC.
+*   **addNPCInteraction:** Logs an interaction with an NPC, updating their emotional state and relationship.
+
+#### Selectors
+*   **selectNPCById:** Retrieves an NPC by their ID.
+*   **selectAllNPCs:** Gets all NPCs, optionally filtered by online status or other criteria.
+*   **selectNPCRelationships:** Selects relationship data for NPCs.
+*   **selectNPCInteractions:** Selects interaction logs for NPCs.
+
+### 7.2. NPCThunks.ts
+
+The NPCThunks file contains asynchronous thunk actions for complex NPC interactions, such as initializing NPCs, updating relationships, and processing interactions.
+
+#### Core Thunks
+```typescript
+// ✅ Core async operations implemented
+export const initializeNPCsThunk = createAsyncThunk<
+  Record<string, NPC>,
+  Record<string, NPC> | undefined,
+  { state: RootState }
+>('npcs/initialize', async (npcData, { rejectWithValue }) => {
+  // Initialize NPCs with mock or loaded data
+  // Handles data loading and error management
+});
+
+export const updateNPCRelationshipThunk = createAsyncThunk<
+  { npcId: string; relationshipChange: number; newValue: number },
+  { npcId: string; relationshipChange: number; reason?: string },
+  { state: RootState }
+>('npcs/updateRelationship', async ({ npcId, relationshipChange, reason }, { getState, rejectWithValue }) => {
+  // Handles relationship updates with validation and side effects
+  // Includes boundary checking and error handling
+});
+
+export const processNPCInteractionThunk = createAsyncThunk<
+  InteractionResult,
+  { npcId: string; interactionType: string; options?: Record<string, any> },
+  { state: RootState }
+>('npcs/processInteraction', async ({ npcId, interactionType, options }, { getState, dispatch, rejectWithValue }) => {
+  // Complex interaction processing with relationship effects
+  // Handles dialogue, gifts, quest completion, trading
+  // Includes unlock rewards and essence generation
+});
+```
+
+#### Key Thunk Features Implemented
+- **Data Initialization:** NPCs initialization with mock data loading and error handling
+- **Relationship Management:** Validated relationship updates with boundary checking (0-100 range)
+- **Complex Interactions:** Multi-step interaction processing with side effects and reward calculations
+- **Discovery System:** NPC discovery with validation and duplicate prevention
+- **Session Management:** Interaction session start/end with availability checking
+- **Dialogue Processing:** Dynamic dialogue choice handling with relationship consequences
+- **Trait Sharing:** NPC trait sharing with relationship level validation
+- **Error Handling:** Comprehensive error management with rejectWithValue patterns
+- **State Coordination:** Cross-system integration with essence and trait systems
+
+### 7.3. NPCSelectors.ts
+
+Selectors for retrieving and computing NPC-related state data, optimized for performance with memoization.
+
+#### Example Selectors
+```typescript
+// ✅ New interaction types for thunk operations
+export interface InteractionResult {
+  success: boolean;
+  relationshipChange?: number;
+  essenceGained?: number;
+  unlockRewards?: string[];
+  message: string;
+}
+
+export interface NPCInteraction {
+  npcId: string;
+  startTime: number;
+  interactionType: 'dialogue' | 'trade' | 'quest' | 'trait_sharing';
+}
+
+export interface RelationshipChangeEntry {
+  id: string;
+  npcId: string;
+  timestamp: number;
+  change: number;
+  reason: string;
+  newValue: number;
+}
+```
+
+## 8. Integration Points ✅ **THUNK-ENHANCED**
+
+### 8.1. Cross-Feature Integration ✅ **ASYNC-READY**
+
+**Essence System Integration**: ✅ **THUNK-COORDINATED**
+- **Generation Calculation:** Thunks coordinate essence generation from NPC relationships
+- **Spending Integration:** Trait acquisition costs handled through thunk operations
+- **Reward Distribution:** Interaction rewards properly distribute essence
+
+**Trait System Integration**: ✅ **THUNK-ENABLED**
+- **Sharing Validation:** Thunks validate trait sharing prerequisites
+- **Relationship Gating:** Trait access gated through relationship thresholds
+- **Cross-System Actions:** Thunks coordinate trait operations between systems
+
+**Player System Integration**: ✅ **STATE-COORDINATED**
+- **Stat Modifications:** Player stats affected by NPC relationships through thunks
+- **Progress Tracking:** Player interaction history managed via thunk operations
+- **Achievement Integration:** Player achievements triggered through NPC interactions
+
+### 8.2. Future Thunk Extensions 📋 **ARCHITECTURALLY PREPARED**
+
+**Planned Thunk Operations**:
+- **Quest Integration:** questCompletionThunk for quest rewards and relationship effects
+- **Copy Creation:** createCopyFromNPCThunk for seduction and copy creation mechanics
+- **Advanced Dialogue:** dialogueTreeProgressionThunk for complex conversation systems
+- **Trade Operations:** npcTradeTransactionThunk for commerce with relationship pricing
+- **Faction Management:** factionRelationshipThunk for group relationship dynamics
+
+**Scalability Architecture**:
+- **Plugin Pattern:** Thunk system ready for additional interaction types
+- **Event System:** Architecture supports event-driven NPC behavior
+- **AI Integration:** Prepared for advanced NPC decision-making systems
+- **Persistence:** Thunk operations ready for backend API integration
+
+## 9. Implementation Excellence ✅ **THUNK-COMPLETE**
+
+The NPC system now demonstrates mature async operation patterns with NPCThunks.ts providing:
+
+**Professional Error Handling:** Comprehensive error management with graceful degradation
+**State Coordination:** Sophisticated cross-system state management
+**Type Safety:** Full TypeScript integration throughout async operations
+**Performance:** Optimized thunk operations with minimal overhead
+**Maintainability:** Clean, testable async code following Redux Toolkit best practices
+**Scalability:** Architecture ready for advanced NPC mechanics and backend integration
+
+The implementation showcases modern React development practices with Redux Toolkit async patterns, providing a solid foundation for complex NPC interactions while maintaining code quality and user experience excellence.

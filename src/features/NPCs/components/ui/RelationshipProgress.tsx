@@ -8,58 +8,24 @@ import {
   Box,
   Typography,
   LinearProgress,
-  Tooltip,
-  Paper,
-  Grid,
+  Chip,
+  Tooltip
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-
-import { useAppSelector } from '../../../../app/hooks';
-import { selectNPCById, selectRelationshipChanges } from '../state/NPCSelectors';
-import { RELATIONSHIP_TIERS } from '../../../../config/relationshipConstants';
-
-// Styled components
-const ProgressContainer = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  borderRadius: theme.spacing(1),
-}));
-
-const RelationshipBar = styled(LinearProgress)(({ theme }) => ({
-  height: 12,
-  borderRadius: 6,
-  '& .MuiLinearProgress-bar': {
-    borderRadius: 6,
-  },
-}));
-
-const TierIndicator = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  marginTop: theme.spacing(1),
-  marginBottom: theme.spacing(2),
-}));
-
-const TierMark = styled(Box)<{ position: number; color: string; active: boolean }>(
-  ({ theme, position, color, active }) => ({
-    position: 'absolute',
-    left: `${position}%`,
-    top: -6,
-    width: 12,
-    height: 12,
-    borderRadius: '50%',
-    backgroundColor: active ? color : theme.palette.grey[300],
-    border: `2px solid ${theme.palette.background.paper}`,
-    transform: 'translateX(-50%)',
-    zIndex: 1,
-  })
-);
+import {
+  Favorite,
+  FavoriteBorder,
+  SentimentVeryDissatisfied,
+  SentimentNeutral,
+  SentimentSatisfied,
+  SentimentVerySatisfied
+} from '@mui/icons-material';
+import { getRelationshipTier, RELATIONSHIP_THRESHOLDS } from '../../state/NpcTypes';
 
 interface RelationshipProgressProps {
-  npcId: string;
-  showDetails?: boolean;
-  compact?: boolean;
+  value: number;
+  showLabel?: boolean;
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'default' | 'compact';
 }
 
 /**
@@ -72,223 +38,93 @@ interface RelationshipProgressProps {
  * - Next tier progress indication
  * - Optional detailed breakdown
  */
-const RelationshipProgress: React.FC<RelationshipProgressProps> = ({ 
-  npcId, 
-  showDetails = false, 
-  compact = false 
+const RelationshipProgress: React.FC<RelationshipProgressProps> = ({
+  value,
+  showLabel = true,
+  size = 'medium',
+  variant = 'default'
 }) => {
-  const npc = useAppSelector((state) => selectNPCById(state, npcId));
-  const recentChanges = useAppSelector(selectRelationshipChanges)
-    .filter(change => change.npcId === npcId)
-    .slice(-5); // Last 5 changes
+  const percentage = Math.max(0, (value + 100) / 2);
+  const tier = getRelationshipTier(value);
+  
+  const getRelationshipIcon = () => {
+    if (value >= RELATIONSHIP_THRESHOLDS.BELOVED) return <Favorite color="error" />;
+    if (value >= RELATIONSHIP_THRESHOLDS.FRIEND) return <SentimentVerySatisfied color="success" />;
+    if (value >= RELATIONSHIP_THRESHOLDS.ACQUAINTANCE) return <SentimentSatisfied color="primary" />;
+    if (value >= RELATIONSHIP_THRESHOLDS.NEUTRAL) return <SentimentNeutral color="action" />;
+    return <SentimentVeryDissatisfied color="error" />;
+  };
 
-  if (!npc) {
+  const getRelationshipColor = (): 'success' | 'primary' | 'secondary' | 'error' | 'warning' => {
+    if (value >= RELATIONSHIP_THRESHOLDS.BELOVED) return 'error';
+    if (value >= RELATIONSHIP_THRESHOLDS.CLOSE_FRIEND) return 'success';
+    if (value >= RELATIONSHIP_THRESHOLDS.FRIEND) return 'primary';
+    if (value >= RELATIONSHIP_THRESHOLDS.ACQUAINTANCE) return 'secondary';
+    if (value >= RELATIONSHIP_THRESHOLDS.NEUTRAL) return 'warning';
+    return 'error';
+  };
+
+  const barHeight = size === 'small' ? 4 : size === 'medium' ? 6 : 8;
+
+  if (variant === 'compact') {
     return (
-      <Typography variant="body2" color="text.secondary">
-        NPC not found
-      </Typography>
-    );
-  }
-
-  const { relationshipValue } = npc;
-
-  // Get current and next tier
-  const getCurrentTier = () => {
-    const tiers = Object.entries(RELATIONSHIP_TIERS);
-    for (const [tierKey, tierData] of tiers) {
-      if (relationshipValue >= tierData.min && relationshipValue <= tierData.max) {
-        return { key: tierKey, ...tierData };
-      }
-    }
-    return { key: 'NEUTRAL', ...RELATIONSHIP_TIERS.NEUTRAL };
-  };
-
-  const getNextTier = () => {
-    const currentTier = getCurrentTier();
-    const tiers = Object.entries(RELATIONSHIP_TIERS);
-    const currentIndex = tiers.findIndex(([key]) => key === currentTier.key);
-    
-    if (currentIndex < tiers.length - 1) {
-      const [nextKey, nextData] = tiers[currentIndex + 1];
-      return { key: nextKey, ...nextData };
-    }
-    return null;
-  };
-
-  const currentTier = getCurrentTier();
-  const nextTier = getNextTier();
-
-  // Calculate progress within current tier
-  const tierProgress = nextTier 
-    ? ((relationshipValue - currentTier.min) / (nextTier.min - currentTier.min)) * 100
-    : 100;
-
-  // Get all tier positions for indicators
-  const tierPositions = Object.entries(RELATIONSHIP_TIERS).map(([key, tier]) => ({
-    key,
-    ...tier,
-    position: tier.min,
-    active: relationshipValue >= tier.min,
-  }));
-
-  // Recent change summary
-  const getRecentChangesSummary = () => {
-    if (recentChanges.length === 0) return null;
-    
-    const totalChange = recentChanges.reduce((sum, change) => sum + (change.newValue - change.oldValue), 0);
-    const isPositive = totalChange > 0;
-    
-    return {
-      total: Math.abs(totalChange),
-      isPositive,
-      count: recentChanges.length,
-    };
-  };
-
-  const changesSummary = getRecentChangesSummary();
-
-  if (compact) {
-    return (
-      <Box display="flex" alignItems="center" gap={1}>
-        <FavoriteIcon 
-          sx={{ 
-            color: currentTier.color,
-            fontSize: 20 
-          }} 
-        />
-        <RelationshipBar
-          variant="determinate"
-          value={relationshipValue}
-          sx={{
-            flex: 1,
-            '& .MuiLinearProgress-bar': {
-              backgroundColor: currentTier.color,
-            },
-          }}
-        />
-        <Typography variant="body2" fontWeight="medium">
-          {relationshipValue}/100
-        </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {getRelationshipIcon()}
+        <Tooltip title={`${tier}: ${value}/100`}>
+          <LinearProgress
+            variant="determinate"
+            value={percentage}
+            color={getRelationshipColor()}
+            sx={{ 
+              flexGrow: 1, 
+              height: barHeight, 
+              borderRadius: 2 
+            }}
+          />
+        </Tooltip>
+        {showLabel && (
+          <Typography variant="caption" color="text.secondary">
+            {value}
+          </Typography>
+        )}
       </Box>
     );
   }
 
   return (
-    <ProgressContainer variant="outlined">
-      {/* Current Status */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-        <Typography variant="body2" fontWeight="medium">
-          Relationship Level
+    <Box>
+      {showLabel && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Relationship
+          </Typography>
+          <Chip
+            icon={getRelationshipIcon()}
+            label={tier}
+            size="small"
+            color={getRelationshipColor()}
+            variant="outlined"
+          />
+        </Box>
+      )}
+      
+      <LinearProgress
+        variant="determinate"
+        value={percentage}
+        color={getRelationshipColor()}
+        sx={{ height: barHeight, borderRadius: 2 }}
+      />
+      
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
+        <Typography variant="caption" color="text.secondary">
+          {value}/100
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {relationshipValue}/100
+        <Typography variant="caption" color="text.secondary">
+          {Math.round(percentage)}%
         </Typography>
       </Box>
-
-      {/* Progress Bar */}
-      <RelationshipBar
-        variant="determinate"
-        value={relationshipValue}
-        sx={{
-          '& .MuiLinearProgress-bar': {
-            backgroundColor: currentTier.color,
-          },
-        }}
-      />
-
-      {/* Tier Indicators */}
-      <TierIndicator>
-        {tierPositions.map((tier) => (
-          <Tooltip 
-            key={tier.key}
-            title={`${tier.name} (${tier.min}+)`}
-            arrow
-          >
-            <TierMark
-              position={tier.position}
-              color={tier.color}
-              active={tier.active}
-            />
-          </Tooltip>
-        ))}
-      </TierIndicator>
-
-      {showDetails && (
-        <Grid container spacing={2}>
-          {/* Current Tier Info */}
-          <Grid item xs={12} sm={6}>
-            <Typography variant="caption" color="text.secondary">
-              Current Tier
-            </Typography>
-            <Typography variant="body2" fontWeight="medium">
-              {currentTier.name}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {currentTier.description}
-            </Typography>
-          </Grid>
-
-          {/* Next Tier Progress */}
-          {nextTier && (
-            <Grid item xs={12} sm={6}>
-              <Typography variant="caption" color="text.secondary">
-                Progress to {nextTier.name}
-              </Typography>
-              <Box display="flex" alignItems="center" gap={1}>
-                <LinearProgress
-                  variant="determinate"
-                  value={tierProgress}
-                  sx={{ 
-                    flex: 1, 
-                    '& .MuiLinearProgress-bar': {
-                      backgroundColor: nextTier.color,
-                    },
-                  }}
-                />
-                <Typography variant="caption">
-                  {Math.round(tierProgress)}%
-                </Typography>
-              </Box>
-              <Typography variant="caption" color="text.secondary">
-                {nextTier.min - relationshipValue} points needed
-              </Typography>
-            </Grid>
-          )}
-
-          {/* Recent Changes */}
-          {changesSummary && (
-            <Grid item xs={12}>
-              <Box 
-                display="flex" 
-                alignItems="center" 
-                gap={1}
-                sx={{ 
-                  p: 1, 
-                  borderRadius: 1, 
-                  backgroundColor: changesSummary.isPositive 
-                    ? 'success.light' 
-                    : 'error.light',
-                  color: changesSummary.isPositive 
-                    ? 'success.contrastText' 
-                    : 'error.contrastText',
-                }}
-              >
-                {changesSummary.isPositive ? (
-                  <TrendingUpIcon fontSize="small" />
-                ) : (
-                  <TrendingDownIcon fontSize="small" />
-                )}
-                <Typography variant="caption">
-                  {changesSummary.isPositive ? '+' : '-'}{changesSummary.total} 
-                  {' '}points from {changesSummary.count} recent interaction{changesSummary.count > 1 ? 's' : ''}
-                </Typography>
-              </Box>
-            </Grid>
-          )}
-        </Grid>
-      )}
-    </ProgressContainer>
+    </Box>
   );
 };
 
-export default RelationshipProgress;
+export default React.memo(RelationshipProgress);
