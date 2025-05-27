@@ -123,18 +123,19 @@ export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
             
             {showDetails && (
               <>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={6} sm={4}>
                   <StatDisplay
                     label="Critical Hit Chance"
-                    value={stats.critChance * 100}
+                    value={stats.criticalChance * 100}
                     unit="%"
                     color="warning"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                
+                <Grid item xs={6} sm={4}>
                   <StatDisplay
                     label="Critical Hit Damage"
-                    value={stats.critDamage}
+                    value={stats.criticalDamage}
                     unit="x"
                     color="warning"
                   />
@@ -155,18 +156,18 @@ export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
             </Box>
             
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={6}>
                 <StatDisplay
                   label="Health Regeneration"
-                  value={stats.healthRegen}
+                  value={stats.healthRegeneration}
                   unit="/sec"
                   color="success"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={6}>
                 <StatDisplay
                   label="Mana Regeneration"
-                  value={stats.manaRegen}
+                  value={stats.manaRegeneration}
                   unit="/sec"
                   color="info"
                 />

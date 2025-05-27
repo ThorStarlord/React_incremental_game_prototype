@@ -3,48 +3,44 @@
  * Following Feature-Sliced Design principles
  */
 
+// Player Feature Public API
+
+// Components - Containers
+export { default as PlayerStatsContainer } from './components/containers/PlayerStatsContainer';
+export { default as Progression } from './components/containers/Progression';
+
+// Components - UI
+export { default as PlayerStatsUI } from './components/ui/PlayerStatsUI';
+export { default as PlayerTraitsUI } from './components/ui/PlayerTraitsUI';
+export { default as StatDisplay } from './components/ui/StatDisplay';
+export { default as ProgressBar } from './components/ui/ProgressBar';
+
+// Components - Layout
+export { default as CharacterPanel } from './components/layout/CharacterPanel';
+
 // Redux State Management
 export { default as playerReducer } from './state/PlayerSlice';
 export * from './state/PlayerSlice';
 export * from './state/PlayerSelectors';
-export * from './state/PlayerThunks';
+export * from './state/PlayerTypes';
 
-// Type Definitions
+// Hook exports would go here when implemented
+export { usePlayerStats, usePlayerAttribute, usePlayerHealth, usePlayerMana } from './hooks/usePlayerStats';
+
+// Type Definitions - Only export types that actually exist
 export type {
   PlayerState,
   PlayerStats,
-  Attribute,
+  PlayerAttributes,
   StatusEffect,
-  UpdatePlayerPayload,
-  ModifyHealthPayload,
-  AllocateAttributePayload,
-  EquipTraitPayload,
-  UnequipTraitPayload,
-  PlayerTraitsContainerProps,
-  TraitSlotData,
-  PlayerStatsUIProps,
-  StatDisplayProps,
-  ProgressBarProps,
-  PlayerStatsContainerProps,
-  ProgressionProps,
   PlayerHealthData,
   PlayerManaData,
   CombatStats,
-  PerformanceStats
+  PerformanceStats,
+  StatDisplayProps,
+  ProgressBarProps
 } from './state/PlayerTypes';
-
-// Component exports would go here when implemented
-// export { PlayerStatsContainer } from './components/containers/PlayerStatsContainer';
-// export { PlayerTraitsContainer } from './components/containers/PlayerTraitsContainer';
-// export { Progression } from './components/containers/Progression';
-// export { PlayerStatsUI } from './components/ui/PlayerStatsUI';
-// export { PlayerTraitsUI } from './components/ui/PlayerTraitsUI';
-// export { StatDisplay } from './components/ui/StatDisplay';
-// export { ProgressBar } from './components/ui/ProgressBar';
 
 // Utility exports would go here when implemented
 // export * from './utils/getPlayerStats';
 // export * from './utils/calculateDerivedStats';
-
-// Hook exports would go here when implemented
-// export { usePlayerStats } from './hooks/usePlayerStats';

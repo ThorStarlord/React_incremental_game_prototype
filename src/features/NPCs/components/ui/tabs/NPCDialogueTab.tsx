@@ -3,10 +3,10 @@ import { Box, Typography, Card, CardContent, Button, TextField, List, ListItem, 
 import ChatIcon from '@mui/icons-material/Chat';
 import SendIcon from '@mui/icons-material/Send';
 
-import type { NpcState } from '../../../state/NpcTypes';
+import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCDialogueTabProps {
-  npc: NpcState;
+  npc: NPC;
 }
 
 interface DialogueMessage {
@@ -54,7 +54,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {
     setMessage('');
   };
 
-  const generateNPCResponse = (playerMessage: string, npc: NpcState): string => {
+  const generateNPCResponse = (playerMessage: string, npc: NPC): string => {
     // Simple response generation based on relationship level
     const responses = {
       low: [

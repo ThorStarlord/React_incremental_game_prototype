@@ -47,9 +47,8 @@ import {
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectNPCById } from '../../state/NPCSelectors';
-import { shareTraitWithNPC, updateRelationship } from '../../state/NPCSlice';
-import { NPC, NPCTrait } from '../../state/NPCTypes';
-import { RELATIONSHIP_TIERS } from '../../../../config/relationshipConstants';
+import { shareTraitWithNPCThunk, updateNpcRelationship } from '../../state/NPCSlice';
+import { NPC, NPCTraitInfo } from '../../state/NPCTypes';
 
 interface NPCTraitsTabProps {
   npcId: string;
@@ -67,15 +66,15 @@ interface PlayerTrait {
 
 interface TraitAcquisitionDialog {
   open: boolean;
-  trait: NPCTrait | PlayerTrait | null;
+  trait: NPCTraitInfo | PlayerTrait | null;
   traitId: string | null;
 }
 
 export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
-  const npc = useAppSelector(selectNPCById(npcId)) as NPC;
+  const npc = useAppSelector(state => selectNPCById(state, npcId)) as NPC;
   const [selectedTab, setSelectedTab] = useState(0);
-  const [selectedTrait, setSelectedTrait] = useState<NPCTrait | PlayerTrait | null>(null);
+  const [selectedTrait, setSelectedTrait] = useState<NPCTraitInfo | PlayerTrait | null>(null);
   const [showTraitDialog, setShowTraitDialog] = useState(false);
   const [actionType, setActionType] = useState<'learn' | 'share'>('learn');
   const [acquisitionDialog, setAcquisitionDialog] = useState<TraitAcquisitionDialog>({
@@ -116,29 +115,29 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   ];
 
   // Get available trait slots
-  const usedSharedSlots = Object.keys(npc.traits).length;
-  const availableSlots = npc.sharedTraitSlots - usedSharedSlots;
+  const usedSharedSlots = Object.keys(npc.traits || {}).length;
+  const availableSlots = (npc.sharedTraitSlots || []).length - usedSharedSlots;
 
   // Get traits the NPC can teach based on relationship level
   const teachableTraits = useMemo(() => {
     return npc.teachableTraits
       .map(traitId => {
-        const trait = npc.traits[traitId];
+        const trait = npc.traits?.[traitId];
         if (!trait) return null;
         
         return {
           ...trait,
-          canLearn: npc.relationshipValue >= trait.relationshipRequirement,
+          canLearn: npc.relationshipValue >= (trait.relationshipRequirement || 0),
         };
       })
-      .filter(Boolean) as (NPCTrait & { canLearn: boolean })[];
+      .filter(Boolean) as (NPCTraitInfo & { canLearn: boolean })[];
   }, [npc.traits, npc.teachableTraits, npc.relationshipValue]);
 
   // Get shareable player traits
   const shareableTraits = mockPlayerTraits.filter(trait => trait.canShare);
 
   // Handle trait learning
-  const handleLearnTrait = (trait: NPCTrait) => {
+  const handleLearnTrait = (trait: NPCTraitInfo) => {
     setSelectedTrait(trait);
     setActionType('learn');
     setShowTraitDialog(true);
@@ -159,14 +158,14 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
       // This would dispatch an action to learn the trait
       console.log(`Learning trait: ${selectedTrait.id}`);
       // Add relationship bonus for learning
-      dispatch(updateRelationship({
+      dispatch(updateNpcRelationship({
         npcId,
         change: 5,
         reason: `Learned trait: ${selectedTrait.name}`,
       }));
     } else if (actionType === 'share') {
       // Share trait with NPC
-      dispatch(shareTraitWithNPC({
+      dispatch(shareTraitWithNPCThunk({
         npcId,
         traitId: selectedTrait.id,
         slotIndex: usedSharedSlots, // Use next available slot
@@ -192,7 +191,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     console.log(`Removing shared trait: ${traitId}`);
   };
 
-  const renderNPCTrait = (trait: NPCTrait & { canLearn: boolean }) => (
+  const renderNPCTrait = (trait: NPCTraitInfo & { canLearn: boolean }) => (
     <Card key={trait.id} sx={{ mb: 2 }}>
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -204,33 +203,31 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
             </Box>
             
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Trait description would go here
+              {trait.description}
             </Typography>
 
             <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
               <Chip
                 size="small"
-                label={`Req. ${trait.relationshipRequirement} relationship`}
+                label={`Req. ${trait.relationshipRequirement || 0} relationship`}
                 color={trait.canLearn ? 'success' : 'error'}
                 variant="outlined"
               />
               <Chip
                 size="small"
-                label={`${trait.essenceCost} essence`}
+                label={`${trait.cost || 0} essence`}
                 color="primary"
                 variant="outlined"
               />
             </Box>
 
-            {trait.prerequisites && trait.prerequisites.length > 0 && (
+            {trait.rarity && (
               <Box sx={{ mb: 2 }}>
                 <Typography variant="caption" color="text.secondary">
-                  Prerequisites:
+                  Rarity:
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
-                  {trait.prerequisites.map(prereq => (
-                    <Chip key={prereq} size="small" label={prereq} variant="outlined" />
-                  ))}
+                  <Chip size="small" label={trait.rarity} variant="outlined" />
                 </Box>
               </Box>
             )}
@@ -314,9 +311,9 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     </ListItem>
   );
 
-  const currentRelationship = 0; // Placeholder for current relationship value
+  const currentRelationship = npc.relationshipValue || 0;
 
-  const getTraitVisibilityIcon = (traitInfo: NPCTrait) => {
+  const getTraitVisibilityIcon = (traitInfo: NPCTraitInfo) => {
     return traitInfo.isVisible ? (
       <VisibleIcon color="primary" />
     ) : (
@@ -324,8 +321,8 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     );
   };
 
-  const isTraitAvailable = (traitInfo: NPCTrait) => {
-    return currentRelationship >= traitInfo.relationshipRequirement;
+  const isTraitAvailable = (traitInfo: NPCTraitInfo) => {
+    return currentRelationship >= (traitInfo.relationshipRequirement || 0);
   };
 
   const getTraitDetails = (traitId: string) => {
@@ -410,7 +407,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                         color="primary"
                         variant="outlined"
                       />
-                    </Box
+                    </Box>
                     
                     <Typography variant="body2" color="text.secondary" paragraph>
                       {details.description}
@@ -438,14 +435,14 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                       <ListItem>
                         <ListItemText
                           primary="Relationship Required"
-                          secondary={traitInfo.relationshipRequirement}
+                          secondary={traitInfo.relationshipRequirement || 0}
                         />
                         <ListItemIcon>
-                          {currentRelationship >= traitInfo.relationshipRequirement ? (
+                          {currentRelationship >= (traitInfo.relationshipRequirement || 0) ? (
                             <Chip label="✓" color="success" size="small" />
                           ) : (
                             <Chip 
-                              label={`Need ${traitInfo.relationshipRequirement - currentRelationship} more`}
+                              label={`Need ${(traitInfo.relationshipRequirement || 0) - currentRelationship} more`}
                               color="warning" 
                               size="small" 
                             />
@@ -453,11 +450,11 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                         </ListItemIcon>
                       </ListItem>
                       
-                      {traitInfo.essenceCost && (
+                      {traitInfo.cost && (
                         <ListItem>
                           <ListItemText
                             primary="Essence Cost"
-                            secondary={`${traitInfo.essenceCost} Essence`}
+                            secondary={`${traitInfo.cost} Essence`}
                           />
                         </ListItem>
                       )}
@@ -466,12 +463,12 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                     <Button
                       fullWidth
                       variant={isAvailable ? "contained" : "outlined"}
-                      onClick={() => handleLearnTrait(traitId, traitInfo)}
+                      onClick={() => handleLearnTrait(traitInfo)}
                       disabled={!isAvailable}
-                      startIcon={<LearnIcon />}
+                      startIcon={<School />}
                       sx={{ mt: 2 }}
                     >
-                      {isAvailable ? 'Learn Trait' : `Requires Relationship ${traitInfo.relationshipRequirement}`}
+                      {isAvailable ? 'Learn Trait' : `Requires Relationship ${traitInfo.relationshipRequirement || 0}`}
                     </Button>
                   </CardContent>
                 </Card>
@@ -500,7 +497,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                 <ListItem key={traitId}>
                   <ListItemText
                     primary="Hidden Trait"
-                    secondary={`Unlock at relationship level ${traitInfo.relationshipRequirement}`}
+                    secondary={`Unlock at relationship level ${traitInfo.relationshipRequirement || 0}`}
                   />
                   <ListItemIcon>
                     <HiddenIcon color="disabled" />
@@ -547,7 +544,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                     Learn this trait from {npc.name}?
                   </Typography>
                   <Alert severity="info" sx={{ mb: 2 }}>
-                    Cost: {selectedTrait.essenceCost} essence
+                    Cost: {selectedTrait.cost || 0} essence
                   </Alert>
                   <Typography variant="body2" color="text.secondary">
                     Learning traits from NPCs strengthens your relationship and expands your abilities.
@@ -605,9 +602,9 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                 {getTraitDetails(acquisitionDialog.traitId).description}
               </Typography>
               
-              {acquisitionDialog.trait.essenceCost && (
+              {'cost' in acquisitionDialog.trait && acquisitionDialog.trait.cost && (
                 <Alert severity="warning">
-                  This will cost {acquisitionDialog.trait.essenceCost} Essence.
+                  This will cost {acquisitionDialog.trait.cost} Essence.
                 </Alert>
               )}
             </Box>

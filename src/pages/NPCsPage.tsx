@@ -24,9 +24,9 @@ import {
   ViewModule,
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { selectAllNPCs, selectNPCById } from '../features/NPCs/state/NPCSelectors';
-import { NPCListView } from '../features/NPCs/components/containers/NPCListView';
+import { useAppSelector } from '../app/hooks';
+import { selectNPCs, selectNPCById } from '../features/NPCs';
+import { NPCListView } from '../features/NPCs';
 
 /**
  * NPCsPage - Main page for NPC interactions
@@ -34,7 +34,7 @@ import { NPCListView } from '../features/NPCs/components/containers/NPCListView'
  * Features:
  * - NPC list/grid view with search and filtering
  * - Individual NPC interaction panel
- * - Responsive three-column layout
+ * - Responsive layout
  * - Breadcrumb navigation
  * - View mode toggle (list/grid)
  */
@@ -47,7 +47,7 @@ const NPCsPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedNPCId, setSelectedNPCId] = useState<string | null>(npcId || null);
   
-  const npcs = useAppSelector(selectAllNPCs);
+  const npcs = useAppSelector(selectNPCs);
   const selectedNPC = useAppSelector(state => 
     selectedNPCId ? selectNPCById(state, selectedNPCId) : null
   );
@@ -72,9 +72,14 @@ const NPCsPage: React.FC = () => {
   };
 
   // Handle breadcrumb navigation
-  const handleBreadcrumbClick = (path: string) => {
+  const handleBreadcrumbClick = (event: React.MouseEvent, path: string) => {
+    event.preventDefault();
     navigate(path);
   };
+
+  // Check if NPCs are available
+  const npcCount = Object.keys(npcs).length;
+  const hasNPCs = npcCount > 0;
 
   // Mobile view: show either list or detail
   if (isMobile) {
@@ -85,8 +90,8 @@ const NPCsPage: React.FC = () => {
           <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
             <Link
               color="inherit"
-              href="#"
-              onClick={() => handleBreadcrumbClick('/game')}
+              href="/game"
+              onClick={(e) => handleBreadcrumbClick(e, '/game')}
               sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
             >
               <Home sx={{ mr: 0.5 }} fontSize="inherit" />
@@ -115,32 +120,32 @@ const NPCsPage: React.FC = () => {
         </Box>
 
         {/* Mobile Content */}
-        {selectedNPCId && selectedNPC ? (
-          <Fade in={true} timeout={300}>
-            <Box>
+        <Fade in={true} timeout={300}>
+          <Box>
+            {hasNPCs ? (
               <NPCListView
                 onSelectNPC={handleSelectNPC}
                 selectedNPCId={selectedNPCId || undefined}
                 viewMode={viewMode}
               />
-            </Box>
-          </Fade>
-        ) : (
-          <Fade in={true} timeout={300}>
-            <Box>
-              <NPCListView
-                onSelectNPC={handleSelectNPC}
-                selectedNPCId={selectedNPCId || undefined}
-                viewMode={viewMode}
-              />
-            </Box>
-          </Fade>
-        )}
+            ) : (
+              <Paper sx={{ p: 3, textAlign: 'center' }}>
+                <People sx={{ fontSize: 64, mb: 2, color: 'text.secondary' }} />
+                <Typography variant="h6" gutterBottom>
+                  No NPCs Available
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  NPCs will appear here once they are discovered or initialized
+                </Typography>
+              </Paper>
+            )}
+          </Box>
+        </Fade>
       </Box>
     );
   }
 
-  // Desktop view: three-column layout
+  // Desktop view: responsive layout
   return (
     <Box sx={{ p: 3, height: '100vh', overflow: 'hidden' }}>
       {/* Desktop Header */}
@@ -148,8 +153,8 @@ const NPCsPage: React.FC = () => {
         <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
           <Link
             color="inherit"
-            href="#"
-            onClick={() => handleBreadcrumbClick('/game')}
+            href="/game"
+            onClick={(e) => handleBreadcrumbClick(e, '/game')}
             sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
           >
             <Home sx={{ mr: 0.5 }} fontSize="inherit" />
@@ -157,7 +162,7 @@ const NPCsPage: React.FC = () => {
           </Link>
           <Typography color="text.primary" sx={{ display: 'flex', alignItems: 'center' }}>
             <People sx={{ mr: 0.5 }} fontSize="inherit" />
-            NPCs
+            NPCs ({npcCount})
           </Typography>
           {selectedNPC && (
             <Typography color="text.primary">
@@ -171,86 +176,132 @@ const NPCsPage: React.FC = () => {
             NPC Interactions
           </Typography>
           
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              variant={viewMode === 'grid' ? 'contained' : 'outlined'}
-              startIcon={<ViewModule />}
-              onClick={() => setViewMode('grid')}
-              size="small"
-            >
-              Grid
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'contained' : 'outlined'}
-              startIcon={<ViewList />}
-              onClick={() => setViewMode('list')}
-              size="small"
-            >
-              List
-            </Button>
-          </Box>
+          {hasNPCs && (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant={viewMode === 'grid' ? 'contained' : 'outlined'}
+                startIcon={<ViewModule />}
+                onClick={() => setViewMode('grid')}
+                size="small"
+              >
+                Grid
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'contained' : 'outlined'}
+                startIcon={<ViewList />}
+                onClick={() => setViewMode('list')}
+                size="small"
+              >
+                List
+              </Button>
+            </Box>
+          )}
         </Box>
       </Box>
 
-      {/* Desktop Three-Column Layout */}
-      <Grid container spacing={3} sx={{ height: 'calc(100vh - 140px)' }}>
-        {/* Left Column: NPC List */}
-        <Grid item xs={4}>
-          <Paper
-            sx={{
-              height: '100%',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <NPCListView
-              onSelectNPC={handleSelectNPC}
-              selectedNPCId={selectedNPCId || undefined}
-              viewMode={viewMode}
-            />
-          </Paper>
-        </Grid>
+      {/* Desktop Layout */}
+      {hasNPCs ? (
+        <Grid container spacing={3} sx={{ height: 'calc(100vh - 140px)' }}>
+          {/* Left Column: NPC List */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              sx={{
+                height: '100%',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <NPCListView
+                onSelectNPC={handleSelectNPC}
+                selectedNPCId={selectedNPCId || undefined}
+                viewMode={viewMode}
+              />
+            </Paper>
+          </Grid>
 
-        {/* Right Column: NPC Details */}
-        <Grid item xs={8}>
-          <Paper
-            sx={{
-              height: '100%',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            {selectedNPCId && selectedNPC ? (
-              <Fade in={true} timeout={300} key={selectedNPCId}>
-                <Box sx={{ height: '100%' }}>
-                  <NPCListView npcId={selectedNPCId} />
+          {/* Right Column: NPC Details */}
+          <Grid item xs={12} md={8}>
+            <Paper
+              sx={{
+                height: '100%',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {selectedNPCId && selectedNPC ? (
+                <Fade in={true} timeout={300} key={selectedNPCId}>
+                  <Box sx={{ height: '100%', overflow: 'auto' }}>
+                    {/* Use NPCPanel directly for detailed NPC view */}
+                    <Box sx={{ p: 2 }}>
+                      <Typography variant="h5" gutterBottom>
+                        {selectedNPC.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" paragraph>
+                        Detailed NPC interaction interface will be displayed here.
+                        This area is reserved for the comprehensive NPC panel with tabs for
+                        Overview, Dialogue, Trade, Quests, and Traits.
+                      </Typography>
+                      {/* TODO: Replace with actual NPCPanel component when available */}
+                      <Box sx={{ 
+                        p: 3, 
+                        bgcolor: 'background.default', 
+                        borderRadius: 1,
+                        border: '1px dashed',
+                        borderColor: 'divider'
+                      }}>
+                        <Typography variant="body2" color="text.secondary" textAlign="center">
+                          NPCPanel Component Integration Pending
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Fade>
+              ) : (
+                <Box
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: 'text.secondary',
+                    p: 3,
+                  }}
+                >
+                  <People sx={{ fontSize: 64, mb: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Select an NPC
+                  </Typography>
+                  <Typography variant="body2" textAlign="center">
+                    Choose an NPC from the list to view their details and interact with them
+                  </Typography>
                 </Box>
-              </Fade>
-            ) : (
-              <Box
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  color: 'text.secondary',
-                }}
-              >
-                <People sx={{ fontSize: 64, mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Select an NPC
-                </Typography>
-                <Typography variant="body2" textAlign="center">
-                  Choose an NPC from the list to view their details and interact with them
-                </Typography>
-              </Box>
-            )}
-          </Paper>
+              )}
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      ) : (
+        <Paper 
+          sx={{ 
+            height: 'calc(100vh - 140px)', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            p: 3 
+          }}
+        >
+          <People sx={{ fontSize: 64, mb: 2, color: 'text.secondary' }} />
+          <Typography variant="h5" gutterBottom>
+            No NPCs Available
+          </Typography>
+          <Typography variant="body1" color="text.secondary" textAlign="center">
+            NPCs will appear here once they are discovered or initialized through gameplay
+          </Typography>
+        </Paper>
+      )}
     </Box>
   );
 };

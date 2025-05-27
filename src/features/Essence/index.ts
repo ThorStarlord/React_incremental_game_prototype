@@ -1,21 +1,27 @@
-// Essence System Feature Exports
+/**
+ * Essence Feature - Barrel Export
+ * 
+ * This file exports the public API of the Essence feature following
+ * Feature-Sliced Design principles.
+ */
 
-// Redux State Management
-export { default as essenceReducer } from './state/EssenceSlice';
-export { essenceSlice } from './state/EssenceSlice';
-export * from './state/EssenceSlice';
+// Components
+export {
+  EssenceDisplay,
+  ConfigurableEssenceButton,
+  ManualEssenceButton,
+  EssenceGenerationTimer,
+  EssencePanel
+} from './components';
 
 // Types
-export type * from './state/EssenceTypes';
+export type { EssenceState } from './state/EssenceTypes';
 
 // Selectors
 export * from './state/EssenceSelectors';
 
-// Components (if they exist)
-// export * from './components';
+// Actions and Slice
+export * from './state/EssenceSlice';
 
-// Hooks (if they exist)
-// export * from './hooks';
-
-// Utils (if they exist)
-// export * from './utils';
+// Hooks
+export { default as useEssenceGeneration, useAutoGenerateEssence } from './hooks/useEssenceGeneration';

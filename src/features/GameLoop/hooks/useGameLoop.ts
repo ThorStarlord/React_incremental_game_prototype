@@ -13,7 +13,7 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
   const gameLoop = useAppSelector((state) => state.gameLoop);
   const { onTick, onAutoSave } = options;
   
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const lastFrameTimeRef = useRef<number>(0);
   const accumulatorRef = useRef<number>(0);
 
@@ -93,14 +93,21 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
   };
 };
 
-// Example usage in other components:
-const { isRunning, currentTick } = useGameLoop({
-  onTick: (tickData) => {
-    // Generate essence every tick
-    // Update trait cooldowns
-    // Process time-based events
-  },
-  onAutoSave: () => {
-    // Save game state to localStorage
-  }
-});
+/**
+ * Example usage in other components:
+ * 
+ * function GameComponent() {
+ *   const { isRunning, currentTick } = useGameLoop({
+ *     onTick: (tickData) => {
+ *       // Generate essence every tick
+ *       // Update trait cooldowns
+ *       // Process time-based events
+ *     },
+ *     onAutoSave: () => {
+ *       // Save game state to localStorage
+ *     }
+ *   });
+ *   
+ *   return <div>Game running: {isRunning}</div>;
+ * }
+ */

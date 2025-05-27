@@ -44,7 +44,7 @@ import {
   VisibilityOff,
 } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectAllNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
+import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
 import { NPC } from '../../state/NPCTypes';
 import { RELATIONSHIP_TIERS } from '../../../../config/relationshipConstants';
 
@@ -62,70 +62,77 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   selectedNPCId,
   viewMode = 'grid'
 }) => {
-  const npcs = useAppSelector(selectAllNPCs);
+  const npcs = useAppSelector(selectNPCs);
   const discoveredNPCIds = useAppSelector(selectDiscoveredNPCs);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
 
-  // Get discovered NPCs only
-  const discoveredNPCs = useMemo(() => {
-    return discoveredNPCIds.map(id => npcs[id]).filter(Boolean);
-  }, [npcs, discoveredNPCIds]);
-
-  // Filter and sort NPCs
+  // Transform discovered NPC IDs to NPC objects and apply filtering/sorting
   const filteredAndSortedNPCs = useMemo(() => {
-    let filtered = discoveredNPCs;
+    // Convert IDs to NPC objects
+    let npcList = discoveredNPCIds
+      .map(id => npcs[id])
+      .filter(Boolean); // Remove any undefined NPCs
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(npc => 
-        npc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        npc.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        npc.faction?.toLowerCase().includes(searchTerm.toLowerCase())
+      const searchLower = searchTerm.toLowerCase();
+      npcList = npcList.filter(npc => 
+        npc.name.toLowerCase().includes(searchLower) ||
+        (npc.description?.toLowerCase().includes(searchLower) ?? false) ||
+        npc.location.toLowerCase().includes(searchLower) ||
+        (npc.faction?.toLowerCase().includes(searchLower) ?? false)
       );
     }
 
-    // Apply category filter
+    // Apply filters
     switch (filterBy) {
       case 'available':
-        filtered = filtered.filter(npc => npc.isAvailable);
+        npcList = npcList.filter(npc => npc.isAvailable);
         break;
       case 'high_relationship':
-        filtered = filtered.filter(npc => npc.relationshipValue >= 50);
+        npcList = npcList.filter(npc => npc.relationshipValue >= 60);
         break;
       case 'same_location':
-        // This would filter by current player location
-        // For now, just show all
+        // This would need player location - for now, just show all
+        break;
+      default:
+        // 'all' - no additional filtering
         break;
     }
 
     // Apply sorting
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'relationship':
-          return b.relationshipValue - a.relationshipValue;
-        case 'location':
-          return a.location.localeCompare(b.location);
-        case 'recent':
-          const aTime = a.lastInteraction ? new Date(a.lastInteraction).getTime() : 0;
-          const bTime = b.lastInteraction ? new Date(b.lastInteraction).getTime() : 0;
+    switch (sortBy) {
+      case 'name':
+        npcList.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'relationship':
+        npcList.sort((a, b) => b.relationshipValue - a.relationshipValue);
+        break;
+      case 'location':
+        npcList.sort((a, b) => a.location.localeCompare(b.location));
+        break;
+      case 'recent':
+        npcList.sort((a, b) => {
+          const aTime = a.lastInteraction || 0;
+          const bTime = b.lastInteraction || 0;
           return bTime - aTime;
-        default:
-          return 0;
-      }
-    });
+        });
+        break;
+      default:
+        break;
+    }
 
-    return filtered;
-  }, [discoveredNPCs, searchTerm, sortBy, filterBy]);
+    return npcList;
+  }, [npcs, discoveredNPCIds, searchTerm, filterBy, sortBy]);
 
   // Get relationship tier for an NPC
   const getRelationshipTier = (relationshipValue: number) => {
-    return RELATIONSHIP_TIERS.find(tier => 
-      relationshipValue >= tier.minValue && relationshipValue <= tier.maxValue
+    const tiers = Object.values(RELATIONSHIP_TIERS);
+    return tiers.find((tier: any) => 
+      relationshipValue >= tier.min && relationshipValue <= tier.max
     );
   };
 
@@ -192,7 +199,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
             </Box>
 
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, height: 40, overflow: 'hidden' }}>
-              {npc.description}
+              {npc.description || 'No description available'}
             </Typography>
 
             <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
@@ -248,10 +255,15 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
     return (
       <React.Fragment key={npc.id}>
         <ListItem
-          button
-          selected={isSelected}
           onClick={() => onSelectNPC(npc.id)}
-          sx={{ py: 2 }}
+          sx={{ 
+            py: 2,
+            cursor: 'pointer',
+            backgroundColor: isSelected ? 'action.selected' : 'transparent',
+            '&:hover': {
+              backgroundColor: isSelected ? 'action.selected' : 'action.hover',
+            },
+          }}
         >
           <ListItemAvatar>
             <Avatar
@@ -299,7 +311,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
                   )}
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  {npc.description}
+                  {npc.description || 'No description available'}
                 </Typography>
               </Box>
             }
@@ -322,7 +334,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ mb: 1 }}>
-          NPCs ({discoveredNPCs.length} discovered)
+          NPCs ({discoveredNPCIds.length} discovered)
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Manage your relationships and interactions with discovered NPCs
@@ -377,7 +389,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
       {/* Results Summary */}
       {(searchTerm || filterBy !== 'all') && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          Showing {filteredAndSortedNPCs.length} of {discoveredNPCs.length} NPCs
+          Showing {filteredAndSortedNPCs.length} of {discoveredNPCIds.length} NPCs
         </Alert>
       )}
 
@@ -396,10 +408,10 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Person sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-            {discoveredNPCs.length === 0 ? 'No NPCs discovered yet' : 'No NPCs match your filters'}
+            {discoveredNPCIds.length === 0 ? 'No NPCs discovered yet' : 'No NPCs match your filters'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {discoveredNPCs.length === 0 
+            {discoveredNPCIds.length === 0 
               ? 'Explore the world to meet new NPCs'
               : 'Try adjusting your search or filters'
             }

@@ -103,3 +103,19 @@ export const selectEssenceDisplayStats = createSelector(
     essenceGenerationRate: essence.generationRate,
   })
 );
+
+/**
+ * Select essence generation rate (fallback to 0 if undefined)
+ */
+export const selectGenerationRate = createSelector(
+  [selectEssence],
+  (essence) => essence.generationRate || 0
+);
+
+/**
+ * Select essence per click value (fallback to 1 if undefined)
+ */
+export const selectPerClick = createSelector(
+  [selectEssence],
+  (essence) => essence.perClick || 1
+);

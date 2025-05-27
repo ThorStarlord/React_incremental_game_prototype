@@ -1,253 +1,273 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, List, ListItem, ListItemText, Button, Chip, LinearProgress } from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-
-import type { NpcState } from '../../../state/NpcTypes';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  LinearProgress,
+  Chip,
+  Alert,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Divider
+} from '@mui/material';
+import {
+  Assignment as QuestIcon,
+  CheckCircle as CompleteIcon,
+  RadioButtonUnchecked as IncompleteIcon,
+  Star as RewardIcon,
+  Info as InfoIcon
+} from '@mui/icons-material';
+import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCQuestsTabProps {
-  npc: NpcState;
+  npc: NPC;
+  relationshipLevel: number;
 }
 
-interface Quest {
-  id: string;
-  title: string;
-  description: string;
-  status: 'available' | 'accepted' | 'completed';
-  progress?: number;
-  maxProgress?: number;
-  rewards: {
-    xp?: number;
-    gold?: number;
-    essence?: number;
-    items?: string[];
-  };
-  requirements?: {
-    level?: number;
-    relationshipLevel?: number;
-  };
-}
+// Mock quest data for demonstration
+const mockQuests = [
+  {
+    id: 'gather_herbs',
+    title: 'Gather Healing Herbs',
+    description: 'Collect 10 healing herbs from the nearby forest to help with my research.',
+    objectives: [
+      { text: 'Collect healing herbs', current: 7, required: 10, completed: false }
+    ],
+    rewards: ['50 XP', '25 Gold', '+5 Relationship'],
+    status: 'accepted',
+    difficulty: 'Easy'
+  },
+  {
+    id: 'ancient_artifact',
+    title: 'Retrieve Ancient Artifact',
+    description: 'Venture into the old ruins and retrieve the crystalline artifact.',
+    objectives: [
+      { text: 'Enter the ancient ruins', current: 1, required: 1, completed: true },
+      { text: 'Find the crystalline artifact', current: 0, required: 1, completed: false },
+      { text: 'Return safely', current: 0, required: 1, completed: false }
+    ],
+    rewards: ['100 XP', '75 Gold', 'Rare Trait: Explorer', '+10 Relationship'],
+    status: 'available',
+    difficulty: 'Hard'
+  },
+  {
+    id: 'deliver_message',
+    title: 'Deliver Important Message',
+    description: 'Take this sealed letter to the merchant in the town square.',
+    objectives: [
+      { text: 'Deliver message to merchant', current: 1, required: 1, completed: true }
+    ],
+    rewards: ['25 XP', '15 Gold', '+3 Relationship'],
+    status: 'completed',
+    difficulty: 'Easy'
+  }
+];
 
-const NPCQuestsTab: React.FC<NPCQuestsTabProps> = ({ npc }) => {
-  // Mock quests - in real implementation, this would come from quest system
-  const quests: Quest[] = [
-    {
-      id: 'fetch_herbs',
-      title: 'Gather Healing Herbs',
-      description: 'Collect 10 healing herbs from the nearby forest to help with my research.',
-      status: 'available',
-      rewards: {
-        xp: 100,
-        gold: 50,
-        essence: 5
-      },
-      requirements: {
-        relationshipLevel: 3
-      }
-    },
-    {
-      id: 'deliver_message',
-      title: 'Deliver a Message',
-      description: 'Take this important message to the merchant in the town square.',
-      status: 'accepted',
-      progress: 0,
-      maxProgress: 1,
-      rewards: {
-        xp: 75,
-        gold: 30,
-        essence: 3
-      }
-    },
-    {
-      id: 'find_artifact',
-      title: 'Locate Ancient Artifact',
-      description: 'Help me find a mysterious artifact rumored to be hidden in the old ruins.',
-      status: 'available',
-      rewards: {
-        xp: 300,
-        gold: 200,
-        essence: 25,
-        items: ['Ancient Key']
-      },
-      requirements: {
-        level: 5,
-        relationshipLevel: 4
-      }
-    }
-  ];
-
-  const handleAcceptQuest = (quest: Quest) => {
+const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npc, relationshipLevel }) => {
+  const handleAcceptQuest = (questId: string) => {
     // TODO: Implement quest acceptance logic
-    console.log(`Accepting quest: ${quest.title}`);
+    console.log(`Accepting quest: ${questId}`);
   };
 
-  const handleCompleteQuest = (quest: Quest) => {
+  const handleCompleteQuest = (questId: string) => {
     // TODO: Implement quest completion logic
-    console.log(`Completing quest: ${quest.title}`);
+    console.log(`Completing quest: ${questId}`);
   };
 
-  const canAcceptQuest = (quest: Quest): boolean => {
-    if (quest.requirements?.relationshipLevel && npc.relationshipValue < quest.requirements.relationshipLevel) {
-      return false;
-    }
-    // TODO: Check player level requirement
-    return true;
-  };
-
-  const getQuestStatusColor = (status: Quest['status']) => {
-    switch (status) {
-      case 'available': return 'primary';
-      case 'accepted': return 'warning';
-      case 'completed': return 'success';
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty.toLowerCase()) {
+      case 'easy': return 'success';
+      case 'medium': return 'warning';
+      case 'hard': return 'error';
       default: return 'default';
     }
   };
 
-  const getQuestStatusIcon = (status: Quest['status']) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'available': return <AssignmentIcon />;
-      case 'accepted': return <HourglassEmptyIcon />;
-      case 'completed': return <CheckCircleIcon />;
-      default: return <AssignmentIcon />;
+      case 'completed': return 'success';
+      case 'accepted': return 'primary';
+      case 'available': return 'secondary';
+      default: return 'default';
     }
   };
 
+  const calculateProgress = (objectives: any[]) => {
+    const completed = objectives.filter(obj => obj.completed).length;
+    return (completed / objectives.length) * 100;
+  };
+
+  const isQuestReady = (quest: any) => {
+    return quest.status === 'accepted' && quest.objectives.every((obj: any) => obj.completed);
+  };
+
   return (
-    <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <AssignmentIcon color="primary" />
-        <Typography variant="h6">Quests from {npc.name}</Typography>
+    <Box sx={{ p: 2 }}>
+      {/* Quests Header */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <QuestIcon color="primary" />
+          Quests from {npc.name}
+        </Typography>
+        
+        <Alert severity="info" sx={{ mb: 2 }}>
+          <Typography variant="body2">
+            Complete quests to earn rewards and strengthen your relationship with {npc.name}.
+          </Typography>
+        </Alert>
       </Box>
 
-      {/* Quests List */}
+      {/* Quest List */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {quests.map((quest) => (
-          <Card key={quest.id}>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Box sx={{ flexGrow: 1, mr: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    {getQuestStatusIcon(quest.status)}
-                    <Typography variant="h6">{quest.title}</Typography>
-                    <Chip
-                      label={quest.status.toUpperCase()}
+        {mockQuests.map((quest) => {
+          const progress = calculateProgress(quest.objectives);
+          const readyToComplete = isQuestReady(quest);
+
+          return (
+            <Card key={quest.id} sx={{ overflow: 'visible' }}>
+              <CardContent>
+                {/* Quest Header */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" gutterBottom>
+                      {quest.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {quest.description}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+                    <Chip 
+                      label={quest.difficulty} 
+                      color={getDifficultyColor(quest.difficulty) as any}
                       size="small"
-                      color={getQuestStatusColor(quest.status)}
+                    />
+                    <Chip 
+                      label={quest.status} 
+                      color={getStatusColor(quest.status) as any}
+                      size="small"
                       variant="outlined"
                     />
                   </Box>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {quest.description}
+                </Box>
+
+                {/* Quest Objectives */}
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Objectives:
                   </Typography>
+                  <List dense>
+                    {quest.objectives.map((objective, index) => (
+                      <ListItem key={index} sx={{ pl: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          {objective.completed ? (
+                            <CompleteIcon color="success" fontSize="small" />
+                          ) : (
+                            <IncompleteIcon color="disabled" fontSize="small" />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={
+                            <Typography 
+                              variant="body2" 
+                              sx={{ 
+                                textDecoration: objective.completed ? 'line-through' : 'none',
+                                color: objective.completed ? 'text.secondary' : 'text.primary'
+                              }}
+                            >
+                              {objective.text} ({objective.current}/{objective.required})
+                            </Typography>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                  
+                  {quest.status === 'accepted' && (
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={progress} 
+                      sx={{ mt: 1, mb: 2 }}
+                      color={progress === 100 ? 'success' : 'primary'}
+                    />
+                  )}
+                </Box>
 
-                  {/* Progress Bar for Accepted Quests */}
-                  {quest.status === 'accepted' && quest.progress !== undefined && quest.maxProgress !== undefined && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" sx={{ mb: 0.5 }}>
-                        Progress: {quest.progress} / {quest.maxProgress}
-                      </Typography>
-                      <LinearProgress
-                        variant="determinate"
-                        value={(quest.progress / quest.maxProgress) * 100}
-                        sx={{ height: 8, borderRadius: 4 }}
+                <Divider sx={{ my: 2 }} />
+
+                {/* Quest Rewards */}
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <RewardIcon fontSize="small" />
+                    Rewards:
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {quest.rewards.map((reward, index) => (
+                      <Chip 
+                        key={index}
+                        label={reward} 
+                        size="small" 
+                        variant="outlined"
+                        color="primary"
                       />
-                    </Box>
-                  )}
-
-                  {/* Requirements */}
-                  {quest.requirements && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                        Requirements:
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                        {quest.requirements.level && (
-                          <Chip
-                            label={`Level ${quest.requirements.level}`}
-                            size="small"
-                            variant="outlined"
-                          />
-                        )}
-                        {quest.requirements.relationshipLevel && (
-                          <Chip
-                            label={`Relationship ${quest.requirements.relationshipLevel}+`}
-                            size="small"
-                            variant="outlined"
-                            color={npc.relationshipValue >= quest.requirements.relationshipLevel ? 'success' : 'error'}
-                          />
-                        )}
-                      </Box>
-                    </Box>
-                  )}
-
-                  {/* Rewards */}
-                  <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                      Rewards:
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      {quest.rewards.xp && (
-                        <Chip label={`${quest.rewards.xp} XP`} size="small" color="info" />
-                      )}
-                      {quest.rewards.gold && (
-                        <Chip label={`${quest.rewards.gold} Gold`} size="small" color="warning" />
-                      )}
-                      {quest.rewards.essence && (
-                        <Chip label={`${quest.rewards.essence} Essence`} size="small" color="secondary" />
-                      )}
-                      {quest.rewards.items?.map((item) => (
-                        <Chip key={item} label={item} size="small" color="success" />
-                      ))}
-                    </Box>
+                    ))}
                   </Box>
                 </Box>
 
-                {/* Action Button */}
-                <Box sx={{ flexShrink: 0 }}>
+                {/* Quest Actions */}
+                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                   {quest.status === 'available' && (
-                    <Button
-                      variant="contained"
-                      onClick={() => handleAcceptQuest(quest)}
-                      disabled={!canAcceptQuest(quest)}
+                    <Button 
+                      variant="contained" 
+                      onClick={() => handleAcceptQuest(quest.id)}
                     >
-                      Accept
+                      Accept Quest
                     </Button>
                   )}
-                  {quest.status === 'accepted' && quest.progress === quest.maxProgress && (
-                    <Button
-                      variant="contained"
+                  
+                  {readyToComplete && (
+                    <Button 
+                      variant="contained" 
                       color="success"
-                      onClick={() => handleCompleteQuest(quest)}
+                      onClick={() => handleCompleteQuest(quest.id)}
                     >
-                      Complete
+                      Complete Quest
                     </Button>
                   )}
+                  
                   {quest.status === 'completed' && (
-                    <Button variant="outlined" disabled>
-                      Completed
-                    </Button>
+                    <Chip 
+                      icon={<CompleteIcon />}
+                      label="Completed" 
+                      color="success" 
+                      variant="filled"
+                    />
                   )}
                 </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </Box>
 
-      {quests.length === 0 && (
-        <Card>
-          <CardContent>
-            <Typography variant="body1" color="text.secondary" textAlign="center">
-              No quests available from {npc.name} at this time.
-            </Typography>
-          </CardContent>
-        </Card>
+      {/* Quest Information */}
+      {mockQuests.length === 0 && (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          <Typography variant="body2">
+            <InfoIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
+            No quests available at the moment. Check back later or improve your relationship!
+          </Typography>
+        </Alert>
       )}
     </Box>
   );
-};
+});
 
-export default React.memo(NPCQuestsTab);
+NPCQuestsTab.displayName = 'NPCQuestsTab';
+
+export default NPCQuestsTab;

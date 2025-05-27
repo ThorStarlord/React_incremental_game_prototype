@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Typography, Paper, Divider } from '@mui/material';
-import StatDisplay from '../ui/StatDisplay';
-import PlayerTraits from '../ui/PlayerTraitsUI';
-import Progression from '../containers/Progression';
+import { PlayerStatsContainer } from '../containers/PlayerStatsContainer';
+import { PlayerTraitsContainer } from '../containers/PlayerTraitsContainer';
+import { Progression } from '../containers/Progression';
 
 /**
  * Interface for CharacterPanel props
@@ -10,21 +10,28 @@ import Progression from '../containers/Progression';
 interface CharacterPanelProps {
   /** Optional player name to display */
   playerName?: string;
+  /** Optional className for styling */
+  className?: string;
 }
 
 /**
  * CharacterPanel Component
  * 
  * Displays a comprehensive view of the player's character including
- * stats, traits, and progression information.
+ * stats, traits, and progression information. Uses container components
+ * that handle Redux state management.
  * 
  * @param props Component props
  * @returns CharacterPanel component
  */
-const CharacterPanel: React.FC<CharacterPanelProps> = ({ playerName = 'Character' }) => {
+const CharacterPanel: React.FC<CharacterPanelProps> = ({ 
+  playerName = 'Character',
+  className 
+}) => {
   return (
     <Paper 
       elevation={2} 
+      className={className}
       sx={{ 
         p: 3,
         borderRadius: 2,
@@ -37,19 +44,31 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ playerName = 'Character
       
       <Divider sx={{ mb: 2 }} />
       
+      {/* Player Statistics Section */}
       <Box sx={{ mb: 3 }}>
-        <StatDisplay />
+        <Typography variant="h6" component="h3" gutterBottom>
+          Character Statistics
+        </Typography>
+        <PlayerStatsContainer />
       </Box>
       
+      {/* Player Traits Section */}
       <Box sx={{ mb: 3 }}>
-        <PlayerTraits />
+        <Typography variant="h6" component="h3" gutterBottom>
+          Character Traits
+        </Typography>
+        <PlayerTraitsContainer />
       </Box>
       
+      {/* Progression Section */}
       <Box>
-        <Progression />
+        <Typography variant="h6" component="h3" gutterBottom>
+          Character Progress
+        </Typography>
+        <Progression showDetails={true} />
       </Box>
     </Paper>
   );
 };
 
-export default CharacterPanel;
+export default React.memo(CharacterPanel);

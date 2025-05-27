@@ -5,9 +5,8 @@
  */
 import React from 'react';
 import { useAppSelector } from '../../../../app/hooks';
-// Correct the imported selector names
-import { selectEssenceAmount, selectEssenceMaxAmount } from '../../state/EssenceSelectors'; 
-import EssenceDisplay from '../ui/EssenceDisplay'; // Import the UI component
+import { selectEssence } from '../../state/EssenceSelectors'; 
+import EssenceDisplay from '../ui/EssenceDisplay';
 import useEssenceGeneration, { useAutoGenerateEssence } from '../../hooks/useEssenceGeneration';
 
 /**
@@ -16,18 +15,23 @@ import useEssenceGeneration, { useAutoGenerateEssence } from '../../hooks/useEss
  * Fetches current and max essence from the Redux store and renders the
  * EssenceDisplay component with the fetched data.
  */
-const EssenceDisplayContainer: React.FC = () => {
+const EssenceDisplayContainer: React.FC = React.memo(() => {
   // Sync generation rate and start auto-generation interval
   useEssenceGeneration();
   useAutoGenerateEssence();
   
-  // Select the necessary data from the Redux store
-  const currentEssence = useAppSelector(selectEssenceAmount);
-  const maxEssence = useAppSelector(selectEssenceMaxAmount);
+  // Select the essence state from the Redux store
+  const essenceState = useAppSelector(selectEssence);
+  const currentEssence = essenceState.amount; // Changed from currentAmount to amount
+  
+  // Since there's no maxEssence in the current system, use a reasonable default
+  // or remove the maxEssence prop if EssenceDisplay doesn't need it
+  const maxEssence = 1000; // Default max for display purposes
 
   // Render the UI component, passing the data as props
-  // Provide a default value (e.g., 1000) for maxEssence if it's undefined
-  return <EssenceDisplay currentEssence={currentEssence} maxEssence={maxEssence ?? 1000} />;
-};
+  return <EssenceDisplay currentEssence={currentEssence} maxEssence={maxEssence} />;
+});
+
+EssenceDisplayContainer.displayName = 'EssenceDisplayContainer';
 
 export default EssenceDisplayContainer;

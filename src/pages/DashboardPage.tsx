@@ -36,7 +36,7 @@ import { selectPlayer } from '../features/Player';
 import { selectEssence } from '../features/Essence';
 import { selectGameLoop } from '../features/GameLoop';
 import { selectEquippedTraitObjects } from '../features/Traits'; // Fixed import
-import { selectAllNPCs } from '../features/NPCs';
+import { selectNPCs } from '../features/NPCs'; // Fixed import
 
 // Feature components
 import { GameControlPanel } from '../features/GameLoop/components/ui/GameControlPanel';
@@ -82,7 +82,7 @@ export const DashboardPage: React.FC = React.memo(() => {
   const essence = useAppSelector(selectEssence);
   const gameLoop = useAppSelector(selectGameLoop);
   const traits = useAppSelector(selectEquippedTraitObjects); // Fixed usage
-  const npcs = useAppSelector(selectAllNPCs);
+  const npcs = useAppSelector(selectNPCs); // Fixed usage
 
   // Computed dashboard statistics
   const dashboardStats = useMemo((): DashboardStatCard[] => [
@@ -321,360 +321,54 @@ export const DashboardPage: React.FC = React.memo(() => {
               </Alert>
               
               <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
-                <Grid container spacing={1}>
-                  {/*
-                    Navigation items can be dynamically generated based on available features
-                    and user permissions in a real-world scenario.
-                  */}
-                  {/*
-                    For now, we use static items for demonstration purposes.
-                  */}
-                  {/*
-                    - Character: Stats & Equipment
-                    - Traits: Abilities & Powers
-                    - NPCs: Relationships
-                    - Essence: Core Resource
-                  */}
-                  {/*
-                    Each item can be a link to the corresponding page or section in the app.
-                  */}
-                  {/*
-                    Icons and labels should be consistent with the rest of the app.
-                  */}
-                  {/*
-                    Consider using tooltips or help icons to provide additional information
-                    about each system's features and benefits.
-                  */}
-                  {/*
-                    Ensure proper spacing, alignment, and responsive behavior of the grid items.
-                  */}
-                  {/*
-                    Test the navigation thoroughly to avoid broken links or inaccessible pages.
-                  */}
-                  {/*
-                    Monitor user feedback to improve the navigation structure and item visibility.
-                  */}
-                  {/*
-                    Regularly update the navigation items based on feature updates or user requests.
-                  */}
-                  {/*
-                    Keep the number of items manageable to avoid overwhelming the users.
-                  */}
-                  {/*
-                    Use clear and concise labels for each navigation item.
-                  */}
-                  {/*
-                    Avoid using jargon or complex terms that may confuse the users.
-                  */}
-                  {/*
-                    Ensure the navigation is accessible via keyboard and screen readers.
-                  */}
-                  {/*
-                    Provide visual feedback for active or selected navigation items.
-                  */}
-                  {/*
-                    Consider adding a search or filter option for quick access to specific features.
-                  */}
-                  {/*
-                    Group related items under common categories or sections.
-                  */}
-                  {/*
-                    Use dividers or spacing to separate different groups of items.
-                  */}
-                  {/*
-                    Highlight important or frequently used items to draw attention.
-                  */}
-                  {/*
-                    Use consistent iconography and color schemes for the navigation items.
-                  */}
-                  {/*
-                    Ensure the navigation is intuitive and easy to use for all players.
-                  */}
-                  {/*
-                    Test the navigation with real users to identify any pain points or confusion.
-                  */}
-                  {/*
-                    Iterate on the navigation design based on user testing and feedback.
-                  */}
-                  {/*
-                    Keep the navigation updated with the latest game features and content.
-                  */}
-                  {/*
-                    Monitor analytics to track navigation usage and identify popular or problematic areas.
-                  */}
-                  {/*
-                    Consider adding animations or transitions for a smoother navigation experience.
-                  */}
-                  {/*
-                    Ensure the navigation performs well on all devices and screen sizes.
-                  */}
-                  {/*
-                    Optimize the navigation for touch and pointer interactions.
-                  */}
-                  {/*
-                    Provide options to customize or rearrange the navigation items for advanced users.
-                  */}
-                  {/*
-                    Consider adding keyboard shortcuts or hotkeys for power users.
-                  */}
-                  {/*
-                    Ensure the navigation is secure and does not expose any sensitive information.
-                  */}
-                  {/*
-                    Regularly review and audit the navigation for any issues or improvements.
-                  */}
-                  {/*
-                    Keep the navigation simple and focused on the core game features.
-                  */}
-                  {/*
-                    Avoid cluttering the navigation with too many items or categories.
-                  */}
-                  {/*
-                    Use clear and meaningful icons for each navigation item.
-                  */}
-                  {/*
-                    Ensure the icons are recognizable and consistent with the app's style.
-                  */}
-                  {/*
-                    Test the icons for visibility and clarity at different sizes and resolutions.
-                  */}
-                  {/*
-                    Consider using animated or dynamic icons to enhance the visual interest.
-                  */}
-                  {/*
-                    Ensure the icons are accessible and have appropriate alt text or labels.
-                  */}
-                  {/*
-                    Monitor the icon usage and update or replace any unclear or unpopular icons.
-                  */}
-                  {/*
-                    Keep the icon design consistent with the overall game theme and branding.
-                  */}
-                  {/*
-                    Use icons to complement the text labels, not to replace them.
-                  */}
-                  {/*
-                    Ensure the text labels are always visible and legible.
-                  */}
-                  {/*
-                    Avoid using icons that may have multiple meanings or interpretations.
-                  */}
-                  {/*
-                    Test the icons with real users to ensure they are intuitive and helpful.
-                  */}
-                  {/*
-                    Iterate on the icon design based on user testing and feedback.
-                  */}
-                  {/*
-                    Regularly update the icons to keep them fresh and aligned with the game updates.
-                  */}
-                  {/*
-                    Monitor analytics to track icon usage and identify any issues or improvements.
-                  */}
-                  {/*
-                    Consider adding sound or haptic feedback for icon interactions.
-                  */}
-                  {/*
-                    Ensure the icons are optimized for performance and do not affect the app's speed.
-                  */}
-                  {/*
-                    Provide options to customize or change the icons for advanced users.
-                  */}
-                  {/*
-                    Consider adding keyboard shortcuts or hotkeys for icon actions.
-                  */}
-                  {/*
-                    Ensure the icons are secure and do not expose any vulnerabilities.
-                  */}
-                  {/*
-                    Regularly review and audit the icons for any issues or improvements.
-                  */}
-                  {/*
-                    Keep the icon usage consistent and avoid unnecessary changes or variations.
-                  */}
-                  {/*
-                    Use icons to enhance the storytelling and immersion of the game.
-                  */}
-                  {/*
-                    Ensure the icons are culturally appropriate and do not cause offense.
-                  */}
-                  {/*
-                    Test the icons for accessibility and inclusivity.
-                  */}
-                  {/*
-                    Iterate on the icon design based on user feedback and cultural considerations.
-                  */}
-                  {/*
-                    Regularly update the icons to reflect any changes in the game world or lore.
-                  */}
-                  {/*
-                    Monitor the icon usage and update or retire any outdated or irrelevant icons.
-                  */}
-                  {/*
-                    Consider adding achievements or rewards for using the navigation or icons.
-                  */}
-                  {/*
-                    Ensure the navigation and icons are fun and engaging to use.
-                  */}
-                  {/*
-                    Test the navigation and icons with real users to ensure they are enjoyable and satisfying.
-                  */}
-                  {/*
-                    Iterate on the navigation and icon design based on user testing and feedback.
-                  */}
-                  {/*
-                    Regularly update the navigation and icons to keep them fresh and aligned with the game vision.
-                  */}
-                  {/*
-                    Monitor analytics to track navigation and icon usage and identify popular or problematic areas.
-                  */}
-                  {/*
-                    Consider adding animations or transitions for a smoother navigation and icon experience.
-                  */}
-                  {/*
-                    Ensure the navigation and icons perform well on all devices and screen sizes.
-                  */}
-                  {/*
-                    Optimize the navigation and icons for touch and pointer interactions.
-                  */}
-                  {/*
-                    Provide options to customize or rearrange the navigation and icons for advanced users.
-                  */}
-                  {/*
-                    Consider adding keyboard shortcuts or hotkeys for power users.
-                  */}
-                  {/*
-                    Ensure the navigation and icons are secure and do not expose any sensitive information.
-                  */}
-                  {/*
-                    Regularly review and audit the navigation and icons for any issues or improvements.
-                  */}
-                  {/*
-                    Keep the navigation and icons simple and focused on the core game features.
-                  */}
-                  {/*
-                    Avoid cluttering the navigation and icons with too many items or categories.
-                  */}
-                  {/*
-                    Use clear and meaningful labels for each navigation item.
-                  */}
-                  {/*
-                    Ensure the labels are concise and descriptive, avoiding ambiguity or confusion.
-                  */}
-                  {/*
-                    Test the labels for readability and clarity at different sizes and resolutions.
-                  */}
-                  {/*
-                    Consider using tooltips or help icons to provide additional information about each item.
-                  */}
-                  {/*
-                    Ensure the labels are accessible and have appropriate aria-labels or descriptions.
-                  */}
-                  {/*
-                    Monitor the label usage and update or replace any unclear or unpopular labels.
-                  */}
-                  {/*
-                    Keep the label design consistent with the overall game theme and branding.
-                  */}
-                  {/*
-                    Use labels to complement the icons, not to replace them.
-                  */}
-                  {/*
-                    Ensure the icons are always visible and legible, regardless of the context or state.
-                  */}
-                  {/*
-                    Avoid using labels that may be redundant or unnecessary.
-                  */}
-                  {/*
-                    Test the labels with real users to ensure they are intuitive and helpful.
-                  */}
-                  {/*
-                    Iterate on the label design based on user testing and feedback.
-                  */}
-                  {/*
-                    Regularly update the labels to keep them fresh and aligned with the game updates.
-                  */}
-                  {/*
-                    Monitor analytics to track label usage and identify any issues or improvements.
-                  */}
-                  {/*
-                    Consider adding sound or haptic feedback for label interactions.
-                  */}
-                  {/*
-                    Ensure the labels are optimized for performance and do not affect the app's speed.
-                  */}
-                  {/*
-                    Provide options to customize or change the labels for advanced users.
-                  */}
-                  {/*
-                    Consider adding keyboard shortcuts or hotkeys for label actions.
-                  */}
-                  {/*
-                    Ensure the labels are secure and do not expose any vulnerabilities.
-                  */}
-                  {/*
-                    Regularly review and audit the labels for any issues or improvements.
-                  */}
-                  {/*
-                    Keep the label usage consistent and avoid unnecessary changes or variations.
-                  */}
-                  {/*
-                    Use labels to enhance the storytelling and immersion of the game.
-                  */}
-                  {/*
-                    Ensure the labels are culturally appropriate and do not cause offense.
-                  */}
-                  {/*
-                    Test the labels for accessibility and inclusivity.
-                  */}
-                  {/*
-                    Iterate on the label design based on user feedback and cultural considerations.
-                  */}
-                  {/*
-                    Regularly update the labels to reflect any changes in the game world or lore.
-                  */}
-                  {/*
-                    Monitor the label usage and update or retire any outdated or irrelevant labels.
-                  */}
-                  {/*
-                    Consider adding achievements or rewards for using the navigation or labels.
-                  */}
-                  {/*
-                    Ensure the navigation and labels are fun and engaging to use.
-                  */}
-                  {/*
-                    Test the navigation and labels with real users to ensure they are enjoyable and satisfying.
-                  */}
-                  {/*
-                    Iterate on the navigation and label design based on user testing and feedback.
-                  */}
-                  {/*
-                    Regularly update the navigation and labels to keep them fresh and aligned with the game vision.
-                  */}
-                  {/*
-                    Monitor analytics to track navigation and label usage and identify popular or problematic areas.
-                  */}
-                  {/*
-                    Consider adding animations or transitions for a smoother navigation and label experience.
-                  */}
-                  {/*
-                    Ensure the navigation and labels perform well on all devices and screen sizes.
-                  */}
-                  {/*
-                    Optimize the navigation and labels for touch and pointer interactions.
-                  */}
-                  {/*
-                    Provide options to customize or rearrange the navigation and labels for advanced users.
-                  */}
-                  {/*
-                    Consider adding keyboard shortcuts or hotkeys for power users.
-                  */}
-                  {/*
-                    Ensure the navigation and labels are secure and do not expose any sensitive information.
-                  */}
-                  {/*
-                    Regularly review and audit the navigation and labels for any issues or improvements.
-                  */}
+                <Grid container spacing={2}>
+                  <Grid item xs={6} sm={3}>
+                    <Stack alignItems="center" spacing={1}>
+                      <PersonIcon color="primary" fontSize="large" />
+                      <Typography variant="caption" textAlign="center">
+                        Character
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" textAlign="center">
+                        Stats & Equipment
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  
+                  <Grid item xs={6} sm={3}>
+                    <Stack alignItems="center" spacing={1}>
+                      <StarIcon color="secondary" fontSize="large" />
+                      <Typography variant="caption" textAlign="center">
+                        Traits
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" textAlign="center">
+                        Abilities & Powers
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  
+                  <Grid item xs={6} sm={3}>
+                    <Stack alignItems="center" spacing={1}>
+                      <GroupIcon color="warning" fontSize="large" />
+                      <Typography variant="caption" textAlign="center">
+                        NPCs
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" textAlign="center">
+                        Relationships
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  
+                  <Grid item xs={6} sm={3}>
+                    <Stack alignItems="center" spacing={1}>
+                      <EssenceIcon color="info" fontSize="large" />
+                      <Typography variant="caption" textAlign="center">
+                        Essence
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" textAlign="center">
+                        Core Resource
+                      </Typography>
+                    </Stack>
+                  </Grid>
                 </Grid>
               </Paper>
             </CardContent>
@@ -693,10 +387,10 @@ export const DashboardPage: React.FC = React.memo(() => {
                 <Grid item xs={12} sm={4}>
                   <Stack alignItems="center" spacing={1}>
                     <Typography variant="h4" color="primary.main" fontWeight={600}>
-                      {traits.acquiredTraits.length}
+                      {traits.length}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" textAlign="center">
-                      Acquired Traits
+                      Equipped Traits
                     </Typography>
                   </Stack>
                 </Grid>

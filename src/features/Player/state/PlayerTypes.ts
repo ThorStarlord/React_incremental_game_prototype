@@ -1,23 +1,8 @@
+import type { Trait } from '../../Traits';
+
 /**
- * Player state type definitions following Feature-Sliced Design
- * Based on specification in DataModel.md
+ * Core player statistics interface
  */
-
-// Core Player State Interface
-export interface PlayerState {
-  name: string;
-  stats: PlayerStats;
-  attributes: Record<string, Attribute>;
-  attributePoints: number;
-  skillPoints: number;
-  statusEffects: StatusEffect[];
-  equipment: EquipmentState;
-  gold: number;
-  totalPlayTime: number; // In milliseconds
-  isAlive: boolean;
-}
-
-// Player Statistics Interface
 export interface PlayerStats {
   health: number;
   maxHealth: number;
@@ -26,216 +11,211 @@ export interface PlayerStats {
   attack: number;
   defense: number;
   speed: number;
-  healthRegen: number;
-  manaRegen: number;
-  critChance: number; // 0.0 to 1.0
-  critDamage: number; // Multiplier (e.g., 1.5 for +50%)
-  [key: string]: number; // Allow dynamic stats
+  healthRegeneration: number;
+  manaRegeneration: number;
+  criticalChance: number;  // 0.0 to 1.0
+  criticalDamage: number;  // multiplier (1.5 = 150%)
 }
 
-// Player Attributes Interface
-export interface Attribute {
-  name: string;
-  value: number; // Current value including bonuses
-  baseValue: number; // Value from allocated points
+/**
+ * Player attributes interface
+ */
+export interface PlayerAttributes {
+  strength: number;
+  dexterity: number;
+  intelligence: number;
+  constitution: number;
+  wisdom: number;
+  charisma: number;
 }
 
-// Status Effects Interface
+/**
+ * Status effect interface for temporary modifications
+ */
 export interface StatusEffect {
   id: string;
   name: string;
-  type: string; // e.g., 'buff', 'debuff'
-  duration: number; // Remaining duration in seconds or ticks
-  magnitude?: number;
-  source?: string;
-  timestampApplied: number;
-  effects: Partial<PlayerStats>;
+  description: string;
+  duration: number; // in milliseconds, -1 for permanent
+  effects: Partial<PlayerStats>; // stat modifications
+  startTime: number; // timestamp when effect was applied
 }
 
-// Equipment Interfaces
-export interface EquipmentItem {
+/**
+ * Trait slot data structure for UI components
+ */
+export interface TraitSlot {
   id: string;
-  name: string;
-  type: string; // e.g., 'weapon', 'armor', 'accessory'
-  slot: string; // e.g., 'head', 'chest', 'mainHand'
-  stats?: Partial<PlayerStats>;
-  rarity?: string; // e.g., 'common', 'rare'
+  slotIndex: number;
+  traitId: string | null;
+  isLocked: boolean;
+  unlockRequirement?: string;
 }
 
-export interface EquipmentState {
-  head?: EquipmentItem | null;
-  chest?: EquipmentItem | null;
-  legs?: EquipmentItem | null;
-  feet?: EquipmentItem | null;
-  mainHand?: EquipmentItem | null;
-  offHand?: EquipmentItem | null;
-  accessory1?: EquipmentItem | null;
-  accessory2?: EquipmentItem | null;
-  [key: string]: EquipmentItem | null | undefined;
+// Enhanced trait slot data for UI components - aligned with container transformation
+export interface TraitSlotData {
+  // Core properties from transformation
+  id: string;
+  index: number;
+  isUnlocked: boolean;
+  traitId: string | null;
+  // Optional derived properties for UI compatibility
+  slotIndex?: number; // Derived from index or provided separately
+  isLocked?: boolean; // Inverse of isUnlocked (!isUnlocked)
+  isEquipped?: boolean; // Derived from traitId !== null
+  traitName?: string;
+  traitDescription?: string;
+  traitRarity?: string;
+  unlockRequirement?: string;
 }
 
-// Action Payload Types
-export interface UpdatePlayerPayload {
-  updates: Partial<PlayerState>;
+/**
+ * Main player state interface
+ */
+export interface PlayerState {
+  stats: PlayerStats;
+  attributes: PlayerAttributes;
+  availableAttributePoints: number;
+  availableSkillPoints: number;
+  statusEffects: StatusEffect[];
+  equippedTraits: (string | null)[];
+  permanentTraits: string[];
+  traitSlots: TraitSlot[];
+  totalPlaytime: number; // in milliseconds
+  isAlive: boolean;
 }
 
-export interface ModifyHealthPayload {
-  amount: number;
-  type: 'damage' | 'heal';
-}
-
-export interface AllocateAttributePayload {
-  attributeName: string;
+/**
+ * Action payload interfaces for Redux
+ */
+export interface AllocateAttributePointPayload {
+  attributeName: keyof PlayerAttributes;
   points: number;
 }
 
-export interface EquipItemPayload {
-  slot: string;
-  item: EquipmentItem | null;
-}
-
 export interface EquipTraitPayload {
-  slotIndex: number;
   traitId: string;
+  slotIndex: number;
 }
 
 export interface UnequipTraitPayload {
-  slotId: string;
+  slotIndex: number;
 }
 
-// Enhanced Data Interfaces for Selectors
+/**
+ * Enhanced data interfaces for selectors
+ */
 export interface PlayerHealthData {
   current: number;
   max: number;
   percentage: number;
+  status: 'critical' | 'low' | 'normal' | 'full';
 }
 
 export interface PlayerManaData {
   current: number;
   max: number;
   percentage: number;
+  status: 'critical' | 'low' | 'normal' | 'full';
 }
 
 export interface CombatStats {
   attack: number;
   defense: number;
   speed: number;
-  critChance: number;
-  critDamage: number;
+  criticalChance: number;
+  criticalDamage: number;
 }
 
 export interface PerformanceStats {
-  totalPlayTime: number;
+  totalPlaytime: number;
   powerLevel: number;
+  availableAttributePoints: number;
+  availableSkillPoints: number;
 }
 
-// Equipment Category Interfaces
-export interface ArmorEquipment {
-  head?: EquipmentItem | null;
-  chest?: EquipmentItem | null;
-  legs?: EquipmentItem | null;
-  feet?: EquipmentItem | null;
+/**
+ * Player progression data interface for Progression container
+ */
+export interface PlayerProgressionData {
+  totalPlaytime: number;
+  formattedPlaytime: string;
+  availableAttributePoints: number;
+  availableSkillPoints: number;
+  isAlive: boolean;
+  characterLevel?: number; // Optional for future level system
+  experiencePoints?: number; // Optional for future XP system
+  nextLevelRequirement?: number; // Optional for future progression
 }
 
-export interface WeaponEquipment {
-  mainHand?: EquipmentItem | null;
-  offHand?: EquipmentItem | null;
-}
-
-export interface AccessoryEquipment {
-  accessory1?: EquipmentItem | null;
-  accessory2?: EquipmentItem | null;
-}
-
-// Component Props Interfaces
-export interface PlayerStatsContainerProps {
-  showDetails?: boolean;
-  className?: string;
-}
-
+/**
+ * Container component prop interfaces
+ */
 export interface PlayerTraitsContainerProps {
+  className?: string;
+  showPermanentTraits?: boolean;
+  showEquippedTraits?: boolean;
+  maxSlotsDisplayed?: number;
   showLoading?: boolean;
-  onTraitChange?: (action: 'equip' | 'unequip' | 'permanent', traitId: string) => void;
+  onTraitEquip?: (traitId: string, slotIndex: number) => void;
+  onTraitUnequip?: (slotIndex: number) => void;
+  onTraitMakePermanent?: (traitId: string) => void;
+  onTraitChange?: (action: 'equip' | 'unequip' | 'permanent', value: string) => void;
+}
+
+/**
+ * Component prop interfaces
+ */
+export interface PlayerStatsUIProps {
+  healthData: PlayerHealthData;
+  manaData: PlayerManaData;
+  combatStats: CombatStats;
+  performanceStats: PerformanceStats;
   className?: string;
 }
 
-/**
- * Unlock requirement definition for trait slots
- */
-export interface SlotUnlockRequirement {
-  type: 'level' | 'essence' | 'achievement' | 'quest';
-  value: number | string;
-  description?: string;
-}
-
-/**
- * Trait slot data structure for UI components
- */
-export interface TraitSlotData {
-  id: string;
-  index: number;
-  isUnlocked: boolean;
-  traitId?: string | null;
-  unlockRequirements?: SlotUnlockRequirement;
-}
-
-export interface PlayerStatsUIProps {
-  stats: PlayerStats;
-  showDetails?: boolean;
+export interface PlayerTraitsUIProps {
+  slots: TraitSlotData[];
+  equippedTraits: any[]; // TODO: Replace with proper Trait type when available
+  permanentTraits: any[]; // TODO: Replace with proper Trait type when available
+  onSlotClick?: (slotId: string) => void;
+  onTraitEquip?: (traitId: string, slotIndex: number) => void;
+  onTraitUnequip?: (slotIndex: number) => void;
+  onTraitMakePermanent?: (traitId: string) => void;
+  // Event handlers from container
+  onEquipTrait?: (slotIndex: number, traitId: string) => void;
+  onUnequipTrait?: (slotId: string) => void;
+  onMakePermanent?: (traitId: string) => void;
+  // Display and state properties
+  showLoading?: boolean;
+  isLoading?: boolean;
+  equippedCount?: number;
+  permanentCount?: number;
+  maxSlots?: number;
+  // Add missing properties from container
+  totalSlots?: number;
+  unlockedSlots?: number;
+  className?: string;
 }
 
 export interface StatDisplayProps {
   label: string;
-  value: number | string;
-  unit?: string;
-  showProgress?: boolean;
+  value: string | number;
   maxValue?: number;
-  color?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+  showProgress?: boolean;
   size?: 'small' | 'medium' | 'large';
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+  unit?: string; // Unit property for displaying units like "%" or "/sec"
+  className?: string;
 }
 
 export interface ProgressBarProps {
-  value: number;
-  maxValue: number;
+  current: number;
+  max: number;
   height?: number;
-  color?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
-  showValue?: boolean;
+  showValues?: boolean;
   showPercentage?: boolean;
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
   animate?: boolean;
   className?: string;
 }
-
-export interface PlayerEquipmentProps {
-  equipment: EquipmentState;
-  onEquipItem?: (slot: string, item: EquipmentItem | null) => void;
-  onUnequipItem?: (slot: string) => void;
-  showQuickActions?: boolean;
-  className?: string;
-}
-
-export interface ProgressionProps {
-  showAdvancedStats?: boolean;
-  className?: string;
-}
-
-/**
- * Props interface for PlayerTraitsUI component
- * Provides trait management data and statistical information
- */
-export interface PlayerTraitsUIProps {
-  slots: TraitSlotData[];
-  equippedTraits: Trait[];
-  permanentTraits: Trait[];
-  onEquipTrait: (slotIndex: number, traitId: string) => void;
-  onUnequipTrait: (slotId: string) => void;
-  onMakePermanent: (traitId: string) => void;
-  showLoading?: boolean;
-  className?: string;
-  // Statistical props for enhanced UI functionality
-  totalSlots?: number;
-  unlockedSlots?: number;
-  equippedCount?: number;
-  permanentCount?: number;
-}
-
-import type { Trait } from '../../Traits';

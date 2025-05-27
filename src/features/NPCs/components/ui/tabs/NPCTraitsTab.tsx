@@ -4,11 +4,11 @@ import ExtensionIcon from '@mui/icons-material/Extension';
 import ShareIcon from '@mui/icons-material/Share';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
-import type { NpcState } from '../../../state/NpcTypes';
+import type { NPC } from '../../../state/NPCTypes';
 import { useAppSelector } from '../../../../../app/hooks';
 
 interface NPCTraitsTabProps {
-  npc: NpcState;
+  npc: NPC;
 }
 
 const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {

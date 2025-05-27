@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import type { NPC, RelationshipChangeEntry, DialogueEntry, InteractionResult } from './NpcTypes';
+import type { NPC, RelationshipChangeEntry, DialogueEntry, InteractionResult } from './NPCTypes';
 
 /**
  * Initialize NPCs with mock or loaded data
@@ -15,8 +15,15 @@ export const initializeNPCsThunk = createAsyncThunk<
     try {
       // If no data provided, load mock data
       if (!npcData) {
-        const { mockNPCData } = await import('../data/mockNPCData');
-        return mockNPCData;
+        const mockNPCModule = await import('../data/mockNPCData');
+        // Use the correct export name 'mockNPCs' from mockNPCData.ts
+        const mockData = mockNPCModule.mockNPCs;
+        
+        if (!mockData) {
+          throw new Error('Mock NPC data not found');
+        }
+        
+        return mockData;
       }
       return npcData;
     } catch (error) {

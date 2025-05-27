@@ -4,7 +4,3 @@
  */
 
 export { AudioSettingsPanel } from './AudioSettingsPanel';
-export { GraphicsSettingsPanel } from './GraphicsSettingsPanel';
-export { GameplaySettingsPanel } from './GameplaySettingsPanel';
-export { UISettingsPanel } from './UISettingsPanel';
-export { SettingsActions } from './SettingsActions';

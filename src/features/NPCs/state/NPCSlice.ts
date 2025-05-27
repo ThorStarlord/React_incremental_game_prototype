@@ -16,11 +16,15 @@ import type {
   ShareTraitPayload,
   InteractionResult,
   DialogueResult,
-  DEFAULT_NPC_STATE
+  DialogueEntry,
+  RelationshipChangeEntry,
+  NPCStatus,
+  InteractionType
 } from './NPCTypes';
+import { DEFAULT_NPC_STATE } from './NPCTypes';
 
 // Async thunks
-export const initializeNPCsThunk = createAsyncThunk<
+const initializeNPCsThunk = createAsyncThunk<
   Record<string, NPC>,
   NPC[] | undefined,
   { state: RootState }
@@ -37,52 +41,50 @@ export const initializeNPCsThunk = createAsyncThunk<
         return npcsRecord;
       }
 
-      // Load mock data if no NPCs provided
-      const { getMockNPCs } = await import('../data/mockNPCData');
-      const mockNPCs = getMockNPCs();
-      const npcsRecord: Record<string, NPC> = {};
-      mockNPCs.forEach(npc => {
-        npcsRecord[npc.id] = npc;
-      });
-      return npcsRecord;
+      // Load mock data from existing mock data file
+      const mockNPCModule = await import('../data/mockNPCData');
+      // Use the correct export name 'mockNPCs' from mockNPCData.ts
+      const mockData = mockNPCModule.mockNPCs;
+      
+      if (!mockData) {
+        throw new Error('Mock NPC data not found');
+      }
+      
+      // mockNPCs is exported as Record<string, NPC>, so we can use it directly
+      return mockData;
     } catch (error) {
       return rejectWithValue('Failed to initialize NPCs');
     }
   }
 );
 
-export const updateNPCRelationshipThunk = createAsyncThunk<
-  InteractionResult,
+const updateNPCRelationshipThunk = createAsyncThunk<
+  { npcId: string; relationshipChange: number; newValue: number },
   UpdateNPCRelationshipPayload,
   { state: RootState }
 >(
   'npcs/updateRelationship',
   async ({ npcId, change, reason = 'Unknown' }, { getState, rejectWithValue }) => {
-    try {
-      const state = getState();
-      const npc = state.npcs.npcs[npcId];
-      
-      if (!npc) {
-        return rejectWithValue('NPC not found');
-      }
-
-      const newValue = Math.max(-100, Math.min(100, npc.relationshipValue + change));
-      const actualChange = newValue - npc.relationshipValue;
-
-      return {
-        success: true,
-        relationshipChange: actualChange,
-        rewards: actualChange > 0 ? ['Improved relationship'] : []
-      };
-    } catch (error) {
-      return rejectWithValue('Failed to update relationship');
+    const state = getState();
+    const npc = state.npcs.npcs[npcId];
+    
+    if (!npc) {
+      return rejectWithValue(`NPC with id ${npcId} not found`);
     }
+
+    const newValue = Math.max(0, Math.min(100, npc.relationshipValue + change));
+    
+    return {
+      npcId,
+      relationshipChange: change,
+      newValue
+    };
   }
 );
 
-export const processNPCInteractionThunk = createAsyncThunk<
+const processNPCInteractionThunk = createAsyncThunk<
   InteractionResult,
-  { npcId: string; interactionType: string; options?: Record<string, any> },
+  { npcId: string; interactionType: InteractionType; options?: Record<string, any> },
   { state: RootState }
 >(
   'npcs/processInteraction',
@@ -96,29 +98,41 @@ export const processNPCInteractionThunk = createAsyncThunk<
       }
 
       // Process different interaction types
-      let result: InteractionResult = { success: true };
+      let result: InteractionResult = { 
+        success: true,
+        message: 'Interaction completed successfully'
+      };
       
       switch (interactionType) {
         case 'dialogue':
           result.relationshipChange = Math.floor(Math.random() * 3) + 1;
-          result.rewards = ['Had a pleasant conversation'];
+          result.message = 'Had a pleasant conversation';
+          result.rewards = ['Improved understanding'];
           break;
         case 'trade':
-          result.rewards = ['Completed trade'];
+          result.message = 'Completed trade transaction';
+          result.rewards = ['Traded goods'];
           break;
         case 'quest':
-          result.rewards = ['Quest interaction'];
+          result.message = 'Quest interaction completed';
+          result.rewards = ['Quest progress'];
+          break;
+        case 'trait_sharing':
+          result.message = 'Shared knowledge and experiences';
+          result.relationshipChange = 2;
+          result.rewards = ['Deepened bond'];
           break;
         default:
-          result.rewards = ['General interaction'];
+          result.message = 'General interaction completed';
+          result.rewards = ['Social connection'];
       }
 
       // Apply relationship change if any
       if (result.relationshipChange) {
-        dispatch(updateNPCRelationshipThunk({
+        await dispatch(updateNPCRelationshipThunk({
           npcId,
           change: result.relationshipChange,
-          reason: interactionType
+          reason: `${interactionType} interaction`
         }));
       }
 
@@ -129,7 +143,7 @@ export const processNPCInteractionThunk = createAsyncThunk<
   }
 );
 
-export const discoverNPCThunk = createAsyncThunk<
+const discoverNPCThunk = createAsyncThunk<
   string,
   DiscoverNPCPayload,
   { state: RootState }
@@ -155,13 +169,13 @@ export const discoverNPCThunk = createAsyncThunk<
   }
 );
 
-export const processDialogueChoiceThunk = createAsyncThunk<
+const processDialogueChoiceThunk = createAsyncThunk<
   DialogueResult,
   ProcessDialoguePayload,
   { state: RootState }
 >(
   'npcs/processDialogue',
-  async ({ npcId, choiceId, playerText }, { getState, rejectWithValue }) => {
+  async ({ npcId, choiceId, playerText }, { getState, dispatch, rejectWithValue }) => {
     try {
       const state = getState();
       const npc = state.npcs.npcs[npcId];
@@ -170,16 +184,26 @@ export const processDialogueChoiceThunk = createAsyncThunk<
         return rejectWithValue('NPC not found');
       }
 
-      // Mock dialogue processing
+      // Mock dialogue processing based on relationship level
       const responses = [
         "That's an interesting perspective.",
         "I appreciate you sharing that with me.",
         "Tell me more about that.",
-        "I see your point of view."
+        "I see your point of view.",
+        "Your words resonate with me.",
+        "I'm beginning to understand you better."
       ];
 
       const npcResponse = responses[Math.floor(Math.random() * responses.length)];
-      const relationshipChange = Math.floor(Math.random() * 3);
+      const relationshipChange = Math.floor(Math.random() * 3) + 1;
+
+      // Add dialogue entry
+      dispatch(addDialogueEntry({
+        npcId,
+        playerText,
+        npcResponse,
+        relationshipChange
+      }));
 
       return {
         success: true,
@@ -189,6 +213,38 @@ export const processDialogueChoiceThunk = createAsyncThunk<
       };
     } catch (error) {
       return rejectWithValue('Failed to process dialogue');
+    }
+  }
+);
+
+const shareTraitWithNPCThunk = createAsyncThunk<
+  InteractionResult,
+  ShareTraitPayload,
+  { state: RootState }
+>(
+  'npcs/shareTrait',
+  async ({ npcId, traitId, slotIndex }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState();
+      const npc = state.npcs.npcs[npcId];
+      
+      if (!npc) {
+        return rejectWithValue('NPC not found');
+      }
+
+      // Check if NPC has relationship level for trait sharing (4+)
+      if (npc.relationshipValue < 4) {
+        return rejectWithValue('Insufficient relationship level for trait sharing');
+      }
+
+      return {
+        success: true,
+        message: `Successfully shared trait with ${npc.name}`,
+        relationshipChange: 1,
+        rewards: ['Trait sharing bond']
+      };
+    } catch (error) {
+      return rejectWithValue('Failed to share trait');
     }
   }
 );
@@ -212,19 +268,19 @@ const npcSlice = createSlice({
         state.relationshipChanges.push({
           id: `${npcId}-${Date.now()}`,
           npcId,
+          timestamp: Date.now(),
           oldValue,
           newValue,
-          reason,
-          timestamp: Date.now()
+          reason
         });
       }
     },
 
-    setNpcStatus: (state, action: PayloadAction<{ npcId: string; status: string }>) => {
+    setNpcStatus: (state, action: PayloadAction<{ npcId: string; status: NPCStatus }>) => {
       const { npcId, status } = action.payload;
       const npc = state.npcs[npcId];
       if (npc) {
-        npc.status = status as any;
+        npc.status = status;
       }
     },
 
@@ -257,14 +313,15 @@ const npcSlice = createSlice({
       relationshipChange?: number;
     }>) => {
       const { npcId, playerText, npcResponse, relationshipChange } = action.payload;
-      state.dialogueHistory.push({
+      const entry: DialogueEntry = {
         id: `${npcId}-${Date.now()}`,
         npcId,
+        timestamp: Date.now(),
         playerText,
         npcResponse,
-        timestamp: Date.now(),
         relationshipChange
-      });
+      };
+      state.dialogueHistory.push(entry);
     },
 
     clearError: (state) => {
@@ -282,6 +339,12 @@ const npcSlice = createSlice({
       .addCase(initializeNPCsThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.npcs = action.payload;
+        // Auto-discover available NPCs
+        Object.values(action.payload).forEach(npc => {
+          if (npc.isDiscovered && !state.discoveredNPCs.includes(npc.id)) {
+            state.discoveredNPCs.push(npc.id);
+          }
+        });
       })
       .addCase(initializeNPCsThunk.rejected, (state, action) => {
         state.loading = false;
@@ -290,7 +353,23 @@ const npcSlice = createSlice({
 
       // Update relationship
       .addCase(updateNPCRelationshipThunk.fulfilled, (state, action) => {
-        // Handled by the manual reducer above
+        const { npcId, relationshipChange, newValue } = action.payload;
+        const npc = state.npcs[npcId];
+        if (npc) {
+          const oldValue = npc.relationshipValue;
+          npc.relationshipValue = newValue;
+          npc.lastInteraction = Date.now();
+
+          // Record the change
+          state.relationshipChanges.push({
+            id: `${npcId}-${Date.now()}`,
+            npcId,
+            timestamp: Date.now(),
+            oldValue,
+            newValue,
+            reason: action.meta.arg.reason || 'Relationship update'
+          });
+        }
       })
 
       // Discover NPC
@@ -298,6 +377,10 @@ const npcSlice = createSlice({
         const npcId = action.payload;
         if (!state.discoveredNPCs.includes(npcId)) {
           state.discoveredNPCs.push(npcId);
+          const npc = state.npcs[npcId];
+          if (npc) {
+            npc.isDiscovered = true;
+          }
         }
       })
 
@@ -309,16 +392,75 @@ const npcSlice = createSlice({
         if (result.relationshipChange) {
           const npc = state.npcs[npcId];
           if (npc) {
-            npc.relationshipValue = Math.max(-100, Math.min(100, 
-              npc.relationshipValue + result.relationshipChange
-            ));
+            const oldValue = npc.relationshipValue;
+            const newValue = Math.max(-100, Math.min(100, oldValue + result.relationshipChange));
+            npc.relationshipValue = newValue;
             npc.lastInteraction = Date.now();
+
+            // Record the relationship change
+            state.relationshipChanges.push({
+              id: `${npcId}-${Date.now()}`,
+              npcId,
+              timestamp: Date.now(),
+              oldValue,
+              newValue,
+              reason: 'Dialogue interaction'
+            });
           }
         }
-      });
+      })
+
+      // Share trait with NPC
+      .addCase(shareTraitWithNPCThunk.fulfilled, (state, action) => {
+        const result = action.payload;
+        const { npcId } = action.meta.arg;
+        
+        if (result.relationshipChange) {
+          const npc = state.npcs[npcId];
+          if (npc) {
+            const oldValue = npc.relationshipValue;
+            const newValue = Math.max(-100, Math.min(100, oldValue + result.relationshipChange));
+            npc.relationshipValue = newValue;
+            npc.lastInteraction = Date.now();
+
+            // Record the relationship change
+            state.relationshipChanges.push({
+              id: `${npcId}-${Date.now()}`,
+              npcId,
+              timestamp: Date.now(),
+              oldValue,
+              newValue,
+              reason: 'Trait sharing interaction'
+            });
+          }
+        }
+      })
+
+      // Handle async thunk errors with proper typing
+      .addMatcher(
+        (action): action is ReturnType<typeof initializeNPCsThunk.rejected> |
+                        ReturnType<typeof updateNPCRelationshipThunk.rejected> |
+                        ReturnType<typeof processNPCInteractionThunk.rejected> |
+                        ReturnType<typeof discoverNPCThunk.rejected> |
+                        ReturnType<typeof processDialogueChoiceThunk.rejected> |
+                        ReturnType<typeof shareTraitWithNPCThunk.rejected> => {
+          return action.type.endsWith('/rejected');
+        },
+        (state, action) => {
+          state.loading = false;
+          if (action.payload && typeof action.payload === 'string') {
+            state.error = action.payload;
+          } else if (action.error?.message) {
+            state.error = action.error.message;
+          } else {
+            state.error = 'An error occurred';
+          }
+        }
+      );
   }
 });
 
+// Export actions
 export const {
   updateNpcRelationship,
   setNpcStatus,
@@ -329,4 +471,15 @@ export const {
   clearError
 } = npcSlice.actions;
 
+// Export thunks
+export {
+  initializeNPCsThunk,
+  updateNPCRelationshipThunk,
+  processNPCInteractionThunk,
+  discoverNPCThunk,
+  processDialogueChoiceThunk,
+  shareTraitWithNPCThunk
+};
+
+// Export reducer as default
 export default npcSlice.reducer;

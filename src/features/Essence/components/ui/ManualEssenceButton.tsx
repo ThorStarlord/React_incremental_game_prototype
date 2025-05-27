@@ -6,18 +6,17 @@ import { addManualEssence } from '../../state/EssenceSlice';
 import { selectPerClick } from '../../state/EssenceSelectors';
 
 /**
- * BasicEssenceButton - Manual essence generation component
+ * ManualEssenceButton - Simplified manual essence generation component
  * 
- * Provides a button for manually generating essence, primarily used for
- * testing and prototyping the essence system. Displays the per-click
- * value and provides visual feedback on interaction.
+ * Provides basic manual essence generation functionality for testing and prototyping.
+ * Displays current per-click value and uses addManualEssence action.
  */
-export const BasicEssenceButton: React.FC = React.memo(() => {
+export const ManualEssenceButton: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
   const perClick = useAppSelector(selectPerClick);
   const theme = useTheme();
 
-  const handleClick = useCallback(() => {
+  const handleGenerateEssence = useCallback(() => {
     dispatch(addManualEssence());
   }, [dispatch]);
 
@@ -27,29 +26,32 @@ export const BasicEssenceButton: React.FC = React.memo(() => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 1,
+        gap: 2,
         p: 2,
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 2,
+        backgroundColor: 'background.paper',
+        transition: 'all 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'scale(1.02)',
+          boxShadow: 2,
+        },
       }}
     >
-      <Typography variant="h6" color="primary">
+      <Typography variant="h6" color="primary" textAlign="center">
         Manual Generation
       </Typography>
-      
+
       <Button
         variant="contained"
         color="primary"
         size="large"
         startIcon={<TouchAppIcon />}
-        onClick={handleClick}
+        onClick={handleGenerateEssence}
         sx={{
-          minWidth: 200,
-          py: 1.5,
-          fontSize: '1.1rem',
-          transition: theme.transitions.create(['transform', 'box-shadow']),
-          '&:hover': {
-            transform: 'scale(1.02)',
-            boxShadow: theme.shadows[8],
-          },
+          minWidth: 180,
+          transition: 'transform 0.1s ease-in-out',
           '&:active': {
             transform: 'scale(0.98)',
           },
@@ -64,10 +66,13 @@ export const BasicEssenceButton: React.FC = React.memo(() => {
         size="small"
         sx={{
           fontWeight: 'medium',
+          fontSize: '0.875rem',
         }}
       />
     </Box>
   );
 });
 
-BasicEssenceButton.displayName = 'BasicEssenceButton';
+ManualEssenceButton.displayName = 'ManualEssenceButton';
+
+export default ManualEssenceButton;

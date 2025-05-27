@@ -18,8 +18,9 @@ import {
   Psychology as SkillIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectPlayerProgression } from '../../state/PlayerSelectors';
+import { selectPlayer } from '../../state/PlayerSelectors';
 import { StatDisplay } from '../ui/StatDisplay';
+import type { PlayerProgressionData } from '../../state/PlayerTypes';
 
 interface ProgressionProps {
   showDetails?: boolean;
@@ -34,7 +35,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
   showDetails = true,
   className,
 }) => {
-  const progression = useAppSelector(selectPlayerProgression);
+  const playerState = useAppSelector(selectPlayer);
 
   // Format total playtime for display
   const formatPlaytime = (milliseconds: number): string => {
@@ -48,7 +49,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
     }
   };
 
-  const formattedPlaytime = formatPlaytime(progression.totalPlayTime);
+  const formattedPlaytime = formatPlaytime(playerState.totalPlaytime);
 
   return (
     <Box className={className}>
@@ -64,7 +65,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Total Playtime"
-                value={formattedPlaytime}  // String value is now properly supported
+                value={formattedPlaytime}
                 color="primary"
               />
             </Grid>
@@ -72,8 +73,8 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Status"
-                value={progression.isAlive ? 'Alive' : 'Defeated'}  // String value is now properly supported
-                color={progression.isAlive ? 'success' : 'error'}
+                value={playerState.isAlive ? 'Alive' : 'Defeated'}
+                color={playerState.isAlive ? 'success' : 'error'}
               />
             </Grid>
           </Grid>
@@ -92,7 +93,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Attribute Points"
-                value={progression.attributePoints}  // Number value works as before
+                value={playerState.availableAttributePoints}
                 color="warning"
               />
             </Grid>
@@ -100,7 +101,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Skill Points"
-                value={progression.skillPoints}  // Number value works as before
+                value={playerState.availableSkillPoints}
                 color="info"
               />
             </Grid>
@@ -128,16 +129,16 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
               <Grid item xs={12} sm={6}>
                 <StatDisplay
                   label="Unspent Attribute Points"
-                  value={progression.attributePoints}
-                  color={progression.attributePoints > 0 ? 'warning' : 'secondary'} // Changed from 'default' to 'secondary'
+                  value={playerState.availableAttributePoints}
+                  color={playerState.availableAttributePoints > 0 ? 'warning' : 'secondary'}
                 />
               </Grid>
               
               <Grid item xs={12} sm={6}>
                 <StatDisplay
                   label="Unspent Skill Points"
-                  value={progression.skillPoints}
-                  color={progression.skillPoints > 0 ? 'info' : 'secondary'} // Changed from 'default' to 'secondary'
+                  value={playerState.availableSkillPoints}
+                  color={playerState.availableSkillPoints > 0 ? 'info' : 'secondary'}
                 />
               </Grid>
               

@@ -151,7 +151,6 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
       onMakePermanent={handleMakePermanent}
       showLoading={showLoading || isLoading}
       className={className}
-      // Additional props for enhanced UI functionality
       totalSlots={totalSlots}
       unlockedSlots={unlockedSlots}
       equippedCount={equippedCount}

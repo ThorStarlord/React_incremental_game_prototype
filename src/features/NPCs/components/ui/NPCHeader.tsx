@@ -24,11 +24,11 @@ interface NPCHeaderProps {
 }
 
 const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
-  const getRelationshipColor = (value: number) => {
+  const getRelationshipColor = (value: number): 'success' | 'info' | 'warning' | 'primary' => {
     if (value >= 75) return 'success';
     if (value >= 50) return 'info';
     if (value >= 25) return 'warning';
-    return 'default';
+    return 'primary';
   };
 
   const getRelationshipLabel = (value: number) => {

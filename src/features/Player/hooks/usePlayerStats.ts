@@ -1,88 +1,122 @@
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../app/store';
+import { useMemo } from 'react';
+import { useAppSelector } from '../../../app/hooks';
 import {
-  selectPlayerName,
-  selectPlayerLevel,
-  selectPlayerHealth,
-  selectPlayerMaxHealth,
-  selectPlayerMana,
-  selectPlayerMaxMana,
-  selectPlayerStats,
+  selectPlayerHealthData,
+  selectPlayerManaData,
+  selectPlayerCombatStats,
+  selectPlayerPerformanceStats,
   selectPlayerAttributes,
-  selectPlayerAttributePoints,
-  selectPlayerSkills,
-  selectPlayerSkillPoints,
-  selectPlayerGold,
-  selectPlayerExperience,
-  selectPlayerLevelProgress,
-  selectPlayerHealthPercentage,
-  selectPlayerManaPercentage
+  selectAvailableAttributePoints,
+  selectAvailableSkillPoints,
+  selectIsPlayerAlive,
+  selectFormattedPlaytime
 } from '../state/PlayerSelectors';
-import { PlayerStats, Attribute, Skill } from '../state/PlayerTypes';
 
 /**
- * Interface for the return value of the usePlayerStats hook
+ * Custom hook for accessing player statistics and computed data
+ * Provides memoized access to player stats with derived calculations
  */
-interface UsePlayerStatsReturn {
-  name: string;
-  level: number;
-  experience: number;
-  levelProgress: number;
-  health: number;
-  maxHealth: number;
-  healthPercentage: number;
-  mana: number;
-  maxMana: number;
-  manaPercentage: number;
-  gold: number;
-  stats: PlayerStats;
-  attributes: Record<string, Attribute>;
-  attributePoints: number;
-  skills: Skill[];
-  skillPoints: number;
-}
+export const usePlayerStats = () => {
+  const healthData = useAppSelector(selectPlayerHealthData);
+  const manaData = useAppSelector(selectPlayerManaData);
+  const combatStats = useAppSelector(selectPlayerCombatStats);
+  const performanceStats = useAppSelector(selectPlayerPerformanceStats);
+  const attributes = useAppSelector(selectPlayerAttributes);
+  const availableAttributePoints = useAppSelector(selectAvailableAttributePoints);
+  const availableSkillPoints = useAppSelector(selectAvailableSkillPoints);
+  const isAlive = useAppSelector(selectIsPlayerAlive);
+  const formattedPlaytime = useAppSelector(selectFormattedPlaytime);
 
-/**
- * Custom hook to conveniently access various player statistics from the Redux store.
- *
- * @returns {UsePlayerStatsReturn} An object containing commonly used player stats.
- */
-const usePlayerStats = (): UsePlayerStatsReturn => {
-  const name = useSelector(selectPlayerName);
-  const level = useSelector(selectPlayerLevel);
-  const experience = useSelector(selectPlayerExperience);
-  const levelProgress = useSelector(selectPlayerLevelProgress);
-  const health = useSelector(selectPlayerHealth);
-  const maxHealth = useSelector(selectPlayerMaxHealth);
-  const healthPercentage = useSelector(selectPlayerHealthPercentage);
-  const mana = useSelector(selectPlayerMana);
-  const maxMana = useSelector(selectPlayerMaxMana);
-  const manaPercentage = useSelector(selectPlayerManaPercentage);
-  const gold = useSelector(selectPlayerGold);
-  const stats = useSelector(selectPlayerStats);
-  const attributes = useSelector(selectPlayerAttributes);
-  const attributePoints = useSelector(selectPlayerAttributePoints);
-  const skills = useSelector(selectPlayerSkills);
-  const skillPoints = useSelector(selectPlayerSkillPoints);
+  // Memoized computed values
+  const computedStats = useMemo(() => ({
+    // Health status indicators
+    isHealthCritical: healthData.status === 'critical',
+    isHealthLow: healthData.status === 'low',
+    isHealthFull: healthData.status === 'full',
+    
+    // Mana status indicators
+    isManaCritical: manaData.status === 'critical',
+    isManaLow: manaData.status === 'low',
+    isManaFull: manaData.status === 'full',
+    
+    // Combat readiness
+    combatReadiness: isAlive && healthData.percentage > 25 && manaData.percentage > 15,
+    
+    // Progression indicators
+    hasAttributePoints: availableAttributePoints > 0,
+    hasSkillPoints: availableSkillPoints > 0,
+    canProgress: availableAttributePoints > 0 || availableSkillPoints > 0,
+    
+    // Attribute totals
+    totalAttributePoints: Object.values(attributes).reduce((sum, val) => sum + val, 0),
+    averageAttribute: Object.values(attributes).reduce((sum, val) => sum + val, 0) / 6,
+    
+    // Power indicators
+    isPowerful: performanceStats.powerLevel > 100,
+    isNewPlayer: performanceStats.totalPlaytime < 300000 // 5 minutes
+  }), [
+    healthData,
+    manaData,
+    isAlive,
+    availableAttributePoints,
+    availableSkillPoints,
+    attributes,
+    performanceStats
+  ]);
 
   return {
-    name,
-    level,
-    experience,
-    levelProgress,
-    health,
-    maxHealth,
-    healthPercentage,
-    mana,
-    maxMana,
-    manaPercentage,
-    gold,
-    stats,
+    // Core data
+    healthData,
+    manaData,
+    combatStats,
+    performanceStats,
     attributes,
-    attributePoints,
-    skills,
-    skillPoints,
+    
+    // Availability
+    availableAttributePoints,
+    availableSkillPoints,
+    
+    // Status
+    isAlive,
+    formattedPlaytime,
+    
+    // Computed values
+    ...computedStats
   };
 };
 
-export default usePlayerStats;
+/**
+ * Hook for accessing specific attribute values
+ */
+export const usePlayerAttribute = (attributeName: keyof typeof attributes) => {
+  const attributes = useAppSelector(selectPlayerAttributes);
+  return attributes[attributeName];
+};
+
+/**
+ * Hook for player health monitoring
+ */
+export const usePlayerHealth = () => {
+  const healthData = useAppSelector(selectPlayerHealthData);
+  const isAlive = useAppSelector(selectIsPlayerAlive);
+  
+  return {
+    ...healthData,
+    isAlive,
+    needsHealing: healthData.percentage < 50,
+    isEmergency: healthData.percentage < 25
+  };
+};
+
+/**
+ * Hook for player mana monitoring
+ */
+export const usePlayerMana = () => {
+  const manaData = useAppSelector(selectPlayerManaData);
+  
+  return {
+    ...manaData,
+    needsRestoration: manaData.percentage < 35,
+    isEmpty: manaData.current === 0
+  };
+};

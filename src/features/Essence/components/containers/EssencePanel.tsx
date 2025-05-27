@@ -8,9 +8,9 @@
 import React, { useCallback } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectEssenceAmount, selectTotalCollected } from '../../state/EssenceSelectors';
+import { selectEssence } from '../../state/EssenceSelectors';
 import EssenceDisplay from '../ui/EssenceDisplay';
-import EssenceButton from '../ui/EssenceButton';
+import ConfigurableEssenceButton from '../ui/ConfigurableEssenceButton';
 import EssenceGenerationTimer from './EssenceGenerationTimer';
 
 /**
@@ -34,11 +34,12 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
   title = 'Essence',
   showTimer = true
 }) => {
-  // Get data from Redux store using typed selectors
-  const essenceAmount = useAppSelector(selectEssenceAmount);
-  const totalCollected = useAppSelector(selectTotalCollected);
-  const maxEssence = useAppSelector(state => state.essence.maxAmount) || 1000;
-  const generationRate = useAppSelector(state => state.essence.generationRate) || 1;
+  // Get data from Redux store using the correct selector
+  const essenceState = useAppSelector(selectEssence);
+  const essenceAmount = essenceState.amount;
+  const totalCollected = essenceState.totalCollected || 0;
+  const maxEssence = 1000; // Default max since maxAmount doesn't exist in state
+  const generationRate = essenceState.generationRate || 1;
   const dispatch = useAppDispatch();
   
   // Calculate the percentage of essence to max
@@ -60,7 +61,7 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
       
       {/* Action buttons */}
       <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'center' }}>
-        <EssenceButton 
+        <ConfigurableEssenceButton 
           amount={25}
           text="Focus Mind"
           tooltip="Concentrate to gather more essence"

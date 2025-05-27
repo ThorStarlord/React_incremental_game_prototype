@@ -54,11 +54,8 @@ const EssenceButton: React.FC<EssenceButtonProps> = ({
   const handleEssenceGain = (): void => {
     if (isOnCooldown) return;
     
-    // Dispatch gainEssence action from EssenceSlice
-    dispatch(gainEssence({ 
-      amount,
-      source: 'essence_button'
-    }));
+    // Dispatch gainEssence action with just the amount (number)
+    dispatch(gainEssence(amount));
     
     // Start cooldown
     setIsOnCooldown(true);

@@ -19,7 +19,7 @@ import {
   SentimentSatisfied,
   SentimentVerySatisfied
 } from '@mui/icons-material';
-import { getRelationshipTier, RELATIONSHIP_THRESHOLDS } from '../../state/NpcTypes';
+import { getRelationshipTier, RELATIONSHIP_THRESHOLDS } from '../../state/NPCTypes';
 
 interface RelationshipProgressProps {
   value: number;
@@ -57,7 +57,7 @@ const RelationshipProgress: React.FC<RelationshipProgressProps> = ({
 
   const getRelationshipColor = (): 'success' | 'primary' | 'secondary' | 'error' | 'warning' => {
     if (value >= RELATIONSHIP_THRESHOLDS.BELOVED) return 'error';
-    if (value >= RELATIONSHIP_THRESHOLDS.CLOSE_FRIEND) return 'success';
+    if (value >= RELATIONSHIP_THRESHOLDS.TRUSTED) return 'success';
     if (value >= RELATIONSHIP_THRESHOLDS.FRIEND) return 'primary';
     if (value >= RELATIONSHIP_THRESHOLDS.ACQUAINTANCE) return 'secondary';
     if (value >= RELATIONSHIP_THRESHOLDS.NEUTRAL) return 'warning';

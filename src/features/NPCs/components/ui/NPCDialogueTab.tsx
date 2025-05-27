@@ -25,7 +25,7 @@ import {
   Person as PlayerIcon,
   Chat as NPCIcon
 } from '@mui/icons-material';
-import type { NPC, NPCInteraction } from '../../state/NpcTypes';
+import type { NPC, NPCInteraction } from '../../state/NPCTypes';
 
 interface NPCDialogueTabProps {
   npc: NPC;
@@ -139,7 +139,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({
                   color="primary"
                   size="small"
                 />
-                {currentInteraction?.interactionType === 'dialogue' && (
+                {currentInteraction && (
                   <Chip 
                     label="In Conversation"
                     color="success"
@@ -188,7 +188,10 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({
                   }}
                 >
                   {message.speaker === 'npc' && (
-                    <Avatar size="small" src={npc.avatar}>
+                    <Avatar 
+                      src={npc.avatar}
+                      sx={{ width: 24, height: 24 }}
+                    >
                       <NPCIcon fontSize="small" />
                     </Avatar>
                   )}
@@ -196,7 +199,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({
                     {message.speaker === 'player' ? 'You' : npc.name}
                   </Typography>
                   {message.speaker === 'player' && (
-                    <Avatar size="small">
+                    <Avatar sx={{ width: 24, height: 24 }}>
                       <PlayerIcon fontSize="small" />
                     </Avatar>
                   )}
@@ -237,7 +240,10 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({
           {isTyping && (
             <ListItem sx={{ justifyContent: 'flex-start', px: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Avatar size="small" src={npc.avatar}>
+                <Avatar 
+                  src={npc.avatar}
+                  sx={{ width: 24, height: 24 }}
+                >
                   <NPCIcon fontSize="small" />
                 </Avatar>
                 <Paper elevation={1} sx={{ p: 1.5, backgroundColor: 'grey.100' }}>

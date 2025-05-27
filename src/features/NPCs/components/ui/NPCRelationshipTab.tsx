@@ -25,14 +25,34 @@ import {
   EmojiEvents,
   Schedule
 } from '@mui/icons-material';
-import type { NPC, RelationshipChange } from '../../state/NpcTypes';
-import { getRelationshipTier, RELATIONSHIP_THRESHOLDS } from '../../state/NpcTypes';
+import type { NPC, RelationshipChangeEntry } from '../../state/NPCTypes';
 
 interface NPCRelationshipTabProps {
   npc: NPC;
-  relationshipChanges?: RelationshipChange[];
+  relationshipChanges?: RelationshipChangeEntry[];
   onImproveRelationship?: (npcId: string) => void;
 }
+
+// Local utilities for relationship calculations
+const RELATIONSHIP_THRESHOLDS = {
+  HOSTILE: -75,
+  UNFRIENDLY: -25,
+  NEUTRAL: 0,
+  FRIENDLY: 25,
+  ALLY: 50,
+  DEVOTED: 75,
+  SOULMATE: 100
+} as const;
+
+const getRelationshipTier = (value: number): string => {
+  if (value >= 100) return 'Soulmate';
+  if (value >= 75) return 'Devoted';
+  if (value >= 50) return 'Ally';
+  if (value >= 25) return 'Friendly';
+  if (value >= 0) return 'Neutral';
+  if (value >= -25) return 'Unfriendly';
+  return 'Hostile';
+};
 
 const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({ 
   npc, 
@@ -42,21 +62,21 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
   const currentTier = getRelationshipTier(npc.relationshipValue);
   const percentage = Math.max(0, (npc.relationshipValue + 100) / 2);
   
-  const getNextThreshold = () => {
+  const getNextThreshold = (): number => {
     const thresholds = Object.values(RELATIONSHIP_THRESHOLDS).sort((a, b) => a - b);
-    return thresholds.find(threshold => threshold > npc.relationshipValue) || 100;
+    return thresholds.find((threshold: number) => threshold > npc.relationshipValue) || 100;
   };
 
   const nextThreshold = getNextThreshold();
-  const progressToNext = nextThreshold ? Math.max(0, (npc.relationshipValue - (nextThreshold - 25)) / 25 * 100) : 100;
+  const progressToNext = nextThreshold < 100 ? Math.max(0, (npc.relationshipValue - (nextThreshold - 25)) / 25 * 100) : 100;
 
   const recentChanges = relationshipChanges
     .filter(change => change.npcId === npc.id)
     .slice(-5)
     .reverse();
 
-  const getUnlockAtLevel = (level: number) => {
-    const unlocks = [];
+  const getUnlockAtLevel = (level: number): string[] => {
+    const unlocks: string[] = [];
     if (level >= 25) unlocks.push('Advanced Dialogue', 'Basic Quest Access');
     if (level >= 50) unlocks.push('Trade Discounts', 'Personal Stories', 'Trait Acquisition');
     if (level >= 75) unlocks.push('Deep Conversations', 'Major Quests', 'Trait Sharing');
@@ -153,8 +173,9 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
 
               <List dense>
                 {Object.entries(RELATIONSHIP_THRESHOLDS).map(([tierName, threshold]) => {
-                  const isUnlocked = npc.relationshipValue >= threshold;
-                  const unlocks = getUnlockAtLevel(threshold);
+                  const thresholdValue = threshold as number;
+                  const isUnlocked = npc.relationshipValue >= thresholdValue;
+                  const unlocks = getUnlockAtLevel(thresholdValue);
 
                   return (
                     <ListItem 
@@ -169,7 +190,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                     >
                       <ListItemIcon>
                         <Chip
-                          label={threshold}
+                          label={thresholdValue}
                           size="small"
                           color={isUnlocked ? 'success' : 'default'}
                           variant={isUnlocked ? 'filled' : 'outlined'}

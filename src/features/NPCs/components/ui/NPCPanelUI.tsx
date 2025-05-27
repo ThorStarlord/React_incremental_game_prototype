@@ -7,7 +7,7 @@ import ExtensionIcon from '@mui/icons-material/Extension';
 import { TabContainer } from '../../../../shared/components/Tabs';
 import { useTabs } from '../../../../shared/hooks/useTabs';
 import { useAppSelector } from '../../../../app/hooks';
-import type { NpcState } from '../../state/NpcTypes';
+import type { NPC } from '../../state/NPCTypes';
 
 import NPCHeader from './NPCHeader';
 import NPCOverviewTab from './tabs/NPCOverviewTab';
@@ -15,33 +15,31 @@ import NPCDialogueTab from './tabs/NPCDialogueTab';
 import NPCTraitsTab from './tabs/NPCTraitsTab';
 
 interface NPCPanelUIProps {
-  npc: NpcState;
+  npc: NPC;
 }
 
 const NPCPanelUI: React.FC<NPCPanelUIProps> = ({ npc }) => {
-  const playerLevel = useAppSelector(state => state.player.level);
-
   // Define available tabs based on relationship level
   const availableTabs = useMemo(() => {
     const allTabs = [
       {
         id: 'overview',
         label: 'Overview',
-        icon: PersonIcon,
+        icon: <PersonIcon />,
         disabled: false,
         tooltip: 'Basic NPC information'
       },
       {
         id: 'dialogue',
         label: 'Dialogue',
-        icon: ChatIcon,
+        icon: <ChatIcon />,
         disabled: npc.relationshipValue < 1,
         tooltip: npc.relationshipValue < 1 ? 'Requires relationship level 1+' : 'Conversation interface'
       },
       {
         id: 'traits',
         label: 'Traits',
-        icon: ExtensionIcon,
+        icon: <ExtensionIcon />,
         disabled: npc.relationshipValue < 4,
         tooltip: npc.relationshipValue < 4 ? 'Requires relationship level 4+' : 'Trait sharing and acquisition'
       }
@@ -85,11 +83,6 @@ const NPCPanelUI: React.FC<NPCPanelUIProps> = ({ npc }) => {
         tabs={availableTabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        tabsProps={{
-          variant: 'scrollable',
-          scrollButtons: 'auto',
-          'aria-label': `${npc.name} Interaction Tabs`
-        }}
         sx={{ flexGrow: 1 }}
       >
         {/* Overview Tab - Always available */}

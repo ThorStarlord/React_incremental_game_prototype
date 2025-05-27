@@ -19,7 +19,7 @@ import {
   saveSettingsThunk
 } from '../features/Settings';
 
-import { AudioSettingsPanel } from '../features/Settings/components/ui/AudioSettingsPanel.ts';
+import { AudioSettingsPanel } from '../features/Settings/components/ui/AudioSettingsPanel';
 import { GraphicsSettingsPanel } from '../features/Settings/components/ui/GraphicsSettingsPanel';
 import { GameplaySettingsPanel } from '../features/Settings/components/ui/GameplaySettingsPanel';
 import { UISettingsPanel } from '../features/Settings/components/ui/UISettingsPanel';
@@ -50,23 +50,23 @@ const SettingsPage: React.FC = () => {
     dispatch(loadSettingsThunk());
   }, [dispatch]);
 
-  // Category update handlers using the generic updateCategorySettings action
-  const handleAudioUpdate = (newSettings: any) => {
+  // Category update handlers with proper type safety
+  const handleAudioUpdate = (newSettings: Partial<typeof audioSettings>) => {
     dispatch(updateCategorySettings({ category: 'audio', settings: newSettings }));
     dispatch(saveSettingsThunk());
   };
 
-  const handleGraphicsUpdate = (newSettings: any) => {
+  const handleGraphicsUpdate = (newSettings: Partial<typeof graphicsSettings>) => {
     dispatch(updateCategorySettings({ category: 'graphics', settings: newSettings }));
     dispatch(saveSettingsThunk());
   };
 
-  const handleGameplayUpdate = (newSettings: any) => {
+  const handleGameplayUpdate = (newSettings: Partial<typeof gameplaySettings>) => {
     dispatch(updateCategorySettings({ category: 'gameplay', settings: newSettings }));
     dispatch(saveSettingsThunk());
   };
 
-  const handleUIUpdate = (newSettings: any) => {
+  const handleUIUpdate = (newSettings: Partial<typeof uiSettings>) => {
     dispatch(updateCategorySettings({ category: 'ui', settings: newSettings }));
     dispatch(saveSettingsThunk());
   };

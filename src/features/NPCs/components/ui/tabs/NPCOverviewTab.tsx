@@ -3,10 +3,10 @@ import { Box, Typography, Card, CardContent, List, ListItem, ListItemText, Chip,
 import InfoIcon from '@mui/icons-material/Info';
 import ExtensionIcon from '@mui/icons-material/Extension';
 
-import type { NpcState } from '../../../state/NpcTypes';
+import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCOverviewTabProps {
-  npc: NpcState;
+  npc: NPC;
 }
 
 const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {

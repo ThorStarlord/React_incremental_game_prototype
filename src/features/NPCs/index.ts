@@ -3,13 +3,12 @@
  * @description Public API for the NPCs feature following Feature-Sliced Design
  */
 
-// Types - Using correct file name
+// Types
 export type {
   NPC,
   NPCState,
   NPCTraitInfo,
   NPCSharedTraitSlot,
-  TradeItem,
   NPCService,
   NPCPersonality,
   NPCInteraction,
@@ -22,17 +21,14 @@ export type {
   StartInteractionPayload,
   ProcessDialoguePayload,
   ShareTraitPayload,
-  TradeWithNPCPayload,
-  NPCFilterCriteria,
-  NPCSortOptions,
   InteractionResult,
-  DialogueResult,
-  DialogueChoice
+  DialogueResult
 } from './state/NPCTypes';
 
-// State management - Using correct file name
+// State management
 export { default as npcReducer } from './state/NPCSlice';
 export {
+  // Regular action creators (if they exist)
   updateNpcRelationship,
   setNpcStatus,
   setNpcAvailability,
@@ -40,18 +36,20 @@ export {
   endInteraction,
   addDialogueEntry,
   clearError,
+  // Async thunks (only export if they exist)
   initializeNPCsThunk,
   updateNPCRelationshipThunk,
   processNPCInteractionThunk,
   discoverNPCThunk,
-  processDialogueChoiceThunk
+  processDialogueChoiceThunk,
+  shareTraitWithNPCThunk
 } from './state/NPCSlice';
 
-// Selectors - Using correct file name
+// Selectors
 export * from './state/NPCSelectors';
 
-// Components - Export the container component that exists
+// Components - Only export components that actually exist
 export { default as NPCListView } from './components/containers/NPCListView';
 
-// Data
-export { getMockNPCs, getMockTradeItems } from './data/mockNPCData';
+// Mock data - Export the actual mockNPCs export
+export { mockNPCs } from './data/mockNPCData';

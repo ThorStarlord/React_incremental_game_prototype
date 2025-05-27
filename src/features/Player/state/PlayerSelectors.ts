@@ -1,27 +1,16 @@
 // Player feature selectors using createSelector for memoization
 
 import { createSelector } from '@reduxjs/toolkit';
-import type { RootState } from '../../../app/store';
-import type {
+import { RootState } from '../../../app/store';
+import {
   PlayerState,
   PlayerStats,
-  PlayerHealthData,
-  PlayerManaData,
-  CombatStats,
-  PerformanceStats,
-  ArmorEquipment,
-  WeaponEquipment,
-  AccessoryEquipment,
-  EquipmentState
+  PlayerAttributes,
+  StatusEffect
 } from './PlayerTypes';
 
-// Base selectors
+// Basic selectors
 export const selectPlayer = (state: RootState): PlayerState => state.player;
-
-export const selectPlayerName = createSelector(
-  [selectPlayer],
-  (player) => player.name
-);
 
 export const selectPlayerStats = createSelector(
   [selectPlayer],
@@ -33,140 +22,115 @@ export const selectPlayerAttributes = createSelector(
   (player) => player.attributes
 );
 
-export const selectPlayerEquipment = createSelector(
-  [selectPlayer],
-  (player) => player.equipment
-);
-
 export const selectPlayerStatusEffects = createSelector(
   [selectPlayer],
-  (player) => player.statusEffects
+  (player) => player.statusEffects || []
 );
 
-// Enhanced health data with percentage calculation
-export const selectPlayerHealth = createSelector(
+// Health and mana data selectors with safe calculations
+export const selectPlayerHealthData = createSelector(
   [selectPlayerStats],
-  (stats): PlayerHealthData => ({
-    current: stats.health,
-    max: stats.maxHealth,
-    percentage: (stats.health / stats.maxHealth) * 100
-  })
-);
-
-// Enhanced mana data with percentage calculation
-export const selectPlayerMana = createSelector(
-  [selectPlayerStats],
-  (stats): PlayerManaData => ({
-    current: stats.mana,
-    max: stats.maxMana,
-    percentage: (stats.mana / stats.maxMana) * 100
-  })
-);
-
-// Combat statistics grouping
-export const selectCombatStats = createSelector(
-  [selectPlayerStats],
-  (stats): CombatStats => ({
-    attack: stats.attack,
-    defense: stats.defense,
-    speed: stats.speed,
-    critChance: stats.critChance,
-    critDamage: stats.critDamage
-  })
-);
-
-// Performance and progression stats
-export const selectPerformanceStats = createSelector(
-  [selectPlayer],
-  (player): PerformanceStats => {
-    // Calculate power level as sum of key stats
-    const powerLevel = player.stats.attack + player.stats.defense + 
-                      player.stats.maxHealth / 10 + player.stats.maxMana / 5;
+  (stats) => {
+    const healthPercentage = stats.maxHealth > 0 
+      ? Math.min(100, Math.max(0, (stats.health / stats.maxHealth) * 100))
+      : 0;
     
+    const getHealthStatus = (percentage: number): 'critical' | 'low' | 'normal' | 'full' => {
+      if (percentage <= 25) return 'critical';
+      if (percentage <= 50) return 'low';
+      if (percentage < 100) return 'normal';
+      return 'full';
+    };
+
     return {
-      totalPlayTime: player.totalPlayTime,
-      powerLevel: Math.floor(powerLevel)
+      current: Math.max(0, stats.health),
+      max: Math.max(1, stats.maxHealth),
+      percentage: healthPercentage,
+      status: getHealthStatus(healthPercentage)
     };
   }
 );
 
-// Equipment category selectors
-export const selectArmorEquipment = createSelector(
-  [selectPlayerEquipment],
-  (equipment): ArmorEquipment => ({
-    head: equipment.head,
-    chest: equipment.chest,
-    legs: equipment.legs,
-    feet: equipment.feet
-  })
-);
+export const selectPlayerManaData = createSelector(
+  [selectPlayerStats],
+  (stats) => {
+    const manaPercentage = stats.maxMana > 0
+      ? Math.min(100, Math.max(0, (stats.mana / stats.maxMana) * 100))
+      : 0;
+    
+    const getManaStatus = (percentage: number): 'critical' | 'low' | 'normal' | 'full' => {
+      if (percentage <= 15) return 'critical';
+      if (percentage <= 35) return 'low';
+      if (percentage < 100) return 'normal';
+      return 'full';
+    };
 
-export const selectWeaponEquipment = createSelector(
-  [selectPlayerEquipment],
-  (equipment): WeaponEquipment => ({
-    mainHand: equipment.mainHand,
-    offHand: equipment.offHand
-  })
-);
-
-export const selectAccessoryEquipment = createSelector(
-  [selectPlayerEquipment],
-  (equipment): AccessoryEquipment => ({
-    accessory1: equipment.accessory1,
-    accessory2: equipment.accessory2
-  })
-);
-
-// Utility selectors
-export const selectAttributePoints = createSelector(
-  [selectPlayer],
-  (player) => player.attributePoints
-);
-
-export const selectSkillPoints = createSelector(
-  [selectPlayer],
-  (player) => player.skillPoints
-);
-
-export const selectPlayerGold = createSelector(
-  [selectPlayer],
-  (player) => player.gold
-);
-
-export const selectIsPlayerAlive = createSelector(
-  [selectPlayer],
-  (player) => player.isAlive
-);
-
-// Equipment utility selectors
-export const selectEquippedItemsCount = createSelector(
-  [selectPlayerEquipment],
-  (equipment) => {
-    return Object.values(equipment).filter(item => item !== null).length;
+    return {
+      current: Math.max(0, stats.mana),
+      max: Math.max(1, stats.maxMana),
+      percentage: manaPercentage,
+      status: getManaStatus(manaPercentage)
+    };
   }
 );
 
-export const selectEquipmentBySlot = createSelector(
-  [selectPlayerEquipment],
-  (equipment) => (slot: string) => equipment[slot] || null
+// Combat stats selector
+export const selectPlayerCombatStats = createSelector(
+  [selectPlayerStats],
+  (stats) => ({
+    attack: Math.max(0, stats.attack),
+    defense: Math.max(0, stats.defense),
+    speed: Math.max(0, stats.speed),
+    criticalChance: Math.min(1, Math.max(0, stats.criticalChance)),
+    criticalDamage: Math.max(1, stats.criticalDamage)
+  })
 );
 
-// Status effect utility selectors
-export const selectActiveStatusEffects = createSelector(
-  [selectPlayerStatusEffects],
-  (effects) => effects.filter(effect => effect.duration > 0)
-);
-
-export const selectStatusEffectsByType = createSelector(
-  [selectPlayerStatusEffects],
-  (effects) => (type: string) => effects.filter(effect => effect.type === type)
-);
-
-// Formatted display selectors
-export const selectFormattedPlayTime = createSelector(
+// Performance stats selector
+export const selectPlayerPerformanceStats = createSelector(
   [selectPlayer],
   (player) => {
-    const totalSeconds = Math.floor(player.totalPlayTime / 1000);
+    // Calculate power level from attributes and stats
+    const attributeSum = Object.values(player.attributes || {}).reduce((sum, val) => sum + val, 0);
+    const powerLevel = attributeSum + (player.stats?.attack || 0) + (player.stats?.defense || 0);
+    
+    return {
+      totalPlaytime: player.totalPlaytime || 0,
+      powerLevel: Math.floor(powerLevel),
+      availableAttributePoints: player.availableAttributePoints || 0,
+      availableSkillPoints: player.availableSkillPoints || 0
+    };
+  }
+);
+
+// Point allocation selectors
+export const selectAvailableAttributePoints = createSelector(
+  [selectPlayer],
+  (player) => player.availableAttributePoints || 0
+);
+
+export const selectAvailableSkillPoints = createSelector(
+  [selectPlayer],
+  (player) => player.availableSkillPoints || 0
+);
+
+// Player status selectors
+export const selectIsPlayerAlive = createSelector(
+  [selectPlayer],
+  (player) => player.isAlive !== false // Default to true if undefined
+);
+
+// Status effects by type (commented out until StatusEffect type is properly defined)
+// export const selectStatusEffectsByType = createSelector(
+//   [selectPlayerStatusEffects],
+//   (effects) => (type: string) => effects.filter(effect => effect.type === type)
+// );
+
+// Formatted display selectors
+export const selectFormattedPlaytime = createSelector(
+  [selectPlayer],
+  (player) => {
+    const totalSeconds = Math.floor((player.totalPlaytime || 0) / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
@@ -181,30 +145,31 @@ export const selectFormattedPlayTime = createSelector(
   }
 );
 
-// Attribute by name selector factory
+// Attribute by name selector with proper typing
 export const selectAttributeByName = createSelector(
   [selectPlayerAttributes],
-  (attributes) => (attributeName: string) => attributes[attributeName] || null
+  (attributes) => (attributeName: keyof PlayerAttributes) => attributes[attributeName] || 0
 );
 
-// Health status selector (for UI coloring)
+// Health status for UI coloring
 export const selectHealthStatus = createSelector(
-  [selectPlayerHealth],
-  (health): 'critical' | 'low' | 'medium' | 'high' => {
-    if (health.percentage <= 25) return 'critical';
-    if (health.percentage <= 50) return 'low';
-    if (health.percentage <= 75) return 'medium';
-    return 'high';
-  }
+  [selectPlayerHealthData],
+  (healthData) => healthData.status
 );
 
-// Mana status selector (for UI coloring)
+// Mana status for UI coloring
 export const selectManaStatus = createSelector(
-  [selectPlayerMana],
-  (mana): 'empty' | 'low' | 'medium' | 'full' => {
-    if (mana.percentage <= 10) return 'empty';
-    if (mana.percentage <= 30) return 'low';
-    if (mana.percentage <= 70) return 'medium';
-    return 'full';
-  }
+  [selectPlayerManaData],
+  (manaData) => manaData.status
+);
+
+// Computed stats selector (comprehensive stats for display)
+export const selectPlayerStatsData = createSelector(
+  [selectPlayerHealthData, selectPlayerManaData],
+  (healthData, manaData) => ({
+    healthPercentage: healthData.percentage,
+    manaPercentage: manaData.percentage,
+    healthStatus: healthData.status,
+    manaStatus: manaData.status
+  })
 );
