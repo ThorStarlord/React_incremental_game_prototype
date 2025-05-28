@@ -1,404 +1,523 @@
-# State Management Specification (Redux Toolkit)
+# State Management Specification
 
-This document details the structure and strategy for managing application state using Redux Toolkit (RTK).
+This document outlines the state management architecture for the React Incremental RPG Prototype, detailing Redux Toolkit implementation, slice organization, and data flow patterns.
 
 ## 1. Overview
 
-Redux Toolkit is used as the **single source of truth** for the application's global state. It provides a predictable and maintainable way to manage complex state interactions inherent in an incremental RPG.
+The application uses Redux Toolkit for centralized state management, following modern Redux patterns with feature-sliced organization. Each game system maintains its own slice while supporting cross-feature integration through well-defined interfaces.
 
-**Architecture Status**: ✅ **IMPLEMENTED** - Redux Toolkit serves as the exclusive state management system with no competing context-based approaches. **Layout state management implemented via custom hooks with React Router integration** and **✅ NEWLY ENHANCED with GameLayout component integration**.
+### 1.1. Architecture Principles
+- **Feature-Sliced Design**: State organized by domain/feature boundaries
+- **Redux Toolkit**: Modern Redux with createSlice and createAsyncThunk
+- **Type Safety**: Comprehensive TypeScript integration throughout
+- **Performance**: Memoized selectors and optimized component subscriptions
+- **Immutability**: Leveraging Immer for safe state mutations
 
-## 2. Core Principles
+## 2. Store Configuration
 
-*   **Single Source of Truth:** The entire application state is stored in a single Redux store object.
-*   **State is Read-Only:** The only way to change the state is by dispatching actions.
-*   **Changes are Made with Pure Functions:** Reducers are pure functions that take the previous state and an action, and return the next state. Immutability is handled by Immer within RTK.
-*   **Feature-Sliced Structure:** State logic is co-located with the feature it belongs to (`src/features/FeatureName/state/`).
-*   **Type Safety**: ✅ **IMPLEMENTED** - Strong TypeScript integration throughout state management.
+### 2.1. Root Store Setup
+**Location**: `src/app/store.ts`
 
-## 3. Redux Toolkit Features Used
-
-*   **`configureStore`:** Sets up the Redux store with sensible defaults (like Redux DevTools Extension integration and default middleware).
-*   **`createSlice`:** Generates slice reducers and action creators with less boilerplate. Uses Immer internally for immutable updates.
-*   **`createAsyncThunk`:** Handles asynchronous logic (like API calls, `localStorage` interactions) and dispatches actions based on promise lifecycle (pending, fulfilled, rejected).
-*   **`createSelector` (via Reselect):** Creates memoized selectors to efficiently compute derived data and optimize performance by preventing unnecessary re-renders.
-*   **Typed Hooks (`useAppDispatch`, `useAppSelector`):** Provide type safety when dispatching actions and selecting state.
-
-## 4. State Structure (Slices) ✅ IMPLEMENTED
-
-The global state (`RootState`) is composed of multiple slices, each managing a specific domain:
-
-*   **`gameLoop` (`GameLoopSlice.ts`):** ✅ **IMPLEMENTED**
-    *   Manages core game timing and state: running status, pause state, tick count, game speed, total game time, auto-save configuration.
-    *   *Key Actions:* `startGame`, `pauseGame`, `resumeGame`, `stopGame`, `setGameSpeed`, `incrementTick`, `updateGameTime`, `triggerAutoSave`.
-    *   *Integration:* Provides tick-based updates to other systems via custom hooks and callbacks.
-
-*   **`player` (`PlayerSlice.ts`):** ✅ **IMPLEMENTED**
-    *   Manages player-specific data: name, level, XP, stats (HP, MP, attack, etc.), attributes (STR, DEX, etc.), skills, status effects, equipment.
-    *   *Key Actions:* `updatePlayer`, `setName`, `resetPlayer`, `modifyHealth`, `allocateAttribute`, `updateSkill`, `equipItem`.
-    *   *Types:* Comprehensive type definitions in `PlayerTypes.ts` with proper Feature-Sliced exports.
-    *   *Selectors:* Memoized selectors in `PlayerSelectors.ts` for efficient state access.
-
-*   **`traits` (`TraitsSlice.ts`):** ✅ **IMPLEMENTED**
-    *   Manages all trait definitions, player's acquired traits, equipped traits, permanent traits, trait slots, and presets.
-    *   *Key Actions:* `setTraits`, `acquireTrait`, `discoverTrait`, `equipTrait`, `unequipTrait`, `makePermanent`, `unlockTraitSlot`, `saveTraitPreset`.
-    *   *Thunks:* `fetchTraitsThunk`, `makeTraitPermanentThunk`.
-
-*   **`essence` (`EssenceSlice.ts`):** ✅ **IMPLEMENTED**
-    *   Manages the core Essence resource: current amount, total collected, generation rate, per-click value, multipliers, generators, upgrades, NPC connections affecting generation.
-    *   *Key Actions:* `gainEssence`, `spendEssence`, `setGenerationRate`, `addNpcConnection`, `addManualEssence`.
-
-*   **`settings` (`SettingsSlice.ts`):** ✅ **IMPLEMENTED**
-    *   Manages user-configurable settings: audio levels, graphics quality, gameplay difficulty, UI preferences (theme, font size), autosave configuration.
-    *   *Key Actions:* `updateSetting`, `updateCategorySettings`, `resetSettings`, `loadSettings`.
-    *   *Thunks:* `loadSettingsThunk`, `saveSettingsThunk`.
-
-*   **`meta` (`MetaSlice.ts`):** ✅ **IMPLEMENTED**
-    *   Manages application metadata: last save/load timestamps, game version, session start time, current save ID.
-    *   *Key Actions:* `updateLastSaved`, `updateGameMetadata`, `setGameVersion`.
-    *   *Thunks:* `saveGameThunk`, `loadGameThunk`, `importGameThunk`.
-
-*   **`npcs` (`NpcSlice.ts`):** ✅ **IMPLEMENTED + THUNKS**
-    *   Manages the state of Non-Player Characters: locations, relationship levels/connection depth with the player, current status, potentially traits.
-    *   *Actions:* `updateNpcRelationship`, `setNpcStatus`, `addNpcTrait`, `discoverNPC`, `startInteraction`, `endInteraction`.
-    *   *Thunks:* ✅ **NEWLY IMPLEMENTED** - `initializeNPCsThunk`, `updateNPCRelationshipThunk`, `processNPCInteractionThunk`, `discoverNPCThunk`, `startNPCInteractionThunk`, `endNPCInteractionThunk`, `processDialogueChoiceThunk`, `shareTraitWithNPCThunk`.
-    *   *Integration:* Cross-system coordination with Essence and Trait systems through async thunk operations.
-
-*   **Future Slices (Planned):**
-    *   `copies` (`CopySlice.ts` - *Planned*): For player-created Copies management
-    *   `quests` (`QuestSlice.ts` - *Planned*): For quest state management
-    *   `notifications` (`NotificationsSlice.ts` - *Planned*): For transient UI notifications
-
-## 5. Type Safety Implementation ✅ COMPLETED
-
-### 5.1. Feature-Level Type Organization
 ```typescript
-// ✅ Implemented pattern
-src/features/Player/
-├── state/
-│   ├── PlayerTypes.ts      // Primary type definitions
-│   ├── PlayerSlice.ts      // Slice implementation  
-│   └── PlayerSelectors.ts  // Memoized selectors
-└── index.ts               // Barrel exports with types
+// ✅ Implemented store configuration
+export const store = configureStore({
+  reducer: {
+    player: playerSlice.reducer,
+    traits: traitsSlice.reducer,
+    npcs: npcsSlice.reducer,
+    essence: essenceSlice.reducer,
+    gameLoop: gameLoopSlice.reducer,
+    settings: settingsSlice.reducer,
+    saveLoad: saveLoadSlice.reducer,
+    // Future: quests, copies, inventory
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+  devTools: process.env.NODE_ENV !== 'production',
+});
 ```
 
-### 5.2. Import Patterns ✅ STANDARDIZED
+### 2.2. Type Definitions
+**Location**: `src/app/store.ts`
+
 ```typescript
-// ✅ Feature-internal imports
-import type { PlayerState } from '../state/PlayerTypes';
-
-// ✅ Cross-feature imports via barrel
-import type { PlayerState } from '../../Player';
-
-// ✅ Store-level imports
-import type { RootState } from '../../../app/store';
+// ✅ Implemented type safety
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
 ```
 
-### 5.3. Context System Resolution ✅ COMPLETED
-**Problem Resolved**: Eliminated competing context-based state management
-- **Removed**: `context/GameStateExports` dependencies
-- **Implemented**: Direct feature-based type imports
-- **Result**: Single source of truth maintained through Redux only
+### 2.3. Typed Hooks
+**Location**: `src/app/hooks.ts`
 
-## 6. Handling Asynchronous Operations ✅ IMPLEMENTED + **NPC-ENHANCED**
-
-*   **Thunks (`createAsyncThunk`):** Used for:
-    *   Saving/Loading game state to/from `localStorage` via `MetaThunks.ts`
-    *   Importing/Exporting save data  
-    *   Fetching initial game data (e.g., trait definitions from static files)
-    *   ✅ **NPC Operations** - Complex NPC interactions, relationship calculations, and cross-system integration via `NPCThunks.ts`
-    *   Complex actions requiring access to `getState` or dispatching multiple actions
-*   **Lifecycle Actions:** Thunks automatically dispatch `pending`, `fulfilled`, and `rejected` actions, allowing slices to update loading and error states accordingly in their `extraReducers`.
-
-### 6.1. NPC Thunk Architecture ✅ **NEWLY DOCUMENTED**
-
-**NPCThunks.ts Implementation**: Comprehensive async operations for NPC system
 ```typescript
-// ✅ Core thunk patterns implemented
-export const processNPCInteractionThunk = createAsyncThunk<
-  InteractionResult,
-  { npcId: string; interactionType: string; options?: Record<string, any> },
-  { state: RootState }
->(
-  'npcs/processInteraction',
-  async ({ npcId, interactionType, options }, { getState, dispatch, rejectWithValue }) => {
-    // Complex interaction processing with relationship effects
-    // Cross-system integration with Essence and Trait systems
-    // Comprehensive error handling and validation
+// ✅ Implemented typed hooks
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+```
+
+## 3. Slice Architecture
+
+### 3.1. Standard Slice Structure
+
+Each feature follows a consistent slice organization:
+
+```
+src/features/FeatureName/state/
+├── FeatureSlice.ts        # Redux slice with actions and reducers
+├── FeatureTypes.ts        # TypeScript interfaces and types
+├── FeatureSelectors.ts    # Memoized selectors
+├── FeatureThunks.ts       # Async thunk operations
+└── index.ts               # Barrel export for state API
+```
+
+### 3.2. Slice Implementation Pattern
+
+#### Basic Slice Structure
+```typescript
+// ✅ Standard slice pattern used throughout
+const featureSlice = createSlice({
+  name: 'feature',
+  initialState,
+  reducers: {
+    // Synchronous actions with Immer-enabled mutations
+    updateData: (state, action: PayloadAction<UpdatePayload>) => {
+      // Direct mutation - Immer handles immutability
+      state.data = action.payload;
+    },
+    
+    resetState: (state) => {
+      return initialState; // Full state replacement
+    },
+  },
+  extraReducers: (builder) => {
+    // Async thunk handlers
+    builder
+      .addCase(fetchDataThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDataThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(fetchDataThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Operation failed';
+      });
+  },
+});
+```
+
+## 4. Feature Slice Details
+
+### 4.1. Player Slice ✅ COMPLETE
+**Location**: `src/features/Player/state/PlayerSlice.ts`
+
+**State Structure**:
+```typescript
+interface PlayerState {
+  stats: PlayerStats;
+  attributes: PlayerAttributes;
+  availableAttributePoints: number;
+  availableSkillPoints: number;
+  statusEffects: StatusEffect[];
+  equippedTraits: (string | null)[];
+  permanentTraits: string[];
+  traitSlots: TraitSlot[];
+  totalPlaytime: number;
+  isAlive: boolean;
+}
+```
+
+**Key Features**:
+- **Stat Calculations**: Automatic recalculation of derived stats
+- **Attribute Management**: Point allocation with validation
+- **Status Effects**: Time-based effect processing
+- **Trait Integration**: Equipment and permanence mechanics
+- **Playtime Tracking**: Session and total time management
+
+### 4.2. Traits Slice ✅ COMPLETE
+**Location**: `src/features/Traits/state/TraitsSlice.ts`
+
+**State Structure**:
+```typescript
+interface TraitsState {
+  availableTraits: Record<string, Trait>;
+  acquiredTraits: string[];
+  traitSlots: TraitSlot[];
+  permanentTraits: string[];
+  loading: boolean;
+  error: string | null;
+}
+```
+
+**Key Features**:
+- **Trait Discovery**: Unlocking and categorizing traits
+- **Acquisition System**: Essence-based trait acquisition
+- **Slot Management**: Equipment and permanence mechanics
+- **Codex Integration**: Trait information and filtering
+
+### 4.3. NPCs Slice ✅ COMPLETE
+**Location**: `src/features/NPCs/state/NPCSlice.ts`
+
+**State Structure**:
+```typescript
+interface NPCState {
+  npcs: Record<string, NPC>;
+  relationships: Record<string, number>;
+  interactions: NPCInteraction[];
+  currentInteraction: string | null;
+  loading: boolean;
+  error: string | null;
+}
+```
+
+**Key Features**:
+- **Relationship Tracking**: Progressive relationship levels
+- **Interaction Management**: Session-based interaction tracking
+- **Trait Sharing**: NPC trait slot management
+- **Commerce Integration**: Relationship-based pricing
+
+### 4.4. Essence Slice ✅ COMPLETE
+**Location**: `src/features/Essence/state/EssenceSlice.ts`
+
+**State Structure**:
+```typescript
+interface EssenceState {
+  currentAmount: number;
+  totalCollected: number;
+  generationRate: number;
+  perClickAmount: number;
+  lastGeneration: number;
+}
+```
+
+**Key Features**:
+- **Resource Management**: Current amount and accumulation
+- **Generation Tracking**: Passive and manual generation
+- **Statistics**: Total collected and generation metrics
+
+### 4.5. GameLoop Slice ✅ COMPLETE
+**Location**: `src/features/GameLoop/state/GameLoopSlice.ts`
+
+**State Structure**:
+```typescript
+interface GameLoopState {
+  isRunning: boolean;
+  isPaused: boolean;
+  gameSpeed: number;
+  currentTick: number;
+  totalGameTime: number;
+  autoSaveInterval: number;
+  lastAutoSave: number;
+}
+```
+
+**Key Features**:
+- **Time Management**: Game progression and timing
+- **Speed Control**: Adjustable game speed multipliers
+- **Auto-save**: Configurable automatic saving
+
+### 4.6. Settings Slice ✅ COMPLETE
+**Location**: `src/features/Settings/state/SettingsSlice.ts`
+
+**State Structure**:
+```typescript
+interface SettingsState {
+  audio: AudioSettings;
+  graphics: GraphicsSettings;
+  gameplay: GameplaySettings;
+  ui: UISettings;
+}
+```
+
+**Key Features**:
+- **Category Organization**: Audio, graphics, gameplay, UI
+- **Immediate Persistence**: Real-time settings application
+- **Default Management**: Reset and validation capabilities
+
+## 5. Selector Architecture
+
+### 5.1. Selector Organization
+
+Each feature maintains organized selectors with consistent patterns:
+
+```typescript
+// ✅ Standard selector pattern
+// Basic selectors
+export const selectFeature = (state: RootState) => state.feature;
+export const selectFeatureData = (state: RootState) => state.feature.data;
+export const selectFeatureLoading = (state: RootState) => state.feature.loading;
+
+// Memoized selectors with createSelector
+export const selectProcessedData = createSelector(
+  [selectFeatureData, selectOtherRelevantData],
+  (data, otherData) => {
+    // Expensive computation here
+    return processedResult;
   }
 );
 ```
 
-**Key Benefits Achieved**:
-- **Cross-System Coordination**: NPCs, Essence, and Trait systems work together seamlessly
-- **Complex State Logic**: Multi-step operations handled cleanly through thunks
-- **Error Management**: Robust error handling with user-friendly feedback
-- **Type Safety**: Full TypeScript integration throughout async operations
-- **Performance**: Efficient state updates with minimal overhead
+### 5.2. Cross-Feature Selectors
 
-## 7. Selectors ✅ IMPLEMENTED
+For data requiring multiple feature states:
 
-*   **Purpose:** Decouple components from the specific shape of the state tree and optimize performance.
-*   **Implementation:** Defined alongside their respective slices (e.g., `PlayerSelectors.ts`).
-*   **Memoization:** `createSelector` is used for derived data or computations to avoid recalculating on every state change if the input state parts haven't changed.
-*   **Usage:** Components use `useAppSelector` with these selectors to subscribe to state updates.
-*   **Tab State Management:** Use shared `useTabs` hook for consistent tab state management across features rather than individual component state.
-
-### 7.1. Example Selector Implementation
 ```typescript
-// ✅ Implemented in PlayerSelectors.ts
-export const selectPlayerHealth = createSelector(
-  [selectPlayerStats],
-  (stats) => ({
-    current: stats.health,
-    max: stats.maxHealth,
-    percentage: (stats.health / stats.maxHealth) * 100
+// ✅ Implemented in various features
+export const selectPlayerWithTraits = createSelector(
+  [selectPlayer, selectTraits],
+  (player, traits) => ({
+    ...player,
+    equippedTraitDetails: player.equippedTraits
+      .map(traitId => traitId ? traits[traitId] : null)
+      .filter(Boolean)
   })
 );
 ```
 
-## 8. State Persistence ✅ IMPLEMENTED
+## 6. Async Operations (Thunks)
 
-*   **Mechanism:** Using `localStorage` via utility functions in `shared/utils/saveUtils.ts`
-*   **Triggers:** Saving is triggered manually by the player or automatically via the autosave system (`saveGameThunk`). Settings are saved when changed (`saveSettingsThunk`).
-*   **Loading:** The initial state can be hydrated from `localStorage` on application startup (`loadGameThunk`, `loadSettingsThunk`). The `replaceState` action is used to overwrite the entire store state when loading a save file.
+### 6.1. Thunk Architecture
 
-## 9. Root Reducer (`app/store.ts`) ✅ IMPLEMENTED
-
-*   A `combinedReducer` merges all slice reducers.
-*   A `rootReducer` wraps the `combinedReducer` to handle the special `replaceState` action, allowing the entire state to be overwritten during game load operations.
+Async operations follow consistent patterns with comprehensive error handling:
 
 ```typescript
-// ✅ Implemented store structure
-const store = configureStore({
-  reducer: rootReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['meta/replaceState'],
-      },
-    }),
+// ✅ Standard thunk pattern used throughout
+export const operationThunk = createAsyncThunk<
+  ReturnType,           // Success payload type
+  ParameterType,        // Input parameter type  
+  { state: RootState; rejectValue: string }
+>(
+  'feature/operation',
+  async (params, { getState, dispatch, rejectWithValue }) => {
+    try {
+      // Validation
+      if (!isValidParams(params)) {
+        return rejectWithValue('Invalid parameters');
+      }
+
+      // State access
+      const currentState = getState();
+      
+      // Business logic
+      const result = await performOperation(params, currentState);
+      
+      // Side effects
+      dispatch(relatedAction(result));
+      
+      return result;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Operation failed'
+      );
+    }
+  }
+);
+```
+
+### 6.2. Implemented Thunk Operations
+
+#### Player Thunks ✅ COMPLETE
+- **regenerateResourcesThunk**: Health and mana regeneration
+- **processStatusEffectsThunk**: Time-based effect processing
+- **useConsumableThunk**: Item consumption with effects
+- **restThunk**: Enhanced recovery mechanics
+- **autoAllocateAttributesThunk**: Automated point distribution
+
+#### NPC Thunks ✅ COMPLETE
+- **initializeNPCsThunk**: NPC data loading and setup
+- **updateNPCRelationshipThunk**: Relationship modification
+- **processNPCInteractionThunk**: Complex interaction handling
+- **shareTraitWithNPCThunk**: Trait sharing operations
+
+#### Settings Thunks ✅ COMPLETE
+- **saveSettingsThunk**: Immediate settings persistence
+- **loadSettingsThunk**: Settings restoration with defaults
+
+## 7. Performance Optimization
+
+### 7.1. Memoization Strategy
+
+**Selector Memoization**:
+```typescript
+// ✅ Applied throughout selectors
+export const selectExpensiveComputation = createSelector(
+  [selectInputData],
+  (inputData) => {
+    // Expensive computation only runs when inputData changes
+    return computeResult(inputData);
+  }
+);
+```
+
+**Component Memoization**:
+```typescript
+// ✅ Applied to major components
+export default React.memo(ComponentName, (prevProps, nextProps) => {
+  // Custom comparison logic if needed
+  return prevProps.data === nextProps.data;
 });
 ```
 
-## 10. Performance Optimizations ✅ IMPLEMENTED
+### 7.2. State Subscription Optimization
 
-### 10.1. Selector Memoization
-- **createSelector**: Used throughout for derived state calculations
-- **Component Optimization**: React.memo applied where beneficial
-- **Callback Memoization**: useCallback for event handlers
-
-### 10.2. Efficient Updates
-- **Targeted Updates**: Slices update only relevant state portions
-- **Immutable Updates**: Immer handles immutability transparently
-- **Minimal Re-renders**: Memoized selectors prevent unnecessary component updates
-
-## 11. Layout State Management ✅ COMPLETE + GAMELAYOUT + **LEGACY-DEPRECATION**
-
-### 11.1. useLayoutState Hook Implementation ✅ ENHANCED + GAMELAYOUT + ROUTER-INTEGRATION + DEPRECATION-SUPPORT
-
-**Location**: `src/layout/hooks/useLayoutState.ts`
-
-The layout state management follows a hybrid approach, using local component state with React Router integration rather than Redux for layout-specific concerns. **✅ ENHANCED with comprehensive GameLayout component integration**, **✅ IMPLEMENTED AppRouter coordination**, and **✅ NEWLY ADDED deprecation support for legacy layout components**:
-
+**Targeted Subscriptions**:
 ```typescript
-// ✅ Layout state management pattern enhanced for GameLayout + AppRouter + Legacy Support
-export const useLayoutState = (options: UseLayoutStateOptions = {}): UseLayoutStateReturn => {
-  const [activeTab, setActiveTabState] = useState<TabId>();
-  const [sidebarCollapsed, setSidebarCollapsedState] = useState<boolean>();
+// ✅ Pattern used throughout components
+const ComponentWithOptimizedSubscription: React.FC = () => {
+  // Only subscribe to specific needed data
+  const specificData = useAppSelector(selectSpecificData);
   
-  // React Router integration with AppRouter coordination
-  const location = useLocation();
-  const navigate = useNavigate();
-  
-  // Legacy component detection and warning system
-  const warnLegacyUsage = useCallback((componentName: string) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn(
-        `Legacy layout component "${componentName}" detected. ` +
-        'Please migrate to GameLayout for improved performance and features.'
-      );
-    }
-  }, []);
-  
-  // Memoized actions optimized for GameLayout + AppRouter usage
-  const setActiveTab = useCallback((tabId: TabId) => {
-    setActiveTabState(tabId);
-    // Internal navigation - no route changes needed with AppRouter integration
-    if (syncWithRouter && window.location.pathname.startsWith('/game')) {
-      // GameLayout handles internal navigation without URL changes
-      localStorage.setItem(STORAGE_KEYS.activeTab, tabId);
-    }
-  }, [syncWithRouter]);
-  
-  const setSidebarCollapsed = useCallback((collapsed: boolean) => {
-    setSidebarCollapsedState(collapsed);
-    if (persistSidebar) {
-      localStorage.setItem(STORAGE_KEYS.sidebarCollapsed, String(collapsed));
-    }
-  }, [persistSidebar]);
-  
-  const toggleSidebar = useCallback(() => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  }, [sidebarCollapsed, setSidebarCollapsed]);
-  
-  return { 
-    activeTab, 
-    sidebarCollapsed, 
-    setActiveTab, 
-    setSidebarCollapsed, 
-    toggleSidebar 
-  };
+  // Memoized callbacks prevent unnecessary re-renders
+  const handleAction = useCallback(() => {
+    dispatch(actionCreator());
+  }, [dispatch]);
+
+  return <div>{/* Component content */}</div>;
 };
 ```
 
-### 11.2. GameLayout Integration ✅ **COMPLETE WITH DEPRECATION AWARENESS**
+## 8. Error Handling
 
-#### Legacy Component Support ✅ NEWLY IMPLEMENTED
+### 8.1. Slice Error Management
 
-**Deprecation Detection Pattern**:
+Each slice maintains consistent error handling:
+
 ```typescript
-// ✅ GameLayout with legacy component awareness
-export const GameLayout: React.FC = React.memo(() => {
-  const {
-    activeTab,
-    sidebarCollapsed,
-    setActiveTab,
-    setSidebarCollapsed,
-    toggleSidebar
-  } = useLayoutState({
-    defaultTab: 'dashboard',
-    persistSidebar: true,
-    syncWithRouter: false,
-    detectLegacyComponents: true // ✅ New option for legacy detection
-  });
+// ✅ Standard error handling pattern
+interface FeatureState {
+  data: FeatureData;
+  loading: boolean;
+  error: string | null; // Consistent error storage
+}
 
-  // Legacy component usage detection
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const legacyComponents = [
-        'GameContainer',
-        'LeftColumn', 
-        'MiddleColumn',
-        'RightColumn'
-      ];
-      
-      legacyComponents.forEach(componentName => {
-        const elements = document.querySelectorAll(`[data-component="${componentName}"]`);
-        if (elements.length > 0) {
-          console.warn(
-            `Legacy component ${componentName} detected. Consider migration to GameLayout.`
-          );
-        }
-      });
-    }
-  }, []);
+// Error handling in extraReducers
+.addCase(operationThunk.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload || 'Operation failed';
+})
+```
 
-  // Route detection for initial tab state
-  useEffect(() => {
-    const path = window.location.pathname;
-    if (path.startsWith('/game/')) {
-      const tabFromPath = extractTabFromPath(path);
-      if (tabFromPath) {
-        setActiveTab(tabFromPath);
+### 8.2. Thunk Error Patterns
+
+```typescript
+// ✅ Comprehensive error handling in thunks
+export const operationThunk = createAsyncThunk(
+  'feature/operation',
+  async (params, { rejectWithValue }) => {
+    try {
+      // Validation errors
+      if (!isValid(params)) {
+        return rejectWithValue('Invalid input parameters');
       }
+
+      // Business logic
+      const result = await performOperation(params);
+      return result;
+      
+    } catch (error) {
+      // Network/API errors
+      if (error instanceof NetworkError) {
+        return rejectWithValue('Network connection failed');
+      }
+      
+      // Generic error fallback
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Unknown error occurred'
+      );
     }
-  }, [setActiveTab]);
+  }
+);
+```
 
-  // Responsive design logic
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-  // Dynamic margin calculation based on layout state
-  const getMainContentMargin = () => {
-    if (isMobile) return 0;
-    return sidebarCollapsed ? 64 : 240;
-  };
+## 9. Testing Strategy
 
-  // Efficient component rendering with conditional updates
-  return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <VerticalNavBar
-        collapsed={sidebarCollapsed}
-        onCollapseChange={setSidebarCollapsed}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          marginLeft: isMobile ? 0 : `${getMainContentMargin()}px`,
-          transition: theme.transitions.create(['margin-left']),
-          padding: theme.spacing(3),
-        }}
-      >
-        <MainContentArea 
-          activeTabId={activeTab}
-          changeTab={setActiveTab}
-        />
-      </Box>
-    </Box>
-  );
+### 9.1. Reducer Testing
+
+```typescript
+// ✅ Testing pattern for reducers
+describe('featureSlice reducers', () => {
+  it('should handle action correctly', () => {
+    const initialState = getInitialState();
+    const action = actionCreator(payload);
+    const newState = featureSlice.reducer(initialState, action);
+    
+    expect(newState.data).toEqual(expectedData);
+  });
 });
 ```
 
-#### Migration Support Features ✅ IMPLEMENTED
+### 9.2. Selector Testing
 
-**Legacy Compatibility**:
-- **Graceful Coexistence**: GameLayout can coexist with deprecated components during migration
-- **State Synchronization**: Layout state remains consistent even with legacy component usage
-- **Migration Warnings**: Development-time warnings guide migration process
-- **Performance Monitoring**: Legacy component usage tracked for optimization opportunities
+```typescript
+// ✅ Testing pattern for selectors
+describe('feature selectors', () => {
+  it('should select correct data', () => {
+    const mockState = createMockState();
+    const result = selectFeatureData(mockState);
+    
+    expect(result).toEqual(expectedResult);
+  });
+});
+```
 
-**Deprecation Benefits**:
-- **Smooth Transition**: Developers can migrate components incrementally
-- **Clear Guidance**: Specific migration paths for each deprecated component
-- **Maintained Functionality**: Legacy components continue working while deprecated
-- **Future Readiness**: Architecture prepared for complete legacy component removal
+### 9.3. Thunk Testing
 
-### 11.3. Layout State Architecture Decisions ✅ ENHANCED + DEPRECATION-STRATEGY
+```typescript
+// ✅ Testing pattern for thunks
+describe('operationThunk', () => {
+  it('should handle successful operation', async () => {
+    const mockStore = configureMockStore([thunk]);
+    const store = mockStore(initialState);
+    
+    await store.dispatch(operationThunk(params));
+    
+    const actions = store.getActions();
+    expect(actions[0].type).toBe(operationThunk.pending.type);
+    expect(actions[1].type).toBe(operationThunk.fulfilled.type);
+  });
+});
+```
 
-#### Legacy Component Deprecation Rationale ✅ NEWLY ESTABLISHED
+## 10. Future Enhancements
 
-**Architectural Evolution Benefits**:
-- **Single Layout Component**: GameLayout eliminates complexity of multiple layout components
-- **Unified State Management**: useLayoutState provides centralized layout control vs. scattered component state
-- **Performance Improvement**: Reduced component mounting/unmounting overhead
-- **Responsive Design**: Built-in responsive behavior vs. manual device handling
-- **Router Integration**: Seamless AppRouter coordination vs. complex route management
+### 10.1. Planned Slice Extensions
+- **Quest Slice**: Quest management and progression tracking
+- **Copy Slice**: Character copy creation and management
+- **Inventory Slice**: Item management and equipment
+- **Achievement Slice**: Player achievement tracking
 
-**Migration Strategy Benefits**:
-- **Developer Productivity**: Clear migration paths reduce refactoring time
-- **Code Quality**: Modern patterns improve maintainability and testability
-- **User Experience**: Improved performance and consistency through unified layout
-- **Future Scalability**: GameLayout architecture supports feature growth
+### 10.2. Advanced Features
+- **Middleware**: Custom middleware for complex cross-slice operations
+- **Persistence**: Enhanced save/load with selective state persistence
+- **Real-time Updates**: WebSocket integration for multiplayer features
+- **Offline Support**: Service worker integration for offline gameplay
 
-#### Integration with Redux ✅ MAINTAINED + DEPRECATION-AWARE
+## 11. Best Practices Summary
 
-**Enhanced Architectural Boundaries** ✅ UPDATED:
-- **Redux**: Application state (player, traits, essence, NPCs, etc.)
-- **GameLayout + useLayoutState + AppRouter**: UI layout and navigation state coordination
-- **Legacy Components**: Deprecated layout components with migration guidance
-- **No Conflicts**: Layout/routing state doesn't compete with Redux patterns
-- **Performance**: Separation reduces Redux store updates for UI-only changes
+### 11.1. Development Guidelines
+1. **Consistent Structure**: Follow established slice organization patterns
+2. **Type Safety**: Maintain comprehensive TypeScript coverage
+3. **Performance**: Use memoization and targeted subscriptions
+4. **Error Handling**: Implement consistent error management
+5. **Testing**: Write tests for critical state operations
 
-**Deprecation Integration**:
-- **State Isolation**: Deprecated components don't interfere with modern state management
-- **Clean Boundaries**: Legacy and modern components maintain clear separation
-- **Migration Path**: State management patterns support incremental migration
-- **Future Removal**: Architecture prepared for clean legacy component removal
+### 11.2. Code Quality Standards
+- **Immutability**: Leverage Immer for safe state mutations
+- **Predictability**: Pure reducers and deterministic state changes
+- **Debuggability**: Clear action names and payload structures
+- **Documentation**: Comprehensive JSDoc comments for complex operations
+- **Validation**: Input validation in thunks and reducers
 
-## 12. Architecture Compliance ✅ VERIFIED + DEPRECATION-STRATEGY
-
-The current implementation fully adheres to:
-- **Feature-Sliced Design**: All state logic properly organized by feature
-- **Single Source of Truth**: Redux as the exclusive state management system for application data
-- **Type Safety**: Comprehensive TypeScript integration
-- **Performance**: Optimized with memoization and efficient updates
-- **Maintainability**: Clear patterns and consistent structure
-- **Layout State Management**: ✅ **ENHANCED** - Proper separation of concerns with layout state managed via GameLayout component and useLayoutState hook, application state via Redux
-- **Legacy Component Deprecation**: ✅ **NEWLY IMPLEMENTED** - Comprehensive deprecation strategy with migration guidance, runtime warnings, graceful degradation, and preparation for future removal
-- **Architectural Evolution**: ✅ **DEMONSTRATED** - Clean transition from legacy layout architecture to modern GameLayout system while maintaining compatibility and developer productivity
-
-**Deprecation Architecture Enhancement**: The legacy component deprecation strategy demonstrates mature software architecture practices including lifecycle management, migration planning, developer communication, and graceful degradation. This approach ensures smooth architectural evolution while maintaining code quality and developer experience throughout the transition process.
+The state management architecture provides a robust foundation for the React Incremental RPG Prototype, supporting complex game mechanics while maintaining performance, type safety, and developer experience excellence.

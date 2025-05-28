@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 import { Button, Chip, Box, Typography, useTheme } from '@mui/material';
 import { TouchApp as TouchAppIcon } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { addManualEssence } from '../../state/EssenceSlice';
-import { selectPerClick } from '../../state/EssenceSelectors';
+import { gainEssence } from '../../state/EssenceSlice';
+import { selectPerClickValue } from '../../state/EssenceSelectors';
 
 /**
  * ManualEssenceButton - Simplified manual essence generation component
@@ -13,12 +13,12 @@ import { selectPerClick } from '../../state/EssenceSelectors';
  */
 export const ManualEssenceButton: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
-  const perClick = useAppSelector(selectPerClick);
+  const perClickValue = useAppSelector(selectPerClickValue);
   const theme = useTheme();
 
   const handleGenerateEssence = useCallback(() => {
-    dispatch(addManualEssence());
-  }, [dispatch]);
+    dispatch(gainEssence({ amount: perClickValue, source: 'manual_click' }));
+  }, [dispatch, perClickValue]);
 
   return (
     <Box
@@ -61,7 +61,7 @@ export const ManualEssenceButton: React.FC = React.memo(() => {
       </Button>
 
       <Chip
-        label={`+${perClick.toFixed(1)} per click`}
+        label={`+${perClickValue.toFixed(1)} per click`}
         color="secondary"
         size="small"
         sx={{

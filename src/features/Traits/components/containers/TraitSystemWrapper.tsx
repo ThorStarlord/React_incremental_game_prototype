@@ -10,7 +10,7 @@ import {
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSelectors';
-import { selectEssenceAmount } from '../../../Essence/state/EssenceSelectors';
+import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import {
   equipTrait,
   unequipTrait,
@@ -50,7 +50,7 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const loading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const currentEssence = useAppSelector(selectEssenceAmount);
+  const currentEssence = useAppSelector(selectCurrentEssence);
 
   // Memoized data derivations for UI
   const availableTraitsForEquip = useMemo(() => 

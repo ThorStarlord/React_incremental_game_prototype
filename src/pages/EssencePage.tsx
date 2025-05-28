@@ -19,18 +19,18 @@ import {
 import { useAppSelector } from '../app/hooks';
 import { 
   selectEssence, 
-  selectEssenceDisplayStats,
-  selectEssenceGenerationRate,
-  selectEssencePerClick,
-  selectTotalEssence
+  selectEssenceStatistics,
+  selectGenerationRate,
+  selectPerClickValue,
+  selectTotalCollected
 } from '../features/Essence';
 
 const EssencePage: React.FC = () => {
   const essence = useAppSelector(selectEssence);
-  const displayStats = useAppSelector(selectEssenceDisplayStats);
-  const generationRate = useAppSelector(selectEssenceGenerationRate);
-  const perClickValue = useAppSelector(selectEssencePerClick);
-  const totalCollected = useAppSelector(selectTotalEssence);
+  const statistics = useAppSelector(selectEssenceStatistics);
+  const generationRate = useAppSelector(selectGenerationRate);
+  const perClickValue = useAppSelector(selectPerClickValue);
+  const totalCollected = useAppSelector(selectTotalCollected);
 
   const formatNumber = (num: number): string => {
     return num.toLocaleString();
@@ -140,7 +140,7 @@ const EssencePage: React.FC = () => {
               </Box>
               
               <Typography variant="h5" color="info.main" gutterBottom>
-                {displayStats.activeConnections || 0}
+                {statistics?.activeConnections || 0}
               </Typography>
               
               <Typography variant="body2" color="text.secondary">

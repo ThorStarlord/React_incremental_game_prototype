@@ -18,10 +18,10 @@ const initialStats: PlayerStats = {
   attack: 10,
   defense: 5,
   speed: 10,
-  healthRegeneration: 1,
-  manaRegeneration: 1,
-  criticalChance: 0.05, // 5%
-  criticalDamage: 1.5   // 150%
+  healthRegen: 1.0,      // Consistent naming
+  manaRegen: 0.5,        // Consistent naming
+  criticalChance: 0.05,
+  criticalDamage: 1.5,
 };
 
 // Initial player attributes - all start at 10
@@ -36,7 +36,19 @@ const initialAttributes: PlayerAttributes = {
 
 // Initial player state
 const initialState: PlayerState = {
-  stats: initialStats,
+  stats: {
+    health: 100,
+    maxHealth: 100,
+    mana: 50,
+    maxMana: 50,
+    attack: 10,
+    defense: 5,
+    speed: 10,
+    healthRegen: 1.0,      // Consistent naming
+    manaRegen: 0.5,        // Consistent naming
+    criticalChance: 0.05,
+    criticalDamage: 1.5,
+  },
   attributes: initialAttributes,
   availableAttributePoints: 0,
   availableSkillPoints: 0,
@@ -163,35 +175,59 @@ const playerSlice = createSlice({
 
     // Recalculate all derived stats
     recalculateStats: (state) => {
-      // Start with base stats influenced by attributes
-      const str = state.attributes.strength || 10;
-      const dex = state.attributes.dexterity || 10;
-      const int = state.attributes.intelligence || 10;
-      const con = state.attributes.constitution || 10;
-      const wis = state.attributes.wisdom || 10;
-
-      // Calculate base stats from attributes
-      state.stats.maxHealth = 100 + (con - 10) * 10;
-      state.stats.maxMana = 50 + (int - 10) * 5;
-      state.stats.attack = 10 + (str - 10) * 2;
-      state.stats.defense = 5 + (con - 10) * 1;
-      state.stats.speed = 10 + (dex - 10) * 1;
-      state.stats.healthRegeneration = 1 + Math.floor((con - 10) * 0.2);
-      state.stats.manaRegeneration = 2 + Math.floor((wis - 10) * 0.3);
-      state.stats.criticalChance = Math.min(0.5, 0.05 + (dex - 10) * 0.005);
-
-      // Apply status effect bonuses
-      state.statusEffects.forEach(effect => {
-        // Status effect application would go here when StatusEffect type is properly defined
-        // For now, we'll skip this to avoid TypeScript errors
+      const { attributes, statusEffects, stats: baseStats } = state;
+      
+      // Calculate attribute bonuses (D&D style: (attribute - 10) / 2)
+      const strengthBonus = Math.floor((attributes.strength - 10) / 2);
+      const dexterityBonus = Math.floor((attributes.dexterity - 10) / 2);
+      const intelligenceBonus = Math.floor((attributes.intelligence - 10) / 2);
+      const constitutionBonus = Math.floor((attributes.constitution - 10) / 2);
+      const wisdomBonus = Math.floor((attributes.wisdom - 10) / 2);
+      
+      // Calculate derived stats from attributes
+      const maxHealth = Math.max(1, baseStats.maxHealth + (constitutionBonus * 5));
+      const maxMana = Math.max(0, baseStats.maxMana + (intelligenceBonus * 3));
+      const healthRegen = Math.max(0, baseStats.healthRegen + (constitutionBonus * 0.1));
+      const manaRegen = Math.max(0, baseStats.manaRegen + (wisdomBonus * 0.15));
+      
+      // Apply status effect modifiers
+      let statusModifiers = {
+        health: 0,
+        mana: 0,
+        attack: 0,
+        defense: 0,
+        speed: 0,
+        healthRegen: 0,     // Consistent naming
+        manaRegen: 0,       // Consistent naming
+        criticalChance: 0,
+        criticalDamage: 0
+      };
+      
+      statusEffects.forEach(effect => {
+        if (effect.effects) {
+          Object.entries(effect.effects).forEach(([stat, value]) => {
+            if (stat in statusModifiers) {
+              statusModifiers[stat as keyof typeof statusModifiers] += value as number;
+            }
+          });
+        }
       });
-
-      // Ensure current health and mana don't exceed new maximums
-      state.stats.health = Math.min(state.stats.health, state.stats.maxHealth);
-      state.stats.mana = Math.min(state.stats.mana, state.stats.maxMana);
-
-      // Update alive status
-      state.isAlive = state.stats.health > 0;
+      
+      // Update calculated stats with consistent property names
+      state.stats = {
+        ...state.stats,
+        maxHealth,
+        maxMana,
+        health: Math.max(0, Math.min(maxHealth, state.stats.health)),
+        mana: Math.max(0, Math.min(maxMana, state.stats.mana)),
+        attack: Math.max(0, baseStats.attack + strengthBonus + statusModifiers.attack),
+        defense: Math.max(0, baseStats.defense + constitutionBonus + statusModifiers.defense),
+        speed: Math.max(0, baseStats.speed + dexterityBonus + statusModifiers.speed),
+        healthRegen: Math.max(0, healthRegen + statusModifiers.healthRegen),
+        manaRegen: Math.max(0, manaRegen + statusModifiers.manaRegen),
+        criticalChance: Math.max(0, Math.min(1, baseStats.criticalChance + (dexterityBonus * 0.01) + statusModifiers.criticalChance)),
+        criticalDamage: Math.max(1, baseStats.criticalDamage + (strengthBonus * 0.05) + statusModifiers.criticalDamage),
+      };
     }
   }
 });

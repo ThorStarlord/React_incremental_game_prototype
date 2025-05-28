@@ -1,121 +1,102 @@
 import { createSelector } from '@reduxjs/toolkit';
-import type { RootState } from '../../../app/store';
-import type { EssenceState } from './EssenceTypes';
+import { RootState } from '../../../app/store';
+import { EssenceStatistics } from './EssenceTypes';
 
 /**
- * Base selector for the essence state
+ * Essence Selectors
+ *
+ * Memoized selectors for efficient Essence state access and derived data calculations.
+ * Uses createSelector for performance optimization.
  */
-export const selectEssenceState = (state: RootState): EssenceState => state.essence;
 
-/**
- * Select current essence amount
- */
-export const selectEssenceAmount = createSelector(
+// Base selector
+export const selectEssenceState = (state: RootState) => state.essence;
+
+// Basic selectors
+export const selectCurrentEssence = createSelector(
   [selectEssenceState],
-  (essence) => essence.amount
+  (essence) => essence.currentEssence
 );
 
-/**
- * Select total essence collected
- */
-export const selectTotalEssence = createSelector(
+export const selectTotalCollected = createSelector(
   [selectEssenceState],
   (essence) => essence.totalCollected
 );
 
-/**
- * Select essence generation rate
- */
-export const selectEssenceGenerationRate = createSelector(
+export const selectGenerationRate = createSelector(
   [selectEssenceState],
   (essence) => essence.generationRate
 );
 
-/**
- * Select essence per click value
- */
-export const selectEssencePerClick = createSelector(
+export const selectPerClickValue = createSelector(
   [selectEssenceState],
-  (essence) => essence.perClick * essence.multiplier
+  (essence) => essence.perClickValue
 );
 
-/**
- * Select essence multiplier
- */
-export const selectEssenceMultiplier = createSelector(
+export const selectIsGenerating = createSelector(
   [selectEssenceState],
-  (essence) => essence.multiplier
+  (essence) => essence.isGenerating
 );
 
-/**
- * Select NPC connections count
- */
-export const selectNpcConnections = createSelector(
+export const selectEssenceLoading = createSelector(
   [selectEssenceState],
-  (essence) => essence.npcConnections
+  (essence) => essence.loading
 );
 
-/**
- * Select last updated timestamp
- */
-export const selectEssenceLastUpdated = createSelector(
+export const selectEssenceError = createSelector(
   [selectEssenceState],
-  (essence) => essence.lastUpdated
+  (essence) => essence.error
 );
 
-/**
- * Select essence generation statistics
- */
-export const selectEssenceStats = createSelector(
+// Derived selectors
+export const selectEssenceStatistics = createSelector(
   [selectEssenceState],
-  (essence) => ({
-    current: essence.amount,
-    total: essence.totalCollected,
+  (essence): EssenceStatistics => ({
+    currentAmount: essence.currentEssence,
+    totalCollected: essence.totalCollected,
     generationRate: essence.generationRate,
-    perClick: essence.perClick * essence.multiplier,
-    multiplier: essence.multiplier,
-    npcConnections: essence.npcConnections,
-    lastUpdated: essence.lastUpdated,
+    perClickValue: essence.perClickValue,
+    activeConnections: 0, // TODO: Calculate from NPC connections
   })
 );
 
-/**
- * Select whether enough essence is available for a purchase
- */
-export const selectCanAffordEssence = createSelector(
-  [selectEssenceAmount],
-  (amount) => (cost: number) => amount >= cost
+export const selectCanAfford = createSelector(
+  [selectCurrentEssence],
+  (currentEssence) => (cost: number) => currentEssence >= cost
 );
 
-/**
- * Convenience selector for the entire essence state (alias)
- */
-export const selectEssence = selectEssenceState;
+export const selectGenerationPerHour = createSelector(
+  [selectGenerationRate],
+  (rate) => rate * 3600 // Convert per-second to per-hour
+);
 
-/**
- * Select essence statistics for display in PlayerStats
- */
-export const selectEssenceDisplayStats = createSelector(
+export const selectLastGenerationTime = createSelector(
   [selectEssenceState],
-  (essence) => ({
-    totalEssence: essence.totalCollected,
-    essencePerClick: essence.perClick * essence.multiplier,
-    essenceGenerationRate: essence.generationRate,
-  })
+  (essence) => essence.lastGenerationTime
 );
 
-/**
- * Select essence generation rate (fallback to 0 if undefined)
- */
-export const selectGenerationRate = createSelector(
-  [selectEssence],
-  (essence) => essence.generationRate || 0
+// Complex derived selector for essence gain since last check
+export const selectPendingEssenceGain = createSelector(
+  [selectGenerationRate, selectLastGenerationTime, selectIsGenerating],
+  (rate, lastTime, isGenerating) => {
+    if (!isGenerating) return 0;
+    const timeDiff = (Date.now() - lastTime) / 1000; // seconds
+    return Math.floor(rate * timeDiff);
+  }
 );
 
-/**
- * Select essence per click value (fallback to 1 if undefined)
- */
-export const selectPerClick = createSelector(
-  [selectEssence],
-  (essence) => essence.perClick || 1
+// Formatted display selectors
+export const selectFormattedCurrentEssence = createSelector(
+  [selectCurrentEssence],
+  (amount) => new Intl.NumberFormat().format(Math.floor(amount))
+);
+
+export const selectFormattedTotalCollected = createSelector(
+  [selectTotalCollected],
+  (amount) => new Intl.NumberFormat().format(Math.floor(amount))
+);
+
+export const selectFormattedGenerationRate = createSelector(
+  [selectGenerationRate],
+  (rate) => rate.toFixed(1)
 );

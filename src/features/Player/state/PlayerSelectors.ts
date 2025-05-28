@@ -6,7 +6,11 @@ import {
   PlayerState,
   PlayerStats,
   PlayerAttributes,
-  StatusEffect
+  StatusEffect,
+  PlayerHealthData,
+  PlayerManaData,
+  CombatStats,
+  PerformanceStats
 } from './PlayerTypes';
 
 // Basic selectors
@@ -27,149 +31,113 @@ export const selectPlayerStatusEffects = createSelector(
   (player) => player.statusEffects || []
 );
 
-// Health and mana data selectors with safe calculations
-export const selectPlayerHealthData = createSelector(
+// Enhanced health data selector with percentage and status
+export const selectHealthData = createSelector(
   [selectPlayerStats],
-  (stats) => {
-    const healthPercentage = stats.maxHealth > 0 
-      ? Math.min(100, Math.max(0, (stats.health / stats.maxHealth) * 100))
-      : 0;
+  (stats): PlayerHealthData => {
+    const percentage = stats.maxHealth > 0 ? stats.health / stats.maxHealth : 0;
     
     const getHealthStatus = (percentage: number): 'critical' | 'low' | 'normal' | 'full' => {
-      if (percentage <= 25) return 'critical';
-      if (percentage <= 50) return 'low';
-      if (percentage < 100) return 'normal';
+      if (percentage <= 0.1) return 'critical';
+      if (percentage <= 0.25) return 'low';
+      if (percentage < 1.0) return 'normal';
       return 'full';
     };
 
     return {
       current: Math.max(0, stats.health),
       max: Math.max(1, stats.maxHealth),
-      percentage: healthPercentage,
-      status: getHealthStatus(healthPercentage)
+      percentage: Math.min(1, Math.max(0, percentage)),
+      status: getHealthStatus(percentage)
     };
   }
 );
 
-export const selectPlayerManaData = createSelector(
+// Enhanced mana data selector with percentage and status
+export const selectManaData = createSelector(
   [selectPlayerStats],
-  (stats) => {
-    const manaPercentage = stats.maxMana > 0
-      ? Math.min(100, Math.max(0, (stats.mana / stats.maxMana) * 100))
-      : 0;
+  (stats): PlayerManaData => {
+    const percentage = stats.maxMana > 0 ? stats.mana / stats.maxMana : 0;
     
     const getManaStatus = (percentage: number): 'critical' | 'low' | 'normal' | 'full' => {
-      if (percentage <= 15) return 'critical';
-      if (percentage <= 35) return 'low';
-      if (percentage < 100) return 'normal';
+      if (percentage <= 0.1) return 'critical';
+      if (percentage <= 0.25) return 'low';
+      if (percentage < 1.0) return 'normal';
       return 'full';
     };
 
     return {
       current: Math.max(0, stats.mana),
       max: Math.max(1, stats.maxMana),
-      percentage: manaPercentage,
-      status: getManaStatus(manaPercentage)
+      percentage: Math.min(1, Math.max(0, percentage)),
+      status: getManaStatus(percentage)
     };
   }
 );
 
-// Combat stats selector
-export const selectPlayerCombatStats = createSelector(
+/**
+ * Combat stats selector for grouped combat-related statistics
+ */
+export const selectCombatStats = createSelector(
   [selectPlayerStats],
-  (stats) => ({
-    attack: Math.max(0, stats.attack),
-    defense: Math.max(0, stats.defense),
-    speed: Math.max(0, stats.speed),
-    criticalChance: Math.min(1, Math.max(0, stats.criticalChance)),
-    criticalDamage: Math.max(1, stats.criticalDamage)
+  (stats): CombatStats => ({
+    attack: stats.attack,
+    defense: stats.defense,
+    speed: stats.speed,
+    criticalChance: stats.criticalChance,
+    criticalDamage: stats.criticalDamage
   })
 );
 
-// Performance stats selector
-export const selectPlayerPerformanceStats = createSelector(
+/**
+ * Performance stats selector for progression and advancement metrics
+ */
+export const selectPerformanceStats = createSelector(
   [selectPlayer],
-  (player) => {
-    // Calculate power level from attributes and stats
-    const attributeSum = Object.values(player.attributes || {}).reduce((sum, val) => sum + val, 0);
-    const powerLevel = attributeSum + (player.stats?.attack || 0) + (player.stats?.defense || 0);
-    
-    return {
-      totalPlaytime: player.totalPlaytime || 0,
-      powerLevel: Math.floor(powerLevel),
-      availableAttributePoints: player.availableAttributePoints || 0,
-      availableSkillPoints: player.availableSkillPoints || 0
-    };
-  }
+  (player): PerformanceStats => ({
+    totalPlaytime: player.totalPlaytime,
+    powerLevel: Math.floor(player.totalPlaytime / 3600000) + 1, // Basic power level calculation
+    availableAttributePoints: player.availableAttributePoints,
+    availableSkillPoints: player.availableSkillPoints
+  })
 );
 
-// Point allocation selectors
+// Additional selectors for feature integration
 export const selectAvailableAttributePoints = createSelector(
   [selectPlayer],
-  (player) => player.availableAttributePoints || 0
+  (player) => player.availableAttributePoints
 );
 
 export const selectAvailableSkillPoints = createSelector(
   [selectPlayer],
-  (player) => player.availableSkillPoints || 0
+  (player) => player.availableSkillPoints
 );
 
-// Player status selectors
+export const selectEquippedTraits = createSelector(
+  [selectPlayer],
+  (player) => player.equippedTraits
+);
+
+export const selectPermanentTraits = createSelector(
+  [selectPlayer],
+  (player) => player.permanentTraits
+);
+
+export const selectTraitSlots = createSelector(
+  [selectPlayer],
+  (player) => player.traitSlots
+);
+
 export const selectIsPlayerAlive = createSelector(
+  [selectPlayerStats],
+  (stats) => stats.health > 0
+);
+
+export const selectTotalPlaytime = createSelector(
   [selectPlayer],
-  (player) => player.isAlive !== false // Default to true if undefined
+  (player) => player.totalPlaytime
 );
 
-// Status effects by type (commented out until StatusEffect type is properly defined)
-// export const selectStatusEffectsByType = createSelector(
-//   [selectPlayerStatusEffects],
-//   (effects) => (type: string) => effects.filter(effect => effect.type === type)
-// );
-
-// Formatted display selectors
-export const selectFormattedPlaytime = createSelector(
-  [selectPlayer],
-  (player) => {
-    const totalSeconds = Math.floor((player.totalPlaytime || 0) / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes}m ${seconds}s`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds}s`;
-    } else {
-      return `${seconds}s`;
-    }
-  }
-);
-
-// Attribute by name selector with proper typing
-export const selectAttributeByName = createSelector(
-  [selectPlayerAttributes],
-  (attributes) => (attributeName: keyof PlayerAttributes) => attributes[attributeName] || 0
-);
-
-// Health status for UI coloring
-export const selectHealthStatus = createSelector(
-  [selectPlayerHealthData],
-  (healthData) => healthData.status
-);
-
-// Mana status for UI coloring
-export const selectManaStatus = createSelector(
-  [selectPlayerManaData],
-  (manaData) => manaData.status
-);
-
-// Computed stats selector (comprehensive stats for display)
-export const selectPlayerStatsData = createSelector(
-  [selectPlayerHealthData, selectPlayerManaData],
-  (healthData, manaData) => ({
-    healthPercentage: healthData.percentage,
-    manaPercentage: manaData.percentage,
-    healthStatus: healthData.status,
-    manaStatus: manaData.status
-  })
-);
+// Legacy selectors for backward compatibility
+export const selectPlayerHealthData = selectHealthData;
+export const selectPlayerManaData = selectManaData;

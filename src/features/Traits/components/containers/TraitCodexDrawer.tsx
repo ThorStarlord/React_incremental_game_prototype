@@ -47,7 +47,7 @@ import {
 } from '../../state/TraitsSlice';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
-import { selectEssenceAmount } from '../../../Essence/state/EssenceSelectors';
+import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 
 interface TraitCodexDrawerProps {
     open: boolean;
@@ -74,7 +74,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const playerEssence = useAppSelector(selectEssenceAmount);
+  const currentEssence = useAppSelector(selectCurrentEssence);
 
   useEffect(() => {
     if (open && Object.keys(allTraits).length === 0 && !isLoading) {
@@ -184,7 +184,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
           const isAcquired = acquiredTraitIds.includes(trait.id);
           const isPermanent = permanentTraitIds.includes(trait.id);
           const cost = trait.essenceCost || 0;
-          const canAfford = playerEssence >= cost;
+          const canAfford = currentEssence >= cost;
 
           return (
             <ListItem

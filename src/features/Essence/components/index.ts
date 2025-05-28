@@ -6,7 +6,7 @@
  */
 
 // UI Components
-export { default as EssenceDisplay } from './ui/EssenceDisplay';
+export { default as EssenceDisplayUI } from './ui/EssenceDisplayUI';
 export { default as ConfigurableEssenceButton } from './ui/ConfigurableEssenceButton';
 export { default as ManualEssenceButton } from './ui/ManualEssenceButton';
 export { EssenceGenerationTimer } from './ui/EssenceGenerationTimer';

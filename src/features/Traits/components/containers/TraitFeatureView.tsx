@@ -1,54 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../../app/hooks'; // Use typed hooks
+import React, { useEffect, useCallback, useMemo } from 'react';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { Grid } from '@mui/material';
 import TraitList from '../ui/TraitList';
 import TraitSlotsContainer from './TraitSlotsContainer';
 import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
 
-// Import from Redux store
-import { RootState } from '../../../../app/store';
-import { selectPlayerLevel, selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
-import { unlockTraitSlotThunk } from '../../../Player/state/PlayerThunks';
-import { selectEssenceAmount, spendEssence } from '../../../Essence/state/EssenceSlice';
-import {
-  fetchTraitsThunk,
-  makeTraitPermanentThunk // Keep if TraitSlots uses it
-} from '../../state/TraitThunks';
-import {
-  equipTrait,
-  unequipTrait,
-  selectTraits,
-  selectTraitSlots as selectTraitSliceSlots, // Alias to avoid naming conflict
-} from '../../state/TraitsSlice'; // Import actions and selectors from Traits slice
-// Import object selectors from the correct file
-import {
-  selectEquippedTraitObjects,
-  selectAvailableTraitObjects,
-  selectAcquiredTraitObjects // Need this for TraitList if it shows all acquired
-} from '../../state/TraitsSelectors';
-// Import Trait and TraitEffect types
-import { Trait, TraitSlot as StateTraitSlot, TraitEffect } from '../../state/TraitsTypes'; 
+// Import selectors and actions
+import { selectPlayer } from '../../../Player/state/PlayerSelectors';
+import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
+import { fetchTraitsThunk } from '../../state/TraitThunks';
+import { selectTraits } from '../../state/TraitsSlice';
+import { selectAcquiredTraitObjects } from '../../state/TraitsSelectors';
+import { TraitEffect } from '../../state/TraitsTypes';
 
 /**
- * TraitSystemWrapper Component (Renamed from TraitFeatureView)
+ * TraitSystemWrapper Component
  *
  * Manages the trait system UI, coordinating between trait list and trait slots components using Redux.
+ * Follows Feature-Sliced Design principles and React best practices.
  *
  * @returns {JSX.Element} The rendered component
  */
-const TraitSystemWrapper: React.FC = () => {
+const TraitSystemWrapper: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
 
-  // Get data from Redux store using selectors
-  const playerLevel = useAppSelector(selectPlayerLevel);
-  const allTraits = useAppSelector(selectTraits); // All defined traits
-  const acquiredTraitsObjects = useAppSelector(selectAcquiredTraitObjects); // Acquired Trait objects
-  const equippedTraitsObjects = useAppSelector(selectEquippedTraitObjects); // Equipped Trait objects
-  const availableTraitsObjects = useAppSelector(selectAvailableTraitObjects); // Available Trait objects
-  const traitSlotsData = useAppSelector(selectTraitSliceSlots); // TraitSlot[] from traits slice
-  const playerTraitSlotsCount = useAppSelector(selectPlayerTraitSlots); // Number of slots from player slice
-  const essence = useAppSelector(selectEssenceAmount);
-  const traitPoints = 0; // Placeholder
+  // Select required data from Redux store
+  const player = useAppSelector(selectPlayer);
+  const allTraits = useAppSelector(selectTraits);
+  const acquiredTraitsObjects = useAppSelector(selectAcquiredTraitObjects);
+  const currentEssence = useAppSelector(selectCurrentEssence);
 
   // Fetch traits if not already loaded
   useEffect(() => {
@@ -57,55 +37,51 @@ const TraitSystemWrapper: React.FC = () => {
     }
   }, [dispatch, allTraits]);
 
-  // --- Event Handlers ---
-  const handleEquipTrait = (traitId: string, slotIndex?: number): void => {
-    dispatch(equipTrait({ traitId, slotIndex }));
-  };
-
-  const handleUnequipTrait = (traitId: string): void => {
-    dispatch(unequipTrait(traitId));
-  };
-
-  const handleUpgradeSlot = (cost: number): void => {
-    if (essence >= cost) {
-        dispatch(unlockTraitSlotThunk(cost));
-    } else {
-        console.warn("Not enough essence to upgrade trait slot");
-    }
-  };
-
-  const handleTraitLevelUp = (traitId: string): void => {
+  // Memoized trait level up handler
+  const handleTraitLevelUp = useCallback((traitId: string): void => {
     console.log(`Level up requested for trait: ${traitId}`);
-  };
+    // TODO: Implement trait level up logic
+  }, []);
 
-  // --- Prepare Props for Child Components ---
+  // Format trait effects for display
+  const formatTraitEffects = useCallback((effects: unknown): string => {
+    if (Array.isArray(effects)) {
+      return effects
+        .map((e: TraitEffect) => `${e.type}: ${e.magnitude > 0 ? '+' : ''}${e.magnitude}`)
+        .join(', ');
+    }
+    
+    if (typeof effects === 'object' && effects !== null) {
+      return Object.entries(effects)
+        .map(([key, value]) => {
+          const formattedValue = typeof value === 'number' && value > 0 ? `+${value}` : String(value);
+          return `${key}: ${formattedValue}`;
+        })
+        .join(', ');
+    }
+    
+    return 'No effects';
+  }, []);
 
-  // Props for TraitList
-  const traitListProps = {
+  // Prepare props for TraitList component
+  const traitListProps = useMemo(() => ({
     traits: acquiredTraitsObjects.map(trait => ({
       id: trait.id,
       name: trait.name,
       level: trait.level || 1,
-      description: trait.description,
-      // Add type annotation for 'e' and type check for 'v'
-      effect: Array.isArray(trait.effects)
-        ? trait.effects.map((e: TraitEffect) => `${e.type}: ${e.magnitude > 0 ? '+' : ''}${e.magnitude}`).join(', ')
-        : typeof trait.effects === 'object'
-        ? Object.entries(trait.effects).map(([k, v]) => `${k}: ${typeof v === 'number' && v > 0 ? '+' : ''}${v}`).join(', ')
-        : 'No effects',
+      description: trait.description || '',
+      effect: formatTraitEffects(trait.effects),
       cost: trait.essenceCost || 0,
-      // Pass the category as 'type' for TraitList/TraitPanel if needed
-      type: trait.category 
+      type: trait.category || 'unknown'
     })),
     onTraitLevelUp: handleTraitLevelUp,
-    pointsAvailable: traitPoints,
-  };
+    pointsAvailable: 0, // TODO: Implement trait points system
+  }), [acquiredTraitsObjects, formatTraitEffects, handleTraitLevelUp]);
 
   return (
     <TraitSystemErrorBoundary>
       <Grid container spacing={2}>
         <Grid item xs={12} md={7}>
-          {/* Pass the correctly typed props */}
           <TraitList {...traitListProps} />
         </Grid>
         <Grid item xs={12} md={5}>
@@ -114,6 +90,8 @@ const TraitSystemWrapper: React.FC = () => {
       </Grid>
     </TraitSystemErrorBoundary>
   );
-};
+});
+
+TraitSystemWrapper.displayName = 'TraitSystemWrapper';
 
 export default TraitSystemWrapper;

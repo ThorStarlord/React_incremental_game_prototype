@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, LinearProgress, Box, Chip } from '@mui/material';
 import { Speed as SpeedIcon, Timer as TimerIcon } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectEssence } from '../../state/EssenceSelectors';
+import { selectEssenceState } from '../../state/EssenceSelectors';
 
 /**
  * EssenceGenerationTimer - Passive generation tracking component
@@ -11,7 +11,7 @@ import { selectEssence } from '../../state/EssenceSelectors';
  * and information about NPC connections contributing to generation.
  */
 export const EssenceGenerationTimer: React.FC = React.memo(() => {
-  const essenceState = useAppSelector(selectEssence);
+  const essenceState = useAppSelector(selectEssenceState);
   const generationRate = essenceState.generationRate || 0;
   const npcConnections = 0; // Placeholder until NPC connection tracking is implemented
   const [progress, setProgress] = useState(0);

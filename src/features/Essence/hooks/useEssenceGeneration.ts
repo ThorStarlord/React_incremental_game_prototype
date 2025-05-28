@@ -1,8 +1,8 @@
 import { useEffect, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
-import { gainEssence, setGenerationRate } from '../state/EssenceSlice'; 
+import { gainEssence, updateGenerationRate } from '../state/EssenceSlice'; 
 import { selectEquippedTraitIds } from '../../Traits/state/TraitsSelectors';
-import { selectEssence, selectGenerationRate } from '../state/EssenceSelectors';
+import { selectEssenceState, selectGenerationRate } from '../state/EssenceSelectors';
 
 /**
  * Custom hook to manage essence generation based on game state.
@@ -14,8 +14,8 @@ const useEssenceGeneration = () => {
   const dispatch = useAppDispatch();
   
   // Get essence state using selectors
-  const essence = useAppSelector(selectEssence);
-  const currentGenerationRate = useAppSelector(selectGenerationRate) as number;
+  const essence = useAppSelector(selectEssenceState);
+  const currentGenerationRate = useAppSelector(selectGenerationRate);
   
   // Get traits that might affect essence generation
   const equippedTraitIds = useAppSelector(selectEquippedTraitIds); 
@@ -46,13 +46,13 @@ const useEssenceGeneration = () => {
   useEffect(() => {
     const newRate = calculateTotalRate();
     if (Math.abs(newRate - currentGenerationRate) > 0.01) { // Avoid unnecessary updates
-      dispatch(setGenerationRate(newRate));
+      dispatch(updateGenerationRate(newRate));
     }
   }, [calculateTotalRate, currentGenerationRate, dispatch]);
 
   // Manual essence generation function
   const generateEssence = useCallback((amount: number) => {
-    dispatch(gainEssence(amount));
+    dispatch(gainEssence({ amount, source: 'manual_generation' }));
   }, [dispatch]);
 
   // Return generation utilities
@@ -66,14 +66,14 @@ const useEssenceGeneration = () => {
 // Auto-generation hook for passive essence gain
 export const useAutoGenerateEssence = () => {
   const dispatch = useAppDispatch();
-  const generationRate = useAppSelector(selectGenerationRate) as number;
+  const generationRate = useAppSelector(selectGenerationRate);
   
   useEffect(() => {
     if (generationRate <= 0) return;
     
     const intervalId = setInterval(() => {
       // Generate essence based on per-second rate
-      dispatch(gainEssence(generationRate));
+      dispatch(gainEssence({ amount: generationRate, source: 'passive_generation' }));
     }, 1000); // Generate every second
     
     return () => clearInterval(intervalId);

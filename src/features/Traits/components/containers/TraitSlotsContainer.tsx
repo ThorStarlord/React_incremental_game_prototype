@@ -2,17 +2,17 @@ import React, { useState, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectTraits, selectTraitSlots, selectEquippedTraitIds, selectPermanentTraits, equipTrait, unequipTrait } from '../../state/TraitsSlice';
 import { makeTraitPermanentThunk } from '../../state/TraitThunks';
-import { selectEssenceAmount } from '../../../Essence/state/EssenceSelectors';
+import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { selectAvailableTraitObjects, selectTraitLoading, selectTraitError } from '../../state/TraitsSelectors';
 import TraitSlots from '../ui/TraitSlots';
 
 const TraitSlotsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const traitsData = useAppSelector(selectTraits);
-  const slots = useAppSelector(selectTraitSlots);
+  const traitSlots = useAppSelector(selectTraitSlots);
   const equippedTraitIds = useAppSelector(selectEquippedTraitIds);
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
-  const essence = useAppSelector(selectEssenceAmount);
+  const essence = useAppSelector(selectCurrentEssence);
   const availableTraits = useAppSelector(selectAvailableTraitObjects);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
@@ -30,9 +30,9 @@ const TraitSlotsContainer: React.FC = () => {
   const onSelectTrait = useCallback((traitId: string) => setSelectedTraitId(traitId), []);
 
   const onConfirmAssign = useCallback(() => { 
-    if (selectedTraitId && activeSlotId) dispatch(equipTrait({ traitId: selectedTraitId, slotIndex: slots.find(s => s.id === activeSlotId)!.index }));
+    if (selectedTraitId && activeSlotId) dispatch(equipTrait({ traitId: selectedTraitId, slotIndex: traitSlots.find(s => s.id === activeSlotId)!.index }));
     onCloseSelector();
-  }, [selectedTraitId, activeSlotId, dispatch, onCloseSelector, slots]);
+  }, [selectedTraitId, activeSlotId, dispatch, onCloseSelector, traitSlots]);
 
   const onRemove = useCallback((id: string) => dispatch(unequipTrait(id)), [dispatch]);
 
@@ -54,10 +54,10 @@ const TraitSlotsContainer: React.FC = () => {
 
   const eligibleTraits = availableTraits.filter(t => !equippedTraitIds.includes(t.id));
 
-  if (isLoading) return <TraitSlots slots={slots} traitsData={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading error={null} showSelector={false} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
-  if (error) return <TraitSlots slots={slots} traitsData={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading={false} error={error} showSelector={false} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
+  if (isLoading) return <TraitSlots traitSlots={traitSlots} allTraits={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading={true} error={null} showSelector={false} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
+  if (error) return <TraitSlots traitSlots={traitSlots} allTraits={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading={false} error={error} showSelector={false} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
 
-  return <TraitSlots slots={slots} traitsData={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading={false} error={null} showSelector={showSelector} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
+  return <TraitSlots traitSlots={traitSlots} allTraits={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading={false} error={null} showSelector={showSelector} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
 };
 
 export default TraitSlotsContainer;

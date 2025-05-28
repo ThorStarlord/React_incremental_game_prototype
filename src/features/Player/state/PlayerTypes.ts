@@ -1,9 +1,35 @@
 import type { Trait } from '../../Traits';
 
 /**
- * Core player statistics interface
+ * Player statistics interface - represents computed player stats
+ * Includes base stats modified by attributes, traits, and status effects
  */
 export interface PlayerStats {
+  // Core vital statistics
+  health: number;
+  maxHealth: number;
+  mana: number;
+  maxMana: number;
+  
+  // Combat statistics
+  attack: number;
+  defense: number;
+  speed: number;
+  
+  // Regeneration statistics
+  healthRegen: number;        // Health regeneration per second
+  manaRegen: number;          // Mana regeneration per second
+  
+  // Advanced combat statistics
+  criticalChance: number;     // 0.0 to 1.0 (percentage as decimal)
+  criticalDamage: number;     // Multiplier (1.0 = 100%, 2.0 = 200%)
+}
+
+/**
+ * Player base stats interface - stored values before calculations
+ * These are the raw values stored in Redux state
+ */
+export interface PlayerBaseStats {
   health: number;
   maxHealth: number;
   mana: number;
@@ -11,10 +37,10 @@ export interface PlayerStats {
   attack: number;
   defense: number;
   speed: number;
-  healthRegeneration: number;
-  manaRegeneration: number;
-  criticalChance: number;  // 0.0 to 1.0
-  criticalDamage: number;  // multiplier (1.5 = 150%)
+  healthRegen: number;        // Consistent with PlayerStats
+  manaRegen: number;          // Consistent with PlayerStats
+  criticalChance: number;
+  criticalDamage: number;
 }
 
 /**
@@ -39,6 +65,8 @@ export interface StatusEffect {
   duration: number; // in milliseconds, -1 for permanent
   effects: Partial<PlayerStats>; // stat modifications
   startTime: number; // timestamp when effect was applied
+  type?: string; // effect type (buff, debuff, neutral)
+  category?: string; // effect category (combat, social, magical, etc.)
 }
 
 /**

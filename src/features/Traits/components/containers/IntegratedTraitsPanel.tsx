@@ -30,7 +30,7 @@ import {
   selectPermanentTraitObjects,
   selectAvailableTraitObjects
 } from '../../state/TraitsSelectors';
-import { selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
+import { selectTraitSlots } from '../../../Player/state/PlayerSelectors';
 import { Trait } from '../../state/TraitsTypes';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import AvailableTraitList from './AvailableTraitList';
@@ -67,14 +67,16 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   const allTraitsData = useAppSelector(selectTraits);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const totalSlots = useAppSelector(selectPlayerTraitSlots);
+  
+  // Fix selector usage to work with TraitSlot[] array
+  const traitSlots = useAppSelector(selectTraitSlots);
+  const totalSlots = traitSlots.length;
+  const usedSlots = traitSlots.filter(slot => slot.traitId !== null).length;
 
   // Use selectors that return full trait objects
   const equippedTraits = useAppSelector(selectEquippedTraitObjects);
   const permanentTraits = useAppSelector(selectPermanentTraitObjects);
   const availableTraits = useAppSelector(selectAvailableTraitObjects);
-
-  const usedSlots = equippedTraits.length;
 
   useEffect(() => {
     dispatch(fetchTraitsThunk());

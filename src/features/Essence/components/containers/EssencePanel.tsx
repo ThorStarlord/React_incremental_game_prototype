@@ -8,8 +8,8 @@
 import React, { useCallback } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectEssence } from '../../state/EssenceSelectors';
-import EssenceDisplay from '../ui/EssenceDisplay';
+import { selectEssenceState } from '../../state/EssenceSelectors';
+import EssenceDisplayUI from '../ui/EssenceDisplayUI';
 import ConfigurableEssenceButton from '../ui/ConfigurableEssenceButton';
 import EssenceGenerationTimer from './EssenceGenerationTimer';
 
@@ -35,7 +35,7 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
   showTimer = true
 }) => {
   // Get data from Redux store using the correct selector
-  const essenceState = useAppSelector(selectEssence);
+  const essenceState = useAppSelector(selectEssenceState);
   const essenceAmount = essenceState.amount;
   const totalCollected = essenceState.totalCollected || 0;
   const maxEssence = 1000; // Default max since maxAmount doesn't exist in state
@@ -50,7 +50,7 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
       <Typography variant="h6" gutterBottom>{title}</Typography>
       
       {/* Display current essence and max */}
-      <EssenceDisplay 
+      <EssenceDisplayUI 
         currentEssence={essenceAmount}
         maxEssence={maxEssence}
         essenceRate={generationRate}

@@ -159,7 +159,7 @@ export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
               <Grid item xs={6}>
                 <StatDisplay
                   label="Health Regeneration"
-                  value={stats.healthRegeneration}
+                  value={stats.healthRegen}
                   unit="/sec"
                   color="success"
                 />
@@ -167,7 +167,7 @@ export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
               <Grid item xs={6}>
                 <StatDisplay
                   label="Mana Regeneration"
-                  value={stats.manaRegeneration}
+                  value={stats.manaRegen}
                   unit="/sec"
                   color="info"
                 />
