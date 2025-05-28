@@ -62,7 +62,7 @@ const EssencePage: React.FC = () => {
               </Box>
               
               <Typography variant="h3" color="secondary" gutterBottom>
-                {formatNumber(essence.current)}
+                {formatNumber(essence.currentEssence)}
               </Typography>
               
               <Typography variant="body2" color="text.secondary">

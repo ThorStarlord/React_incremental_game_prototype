@@ -36,7 +36,7 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
 }) => {
   // Get data from Redux store using the correct selector
   const essenceState = useAppSelector(selectEssenceState);
-  const essenceAmount = essenceState.amount;
+  const essenceAmount = essenceState.currentEssence; // Changed to use the correct property name
   const totalCollected = essenceState.totalCollected || 0;
   const maxEssence = 1000; // Default max since maxAmount doesn't exist in state
   const generationRate = essenceState.generationRate || 1;

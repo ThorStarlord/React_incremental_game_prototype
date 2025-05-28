@@ -54,10 +54,43 @@ const TraitSlotsContainer: React.FC = () => {
 
   const eligibleTraits = availableTraits.filter(t => !equippedTraitIds.includes(t.id));
 
-  if (isLoading) return <TraitSlots traitSlots={traitSlots} allTraits={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading={true} error={null} showSelector={false} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
-  if (error) return <TraitSlots traitSlots={traitSlots} allTraits={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading={false} error={error} showSelector={false} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
+  // Transform equipped trait IDs to trait objects for the component
+  const equippedTraits = equippedTraitIds
+    .map(id => traitsData[id])
+    .filter(Boolean); // Remove any undefined traits
 
-  return <TraitSlots traitSlots={traitSlots} allTraits={traitsData} equippedTraitIds={equippedTraitIds} permanentTraitIds={permanentTraitIds} essence={essence} eligibleTraits={eligibleTraits} isLoading={false} error={null} showSelector={showSelector} confirmPermanent={confirmPermanent} notification={notification} onOpenSelector={onOpenSelector} onCloseSelector={onCloseSelector} onSelectTrait={onSelectTrait} onConfirmAssign={onConfirmAssign} onRemove={onRemove} onMakePermanent={onMakePermanent} onConfirmPermanent={onConfirmPermanent} onCancelPermanent={onCancelPermanent} onCloseNotification={onCloseNotification} selectedTraitId={selectedTraitId}/>;
+  // Create props object matching the actual TraitSlotsProps interface
+  const traitSlotsProps = {
+    traitSlots,
+    equippedTraits, // Component expects equippedTraits, not equippedTraitIds
+    availableTraits: eligibleTraits, // Component expects availableTraits, not eligibleTraits
+    permanentTraitIds,
+    essence,
+    showSelector,
+    confirmPermanent,
+    notification,
+    selectedTraitId,
+    onOpenSelector,
+    onCloseSelector,
+    onSelectTrait,
+    onEquipTrait: onConfirmAssign, // Component expects onEquipTrait, not onConfirmAssign
+    onUnequipTrait: onRemove, // Component expects onUnequipTrait, not onRemove
+    onMakePermanent,
+    onConfirmPermanent,
+    onCancelPermanent,
+    onCloseNotification
+  };
+
+  // Handle loading and error states before rendering TraitSlots
+  if (isLoading) {
+    return <TraitSlots {...traitSlotsProps} />;
+  }
+  
+  if (error) {
+    return <TraitSlots {...traitSlotsProps} />;
+  }
+
+  return <TraitSlots {...traitSlotsProps} />;
 };
 
 export default TraitSlotsContainer;

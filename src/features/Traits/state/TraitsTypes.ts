@@ -66,6 +66,9 @@ export interface Trait {
 
   /** Level of the trait if traits can be leveled up (optional) */
   level?: number;
+
+  /** Cost in permanence to acquire the trait (optional) */
+  permanenceCost?: number; // Cost in Essence to make this trait permanent
 }
 
 /**

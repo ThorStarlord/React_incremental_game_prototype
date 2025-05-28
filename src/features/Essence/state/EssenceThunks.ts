@@ -22,7 +22,7 @@ export const generateEssence = createAsyncThunk<number, void, { state: RootState
     const rate = getState().essence.generationRate ?? 0;
     const amount = Math.floor(rate);
     if (amount > 0) {
-      dispatch(gainEssence(amount));
+      dispatch(gainEssence({amount}));
     }
     return amount;
   }
