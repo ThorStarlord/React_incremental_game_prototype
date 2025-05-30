@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import { NotificationLog } from '../../features/Notifications/components/ui/NotificationLog';
-import { SystemMessages } from '../../shared/components/ui/SystemMessages';
+// import { NotificationLog } from '../../features/Notifications/components/ui/NotificationLog'; // Commented out
+// import { SystemMessages } from '../../shared/components/ui/SystemMessages'; // Commented out
 import { ContextualRightContent } from './ContextualRightContent';
 
 /**
@@ -22,8 +22,8 @@ export const RightColumnLayout: React.FC = () => {
       }}
     >
       {/* Static/Persistent Components */}
-      <NotificationLog />
-      <SystemMessages />
+      {/* <NotificationLog /> */}
+      {/* <SystemMessages /> */}
       
       {/* Contextual Content Based on Game State */}
       <ContextualRightContent />

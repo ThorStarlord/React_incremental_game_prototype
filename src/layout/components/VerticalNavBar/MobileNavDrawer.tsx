@@ -14,8 +14,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import type { TabId } from '../../types/NavigationTypes';
-import type { NavItem } from '../../constants/navigationConfig';
+import type { TabId, NavItem } from '../../types/NavigationTypes'; // Corrected import for NavItem
 import { NAVIGATION_SECTIONS } from '../../constants/navigationConfig';
 
 interface MobileNavDrawerProps {

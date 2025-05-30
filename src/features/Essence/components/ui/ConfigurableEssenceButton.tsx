@@ -55,7 +55,7 @@ const EssenceButton: React.FC<EssenceButtonProps> = ({
     if (isOnCooldown) return;
     
     // Dispatch gainEssence action with just the amount (number)
-    dispatch(gainEssence(amount));
+    dispatch(gainEssence({ amount, description: 'Manual Click' }));
     
     // Start cooldown
     setIsOnCooldown(true);

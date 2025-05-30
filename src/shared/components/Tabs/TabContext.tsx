@@ -1,14 +1,8 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useNestedTabs } from '../../hooks/useNestedTabs';
 import { 
-  createPrimaryNavigationTabs,
-  createTraitSystemTabs,
-  createEssenceSystemTabs,
-  createNPCSystemTabs,
-  createCopySystemTabs,
-  createQuestSystemTabs,
-  createSettingsTabs,
-} from './TabUtils';
+  gameTabConfigs // Changed to import gameTabConfigs
+} from './tabUtils'; // Corrected casing
 import { TabConfig } from './StandardTabs';
 
 interface TabContextValue {
@@ -59,26 +53,33 @@ export const TabProvider: React.FC<TabProviderProps> = ({
   customSecondaryTabsMap,
 }) => {
   // Default tab configurations
-  const defaultPrimaryTabs = customPrimaryTabs || createPrimaryNavigationTabs();
+  const defaultPrimaryTabs = customPrimaryTabs || gameTabConfigs.mainNavigationTabs; // Use gameTabConfigs
   
   const defaultSecondaryTabsMap = customSecondaryTabsMap || {
-    game: [
+    game: [ // This 'game' key might need to align with a TabId from mainNavigationTabs if used as primary key
       { id: 'overview', label: 'Overview' },
       { id: 'world', label: 'World' },
       { id: 'combat', label: 'Combat' },
     ],
-    traits: createTraitSystemTabs(),
-    essence: createEssenceSystemTabs(),
-    npcs: createNPCSystemTabs(),
-    copies: createCopySystemTabs(),
-    quests: createQuestSystemTabs(),
-    settings: createSettingsTabs(),
+    traits: gameTabConfigs.traitTabs, // Use gameTabConfigs
+    essence: gameTabConfigs.essenceTabs, // Use gameTabConfigs
+    npcs: gameTabConfigs.npcTabs, // Use gameTabConfigs
+    copies: gameTabConfigs.copyTabs, // Use gameTabConfigs
+    quests: gameTabConfigs.questTabs, // Use gameTabConfigs
+    settings: gameTabConfigs.settingsTabs, // Use gameTabConfigs
+    // Add other primary tab IDs here if they have secondary tabs
+    player: gameTabConfigs.playerTabs, // Example if 'player' is a primary tab
+    'save-load': gameTabConfigs.saveLoadTabs // Example for save-load
   };
 
   const defaultSecondaryTabs = Object.keys(defaultSecondaryTabsMap).reduce(
-    (acc, key) => {
-      const tabs = defaultSecondaryTabsMap[key];
-      acc[key] = tabs.find(tab => !tab.disabled)?.id || tabs[0]?.id || '';
+    (acc, key: string) => { // Added type for key
+      const tabs: TabConfig[] | undefined = defaultSecondaryTabsMap[key as keyof typeof defaultSecondaryTabsMap]; // Type assertion
+      if (tabs && tabs.length > 0) {
+        acc[key] = tabs.find(tab => !tab.disabled)?.id || tabs[0]?.id || '';
+      } else {
+        acc[key] = ''; // Handle cases where tabs might be undefined or empty
+      }
       return acc;
     },
     {} as Record<string, string>

@@ -68,8 +68,8 @@ interface PlayerStats {
   speed: number;
   
   // Regeneration rates (per second)
-  healthRegeneration: number;
-  manaRegeneration: number;
+  healthRegen: number;        // Consistent with PlayerStats in code
+  manaRegen: number;          // Consistent with PlayerStats in code
   
   // Advanced combat
   criticalChance: number;  // 0.0 to 1.0
@@ -98,6 +98,8 @@ interface StatusEffect {
   duration: number;              // Duration in milliseconds (-1 = permanent)
   effects: Partial<PlayerStats>; // Stat modifications
   startTime: number;             // Application timestamp
+  type?: string;                 // New in code: optional effect type (buff, debuff, neutral)
+  category?: string;             // New in code: optional effect category (combat, social, magical, etc.)
 }
 ```
 
@@ -112,6 +114,26 @@ interface TraitSlot {
 }
 ```
 
+### 3.6. Player Base Statistics
+This interface represents the raw base statistics for the player, before any modifiers from attributes, traits, or status effects are applied. These are typically the values stored directly in the Redux state.
+**Location**: `src/features/Player/state/PlayerTypes.ts` (implicitly, as it's defined there)
+
+```typescript
+interface PlayerBaseStats {
+  health: number;
+  maxHealth: number;
+  mana: number;
+  maxMana: number;
+  attack: number;
+  defense: number;
+  speed: number;
+  healthRegen: number;
+  manaRegen: number;
+  criticalChance: number;
+  criticalDamage: number;
+}
+```
+
 ## 4. Trait Data Model ✅ IMPLEMENTED
 
 ### 4.1. Trait Definition
@@ -122,48 +144,51 @@ interface Trait {
   id: string;              // Unique trait identifier
   name: string;            // Display name
   description: string;     // Detailed description
-  category: TraitCategory; // Grouping category
-  rarity: TraitRarity;     // Trait rarity level
-  effects: TraitEffect[];  // Stat modifications
-  requirements?: TraitRequirement[]; // Acquisition requirements
-  essenceCost: number;     // Acquisition cost
-  permanenceCost: number;  // Cost to make permanent
-  isDiscovered: boolean;   // Player knowledge state
+  category: string;        // Grouping category (code uses string)
+  rarity: string;          // Trait rarity level (code uses string)
+  effects: TraitEffect[] | TraitEffectValues;  // Stat modifications (updated type)
+  requirements?: Record<string, any>; // Acquisition requirements (simplified to match general object structure)
+  essenceCost?: number;    // Acquisition cost (optional in code)
+  permanenceCost?: number; // Cost to make permanent (optional in code)
+  // isDiscovered is handled in TraitsState.discoveredTraits in code
   source?: string;         // Acquisition source (NPC ID, quest, etc.)
+  tier?: number;           // New optional in code
+  iconPath?: string;       // New optional in code
+  level?: number;          // New optional in code
 }
 ```
 
-### 4.2. Trait Categories
-```typescript
-enum TraitCategory {
-  COMBAT = 'combat',       // Combat effectiveness
-  PHYSICAL = 'physical',   // Physical capabilities
-  SOCIAL = 'social',       // Social interactions
-  MENTAL = 'mental',       // Mental attributes
-  MYSTICAL = 'mystical',   // Magical/essence abilities
-  UTILITY = 'utility'      // General utility effects
-}
-```
+### 4.2. Trait Categories and Rarity
+In the codebase (`TraitsTypes.ts`), `category` and `rarity` are represented as `string` types on the `Trait` interface, rather than enums. The specific string values (e.g., 'combat', 'common') would be defined by convention or loaded data.
 
-### 4.3. Trait Rarity
-```typescript
-enum TraitRarity {
-  COMMON = 'common',       // Basic traits, low cost
-  UNCOMMON = 'uncommon',   // Moderate effects, moderate cost
-  RARE = 'rare',           // Strong effects, high cost
-  EPIC = 'epic',           // Very strong effects, very high cost
-  LEGENDARY = 'legendary'  // Unique effects, extreme cost
-}
-```
-
-### 4.4. Trait Effects
+### 4.3. Trait Effects
 ```typescript
 interface TraitEffect {
-  type: 'stat_modifier' | 'ability_grant' | 'passive_effect';
-  target: string;          // Affected stat or system
-  value: number;           // Effect magnitude
+  type: string;            // Type of effect (e.g., "STAT_MODIFIER", "ABILITY_GRANT")
+  magnitude: number;       // Effect magnitude
   duration?: number;       // Effect duration (permanent if omitted)
-  conditions?: string[];   // Activation conditions
+  description?: string;    // Optional description of the specific effect instance
+}
+```
+
+### 4.4. Trait Effect Values
+This interface is used when trait effects are stored as a simple key-value map of effect names to their magnitudes, as an alternative to an array of `TraitEffect` objects.
+```typescript
+interface TraitEffectValues {
+  [effectName: string]: number;
+}
+```
+
+### 4.5. Trait Preset
+Defines a saved loadout or configuration of traits.
+**Location**: `src/features/Traits/state/TraitsTypes.ts`
+```typescript
+interface TraitPreset {
+  id: string;                // Unique identifier for this preset
+  name: string;              // Name of this preset
+  traits: string[];          // Array of trait IDs in this preset
+  description?: string;    // Optional description
+  created: number;           // Created timestamp
 }
 ```
 
@@ -174,68 +199,203 @@ interface TraitEffect {
 
 ```typescript
 interface NPC {
-  id: string;              // Unique NPC identifier
-  name: string;            // Display name
-  description: string;     // Character description
-  location: string;        // Current location
-  avatar?: string;         // Character image/avatar
-  personality: NPCPersonality; // Behavioral traits
-  availableTraits: string[]; // Traits player can acquire
-  sharedTraitSlots: number; // Slots for player trait sharing
-  baseRelationship: number; // Starting relationship value
-  maxRelationship: number;  // Maximum achievable relationship
-  isOnline: boolean;       // Availability status
-  lastInteraction?: number; // Last interaction timestamp
+  // Basic identification and presentation
+  id: string;
+  name: string;
+  description?: string; // Optional in code
+  location: string;
+  avatar?: string;
+  faction?: string;     // New optional in code
+  
+  // Relationship and connection data
+  relationshipValue: number; // New in code
+  connectionDepth: number;   // New in code
+  loyalty: number;           // New in code
+  
+  // Interaction tracking
+  availableDialogues: string[]; // New in code
+  completedDialogues: string[]; // New in code
+  availableQuests: string[];    // New in code
+  completedQuests: string[];    // New in code
+  
+  // Trait system integration
+  traits?: Record<string, NPCTraitInfo>; // New optional in code, uses NPCTraitInfo
+  teachableTraits: string[];            // New in code
+  sharedTraitSlots?: NPCSharedTraitSlot[]; // New optional in code, array of NPCSharedTraitSlot
+  
+  // Commerce and services (placeholders in code)
+  inventory?: NPCInventory;   // New optional in code
+  services?: NPCService[];    // New optional in code
+  
+  // Behavioral characteristics (placeholders in code)
+  personality?: NPCPersonality; // Optional in code
+  schedule?: NPCSchedule;     // New optional in code
+  
+  // State management
+  status: NPCStatus;            // New in code, uses NPCStatus type
+  lastInteraction?: number;     // Matches
+  isDiscovered?: boolean;       // New optional in code
+  isAvailable?: boolean;        // New optional in code
+  discoveredAt: number;         // New in code: Timestamp when NPC was first discovered
 }
 ```
 
-### 5.2. NPC Personality
+### 5.2. NPC Status
+This type defines the possible statuses for an NPC.
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
 ```typescript
-interface NPCPersonality {
-  openness: number;        // 0-100, affects trait sharing willingness
-  friendliness: number;    // 0-100, affects relationship gain rate
-  trustfulness: number;    // 0-100, affects unlock thresholds
-  interests: string[];     // Topics/traits of interest
-  dislikes: string[];      // Topics/traits to avoid
+type NPCStatus = 
+  | 'available'
+  | 'busy' 
+  | 'traveling'
+  | 'sleeping'
+  | 'hostile'
+  | 'dead'
+  | 'unknown';
+```
+
+### 5.3. NPC Trait Information
+Trait information specific to NPCs, including acquisition requirements.
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
+```typescript
+interface NPCTraitInfo {
+  id: string;
+  name?: string;
+  description?: string;
+  category: 'physical' | 'combat' | 'social';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
+  effects: Record<string, number>;
+  requirements: {
+    relationshipLevel: number;
+  };
+  essenceCost?: number;
+  prerequisites?: string[];
+  isVisible?: boolean;
+  discovered: boolean;
+  cost: number;
+  relationshipRequirement?: number;
 }
 ```
 
-### 5.3. Relationship Data
+### 5.4. NPC Shared Trait Slot
+Defines a slot where the player can share traits with an NPC.
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
 ```typescript
-interface NPCRelationship {
-  npcId: string;           // Target NPC identifier
-  currentValue: number;    // Current relationship level (0-100)
-  maxValue: number;        // Maximum achievable relationship
-  interactionCount: number; // Total interactions
-  lastInteraction: number; // Last interaction timestamp
-  relationshipHistory: RelationshipChangeEntry[]; // Change log
+interface NPCSharedTraitSlot {
+  id: string;
+  index: number;
+  traitId?: string | null;
+  isUnlocked: boolean;
+  unlockRequirement?: number;
 }
 ```
 
-### 5.4. Interaction Data
+### 5.5. NPC Personality (Placeholder in Code)
+The current `NPCPersonality` in `NPCTypes.ts` is a placeholder. The specification's original version was more detailed. For now, reflecting the code:
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
 ```typescript
-interface NPCInteraction {
-  id: string;              // Unique interaction identifier
-  npcId: string;           // Target NPC
-  type: InteractionType;   // Interaction category
-  timestamp: number;       // When interaction occurred
-  outcome: InteractionOutcome; // Interaction result
-  relationshipChange: number; // Relationship effect
-  essenceGained: number;   // Essence reward
-  itemsGained?: string[];  // Item rewards
-  traitsUnlocked?: string[]; // Trait unlock rewards
+interface NPCPersonality { // Placeholder structure from code
+  traits: string[];
+  preferences: Record<string, number>;
+  dislikes: Record<string, number>;
+}
+```
+*(Note: The original DataModel.md had a more detailed NPCPersonality. This will need to be reconciled during feature development.)*
+
+### 5.6. Relationship Data
+In the codebase, direct relationship metrics like `relationshipValue` are stored on the `NPC` object itself. A history of changes is maintained via `RelationshipChangeEntry`. The `NPCRelationship` object from the original spec is not directly used.
+
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
+```typescript
+interface RelationshipChangeEntry {
+  id: string;
+  npcId: string;
+  timestamp: number;
+  oldValue: number;
+  newValue: number;
+  reason: string;
 }
 ```
 
-### 5.5. Interaction Types
+### 5.7. Interaction System
+The interaction system in code has several parts:
+- `InteractionType`: Defines types of interactions.
+- `NPCInteraction`: Represents the current, active interaction session.
+- `InteractionResult`: The outcome of an interaction.
+- `DialogueEntry`: For logging dialogue.
+
+**InteractionType (Code uses a type alias)**
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
 ```typescript
-enum InteractionType {
-  DIALOGUE = 'dialogue',     // Conversation
-  GIFT = 'gift',             // Item giving
-  TRADE = 'trade',           // Commerce
-  QUEST = 'quest',           // Quest completion
-  TRAIT_SHARE = 'trait_share', // Trait sharing
-  SEDUCTION = 'seduction'    // Copy creation attempt
+type InteractionType = 
+  | 'dialogue'
+  | 'trade'
+  | 'quest'
+  | 'trait_sharing'
+  | 'gift'
+  | 'challenge';
+```
+
+**Current Interaction Session (NPCInteraction in code)**
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
+```typescript
+interface NPCInteraction { // Represents current interaction session
+  npcId: string;
+  startTime: number;
+  type: InteractionType;
+  context?: Record<string, any>;
+}
+```
+
+**Interaction Result**
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
+```typescript
+interface InteractionResult {
+  success: boolean;
+  relationshipChange?: number;
+  essenceGained?: number;
+  unlockRewards?: string[];
+  message?: string;
+  rewards?: string[];
+}
+```
+
+**Dialogue Entry**
+**Location**: `src/features/NPCs/state/NPCTypes.ts`
+```typescript
+interface DialogueEntry {
+  id: string;
+  npcId: string;
+  timestamp: number;
+  playerText: string;
+  npcResponse: string;
+  relationshipChange?: number;
+}
+```
+
+### 5.8. Placeholder NPC Data Structures (from NPCTypes.ts)
+The following are defined in code, often as placeholders for future systems.
+```typescript
+interface NPCInventory {
+  items: any[]; // Placeholder
+  currency: number;
+}
+
+interface NPCService {
+  id: string;
+  name: string;
+  description: string;
+  basePrice: number;
+  currentPrice: number;
+  isAvailable: boolean;
+}
+
+interface NPCSchedule {
+  [timeSlot: string]: {
+    location: string;
+    availability: boolean;
+    activities: string[];
+  };
 }
 ```
 
@@ -246,28 +406,18 @@ enum InteractionType {
 
 ```typescript
 interface EssenceState {
-  currentAmount: number;     // Current essence available
+  currentEssence: number;     // Current essence available (renamed from currentAmount)
   totalCollected: number;   // Lifetime essence collection
-  generationRate: number;   // Essence per second from connections
-  perClickAmount: number;   // Manual generation amount
-  lastGeneration: number;   // Last generation timestamp
-  connections: EssenceConnection[]; // Active generation sources
+  generationRate: number;   // Essence per second
+  perClickValue: number;    // Manual generation amount (renamed from perClickAmount)
+  lastGenerationTime: number; // Last generation timestamp (renamed from lastGeneration)
+  isGenerating: boolean;    // New in code: Tracks if passive generation is active
+  loading: boolean;         // New in code: Loading state for async operations
+  error: string | null;     // New in code: Error message if any
+  // 'connections: EssenceConnection[]' was removed as it's not in the code's EssenceState
 }
 ```
-
-### 6.2. Essence Connections
-```typescript
-interface EssenceConnection {
-  id: string;                // Unique connection identifier
-  sourceId: string;          // NPC or entity ID
-  sourceType: 'npc' | 'copy' | 'location'; // Source category
-  connectionDepth: number;   // Relationship strength (0-100)
-  baseGenerationRate: number; // Base essence per second
-  multipliers: number[];     // Active multiplier effects
-  isActive: boolean;         // Whether currently generating
-  establishedAt: number;     // Connection creation timestamp
-}
-```
+*(Note: The `EssenceConnection` interface and its usage within `EssenceState` have been removed from this section of the DataModel.md as they are not present in the current `EssenceTypes.ts`. If connection-specific data is managed elsewhere, that should be documented in the relevant section, e.g., NPC or a dedicated Connection/Relationship model.)*
 
 ## 7. Game Loop Data Model ✅ IMPLEMENTED
 
@@ -278,15 +428,17 @@ interface EssenceConnection {
 interface GameLoopState {
   isRunning: boolean;        // Game loop active status
   isPaused: boolean;         // Temporary pause state
-  gameSpeed: number;         // Speed multiplier (0.1x to 5.0x)
   currentTick: number;       // Current game tick
-  totalGameTime: number;     // Total elapsed time (milliseconds)
   tickRate: number;          // Ticks per second (default: 10)
-  autoSaveInterval: number;  // Auto-save frequency (seconds)
+  lastUpdateTime: number;    // New in code: Timestamp of the last update
+  totalGameTime: number;     // Total elapsed time (milliseconds)
+  gameSpeed: number;         // Speed multiplier (0.1x to 5.0x)
+  autoSaveInterval: number;  // Auto-save frequency (in milliseconds in code)
   lastAutoSave: number;      // Last auto-save timestamp
-  deltaTime: number;         // Time since last tick
+  // deltaTime is part of tick processing data, not stored state.
 }
 ```
+*(Note: `deltaTime` was removed from `GameLoopState` as it's typically calculated per tick and not stored state. The code defines a separate `TickData` interface for such transient data.)*
 
 ## 8. Settings Data Model ✅ IMPLEMENTED
 
@@ -308,26 +460,34 @@ interface AudioSettings {
   masterVolume: number;      // 0-100
   musicVolume: number;       // 0-100
   effectsVolume: number;     // 0-100
+  ambientVolume: number;     // New in code
+  dialogueVolume: number;    // New in code
   muteWhenInactive: boolean;
 }
 
 interface GraphicsSettings {
   quality: 'low' | 'medium' | 'high' | 'ultra';
   particleEffects: boolean;
+  animations: boolean;       // New in code
+  showFPS: boolean;          // New in code
   darkMode: boolean;
 }
 
 interface GameplaySettings {
   difficulty: 'easy' | 'normal' | 'hard' | 'expert';
-  autosaveInterval: number;  // minutes (1-60)
+  autosaveInterval: number;  // Interval in minutes (code comment)
   autosaveEnabled: boolean;
   showTutorials: boolean;
+  combatSpeed: number;       // New in code
+  notificationDuration: number; // Duration in seconds (code comment)
 }
 
 interface UISettings {
   fontSize: 'small' | 'medium' | 'large';
-  theme: string;
+  theme: string;             // Theme identifier (e.g., 'dark', 'light', 'blue')
   showResourceNotifications: boolean;
+  showLevelUpAnimations: boolean; // New in code
+  compactInventory: boolean;    // New in code
 }
 ```
 

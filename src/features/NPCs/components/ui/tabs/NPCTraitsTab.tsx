@@ -14,7 +14,7 @@ interface NPCTraitsTabProps {
 const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
   const playerAcquiredTraits = useAppSelector(state => state.traits.acquiredTraits);
   const allTraits = useAppSelector(state => state.traits.traits);
-  const essenceAmount = useAppSelector(state => state.essence.amount);
+  const essenceAmount = useAppSelector(state => state.essence.currentEssence);
 
   // Get NPC's visible traits
   const npcTraits = npc.traits ? Object.values(npc.traits).filter(trait => trait.isVisible) : [];

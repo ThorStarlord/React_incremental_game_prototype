@@ -4,7 +4,7 @@ import { Box, Typography, LinearProgress, Chip, Stack, useTheme } from '@mui/mat
 // Define interface for the component props - making required props non-optional
 interface EssenceDisplayProps {
   currentEssence: number;
-  maxEssence: number;
+  maxEssence?: number; // Made optional
   essenceTypes?: Array<{
     id: string;
     name: string;

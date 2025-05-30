@@ -7,13 +7,18 @@ export { VerticalNavBar } from './components/VerticalNavBar/VerticalNavBar';
 export { useLayoutState } from './hooks/useLayoutState';
 export type { 
   UseLayoutStateOptions, 
-  UseLayoutStateReturn,
-  TabId 
+  UseLayoutStateReturn
+  // TabId is exported from ./types/NavigationTypes below
 } from './hooks/useLayoutState';
 
 // Layout types and constants
-export type { NavigationItem, NavigationSection } from './types/NavigationTypes';
-export { NAVIGATION_ITEMS, NAVIGATION_SECTIONS } from './constants/NavigationConstants';
+import type { NavItem as NavItemType, NavSection as NavSectionType, TabId as TabIdType } from './types/NavigationTypes'; // Import with alias
+
+export type NavItem = NavItemType;
+export type NavSection = NavSectionType;
+export type TabId = TabIdType; // Re-export TabId as well for consistency here
+
+export { NAVIGATION_ITEMS, NAVIGATION_SECTIONS } from './constants/navigationConfig'; // Corrected path
 
 // Legacy components (Deprecated - will be removed)
 /**

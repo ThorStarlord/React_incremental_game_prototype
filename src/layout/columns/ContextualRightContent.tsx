@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { useAppSelector } from '../../../app/hooks';
-import { CombatLog } from '../../features/Combat/components/ui/CombatLog';
-import { DebugPanel } from '../../shared/components/ui/DebugPanel';
+import { useAppSelector } from '../../app/hooks'; // Corrected path
+// import { CombatLog } from '../../features/Combat/components/ui/CombatLog'; // Commented out
+// import { DebugPanel } from '../../shared/components/ui/DebugPanel'; // Commented out
 
 /**
  * Component that renders contextual content in the right column
@@ -19,14 +19,14 @@ export const ContextualRightContent: React.FC = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       {/* Combat Log - only show during/after combat */}
-      {gameState.inCombat && (
+      {/* {gameState.inCombat && (
         <CombatLog />
-      )}
+      )} */}
       
       {/* Debug Panel - only show in development or when enabled */}
-      {(gameState.isDevelopment || gameState.showDebugPanel) && (
+      {/* {(gameState.isDevelopment || gameState.showDebugPanel) && (
         <DebugPanel />
-      )}
+      )} */}
     </Box>
   );
 };

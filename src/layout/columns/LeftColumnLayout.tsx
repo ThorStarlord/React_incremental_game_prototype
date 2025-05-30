@@ -1,8 +1,10 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import { CompactCharacterPanel } from '../../features/Player/components/ui/CompactCharacterPanel';
-import { EssenceDisplay } from '../../features/Essence/components/ui/EssenceDisplay';
+import { useAppSelector } from '../../app/hooks'; // Import useAppSelector
+import { selectCurrentEssence } from '../../features/Essence/state/EssenceSelectors'; // Import selector
+// import { CompactCharacterPanel } from '../../features/Player/components/ui/CompactCharacterPanel'; // Commented out
+import { EssenceDisplay } from '../../features/Essence'; // Corrected import path
 import { GameControlPanel } from '../../features/GameLoop/components/ui/GameControlPanel';
 
 /**
@@ -10,6 +12,8 @@ import { GameControlPanel } from '../../features/GameLoop/components/ui/GameCont
  * and provides an outlet for dynamic routed content
  */
 export const LeftColumnLayout: React.FC = () => {
+  const currentEssence = useAppSelector(selectCurrentEssence);
+
   return (
     <Box
       sx={{
@@ -22,8 +26,8 @@ export const LeftColumnLayout: React.FC = () => {
       }}
     >
       {/* Static/Persistent Components */}
-      <CompactCharacterPanel />
-      <EssenceDisplay />
+      {/* <CompactCharacterPanel /> */}
+      <EssenceDisplay currentEssence={currentEssence} />
       <GameControlPanel />
       
       {/* Dynamic Content Slot */}

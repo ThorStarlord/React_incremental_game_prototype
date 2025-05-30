@@ -1,10 +1,8 @@
 import React from 'react';
 import { Box, Typography, LinearProgress, Tooltip } from '@mui/material';
 import { useAppSelector } from '../../../../app/hooks';
-import {
-  selectPlayerTotalEssenceEarned,
-  selectPlayerTraitSlots
-} from '../../../Player/state/PlayerSelectors';
+import { selectTraitSlots } from '../../../Player/state/PlayerSelectors';
+import { selectTotalCollected } from '../../../Essence/state/EssenceSelectors';
 
 /**
  * TraitSlotProgressIndicator Component
@@ -16,8 +14,8 @@ import {
  */
 const TraitSlotProgressIndicator: React.FC = () => {
   // Use Redux selectors to get player data
-  const totalEssenceEarned = useAppSelector(selectPlayerTotalEssenceEarned);
-  const traitSlots = useAppSelector(selectPlayerTraitSlots);
+  const totalEssenceEarned = useAppSelector(selectTotalCollected);
+  const traitSlotsArray = useAppSelector(selectTraitSlots); // Renamed to avoid conflict if traitSlots was a number
 
   // Calculate the next essence threshold for a slot unlock
   const currentUnlocks: number = Math.floor(totalEssenceEarned / 1000);
@@ -28,8 +26,8 @@ const TraitSlotProgressIndicator: React.FC = () => {
 
   // If already at max slots, show 100% progress
   const MAX_TRAIT_SLOTS: number = 8;
-  const DEFAULT_TRAIT_SLOTS: number = 1;
-  const currentTraitSlots = traitSlots || DEFAULT_TRAIT_SLOTS;
+  // const DEFAULT_TRAIT_SLOTS: number = 1; // Defaulting logic might need review if traitSlotsArray is always an array
+  const currentTraitSlots = traitSlotsArray.length; // Assuming traitSlots from PlayerState is an array of actual slots
   const isMaxSlots: boolean = currentTraitSlots >= MAX_TRAIT_SLOTS;
   const displayProgress: number = isMaxSlots ? 100 : progress;
 

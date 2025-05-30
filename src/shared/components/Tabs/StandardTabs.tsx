@@ -4,7 +4,7 @@ import { SxProps, Theme } from '@mui/material/styles';
 
 export interface TabConfig {
   id: string;
-  label: string;
+  label: React.ReactNode; // Changed to React.ReactNode
   disabled?: boolean;
   icon?: React.ReactElement;
 }

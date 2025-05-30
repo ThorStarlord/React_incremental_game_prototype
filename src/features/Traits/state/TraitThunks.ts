@@ -27,7 +27,7 @@ export const makeTraitPermanentThunk = createAsyncThunk<
     const state = getState();
     
     // Get the current essence amount from essence slice
-    const currentEssence = state.essence.amount;
+    const currentEssence = state.essence.currentEssence;
     
     // Get the trait details and permanent traits list
     const trait = state.traits.traits[traitId];
@@ -57,7 +57,7 @@ export const makeTraitPermanentThunk = createAsyncThunk<
       // This call should now be valid with the updated SpendEssencePayload type
       dispatch(spendEssence({
         amount: MAKE_PERMANENT_COST,
-        reason: `Made ${trait.name} permanent`
+        description: `Made ${trait.name} permanent`
       }));
       
       // Step 2: Make the trait permanent

@@ -182,7 +182,12 @@ export const validateTabConfig = (tabs: TabConfig[]): boolean => {
   }
 
   // Check for empty labels
-  const hasEmptyLabels = tabs.some((tab) => !tab.label || tab.label.trim() === '');
+  const hasEmptyLabels = tabs.some((tab) => {
+    if (typeof tab.label === 'string') {
+      return !tab.label || tab.label.trim() === '';
+    }
+    return !tab.label; // If not a string, just check if it's falsy
+  });
   if (hasEmptyLabels) {
     console.warn('Empty labels found in tab configuration');
     return false;

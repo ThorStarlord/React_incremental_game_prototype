@@ -30,7 +30,7 @@ import {
   selectPermanentTraitObjects,
   selectAvailableTraitObjects
 } from '../../state/TraitsSelectors';
-import { selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
+import { selectTraitSlots } from '../../../Player/state/PlayerSelectors';
 import { Trait } from '../../state/TraitsTypes';
 
 /**
@@ -65,7 +65,8 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   const allTraitsData = useAppSelector(selectTraits);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const totalSlots = useAppSelector(selectPlayerTraitSlots);
+  const traitSlotsArray = useAppSelector(selectTraitSlots); // Changed selector and variable name
+  const totalSlots = traitSlotsArray.length; // Get length from array
 
   // Use selectors that return full trait objects
   const equippedTraits = useAppSelector(selectEquippedTraitObjects);
@@ -290,7 +291,7 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
       )}
       
       <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'flex-end' }}>
-        {selectedTrait && activeTab === 1 && usedSlots < totalSlots && (
+        {selectedTrait && activeTab === 1 && usedSlots < totalSlots && ( // totalSlots is now a number
           <Button 
             variant="contained" 
             color="primary"

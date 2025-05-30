@@ -61,15 +61,15 @@ const routeToTabMap: Record<string, TabId> = {
   '/game/dashboard': 'dashboard',
   '/game/traits': 'traits',
   '/game/npcs': 'npcs',
-  '/game/character': 'player',
-  '/game/player': 'player',
+  '/game/character': 'character', // Changed
+  '/game/player': 'character',    // Changed
   '/game/essence': 'essence',
   '/game/copies': 'copies',
   '/game/quests': 'quests',
   '/game/inventory': 'inventory',
   '/game/settings': 'settings',
   '/game/save-load': 'save-load',
-  '/game/debug': 'debug',
+  // '/game/debug': 'debug', // Removed, 'debug' is not a valid TabId
 };
 
 /**
@@ -77,16 +77,19 @@ const routeToTabMap: Record<string, TabId> = {
  */
 const tabToRouteMap: Record<TabId, string> = {
   dashboard: '/game',
+  character: '/game/character', // Changed
   traits: '/game/traits',
+  skills: '/game/skills', // Added for completeness, ensure it's in TabId
   npcs: '/game/npcs',
-  player: '/game/character',
   essence: '/game/essence',
   copies: '/game/copies',
   quests: '/game/quests',
   inventory: '/game/inventory',
   settings: '/game/settings',
+  saves: '/game/saves', // Added for completeness, ensure it's in TabId
+  crafting: '/game/crafting', // Added for completeness, ensure it's in TabId
   'save-load': '/game/save-load',
-  debug: '/game/debug',
+  // debug: '/game/debug', // Removed, 'debug' is not a valid TabId
 };
 
 /**

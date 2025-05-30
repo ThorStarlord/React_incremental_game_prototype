@@ -140,15 +140,14 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
 
   return (
     <Box className={className}>
-      <TabContainer>
-        <StandardTabs
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          variant="standard"
-        />
-        
-        <TabPanel value={activeTab} index="slots">
+      <TabContainer
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        // variant="standard" is default in TabContainer
+      >
+        {/* StandardTabs is rendered by TabContainer itself. Children should be TabPanels. */}
+        <TabPanel tabId="slots" activeTab={activeTab}>
           <TraitSlots
             traitSlots={traitSlots}
             equippedTraits={equippedTraits}
@@ -158,7 +157,7 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
           />
         </TabPanel>
         
-        <TabPanel value={activeTab} index="manage">
+        <TabPanel tabId="manage" activeTab={activeTab}>
           <TraitManagement
             acquiredTraits={acquiredTraits}
             permanentTraits={permanentTraits}
@@ -172,7 +171,7 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
           />
         </TabPanel>
         
-        <TabPanel value={activeTab} index="codex">
+        <TabPanel tabId="codex" activeTab={activeTab}>
           <TraitCodex
             allTraits={allTraits}
             discoveredTraits={discoveredTraits}

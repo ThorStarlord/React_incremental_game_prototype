@@ -60,7 +60,7 @@ const EssenceGenerationTimer: React.FC<EssenceGenerationTimerProps> = ({
         setProgress(0);
         
         // Dispatch gainEssence action with the generation rate
-        dispatch(gainEssence(generationRate));
+        dispatch(gainEssence({ amount: generationRate, description: 'Passive Generation' }));
       } else {
         setProgress(newProgress);
       }

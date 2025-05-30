@@ -12,7 +12,11 @@ import {
   Inventory as InventoryIcon,
   Build as CraftingIcon,
   Settings as SettingsIcon,
-  Save as SaveLoadIcon
+  Save as SaveLoadIcon,
+  Dashboard as DashboardIcon, // Added
+  School as SkillsIcon, // Added
+  LocalFireDepartment as EssenceIcon, // Added
+  SaveAlt as SavesIcon // Added
 } from '@mui/icons-material';
 
 import type { 
@@ -121,9 +125,46 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     id: 'save-load',
     label: 'Save/Load',
     icon: SaveLoadIcon,
-    route: '/game/save-load',
-    isImplemented: true, // ✅ Implemented
-    tooltip: 'Save and load game progress'
+  route: '/game/save-load',
+  isImplemented: true, // ✅ Implemented
+  tooltip: 'Save and load game progress'
+  },
+  // Added missing TabIds
+  dashboard: {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: DashboardIcon,
+    route: '/game/dashboard',
+    isImplemented: false, // Assuming not yet, or needs verification
+    tooltip: 'View game overview and statistics',
+    section: 'systems',
+  },
+  skills: {
+    id: 'skills',
+    label: 'Skills',
+    icon: SkillsIcon,
+    route: '/game/skills',
+    isImplemented: false, // Assuming not yet
+    tooltip: 'Manage character skills',
+    section: 'character-management',
+  },
+  essence: {
+    id: 'essence',
+    label: 'Essence',
+    icon: EssenceIcon,
+    route: '/game/essence',
+    isImplemented: true, // Essence page exists
+    tooltip: 'Manage essence and related mechanics',
+    section: 'character-management', // Or a new section like 'core-systems'
+  },
+  saves: {
+    id: 'saves',
+    label: 'Manage Saves',
+    icon: SavesIcon,
+    route: '/game/saves', // Distinct from save-load page
+    isImplemented: false, // Assuming this is for a dedicated save slot management UI
+    tooltip: 'Manage multiple save game slots',
+    section: 'systems',
   }
 };
 
@@ -138,6 +179,8 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     items: [
       NAVIGATION_ITEMS.character,
       NAVIGATION_ITEMS.traits,
+      NAVIGATION_ITEMS.skills, // Added skills
+      NAVIGATION_ITEMS.essence, // Added essence
       NAVIGATION_ITEMS.inventory
     ]
   },
@@ -156,9 +199,11 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     id: 'systems',
     title: 'Systems',
     items: [
+      NAVIGATION_ITEMS.dashboard, // Added dashboard
       NAVIGATION_ITEMS.crafting,
       NAVIGATION_ITEMS.settings,
-      NAVIGATION_ITEMS['save-load']
+      NAVIGATION_ITEMS['save-load'],
+      NAVIGATION_ITEMS.saves // Added saves
     ]
   }
 ];
@@ -204,7 +249,7 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
     id: 'character',
     label: 'Character',
-    icon: PersonIcon,
+    icon: CharacterIcon, // Changed to alias
     route: '/game/character',
     isImplemented: true, // Player state management implemented
     tooltip: 'View character stats and attributes',
@@ -213,7 +258,7 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
     id: 'traits',
     label: 'Traits',
-    icon: PsychologyIcon,
+    icon: TraitsIcon, // Changed to alias
     route: '/game/traits',
     isImplemented: true, // UI fully implemented
     tooltip: 'Manage acquired traits and abilities',
@@ -222,7 +267,7 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
     id: 'npcs',
     label: 'NPCs',
-    icon: GroupIcon,
+    icon: NPCsIcon, // Changed to alias
     route: '/game/npcs',
     isImplemented: true, // UI fully implemented
     tooltip: 'Interact with non-player characters',
@@ -231,7 +276,7 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
     id: 'quests',
     label: 'Quests',
-    icon: AssignmentIcon,
+    icon: QuestsIcon, // Changed to alias
     route: '/game/quests',
     isImplemented: false, // Planned
     tooltip: 'Track active and completed quests',
@@ -240,7 +285,7 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
     id: 'copies',
     label: 'Copies',
-    icon: FileCopyIcon,
+    icon: CopiesIcon, // Changed to alias
     route: '/game/copies',
     isImplemented: false, // Planned
     tooltip: 'Manage created copies',

@@ -7,7 +7,7 @@
 
 // Components
 export {
-  EssenceDisplay,
+  EssenceDisplayUI as EssenceDisplay,
   ConfigurableEssenceButton,
   ManualEssenceButton,
   EssenceGenerationTimer,

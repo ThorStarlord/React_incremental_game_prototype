@@ -88,7 +88,7 @@ export const DashboardPage: React.FC = React.memo(() => {
   const dashboardStats = useMemo((): DashboardStatCard[] => [
     {
       title: 'Current Essence',
-      value: essence.amount.toLocaleString(),
+      value: essence.currentEssence.toLocaleString(), // Changed
       subtitle: `+${essence.generationRate.toFixed(2)}/sec`,
       color: 'secondary',
       icon: EssenceIcon
@@ -103,7 +103,7 @@ export const DashboardPage: React.FC = React.memo(() => {
     {
       title: 'NPC Relationships',
       value: Object.keys(npcs).length,
-      subtitle: `${essence.npcConnections} connections`,
+      subtitle: `${Object.keys(npcs).length} known`, // Changed
       color: 'warning',
       icon: GroupIcon
     }
@@ -123,12 +123,12 @@ export const DashboardPage: React.FC = React.memo(() => {
       icon: TrendingUpIcon,
       color: player.stats.mana < player.stats.maxMana * 0.3 ? 'warning' : 'primary'
     },
-    {
-      label: 'Gold',
-      value: player.gold.toLocaleString(),
-      icon: TrendingUpIcon,
-      color: 'warning'
-    },
+    // { // Commented out Gold section
+    //   label: 'Gold',
+    //   value: player.gold.toLocaleString(),
+    //   icon: TrendingUpIcon,
+    //   color: 'warning'
+    // },
     {
       label: 'Game Time',
       value: formatGameTime(gameLoop.totalGameTime),
@@ -204,7 +204,7 @@ export const DashboardPage: React.FC = React.memo(() => {
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    <strong>{player.name || 'Unnamed Character'}</strong>
+                    <strong>{'Unnamed Character'}</strong> 
                   </Typography>
                   
                   <Box sx={{ mb: 1 }}>

@@ -92,16 +92,20 @@ export const createSave = (
 ): string | null => {
   try {
     const saveId = `save_${Date.now()}`;
-    const playerName = gameState.player.name || 'Unnamed Hero';
-    const playerLevel = gameState.player.level || 1;
-    const playtime = gameState.player.totalPlayTime || 0; 
+    // PlayerState does not have .name or .level
+    // const playerName = gameState.player.name || 'Unnamed Hero'; 
+    // const playerLevel = gameState.player.level || 1;
+    const defaultPlayerName = 'Player'; // Generic name
+    const defaultPlayerLevel = 1; // Default level
+
+    const playtime = gameState.player.totalPlaytime || 0; // Corrected casing
     
     // Create save metadata
     const saveInfo: SavedGame = {
       id: saveId,
-      name: saveName || `${playerName} - Level ${playerLevel}`,
+      name: saveName || `${defaultPlayerName} - Save ${new Date().toLocaleTimeString()}`, // Use generic name
       timestamp: Date.now(),
-      playerLevel,
+      playerLevel: defaultPlayerLevel, // Use default level
       playtime,
       screenshot,
       version: gameState.meta?.gameVersion || '1.0.0'

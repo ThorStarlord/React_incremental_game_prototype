@@ -140,11 +140,11 @@ interface PlayerState {
 ```
 
 **Key Features**:
-- **Stat Calculations**: Automatic recalculation of derived stats
-- **Attribute Management**: Point allocation with validation
-- **Status Effects**: Time-based effect processing
-- **Trait Integration**: Equipment and permanence mechanics
-- **Playtime Tracking**: Session and total time management
+- **Stat Calculations**: Provides `recalculateStats` reducer for automatic recalculation of derived stats when attributes, traits, or status effects change.
+- **Attribute Management**: Handles attribute point allocation (`allocateAttributePoint`) with validation against available points, and updates available points.
+- **Status Effects**: Manages the list of active status effects (`addStatusEffect`, `removeStatusEffect`); their impact on stats is handled via `recalculateStats`. Time-based processing (e.g., duration countdown) is typically managed by thunks.
+- **Trait Integration**: Manages equipped and permanent traits (`equipTrait`, `unequipTrait`, `addPermanentTrait`); their impact on stats is handled via `recalculateStats`.
+- **Playtime Tracking**: Manages `totalPlaytime` (`updatePlaytime`). Session-specific playtime might be derived elsewhere.
 
 ### 4.2. Traits Slice ✅ COMPLETE
 **Location**: `src/features/Traits/state/TraitsSlice.ts`
@@ -152,20 +152,26 @@ interface PlayerState {
 **State Structure**:
 ```typescript
 interface TraitsState {
-  availableTraits: Record<string, Trait>;
-  acquiredTraits: string[];
-  traitSlots: TraitSlot[];
-  permanentTraits: string[];
+  traits: Record<string, Trait>; // All trait definitions (renamed from availableTraits)
+  acquiredTraits: string[];      // IDs of traits the player has acquired
+  permanentTraits: string[];     // Traits the player has permanently unlocked
+  equippedTraits: string[];      // IDs of traits currently equipped (new in code)
+  slots: TraitSlot[];            // Available trait slots (renamed from traitSlots)
+  maxTraitSlots: number;         // Maximum number of equippable traits (new in code)
+  presets: TraitPreset[];        // Trait presets (new in code)
+  discoveredTraits: string[];    // IDs of traits the player has discovered (new in code)
   loading: boolean;
   error: string | null;
 }
 ```
+*(Note: `TraitPreset` would also need to be defined in DataModel.md if it's a core, storable entity.)*
 
 **Key Features**:
-- **Trait Discovery**: Unlocking and categorizing traits
-- **Acquisition System**: Essence-based trait acquisition
-- **Slot Management**: Equipment and permanence mechanics
-- **Codex Integration**: Trait information and filtering
+- **Trait Definitions & Discovery**: Manages all trait definitions (loaded via `fetchTraitsThunk`) and tracks discovered traits (`discoverTrait`, `discoveredTraits` state).
+- **Acquisition System**: Handles acquiring traits (`acquireTrait`). *Note: Currently, the `acquireTrait` reducer does not directly manage Essence cost; this would likely be handled by a thunk coordinating with the Essence slice if acquisition is intended to cost Essence (as suggested by `Trait.essenceCost`).*
+- **Slot Management & Permanence**: Manages equipping (`equipTrait`), unequipping (`unequipTrait`), and making traits permanent (`makePermanent`, `makeTraitPermanentThunk`). Also handles unlocking trait slots (`unlockTraitSlot`).
+- **Codex Data**: Provides the necessary data (`traits`, `discoveredTraits`) for a Trait Codex UI, allowing for information display and filtering (filtering itself is a UI/selector concern).
+- **Trait Presets**: Manages saving, loading, and deleting trait presets (`saveTraitPreset`, `loadTraitPreset`, `deleteTraitPreset`).
 
 ### 4.3. NPCs Slice ✅ COMPLETE
 **Location**: `src/features/NPCs/state/NPCSlice.ts`
@@ -173,20 +179,27 @@ interface TraitsState {
 **State Structure**:
 ```typescript
 interface NPCState {
-  npcs: Record<string, NPC>;
-  relationships: Record<string, number>;
-  interactions: NPCInteraction[];
-  currentInteraction: string | null;
+  npcs: Record<string, NPC>;             // All NPC data, keyed by ID
+  discoveredNPCs: string[];            // IDs of NPCs the player has discovered (new in code)
+  currentInteraction: NPCInteraction | null; // Data about the active interaction session (object in code, not string)
+  dialogueHistory: DialogueEntry[];      // Log of past dialogues (new in code)
+  relationshipChanges: RelationshipChangeEntry[]; // Log of relationship changes (new in code)
   loading: boolean;
   error: string | null;
+  // `relationships: Record<string, number>` (from spec) is not directly in NPCState; relationship data is on NPC objects.
+  // `interactions: NPCInteraction[]` (from spec, for logged interactions) is replaced by more specific logs.
 }
 ```
+*(Note: `NPCInteraction` (for current session), `DialogueEntry`, and `RelationshipChangeEntry` types are defined in NPCTypes.ts and documented in DataModel.md.)*
 
 **Key Features**:
-- **Relationship Tracking**: Progressive relationship levels
-- **Interaction Management**: Session-based interaction tracking
-- **Trait Sharing**: NPC trait slot management
-- **Commerce Integration**: Relationship-based pricing
+- **NPC Data Management**: Initializes and stores core NPC data (via `initializeNPCsThunk` and `npcs` state).
+- **Discovery**: Tracks discovered NPCs (`discoverNPCThunk`, `discoveredNPCs` state).
+- **Relationship Tracking**: Manages NPC relationship values (`updateNpcRelationship` reducer, `updateNPCRelationshipThunk`) and logs changes (`relationshipChanges` state).
+- **Interaction Management**: Handles current interaction sessions (`startInteraction`, `endInteraction`, `currentInteraction` state) and logs dialogue history (`addDialogueEntry`, `dialogueHistory` state). Thunks like `processNPCInteractionThunk` and `processDialogueChoiceThunk` orchestrate interaction logic.
+- **Status & Availability**: Manages NPC status (e.g., 'available', 'busy') and availability (`setNpcStatus`, `setNpcAvailability`).
+- **Trait Sharing Support**: Facilitates trait sharing mechanics through thunks (`shareTraitWithNPCThunk`) that can update NPC data and relationships. Direct management of `sharedTraitSlots` occurs on the `NPC` objects within `state.npcs`.
+- **Commerce Integration (Placeholder)**: Includes basic structure for trade interactions (`processNPCInteractionThunk` case for 'trade'), with detailed logic like relationship-based pricing intended for future implementation within the thunk or related services.
 
 ### 4.4. Essence Slice ✅ COMPLETE
 **Location**: `src/features/Essence/state/EssenceSlice.ts`
@@ -194,11 +207,14 @@ interface NPCState {
 **State Structure**:
 ```typescript
 interface EssenceState {
-  currentAmount: number;
-  totalCollected: number;
-  generationRate: number;
-  perClickAmount: number;
-  lastGeneration: number;
+  currentEssence: number;     // Current essence (renamed from currentAmount)
+  totalCollected: number;   // Lifetime essence collection
+  generationRate: number;   // Essence per second
+  perClickValue: number;    // Manual generation amount (renamed from perClickAmount)
+  lastGenerationTime: number; // Last generation timestamp (renamed from lastGeneration)
+  isGenerating: boolean;    // Tracks if passive generation is active (new in code)
+  loading: boolean;         // Loading state for async operations (new in code)
+  error: string | null;     // Error message if any (new in code)
 }
 ```
 
@@ -213,13 +229,15 @@ interface EssenceState {
 **State Structure**:
 ```typescript
 interface GameLoopState {
-  isRunning: boolean;
-  isPaused: boolean;
-  gameSpeed: number;
-  currentTick: number;
-  totalGameTime: number;
-  autoSaveInterval: number;
-  lastAutoSave: number;
+  isRunning: boolean;        // Game loop active status
+  isPaused: boolean;         // Temporary pause state
+  currentTick: number;       // Current game tick
+  tickRate: number;          // Ticks per second (default: 10) - from GameLoopTypes.ts
+  lastUpdateTime: number;    // Timestamp of the last update - from GameLoopTypes.ts
+  totalGameTime: number;     // Total elapsed time (milliseconds)
+  gameSpeed: number;         // Speed multiplier (0.1x to 5.0x)
+  autoSaveInterval: number;  // Auto-save frequency (in milliseconds) - from GameLoopTypes.ts
+  lastAutoSave: number;      // Last auto-save timestamp
 }
 ```
 
@@ -242,9 +260,9 @@ interface SettingsState {
 ```
 
 **Key Features**:
-- **Category Organization**: Audio, graphics, gameplay, UI
-- **Immediate Persistence**: Real-time settings application
-- **Default Management**: Reset and validation capabilities
+- **Category Organization**: Manages settings grouped into `audio`, `graphics`, `gameplay`, and `ui` categories.
+- **State Updates**: Provides actions (`updateSetting`, `updateCategorySettings`) for modifying individual settings or entire categories, enabling real-time application of changes in the UI. Persistence to storage is typically handled by thunks (e.g., `saveSettingsThunk`).
+- **Default Management & Reset**: Defines initial default settings and provides a `resetSettings` action. The `loadSettings` action merges loaded data with defaults, ensuring a complete settings state. (Value validation is primarily expected at the UI or thunk level before dispatching updates).
 
 ## 5. Selector Architecture
 
@@ -329,9 +347,9 @@ export const operationThunk = createAsyncThunk<
 ### 6.2. Implemented Thunk Operations
 
 #### Player Thunks ✅ COMPLETE
-- **regenerateResourcesThunk**: Health and mana regeneration
+- **regenerateVitalsThunk**: Health and mana regeneration (was regenerateResourcesThunk)
 - **processStatusEffectsThunk**: Time-based effect processing
-- **useConsumableThunk**: Item consumption with effects
+- **useConsumableItemThunk**: Item consumption with effects (was useConsumableThunk)
 - **restThunk**: Enhanced recovery mechanics
 - **autoAllocateAttributesThunk**: Automated point distribution
 

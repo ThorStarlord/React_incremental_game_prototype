@@ -53,7 +53,7 @@ export function useGameImportExport() {
 
       // Use createSave to add the imported state as a new save slot
       // Use a generic name or derive one if possible
-      const saveName = `Imported - ${importedGameState.player?.name || 'Unknown'} - ${new Date().toLocaleDateString()}`;
+      const saveName = `Imported Save - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
       const newSaveId = createSave(importedGameState, saveName); // createSave now expects RootState
 
       if (newSaveId) {
