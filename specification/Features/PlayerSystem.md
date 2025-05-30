@@ -16,12 +16,12 @@ The Player System manages the player character's core data, statistics, attribut
 - **Health**: Current and maximum health values
 - **Mana**: Current and maximum mana values  
 - **Attack**: Base physical damage capability
-- **Defense**: Physical damage reduction
-- **Speed**: Action frequency and responsiveness
-- **Health Regeneration**: Per-second health recovery
-- **Mana Regeneration**: Per-second mana recovery
-- **Critical Chance**: Probability of critical hits (0.0 to 1.0)
-- **Critical Damage**: Critical hit damage multiplier
+  - **Defense**: Physical damage reduction
+  - **Speed**: Action frequency and responsiveness
+  - **healthRegen**: Per-second health recovery
+  - **manaRegen**: Per-second mana recovery
+  - **Critical Chance**: Probability of critical hits (0.0 to 1.0)
+  - **Critical Damage**: Critical hit damage multiplier
 
 ### 2.2. Stat Calculations ✅ IMPLEMENTED
 Stats are calculated from multiple sources:
@@ -171,11 +171,11 @@ Complete type definitions including:
 **Location**: `src/features/Player/state/PlayerThunks.ts`
 
 Async thunk implementations for:
-- **Resource Regeneration**: Health and mana regeneration over time
-- **Status Effect Processing**: Duration tracking and expiration
-- **Consumable Items**: Item usage with effect application
-- **Rest Actions**: Enhanced recovery mechanics
-- **Attribute Auto-Allocation**: Automated point distribution
+- **regenerateVitalsThunk**: Health and mana regeneration over time
+- **processStatusEffectsThunk**: Duration tracking and expiration
+- **useConsumableItemThunk**: Item usage with effect application
+- **restThunk**: Enhanced recovery mechanics
+- **autoAllocateAttributesThunk**: Automated point distribution
 
 ## 7. CSS Architecture ✅ IMPLEMENTED
 

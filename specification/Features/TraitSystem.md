@@ -12,7 +12,8 @@ This document details the design and mechanics of the Trait system, which allows
 ## 2. Trait Acquisition
 
 *   **Primary Method: Emotional Connection & Resonance**
-    *   The player can acquire traits observed in targets (NPCs, potentially enemies, or even abstract concepts) by establishing an "Emotional Connection" and spending Essence to resonate with and copy the trait's underlying pattern.
+    *   The design intent is for players to acquire traits by establishing an "Emotional Connection" and spending Essence. The `Trait` data model includes an `essenceCost` property.
+    *   *Current Implementation Note:* The `TraitsSlice.acquireTrait` action currently adds a trait to the acquired list without deducting Essence. A thunk would be needed to integrate Essence spending into the acquisition process.
 *   **Other Acquisition Methods:**
     *   Completing specific quests or achievements might grant certain traits directly.
     *   (Future) Research or crafting systems could yield traits.
@@ -22,14 +23,13 @@ This document details the design and mechanics of the Trait system, which allows
 
 ## 3. Trait Slots ✅ IMPLEMENTED
 
-*   **Concept:** Players have a limited number of slots to equip active traits for themselves. Shared slots for targets (**NPCs and Copies**) are handled separately (See Section 7).
-*   **Base Slots:** Player starts with a base number of slots (e.g., 1-2, defined in `PlayerInitialState`).
-*   **Leveling Slots:** Additional slots are unlocked upon reaching specific player levels (Defined in `PlayerSystem.md` / `gameConstants.ts`).
+*   **Concept:** Players have a limited number of slots to equip active traits.
+*   **Slot Configuration:** The initial number of slots, their unlocked status, and unlock requirements (e.g., by player level) are defined in the `initialState` of `TraitsSlice.ts` within `state.slots`. The maximum number of slots is defined by `state.maxTraitSlots` (currently initialized to 5).
+*   **Leveling Slots:** Unlocking slots based on player level is supported by the `unlockRequirements` in the `TraitSlot` data.
 *   **Free Trait Slots (Essence-Based):**
-    *   Additional slots are unlocked passively as the player reaches certain thresholds of **Total Essence Earned** or perhaps **Current Essence Level** (TBD - Total Earned feels more permanent).
-    *   **Thresholds/Curve:** Define the specific Essence amounts needed for each free slot (e.g., Slot 1 at 1k Essence, Slot 2 at 10k, Slot 3 at 100k - needs balancing).
-*   **Maximum Slots:** Define the total maximum number of equippable trait slots for the player (e.g., 10-15).
-*   **Equipping/Unequipping:** ✅ **IMPLEMENTED** - Assigning acquired traits to player slots uses click-based interactions and can be done at any time outside of combat.
+    *   The `TraitSlotProgressIndicator.tsx` component calculates progress towards unlocking slots based on total essence earned, suggesting this mechanic is intended. The actual unlocking is handled by the `unlockTraitSlot` action.
+*   **Maximum Slots:** Currently initialized to 5 in `TraitsState.maxTraitSlots`.
+*   **Equipping/Unequipping:** ✅ **IMPLEMENTED** - Handled by `equipTrait` and `unequipTrait` actions in `TraitsSlice.ts`.
 
 ### 3.1. Slot Interaction Implementation ✅ COMPLETED
 
@@ -45,10 +45,10 @@ This document details the design and mechanics of the Trait system, which allows
 *   **Concept:** The player can use a special ability, likely unlocked via progression, called "Make Permanent" or similar. This ability targets an acquired trait.
 *   **Mechanics:**
     *   Consumes a significant amount of Essence.
-    *   The original acquired trait remains available to be equipped or shared if desired (TBD - or is the "template" consumed/marked as permanent?). *Decision:* Keep the template available.
-*   **Essence Cost Scaling:** The cost to make a trait permanent scales based on:
-    *   **Trait Power/Rarity:** More potent traits cost significantly more to make permanent.
-    *   **Target Power Level (Optional):** The power level of the original source target *might* influence the permanence cost (TBD - adds complexity, maybe omit initially).
+    *   The original acquired trait remains available to be equipped or shared if desired. *Decision in spec:* Keep the template available. (This is consistent with current slice logic).
+*   **Essence Cost:**
+    *   *Current Implementation:* The `makeTraitPermanentThunk` uses a flat cost (`MAKE_PERMANENT_COST` defined in `TraitThunks.ts`).
+    *   *Data Model Support:* The `Trait` type includes an optional `permanenceCost?: number` field, allowing for variable costs per trait in the future.
 *   **Target Scope:**
     *   Can primarily target traits the player possesses for self-permanence.
     *   *Question:* Can this ability be used on NPCs or **Copies** directly to make one of *their* traits permanent for *them*? (Potentially very powerful, needs careful consideration. Maybe a high-tier upgrade or separate ability). *Decision:* Initially, only for player self-permanence.
@@ -73,26 +73,26 @@ The trait system UI has been fully implemented with modern, accessible patterns:
 
 ### 7.1. Component Architecture ✅ IMPLEMENTED
 
-**TraitSystemWrapper**: ✅ **IMPLEMENTED** - Main container with standardized MUI tabbed navigation
-- **Tab Navigation**: Uses the universal MUI tabs strategy
-- **Content Organization**: Clear separation of trait management functions
-- **Performance Optimized**: Memoized components and selectors
+**TraitSystemWrapper**: ✅ **IMPLEMENTED** - Main container (`src/features/Traits/components/containers/TraitSystemWrapper.tsx`) using `TraitSystemUI.tsx` for tabbed navigation.
+- **Tab Navigation**: Uses the universal MUI tabs strategy via `TraitSystemUI.tsx`.
+- **Content Organization**: Clear separation of trait management functions within tabs.
+- **Performance Optimized**: Memoized components and selectors.
 
-**TraitSlots**: ✅ **IMPLEMENTED** - Click-based slot management system
-- **Interaction Pattern**: Click empty slot → trait selection dialog, click equipped trait → unequip
-- **Visual Design**: Clear slot states (empty, equipped, locked)
-- **Accessibility**: Full keyboard navigation and screen reader support
-- **Error Prevention**: Locked slots show unlock requirements
+**TraitSlots**: ✅ **IMPLEMENTED** - UI for managing equipped traits (`src/features/Traits/components/ui/TraitSlots.tsx`).
+- **Interaction Pattern**: Click-based interactions for equipping/unequipping.
+- **Visual Design**: Displays slot states (empty, equipped, locked).
+- **Accessibility**: Designed for keyboard navigation and screen reader support.
+- **Error Prevention**: Locked slots show unlock requirements (data-driven).
 
-**TraitManagement**: ✅ **IMPLEMENTED** - Trait acquisition and permanence interface
-- **Acquisition Interface**: Browse and acquire available traits
-- **Permanence System**: Make traits permanent with Essence cost display
-- **Cost Transparency**: Clear indication of affordability and requirements
+**TraitManagement**: ✅ **IMPLEMENTED** - Interface for trait acquisition and permanence, likely referring to `TraitManagementPanel.tsx` (`src/features/Traits/components/containers/TraitManagementPanel.tsx`) or parts of `TraitAcquisitionPanel.tsx`.
+- **Acquisition Interface**: Allows browsing and acquiring available traits.
+- **Permanence System**: Interface to make traits permanent, displaying Essence cost.
+- **Cost Transparency**: Clear indication of affordability and requirements.
 
-**TraitCodex**: ✅ **IMPLEMENTED** - Comprehensive trait reference
-- **Discovery Tracking**: Shows discovered vs. unknown traits
-- **Detailed Information**: Complete trait descriptions and effects
-- **Search/Filter**: Easy navigation through trait collection
+**TraitCodex**: ✅ **IMPLEMENTED** - Comprehensive trait reference, likely `TraitCodexDrawer.tsx` (`src/features/Traits/components/containers/TraitCodexDrawer.tsx`).
+- **Discovery Tracking**: Shows discovered vs. unknown traits.
+- **Detailed Information**: Complete trait descriptions and effects.
+- **Search/Filter**: Intended for easy navigation through trait collection.
 
 ### 7.2. Tabbed Navigation System ✅ IMPLEMENTED
 
@@ -181,8 +181,8 @@ const traitTabs = [
 - **Type Safety**: Full TypeScript integration throughout
 
 ### 8.2. Feature Interoperability ✅ DESIGNED
-- **Essence System**: Integration ready for trait acquisition costs
-- **Player System**: Ready to apply trait effects to player stats
+- **Essence System**: The `Trait` data model includes `essenceCost` and `permanenceCost`. `makeTraitPermanentThunk` integrates with the Essence system for permanence. *Note: As mentioned in Section 2, direct Essence cost for initial acquisition via `acquireTrait` action is not yet implemented in the slice and would require a thunk.*
+- **Player System**: Ready to apply trait effects to player stats (handled by `PlayerSlice.recalculateStats`).
 - **NPC System**: Architecture prepared for trait sharing mechanics
 - **Copy System**: Framework in place for trait inheritance
 

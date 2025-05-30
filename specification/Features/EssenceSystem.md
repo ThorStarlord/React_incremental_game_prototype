@@ -13,7 +13,9 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 ## 2. Essence Sources
 
-*   **Primary Source: Emotional Connection**
+*   **Primary Source: Emotional Connection** *(Design Intent - Planned for Future Implementation)*
+    *   **Current Implementation Note:** The current codebase uses a simpler model with a single `generationRate` property in `EssenceState`. The connection-based system described below is planned for future updates, as indicated by placeholders in the UI components and explicit "Future Features" messaging in `EssencePage.tsx`.
+    
     *   **Formation:** Connections are established and deepened through meaningful interactions with targets (NPCs, potentially other entities). Key actions include:
         *   Dialogue choices that resonate with the target.
         *   Completing quests or tasks for the target.
@@ -31,7 +33,12 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 ## 3. Essence Generation Mechanics
 
-*   **Connection-Based Generation:**
+*   **Current Implementation:** ✅ **IMPLEMENTED**
+    *   The current implementation uses a base generation rate (`essence.generationRate`) that can be modified by trait bonuses.
+    *   The `useEssenceGeneration` hook calculates a total rate as `baseRate * traitMultiplier`, where trait bonuses come from equipped traits like 'essence_boost' and 'growing_affinity'.
+    *   The `useAutoGenerateEssence` hook generates essence every second based on this rate.
+
+*   **Connection-Based Generation:** *(Planned for Future Implementation)*
     *   Passive, continuous generation from all active emotional connections.
     *   The total passive generation rate is the sum of rates from all individual connections.
 *   **Multipliers:**
@@ -42,13 +49,15 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 ## 4. Essence Costs & Spending (Sinks)
 
-*   **Emotional Influence:**
+*   **Emotional Influence:** *(Planned for Future Implementation)*
     *   Spending Essence to perform actions that directly (but subtly) influence a target's emotional state or favorability towards the player (e.g., accelerating relationship gain, calming hostility). Cost scales with desired effect intensity and target resistance.
-*   **Trait Acquisition:**
-    *   The primary cost for resonating with and acquiring a trait blueprint from a target. Cost determined by trait rarity/complexity and potentially reduced by connection depth. (See `TraitSystem.md`).
-*   **Trait Permanence:**
-    *   Significant Essence cost to make an acquired trait permanently active for the player without requiring an equip slot. Cost scales heavily with trait power/rarity. (See `TraitSystem.md`).
-*   **Accelerated Copy Growth:**
+*   **Trait Acquisition:** *(Partially Implemented)*
+    *   **Design Intent:** The primary cost for resonating with and acquiring a trait blueprint from a target. Cost determined by trait rarity/complexity and potentially reduced by connection depth.
+    *   **Current Implementation Note:** While the `Trait` data model includes an `essenceCost` property, the current `acquireTrait` action in `TraitsSlice.ts` does not yet implement essence cost deduction. This would require a thunk similar to `makeTraitPermanentThunk`.
+*   **Trait Permanence:** ✅ **IMPLEMENTED**
+    *   Significant Essence cost to make an acquired trait permanently active for the player without requiring an equip slot.
+    *   **Current Implementation:** The `makeTraitPermanentThunk` in `TraitThunks.ts` implements this, using a flat cost (`MAKE_PERMANENT_COST`).
+*   **Accelerated Copy Growth:** *(Planned for Future Implementation)*
     *   Spending Essence to speed up the development, training, or task performance of player-created Copies. A significant upfront cost is required to choose the accelerated path upon creation. (See `CopySystem.md`).
 *   **Standard Upgrades (Optional):**
     *   If applicable, costs for upgrading secondary mechanics (e.g., manual click power, base offline progress multiplier if not solely connection-driven). These should be less central than the core sinks.
@@ -74,7 +83,7 @@ This document outlines the design and mechanics of the Essence system in the gam
 ```typescript
 // ✅ Integrated components
 <EssenceDisplay />           // Current Essence amount and visual representation
-<BasicEssenceButton />       // Manual Essence generation for testing
+<ManualEssenceButton />      // Manual Essence generation for testing (referred to as "BasicEssenceButton" in some specs)
 <EssenceGenerationTimer />   // Passive generation rate tracking
 ```
 
