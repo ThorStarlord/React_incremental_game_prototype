@@ -13,9 +13,7 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 ## 2. Essence Sources
 
-*   **Primary Source: Emotional Connection** *(Design Intent - Planned for Future Implementation)*
-    *   **Current Implementation Note:** The current codebase uses a simpler model with a single `generationRate` property in `EssenceState`. The connection-based system described below is planned for future updates, as indicated by placeholders in the UI components and explicit "Future Features" messaging in `EssencePage.tsx`.
-    
+*   **Primary Source: Emotional Connection** ✅ **IMPLEMENTED**
     *   **Formation:** Connections are established and deepened through meaningful interactions with targets (NPCs, potentially other entities). Key actions include:
         *   Dialogue choices that resonate with the target.
         *   Completing quests or tasks for the target.
@@ -33,12 +31,7 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 ## 3. Essence Generation Mechanics
 
-*   **Current Implementation:** ✅ **IMPLEMENTED**
-    *   The current implementation uses a base generation rate (`essence.generationRate`) that can be modified by trait bonuses.
-    *   The `useEssenceGeneration` hook calculates a total rate as `baseRate * traitMultiplier`, where trait bonuses come from equipped traits like 'essence_boost' and 'growing_affinity'.
-    *   The `useAutoGenerateEssence` hook generates essence every second based on this rate.
-
-*   **Connection-Based Generation:** *(Planned for Future Implementation)*
+*   **Connection-Based Generation:** ✅ **IMPLEMENTED**
     *   Passive, continuous generation from all active emotional connections.
     *   The total passive generation rate is the sum of rates from all individual connections.
 *   **Multipliers:**
@@ -51,9 +44,9 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 *   **Emotional Influence:** *(Planned for Future Implementation)*
     *   Spending Essence to perform actions that directly (but subtly) influence a target's emotional state or favorability towards the player (e.g., accelerating relationship gain, calming hostility). Cost scales with desired effect intensity and target resistance.
-*   **Trait Acquisition:** *(Partially Implemented)*
+*   **Trait Acquisition:** ✅ **IMPLEMENTED**
     *   **Design Intent:** The primary cost for resonating with and acquiring a trait blueprint from a target. Cost determined by trait rarity/complexity and potentially reduced by connection depth.
-    *   **Current Implementation Note:** While the `Trait` data model includes an `essenceCost` property, the current `acquireTrait` action in `TraitsSlice.ts` does not yet implement essence cost deduction. This would require a thunk similar to `makeTraitPermanentThunk`.
+    *   **Current Implementation:** The `acquireTraitWithEssenceThunk` implements this, checking for sufficient essence and deducting the `trait.essenceCost`.
 *   **Trait Permanence:** ✅ **IMPLEMENTED**
     *   Significant Essence cost to make an acquired trait permanently active for the player without requiring an equip slot.
     *   **Current Implementation:** The `makeTraitPermanentThunk` in `TraitThunks.ts` implements this, using a flat cost (`MAKE_PERMANENT_COST`).

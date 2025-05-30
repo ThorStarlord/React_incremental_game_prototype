@@ -1,8 +1,9 @@
 import { useEffect, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
-import { gainEssence, updateGenerationRate } from '../state/EssenceSlice'; 
-import { selectEquippedTraitIds } from '../../Traits/state/TraitsSelectors';
+import { gainEssence, updateGenerationRate, updateEssenceConnection } from '../state/EssenceSlice'; 
+import { selectEquippedTraitIds } from '../../Player/state/PlayerSelectors'; // Corrected import
 import { selectEssenceState, selectGenerationRate } from '../state/EssenceSelectors';
+import { selectGameLoop } from '../../GameLoop/state/GameLoopSelectors'; // Corrected import
 
 /**
  * Custom hook to manage essence generation based on game state.
@@ -35,20 +36,59 @@ const useEssenceGeneration = () => {
     }, 1.0); // Start with 1.0 (no bonus)
   }, [equippedTraitIds]);
 
-  // Calculate total generation rate including bonuses
+  // Calculate total generation rate from NPC connections and apply trait bonuses
   const calculateTotalRate = useCallback(() => {
-    const baseRate = essence.generationRate || 0;
+    let totalBaseRateFromConnections = 0;
+    Object.values(essence.npcConnections).forEach(connection => {
+      totalBaseRateFromConnections += connection.baseGenerationRate;
+    });
+
+    // If essence.generationRate was meant as a global base, it would be added here.
+    // For now, let's make it purely connection-driven for clarity.
+    const baseRate = totalBaseRateFromConnections; 
     const traitMultiplier = calculateTraitBonus();
     return baseRate * traitMultiplier;
-  }, [essence.generationRate, calculateTraitBonus]);
+  }, [essence.npcConnections, calculateTraitBonus]);
 
-  // Update generation rate when bonuses change
+  // Update generation rate when connections or bonuses change
   useEffect(() => {
     const newRate = calculateTotalRate();
-    if (Math.abs(newRate - currentGenerationRate) > 0.01) { // Avoid unnecessary updates
+    // Only dispatch if the rate has significantly changed to avoid unnecessary re-renders
+    if (Math.abs(newRate - currentGenerationRate) > 0.001) { 
       dispatch(updateGenerationRate(newRate));
     }
   }, [calculateTotalRate, currentGenerationRate, dispatch]);
+
+  // Auto-generation hook for passive essence gain (modified to use tick-based generation per connection)
+  const gameLoop = useAppSelector(selectGameLoop); // Corrected selector
+  const currentTick = gameLoop.currentTick;
+
+  useEffect(() => {
+    if (!gameLoop.isRunning || gameLoop.isPaused) return;
+
+    // Iterate over each NPC connection and generate essence if due
+    Object.values(essence.npcConnections).forEach(connection => {
+      // Assuming 1 essence per tick for simplicity, or based on connection.baseGenerationRate
+      // For now, let's use connection.baseGenerationRate per tick
+      const ticksSinceLastGeneration = currentTick - connection.lastGeneratedTick;
+      
+      if (ticksSinceLastGeneration >= 1) { // If at least one tick has passed
+        const amountToGenerate = connection.baseGenerationRate * ticksSinceLastGeneration;
+        if (amountToGenerate > 0) {
+          dispatch(gainEssence({ 
+            amount: amountToGenerate, 
+            source: `npc_connection_${connection.npcId}`,
+            description: `Essence from ${connection.npcId} connection`
+          }));
+          // Update the lastGeneratedTick for this specific connection
+          dispatch(updateEssenceConnection({
+            npcId: connection.npcId,
+            updates: { lastGeneratedTick: currentTick }
+          }));
+        }
+      }
+    });
+  }, [dispatch, essence.npcConnections, currentTick, gameLoop.isRunning, gameLoop.isPaused]);
 
   // Manual essence generation function
   const generateEssence = useCallback((amount: number) => {
@@ -63,21 +103,8 @@ const useEssenceGeneration = () => {
   };
 };
 
-// Auto-generation hook for passive essence gain
-export const useAutoGenerateEssence = () => {
-  const dispatch = useAppDispatch();
-  const generationRate = useAppSelector(selectGenerationRate);
-  
-  useEffect(() => {
-    if (generationRate <= 0) return;
-    
-    const intervalId = setInterval(() => {
-      // Generate essence based on per-second rate
-      dispatch(gainEssence({ amount: generationRate, source: 'passive_generation' }));
-    }, 1000); // Generate every second
-    
-    return () => clearInterval(intervalId);
-  }, [dispatch, generationRate]);
-};
+// The useAutoGenerateEssence hook is now integrated into useEssenceGeneration's useEffect
+// and will be removed or refactored.
+// export const useAutoGenerateEssence = () => { ... }; // Removed or refactored
 
 export default useEssenceGeneration;

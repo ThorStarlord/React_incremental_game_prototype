@@ -40,9 +40,9 @@ export const selectDialogueHistory = createSelector(
   (npcState) => npcState.dialogueHistory || []
 );
 
-export const selectRelationshipChanges = createSelector(
+export const selectRelationshipHistory = createSelector( // Renamed from selectRelationshipChanges
   [selectNPCState],
-  (npcState) => npcState.relationshipChanges || []
+  (npcState) => npcState.relationshipHistory || [] // Updated to relationshipHistory
 );
 
 // Note: Using dialogueHistory with proper property names from DialogueEntry interface
@@ -69,24 +69,26 @@ export const selectNPCRelationshipValue = createSelector(
 );
 
 export const selectNPCsByLocation = createSelector(
-  [selectNPCs, (_state: RootState, location: string) => location],
-  (npcs, location) => Object.values(npcs).filter(npc => npc.location === location)
+  [selectNPCs],
+  (npcs) => (location: string) => Object.values(npcs).filter(npc => npc.location === location)
 );
 
 export const selectNPCsByStatus = createSelector(
-  [selectNPCs, (_state: RootState, status: string) => status],
-  (npcs, status) => Object.values(npcs).filter(npc => npc.status === status)
+  [selectNPCs],
+  (npcs) => (status: string) => Object.values(npcs).filter(npc => npc.status === status)
 );
 
 // Computed selectors
+// selectAllNPCs now returns the Record<string, NPC> directly
+// Other selectors that need an array of NPCs should use Object.values(npcs)
 export const selectAllNPCs = createSelector(
   [selectNPCs],
-  (npcs) => Object.values(npcs)
+  (npcs) => npcs
 );
 
 export const selectDiscoveredNPCsList = createSelector(
   [selectNPCs, selectDiscoveredNPCs],
-  (npcs, discoveredIds) => discoveredIds.map(id => npcs[id]).filter(Boolean)
+  (npcs, discoveredIds) => discoveredIds.map(id => npcs[id]).filter(Boolean) as NPC[]
 );
 
 export const selectAvailableNPCs = createSelector(
@@ -96,7 +98,7 @@ export const selectAvailableNPCs = createSelector(
 
 export const selectOnlineNPCs = createSelector(
   [selectAllNPCs],
-  (npcs) => npcs.filter(npc => npc.status === 'available' || npc.status === 'busy')
+  (npcs) => Object.values(npcs).filter(npc => npc.status === 'available' || npc.status === 'busy')
 );
 
 export const selectNPCDialogueHistory = createSelector(
@@ -106,9 +108,9 @@ export const selectNPCDialogueHistory = createSelector(
 );
 
 export const selectNPCRelationshipHistory = createSelector(
-  [selectRelationshipChanges, (_state: RootState, npcId: string) => npcId],
-  (relationshipChanges, npcId) => 
-    relationshipChanges.filter(entry => entry.npcId === npcId)
+  [selectRelationshipHistory, (_state: RootState, npcId: string) => npcId], // Use renamed selector
+  (relationshipHistory, npcId) => 
+    relationshipHistory.filter(entry => entry.npcId === npcId)
 );
 
 export const selectRecentInteractions = createSelector(
@@ -123,7 +125,7 @@ export const selectRecentlyActiveNPCs = createSelector(
   [selectAllNPCs],
   (npcs) => {
     const oneHourAgo = Date.now() - 3600000;
-    return npcs.filter(npc => npc.lastInteraction && npc.lastInteraction > oneHourAgo);
+    return Object.values(npcs).filter(npc => npc.lastInteraction && npc.lastInteraction > oneHourAgo);
   }
 );
 
@@ -166,7 +168,7 @@ export const selectNPCInteractionCapabilities = createSelector(
 
 export const selectHighRelationshipNPCs = createSelector(
   [selectAllNPCs],
-  (npcs) => npcs.filter(npc => npc.relationshipValue >= 25)
+  (npcs) => Object.values(npcs).filter(npc => npc.relationshipValue >= 25)
 );
 
 // Trait-related selectors with safe property access
@@ -185,23 +187,23 @@ export const selectNPCDiscoveredTraits = createSelector(
 
 export const selectNPCsWithTraits = createSelector(
   [selectAllNPCs],
-  (npcs) => npcs.filter(npc => npc.traits && Object.keys(npc.traits).length > 0)
+  (npcs) => Object.values(npcs).filter(npc => npc.traits && Object.keys(npc.traits).length > 0)
 );
 
 // Utility selectors
 export const selectNPCLocations = createSelector(
   [selectAllNPCs],
-  (npcs) => Array.from(new Set(npcs.map(npc => npc.location)))
+  (npcs) => Array.from(new Set(Object.values(npcs).map(npc => npc.location)))
 );
 
 export const selectNPCStatistics = createSelector(
   [selectNPCs, selectDiscoveredNPCs],
   (npcs, discoveredIds) => {
-    const allNPCs = Object.values(npcs);
-    const discoveredNPCs = discoveredIds.map(id => npcs[id]).filter(Boolean);
+    const allNPCsArray = Object.values(npcs);
+    const discoveredNPCs = discoveredIds.map(id => npcs[id]).filter(Boolean) as NPC[];
     
     return {
-      totalNPCs: allNPCs.length,
+      totalNPCs: allNPCsArray.length,
       discoveredCount: discoveredNPCs.length,
       availableCount: discoveredNPCs.filter(npc => npc.isAvailable).length,
       onlineCount: discoveredNPCs.filter(npc => npc.status === 'available' || npc.status === 'busy').length,
@@ -219,7 +221,7 @@ export const selectNPCStatistics = createSelector(
 // Relationship selectors
 export const selectNPCRelationships = createSelector(
   [selectAllNPCs],
-  (npcs) => npcs.reduce((acc, npc) => {
+  (npcs) => Object.values(npcs).reduce((acc: Record<string, { value: number; depth: number; loyalty: number }>, npc) => {
     acc[npc.id] = {
       value: npc.relationshipValue,
       depth: npc.connectionDepth,
@@ -260,9 +262,9 @@ export const selectMockNPCData = createSelector(
 
 // Advanced filtering selectors
 export const selectNPCsByRelationshipRange = createSelector(
-  [selectAllNPCs, (_state: RootState, minValue: number, maxValue: number) => ({ minValue, maxValue })],
-  (npcs, { minValue, maxValue }) => 
-    npcs.filter(npc => npc.relationshipValue >= minValue && npc.relationshipValue <= maxValue)
+  [selectAllNPCs],
+  (npcs) => (minValue: number, maxValue: number) => 
+    Object.values(npcs).filter(npc => npc.relationshipValue >= minValue && npc.relationshipValue <= maxValue)
 );
 
 // Session management selectors
@@ -283,7 +285,7 @@ export const selectInteractionSessionNPC = createSelector(
 export const selectNPCEssenceGeneration = createSelector(
   [selectAllNPCs],
   (npcs) => {
-    return npcs.reduce((total, npc) => {
+    return Object.values(npcs).reduce((total, npc) => {
       // Calculate essence generation based on relationship and connection depth
       const baseGeneration = Math.max(0, npc.relationshipValue - 10) * 0.1;
       const depthMultiplier = 1 + (npc.connectionDepth * 0.2);
@@ -295,7 +297,7 @@ export const selectNPCEssenceGeneration = createSelector(
 export const selectTopEssenceGenerators = createSelector(
   [selectAllNPCs],
   (npcs) => {
-    return npcs
+    return Object.values(npcs)
       .map(npc => ({
         ...npc,
         essenceGeneration: Math.max(0, npc.relationshipValue - 10) * 0.1 * (1 + (npc.connectionDepth * 0.2))

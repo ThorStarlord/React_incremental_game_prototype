@@ -17,8 +17,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import Panel from '../../../../shared/components/layout/Panel';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
-import { spendEssence } from '../../../Essence/state/EssenceSlice';
-import { acquireTrait } from '../../state/TraitsSlice';
+// import { spendEssence } from '../../../Essence/state/EssenceSlice'; // Removed
+// import { acquireTrait } from '../../state/TraitsSlice'; // Removed
+import { acquireTraitWithEssenceThunk } from '../../state/TraitThunks'; // Import the new thunk
 import { 
   selectAvailableTraitObjects, 
   selectTraitLoading, 
@@ -70,26 +71,24 @@ const TraitAcquisitionPanel: React.FC = React.memo(() => {
   }, [availableTraits, searchQuery, selectedCategory]);
 
   // Memoized trait acquisition handler
-  const handleAcquireTrait = useCallback((traitId: string, cost: number) => {
+  const handleAcquireTrait = useCallback(async (traitId: string, cost: number) => {
     if (essenceAmount < cost) {
       console.warn(`Insufficient essence: need ${cost}, have ${essenceAmount}`);
       return;
     }
 
     try {
-      const trait = availableTraits.find(t => t.id === traitId);
-      if (!trait) {
-        console.error(`Trait not found: ${traitId}`);
-        return;
+      const resultAction = await dispatch(acquireTraitWithEssenceThunk(traitId));
+      
+      if (acquireTraitWithEssenceThunk.fulfilled.match(resultAction)) {
+        console.log(`Successfully acquired trait: ${resultAction.payload.message}`);
+        // Optionally show a success notification
+      } else if (acquireTraitWithEssenceThunk.rejected.match(resultAction)) {
+        console.error(`Failed to acquire trait: ${resultAction.payload}`);
+        // Optionally show an error notification
       }
-
-      // Dispatch actions in sequence
-      dispatch(spendEssence({ amount: cost, source: 'trait_acquisition' }));
-      dispatch(acquireTrait(traitId));
-
-      console.log(`Successfully acquired trait: ${trait.name} for ${cost} essence`);
     } catch (e) {
-      console.error('Error acquiring trait:', e);
+      console.error('Unexpected error acquiring trait:', e);
     }
   }, [dispatch, essenceAmount, availableTraits]);
 

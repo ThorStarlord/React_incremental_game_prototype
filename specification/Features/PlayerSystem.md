@@ -53,7 +53,8 @@ Stats are calculated from multiple sources:
 ## 4. Progression System ✅ IMPLEMENTED
 
 ### 4.1. Character Advancement
-The Player system focuses on skill-based progression rather than traditional leveling:
+The Player system focuses on skill-based progression and a unique "Resonance Level" rather than traditional leveling:
+- **Resonance Level**: A core player ability that increases based on accumulated Essence. This level directly unlocks additional Player Trait Slots and may influence other Essence-related mechanics.
 - **Attribute Points**: Gained through gameplay achievements and milestones
 - **Skill Points**: Acquired through various in-game activities
 - **Trait Progression**: Character development through trait acquisition and permanence

@@ -7,13 +7,15 @@ import {
     selectTraitLoading, // Import loading selector
     selectTraitError    // Import error selector
 } from '../../state/TraitsSelectors'; 
-import { equipTrait } from '../../state/TraitsSlice';
+import { equipTrait } from '../../../Player/state/PlayerSlice'; // Import from PlayerSlice
+import { selectTraitSlots } from '../../../Player/state/PlayerSelectors'; // Import selectTraitSlots
 import TraitCard from '../ui/TraitCard';
 
 const AvailableTraitList: React.FC = () => {
   const dispatch = useAppDispatch();
   const availableTraits = useAppSelector(selectAvailableTraitObjectsForEquip);
   const availableSlotCount = useAppSelector(selectAvailableTraitSlotCount);
+  const playerTraitSlots = useAppSelector(selectTraitSlots); // Get player trait slots
 
   // Select loading and error states
   const isLoading = useAppSelector(selectTraitLoading); // Use the selector
@@ -40,7 +42,12 @@ const AvailableTraitList: React.FC = () => {
   const handleEquip = (traitId: string) => {
     // Optional: Add check here based on availableSlotCount before dispatching
     if (availableSlotCount > 0) {
-       dispatch(equipTrait({ traitId }));
+      const availableSlot = playerTraitSlots.find(slot => slot.isUnlocked && !slot.traitId);
+      if (availableSlot) {
+        dispatch(equipTrait({ traitId, slotIndex: availableSlot.index }));
+      } else {
+        console.warn("No available slots to equip trait (this should not happen if availableSlotCount > 0).");
+      }
     } else {
        console.warn("Attempted to equip trait with no available slots.");
        // Optionally show a user notification

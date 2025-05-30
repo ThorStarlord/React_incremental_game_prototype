@@ -5,6 +5,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
 import type { NPC } from '../../../state/NPCTypes';
+import type { Trait } from '../../../../Traits/state/TraitsTypes'; // Added Trait import
 import { useAppSelector } from '../../../../../app/hooks';
 
 interface NPCTraitsTabProps {
@@ -15,27 +16,52 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
   const playerAcquiredTraits = useAppSelector(state => state.traits.acquiredTraits);
   const allTraits = useAppSelector(state => state.traits.traits);
   const essenceAmount = useAppSelector(state => state.essence.currentEssence);
+  const playerRelationshipWithNPC = npc.relationshipValue; // Get current relationship value
 
-  // Get NPC's visible traits
-  const npcTraits = npc.traits ? Object.values(npc.traits).filter(trait => trait.isVisible) : [];
+  // Get NPC's teachable traits and their full details
+  const teachableTraitsDetails = React.useMemo(() => {
+    if (!npc.teachableTraits || !allTraits) {
+      return [];
+    }
+    return npc.teachableTraits
+      .map(traitId => allTraits[traitId])
+      .filter(trait => trait !== undefined); // Filter out undefined if a traitId is not in allTraits
+  }, [npc.teachableTraits, allTraits]);
   
   // Get traits player can share (acquired traits not already shared)
   const sharedTraitIds = npc.sharedTraitSlots?.map(slot => slot.traitId).filter(Boolean) || [];
   const shareableTraits = playerAcquiredTraits.filter(traitId => !sharedTraitIds.includes(traitId));
 
   const handleAcquireTrait = (traitId: string) => {
-    // TODO: Implement trait acquisition logic
-    console.log(`Acquiring trait ${traitId} from ${npc.name}`);
+    // TODO: Dispatch actual acquireTrait thunk from Traits feature
+    console.log(`Attempting to acquire trait ${traitId} from ${npc.name}`);
+    // Example: dispatch(acquireTraitThunk(traitId));
   };
 
   const handleShareTrait = (traitId: string) => {
-    // TODO: Implement trait sharing logic
-    console.log(`Sharing trait ${traitId} with ${npc.name}`);
+    // TODO: Dispatch actual shareTraitWithNPCThunk 
+    console.log(`Attempting to share trait ${traitId} with ${npc.name}`);
+    // Example: dispatch(shareTraitWithNPCThunk({ npcId: npc.id, traitId, slotIndex: ... }));
   };
 
-  const canAcquireTrait = (traitId: string): boolean => {
-    return !playerAcquiredTraits.includes(traitId) && essenceAmount >= (allTraits[traitId]?.essenceCost || 0);
+  // Updated canAcquireTrait to check all conditions
+  const canPlayerAcquireTrait = (trait: Trait): boolean => {
+    if (playerAcquiredTraits.includes(trait.id)) return false; // Already acquired
+
+    const relationshipReq = trait.requirements?.relationshipLevel;
+    if (relationshipReq && playerRelationshipWithNPC < relationshipReq) return false; // Relationship too low
+
+    const prerequisiteTraitsReq = trait.requirements?.prerequisiteTraits;
+    if (prerequisiteTraitsReq && prerequisiteTraitsReq.length > 0) {
+      if (!prerequisiteTraitsReq.every(reqId => playerAcquiredTraits.includes(reqId))) {
+        return false; // Missing prerequisite traits
+      }
+    }
+    
+    // Check essence cost
+    return essenceAmount >= (trait.essenceCost || 0);
   };
+
 
   return (
     <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
@@ -45,28 +71,24 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
         <Typography variant="h6">Trait Interaction with {npc.name}</Typography>
       </Box>
 
-      {/* NPC's Traits - Available for Acquisition */}
+      {/* NPC's Teachable Traits */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            {npc.name}'s Traits
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            These traits can be acquired through Emotional Resonance.
+            Traits {npc.name} Can Teach
           </Typography>
           
-          {npcTraits.length > 0 ? (
+          {teachableTraitsDetails.length > 0 ? (
             <Grid container spacing={2}>
-              {npcTraits.map((npcTrait) => {
-                const trait = allTraits[npcTrait.id];
-                if (!trait) return null;
-
-                const isAcquired = playerAcquiredTraits.includes(trait.id);
-                const canAcquire = canAcquireTrait(trait.id);
+              {teachableTraitsDetails.map((trait) => {
+                const isAcquiredByPlayer = playerAcquiredTraits.includes(trait.id);
+                const canAcquireNow = canPlayerAcquireTrait(trait);
                 const essenceCost = trait.essenceCost || 0;
+                const relationshipReq = trait.requirements?.relationshipLevel;
+                const prerequisiteTraitsReq = trait.requirements?.prerequisiteTraits;
 
                 return (
-                  <Grid item xs={12} key={trait.id}>
+                  <Grid item xs={12} md={6} key={trait.id}>
                     <Card variant="outlined">
                       <CardContent>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -75,7 +97,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                               {trait.description}
                             </Typography>
-                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1 }}>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', mb: 1 }}>
                               <Chip label={trait.category} size="small" variant="outlined" />
                               <Chip label={trait.rarity} size="small" color="secondary" />
                               {essenceCost > 0 && (
@@ -86,21 +108,28 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
                                 />
                               )}
                             </Box>
-                            {npcTrait.relationshipRequirement && (
-                              <Typography variant="caption" color="text.secondary">
-                                Requires relationship level {npcTrait.relationshipRequirement}+
+                            {relationshipReq && (
+                              <Typography variant="caption" color={playerRelationshipWithNPC >= relationshipReq ? 'success.main' : 'error.main'}>
+                                Requires Relationship: {relationshipReq} (Current: {playerRelationshipWithNPC})
                               </Typography>
+                            )}
+                            {prerequisiteTraitsReq && prerequisiteTraitsReq.length > 0 && (
+                              <Box>
+                                <Typography variant="caption" color="text.secondary">
+                                  Requires Traits: {prerequisiteTraitsReq.map(id => allTraits[id]?.name || id).join(', ')}
+                                </Typography>
+                              </Box>
                             )}
                           </Box>
                           
                           <Button
-                            variant={isAcquired ? "outlined" : "contained"}
+                            variant={isAcquiredByPlayer ? "outlined" : "contained"}
                             size="small"
                             startIcon={<GetAppIcon />}
                             onClick={() => handleAcquireTrait(trait.id)}
-                            disabled={isAcquired || !canAcquire}
+                            disabled={isAcquiredByPlayer || !canAcquireNow}
                           >
-                            {isAcquired ? 'Acquired' : 'Acquire'}
+                            {isAcquiredByPlayer ? 'Acquired' : 'Learn'}
                           </Button>
                         </Box>
                       </CardContent>
@@ -111,7 +140,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
             </Grid>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              No traits visible from {npc.name} at your current relationship level.
+              {npc.name} has no traits to teach you at this time, or you do not meet the requirements to see them.
             </Typography>
           )}
         </CardContent>

@@ -1,16 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectTraits, selectTraitSlots, selectEquippedTraitIds, selectPermanentTraits, equipTrait, unequipTrait } from '../../state/TraitsSlice';
+import { selectTraits, selectPermanentTraits, selectAvailableTraitObjects, selectTraitLoading, selectTraitError } from '../../state/TraitsSelectors';
 import { makeTraitPermanentThunk } from '../../state/TraitThunks';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
-import { selectAvailableTraitObjects, selectTraitLoading, selectTraitError } from '../../state/TraitsSelectors';
+import { selectTraitSlots, selectEquippedTraitIds } from '../../../Player/state/PlayerSelectors'; // Import selectors from PlayerSelectors
+import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice'; // Import actions from PlayerSlice
 import TraitSlots from '../ui/TraitSlots';
 
 const TraitSlotsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const traitsData = useAppSelector(selectTraits);
-  const traitSlots = useAppSelector(selectTraitSlots);
-  const equippedTraitIds = useAppSelector(selectEquippedTraitIds);
+  const playerTraitSlots = useAppSelector(selectTraitSlots); // Get trait slots from PlayerSelectors
+  const equippedTraitIds = useAppSelector(selectEquippedTraitIds); // Get equipped trait IDs from PlayerSelectors
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
   const essence = useAppSelector(selectCurrentEssence);
   const availableTraits = useAppSelector(selectAvailableTraitObjects);
@@ -30,11 +31,21 @@ const TraitSlotsContainer: React.FC = () => {
   const onSelectTrait = useCallback((traitId: string) => setSelectedTraitId(traitId), []);
 
   const onConfirmAssign = useCallback(() => { 
-    if (selectedTraitId && activeSlotId) dispatch(equipTrait({ traitId: selectedTraitId, slotIndex: traitSlots.find(s => s.id === activeSlotId)!.index }));
+    if (selectedTraitId && activeSlotId) {
+      const targetSlot = playerTraitSlots.find(s => s.id === activeSlotId);
+      if (targetSlot) {
+        dispatch(equipTrait({ traitId: selectedTraitId, slotIndex: targetSlot.index }));
+      }
+    }
     onCloseSelector();
-  }, [selectedTraitId, activeSlotId, dispatch, onCloseSelector, traitSlots]);
+  }, [selectedTraitId, activeSlotId, dispatch, onCloseSelector, playerTraitSlots]);
 
-  const onRemove = useCallback((id: string) => dispatch(unequipTrait(id)), [dispatch]);
+  const onRemove = useCallback((slotIndex: number) => { // Changed parameter from id: string to slotIndex: number
+    const targetSlot = playerTraitSlots.find(slot => slot.index === slotIndex);
+    if (targetSlot && targetSlot.traitId) {
+      dispatch(unequipTrait({ slotIndex: targetSlot.index }));
+    }
+  }, [dispatch, playerTraitSlots]);
 
   const onMakePermanent = useCallback((id: string) => setConfirmPermanent({ open: true, traitId: id }), []);
 
@@ -61,7 +72,7 @@ const TraitSlotsContainer: React.FC = () => {
 
   // Create props object matching the actual TraitSlotsProps interface
   const traitSlotsProps = {
-    traitSlots,
+    traitSlots: playerTraitSlots, // Pass playerTraitSlots
     equippedTraits, // Component expects equippedTraits, not equippedTraitIds
     availableTraits: eligibleTraits, // Component expects availableTraits, not eligibleTraits
     permanentTraitIds,
@@ -73,8 +84,8 @@ const TraitSlotsContainer: React.FC = () => {
     onOpenSelector,
     onCloseSelector,
     onSelectTrait,
-    onEquipTrait: onConfirmAssign, // Component expects onEquipTrait, not onConfirmAssign
-    onUnequipTrait: onRemove, // Component expects onUnequipTrait, not onRemove
+    onEquipTrait: onConfirmAssign,
+    onUnequipTrait: onRemove,
     onMakePermanent,
     onConfirmPermanent,
     onCancelPermanent,

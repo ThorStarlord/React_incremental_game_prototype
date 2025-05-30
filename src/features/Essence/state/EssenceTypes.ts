@@ -5,15 +5,23 @@
  * Follows Feature-Sliced Design principles with co-located type definitions.
  */
 
+export interface EssenceConnection {
+  npcId: string;
+  connectionDepth: number; // Represents the strength/depth of the connection (e.g., 0-100)
+  baseGenerationRate: number; // Base essence generated per tick by this specific connection
+  lastGeneratedTick: number; // The game tick when essence was last generated from this connection
+}
+
 export interface EssenceState {
   currentEssence: number;
   totalCollected: number;
-  generationRate: number; // per second
+  generationRate: number; // overall passive generation rate per second (sum of all active connections + other bonuses)
   perClickValue: number;
-  lastGenerationTime: number;
+  lastGenerationTime: number; // Timestamp of the last time passive essence was generated
   isGenerating: boolean;
   loading: boolean;
   error: string | null;
+  npcConnections: Record<string, EssenceConnection>; // Map of NPC ID to their EssenceConnection data
 }
 
 export interface EssenceGenerationSource {
@@ -40,5 +48,5 @@ export interface EssenceStatistics {
   totalCollected: number;
   generationRate: number;
   perClickValue: number;
-  activeConnections: number;
+  activeConnections: number; // This will now be derived from npcConnections
 }

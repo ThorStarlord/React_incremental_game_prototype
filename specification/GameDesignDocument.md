@@ -55,13 +55,19 @@ Players should feel like they're building a network of meaningful relationships 
 ## 🧠 Core Mechanics
 
 ### Emotional Connection System
-**Concept**: The foundation of all progression, representing the depth of understanding and bond between player and NPCs.
+**Concept**: The foundation of all progression, representing the depth of understanding and bond between player and NPCs. This connection is crucial for unlocking interactions and generating Essence.
 
 **Implementation**:
-- **Connection Depth** - Numerical representation of relationship strength (0-100)
-- **Connection Quality** - Categorical assessment of relationship type (friendship, mentorship, rivalry)
-- **Essence Generation** - Passive resource production based on active connections
-- **Unlock Gates** - Deeper connections unlock new interaction options and content
+- **Connection Depth** - Numerical representation of relationship strength (0-100). This is the primary stat for tracking Emotional Connection.
+- **Connection Quality** - Categorical assessment of relationship type (friendship, mentorship, rivalry) - *Planned for future implementation.*
+- **Essence Generation** - Passive resource production directly linked to the `connectionDepth` of active emotional connections.
+- **Unlock Gates** - Deeper connections unlock new interaction options and content (e.g., tabs in the NPC panel).
+
+**Player Actions**:
+- Engage in meaningful dialogue choices that resonate with NPC personalities
+- Complete personal quests or favors that matter to the NPC
+- Share beneficial traits to demonstrate care and investment
+- Spend time in activities the NPC enjoys or values
 
 **Player Actions**:
 - Engage in meaningful dialogue choices that resonate with NPC personalities
@@ -70,13 +76,20 @@ Players should feel like they're building a network of meaningful relationships 
 - Spend time in activities the NPC enjoys or values
 
 ### Essence System
-**Concept**: Metaphysical currency representing emotional energy and potential for growth.
+**Concept**: Metaphysical currency representing emotional energy and potential for growth. Essence is the primary resource for advanced actions and progression.
 
 **Generation**:
-- **Passive Income** - Continuous generation from all active emotional connections
-- **Quality Multipliers** - Deeper and more diverse connections generate more Essence
-- **NPC Uniqueness** - More complex or powerful NPCs provide higher base generation
-- **Manual Actions** - Limited direct generation through focused meditation/resonance
+- **Passive Income** - Continuous generation directly from the `connectionDepth` of all active emotional connections.
+- **Connection Depth Influence** - Higher `connectionDepth` with NPCs leads to increased passive Essence generation.
+- **NPC Uniqueness** - More complex or powerful NPCs provide higher base generation rates for their connections.
+- **Manual Actions** - Limited direct generation through focused actions (e.g., clicking a button).
+- **Trait Multipliers** - Certain player traits can increase the overall Essence generation rate.
+
+**Consumption**:
+- **Trait Acquisition (Resonance)** - Primary Essence sink for learning new abilities from NPCs. This is the "Resonance" action.
+- **Trait Permanence** - Major investment to make traits always active without slot usage.
+- **Copy Acceleration** - Speed up entity creation and development.
+- **Emotional Influence** - Direct manipulation of NPC emotional states - *Planned for future implementation.*
 
 **Consumption**:
 - **Trait Acquisition** - Primary Essence sink for learning new abilities
@@ -85,13 +98,13 @@ Players should feel like they're building a network of meaningful relationships 
 - **Emotional Influence** - Direct manipulation of NPC emotional states
 
 ### Trait System
-**Concept**: Abilities, characteristics, and passive bonuses that define character capabilities.
+**Concept**: Abilities, characteristics, and passive bonuses that define character capabilities. Traits are acquired from NPCs and equipped to enhance the player.
 
 **Acquisition Methods**:
-- **Resonance** - Primary method using Essence to copy observed traits from NPCs
-- **Quest Rewards** - Direct grants from significant achievements
-- **Research** - Future system for discovering abstract or unique traits
-- **Copy Inheritance** - Traits passed to created entities
+- **Resonance** - The primary method for acquiring traits. This is an **action** where the player spends **Essence** to copy an observed trait from an NPC. This action requires a sufficient level of **Emotional Connection** (`connectionDepth`) with the NPC.
+- **Quest Rewards** - Direct grants from significant achievements.
+- **Research** - Future system for discovering abstract or unique traits.
+- **Copy Inheritance** - Traits passed to created entities.
 
 **Management**:
 - **Limited Slots** - Players start with few trait slots, unlock more through progression
@@ -116,19 +129,24 @@ Players should feel like they're building a network of meaningful relationships 
 - **Conflict Resolution** - Help NPCs overcome personal challenges or problems
 
 ### Copy Creation System
-**Concept**: Transform the deepest emotional connections into allied entities that assist the player.
+**Concept**: Transform deep emotional connections into allied entities that assist the player. Copies inherit aspects of the player and their "parent" NPC.
 
 **Creation Process**:
-- **Seduction Outcome** - Successful deep relationship interaction creates Copy opportunity
-- **Growth Options** - Choose between time-intensive natural growth or Essence-accelerated development
-- **Trait Inheritance** - New Copy inherits traits shared with the parent NPC at creation time
-- **Loyalty System** - Ongoing relationship maintenance required for reliable Copy behavior
+- **Seduction Outcome** - A successful outcome of a specific deep relationship interaction with an NPC creates the opportunity to create a Copy.
+- **Growth Options** - Choose between time-intensive natural growth or Essence-accelerated development.
+- **Trait Inheritance** - A new Copy inherits a snapshot of traits the player had actively shared with the parent NPC at the moment of creation.
+- **Loyalty System** - Ongoing relationship maintenance is required for reliable Copy behavior.
+
+**Inheritance**:
+- **Emotional Resonance (Player Ability):** Copies inherit the player's core "Emotional Resonance" ability. This is a planned player characteristic that allows Copies to potentially form connections and interact with the Trait system (perhaps in a limited way initially). Its specific mechanics are currently undefined and planned for future implementation with the Copy system. **Note: This is distinct from the sidelined "Soul Resonance" concept found in `soulResonanceUtils.ts`.**
+- **Shared Traits:** Copies inherit *snapshots* of any traits the player had actively shared with the *target parent* via Trait Slots *at the moment of creation*. These become the Copy's initial base traits. They do *not* automatically update if the player later changes the traits shared with the parent.
+- **Player Traits:** Copies do not inherit traits the player has permanently active or equipped for themselves by default, to differentiate them from the player.
 
 **Copy Management**:
-- **Task Assignment** - Direct Copies to perform specific activities or goals
-- **Trait Sharing** - Grant additional abilities to Copies for specialized roles
-- **Loyalty Maintenance** - Ongoing investment required to prevent Copy independence or rebellion
-- **Capability Limits** - Maximum number of active Copies based on player progression
+- **Task Assignment** - Direct Copies to perform specific activities or goals.
+- **Trait Sharing** - Grant additional abilities to Copies for specialized roles via dedicated Copy Trait Slots.
+- **Loyalty Maintenance** - Ongoing investment required to prevent Copy independence or rebellion.
+- **Capability Limits** - Maximum number of active Copies based on player progression.
 
 ## 🎨 Aesthetic & Narrative Direction
 
@@ -222,12 +240,12 @@ Players should feel like they're building a network of meaningful relationships 
 - ✅ Responsive navigation and layout system
 - ✅ Save/load functionality with import/export
 
-### Phase 2: Enhanced Interactions 🔄 **IN PROGRESS**
-- 🔄 Advanced NPC dialogue systems
-- 🔄 Trait acquisition and permanence mechanics
-- 🔄 Enhanced Essence generation from relationships
-- 📋 Copy creation system implementation
-- 📋 Quest system foundation
+### Phase 2: Enhanced Interactions ✅ **COMPLETE**
+- ✅ Advanced NPC dialogue systems (Basic implementation complete)
+- ✅ Trait acquisition and permanence mechanics (Essence cost for acquisition and permanence implemented)
+- ✅ Enhanced Essence generation from relationships (Passive generation now based on NPC connection depth)
+- 📋 Copy creation system implementation (Planned)
+- 📋 Quest system foundation (Planned)
 
 ### Phase 3: Polish & Expansion 📋 **PLANNED**
 - 📋 Advanced Copy management and task systems

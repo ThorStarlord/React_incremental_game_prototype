@@ -98,7 +98,8 @@ export const selectPerformanceStats = createSelector(
     totalPlaytime: player.totalPlaytime,
     powerLevel: Math.floor(player.totalPlaytime / 3600000) + 1, // Basic power level calculation
     availableAttributePoints: player.availableAttributePoints,
-    availableSkillPoints: player.availableSkillPoints
+    availableSkillPoints: player.availableSkillPoints,
+    resonanceLevel: player.resonanceLevel, // Include resonanceLevel
   })
 );
 
@@ -113,9 +114,10 @@ export const selectAvailableSkillPoints = createSelector(
   (player) => player.availableSkillPoints
 );
 
-export const selectEquippedTraits = createSelector(
+// Selects the IDs of currently equipped traits from traitSlots
+export const selectEquippedTraitIds = createSelector(
   [selectPlayer],
-  (player) => player.equippedTraits
+  (player) => player.traitSlots.filter(slot => slot.traitId !== null).map(slot => slot.traitId as string)
 );
 
 export const selectPermanentTraits = createSelector(
@@ -136,6 +138,11 @@ export const selectIsPlayerAlive = createSelector(
 export const selectTotalPlaytime = createSelector(
   [selectPlayer],
   (player) => player.totalPlaytime
+);
+
+export const selectMaxTraitSlots = createSelector(
+  [selectPlayer],
+  (player) => player.maxTraitSlots
 );
 
 // Legacy selectors for backward compatibility

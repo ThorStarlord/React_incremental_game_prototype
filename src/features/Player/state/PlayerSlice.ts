@@ -6,8 +6,9 @@ import {
   StatusEffect,
   AllocateAttributePointPayload,
   EquipTraitPayload,
-  UnequipTraitPayload
+  UnequipTraitPayload,
 } from './PlayerTypes';
+import { TraitSlot } from '../../Traits/state/TraitsTypes'; // Import TraitSlot
 
 // Initial player stats following specification defaults
 const initialStats: PlayerStats = {
@@ -34,6 +35,15 @@ const initialAttributes: PlayerAttributes = {
   charisma: 10
 };
 
+// Initial trait slots for player (default unlocked)
+const initialPlayerTraitSlots: TraitSlot[] = [
+  { id: 'player-slot-0', index: 0, isUnlocked: true, traitId: null },
+  { id: 'player-slot-1', index: 1, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 2 } },
+  { id: 'player-slot-2', index: 2, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 3 } },
+  { id: 'player-slot-3', index: 3, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 4 } },
+  { id: 'player-slot-4', index: 4, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 5 } },
+];
+
 // Initial player state
 const initialState: PlayerState = {
   stats: {
@@ -53,11 +63,12 @@ const initialState: PlayerState = {
   availableAttributePoints: 0,
   availableSkillPoints: 0,
   statusEffects: [],
-  equippedTraits: [],
   permanentTraits: [],
-  traitSlots: [], // Add missing traitSlots property
+  traitSlots: initialPlayerTraitSlots, // Use the new initial player trait slots
+  maxTraitSlots: 5, // Max slots for the player
   totalPlaytime: 0,
-  isAlive: true
+  isAlive: true,
+  resonanceLevel: 1, // Initial Resonance Level
 };
 
 const playerSlice = createSlice({
@@ -113,27 +124,41 @@ const playerSlice = createSlice({
       state.availableSkillPoints = Math.max(0, action.payload);
     },
 
-    // Equip a trait
+    // Equip a trait to a specific slot
     equipTrait: (state, action: PayloadAction<EquipTraitPayload>) => {
       const { traitId, slotIndex } = action.payload;
       
-      // Ensure we don't exceed array bounds
-      while (state.equippedTraits.length <= slotIndex) {
-        state.equippedTraits.push(null);
+      const targetSlot = state.traitSlots.find(slot => slot.index === slotIndex);
+
+      if (!targetSlot) {
+        console.warn(`Slot index ${slotIndex} not found.`);
+        return;
       }
-      
-      state.equippedTraits[slotIndex] = traitId;
+      if (!targetSlot.isUnlocked) {
+        console.warn(`Slot index ${slotIndex} is locked.`);
+        return;
+      }
+      if (targetSlot.traitId) {
+        console.warn(`Slot index ${slotIndex} is already occupied by ${targetSlot.traitId}.`);
+        return; // Or handle replacement if desired
+      }
+
+      targetSlot.traitId = traitId;
+      console.log(`Equipped trait ${traitId} to slot index ${targetSlot.index}.`);
       
       // Recalculate stats with new trait
       playerSlice.caseReducers.recalculateStats(state);
     },
 
-    // Unequip a trait
+    // Unequip a trait from a specific slot
     unequipTrait: (state, action: PayloadAction<UnequipTraitPayload>) => {
       const { slotIndex } = action.payload;
       
-      if (state.equippedTraits[slotIndex]) {
-        state.equippedTraits[slotIndex] = null;
+      const targetSlot = state.traitSlots.find(slot => slot.index === slotIndex);
+
+      if (targetSlot && targetSlot.traitId) {
+        targetSlot.traitId = null;
+        console.log(`Unequipped trait from slot index ${slotIndex}.`);
         
         // Recalculate stats without the trait
         playerSlice.caseReducers.recalculateStats(state);
@@ -149,6 +174,22 @@ const playerSlice = createSlice({
         // Recalculate stats with new permanent trait
         playerSlice.caseReducers.recalculateStats(state);
       }
+    },
+
+    // Unlock a player trait slot
+    unlockTraitSlot: (state, action: PayloadAction<number>) => {
+      const slotIndex = action.payload;
+      const slot = state.traitSlots.find(s => s.index === slotIndex);
+      
+      if (slot && !slot.isUnlocked) {
+        slot.isUnlocked = true;
+        console.log(`Player trait slot ${slotIndex} unlocked.`);
+      }
+    },
+
+    // Update player's Resonance Level
+    updateResonanceLevel: (state, action: PayloadAction<number>) => {
+      state.resonanceLevel = action.payload;
     },
 
     // Add status effect
@@ -184,12 +225,6 @@ const playerSlice = createSlice({
       const constitutionBonus = Math.floor((attributes.constitution - 10) / 2);
       const wisdomBonus = Math.floor((attributes.wisdom - 10) / 2);
       
-      // Calculate derived stats from attributes
-      const maxHealth = Math.max(1, baseStats.maxHealth + (constitutionBonus * 5));
-      const maxMana = Math.max(0, baseStats.maxMana + (intelligenceBonus * 3));
-      const healthRegen = Math.max(0, baseStats.healthRegen + (constitutionBonus * 0.1));
-      const manaRegen = Math.max(0, baseStats.manaRegen + (wisdomBonus * 0.15));
-      
       // Apply status effect modifiers
       let statusModifiers = {
         health: 0,
@@ -216,15 +251,15 @@ const playerSlice = createSlice({
       // Update calculated stats with consistent property names
       state.stats = {
         ...state.stats,
-        maxHealth,
-        maxMana,
-        health: Math.max(0, Math.min(maxHealth, state.stats.health)),
-        mana: Math.max(0, Math.min(maxMana, state.stats.mana)),
+        maxHealth: Math.max(1, baseStats.maxHealth + (constitutionBonus * 5)),
+        maxMana: Math.max(0, baseStats.maxMana + (intelligenceBonus * 3)),
+        health: Math.max(0, Math.min(state.stats.health, state.stats.maxHealth)), // Ensure current health doesn't exceed new max
+        mana: Math.max(0, Math.min(state.stats.mana, state.stats.maxMana)), // Ensure current mana doesn't exceed new max
         attack: Math.max(0, baseStats.attack + strengthBonus + statusModifiers.attack),
         defense: Math.max(0, baseStats.defense + constitutionBonus + statusModifiers.defense),
         speed: Math.max(0, baseStats.speed + dexterityBonus + statusModifiers.speed),
-        healthRegen: Math.max(0, healthRegen + statusModifiers.healthRegen),
-        manaRegen: Math.max(0, manaRegen + statusModifiers.manaRegen),
+        healthRegen: Math.max(0, baseStats.healthRegen + (constitutionBonus * 0.1) + statusModifiers.healthRegen), // Corrected: use baseStats.healthRegen
+        manaRegen: Math.max(0, baseStats.manaRegen + (wisdomBonus * 0.15) + statusModifiers.manaRegen), // Corrected: use baseStats.manaRegen
         criticalChance: Math.max(0, Math.min(1, baseStats.criticalChance + (dexterityBonus * 0.01) + statusModifiers.criticalChance)),
         criticalDamage: Math.max(1, baseStats.criticalDamage + (strengthBonus * 0.05) + statusModifiers.criticalDamage),
       };
@@ -243,6 +278,8 @@ export const {
   equipTrait,
   unequipTrait,
   addPermanentTrait,
+  unlockTraitSlot, // Export new action
+  updateResonanceLevel, // Export new action
   addStatusEffect,
   removeStatusEffect,
   updatePlaytime,

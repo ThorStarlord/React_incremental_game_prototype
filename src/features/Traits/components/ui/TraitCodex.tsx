@@ -32,6 +32,16 @@ import {
 } from '@mui/icons-material';
 import type { Trait } from '../../state/TraitsTypes';
 
+// Define an explicit type for processed traits
+type ProcessedTrait = Trait & {
+  isDiscovered: boolean;
+  isAcquired: boolean;
+  isPermanent: boolean;
+  statusLabel: string;
+  statusColor: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
+  canBeAcquired: boolean;
+};
+
 /**
  * Props for the TraitCodex component
  */
@@ -77,46 +87,87 @@ export const TraitCodex: React.FC<TraitCodexProps> = React.memo(({
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
 
-  // Get unique categories and rarities for filters
+  // Get unique categories and rarities for filters from allTraits
+  const allTraitsArray = useMemo(() => Object.values(allTraits), [allTraits]);
+
   const categories = useMemo(() => {
-    const cats = new Set(discoveredTraits.map(trait => trait.category));
+    const cats = new Set(allTraitsArray.map(trait => trait.category));
     return ['all', ...Array.from(cats).sort()];
-  }, [discoveredTraits]);
+  }, [allTraitsArray]);
 
   const rarities = useMemo(() => {
-    const rars = new Set(discoveredTraits.map(trait => trait.rarity));
+    const rars = new Set(allTraitsArray.map(trait => trait.rarity));
     return ['all', ...Array.from(rars).sort()];
-  }, [discoveredTraits]);
+  }, [allTraitsArray]);
 
-  // Filter and search traits
-  const filteredTraits = useMemo(() => {
-    let traits = discoveredTraits;
+  // Process traits to include status and acquisition info
+  const processedTraits = useMemo((): ProcessedTrait[] => {
+    return allTraitsArray.map(trait => {
+      const isDiscovered = discoveredTraits.some(d => d.id === trait.id);
+      const isAcquired = acquiredTraitIds.includes(trait.id);
+      const isPermanent = permanentTraitIds.includes(trait.id);
+      let statusLabel = 'Hidden';
+      let statusColor: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+
+      if (isPermanent) {
+        statusLabel = 'Permanent';
+        statusColor = 'success';
+      } else if (isAcquired) {
+        statusLabel = 'Acquired';
+        statusColor = 'primary';
+      } else if (isDiscovered) {
+        statusLabel = 'Discovered';
+        statusColor = 'info';
+      }
+      
+      return {
+        ...trait,
+        isDiscovered,
+        isAcquired,
+        isPermanent,
+        statusLabel,
+        statusColor,
+        canBeAcquired: canAcquireTrait(trait) // Use the existing prop function
+      };
+    });
+  }, [allTraitsArray, discoveredTraits, acquiredTraitIds, permanentTraitIds, canAcquireTrait]);
+
+  // Filter and sort traits
+  const filteredAndSortedTraits = useMemo(() => {
+    let traitsToDisplay = processedTraits;
+
+    if (!showHidden) {
+      // If not showing hidden, only show discovered traits
+      traitsToDisplay = traitsToDisplay.filter(trait => trait.isDiscovered);
+    }
 
     // Search filter
     if (searchTerm) {
-      traits = traits.filter(trait =>
+      traitsToDisplay = traitsToDisplay.filter(trait =>
         trait.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         trait.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     // Category filter
     if (categoryFilter !== 'all') {
-      traits = traits.filter(trait => trait.category === categoryFilter);
+      traitsToDisplay = traitsToDisplay.filter(trait => trait.category === categoryFilter);
     }
-
     // Rarity filter
     if (rarityFilter !== 'all') {
-      traits = traits.filter(trait => trait.rarity === rarityFilter);
+      traitsToDisplay = traitsToDisplay.filter(trait => trait.rarity === rarityFilter);
     }
-
-    // Only available filter
+    // Only available to acquire filter
     if (showOnlyAvailable) {
-      traits = traits.filter(trait => canAcquireTrait(trait));
+      traitsToDisplay = traitsToDisplay.filter(trait => trait.isDiscovered && !trait.isAcquired && trait.canBeAcquired);
     }
 
-    return traits.sort((a, b) => a.name.localeCompare(b.name));
-  }, [discoveredTraits, searchTerm, categoryFilter, rarityFilter, showOnlyAvailable, canAcquireTrait]);
+    return traitsToDisplay.sort((a, b) => {
+      // Sort by discovery status first (discovered > hidden), then by name
+      if (a.isDiscovered && !b.isDiscovered) return -1;
+      if (!a.isDiscovered && b.isDiscovered) return 1;
+      return a.name.localeCompare(b.name);
+    });
+  }, [processedTraits, searchTerm, categoryFilter, rarityFilter, showOnlyAvailable, showHidden]);
 
   const handleAcquireTrait = useCallback((trait: Trait) => {
     if (!canAcquireTrait(trait)) return;
@@ -136,19 +187,9 @@ export const TraitCodex: React.FC<TraitCodexProps> = React.memo(({
     }
   };
 
-  const getTraitStatus = (trait: Trait) => {
-    if (permanentTraitIds.includes(trait.id)) {
-      return { status: 'permanent', label: 'Permanent', color: 'success' as const };
-    }
-    if (acquiredTraitIds.includes(trait.id)) {
-      return { status: 'acquired', label: 'Acquired', color: 'primary' as const };
-    }
-    return { status: 'available', label: 'Available', color: 'default' as const };
-  };
+  // Removed getTraitStatus as status is now part of processedTraits
 
-  const renderTraitCard = (trait: Trait) => {
-    const status = getTraitStatus(trait);
-    const canAcquire = canAcquireTrait(trait);
+  const renderTraitCard = (trait: ProcessedTrait) => { // Use the new explicit type
     const affordability = trait.essenceCost ? getTraitAffordability(trait, 'acquire') : null;
 
     return (
@@ -158,54 +199,79 @@ export const TraitCodex: React.FC<TraitCodexProps> = React.memo(({
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          border: status.status === 'permanent' ? 2 : 1,
-          borderColor: status.status === 'permanent' ? 'success.main' : 'divider'
+          border: trait.isPermanent ? 2 : 1,
+          borderColor: trait.isPermanent ? 'success.main' : (trait.isDiscovered ? 'divider' : 'warning.light'),
+          opacity: trait.isDiscovered ? 1 : 0.7,
         }}
       >
         <CardContent sx={{ flexGrow: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {trait.name}
+              {trait.isDiscovered ? trait.name : '???'}
             </Typography>
             <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+              {trait.isDiscovered && (
+                <Chip
+                  label={trait.rarity}
+                  size="small"
+                  color={getRarityColor(trait.rarity)}
+                />
+              )}
               <Chip
-                label={trait.rarity}
+                label={trait.statusLabel}
                 size="small"
-                color={getRarityColor(trait.rarity)}
-              />
-              <Chip
-                label={status.label}
-                size="small"
-                color={status.color}
-                icon={status.status === 'permanent' ? <CheckCircleIcon /> : undefined}
+                color={trait.statusColor}
+                icon={trait.isPermanent ? <CheckCircleIcon /> : (trait.isDiscovered ? undefined : <VisibilityOffIcon fontSize="small" />)}
               />
             </Box>
           </Box>
 
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {trait.description}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: '60px' /* Ensure consistent card height */ }}>
+            {trait.isDiscovered ? trait.description : 'This trait is yet to be discovered.'}
           </Typography>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
+          {trait.isDiscovered && (
+            <>
+              {/* Effects Display */}
+              {trait.effects && Object.keys(trait.effects).length > 0 && (
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="caption" color="text.secondary" display="block">Effects:</Typography>
+                  {Object.entries(trait.effects).map(([key, value]) => (
+                    <Chip key={key} label={`${key.replace(/([A-Z])/g, ' $1').trim()}: ${value}`} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
+                  ))}
+                </Box>
+              )}
+
               <Typography variant="caption" color="text.secondary">
                 Category: {trait.category}
               </Typography>
-              {trait.source && (
+              {trait.tier && (
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                  Source: {trait.source}
+                  Tier: {trait.tier}
                 </Typography>
               )}
-            </Box>
-
-            {status.status === 'available' && trait.essenceCost && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {trait.requirements?.prerequisiteTraits && trait.requirements.prerequisiteTraits.length > 0 && (
+                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                   Requires: {trait.requirements.prerequisiteTraits.join(', ')}
+                 </Typography>
+              )}
+               {trait.sourceNpc && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                  Source: NPC {trait.sourceNpc} {trait.requirements?.relationshipLevel ? `(Rel: ${trait.requirements.relationshipLevel})` : ''}
+                </Typography>
+              )}
+            </>
+          )}
+          
+          <Box sx={{ mt: 'auto', pt: 1 }}> {/* Push button to bottom */}
+            {trait.isDiscovered && !trait.isAcquired && trait.essenceCost && (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1, width: '100%' }}>
                 {affordability && (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <EssenceIcon fontSize="small" />
                     <Typography
                       variant="body2"
-                      color={affordability.canAfford ? 'success.main' : 'error.main'}
+                      color={affordability.canAfford ? 'text.primary' : 'error.main'}
                     >
                       {trait.essenceCost}
                     </Typography>
@@ -213,18 +279,18 @@ export const TraitCodex: React.FC<TraitCodexProps> = React.memo(({
                 )}
                 <Tooltip
                   title={
-                    !canAcquire
+                    !trait.canBeAcquired
                       ? "Requirements not met"
                       : !affordability?.canAfford
                       ? `Need ${trait.essenceCost} Essence (have ${currentEssence})`
                       : "Acquire this trait"
                   }
                 >
-                  <span>
+                  <span> {/* Tooltip needs a span wrapper for disabled buttons */}
                     <Button
                       variant="contained"
                       size="small"
-                      disabled={!canAcquire}
+                      disabled={!trait.canBeAcquired || !affordability?.canAfford}
                       onClick={() => handleAcquireTrait(trait)}
                       startIcon={<StarIcon />}
                     >
@@ -234,13 +300,18 @@ export const TraitCodex: React.FC<TraitCodexProps> = React.memo(({
                 </Tooltip>
               </Box>
             )}
+             {trait.isDiscovered && !trait.isAcquired && !trait.essenceCost && ( // For traits that are discovered but not acquirable via essence
+                <Typography variant="caption" color="text.secondary" align="right" sx={{ display: 'block', width: '100%' }}>
+                  Acquired via other means.
+                </Typography>
+             )}
           </Box>
         </CardContent>
       </Card>
     );
   };
 
-  const undiscoveredCount = Object.keys(allTraits).length - discoveredTraits.length;
+  const undiscoveredCount = processedTraits.filter(trait => !trait.isDiscovered).length;
 
   return (
     <Box>
@@ -261,16 +332,16 @@ export const TraitCodex: React.FC<TraitCodexProps> = React.memo(({
           <Typography variant="h6" gutterBottom>
             Discovery Progress
           </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Discovered
-              </Typography>
-              <Typography variant="h6">
-                {discoveredTraits.length} / {Object.keys(allTraits).length}
-              </Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
+      <Grid container spacing={2}>
+        <Grid item xs={6} sm={3}>
+          <Typography variant="body2" color="text.secondary">
+            Total Traits
+          </Typography>
+          <Typography variant="h6">
+            {allTraitsArray.length}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} sm={3}>
               <Typography variant="body2" color="text.secondary">
                 Acquired
               </Typography>
@@ -373,16 +444,16 @@ export const TraitCodex: React.FC<TraitCodexProps> = React.memo(({
       </Card>
 
       {/* Trait Grid */}
-      {filteredTraits.length === 0 ? (
-        <Alert severity="info">
-          {searchTerm || categoryFilter !== 'all' || rarityFilter !== 'all'
+      {filteredAndSortedTraits.length === 0 ? (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          {searchTerm || categoryFilter !== 'all' || rarityFilter !== 'all' || showOnlyAvailable
             ? "No traits match your current filters."
-            : "No traits discovered yet. Interact with NPCs to discover new traits."
+            : "No traits available to display. Adjust filters or discover more traits."
           }
         </Alert>
       ) : (
-        <Grid container spacing={2}>
-          {filteredTraits.map(trait => (
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          {filteredAndSortedTraits.map(trait => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={trait.id}>
               {renderTraitCard(trait)}
             </Grid>
@@ -390,40 +461,7 @@ export const TraitCodex: React.FC<TraitCodexProps> = React.memo(({
         </Grid>
       )}
 
-      {/* Hidden Traits Section */}
-      {showHidden && undiscoveredCount > 0 && (
-        <Box sx={{ mt: 4 }}>
-          <Divider sx={{ mb: 2 }} />
-          <Typography variant="h6" gutterBottom>
-            Hidden Traits ({undiscoveredCount})
-          </Typography>
-          <Alert severity="info" sx={{ mb: 2 }}>
-            These traits exist but haven't been discovered yet. Build relationships with NPCs to uncover new traits.
-          </Alert>
-          <List>
-            {Object.values(allTraits)
-              .filter(trait => !discoveredTraits.some(d => d.id === trait.id))
-              .slice(0, 5) // Show only first 5 for teasing
-              .map((trait, index) => (
-                <ListItem key={`hidden-${index}`} divider>
-                  <ListItemText
-                    primary="???"
-                    secondary={`Hidden ${trait.category} trait`}
-                  />
-                  <Chip label="Unknown" size="small" />
-                </ListItem>
-              ))}
-            {undiscoveredCount > 5 && (
-              <ListItem>
-                <ListItemText
-                  primary={`... and ${undiscoveredCount - 5} more hidden traits`}
-                  secondary="Keep exploring to discover them all!"
-                />
-              </ListItem>
-            )}
-          </List>
-        </Box>
-      )}
+      {/* Removed separate Hidden Traits Section as it's integrated with the "Show Hidden" toggle */}
     </Box>
   );
 });

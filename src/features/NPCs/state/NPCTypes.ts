@@ -15,9 +15,12 @@ export interface NPC {
   id: string;
   name: string;
   description?: string;
+  category?: string; // Added from mock data
   location: string;
   avatar?: string;
+  spritePath?: string; // Added for character sprites
   faction?: string;
+  interactionPrompt?: string; // Added for UI prompts
   
   // Relationship and connection data
   relationshipValue: number;
@@ -115,7 +118,8 @@ export interface NPCSharedTraitSlot {
  */
 export interface InteractionResult {
   success: boolean;
-  relationshipChange?: number;
+  affinityDelta?: number; // Renamed from relationshipChange
+  connectionDepthChange?: number; // Added: Change in connection depth
   essenceGained?: number;
   unlockRewards?: string[];
   message?: string;
@@ -128,7 +132,7 @@ export interface InteractionResult {
 export interface DialogueResult {
   success: boolean;
   npcResponse: string;
-  relationshipChange?: number;
+  affinityDelta?: number; // Renamed from relationshipChange
   rewards?: string[];
 }
 
@@ -141,7 +145,7 @@ export interface DialogueEntry {
   timestamp: number;
   playerText: string;
   npcResponse: string;
-  relationshipChange?: number;
+  affinityDelta?: number; // Renamed from relationshipChange
 }
 
 /**
@@ -227,7 +231,7 @@ export interface NPCState {
   discoveredNPCs: string[];
   currentInteraction: NPCInteraction | null;
   dialogueHistory: DialogueEntry[];
-  relationshipChanges: RelationshipChangeEntry[];
+  relationshipHistory: RelationshipChangeEntry[]; // Renamed from relationshipChanges
   loading: boolean;
   error: string | null;
 }
@@ -241,7 +245,7 @@ export const DEFAULT_NPC_STATE: NPCState = {
   discoveredNPCs: [],
   currentInteraction: null,
   dialogueHistory: [],
-  relationshipChanges: [],
+  relationshipHistory: [], // Renamed from relationshipChanges
   loading: false,
   error: null
 };

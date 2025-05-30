@@ -19,6 +19,7 @@ export interface TraitSystemUIProps {
   discoveredTraits: Trait[];
   availableTraitsForEquip: Trait[];
   currentEssence: number;
+  playerMaxTraitSlots?: number; // Added playerMaxTraitSlots
   
   // Status
   loading: boolean;
@@ -30,7 +31,7 @@ export interface TraitSystemUIProps {
   
   // Actions
   onEquipTrait: (traitId: string, slotIndex: number) => void;
-  onUnequipTrait: (slotId: string) => void;
+  onUnequipTrait: (slotIndex: number) => void; // Changed from slotId: string
   onAcquireTrait: (traitId: string) => void;
   onMakeTraitPermanent: (traitId: string) => void;
   onDiscoverTrait: (traitId: string) => void;

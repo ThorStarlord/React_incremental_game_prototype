@@ -1,33 +1,20 @@
-import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import {
   Trait,
-  TraitSlot,
   TraitPreset,
   TraitsState
 } from './TraitsTypes';
 // Import the thunks
 import { makeTraitPermanentThunk, fetchTraitsThunk } from './TraitThunks';
 
-// Initial trait slots
-const initialSlots: TraitSlot[] = [
-  { id: 'slot-1', index: 0, isUnlocked: true },
-  { id: 'slot-2', index: 1, isUnlocked: true },
-  { id: 'slot-3', index: 2, isUnlocked: false, unlockRequirements: { type: 'level', value: 5 } },
-  { id: 'slot-4', index: 3, isUnlocked: false, unlockRequirements: { type: 'level', value: 10 } },
-  { id: 'slot-5', index: 4, isUnlocked: false, unlockRequirements: { type: 'quest', value: 'master-of-traits' } },
-];
-
 // Initial state - ensure traits starts empty
 const initialState: TraitsState = {
   traits: {}, // Start with an empty traits object
   acquiredTraits: [],
   permanentTraits: [],
-  slots: initialSlots,
-  maxTraitSlots: 5,
   presets: [],
   discoveredTraits: [],
-  equippedTraits: [],
   loading: false,
   error: null
 };
@@ -64,75 +51,6 @@ const traitsSlice = createSlice({
       }
     },
     
-    // Equip a trait to a specific slot or the first available one
-    equipTrait: (state, action: PayloadAction<{ traitId: string; slotIndex?: number }>) => {
-      const { traitId, slotIndex } = action.payload;
-      
-      // Validate trait exists and is acquired
-      if (!state.acquiredTraits.includes(traitId)) {
-        console.warn(`Trait ${traitId} not acquired.`);
-        return;
-      }
-      
-      // Check if trait is already equipped in any slot
-      if (state.slots.some(slot => slot.traitId === traitId)) {
-        console.warn(`Trait ${traitId} is already equipped.`);
-        return;
-      }
-      
-      let targetSlot: TraitSlot | undefined;
-
-      // If a specific slot index is provided
-      if (typeof slotIndex === 'number') {
-        targetSlot = state.slots.find(slot => slot.index === slotIndex);
-        // Validate the specified slot
-        if (!targetSlot) {
-          console.warn(`Slot index ${slotIndex} not found.`);
-          return;
-        }
-        if (!targetSlot.isUnlocked) {
-          console.warn(`Slot index ${slotIndex} is locked.`);
-          return;
-        }
-        if (targetSlot.traitId) {
-          console.warn(`Slot index ${slotIndex} is already occupied by ${targetSlot.traitId}.`);
-          return; // Or handle replacement if desired
-        }
-      } else {
-        // Find the first available unlocked slot if no index is provided
-        targetSlot = state.slots.find(
-          slot => slot.isUnlocked && !slot.traitId
-        );
-      }
-      
-      // Check if a valid slot was found
-      if (!targetSlot) {
-        console.warn(`No available trait slots to equip ${traitId}.`);
-        return;
-      }
-      
-      // Equip the trait to the target slot
-      targetSlot.traitId = traitId;
-      console.log(`Equipped trait ${traitId} to slot index ${targetSlot.index}.`);
-      // Also record in equippedTraits array
-      if (!state.equippedTraits.includes(traitId)) {
-        state.equippedTraits.push(traitId);
-      }
-    },
-    
-    // Unequip a trait
-    unequipTrait: (state, action: PayloadAction<string>) => {
-      const traitId = action.payload;
-      
-      // Find and clear the slot with this trait
-      const slot = state.slots.find(slot => slot.traitId === traitId);
-      if (slot) {
-        slot.traitId = null;
-      }
-      // Remove from equippedTraits array
-      state.equippedTraits = state.equippedTraits.filter(id => id !== traitId);
-    },
-    
     // Make a trait permanent (always active)
     makePermanent: (state, action: PayloadAction<string>) => {
       const traitId = action.payload;
@@ -146,22 +64,6 @@ const traitsSlice = createSlice({
       if (!state.permanentTraits.includes(traitId)) {
         state.permanentTraits.push(traitId);
       }
-      
-      // Remove from equipped traits to avoid duplicate effects
-      const slot = state.slots.find(slot => slot.traitId === traitId);
-      if (slot) {
-        slot.traitId = null;
-      }
-    },
-    
-    // Unlock a trait slot
-    unlockTraitSlot: (state, action: PayloadAction<number>) => {
-      const slotIndex = action.payload;
-      const slot = state.slots.find(s => s.index === slotIndex);
-      
-      if (slot && !slot.isUnlocked) {
-        slot.isUnlocked = true;
-      }
     },
     
     // Save a trait preset
@@ -173,9 +75,8 @@ const traitsSlice = createSlice({
         id: `preset-${Date.now()}`,
         name,
         description: description || '',
-        traits: state.slots
-          .filter(slot => slot.traitId)
-          .map(slot => slot.traitId as string),
+        // Traits in presets will now refer to acquired traits, not equipped slots
+        traits: state.acquiredTraits, // Or a filtered list if only equipped traits should be saved
         created: Date.now()
       };
       
@@ -191,30 +92,13 @@ const traitsSlice = createSlice({
         return;
       }
       
-      // Clear current equipped traits
-      state.slots.forEach(slot => {
-        slot.traitId = null;
-      });
-      
-      // Equip each trait from the preset
-      preset.traits.forEach((traitId, index) => {
-        // Skip if index is out of bounds
-        if (index >= state.slots.length) {
-          return;
-        }
-        
-        // Skip if slot is not unlocked
-        if (!state.slots[index].isUnlocked) {
-          return;
-        }
-        
-        // Skip if trait is not acquired
+      // This reducer will no longer directly equip to slots.
+      // A thunk would be needed to coordinate with PlayerSlice to equip traits.
+      // For now, just ensure traits are acquired if not already.
+      preset.traits.forEach((traitId) => {
         if (!state.acquiredTraits.includes(traitId)) {
-          return;
+          state.acquiredTraits.push(traitId);
         }
-        
-        // Equip the trait
-        state.slots[index].traitId = traitId;
       });
     },
     
@@ -286,10 +170,7 @@ export const {
   setTraits,
   discoverTrait,
   acquireTrait,
-  equipTrait,
-  unequipTrait,
   makePermanent,
-  unlockTraitSlot,
   saveTraitPreset,
   loadTraitPreset,
   deleteTraitPreset,
@@ -302,7 +183,6 @@ export const {
 export const selectTraits = (state: RootState) => state.traits.traits;
 export const selectAcquiredTraits = (state: RootState) => state.traits.acquiredTraits;
 export const selectPermanentTraits = (state: RootState) => state.traits.permanentTraits;
-export const selectTraitSlots = (state: RootState) => state.traits.slots;
 export const selectTraitPresets = (state: RootState) => state.traits.presets;
 export const selectTraitLoading = (state: RootState) => state.traits.loading;
 export const selectTraitError = (state: RootState) => state.traits.error;
@@ -312,11 +192,6 @@ export const selectDiscoveredTraits = (state: RootState) => state.traits.discove
 export const selectTraitsByIds = (state: RootState, traitIds: string[]) => {
   return traitIds.map(id => state.traits.traits[id]).filter(Boolean);
 };
-
-/**
- * Selector for equipped trait IDs stored in state.equippedTraits
- */
-export const selectEquippedTraitIds = (state: RootState) => state.traits.equippedTraits;
 
 // Export reducer
 export default traitsSlice.reducer;

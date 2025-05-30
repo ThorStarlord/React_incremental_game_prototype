@@ -11,9 +11,11 @@ This document details the design and mechanics of the Trait system, which allows
 
 ## 2. Trait Acquisition
 
-*   **Primary Method: Emotional Connection & Resonance**
-    *   The design intent is for players to acquire traits by establishing an "Emotional Connection" and spending Essence. The `Trait` data model includes an `essenceCost` property.
-    *   *Current Implementation Note:* The `TraitsSlice.acquireTrait` action currently adds a trait to the acquired list without deducting Essence. A thunk would be needed to integrate Essence spending into the acquisition process.
+*   **Primary Method: Resonance (via Emotional Connection)** ✅ **IMPLEMENTED**
+    *   **Concept:** Players can acquire traits from targets (NPCs, potentially enemies, or even abstract concepts) by performing a "Resonance" action. This action requires a sufficient level of **Emotional Connection** with the target and the expenditure of **Essence**.
+    *   **Emotional Connection:** This is the prerequisite relationship state with the target (tracked as `connectionDepth` in the NPC system). A certain depth is needed to unlock the ability to Resonate for traits from that target.
+    *   **Resonance Action:** This is the process of spending Essence to "tune into," "understand," or "copy" a trait's pattern from the target. The `Trait` data model includes an `essenceCost` property.
+    *   **Current Implementation:** The `acquireTraitWithEssenceThunk` implements the Essence cost deduction and trait acquisition, gated by the player having sufficient Essence. The gating based on Emotional Connection level is handled in the UI or interaction logic.
 *   **Other Acquisition Methods:**
     *   Completing specific quests or achievements might grant certain traits directly.
     *   (Future) Research or crafting systems could yield traits.

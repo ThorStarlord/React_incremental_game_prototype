@@ -27,7 +27,8 @@ This document details the mechanics for creating, managing, and utilizing "Copie
 
 ## 4. Inheritance
 
-*   **Base Abilities:** Copies automatically inherit the player's core "Emotional Resonance" ability, allowing them to potentially form connections and interact with the Trait system (perhaps in a limited way initially).
+*   **Base Abilities:** Copies automatically inherit the player's core "Emotional Resonance" ability.
+    *   **Emotional Resonance (Player Ability):** This is a planned player characteristic that allows Copies to potentially form connections and interact with the Trait system (perhaps in a limited way initially). Its specific mechanics are currently undefined and planned for future implementation with the Copy system. **Note: This is distinct from the sidelined "Soul Resonance" concept found in `soulResonanceUtils.ts`.**
 *   **Shared Traits:** Copies inherit *snapshots* of any traits the player had actively shared with the *target parent* via Trait Slots *at the moment of creation*.
     *   These inherited traits become the Copy's initial base traits.
     *   They do *not* automatically update if the player later changes the traits shared with the parent.

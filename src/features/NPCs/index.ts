@@ -26,9 +26,8 @@ export type {
 } from './state/NPCTypes';
 
 // State management
-export { default as npcReducer } from './state/NPCSlice';
-export {
-  // Regular action creators (if they exist)
+export { default as npcReducer,
+  // Regular action creators
   updateNpcRelationship,
   setNpcStatus,
   setNpcAvailability,
@@ -36,14 +35,21 @@ export {
   endInteraction,
   addDialogueEntry,
   clearError,
-  // Async thunks (only export if they exist)
+  setLoading, // Added
+  setError,   // Added
+  setNPCs     // Added
+} from './state/NPCSlice';
+
+// Async thunks
+export {
   initializeNPCsThunk,
   updateNPCRelationshipThunk,
   processNPCInteractionThunk,
   discoverNPCThunk,
   processDialogueChoiceThunk,
-  shareTraitWithNPCThunk
-} from './state/NPCSlice';
+  shareTraitWithNPCThunk,
+  fetchNPCsThunk // Added
+} from './state/NPCThunks';
 
 // Selectors
 export * from './state/NPCSelectors';

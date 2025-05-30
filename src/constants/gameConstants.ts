@@ -13,33 +13,19 @@ export const TIMING = {
   DAY_LENGTH: 24000 // Game day length in ms
 };
 
-// Experience & leveling
-export interface LevelRequirements {
-  xp: number; // XP needed for this level
-  attributePoints: number; // Attribute points awarded
-  skillPoints: number; // Skill points awarded
-  traitSlots?: number; // Trait slots unlocked at this level
+// Resonance Level & Trait Slot Unlocking (replaces traditional XP/leveling)
+export interface ResonanceLevelThreshold {
+  essenceRequired: number; // Total essence needed to reach this Resonance Level
+  traitSlotsUnlocked: number; // Total trait slots available at this Resonance Level
 }
 
-export const LEVEL_REQUIREMENTS: Record<number, LevelRequirements> = {
-  1: { xp: 0, attributePoints: 0, skillPoints: 0, traitSlots: 1 },
-  2: { xp: 100, attributePoints: 3, skillPoints: 1 },
-  3: { xp: 200, attributePoints: 3, skillPoints: 1 },
-  4: { xp: 300, attributePoints: 3, skillPoints: 1 },
-  5: { xp: 500, attributePoints: 3, skillPoints: 2, traitSlots: 2 },
-  6: { xp: 750, attributePoints: 3, skillPoints: 1 },
-  7: { xp: 1000, attributePoints: 3, skillPoints: 1 },
-  8: { xp: 1500, attributePoints: 3, skillPoints: 1 },
-  9: { xp: 2000, attributePoints: 3, skillPoints: 1 },
-  10: { xp: 2500, attributePoints: 5, skillPoints: 3, traitSlots: 3 }
-};
-
-// Calculate XP for levels beyond those defined explicitly
-export const calculateExperienceForLevel = (level: number): number => {
-  if (level <= 10) {
-    return LEVEL_REQUIREMENTS[level]?.xp || 0;
-  }
-  return Math.floor(100 * Math.pow(level, 1.8));
+export const RESONANCE_LEVEL_THRESHOLDS: Record<number, ResonanceLevelThreshold> = {
+  1: { essenceRequired: 0, traitSlotsUnlocked: 1 },
+  2: { essenceRequired: 100, traitSlotsUnlocked: 2 },
+  3: { essenceRequired: 500, traitSlotsUnlocked: 3 },
+  4: { essenceRequired: 1500, traitSlotsUnlocked: 4 },
+  5: { essenceRequired: 3000, traitSlotsUnlocked: 5 },
+  // Add more levels as needed
 };
 
 // Game difficulty settings

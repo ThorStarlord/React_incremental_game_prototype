@@ -15,9 +15,30 @@ interface ResonanceEffect {
  * @param {number} multiplier - Resonance multiplier
  * @returns {number} Calculated resonance value
  */
+// This file contains utility functions related to soul resonance in the Essence feature of the game.
+// NOTE: This concept is currently sidelined and not integrated into the core game loop.
+// These utilities are kept for potential future use or refactoring.
+
+/**
+ * Interface for resonance level effects
+ */
+interface ResonanceEffect {
+    description: string;
+    level: number;
+}
+
+/**
+ * Calculate the soul resonance value based on essence and multiplier
+ * 
+ * @param {number} essence - Current essence amount
+ * @param {number} multiplier - Resonance multiplier
+ * @returns {number} Calculated resonance value
+ */
+/*
 export const calculateSoulResonance = (essence: number, multiplier: number): number => {
     return essence * multiplier;
 };
+*/
 
 /**
  * Check if resonance is active based on its level
@@ -25,9 +46,11 @@ export const calculateSoulResonance = (essence: number, multiplier: number): num
  * @param {number} resonanceLevel - Current resonance level
  * @returns {boolean} Whether resonance is active
  */
+/*
 export const isResonanceActive = (resonanceLevel: number): boolean => {
     return resonanceLevel > 0;
 };
+*/
 
 /**
  * Get the effect description for the current resonance level
@@ -35,6 +58,7 @@ export const isResonanceActive = (resonanceLevel: number): boolean => {
  * @param {number} resonanceLevel - Current resonance level
  * @returns {string} Description of the resonance effect
  */
+/*
 export const getResonanceEffect = (resonanceLevel: number): string => {
     switch (resonanceLevel) {
         case 1:
@@ -47,12 +71,14 @@ export const getResonanceEffect = (resonanceLevel: number): string => {
             return "No effect.";
     }
 };
+*/
 
 /**
  * Get all possible resonance effects
  * 
  * @returns {ResonanceEffect[]} Array of all resonance effects
  */
+/*
 export const getAllResonanceEffects = (): ResonanceEffect[] => {
     return [
         { level: 0, description: "No effect." },
@@ -61,3 +87,4 @@ export const getAllResonanceEffects = (): ResonanceEffect[] => {
         { level: 3, description: "Major effect activated." }
     ];
 };
+*/

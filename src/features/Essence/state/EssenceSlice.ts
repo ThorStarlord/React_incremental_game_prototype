@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { EssenceState, EssenceTransactionPayload } from './EssenceTypes';
+import { EssenceState, EssenceTransactionPayload, EssenceConnection } from './EssenceTypes';
 import { saveEssenceThunk, loadEssenceThunk, generateEssenceThunk } from './EssenceThunks';
 
 /**
@@ -14,6 +14,7 @@ const initialState: EssenceState = {
   isGenerating: false,
   loading: false,
   error: null,
+  npcConnections: {}, // Initialize as an empty object
 };
 
 /**
@@ -78,6 +79,18 @@ const essenceSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    /**
+     * Update properties of an existing EssenceConnection
+     */
+    updateEssenceConnection: (state, action: PayloadAction<{ npcId: string; updates: Partial<EssenceConnection> }>) => {
+      const { npcId, updates } = action.payload;
+      if (state.npcConnections[npcId]) {
+        state.npcConnections[npcId] = {
+          ...state.npcConnections[npcId],
+          ...updates,
+        };
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -128,6 +141,7 @@ export const {
   toggleGeneration,
   resetEssence,
   clearError,
+  updateEssenceConnection, // Export the new action
 } = essenceSlice.actions;
 
 export const selectEssence = (state: { essence: EssenceState }) => state.essence;

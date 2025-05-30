@@ -1,118 +1,325 @@
 {
   "BargainingMaster": {
+    "id": "BargainingMaster",
     "name": "Bargaining Master",
-    "category": "Knowledge",
+    "category": "Social",
     "description": "Your keen business sense allows you to get better deals from merchants.",
     "essenceCost": 50,
+    "permanenceCost": 100,
     "effects": {
       "shopDiscount": 0.05
     },
-    "rarity": "Common"
+    "rarity": "Common",
+    "iconPath": "storefront"
   },
   "QuickLearner": {
+    "id": "QuickLearner",
     "name": "Quick Learner",
     "category": "Knowledge",
     "description": "You gain 15% more skill experience from all sources.",
     "essenceCost": 75,
+    "permanenceCost": 150,
     "effects": {
       "skillXpMultiplier": 0.15
     },
-    "rarity": "Uncommon"
+    "rarity": "Uncommon",
+    "iconPath": "school"
   },
   "MentorsInsight": {
+    "id": "MentorsInsight",
     "name": "Mentor's Insight",
     "category": "Mental",
     "description": "Increases essence gained from all sources by 10%",
     "essenceCost": 50,
+    "permanenceCost": 120,
     "effects": {
       "essenceGainMultiplier": 1.1
     },
     "tier": 1,
     "rarity": "Uncommon",
-    "iconPath": "school"
+    "iconPath": "psychology"
   },
   "BattleHardened": {
+    "id": "BattleHardened",
     "name": "Battle Hardened",
     "category": "Combat",
     "description": "Your combat experience grants you increased attack and defense capabilities.",
     "essenceCost": 80,
+    "permanenceCost": 160,
     "effects": {
-      "attackBonus": 0.10,
-      "defenseBonus": 0.05
+      "attack": 5,
+      "defense": 3
     },
-    "rarity": "Uncommon"
+    "rarity": "Uncommon",
+    "iconPath": "swords"
   },
   "EssenceSiphon": {
+    "id": "EssenceSiphon",
     "name": "Essence Siphon",
     "category": "Combat",
     "description": "You have a chance to gain essence when landing hits in combat.",
     "essenceCost": 120,
+    "permanenceCost": 250,
     "effects": {
-      "essenceSiphonChance": 0.05
+      "essenceSiphonChance": 0.05,
+      "essenceSiphonAmount": 10
     },
-    "rarity": "Rare"
+    "rarity": "Rare",
+    "iconPath": "bolt",
+    "requirements": {
+      "prerequisiteTraits": ["MentorsInsight"]
+    }
   },
   "RelationshipSage": {
+    "id": "RelationshipSage",
     "name": "Relationship Sage",
     "category": "Social",
     "description": "Your actions have a greater impact on NPC relationships.",
     "essenceCost": 90,
+    "permanenceCost": 180,
     "effects": {
       "relationshipGainMultiplier": 1.2
     },
-    "rarity": "Uncommon"
+    "rarity": "Uncommon",
+    "iconPath": "groups"
   },
   "EssenceFlow": {
+    "id": "EssenceFlow",
     "name": "Essence Flow",
     "category": "Knowledge",
     "description": "Increases your essence generation rate from all sources.",
     "essenceCost": 150,
+    "permanenceCost": 300,
     "effects": {
       "essenceGenerationMultiplier": 1.15
     },
-    "rarity": "Rare"
+    "rarity": "Rare",
+    "iconPath": "waterfall"
   },
   "CombatReflexes": {
+    "id": "CombatReflexes",
     "name": "Combat Reflexes",
     "category": "Combat",
     "description": "Increases your chance to dodge enemy attacks.",
     "essenceCost": 100,
+    "permanenceCost": 200,
     "effects": {
       "dodgeChance": 0.1
     },
-    "rarity": "Uncommon"
+    "rarity": "Uncommon",
+    "iconPath": "directions_run"
   },
   "GrowingAffinity": {
+    "id": "GrowingAffinity",
     "name": "Growing Affinity",
     "category": "Social",
-    "description": "Automatically increases relationships with all NPCs by 1 point every minute",
+    "description": "Automatically increases relationships with all NPCs by 1 point every minute.",
     "essenceCost": 20,
-    "effect": "relationshipGrowth",
-    "effects": {},
-    "rarity": "Common"
+    "permanenceCost": 50,
+    "effects": {
+      "passiveRelationshipGrowth": 1
+    },
+    "rarity": "Common",
+    "iconPath": "favorite"
   },
   "WillowsWisdom": {
+    "id": "WillowsWisdom",
     "name": "Willow's Wisdom",
     "category": "Knowledge",
-    "description": "Elder Willow's ancient knowledge increases your learning speed by 15%",
+    "description": "Elder Willow's ancient knowledge increases your learning speed by 15%.",
     "essenceCost": 40,
-    "sourceNpc": "npc1",
-    "requiredRelationship": 50,
+    "permanenceCost": 80,
+    "sourceNpc": "npc_elder_willow",
     "effects": {
       "learningSpeed": 0.15
     },
-    "rarity": "Uncommon"
+    "rarity": "Uncommon",
+    "iconPath": "nature_people",
+    "requirements": {
+      "relationshipLevel": 50
+    }
   },
   "ScholarlyInsight": {
+    "id": "ScholarlyInsight",
     "name": "Scholarly Insight",
     "category": "Knowledge",
-    "description": "Scholar Elara's teachings help you gain 10% more essence from knowledge-based activities",
+    "description": "Scholar Elara's teachings help you gain 10% more essence from knowledge-based activities.",
     "essenceCost": 30,
-    "sourceNpc": "npc2",
-    "requiredRelationship": 40,
+    "permanenceCost": 70,
+    "sourceNpc": "npc_scholar_elara",
     "effects": {
       "knowledgeEssence": 0.1
     },
-    "rarity": "Uncommon"
+    "rarity": "Uncommon",
+    "iconPath": "menu_book",
+    "requirements": {
+      "relationshipLevel": 40
+    }
+  },
+  "ResilientConstitution": {
+    "id": "ResilientConstitution",
+    "name": "Resilient Constitution",
+    "category": "Physical",
+    "description": "Your body is exceptionally tough, increasing your maximum health.",
+    "essenceCost": 100,
+    "permanenceCost": 200,
+    "effects": {
+      "maxHealth": 50
+    },
+    "rarity": "Uncommon",
+    "iconPath": "shield"
+  },
+  "ArcaneIntellect": {
+    "id": "ArcaneIntellect",
+    "name": "Arcane Intellect",
+    "category": "Mental",
+    "description": "Your mind is a wellspring of magical energy, increasing max mana and mana regeneration.",
+    "essenceCost": 150,
+    "permanenceCost": 300,
+    "effects": {
+      "maxMana": 30,
+      "manaRegen": 0.25
+    },
+    "rarity": "Rare",
+    "iconPath": "auto_stories"
+  },
+  "SwiftStrikes": {
+    "id": "SwiftStrikes",
+    "name": "Swift Strikes",
+    "category": "Combat",
+    "description": "You attack with blinding speed, increasing attack speed and overall attack power.",
+    "essenceCost": 130,
+    "permanenceCost": 260,
+    "effects": {
+      "speed": 5,
+      "attack": 3
+    },
+    "rarity": "Rare",
+    "iconPath": "speed"
+  },
+  "IronWill": {
+    "id": "IronWill",
+    "name": "Iron Will",
+    "category": "Mental",
+    "description": "Your resolve is unbreakable, significantly boosting your defense.",
+    "essenceCost": 120,
+    "permanenceCost": 240,
+    "effects": {
+      "defense": 10
+    },
+    "rarity": "Uncommon",
+    "iconPath": "security"
+  },
+  "SilverTongue": {
+    "id": "SilverTongue",
+    "name": "Silver Tongue",
+    "category": "Social",
+    "description": "You have a way with words, making social interactions more favorable.",
+    "essenceCost": 70,
+    "permanenceCost": 140,
+    "effects": {
+      "charismaBonus": 2 
+    },
+    "rarity": "Uncommon",
+    "iconPath": "record_voice_over"
+  },
+  "MasterCraftsman": {
+    "id": "MasterCraftsman",
+    "name": "Master Craftsman",
+    "category": "Knowledge",
+    "description": "Your skill in crafting is unparalleled, yielding better quality items.",
+    "essenceCost": 200,
+    "permanenceCost": 400,
+    "effects": {
+      "craftingQualityBonus": 0.15
+    },
+    "rarity": "Rare",
+    "iconPath": "construction"
+  },
+  "ShadowWalker": {
+    "id": "ShadowWalker",
+    "name": "Shadow Walker",
+    "category": "Physical",
+    "description": "You move like a whisper in the dark, enhancing your stealth capabilities.",
+    "essenceCost": 180,
+    "permanenceCost": 360,
+    "effects": {
+      "stealthEffectiveness": 0.20
+    },
+    "rarity": "Rare",
+    "iconPath": "visibility_off"
+  },
+  "ElementalAffinity": {
+    "id": "ElementalAffinity",
+    "name": "Elemental Affinity",
+    "category": "Mental",
+    "description": "You have a natural connection to the elements, boosting your magical damage.",
+    "essenceCost": 250,
+    "permanenceCost": 500,
+    "effects": {
+      "magicDamageBonus": 0.10
+    },
+    "rarity": "Epic",
+    "iconPath": "filter_vintage"
+  },
+  "LuckyCharm": {
+    "id": "LuckyCharm",
+    "name": "Lucky Charm",
+    "category": "Mental",
+    "description": "Fortune seems to favor you, slightly increasing your critical hit chance.",
+    "essenceCost": 60,
+    "permanenceCost": 120,
+    "effects": {
+      "criticalChance": 0.02
+    },
+    "rarity": "Common",
+    "iconPath": "casino"
+  },
+  "TomeOfForbiddenKnowledge": {
+    "id": "TomeOfForbiddenKnowledge",
+    "name": "Tome of Forbidden Knowledge",
+    "category": "Knowledge",
+    "description": "Unlocking secrets man was not meant to know. Grants immense power at a potential cost.",
+    "essenceCost": 1000,
+    "permanenceCost": 2500,
+    "effects": {
+      "intelligence": 10,
+      "maxMana": 50,
+      "manaRegen": 1,
+      "health": -25 
+    },
+    "rarity": "Legendary",
+    "iconPath": "auto_stories",
+    "requirements": {
+      "prerequisiteTraits": ["ArcaneIntellect"]
+    }
+  },
+  "HeartOfTheMountain": {
+    "id": "HeartOfTheMountain",
+    "name": "Heart of the Mountain",
+    "category": "Physical",
+    "description": "Your resilience is like stone, greatly increasing max health and defense.",
+    "essenceCost": 500,
+    "permanenceCost": 1000,
+    "effects": {
+      "maxHealth": 100,
+      "defense": 15
+    },
+    "rarity": "Epic",
+    "iconPath": "landscape"
+  },
+  "WhispersOfTheVoid": {
+    "id": "WhispersOfTheVoid",
+    "name": "Whispers of the Void",
+    "category": "Mental",
+    "description": "You hear faint whispers, granting insight but slightly unsettling your mind. Increases critical chance but may have minor negative side effects.",
+    "essenceCost": 300,
+    "permanenceCost": 600,
+    "effects": {
+      "criticalChance": 0.05,
+      "manaRegen": -0.1
+    },
+    "rarity": "Epic",
+    "iconPath": "hearing"
   }
 }

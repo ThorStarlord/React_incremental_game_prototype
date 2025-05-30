@@ -1,4 +1,5 @@
 import type { Trait } from '../../Traits';
+import type { TraitSlot } from '../../Traits/state/TraitsTypes'; // Import TraitSlot from TraitsTypes
 
 /**
  * Player statistics interface - represents computed player stats
@@ -70,14 +71,20 @@ export interface StatusEffect {
 }
 
 /**
- * Trait slot data structure for UI components
+ * Main player state interface
  */
-export interface TraitSlot {
-  id: string;
-  slotIndex: number;
-  traitId: string | null;
-  isLocked: boolean;
-  unlockRequirement?: string;
+export interface PlayerState {
+  stats: PlayerStats;
+  attributes: PlayerAttributes;
+  availableAttributePoints: number;
+  availableSkillPoints: number;
+  statusEffects: StatusEffect[];
+  permanentTraits: string[];
+  traitSlots: TraitSlot[]; // Player's equipped trait slots
+  maxTraitSlots: number; // Maximum number of player trait slots
+  totalPlaytime: number; // in milliseconds
+  isAlive: boolean;
+  resonanceLevel: number; // New: Player's Resonance Level
 }
 
 // Enhanced trait slot data for UI components - aligned with container transformation
@@ -95,22 +102,6 @@ export interface TraitSlotData {
   traitDescription?: string;
   traitRarity?: string;
   unlockRequirement?: string;
-}
-
-/**
- * Main player state interface
- */
-export interface PlayerState {
-  stats: PlayerStats;
-  attributes: PlayerAttributes;
-  availableAttributePoints: number;
-  availableSkillPoints: number;
-  statusEffects: StatusEffect[];
-  equippedTraits: (string | null)[];
-  permanentTraits: string[];
-  traitSlots: TraitSlot[];
-  totalPlaytime: number; // in milliseconds
-  isAlive: boolean;
 }
 
 /**
@@ -160,6 +151,7 @@ export interface PerformanceStats {
   powerLevel: number;
   availableAttributePoints: number;
   availableSkillPoints: number;
+  resonanceLevel: number; // Added: Player's Resonance Level
 }
 
 /**
@@ -203,7 +195,7 @@ export interface PlayerStatsUIProps {
 }
 
 export interface PlayerTraitsUIProps {
-  slots: TraitSlotData[];
+  slots: TraitSlotData[]; // Use TraitSlotData
   equippedTraits: any[]; // TODO: Replace with proper Trait type when available
   permanentTraits: any[]; // TODO: Replace with proper Trait type when available
   onSlotClick?: (slotId: string) => void;

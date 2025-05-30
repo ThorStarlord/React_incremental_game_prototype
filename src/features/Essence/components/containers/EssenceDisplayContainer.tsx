@@ -7,7 +7,7 @@ import React from 'react';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectCurrentEssence } from '../../state/EssenceSelectors'; 
 import EssenceDisplayUI from '../ui/EssenceDisplayUI';
-import useEssenceGeneration, { useAutoGenerateEssence } from '../../hooks/useEssenceGeneration';
+import useEssenceGeneration from '../../hooks/useEssenceGeneration';
 
 /**
  * EssenceDisplayContainer Component
@@ -18,7 +18,7 @@ import useEssenceGeneration, { useAutoGenerateEssence } from '../../hooks/useEss
 const EssenceDisplayContainer: React.FC = React.memo(() => {
   // Sync generation rate and start auto-generation interval
   useEssenceGeneration();
-  useAutoGenerateEssence();
+  // useAutoGenerateEssence(); // Auto-generation is now handled within useEssenceGeneration
   
   // Select the current essence amount from the Redux store
   const currentEssence = useAppSelector(selectCurrentEssence);

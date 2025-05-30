@@ -135,7 +135,7 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     label: 'Dashboard',
     icon: DashboardIcon,
     route: '/game/dashboard',
-    isImplemented: false, // Assuming not yet, or needs verification
+    isImplemented: true, // Dashboard page is implemented
     tooltip: 'View game overview and statistics',
     section: 'systems',
   },
@@ -246,6 +246,15 @@ export function isItemAvailable(id: TabId): boolean {
  * Default navigation items for initial load
  */
 export const DEFAULT_NAV_ITEMS: NavItem[] = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: DashboardIcon,
+    route: '/game/dashboard',
+    isImplemented: true,
+    tooltip: 'View game overview and statistics',
+    section: 'systems',
+  },
   {
     id: 'character',
     label: 'Character',

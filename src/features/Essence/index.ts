@@ -24,4 +24,5 @@ export * from './state/EssenceSelectors';
 export * from './state/EssenceSlice';
 
 // Hooks
-export { default as useEssenceGeneration, useAutoGenerateEssence } from './hooks/useEssenceGeneration';
+export { default as useEssenceGeneration } from './hooks/useEssenceGeneration';
+// The useAutoGenerateEssence hook is now integrated into useEssenceGeneration

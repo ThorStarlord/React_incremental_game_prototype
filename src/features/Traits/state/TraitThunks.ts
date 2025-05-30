@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
-import { makePermanent, setTraits } from './TraitsSlice';
+import { selectCurrentEssence } from '../../Essence/state/EssenceSelectors'; // Import Essence selector
+import { makePermanent, acquireTrait } from './TraitsSlice'; // Import acquireTrait
 // Import TraitEffectValues as well if needed for RawTraitJsonData
 import { Trait, TraitEffect, TraitEffectValues } from './TraitsTypes';
 
@@ -81,28 +82,100 @@ export const makeTraitPermanentThunk = createAsyncThunk<
 );
 
 /**
+ * Thunk for acquiring a trait with Essence cost
+ * This operation involves:
+ * - Checking essence availability
+ * - Spending essence via Essence slice
+ * - Acquiring the trait via Traits slice
+ */
+export const acquireTraitWithEssenceThunk = createAsyncThunk<
+  // Return type on success
+  { success: boolean; message: string; traitId: string },
+  // Argument type: the ID of the trait to acquire
+  string,
+  // ThunkAPI config
+  { state: RootState }
+>(
+  'traits/acquireTraitWithEssence',
+  async (traitId: string, { getState, dispatch, rejectWithValue }) => {
+    const state = getState();
+    
+    // Get the trait details
+    const trait = state.traits.traits[traitId];
+    
+    // Validation step 1: Check if trait exists
+    if (!trait) {
+      return rejectWithValue("Trait not found.");
+    }
+
+    // Validation step 2: Check if trait is already acquired
+    if (state.traits.acquiredTraits.includes(traitId)) {
+      return {
+        success: false,
+        message: "You already possess this trait.",
+        traitId
+      };
+    }
+    
+    // Get the current essence amount
+    const currentEssence = selectCurrentEssence(state);
+    const essenceCost = trait.essenceCost || 0; // Default to 0 if not defined
+
+    // Validation step 3: Check if player has enough essence
+    if (currentEssence < essenceCost) {
+      return rejectWithValue(`Insufficient essence (${essenceCost} required, have ${currentEssence}).`);
+    }
+    
+    try {
+      // Step 1: Spend essence
+      dispatch(spendEssence({
+        amount: essenceCost,
+        description: `Acquired trait: ${trait.name}`
+      }));
+      
+      // Step 2: Acquire the trait
+      dispatch(acquireTrait(traitId));
+      
+      // Return success result
+      return {
+        success: true,
+        message: `${trait.name} acquired!`,
+        traitId
+      };
+    } catch (error) {
+      let errorMessage = 'Failed to acquire trait';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
  * Interface defining the expected raw structure of a trait object in traits.json
  */
 interface RawTraitJsonData {
   name: string;
   description: string;
-  category?: string; // Explicitly optional category
-  type?: string;     // Explicitly optional type field from older format
+  category?: string; 
+  type?: string;     // Kept for backward compatibility if old JSON data exists
   effects?: TraitEffect[] | TraitEffectValues;
   rarity?: string;
   essenceCost?: number;
+  permanenceCost?: number; // Added to match Trait type
   tier?: number;
-  iconPath?: string; // Use iconPath if that's the field name in JSON
+  iconPath?: string;
+  sourceNpc?: string; // Added to match Trait type and new JSON structure
   requirements?: {
     level?: number;
-    relationshipLevel?: string;
+    relationshipLevel?: number; // Changed to number
     npcId?: string;
-    prerequisiteTrait?: string;
+    prerequisiteTraits?: string[]; // Changed to array
     quest?: string;
     [key: string]: any;
   };
   level?: number;
-  // Add any other fields expected directly from the JSON
 }
 
 /**
@@ -127,24 +200,29 @@ export const fetchTraitsThunk = createAsyncThunk<
 
       const processedTraits: Record<string, Trait> = {};
       for (const [id, rawData] of Object.entries(rawTraitsData)) {
-        processedTraits[id] = {
-          // Spread known properties explicitly or use rawData if RawTraitJsonData is very close to Trait
+        // Explicitly map fields to ensure type correctness
+        const traitData: Trait = {
+          id: id,
           name: rawData.name,
           description: rawData.description,
-          effects: rawData.effects || {}, // Ensure effects is at least an empty object
-          essenceCost: rawData.essenceCost,
-          tier: rawData.tier,
-          iconPath: rawData.iconPath,
-          requirements: rawData.requirements,
-          level: rawData.level,
-          // Add the ID property from the key
-          id: id, 
-          // Ensure required fields have defaults if potentially missing in JSON
-          // Use the stricter types - no 'as any' needed
-          category: rawData.category || rawData.type || 'General', 
+          category: rawData.category || rawData.type || 'General', // Handle potential 'type' field
+          effects: rawData.effects || {},
           rarity: rawData.rarity || 'Common',
-          // Add other defaults as needed based on the Trait interface
+          tier: rawData.tier,
+          sourceNpc: rawData.sourceNpc, // Map sourceNpc
+          essenceCost: rawData.essenceCost,
+          permanenceCost: rawData.permanenceCost, // Map permanenceCost
+          iconPath: rawData.iconPath,
+          level: rawData.level,
+          requirements: rawData.requirements ? {
+            level: rawData.requirements.level,
+            relationshipLevel: rawData.requirements.relationshipLevel, // Already number in RawTraitJsonData
+            npcId: rawData.requirements.npcId,
+            prerequisiteTraits: rawData.requirements.prerequisiteTraits, // Already string[]
+            quest: rawData.requirements.quest
+          } : undefined
         };
+        processedTraits[id] = traitData;
       }
 
       return processedTraits;

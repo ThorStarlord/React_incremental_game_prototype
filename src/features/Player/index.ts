@@ -33,7 +33,7 @@ export {
   selectPerformanceStats,
   selectAvailableAttributePoints,
   selectAvailableSkillPoints,
-  selectEquippedTraits,
+  selectEquippedTraitIds, // Renamed from selectEquippedTraits
   selectPermanentTraits,
   selectTraitSlots,
   selectIsPlayerAlive,

@@ -157,9 +157,9 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
               <Typography variant="caption" color="text.secondary">
                 Category: {trait.category}
               </Typography>
-              {trait.source && (
+              {trait.sourceNpc && (
                 <Typography variant="caption" color="text.secondary">
-                  • Source: {trait.source}
+                  • Source: {trait.sourceNpc}
                 </Typography>
               )}
             </Box>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Typography, LinearProgress, Tooltip } from '@mui/material';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectTraitSlots } from '../../../Player/state/PlayerSelectors';
-import { selectTotalCollected } from '../../../Essence/state/EssenceSelectors';
+import { selectTotalCollected, selectResonanceLevelProgress } from '../../../Essence/state/EssenceSelectors';
+import { selectTraitSlots, selectMaxTraitSlots } from '../../../Player/state/PlayerSelectors'; // Import from PlayerSelectors
 
 /**
  * TraitSlotProgressIndicator Component
@@ -15,39 +15,41 @@ import { selectTotalCollected } from '../../../Essence/state/EssenceSelectors';
 const TraitSlotProgressIndicator: React.FC = () => {
   // Use Redux selectors to get player data
   const totalEssenceEarned = useAppSelector(selectTotalCollected);
-  const traitSlotsArray = useAppSelector(selectTraitSlots); // Renamed to avoid conflict if traitSlots was a number
+  const traitSlotsArray = useAppSelector(selectTraitSlots);
+  const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
+  const resonanceProgress = useAppSelector(selectResonanceLevelProgress);
 
-  // Calculate the next essence threshold for a slot unlock
-  const currentUnlocks: number = Math.floor(totalEssenceEarned / 1000);
-  const nextThreshold: number = (currentUnlocks + 1) * 1000;
+  const {
+    currentResonanceLevel,
+    nextResonanceLevel,
+    nextResonanceLevelThreshold,
+    progressPercentage,
+    essenceNeeded,
+    isMaxResonanceLevel,
+  } = resonanceProgress;
 
-  // Calculate progress percentage toward next slot
-  const progress: number = ((totalEssenceEarned % 1000) / 1000) * 100;
+  const currentUnlockedSlots = traitSlotsArray.filter(slot => slot.isUnlocked).length;
+  const isMaxSlots = currentUnlockedSlots >= maxTraitSlots; // Check against actual max slots from state
 
-  // If already at max slots, show 100% progress
-  const MAX_TRAIT_SLOTS: number = 8;
-  // const DEFAULT_TRAIT_SLOTS: number = 1; // Defaulting logic might need review if traitSlotsArray is always an array
-  const currentTraitSlots = traitSlotsArray.length; // Assuming traitSlots from PlayerState is an array of actual slots
-  const isMaxSlots: boolean = currentTraitSlots >= MAX_TRAIT_SLOTS;
-  const displayProgress: number = isMaxSlots ? 100 : progress;
+  const displayProgress: number = isMaxResonanceLevel ? 100 : progressPercentage;
 
   return (
     <Tooltip
-      title={isMaxSlots
-        ? "Maximum trait slots reached!"
-        : `${totalEssenceEarned % 1000}/${1000} essence toward next slot`
+      title={isMaxResonanceLevel
+        ? "Maximum Resonance Level reached!"
+        : `Resonance Level ${currentResonanceLevel} (Next at ${nextResonanceLevelThreshold?.essenceRequired.toLocaleString() || 'N/A'} Essence)`
       }
       arrow
     >
       <Box sx={{ width: '100%', mt: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
           <Typography variant="caption" color="text.secondary">
-            Next Trait Slot
+            Resonance Level: {currentResonanceLevel}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {isMaxSlots
+            {isMaxResonanceLevel
               ? "Max slots reached"
-              : `${Math.floor(progress)}% (${currentTraitSlots}/${MAX_TRAIT_SLOTS} slots)`}
+              : `Next Slot at RL ${nextResonanceLevel} (${currentUnlockedSlots}/${maxTraitSlots} slots)`}
           </Typography>
         </Box>
 
@@ -59,14 +61,14 @@ const TraitSlotProgressIndicator: React.FC = () => {
             borderRadius: 4,
             bgcolor: 'grey.200',
             '& .MuiLinearProgress-bar': {
-              bgcolor: isMaxSlots ? 'success.main' : 'primary.main',
+              bgcolor: isMaxResonanceLevel ? 'success.main' : 'primary.main',
             }
           }}
         />
 
-        {!isMaxSlots && (
+        {!isMaxResonanceLevel && nextResonanceLevelThreshold && (
           <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-            Need {nextThreshold - totalEssenceEarned} more essence
+            Need {essenceNeeded.toLocaleString()} more Essence for Resonance Level {nextResonanceLevel}
           </Typography>
         )}
       </Box>

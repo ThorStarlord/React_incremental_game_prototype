@@ -20,17 +20,16 @@ import Panel from '../../../../shared/components/layout/Panel';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import {
   selectTraits,
-  equipTrait,
-  unequipTrait,
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSlice';
 import {
   selectEquippedTraitObjects,
   selectPermanentTraitObjects,
-  selectAvailableTraitObjects
-} from '../../state/TraitsSelectors';
-import { selectTraitSlots } from '../../../Player/state/PlayerSelectors';
+  selectAvailableTraitObjects,
+  selectTraitSlots as selectPlayerTraitSlots // Alias to avoid name collision
+} from '../../state/TraitsSelectors'; // selectTraitSlots is re-exported from PlayerSelectors
+import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice'; // Import actions from PlayerSlice
 import { Trait } from '../../state/TraitsTypes';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import AvailableTraitList from './AvailableTraitList';
@@ -68,10 +67,10 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   
-  // Fix selector usage to work with TraitSlot[] array
-  const traitSlots = useAppSelector(selectTraitSlots);
-  const totalSlots = traitSlots.length;
-  const usedSlots = traitSlots.filter(slot => slot.traitId !== null).length;
+  // Use selectors from PlayerState for trait slots
+  const playerTraitSlots = useAppSelector(selectPlayerTraitSlots);
+  const totalSlots = playerTraitSlots.length;
+  const usedSlots = playerTraitSlots.filter(slot => slot.traitId !== null).length;
 
   // Use selectors that return full trait objects
   const equippedTraits = useAppSelector(selectEquippedTraitObjects);
@@ -291,8 +290,14 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
             variant="contained" 
             color="primary"
             onClick={() => {
-              dispatch(equipTrait({ traitId: selectedTrait.id }));
-              setSelectedTrait(null);
+              // Find the first available slot index
+              const availableSlot = playerTraitSlots.find(slot => slot.isUnlocked && !slot.traitId);
+              if (availableSlot) {
+                dispatch(equipTrait({ traitId: selectedTrait.id, slotIndex: availableSlot.index }));
+                setSelectedTrait(null);
+              } else {
+                console.warn("No available slots to equip trait.");
+              }
             }}
           >
             Equip Selected
@@ -304,8 +309,14 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
             variant="outlined" 
             color="secondary"
             onClick={() => {
-              dispatch(unequipTrait(selectedTrait.id));
-              setSelectedTrait(null);
+              // Find the slot index of the equipped trait
+              const equippedSlot = playerTraitSlots.find(slot => slot.traitId === selectedTrait.id);
+              if (equippedSlot) {
+                dispatch(unequipTrait({ slotIndex: equippedSlot.index }));
+                setSelectedTrait(null);
+              } else {
+                console.warn("Selected trait is not equipped.");
+              }
             }}
           >
             Unequip Selected

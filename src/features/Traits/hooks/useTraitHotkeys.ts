@@ -2,11 +2,10 @@ import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import { RootState } from '../../../app/store';
 import {
-  selectTraits,
-  selectTraitSlots,
-  equipTrait,
-  unequipTrait
+  selectTraits
 } from '../state/TraitsSlice';
+import { selectTraitSlots } from '../../Player/state/PlayerSelectors'; // Corrected import path
+import { equipTrait, unequipTrait } from '../../Player/state/PlayerSlice'; // Corrected import path
 import { Trait, TraitSlot } from '../state/TraitsTypes';
 
 interface ShortcutConfig {
@@ -115,7 +114,7 @@ const useTraitHotkeys = (): UseTraitHotkeysReturn => {
     const equippedSlot = traitSlots.find((slot: TraitSlot) => slot.traitId === traitId);
 
     if (equippedSlot) {
-      dispatch(unequipTrait(traitId));
+      dispatch(unequipTrait({ slotIndex: equippedSlot.index })); // Dispatch with slotIndex
 
       if (config.showNotifications) {
         console.log(`Unequipped ${trait.name} with hotkey ${key}`);

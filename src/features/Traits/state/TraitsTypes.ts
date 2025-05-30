@@ -45,8 +45,8 @@ export interface Trait {
   /** Tier level of the trait (optional) */
   tier?: number;
   
-  /** Source where the trait can be obtained (optional) */
-  source?: string;
+  /** Source NPC where the trait can be obtained (optional) */
+  sourceNpc?: string; // Renamed from source and matches traits.json
   
   /** Cost in essence to acquire the trait (optional) */
   essenceCost?: number;
@@ -57,9 +57,9 @@ export interface Trait {
   /** Requirements for obtaining this trait (optional) */
   requirements?: {
     level?: number;
-    relationshipLevel?: string;
+    relationshipLevel?: number; // Changed to number
     npcId?: string;
-    prerequisiteTrait?: string;
+    prerequisiteTraits?: string[]; // Changed to array for multiple prerequisites
     quest?: string;
     [key: string]: any;
   };
@@ -106,8 +106,8 @@ export interface TraitSlot {
   
   /** Requirements to unlock this slot */
   unlockRequirements?: {
-    type: string;
-    value: any;
+    type: 'resonanceLevel' | 'quest' | 'relationshipLevel'; // Specific types for unlock conditions
+    value: number | string; // Numeric for levels, string for quest IDs
   };
 }
 
@@ -160,15 +160,6 @@ export interface TraitsState {
   
   /** Traits the player has permanently unlocked (always active) */
   permanentTraits: string[];
-  
-  /** Traits currently equipped */
-  equippedTraits: string[];
-  
-  /** Available trait slots */
-  slots: TraitSlot[];
-  
-  /** Maximum number of equippable traits */
-  maxTraitSlots: number;
   
   /** Currently active presets */
   presets: TraitPreset[];

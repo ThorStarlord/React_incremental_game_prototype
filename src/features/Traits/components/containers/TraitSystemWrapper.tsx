@@ -2,22 +2,25 @@ import React, { useCallback, useMemo } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import {
   selectTraits,
-  selectTraitSlots,
-  selectEquippedTraitObjects,
   selectPermanentTraitObjects,
   selectAcquiredTraitObjects,
   selectDiscoveredTraitObjects,
   selectTraitLoading,
-  selectTraitError
+  selectTraitError,
+  selectEquippedTraitObjects // Added import for selectEquippedTraitObjects
 } from '../../state/TraitsSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import {
-  equipTrait,
-  unequipTrait,
   acquireTrait,
   makePermanent,
   discoverTrait
-} from '../../state/TraitsSlice';
+} from '../../state/TraitsSlice'; // Actions still in TraitsSlice
+import {
+  selectTraitSlots as selectPlayerTraitSlots, // Alias for player's trait slots
+  selectEquippedTraitIds as selectPlayerEquippedTraitIds, // Alias for player's equipped trait IDs
+  selectMaxTraitSlots as selectPlayerMaxTraitSlots // Import max slots
+} from '../../../Player/state/PlayerSelectors'; // Import from PlayerSelectors
+import { equipTrait, unequipTrait, unlockTraitSlot } from '../../../Player/state/PlayerSlice'; // Import actions from PlayerSlice
 import { TraitSystemUI, type TraitSystemUIProps } from '../ui/TraitSystemUI';
 import type { Trait } from '../../state/TraitsTypes';
 
@@ -43,8 +46,9 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
 
   // Fetch all necessary data from Redux store
   const allTraits = useAppSelector(selectTraits);
-  const traitSlots = useAppSelector(selectTraitSlots);
-  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
+  const playerTraitSlots = useAppSelector(selectPlayerTraitSlots); // Get player's trait slots
+  const equippedTraitObjects = useAppSelector(selectEquippedTraitObjects); // Corrected: This selector is from TraitsSelectors.ts
+  const playerMaxTraitSlots = useAppSelector(selectPlayerMaxTraitSlots); // Get player's max trait slots
   const permanentTraits = useAppSelector(selectPermanentTraitObjects);
   const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects);
@@ -53,16 +57,13 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
   const currentEssence = useAppSelector(selectCurrentEssence);
 
   // Memoized data derivations for UI
+  const equippedTraitIds = useAppSelector(selectPlayerEquippedTraitIds); // Get equipped trait IDs from PlayerSelectors
+
   const availableTraitsForEquip = useMemo(() => 
     acquiredTraits.filter(trait => 
-      !equippedTraits.some(equipped => equipped.id === trait.id)
+      !equippedTraitIds.includes(trait.id) && !permanentTraits.some(p => p.id === trait.id)
     ),
-    [acquiredTraits, equippedTraits]
-  );
-
-  const equippedTraitIds = useMemo(() => 
-    equippedTraits.map(trait => trait.id),
-    [equippedTraits]
+    [acquiredTraits, equippedTraitIds, permanentTraits]
   );
 
   const permanentTraitIds = useMemo(() => 
@@ -82,11 +83,11 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
 
   // Action handlers
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
-    dispatch(equipTrait({ traitId, slotIndex }));
+    dispatch(equipTrait({ traitId, slotIndex })); // Dispatch to PlayerSlice
   }, [dispatch]);
 
-  const handleUnequipTrait = useCallback((slotId: string) => {
-    dispatch(unequipTrait(slotId));
+  const handleUnequipTrait = useCallback((slotIndex: number) => {
+    dispatch(unequipTrait({ slotIndex })); // Dispatch to PlayerSlice
   }, [dispatch]);
 
   const handleAcquireTrait = useCallback((traitId: string) => {
@@ -133,25 +134,26 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
   const uiProps: TraitSystemUIProps = {
     // Data
     allTraits,
-    traitSlots,
-    equippedTraits,
+    traitSlots: playerTraitSlots, // Pass player's trait slots
+    equippedTraits: equippedTraitObjects, // Pass equipped trait objects
     permanentTraits,
     acquiredTraits,
     discoveredTraits,
     availableTraitsForEquip,
     currentEssence,
+    playerMaxTraitSlots, // Pass player's max trait slots
     
     // Status
     loading,
     error,
-    equippedTraitIds,
+    equippedTraitIds, // This is now from PlayerSelectors
     permanentTraitIds,
     discoveredTraitIds,
     acquiredTraitIds,
     
     // Actions
     onEquipTrait: handleEquipTrait,
-    onUnequipTrait: handleUnequipTrait,
+    onUnequipTrait: handleUnequipTrait, // This now expects slotIndex: number
     onAcquireTrait: handleAcquireTrait,
     onMakeTraitPermanent: handleMakeTraitPermanent,
     onDiscoverTrait: handleDiscoverTrait,

@@ -6,7 +6,8 @@
 import React, { useEffect } from 'react';
 import { Box, Typography, Paper, Chip, Divider } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectAcquiredTraits, selectEquippedTraitIds, selectTraits } from '../../state/TraitsSlice';
+import { selectAcquiredTraits, selectTraits } from '../../state/TraitsSlice';
+import { selectEquippedTraitIds } from '../../../Player/state/PlayerSelectors'; // Import from PlayerSelectors
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 
 /**

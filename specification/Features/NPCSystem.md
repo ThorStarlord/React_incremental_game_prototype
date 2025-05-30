@@ -25,8 +25,8 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 ## 2. Features
 
 *   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions.
-*   **Emotional Connections:** NPCs exhibit a range of emotions and can form deep connections with the player, affecting their behavior and dialogue.
-*   **Trait Sharing and Acquisition:** Players can acquire traits from NPCs, which can then be used to influence other NPCs or enhance the player's abilities.
+*   **Emotional Connections (Connection Depth):** NPCs exhibit a range of emotions and can form deep connections with the player. This connection is quantified by the `connectionDepth` stat, which affects their behavior, dialogue, and contributes to passive Essence generation.
+*   **Trait Sharing and Acquisition:** Players can acquire traits from NPCs (via the Resonance action, requiring sufficient Emotional Connection/Connection Depth), which can then be used to influence other NPCs or enhance the player's abilities.
 *   **Social Interactions:** NPCs can interact with each other and the player in a variety of social contexts, including trading, gifting, and collaborative activities.
 
 ## 3. Technical Specifications
@@ -160,17 +160,23 @@ The NPC slice manages the state of NPCs in the game, including their relationshi
 #### State Structure
 ```typescript
 interface NPCState {
-  npcs: Record<string, NPC>;
-  relationships: Record<string, Relationship>;
-  interactions: Interaction[];
-  // ... other state fields
+  npcs: Record<string, NPC>; // Includes connectionDepth for each NPC
+  discoveredNPCs: string[];
+  currentInteraction: NPCInteraction | null;
+  dialogueHistory: DialogueEntry[];
+  relationshipChanges: RelationshipChangeEntry[];
+  loading: boolean;
+  error: string | null;
 }
 ```
 
 #### Reducers
 *   **initializeNPCs:** Sets up the NPCs in the game, either from provided data or mock data.
 *   **updateNPCRelationship:** Updates the relationship value between the player and an NPC.
-*   **addNPCInteraction:** Logs an interaction with an NPC, updating their emotional state and relationship.
+*   **updateNpcConnectionDepth:** Updates the connectionDepth stat for an NPC based on interactions.
+*   **addDialogueEntry:** Adds a dialogue entry to the history.
+*   **startInteraction / endInteraction:** Manage the current interaction session.
+*   **clearError:** Clears error states.
 
 #### Selectors
 *   **selectNPCById:** Retrieves an NPC by their ID.

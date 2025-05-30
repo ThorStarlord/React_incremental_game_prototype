@@ -39,7 +39,7 @@ export interface TraitSlotsProps {
   
   // Actions
   onEquipTrait: (traitId: string, slotIndex: number) => void;
-  onUnequipTrait: (slotId: string) => void;
+  onUnequipTrait: (slotIndex: number) => void; // Changed from slotId: string
 }
 
 /**
@@ -57,7 +57,7 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
   const [unequipDialog, setUnequipDialog] = React.useState<{
     open: boolean;
     trait?: Trait;
-    slotId?: string;
+    slotIndex?: number; // Changed from slotId to slotIndex
   }>({ open: false });
 
   const handleSlotClick = useCallback((slot: TraitSlot, index: number) => {
@@ -70,7 +70,7 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
         setUnequipDialog({
           open: true,
           trait: equippedTrait,
-          slotId: slot.id
+          slotIndex: slot.index // Use slot.index
         });
       }
     } else {
@@ -87,11 +87,11 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
   }, [selectedSlotIndex, onEquipTrait]);
 
   const handleUnequipConfirm = useCallback(() => {
-    if (unequipDialog.slotId) {
-      onUnequipTrait(unequipDialog.slotId);
+    if (unequipDialog.slotIndex !== undefined) { // Check if slotIndex is defined
+      onUnequipTrait(unequipDialog.slotIndex);
     }
     setUnequipDialog({ open: false });
-  }, [unequipDialog.slotId, onUnequipTrait]);
+  }, [unequipDialog.slotIndex, onUnequipTrait]);
 
   const getSlotContent = (slot: TraitSlot) => {
     if (!slot.isUnlocked) {

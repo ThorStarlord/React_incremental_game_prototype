@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import type { NPC, RelationshipChangeEntry, DialogueEntry, InteractionResult } from './NPCTypes';
+import { setNPCs, setLoading, setError, updateNpcConnectionDepth } from './NPCSlice'; 
+import type { NPC, RelationshipChangeEntry, DialogueEntry, InteractionResult, DialogueResult, ProcessDialoguePayload } from './NPCTypes'; // Added ProcessDialoguePayload
 
 /**
  * Initialize NPCs with mock or loaded data
@@ -68,7 +69,7 @@ export const updateNPCRelationshipThunk = createAsyncThunk<
  */
 export const processNPCInteractionThunk = createAsyncThunk<
   InteractionResult,
-  { npcId: string; interactionType: string; options?: Record<string, any> },
+  { npcId: string; interactionType: string; options?: Record<string, any> }, // Ensure InteractionType is imported or defined
   { state: RootState }
 >(
   'npcs/processInteraction',
@@ -83,25 +84,35 @@ export const processNPCInteractionThunk = createAsyncThunk<
 
       // Process different interaction types
       let relationshipChange = 0;
+      let connectionDepthChange = 0; // New: Track connection depth changes
       let essenceGained = 0;
       let unlockRewards: string[] = [];
 
       switch (interactionType) {
         case 'dialogue':
           relationshipChange = Math.random() * 2 + 1; // 1-3 points
+          connectionDepthChange = Math.random() * 0.5 + 0.1; // Small connection depth gain
           break;
         case 'gift':
           relationshipChange = options.giftValue ? options.giftValue * 0.1 : 5;
+          connectionDepthChange = options.giftValue ? options.giftValue * 0.05 : 0.5;
           break;
         case 'quest_completion':
           relationshipChange = 10;
           essenceGained = 50;
+          connectionDepthChange = 1; // Significant connection depth gain
           break;
         case 'trade':
           relationshipChange = 1;
+          connectionDepthChange = 0.1;
+          break;
+        case 'trait_sharing':
+          relationshipChange = 2;
+          connectionDepthChange = 0.8; // Good connection depth gain
           break;
         default:
           relationshipChange = 1;
+          connectionDepthChange = 0.1;
       }
 
       // Apply relationship change
@@ -110,6 +121,14 @@ export const processNPCInteractionThunk = createAsyncThunk<
           npcId,
           relationshipChange,
           reason: interactionType
+        }));
+      }
+
+      // Apply connection depth change
+      if (connectionDepthChange > 0) {
+        dispatch(updateNpcConnectionDepth({
+          npcId,
+          change: connectionDepthChange
         }));
       }
 
@@ -127,7 +146,8 @@ export const processNPCInteractionThunk = createAsyncThunk<
 
       return {
         success: true,
-        relationshipChange,
+        affinityDelta: relationshipChange, // Renamed
+        connectionDepthChange,
         essenceGained,
         unlockRewards,
         message: `Successfully interacted with ${npc.name}`
@@ -222,12 +242,12 @@ export const endNPCInteractionThunk = createAsyncThunk<
  * Process dialogue choice with NPC
  */
 export const processDialogueChoiceThunk = createAsyncThunk<
-  { responseText: string; relationshipChange: number },
-  { npcId: string; choiceId: string },
+  DialogueResult,
+  ProcessDialoguePayload, // Use ProcessDialoguePayload for args
   { state: RootState }
 >(
   'npcs/processDialogueChoice',
-  async ({ npcId, choiceId }, { getState, dispatch, rejectWithValue }) => {
+  async ({ npcId, choiceId, playerText }, { getState, dispatch, rejectWithValue }) => { // Added playerText
     try {
       const state = getState();
       const npc = state.npcs.npcs[npcId];
@@ -256,8 +276,10 @@ export const processDialogueChoiceThunk = createAsyncThunk<
       }));
 
       return {
-        responseText,
-        relationshipChange
+        success: true,
+        npcResponse: responseText, // Renamed from responseText
+        affinityDelta: relationshipChange, // Renamed from relationshipChange
+        rewards: relationshipChange > 0 ? ['Positive conversation'] : []
       };
     } catch (error) {
       return rejectWithValue('Failed to process dialogue choice');
@@ -269,7 +291,7 @@ export const processDialogueChoiceThunk = createAsyncThunk<
  * Share trait with NPC
  */
 export const shareTraitWithNPCThunk = createAsyncThunk<
-  { success: boolean; message: string },
+  InteractionResult, // Changed return type
   { npcId: string; traitId: string; slotIndex: number },
   { state: RootState }
 >(
@@ -289,17 +311,49 @@ export const shareTraitWithNPCThunk = createAsyncThunk<
       }
 
       // Check if player has the trait
-      const playerTraits = state.traits?.acquiredTraits || [];
-      if (!playerTraits.includes(traitId)) {
+      // Assuming player traits are stored in player slice, adjust path if necessary
+      const playerAcquiredTraits = state.player.permanentTraits.concat(state.player.traitSlots.filter(s => s.traitId).map(s => s.traitId as string));
+      if (!playerAcquiredTraits.includes(traitId)) {
         return rejectWithValue('Player does not have this trait');
       }
 
       return {
         success: true,
-        message: `Successfully shared trait with ${npc.name}`
+        message: `Successfully shared trait with ${npc.name}`,
+        affinityDelta: 1, // Renamed from relationshipChange
+        rewards: ['Trait sharing bond']
       };
     } catch (error) {
       return rejectWithValue('Failed to share trait with NPC');
+    }
+  }
+);
+
+/**
+ * Fetch NPCs from the data file
+ */
+export const fetchNPCsThunk = createAsyncThunk<
+  Record<string, NPC>, // Return type of the payload creator
+  void, // First argument to the payload creator (no argument)
+  { state: RootState; rejectValue: string } // ThunkAPI config
+>(
+  'npcs/fetchNPCs',
+  async (_, { dispatch, rejectWithValue }) => {
+    dispatch(setLoading(true));
+    try {
+      const response = await fetch('/data/npcs.json'); // Path relative to public folder
+      if (!response.ok) {
+        throw new Error(`Failed to fetch NPCs: ${response.statusText}`);
+      }
+      const data: Record<string, NPC> = await response.json();
+      dispatch(setNPCs(data)); // Dispatch setNPCs from NPCSlice
+      dispatch(setLoading(false));
+      return data;
+    } catch (error: any) {
+      const errorMessage = error.message || 'Failed to fetch NPCs';
+      dispatch(setError(errorMessage));
+      dispatch(setLoading(false));
+      return rejectWithValue(errorMessage);
     }
   }
 );

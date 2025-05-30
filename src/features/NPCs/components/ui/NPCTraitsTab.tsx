@@ -47,7 +47,8 @@ import {
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectNPCById } from '../../state/NPCSelectors';
-import { shareTraitWithNPCThunk, updateNpcRelationship } from '../../state/NPCSlice';
+import { updateNpcRelationship } from '../../state/NPCSlice'; // updateNpcRelationship is an action from NPCSlice
+import { shareTraitWithNPCThunk } from '../../state/NPCThunks'; // shareTraitWithNPCThunk is a thunk from NPCThunks
 import { NPC, NPCTraitInfo } from '../../state/NPCTypes';
 
 interface NPCTraitsTabProps {

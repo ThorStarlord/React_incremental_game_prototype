@@ -15,6 +15,8 @@ import {
   Fade,
   useTheme,
   useMediaQuery,
+  CircularProgress, // Added for loading state
+  Alert, // Added for error state
 } from '@mui/material';
 import {
   Home,
@@ -24,9 +26,16 @@ import {
   ViewModule,
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAppSelector } from '../app/hooks';
-import { selectNPCs, selectNPCById } from '../features/NPCs';
+import { useAppSelector, useAppDispatch } from '../app/hooks'; // Added useAppDispatch
+import { 
+  selectNPCs, 
+  selectNPCById, 
+  fetchNPCsThunk, // Added fetchNPCsThunk
+  selectNPCLoading, // Added selectNPCLoading
+  selectNPCError // Added selectNPCError
+} from '../features/NPCs';
 import { NPCListView } from '../features/NPCs';
+import NPCPanelUI from '../features/NPCs/components/ui/NPCPanelUI'; // Import NPCPanelUI
 
 /**
  * NPCsPage - Main page for NPC interactions
@@ -43,14 +52,22 @@ const NPCsPage: React.FC = () => {
   const { npcId } = useParams<{ npcId?: string }>();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const dispatch = useAppDispatch(); // Added dispatch
   
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedNPCId, setSelectedNPCId] = useState<string | null>(npcId || null);
   
   const npcs = useAppSelector(selectNPCs);
+  const isLoading = useAppSelector(selectNPCLoading); // Added isLoading
+  const error = useAppSelector(selectNPCError); // Added error
   const selectedNPC = useAppSelector(state => 
     selectedNPCId ? selectNPCById(state, selectedNPCId) : null
   );
+
+  // Fetch NPCs on component mount
+  useEffect(() => {
+    dispatch(fetchNPCsThunk());
+  }, [dispatch]);
 
   // Update selected NPC when URL parameter changes
   useEffect(() => {
@@ -79,7 +96,25 @@ const NPCsPage: React.FC = () => {
 
   // Check if NPCs are available
   const npcCount = Object.keys(npcs).length;
-  const hasNPCs = npcCount > 0;
+  const hasNPCs = npcCount > 0 && !isLoading && !error; // Consider loading/error state
+
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Alert severity="error">Failed to load NPCs: {error}</Alert>
+      </Box>
+    );
+  }
 
   // Mobile view: show either list or detail
   if (isMobile) {
@@ -234,28 +269,7 @@ const NPCsPage: React.FC = () => {
                 <Fade in={true} timeout={300} key={selectedNPCId}>
                   <Box sx={{ height: '100%', overflow: 'auto' }}>
                     {/* Use NPCPanel directly for detailed NPC view */}
-                    <Box sx={{ p: 2 }}>
-                      <Typography variant="h5" gutterBottom>
-                        {selectedNPC.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph>
-                        Detailed NPC interaction interface will be displayed here.
-                        This area is reserved for the comprehensive NPC panel with tabs for
-                        Overview, Dialogue, Trade, Quests, and Traits.
-                      </Typography>
-                      {/* TODO: Replace with actual NPCPanel component when available */}
-                      <Box sx={{ 
-                        p: 3, 
-                        bgcolor: 'background.default', 
-                        borderRadius: 1,
-                        border: '1px dashed',
-                        borderColor: 'divider'
-                      }}>
-                        <Typography variant="body2" color="text.secondary" textAlign="center">
-                          NPCPanel Component Integration Pending
-                        </Typography>
-                      </Box>
-                    </Box>
+                    <NPCPanelUI npc={selectedNPC} />
                   </Box>
                 </Fade>
               ) : (
