@@ -25,7 +25,7 @@ import {
   EmojiEvents,
   Schedule
 } from '@mui/icons-material';
-import type { NPC, RelationshipChangeEntry } from '../../state/NPCTypes';
+import type { NPC, RelationshipChangeEntry } from '../../../state/NPCTypes';
 
 interface NPCRelationshipTabProps {
   npc: NPC;
