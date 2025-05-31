@@ -181,6 +181,8 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
             currentEssence={currentEssence}
             onDiscoverTrait={onDiscoverTrait}
             onAcquireTrait={onAcquireTrait}
+            onMakeTraitPermanent={onMakeTraitPermanent} // Pass down
+            canMakePermanent={canMakePermanent} // Pass down
             canAcquireTrait={canAcquireTrait}
             getTraitAffordability={getTraitAffordability}
           />

@@ -3,85 +3,86 @@ import { Box, Typography, Card, CardContent, Button, TextField, List, ListItem, 
 import ChatIcon from '@mui/icons-material/Chat';
 import SendIcon from '@mui/icons-material/Send';
 
-import type { NPC } from '../../../state/NPCTypes';
+import type { NPC, DialogueEntry } from '../../../state/NPCTypes'; // Import DialogueEntry from NPCTypes
+import { useAppDispatch } from '../../../../../app/hooks'; // Only need useAppDispatch here
+import { processDialogueChoiceThunk } from '../../../state/NPCThunks'; // Import the thunk
+// Removed addReduxDialogueEntry and selectDialogueHistoryForNPC as they are not used directly here
 
 interface NPCDialogueTabProps {
   npc: NPC;
 }
 
-interface DialogueMessage {
-  id: string;
-  speaker: 'player' | 'npc';
-  text: string;
-  timestamp: Date;
-}
-
-const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {
+const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => { // Corrected prop type
+  const dispatch = useAppDispatch();
   const [message, setMessage] = useState('');
-  const [dialogueHistory, setDialogueHistory] = useState<DialogueMessage[]>([
-    {
-      id: '1',
-      speaker: 'npc',
-      text: `Hello! It's good to see you again.`,
-      timestamp: new Date()
-    }
-  ]);
+  
+  const [localDialogueHistory, setLocalDialogueHistory] = useState<DialogueEntry[]>([]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!message.trim()) return;
 
-    const playerMessage: DialogueMessage = {
-      id: Date.now().toString(),
-      speaker: 'player',
-      text: message,
-      timestamp: new Date()
+    const playerMessageText = message;
+    setMessage(''); // Clear input immediately
+
+    // Optimistically update local UI for player message
+    const playerDisplayMessage: DialogueEntry = {
+      id: `player-${Date.now()}`,
+      npcId: npc.id,
+      speaker: 'player', // Add speaker to DialogueEntry in NPCTypes.ts
+      playerText: playerMessageText, // Use playerText for player's message
+      npcResponse: '', // Empty for player message
+      timestamp: Date.now(),
     };
+    setLocalDialogueHistory(prev => [...prev, playerDisplayMessage]);
 
-    // Add player message
-    setDialogueHistory(prev => [...prev, playerMessage]);
+    try {
+      const resultAction = await dispatch(processDialogueChoiceThunk({
+        npcId: npc.id,
+        choiceId: 'generic_talk', // Placeholder for now
+        playerText: playerMessageText,
+      }));
 
-    // Simulate NPC response
-    setTimeout(() => {
-      const npcResponse: DialogueMessage = {
-        id: (Date.now() + 1).toString(),
-        speaker: 'npc',
-        text: generateNPCResponse(message, npc),
-        timestamp: new Date()
-      };
-      setDialogueHistory(prev => [...prev, npcResponse]);
-    }, 1000);
-
-    setMessage('');
+      if (processDialogueChoiceThunk.fulfilled.match(resultAction)) {
+        const npcResponsePayload = resultAction.payload;
+        // Optimistically update local UI for NPC message
+        const npcDisplayMessage: DialogueEntry = {
+          id: `npc-${Date.now()}`,
+          npcId: npc.id,
+          speaker: 'npc', // Add speaker to DialogueEntry in NPCTypes.ts
+          playerText: playerMessageText, // Store player's text for context
+          npcResponse: npcResponsePayload.npcResponse,
+          timestamp: Date.now(),
+          affinityDelta: npcResponsePayload.affinityDelta,
+        };
+        setLocalDialogueHistory(prev => [...prev, npcDisplayMessage]);
+      } else {
+        console.error("Dialogue thunk failed:", resultAction.payload || resultAction.error);
+         const errorDisplayMessage: DialogueEntry = {
+          id: `error-${Date.now()}`,
+          npcId: npc.id,
+          speaker: 'system',
+          playerText: playerMessageText,
+          npcResponse: "Sorry, I couldn't process that.",
+          timestamp: Date.now(),
+        };
+        setLocalDialogueHistory(prev => [...prev, errorDisplayMessage]);
+      }
+    } catch (error) {
+      console.error("Error dispatching dialogue thunk:", error);
+       const errorDisplayMessage: DialogueEntry = {
+          id: `error-${Date.now()}`,
+          npcId: npc.id,
+          speaker: 'system',
+          playerText: playerMessageText,
+          npcResponse: "An unexpected error occurred.",
+          timestamp: Date.now(),
+        };
+        setLocalDialogueHistory(prev => [...prev, errorDisplayMessage]);
+    }
   };
 
-  const generateNPCResponse = (playerMessage: string, npc: NPC): string => {
-    // Simple response generation based on relationship level
-    const responses = {
-      low: [
-        "I appreciate you talking to me.",
-        "Thank you for your interest.",
-        "I'm still getting to know you."
-      ],
-      medium: [
-        "I'm glad we're becoming friends.",
-        "You seem like someone I can trust.",
-        "I enjoy our conversations."
-      ],
-      high: [
-        "You've become very important to me.",
-        "I feel like we really understand each other.",
-        "I'm grateful for our deep connection."
-      ]
-    };
-
-    let responseLevel: keyof typeof responses;
-    if (npc.relationshipValue >= 3) responseLevel = 'high';
-    else if (npc.relationshipValue >= 2) responseLevel = 'medium';
-    else responseLevel = 'low';
-
-    const availableResponses = responses[responseLevel];
-    return availableResponses[Math.floor(Math.random() * availableResponses.length)];
-  };
+  // Removed generateNPCResponse as it's now handled by the thunk
+  // The responses object was part of the commented-out function, so it's removed.
 
   return (
     <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -95,12 +96,12 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {
       <Card sx={{ flexGrow: 1, mb: 2, overflow: 'hidden' }}>
         <CardContent sx={{ height: '100%', overflow: 'auto', p: 1 }}>
           <List dense>
-            {dialogueHistory.map((msg, index) => (
+            {localDialogueHistory.map((msg, index) => (
               <React.Fragment key={msg.id}>
                 <ListItem
                   sx={{
                     flexDirection: 'column',
-                    alignItems: msg.speaker === 'player' ? 'flex-end' : 'flex-start',
+                    alignItems: msg.speaker === 'player' ? 'flex-end' : 'flex-start', // Assuming DialogueEntry has speaker
                   }}
                 >
                   <Box
@@ -112,13 +113,20 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {
                       color: msg.speaker === 'player' ? 'primary.contrastText' : 'text.primary',
                     }}
                   >
-                    <Typography variant="body2">{msg.text}</Typography>
+                    <Typography variant="body2">
+                      {msg.speaker === 'player' ? msg.playerText : msg.npcResponse}
+                    </Typography>
                   </Box>
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                    {msg.speaker === 'player' ? 'You' : npc.name} • {msg.timestamp.toLocaleTimeString()}
+                    {msg.speaker === 'player' ? 'You' : npc.name} • {new Date(msg.timestamp).toLocaleTimeString()}
+                    {msg.speaker === 'npc' && msg.affinityDelta && (
+                      <Typography variant="caption" component="span" sx={{ ml: 1, color: msg.affinityDelta > 0 ? 'success.main' : 'error.main' }}>
+                        ({msg.affinityDelta > 0 ? '+' : ''}{msg.affinityDelta} Rel)
+                      </Typography>
+                    )}
                   </Typography>
                 </ListItem>
-                {index < dialogueHistory.length - 1 && <Divider />}
+                {index < localDialogueHistory.length - 1 && <Divider />}
               </React.Fragment>
             ))}
           </List>

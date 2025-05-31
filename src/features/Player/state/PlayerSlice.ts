@@ -9,6 +9,7 @@ import {
   UnequipTraitPayload,
 } from './PlayerTypes';
 import { TraitSlot } from '../../Traits/state/TraitsTypes'; // Import TraitSlot
+import { processStatusEffectsThunk, regenerateVitalsThunk, useConsumableItemThunk, autoAllocateAttributesThunk, recalculateStatsThunk } from './PlayerThunks'; // Added recalculateStatsThunk
 
 // Initial player stats following specification defaults
 const initialStats: PlayerStats = {
@@ -44,8 +45,8 @@ const initialPlayerTraitSlots: TraitSlot[] = [
   { id: 'player-slot-4', index: 4, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 5 } },
 ];
 
-// Initial player state
-const initialState: PlayerState = {
+// Initial player state - Exporting for use in thunks
+export const initialState: PlayerState = {
   stats: {
     health: 100,
     maxHealth: 100,
@@ -110,7 +111,8 @@ const playerSlice = createSlice({
         state.attributes[attributeName] += points;
         
         // Recalculate derived stats based on new attributes
-        playerSlice.caseReducers.recalculateStats(state);
+        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+        // recalculateStatsThunk should be dispatched by the calling component/middleware
       }
     },
 
@@ -147,7 +149,8 @@ const playerSlice = createSlice({
       console.log(`Equipped trait ${traitId} to slot index ${targetSlot.index}.`);
       
       // Recalculate stats with new trait
-      playerSlice.caseReducers.recalculateStats(state);
+      // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+      // recalculateStatsThunk should be dispatched by the calling component/middleware
     },
 
     // Unequip a trait from a specific slot
@@ -161,7 +164,8 @@ const playerSlice = createSlice({
         console.log(`Unequipped trait from slot index ${slotIndex}.`);
         
         // Recalculate stats without the trait
-        playerSlice.caseReducers.recalculateStats(state);
+        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+        // recalculateStatsThunk should be dispatched by the calling component/middleware
       }
     },
 
@@ -172,7 +176,8 @@ const playerSlice = createSlice({
         state.permanentTraits.push(traitId);
         
         // Recalculate stats with new permanent trait
-        playerSlice.caseReducers.recalculateStats(state);
+        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+        // recalculateStatsThunk should be dispatched by the calling component/middleware
       }
     },
 
@@ -197,7 +202,8 @@ const playerSlice = createSlice({
       state.statusEffects.push(action.payload);
       
       // Recalculate stats with new effect
-      playerSlice.caseReducers.recalculateStats(state);
+      // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+      // recalculateStatsThunk should be dispatched by the calling component/middleware
     },
 
     // Remove status effect
@@ -206,7 +212,8 @@ const playerSlice = createSlice({
       state.statusEffects = state.statusEffects.filter(effect => effect.id !== effectId);
       
       // Recalculate stats without the effect
-      playerSlice.caseReducers.recalculateStats(state);
+      // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+      // recalculateStatsThunk should be dispatched by the calling component/middleware
     },
 
     // Update total play time
@@ -214,56 +221,67 @@ const playerSlice = createSlice({
       state.totalPlaytime = action.payload;
     },
 
-    // Recalculate all derived stats
+    // Recalculate all derived stats - This logic is now primarily in recalculateStatsThunk.
+    // This reducer can be kept simple or removed if all recalculations are triggered via the thunk.
+    // For now, let's make it a no-op or a very basic stat consistency check if needed.
+    // The thunk `recalculateStatsThunk` will dispatch `updateStats` with the full calculation.
     recalculateStats: (state) => {
-      const { attributes, statusEffects, stats: baseStats } = state;
-      
-      // Calculate attribute bonuses (D&D style: (attribute - 10) / 2)
-      const strengthBonus = Math.floor((attributes.strength - 10) / 2);
-      const dexterityBonus = Math.floor((attributes.dexterity - 10) / 2);
-      const intelligenceBonus = Math.floor((attributes.intelligence - 10) / 2);
-      const constitutionBonus = Math.floor((attributes.constitution - 10) / 2);
-      const wisdomBonus = Math.floor((attributes.wisdom - 10) / 2);
-      
-      // Apply status effect modifiers
-      let statusModifiers = {
-        health: 0,
-        mana: 0,
-        attack: 0,
-        defense: 0,
-        speed: 0,
-        healthRegen: 0,     // Consistent naming
-        manaRegen: 0,       // Consistent naming
-        criticalChance: 0,
-        criticalDamage: 0
-      };
-      
-      statusEffects.forEach(effect => {
-        if (effect.effects) {
-          Object.entries(effect.effects).forEach(([stat, value]) => {
-            if (stat in statusModifiers) {
-              statusModifiers[stat as keyof typeof statusModifiers] += value as number;
-            }
-          });
-        }
-      });
-      
-      // Update calculated stats with consistent property names
-      state.stats = {
-        ...state.stats,
-        maxHealth: Math.max(1, baseStats.maxHealth + (constitutionBonus * 5)),
-        maxMana: Math.max(0, baseStats.maxMana + (intelligenceBonus * 3)),
-        health: Math.max(0, Math.min(state.stats.health, state.stats.maxHealth)), // Ensure current health doesn't exceed new max
-        mana: Math.max(0, Math.min(state.stats.mana, state.stats.maxMana)), // Ensure current mana doesn't exceed new max
-        attack: Math.max(0, baseStats.attack + strengthBonus + statusModifiers.attack),
-        defense: Math.max(0, baseStats.defense + constitutionBonus + statusModifiers.defense),
-        speed: Math.max(0, baseStats.speed + dexterityBonus + statusModifiers.speed),
-        healthRegen: Math.max(0, baseStats.healthRegen + (constitutionBonus * 0.1) + statusModifiers.healthRegen), // Corrected: use baseStats.healthRegen
-        manaRegen: Math.max(0, baseStats.manaRegen + (wisdomBonus * 0.15) + statusModifiers.manaRegen), // Corrected: use baseStats.manaRegen
-        criticalChance: Math.max(0, Math.min(1, baseStats.criticalChance + (dexterityBonus * 0.01) + statusModifiers.criticalChance)),
-        criticalDamage: Math.max(1, baseStats.criticalDamage + (strengthBonus * 0.05) + statusModifiers.criticalDamage),
-      };
+      // Placeholder: The main logic is moved to recalculateStatsThunk.
+      // Ensure health and mana don't exceed maximums after any direct modifications.
+      // This is a safety net if updateStats isn't called immediately after a direct change.
+      if (state.stats.health > state.stats.maxHealth) {
+        state.stats.health = state.stats.maxHealth;
+      }
+      if (state.stats.mana > state.stats.maxMana) {
+        state.stats.mana = state.stats.maxMana;
+      }
+      if (state.stats.health < 0) state.stats.health = 0;
+      if (state.stats.mana < 0) state.stats.mana = 0;
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(processStatusEffectsThunk.fulfilled, (state, action) => {
+        const expiredEffectIds = action.payload;
+        state.statusEffects = state.statusEffects.filter(effect => !expiredEffectIds.includes(effect.id));
+        // Recalculate stats after status effects are removed
+        // The recalculateStatsThunk will need to be dispatched by the component that dispatches processStatusEffectsThunk
+        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+      })
+      .addCase(regenerateVitalsThunk.fulfilled, (state, action) => {
+        state.stats.health += action.payload.healthRegenerated;
+        state.stats.mana += action.payload.manaRegenerated;
+        // Recalculate stats after regeneration
+        // The recalculateStatsThunk will need to be dispatched by the component that dispatches regenerateVitalsThunk
+        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+      })
+      .addCase(useConsumableItemThunk.fulfilled, (state, action) => {
+        const { effectsApplied, statsModified } = action.payload;
+        effectsApplied.forEach(effect => {
+          state.statusEffects.push(effect);
+        });
+        if (statsModified.health) {
+          state.stats.health += statsModified.health;
+        }
+        if (statsModified.mana) {
+          state.stats.mana += statsModified.mana;
+        }
+        // Recalculate stats after consumable item effects
+        // The recalculateStatsThunk will need to be dispatched by the component that dispatches useConsumableItemThunk
+        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+      })
+      .addCase(autoAllocateAttributesThunk.fulfilled, (state, action) => {
+        const allocation = action.payload;
+        for (const attr in allocation) {
+          if (allocation.hasOwnProperty(attr)) {
+            state.attributes[attr as keyof PlayerAttributes] += allocation[attr];
+          }
+        }
+        state.availableAttributePoints -= Object.values(allocation).reduce((sum, val) => sum + val, 0);
+        // Recalculate stats after attribute allocation
+        // The recalculateStatsThunk will need to be dispatched by the component that dispatches autoAllocateAttributesThunk
+        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
+      });
   }
 });
 

@@ -1,6 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { EssenceState, EssenceTransactionPayload, EssenceConnection } from './EssenceTypes';
-import { saveEssenceThunk, loadEssenceThunk, generateEssenceThunk } from './EssenceThunks';
+import { 
+  saveEssenceThunk, 
+  loadEssenceThunk, 
+  manualGenerateEssenceThunk, // Renamed import
+  passiveGenerateEssenceThunk // Added import
+} from './EssenceThunks';
 
 /**
  * Initial state for the Essence system
@@ -15,6 +20,9 @@ const initialState: EssenceState = {
   loading: false,
   error: null,
   npcConnections: {}, // Initialize as an empty object
+  currentResonanceLevel: 0,
+  maxResonanceLevel: 3, // Example: Corresponds to 3 thresholds
+  resonanceThresholds: [100, 500, 2000], // Example: Essence needed for levels 1, 2, 3
 };
 
 /**
@@ -91,6 +99,14 @@ const essenceSlice = createSlice({
         };
       }
     },
+    /**
+     * Updates the player's current resonance level.
+     */
+    updateResonanceLevel: (state, action: PayloadAction<number>) => {
+      if (action.payload >= 0 && action.payload <= state.maxResonanceLevel) {
+        state.currentResonanceLevel = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -123,12 +139,21 @@ const essenceSlice = createSlice({
         state.error = action.error.message || 'Failed to load essence data';
       })
       
-      // Generate essence thunk
-      .addCase(generateEssenceThunk.fulfilled, (state, action) => {
+      // Manual Generate essence thunk
+      .addCase(manualGenerateEssenceThunk.fulfilled, (state, action: PayloadAction<number>) => {
         const amount = action.payload;
         state.currentEssence += amount;
         state.totalCollected += amount;
         state.lastGenerationTime = Date.now();
+      })
+      // Passive Generate essence thunk
+      .addCase(passiveGenerateEssenceThunk.fulfilled, (state, action: PayloadAction<number>) => {
+        const amount = action.payload;
+        if (amount > 0) { // Only update if some essence was actually generated
+          state.currentEssence += amount;
+          state.totalCollected += amount;
+          state.lastGenerationTime = Date.now();
+        }
       });
   },
 });
@@ -141,7 +166,8 @@ export const {
   toggleGeneration,
   resetEssence,
   clearError,
-  updateEssenceConnection, // Export the new action
+  updateEssenceConnection,
+  updateResonanceLevel, // Export the new action
 } = essenceSlice.actions;
 
 export const selectEssence = (state: { essence: EssenceState }) => state.essence;

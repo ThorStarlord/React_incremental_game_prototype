@@ -145,6 +145,11 @@ export const selectMaxTraitSlots = createSelector(
   (player) => player.maxTraitSlots
 );
 
+export const selectPlayerResonanceLevel = createSelector(
+  [selectPlayer],
+  (player) => player.resonanceLevel
+);
+
 // Legacy selectors for backward compatibility
 export const selectPlayerHealthData = selectHealthData;
 export const selectPlayerManaData = selectManaData;

@@ -114,14 +114,16 @@ const npcSlice = createSlice({
     },
     addDialogueEntry: (state, action: PayloadAction<{
       npcId: string;
+      speaker: 'player' | 'npc' | 'system'; // Added speaker to payload
       playerText: string;
       npcResponse: string;
       affinityDelta?: number;
     }>) => {
-      const { npcId, playerText, npcResponse, affinityDelta } = action.payload;
+      const { npcId, speaker, playerText, npcResponse, affinityDelta } = action.payload; // Destructure speaker
       const entry: DialogueEntry = {
         id: `${npcId}-${Date.now()}`,
         npcId,
+        speaker, // Assign speaker
         timestamp: Date.now(),
         playerText,
         npcResponse,

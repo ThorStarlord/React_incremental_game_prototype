@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import { PlayerStatsContainer } from '../features/Player/components/containers/PlayerStatsContainer';
 import { PlayerTraitsContainer } from '../features/Player/components/containers/PlayerTraitsContainer';
+import { PlayerAttributeAllocation } from '../features/Player/components/ui/PlayerAttributeAllocation'; // Import PlayerAttributeAllocation
 import { PlaceholderPage } from '../shared/components/PlaceholderPage/PlaceholderPage';
 
 interface TabPanelProps {
@@ -146,6 +147,7 @@ export const CharacterPage: React.FC = React.memo(() => {
                 Character Statistics
               </Typography>
               <PlayerStatsContainer showDetails={true} />
+              <PlayerAttributeAllocation /> {/* Add the attribute allocation component */}
             </Box>
           </TabPanel>
 

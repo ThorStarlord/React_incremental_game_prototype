@@ -142,6 +142,7 @@ export interface DialogueResult {
 export interface DialogueEntry {
   id: string;
   npcId: string;
+  speaker: 'player' | 'npc' | 'system'; // Added speaker property
   timestamp: number;
   playerText: string;
   npcResponse: string;

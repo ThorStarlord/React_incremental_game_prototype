@@ -21,6 +21,7 @@ import {
   selectMaxTraitSlots as selectPlayerMaxTraitSlots // Import max slots
 } from '../../../Player/state/PlayerSelectors'; // Import from PlayerSelectors
 import { equipTrait, unequipTrait, unlockTraitSlot } from '../../../Player/state/PlayerSlice'; // Import actions from PlayerSlice
+import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks'; // Import recalculateStatsThunk
 import { TraitSystemUI, type TraitSystemUIProps } from '../ui/TraitSystemUI';
 import type { Trait } from '../../state/TraitsTypes';
 
@@ -83,11 +84,13 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
 
   // Action handlers
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
-    dispatch(equipTrait({ traitId, slotIndex })); // Dispatch to PlayerSlice
+    dispatch(equipTrait({ traitId, slotIndex }));
+    dispatch(recalculateStatsThunk());
   }, [dispatch]);
 
   const handleUnequipTrait = useCallback((slotIndex: number) => {
-    dispatch(unequipTrait({ slotIndex })); // Dispatch to PlayerSlice
+    dispatch(unequipTrait({ slotIndex }));
+    dispatch(recalculateStatsThunk());
   }, [dispatch]);
 
   const handleAcquireTrait = useCallback((traitId: string) => {
@@ -96,6 +99,7 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
 
   const handleMakeTraitPermanent = useCallback((traitId: string) => {
     dispatch(makePermanent(traitId));
+    dispatch(recalculateStatsThunk()); // Dispatch recalculateStatsThunk after making trait permanent
   }, [dispatch]);
 
   const handleDiscoverTrait = useCallback((traitId: string) => {

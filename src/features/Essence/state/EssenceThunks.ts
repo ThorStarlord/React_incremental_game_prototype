@@ -2,9 +2,11 @@
  * Redux Thunks for Essence-related async operations
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { gainEssence } from './EssenceSlice';
+import { gainEssence, updateResonanceLevel as updateEssenceResonanceLevel } from './EssenceSlice'; // Renamed import
 import { RootState } from '../../../app/store';
 import { EssenceState } from './EssenceTypes';
+import { unlockTraitSlot, updateResonanceLevel as updatePlayerResonanceLevel } from '../../Player/state/PlayerSlice';
+import { selectTraitSlots, selectMaxTraitSlots, selectPlayerResonanceLevel } from '../../Player/state/PlayerSelectors';
 
 /**
  * Essence System Async Thunks
@@ -14,17 +16,24 @@ import { EssenceState } from './EssenceTypes';
  */
 
 /**
- * Generate essence over time based on current generators and modifiers
+ * Generate essence over time based on current generators and modifiers (Passive Generation)
  */
-export const generateEssence = createAsyncThunk<number, void, { state: RootState }>(
-  'essence/generate',
+export const passiveGenerateEssenceThunk = createAsyncThunk<number, void, { state: RootState }>(
+  'essence/passiveGenerate', // Changed name for clarity
   async (_, { dispatch, getState }) => {
-    const rate = getState().essence.generationRate ?? 0;
-    const amount = Math.floor(rate);
+    const essenceState = getState().essence;
+    if (!essenceState.isGenerating) return 0;
+
+    const timeDiff = (Date.now() - essenceState.lastGenerationTime) / 1000; // Time diff in seconds
+    const amount = Math.floor(essenceState.generationRate * timeDiff);
+
     if (amount > 0) {
-      dispatch(gainEssence({amount}));
+      // Dispatching gainEssence will update totalCollected in the slice
+      // The checkAndProcessResonanceLevelUpThunk should be dispatched after this.
+      // For now, this thunk just returns the amount.
     }
-    return amount;
+    // This thunk's fulfilled action in EssenceSlice will handle calling gainEssence.
+    return amount; 
   }
 );
 
@@ -72,48 +81,74 @@ export const loadEssenceThunk = createAsyncThunk<
 });
 
 /**
- * Manual essence generation (for testing/prototyping)
+ * Manual essence generation (e.g., from clicking a button)
  */
-export const generateEssenceThunk = createAsyncThunk<
-  number,
-  number | undefined,
+export const manualGenerateEssenceThunk = createAsyncThunk<
+  number, // Amount generated
+  number | undefined, // Optional amount to generate, otherwise uses perClickValue
   { state: RootState }
->('essence/generateEssence', async (amount, { getState, rejectWithValue }) => {
+>('essence/manualGenerate', async (amount, { getState, dispatch, rejectWithValue }) => { // Renamed for clarity
   try {
-    const state = getState();
-    const baseAmount = amount || state.essence.perClickValue;
-    
-    // Apply any modifiers or multipliers here
+    const state = getState().essence;
+    const baseAmount = amount || state.perClickValue;
     const finalAmount = Math.max(0, baseAmount);
     
-    return finalAmount;
+    // Dispatching gainEssence will update totalCollected in the slice.
+    // The checkAndProcessResonanceLevelUpThunk should be dispatched after this.
+    // For now, this thunk just returns the amount.
+    return finalAmount; // This amount will be passed to the fulfilled reducer in EssenceSlice
   } catch (error) {
-    return rejectWithValue('Failed to generate essence');
+    return rejectWithValue('Failed to generate essence manually');
   }
 });
 
+// Removed redundant processPassiveGenerationThunk, passiveGenerateEssenceThunk covers it.
+
 /**
- * Process passive essence generation based on connections
+ * Checks for resonance level up and dispatches actions to update levels and unlock trait slots.
+ * This thunk should be dispatched after any action that increases totalCollected essence.
  */
-export const processPassiveGenerationThunk = createAsyncThunk<
-  number,
-  void,
+export const checkAndProcessResonanceLevelUpThunk = createAsyncThunk<
+  void, // Returns nothing
+  void, // Takes no arguments
   { state: RootState }
->('essence/processPassiveGeneration', async (_, { getState, rejectWithValue }) => {
-  try {
+>(
+  'essence/checkResonanceLevelUp',
+  async (_, { getState, dispatch }) => {
     const state = getState();
-    const essence = state.essence;
-    
-    if (!essence.isGenerating) return 0;
-    
-    const timeDiff = (Date.now() - essence.lastGenerationTime) / 1000;
-    const generatedAmount = essence.generationRate * timeDiff;
-    
-    return Math.max(0, generatedAmount);
-  } catch (error) {
-    return rejectWithValue('Failed to process passive generation');
+    const essenceState = state.essence;
+    const playerState = state.player;
+
+    let newCalculatedResonanceLevel = 0;
+    for (let i = 0; i < essenceState.resonanceThresholds.length; i++) {
+      if (essenceState.totalCollected >= essenceState.resonanceThresholds[i]) {
+        newCalculatedResonanceLevel = i + 1;
+      } else {
+        break; 
+      }
+    }
+    newCalculatedResonanceLevel = Math.min(newCalculatedResonanceLevel, essenceState.maxResonanceLevel);
+
+    if (newCalculatedResonanceLevel > essenceState.currentResonanceLevel) {
+      dispatch(updateEssenceResonanceLevel(newCalculatedResonanceLevel));
+      dispatch(updatePlayerResonanceLevel(newCalculatedResonanceLevel)); // Keep PlayerSlice in sync
+
+      // Check for trait slot unlocks
+      const currentUnlockedSlots = playerState.traitSlots.filter(slot => slot.isUnlocked).length;
+      
+      playerState.traitSlots.forEach(slot => {
+        if (
+          !slot.isUnlocked &&
+          slot.unlockRequirements?.type === 'resonanceLevel' &&
+          newCalculatedResonanceLevel >= (slot.unlockRequirements.value as number) && // Assuming value is number for resonanceLevel type
+          currentUnlockedSlots < playerState.maxTraitSlots // Ensure we don't exceed max slots (though individual slot logic should handle this)
+        ) {
+          dispatch(unlockTraitSlot(slot.index));
+        }
+      });
+    }
   }
-});
+);
 
 /**
  * Update generation rate based on NPC connections

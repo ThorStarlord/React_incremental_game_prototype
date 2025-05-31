@@ -21,23 +21,25 @@ const TraitSlotProgressIndicator: React.FC = () => {
 
   const {
     currentResonanceLevel,
-    nextResonanceLevel,
-    nextResonanceLevelThreshold,
+    nextResonanceLevelForSlotUnlock,
+    essenceForNextSlotUnlock,
     progressPercentage,
-    essenceNeeded,
-    isMaxResonanceLevel,
+    essenceNeededForNextSlotUnlock,
+    allSlotsUnlocked,
   } = resonanceProgress;
 
   const currentUnlockedSlots = traitSlotsArray.filter(slot => slot.isUnlocked).length;
-  const isMaxSlots = currentUnlockedSlots >= maxTraitSlots; // Check against actual max slots from state
+  // isMaxSlots can be simplified or directly use allSlotsUnlocked if it covers all conditions
+  const isEffectivelyMaxSlots = allSlotsUnlocked || currentUnlockedSlots >= maxTraitSlots;
 
-  const displayProgress: number = isMaxResonanceLevel ? 100 : progressPercentage;
+
+  const displayProgress: number = isEffectivelyMaxSlots ? 100 : progressPercentage;
 
   return (
     <Tooltip
-      title={isMaxResonanceLevel
-        ? "Maximum Resonance Level reached!"
-        : `Resonance Level ${currentResonanceLevel} (Next at ${nextResonanceLevelThreshold?.essenceRequired.toLocaleString() || 'N/A'} Essence)`
+      title={isEffectivelyMaxSlots
+        ? "All trait slots unlocked or max resonance reached!"
+        : `Resonance Level ${currentResonanceLevel} (Next slot at RL ${nextResonanceLevelForSlotUnlock} - requires ${essenceForNextSlotUnlock.toLocaleString()} total Essence)`
       }
       arrow
     >
@@ -47,9 +49,9 @@ const TraitSlotProgressIndicator: React.FC = () => {
             Resonance Level: {currentResonanceLevel}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {isMaxResonanceLevel
-              ? "Max slots reached"
-              : `Next Slot at RL ${nextResonanceLevel} (${currentUnlockedSlots}/${maxTraitSlots} slots)`}
+            {isEffectivelyMaxSlots
+              ? "All Slots Unlocked"
+              : `Next Slot at RL ${nextResonanceLevelForSlotUnlock} (${currentUnlockedSlots}/${maxTraitSlots} slots)`}
           </Typography>
         </Box>
 
@@ -61,14 +63,14 @@ const TraitSlotProgressIndicator: React.FC = () => {
             borderRadius: 4,
             bgcolor: 'grey.200',
             '& .MuiLinearProgress-bar': {
-              bgcolor: isMaxResonanceLevel ? 'success.main' : 'primary.main',
+              bgcolor: isEffectivelyMaxSlots ? 'success.main' : 'primary.main',
             }
           }}
         />
 
-        {!isMaxResonanceLevel && nextResonanceLevelThreshold && (
+        {!isEffectivelyMaxSlots && (
           <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-            Need {essenceNeeded.toLocaleString()} more Essence for Resonance Level {nextResonanceLevel}
+            Need {essenceNeededForNextSlotUnlock.toLocaleString()} more Essence for next slot (RL {nextResonanceLevelForSlotUnlock})
           </Typography>
         )}
       </Box>

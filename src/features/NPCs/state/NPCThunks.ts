@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { setNPCs, setLoading, setError, updateNpcConnectionDepth } from './NPCSlice'; 
-import type { NPC, RelationshipChangeEntry, DialogueEntry, InteractionResult, DialogueResult, ProcessDialoguePayload } from './NPCTypes'; // Added ProcessDialoguePayload
+import { setNPCs, setLoading, setError, updateNpcConnectionDepth, addDialogueEntry } from './NPCSlice'; // Added addDialogueEntry
+import type { NPC, RelationshipChangeEntry, DialogueEntry, InteractionResult, DialogueResult, ProcessDialoguePayload } from './NPCTypes';
 
 /**
  * Initialize NPCs with mock or loaded data
@@ -275,10 +275,19 @@ export const processDialogueChoiceThunk = createAsyncThunk<
         reason: 'dialogue_choice'
       }));
 
+      // Dispatch addDialogueEntry to log the NPC's response in the history
+      dispatch(addDialogueEntry({
+        npcId,
+        speaker: 'npc', // NPC is the speaker for this entry
+        playerText: playerText, // Include player's original text for context
+        npcResponse: responseText,
+        affinityDelta: relationshipChange,
+      }));
+
       return {
         success: true,
-        npcResponse: responseText, // Renamed from responseText
-        affinityDelta: relationshipChange, // Renamed from relationshipChange
+        npcResponse: responseText,
+        affinityDelta: relationshipChange,
         rewards: relationshipChange > 0 ? ['Positive conversation'] : []
       };
     } catch (error) {

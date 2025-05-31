@@ -22,6 +22,9 @@ export interface EssenceState {
   loading: boolean;
   error: string | null;
   npcConnections: Record<string, EssenceConnection>; // Map of NPC ID to their EssenceConnection data
+  currentResonanceLevel: number; // Player's current resonance level
+  maxResonanceLevel: number; // Maximum achievable resonance level
+  resonanceThresholds: number[]; // Array of totalCollected essence needed for each level [level1_threshold, level2_threshold, ...]
 }
 
 export interface EssenceGenerationSource {

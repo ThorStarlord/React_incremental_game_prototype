@@ -26,6 +26,8 @@ import { ProgressBar } from './ProgressBar';
 export interface PlayerStatsUIProps {
   /** Player statistics data */
   stats: PlayerStats;
+  /** Player's current resonance level */
+  resonanceLevel?: number;
   /** Show detailed breakdown */
   showDetails?: boolean;
 }
@@ -35,6 +37,7 @@ export interface PlayerStatsUIProps {
  */
 export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
   stats,
+  resonanceLevel,
   showDetails = true,
 }) => {
   const healthPercentage = Math.round((stats.health / stats.maxHealth) * 100);
@@ -172,6 +175,15 @@ export const PlayerStatsUI: React.FC<PlayerStatsUIProps> = React.memo(({
                   color="info"
                 />
               </Grid>
+              {resonanceLevel !== undefined && (
+                <Grid item xs={12} sm={6}>
+                  <StatDisplay
+                    label="Resonance Level"
+                    value={resonanceLevel}
+                    color="secondary"
+                  />
+                </Grid>
+              )}
             </Grid>
           </CardContent>
         </Card>
