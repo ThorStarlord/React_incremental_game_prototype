@@ -3,7 +3,7 @@
  * @description Overview tab showing basic NPC information and available interactions
  */
 
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -15,7 +15,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import {
   Assignment as QuestIcon,
@@ -26,12 +27,25 @@ import {
   CheckCircle as CompletedIcon
 } from '@mui/icons-material';
 import type { NPC } from '../../state/NPCTypes';
+import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+import { selectTraits, selectTraitLoading } from '../../../Traits/state/TraitsSelectors';
+import { fetchTraitsThunk } from '../../../Traits/state/TraitThunks';
 
 interface NPCOverviewTabProps {
   npc: NPC;
 }
 
 const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
+  const dispatch = useAppDispatch();
+  const allTraits = useAppSelector(selectTraits);
+  const traitsLoading = useAppSelector(selectTraitLoading);
+
+  useEffect(() => {
+    if (Object.keys(allTraits).length === 0 && !traitsLoading) {
+      dispatch(fetchTraitsThunk());
+    }
+  }, [dispatch, allTraits, traitsLoading]);
+
   const getUnlockRequirement = (level: number) => {
     return `Requires relationship level ${level}+`;
   };
@@ -39,6 +53,37 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
   const isTabUnlocked = (requirement: number) => {
     return npc.relationshipValue >= requirement;
   };
+
+  // Get traits shared by the player with this NPC
+  const sharedTraitsDisplay = useMemo(() => {
+    if (!npc.sharedTraits || !allTraits) return [];
+    
+    return Object.entries(npc.sharedTraits)
+      .filter(([_, npcTraitInfo]) => npcTraitInfo.isVisible) // Filter by isVisible property on NPCTraitInfo
+      .map(([traitId, _]) => ({
+        ...allTraits[traitId] // Merge with full trait data, 'id' is already in allTraits[traitId]
+      }))
+      .filter(trait => trait && trait.name); // Ensure trait exists and has a name
+  }, [npc.sharedTraits, allTraits]);
+
+  // Get traits available for acquisition from this NPC
+  const availableTraitsDisplay = useMemo(() => {
+    if (!npc.availableTraits || !allTraits) return [];
+    
+    return npc.availableTraits
+      .map(traitId => allTraits[traitId])
+      .filter(trait => trait && trait.name); // Ensure trait exists and has a name
+  }, [npc.availableTraits, allTraits]);
+
+
+  if (traitsLoading) {
+    return (
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+        <CircularProgress />
+        <Typography sx={{ ml: 2 }}>Loading traits...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3 }}>
@@ -131,8 +176,8 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                       getUnlockRequirement(4)
                     }
                   />
-                  {isTabUnlocked(4) && npc.teachableTraits?.length && (
-                    <Chip label={`${npc.teachableTraits.length} teachable`} color="secondary" size="small" />
+                  {isTabUnlocked(4) && npc.availableTraits?.length && (
+                    <Chip label={`${npc.availableTraits.length} available`} color="secondary" size="small" />
                   )}
                 </ListItem>
               </List>
@@ -158,6 +203,9 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                 <Typography variant="body2" color="text.secondary">
                   Connection Depth: {npc.connectionDepth?.toFixed(1) || '0.0'}
                 </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Value: {npc.relationshipValue || 0}
+                </Typography>
               </Box>
 
               {npc.personality && (
@@ -178,33 +226,74 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                 </Box>
               )}
 
-              {/* Commented out Known Traits section due to persistent compilation error */}
-              {/*
-              {npc.teachableTraits && npc.teachableTraits.length > 0 && (
-                <Box>
+              {/* Available Traits for Resonance (formerly Known Traits) */}
+              {availableTraitsDisplay.length > 0 && (
+                <Box sx={{ mb: 2 }}>
                   <Typography variant="subtitle2" gutterBottom>
-                    Known Traits
+                    Available Traits for Resonance
                   </Typography>
                   <List dense>
-                    {npc.teachableTraits.map((traitId) => {
-                      const traitInfo = npc.traits?.[traitId]; // Assuming npc.traits contains full trait info
-                      
-                      return (
-                        <ListItem key={traitId} sx={{ pl: 0 }}>
-                          <ListItemIcon>
-                            <TraitIcon color="primary" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={traitInfo?.name || traitId}
-                            secondary={traitInfo?.category || 'N/A'}
-                          />
-                        </ListItem>
-                      );
-                    })}
+                    {availableTraitsDisplay.map((trait) => (
+                      <ListItem key={trait.id} sx={{ pl: 0 }}>
+                        <ListItemIcon>
+                          <TraitIcon color="primary" /> {/* Always visible */}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={trait.name || trait.id}
+                          secondary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              {trait.category && (
+                                <Typography variant="caption" color="text.secondary">
+                                  Category: {trait.category}
+                                </Typography>
+                              )}
+                              {trait.rarity && (
+                                <Chip label={trait.rarity} size="small" variant="outlined" />
+                              )}
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                    ))}
                   </List>
                 </Box>
               )}
-              */}
+
+              {/* Shared Traits section - traits the player has shared with this NPC */}
+              {sharedTraitsDisplay.length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Shared Traits
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                    Traits you have shared with {npc.name}
+                  </Typography>
+                  <List dense>
+                    {sharedTraitsDisplay.map((trait) => (
+                      <ListItem key={trait.id} sx={{ pl: 0 }}>
+                        <ListItemIcon>
+                          <TraitIcon color="primary" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={trait.name || trait.id}
+                          secondary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              {trait.category && (
+                                <Typography variant="caption" color="text.secondary">
+                                  Category: {trait.category}
+                                </Typography>
+                              )}
+                              {trait.rarity && (
+                                <Chip label={trait.rarity} size="small" variant="outlined" />
+                              )}
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>

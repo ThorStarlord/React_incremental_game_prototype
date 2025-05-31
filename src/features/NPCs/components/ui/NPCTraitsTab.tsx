@@ -3,7 +3,7 @@
  * @description Trait sharing and acquisition tab for NPC interactions
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -46,6 +46,8 @@ import {
   VisibilityOff as HiddenIcon,
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+import { selectTraits, selectTraitLoading } from '../../../Traits/state/TraitsSelectors';
+import { fetchTraitsThunk } from '../../../Traits/state/TraitThunks';
 import { selectNPCById } from '../../state/NPCSelectors';
 import { updateNpcRelationship } from '../../state/NPCSlice'; // updateNpcRelationship is an action from NPCSlice
 import { shareTraitWithNPCThunk } from '../../state/NPCThunks'; // shareTraitWithNPCThunk is a thunk from NPCThunks
@@ -74,6 +76,8 @@ interface TraitAcquisitionDialog {
 export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
   const npc = useAppSelector(state => selectNPCById(state, npcId)) as NPC;
+  const allTraits = useAppSelector(selectTraits);
+  const traitsLoading = useAppSelector(selectTraitLoading);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedTrait, setSelectedTrait] = useState<NPCTraitInfo | PlayerTrait | null>(null);
   const [showTraitDialog, setShowTraitDialog] = useState(false);
@@ -115,27 +119,26 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     },
   ];
 
+  useEffect(() => {
+    if (Object.keys(allTraits).length === 0 && !traitsLoading) {
+      dispatch(fetchTraitsThunk());
+    }
+  }, [dispatch, allTraits, traitsLoading]);
+
   // Get available trait slots
-  const usedSharedSlots = Object.keys(npc.traits || {}).length;
+  const usedSharedSlots = Object.keys(npc.sharedTraits || {}).length;
   const availableSlots = (npc.sharedTraitSlots || []).length - usedSharedSlots;
 
-  // Get traits the NPC can teach based on relationship level
-  const teachableTraits = useMemo(() => {
-    return npc.teachableTraits
-      .map(traitId => {
-        const trait = npc.traits?.[traitId];
-        if (!trait) return null;
-        
-        return {
-          ...trait,
-          canLearn: npc.relationshipValue >= (trait.relationshipRequirement || 0),
-        };
-      })
-      .filter(Boolean) as (NPCTraitInfo & { canLearn: boolean })[];
-  }, [npc.traits, npc.teachableTraits, npc.relationshipValue]);
-
-  // Get shareable player traits
-  const shareableTraits = mockPlayerTraits.filter(trait => trait.canShare);
+  // Get traits available from this NPC based on relationship level
+  const availableTraitsDetails = useMemo(() => {
+    if (!npc.availableTraits || !allTraits) {
+      return [];
+    }
+    
+    return npc.availableTraits
+      .map(traitId => allTraits[traitId])
+      .filter(trait => trait !== undefined);
+  }, [npc.availableTraits, allTraits]);
 
   // Handle trait learning
   const handleLearnTrait = (trait: NPCTraitInfo) => {
@@ -335,7 +338,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     };
   };
 
-  if (!npc.traits || Object.keys(npc.traits).length === 0) {
+  if (!npc.sharedTraits || Object.keys(npc.sharedTraits).length === 0) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <TraitIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
@@ -367,7 +370,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
               color="primary"
             />
             <Chip
-              label={`Traits Available: ${Object.values(npc.traits).filter(t => t.isVisible).length}`}
+              label={`Traits Available: ${Object.values(npc.sharedTraits).filter(t => t.isVisible).length}`}
               color="secondary"
             />
           </Box>
@@ -380,7 +383,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
       </Typography>
       
       <Grid container spacing={2} sx={{ mb: 4 }}>
-        {Object.entries(npc.traits)
+        {Object.entries(npc.sharedTraits)
           .filter(([_, traitInfo]) => traitInfo.isVisible)
           .map(([traitId, traitInfo]) => {
             const details = getTraitDetails(traitId);
@@ -408,7 +411,8 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                         color="primary"
                         variant="outlined"
                       />
-                    </Box>
+                    </Box
+                    >
                     
                     <Typography variant="body2" color="text.secondary" paragraph>
                       {details.description}
@@ -479,7 +483,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
       </Grid>
 
       {/* Hidden Traits */}
-      {Object.values(npc.traits).some(t => !t.isVisible) && (
+      {Object.values(npc.sharedTraits).some(t => !t.isVisible) && (
         <>
           <Divider sx={{ my: 3 }} />
           
@@ -492,7 +496,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
           </Alert>
           
           <List>
-            {Object.entries(npc.traits)
+            {Object.entries(npc.sharedTraits)
               .filter(([_, traitInfo]) => !traitInfo.isVisible)
               .map(([traitId, traitInfo], index) => (
                 <ListItem key={traitId}>

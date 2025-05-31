@@ -172,22 +172,22 @@ export const selectHighRelationshipNPCs = createSelector(
 );
 
 // Trait-related selectors with safe property access
-export const selectNPCTraits = createSelector(
+export const selectNPCSharedTraits = createSelector( // Renamed from selectNPCTraits
   [selectNPCById],
-  (npc) => npc?.traits ? Object.values(npc.traits) : []
+  (npc) => npc?.sharedTraits ? Object.values(npc.sharedTraits) : []
 );
 
-export const selectNPCDiscoveredTraits = createSelector(
+export const selectNPCSharedTraitIds = createSelector( // Renamed from selectNPCDiscoveredTraits
   [selectNPCById],
   (npc) => {
-    // Return trait IDs from the traits object since discoveredTraits may not exist
-    return npc?.traits ? Object.keys(npc.traits) : [];
+    // Return trait IDs from the sharedTraits object
+    return npc?.sharedTraits ? Object.keys(npc.sharedTraits) : [];
   }
 );
 
-export const selectNPCsWithTraits = createSelector(
+export const selectNPCsWithSharedTraits = createSelector( // Renamed from selectNPCsWithTraits
   [selectAllNPCs],
-  (npcs) => Object.values(npcs).filter(npc => npc.traits && Object.keys(npc.traits).length > 0)
+  (npcs) => Object.values(npcs).filter(npc => npc.sharedTraits && Object.keys(npc.sharedTraits).length > 0)
 );
 
 // Utility selectors

@@ -1,151 +1,255 @@
-import React from 'react';
-import { Box, Typography, Card, CardContent, Grid, Button, Chip, Divider, Tooltip } from '@mui/material'; // Added Tooltip
-import ExtensionIcon from '@mui/icons-material/Extension';
-import ShareIcon from '@mui/icons-material/Share';
-import GetAppIcon from '@mui/icons-material/GetApp';
+/**
+ * @file NPCTraitsTab.tsx
+ * @description Trait sharing and acquisition tab for NPC interactions
+ */
 
-import type { NPC } from '../../../state/NPCTypes';
-import type { Trait } from '../../../../Traits/state/TraitsTypes';
-import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
-import { discoverTrait } from '../../../../Traits/state/TraitsSlice';
-import { acquireTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks'; // Import the thunk
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import React, { useState, useMemo, useCallback } from 'react';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  Chip,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Grid,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Tooltip,
+  Divider,
+  LinearProgress,
+  Avatar,
+} from '@mui/material';
+import {
+  Psychology,
+  Share,
+  School,
+  CheckCircle,
+  Remove,
+  GetApp as GetAppIcon,
+  Extension as TraitIcon,
+} from '@mui/icons-material';
+import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'; // Corrected path
+import { selectNPCById } from '../../../state/NPCSelectors'; // Corrected path
+import { updateNpcRelationship } from '../../../state/NPCSlice'; // Corrected path
+import { shareTraitWithNPCThunk } from '../../../state/NPCThunks'; // Corrected path
+import { acquireTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks'; // Corrected path
+import { selectTraits } from '../../../../Traits/state/TraitsSelectors'; // Corrected path
+import { selectAcquiredTraitObjects, selectPermanentTraitObjects } from '../../../../Traits/state/TraitsSelectors'; // Corrected path
+import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors'; // Corrected path
+import { selectIsInProximityToNPC } from '../../../../Meta/state/MetaSlice'; // Corrected path
+import { NPC } from '../../../state/NPCTypes'; // Corrected path
+import { Trait } from '../../../../Traits/state/TraitsTypes'; // Corrected path
 
 interface NPCTraitsTabProps {
-  npc: NPC;
+  npcId: string;
 }
 
-const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
-  const dispatch = useAppDispatch(); // Added dispatch
-  const playerAcquiredTraits = useAppSelector(state => state.traits.acquiredTraits);
-  const allTraits = useAppSelector(state => state.traits.traits);
-  const essenceAmount = useAppSelector(state => state.essence.currentEssence);
-  const playerRelationshipWithNPC = npc.relationshipValue; // Get current relationship value
+interface TraitAcquisitionDialog {
+  open: boolean;
+  trait: Trait | null;
+  traitId: string | null;
+}
 
-  // Get NPC's teachable traits and their full details
-  const teachableTraitsDetails = React.useMemo(() => {
-    if (!npc.teachableTraits || !allTraits) {
+export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
+  const dispatch = useAppDispatch();
+  
+  // Redux selectors
+  const npc = useAppSelector(state => selectNPCById(state, npcId)) as NPC;
+  const allTraits = useAppSelector(selectTraits);
+  const playerAcquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const playerPermanentTraits = useAppSelector(selectPermanentTraitObjects);
+  const currentEssence = useAppSelector(selectCurrentEssence);
+  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC);
+  
+  // Local state
+  const [acquisitionDialog, setAcquisitionDialog] = useState<TraitAcquisitionDialog>({
+    open: false,
+    trait: null,
+    traitId: null,
+  });
+
+  // Get player's acquired trait IDs for easy checking
+  const playerAcquiredTraitIds = useMemo(() => 
+    playerAcquiredTraits.map((trait: Trait) => trait.id),
+    [playerAcquiredTraits]
+  );
+
+  // Get player's permanent trait IDs for easy checking
+  const playerPermanentTraitIds = useMemo(() => 
+    playerPermanentTraits.map((trait: Trait) => trait.id),
+    [playerPermanentTraits]
+  );
+
+  // Get NPC's available traits with full details
+  const availableTraitsDetails = useMemo(() => {
+    if (!npc.availableTraits || !allTraits) {
       return [];
     }
-    return npc.teachableTraits
-      .map(traitId => allTraits[traitId])
-      .filter(trait => trait !== undefined); // Filter out undefined if a traitId is not in allTraits
-  }, [npc.teachableTraits, allTraits]);
+    return npc.availableTraits
+      .map((traitId: string) => allTraits[traitId])
+      .filter((trait: Trait | undefined) => trait !== undefined) as Trait[];
+  }, [npc.availableTraits, allTraits]);
   
   // Get traits player can share (acquired traits not already shared)
-  const sharedTraitIds = npc.sharedTraitSlots?.map(slot => slot.traitId).filter(Boolean) || [];
-  const shareableTraits = playerAcquiredTraits.filter(traitId => !sharedTraitIds.includes(traitId));
+  const sharedTraitIds = npc.sharedTraitSlots?.map((slot: { traitId?: string | null }) => slot.traitId).filter(Boolean) || [];
+  const shareableTraits = playerAcquiredTraits.filter((trait: Trait) => 
+    !sharedTraitIds.includes(trait.id) && !playerPermanentTraitIds.includes(trait.id)
+  );
 
-  const handleAcquireTrait = (traitId: string) => {
-    dispatch(acquireTraitWithEssenceThunk(traitId));
-  };
-
-
-  const handleShareTrait = (traitId: string) => {
-    // TODO: Dispatch actual shareTraitWithNPCThunk 
-    console.log(`Attempting to share trait ${traitId} with ${npc.name}`);
-  };
-
-  // Updated canPlayerAcquireTrait to check all conditions
-  const canPlayerAcquireTrait = (trait: Trait): boolean => {
-    if (playerAcquiredTraits.includes(trait.id)) return false; // Already acquired
-
-    // Removed relationship requirement as per new specification
-
-    const prerequisiteTraitsReq = trait.requirements?.prerequisiteTraits;
-    if (prerequisiteTraitsReq && prerequisiteTraitsReq.length > 0) {
-      if (!prerequisiteTraitsReq.every(reqId => playerAcquiredTraits.includes(reqId))) {
-        return false; // Missing prerequisite traits
-      }
-    }
+  // Check if player can acquire a trait
+  const canPlayerAcquireTrait = useCallback((trait: Trait): boolean => {
+    // Already acquired
+    if (playerAcquiredTraitIds.includes(trait.id)) return false;
     
-    // Check essence cost
-    return essenceAmount >= (trait.essenceCost || 0);
-  };
+    // Not in proximity to NPC
+    if (!isInProximityToNPC) return false;
+    
+    // Insufficient essence
+    const essenceCost = trait.essenceCost || 0;
+    if (currentEssence < essenceCost) return false;
+    
+    return true;
+  }, [playerAcquiredTraitIds, isInProximityToNPC, currentEssence]);
 
-  const getLearnButtonTooltip = (trait: Trait, canAcquireNow: boolean, isAcquiredByPlayer: boolean): string => {
+  // Handle trait acquisition
+  const handleAcquireTrait = useCallback(async (traitId: string) => {
+    try {
+      await dispatch(acquireTraitWithEssenceThunk(traitId)).unwrap();
+      
+      // Add relationship bonus for learning
+      dispatch(updateNpcRelationship({
+        npcId,
+        change: 5,
+        reason: `Resonated trait from ${npc.name}`,
+      }));
+    } catch (error) {
+      console.error('Failed to acquire trait:', error);
+    }
+  }, [dispatch, npcId, npc.name]);
+
+  // Handle trait sharing
+  const handleShareTrait = useCallback(async (traitId: string) => {
+    try {
+      // Use npc.sharedTraits for count of currently shared traits
+      const usedSharedSlots = Object.keys(npc.sharedTraits || {}).length;
+      await dispatch(shareTraitWithNPCThunk({
+        npcId,
+        traitId,
+        slotIndex: usedSharedSlots, // This might need more sophisticated logic for actual slot management
+      })).unwrap();
+    } catch (error) {
+      console.error('Failed to share trait:', error);
+    }
+  }, [dispatch, npcId, npc.sharedTraits]);
+
+  // Get button tooltip for trait acquisition
+  const getLearnButtonTooltip = useCallback((trait: Trait, canAcquireNow: boolean, isAcquiredByPlayer: boolean): string => {
     if (isAcquiredByPlayer) return "Already acquired";
-    if (!canAcquireNow) {
-      const prerequisiteTraitsReq = trait.requirements?.prerequisiteTraits;
-      if (prerequisiteTraitsReq && prerequisiteTraitsReq.length > 0) {
-        const missingPrerequisites = prerequisiteTraitsReq.filter(reqId => !playerAcquiredTraits.includes(reqId));
-        if (missingPrerequisites.length > 0) {
-          return `Requires traits: ${missingPrerequisites.map(id => allTraits[id]?.name || id).join(', ')}`;
-        }
-      }
-      if (essenceAmount < (trait.essenceCost || 0)) {
-        return `Requires ${trait.essenceCost || 0} Essence`;
-      }
-      return "Cannot acquire yet"; // Generic fallback
+    if (!isInProximityToNPC) return "You must be in proximity to this NPC";
+    if (currentEssence < (trait.essenceCost || 0)) {
+      return `Requires ${trait.essenceCost || 0} Essence (you have ${currentEssence})`;
     }
     return "Learn this trait";
-  };
+  }, [isInProximityToNPC, currentEssence]);
+
+  // Handle acquisition dialog
+  const handleOpenAcquisitionDialog = useCallback((trait: Trait) => {
+    setAcquisitionDialog({
+      open: true,
+      trait,
+      traitId: trait.id,
+    });
+  }, []);
+
+  const handleCloseAcquisitionDialog = useCallback(() => {
+    setAcquisitionDialog({
+      open: false,
+      trait: null,
+      traitId: null,
+    });
+  }, []);
+
+  const handleConfirmAcquisition = useCallback(async () => {
+    if (acquisitionDialog.traitId) {
+      await handleAcquireTrait(acquisitionDialog.traitId);
+      handleCloseAcquisitionDialog();
+    }
+  }, [acquisitionDialog.traitId, handleAcquireTrait, handleCloseAcquisitionDialog]);
 
   return (
     <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <ExtensionIcon color="primary" />
+        <TraitIcon color="primary" />
         <Typography variant="h6">Trait Interaction with {npc.name}</Typography>
       </Box>
 
-      {/* NPC's Teachable Traits */}
+      {/* Proximity Warning */}
+      {!isInProximityToNPC && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          You must be in proximity to this NPC to acquire traits.
+        </Alert>
+      )}
+
+      {/* NPC's Available Traits for Resonance */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Traits {npc.name} Can Teach
+            Traits Available from {npc.name} for Resonance
           </Typography>
           
-          {teachableTraitsDetails.length > 0 ? (
+          {availableTraitsDetails.length > 0 ? (
             <Grid container spacing={2}>
-              {teachableTraitsDetails.map((trait) => {
-                const isAcquiredByPlayer = playerAcquiredTraits.includes(trait.id);
+              {availableTraitsDetails.map((trait: Trait) => {
+                const isAcquiredByPlayer = playerAcquiredTraitIds.includes(trait.id);
                 const canAcquireNow = canPlayerAcquireTrait(trait);
                 const essenceCost = trait.essenceCost || 0;
-                const relationshipReq = trait.requirements?.relationshipLevel;
-                const prerequisiteTraitsReq = trait.requirements?.prerequisiteTraits;
 
                 return (
                   <Grid item xs={12} md={6} key={trait.id}>
                     <Card variant="outlined">
                       <CardContent>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <Box sx={{ flexGrow: 1, mr: 2 }}>
-                            <Typography variant="subtitle1">{trait.name}</Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" gutterBottom>
+                              {trait.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" paragraph>
                               {trait.description}
                             </Typography>
-                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', mb: 1 }}>
-                              <Chip label={trait.category} size="small" variant="outlined" />
-                              <Chip label={trait.rarity} size="small" color="secondary" />
+                            
+                            <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                              <Chip size="small" label={trait.category} variant="outlined" />
+                              <Chip size="small" label={trait.rarity} color="primary" variant="outlined" />
                               {essenceCost > 0 && (
-                                <Chip 
-                                  label={`${essenceCost} Essence`} 
-                                  size="small" 
-                                  color={essenceAmount >= essenceCost ? 'success' : 'error'}
+                                <Chip
+                                  size="small"
+                                  label={`${essenceCost} Essence`}
+                                  color={currentEssence >= essenceCost ? 'success' : 'error'}
                                 />
                               )}
                             </Box>
-                            {/* Relationship requirement removed as per new specification */}
-                            {prerequisiteTraitsReq && prerequisiteTraitsReq.length > 0 && (
-                              <Box>
-                                <Typography variant="caption" color="text.secondary">
-                                  Requires Traits: {prerequisiteTraitsReq.map(id => allTraits[id]?.name || id).join(', ')}
-                                </Typography>
-                              </Box>
-                            )}
                           </Box>
                           
                           <Tooltip title={getLearnButtonTooltip(trait, canAcquireNow, isAcquiredByPlayer)}>
-                            <span> {/* Tooltip needs a span wrapper for disabled buttons */}
+                            <span>
                               <Button
                                 variant={isAcquiredByPlayer ? "outlined" : "contained"}
                                 size="small"
-                                startIcon={<GetAppIcon />}
-                                onClick={() => handleAcquireTrait(trait.id)}
+                                startIcon={isAcquiredByPlayer ? <CheckCircle /> : <GetAppIcon />}
+                                onClick={() => handleOpenAcquisitionDialog(trait)}
                                 disabled={isAcquiredByPlayer || !canAcquireNow}
+                                color={isAcquiredByPlayer ? "success" : "primary"}
                               >
-                                {isAcquiredByPlayer ? 'Acquired' : 'Learn'}
+                                {isAcquiredByPlayer ? 'Acquired' : 'Resonate'}
                               </Button>
                             </span>
                           </Tooltip>
@@ -158,7 +262,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
             </Grid>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              {npc.name} has no traits to teach you at this time.
+              {npc.name} has no traits available for Resonance at this time.
             </Typography>
           )}
         </CardContent>
@@ -178,8 +282,8 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
           
           {npc.sharedTraitSlots && npc.sharedTraitSlots.length > 0 ? (
             <Grid container spacing={2}>
-              {npc.sharedTraitSlots.map((slot) => (
-                <Grid item xs={12} sm={6} key={slot.id}>
+              {npc.sharedTraitSlots.map((slot: { id: string; index: number; traitId?: string | null }) => (
+                <Grid item xs={12} md={6} key={slot.id}>
                   <Card variant="outlined">
                     <CardContent>
                       <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -226,17 +330,16 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
             </Typography>
             
             <Grid container spacing={1}>
-              {shareableTraits.map((traitId) => {
-                const trait = allTraits[traitId];
+              {shareableTraits.map((trait: Trait) => {
                 if (!trait) return null;
 
                 return (
-                  <Grid item key={traitId}>
+                  <Grid item key={trait.id}>
                     <Button
                       variant="outlined"
                       size="small"
-                      startIcon={<ShareIcon />}
-                      onClick={() => handleShareTrait(traitId)}
+                      startIcon={<Share />}
+                      onClick={() => handleShareTrait(trait.id)}
                     >
                       {trait.name}
                     </Button>
@@ -247,6 +350,52 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
           </CardContent>
         </Card>
       )}
+
+      {/* Trait Acquisition Confirmation Dialog */}
+      <Dialog
+        open={acquisitionDialog.open}
+        onClose={handleCloseAcquisitionDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          Resonate Trait: {acquisitionDialog.trait?.name}
+        </DialogTitle>
+        
+        <DialogContent>
+          {acquisitionDialog.trait && (
+            <Box>
+              <Typography variant="body1" paragraph>
+                Are you sure you want to resonate with "{acquisitionDialog.trait.name}" from {npc.name}?
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary" paragraph>
+                {acquisitionDialog.trait.description}
+              </Typography>
+              
+              {acquisitionDialog.trait.essenceCost && acquisitionDialog.trait.essenceCost > 0 && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  This will cost {acquisitionDialog.trait.essenceCost} Essence.
+                  You currently have {currentEssence} Essence.
+                </Alert>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseAcquisitionDialog}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmAcquisition}
+            variant="contained"
+            disabled={!acquisitionDialog.trait || !canPlayerAcquireTrait(acquisitionDialog.trait)}
+          >
+            Resonate Trait
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

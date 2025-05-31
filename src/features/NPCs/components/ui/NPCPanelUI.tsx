@@ -118,7 +118,7 @@ const NPCPanelUI: React.FC<NPCPanelUIProps> = ({ npc }) => {
         
         {/* Traits Tab - Relationship 4+ */}
         {activeTab === 'traits' && npc.relationshipValue >= 4 && (
-          <NPCTraitsTab npc={npc} />
+          <NPCTraitsTab npcId={npc.id} />
         )}
         {/* Trade Tab - Relationship 2+ */}
         {activeTab === 'trade' && npc.relationshipValue >= 2 && (

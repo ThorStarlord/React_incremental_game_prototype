@@ -6,7 +6,7 @@ import SendIcon from '@mui/icons-material/Send';
 import type { NPC, DialogueEntry } from '../../../state/NPCTypes';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import { processDialogueChoiceThunk } from '../../../state/NPCThunks';
-import { mockDialogues } from '../../../data/mockNPCData'; // Corrected path
+import { mockDialogues } from '../../../data'; // Import from index.ts
 import { selectNPCDialogueHistory } from '../../../state/NPCSelectors'; // Corrected selector name
 
 interface NPCDialogueTabProps {

@@ -34,8 +34,10 @@ export interface NPC {
   completedQuests: string[];
   
   // Trait system integration
-  traits?: Record<string, NPCTraitInfo>;
-  teachableTraits: string[];
+  /** Traits that the player has shared with this NPC */
+  sharedTraits?: Record<string, NPCTraitInfo>; // Renamed from traits for clarity
+  /** Traits that can be acquired from this NPC through proximity and essence cost */
+  availableTraits: string[]; // Renamed from teachableTraits
   sharedTraitSlots?: NPCSharedTraitSlot[];
   
   // Commerce and services
@@ -83,19 +85,19 @@ export type InteractionType =
 export interface NPCTraitInfo {
   id: string;
   name?: string;
-  description?: string; // Added: Description property for trait details
-  category: 'physical' | 'combat' | 'social'; // Added: Category property for trait classification
-  rarity: 'common' | 'rare' | 'epic' | 'legendary' | 'mythic'; // Added: Rarity property for trait power level
-  effects: Record<string, number>; // Added: Effects property for trait bonuses
+  description?: string;
+  category: 'physical' | 'combat' | 'social' | 'Essence' | 'Knowledge' | 'Mental'; // Updated: Added 'Essence', 'Knowledge', 'Mental'
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic'; // Updated: Added 'uncommon' and ensured lowercase
+  effects: Record<string, number>;
   requirements: {
     relationshipLevel: number;
-  }; // Added: Requirements structure for trait acquisition
+  };
   essenceCost?: number;
   prerequisites?: string[];
   isVisible?: boolean;
-  discovered: boolean; // Added: Discovery tracking for trait visibility
-  cost: number; // Added: Cost property for trait acquisition
-  relationshipRequirement?: number; // Added: Relationship requirement for trait acquisition
+  discovered: boolean;
+  cost: number;
+  relationshipRequirement?: number;
 }
 
 /**

@@ -25,17 +25,18 @@ export const mockNPCs: Record<string, NPC> = {
     // Added: Missing required properties for quest system
     availableQuests: ['gather-essence-crystals', 'library-research'],
     completedQuests: [],
-    // Added: Missing required property for trait sharing
-    teachableTraits: ['essence-affinity', 'scholarly-insight', 'mental-focus'],
-    traits: {
-      'essence-affinity': {
-        id: 'essence-affinity',
+    // Updated: teachableTraits to availableTraits, and traits to sharedTraits
+    availableTraits: ['EssenceAffinity', 'ScholarlyInsight', 'MentalFocus'],
+    sharedTraits: {
+      'EssenceAffinity': {
+        id: 'EssenceAffinity',
         name: 'Essence Affinity',
         description: 'Natural connection to essence energy, improving generation and control.',
-        category: 'social',
+        category: 'Essence',
         rarity: 'rare',
         effects: { essenceGeneration: 1.2, essenceCapacity: 50 },
         requirements: { relationshipLevel: 10 },
+        isVisible: true, // Assuming all available traits are visible on first meeting
         discovered: true,
         cost: 25
       }
@@ -61,17 +62,18 @@ export const mockNPCs: Record<string, NPC> = {
     // Added: Missing required properties for quest system
     availableQuests: ['combat-trial', 'weapon-mastery-test'],
     completedQuests: [],
-    // Added: Missing required property for trait sharing
-    teachableTraits: ['combat-prowess', 'physical-endurance', 'warrior-spirit'],
-    traits: {
-      'combat-prowess': {
-        id: 'combat-prowess',
-        name: 'Combat Prowess',
-        description: 'Enhanced combat abilities and weapon mastery.',
+    // Updated: teachableTraits to availableTraits, and traits to sharedTraits
+    availableTraits: ['BattleHardened', 'ResilientConstitution'],
+    sharedTraits: {
+      'BattleHardened': {
+        id: 'BattleHardened',
+        name: 'Battle Hardened',
+        description: 'Your combat experience grants you increased attack and defense capabilities.',
         category: 'combat',
-        rarity: 'common',
-        effects: { attack: 15, criticalChance: 0.05 },
+        rarity: 'uncommon',
+        effects: { attack: 5, defense: 3 },
         requirements: { relationshipLevel: 5 },
+        isVisible: true, // Assuming all available traits are visible on first meeting
         discovered: false,
         cost: 15
       }
@@ -98,27 +100,29 @@ export const mockNPCs: Record<string, NPC> = {
     availableQuests: ['forest-patrol', 'stealth-mission', 'rare-herb-gathering'],
     completedQuests: ['introduction-task'],
     // Added: Missing required property for trait sharing
-    teachableTraits: ['swift-movement', 'stealth-mastery', 'nature-connection'],
-    traits: {
-      'swift-movement': {
-        id: 'swift-movement',
+    availableTraits: ['SwiftMovement', 'ShadowWalker', 'ElementalAffinity'],
+    sharedTraits: {
+      'SwiftMovement': {
+        id: 'SwiftMovement',
         name: 'Swift Movement',
         description: 'Incredible speed and agility for rapid traversal.',
         category: 'physical',
         rarity: 'rare',
         effects: { speed: 25, dodge: 10 },
         requirements: { relationshipLevel: 15 },
+        isVisible: true, // Assuming all available traits are visible on first meeting
         discovered: true,
         cost: 30
       },
-      'stealth-mastery': {
-        id: 'stealth-mastery',
-        name: 'Stealth Mastery',
+      'ShadowWalker': {
+        id: 'ShadowWalker',
+        name: 'Shadow Walker',
         description: 'Expert concealment and silent movement abilities.',
         category: 'physical',
-        rarity: 'epic',
-        effects: { stealth: 40, criticalChance: 0.1 },
+        rarity: 'rare',
+        effects: { stealthEffectiveness: 0.20 },
         requirements: { relationshipLevel: 20 },
+        isVisible: true, // Assuming all available traits are visible on first meeting
         discovered: false,
         cost: 45
       }
@@ -145,16 +149,17 @@ export const mockNPCs: Record<string, NPC> = {
     availableQuests: ['trade-route-security', 'rare-item-procurement'],
     completedQuests: [],
     // Added: Missing required property for trait sharing
-    teachableTraits: ['merchant-savvy', 'negotiation-skills', 'wealth-attraction'],
-    traits: {
-      'merchant-savvy': {
-        id: 'merchant-savvy',
-        name: 'Merchant Savvy',
-        description: 'Expert trading skills and market knowledge.',
+    availableTraits: ['BargainingMaster', 'MasterCraftsman', 'SilverTongue'],
+    sharedTraits: {
+      'BargainingMaster': {
+        id: 'BargainingMaster',
+        name: 'Bargaining Master',
+        description: 'Your keen business sense allows you to get better deals from merchants.',
         category: 'social',
         rarity: 'common',
-        effects: { goldGeneration: 1.15, tradingBonus: 0.1 },
+        effects: { shopDiscount: 0.05 },
         requirements: { relationshipLevel: 8 },
+        isVisible: true, // Assuming all available traits are visible on first meeting
         discovered: true,
         cost: 20
       }
@@ -181,16 +186,17 @@ export const mockNPCs: Record<string, NPC> = {
     availableQuests: ['magical-trial', 'crystal-attunement'],
     completedQuests: [],
     // Added: Missing required property for trait sharing
-    teachableTraits: ['arcane-knowledge', 'mystical-insight', 'magical-resonance'],
-    traits: {
-      'arcane-knowledge': {
-        id: 'arcane-knowledge',
+    availableTraits: ['ArcaneIntellect', 'WhispersOfTheVoid', 'ElementalAffinity'],
+    sharedTraits: {
+      'ArcaneIntellect': {
+        id: 'ArcaneIntellect',
         name: 'Arcane Knowledge',
         description: 'Deep understanding of magical principles and mystical forces.',
-        category: 'social',
-        rarity: 'legendary',
+        category: 'Mental',
+        rarity: 'rare',
         effects: { mana: 50, spellPower: 20, mysticalInsight: 15 },
         requirements: { relationshipLevel: 25 },
+        isVisible: true, // Assuming all available traits are visible on first meeting
         discovered: false,
         cost: 75
       }

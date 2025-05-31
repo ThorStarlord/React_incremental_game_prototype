@@ -26,13 +26,14 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 
 *   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions.
 *   **Emotional Connections (Connection Depth):** NPCs exhibit a range of emotions and can form deep connections with the player. This connection is quantified by the `connectionDepth` stat, which affects their behavior, dialogue, and contributes to passive Essence generation.
-*   **Trait Sharing and Acquisition:** Players can acquire traits from NPCs (via the Resonance action, requiring sufficient Emotional Connection/Connection Depth), which can then be used to influence other NPCs or enhance the player's abilities.
+*   **Trait Acquisition (Resonance):** Players acquire traits *from* NPCs (and other targets) using the Resonance ability. Acquisition is limited only by **Essence cost** and **physical proximity** to the NPC.
+*   **Trait Sharing:** Players can share their acquired traits *with* NPCs, which can influence NPC behavior or relationships.
 *   **Social Interactions:** NPCs can interact with each other and the player in a variety of social contexts, including trading, gifting, and collaborative activities.
 
 ## 3. Technical Specifications
 
 *   **Engine:** Built on top of the existing player and trait systems, leveraging Redux for state management and Material-UI for the interface.
-*   **Data Structure:** NPC data includes fields for relationship status, emotional state, traits, and quest information.
+*   **Data Structure:** NPC data includes fields for relationship status, emotional state, `availableTraits` (traits player can acquire from NPC), `sharedTraits` (traits player has shared with NPC), and quest information.
 *   **Async Operations:** Utilizes Redux Thunks for asynchronous operations, such as fetching NPC data, updating relationships, and processing interactions.
 
 ## 4. Implementation Phases
@@ -103,19 +104,19 @@ Comprehensive NPC information display:
 
 **NPCOverviewTab:** ✅ **IMPLEMENTED**
 - Basic NPC information and statistics
-- **All NPC traits are visible to the player upon first meeting the NPC.**
-- Clear unlock requirement displays for all interaction types
+- **Displays "Available Traits for Resonance" (traits player can acquire from this NPC) and "Shared Traits" (traits player has shared with this NPC). All available traits are visible upon first meeting the NPC.**
+- Clear unlock requirement displays for other interaction types
 - Relationship progress visualization
 
 **NPCDialogueTab:** ✅ **IMPLEMENTED**
-- Interactive conversation interface with message history
-- Simulated NPC responses based on relationship level
-- Real-time message composition and sending
-- Conversation history with timestamps
+- Interactive conversation interface with full message history (including player messages).
+- Supports player dialogue choices, leading to dynamic and relationship-based NPC responses.
+- Real-time message composition and sending.
+- Conversation history with timestamps.
 
 **NPCTradeTab:** ✅ **IMPLEMENTED**
 - Commerce interface with item browsing
-- Relationship-based discount system (up to 20% discount)
+- Relationship-based pricing discount system (up to 20% discount)
 - Stock management and availability tracking
 - Purchase confirmation and affordability checking
 
@@ -126,10 +127,10 @@ Comprehensive NPC information display:
 - Quest status management (available, accepted, completed)
 
 **NPCTraitsTab:** ✅ **IMPLEMENTED**
-- Trait acquisition interface with cost display
-- Shared trait slot management system
-- Player trait sharing capabilities
-- Acquisition validation and cost transparency
+- **Trait acquisition interface for "Available Traits" (traits player can acquire from this NPC via Resonance). Acquisition is limited only by Essence cost and physical proximity to the NPC.**
+- Shared trait slot management system for "Shared Traits" (traits player has shared with this NPC).
+- Player trait sharing capabilities.
+- Acquisition validation and cost transparency.
 
 ### 6.4. Performance and User Experience ✅ IMPLEMENTED
 
@@ -164,7 +165,7 @@ interface NPCState {
   discoveredNPCs: string[];
   currentInteraction: NPCInteraction | null;
   dialogueHistory: DialogueEntry[];
-  relationshipChanges: RelationshipChangeEntry[];
+  relationshipHistory: RelationshipChangeEntry[]; // Renamed from relationshipChanges
   loading: boolean;
   error: string | null;
 }
@@ -175,6 +176,7 @@ interface NPCState {
 *   **updateNPCRelationship:** Updates the relationship value between the player and an NPC.
 *   **updateNpcConnectionDepth:** Updates the connectionDepth stat for an NPC based on interactions.
 *   **addDialogueEntry:** Adds a dialogue entry to the history.
+*   **completeDialogueTopic:** Marks a dialogue topic as completed for a specific NPC, moving it from availableDialogues to completedDialogues.
 *   **startInteraction / endInteraction:** Manage the current interaction session.
 *   **clearError:** Clears error states.
 
@@ -183,6 +185,7 @@ interface NPCState {
 *   **selectAllNPCs:** Gets all NPCs, optionally filtered by online status or other criteria.
 *   **selectNPCRelationships:** Selects relationship data for NPCs.
 *   **selectNPCInteractions:** Selects interaction logs for NPCs.
+*   **selectNPCDialogueHistory:** Selects dialogue history for a specific NPC.
 
 ### 7.2. NPCThunks.ts
 
@@ -218,6 +221,15 @@ export const processNPCInteractionThunk = createAsyncThunk<
   // Handles dialogue, gifts, quest completion, trading
   // Includes unlock rewards and essence generation
 });
+
+export const processDialogueChoiceThunk = createAsyncThunk<
+  DialogueResult,
+  ProcessDialoguePayload,
+  { state: RootState }
+>('npcs/processDialogueChoice', async ({ npcId, choiceId, playerText }, { getState, dispatch, rejectWithValue }) => {
+  // Processes player dialogue choice, dispatches player and NPC messages to history,
+  // updates relationship, and marks dialogue topic as completed.
+});
 ```
 
 #### Key Thunk Features Implemented
@@ -226,7 +238,7 @@ export const processNPCInteractionThunk = createAsyncThunk<
 - **Complex Interactions:** Multi-step interaction processing with side effects and reward calculations
 - **Discovery System:** NPC discovery with validation and duplicate prevention
 - **Session Management:** Interaction session start/end with availability checking
-- **Dialogue Processing:** Dynamic dialogue choice handling with relationship consequences
+- **Dialogue Processing:** Dynamic dialogue choice handling with relationship consequences, **including player messages in history and relationship-based NPC responses.**
 - **Trait Sharing:** NPC trait sharing with relationship level validation
 - **Error Handling:** Comprehensive error management with rejectWithValue patterns
 - **State Coordination:** Cross-system integration with essence and trait systems

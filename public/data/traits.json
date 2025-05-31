@@ -321,5 +321,33 @@
     },
     "rarity": "Epic",
     "iconPath": "hearing"
+  },
+  "EssenceAffinity": {
+    "id": "EssenceAffinity",
+    "name": "Essence Affinity",
+    "category": "Essence",
+    "description": "Natural connection to essence energy, improving generation and control.",
+    "essenceCost": 25,
+    "permanenceCost": 50,
+    "effects": {
+      "essenceGeneration": 1.2,
+      "essenceCapacity": 50
+    },
+    "rarity": "Rare",
+    "iconPath": "bolt"
+  },
+  "MentalFocus": {
+    "id": "MentalFocus",
+    "name": "Mental Focus",
+    "category": "Mental",
+    "description": "Enhances mental clarity and concentration, improving spellcasting and thought processes.",
+    "essenceCost": 30,
+    "permanenceCost": 60,
+    "effects": {
+      "manaRegen": 0.1,
+      "intelligence": 5
+    },
+    "rarity": "Common",
+    "iconPath": "psychology"
   }
 }

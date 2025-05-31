@@ -19,7 +19,7 @@ This document details the design and mechanics of the Trait system, which allows
 *   **Other Acquisition Methods:**
     *   Completing specific quests or achievements might grant certain traits directly.
     *   (Future) Research or crafting systems could yield traits.
-*   **Requirements:** Conditions needed before a trait can be acquired (applies mostly to non-resonance methods or specific resonance targets).
+*   **Requirements:** Conditions needed before a trait can be acquired (applies mostly to non-resonance methods or specific resonance targets). Global prerequisite traits (defined on the trait itself in `traits.json`) still apply. Acquisition from NPCs is not gated by NPC relationship levels.
 
 ## 3. Trait Slots ✅ IMPLEMENTED
 
@@ -29,7 +29,7 @@ This document details the design and mechanics of the Trait system, which allows
     *   The `TraitSlotProgressIndicator.tsx` component calculates progress towards unlocking slots based on total essence earned, suggesting this mechanic is intended. The actual unlocking is handled by the `unlockTraitSlot` action.
 *   **Maximum Slots:** Currently initialized to 5 in `TraitsState.maxTraitSlots`.
 *   **Equipping/Unequipping:** ✅ **IMPLEMENTED** - Handled by `equipTrait` and `unequipTrait` actions in `TraitsSlice.ts`.
-*   **Management Limitation:** The player can manage trait slots (equip/unequip) only when in close proximity to an NPC from whom traits can be acquired.
+*   **Management Limitation:** The player can manage trait slots (equip/unequip) and make traits permanent only when in close proximity to an NPC from whom traits can be acquired.
 
 ### 3.1. Slot Interaction Implementation ✅ COMPLETED
 
@@ -221,3 +221,50 @@ const traitTabs = [
 - **Accessibility**: Structure ready for a11y testing
 
 The Trait System UI implementation is complete and provides a solid foundation for the trait mechanics, offering an intuitive, accessible, and performant user experience that aligns with the overall game architecture.
+<environment_details>
+# VSCode Visible Files
+../../../../request_0917181c-de3a-4c1e-8130-b129f35c5328/0
+../../../../request_0917181c-de3a-4c1e-8130-b129f35c5328/1
+../../../../request_0917181c-de3a-4c1e-8130-b129f35c5328/2
+../../../../request_0917181c-de3a-4c1e-8130-b129f35c5328/3
+../../../../request_0917181c-de3a-4c1e-8130-b129f35c5328/0
+../../../../request_0917181c-de3a-4c1e-8130-b129f35c5328/1
+../../../../request_0917181c-de3a-4c1e-8130-b129f35c5328/2
+../../../../request_0917181c-de3a-4c1e-8130-b129f35c5328/3
+../../../../response_66d5146c-69e8-4670-8417-882ecdf9d848/1
+../../../../response_66d5146c-69e8-4670-8417-882ecdf9d848/1
+../../../../response_292852e0-8d08-4ef8-9c9d-29fc27e6bd70/2
+../../../../response_292852e0-8d08-4ef8-9c9d-29fc27e6bd70/2
+specification/Features/NPCSystem.md
+
+# VSCode Open Tabs
+src/pages/CharacterPage.tsx
+specification/Features/TraitSystem.md
+src/features/NPCs/components/ui/tabs/NPCTraitsTab.tsx
+src/features/Traits/components/ui/TraitSystemUI.tsx
+src/features/Traits/components/ui/TraitSlots.tsx
+src/features/Traits/components/ui/TraitManagement.tsx
+src/features/Meta/state/MetaTypes.ts
+src/features/Meta/state/MetaSlice.ts
+src/features/Traits/components/containers/TraitSystemWrapper.tsx
+src/features/Traits/components/containers/TraitSlotsContainer.tsx
+src/features/NPCs/data/index.ts
+src/features/NPCs/state/NPCSlice.ts
+src/features/NPCs/state/NPCThunks.ts
+public/data/traits.json
+src/features/NPCs/components/ui/NPCTraitsTab.tsx
+src/features/NPCs/state/NPCTypes.ts
+src/features/NPCs/data/mockNPCData.ts
+src/features/NPCs/components/ui/NPCOverviewTab.tsx
+specification/Features/NPCSystem.md
+src/features/NPCs/components/ui/tabs/NPCDialogueTab.tsx
+
+# Current Time
+5/31/2025, 4:36:40 AM (America/Sao_Paulo, UTC-3:00)
+
+# Context Window Usage
+868,469 / 1,048.576K tokens used (83%)
+
+# Current Mode
+ACT MODE
+</environment_details>

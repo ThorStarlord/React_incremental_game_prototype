@@ -1,178 +1,120 @@
-import React from 'react';
-import { Box, Typography, Card, CardContent, List, ListItem, ListItemText, Chip, Divider } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
-import ExtensionIcon from '@mui/icons-material/Extension';
-
+import React, { useMemo } from 'react';
+import { Box, Typography, Card, CardContent, Chip, Grid } from '@mui/material';
 import type { NPC } from '../../../state/NPCTypes';
+import { useAppSelector } from '../../../../../app/hooks';
+import { selectTraits } from '../../../../Traits/state/TraitsSelectors';
 
 interface NPCOverviewTabProps {
   npc: NPC;
 }
 
 const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
-  const visibleTraits = npc.traits ? Object.values(npc.traits).filter(trait => trait.isVisible) : [];
-  const totalTraits = npc.traits ? Object.keys(npc.traits).length : 0;
+  const allTraits = useAppSelector(selectTraits);
+
+  // Get traits shared by the player with this NPC
+  const visibleSharedTraits = useMemo(() => {
+    if (!npc.sharedTraits || !allTraits) return [];
+    
+    return Object.entries(npc.sharedTraits)
+      .filter(([_, npcTraitInfo]) => npcTraitInfo.isVisible)
+      .map(([traitId, _]) => allTraits[traitId])
+      .filter(trait => trait && trait.name);
+  }, [npc.sharedTraits, allTraits]);
+
+  // Get traits available from this NPC
+  const availableTraitsDisplay = useMemo(() => {
+    if (!npc.availableTraits || !allTraits) return [];
+    
+    return npc.availableTraits
+      .map(traitId => allTraits[traitId])
+      .filter(trait => trait && trait.name);
+  }, [npc.availableTraits, allTraits]);
+
+  const totalSharedTraits = visibleSharedTraits.length;
+  const totalAvailableTraits = availableTraitsDisplay.length;
 
   return (
     <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-      {/* Basic Information */}
+      {/* NPC Basic Info */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <InfoIcon color="primary" />
-            <Typography variant="h6">Basic Information</Typography>
-          </Box>
+          <Typography variant="h6" gutterBottom>
+            {npc.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            {npc.description || 'No description available.'}
+          </Typography>
           
-          <List dense>
-            <ListItem>
-              <ListItemText 
-                primary="Name" 
-                secondary={npc.name}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText 
-                primary="Location" 
-                secondary={npc.location}
-              />
-            </ListItem>
-            {npc.status && (
-              <ListItem>
-                <ListItemText 
-                  primary="Current Status" 
-                  secondary={npc.status}
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Typography variant="subtitle2">Relationship Value</Typography>
+              <Typography variant="body1">{npc.relationshipValue || 0}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle2">Connection Depth</Typography>
+              <Typography variant="body1">{npc.connectionDepth?.toFixed(1) || '0.0'}</Typography>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Shared Traits */}
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Shared Traits ({totalSharedTraits})
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Traits you have shared with this NPC
+          </Typography>
+          
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {visibleSharedTraits.length > 0 ? (
+              visibleSharedTraits.map((trait) => (
+                <Chip
+                  key={trait.id}
+                  label={trait.name || trait.id}
+                  size="small"
+                  variant="outlined"
+                  color="primary"
                 />
-              </ListItem>
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No shared traits yet
+              </Typography>
             )}
-            <ListItem>
-              <ListItemText 
-                primary="Relationship Level" 
-                secondary={`${npc.relationshipValue.toFixed(1)} / 5.0`}
-              />
-            </ListItem>
-            {npc.connectionDepth !== undefined && (
-              <ListItem>
-                <ListItemText 
-                  primary="Connection Depth" 
-                  secondary={npc.connectionDepth.toFixed(2)}
-                />
-              </ListItem>
-            )}
-            {npc.loyalty !== undefined && (
-              <ListItem>
-                <ListItemText 
-                  primary="Loyalty" 
-                  secondary={`${npc.loyalty}%`}
-                />
-              </ListItem>
-            )}
-          </List>
+          </Box>
         </CardContent>
       </Card>
 
       {/* Available Traits */}
       <Card>
         <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <ExtensionIcon color="primary" />
-            <Typography variant="h6">Traits</Typography>
-            <Chip 
-              label={`${visibleTraits.length} / ${totalTraits}`} 
-              size="small" 
-              variant="outlined"
-            />
-          </Box>
-          
-          {visibleTraits.length > 0 ? (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {visibleTraits.map((trait) => (
-                <Chip
-                  key={trait.id}
-                  label={trait.id}
-                  size="small"
-                  variant="outlined"
-                  color="primary"
-                />
-              ))}
-            </Box>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              {totalTraits > 0 
-                ? 'No traits visible at current relationship level'
-                : 'No known traits'
-              }
-            </Typography>
-          )}
-          
-          {totalTraits > visibleTraits.length && (
-            <>
-              <Divider sx={{ my: 1 }} />
-              <Typography variant="body2" color="text.secondary">
-                {totalTraits - visibleTraits.length} additional traits hidden. 
-                Improve your relationship to discover more.
-              </Typography>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Unlock Requirements */}
-      <Card sx={{ mt: 2 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Interaction Unlocks
+          <Typography variant="h6" gutterBottom>
+            Available Traits ({totalAvailableTraits})
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Traits available from this NPC
           </Typography>
           
-          <List dense>
-            <ListItem>
-              <ListItemText 
-                primary="Dialogue" 
-                secondary={npc.relationshipValue >= 1 ? "✓ Unlocked" : "Requires relationship level 1+"}
-              />
-              <Chip 
-                label={npc.relationshipValue >= 1 ? "Available" : "Locked"} 
-                size="small" 
-                color={npc.relationshipValue >= 1 ? "success" : "default"}
-                variant="outlined"
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText 
-                primary="Trade" 
-                secondary={npc.relationshipValue >= 2 ? "✓ Unlocked" : "Requires relationship level 2+"}
-              />
-              <Chip 
-                label={npc.relationshipValue >= 2 ? "Available" : "Locked"} 
-                size="small" 
-                color={npc.relationshipValue >= 2 ? "success" : "default"}
-                variant="outlined"
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText 
-                primary="Quests" 
-                secondary={npc.relationshipValue >= 3 ? "✓ Unlocked" : "Requires relationship level 3+"}
-              />
-              <Chip 
-                label={npc.relationshipValue >= 3 ? "Available" : "Locked"} 
-                size="small" 
-                color={npc.relationshipValue >= 3 ? "success" : "default"}
-                variant="outlined"
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText 
-                primary="Trait Sharing" 
-                secondary={npc.relationshipValue >= 4 ? "✓ Unlocked" : "Requires relationship level 4+"}
-              />
-              <Chip 
-                label={npc.relationshipValue >= 4 ? "Available" : "Locked"} 
-                size="small" 
-                color={npc.relationshipValue >= 4 ? "success" : "default"}
-                variant="outlined"
-              />
-            </ListItem>
-          </List>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {availableTraitsDisplay.length > 0 ? (
+              availableTraitsDisplay.map((trait) => (
+                <Chip
+                  key={trait.id}
+                  label={trait.name || trait.id}
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No traits available
+              </Typography>
+            )}
+          </Box>
         </CardContent>
       </Card>
     </Box>
