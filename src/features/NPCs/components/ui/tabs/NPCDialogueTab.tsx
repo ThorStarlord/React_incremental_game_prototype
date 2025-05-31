@@ -1,88 +1,62 @@
 import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Button, TextField, List, ListItem, ListItemText, Divider } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, TextField, List, ListItem, ListItemText, Divider, Grid } from '@mui/material'; // Added Grid
 import ChatIcon from '@mui/icons-material/Chat';
 import SendIcon from '@mui/icons-material/Send';
 
-import type { NPC, DialogueEntry } from '../../../state/NPCTypes'; // Import DialogueEntry from NPCTypes
-import { useAppDispatch } from '../../../../../app/hooks'; // Only need useAppDispatch here
-import { processDialogueChoiceThunk } from '../../../state/NPCThunks'; // Import the thunk
-// Removed addReduxDialogueEntry and selectDialogueHistoryForNPC as they are not used directly here
+import type { NPC, DialogueEntry } from '../../../state/NPCTypes';
+import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
+import { processDialogueChoiceThunk } from '../../../state/NPCThunks';
+import { mockDialogues } from '../../../data/mockNPCData'; // Corrected path
+import { selectNPCDialogueHistory } from '../../../state/NPCSelectors'; // Corrected selector name
 
 interface NPCDialogueTabProps {
   npc: NPC;
 }
 
-const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => { // Corrected prop type
+const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {
   const dispatch = useAppDispatch();
-  const [message, setMessage] = useState('');
-  
-  const [localDialogueHistory, setLocalDialogueHistory] = useState<DialogueEntry[]>([]);
+  const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npc.id)); // Use global history
 
-  const handleSendMessage = async () => {
+  const [message, setMessage] = useState(''); // For free-text input, if still desired
+
+  // Filter available dialogues based on NPC's availableDialogues array
+  const availableDialogueChoices = React.useMemo(() => {
+    return npc.availableDialogues
+      .map(dialogueId => mockDialogues[dialogueId])
+      .filter(Boolean); // Filter out undefined entries if ID not found in mockDialogues
+  }, [npc.availableDialogues]);
+
+  const handleSendFreeTextMessage = async () => {
     if (!message.trim()) return;
 
     const playerMessageText = message;
     setMessage(''); // Clear input immediately
 
-    // Optimistically update local UI for player message
-    const playerDisplayMessage: DialogueEntry = {
-      id: `player-${Date.now()}`,
-      npcId: npc.id,
-      speaker: 'player', // Add speaker to DialogueEntry in NPCTypes.ts
-      playerText: playerMessageText, // Use playerText for player's message
-      npcResponse: '', // Empty for player message
-      timestamp: Date.now(),
-    };
-    setLocalDialogueHistory(prev => [...prev, playerDisplayMessage]);
-
     try {
-      const resultAction = await dispatch(processDialogueChoiceThunk({
+      // Use a generic choiceId for free text, or remove free text if not desired
+      await dispatch(processDialogueChoiceThunk({
         npcId: npc.id,
-        choiceId: 'generic_talk', // Placeholder for now
+        choiceId: 'generic_talk', // Keep 'generic_talk' for free text
         playerText: playerMessageText,
       }));
-
-      if (processDialogueChoiceThunk.fulfilled.match(resultAction)) {
-        const npcResponsePayload = resultAction.payload;
-        // Optimistically update local UI for NPC message
-        const npcDisplayMessage: DialogueEntry = {
-          id: `npc-${Date.now()}`,
-          npcId: npc.id,
-          speaker: 'npc', // Add speaker to DialogueEntry in NPCTypes.ts
-          playerText: playerMessageText, // Store player's text for context
-          npcResponse: npcResponsePayload.npcResponse,
-          timestamp: Date.now(),
-          affinityDelta: npcResponsePayload.affinityDelta,
-        };
-        setLocalDialogueHistory(prev => [...prev, npcDisplayMessage]);
-      } else {
-        console.error("Dialogue thunk failed:", resultAction.payload || resultAction.error);
-         const errorDisplayMessage: DialogueEntry = {
-          id: `error-${Date.now()}`,
-          npcId: npc.id,
-          speaker: 'system',
-          playerText: playerMessageText,
-          npcResponse: "Sorry, I couldn't process that.",
-          timestamp: Date.now(),
-        };
-        setLocalDialogueHistory(prev => [...prev, errorDisplayMessage]);
-      }
     } catch (error) {
-      console.error("Error dispatching dialogue thunk:", error);
-       const errorDisplayMessage: DialogueEntry = {
-          id: `error-${Date.now()}`,
-          npcId: npc.id,
-          speaker: 'system',
-          playerText: playerMessageText,
-          npcResponse: "An unexpected error occurred.",
-          timestamp: Date.now(),
-        };
-        setLocalDialogueHistory(prev => [...prev, errorDisplayMessage]);
+      console.error("Error dispatching free text dialogue thunk:", error);
+      // Error handling for UI could be added here, e.g., a temporary system message
     }
   };
 
-  // Removed generateNPCResponse as it's now handled by the thunk
-  // The responses object was part of the commented-out function, so it's removed.
+  const handleSelectDialogueChoice = async (choiceId: string, playerText: string) => {
+    try {
+      await dispatch(processDialogueChoiceThunk({
+        npcId: npc.id,
+        choiceId: choiceId,
+        playerText: playerText,
+      }));
+    } catch (error) {
+      console.error("Error dispatching dialogue choice thunk:", error);
+      // Error handling for UI
+    }
+  };
 
   return (
     <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -96,12 +70,12 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => { // Correcte
       <Card sx={{ flexGrow: 1, mb: 2, overflow: 'hidden' }}>
         <CardContent sx={{ height: '100%', overflow: 'auto', p: 1 }}>
           <List dense>
-            {localDialogueHistory.map((msg, index) => (
+            {dialogueHistory.map((msg: DialogueEntry, index: number) => ( // Explicitly type msg and index
               <React.Fragment key={msg.id}>
                 <ListItem
                   sx={{
                     flexDirection: 'column',
-                    alignItems: msg.speaker === 'player' ? 'flex-end' : 'flex-start', // Assuming DialogueEntry has speaker
+                    alignItems: msg.speaker === 'player' ? 'flex-end' : 'flex-start',
                   }}
                 >
                   <Box
@@ -126,14 +100,35 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => { // Correcte
                     )}
                   </Typography>
                 </ListItem>
-                {index < localDialogueHistory.length - 1 && <Divider />}
+                {index < dialogueHistory.length - 1 && <Divider />}
               </React.Fragment>
             ))}
           </List>
         </CardContent>
       </Card>
 
-      {/* Message Input */}
+      {/* Dialogue Choices */}
+      {availableDialogueChoices.length > 0 && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            Choose a topic:
+          </Typography>
+          <Grid container spacing={1}>
+            {availableDialogueChoices.map((choice) => (
+              <Grid item key={choice.id}>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleSelectDialogueChoice(choice.id, choice.title)} // Pass choice.id and choice.title as playerText
+                >
+                  {choice.title}
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
+
+      {/* Free-text Message Input (Optional, can be removed if only choices are desired) */}
       <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField
           fullWidth
@@ -144,7 +139,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => { // Correcte
           onKeyPress={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
-              handleSendMessage();
+              handleSendFreeTextMessage();
             }
           }}
           multiline
@@ -152,7 +147,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => { // Correcte
         />
         <Button
           variant="contained"
-          onClick={handleSendMessage}
+          onClick={handleSendFreeTextMessage}
           disabled={!message.trim()}
           startIcon={<SendIcon />}
           sx={{ alignSelf: 'flex-end' }}

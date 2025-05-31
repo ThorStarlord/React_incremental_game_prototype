@@ -1,7 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { setNPCs, setLoading, setError, updateNpcConnectionDepth, addDialogueEntry } from './NPCSlice'; // Added addDialogueEntry
+import { setNPCs, setLoading, setError, updateNpcConnectionDepth, addDialogueEntry, completeDialogueTopic } from './NPCSlice'; // Added completeDialogueTopic
 import type { NPC, RelationshipChangeEntry, DialogueEntry, InteractionResult, DialogueResult, ProcessDialoguePayload } from './NPCTypes';
+import { getRelationshipTier, RELATIONSHIP_THRESHOLDS } from './NPCTypes';
+import { mockDialogues } from '../data/mockNPCData';
 
 /**
  * Initialize NPCs with mock or loaded data
@@ -256,17 +258,36 @@ export const processDialogueChoiceThunk = createAsyncThunk<
         return rejectWithValue(`NPC with ID ${npcId} not found`);
       }
 
-      // Mock dialogue processing - in real implementation this would
-      // reference dialogue trees and choice consequences
-      const responses = [
-        "That's an interesting perspective.",
-        "I appreciate your honesty.",
-        "Thank you for sharing that with me.",
-        "I understand how you feel."
-      ];
+      // Get dialogue data based on choiceId
+      const dialogueData = mockDialogues[choiceId];
+      if (!dialogueData) {
+        return rejectWithValue(`Dialogue choice with ID ${choiceId} not found`);
+      }
 
-      const responseText = responses[Math.floor(Math.random() * responses.length)];
+      // Determine NPC response based on relationship level
+      const currentRelationshipTier = getRelationshipTier(npc.relationshipValue);
+      let responseText = dialogueData.responses[currentRelationshipTier] || dialogueData.responses['NEUTRAL']; // Fallback to NEUTRAL
+
+      // If the choiceId is 'generic_talk', use a generic response if no specific one is found
+      if (choiceId === 'generic_talk') {
+        const genericResponses = [
+          "That's an interesting perspective.",
+          "I appreciate your honesty.",
+          "Thank you for sharing that with me.",
+          "I understand how you feel."
+        ];
+        responseText = genericResponses[Math.floor(Math.random() * genericResponses.length)];
+      }
+
       const relationshipChange = Math.random() * 3 + 1; // 1-4 points
+
+      // Dispatch addDialogueEntry to log the player's message in the history
+      dispatch(addDialogueEntry({
+        npcId,
+        speaker: 'player',
+        playerText: playerText,
+        npcResponse: '',
+      }));
 
       // Update relationship
       await dispatch(updateNPCRelationshipThunk({
@@ -278,11 +299,16 @@ export const processDialogueChoiceThunk = createAsyncThunk<
       // Dispatch addDialogueEntry to log the NPC's response in the history
       dispatch(addDialogueEntry({
         npcId,
-        speaker: 'npc', // NPC is the speaker for this entry
-        playerText: playerText, // Include player's original text for context
+        speaker: 'npc',
+        playerText: playerText,
         npcResponse: responseText,
         affinityDelta: relationshipChange,
       }));
+
+      // If it's a specific dialogue choice (not generic_talk), mark it as completed
+      if (choiceId !== 'generic_talk') {
+        dispatch(completeDialogueTopic({ npcId, dialogueId: choiceId }));
+      }
 
       return {
         success: true,

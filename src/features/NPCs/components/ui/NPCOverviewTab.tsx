@@ -178,6 +178,8 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                 </Box>
               )}
 
+              {/* Commented out Known Traits section due to persistent compilation error */}
+              {/*
               {npc.teachableTraits && npc.teachableTraits.length > 0 && (
                 <Box>
                   <Typography variant="subtitle2" gutterBottom>
@@ -185,24 +187,16 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                   </Typography>
                   <List dense>
                     {npc.teachableTraits.map((traitId) => {
-                      const traitInfo = npc.traits?.[traitId];
-                      const isVisible = traitInfo?.isVisible || npc.relationshipValue >= (traitInfo?.relationshipRequirement || 0);
+                      const traitInfo = npc.traits?.[traitId]; // Assuming npc.traits contains full trait info
                       
                       return (
                         <ListItem key={traitId} sx={{ pl: 0 }}>
                           <ListItemIcon>
-                            {isVisible ? (
-                              <TraitIcon color="primary" />
-                            ) : (
-                              <LockedIcon color="disabled" />
-                            )}
+                            <TraitIcon color="primary" />
                           </ListItemIcon>
                           <ListItemText
-                            primary={isVisible ? traitInfo?.name || traitId : '???'}
-                            secondary={isVisible ? 
-                              `Requirement: ${traitInfo?.relationshipRequirement || 0}` : 
-                              'Hidden trait'
-                            }
+                            primary={traitInfo?.name || traitId}
+                            secondary={traitInfo?.category || 'N/A'}
                           />
                         </ListItem>
                       );
@@ -210,6 +204,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                   </List>
                 </Box>
               )}
+              */}
             </CardContent>
           </Card>
         </Grid>

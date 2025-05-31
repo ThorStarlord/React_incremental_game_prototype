@@ -141,6 +141,24 @@ const npcSlice = createSlice({
         npc.connectionDepth = Math.max(0, npc.connectionDepth + change);
       }
     },
+    /**
+     * Marks a dialogue topic as completed for a specific NPC.
+     * Moves the dialogueId from availableDialogues to completedDialogues.
+     * @param state - The current NPC state.
+     * @param action - The action containing npcId and dialogueId.
+     */
+    completeDialogueTopic: (state, action: PayloadAction<{ npcId: string; dialogueId: string }>) => {
+      const { npcId, dialogueId } = action.payload;
+      const npc = state.npcs[npcId];
+      if (npc) {
+        // Remove from availableDialogues
+        npc.availableDialogues = npc.availableDialogues.filter(id => id !== dialogueId);
+        // Add to completedDialogues if not already there
+        if (!npc.completedDialogues.includes(dialogueId)) {
+          npc.completedDialogues.push(dialogueId);
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -280,7 +298,8 @@ export const {
   endInteraction,
   addDialogueEntry,
   clearError,
-  updateNpcConnectionDepth
+  updateNpcConnectionDepth,
+  completeDialogueTopic // Export new action
 } = npcSlice.actions;
 
 export default npcSlice.reducer;

@@ -199,21 +199,42 @@ export const mockNPCs: Record<string, NPC> = {
 };
 
 // Additional helper data for development and testing
-export const mockDialogues: Record<string, { id: string; title: string; npcResponse: string }> = {
+export const mockDialogues: Record<string, { id: string; title: string; responses: Record<string, string> }> = {
   'intro-greeting': {
     id: 'intro-greeting',
     title: 'Greet Elena',
-    npcResponse: 'Welcome, seeker. The ancient texts speak of one such as you...'
+    responses: {
+      'NEUTRAL': 'Welcome, seeker. The ancient texts speak of one such as you...',
+      'ACQUAINTANCE': 'Ah, it is you again. What brings you to the library today?',
+      'FRIEND': 'Elena smiles warmly. "A pleasure to see you, friend. How may I assist you?"',
+      'ALLY': 'Elena bows slightly. "Your presence is a comfort, ally. What wisdom do you seek?"',
+      'TRUSTED': 'Elena\'s eyes sparkle. "Come, sit. Let us share knowledge as trusted companions."',
+      'BELOVED': 'Elena embraces you. "My dearest friend, your presence brightens even the oldest halls."'
+    }
   },
   'warrior-greeting': {
     id: 'warrior-greeting', 
     title: 'Challenge Marcus',
-    npcResponse: 'Ah, another warrior! Show me your stance and I will judge your worth.'
+    responses: {
+      'NEUTRAL': 'Ah, another warrior! Show me your stance and I will judge your worth.',
+      'ACQUAINTANCE': 'Ready for another spar, eh? Let\'s see how much you\'ve improved.',
+      'FRIEND': 'Marcus grins. "Always a pleasure to train with a comrade like you!"',
+      'ALLY': 'Marcus claps your shoulder. "Together, we are unstoppable. What challenge do you face?"',
+      'TRUSTED': 'Marcus nods respectfully. "Your strength is undeniable. What wisdom do you seek from a veteran?"',
+      'BELOVED': 'Marcus laughs heartily. "My brother/sister in arms! Let us forge our legends together!"'
+    }
   },
   'scout-report': {
     id: 'scout-report',
     title: 'Ask for Scout Report',
-    npcResponse: 'The forest whispers of strange movements to the north. Proceed with caution.'
+    responses: {
+      'NEUTRAL': 'The forest whispers of strange movements to the north. Proceed with caution.',
+      'ACQUAINTANCE': 'My latest patrol revealed nothing unusual, but the woods are always full of secrets.',
+      'FRIEND': 'Lyra shares a detailed map. "I\'ve marked a new path, safer than the old one."',
+      'ALLY': 'Lyra points to a distant peak. "I\'ve found a hidden grove, perfect for quiet contemplation."',
+      'TRUSTED': 'Lyra whispers a secret. "The ancient spirits are restless near the old ruins. Be wary."',
+      'BELOVED': 'Lyra takes your hand. "The forest itself sings when you are near. What do you wish to know?"'
+    }
   }
 };
 
