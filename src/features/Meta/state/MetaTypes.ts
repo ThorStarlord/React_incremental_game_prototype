@@ -15,4 +15,6 @@ export interface MetaState {
   gameVersion: string;
   /** Timestamp when the current game session started. */
   sessionStartTime: number;
+  /** Indicates if the player is currently in close proximity to an NPC for trait management. */
+  isInProximityToNPC: boolean;
 }

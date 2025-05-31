@@ -18,7 +18,6 @@ interface NPCTraitsTabProps {
 const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
   const dispatch = useAppDispatch(); // Added dispatch
   const playerAcquiredTraits = useAppSelector(state => state.traits.acquiredTraits);
-  const playerDiscoveredTraits = useAppSelector(state => state.traits.discoveredTraits); // Added discoveredTraits
   const allTraits = useAppSelector(state => state.traits.traits);
   const essenceAmount = useAppSelector(state => state.essence.currentEssence);
   const playerRelationshipWithNPC = npc.relationshipValue; // Get current relationship value
@@ -41,10 +40,6 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
     dispatch(acquireTraitWithEssenceThunk(traitId));
   };
 
-  const handleDiscoverTrait = (traitId: string) => {
-    dispatch(discoverTrait(traitId));
-    console.log(`Attempting to discover trait ${traitId} from ${npc.name}`);
-  };
 
   const handleShareTrait = (traitId: string) => {
     // TODO: Dispatch actual shareTraitWithNPCThunk 
@@ -53,11 +48,9 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
 
   // Updated canPlayerAcquireTrait to check all conditions
   const canPlayerAcquireTrait = (trait: Trait): boolean => {
-    if (!playerDiscoveredTraits.includes(trait.id)) return false; // Must be discovered first
     if (playerAcquiredTraits.includes(trait.id)) return false; // Already acquired
 
-    const relationshipReq = trait.requirements?.relationshipLevel;
-    if (relationshipReq && playerRelationshipWithNPC < relationshipReq) return false; // Relationship too low
+    // Removed relationship requirement as per new specification
 
     const prerequisiteTraitsReq = trait.requirements?.prerequisiteTraits;
     if (prerequisiteTraitsReq && prerequisiteTraitsReq.length > 0) {
@@ -73,10 +66,6 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
   const getLearnButtonTooltip = (trait: Trait, canAcquireNow: boolean, isAcquiredByPlayer: boolean): string => {
     if (isAcquiredByPlayer) return "Already acquired";
     if (!canAcquireNow) {
-      const relationshipReq = trait.requirements?.relationshipLevel;
-      if (relationshipReq && playerRelationshipWithNPC < relationshipReq) {
-        return `Requires Relationship Level ${relationshipReq}`;
-      }
       const prerequisiteTraitsReq = trait.requirements?.prerequisiteTraits;
       if (prerequisiteTraitsReq && prerequisiteTraitsReq.length > 0) {
         const missingPrerequisites = prerequisiteTraitsReq.filter(reqId => !playerAcquiredTraits.includes(reqId));
@@ -110,9 +99,8 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
           {teachableTraitsDetails.length > 0 ? (
             <Grid container spacing={2}>
               {teachableTraitsDetails.map((trait) => {
-                const isDiscoveredByPlayer = playerDiscoveredTraits.includes(trait.id);
                 const isAcquiredByPlayer = playerAcquiredTraits.includes(trait.id);
-                const canAcquireNow = canPlayerAcquireTrait(trait); // This now implies discovered
+                const canAcquireNow = canPlayerAcquireTrait(trait);
                 const essenceCost = trait.essenceCost || 0;
                 const relationshipReq = trait.requirements?.relationshipLevel;
                 const prerequisiteTraitsReq = trait.requirements?.prerequisiteTraits;
@@ -138,11 +126,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
                                 />
                               )}
                             </Box>
-                            {relationshipReq && (
-                              <Typography variant="caption" color={playerRelationshipWithNPC >= relationshipReq ? 'success.main' : 'error.main'}>
-                                Requires Relationship: {relationshipReq} (Current: {playerRelationshipWithNPC})
-                              </Typography>
-                            )}
+                            {/* Relationship requirement removed as per new specification */}
                             {prerequisiteTraitsReq && prerequisiteTraitsReq.length > 0 && (
                               <Box>
                                 <Typography variant="caption" color="text.secondary">
@@ -152,31 +136,19 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
                             )}
                           </Box>
                           
-                          {isDiscoveredByPlayer ? (
-                            <Tooltip title={getLearnButtonTooltip(trait, canAcquireNow, isAcquiredByPlayer)}>
-                              <span> {/* Tooltip needs a span wrapper for disabled buttons */}
-                                <Button
-                                  variant={isAcquiredByPlayer ? "outlined" : "contained"}
-                                  size="small"
-                                  startIcon={<GetAppIcon />}
-                                  onClick={() => handleAcquireTrait(trait.id)}
-                                  disabled={isAcquiredByPlayer || !canAcquireNow}
-                                >
-                                  {isAcquiredByPlayer ? 'Acquired' : 'Learn'}
-                                </Button>
-                              </span>
-                            </Tooltip>
-                          ) : (
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              startIcon={<VisibilityIcon />}
-                              onClick={() => handleDiscoverTrait(trait.id)}
-                              // TODO: Add conditions for enabling Observe button, e.g., relationship level
-                            >
-                              Observe
-                            </Button>
-                          )}
+                          <Tooltip title={getLearnButtonTooltip(trait, canAcquireNow, isAcquiredByPlayer)}>
+                            <span> {/* Tooltip needs a span wrapper for disabled buttons */}
+                              <Button
+                                variant={isAcquiredByPlayer ? "outlined" : "contained"}
+                                size="small"
+                                startIcon={<GetAppIcon />}
+                                onClick={() => handleAcquireTrait(trait.id)}
+                                disabled={isAcquiredByPlayer || !canAcquireNow}
+                              >
+                                {isAcquiredByPlayer ? 'Acquired' : 'Learn'}
+                              </Button>
+                            </span>
+                          </Tooltip>
                         </Box>
                       </CardContent>
                     </Card>
@@ -186,7 +158,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npc }) => {
             </Grid>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              {npc.name} has no traits to teach you at this time, or you do not meet the requirements to see them.
+              {npc.name} has no traits to teach you at this time.
             </Typography>
           )}
         </CardContent>

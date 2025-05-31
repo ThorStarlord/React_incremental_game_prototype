@@ -20,6 +20,7 @@ export interface TraitSystemUIProps {
   availableTraitsForEquip: Trait[];
   currentEssence: number;
   playerMaxTraitSlots?: number; // Added playerMaxTraitSlots
+  isInProximityToNPC: boolean; // Added for proximity-based trait management
   
   // Status
   loading: boolean;
@@ -64,6 +65,7 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
   discoveredTraits,
   availableTraitsForEquip,
   currentEssence,
+  isInProximityToNPC, // Destructure new prop
   
   // Status
   loading,
@@ -155,6 +157,7 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
             availableTraits={availableTraitsForEquip}
             onEquipTrait={onEquipTrait}
             onUnequipTrait={onUnequipTrait}
+            isInProximityToNPC={isInProximityToNPC} // Pass new prop
           />
         </TabPanel>
         
@@ -169,6 +172,7 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
             onMakeTraitPermanent={onMakeTraitPermanent}
             canMakePermanent={canMakePermanent}
             getTraitAffordability={getTraitAffordability}
+            isInProximityToNPC={isInProximityToNPC} // Pass new prop
           />
         </TabPanel>
         

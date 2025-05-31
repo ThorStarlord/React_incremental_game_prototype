@@ -11,27 +11,25 @@ This document details the design and mechanics of the Trait system, which allows
 
 ## 2. Trait Acquisition
 
-*   **Primary Method: Resonance (via Emotional Connection)** ✅ **IMPLEMENTED**
-    *   **Concept:** Players can acquire traits from targets (NPCs, potentially enemies, or even abstract concepts) by performing a "Resonance" action. This action requires a sufficient level of **Emotional Connection** with the target and the expenditure of **Essence**.
-    *   **Emotional Connection:** This is the prerequisite relationship state with the target (tracked as `connectionDepth` in the NPC system). A certain depth is needed to unlock the ability to Resonate for traits from that target.
+*   **Primary Method: Resonance (via Proximity and Essence Cost)** ✅ **IMPLEMENTED**
+    *   **Concept:** Players can acquire traits from targets (NPCs, potentially enemies, or even abstract concepts) by performing a "Resonance" action. This action requires **close proximity** to the target and the expenditure of **Essence**.
+    *   **Proximity:** The player must be in close proximity to the target to perform the Resonance action.
     *   **Resonance Action:** This is the process of spending Essence to "tune into," "understand," or "copy" a trait's pattern from the target. The `Trait` data model includes an `essenceCost` property.
-    *   **Current Implementation:** The `acquireTraitWithEssenceThunk` implements the Essence cost deduction and trait acquisition, gated by the player having sufficient Essence. The gating based on Emotional Connection level is handled in the UI or interaction logic.
+    *   **Current Implementation:** The `acquireTraitWithEssenceThunk` implements the Essence cost deduction and trait acquisition, gated by the player having sufficient Essence. The proximity requirement is handled in the UI or interaction logic.
 *   **Other Acquisition Methods:**
     *   Completing specific quests or achievements might grant certain traits directly.
     *   (Future) Research or crafting systems could yield traits.
 *   **Requirements:** Conditions needed before a trait can be acquired (applies mostly to non-resonance methods or specific resonance targets).
-    *   Minimum player level.
-    *   NPC relationship level (for traits offered by NPCs).
 
 ## 3. Trait Slots ✅ IMPLEMENTED
 
 *   **Concept:** Players have a limited number of slots to equip active traits.
 *   **Slot Configuration:** The initial number of slots, their unlocked status, and unlock requirements (e.g., by player level) are defined in the `initialState` of `TraitsSlice.ts` within `state.slots`. The maximum number of slots is defined by `state.maxTraitSlots` (currently initialized to 5).
-*   **Leveling Slots:** Unlocking slots based on player level is supported by the `unlockRequirements` in the `TraitSlot` data.
 *   **Free Trait Slots (Essence-Based):**
     *   The `TraitSlotProgressIndicator.tsx` component calculates progress towards unlocking slots based on total essence earned, suggesting this mechanic is intended. The actual unlocking is handled by the `unlockTraitSlot` action.
 *   **Maximum Slots:** Currently initialized to 5 in `TraitsState.maxTraitSlots`.
 *   **Equipping/Unequipping:** ✅ **IMPLEMENTED** - Handled by `equipTrait` and `unequipTrait` actions in `TraitsSlice.ts`.
+*   **Management Limitation:** The player can manage trait slots (equip/unequip) only when in close proximity to an NPC from whom traits can be acquired.
 
 ### 3.1. Slot Interaction Implementation ✅ COMPLETED
 

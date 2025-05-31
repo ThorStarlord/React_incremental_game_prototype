@@ -103,7 +103,7 @@ Comprehensive NPC information display:
 
 **NPCOverviewTab:** ✅ **IMPLEMENTED**
 - Basic NPC information and statistics
-- Trait discovery tracking with visibility indicators
+- **All NPC traits are visible to the player upon first meeting the NPC.**
 - Clear unlock requirement displays for all interaction types
 - Relationship progress visualization
 

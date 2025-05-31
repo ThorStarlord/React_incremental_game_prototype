@@ -48,6 +48,7 @@ export interface TraitManagementProps {
     cost: number;
     currentEssence: number;
   };
+  isInProximityToNPC: boolean; // Added for proximity-based trait management
 }
 
 /**
@@ -63,9 +64,11 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
   onAcquireTrait,
   onMakeTraitPermanent,
   canMakePermanent,
-  getTraitAffordability
+  getTraitAffordability,
+  isInProximityToNPC // Destructure new prop
 }) => {
   const handleMakePermanent = useCallback((trait: Trait) => {
+    if (!isInProximityToNPC) return; // Disable if not in proximity
     if (!canMakePermanent(trait)) return;
     
     const affordability = getTraitAffordability(trait, 'permanent');
@@ -73,7 +76,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
     
     // TODO: Add confirmation dialog
     onMakeTraitPermanent(trait.id);
-  }, [canMakePermanent, getTraitAffordability, onMakeTraitPermanent]);
+  }, [canMakePermanent, getTraitAffordability, onMakeTraitPermanent, isInProximityToNPC]);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
@@ -224,6 +227,12 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
                   </IconButton>
                 </Tooltip>
               </Box>
+
+              {!isInProximityToNPC && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  You must be in close proximity to an NPC to make traits permanent.
+                </Alert>
+              )}
 
               {acquiredTraits.length === 0 ? (
                 <Alert severity="info">

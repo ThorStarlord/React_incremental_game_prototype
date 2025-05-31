@@ -7,21 +7,22 @@ import {
   selectDiscoveredTraitObjects,
   selectTraitLoading,
   selectTraitError,
-  selectEquippedTraitObjects // Added import for selectEquippedTraitObjects
+  selectEquippedTraitObjects
 } from '../../state/TraitsSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
+import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice'; // Import the new selector
 import {
   acquireTrait,
   makePermanent,
   discoverTrait
-} from '../../state/TraitsSlice'; // Actions still in TraitsSlice
+} from '../../state/TraitsSlice';
 import {
-  selectTraitSlots as selectPlayerTraitSlots, // Alias for player's trait slots
-  selectEquippedTraitIds as selectPlayerEquippedTraitIds, // Alias for player's equipped trait IDs
-  selectMaxTraitSlots as selectPlayerMaxTraitSlots // Import max slots
-} from '../../../Player/state/PlayerSelectors'; // Import from PlayerSelectors
-import { equipTrait, unequipTrait, unlockTraitSlot } from '../../../Player/state/PlayerSlice'; // Import actions from PlayerSlice
-import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks'; // Import recalculateStatsThunk
+  selectTraitSlots as selectPlayerTraitSlots,
+  selectEquippedTraitIds as selectPlayerEquippedTraitIds,
+  selectMaxTraitSlots as selectPlayerMaxTraitSlots
+} from '../../../Player/state/PlayerSelectors';
+import { equipTrait, unequipTrait, unlockTraitSlot } from '../../../Player/state/PlayerSlice';
+import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks';
 import { TraitSystemUI, type TraitSystemUIProps } from '../ui/TraitSystemUI';
 import type { Trait } from '../../state/TraitsTypes';
 
@@ -47,15 +48,16 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
 
   // Fetch all necessary data from Redux store
   const allTraits = useAppSelector(selectTraits);
-  const playerTraitSlots = useAppSelector(selectPlayerTraitSlots); // Get player's trait slots
-  const equippedTraitObjects = useAppSelector(selectEquippedTraitObjects); // Corrected: This selector is from TraitsSelectors.ts
-  const playerMaxTraitSlots = useAppSelector(selectPlayerMaxTraitSlots); // Get player's max trait slots
+  const playerTraitSlots = useAppSelector(selectPlayerTraitSlots);
+  const equippedTraitObjects = useAppSelector(selectEquippedTraitObjects);
+  const playerMaxTraitSlots = useAppSelector(selectPlayerMaxTraitSlots);
   const permanentTraits = useAppSelector(selectPermanentTraitObjects);
   const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const loading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   const currentEssence = useAppSelector(selectCurrentEssence);
+  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC); // Get proximity status from MetaSlice
 
   // Memoized data derivations for UI
   const equippedTraitIds = useAppSelector(selectPlayerEquippedTraitIds); // Get equipped trait IDs from PlayerSelectors
@@ -146,6 +148,7 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
     availableTraitsForEquip,
     currentEssence,
     playerMaxTraitSlots, // Pass player's max trait slots
+    isInProximityToNPC, // Pass proximity status
     
     // Status
     loading,

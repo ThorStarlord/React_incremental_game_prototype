@@ -40,6 +40,7 @@ export interface TraitSlotsProps {
   // Actions
   onEquipTrait: (traitId: string, slotIndex: number) => void;
   onUnequipTrait: (slotIndex: number) => void; // Changed from slotId: string
+  isInProximityToNPC: boolean; // Added for proximity-based trait management
 }
 
 /**
@@ -51,7 +52,8 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
   equippedTraits,
   availableTraits,
   onEquipTrait,
-  onUnequipTrait
+  onUnequipTrait,
+  isInProximityToNPC // Destructure new prop
 }) => {
   const [selectedSlotIndex, setSelectedSlotIndex] = React.useState<number | null>(null);
   const [unequipDialog, setUnequipDialog] = React.useState<{
@@ -61,6 +63,7 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
   }>({ open: false });
 
   const handleSlotClick = useCallback((slot: TraitSlot, index: number) => {
+    if (!isInProximityToNPC) return; // Disable if not in proximity
     if (!slot.isUnlocked) return;
     
     if (slot.traitId) {
@@ -77,7 +80,7 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
       // Empty slot - show trait selection
       setSelectedSlotIndex(index);
     }
-  }, [equippedTraits]);
+  }, [equippedTraits, isInProximityToNPC]);
 
   const handleTraitSelect = useCallback((traitId: string) => {
     if (selectedSlotIndex !== null) {
@@ -132,11 +135,11 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
         <Card
           sx={{
             minHeight: 120,
-            cursor: 'pointer',
+            cursor: isInProximityToNPC ? 'pointer' : 'not-allowed',
             transition: 'all 0.2s',
             '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: 3
+              transform: isInProximityToNPC ? 'translateY(-2px)' : 'none',
+              boxShadow: isInProximityToNPC ? 3 : 'none'
             },
             border: 2,
             borderColor: 'primary.main'
@@ -148,7 +151,7 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', flexGrow: 1 }}>
                 {trait.name}
               </Typography>
-              <IconButton size="small" color="error" aria-label="Unequip trait">
+              <IconButton size="small" color="error" aria-label="Unequip trait" disabled={!isInProximityToNPC}>
                 <ClearIcon fontSize="small" />
               </IconButton>
             </Box>
@@ -185,18 +188,18 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
           bgcolor: 'background.paper',
           minHeight: 120,
           justifyContent: 'center',
-          cursor: 'pointer',
+          cursor: isInProximityToNPC ? 'pointer' : 'not-allowed',
           transition: 'all 0.2s',
           '&:hover': {
-            borderColor: 'primary.main',
-            bgcolor: 'primary.50'
+            borderColor: isInProximityToNPC ? 'primary.main' : 'grey.400',
+            bgcolor: isInProximityToNPC ? 'primary.50' : 'background.paper'
           }
         }}
         onClick={() => handleSlotClick(slot, slot.index)}
       >
-        <AddIcon color="action" />
+        <AddIcon color={isInProximityToNPC ? "action" : "disabled"} />
         <Typography variant="caption" color="text.secondary" align="center">
-          Click to equip trait
+          {isInProximityToNPC ? 'Click to equip trait' : 'Must be near an NPC to manage traits'}
         </Typography>
       </Box>
     );
@@ -229,6 +232,12 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
         </Tooltip>
       </Box>
 
+      {!isInProximityToNPC && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          You must be in close proximity to an NPC to manage your trait slots (equip/unequip).
+        </Alert>
+      )}
+
       {traitSlots.length === 0 ? (
         <Alert severity="info">
           No trait slots available. Unlock slots by leveling up or earning Essence.
@@ -259,6 +268,11 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
           Select Trait to Equip
         </DialogTitle>
         <DialogContent>
+          {!isInProximityToNPC && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              You must be in close proximity to an NPC to equip traits.
+            </Alert>
+          )}
           {getAvailableTraitsForSlot().length === 0 ? (
             <Alert severity="info">
               No traits available to equip. Acquire traits from NPCs or other sources.
@@ -267,7 +281,7 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
             <List>
               {getAvailableTraitsForSlot().map((trait) => (
                 <ListItem key={trait.id} disablePadding>
-                  <ListItemButton onClick={() => handleTraitSelect(trait.id)}>
+                  <ListItemButton onClick={() => handleTraitSelect(trait.id)} disabled={!isInProximityToNPC}>
                     <ListItemText
                       primary={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -303,6 +317,11 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
           Unequip Trait
         </DialogTitle>
         <DialogContent>
+          {!isInProximityToNPC && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              You must be in close proximity to an NPC to unequip traits.
+            </Alert>
+          )}
           <Typography>
             Are you sure you want to unequip "{unequipDialog.trait?.name}"?
           </Typography>
@@ -314,7 +333,7 @@ export const TraitSlots: React.FC<TraitSlotsProps> = React.memo(({
           <Button onClick={() => setUnequipDialog({ open: false })}>
             Cancel
           </Button>
-          <Button onClick={handleUnequipConfirm} variant="contained" color="warning">
+          <Button onClick={handleUnequipConfirm} variant="contained" color="warning" disabled={!isInProximityToNPC}>
             Unequip
           </Button>
         </DialogActions>

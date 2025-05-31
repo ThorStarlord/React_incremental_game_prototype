@@ -10,6 +10,7 @@ const initialState: MetaState = {
   isImported: false,
   gameVersion: '0.1.0', // Default game version
   sessionStartTime: Date.now(),
+  isInProximityToNPC: false, // Initialize proximity to false
 };
 
 // Create the meta slice
@@ -47,7 +48,15 @@ const metaSlice = createSlice({
      */
     resetSessionStartTime: (state) => {
         state.sessionStartTime = Date.now();
-    }
+    },
+    /**
+     * Sets the player's proximity status to an NPC.
+     * @param state - The current meta state.
+     * @param action - The action containing the boolean payload.
+     */
+    setIsInProximityToNPC: (state, action: PayloadAction<boolean>) => {
+      state.isInProximityToNPC = action.payload;
+    },
   },
 });
 
@@ -56,7 +65,8 @@ export const {
   updateLastSaved, 
   updateGameMetadata, 
   setGameVersion, 
-  resetSessionStartTime 
+  resetSessionStartTime,
+  setIsInProximityToNPC // Export new action
 } = metaSlice.actions;
 
 // Export selectors
@@ -66,6 +76,7 @@ export const selectCurrentSaveId = (state: RootState) => state.meta.currentSaveI
 export const selectIsImported = (state: RootState) => state.meta.isImported;
 export const selectGameVersion = (state: RootState) => state.meta.gameVersion;
 export const selectSessionStartTime = (state: RootState) => state.meta.sessionStartTime;
+export const selectIsInProximityToNPC = (state: RootState) => state.meta.isInProximityToNPC; // New selector
 
 // Export the reducer as the default export
 export default metaSlice.reducer;

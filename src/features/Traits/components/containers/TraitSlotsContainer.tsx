@@ -3,6 +3,7 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectTraits, selectPermanentTraits, selectAvailableTraitObjects, selectTraitLoading, selectTraitError } from '../../state/TraitsSelectors';
 import { makeTraitPermanentThunk } from '../../state/TraitThunks';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
+import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice'; // Import the new selector
 import { selectTraitSlots, selectEquippedTraitIds } from '../../../Player/state/PlayerSelectors'; // Import selectors from PlayerSelectors
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice'; // Import actions from PlayerSlice
 import TraitSlots from '../ui/TraitSlots';
@@ -17,6 +18,7 @@ const TraitSlotsContainer: React.FC = () => {
   const availableTraits = useAppSelector(selectAvailableTraitObjects);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
+  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC); // Get proximity status
 
   const [showSelector, setShowSelector] = useState(false);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
@@ -89,7 +91,8 @@ const TraitSlotsContainer: React.FC = () => {
     onMakePermanent,
     onConfirmPermanent,
     onCancelPermanent,
-    onCloseNotification
+    onCloseNotification,
+    isInProximityToNPC // Pass proximity status
   };
 
   // Handle loading and error states before rendering TraitSlots
