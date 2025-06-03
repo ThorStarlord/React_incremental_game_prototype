@@ -41,15 +41,17 @@ import { selectNPCById } from '../../../state/NPCSelectors'; // Corrected path
 import { updateNpcRelationship } from '../../../state/NPCSlice'; // Corrected path
 import { shareTraitWithNPCThunk } from '../../../state/NPCThunks'; // Corrected path
 import { acquireTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks'; // Corrected path
-import { selectTraits } from '../../../../Traits/state/TraitsSelectors'; // Corrected path
-import { selectAcquiredTraitObjects, selectPermanentTraitObjects } from '../../../../Traits/state/TraitsSelectors'; // Corrected path
+import { selectTraits, selectPlayerTrulyPossessedTraitObjects } from '../../../../Traits/state/TraitsSelectors'; // Corrected path
+// Removed selectAcquiredTraitObjects, selectPermanentTraitObjects as they will be replaced
 import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors'; // Corrected path
 import { selectIsInProximityToNPC } from '../../../../Meta/state/MetaSlice'; // Corrected path
+import { selectPermanentTraits as selectPlayerSlicePermanentTraitIds } from '../../../../Player/state/PlayerSelectors'; // Import player's permanent trait IDs
 import { NPC } from '../../../state/NPCTypes'; // Corrected path
 import { Trait } from '../../../../Traits/state/TraitsTypes'; // Corrected path
 
 interface NPCTraitsTabProps {
   npcId: string;
+  onInteraction: (data: { traitId: string; actionType: 'acquire' | 'share' | 'unshare' }) => void;
 }
 
 interface TraitAcquisitionDialog {
@@ -64,8 +66,10 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   // Redux selectors
   const npc = useAppSelector(state => selectNPCById(state, npcId)) as NPC;
   const allTraits = useAppSelector(selectTraits);
-  const playerAcquiredTraits = useAppSelector(selectAcquiredTraitObjects);
-  const playerPermanentTraits = useAppSelector(selectPermanentTraitObjects);
+  // Use the new selector for traits player truly possesses according to PlayerSlice
+  const playerPossessedTraits = useAppSelector(selectPlayerTrulyPossessedTraitObjects); 
+  // Get permanent trait IDs directly from PlayerSlice for consistent filtering
+  const playerPermanentTraitIdsFromPlayerSlice = useAppSelector(selectPlayerSlicePermanentTraitIds);
   const currentEssence = useAppSelector(selectCurrentEssence);
   const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC);
   
@@ -75,18 +79,16 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     trait: null,
     traitId: null,
   });
+  const [shareError, setShareError] = useState<string | null>(null);
+  const [acquireError, setAcquireError] = useState<string | null>(null);
 
-  // Get player's acquired trait IDs for easy checking
+  // Get player's acquired trait IDs for easy checking (from playerPossessedTraits)
   const playerAcquiredTraitIds = useMemo(() => 
-    playerAcquiredTraits.map((trait: Trait) => trait.id),
-    [playerAcquiredTraits]
+    playerPossessedTraits.map((trait: Trait) => trait.id),
+    [playerPossessedTraits]
   );
 
-  // Get player's permanent trait IDs for easy checking
-  const playerPermanentTraitIds = useMemo(() => 
-    playerPermanentTraits.map((trait: Trait) => trait.id),
-    [playerPermanentTraits]
-  );
+  // playerPermanentTraitIds will now directly use playerPermanentTraitIdsFromPlayerSlice (which is already an array of IDs)
 
   // Get NPC's available traits with full details
   const availableTraitsDetails = useMemo(() => {
@@ -98,10 +100,11 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
       .filter((trait: Trait | undefined) => trait !== undefined) as Trait[];
   }, [npc.availableTraits, allTraits]);
   
-  // Get traits player can share (acquired traits not already shared)
+  // Get traits player can share
   const sharedTraitIds = npc.sharedTraitSlots?.map((slot: { traitId?: string | null }) => slot.traitId).filter(Boolean) || [];
-  const shareableTraits = playerAcquiredTraits.filter((trait: Trait) => 
-    !sharedTraitIds.includes(trait.id) && !playerPermanentTraitIds.includes(trait.id)
+  const shareableTraits = playerPossessedTraits.filter((trait: Trait) => 
+    !sharedTraitIds.includes(trait.id) && 
+    !playerPermanentTraitIdsFromPlayerSlice.includes(trait.id) // Use permanent IDs from PlayerSlice
   );
 
   // Check if player can acquire a trait
@@ -121,6 +124,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
 
   // Handle trait acquisition
   const handleAcquireTrait = useCallback(async (traitId: string) => {
+    setAcquireError(null); // Clear previous error
     try {
       await dispatch(acquireTraitWithEssenceThunk(traitId)).unwrap();
       
@@ -130,25 +134,47 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
         change: 5,
         reason: `Resonated trait from ${npc.name}`,
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to acquire trait:', error);
+      setAcquireError(error?.message || (typeof error === 'string' ? error : 'Failed to acquire trait.'));
     }
   }, [dispatch, npcId, npc.name]);
 
   // Handle trait sharing
-  const handleShareTrait = useCallback(async (traitId: string) => {
+  const handleShareTrait = useCallback(async (traitId: string, targetSlotIndex?: number) => {
+    setShareError(null); // Clear previous error
     try {
-      // Use npc.sharedTraits for count of currently shared traits
-      const usedSharedSlots = Object.keys(npc.sharedTraits || {}).length;
+      let actualSlotIndex: number;
+
+      if (traitId === '') { // This is an unshare operation
+        if (targetSlotIndex === undefined) {
+          console.error('Cannot unshare: targetSlotIndex is undefined.');
+          return;
+        }
+        actualSlotIndex = targetSlotIndex;
+      } else { // This is a share operation
+        // Find the first empty slot
+        const emptySlot = npc.sharedTraitSlots?.find(slot => slot.traitId === null);
+        if (emptySlot) {
+          actualSlotIndex = emptySlot.index;
+        } else {
+          // If no empty slots, use the next available index (append a new slot)
+          actualSlotIndex = npc.sharedTraitSlots?.length || 0;
+        }
+      }
+
       await dispatch(shareTraitWithNPCThunk({
         npcId,
         traitId,
-        slotIndex: usedSharedSlots, // This might need more sophisticated logic for actual slot management
+        slotIndex: actualSlotIndex,
       })).unwrap();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to share trait:', error);
+      // If error is an object with a message property, use that, otherwise use the error itself if it's a string.
+      const errorMessage = error?.message || (typeof error === 'string' ? error : 'Failed to share trait.');
+      setShareError(errorMessage);
     }
-  }, [dispatch, npcId, npc.sharedTraits]);
+  }, [dispatch, npcId, npc.sharedTraitSlots]);
 
   // Get button tooltip for trait acquisition
   const getLearnButtonTooltip = useCallback((trait: Trait, canAcquireNow: boolean, isAcquiredByPlayer: boolean): string => {
@@ -195,13 +221,18 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
       {/* Proximity Warning */}
       {!isInProximityToNPC && (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          You must be in proximity to this NPC to acquire traits.
+          You must be in proximity to this NPC to acquire or share traits effectively.
         </Alert>
       )}
 
       {/* NPC's Available Traits for Resonance */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
+          {acquireError && (
+            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setAcquireError(null)}>
+              {acquireError}
+            </Alert>
+          )}
           <Typography variant="h6" sx={{ mb: 2 }}>
             Traits Available from {npc.name} for Resonance
           </Typography>
@@ -273,6 +304,11 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
       {/* Shared Trait Slots */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
+          {shareError && (
+            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setShareError(null)}>
+              {shareError}
+            </Alert>
+          )}
           <Typography variant="h6" sx={{ mb: 2 }}>
             Shared Trait Slots
           </Typography>
@@ -297,7 +333,7 @@ export const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                           <Button
                             size="small"
                             color="error"
-                            onClick={() => handleShareTrait('')} // Empty string to unshare
+                            onClick={() => handleShareTrait('', slot.index)} // Pass slot.index for unsharing
                             sx={{ mt: 1 }}
                           >
                             Remove

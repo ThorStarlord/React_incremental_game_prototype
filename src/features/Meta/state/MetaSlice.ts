@@ -10,7 +10,7 @@ const initialState: MetaState = {
   isImported: false,
   gameVersion: '0.1.0', // Default game version
   sessionStartTime: Date.now(),
-  isInProximityToNPC: false, // Initialize proximity to false
+  isInProximityToNPC: true, // Set proximity to true for testing
 };
 
 // Create the meta slice

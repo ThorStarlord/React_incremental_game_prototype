@@ -56,6 +56,7 @@ export * from './state/NPCSelectors';
 
 // Components - Only export components that actually exist
 export { default as NPCListView } from './components/containers/NPCListView';
+export { default as NPCPanelContainer } from './components/containers/NPCPanelContainer';
 
 // Mock data - Export the actual mockNPCs export
 export { mockNPCs } from './data/mockNPCData';

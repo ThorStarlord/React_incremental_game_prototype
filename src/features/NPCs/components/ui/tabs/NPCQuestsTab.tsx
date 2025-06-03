@@ -12,20 +12,25 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider
+  Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
 import {
   Assignment as QuestIcon,
   CheckCircle as CompleteIcon,
   RadioButtonUnchecked as IncompleteIcon,
   Star as RewardIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCQuestsTabProps {
   npc: NPC;
   relationshipLevel: number;
+  onInteraction: (data: { questId: string; actionType: 'accept' | 'complete' }) => void;
 }
 
 // Mock quest data for demonstration
@@ -128,20 +133,11 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npc, relationshi
           const readyToComplete = isQuestReady(quest);
 
           return (
-            <Card key={quest.id} sx={{ overflow: 'visible' }}>
-              <CardContent>
-                {/* Quest Header */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" gutterBottom>
-                      {quest.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      {quest.description}
-                    </Typography>
-                  </Box>
-                  
-                  <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+            <Accordion key={quest.id} sx={{ '&:before': { display: 'none' }, border: '1px solid', borderColor: 'divider' }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                  <Typography variant="h6">{quest.title}</Typography>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
                     <Chip 
                       label={quest.difficulty} 
                       color={getDifficultyColor(quest.difficulty) as any}
@@ -155,6 +151,11 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npc, relationshi
                     />
                   </Box>
                 </Box>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0 }}> {/* Remove default padding top from details */}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {quest.description}
+                </Typography>
 
                 {/* Quest Objectives */}
                 <Box sx={{ mb: 2 }}>
@@ -220,7 +221,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npc, relationshi
                 </Box>
 
                 {/* Quest Actions */}
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt:2 }}>
                   {quest.status === 'available' && (
                     <Button 
                       variant="contained" 
@@ -249,8 +250,8 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npc, relationshi
                     />
                   )}
                 </Box>
-              </CardContent>
-            </Card>
+              </AccordionDetails>
+            </Accordion>
           );
         })}
       </Box>

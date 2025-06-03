@@ -24,7 +24,8 @@ import {
 import { 
   selectEquippedTraitIds as selectPlayerEquippedTraitIds,
   selectTraitSlots as selectPlayerTraitSlots,
-  selectMaxTraitSlots as selectPlayerMaxTraitSlots
+  selectMaxTraitSlots as selectPlayerMaxTraitSlots,
+  selectPermanentTraits as selectPlayerSlicePermanentTraitIds // Import player's permanent trait IDs
 } from '../../Player/state/PlayerSelectors';
 
 // Basic selectors (re-exports from TraitsSlice for consistency)
@@ -162,6 +163,20 @@ export const selectAvailableTraitSlotCount = createSelector(
   [selectTraitSlots],
   (slots): number => {
     return slots.filter((slot: TraitSlot) => slot.isUnlocked && !slot.traitId).length;
+  }
+);
+
+/**
+ * Selects Trait objects that the player truly possesses (equipped or permanent on the player character).
+ * This is the definitive list for actions like sharing.
+ */
+export const selectPlayerTrulyPossessedTraitObjects = createSelector(
+  [selectTraits, selectPlayerEquippedTraitIds, selectPlayerSlicePermanentTraitIds],
+  (allTraits, equippedIds, playerPermanentIds): Trait[] => {
+    const possessedIds = Array.from(new Set([...equippedIds, ...playerPermanentIds]));
+    return possessedIds
+      .map(id => allTraits[id])
+      .filter(Boolean) as Trait[];
   }
 );
 

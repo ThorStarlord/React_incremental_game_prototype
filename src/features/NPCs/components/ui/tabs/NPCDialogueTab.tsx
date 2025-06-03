@@ -11,6 +11,7 @@ import { selectNPCDialogueHistory } from '../../../state/NPCSelectors'; // Corre
 
 interface NPCDialogueTabProps {
   npc: NPC;
+  onInteraction: (data: { choiceId: string; playerText: string }) => void;
 }
 
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {

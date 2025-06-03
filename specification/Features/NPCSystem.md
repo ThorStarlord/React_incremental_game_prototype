@@ -27,7 +27,7 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 *   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions.
 *   **Emotional Connections (Connection Depth):** NPCs exhibit a range of emotions and can form deep connections with the player. This connection is quantified by the `connectionDepth` stat, which affects their behavior, dialogue, and contributes to passive Essence generation.
 *   **Trait Acquisition (Resonance):** Players acquire traits *from* NPCs (and other targets) using the Resonance ability. Acquisition is limited only by **Essence cost** and **physical proximity** to the NPC.
-*   **Trait Sharing:** Players can share their acquired traits *with* NPCs, which can influence NPC behavior or relationships.
+*   **Trait Sharing:** Players can share their acquired traits *with* NPCs, which can influence NPC behavior or relationships. **(Relationship level limitation for sharing has been removed for testing purposes.)**
 *   **Social Interactions:** NPCs can interact with each other and the player in a variety of social contexts, including trading, gifting, and collaborative activities.
 
 ## 3. Technical Specifications
@@ -70,7 +70,7 @@ The NPC interaction system uses the standardized MUI tabs pattern established in
 *   **Dialogue Tab:** ✅ **IMPLEMENTED** - Conversation interface with simulated NPC responses (unlocked at relationship level 1+)
 *   **Trade Tab:** ✅ **IMPLEMENTED** - Commerce interface with relationship-based pricing discounts (unlocked at relationship level 2+)
 *   **Quests Tab:** ✅ **IMPLEMENTED** - Quest management with progress tracking and reward display (unlocked at relationship level 3+)
-*   **Traits Tab:** ✅ **IMPLEMENTED** - Trait acquisition and sharing interface with comprehensive slot management (unlocked at relationship level 4+)
+*   **Traits Tab:** ✅ **IMPLEMENTED** - Trait acquisition and sharing interface with comprehensive slot management (unlocked at relationship level 0+ for testing purposes)
 
 #### Accessibility Features ✅ IMPLEMENTED
 *   **Keyboard Navigation:** Full arrow key and tab navigation support
@@ -128,7 +128,7 @@ Comprehensive NPC information display:
 
 **NPCTraitsTab:** ✅ **IMPLEMENTED**
 - **Trait acquisition interface for "Available Traits" (traits player can acquire from this NPC via Resonance). Acquisition is limited only by Essence cost and physical proximity to the NPC.**
-- Shared trait slot management system for "Shared Traits" (traits player has shared with this NPC).
+- Shared trait slot management system for "Shared Traits" (traits player has shared with this NPC). **The `NPCSlice` reducer now handles updating the NPC's `sharedTraitSlots` array when a trait is shared or unshared.**
 - Player trait sharing capabilities.
 - Acquisition validation and cost transparency.
 
@@ -168,6 +168,7 @@ interface NPCState {
   relationshipHistory: RelationshipChangeEntry[]; // Renamed from relationshipChanges
   loading: boolean;
   error: string | null;
+  selectedNPCId: string | null; // Added to track the currently selected NPC in the UI
 }
 ```
 
@@ -179,6 +180,7 @@ interface NPCState {
 *   **completeDialogueTopic:** Marks a dialogue topic as completed for a specific NPC, moving it from availableDialogues to completedDialogues.
 *   **startInteraction / endInteraction:** Manage the current interaction session.
 *   **clearError:** Clears error states.
+*   **selectNPC:** Sets the currently selected NPC ID in the state.
 
 #### Selectors
 *   **selectNPCById:** Retrieves an NPC by their ID.
@@ -186,6 +188,7 @@ interface NPCState {
 *   **selectNPCRelationships:** Selects relationship data for NPCs.
 *   **selectNPCInteractions:** Selects interaction logs for NPCs.
 *   **selectNPCDialogueHistory:** Selects dialogue history for a specific NPC.
+*   **selectSelectedNPCId:** Selects the ID of the currently selected NPC.
 
 ### 7.2. NPCThunks.ts
 
@@ -239,7 +242,7 @@ export const processDialogueChoiceThunk = createAsyncThunk<
 - **Discovery System:** NPC discovery with validation and duplicate prevention
 - **Session Management:** Interaction session start/end with availability checking
 - **Dialogue Processing:** Dynamic dialogue choice handling with relationship consequences, **including player messages in history and relationship-based NPC responses.**
-- **Trait Sharing:** NPC trait sharing with relationship level validation
+- **Trait Sharing:** NPC trait sharing with relationship level validation **(Relationship level validation has been removed for testing purposes.)**
 - **Error Handling:** Comprehensive error management with rejectWithValue patterns
 - **State Coordination:** Cross-system integration with essence and trait systems
 

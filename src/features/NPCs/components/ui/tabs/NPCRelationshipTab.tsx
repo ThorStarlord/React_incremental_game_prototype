@@ -16,73 +16,53 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon
+  ListItemIcon,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
 import {
   Favorite,
   TrendingUp,
   History,
   EmojiEvents,
-  Schedule
+  Schedule,
+  ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 import type { NPC, RelationshipChangeEntry } from '../../../state/NPCTypes';
+import { 
+  RELATIONSHIP_TIERS, 
+  getRelationshipTier as getCentralRelationshipTierInfo, // Renamed to avoid conflict if any local one was kept temporarily
+  getTierBenefits 
+} from '../../../../../config/relationshipConstants'; // Import centralized constants
 
 interface NPCRelationshipTabProps {
   npc: NPC;
   relationshipChanges?: RelationshipChangeEntry[];
   onImproveRelationship?: (npcId: string) => void;
+  onRelationshipChange: (change: number, reason: string) => void;
 }
 
-// Local utilities for relationship calculations
-const RELATIONSHIP_THRESHOLDS = {
-  HOSTILE: -75,
-  UNFRIENDLY: -25,
-  NEUTRAL: 0,
-  FRIENDLY: 25,
-  ALLY: 50,
-  DEVOTED: 75,
-  SOULMATE: 100
-} as const;
-
-const getRelationshipTier = (value: number): string => {
-  if (value >= 100) return 'Soulmate';
-  if (value >= 75) return 'Devoted';
-  if (value >= 50) return 'Ally';
-  if (value >= 25) return 'Friendly';
-  if (value >= 0) return 'Neutral';
-  if (value >= -25) return 'Unfriendly';
-  return 'Hostile';
-};
+// Local utilities are now removed, will use centralized ones.
 
 const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({ 
   npc, 
   relationshipChanges = [],
   onImproveRelationship 
 }) => {
-  const currentTier = getRelationshipTier(npc.relationshipValue);
-  const percentage = Math.max(0, (npc.relationshipValue + 100) / 2);
-  
-  const getNextThreshold = (): number => {
-    const thresholds = Object.values(RELATIONSHIP_THRESHOLDS).sort((a, b) => a - b);
-    return thresholds.find((threshold: number) => threshold > npc.relationshipValue) || 100;
-  };
-
-  const nextThreshold = getNextThreshold();
-  const progressToNext = nextThreshold < 100 ? Math.max(0, (npc.relationshipValue - (nextThreshold - 25)) / 25 * 100) : 100;
+  const currentTierInfo = getTierBenefits(npc.relationshipValue);
+  const currentTierName = currentTierInfo.name;
+  // The percentage for the main progress bar can represent overall progress from -100 to 100.
+  // Or, it could represent progress within the current tier towards the next.
+  // Let's keep the existing overall progress for the main bar.
+  const overallPercentage = Math.max(0, (npc.relationshipValue + 100) / 200 * 100); // Assumes -100 to 100 range
 
   const recentChanges = relationshipChanges
     .filter(change => change.npcId === npc.id)
     .slice(-5)
     .reverse();
 
-  const getUnlockAtLevel = (level: number): string[] => {
-    const unlocks: string[] = [];
-    if (level >= 25) unlocks.push('Advanced Dialogue', 'Basic Quest Access');
-    if (level >= 50) unlocks.push('Trade Discounts', 'Personal Stories', 'Trait Acquisition');
-    if (level >= 75) unlocks.push('Deep Conversations', 'Major Quests', 'Trait Sharing');
-    if (level >= 100) unlocks.push('Intimate Bond', 'Exclusive Content', 'Maximum Benefits');
-    return unlocks;
-  };
+  // getUnlockAtLevel is replaced by currentTierInfo.benefits and iterating through RELATIONSHIP_TIERS
 
   return (
     <Box sx={{ p: 2 }}>
@@ -99,7 +79,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                   <Typography variant="body1" fontWeight="medium">
-                    {currentTier}
+                    {currentTierName}
                   </Typography>
                   <Typography variant="h5" color="primary">
                     {npc.relationshipValue}/100
@@ -108,17 +88,31 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                 
                 <LinearProgress
                   variant="determinate"
-                  value={percentage}
-                  sx={{ height: 8, borderRadius: 4, mb: 2 }}
+                  value={overallPercentage}
+                  sx={{ 
+                    height: 8, 
+                    borderRadius: 4, 
+                    mb: 2,
+                    backgroundColor: 'action.hover', // A neutral track color from the theme
+                    ...(currentTierInfo.color && {
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: currentTierInfo.color,
+                      },
+                    }),
+                  }}
+                  // Fallback color prop if currentTierInfo.color is not defined, though sx should handle it.
+                  // If currentTierInfo.color is always defined, this color prop might not be strictly necessary
+                  // but acts as a safe default if sx somehow doesn't apply.
+                  color={!currentTierInfo.color ? 'primary' : undefined}
                 />
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant="caption" color="text.secondary">
-                    Progress: {Math.round(percentage)}%
+                    Overall Progress: {Math.round(overallPercentage)}%
                   </Typography>
-                  {nextThreshold < 100 && (
+                  {currentTierInfo.nextTier && currentTierInfo.pointsNeeded !== undefined && (
                     <Typography variant="caption" color="text.secondary">
-                      Next: {nextThreshold} ({nextThreshold - npc.relationshipValue} to go)
+                      Next: {currentTierInfo.nextTier.name} ({currentTierInfo.pointsNeeded} to go)
                     </Typography>
                   )}
                 </Box>
@@ -164,27 +158,28 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
 
         {/* Relationship Milestones */}
         <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+          <Accordion sx={{ '&:before': { display: 'none' }, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
                 <EmojiEvents sx={{ mr: 1 }} />
                 Relationship Milestones
               </Typography>
-
+            </AccordionSummary>
+            <AccordionDetails sx={{ pt: 0 }}>
               <List dense>
-                {Object.entries(RELATIONSHIP_THRESHOLDS).map(([tierName, threshold]) => {
-                  const thresholdValue = threshold as number;
+                {Object.values(RELATIONSHIP_TIERS).sort((a,b) => a.min - b.min).map((tier) => {
+                  const thresholdValue = tier.min;
                   const isUnlocked = npc.relationshipValue >= thresholdValue;
-                  const unlocks = getUnlockAtLevel(thresholdValue);
+                  const unlocks = getTierBenefits(thresholdValue).benefits; // Get benefits for this specific tier level
 
                   return (
                     <ListItem 
-                      key={tierName}
+                      key={tier.name}
                       sx={{ 
                         pl: 0,
                         opacity: isUnlocked ? 1 : 0.6,
-                        bgcolor: isUnlocked ? 'success.light' : 'transparent',
-                        borderRadius: 1,
+                        // bgcolor: isUnlocked ? 'success.light' : 'transparent', // Keep original styling or adjust
+                        // borderRadius: 1, // AccordionDetails will handle overall shape
                         mb: 1
                       }}
                     >
@@ -197,10 +192,10 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                         />
                       </ListItemIcon>
                       <ListItemText
-                        primary={tierName.replace('_', ' ').toLowerCase()}
+                        primary={tier.name}
                         secondary={unlocks.join(', ')}
                         primaryTypographyProps={{
-                          textTransform: 'capitalize',
+                          // textTransform: 'capitalize', // Name is already capitalized
                           fontWeight: isUnlocked ? 'medium' : 'normal'
                         }}
                       />
@@ -208,8 +203,8 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                   );
                 })}
               </List>
-            </CardContent>
-          </Card>
+            </AccordionDetails>
+          </Accordion>
         </Grid>
 
         {/* Recent Activity */}

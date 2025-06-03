@@ -18,27 +18,16 @@ import {
   Favorite as FavoriteIcon
 } from '@mui/icons-material';
 import type { NPC } from '../../state/NPCTypes';
+import { getRelationshipTier } from '../../../../config/relationshipConstants'; // Import centralized function
 
 interface NPCHeaderProps {
   npc: NPC;
 }
 
 const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
-  const getRelationshipColor = (value: number): 'success' | 'info' | 'warning' | 'primary' => {
-    if (value >= 75) return 'success';
-    if (value >= 50) return 'info';
-    if (value >= 25) return 'warning';
-    return 'primary';
-  };
-
-  const getRelationshipLabel = (value: number) => {
-    if (value >= 90) return 'Beloved';
-    if (value >= 75) return 'Trusted';
-    if (value >= 50) return 'Ally';
-    if (value >= 25) return 'Friend';
-    if (value >= 10) return 'Acquaintance';
-    return 'Neutral';
-  };
+  // Local getRelationshipColor and getRelationshipLabel are removed.
+  // We will use the tier information from getRelationshipTier.
+  const currentRelationshipTier = getRelationshipTier(npc.relationshipValue);
 
   return (
     <Paper 
@@ -120,9 +109,9 @@ const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
           
           <Box sx={{ mb: 1 }}>
             <Chip
-              label={getRelationshipLabel(npc.relationshipValue)}
-              color={getRelationshipColor(npc.relationshipValue)}
+              label={currentRelationshipTier.name}
               size="small"
+              sx={{ backgroundColor: currentRelationshipTier.color, color: '#fff' }} // Use custom color
             />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               Level {npc.relationshipValue}/100
@@ -131,12 +120,14 @@ const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
 
           <LinearProgress
             variant="determinate"
-            value={npc.relationshipValue}
-            color={getRelationshipColor(npc.relationshipValue)}
+            value={Math.max(0, (npc.relationshipValue + 100) / 200 * 100)} // Normalize value for progress bar if needed
             sx={{ 
               height: 8, 
               borderRadius: 4,
-              backgroundColor: 'rgba(0,0,0,0.1)'
+              backgroundColor: 'action.hover', // Neutral track color
+              '& .MuiLinearProgress-bar': {
+                backgroundColor: currentRelationshipTier.color, // Custom bar color
+              },
             }}
           />
 

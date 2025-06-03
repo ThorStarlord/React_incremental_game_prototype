@@ -159,6 +159,9 @@ const npcSlice = createSlice({
         }
       }
     },
+    selectNPC: (state, action: PayloadAction<string | null>) => {
+      state.selectedNPCId = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -250,10 +253,12 @@ const npcSlice = createSlice({
 
       .addCase(shareTraitWithNPCThunk.fulfilled, (state, action: PayloadAction<InteractionResult, string, { arg: ShareTraitPayload; requestId: string; requestStatus: "fulfilled"; }, never>) => {
         const result = action.payload;
-        const { npcId } = action.meta.arg;
-        if (result.affinityDelta) {
-          const npc = state.npcs[npcId];
-          if (npc) {
+        const { npcId, traitId, slotIndex } = action.meta.arg; // Destructure traitId and slotIndex
+        
+        const npc = state.npcs[npcId];
+        if (npc) {
+          // Update relationship if affinityDelta is present
+          if (result.affinityDelta) {
             const oldValue = npc.relationshipValue;
             const newValue = Math.max(-100, Math.min(100, oldValue + result.affinityDelta));
             npc.relationshipValue = newValue;
@@ -267,19 +272,57 @@ const npcSlice = createSlice({
               reason: 'Trait sharing interaction'
             });
           }
+
+          // Ensure sharedTraitSlots array exists
+          if (!npc.sharedTraitSlots) {
+            npc.sharedTraitSlots = [];
+          }
+
+          // Find or create the slot
+          let targetSlot = npc.sharedTraitSlots.find(slot => slot.index === slotIndex);
+
+          if (traitId === '') { // Logic for unsharing (empty traitId)
+            if (targetSlot) {
+              targetSlot.traitId = null;
+            }
+          } else { // Logic for sharing
+            if (targetSlot) {
+              targetSlot.traitId = traitId;
+            } else {
+              // If slot doesn't exist, create a new one and push it
+              // Assuming isUnlocked is true and unlockRequirement is undefined for newly created slots via sharing
+              npc.sharedTraitSlots.push({
+                id: `${npcId}-shared-slot-${slotIndex}`, // Generate a unique ID for the slot
+                index: slotIndex,
+                traitId: traitId,
+                isUnlocked: true,
+                unlockRequirement: undefined,
+              });
+            }
+          }
         }
       })
 
       .addMatcher(
         (action): action is RejectedAction => action.type.endsWith('/rejected'),
         (state, action) => {
-          state.loading = false;
-          if (action.payload && typeof action.payload === 'string') {
-            state.error = action.payload;
-          } else if (action.error?.message) {
-            state.error = action.error.message;
+          // Only set the main 'loading' error for these specific thunks
+          if (action.type.startsWith('npcs/initializeNPCs/rejected') || action.type.startsWith('npcs/fetchNPCs/rejected')) {
+            state.loading = false;
+            if (action.payload && typeof action.payload === 'string') {
+              state.error = action.payload;
+            } else if (action.error?.message) {
+              state.error = action.error.message;
+            } else {
+              state.error = 'An unknown error occurred while loading NPCs.';
+            }
           } else {
-            state.error = 'An unknown error occurred in an NPC thunk';
+            // For other rejected thunks, ensure loading is false but don't set the main 'error'
+            // These should be handled locally by the component that dispatched them or use a different error state.
+            state.loading = false; 
+            console.warn(`NPC Thunk Rejected: ${action.type}`, action.payload || action.error);
+            // Optionally, you could set a different error field here if needed for specific UI feedback,
+            // e.g., state.interactionError = (action.payload as string) || action.error?.message || 'Interaction failed';
           }
         }
       );
@@ -299,7 +342,11 @@ export const {
   addDialogueEntry,
   clearError,
   updateNpcConnectionDepth,
-  completeDialogueTopic // Export new action
+  completeDialogueTopic,
+  selectNPC // Keep selectNPC here for now, but also export actions object
 } = npcSlice.actions;
 
+export const npcActions = npcSlice.actions; // Export all actions as a single object
+
+export { npcSlice }; // Export the slice object itself
 export default npcSlice.reducer;

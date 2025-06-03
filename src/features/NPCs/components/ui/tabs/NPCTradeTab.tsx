@@ -21,6 +21,7 @@ import type { NPC } from '../../../state/NPCTypes';
 interface NPCTradeTabProps {
   npc: NPC;
   relationshipLevel: number;
+  onInteraction: (data: { itemId: string; price: number }) => void;
 }
 
 // Mock trade items for demonstration

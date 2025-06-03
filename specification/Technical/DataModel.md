@@ -220,7 +220,7 @@ interface NPC {
   
   // Trait system integration
   traits?: Record<string, NPCTraitInfo>; // New optional in code, uses NPCTraitInfo
-  teachableTraits: string[];            // New in code
+  availableTraits: string[];            // Renamed from teachableTraits to align with NPCTypes.ts
   sharedTraitSlots?: NPCSharedTraitSlot[]; // New optional in code, array of NPCSharedTraitSlot
   
   // Commerce and services (placeholders in code)

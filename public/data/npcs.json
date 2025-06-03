@@ -17,7 +17,7 @@
     "availableQuests": ["quest_willow_ancient_seed"],
     "completedQuests": [],
     "traits": {},
-    "teachableTraits": ["WillowsWisdom", "EssenceFlow"],
+    "availableTraits": ["WillowsWisdom", "EssenceFlow"],
     "sharedTraitSlots": [],
     "inventory": { "items": [], "currency": 100 },
     "services": [
@@ -48,7 +48,7 @@
     "availableQuests": ["quest_elara_lost_tome"],
     "completedQuests": [],
     "traits": {},
-    "teachableTraits": ["ScholarlyInsight", "QuickLearner", "MentorsInsight"],
+    "availableTraits": ["ScholarlyInsight", "QuickLearner", "MentorsInsight"],
     "sharedTraitSlots": [],
     "inventory": { "items": [], "currency": 50 },
     "services": [
@@ -80,7 +80,7 @@
     "availableQuests": [],
     "completedQuests": [],
     "traits": {},
-    "teachableTraits": ["MasterCraftsman", "BattleHardened"],
+    "availableTraits": ["MasterCraftsman", "BattleHardened"],
     "sharedTraitSlots": [],
     "inventory": { "items": ["item_iron_sword", "item_steel_shield"], "currency": 200 },
     "services": [
@@ -111,7 +111,7 @@
     "availableQuests": ["quest_silas_retrieve_item"],
     "completedQuests": [],
     "traits": {},
-    "teachableTraits": ["ShadowWalker", "CombatReflexes", "LuckyCharm"],
+    "availableTraits": ["ShadowWalker", "CombatReflexes", "LuckyCharm"],
     "sharedTraitSlots": [],
     "inventory": { "items": ["item_lockpicks", "item_poison_vial"], "currency": 75 },
     "services": [
@@ -142,7 +142,7 @@
     "availableQuests": ["quest_valerius_patrol_duty"],
     "completedQuests": [],
     "traits": {},
-    "teachableTraits": ["IronWill", "BattleHardened", "SwiftStrikes"],
+    "availableTraits": ["IronWill", "BattleHardened", "SwiftStrikes"],
     "sharedTraitSlots": [],
     "inventory": { "items": [], "currency": 150 },
     "services": [

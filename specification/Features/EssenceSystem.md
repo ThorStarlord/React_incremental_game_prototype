@@ -9,7 +9,7 @@ This document outlines the design and mechanics of the Essence system in the gam
 *   **Purpose:** Essence fuels the player's unique abilities related to emotional connection, trait manipulation, and the creation/enhancement of Copies. It serves as the primary currency for advanced progression and interaction mechanics.
 *   **Core Loop:** Establish Emotional Connections -> Generate Essence passively -> Spend Essence on Influence, Trait Acquisition/Permanence, **Accelerated Copy Growth**, and potentially other upgrades.
 
-**UI Implementation**: ✅ **COMPLETE** - EssencePage provides comprehensive interface for all Essence-related functionality with integrated components and statistics tracking.
+**UI Implementation**: ✅ **COMPLETE** - EssencePage provides comprehensive interface for all Essence-related functionality with integrated components, statistics tracking, and a manual generation button for testing.
 
 ## 2. Essence Sources
 
@@ -25,7 +25,7 @@ This document outlines the design and mechanics of the Essence system in the gam
         *   **Connection Depth:** Deeper connections yield a higher generation rate.
         *   *(Formula TBD: e.g., `Rate = BaseTargetValue * ConnectionDepthMultiplier * GlobalModifiers`)*
 *   **Secondary Sources:**
-    *   **Manual Actions:** Potential for minor Essence gain through specific, focused actions (e.g., "Resonate" click action, minimal base gain).
+*   **Manual Actions:** Manual Essence gain through a dedicated button on the Essence Page for testing and prototyping.
     *   **Rewards:** One-time gains from completing significant quests, achievements, or overcoming major challenges.
     *   **Combat/Defeat:** Minor Essence gain from defeating enemies, representing absorbed potential (less significant than connections).
 
@@ -64,7 +64,7 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 **Comprehensive Essence Interface**: Complete page implementation integrating all Essence functionality
 - **Main Essence Display**: Current amount with visual representation using EssenceDisplay component
-- **Manual Generation**: Integrated BasicEssenceButton for testing and prototyping
+- **Manual Generation**: ✅ **IMPLEMENTED** - Integrated `ManualEssenceButton` for testing and prototyping
 - **Generation Tracking**: EssenceGenerationTimer component for passive generation monitoring
 - **Statistics Dashboard**: Complete overview of Essence metrics and generation rates
 - **NPC Connections**: Display of active connections contributing to generation
@@ -76,7 +76,7 @@ This document outlines the design and mechanics of the Essence system in the gam
 ```typescript
 // ✅ Integrated components
 <EssenceDisplay />           // Current Essence amount and visual representation
-<ManualEssenceButton />      // Manual Essence generation for testing (referred to as "BasicEssenceButton" in some specs)
+<ManualEssenceButton />      // ✅ IMPLEMENTED - Manual Essence generation button added to EssencePage.tsx
 <EssenceGenerationTimer />   // Passive generation rate tracking
 ```
 
@@ -132,7 +132,7 @@ This document outlines the design and mechanics of the Essence system in the gam
 *   **Current Essence Display**: ✅ **IMPLEMENTED** - Clear, prominent display of current Essence total with visual representation
 *   **Generation Rate Breakdown**: ✅ **IMPLEMENTED** - Detailed breakdown of current Essence generation rate with timer component
 *   **Connection Management**: ✅ **IMPLEMENTED** - Interface for viewing NPC connections and their contribution to generation
-*   **Manual Generation**: ✅ **IMPLEMENTED** - Testing interface with BasicEssenceButton for development and prototyping
+*   **Manual Generation**: ✅ **IMPLEMENTED** - Testing interface with `ManualEssenceButton` on EssencePage for development and prototyping
 *   **Statistics Tracking**: ✅ **NEWLY IMPLEMENTED** - Comprehensive metrics dashboard with current amount, total collected, generation rate, and per-click values
 *   **Cost Indication**: 📋 **READY FOR INTEGRATION** - Architecture prepared for clear indication of Essence costs for actions (tooltips, confirmation dialogs)
 *   **Visual Feedback**: ✅ **IMPLEMENTED** - Visual feedback for gaining/spending Essence through UI updates and number formatting
@@ -154,7 +154,7 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 ### 9.3. Development Status
 - **Current Functionality**: Complete UI for existing Essence features
-- **Testing Interface**: Manual generation button for development and testing
+- **Testing Interface**: ✅ **IMPLEMENTED** - Manual generation button (`ManualEssenceButton`) added to EssencePage for development and testing.
 - **Future Readiness**: Architecture prepared for advanced Essence mechanics
 - **Documentation**: Clear indication of implemented vs. planned features
 

@@ -237,6 +237,7 @@ export interface NPCState {
   relationshipHistory: RelationshipChangeEntry[]; // Renamed from relationshipChanges
   loading: boolean;
   error: string | null;
+  selectedNPCId: string | null; // Added to track the currently selected NPC in the UI
 }
 
 /**
@@ -250,7 +251,8 @@ export const DEFAULT_NPC_STATE: NPCState = {
   dialogueHistory: [],
   relationshipHistory: [], // Renamed from relationshipChanges
   loading: false,
-  error: null
+  error: null,
+  selectedNPCId: null // Initialize selectedNPCId to null
 };
 
 // ============================================================================

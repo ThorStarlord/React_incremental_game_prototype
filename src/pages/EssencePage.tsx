@@ -26,6 +26,7 @@ import {
 } from '../features/Essence';
 import { selectAllNPCs } from '../features/NPCs/state/NPCSelectors'; // Import NPC selector
 import { EssenceConnection } from '../features/Essence/state/EssenceTypes'; // Import EssenceConnection type
+import ManualEssenceButton from '../features/Essence/components/ui/ManualEssenceButton'; // Import ManualEssenceButton
 
 const EssencePage: React.FC = () => {
   const essence = useAppSelector(selectEssence);
@@ -140,6 +141,11 @@ const EssencePage: React.FC = () => {
               </Typography>
             </CardContent>
           </Card>
+        </Grid>
+
+        {/* Manual Essence Generation Button */}
+        <Grid item xs={12} md={4}>
+          <ManualEssenceButton />
         </Grid>
 
         <Grid item xs={12} md={4}>

@@ -45,6 +45,11 @@ export const selectRelationshipHistory = createSelector( // Renamed from selectR
   (npcState) => npcState.relationshipHistory || [] // Updated to relationshipHistory
 );
 
+export const selectSelectedNPCId = createSelector(
+  [selectNPCState],
+  (npcState) => npcState.selectedNPCId
+);
+
 // Note: Using dialogueHistory with proper property names from DialogueEntry interface
 export const selectInteractionHistory = createSelector(
   [selectDialogueHistory],

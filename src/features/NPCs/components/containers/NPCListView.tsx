@@ -46,7 +46,8 @@ import {
 import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
 import { NPC } from '../../state/NPCTypes';
-import { RELATIONSHIP_TIERS } from '../../../../config/relationshipConstants';
+// Import the centralized getRelationshipTier function
+import { getRelationshipTier as getCentralRelationshipTier } from '../../../../config/relationshipConstants'; 
 
 interface NPCListViewProps {
   onSelectNPC: (npcId: string) => void;
@@ -128,29 +129,12 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
     return npcList;
   }, [npcs, discoveredNPCIds, searchTerm, filterBy, sortBy]);
 
-  // Get relationship tier for an NPC
-  const getRelationshipTier = (relationshipValue: number) => {
-    const tiers = Object.values(RELATIONSHIP_TIERS);
-    return tiers.find((tier: any) => 
-      relationshipValue >= tier.min && relationshipValue <= tier.max
-    );
-  };
-
-  // Get relationship color
-  const getRelationshipColor = (relationshipValue: number) => {
-    const tier = getRelationshipTier(relationshipValue);
-    if (!tier) return 'default';
-    
-    if (relationshipValue >= 80) return 'error'; // Deep bond
-    if (relationshipValue >= 60) return 'warning'; // Close friend
-    if (relationshipValue >= 40) return 'success'; // Friend
-    if (relationshipValue >= 20) return 'primary'; // Acquaintance
-    return 'default'; // Stranger
-  };
+  // Local getRelationshipTier and getRelationshipColor are removed.
+  // We will use getCentralRelationshipTier which returns an object with name and color.
 
   // Render NPC card for grid view
   const renderNPCCard = (npc: NPC) => {
-    const tier = getRelationshipTier(npc.relationshipValue);
+    const currentTier = getCentralRelationshipTier(npc.relationshipValue);
     const isSelected = selectedNPCId === npc.id;
 
     return (
@@ -207,14 +191,14 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
                 size="small"
                 icon={<Favorite />}
                 label={`${npc.relationshipValue}`}
-                color={getRelationshipColor(npc.relationshipValue)}
+                sx={{ backgroundColor: currentTier.color, color: '#fff' }} // Use custom color
               />
-              {tier && (
+              {currentTier && (
                 <Chip
                   size="small"
-                  label={tier.name}
+                  label={currentTier.name}
                   variant="outlined"
-                  color={getRelationshipColor(npc.relationshipValue)}
+                  sx={{ borderColor: currentTier.color, color: currentTier.color }} // Use custom color for outline
                 />
               )}
               {npc.faction && (
@@ -249,7 +233,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
 
   // Render NPC list item for list view
   const renderNPCListItem = (npc: NPC) => {
-    const tier = getRelationshipTier(npc.relationshipValue);
+    const currentTier = getCentralRelationshipTier(npc.relationshipValue);
     const isSelected = selectedNPCId === npc.id;
 
     return (
@@ -286,14 +270,14 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
                   size="small"
                   icon={<Favorite />}
                   label={npc.relationshipValue}
-                  color={getRelationshipColor(npc.relationshipValue)}
+                  sx={{ backgroundColor: currentTier.color, color: '#fff' }} // Use custom color
                 />
-                {tier && (
+                {currentTier && (
                   <Chip
                     size="small"
-                    label={tier.name}
+                    label={currentTier.name}
                     variant="outlined"
-                    color={getRelationshipColor(npc.relationshipValue)}
+                    sx={{ borderColor: currentTier.color, color: currentTier.color }} // Use custom color for outline
                   />
                 )}
               </Box>

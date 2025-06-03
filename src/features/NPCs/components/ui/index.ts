@@ -3,7 +3,18 @@
  * @description Exports for NPC UI components
  */
 
-export { default as NPCHeader } from './NPCHeader';
+// Core UI Components
 export { default as NPCPanelUI } from './NPCPanelUI';
+export { default as NPCHeader } from './NPCHeader';
 export { default as RelationshipProgress } from './RelationshipProgress';
-export * from './tabs'; // Re-export all from the tabs sub-directory
+
+// Tab Components
+export { default as NPCOverviewTab } from './tabs/NPCOverviewTab';
+export { default as NPCDialogueTab } from './tabs/NPCDialogueTab';
+export { default as NPCTraitsTab } from './tabs/NPCTraitsTab';
+export { default as NPCQuestsTab } from './tabs/NPCQuestsTab';
+export { default as NPCTradeTab } from './tabs/NPCTradeTab';
+export { default as NPCRelationshipTab } from './tabs/NPCRelationshipTab';
+
+// Re-export types
+export type { NPCPanelUIProps } from './NPCPanelUI';

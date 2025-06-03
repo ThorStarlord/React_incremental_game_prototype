@@ -5,7 +5,7 @@ This document details the design and mechanics of the Trait system, which allows
 ## 1. Overview
 
 *   **Purpose:** Traits provide passive modifications to character stats, abilities, or game mechanics. They allow for build diversity, character customization, and influencing NPCs/**Copies**.
-*   **Core Loop:** Discover/Target -> Acquire -> Equip / Make Permanent / Share (with NPCs/**Copies**).
+*   **Core Loop:** Discover/Target -> Acquire -> Equip / Make Permanent / Share (with NPCs/**Copies**) ✅ **Sharing with NPCs Implemented**.
 
 **Implementation Status**: ✅ **UI IMPLEMENTED** - Complete trait management interface with click-based interactions, tabbed navigation, and accessibility features.
 
@@ -19,7 +19,7 @@ This document details the design and mechanics of the Trait system, which allows
 *   **Other Acquisition Methods:**
     *   Completing specific quests or achievements might grant certain traits directly.
     *   (Future) Research or crafting systems could yield traits.
-*   **Requirements:** Conditions needed before a trait can be acquired (applies mostly to non-resonance methods or specific resonance targets). Global prerequisite traits (defined on the trait itself in `traits.json`) still apply. Acquisition from NPCs is not gated by NPC relationship levels.
+*   **Requirements:** Conditions needed before a trait can be acquired (applies mostly to non-resonance methods or specific resonance targets). Global prerequisite traits (defined on the trait itself in `traits.json`) still apply. Acquisition of traits *from* NPCs (Resonance) is not gated by NPC relationship levels, only by proximity and Essence cost. Trait *sharing with* NPCs originally had a relationship level requirement, which has been removed for testing.
 
 ## 3. Trait Slots ✅ IMPLEMENTED
 
@@ -183,7 +183,7 @@ const traitTabs = [
 ### 8.2. Feature Interoperability ✅ DESIGNED
 - **Essence System**: The `Trait` data model includes `essenceCost` and `permanenceCost`. `makeTraitPermanentThunk` integrates with the Essence system for permanence. *Note: As mentioned in Section 2, direct Essence cost for initial acquisition via `acquireTrait` action is not yet implemented in the slice and would require a thunk.*
 - **Player System**: Ready to apply trait effects to player stats (handled by `PlayerSlice.recalculateStats`).
-- **NPC System**: Architecture prepared for trait sharing mechanics
+- **NPC System**: ✅ **IMPLEMENTED** - Trait sharing mechanics are now implemented. The `shareTraitWithNPCThunk` handles the action, and the `NPCSlice` reducer updates the NPC's `sharedTraitSlots` array. The relationship level requirement (previously 50) for sharing has been removed for testing purposes. The UI (`NPCTraitsTab`) allows players to share their traits with NPCs and view shared traits.
 - **Copy System**: Framework in place for trait inheritance
 
 ### 8.3. Navigation Integration ✅ PHASE 1 READY

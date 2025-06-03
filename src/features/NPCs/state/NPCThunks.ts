@@ -340,10 +340,10 @@ export const shareTraitWithNPCThunk = createAsyncThunk<
         return rejectWithValue(`NPC with ID ${npcId} not found`);
       }
 
-      // Check if player has sufficient relationship level
-      if (npc.relationshipValue < 50) {
-        return rejectWithValue('Insufficient relationship level for trait sharing');
-      }
+      // Check if player has sufficient relationship level (removed for testing)
+      // if (npc.relationshipValue < 50) {
+      //   return rejectWithValue('Insufficient relationship level for trait sharing');
+      // }
 
       // Check if player has the trait
       // Assuming player traits are stored in player slice, adjust path if necessary
