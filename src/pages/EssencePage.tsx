@@ -166,8 +166,13 @@ const EssencePage: React.FC = () => {
               {activeConnections.length > 0 && (
                 <Box sx={{ mt: 1 }}>
                   {activeConnections.map(connection => {
-                    // We already filtered for existing NPCs, so we can assert here
-                    const npc = allNPCs[connection.npcId]!; 
+                    const npc = allNPCs[connection.npcId]; 
+                    // Explicit check for npc, though filter should guarantee it exists
+                    if (!npc) {
+                      // This case should ideally not be reached if filter is correct
+                      console.warn(`NPC with ID ${connection.npcId} not found after filtering.`);
+                      return null; 
+                    }
                     return (
                       <Typography key={connection.npcId} variant="caption" display="block" color="text.secondary">
                         - {npc.name || connection.npcId}: {connection.connectionDepth.toFixed(1)} depth

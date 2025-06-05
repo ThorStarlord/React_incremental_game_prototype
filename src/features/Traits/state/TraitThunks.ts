@@ -6,64 +6,6 @@ import { acquireTrait as acquireTraitToGeneralPool } from './TraitsSlice'; // Re
 import { addPermanentTrait as addPermanentTraitToPlayer } from '../../Player/state/PlayerSlice';
 import { Trait, TraitEffect, TraitEffectValues } from './TraitsTypes';
 
-// const MAKE_PERMANENT_COST = 150; // This is now obsolete as "Resonate" (acquireTraitWithEssenceThunk) makes traits permanent.
-
-/**
- * Thunk for making a trait permanent (OLD SYSTEM - DEPRECATED / TO BE REMOVED)
- */
-/*
-export const makeTraitPermanentThunk = createAsyncThunk<
-  { success: boolean; message: string; traitId: string },
-  string,
-  { state: RootState }
->(
-  'traits/makePermanentThunk',
-  async (traitId: string, { getState, dispatch, rejectWithValue }) => {
-    const state = getState();
-    const currentEssence = state.essence.currentEssence;
-    const trait = state.traits.traits[traitId];
-    
-    if (!trait) {
-      return rejectWithValue("Trait not found.");
-    }
-    if (state.player.permanentTraits.includes(traitId)) {
-      return {
-        success: false,
-        message: "This trait is already a permanent part of you.",
-        traitId
-      };
-    }
-    // if (state.traits.permanentTraits.includes(traitId)) { // This referred to TraitsSlice.permanentTraits
-    //     // This condition might be redundant
-    // }
-
-    // if (currentEssence < MAKE_PERMANENT_COST) {
-    //   return rejectWithValue(`Insufficient essence (${MAKE_PERMANENT_COST} required, have ${currentEssence}).`);
-    // }
-    
-    try {
-      // dispatch(spendEssence({
-      //   amount: MAKE_PERMANENT_COST,
-      //   description: `Made ${trait.name} permanent (Old System)` 
-      // }));
-      // dispatch(makePermanent(traitId)); // makePermanent was from TraitsSlice
-      
-      return {
-        success: true,
-        message: `${trait.name} is now permanent! (Old System)`,
-        traitId
-      };
-    } catch (error) {
-      let errorMessage = 'Failed to make trait permanent (Old System)';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-*/
-
 /**
  * Thunk for acquiring a trait from an NPC via Resonance, making it PERMANENT for the player.
  */

@@ -90,13 +90,6 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
     dispatch(discoverTrait(traitId));
   }, [dispatch]);
 
-  // This function is deprecated as 'Resonate' now makes traits permanent.
-  const canMakePermanent = useCallback((trait: Trait): boolean => {
-    if (permanentTraitIds.includes(trait.id)) return false; 
-    if (!acquiredTraitIds.includes(trait.id)) return false; 
-    return false; 
-  }, [permanentTraitIds, acquiredTraitIds]);
-
   const canAcquireTrait = useCallback((trait: Trait): boolean => {
     if (acquiredTraitIds.includes(trait.id) || permanentTraitIds.includes(trait.id)) return false; 
     if (!discoveredTraitIds.includes(trait.id) && !trait.sourceNpc) return false; 
@@ -143,7 +136,6 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
         console.warn(`onMakeTraitPermanent called for ${traitId}, but this is deprecated. Use Resonate.`);
     },
     onDiscoverTrait: handleDiscoverTrait,
-    canMakePermanent, 
     canAcquireTrait,
     // Ensure the signature passed matches what TraitSystemUIProps expects for getTraitAffordability
     // If TraitSystemUIProps still expects (trait, action: 'acquire' | 'permanent'), 

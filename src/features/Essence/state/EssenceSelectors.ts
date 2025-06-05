@@ -54,13 +54,19 @@ export const selectEssenceError = createSelector(
 // Derived selectors
 export const selectEssenceStatistics = createSelector(
   [selectEssenceState],
-  (essence): EssenceStatistics => ({
-    currentAmount: essence.currentEssence,
-    totalCollected: essence.totalCollected,
-    generationRate: essence.generationRate,
-    perClickValue: essence.perClickValue,
-    activeConnections: 0, // TODO: Calculate from NPC connections
-  })
+  (essence): EssenceStatistics => {
+    const activeNpcConnections = Object.values(essence.npcConnections).filter(
+      connection => connection.connectionDepth > 0
+    ).length;
+
+    return {
+      currentAmount: essence.currentEssence,
+      totalCollected: essence.totalCollected,
+      generationRate: essence.generationRate,
+      perClickValue: essence.perClickValue,
+      activeConnections: activeNpcConnections,
+    };
+  }
 );
 
 export const selectCanAfford = createSelector(

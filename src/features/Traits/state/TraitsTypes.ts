@@ -66,9 +66,6 @@ export interface Trait {
 
   /** Level of the trait if traits can be leveled up (optional) */
   level?: number;
-
-  // /** Cost in permanence to acquire the trait (optional) */ // Obsolete: Resonance now makes traits permanent
-  // permanenceCost?: number; 
 }
 
 /**
@@ -131,9 +128,6 @@ export interface TraitsState {
   
   /** IDs of traits the player has acquired */
   acquiredTraits: string[];
-  
-  // /** Traits the player has permanently unlocked (always active) */ // Removed: Player's permanent traits are in PlayerSlice
-  // permanentTraits: string[]; 
   
   /** Currently active presets */
   presets: TraitPreset[];

@@ -141,19 +141,19 @@ const essenceSlice = createSlice({
       
       // Manual Generate essence thunk
       .addCase(manualGenerateEssenceThunk.fulfilled, (state, action: PayloadAction<number>) => {
-        const amount = action.payload;
-        state.currentEssence += amount;
-        state.totalCollected += amount;
-        state.lastGenerationTime = Date.now();
+        // Essence gain is now handled by gainEssence action dispatched in the thunk.
+        // This reducer can be used for other side effects related to manual generation completion if needed.
+        // For example, logging or specific UI updates not covered by gainEssence.
+        // state.lastGenerationTime = Date.now(); // gainEssence handles this
       })
       // Passive Generate essence thunk
       .addCase(passiveGenerateEssenceThunk.fulfilled, (state, action: PayloadAction<number>) => {
-        const amount = action.payload;
-        if (amount > 0) { // Only update if some essence was actually generated
-          state.currentEssence += amount;
-          state.totalCollected += amount;
-          state.lastGenerationTime = Date.now();
-        }
+        // Essence gain is now handled by gainEssence action dispatched in the thunk.
+        // This reducer can be used for other side effects related to passive generation completion.
+        // const amount = action.payload;
+        // if (amount > 0) { 
+        //   state.lastGenerationTime = Date.now(); // gainEssence handles this
+        // }
       });
   },
 });

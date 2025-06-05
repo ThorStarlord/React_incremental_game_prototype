@@ -28,11 +28,9 @@ export const passiveGenerateEssenceThunk = createAsyncThunk<number, void, { stat
     const amount = Math.floor(essenceState.generationRate * timeDiff);
 
     if (amount > 0) {
-      // Dispatching gainEssence will update totalCollected in the slice
-      // The checkAndProcessResonanceLevelUpThunk should be dispatched after this.
-      // For now, this thunk just returns the amount.
+      dispatch(gainEssence({ amount, description: 'Passive generation' }));
+      dispatch(checkAndProcessResonanceLevelUpThunk());
     }
-    // This thunk's fulfilled action in EssenceSlice will handle calling gainEssence.
     return amount; 
   }
 );
@@ -93,10 +91,11 @@ export const manualGenerateEssenceThunk = createAsyncThunk<
     const baseAmount = amount || state.perClickValue;
     const finalAmount = Math.max(0, baseAmount);
     
-    // Dispatching gainEssence will update totalCollected in the slice.
-    // The checkAndProcessResonanceLevelUpThunk should be dispatched after this.
-    // For now, this thunk just returns the amount.
-    return finalAmount; // This amount will be passed to the fulfilled reducer in EssenceSlice
+    if (finalAmount > 0) {
+      dispatch(gainEssence({ amount: finalAmount, description: 'Manual generation' }));
+      dispatch(checkAndProcessResonanceLevelUpThunk());
+    }
+    return finalAmount;
   } catch (error) {
     return rejectWithValue('Failed to generate essence manually');
   }
