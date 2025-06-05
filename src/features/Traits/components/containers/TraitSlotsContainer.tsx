@@ -1,35 +1,40 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react'; // Added useMemo
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectTraits, selectPermanentTraits, selectAvailableTraitObjects, selectTraitLoading, selectTraitError } from '../../state/TraitsSelectors';
-import { makeTraitPermanentThunk } from '../../state/TraitThunks';
+import { 
+  selectTraits, 
+  selectAvailableTraitObjects, 
+  selectTraitLoading, 
+  selectTraitError 
+} from '../../state/TraitsSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
-import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice'; // Import the new selector
-import { selectTraitSlots, selectEquippedTraitIds } from '../../../Player/state/PlayerSelectors'; // Import selectors from PlayerSelectors
-import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice'; // Import actions from PlayerSlice
+import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice';
+import { 
+  selectTraitSlots, 
+  selectEquippedTraitIds,
+  selectPermanentTraits as selectPlayerPermanentTraitIds 
+} from '../../../Player/state/PlayerSelectors';
+import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import TraitSlots from '../ui/TraitSlots';
 
 const TraitSlotsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const traitsData = useAppSelector(selectTraits);
-  const playerTraitSlots = useAppSelector(selectTraitSlots); // Get trait slots from PlayerSelectors
-  const equippedTraitIds = useAppSelector(selectEquippedTraitIds); // Get equipped trait IDs from PlayerSelectors
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const playerTraitSlots = useAppSelector(selectTraitSlots);
+  const equippedTraitIds = useAppSelector(selectEquippedTraitIds);
+  const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const essence = useAppSelector(selectCurrentEssence);
-  const availableTraits = useAppSelector(selectAvailableTraitObjects);
+  const availableTraits = useAppSelector(selectAvailableTraitObjects); 
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC); // Get proximity status
+  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC);
 
   const [showSelector, setShowSelector] = useState(false);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
   const [selectedTraitId, setSelectedTraitId] = useState<string | null>(null);
-  const [confirmPermanent, setConfirmPermanent] = useState<{ open: boolean; traitId: string | null }>({ open: false, traitId: null });
   const [notification, setNotification] = useState<{ show: boolean; message: string; severity: 'success' | 'error' | 'info' }>({ show: false, message: '', severity: 'info' });
 
   const onOpenSelector = useCallback((slotId: string) => { setActiveSlotId(slotId); setShowSelector(true); }, []);
-
   const onCloseSelector = useCallback(() => { setShowSelector(false); setActiveSlotId(null); setSelectedTraitId(null); }, []);
-
   const onSelectTrait = useCallback((traitId: string) => setSelectedTraitId(traitId), []);
 
   const onConfirmAssign = useCallback(() => { 
@@ -42,45 +47,33 @@ const TraitSlotsContainer: React.FC = () => {
     onCloseSelector();
   }, [selectedTraitId, activeSlotId, dispatch, onCloseSelector, playerTraitSlots]);
 
-  const onRemove = useCallback((slotIndex: number) => { // Changed parameter from id: string to slotIndex: number
+  const onRemove = useCallback((slotIndex: number) => {
     const targetSlot = playerTraitSlots.find(slot => slot.index === slotIndex);
     if (targetSlot && targetSlot.traitId) {
       dispatch(unequipTrait({ slotIndex: targetSlot.index }));
     }
   }, [dispatch, playerTraitSlots]);
 
-  const onMakePermanent = useCallback((id: string) => setConfirmPermanent({ open: true, traitId: id }), []);
-
-  const onConfirmPermanent = useCallback(() => {
-    if (confirmPermanent.traitId) {
-      dispatch(makeTraitPermanentThunk(confirmPermanent.traitId))
-        .unwrap()
-        .then(res => setNotification({ show: true, message: res.message, severity: res.success ? 'success' : 'info' }))
-        .catch(err => setNotification({ show: true, message: typeof err === 'string' ? err : err.message || 'Error', severity: 'error' }));
-    }
-    setConfirmPermanent({ open: false, traitId: null });
-  }, [confirmPermanent, dispatch]);
-
-  const onCancelPermanent = useCallback(() => setConfirmPermanent({ open: false, traitId: null }), []);
-
   const onCloseNotification = useCallback(() => setNotification(prev => ({ ...prev, show: false })), []);
 
-  const eligibleTraits = availableTraits.filter(t => !equippedTraitIds.includes(t.id));
+  const eligibleTraitsForEquip = useMemo(() => {
+    return availableTraits.filter(trait => 
+      !equippedTraitIds.includes(trait.id) && 
+      !permanentTraitIds.includes(trait.id) 
+    );
+  }, [availableTraits, equippedTraitIds, permanentTraitIds]);
+  
+  const equippedTraitObjects = useMemo(() => {
+    return equippedTraitIds.map(id => traitsData[id]).filter(Boolean);
+  }, [equippedTraitIds, traitsData]);
 
-  // Transform equipped trait IDs to trait objects for the component
-  const equippedTraits = equippedTraitIds
-    .map(id => traitsData[id])
-    .filter(Boolean); // Remove any undefined traits
-
-  // Create props object matching the actual TraitSlotsProps interface
   const traitSlotsProps = {
-    traitSlots: playerTraitSlots, // Pass playerTraitSlots
-    equippedTraits, // Component expects equippedTraits, not equippedTraitIds
-    availableTraits: eligibleTraits, // Component expects availableTraits, not eligibleTraits
-    permanentTraitIds,
+    traitSlots: playerTraitSlots,
+    equippedTraits: equippedTraitObjects, 
+    availableTraits: eligibleTraitsForEquip, 
+    permanentTraitIds, 
     essence,
     showSelector,
-    confirmPermanent,
     notification,
     selectedTraitId,
     onOpenSelector,
@@ -88,20 +81,23 @@ const TraitSlotsContainer: React.FC = () => {
     onSelectTrait,
     onEquipTrait: onConfirmAssign,
     onUnequipTrait: onRemove,
-    onMakePermanent,
-    onConfirmPermanent,
-    onCancelPermanent,
     onCloseNotification,
-    isInProximityToNPC // Pass proximity status
+    isInProximityToNPC,
+    onMakePermanent: (traitId: string) => { 
+      console.warn("MakePermanent UI clicked in TraitSlotsContainer, but action is deprecated. Trait ID:", traitId);
+      setNotification({ show: true, message: "'Make Permanent' action here is deprecated. Resonate traits from NPCs to make them permanent.", severity: 'info' });
+    },
+    confirmPermanent: { open: false, traitId: null }, 
+    onConfirmPermanent: () => { console.warn("onConfirmPermanent called in TraitSlotsContainer, but action is deprecated."); },
+    onCancelPermanent: () => { console.warn("onCancelPermanent called in TraitSlotsContainer, but action is deprecated."); },
   };
 
-  // Handle loading and error states before rendering TraitSlots
-  if (isLoading) {
-    return <TraitSlots {...traitSlotsProps} />;
+  if (isLoading && Object.keys(traitsData).length === 0) { 
+    return <TraitSlots {...traitSlotsProps} />; 
   }
   
   if (error) {
-    return <TraitSlots {...traitSlotsProps} />;
+    return <TraitSlots {...traitSlotsProps} />; 
   }
 
   return <TraitSlots {...traitSlotsProps} />;

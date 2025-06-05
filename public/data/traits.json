@@ -5,7 +5,6 @@
     "category": "Social",
     "description": "Your keen business sense allows you to get better deals from merchants.",
     "essenceCost": 50,
-    "permanenceCost": 100,
     "effects": {
       "shopDiscount": 0.05
     },
@@ -18,7 +17,6 @@
     "category": "Knowledge",
     "description": "You gain 15% more skill experience from all sources.",
     "essenceCost": 75,
-    "permanenceCost": 150,
     "effects": {
       "skillXpMultiplier": 0.15
     },
@@ -31,7 +29,6 @@
     "category": "Mental",
     "description": "Increases essence gained from all sources by 10%",
     "essenceCost": 50,
-    "permanenceCost": 120,
     "effects": {
       "essenceGainMultiplier": 1.1
     },
@@ -45,7 +42,6 @@
     "category": "Combat",
     "description": "Your combat experience grants you increased attack and defense capabilities.",
     "essenceCost": 80,
-    "permanenceCost": 160,
     "effects": {
       "attack": 5,
       "defense": 3
@@ -59,7 +55,6 @@
     "category": "Combat",
     "description": "You have a chance to gain essence when landing hits in combat.",
     "essenceCost": 120,
-    "permanenceCost": 250,
     "effects": {
       "essenceSiphonChance": 0.05,
       "essenceSiphonAmount": 10
@@ -76,7 +71,6 @@
     "category": "Social",
     "description": "Your actions have a greater impact on NPC relationships.",
     "essenceCost": 90,
-    "permanenceCost": 180,
     "effects": {
       "relationshipGainMultiplier": 1.2
     },
@@ -89,7 +83,6 @@
     "category": "Knowledge",
     "description": "Increases your essence generation rate from all sources.",
     "essenceCost": 150,
-    "permanenceCost": 300,
     "effects": {
       "essenceGenerationMultiplier": 1.15
     },
@@ -102,7 +95,6 @@
     "category": "Combat",
     "description": "Increases your chance to dodge enemy attacks.",
     "essenceCost": 100,
-    "permanenceCost": 200,
     "effects": {
       "dodgeChance": 0.1
     },
@@ -115,7 +107,6 @@
     "category": "Social",
     "description": "Automatically increases relationships with all NPCs by 1 point every minute.",
     "essenceCost": 20,
-    "permanenceCost": 50,
     "effects": {
       "passiveRelationshipGrowth": 1
     },
@@ -128,7 +119,6 @@
     "category": "Knowledge",
     "description": "Elder Willow's ancient knowledge increases your learning speed by 15%.",
     "essenceCost": 40,
-    "permanenceCost": 80,
     "sourceNpc": "npc_elder_willow",
     "effects": {
       "learningSpeed": 0.15
@@ -145,7 +135,6 @@
     "category": "Knowledge",
     "description": "Scholar Elara's teachings help you gain 10% more essence from knowledge-based activities.",
     "essenceCost": 30,
-    "permanenceCost": 70,
     "sourceNpc": "npc_scholar_elara",
     "effects": {
       "knowledgeEssence": 0.1
@@ -162,7 +151,6 @@
     "category": "Physical",
     "description": "Your body is exceptionally tough, increasing your maximum health.",
     "essenceCost": 100,
-    "permanenceCost": 200,
     "effects": {
       "maxHealth": 50
     },
@@ -175,7 +163,6 @@
     "category": "Mental",
     "description": "Your mind is a wellspring of magical energy, increasing max mana and mana regeneration.",
     "essenceCost": 150,
-    "permanenceCost": 300,
     "effects": {
       "maxMana": 30,
       "manaRegen": 0.25
@@ -189,7 +176,6 @@
     "category": "Combat",
     "description": "You attack with blinding speed, increasing attack speed and overall attack power.",
     "essenceCost": 130,
-    "permanenceCost": 260,
     "effects": {
       "speed": 5,
       "attack": 3
@@ -203,7 +189,6 @@
     "category": "Mental",
     "description": "Your resolve is unbreakable, significantly boosting your defense.",
     "essenceCost": 120,
-    "permanenceCost": 240,
     "effects": {
       "defense": 10
     },
@@ -216,7 +201,6 @@
     "category": "Social",
     "description": "You have a way with words, making social interactions more favorable.",
     "essenceCost": 70,
-    "permanenceCost": 140,
     "effects": {
       "charismaBonus": 2 
     },
@@ -229,7 +213,6 @@
     "category": "Knowledge",
     "description": "Your skill in crafting is unparalleled, yielding better quality items.",
     "essenceCost": 200,
-    "permanenceCost": 400,
     "effects": {
       "craftingQualityBonus": 0.15
     },
@@ -242,7 +225,6 @@
     "category": "Physical",
     "description": "You move like a whisper in the dark, enhancing your stealth capabilities.",
     "essenceCost": 180,
-    "permanenceCost": 360,
     "effects": {
       "stealthEffectiveness": 0.20
     },
@@ -255,7 +237,6 @@
     "category": "Mental",
     "description": "You have a natural connection to the elements, boosting your magical damage.",
     "essenceCost": 250,
-    "permanenceCost": 500,
     "effects": {
       "magicDamageBonus": 0.10
     },
@@ -268,7 +249,6 @@
     "category": "Mental",
     "description": "Fortune seems to favor you, slightly increasing your critical hit chance.",
     "essenceCost": 60,
-    "permanenceCost": 120,
     "effects": {
       "criticalChance": 0.02
     },
@@ -281,7 +261,6 @@
     "category": "Knowledge",
     "description": "Unlocking secrets man was not meant to know. Grants immense power at a potential cost.",
     "essenceCost": 1000,
-    "permanenceCost": 2500,
     "effects": {
       "intelligence": 10,
       "maxMana": 50,
@@ -300,7 +279,6 @@
     "category": "Physical",
     "description": "Your resilience is like stone, greatly increasing max health and defense.",
     "essenceCost": 500,
-    "permanenceCost": 1000,
     "effects": {
       "maxHealth": 100,
       "defense": 15
@@ -314,7 +292,6 @@
     "category": "Mental",
     "description": "You hear faint whispers, granting insight but slightly unsettling your mind. Increases critical chance but may have minor negative side effects.",
     "essenceCost": 300,
-    "permanenceCost": 600,
     "effects": {
       "criticalChance": 0.05,
       "manaRegen": -0.1
@@ -328,7 +305,6 @@
     "category": "Essence",
     "description": "Natural connection to essence energy, improving generation and control.",
     "essenceCost": 25,
-    "permanenceCost": 50,
     "effects": {
       "essenceGeneration": 1.2,
       "essenceCapacity": 50
@@ -342,7 +318,6 @@
     "category": "Mental",
     "description": "Enhances mental clarity and concentration, improving spellcasting and thought processes.",
     "essenceCost": 30,
-    "permanenceCost": 60,
     "effects": {
       "manaRegen": 0.1,
       "intelligence": 5

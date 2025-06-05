@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Box, Alert, CircularProgress } from '@mui/material';
-import { TabContainer, StandardTabs, TabPanel } from '../../../../shared/components/Tabs';
+import { TabContainer, /* StandardTabs, */ TabPanel } from '../../../../shared/components/Tabs'; // StandardTabs is part of TabContainer
 import { TraitSlots } from './TraitSlots';
 import { TraitManagement } from './TraitManagement';
 import { TraitCodex } from './TraitCodex';
@@ -14,36 +14,37 @@ export interface TraitSystemUIProps {
   allTraits: Record<string, Trait>;
   traitSlots: TraitSlot[];
   equippedTraits: Trait[];
-  permanentTraits: Trait[];
-  acquiredTraits: Trait[];
-  discoveredTraits: Trait[];
+  permanentTraits: Trait[]; // Player's permanent traits (Trait objects)
+  acquiredTraits: Trait[];  // TraitsSlice.acquiredTraits (Trait objects)
+  discoveredTraits: Trait[];// TraitsSlice.discoveredTraits (Trait objects)
   availableTraitsForEquip: Trait[];
   currentEssence: number;
-  playerMaxTraitSlots?: number; // Added playerMaxTraitSlots
-  isInProximityToNPC: boolean; // Added for proximity-based trait management
+  playerMaxTraitSlots?: number;
+  isInProximityToNPC: boolean;
   
   // Status
   loading: boolean;
   error: string | null;
-  equippedTraitIds: string[];
-  permanentTraitIds: string[];
-  discoveredTraitIds: string[];
-  acquiredTraitIds: string[];
+  equippedTraitIds: string[]; // Player's equipped trait IDs
+  permanentTraitIds: string[]; // Player's permanent trait IDs
+  discoveredTraitIds: string[];// TraitsSlice.discoveredTrait IDs
+  acquiredTraitIds: string[];  // TraitsSlice.acquiredTrait IDs
   
   // Actions
   onEquipTrait: (traitId: string, slotIndex: number) => void;
-  onUnequipTrait: (slotIndex: number) => void; // Changed from slotId: string
-  onAcquireTrait: (traitId: string) => void;
-  onMakeTraitPermanent: (traitId: string) => void;
+  onUnequipTrait: (slotIndex: number) => void;
+  onAcquireTrait: (traitId: string) => void; // For general acquisition if needed
+  onMakeTraitPermanent: (traitId: string) => void; // Deprecated, passed as dummy from wrapper
   onDiscoverTrait: (traitId: string) => void;
   
   // Utilities
-  canMakePermanent: (trait: Trait) => boolean;
+  canMakePermanent: (trait: Trait) => boolean; // Deprecated
   canAcquireTrait: (trait: Trait) => boolean;
-  getTraitAffordability: (trait: Trait, action: 'acquire' | 'permanent') => {
+  getTraitAffordability: (trait: Trait) => { 
     canAfford: boolean;
     cost: number;
     currentEssence: number;
+    message?: string; 
   };
   
   // Configuration
@@ -51,43 +52,30 @@ export interface TraitSystemUIProps {
   defaultTab?: string;
 }
 
-/**
- * Presentational component for the trait management system
- * Provides tabbed interface for trait slots, management, and codex
- */
 export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
-  // Data
   allTraits,
   traitSlots,
   equippedTraits,
-  permanentTraits,
-  acquiredTraits,
+  permanentTraits, // Player's permanent Trait objects
+  acquiredTraits,  // TraitsSlice.acquiredTraits (general pool of known traits)
   discoveredTraits,
   availableTraitsForEquip,
   currentEssence,
-  isInProximityToNPC, // Destructure new prop
-  
-  // Status
+  isInProximityToNPC,
   loading,
   error,
-  equippedTraitIds,
-  permanentTraitIds,
-  discoveredTraitIds,
-  acquiredTraitIds,
-  
-  // Actions
+  equippedTraitIds, // Player's equipped trait IDs
+  permanentTraitIds, // Player's permanent trait IDs
+  // discoveredTraitIds, // Not directly used by TraitSystemUI itself
+  // acquiredTraitIds,   // Not directly used by TraitSystemUI itself
   onEquipTrait,
   onUnequipTrait,
   onAcquireTrait,
   onMakeTraitPermanent,
   onDiscoverTrait,
-  
-  // Utilities
   canMakePermanent,
   canAcquireTrait,
   getTraitAffordability,
-  
-  // Configuration
   className,
   defaultTab = 'slots'
 }) => {
@@ -97,7 +85,6 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
     setActiveTab(newTab);
   }, []);
 
-  // Error state
   if (error) {
     return (
       <Box className={className}>
@@ -108,8 +95,7 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
     );
   }
 
-  // Loading state
-  if (loading) {
+  if (loading && Object.keys(allTraits).length === 0) { 
     return (
       <Box 
         className={className}
@@ -124,21 +110,9 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
   }
 
   const tabs = [
-    {
-      id: 'slots',
-      label: 'Equipped Traits',
-      disabled: false
-    },
-    {
-      id: 'manage',
-      label: 'Manage Traits',
-      disabled: false
-    },
-    {
-      id: 'codex',
-      label: 'Trait Codex',
-      disabled: false
-    }
+    { id: 'slots', label: 'Equipped Traits', disabled: false },
+    { id: 'manage', label: 'Manage Traits', disabled: false },
+    { id: 'codex', label: 'Trait Codex', disabled: false }
   ];
 
   return (
@@ -147,48 +121,46 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        // variant="standard" is default in TabContainer
       >
-        {/* StandardTabs is rendered by TabContainer itself. Children should be TabPanels. */}
         <TabPanel tabId="slots" activeTab={activeTab}>
           <TraitSlots
             traitSlots={traitSlots}
-            equippedTraits={equippedTraits}
-            availableTraits={availableTraitsForEquip}
+            equippedTraits={equippedTraits} 
+            availableTraits={availableTraitsForEquip} 
             onEquipTrait={onEquipTrait}
             onUnequipTrait={onUnequipTrait}
-            isInProximityToNPC={isInProximityToNPC} // Pass new prop
+            isInProximityToNPC={isInProximityToNPC}
           />
         </TabPanel>
         
         <TabPanel tabId="manage" activeTab={activeTab}>
           <TraitManagement
-            acquiredTraits={acquiredTraits}
-            permanentTraits={permanentTraits}
+            acquiredTraits={acquiredTraits} 
+            permanentTraits={permanentTraits} 
             currentEssence={currentEssence}
-            equippedTraitIds={equippedTraitIds}
-            permanentTraitIds={permanentTraitIds}
-            onAcquireTrait={onAcquireTrait}
-            onMakeTraitPermanent={onMakeTraitPermanent}
-            canMakePermanent={canMakePermanent}
-            getTraitAffordability={getTraitAffordability}
-            isInProximityToNPC={isInProximityToNPC} // Pass new prop
+            equippedTraitIds={equippedTraitIds} // Pass this down
+            permanentTraitIds={permanentTraitIds} // Pass this down
+            onAcquireTrait={onAcquireTrait} 
+            onMakeTraitPermanent={onMakeTraitPermanent} 
+            canMakePermanent={canMakePermanent} 
+            getTraitAffordability={(trait) => getTraitAffordability(trait)} 
+            isInProximityToNPC={isInProximityToNPC}
           />
         </TabPanel>
         
         <TabPanel tabId="codex" activeTab={activeTab}>
           <TraitCodex
-            allTraits={allTraits}
-            discoveredTraits={discoveredTraits}
-            acquiredTraitIds={acquiredTraitIds}
-            permanentTraitIds={permanentTraitIds}
+            allTraits={allTraits} 
+            discoveredTraits={discoveredTraits} 
+            acquiredTraitIds={acquiredTraits.map(t => t.id)} 
+            permanentTraitIds={permanentTraits.map(t => t.id)} 
             currentEssence={currentEssence}
             onDiscoverTrait={onDiscoverTrait}
-            onAcquireTrait={onAcquireTrait}
-            onMakeTraitPermanent={onMakeTraitPermanent} // Pass down
-            canMakePermanent={canMakePermanent} // Pass down
+            onAcquireTrait={onAcquireTrait} 
+            onMakeTraitPermanent={onMakeTraitPermanent} 
+            canMakePermanent={canMakePermanent} 
             canAcquireTrait={canAcquireTrait}
-            getTraitAffordability={getTraitAffordability}
+            getTraitAffordability={(trait) => getTraitAffordability(trait)} 
           />
         </TabPanel>
       </TabContainer>
@@ -197,5 +169,4 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
 });
 
 TraitSystemUI.displayName = 'TraitSystemUI';
-
 export default TraitSystemUI;

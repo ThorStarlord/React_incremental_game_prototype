@@ -39,25 +39,15 @@ import NPCHeader from './NPCHeader';
 import type { NPC } from '../../state/NPCTypes';
 
 export interface NPCPanelUIProps {
-  /** The currently selected NPC */
   npc?: NPC;
-  /** List of all available NPCs */
   npcList: NPC[];
-  /** ID of the currently selected NPC */
   selectedNPCId?: string | null;
-  /** Loading state */
   loading: boolean;
-  /** Error state */
   error: string | null;
-  /** Additional CSS class */
   className?: string;
-  /** Callback when NPC is selected */
   onNPCSelect: (npcId: string) => void;
-  /** Callback when relationship changes */
   onRelationshipChange: (npcId: string, change: number, reason: string) => void;
-  /** Callback for interactions */
   onInteraction: (npcId: string, interactionType: string, data?: any) => void;
-  /** Callback when panel is closed */
   onClose?: () => void;
 }
 
@@ -70,9 +60,6 @@ const TAB_CONFIG = [
   { id: 'relationship', label: 'Relationship', icon: RelationshipIcon, minLevel: 1 }
 ];
 
-/**
- * Main NPC interaction panel providing tabbed interface for all NPC interactions
- */
 export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
   npc,
   npcList,
@@ -82,7 +69,7 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
   className,
   onNPCSelect,
   onRelationshipChange,
-  onInteraction,
+  onInteraction, // This prop is kept in the interface as other tabs might use it
   onClose
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -94,7 +81,7 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
   const handleNPCChange = useCallback((event: any) => {
     const npcId = event.target.value;
     onNPCSelect(npcId);
-    setActiveTab('overview'); // Reset to overview when switching NPCs
+    setActiveTab('overview'); 
   }, [onNPCSelect]);
   
   const isTabUnlocked = useCallback((minLevel: number) => {
@@ -135,20 +122,23 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
           />
         ) : null;
       case 'traits':
-        // Use the minLevel from TAB_CONFIG for consistency
         const traitsTabConfig = TAB_CONFIG.find(tab => tab.id === 'traits');
-        const traitsMinLevel = traitsTabConfig ? traitsTabConfig.minLevel : 0; // Default to 0 if not found
+        const traitsMinLevel = traitsTabConfig ? traitsTabConfig.minLevel : 0;
         return isTabUnlocked(traitsMinLevel) ? (
           <NPCTraitsTab 
             npcId={npc.id} 
-            onInteraction={(data: any) => onInteraction(npc.id, 'trait', data)}
+            // Removed onInteraction prop as NPCTraitsTab handles its own dispatches
           />
         ) : null;
       case 'relationship':
         return isTabUnlocked(1) ? (
           <NPCRelationshipTab 
             npc={npc} 
+            // Pass the onRelationshipChange from NPCPanelUIProps, which expects npcId as first param
+            // NPCRelationshipTab's prop expects (change, reason)
+            // So we adapt it here:
             onRelationshipChange={(change: number, reason: string) => onRelationshipChange(npc.id, change, reason)}
+            // onImproveRelationship is also a prop of NPCRelationshipTab, if NPCPanelUI needs to pass it, it should be added to NPCPanelUIProps
           />
         ) : null;
       default:
@@ -158,12 +148,10 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
   
   if (loading) {
     return (
-      <Card className={className}>
-        <CardContent>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
-            <CircularProgress />
-            <Typography sx={{ ml: 2 }}>Loading NPCs...</Typography>
-          </Box>
+      <Card className={className} sx={{height: '100%'}}>
+        <CardContent sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <CircularProgress />
+          <Typography sx={{ ml: 2 }}>Loading NPC Data...</Typography>
         </CardContent>
       </Card>
     );
@@ -171,35 +159,31 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
   
   if (error) {
     return (
-      <Card className={className}>
+      <Card className={className} sx={{height: '100%'}}>
         <CardContent>
-          <Alert severity="error">
-            {error}
-          </Alert>
+          <Alert severity="error">{error}</Alert>
         </CardContent>
       </Card>
     );
   }
   
-  if (npcList.length === 0) {
+  if (npcList.length === 0 && !loading) { // Check !loading to avoid showing this during initial load
     return (
-      <Card className={className}>
-        <CardContent>
-          <Alert severity="info">
-            No NPCs available. Explore the world to meet new characters!
-          </Alert>
+      <Card className={className} sx={{height: '100%'}}>
+        <CardContent sx={{textAlign: 'center', pt: 5}}>
+          <Typography variant="h6" gutterBottom>No NPCs Discovered</Typography>
+          <Typography color="text.secondary">Explore the world to meet new characters!</Typography>
         </CardContent>
       </Card>
     );
   }
   
-  if (!npc) {
+  if (!npc && !loading) { // Check !loading
     return (
-      <Card className={className}>
-        <CardContent>
-          <Alert severity="warning">
-            Please select an NPC to interact with.
-          </Alert>
+      <Card className={className} sx={{height: '100%'}}>
+        <CardContent sx={{textAlign: 'center', pt: 5}}>
+           <Typography variant="h6" gutterBottom>Select an NPC</Typography>
+           <Typography color="text.secondary">Choose an NPC from the list or the dropdown above to view their details.</Typography>
         </CardContent>
       </Card>
     );
@@ -209,11 +193,10 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
   
   return (
     <Card className={className} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
       <CardContent sx={{ pb: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: npc ? 1 : 2 }}>
           <Typography variant="h5">
-            NPC Interaction
+            {npc ? npc.name : "NPC Interaction"} 
           </Typography>
           {onClose && (
             <IconButton onClick={onClose} size="small">
@@ -222,56 +205,60 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
           )}
         </Box>
         
-        {/* NPC Selection */}
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>Select NPC</InputLabel>
+        <FormControl fullWidth sx={{ mb: npc ? 1 : 0 }}>
+          <InputLabel id="npc-select-label">Select NPC</InputLabel>
           <Select
+            labelId="npc-select-label"
             value={selectedNPCId || ''}
             onChange={handleNPCChange}
             label="Select NPC"
+            size="small"
           >
             {npcList.map((npcOption) => (
               <MenuItem key={npcOption.id} value={npcOption.id}>
-                {npcOption.name}
+                {npcOption.name} ({npcOption.location})
               </MenuItem>
             ))}
           </Select>
         </FormControl>
         
-        {/* NPC Header */}
-        <NPCHeader npc={npc} />
+        {npc && <NPCHeader npc={npc} />}
       </CardContent>
       
-      <Divider />
+      {npc && <Divider />}
       
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons={true} // Force scroll buttons to be shown if tabs overflow on desktop
-          allowScrollButtonsMobile // Also allow scroll buttons on mobile if needed
-        >
-          {availableTabs.map((tab) => {
-            const IconComponent = tab.icon;
-            return (
-              <Tab
-                key={tab.id}
-                value={tab.id}
-                label={tab.label}
-                icon={<IconComponent />}
-                iconPosition="start"
-              />
-            );
-          })}
-        </Tabs>
-      </Box>
+      {npc && (
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons={true} 
+            allowScrollButtonsMobile
+            aria-label="NPC interaction tabs"
+          >
+            {availableTabs.map((tab) => {
+              const IconComponent = tab.icon;
+              return (
+                <Tab
+                  key={tab.id}
+                  value={tab.id}
+                  label={tab.label}
+                  icon={<IconComponent />}
+                  iconPosition="start"
+                  disabled={!isTabUnlocked(tab.minLevel)}
+                />
+              );
+            })}
+          </Tabs>
+        </Box>
+      )}
       
-      {/* Tab Content */}
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {renderTabContent()}
-      </Box>
+      {npc && (
+        <Box sx={{ flex: 1, overflow: 'auto', p: activeTab === 'overview' ? 0 : 2 }}> {/* Remove padding for overview if it handles its own */}
+          {renderTabContent()}
+        </Box>
+      )}
     </Card>
   );
 };

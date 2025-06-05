@@ -5,7 +5,7 @@ export { default as traitsReducer,
   setTraits,
   discoverTrait,
   acquireTrait,
-  makePermanent,
+  // makePermanent, // Removed, deprecated
   saveTraitPreset,
   loadTraitPreset,
   deleteTraitPreset,

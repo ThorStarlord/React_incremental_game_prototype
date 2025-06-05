@@ -7,7 +7,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  Button,
+  // Button, // Button for Make Permanent removed
   Chip,
   Alert,
   Divider,
@@ -17,9 +17,8 @@ import {
 } from '@mui/material';
 import {
   Star as StarIcon,
-  Lock as LockIcon,
   CheckCircle as CheckCircleIcon,
-  AttachMoney as EssenceIcon,
+  AttachMoney as EssenceIcon, // Added back for current essence display
   Info as InfoIcon
 } from '@mui/icons-material';
 import type { Trait } from '../../state/TraitsTypes';
@@ -30,53 +29,44 @@ import type { Trait } from '../../state/TraitsTypes';
 export interface TraitManagementProps {
   // Data
   acquiredTraits: Trait[];
-  permanentTraits: Trait[];
+  permanentTraits: Trait[]; 
   currentEssence: number;
   
   // Status arrays
   equippedTraitIds: string[];
-  permanentTraitIds: string[];
+  permanentTraitIds: string[]; 
   
   // Actions
-  onAcquireTrait: (traitId: string) => void;
-  onMakeTraitPermanent: (traitId: string) => void;
+  onAcquireTrait: (traitId: string) => void; 
+  onMakeTraitPermanent: (traitId: string) => void; // Deprecated
   
   // Utilities
-  canMakePermanent: (trait: Trait) => boolean;
-  getTraitAffordability: (trait: Trait, action: 'acquire' | 'permanent') => {
+  canMakePermanent: (trait: Trait) => boolean; // Deprecated
+  getTraitAffordability: (trait: Trait) => { 
     canAfford: boolean;
     cost: number;
     currentEssence: number;
+    message?: string;
   };
-  isInProximityToNPC: boolean; // Added for proximity-based trait management
+  isInProximityToNPC: boolean;
 }
 
 /**
- * Trait management interface for acquired traits and permanence actions
- * Handles displaying acquired traits and allowing permanence conversion
+ * Trait management interface for acquired traits.
+ * "Make Permanent" functionality is now deprecated as Resonance handles it.
  */
 export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
   acquiredTraits,
-  permanentTraits,
-  currentEssence,
+  permanentTraits, 
+  currentEssence, // Destructure currentEssence
   equippedTraitIds,
-  permanentTraitIds,
-  onAcquireTrait,
-  onMakeTraitPermanent,
-  canMakePermanent,
-  getTraitAffordability,
-  isInProximityToNPC // Destructure new prop
+  permanentTraitIds: playerPermanentTraitIds, 
+  // onAcquireTrait, // Not used for "Make Permanent"
+  // onMakeTraitPermanent, // Deprecated
+  // canMakePermanent, // Deprecated
+  // getTraitAffordability, // Not used for 'permanent' action
+  // isInProximityToNPC // Not used for "Make Permanent" warning anymore
 }) => {
-  const handleMakePermanent = useCallback((trait: Trait) => {
-    if (!isInProximityToNPC) return; // Disable if not in proximity
-    if (!canMakePermanent(trait)) return;
-    
-    const affordability = getTraitAffordability(trait, 'permanent');
-    if (!affordability.canAfford) return;
-    
-    // TODO: Add confirmation dialog
-    onMakeTraitPermanent(trait.id);
-  }, [canMakePermanent, getTraitAffordability, onMakeTraitPermanent, isInProximityToNPC]);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
@@ -88,7 +78,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
   };
 
   const getStatusChip = (trait: Trait) => {
-    if (permanentTraitIds.includes(trait.id)) {
+    if (playerPermanentTraitIds.includes(trait.id)) {
       return (
         <Chip
           icon={<CheckCircleIcon />}
@@ -114,7 +104,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
     
     return (
       <Chip
-        label="Available"
+        label="Acquired"
         color="default"
         size="small"
         variant="outlined"
@@ -123,9 +113,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
   };
 
   const renderTraitItem = (trait: Trait) => {
-    const isPermanent = permanentTraitIds.includes(trait.id);
-    const canMakePerm = canMakePermanent(trait);
-    const affordability = trait.permanenceCost ? getTraitAffordability(trait, 'permanent') : null;
+    const isPermanentByPlayer = playerPermanentTraitIds.includes(trait.id);
 
     return (
       <ListItem
@@ -167,42 +155,10 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
               )}
             </Box>
             
-            {!isPermanent && trait.permanenceCost && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                {affordability && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <EssenceIcon fontSize="small" />
-                    <Typography
-                      variant="body2"
-                      color={affordability.canAfford ? 'success.main' : 'error.main'}
-                    >
-                      {trait.permanenceCost}
-                    </Typography>
-                  </Box>
-                )}
-                <Tooltip
-                  title={
-                    !canMakePerm
-                      ? "Requirements not met or already permanent"
-                      : !affordability?.canAfford
-                      ? `Need ${trait.permanenceCost} Essence (have ${currentEssence})`
-                      : "Make this trait permanently active"
-                  }
-                >
-                  <span>
-                    <Button
-                      variant="contained"
-                      color="warning"
-                      size="small"
-                      disabled={!canMakePerm}
-                      onClick={() => handleMakePermanent(trait)}
-                      startIcon={<StarIcon />}
-                    >
-                      Make Permanent
-                    </Button>
-                  </span>
-                </Tooltip>
-              </Box>
+            {isPermanentByPlayer && (
+                 <Typography variant="caption" color="success.main">
+                    (Permanently active)
+                 </Typography>
             )}
           </Box>
         </Box>
@@ -210,44 +166,38 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
     );
   };
 
+  const displayableAcquiredTraits = acquiredTraits.filter(t => !playerPermanentTraitIds.includes(t.id));
+
   return (
     <Box>
       <Grid container spacing={3}>
-        {/* Acquired Traits Section */}
         <Grid item xs={12} md={8}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                 <Typography variant="h5" component="h2">
-                  Acquired Traits
+                  Acquired Traits (Not Permanent)
                 </Typography>
-                <Tooltip title="Traits you have learned and can equip or make permanent">
+                <Tooltip title="Traits you have learned but are not yet permanent. Equip them in slots to use.">
                   <IconButton size="small">
                     <InfoIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Box>
 
-              {!isInProximityToNPC && (
-                <Alert severity="warning" sx={{ mb: 2 }}>
-                  You must be in close proximity to an NPC to make traits permanent.
-                </Alert>
-              )}
-
-              {acquiredTraits.length === 0 ? (
+              {displayableAcquiredTraits.length === 0 ? (
                 <Alert severity="info">
-                  No traits acquired yet. Discover and acquire traits from NPCs or other sources.
+                  No non-permanent traits acquired yet. Resonate with NPCs to learn traits permanently, or equip their innate traits temporarily.
                 </Alert>
               ) : (
                 <List sx={{ width: '100%' }}>
-                  {acquiredTraits.map(renderTraitItem)}
+                  {displayableAcquiredTraits.map(renderTraitItem)}
                 </List>
               )}
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Permanent Traits Section */}
         <Grid item xs={12} md={4}>
           <Card>
             <CardContent>
@@ -255,12 +205,14 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
                 <Typography variant="h6" component="h3">
                   Permanent Traits
                 </Typography>
-                <CheckCircleIcon color="success" fontSize="small" />
+                <Tooltip title="Traits you have permanently learned, e.g., via Resonance. These are always active.">
+                 <CheckCircleIcon color="success" fontSize="small" />
+                </Tooltip>
               </Box>
 
-              {permanentTraits.length === 0 ? (
+              {permanentTraits.length === 0 ? ( 
                 <Alert severity="info">
-                  No permanent traits yet. Make acquired traits permanent with Essence.
+                  No permanent traits yet. Resonate with NPCs to make traits permanent.
                 </Alert>
               ) : (
                 <List dense>
@@ -281,18 +233,12 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
                   ))}
                 </List>
               )}
-
               <Divider sx={{ my: 2 }} />
-
               <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="body2" color="text.secondary">
-                  Current Essence
-                </Typography>
+                <Typography variant="body2" color="text.secondary">Current Essence</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
                   <EssenceIcon color="primary" />
-                  <Typography variant="h6" color="primary">
-                    {currentEssence.toLocaleString()}
-                  </Typography>
+                  <Typography variant="h6" color="primary">{currentEssence.toLocaleString()}</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -304,5 +250,4 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
 });
 
 TraitManagement.displayName = 'TraitManagement';
-
 export default TraitManagement;

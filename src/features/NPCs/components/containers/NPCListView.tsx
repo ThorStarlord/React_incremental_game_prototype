@@ -10,8 +10,8 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
-  Button,
+  // CardActions, // CardActions seems unused
+  // Button, // Button seems unused directly in this component's own JSX
   Chip,
   Avatar,
   TextField,
@@ -32,21 +32,20 @@ import {
 } from '@mui/material';
 import {
   Search,
-  FilterList,
+  // FilterList, // FilterList icon seems unused
   Person,
-  Chat,
+  // Chat, // Chat icon seems unused
   LocationOn,
   Favorite,
-  Star,
+  // Star, // Star icon seems unused
   Groups,
-  Schedule,
+  // Schedule, // Schedule icon seems unused
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
 import { NPC } from '../../state/NPCTypes';
-// Import the centralized getRelationshipTier function
 import { getRelationshipTier as getCentralRelationshipTier } from '../../../../config/relationshipConstants'; 
 
 interface NPCListViewProps {
@@ -70,14 +69,11 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   const [sortBy, setSortBy] = useState<SortOption>('name');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
 
-  // Transform discovered NPC IDs to NPC objects and apply filtering/sorting
   const filteredAndSortedNPCs = useMemo(() => {
-    // Convert IDs to NPC objects
     let npcList = discoveredNPCIds
       .map(id => npcs[id])
-      .filter(Boolean); // Remove any undefined NPCs
+      .filter(Boolean); 
 
-    // Apply search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       npcList = npcList.filter(npc => 
@@ -88,7 +84,6 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
       );
     }
 
-    // Apply filters
     switch (filterBy) {
       case 'available':
         npcList = npcList.filter(npc => npc.isAvailable);
@@ -97,14 +92,11 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList = npcList.filter(npc => npc.relationshipValue >= 60);
         break;
       case 'same_location':
-        // This would need player location - for now, just show all
         break;
       default:
-        // 'all' - no additional filtering
         break;
     }
 
-    // Apply sorting
     switch (sortBy) {
       case 'name':
         npcList.sort((a, b) => a.name.localeCompare(b.name));
@@ -116,23 +108,14 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList.sort((a, b) => a.location.localeCompare(b.location));
         break;
       case 'recent':
-        npcList.sort((a, b) => {
-          const aTime = a.lastInteraction || 0;
-          const bTime = b.lastInteraction || 0;
-          return bTime - aTime;
-        });
+        npcList.sort((a, b) => (b.lastInteraction || 0) - (a.lastInteraction || 0));
         break;
       default:
         break;
     }
-
     return npcList;
   }, [npcs, discoveredNPCIds, searchTerm, filterBy, sortBy]);
 
-  // Local getRelationshipTier and getRelationshipColor are removed.
-  // We will use getCentralRelationshipTier which returns an object with name and color.
-
-  // Render NPC card for grid view
   const renderNPCCard = (npc: NPC) => {
     const currentTier = getCentralRelationshipTier(npc.relationshipValue);
     const isSelected = selectedNPCId === npc.id;
@@ -155,62 +138,33 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         >
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-              <Avatar
-                sx={{
-                  width: 48,
-                  height: 48,
-                  bgcolor: npc.isAvailable ? 'success.main' : 'grey.500',
-                  mr: 2,
-                }}
-              >
-                {npc.avatar ? (
-                  <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} />
-                ) : (
-                  <Person />
-                )}
+              <Avatar sx={{ width: 48, height: 48, bgcolor: npc.isAvailable ? 'success.main' : 'grey.500', mr: 2 }}>
+                {npc.avatar ? <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} /> : <Person />}
               </Avatar>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography variant="h6" noWrap>
-                  {npc.name}
-                </Typography>
+                <Typography variant="h6" noWrap>{npc.name}</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
                   <LocationOn fontSize="small" color="action" />
-                  <Typography variant="caption" color="text.secondary" noWrap>
-                    {npc.location}
-                  </Typography>
+                  <Typography variant="caption" color="text.secondary" noWrap>{npc.location}</Typography>
                 </Box>
               </Box>
             </Box>
-
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, height: 40, overflow: 'hidden' }}>
               {npc.description || 'No description available'}
             </Typography>
-
             <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-              <Chip
-                size="small"
-                icon={<Favorite />}
-                label={`${npc.relationshipValue}`}
-                sx={{ backgroundColor: currentTier.color, color: '#fff' }} // Use custom color
-              />
               {currentTier && (
                 <Chip
                   size="small"
                   label={currentTier.name}
-                  variant="outlined"
-                  sx={{ borderColor: currentTier.color, color: currentTier.color }} // Use custom color for outline
+                  icon={<Favorite fontSize="small" />} // Keep icon for visual cue
+                  sx={{ backgroundColor: currentTier.color, color: '#fff' }}
                 />
               )}
               {npc.faction && (
-                <Chip
-                  size="small"
-                  icon={<Groups />}
-                  label={npc.faction}
-                  variant="outlined"
-                />
+                <Chip size="small" icon={<Groups />} label={npc.faction} variant="outlined" />
               )}
             </Box>
-
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 {npc.isAvailable ? (
@@ -231,7 +185,6 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
     );
   };
 
-  // Render NPC list item for list view
   const renderNPCListItem = (npc: NPC) => {
     const currentTier = getCentralRelationshipTier(npc.relationshipValue);
     const isSelected = selectedNPCId === npc.id;
@@ -240,44 +193,23 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
       <React.Fragment key={npc.id}>
         <ListItem
           onClick={() => onSelectNPC(npc.id)}
-          sx={{ 
-            py: 2,
-            cursor: 'pointer',
-            backgroundColor: isSelected ? 'action.selected' : 'transparent',
-            '&:hover': {
-              backgroundColor: isSelected ? 'action.selected' : 'action.hover',
-            },
-          }}
+          sx={{ py: 2, cursor: 'pointer', backgroundColor: isSelected ? 'action.selected' : 'transparent', '&:hover': { backgroundColor: isSelected ? 'action.selected' : 'action.hover' }}}
         >
           <ListItemAvatar>
-            <Avatar
-              sx={{
-                bgcolor: npc.isAvailable ? 'success.main' : 'grey.500',
-              }}
-            >
-              {npc.avatar ? (
-                <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} />
-              ) : (
-                <Person />
-              )}
+            <Avatar sx={{ bgcolor: npc.isAvailable ? 'success.main' : 'grey.500' }}>
+              {npc.avatar ? <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} /> : <Person />}
             </Avatar>
           </ListItemAvatar>
           <ListItemText
             primary={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="subtitle1">{npc.name}</Typography>
-                <Chip
-                  size="small"
-                  icon={<Favorite />}
-                  label={npc.relationshipValue}
-                  sx={{ backgroundColor: currentTier.color, color: '#fff' }} // Use custom color
-                />
                 {currentTier && (
                   <Chip
                     size="small"
                     label={currentTier.name}
-                    variant="outlined"
-                    sx={{ borderColor: currentTier.color, color: currentTier.color }} // Use custom color for outline
+                    icon={<Favorite fontSize="small" />}
+                    sx={{ backgroundColor: currentTier.color, color: '#fff' }}
                   />
                 )}
               </Box>
@@ -294,7 +226,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
                     </>
                   )}
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" noWrap>
                   {npc.description || 'No description available'}
                 </Typography>
               </Box>
@@ -314,54 +246,36 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}> {/* Responsive padding */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ mb: 1 }}>
-          NPCs ({discoveredNPCIds.length} discovered)
+          NPCs ({filteredAndSortedNPCs.length} / {discoveredNPCIds.length} discovered)
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Manage your relationships and interactions with discovered NPCs
+          Manage your relationships and interactions with discovered NPCs.
         </Typography>
       </Box>
 
-      {/* Search and Filters */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
         <TextField
           placeholder="Search NPCs..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ minWidth: 250 }}
+          InputProps={{ startAdornment: (<InputAdornment position="start"><Search /></InputAdornment>)}}
+          sx={{ flexGrow: 1, minWidth: { xs: '100%', sm: 250 } }} // Responsive width
         />
-        
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel>Sort by</InputLabel>
-          <Select
-            value={sortBy}
-            label="Sort by"
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
-          >
+          <Select value={sortBy} label="Sort by" onChange={(e) => setSortBy(e.target.value as SortOption)}>
             <MenuItem value="name">Name</MenuItem>
             <MenuItem value="relationship">Relationship</MenuItem>
             <MenuItem value="location">Location</MenuItem>
             <MenuItem value="recent">Recent</MenuItem>
           </Select>
         </FormControl>
-
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel>Filter</InputLabel>
-          <Select
-            value={filterBy}
-            label="Filter"
-            onChange={(e) => setFilterBy(e.target.value as FilterOption)}
-          >
+          <Select value={filterBy} label="Filter" onChange={(e) => setFilterBy(e.target.value as FilterOption)}>
             <MenuItem value="all">All</MenuItem>
             <MenuItem value="available">Available</MenuItem>
             <MenuItem value="high_relationship">High Relationship</MenuItem>
@@ -370,21 +284,19 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         </FormControl>
       </Box>
 
-      {/* Results Summary */}
-      {(searchTerm || filterBy !== 'all') && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          Showing {filteredAndSortedNPCs.length} of {discoveredNPCIds.length} NPCs
-        </Alert>
-      )}
+      {(searchTerm || filterBy !== 'all') && filteredAndSortedNPCs.length !== discoveredNPCIds.length && (
+         <Alert severity="info" sx={{ mb: 2 }}>
+           Showing {filteredAndSortedNPCs.length} matching NPCs.
+         </Alert>
+       )}
 
-      {/* NPC List/Grid */}
       {filteredAndSortedNPCs.length > 0 ? (
         viewMode === 'grid' ? (
           <Grid container spacing={2}>
             {filteredAndSortedNPCs.map(renderNPCCard)}
           </Grid>
         ) : (
-          <List>
+          <List sx={{ bgcolor: 'background.paper', borderRadius: 1 }}> {/* Added background for list items */}
             {filteredAndSortedNPCs.map(renderNPCListItem)}
           </List>
         )

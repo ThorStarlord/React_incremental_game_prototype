@@ -34,32 +34,32 @@ export interface Trait {
   description: string;
   
   /** Category/type of the trait (e.g., Combat, Knowledge, Social) */
-  category: string; // Standardize on 'category'
+  category: string; 
   
   /** Effects provided by this trait (can be array or object) */
   effects: TraitEffect[] | TraitEffectValues;
   
   /** Rarity classification (Common, Uncommon, Rare, etc.) */
-  rarity: string; // Ensure this is always present (add default in thunk if needed)
+  rarity: string; 
   
   /** Tier level of the trait (optional) */
   tier?: number;
   
   /** Source NPC where the trait can be obtained (optional) */
-  sourceNpc?: string; // Renamed from source and matches traits.json
+  sourceNpc?: string; 
   
   /** Cost in essence to acquire the trait (optional) */
   essenceCost?: number;
   
   /** Optional icon identifier for UI (optional) */
-  iconPath?: string; // Use iconPath if that's the field name
+  iconPath?: string; 
   
   /** Requirements for obtaining this trait (optional) */
   requirements?: {
     level?: number;
-    relationshipLevel?: number; // Changed to number
+    relationshipLevel?: number; 
     npcId?: string;
-    prerequisiteTraits?: string[]; // Changed to array for multiple prerequisites
+    prerequisiteTraits?: string[]; 
     quest?: string;
     [key: string]: any;
   };
@@ -67,8 +67,8 @@ export interface Trait {
   /** Level of the trait if traits can be leveled up (optional) */
   level?: number;
 
-  /** Cost in permanence to acquire the trait (optional) */
-  permanenceCost?: number; // Cost in Essence to make this trait permanent
+  // /** Cost in permanence to acquire the trait (optional) */ // Obsolete: Resonance now makes traits permanent
+  // permanenceCost?: number; 
 }
 
 /**
@@ -82,32 +82,22 @@ export interface ActiveTrait extends Trait {
  * Interface for trait filtering criteria
  */
 export interface TraitFilters {
-  type?: string; // Corresponds to trait.category
-  maxCost?: number; // Corresponds to trait.essenceCost
+  type?: string; 
+  maxCost?: number; 
   searchTerm?: string;
-  // Add other potential filters like rarity, source, etc.
 }
 
 /**
  * Interface for a trait slot
  */
 export interface TraitSlot {
-  /** Unique identifier for this slot */
   id: string;
-  
-  /** Index position of this slot */
   index: number;
-  
-  /** Whether this slot is unlocked and available */
   isUnlocked: boolean;
-  
-  /** ID of the trait currently equipped in this slot, if any */
   traitId?: string | null;
-  
-  /** Requirements to unlock this slot */
   unlockRequirements?: {
-    type: 'resonanceLevel' | 'quest' | 'relationshipLevel'; // Specific types for unlock conditions
-    value: number | string; // Numeric for levels, string for quest IDs
+    type: 'resonanceLevel' | 'quest' | 'relationshipLevel'; 
+    value: number | string; 
   };
 }
 
@@ -115,16 +105,9 @@ export interface TraitSlot {
  * Interface for trait progression
  */
 export interface TraitProgression {
-  /** Number of traits discovered */
   discovered: number;
-  
-  /** Number of total traits in the game */
   total: number;
-  
-  /** Number of trait slots unlocked */
   slotsUnlocked: number;
-  
-  /** Maximum possible trait slots */
   maxSlots: number;
 }
 
@@ -132,19 +115,10 @@ export interface TraitProgression {
  * Interface for a saved trait preset
  */
 export interface TraitPreset {
-  /** Unique identifier for this preset */
   id: string;
-  
-  /** Name of this preset */
   name: string;
-  
-  /** Array of trait IDs in this preset */
   traits: string[];
-  
-  /** Optional description */
   description?: string;
-  
-  /** Created timestamp */
   created: number;
 }
 
@@ -158,8 +132,8 @@ export interface TraitsState {
   /** IDs of traits the player has acquired */
   acquiredTraits: string[];
   
-  /** Traits the player has permanently unlocked (always active) */
-  permanentTraits: string[];
+  // /** Traits the player has permanently unlocked (always active) */ // Removed: Player's permanent traits are in PlayerSlice
+  // permanentTraits: string[]; 
   
   /** Currently active presets */
   presets: TraitPreset[];

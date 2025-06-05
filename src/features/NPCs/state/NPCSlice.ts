@@ -76,6 +76,16 @@ const npcSlice = createSlice({
         npc.relationshipValue = newValue;
         npc.lastInteraction = Date.now();
 
+        // Unlock shared trait slots if requirements met
+        if (npc.sharedTraitSlots) {
+          npc.sharedTraitSlots.forEach(slot => {
+            if (!slot.isUnlocked && slot.unlockRequirement !== undefined && newValue >= slot.unlockRequirement) {
+              slot.isUnlocked = true;
+              console.log(`NPC ${npcId} unlocked trait slot ${slot.index} at relationship ${newValue}`);
+            }
+          });
+        }
+
         state.relationshipHistory.push({
           id: `${npcId}-${Date.now()}`,
           npcId,
@@ -114,16 +124,16 @@ const npcSlice = createSlice({
     },
     addDialogueEntry: (state, action: PayloadAction<{
       npcId: string;
-      speaker: 'player' | 'npc' | 'system'; // Added speaker to payload
+      speaker: 'player' | 'npc' | 'system';
       playerText: string;
       npcResponse: string;
       affinityDelta?: number;
     }>) => {
-      const { npcId, speaker, playerText, npcResponse, affinityDelta } = action.payload; // Destructure speaker
+      const { npcId, speaker, playerText, npcResponse, affinityDelta } = action.payload;
       const entry: DialogueEntry = {
         id: `${npcId}-${Date.now()}`,
         npcId,
-        speaker, // Assign speaker
+        speaker,
         timestamp: Date.now(),
         playerText,
         npcResponse,
@@ -141,19 +151,11 @@ const npcSlice = createSlice({
         npc.connectionDepth = Math.max(0, npc.connectionDepth + change);
       }
     },
-    /**
-     * Marks a dialogue topic as completed for a specific NPC.
-     * Moves the dialogueId from availableDialogues to completedDialogues.
-     * @param state - The current NPC state.
-     * @param action - The action containing npcId and dialogueId.
-     */
     completeDialogueTopic: (state, action: PayloadAction<{ npcId: string; dialogueId: string }>) => {
       const { npcId, dialogueId } = action.payload;
       const npc = state.npcs[npcId];
       if (npc) {
-        // Remove from availableDialogues
         npc.availableDialogues = npc.availableDialogues.filter(id => id !== dialogueId);
-        // Add to completedDialogues if not already there
         if (!npc.completedDialogues.includes(dialogueId)) {
           npc.completedDialogues.push(dialogueId);
         }
@@ -161,6 +163,17 @@ const npcSlice = createSlice({
     },
     selectNPC: (state, action: PayloadAction<string | null>) => {
       state.selectedNPCId = action.payload;
+    },
+    // New reducer for debugging: Unlocks all shared trait slots for a given NPC
+    debugUnlockAllSharedSlots: (state, action: PayloadAction<string>) => {
+      const npcId = action.payload;
+      const npc = state.npcs[npcId];
+      if (npc && npc.sharedTraitSlots) {
+        npc.sharedTraitSlots.forEach(slot => {
+          slot.isUnlocked = true;
+        });
+        console.log(`DEBUG: All shared trait slots unlocked for NPC ${npcId}`);
+      }
     }
   },
   extraReducers: (builder) => {
@@ -172,9 +185,17 @@ const npcSlice = createSlice({
       .addCase(initializeNPCsThunk.fulfilled, (state, action: PayloadAction<Record<string, NPC>>) => {
         state.loading = false;
         state.npcs = action.payload;
-        Object.values(action.payload).forEach(npc => {
+        Object.values(state.npcs).forEach(npc => {
           if (npc.isDiscovered && !state.discoveredNPCs.includes(npc.id)) {
             state.discoveredNPCs.push(npc.id);
+          }
+          if (npc.sharedTraitSlots) {
+            npc.sharedTraitSlots.forEach(slot => {
+              if (!slot.isUnlocked && slot.unlockRequirement !== undefined && npc.relationshipValue >= slot.unlockRequirement) {
+                slot.isUnlocked = true;
+                console.log(`NPC ${npc.id} initially unlocked trait slot ${slot.index} at relationship ${npc.relationshipValue}`);
+              }
+            });
           }
         });
       })
@@ -192,6 +213,16 @@ const npcSlice = createSlice({
         state.discoveredNPCs = Object.values(action.payload)
           .filter(npc => npc.isDiscovered)
           .map(npc => npc.id);
+        Object.values(state.npcs).forEach(npc => {
+          if (npc.sharedTraitSlots) {
+            npc.sharedTraitSlots.forEach(slot => {
+              if (!slot.isUnlocked && slot.unlockRequirement !== undefined && npc.relationshipValue >= slot.unlockRequirement) {
+                slot.isUnlocked = true;
+                console.log(`NPC ${npc.id} initially unlocked trait slot ${slot.index} at relationship ${npc.relationshipValue} (fetch)`);
+              }
+            });
+          }
+        });
         state.loading = false;
         state.error = null;
       })
@@ -207,6 +238,16 @@ const npcSlice = createSlice({
           const oldValue = npc.relationshipValue;
           npc.relationshipValue = newValue;
           npc.lastInteraction = Date.now();
+          
+          if (npc.sharedTraitSlots) {
+            npc.sharedTraitSlots.forEach(slot => {
+              if (!slot.isUnlocked && slot.unlockRequirement !== undefined && newValue >= slot.unlockRequirement) {
+                slot.isUnlocked = true;
+                console.log(`NPC ${npcId} unlocked trait slot ${slot.index} at relationship ${newValue} (via thunk)`);
+              }
+            });
+          }
+
           state.relationshipHistory.push({
             id: `${npcId}-${Date.now()}`,
             npcId,
@@ -239,6 +280,15 @@ const npcSlice = createSlice({
             const newValue = Math.max(-100, Math.min(100, oldValue + result.affinityDelta));
             npc.relationshipValue = newValue;
             npc.lastInteraction = Date.now();
+            // Also check for slot unlocks after dialogue affinity change
+            if (npc.sharedTraitSlots) {
+              npc.sharedTraitSlots.forEach(slot => {
+                if (!slot.isUnlocked && slot.unlockRequirement !== undefined && newValue >= slot.unlockRequirement) {
+                  slot.isUnlocked = true;
+                  console.log(`NPC ${npcId} unlocked trait slot ${slot.index} at relationship ${newValue} (dialogue)`);
+                }
+              });
+            }
             state.relationshipHistory.push({
               id: `${npcId}-${Date.now()}`,
               npcId,
@@ -253,16 +303,24 @@ const npcSlice = createSlice({
 
       .addCase(shareTraitWithNPCThunk.fulfilled, (state, action: PayloadAction<InteractionResult, string, { arg: ShareTraitPayload; requestId: string; requestStatus: "fulfilled"; }, never>) => {
         const result = action.payload;
-        const { npcId, traitId, slotIndex } = action.meta.arg; // Destructure traitId and slotIndex
+        const { npcId, traitId, slotIndex } = action.meta.arg;
         
         const npc = state.npcs[npcId];
         if (npc) {
-          // Update relationship if affinityDelta is present
           if (result.affinityDelta) {
             const oldValue = npc.relationshipValue;
             const newValue = Math.max(-100, Math.min(100, oldValue + result.affinityDelta));
             npc.relationshipValue = newValue;
             npc.lastInteraction = Date.now();
+            // Also check for slot unlocks after sharing affinity change
+            if (npc.sharedTraitSlots) {
+              npc.sharedTraitSlots.forEach(slot => {
+                if (!slot.isUnlocked && slot.unlockRequirement !== undefined && newValue >= slot.unlockRequirement) {
+                  slot.isUnlocked = true;
+                  console.log(`NPC ${npcId} unlocked trait slot ${slot.index} at relationship ${newValue} (trait share)`);
+                }
+              });
+            }
             state.relationshipHistory.push({
               id: `${npcId}-${Date.now()}`,
               npcId,
@@ -273,32 +331,18 @@ const npcSlice = createSlice({
             });
           }
 
-          // Ensure sharedTraitSlots array exists
           if (!npc.sharedTraitSlots) {
             npc.sharedTraitSlots = [];
           }
-
-          // Find or create the slot
           let targetSlot = npc.sharedTraitSlots.find(slot => slot.index === slotIndex);
-
-          if (traitId === '') { // Logic for unsharing (empty traitId)
-            if (targetSlot) {
-              targetSlot.traitId = null;
-            }
-          } else { // Logic for sharing
-            if (targetSlot) {
-              targetSlot.traitId = traitId;
-            } else {
-              // If slot doesn't exist, create a new one and push it
-              // Assuming isUnlocked is true and unlockRequirement is undefined for newly created slots via sharing
-              npc.sharedTraitSlots.push({
-                id: `${npcId}-shared-slot-${slotIndex}`, // Generate a unique ID for the slot
-                index: slotIndex,
-                traitId: traitId,
-                isUnlocked: true,
-                unlockRequirement: undefined,
-              });
-            }
+          if (!targetSlot) {
+            console.error(`[NPCSlice] Share/Unshare failed: Target slot with index ${slotIndex} not found for NPC ${npcId}. Slots must be predefined.`);
+            return;
+          }
+          if (traitId === '') {
+            targetSlot.traitId = null;
+          } else {
+            targetSlot.traitId = traitId;
           }
         }
       })
@@ -306,7 +350,6 @@ const npcSlice = createSlice({
       .addMatcher(
         (action): action is RejectedAction => action.type.endsWith('/rejected'),
         (state, action) => {
-          // Only set the main 'loading' error for these specific thunks
           if (action.type.startsWith('npcs/initializeNPCs/rejected') || action.type.startsWith('npcs/fetchNPCs/rejected')) {
             state.loading = false;
             if (action.payload && typeof action.payload === 'string') {
@@ -317,18 +360,13 @@ const npcSlice = createSlice({
               state.error = 'An unknown error occurred while loading NPCs.';
             }
           } else {
-            // For other rejected thunks, ensure loading is false but don't set the main 'error'
-            // These should be handled locally by the component that dispatched them or use a different error state.
             state.loading = false; 
             console.warn(`NPC Thunk Rejected: ${action.type}`, action.payload || action.error);
-            // Optionally, you could set a different error field here if needed for specific UI feedback,
-            // e.g., state.interactionError = (action.payload as string) || action.error?.message || 'Interaction failed';
           }
         }
       );
   }
 });
-
 
 export const {
   setLoading,
@@ -343,10 +381,10 @@ export const {
   clearError,
   updateNpcConnectionDepth,
   completeDialogueTopic,
-  selectNPC // Keep selectNPC here for now, but also export actions object
+  selectNPC,
+  debugUnlockAllSharedSlots // Export the new action
 } = npcSlice.actions;
 
-export const npcActions = npcSlice.actions; // Export all actions as a single object
-
-export { npcSlice }; // Export the slice object itself
+export const npcActions = npcSlice.actions;
+export { npcSlice };
 export default npcSlice.reducer;

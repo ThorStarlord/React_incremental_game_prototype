@@ -5,43 +5,38 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-// Import Trait type from TraitsTypes
-import { Trait, TraitSlot } from './TraitsTypes'; // Import TraitSlot
-// Import UITrait and convertToUITrait from traitUIUtils
+import { Trait, TraitSlot } from './TraitsTypes';
 import { UITrait, convertToUITrait } from '../utils/traitUIUtils';
 // Import selectors from the slice file
 import { 
   selectTraits as selectTraitsFromSlice,
-  selectPermanentTraits as selectPermanentTraitsFromSlice,
-  selectAcquiredTraits as selectAcquiredTraitsFromSlice,
-  selectTraitLoading as selectTraitLoadingFromSlice, // Import loading selector
-  selectTraitError as selectTraitErrorFromSlice,     // Import error selector
-  selectDiscoveredTraits as selectDiscoveredTraitsFromSlice, // Import discovered selector
+  selectAcquiredTraits as selectAcquiredTraitsFromSlice, // This returns string[] (IDs)
+  selectTraitLoading as selectTraitLoadingFromSlice,
+  selectTraitError as selectTraitErrorFromSlice,
+  selectDiscoveredTraits as selectDiscoveredTraitsFromSlice,
   selectTraitPresets as selectTraitPresetsFromSlice
 } from './TraitsSlice';
 
-// Import player selectors for equipped traits and slots
+// Import player selectors
 import { 
   selectEquippedTraitIds as selectPlayerEquippedTraitIds,
   selectTraitSlots as selectPlayerTraitSlots,
   selectMaxTraitSlots as selectPlayerMaxTraitSlots,
-  selectPermanentTraits as selectPlayerSlicePermanentTraitIds // Import player's permanent trait IDs
+  selectPermanentTraits as selectPlayerSlicePermanentTraitIds 
 } from '../../Player/state/PlayerSelectors';
 
-// Basic selectors (re-exports from TraitsSlice for consistency)
-export const selectTraits = selectTraitsFromSlice;
-export const selectPermanentTraits = selectPermanentTraitsFromSlice;
-export const selectAcquiredTraits = selectAcquiredTraitsFromSlice;
-export const selectTraitLoading = selectTraitLoadingFromSlice; // Re-export loading selector
-export const selectTraitError = selectTraitErrorFromSlice;     // Re-export error selector
-export const selectDiscoveredTraits = selectDiscoveredTraitsFromSlice; // Re-export discovered selector
+// Basic selectors from TraitsSlice (re-exports for consistency)
+export const selectTraits = selectTraitsFromSlice; // Record<string, Trait>
+export const selectAcquiredTraits = selectAcquiredTraitsFromSlice; // string[] - IDs of traits in the general acquired pool
+export const selectTraitLoading = selectTraitLoadingFromSlice;
+export const selectTraitError = selectTraitErrorFromSlice;
+export const selectDiscoveredTraits = selectDiscoveredTraitsFromSlice; // string[] - IDs of discovered traits
 export const selectTraitPresets = selectTraitPresetsFromSlice;
 
 // Re-export player selectors for convenience in Traits feature
-export const selectEquippedTraitIds = selectPlayerEquippedTraitIds;
-export const selectTraitSlots = selectPlayerTraitSlots;
-export const selectMaxTraitSlots = selectPlayerMaxTraitSlots;
-
+export const selectEquippedTraitIds = selectPlayerEquippedTraitIds; 
+export const selectTraitSlots = selectPlayerTraitSlots; 
+export const selectMaxTraitSlots = selectPlayerMaxTraitSlots; 
 
 /**
  * Selects a single trait object by its ID.
@@ -52,10 +47,10 @@ export const selectTraitById = createSelector(
 );
 
 /**
- * Selects trait objects that are currently equipped (from PlayerState)
+ * Selects trait objects that are currently equipped by the player.
  */
 export const selectEquippedTraitObjects = createSelector(
-  [selectTraits, selectEquippedTraitIds],
+  [selectTraits, selectPlayerEquippedTraitIds], 
   (traits, equippedIds): Trait[] => {
     return equippedIds
       .map((id: string) => traits[id])
@@ -64,10 +59,10 @@ export const selectEquippedTraitObjects = createSelector(
 );
 
 /**
- * Selects trait objects that are permanently acquired
+ * Selects trait objects that are permanently acquired by the player.
  */
 export const selectPermanentTraitObjects = createSelector(
-  [selectTraits, selectPermanentTraits],
+  [selectTraits, selectPlayerSlicePermanentTraitIds], 
   (traits, permanentIds): Trait[] => {
     return permanentIds
       .map((id: string) => traits[id])
@@ -76,19 +71,27 @@ export const selectPermanentTraitObjects = createSelector(
 );
 
 /**
- * Selects trait objects that are acquired but not equipped (by player) and not permanent
+ * Selects trait objects from the general acquired pool (TraitsSlice.acquiredTraits).
+ */
+export const selectAcquiredTraitObjects = createSelector(
+  [selectTraits, selectAcquiredTraits], // selectAcquiredTraits is string[] from TraitsSlice
+  (allTraitsData, acquiredTraitIds): Trait[] => {
+    return acquiredTraitIds
+      .map(id => allTraitsData[id])
+      .filter(Boolean) as Trait[];
+  }
+);
+
+/**
+ * Selects trait objects that are in the general acquired pool (TraitsSlice.acquiredTraits)
+ * but are NOT currently equipped by the player AND NOT permanent for the player.
  */
 export const selectAvailableTraitObjects = createSelector(
-  [selectTraits, selectAcquiredTraits, selectEquippedTraitIds, selectPermanentTraits],
-  (traits, acquiredIds, equippedIds, permanentIds): Trait[] => {
-    // Get trait IDs that are acquired but not equipped or permanent
-    const availableIds = acquiredIds.filter(
-      (id: string) => !equippedIds.includes(id) && !permanentIds.includes(id)
+  [selectAcquiredTraitObjects, selectPlayerEquippedTraitIds, selectPlayerSlicePermanentTraitIds],
+  (acquiredTraitObjectsList, equippedIds, playerPermanentIds): Trait[] => {
+    return acquiredTraitObjectsList.filter(
+      (trait: Trait) => !equippedIds.includes(trait.id) && !playerPermanentIds.includes(trait.id)
     );
-    
-    return availableIds
-      .map((id: string) => traits[id])
-      .filter(Boolean) as Trait[];
   }
 );
 
@@ -103,17 +106,17 @@ export const selectEquippedUITraits = createSelector(
 );
 
 /**
- * Selects all permanent traits converted to UITrait format
+ * Selects all player's permanent traits converted to UITrait format
  */
 export const selectPermanentUITraits = createSelector(
-  [selectPermanentTraitObjects],
+  [selectPermanentTraitObjects], 
   (permanentTraits): UITrait[] => {
     return permanentTraits.map(convertToUITrait);
   }
 );
 
 /**
- * Selects all available traits converted to UITrait format
+ * Selects all available (acquired but not equipped/permanent) traits converted to UITrait format
  */
 export const selectAvailableUITraits = createSelector(
   [selectAvailableTraitObjects],
@@ -123,20 +126,10 @@ export const selectAvailableUITraits = createSelector(
 );
 
 /**
- * Selects all acquired traits (equipped + available + permanent) as Trait objects
- */
-export const selectAcquiredTraitObjects = createSelector(
-  [selectEquippedTraitObjects, selectAvailableTraitObjects, selectPermanentTraitObjects],
-  (equipped, available, permanent): Trait[] => {
-    return [...equipped, ...available, ...permanent];
-  }
-);
-
-/**
  * Selects all discovered trait objects
  */
 export const selectDiscoveredTraitObjects = createSelector(
-  [selectTraits, selectDiscoveredTraits],
+  [selectTraits, selectDiscoveredTraits], 
   (traits, discoveredIds): Trait[] => {
     return discoveredIds
       .map((id: string) => traits[id])
@@ -145,22 +138,20 @@ export const selectDiscoveredTraitObjects = createSelector(
 );
 
 /**
- * Selects available trait objects for equip
- * (Traits that are acquired but not equipped and not permanent)
+ * Selects available trait objects for the player to equip.
  */
 export const selectAvailableTraitObjectsForEquip = createSelector(
-  [selectAvailableTraitObjects], // Depends on the selector that already filters permanent traits
+  [selectAvailableTraitObjects], 
   (availableTraits): Trait[] => {
-    // No need for further filtering here, as selectAvailableTraitObjects already excludes permanent traits.
     return availableTraits; 
   }
 );
 
 /**
- * Selects the count of available trait slots (from PlayerState)
+ * Selects the count of available player trait slots.
  */
 export const selectAvailableTraitSlotCount = createSelector(
-  [selectTraitSlots],
+  [selectPlayerTraitSlots], 
   (slots): number => {
     return slots.filter((slot: TraitSlot) => slot.isUnlocked && !slot.traitId).length;
   }
@@ -168,7 +159,6 @@ export const selectAvailableTraitSlotCount = createSelector(
 
 /**
  * Selects Trait objects that the player truly possesses (equipped or permanent on the player character).
- * This is the definitive list for actions like sharing.
  */
 export const selectPlayerTrulyPossessedTraitObjects = createSelector(
   [selectTraits, selectPlayerEquippedTraitIds, selectPlayerSlicePermanentTraitIds],
@@ -180,6 +170,6 @@ export const selectPlayerTrulyPossessedTraitObjects = createSelector(
   }
 );
 
-// Additional convenience selectors for Player UI integration
+// Additional convenience selectors
 export const selectTraitsState = (state: RootState) => state.traits;
 export const selectAllTraits = (state: RootState) => state.traits.traits;

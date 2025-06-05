@@ -15,12 +15,12 @@ export interface NPC {
   id: string;
   name: string;
   description?: string;
-  category?: string; // Added from mock data
+  category?: string; 
   location: string;
   avatar?: string;
-  spritePath?: string; // Added for character sprites
+  spritePath?: string; 
   faction?: string;
-  interactionPrompt?: string; // Added for UI prompts
+  interactionPrompt?: string; 
   
   // Relationship and connection data
   relationshipValue: number;
@@ -35,10 +35,12 @@ export interface NPC {
   
   // Trait system integration
   /** Traits that the player has shared with this NPC */
-  sharedTraits?: Record<string, NPCTraitInfo>; // Renamed from traits for clarity
-  /** Traits that can be acquired from this NPC through proximity and essence cost */
-  availableTraits: string[]; // Renamed from teachableTraits
+  sharedTraits?: Record<string, NPCTraitInfo>; 
+  /** Traits that can be acquired from this NPC through proximity and essence cost (Resonance makes these permanent for player) */
+  availableTraits: string[]; 
   sharedTraitSlots?: NPCSharedTraitSlot[];
+  /** Traits the NPC innately possesses and the player might equip temporarily */
+  innateTraits?: string[]; 
   
   // Commerce and services
   inventory?: NPCInventory;
@@ -53,7 +55,7 @@ export interface NPC {
   lastInteraction?: number;
   isDiscovered?: boolean;
   isAvailable?: boolean;
-  discoveredAt: number; // Added: Timestamp when NPC was first discovered by the player
+  discoveredAt: number; 
 }
 
 /**
@@ -86,8 +88,8 @@ export interface NPCTraitInfo {
   id: string;
   name?: string;
   description?: string;
-  category: 'physical' | 'combat' | 'social' | 'Essence' | 'Knowledge' | 'Mental'; // Updated: Added 'Essence', 'Knowledge', 'Mental'
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic'; // Updated: Added 'uncommon' and ensured lowercase
+  category: 'physical' | 'combat' | 'social' | 'Essence' | 'Knowledge' | 'Mental'; 
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic'; 
   effects: Record<string, number>;
   requirements: {
     relationshipLevel: number;
@@ -120,8 +122,8 @@ export interface NPCSharedTraitSlot {
  */
 export interface InteractionResult {
   success: boolean;
-  affinityDelta?: number; // Renamed from relationshipChange
-  connectionDepthChange?: number; // Added: Change in connection depth
+  affinityDelta?: number; 
+  connectionDepthChange?: number; 
   essenceGained?: number;
   unlockRewards?: string[];
   message?: string;
@@ -134,7 +136,7 @@ export interface InteractionResult {
 export interface DialogueResult {
   success: boolean;
   npcResponse: string;
-  affinityDelta?: number; // Renamed from relationshipChange
+  affinityDelta?: number; 
   rewards?: string[];
 }
 
@@ -144,11 +146,11 @@ export interface DialogueResult {
 export interface DialogueEntry {
   id: string;
   npcId: string;
-  speaker: 'player' | 'npc' | 'system'; // Added speaker property
+  speaker: 'player' | 'npc' | 'system'; 
   timestamp: number;
   playerText: string;
   npcResponse: string;
-  affinityDelta?: number; // Renamed from relationshipChange
+  affinityDelta?: number; 
 }
 
 /**
@@ -234,10 +236,10 @@ export interface NPCState {
   discoveredNPCs: string[];
   currentInteraction: NPCInteraction | null;
   dialogueHistory: DialogueEntry[];
-  relationshipHistory: RelationshipChangeEntry[]; // Renamed from relationshipChanges
+  relationshipHistory: RelationshipChangeEntry[]; 
   loading: boolean;
   error: string | null;
-  selectedNPCId: string | null; // Added to track the currently selected NPC in the UI
+  selectedNPCId: string | null; 
 }
 
 /**
@@ -249,10 +251,10 @@ export const DEFAULT_NPC_STATE: NPCState = {
   discoveredNPCs: [],
   currentInteraction: null,
   dialogueHistory: [],
-  relationshipHistory: [], // Renamed from relationshipChanges
+  relationshipHistory: [], 
   loading: false,
   error: null,
-  selectedNPCId: null // Initialize selectedNPCId to null
+  selectedNPCId: null 
 };
 
 // ============================================================================

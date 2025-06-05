@@ -18,16 +18,40 @@ import {
   Favorite as FavoriteIcon
 } from '@mui/icons-material';
 import type { NPC } from '../../state/NPCTypes';
-import { getRelationshipTier } from '../../../../config/relationshipConstants'; // Import centralized function
+// Import getTierBenefits for comprehensive tier information
+import { getTierBenefits, RELATIONSHIP_TIERS } from '../../../../config/relationshipConstants'; 
 
 interface NPCHeaderProps {
   npc: NPC;
 }
 
 const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
-  // Local getRelationshipColor and getRelationshipLabel are removed.
-  // We will use the tier information from getRelationshipTier.
-  const currentRelationshipTier = getRelationshipTier(npc.relationshipValue);
+  const currentTierInfo = getTierBenefits(npc.relationshipValue);
+  const currentTierName = currentTierInfo.name;
+  
+  let pointsInCurrentTier = 0;
+  let totalPointsInTier = 0;
+  let progressPercentageInTier = 0;
+  let progressLabel = `${currentTierName}`;
+
+  if (currentTierInfo.nextTier) {
+    const currentTierMin = currentTierInfo.threshold; // Min value of current tier
+    const nextTierMin = currentTierInfo.nextTier.threshold; // Min value of next tier (start of next tier)
+    
+    pointsInCurrentTier = npc.relationshipValue - currentTierMin;
+    totalPointsInTier = nextTierMin - currentTierMin;
+
+    if (totalPointsInTier > 0) {
+      progressPercentageInTier = Math.max(0, Math.min(100, (pointsInCurrentTier / totalPointsInTier) * 100));
+    } else { // Should only happen if tiers are not defined correctly or at max tier with no next
+      progressPercentageInTier = 100;
+    }
+    progressLabel = `To ${currentTierInfo.nextTier.name}: ${pointsInCurrentTier} / ${totalPointsInTier} Affinity`;
+  } else {
+    // At the highest tier
+    progressPercentageInTier = 100;
+    progressLabel = `${currentTierName} (Max)`;
+  }
 
   return (
     <Paper 
@@ -109,27 +133,29 @@ const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
           
           <Box sx={{ mb: 1 }}>
             <Chip
-              label={currentRelationshipTier.name}
+              label={currentTierName}
               size="small"
-              sx={{ backgroundColor: currentRelationshipTier.color, color: '#fff' }} // Use custom color
+              sx={{ backgroundColor: currentTierInfo.color, color: '#fff' }} 
             />
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Level {npc.relationshipValue}/100
-            </Typography>
+            {/* Removed the raw "Level X/100" display */}
           </Box>
 
           <LinearProgress
             variant="determinate"
-            value={Math.max(0, (npc.relationshipValue + 100) / 200 * 100)} // Normalize value for progress bar if needed
+            value={progressPercentageInTier}
             sx={{ 
               height: 8, 
               borderRadius: 4,
-              backgroundColor: 'action.hover', // Neutral track color
+              backgroundColor: 'action.hover', 
               '& .MuiLinearProgress-bar': {
-                backgroundColor: currentRelationshipTier.color, // Custom bar color
+                backgroundColor: currentTierInfo.color, 
               },
+              mb: 0.5 // Add some margin below progress bar
             }}
           />
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
+            {progressLabel}
+          </Typography>
 
           {npc.connectionDepth !== undefined && (
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>

@@ -37,17 +37,16 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { RootState } from '../../../../app/store';
 import {
   selectTraits,
   selectAcquiredTraits,
-  selectPermanentTraits,
   selectTraitLoading,
   selectTraitError
-} from '../../state/TraitsSlice';
+} from '../../state/TraitsSlice'; 
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
+import { selectPermanentTraits as selectPlayerPermanentTraitIds } from '../../../Player/state/PlayerSelectors';
 
 interface TraitCodexDrawerProps {
     open: boolean;
@@ -55,13 +54,15 @@ interface TraitCodexDrawerProps {
     focusedId?: string;
 }
 
+type SortableTraitKey = 'name' | 'essenceCost' | 'category';
+
 interface FilterOptions {
     showFilters: boolean;
     traitTypeFilter: string;
-    traitSourceFilter: string;
+    traitSourceFilter: string; 
     traitCostRange: number[];
     traitStatusFilter: string;
-    sortBy: keyof Trait | 'essenceCost' | 'name';
+    sortBy: SortableTraitKey; // Restricted to sortable fields
     sortOrder: 'asc' | 'desc';
     searchQuery: string;
     showUndiscovered: boolean;
@@ -69,9 +70,9 @@ interface FilterOptions {
 
 const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focusedId }) => {
   const dispatch = useAppDispatch();
-  const allTraits = useAppSelector(selectTraits);
-  const acquiredTraitIds = useAppSelector(selectAcquiredTraits);
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const allTraits = useAppSelector(selectTraits); 
+  const acquiredTraitIds = useAppSelector(selectAcquiredTraits); 
+  const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   const currentEssence = useAppSelector(selectCurrentEssence);
@@ -86,7 +87,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
     showFilters: false,
     traitTypeFilter: 'all',
     traitSourceFilter: 'all',
-    traitCostRange: [0, 500],
+    traitCostRange: [0, 1000], 
     traitStatusFilter: 'all',
     sortBy: 'name',
     sortOrder: 'asc',
@@ -113,7 +114,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
       showFilters: false,
       traitTypeFilter: 'all',
       traitSourceFilter: 'all',
-      traitCostRange: [0, 500],
+      traitCostRange: [0, 1000],
       traitStatusFilter: 'all',
       sortBy: 'name',
       sortOrder: 'asc',
@@ -123,7 +124,12 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   }, []);
 
   const filteredAndSortedTraits = useMemo(() => {
-    let traitsArray = Object.entries(allTraits).map(([id, trait]) => ({ ...trait, id }));
+    let traitsArray = Object.values(allTraits); 
+
+    if (!filterState.showUndiscovered) {
+      // Assuming all traits in allTraits are "discovered" for codex purposes
+      // If a specific "isDiscovered" flag exists on Trait, filter here
+    }
 
     if (filterState.searchQuery) {
       const query = filterState.searchQuery.toLowerCase();
@@ -138,27 +144,49 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
       const cost = trait.essenceCost || 0;
       if (cost < filterState.traitCostRange[0] || cost > filterState.traitCostRange[1]) return false;
 
-      const isAcquired = acquiredTraitIds.includes(trait.id);
-      const isPermanent = permanentTraitIds.includes(trait.id);
-      if (filterState.traitStatusFilter === 'acquired' && !isAcquired) return false;
+      const isAcquired = acquiredTraitIds.includes(trait.id); 
+      const isPermanent = permanentTraitIds.includes(trait.id); 
+
+      if (filterState.traitStatusFilter === 'acquired' && !(isAcquired && !isPermanent)) return false;
       if (filterState.traitStatusFilter === 'permanent' && !isPermanent) return false;
-      if (filterState.traitStatusFilter === 'available' && (isAcquired || isPermanent)) return false;
-      if (filterState.traitStatusFilter === 'unlocked' && !isAcquired && !isPermanent) return false;
+      if (filterState.traitStatusFilter === 'available' && (isAcquired || isPermanent)) return false; 
+      if (filterState.traitStatusFilter === 'unlocked' && (isAcquired || isPermanent)) return false; // 'unlocked' might mean discovered but not acquired/permanent
 
       return true;
     });
 
     traitsArray.sort((a, b) => {
-      const sortBy = filterState.sortBy === 'essenceCost' ? 'essenceCost' : filterState.sortBy as keyof Trait;
+      const sortByField = filterState.sortBy;
+      let valA: string | number | undefined;
+      let valB: string | number | undefined;
 
-      const valA = sortBy === 'essenceCost' ? (a.essenceCost || 0) : a[sortBy as keyof Trait];
-      const valB = sortBy === 'essenceCost' ? (b.essenceCost || 0) : b[sortBy as keyof Trait];
-
+      switch (sortByField) {
+        case 'name':
+          valA = a.name;
+          valB = b.name;
+          break;
+        case 'essenceCost':
+          valA = a.essenceCost || 0;
+          valB = b.essenceCost || 0;
+          break;
+        case 'category':
+          valA = a.category || '';
+          valB = b.category || '';
+          break;
+        default:
+          // Should not happen with restricted SortableTraitKey
+          return 0;
+      }
+      
       let comparison = 0;
       if (typeof valA === 'string' && typeof valB === 'string') {
         comparison = valA.localeCompare(valB);
       } else if (typeof valA === 'number' && typeof valB === 'number') {
         comparison = valA - valB;
+      } else if (valA === undefined && valB !== undefined) {
+        comparison = 1; 
+      } else if (valA !== undefined && valB === undefined) {
+        comparison = -1; 
       }
 
       return filterState.sortOrder === 'asc' ? comparison : comparison * -1;
@@ -168,7 +196,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   }, [allTraits, acquiredTraitIds, permanentTraitIds, filterState]);
 
   const renderTraitList = () => {
-    if (isLoading) {
+    if (isLoading && Object.keys(allTraits).length === 0) { 
       return <LinearProgress sx={{ m: 2 }} />;
     }
     if (error) {
@@ -185,6 +213,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
           const isPermanent = permanentTraitIds.includes(trait.id);
           const cost = trait.essenceCost || 0;
           const canAfford = currentEssence >= cost;
+          const canBeAcquiredNow = !isAcquired && !isPermanent && trait.essenceCost !== undefined;
 
           return (
             <ListItem
@@ -192,27 +221,28 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               divider
               sx={{
                 bgcolor: focusedId === trait.id ? 'action.selected' : 'inherit',
-                opacity: isAcquired || isPermanent ? 0.7 : 1,
+                opacity: (isAcquired || isPermanent) ? 0.7 : 1,
               }}
               secondaryAction={
-                !isAcquired && !isPermanent && (
-                  <Tooltip title={canAfford ? "Acquire Trait" : `Requires ${cost} Essence`}>
-                    <span>
+                canBeAcquiredNow ? (
+                  <Tooltip title={canAfford ? "Acquire Trait (Resonate)" : `Requires ${cost} Essence`}>
+                    <span> 
                       <IconButton
                         edge="end"
                         color="primary"
                         disabled={!canAfford}
+                        // onClick={() => dispatch(acquireTraitWithEssenceThunk(trait.id))} // Example action for future
                       >
                         <AddCircleIcon />
                       </IconButton>
                     </span>
                   </Tooltip>
-                )
+                ) : null
               }
             >
               <ListItemAvatar>
-                <Avatar>
-                  <AutoFixHighIcon />
+                <Avatar src={trait.iconPath}>
+                  {!trait.iconPath && <AutoFixHighIcon />}
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
@@ -223,8 +253,8 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
                       {trait.description}
                     </Typography>
                     <br />
-                    <Chip label={`Cost: ${cost}`} size="small" sx={{ mr: 0.5 }} />
-                    {isPermanent && <Chip label="Permanent" color="secondary" size="small" sx={{ mr: 0.5 }} />}
+                    {trait.essenceCost !== undefined && <Chip label={`Cost: ${trait.essenceCost}`} size="small" sx={{ mr: 0.5 }} />}
+                    {isPermanent && <Chip label="Permanent" color="success" size="small" sx={{ mr: 0.5 }} />}
                     {isAcquired && !isPermanent && <Chip label="Acquired" color="primary" size="small" sx={{ mr: 0.5 }} />}
                     <Chip label={`Type: ${trait.category || 'General'}`} size="small" />
                   </>
@@ -250,7 +280,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               onChange={(e) => setFilter('traitTypeFilter', e.target.value)}
             >
               <MenuItem value="all">All Types</MenuItem>
-              {Array.from(new Set(Object.values(allTraits).map(t => t.category))).map(type => (
+              {Array.from(new Set(Object.values(allTraits).map(t => t.category))).sort().map(type => (
                 <MenuItem key={type} value={type}>{type}</MenuItem>
               ))}
             </Select>
@@ -263,19 +293,19 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               onChange={(e) => setFilter('traitStatusFilter', e.target.value)}
             >
               <MenuItem value="all">All Statuses</MenuItem>
-              <MenuItem value="available">Available</MenuItem>
-              <MenuItem value="acquired">Acquired</MenuItem>
+              <MenuItem value="available">Available to Acquire</MenuItem>
+              <MenuItem value="acquired">Acquired (Not Permanent)</MenuItem>
               <MenuItem value="permanent">Permanent</MenuItem>
             </Select>
           </FormControl>
           <Box>
-            <Typography gutterBottom>Cost Range</Typography>
+            <Typography gutterBottom variant="caption">Cost Range (Essence)</Typography>
             <Slider
               value={filterState.traitCostRange}
-              onChange={(e, newValue) => setFilter('traitCostRange', newValue)}
+              onChange={(e, newValue) => setFilter('traitCostRange', newValue as number[])}
               valueLabelDisplay="auto"
               min={0}
-              max={1000}
+              max={1000} 
               step={10}
               size="small"
             />
@@ -333,7 +363,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
             <Select
               value={filterState.sortBy}
               label="Sort By"
-              onChange={(e) => setFilter('sortBy', e.target.value as keyof Trait | 'essenceCost' | 'name')}
+              onChange={(e) => setFilter('sortBy', e.target.value as SortableTraitKey)}
             >
               <MenuItem value="name">Name</MenuItem>
               <MenuItem value="essenceCost">Cost</MenuItem>

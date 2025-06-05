@@ -8,134 +8,79 @@ import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
 import type { TraitSlotData, PlayerTraitsContainerProps } from '../../state/PlayerTypes';
 import { 
-  selectTraitSlots,
-  selectPermanentTraits,
-  selectAllTraits,
+  // selectTraitSlots, // This was incorrectly sourced from Traits
+  selectAllTraits, 
   selectTraitLoading 
-} from '../../../Traits';
+} from '../../../Traits'; 
+
+// Import player specific selectors directly
+import { 
+  selectTraitSlots as selectPlayerTraitSlotsFromPlayer, 
+  selectPermanentTraits as selectPlayerPermanentTraitIds 
+} from '../../state/PlayerSelectors';
+// TODO: Import actual equipTrait/unequipTrait actions from PlayerSlice when ready
+// import { equipTrait, unequipTrait } from '../../state/PlayerSlice';
+
 
 /**
  * Container component for player trait management
- * Provides Redux state integration and trait management logic
  */
 export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   showLoading = false,
-  onTraitChange,
+  onTraitChange, 
   className,
 }) => {
   const dispatch = useAppDispatch();
   
-  // Redux state selectors
-  const rawTraitSlots = useAppSelector(selectTraitSlots);
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
-  const allTraits = useAppSelector(selectAllTraits);
-  const isLoading = useAppSelector(selectTraitLoading);
+  const rawTraitSlots = useAppSelector(selectPlayerTraitSlotsFromPlayer); 
+  const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
+  const allTraits = useAppSelector(selectAllTraits); 
+  const isLoading = useAppSelector(selectTraitLoading); 
 
-  // Transform raw slot data to TraitSlotData format
   const traitSlots: TraitSlotData[] = useMemo(() => {
     if (!Array.isArray(rawTraitSlots)) {
       return [];
     }
-    
     return rawTraitSlots.map((slot, index) => ({
-      id: slot?.id || `slot-${index}`,
+      id: slot?.id || `slot-${index}`, 
       index: slot?.index ?? index,
       isUnlocked: slot?.isUnlocked ?? false,
       traitId: slot?.traitId || null
     }));
   }, [rawTraitSlots]);
 
-  // Convert trait IDs to trait objects for equipped traits
   const equippedTraits = useMemo(() => {
     return traitSlots
       .filter(slot => slot.traitId)
-      .map(slot => allTraits[slot.traitId!])
-      .filter(Boolean);
+      .map(slot => allTraits[slot.traitId!]) 
+      .filter(Boolean); 
   }, [traitSlots, allTraits]);
 
-  // Convert permanent trait IDs to trait objects
   const permanentTraits = useMemo(() => {
-    return permanentTraitIds
-      .map(traitId => allTraits[traitId])
-      .filter(Boolean);
+    return permanentTraitIds 
+      .map((traitId: string) => allTraits[traitId]) 
+      .filter(Boolean); 
   }, [permanentTraitIds, allTraits]);
 
-  // Event handlers with proper error handling and validation
   const handleEquipTrait = useCallback((slotIndex: number, traitId: string) => {
-    try {
-      // Validate slot index
-      if (slotIndex < 0 || slotIndex >= traitSlots.length) {
-        console.error('Invalid slot index:', slotIndex);
-        return;
-      }
+    // TODO: Dispatch PlayerSlice.equipTrait({ slotIndex, traitId });
+    console.log('PlayerTraitsContainer: Equipping trait:', traitId, 'to slot index:', slotIndex);
+    onTraitChange?.('equip', traitId); // Corrected: 2 arguments
+  }, [onTraitChange, dispatch]); // Added dispatch to dependency array if it were used
 
-      // Check if slot is unlocked
-      const targetSlot = traitSlots[slotIndex];
-      if (!targetSlot?.isUnlocked) {
-        console.warn('Attempted to equip trait to locked slot:', slotIndex);
-        return;
-      }
-
-      // Check if trait exists
-      if (!allTraits[traitId]) {
-        console.error('Trait not found:', traitId);
-        return;
-      }
-
-      console.log('Equipping trait:', traitId, 'to slot:', slotIndex);
-      onTraitChange?.('equip', traitId);
-      
-      // TODO: Dispatch actual Redux action when trait system backend is ready
-      // dispatch(equipTrait({ slotIndex, traitId }));
-    } catch (error) {
-      console.error('Error equipping trait:', error);
+  const handleUnequipTrait = useCallback((slotId: string) => { 
+    const slot = traitSlots.find(s => s.id === slotId);
+    if (slot && slot.traitId) {
+      // TODO: Dispatch PlayerSlice.unequipTrait({ slotIndex: slot.index });
+      console.log('PlayerTraitsContainer: Unequipping trait from slot id:', slotId, 'index:', slot.index);
+      onTraitChange?.('unequip', slot.traitId); // Corrected: 2 arguments, pass traitId
+    } else {
+      console.warn('PlayerTraitsContainer: Slot not found or no trait to unequip:', slotId);
     }
-  }, [traitSlots, allTraits, onTraitChange]);
+  }, [traitSlots, onTraitChange, dispatch]); // Added dispatch
 
-  const handleUnequipTrait = useCallback((slotId: string) => {
-    try {
-      // Find the slot by ID
-      const slot = traitSlots.find(s => s.id === slotId);
-      if (!slot || !slot.traitId) {
-        console.warn('No trait equipped in slot:', slotId);
-        return;
-      }
+  // handleMakePermanent is removed.
 
-      console.log('Unequipping trait from slot:', slotId);
-      onTraitChange?.('unequip', slotId);
-      
-      // TODO: Dispatch actual Redux action when trait system backend is ready
-      // dispatch(unequipTrait({ slotId }));
-    } catch (error) {
-      console.error('Error unequipping trait:', error);
-    }
-  }, [traitSlots, onTraitChange]);
-
-  const handleMakePermanent = useCallback((traitId: string) => {
-    try {
-      // Validate trait exists
-      if (!allTraits[traitId]) {
-        console.error('Trait not found for permanence:', traitId);
-        return;
-      }
-
-      // Check if trait is already permanent
-      if (permanentTraitIds.includes(traitId)) {
-        console.warn('Trait is already permanent:', traitId);
-        return;
-      }
-
-      console.log('Making trait permanent:', traitId);
-      onTraitChange?.('permanent', traitId);
-      
-      // TODO: Dispatch actual Redux action when trait system backend is ready
-      // dispatch(makeTraitPermanent({ traitId }));
-    } catch (error) {
-      console.error('Error making trait permanent:', error);
-    }
-  }, [allTraits, permanentTraitIds, onTraitChange]);
-
-  // Additional computed values for UI
   const totalSlots = traitSlots.length;
   const unlockedSlots = traitSlots.filter(slot => slot.isUnlocked).length;
   const equippedCount = equippedTraits.length;
@@ -148,7 +93,7 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
       permanentTraits={permanentTraits}
       onEquipTrait={handleEquipTrait}
       onUnequipTrait={handleUnequipTrait}
-      onMakePermanent={handleMakePermanent}
+      // onMakePermanent prop removed
       showLoading={showLoading || isLoading}
       className={className}
       totalSlots={totalSlots}
@@ -159,7 +104,5 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   );
 };
 
-// Display name for debugging
 PlayerTraitsContainer.displayName = 'PlayerTraitsContainer';
-
 export default React.memo(PlayerTraitsContainer);
