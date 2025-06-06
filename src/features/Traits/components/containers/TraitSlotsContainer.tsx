@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'; // Added useMemo
+import React, { useState, useCallback, useMemo } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { 
   selectTraits, 
@@ -14,6 +14,7 @@ import {
   selectPermanentTraits as selectPlayerPermanentTraitIds 
 } from '../../../Player/state/PlayerSelectors';
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
+import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks'; // Corrected import path
 import TraitSlots from '../ui/TraitSlots';
 
 const TraitSlotsContainer: React.FC = () => {
@@ -42,6 +43,7 @@ const TraitSlotsContainer: React.FC = () => {
       const targetSlot = playerTraitSlots.find(s => s.id === activeSlotId);
       if (targetSlot) {
         dispatch(equipTrait({ traitId: selectedTraitId, slotIndex: targetSlot.index }));
+        dispatch(recalculateStatsThunk()); // Recalculate stats after equipping
       }
     }
     onCloseSelector();
@@ -51,6 +53,7 @@ const TraitSlotsContainer: React.FC = () => {
     const targetSlot = playerTraitSlots.find(slot => slot.index === slotIndex);
     if (targetSlot && targetSlot.traitId) {
       dispatch(unequipTrait({ slotIndex: targetSlot.index }));
+      dispatch(recalculateStatsThunk()); // Recalculate stats after unequipping
     }
   }, [dispatch, playerTraitSlots]);
 
