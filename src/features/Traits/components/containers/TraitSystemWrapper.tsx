@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import { Container, Typography } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import {
   selectTraits,
@@ -137,6 +138,7 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
     },
     onDiscoverTrait: handleDiscoverTrait,
     canAcquireTrait,
+    canMakePermanent: () => false, // Added missing property - always false since this functionality is deprecated
     // Ensure the signature passed matches what TraitSystemUIProps expects for getTraitAffordability
     // If TraitSystemUIProps still expects (trait, action: 'acquire' | 'permanent'), 
     // this might need adjustment or TraitSystemUIProps needs update.
@@ -146,7 +148,24 @@ export const TraitSystemWrapper: React.FC<TraitSystemWrapperProps> = React.memo(
     defaultTab
   };
 
-  return <TraitSystemUI {...uiProps} />;
+  return (
+    <Container maxWidth="lg" sx={{ py: 3 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Trait System
+      </Typography>
+      
+      <Typography variant="body1" color="text.secondary" paragraph>
+        Manage your character traits, acquire new abilities from NPCs, and customize your progression.
+      </Typography>
+
+      {/* Trait system components will be implemented here */}
+      <Typography variant="h6" sx={{ mt: 3 }}>
+        Trait management interface coming soon...
+      </Typography>
+
+      <TraitSystemUI {...uiProps} />
+    </Container>
+  );
 });
 
 TraitSystemWrapper.displayName = 'TraitSystemWrapper';

@@ -8,9 +8,9 @@ import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
 import type { TraitSlotData, PlayerTraitsContainerProps } from '../../state/PlayerTypes';
 import { 
-  // selectTraitSlots, // This was incorrectly sourced from Traits
   selectAllTraits, 
-  selectTraitLoading 
+  selectTraitLoading,
+  selectTraitError 
 } from '../../../Traits'; 
 
 // Import player specific selectors directly
@@ -35,7 +35,8 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   const rawTraitSlots = useAppSelector(selectPlayerTraitSlotsFromPlayer); 
   const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const allTraits = useAppSelector(selectAllTraits); 
-  const isLoading = useAppSelector(selectTraitLoading); 
+  const isLoading = useAppSelector(selectTraitLoading);
+  const error = useAppSelector(selectTraitError); 
 
   const traitSlots: TraitSlotData[] = useMemo(() => {
     if (!Array.isArray(rawTraitSlots)) {
@@ -62,22 +63,24 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
       .filter(Boolean); 
   }, [permanentTraitIds, allTraits]);
 
-  const handleEquipTrait = useCallback((slotIndex: number, traitId: string) => {
+  // Adjusted signature to match PlayerTraitsUIProps: (traitId: string, slotIndex: number)
+  const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
     // TODO: Dispatch PlayerSlice.equipTrait({ slotIndex, traitId });
     console.log('PlayerTraitsContainer: Equipping trait:', traitId, 'to slot index:', slotIndex);
-    onTraitChange?.('equip', traitId); // Corrected: 2 arguments
-  }, [onTraitChange, dispatch]); // Added dispatch to dependency array if it were used
+    onTraitChange?.('equip', traitId); 
+  }, [onTraitChange, dispatch]); 
 
-  const handleUnequipTrait = useCallback((slotId: string) => { 
-    const slot = traitSlots.find(s => s.id === slotId);
+  // Adjusted signature to match PlayerTraitsUIProps: (slotIndex: number)
+  const handleUnequipTrait = useCallback((slotIndex: number) => { 
+    const slot = traitSlots.find(s => s.index === slotIndex); // Find by index
     if (slot && slot.traitId) {
-      // TODO: Dispatch PlayerSlice.unequipTrait({ slotIndex: slot.index });
-      console.log('PlayerTraitsContainer: Unequipping trait from slot id:', slotId, 'index:', slot.index);
-      onTraitChange?.('unequip', slot.traitId); // Corrected: 2 arguments, pass traitId
+      // TODO: Dispatch PlayerSlice.unequipTrait({ slotIndex });
+      console.log('PlayerTraitsContainer: Unequipping trait from slot index:', slotIndex);
+      onTraitChange?.('unequip', slot.traitId); 
     } else {
-      console.warn('PlayerTraitsContainer: Slot not found or no trait to unequip:', slotId);
+      console.warn('PlayerTraitsContainer: Slot not found or no trait to unequip at index:', slotIndex);
     }
-  }, [traitSlots, onTraitChange, dispatch]); // Added dispatch
+  }, [onTraitChange, traitSlots, dispatch]); 
 
   // handleMakePermanent is removed.
 
@@ -88,18 +91,15 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
 
   return (
     <PlayerTraitsUI
-      slots={traitSlots}
-      equippedTraits={equippedTraits}
-      permanentTraits={permanentTraits}
+      traitSlots={traitSlots}
+      equippedTraits={equippedTraits} 
+      permanentTraits={permanentTraits} 
+      availableTraits={[]} 
       onEquipTrait={handleEquipTrait}
       onUnequipTrait={handleUnequipTrait}
-      // onMakePermanent prop removed
-      showLoading={showLoading || isLoading}
+      isLoading={showLoading || isLoading} // Changed showLoading to isLoading
       className={className}
-      totalSlots={totalSlots}
-      unlockedSlots={unlockedSlots}
-      equippedCount={equippedCount}
-      permanentCount={permanentCount}
+      error={error} 
     />
   );
 };

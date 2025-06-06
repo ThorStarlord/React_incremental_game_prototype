@@ -6,46 +6,17 @@ import {
   StatusEffect,
   AllocateAttributePointPayload,
   EquipTraitPayload,
-  UnequipTraitPayload,
+  UnequipTraitPayload
 } from './PlayerTypes';
-import { TraitSlot } from '../../Traits/state/TraitsTypes'; // Import TraitSlot
-import { processStatusEffectsThunk, regenerateVitalsThunk, useConsumableItemThunk, autoAllocateAttributesThunk, recalculateStatsThunk } from './PlayerThunks'; // Added recalculateStatsThunk
+import { TraitSlot } from '../../Traits/state/TraitsTypes';
+import type { ProcessedTraitEffects } from '../utils/traitEffectProcessor';
+import {
+  ATTRIBUTE_CONSTANTS,
+  PROGRESSION_CONSTANTS,
+  STAT_LIMITS
+} from '../../../constants/playerConstants';
 
-// Initial player stats following specification defaults
-const initialStats: PlayerStats = {
-  health: 100,
-  maxHealth: 100,
-  mana: 50,
-  maxMana: 50,
-  attack: 10,
-  defense: 5,
-  speed: 10,
-  healthRegen: 1.0,      // Consistent naming
-  manaRegen: 0.5,        // Consistent naming
-  criticalChance: 0.05,
-  criticalDamage: 1.5,
-};
-
-// Initial player attributes - all start at 10
-const initialAttributes: PlayerAttributes = {
-  strength: 10,
-  dexterity: 10,
-  intelligence: 10,
-  constitution: 10,
-  wisdom: 10,
-  charisma: 10
-};
-
-// Initial trait slots for player (default unlocked)
-const initialPlayerTraitSlots: TraitSlot[] = [
-  { id: 'player-slot-0', index: 0, isUnlocked: true, traitId: null },
-  { id: 'player-slot-1', index: 1, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 2 } },
-  { id: 'player-slot-2', index: 2, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 3 } },
-  { id: 'player-slot-3', index: 3, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 4 } },
-  { id: 'player-slot-4', index: 4, isUnlocked: false, unlockRequirements: { type: 'resonanceLevel', value: 5 } },
-];
-
-// Initial player state - Exporting for use in thunks
+// Canonical initial state - single source of truth
 export const initialState: PlayerState = {
   stats: {
     health: 100,
@@ -55,253 +26,208 @@ export const initialState: PlayerState = {
     attack: 10,
     defense: 5,
     speed: 10,
-    healthRegen: 1.0,      // Consistent naming
-    manaRegen: 0.5,        // Consistent naming
+    healthRegen: 1.0,
+    manaRegen: 0.5,
     criticalChance: 0.05,
     criticalDamage: 1.5,
   },
-  attributes: initialAttributes,
-  availableAttributePoints: 0,
-  availableSkillPoints: 0,
+  attributes: {
+    strength: ATTRIBUTE_CONSTANTS.BASE_ATTRIBUTE_VALUE,
+    dexterity: ATTRIBUTE_CONSTANTS.BASE_ATTRIBUTE_VALUE,
+    intelligence: ATTRIBUTE_CONSTANTS.BASE_ATTRIBUTE_VALUE,
+    constitution: ATTRIBUTE_CONSTANTS.BASE_ATTRIBUTE_VALUE,
+    wisdom: ATTRIBUTE_CONSTANTS.BASE_ATTRIBUTE_VALUE,
+    charisma: ATTRIBUTE_CONSTANTS.BASE_ATTRIBUTE_VALUE,
+  },
+  availableAttributePoints: PROGRESSION_CONSTANTS.STARTING_ATTRIBUTE_POINTS,
+  availableSkillPoints: PROGRESSION_CONSTANTS.STARTING_SKILL_POINTS,
   statusEffects: [],
   permanentTraits: [],
-  traitSlots: initialPlayerTraitSlots, // Use the new initial player trait slots
-  maxTraitSlots: 5, // Max slots for the player
+  traitSlots: [
+    { id: 'slot-0', index: 0, isUnlocked: true, traitId: null },
+    { id: 'slot-1', index: 1, isUnlocked: false, traitId: null, unlockRequirements: { type: 'resonanceLevel', value: 1 } },
+    { id: 'slot-2', index: 2, isUnlocked: false, traitId: null, unlockRequirements: { type: 'resonanceLevel', value: 2 } },
+    { id: 'slot-3', index: 3, isUnlocked: false, traitId: null, unlockRequirements: { type: 'resonanceLevel', value: 3 } },
+  ],
+  maxTraitSlots: PROGRESSION_CONSTANTS.MAX_TRAIT_SLOTS,
   totalPlaytime: 0,
   isAlive: true,
-  resonanceLevel: 1, // Initial Resonance Level
+  resonanceLevel: PROGRESSION_CONSTANTS.STARTING_RESONANCE_LEVEL,
+  activeTraitEffects: {
+    statModifiers: {},
+    specialEffects: {},
+    multipliers: {}
+  }
 };
 
-const playerSlice = createSlice({
+export const PlayerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {
-    // Reset player to initial state
-    resetPlayer: () => initialState,
-
     // Update player stats directly
-    updateStats: (state, action: PayloadAction<Partial<PlayerStats>>) => {
-      state.stats = { ...state.stats, ...action.payload };
-      
-      // Ensure health and mana don't exceed maximums
-      state.stats.health = Math.min(state.stats.health, state.stats.maxHealth);
-      state.stats.mana = Math.min(state.stats.mana, state.stats.maxMana);
+    updateStats: (state, action: PayloadAction<PlayerStats>) => {
+      state.stats = action.payload;
     },
 
-    // Modify health by amount (positive or negative)
-    modifyHealth: (state, action: PayloadAction<number>) => {
-      const newHealth = state.stats.health + action.payload;
-      state.stats.health = Math.max(0, Math.min(newHealth, state.stats.maxHealth));
-      
-      // Update alive status
-      state.isAlive = state.stats.health > 0;
-    },
-
-    // Modify mana by amount (positive or negative)
-    modifyMana: (state, action: PayloadAction<number>) => {
-      const newMana = state.stats.mana + action.payload;
-      state.stats.mana = Math.max(0, Math.min(newMana, state.stats.maxMana));
+    // Update active trait effects
+    updateTraitEffects: (state, action: PayloadAction<ProcessedTraitEffects>) => {
+      state.activeTraitEffects = action.payload;
     },
 
     // Allocate attribute points
     allocateAttributePoint: (state, action: PayloadAction<AllocateAttributePointPayload>) => {
-      const { attributeName, points } = action.payload;
-      if (state.availableAttributePoints >= points && attributeName in state.attributes) {
-        state.availableAttributePoints -= points;
-        state.attributes[attributeName] += points;
-        
-        // Recalculate derived stats based on new attributes
-        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-        // recalculateStatsThunk should be dispatched by the calling component/middleware
+      const { attribute } = action.payload;
+      if (state.availableAttributePoints > 0 && state.attributes[attribute] < ATTRIBUTE_CONSTANTS.MAX_ATTRIBUTE_VALUE) {
+        state.attributes[attribute] += 1;
+        state.availableAttributePoints -= 1;
       }
     },
 
-    // Update available attribute points
-    updateAttributePoints: (state, action: PayloadAction<number>) => {
-      state.availableAttributePoints = Math.max(0, action.payload);
+    // Add attribute points
+    addAttributePoints: (state, action: PayloadAction<number>) => {
+      state.availableAttributePoints += action.payload;
     },
 
-    // Update available skill points
-    updateSkillPoints: (state, action: PayloadAction<number>) => {
-      state.availableSkillPoints = Math.max(0, action.payload);
+    // Add skill points
+    addSkillPoints: (state, action: PayloadAction<number>) => {
+      state.availableSkillPoints += action.payload;
+    },
+
+    // Add a status effect
+    addStatusEffect: (state, action: PayloadAction<StatusEffect>) => {
+      state.statusEffects.push(action.payload);
+    },
+
+    // Remove a status effect by ID
+    removeStatusEffect: (state, action: PayloadAction<string>) => {
+      state.statusEffects = state.statusEffects.filter(effect => effect.id !== action.payload);
+    },
+
+    // Update status effects array
+    updateStatusEffects: (state, action: PayloadAction<StatusEffect[]>) => {
+      state.statusEffects = action.payload;
+    },
+
+    // Add a permanent trait
+    addPermanentTrait: (state, action: PayloadAction<string>) => {
+      if (!state.permanentTraits.includes(action.payload)) {
+        state.permanentTraits.push(action.payload);
+      }
+    },
+
+    // Remove a permanent trait
+    removePermanentTrait: (state, action: PayloadAction<string>) => {
+      state.permanentTraits = state.permanentTraits.filter(id => id !== action.payload);
     },
 
     // Equip a trait to a specific slot
     equipTrait: (state, action: PayloadAction<EquipTraitPayload>) => {
-      const { traitId, slotIndex } = action.payload;
-      
-      const targetSlot = state.traitSlots.find(slot => slot.index === slotIndex);
-
-      if (!targetSlot) {
-        console.warn(`Slot index ${slotIndex} not found.`);
-        return;
+      const { slotIndex, traitId } = action.payload;
+      const slot = state.traitSlots[slotIndex];
+      if (slot && slot.isUnlocked) {
+        slot.traitId = traitId;
       }
-      if (!targetSlot.isUnlocked) {
-        console.warn(`Slot index ${slotIndex} is locked.`);
-        return;
-      }
-      if (targetSlot.traitId) {
-        console.warn(`Slot index ${slotIndex} is already occupied by ${targetSlot.traitId}.`);
-        return; // Or handle replacement if desired
-      }
-
-      targetSlot.traitId = traitId;
-      console.log(`Equipped trait ${traitId} to slot index ${targetSlot.index}.`);
-      
-      // Recalculate stats with new trait
-      // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-      // recalculateStatsThunk should be dispatched by the calling component/middleware
     },
 
     // Unequip a trait from a specific slot
     unequipTrait: (state, action: PayloadAction<UnequipTraitPayload>) => {
       const { slotIndex } = action.payload;
-      
-      const targetSlot = state.traitSlots.find(slot => slot.index === slotIndex);
-
-      if (targetSlot && targetSlot.traitId) {
-        targetSlot.traitId = null;
-        console.log(`Unequipped trait from slot index ${slotIndex}.`);
-        
-        // Recalculate stats without the trait
-        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-        // recalculateStatsThunk should be dispatched by the calling component/middleware
-      }
-    },
-
-    // Add a permanent trait
-    addPermanentTrait: (state, action: PayloadAction<string>) => {
-      const traitId = action.payload;
-      if (!state.permanentTraits.includes(traitId)) {
-        state.permanentTraits.push(traitId);
-        
-        // Recalculate stats with new permanent trait
-        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-        // recalculateStatsThunk should be dispatched by the calling component/middleware
+      const slot = state.traitSlots[slotIndex];
+      if (slot) {
+        slot.traitId = null;
       }
     },
 
     // Unlock a player trait slot
     unlockTraitSlot: (state, action: PayloadAction<number>) => {
-      const slotIndex = action.payload;
-      const slot = state.traitSlots.find(s => s.index === slotIndex);
-      
-      if (slot && !slot.isUnlocked) {
+      const slot = state.traitSlots[action.payload];
+      if (slot) {
         slot.isUnlocked = true;
-        console.log(`Player trait slot ${slotIndex} unlocked.`);
       }
-    },
-
-    // Update player's Resonance Level
-    updateResonanceLevel: (state, action: PayloadAction<number>) => {
-      state.resonanceLevel = action.payload;
-    },
-
-    // Add status effect
-    addStatusEffect: (state, action: PayloadAction<StatusEffect>) => {
-      state.statusEffects.push(action.payload);
-      
-      // Recalculate stats with new effect
-      // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-      // recalculateStatsThunk should be dispatched by the calling component/middleware
-    },
-
-    // Remove status effect
-    removeStatusEffect: (state, action: PayloadAction<string>) => {
-      const effectId = action.payload;
-      state.statusEffects = state.statusEffects.filter(effect => effect.id !== effectId);
-      
-      // Recalculate stats without the effect
-      // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-      // recalculateStatsThunk should be dispatched by the calling component/middleware
     },
 
     // Update total play time
-    updatePlaytime: (state, action: PayloadAction<number>) => {
+    updateTotalPlaytime: (state, action: PayloadAction<number>) => {
       state.totalPlaytime = action.payload;
     },
 
-    // Recalculate all derived stats - This logic is now primarily in recalculateStatsThunk.
-    // This reducer can be kept simple or removed if all recalculations are triggered via the thunk.
-    // For now, let's make it a no-op or a very basic stat consistency check if needed.
-    // The thunk `recalculateStatsThunk` will dispatch `updateStats` with the full calculation.
-    recalculateStats: (state) => {
-      // Placeholder: The main logic is moved to recalculateStatsThunk.
-      // Ensure health and mana don't exceed maximums after any direct modifications.
-      // This is a safety net if updateStats isn't called immediately after a direct change.
-      if (state.stats.health > state.stats.maxHealth) {
-        state.stats.health = state.stats.maxHealth;
+    // Set player's alive status
+    setPlayerAlive: (state, action: PayloadAction<boolean>) => {
+      state.isAlive = action.payload;
+    },
+
+    // Increment resonance level
+    incrementResonanceLevel: (state) => {
+      state.resonanceLevel += 1;
+    },
+
+    // Set resonance level directly
+    setResonanceLevel: (state, action: PayloadAction<number>) => {
+      state.resonanceLevel = Math.max(0, action.payload);
+    },
+
+    // Health and mana management with limits
+    restoreHealth: (state, action: PayloadAction<number>) => {
+      state.stats.health = Math.min(
+        state.stats.maxHealth,
+        state.stats.health + action.payload
+      );
+    },
+
+    restoreMana: (state, action: PayloadAction<number>) => {
+      state.stats.mana = Math.min(
+        state.stats.maxMana,
+        state.stats.mana + action.payload
+      );
+    },
+
+    takeDamage: (state, action: PayloadAction<number>) => {
+      state.stats.health = Math.max(
+        STAT_LIMITS.MIN_HEALTH,
+        state.stats.health - action.payload
+      );
+      if (state.stats.health <= 0) {
+        state.isAlive = false;
       }
-      if (state.stats.mana > state.stats.maxMana) {
-        state.stats.mana = state.stats.maxMana;
-      }
-      if (state.stats.health < 0) state.stats.health = 0;
-      if (state.stats.mana < 0) state.stats.mana = 0;
-    }
+    },
+
+    consumeMana: (state, action: PayloadAction<number>) => {
+      state.stats.mana = Math.max(
+        STAT_LIMITS.MIN_MANA,
+        state.stats.mana - action.payload
+      );
+    },
+
+    // Reset player to initial state
+    resetPlayer: (state) => {
+      return { ...initialState };
+    },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(processStatusEffectsThunk.fulfilled, (state, action) => {
-        const expiredEffectIds = action.payload;
-        state.statusEffects = state.statusEffects.filter(effect => !expiredEffectIds.includes(effect.id));
-        // Recalculate stats after status effects are removed
-        // The recalculateStatsThunk will need to be dispatched by the component that dispatches processStatusEffectsThunk
-        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-      })
-      .addCase(regenerateVitalsThunk.fulfilled, (state, action) => {
-        state.stats.health += action.payload.healthRegenerated;
-        state.stats.mana += action.payload.manaRegenerated;
-        // Recalculate stats after regeneration
-        // The recalculateStatsThunk will need to be dispatched by the component that dispatches regenerateVitalsThunk
-        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-      })
-      .addCase(useConsumableItemThunk.fulfilled, (state, action) => {
-        const { effectsApplied, statsModified } = action.payload;
-        effectsApplied.forEach(effect => {
-          state.statusEffects.push(effect);
-        });
-        if (statsModified.health) {
-          state.stats.health += statsModified.health;
-        }
-        if (statsModified.mana) {
-          state.stats.mana += statsModified.mana;
-        }
-        // Recalculate stats after consumable item effects
-        // The recalculateStatsThunk will need to be dispatched by the component that dispatches useConsumableItemThunk
-        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-      })
-      .addCase(autoAllocateAttributesThunk.fulfilled, (state, action) => {
-        const allocation = action.payload;
-        for (const attr in allocation) {
-          if (allocation.hasOwnProperty(attr)) {
-            state.attributes[attr as keyof PlayerAttributes] += allocation[attr];
-          }
-        }
-        state.availableAttributePoints -= Object.values(allocation).reduce((sum, val) => sum + val, 0);
-        // Recalculate stats after attribute allocation
-        // The recalculateStatsThunk will need to be dispatched by the component that dispatches autoAllocateAttributesThunk
-        // playerSlice.caseReducers.recalculateStats(state); // Removed direct call
-      });
-  }
 });
 
 export const {
-  resetPlayer,
   updateStats,
-  modifyHealth,
-  modifyMana,
+  updateTraitEffects,
   allocateAttributePoint,
-  updateAttributePoints,
-  updateSkillPoints,
-  equipTrait,
-  unequipTrait,
-  addPermanentTrait,
-  unlockTraitSlot, // Export new action
-  updateResonanceLevel, // Export new action
+  addAttributePoints,
+  addSkillPoints,
   addStatusEffect,
   removeStatusEffect,
-  updatePlaytime,
-  recalculateStats
-} = playerSlice.actions;
+  updateStatusEffects,
+  addPermanentTrait,
+  removePermanentTrait,
+  equipTrait,
+  unequipTrait,
+  unlockTraitSlot,
+  updateTotalPlaytime,
+  setPlayerAlive,
+  incrementResonanceLevel,
+  setResonanceLevel,
+  restoreHealth,
+  restoreMana,
+  takeDamage,
+  consumeMana,
+  resetPlayer,
+} = PlayerSlice.actions;
 
-export default playerSlice.reducer;
+export default PlayerSlice.reducer;

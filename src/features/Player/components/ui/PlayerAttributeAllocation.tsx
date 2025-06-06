@@ -24,7 +24,7 @@ export const PlayerAttributeAllocation: React.FC<PlayerAttributeAllocationProps>
 
   const handleAllocatePoint = useCallback((attributeName: keyof typeof attributes) => {
     if (availablePoints > 0) {
-      dispatch(allocateAttributePoint({ attributeName, points: 1 }));
+      dispatch(allocateAttributePoint({ attribute: attributeName })); // Fixed: use 'attribute' instead of 'attributeName'
       dispatch(recalculateStatsThunk()); // Recalculate stats after allocation
     }
   }, [dispatch, availablePoints]);

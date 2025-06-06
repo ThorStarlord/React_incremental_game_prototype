@@ -5,7 +5,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { gainEssence, updateResonanceLevel as updateEssenceResonanceLevel } from './EssenceSlice'; // Renamed import
 import { RootState } from '../../../app/store';
 import { EssenceState } from './EssenceTypes';
-import { unlockTraitSlot, updateResonanceLevel as updatePlayerResonanceLevel } from '../../Player/state/PlayerSlice';
+import { unlockTraitSlot, setResonanceLevel as updatePlayerResonanceLevel } from '../../Player/state/PlayerSlice'; // Fixed import name
 import { selectTraitSlots, selectMaxTraitSlots, selectPlayerResonanceLevel } from '../../Player/state/PlayerSelectors';
 
 /**

@@ -15,13 +15,15 @@ import {
   selectTotalPlaytime
 } from '../state/PlayerSelectors';
 import { 
-  modifyHealth,
-  modifyMana,
+  restoreHealth,
+  restoreMana,
+  takeDamage,
+  consumeMana,
   allocateAttributePoint,
   addStatusEffect,
-  removeStatusEffect,
-  recalculateStats
+  removeStatusEffect
 } from '../state/PlayerSlice';
+import { recalculateStatsThunk } from '../state/PlayerThunks'; // Import thunk from correct location
 import type { StatusEffect, PlayerAttributes } from '../state/PlayerTypes';
 
 /**
@@ -53,17 +55,25 @@ export const usePlayerStats = () => {
   
   // Memoized action dispatchers for health/mana management
   const handleHealthChange = useCallback((amount: number) => {
-    dispatch(modifyHealth(amount));
+    if (amount > 0) {
+      dispatch(restoreHealth(amount));
+    } else {
+      dispatch(takeDamage(Math.abs(amount)));
+    }
   }, [dispatch]);
   
   const handleManaChange = useCallback((amount: number) => {
-    dispatch(modifyMana(amount));
+    if (amount > 0) {
+      dispatch(restoreMana(amount));
+    } else {
+      dispatch(consumeMana(Math.abs(amount)));
+    }
   }, [dispatch]);
   
   // Attribute allocation with validation
   const handleAttributeAllocation = useCallback((attributeName: keyof PlayerAttributes, points: number = 1) => {
     if (availableAttributePoints >= points) {
-      dispatch(allocateAttributePoint({ attributeName, points }));
+      dispatch(allocateAttributePoint({ attribute: attributeName })); // Fixed payload structure
     }
   }, [dispatch, availableAttributePoints]);
   
@@ -78,7 +88,7 @@ export const usePlayerStats = () => {
   
   // Manual stat recalculation trigger
   const handleRecalculateStats = useCallback(() => {
-    dispatch(recalculateStats());
+    dispatch(recalculateStatsThunk());
   }, [dispatch]);
   
   // Helper functions for UI display
@@ -176,7 +186,7 @@ export const usePlayerAttributes = () => {
   
   const allocateAttribute = useCallback((attributeName: keyof PlayerAttributes, points: number = 1) => {
     if (availablePoints >= points) {
-      dispatch(allocateAttributePoint({ attributeName, points }));
+      dispatch(allocateAttributePoint({ attribute: attributeName })); // Fixed payload structure
     }
   }, [dispatch, availablePoints]);
   
@@ -332,19 +342,19 @@ export const usePlayerVitals = () => {
   const isAlive = useAppSelector(selectIsPlayerAlive);
   
   const heal = useCallback((amount: number) => {
-    dispatch(modifyHealth(Math.abs(amount)));
+    dispatch(restoreHealth(Math.abs(amount)));
   }, [dispatch]);
   
   const damage = useCallback((amount: number) => {
-    dispatch(modifyHealth(-Math.abs(amount)));
+    dispatch(takeDamage(Math.abs(amount)));
   }, [dispatch]);
   
-  const restoreMana = useCallback((amount: number) => {
-    dispatch(modifyMana(Math.abs(amount)));
+  const restorePlayerMana = useCallback((amount: number) => {
+    dispatch(restoreMana(Math.abs(amount)));
   }, [dispatch]);
   
-  const consumeMana = useCallback((amount: number) => {
-    dispatch(modifyMana(-Math.abs(amount)));
+  const consumePlayerMana = useCallback((amount: number) => {
+    dispatch(consumeMana(Math.abs(amount)));
   }, [dispatch]);
   
   const canCastSpell = useCallback((manaCost: number): boolean => {
@@ -394,8 +404,8 @@ export const usePlayerVitals = () => {
     // Actions
     heal,
     damage,
-    restoreMana,
-    consumeMana,
+    restoreMana: restorePlayerMana,
+    consumeMana: consumePlayerMana,
     
     // Utilities
     canCastSpell,

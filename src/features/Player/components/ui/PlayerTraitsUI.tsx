@@ -3,7 +3,7 @@
  * @description UI component for displaying player trait information with quick actions
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   Box,
   Card,
@@ -15,280 +15,181 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
-import {
-  Assignment as AssignmentIcon,
-  Star as StarIcon,
-  LockOpen as LockOpenIcon,
-  Lock as LockIcon,
-  Add as AddIcon
-} from '@mui/icons-material';
-import type { PlayerTraitsUIProps, TraitSlotData } from '../../state/PlayerTypes';
+import { PlayerTraitsUIProps } from '../../state/PlayerTypes';
 
 /**
- * PlayerTraitsUI - Presentational component for player trait management
- * Displays trait slots, equipped traits, and provides trait management interface
+ * PlayerTraitsUI Component
+ * 
+ * Presentational component for displaying and managing player trait slots.
+ * Handles trait equipping, unequipping, and slot management.
  */
 export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
-  slots,
-  equippedTraits,
-  permanentTraits,
-  onSlotClick,
-  onTraitEquip,
-  onTraitUnequip,
-  onTraitMakePermanent,
+  traitSlots,
+  availableTraits,
   onEquipTrait,
   onUnequipTrait,
-  onMakePermanent,
-  showLoading = false,
-  isLoading,
-  equippedCount = 0,
-  permanentCount = 0,
-  maxSlots = 0,
-  totalSlots = 0,
-  unlockedSlots = 0,
-  className
+  onTraitSelect,
+  className,
+  isLoading = false,
+  error = null
 }) => {
-  const getTraitById = useMemo(
-    () => (traitId: string | null | undefined) => {
-      if (!traitId) return null;
-      return equippedTraits.find((trait: any) => trait.id === traitId) || null;
-    },
-    [equippedTraits]
-  );
+  const getTraitById = useMemo(() => {
+    // Since we don't have access to all traits here, we'll work with available traits
+    const traitMap = new Map();
+    availableTraits.forEach(trait => {
+      traitMap.set(trait.id || trait.name, trait);
+    });
+    return (id: string) => traitMap.get(id);
+  }, [availableTraits]);
 
-  const handleSlotClick = useCallback(
-    (slotId: string) => {
-      // TODO: Open trait selection dialog
-      console.log('Opening trait selection for slot:', slotId);
-    },
-    []
-  );
-
-  if (showLoading) {
+  if (isLoading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight={200}
-        className={className}
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
         <CircularProgress />
-        <Typography variant="body2" sx={{ ml: 2 }}>
+        <Typography variant="body1" sx={{ ml: 2 }}>
           Loading traits...
         </Typography>
       </Box>
     );
   }
 
+  if (error) {
+    return (
+      <Alert severity="error" sx={{ mb: 2 }}>
+        {error}
+      </Alert>
+    );
+  }
+
   return (
     <Box className={className}>
-      {/* Statistics Overview */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Trait Overview
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={6} sm={3}>
-              <Box textAlign="center">
-                <Typography variant="h4" color="primary">
-                  {equippedCount}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Equipped
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Box textAlign="center">
-                <Typography variant="h4" color="secondary">
-                  {permanentCount}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Permanent
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Box textAlign="center">
-                <Typography variant="h4" color="success.main">
-                  {unlockedSlots}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Unlocked
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Box textAlign="center">
-                <Typography variant="h4" color="info.main">
-                  {totalSlots}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Total Slots
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+      <Typography variant="h6" gutterBottom>
+        Trait Slots
+      </Typography>
+      
+      <Grid container spacing={2}>
+        {traitSlots.map((slot) => {
+          const equippedTrait = slot.traitId ? getTraitById(slot.traitId) : null;
+          
+          return (
+            <Grid item xs={12} sm={6} md={4} key={slot.id}>
+              <Card 
+                variant={slot.isUnlocked ? "outlined" : "elevation"}
+                sx={{
+                  minHeight: 150,
+                  opacity: slot.isUnlocked ? 1 : 0.6,
+                  cursor: slot.isUnlocked ? 'pointer' : 'default',
+                  border: slot.isUnlocked && slot.traitId ? '2px solid' : undefined,
+                  borderColor: slot.isUnlocked && slot.traitId ? 'primary.main' : undefined,
+                  '&:hover': slot.isUnlocked ? {
+                    transform: 'translateY(-2px)',
+                    boxShadow: 2
+                  } : {}
+                }}
+                onClick={() => {
+                  if (slot.isUnlocked && slot.traitId) {
+                    onUnequipTrait?.(slot.index);
+                  }
+                }}
+              >
+                <CardContent>
+                  <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Slot {slot.index + 1}
+                    </Typography>
+                    {slot.isUnlocked ? (
+                      <Chip label="Unlocked" size="small" color="success" />
+                    ) : (
+                      <Chip label="Locked" size="small" color="default" />
+                    )}
+                  </Box>
 
-      {/* Trait Slots */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            <AssignmentIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-            Trait Slots
-          </Typography>
-          <Grid container spacing={2}>
-            {slots.map((slot: TraitSlotData) => {
-              const equippedTrait = getTraitById(slot.traitId);
-
-              return (
-                <Grid item xs={12} sm={6} md={4} key={slot.id}>
-                  <Card
-                    sx={{
-                      minHeight: 200,
-                      cursor: slot.isUnlocked ? 'pointer' : 'default',
-                      opacity: slot.isUnlocked ? 1 : 0.6,
-                      border: equippedTrait ? '2px solid' : '1px solid',
-                      borderColor: equippedTrait ? 'primary.main' : 'divider'
-                    }}
-                    onClick={() => {
-                      if (slot.isUnlocked && slot.traitId) {
-                        onUnequipTrait?.(slot.id);
-                      }
-                    }}
-                  >
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-                        <Typography variant="subtitle2">
-                          Slot {slot.index + 1}
+                  {slot.isUnlocked ? (
+                    equippedTrait ? (
+                      <Box>
+                        <Typography variant="h6" gutterBottom>
+                          {equippedTrait.name}
                         </Typography>
-                        {slot.isUnlocked ? (
-                          <LockOpenIcon color="success" fontSize="small" />
-                        ) : (
-                          <LockIcon color="disabled" fontSize="small" />
-                        )}
-                      </Box>
-                      
-                      {slot.traitId && equippedTrait ? (
-                        <Box>
-                          <Typography variant="body2" gutterBottom>
-                            {equippedTrait.name}
-                          </Typography>
+                        <Typography variant="body2" color="text.secondary" paragraph>
+                          {equippedTrait.description}
+                        </Typography>
+                        <Box display="flex" gap={1} flexWrap="wrap">
                           <Button
                             size="small"
                             variant="outlined"
                             color="warning"
                             onClick={(e) => {
                               e.stopPropagation();
-                              onUnequipTrait?.(slot.id);
+                              onUnequipTrait?.(slot.index);
                             }}
                           >
                             Unequip
                           </Button>
                         </Box>
-                      ) : slot.isUnlocked ? (
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Empty Slot
-                          </Typography>
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            startIcon={<AddIcon />}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSlotClick(slot.id);
-                            }}
-                          >
-                            Equip Trait
-                          </Button>
-                        </Box>
-                      ) : (
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Locked
-                          </Typography>
-                          {slot.unlockRequirement && (
-                            <Typography variant="caption" color="text.secondary">
-                              {slot.unlockRequirement}
-                            </Typography>
-                          )}
-                        </Box>
+                      </Box>
+                    ) : (
+                      <Box>
+                        <Typography variant="body1" color="text.secondary" gutterBottom>
+                          Empty Slot
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Click to equip a trait
+                        </Typography>
+                      </Box>
+                    )
+                  ) : (
+                    <Box>
+                      <Typography variant="body1" color="text.secondary" gutterBottom>
+                        Locked Slot
+                      </Typography>
+                      {slot.unlockRequirements && (
+                        <Typography variant="caption" color="text.secondary">
+                          {slot.unlockRequirements.type === 'resonanceLevel' 
+                            ? `Resonance Level ${slot.unlockRequirements.value}` 
+                            : slot.unlockRequirements.value}
+                        </Typography>
                       )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              );
-            })}
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {/* Permanent Traits */}
-      {permanentTraits.length > 0 && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              <StarIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-              Permanent Traits ({permanentTraits.length})
-            </Typography>
-            <Grid container spacing={1}>
-              {permanentTraits.map((trait: any) => (
-                <Grid item key={trait.id}>
-                  <Chip
-                    label={trait.name}
-                    color="secondary"
-                    variant="filled"
-                    icon={<StarIcon />}
-                  />
-                </Grid>
-              ))}
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
             </Grid>
-          </CardContent>
-        </Card>
-      )}
+          );
+        })}
+      </Grid>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardContent>
+      {availableTraits.length > 0 && (
+        <Box mt={3}>
           <Typography variant="h6" gutterBottom>
-            Trait Management
+            Available Traits
           </Typography>
-
-          <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
-            <Button
-              variant="outlined"
-              startIcon={<AddIcon />}
-              disabled={showLoading}
-            >
-              Discover New Traits
-            </Button>
-
-            <Button
-              variant="contained"
-              color="success"
-              disabled={equippedTraits.length === 0}
-              onClick={() => {
-                const firstEquippedTrait = equippedTraits[0];
-                if (firstEquippedTrait) {
-                  onMakePermanent?.(firstEquippedTrait.id);
-                }
-              }}
-            >
-              Make First Trait Permanent
-            </Button>
-          </Box>
-
-          <Alert severity="info">
-            This interface is ready for full trait system integration. Trait acquisition,
-            permanence mechanics, and slot management are prepared for backend implementation.
-          </Alert>
-        </CardContent>
-      </Card>
+          <Grid container spacing={2}>
+            {availableTraits.map((trait) => (
+              <Grid item xs={12} sm={6} md={4} key={trait.id || trait.name}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {trait.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                      {trait.description}
+                    </Typography>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => {
+                        onTraitSelect?.(trait.id || trait.name);
+                      }}
+                    >
+                      Select
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
     </Box>
   );
 });
