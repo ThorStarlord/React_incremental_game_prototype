@@ -20,7 +20,7 @@ import {
 import { 
   processTraitEffects, 
   applyTraitEffectsToStats
-} from '../utils/traitEffectProcessor';
+} from '../utils/traitEffectProcessor'; // Corrected import path
 import {
   STAT_FORMULAS,
   STAT_LIMITS,

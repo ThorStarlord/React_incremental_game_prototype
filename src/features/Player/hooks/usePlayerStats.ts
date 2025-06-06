@@ -23,7 +23,7 @@ import {
   addStatusEffect,
   removeStatusEffect
 } from '../state/PlayerSlice';
-import { recalculateStatsThunk } from '../state/PlayerThunks'; // Import thunk from correct location
+import { recalculateStatsThunk } from '../state/PlayerThunks'; 
 import type { StatusEffect, PlayerAttributes } from '../state/PlayerTypes';
 
 /**
@@ -73,7 +73,7 @@ export const usePlayerStats = () => {
   // Attribute allocation with validation
   const handleAttributeAllocation = useCallback((attributeName: keyof PlayerAttributes, points: number = 1) => {
     if (availableAttributePoints >= points) {
-      dispatch(allocateAttributePoint({ attribute: attributeName })); // Fixed payload structure
+      dispatch(allocateAttributePoint({ attribute: attributeName })); 
     }
   }, [dispatch, availableAttributePoints]);
   
@@ -186,7 +186,7 @@ export const usePlayerAttributes = () => {
   
   const allocateAttribute = useCallback((attributeName: keyof PlayerAttributes, points: number = 1) => {
     if (availablePoints >= points) {
-      dispatch(allocateAttributePoint({ attribute: attributeName })); // Fixed payload structure
+      dispatch(allocateAttributePoint({ attribute: attributeName })); 
     }
   }, [dispatch, availablePoints]);
   
@@ -247,14 +247,14 @@ export const usePlayerStatusEffects = () => {
   
   const getActiveEffects = useCallback((type?: string): StatusEffect[] => {
     if (type) {
-      return statusEffects.filter(effect => effect.type === type);
+      return statusEffects.filter(effect => effect.type !== undefined && effect.type === type);
     }
     return statusEffects;
   }, [statusEffects]);
   
   const getEffectsByCategory = useCallback((category: string): StatusEffect[] => {
     return statusEffects.filter(effect => 
-      effect.category === category || effect.type === category
+      (effect.category !== undefined && effect.category === category) || (effect.type !== undefined && effect.type === category)
     );
   }, [statusEffects]);
   

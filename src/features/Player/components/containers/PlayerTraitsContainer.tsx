@@ -18,8 +18,8 @@ import {
   selectTraitSlots as selectPlayerTraitSlotsFromPlayer, 
   selectPermanentTraits as selectPlayerPermanentTraitIds 
 } from '../../state/PlayerSelectors';
-// TODO: Import actual equipTrait/unequipTrait actions from PlayerSlice when ready
-// import { equipTrait, unequipTrait } from '../../state/PlayerSlice';
+import { equipTrait, unequipTrait } from '../../state/PlayerSlice'; // Import equipTrait, unequipTrait
+import { recalculateStatsThunk } from '../../state/PlayerThunks'; // Import recalculateStatsThunk
 
 
 /**
@@ -65,18 +65,20 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
 
   // Adjusted signature to match PlayerTraitsUIProps: (traitId: string, slotIndex: number)
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
-    // TODO: Dispatch PlayerSlice.equipTrait({ slotIndex, traitId });
+    dispatch(equipTrait({ slotIndex, traitId })); // Dispatch actual action
     console.log('PlayerTraitsContainer: Equipping trait:', traitId, 'to slot index:', slotIndex);
     onTraitChange?.('equip', traitId); 
+    dispatch(recalculateStatsThunk()); // Recalculate stats after equipping
   }, [onTraitChange, dispatch]); 
 
   // Adjusted signature to match PlayerTraitsUIProps: (slotIndex: number)
   const handleUnequipTrait = useCallback((slotIndex: number) => { 
     const slot = traitSlots.find(s => s.index === slotIndex); // Find by index
     if (slot && slot.traitId) {
-      // TODO: Dispatch PlayerSlice.unequipTrait({ slotIndex });
+      dispatch(unequipTrait({ slotIndex })); // Dispatch actual action
       console.log('PlayerTraitsContainer: Unequipping trait from slot index:', slotIndex);
       onTraitChange?.('unequip', slot.traitId); 
+      dispatch(recalculateStatsThunk()); // Recalculate stats after unequipping
     } else {
       console.warn('PlayerTraitsContainer: Slot not found or no trait to unequip at index:', slotIndex);
     }
@@ -97,7 +99,7 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
       availableTraits={[]} 
       onEquipTrait={handleEquipTrait}
       onUnequipTrait={handleUnequipTrait}
-      isLoading={showLoading || isLoading} // Changed showLoading to isLoading
+      isLoading={showLoading || isLoading} 
       className={className}
       error={error} 
     />
