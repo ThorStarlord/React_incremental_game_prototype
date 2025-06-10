@@ -26,10 +26,10 @@ import {
 import {
   selectEquippedTraitObjects,
   selectPermanentTraitObjects,
-  selectAvailableTraitObjects,
-  selectTraitSlots as selectPlayerTraitSlots // Alias to avoid name collision
-} from '../../state/TraitsSelectors'; // selectTraitSlots is re-exported from PlayerSelectors
-import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice'; // Import actions from PlayerSlice
+  selectAvailableTraitObjects
+} from '../../state/TraitsSelectors';
+import { selectTraitSlots } from '../../../Player/state/PlayerSelectors'; // Fixed import name
+import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import { Trait } from '../../state/TraitsTypes';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import AvailableTraitList from './AvailableTraitList';
@@ -67,8 +67,8 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   
-  // Use selectors from PlayerState for trait slots
-  const playerTraitSlots = useAppSelector(selectPlayerTraitSlots);
+  // Use selector from PlayerSelectors for trait slots
+  const playerTraitSlots = useAppSelector(selectTraitSlots);
   const totalSlots = playerTraitSlots.length;
   const usedSlots = playerTraitSlots.filter(slot => slot.traitId !== null).length;
 

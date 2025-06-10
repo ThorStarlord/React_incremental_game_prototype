@@ -202,6 +202,65 @@ export const PlayerSlice = createSlice({
     resetPlayer: (state) => {
       return { ...initialState };
     },
+
+    /**
+     * Clear all equipped traits from player slots
+     */
+    clearAllEquippedTraits: (state) => {
+      state.traitSlots.forEach(slot => {
+        if (slot.traitId && slot.isUnlocked) { // Changed !slot.isLocked to slot.isUnlocked
+          slot.traitId = null;
+        }
+      });
+      
+      // Recalculate stats after clearing traits (removed direct call, handled by thunk dispatch)
+    },
+
+    /**
+     * Load trait preset configuration
+     */
+    loadTraitPreset: (state, action: PayloadAction<string[]>) => {
+      const traitIds = action.payload;
+      
+      // Clear existing equipped traits first (except permanent ones)
+      state.traitSlots.forEach(slot => {
+        if (slot.traitId && slot.isUnlocked && !state.permanentTraits.includes(slot.traitId)) { // Changed !slot.isLocked to slot.isUnlocked
+          slot.traitId = null;
+        }
+      });
+      
+      // Equip traits from preset
+      let availableSlots = state.traitSlots.filter(slot => slot.isUnlocked && slot.traitId === null); // Changed !slot.isLocked to slot.isUnlocked
+      
+      traitIds.forEach(traitId => {
+        // Skip if trait is already permanent
+        if (state.permanentTraits.includes(traitId)) {
+          return;
+        }
+        
+        // Find an available slot
+        const slot = availableSlots.find(s => s.traitId === null);
+        if (slot) {
+          slot.traitId = traitId;
+          // Remove this slot from available slots
+          availableSlots = availableSlots.filter(s => s.id !== slot.id);
+        }
+      });
+      
+      // Recalculate stats after loading preset (removed direct call, handled by thunk dispatch)
+    },
+  },
+
+  extraReducers: (builder) => {
+    // Handle trait management actions from TraitsSlice
+    builder.addCase(clearAllEquippedTraits, (state) => {
+      state.traitSlots.forEach(slot => {
+        if (slot.traitId && slot.isUnlocked) { // Changed !slot.isLocked to slot.isUnlocked
+          slot.traitId = null;
+        }
+      });
+      // Recalculate stats after clearing traits (removed direct call, handled by thunk dispatch)
+    });
   },
 });
 
@@ -228,6 +287,8 @@ export const {
   takeDamage,
   consumeMana,
   resetPlayer,
+  clearAllEquippedTraits,
+  loadTraitPreset,
 } = PlayerSlice.actions;
 
 export default PlayerSlice.reducer;

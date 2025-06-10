@@ -109,14 +109,35 @@ export interface TraitProgression {
 }
 
 /**
- * Interface for a saved trait preset
+ * Trait preset for saving and loading trait configurations
  */
 export interface TraitPreset {
   id: string;
   name: string;
-  traits: string[];
   description?: string;
-  created: number;
+  traits: string[]; // Array of trait IDs
+  created: number; // Timestamp
+  lastUsed?: number; // Timestamp of last use
+}
+
+/**
+ * Enhanced trait information for management UI
+ */
+export interface ManageableTrait extends Trait {
+  isEquipped: boolean;
+  isPermanent: boolean;
+  isManageable: boolean;
+}
+
+/**
+ * Trait statistics for management overview
+ */
+export interface TraitStatistics {
+  total: number;
+  equipped: number;
+  permanent: number;
+  available: number;
+  temporary: number;
 }
 
 /**

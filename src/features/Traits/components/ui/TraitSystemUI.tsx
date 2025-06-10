@@ -135,16 +135,17 @@ export const TraitSystemUI: React.FC<TraitSystemUIProps> = React.memo(({
         
         <TabPanel tabId="manage" activeTab={activeTab}>
           <TraitManagement
-            acquiredTraits={acquiredTraits} 
-            permanentTraits={permanentTraits} 
+            acquiredTraits={acquiredTraits.map(trait => trait.id)} // Convert to string[]
+            permanentTraits={permanentTraits.map(trait => trait.id)} // Convert to string[]
             currentEssence={currentEssence}
-            equippedTraitIds={equippedTraitIds} // Pass this down
-            permanentTraitIds={permanentTraitIds} // Pass this down
-            onAcquireTrait={onAcquireTrait} 
-            onMakeTraitPermanent={onMakeTraitPermanent} 
-            canMakePermanent={canMakePermanent} 
-            getTraitAffordability={(trait) => getTraitAffordability(trait)} 
-            isInProximityToNPC={isInProximityToNPC}
+            // Removed deprecated props that TraitManagement no longer accepts:
+            // - equippedTraitIds
+            // - permanentTraitIds  
+            // - onAcquireTrait
+            // - onMakeTraitPermanent
+            // - canMakePermanent
+            // - getTraitAffordability
+            // - isInProximityToNPC
           />
         </TabPanel>
         

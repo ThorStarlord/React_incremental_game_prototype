@@ -8,18 +8,18 @@ import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
 import type { TraitSlotData, PlayerTraitsContainerProps } from '../../state/PlayerTypes';
 import { 
-  selectAllTraits, 
+  selectTraits, // Changed from selectAllTraits to selectTraits
   selectTraitLoading,
   selectTraitError 
-} from '../../../Traits'; 
+} from '../../../Traits/state/TraitsSelectors';
 
 // Import player specific selectors directly
 import { 
   selectTraitSlots as selectPlayerTraitSlotsFromPlayer, 
   selectPermanentTraits as selectPlayerPermanentTraitIds 
 } from '../../state/PlayerSelectors';
-import { equipTrait, unequipTrait } from '../../state/PlayerSlice'; // Import equipTrait, unequipTrait
-import { recalculateStatsThunk } from '../../state/PlayerThunks'; // Import recalculateStatsThunk
+import { equipTrait, unequipTrait } from '../../state/PlayerSlice'; 
+import { recalculateStatsThunk } from '../../state/PlayerThunks'; 
 
 
 /**
@@ -34,7 +34,7 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   
   const rawTraitSlots = useAppSelector(selectPlayerTraitSlotsFromPlayer); 
   const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
-  const allTraits = useAppSelector(selectAllTraits); 
+  const allTraits = useAppSelector(selectTraits); // Updated variable name for clarity
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError); 
 
@@ -65,20 +65,20 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
 
   // Adjusted signature to match PlayerTraitsUIProps: (traitId: string, slotIndex: number)
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
-    dispatch(equipTrait({ slotIndex, traitId })); // Dispatch actual action
+    dispatch(equipTrait({ slotIndex, traitId })); 
     console.log('PlayerTraitsContainer: Equipping trait:', traitId, 'to slot index:', slotIndex);
     onTraitChange?.('equip', traitId); 
-    dispatch(recalculateStatsThunk()); // Recalculate stats after equipping
+    dispatch(recalculateStatsThunk()); 
   }, [onTraitChange, dispatch]); 
 
   // Adjusted signature to match PlayerTraitsUIProps: (slotIndex: number)
   const handleUnequipTrait = useCallback((slotIndex: number) => { 
-    const slot = traitSlots.find(s => s.index === slotIndex); // Find by index
+    const slot = traitSlots.find(s => s.index === slotIndex); 
     if (slot && slot.traitId) {
-      dispatch(unequipTrait({ slotIndex })); // Dispatch actual action
+      dispatch(unequipTrait({ slotIndex })); 
       console.log('PlayerTraitsContainer: Unequipping trait from slot index:', slotIndex);
       onTraitChange?.('unequip', slot.traitId); 
-      dispatch(recalculateStatsThunk()); // Recalculate stats after unequipping
+      dispatch(recalculateStatsThunk()); 
     } else {
       console.warn('PlayerTraitsContainer: Slot not found or no trait to unequip at index:', slotIndex);
     }

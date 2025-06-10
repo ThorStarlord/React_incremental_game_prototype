@@ -20,7 +20,7 @@ const initialState: TraitsState = {
 };
 
 // Create the traits slice
-const traitsSlice = createSlice({
+export const traitsSlice = createSlice({
   name: 'traits',
   initialState,
   reducers: {
@@ -52,43 +52,60 @@ const traitsSlice = createSlice({
     //     state.permanentTraits.push(traitId);
     //   }
     // },
-    saveTraitPreset: (state, action: PayloadAction<{ name: string, description?: string }>) => {
-      const { name, description } = action.payload;
-      const preset: TraitPreset = {
-        id: `preset-${Date.now()}`,
-        name,
-        description: description || '',
-        traits: state.acquiredTraits, 
-        created: Date.now()
-      };
-      state.presets.push(preset);
+    /**
+     * Save a trait preset configuration
+     */
+    saveTraitPreset: (state, action: PayloadAction<TraitPreset>) => {
+      const preset = action.payload;
+      const existingIndex = state.presets.findIndex(p => p.id === preset.id);
+      
+      if (existingIndex >= 0) {
+        state.presets[existingIndex] = preset;
+      } else {
+        state.presets.push(preset);
+      }
     },
+
+    /**
+     * Load a trait preset configuration
+     * Note: This action only manages the preset data. 
+     * The actual trait equipping is handled by PlayerSlice actions.
+     */
     loadTraitPreset: (state, action: PayloadAction<string>) => {
       const presetId = action.payload;
       const preset = state.presets.find(p => p.id === presetId);
-      if (!preset) {
-        return;
+      
+      if (preset) {
+        // Mark preset as recently used (for future sorting/UI features)
+        preset.lastUsed = Date.now();
       }
-      preset.traits.forEach((traitId) => {
-        if (!state.acquiredTraits.includes(traitId)) {
-          state.acquiredTraits.push(traitId);
-        }
-      });
     },
+
+    /**
+     * Delete a trait preset
+     */
     deleteTraitPreset: (state, action: PayloadAction<string>) => {
       const presetId = action.payload;
-      state.presets = state.presets.filter(p => p.id !== presetId);
+      state.presets = state.presets.filter(preset => preset.id !== presetId);
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
+
+    /**
+     * Clear all equipped traits
+     * Note: This is a convenience action that will be handled by PlayerSlice
+     */
+    clearAllEquippedTraits: (state) => {
+      // This reducer doesn't actually modify state - it's handled by PlayerSlice
+      // But we keep it here for action consistency
     },
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
+
+    /**
+     * Reset trait management state
+     */
+    resetTraitManagement: (state) => {
+      state.presets = [];
     },
-    addTraitDefinition: (state, action: PayloadAction<Trait>) => {
-      state.traits[action.payload.id] = action.payload;
-    }
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchTraitsThunk.pending, (state) => {
@@ -109,6 +126,7 @@ const traitsSlice = createSlice({
         state.error = null;
       })
       .addCase(acquireTraitWithEssenceThunk.fulfilled, (state, action) => {
+        // Access the correct property from the returned payload
         console.log(`Trait Resonated (TraitsSlice handling): ${action.payload.message}`);
       })
       .addCase(acquireTraitWithEssenceThunk.rejected, (state, action) => {
@@ -128,9 +146,8 @@ export const {
   saveTraitPreset,
   loadTraitPreset,
   deleteTraitPreset,
-  setLoading,
-  setError,
-  addTraitDefinition
+  clearAllEquippedTraits,
+  resetTraitManagement,
 } = traitsSlice.actions;
 
 // Selectors

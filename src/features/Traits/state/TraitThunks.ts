@@ -1,126 +1,110 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { RootState } from '../../../app/store';
+import type { RootState } from '../../../app/store';
+import { acquireTrait } from './TraitsSlice';
+import { equipTrait, addPermanentTrait } from '../../Player/state/PlayerSlice';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
-import { selectCurrentEssence } from '../../Essence/state/EssenceSelectors';
-import { acquireTrait as acquireTraitToGeneralPool } from './TraitsSlice'; 
-import { addPermanentTrait as addPermanentTraitToPlayer } from '../../Player/state/PlayerSlice';
-import { recalculateStatsThunk } from '../../Player/state/PlayerThunks'; // Import recalculateStatsThunk
-import { Trait, TraitEffect, TraitEffectValues } from './TraitsTypes';
-
-// const MAKE_PERMANENT_COST = 150; // This is now obsolete as "Resonate" (acquireTraitWithEssenceThunk) makes traits permanent.
-
-/**
- * Thunk for making a trait permanent (OLD SYSTEM - DEPRECATED / TO BE REMOVED)
- */
-/*
-export const makeTraitPermanentThunk = createAsyncThunk<
-  { success: boolean; message: string; traitId: string },
-  string,
-  { state: RootState }
->(
-  'traits/makePermanentThunk',
-  async (traitId: string, { getState, dispatch, rejectWithValue }) => {
-    const state = getState();
-    const currentEssence = state.essence.currentEssence;
-    const trait = state.traits.traits[traitId];
-    
-    if (!trait) {
-      return rejectWithValue("Trait not found.");
-    }
-    if (state.player.permanentTraits.includes(traitId)) {
-      return {
-        success: false,
-        message: "This trait is already a permanent part of you.",
-        traitId
-      };
-    }
-    // if (state.traits.permanentTraits.includes(traitId)) { 
-    //     // This condition might be redundant
-    // }
-
-    // if (currentEssence < MAKE_PERMANENT_COST) {
-    //   return rejectWithValue(`Insufficient essence (${MAKE_PERMANENT_COST} required, have ${currentEssence}).`);
-    // }
-    
-    try {
-      // dispatch(spendEssence({
-      //   amount: MAKE_PERMANENT_COST,
-      //   description: `Made ${trait.name} permanent (Old System)` 
-      // }));
-      // dispatch(makePermanent(traitId)); 
-      
-      return {
-        success: true,
-        message: `${trait.name} is now permanent! (Old System)`,
-        traitId
-      };
-    } catch (error) {
-      let errorMessage = 'Failed to make trait permanent (Old System)';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-*/
+import type { Trait, TraitEffect, TraitEffectValues, TraitPreset } from './TraitsTypes';
+import { selectAcquiredTraits, selectTraitPresetById } from './TraitsSelectors';
+import { recalculateStatsThunk } from '../../Player/state/PlayerThunks';
+import { loadTraitPreset } from './TraitsSlice';
+import { PlayerSlice } from '../../Player/state/PlayerSlice';
 
 /**
  * Thunk for acquiring a trait from an NPC via Resonance, making it PERMANENT for the player.
  */
-export const acquireTraitWithEssenceThunk = createAsyncThunk<
-  { success: boolean; message: string; traitId: string },
-  string,
-  { state: RootState }
->(
+export const acquireTraitWithEssenceThunk = createAsyncThunk(
   'traits/acquireTraitWithEssence',
   async (traitId: string, { getState, dispatch, rejectWithValue }) => {
-    const state = getState();
-    const trait = state.traits.traits[traitId];
-    
-    if (!trait) {
-      return rejectWithValue("Trait not found for Resonance.");
-    }
-
-    if (state.player.permanentTraits.includes(traitId)) {
-      return {
-        success: false,
-        message: `You already permanently possess ${trait.name}.`,
-        traitId
-      };
-    }
-    
-    const currentEssence = selectCurrentEssence(state);
-    const essenceCost = trait.essenceCost || 0;
-
-    if (currentEssence < essenceCost) {
-      return rejectWithValue(`Insufficient essence to Resonate (${essenceCost} required, have ${currentEssence}).`);
-    }
-    
     try {
-      dispatch(spendEssence({
-        amount: essenceCost,
-        description: `Resonated permanent trait: ${trait.name}`
-      }));
+      const state = getState() as RootState;
       
-      dispatch(acquireTraitToGeneralPool(traitId)); 
-      dispatch(addPermanentTraitToPlayer(traitId));
-      dispatch(recalculateStatsThunk()); // Recalculate stats after permanent trait acquisition
+      // Use direct state access instead of selectors to avoid circular dependency
+      const trait = state.traits.traits[traitId];
+      const currentEssence = state.essence.currentEssence;
       
-      return {
-        success: true,
-        message: `${trait.name} permanently resonated and added to your abilities!`,
-        traitId
+      if (!trait) {
+        return rejectWithValue('Trait not found');
+      }
+
+      const essenceCost = trait.essenceCost || 0;
+      
+      if (currentEssence < essenceCost) {
+        return rejectWithValue('Insufficient Essence');
+      }
+
+      // Deduct essence cost with proper payload structure
+      if (essenceCost > 0) {
+        dispatch(spendEssence({
+          amount: essenceCost,
+          description: `Resonated with trait: ${trait.name}`
+        }));
+      }
+
+      // Add to acquired traits in TraitsSlice
+      dispatch(acquireTrait(traitId));
+      
+      // Add to permanent traits in PlayerSlice (Resonance makes it permanent)
+      dispatch(addPermanentTrait(traitId));
+
+      return { 
+        traitId, 
+        essenceCost,
+        message: `Successfully resonated with trait: ${trait.name}`,
+        success: true
       };
     } catch (error) {
-      let errorMessage = 'Failed to Resonate trait';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error occurred');
     }
   }
 );
+
+/**
+ * Thunk for loading a trait preset and applying it to the player.
+ */
+export const loadTraitPresetThunk = createAsyncThunk<
+  { preset: TraitPreset; message: string },
+  string,
+  { state: RootState }
+>(
+  'traits/loadTraitPreset',
+  async (presetId: string, { getState, dispatch, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const preset = selectTraitPresetById(state, presetId);
+    
+    if (!preset) {
+      return rejectWithValue('Preset not found');
+    }
+    
+    // Validate that all traits in preset are still available (acquired by player)
+    const acquiredTraits = selectAcquiredTraits(state);
+    const validTraits = preset.traits.filter(traitId => acquiredTraits.includes(traitId));
+    
+    if (validTraits.length < preset.traits.length) {
+      console.warn(`Some traits from preset "${preset.name}" are no longer available`);
+    }
+    
+    // Mark preset as used in TraitsSlice
+    dispatch(loadTraitPreset(presetId));
+    
+    // Apply preset to player (clear existing equipped and then equip from preset)
+    dispatch(PlayerSlice.actions.clearAllEquippedTraits());
+    validTraits.forEach(traitId => {
+      // Find an available slot for each trait in the preset
+      const availableSlot = state.player.traitSlots.find(slot => slot.isUnlocked && !slot.traitId);
+      if (availableSlot) {
+        dispatch(PlayerSlice.actions.equipTrait({ traitId, slotIndex: availableSlot.index }));
+      }
+    });
+    
+    dispatch(recalculateStatsThunk());
+
+    return {
+      preset,
+      message: `Preset "${preset.name}" loaded successfully!`
+    };
+  }
+);
+
 
 interface RawTraitJsonData {
   name: string;

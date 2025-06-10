@@ -9,9 +9,9 @@ export { default as traitsReducer,
   saveTraitPreset,
   loadTraitPreset,
   deleteTraitPreset,
-  setLoading,
-  setError,
-  addTraitDefinition
+  // setLoading, // Not exported by TraitsSlice.actions
+  // setError,   // Not exported by TraitsSlice.actions
+  // addTraitDefinition // Not exported by TraitsSlice.actions
 } from './state/TraitsSlice';
 export * from './state/TraitsSelectors';
 export * from './state/TraitThunks';
