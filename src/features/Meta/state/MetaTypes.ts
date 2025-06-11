@@ -1,20 +1,25 @@
 /**
- * Type definitions for the Meta slice, containing game metadata.
+ * Type definitions for the Meta system
  */
 
+/**
+ * Core Meta state interface
+ */
 export interface MetaState {
   /** Timestamp of the last successful save operation, or null if never saved. */
   lastSavedTimestamp: number | null;
-  /** Timestamp of the last successful load operation, or null if never loaded. */
-  lastLoadedTimestamp: number | null;
-  /** ID of the currently loaded save, or null for new games. */
-  currentSaveId: string | null;
-  /** Whether the current game state was imported from an external source. */
-  isImported: boolean;
   /** Current version of the game application. */
   gameVersion: string;
   /** Timestamp when the current game session started. */
   sessionStartTime: number;
-  /** Indicates if the player is currently in close proximity to an NPC for trait management. */
-  isInProximityToNPC: boolean;
+  /** ID of the currently loaded save, or null for new games. */
+  currentSaveId: string | null;
+  /** Whether automatic saving is enabled. */
+  autoSaveEnabled: boolean;
+  /** Indicates if a save operation is currently in progress. */
+  saveInProgress: boolean;
+  /** Indicates if a load operation is currently in progress. */
+  loadInProgress: boolean;
+  /** Error message, if any error has occurred. */
+  error: string | null;
 }

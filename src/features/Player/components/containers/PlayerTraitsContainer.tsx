@@ -6,23 +6,26 @@
 import React, { useMemo, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
-import type { TraitSlotData, PlayerTraitsContainerProps } from '../../state/PlayerTypes';
+import type { Trait, TraitSlot } from '../../../Traits/state/TraitsTypes';
 import { 
-  selectTraits, // Changed from selectAllTraits to selectTraits
-  selectTraitLoading,
-  selectTraitError 
+  selectAllTraits,
+  selectTraitsLoading,
+  selectTraitsError,
+  selectEquippedTraitObjects
 } from '../../../Traits/state/TraitsSelectors';
-
-// Import player specific selectors directly
 import { 
-  selectPermanentTraits 
+  selectPermanentTraits,
+  selectMaxTraitSlots
 } from '../../state/PlayerSelectors';
-import { 
-  selectUnlockedSlotCount, 
-  selectEquippedTraitObjects 
-} from '../../../Traits/state/TraitsSelectors';
-import { recalculateStatsThunk } from '../../state/PlayerThunks'; 
 
+/**
+ * Container component props interface
+ */
+interface PlayerTraitsContainerProps {
+  showLoading?: boolean;
+  onTraitChange?: (traitId: string) => void;
+  className?: string;
+}
 
 /**
  * Container component for player trait management
@@ -34,79 +37,74 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   
+  // Use proper selectors for trait data
   const permanentTraitIds = useAppSelector(selectPermanentTraits); 
   const equippedTraits = useAppSelector(selectEquippedTraitObjects);
-  const unlockedSlotCount = useAppSelector(selectUnlockedSlotCount);
-  const allTraits = useAppSelector(selectTraits); // Updated variable name for clarity
-  const isLoading = useAppSelector(selectTraitLoading);
-  const error = useAppSelector(selectTraitError); 
+  const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
+  const allTraits = useAppSelector(selectAllTraits);
+  const isLoading = useAppSelector(selectTraitsLoading);
+  const error = useAppSelector(selectTraitsError); 
 
-  const traitSlots: TraitSlotData[] = useMemo(() => {
-    if (!Array.isArray(equippedTraits)) {
-      return [];
+  // Create trait slots using proper TraitSlot interface
+  const traitSlots: TraitSlot[] = useMemo(() => {
+    const slots: TraitSlot[] = [];
+    
+    for (let i = 0; i < maxTraitSlots; i++) {
+      const equippedTrait = equippedTraits.find(trait => trait && trait.slotIndex === i);
+      
+      slots.push({
+        id: `slot-${i}`,
+        slotIndex: i,
+        traitId: equippedTrait?.id || null,
+        isLocked: i >= 3, // First 3 slots unlocked by default
+        unlockRequirement: i >= 3 ? 'Resonance Level ' + Math.ceil(i / 2) : undefined
+      });
     }
-    return equippedTraits.map((slot, index) => ({
-      id: slot?.id || `slot-${index}`, 
-      index: slot?.index ?? index,
-      isUnlocked: slot?.isUnlocked ?? false,
-      traitId: slot?.traitId || null
-    }));
-  }, [equippedTraits]);
+    
+    return slots;
+  }, [maxTraitSlots, equippedTraits]);
 
-  const equippedTraitsList = useMemo(() => {
-    return traitSlots
-      .filter(slot => slot.traitId)
-      .map(slot => allTraits[slot.traitId!]) 
-      .filter(Boolean); 
-  }, [traitSlots, allTraits]);
-
+  // Get permanent traits as Trait objects
   const permanentTraits = useMemo(() => {
-    return permanentTraitIds 
+    return permanentTraitIds
       .map((traitId: string) => allTraits[traitId]) 
       .filter(Boolean); 
   }, [permanentTraitIds, allTraits]);
 
-  // Adjusted signature to match PlayerTraitsUIProps: (traitId: string, slotIndex: number)
+  // Get available traits (for future trait selection)
+  const availableTraits = useMemo(() => {
+    return Object.values(allTraits);
+  }, [allTraits]);
+
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
     // TODO: Implement trait equipping when the correct action is available
-    console.log(`Equipping trait ${traitId} - functionality pending`);
-    
-    // When the correct action is available, it might look like:
-    // dispatch(equipPlayerTrait({ traitId, slotIndex: availableSlotIndex }));
-  }, []);
+    console.log(`Equipping trait ${traitId} to slot ${slotIndex} - functionality pending`);
+    onTraitChange?.(traitId);
+  }, [onTraitChange]);
 
-  // Adjusted signature to match PlayerTraitsUIProps: (slotIndex: number)
   const handleUnequipTrait = useCallback((slotIndex: number) => { 
-    const slot = traitSlots.find(s => s.index === slotIndex); 
+    const slot = traitSlots.find(s => s.slotIndex === slotIndex); 
     if (slot && slot.traitId) {
-      // TODO: Implement trait unequipping when the correct action is available
-      console.log(`Unequipping trait ${slot.traitId} - functionality pending`);
-      
-      // When the correct action is available, it might look like:
-      // dispatch(unequipPlayerTrait({ traitId }));
-    } else {
-      console.warn('PlayerTraitsContainer: Slot not found or no trait to unequip at index:', slotIndex);
+      console.log(`Unequipping trait ${slot.traitId} from slot ${slotIndex} - functionality pending`);
+      onTraitChange?.(slot.traitId);
     }
-  }, [traitSlots]); 
+  }, [traitSlots, onTraitChange]); 
 
-  // handleMakePermanent is removed.
-
-  const totalSlots = traitSlots.length;
-  const unlockedSlots = traitSlots.filter(slot => slot.isUnlocked).length;
-  const equippedCount = equippedTraitsList.length;
-  const permanentCount = permanentTraits.length;
+  const handleTraitSelect = useCallback((traitId: string) => {
+    console.log(`Trait selected: ${traitId} - functionality pending`);
+    onTraitChange?.(traitId);
+  }, [onTraitChange]);
 
   return (
     <PlayerTraitsUI
       traitSlots={traitSlots}
-      equippedTraits={equippedTraitsList} 
-      permanentTraits={permanentTraits} 
-      availableTraits={[]} 
+      availableTraits={availableTraits}
       onEquipTrait={handleEquipTrait}
       onUnequipTrait={handleUnequipTrait}
-      isLoading={showLoading || isLoading} 
+      onTraitSelect={handleTraitSelect}
+      isLoading={showLoading || isLoading}
       className={className}
-      error={error} 
+      error={error}
     />
   );
 };

@@ -15,7 +15,21 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
-import { PlayerTraitsUIProps } from '../../state/PlayerTypes';
+import type { Trait, TraitSlot } from '../../../Traits/state/TraitsTypes';
+
+/**
+ * Props interface for PlayerTraitsUI component
+ */
+interface PlayerTraitsUIProps {
+  traitSlots: TraitSlot[];
+  availableTraits: Trait[];
+  onEquipTrait?: (traitId: string, slotIndex: number) => void;
+  onUnequipTrait?: (slotIndex: number) => void;
+  onTraitSelect?: (traitId: string) => void;
+  className?: string;
+  isLoading?: boolean;
+  error?: string | null;
+}
 
 /**
  * PlayerTraitsUI Component
@@ -34,10 +48,9 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
   error = null
 }) => {
   const getTraitById = useMemo(() => {
-    // Since we don't have access to all traits here, we'll work with available traits
     const traitMap = new Map();
     availableTraits.forEach(trait => {
-      traitMap.set(trait.id || trait.name, trait);
+      traitMap.set(trait.id, trait);
     });
     return (id: string) => traitMap.get(id);
   }, [availableTraits]);
@@ -74,37 +87,37 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
           return (
             <Grid item xs={12} sm={6} md={4} key={slot.id}>
               <Card 
-                variant={slot.isUnlocked ? "outlined" : "elevation"}
+                variant={!slot.isLocked ? "outlined" : "elevation"}
                 sx={{
                   minHeight: 150,
-                  opacity: slot.isUnlocked ? 1 : 0.6,
-                  cursor: slot.isUnlocked ? 'pointer' : 'default',
-                  border: slot.isUnlocked && slot.traitId ? '2px solid' : undefined,
-                  borderColor: slot.isUnlocked && slot.traitId ? 'primary.main' : undefined,
-                  '&:hover': slot.isUnlocked ? {
+                  opacity: !slot.isLocked ? 1 : 0.6,
+                  cursor: !slot.isLocked ? 'pointer' : 'default',
+                  border: !slot.isLocked && slot.traitId ? '2px solid' : undefined,
+                  borderColor: !slot.isLocked && slot.traitId ? 'primary.main' : undefined,
+                  '&:hover': !slot.isLocked ? {
                     transform: 'translateY(-2px)',
                     boxShadow: 2
                   } : {}
                 }}
                 onClick={() => {
-                  if (slot.isUnlocked && slot.traitId) {
-                    onUnequipTrait?.(slot.index);
+                  if (!slot.isLocked && slot.traitId) {
+                    onUnequipTrait?.(slot.slotIndex);
                   }
                 }}
               >
                 <CardContent>
                   <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                     <Typography variant="subtitle2" color="text.secondary">
-                      Slot {slot.index + 1}
+                      Slot {slot.slotIndex + 1}
                     </Typography>
-                    {slot.isUnlocked ? (
+                    {!slot.isLocked ? (
                       <Chip label="Unlocked" size="small" color="success" />
                     ) : (
                       <Chip label="Locked" size="small" color="default" />
                     )}
                   </Box>
 
-                  {slot.isUnlocked ? (
+                  {!slot.isLocked ? (
                     equippedTrait ? (
                       <Box>
                         <Typography variant="h6" gutterBottom>
@@ -114,13 +127,19 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
                           {equippedTrait.description}
                         </Typography>
                         <Box display="flex" gap={1} flexWrap="wrap">
+                          <Chip 
+                            label={equippedTrait.rarity} 
+                            size="small" 
+                            color="primary" 
+                            variant="outlined"
+                          />
                           <Button
                             size="small"
                             variant="outlined"
                             color="warning"
                             onClick={(e) => {
                               e.stopPropagation();
-                              onUnequipTrait?.(slot.index);
+                              onUnequipTrait?.(slot.slotIndex);
                             }}
                           >
                             Unequip
@@ -135,6 +154,18 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
                         <Typography variant="body2" color="text.secondary">
                           Click to equip a trait
                         </Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          sx={{ mt: 1 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Open trait selection dialog
+                            console.log('Open trait selection for slot', slot.slotIndex);
+                          }}
+                        >
+                          Equip Trait
+                        </Button>
                       </Box>
                     )
                   ) : (
@@ -142,11 +173,9 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
                       <Typography variant="body1" color="text.secondary" gutterBottom>
                         Locked Slot
                       </Typography>
-                      {slot.unlockRequirements && (
+                      {slot.unlockRequirement && (
                         <Typography variant="caption" color="text.secondary">
-                          {slot.unlockRequirements.type === 'resonanceLevel' 
-                            ? `Resonance Level ${slot.unlockRequirements.value}` 
-                            : slot.unlockRequirements.value}
+                          Requires: {slot.unlockRequirement}
                         </Typography>
                       )}
                     </Box>
@@ -164,8 +193,8 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
             Available Traits
           </Typography>
           <Grid container spacing={2}>
-            {availableTraits.map((trait) => (
-              <Grid item xs={12} sm={6} md={4} key={trait.id || trait.name}>
+            {availableTraits.slice(0, 6).map((trait) => ( // Show first 6 traits
+              <Grid item xs={12} sm={6} md={4} key={trait.id}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
@@ -174,15 +203,23 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
                     <Typography variant="body2" color="text.secondary" paragraph>
                       {trait.description}
                     </Typography>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => {
-                        onTraitSelect?.(trait.id || trait.name);
-                      }}
-                    >
-                      Select
-                    </Button>
+                    <Box display="flex" gap={1} alignItems="center">
+                      <Chip 
+                        label={trait.rarity} 
+                        size="small" 
+                        color="secondary" 
+                        variant="outlined"
+                      />
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          onTraitSelect?.(trait.id);
+                        }}
+                      >
+                        Select
+                      </Button>
+                    </Box>
                   </CardContent>
                 </Card>
               </Grid>

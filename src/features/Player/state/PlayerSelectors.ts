@@ -1,60 +1,116 @@
-// Player feature selectors using createSelector for memoization
+/**
+ * Memoized selectors for Player state
+ */
 
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { PlayerState } from './PlayerTypes';
 import { selectTraits } from '../../Traits/index';
 
-// Basic selectors
+/**
+ * Base player state selector
+ */
 export const selectPlayer = (state: RootState): PlayerState => state.player;
 
-export const selectPlayerStats = createSelector(
+/**
+ * Player health selector
+ */
+export const selectPlayerHealth = createSelector(
   [selectPlayer],
-  (player) => player.stats
+  (player) => player.health
 );
 
+/**
+ * Player max health selector
+ */
+export const selectPlayerMaxHealth = createSelector(
+  [selectPlayer],
+  (player) => player.maxHealth
+);
+
+/**
+ * Player mana selector
+ */
+export const selectPlayerMana = createSelector(
+  [selectPlayer],
+  (player) => player.mana
+);
+
+/**
+ * Player max mana selector
+ */
+export const selectPlayerMaxMana = createSelector(
+  [selectPlayer],
+  (player) => player.maxMana
+);
+
+/**
+ * Available attribute points selector
+ */
+export const selectAvailableAttributePoints = createSelector(
+  [selectPlayer],
+  (player) => player.availableAttributePoints
+);
+
+/**
+ * Player alive status selector
+ */
+export const selectIsPlayerAlive = createSelector(
+  [selectPlayer],
+  (player) => player.isAlive
+);
+
+/**
+ * Player resonance level selector
+ */
+export const selectResonanceLevel = createSelector(
+  [selectPlayer],
+  (player) => player.resonanceLevel
+);
+
+/**
+ * Max trait slots selector
+ */
+export const selectMaxTraitSlots = createSelector(
+  [selectPlayer],
+  (player) => player.maxTraitSlots
+);
+
+/**
+ * Permanent traits selector
+ */
+export const selectPermanentTraits = createSelector(
+  [selectPlayer],
+  (player) => player.permanentTraits
+);
+
+/**
+ * Player attributes selector
+ */
 export const selectPlayerAttributes = createSelector(
   [selectPlayer],
   (player) => player.attributes
 );
 
-export const selectPlayerHealth = createSelector(
-  [selectPlayerStats],
-  (stats) => ({
-    current: stats.health,
-    max: stats.maxHealth,
-    percentage: (stats.health / stats.maxHealth) * 100
-  })
-);
-
-export const selectPlayerMana = createSelector(
-  [selectPlayerStats],
-  (stats) => ({
-    current: stats.mana,
-    max: stats.maxMana,
-    percentage: stats.maxMana > 0 ? (stats.mana / stats.maxMana) * 100 : 0
-  })
-);
-
-export const selectPlayerVitals = createSelector(
-  [selectPlayerHealth, selectPlayerMana],
-  (health, mana) => ({
-    health,
-    mana
-  })
+/**
+ * Player total playtime selector
+ */
+export const selectTotalPlaytime = createSelector(
+  [selectPlayer],
+  (player) => player.totalPlaytime
 );
 
 /**
  * Combat stats selector for grouped combat-related statistics
  */
 export const selectCombatStats = createSelector(
-  [selectPlayerStats],
-  (stats) => ({
-    attack: stats.attack,
-    defense: stats.defense,
-    speed: stats.speed,
-    criticalChance: stats.criticalChance,
-    criticalDamage: stats.criticalDamage
+  [selectPlayer],
+  (player) => ({
+    attack: player.stats.attack,
+    defense: player.stats.defense,
+    speed: player.stats.speed,
+    criticalChance: player.stats.criticalChance,
+    criticalDamage: player.stats.criticalDamage
   })
 );
 

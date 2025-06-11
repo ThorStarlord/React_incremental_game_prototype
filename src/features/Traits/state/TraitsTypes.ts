@@ -3,20 +3,9 @@
  * @description Type definitions for the Traits system
  */
 
-// Base trait effect definition
-export interface TraitEffect {
-  type: string;            // Type of effect (e.g., "STAT_MODIFIER", "ABILITY_GRANT")
-  magnitude: number;       // Effect magnitude
-  duration?: number;       // Effect duration (permanent if omitted)
-  description?: string;    // Optional description of the specific effect instance
-}
-
-// Alternative effect format using key-value pairs
-export interface TraitEffectValues {
-  [effectName: string]: number;
-}
-
-// Core trait definition matching data model specification
+/**
+ * Core trait interface
+ */
 export interface Trait {
   id: string;              // Unique trait identifier
   name: string;            // Display name
@@ -33,7 +22,37 @@ export interface Trait {
   level?: number;          // Optional trait level
 }
 
-// Trait preset for saved loadouts
+/**
+ * Trait effect interface
+ */
+export interface TraitEffect {
+  type: string;            // Type of effect (e.g., "STAT_MODIFIER", "ABILITY_GRANT")
+  magnitude: number;       // Effect magnitude
+  duration?: number;       // Effect duration (permanent if omitted)
+  description?: string;    // Optional description of the specific effect instance
+}
+
+/**
+ * Trait effect values as key-value pairs
+ */
+export interface TraitEffectValues {
+  [effectName: string]: number;
+}
+
+/**
+ * Trait slot interface
+ */
+export interface TraitSlot {
+  id: string;              // Unique identifier for the trait slot
+  slotIndex: number;       // Index position of the slot
+  traitId: string | null;  // Associated trait ID or null if empty
+  isLocked: boolean;       // Lock status of the slot
+  unlockRequirement?: string; // Optional requirement to unlock the slot
+}
+
+/**
+ * Trait preset interface
+ */
 export interface TraitPreset {
   id: string;              // Unique identifier for this preset
   name: string;            // Name of this preset
@@ -42,7 +61,9 @@ export interface TraitPreset {
   created: number;         // Created timestamp
 }
 
-// Main traits state
+/**
+ * Core Traits state interface
+ */
 export interface TraitsState {
   traits: Record<string, Trait>; // All trait definitions
   acquiredTraits: string[];      // IDs of traits the player has generally acquired/learned

@@ -1,3 +1,10 @@
+/**
+ * Type definitions for the GameLoop system
+ */
+
+/**
+ * Core GameLoop state interface
+ */
 export interface GameLoopState {
   isRunning: boolean;
   isPaused: boolean;
@@ -10,10 +17,13 @@ export interface GameLoopState {
   lastAutoSave: number; // Last auto-save timestamp
 }
 
+/**
+ * Tick data interface for processing
+ */
 export interface TickData {
   deltaTime: number;
-  currentTime: number;
-  tickCount: number;
+  currentTick: number;
+  gameSpeed: number;
 }
 
 export interface GameLoopConfig {

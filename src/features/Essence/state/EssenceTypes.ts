@@ -64,3 +64,29 @@ export interface EssenceStatistics {
   perClickValue: number;
   activeConnections: number; // This will now be derived from npcConnections
 }
+
+/**
+ * Type definitions for the Essence system
+ */
+
+/**
+ * Core Essence state interface
+ */
+export interface EssenceState {
+  currentEssence: number;
+  totalCollected: number;
+  generationRate: number;
+  perClickValue: number;
+  lastGenerationTime: number;
+  isGenerating: boolean;
+  loading: boolean;
+  error: string | null;
+}
+
+/**
+ * Payload for essence transaction actions
+ */
+export interface EssenceTransactionPayload {
+  amount: number;
+  reason?: string;
+}

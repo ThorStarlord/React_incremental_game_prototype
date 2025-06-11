@@ -30,24 +30,15 @@ export const selectMetaState = (state: RootState): MetaState => state.meta;
 
 export const selectMeta = selectMetaState;
 
-export const selectSaveSlots = createSelector(
+// Updated selectors to match actual MetaState interface
+export const selectCurrentSaveId = createSelector(
   [selectMetaState],
-  (meta) => meta.saveSlots
-);
-
-export const selectCurrentSaveSlot = createSelector(
-  [selectMetaState],
-  (meta) => meta.currentSaveSlot
+  (meta) => meta.currentSaveId
 );
 
 export const selectLastSaved = createSelector(
   [selectMetaState],
-  (meta) => meta.lastSaved
-);
-
-export const selectLastLoaded = createSelector(
-  [selectMetaState],
-  (meta) => meta.lastLoaded
+  (meta) => meta.lastSavedTimestamp
 );
 
 export const selectAutoSaveEnabled = createSelector(
@@ -70,21 +61,14 @@ export const selectMetaError = createSelector(
   (meta) => meta.error
 );
 
-export const selectAvailableSaveSlots = createSelector(
-  [selectSaveSlots],
-  (saveSlots) => Object.keys(saveSlots).filter(slot => saveSlots[slot] !== null)
-);
+// Note: The following selectors have been removed as they reference properties
+// that don't exist in the current MetaState interface:
+// - selectSaveSlots (meta.saveSlots doesn't exist)
+// - selectCurrentSaveSlot (meta.currentSaveSlot doesn't exist) 
+// - selectLastLoaded (meta.lastLoaded doesn't exist)
+// - selectAvailableSaveSlots (depends on non-existent saveSlots)
+// - selectEmptySaveSlots (depends on non-existent saveSlots)
+// - selectSaveSlotById (depends on non-existent saveSlots)
 
-export const selectEmptySaveSlots = createSelector(
-  [selectSaveSlots],
-  (saveSlots) => Object.keys(saveSlots).filter(slot => saveSlots[slot] === null)
-);
-
-export const selectSaveSlotById = createSelector(
-  [selectSaveSlots, (state: RootState, slotId: string) => slotId],
-  (saveSlots, slotId) => saveSlots[slotId] || null
-);
-
-// Add other selectors for meta state as needed, for example:
-// export const selectCurrentSaveId = (state: RootState) => state.meta.currentSaveId;
-// export const selectIsNewGame = (state: RootState) => state.meta.isNewGame;
+// If save slot functionality is needed, it should use the save utilities
+// from src/shared/utils/saveUtils.ts instead of Meta state

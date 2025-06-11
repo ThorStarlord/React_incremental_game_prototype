@@ -1,14 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { EssenceState, EssenceTransactionPayload, EssenceConnection } from './EssenceTypes';
-import { 
-  processEssenceGenerationThunk,
-  updateEssenceGenerationRateThunk,
-  spendEssenceThunk,
-  acquireTraitWithEssenceThunk,
-  processResonanceLevelThunk,
-  initializeEssenceSystemThunk,
-  manualEssenceGenerationThunk
-} from './EssenceThunks';
+import { EssenceState, EssenceTransactionPayload } from './EssenceTypes';
 
 /**
  * Initial state for the Essence system
@@ -22,10 +13,6 @@ const initialState: EssenceState = {
   isGenerating: false,
   loading: false,
   error: null,
-  npcConnections: {}, // Initialize as an empty object
-  currentResonanceLevel: 0,
-  maxResonanceLevel: 3, // Example: Corresponds to 3 thresholds
-  resonanceThresholds: [100, 500, 2000], // Example: Essence needed for levels 1, 2, 3
 };
 
 /**
@@ -90,67 +77,13 @@ const essenceSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    /**
-     * Update properties of an existing EssenceConnection
-     */
-    updateEssenceConnection: (state, action: PayloadAction<{ npcId: string; updates: Partial<EssenceConnection> }>) => {
-      const { npcId, updates } = action.payload;
-      if (state.npcConnections[npcId]) {
-        state.npcConnections[npcId] = {
-          ...state.npcConnections[npcId],
-          ...updates,
-        };
-      }
-    },
-    /**
-     * Updates the player's current resonance level.
-     */
-    updateResonanceLevel: (state, action: PayloadAction<number>) => {
-      if (action.payload >= 0 && action.payload <= state.maxResonanceLevel) {
-        state.currentResonanceLevel = action.payload;
-      }
-    },
   },
   extraReducers: (builder) => {
-    builder
-      // Manual essence generation
-      .addCase(manualEssenceGenerationThunk.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(manualEssenceGenerationThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        // Handle successful manual generation
-      })
-      .addCase(manualEssenceGenerationThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string || 'Manual generation failed';
-      })
-      
-      // Passive essence generation
-      .addCase(processEssenceGenerationThunk.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(processEssenceGenerationThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        // Handle successful passive generation
-      })
-      .addCase(processEssenceGenerationThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string || 'Passive generation failed';
-      })
-      
-      // Initialize essence system
-      .addCase(initializeEssenceSystemThunk.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(initializeEssenceSystemThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        // Handle successful initialization
-      })
-      .addCase(initializeEssenceSystemThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string || 'Initialization failed';
-      });
+    // Note: Thunk handlers removed as the imported thunks don't exist
+    // When thunks are implemented, add handlers here following the pattern:
+    // .addCase(thunkName.pending, (state) => { state.loading = true; })
+    // .addCase(thunkName.fulfilled, (state, action) => { state.loading = false; /* handle success */ })
+    // .addCase(thunkName.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
   },
 });
 
@@ -162,8 +95,6 @@ export const {
   toggleGeneration,
   resetEssence,
   clearError,
-  updateEssenceConnection,
-  updateResonanceLevel, // Export the new action
 } = essenceSlice.actions;
 
 export const selectEssence = (state: { essence: EssenceState }) => state.essence;
