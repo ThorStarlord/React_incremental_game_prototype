@@ -32,7 +32,15 @@ import { useTheme } from '@mui/material/styles';
 
 // App hooks and selectors
 import { useAppSelector } from '../app/hooks';
-import { selectPlayer } from '../features/Player/state/PlayerSelectors';
+import { 
+  selectPlayerHealth,
+  selectPlayerMaxHealth,
+  selectPlayerMana,
+  selectPlayerMaxMana,
+  selectAvailableAttributePoints,
+  selectIsPlayerAlive,
+  selectResonanceLevel
+} from '../features/Player/state/PlayerSelectors';
 import { selectEssence } from '../features/Essence/state/EssenceSelectors';
 import { selectGameLoop } from '../features/GameLoop/state/GameLoopSelectors';
 import { selectEquippedTraitObjects } from '../features/Traits/state/TraitsSelectors';
@@ -77,8 +85,14 @@ interface QuickActionItem {
 export const DashboardPage: React.FC = React.memo(() => {
   const theme = useTheme();
   
-  // Redux state selection
-  const player = useAppSelector(selectPlayer);
+  // Redux state selection - use individual selectors instead of nested stats
+  const health = useAppSelector(selectPlayerHealth);
+  const maxHealth = useAppSelector(selectPlayerMaxHealth);
+  const mana = useAppSelector(selectPlayerMana);
+  const maxMana = useAppSelector(selectPlayerMaxMana);
+  const availableAttributePoints = useAppSelector(selectAvailableAttributePoints);
+  const isAlive = useAppSelector(selectIsPlayerAlive);
+  const resonanceLevel = useAppSelector(selectResonanceLevel);
   const essence = useAppSelector(selectEssence);
   const gameLoop = useAppSelector(selectGameLoop);
   const traits = useAppSelector(selectEquippedTraitObjects);
@@ -113,21 +127,21 @@ export const DashboardPage: React.FC = React.memo(() => {
   const quickActions = useMemo((): QuickActionItem[] => [
     {
       label: 'Health',
-      value: `${player.stats.health}/${player.stats.maxHealth}`,
+      value: `${health}/${maxHealth}`,
       icon: TrendingUpIcon,
-      color: player.stats.health < player.stats.maxHealth * 0.3 ? 'error' : 'success'
+      color: health < maxHealth * 0.3 ? 'error' : 'success'
     },
     {
       label: 'Mana',
-      value: `${player.stats.mana}/${player.stats.maxMana}`,
+      value: `${mana}/${maxMana}`,
       icon: TrendingUpIcon,
-      color: player.stats.mana < player.stats.maxMana * 0.3 ? 'warning' : 'primary'
+      color: mana < maxMana * 0.3 ? 'warning' : 'primary'
     },
     {
       label: 'Attribute Points',
-      value: player.availableAttributePoints.toString(),
+      value: availableAttributePoints.toString(),
       icon: TrendingUpIcon,
-      color: player.availableAttributePoints > 0 ? 'success' : 'secondary'
+      color: availableAttributePoints > 0 ? 'success' : 'secondary'
     },
     {
       label: 'Game Time',
@@ -135,18 +149,18 @@ export const DashboardPage: React.FC = React.memo(() => {
       icon: ScheduleIcon,
       color: 'secondary'
     }
-  ], [player, gameLoop]);
+  ], [health, maxHealth, mana, maxMana, availableAttributePoints, gameLoop]);
 
   // Health percentage for progress bar
   const healthPercentage = useMemo(() => 
-    (player.stats.health / player.stats.maxHealth) * 100,
-    [player.stats.health, player.stats.maxHealth]
+    (health / maxHealth) * 100,
+    [health, maxHealth]
   );
 
   // Mana percentage for progress bar
   const manaPercentage = useMemo(() => 
-    (player.stats.mana / player.stats.maxMana) * 100,
-    [player.stats.mana, player.stats.maxMana]
+    (mana / maxMana) * 100,
+    [mana, maxMana]
   );
 
   return (
@@ -195,8 +209,8 @@ export const DashboardPage: React.FC = React.memo(() => {
                   Character Vitals
                 </Typography>
                 <Chip 
-                  label={player.isAlive ? 'Alive' : 'Dead'} 
-                  color={player.isAlive ? 'success' : 'error'}
+                  label={isAlive ? 'Alive' : 'Dead'} 
+                  color={isAlive ? 'success' : 'error'}
                   size="small"
                 />
               </Stack>
@@ -204,12 +218,12 @@ export const DashboardPage: React.FC = React.memo(() => {
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    <strong>Resonance Level {player.resonanceLevel}</strong> 
+                    <strong>Resonance Level {resonanceLevel}</strong> 
                   </Typography>
                   
                   <Box sx={{ mb: 1 }}>
                     <Typography variant="caption" color="text.secondary">
-                      Health: {player.stats.health}/{player.stats.maxHealth} ({healthPercentage.toFixed(0)}%)
+                      Health: {health}/{maxHealth} ({healthPercentage.toFixed(0)}%)
                     </Typography>
                     <LinearProgress 
                       variant="determinate" 
@@ -221,7 +235,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                   
                   <Box>
                     <Typography variant="caption" color="text.secondary">
-                      Mana: {player.stats.mana}/{player.stats.maxMana} ({manaPercentage.toFixed(0)}%)
+                      Mana: {mana}/{maxMana} ({manaPercentage.toFixed(0)}%)
                     </Typography>
                     <LinearProgress 
                       variant="determinate" 

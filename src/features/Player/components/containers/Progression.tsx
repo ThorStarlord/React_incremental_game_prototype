@@ -18,7 +18,16 @@ import {
   Psychology as SkillIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectPlayer } from '../../state/PlayerSelectors';
+import { 
+  selectTotalPlaytime,
+  selectIsPlayerAlive,
+  selectAvailableAttributePoints,
+  selectAvailableSkillPoints,
+  selectResonanceLevel,
+  selectMaxTraitSlots,
+  selectPermanentTraits,
+  selectEquippedTraitObjects
+} from '../../state/PlayerSelectors';
 import { StatDisplay } from '../ui/StatDisplay';
 
 interface ProgressionProps {
@@ -34,7 +43,15 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
   showDetails = true,
   className,
 }) => {
-  const playerState = useAppSelector(selectPlayer);
+  // Use individual selectors instead of direct state access
+  const totalPlaytime = useAppSelector(selectTotalPlaytime);
+  const isAlive = useAppSelector(selectIsPlayerAlive);
+  const attributePoints = useAppSelector(selectAvailableAttributePoints);
+  const skillPoints = useAppSelector(selectAvailableSkillPoints);
+  const resonanceLevel = useAppSelector(selectResonanceLevel);
+  const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
+  const permanentTraits = useAppSelector(selectPermanentTraits);
+  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
 
   // Format total playtime for display
   const formatPlaytime = (milliseconds: number): string => {
@@ -48,7 +65,8 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
     }
   };
 
-  const formattedPlaytime = formatPlaytime(playerState.totalPlaytime);
+  const formattedPlaytime = formatPlaytime(totalPlaytime);
+  const equippedCount = equippedTraits.length;
 
   return (
     <Box className={className}>
@@ -72,15 +90,15 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Status"
-                value={playerState.isAlive ? 'Alive' : 'Defeated'}
-                color={playerState.isAlive ? 'success' : 'error'}
+                value={isAlive ? 'Alive' : 'Defeated'}
+                color={isAlive ? 'success' : 'error'}
               />
             </Grid>
 
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Resonance Level"
-                value={playerState.resonanceLevel}
+                value={resonanceLevel}
                 color="secondary"
               />
             </Grid>
@@ -88,7 +106,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Max Trait Slots"
-                value={playerState.maxTraitSlots}
+                value={maxTraitSlots}
                 color="info"
               />
             </Grid>
@@ -108,7 +126,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Attribute Points"
-                value={playerState.availableAttributePoints}
+                value={attributePoints}
                 color="warning"
               />
             </Grid>
@@ -116,7 +134,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Skill Points"
-                value={playerState.availableSkillPoints}
+                value={skillPoints}
                 color="info"
               />
             </Grid>
@@ -144,23 +162,23 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
               <Grid item xs={12} sm={6}>
                 <StatDisplay
                   label="Unspent Attribute Points"
-                  value={playerState.availableAttributePoints}
-                  color={playerState.availableAttributePoints > 0 ? 'warning' : 'secondary'}
+                  value={attributePoints}
+                  color={attributePoints > 0 ? 'warning' : 'secondary'}
                 />
               </Grid>
               
               <Grid item xs={12} sm={6}>
                 <StatDisplay
                   label="Unspent Skill Points"
-                  value={playerState.availableSkillPoints}
-                  color={playerState.availableSkillPoints > 0 ? 'info' : 'secondary'}
+                  value={skillPoints}
+                  color={skillPoints > 0 ? 'info' : 'secondary'}
                 />
               </Grid>
 
               <Grid item xs={12} sm={6}>
                 <StatDisplay
                   label="Permanent Traits"
-                  value={playerState.permanentTraits.length}
+                  value={permanentTraits.length}
                   color="success"
                 />
               </Grid>
@@ -168,7 +186,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
               <Grid item xs={12} sm={6}>
                 <StatDisplay
                   label="Active Trait Slots"
-                  value={`${playerState.traitSlots.filter(slot => slot.traitId !== null).length}/${playerState.traitSlots.length}`}
+                  value={`${equippedCount} / ${maxTraitSlots}`}
                   color="primary"
                 />
               </Grid>
