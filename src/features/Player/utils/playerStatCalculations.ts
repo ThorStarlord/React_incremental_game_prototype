@@ -68,27 +68,26 @@ export const recalculatePlayerStats = (player: PlayerState): PlayerStats => {
     healthRegen: Math.max(0, HEALTH_REGEN.BASE + (constitutionBonus * HEALTH_REGEN.CONSTITUTION_MULTIPLIER)),
     maxMana: Math.max(0, MANA.BASE + (intelligenceBonus * MANA.INTELLIGENCE_MULTIPLIER)),
     manaRegen: Math.max(0, MANA_REGEN.BASE + (wisdomBonus * MANA_REGEN.WISDOM_MULTIPLIER)),
-    attack: Math.max(0, player.stats.attack + strengthBonus),
-    defense: Math.max(0, player.stats.defense + constitutionBonus),
-    speed: Math.max(0, player.stats.speed + dexterityBonus),
+    attack: Math.max(0, player.attack + strengthBonus),
+    defense: Math.max(0, player.defense + constitutionBonus),
+    speed: Math.max(0, player.speed + dexterityBonus),
     criticalChance: Math.max(0, Math.min(1, CRITICAL_CHANCE.BASE + (dexterityBonus * CRITICAL_CHANCE.DEXTERITY_MULTIPLIER))),
     criticalDamage: Math.max(1, CRITICAL_DAMAGE.BASE + (strengthBonus * CRITICAL_DAMAGE.STRENGTH_MULTIPLIER)),
   };
 
   // Return updated stats with proper PlayerStats interface properties
   const updatedStats: PlayerStats = {
-    ...player.stats,
+    health: Math.min(player.health, derivedStats.maxHealth),
     maxHealth: derivedStats.maxHealth,
-    healthRegen: derivedStats.healthRegen,
+    mana: Math.min(player.mana, derivedStats.maxMana),
     maxMana: derivedStats.maxMana,
-    manaRegen: derivedStats.manaRegen,
     attack: derivedStats.attack,
     defense: derivedStats.defense,
     speed: derivedStats.speed,
+    healthRegen: derivedStats.healthRegen,
+    manaRegen: derivedStats.manaRegen,
     criticalChance: derivedStats.criticalChance,
     criticalDamage: derivedStats.criticalDamage,
-    health: Math.min(player.stats.health, derivedStats.maxHealth),
-    mana: Math.min(player.stats.mana, derivedStats.maxMana),
   };
 
   return updatedStats;
@@ -127,9 +126,10 @@ export const applyStatusEffectModifiers = (baseStats: PlayerStats, player: Playe
 
   // Apply modifiers to final stats
   const finalStats: PlayerStats = {
-    ...baseStats,
     health: Math.max(0, Math.min(baseStats.maxHealth, baseStats.health + statusModifiers.health)),
+    maxHealth: baseStats.maxHealth,
     mana: Math.max(0, Math.min(baseStats.maxMana, baseStats.mana + statusModifiers.mana)),
+    maxMana: baseStats.maxMana,
     attack: Math.max(0, baseStats.attack + statusModifiers.attack),
     defense: Math.max(0, baseStats.defense + statusModifiers.defense),
     speed: Math.max(0, baseStats.speed + statusModifiers.speed),
