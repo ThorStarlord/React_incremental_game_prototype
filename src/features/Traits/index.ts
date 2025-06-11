@@ -11,7 +11,6 @@ export * from './state/TraitsTypes';
 export * from './state/TraitThunks';
 
 // Component exports
-export { default as TraitSystemWrapper } from './components/containers/TraitSystemWrapper';
 export { default as TraitSlotsContainer } from './components/containers/TraitSlotsContainer';
 export { default as TraitSystemUI } from './components/ui/TraitSystemUI';
 export { default as TraitCard } from './components/ui/TraitCard';

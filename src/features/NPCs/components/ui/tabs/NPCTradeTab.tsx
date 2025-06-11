@@ -19,13 +19,65 @@ import {
 import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCTradeTabProps {
-  npcId: string; // Add the missing npcId prop
+  npcId: string;
 }
+
+// Mock trade data for development
+const mockTradeItems = [
+  {
+    id: 'potion_health',
+    name: 'Health Potion',
+    description: 'Restores 50 HP instantly. A reliable companion for any adventurer.',
+    category: 'Consumable',
+    basePrice: 25,
+    inStock: 5
+  },
+  {
+    id: 'potion_mana',
+    name: 'Mana Potion',
+    description: 'Restores 30 MP instantly. Essential for spellcasters.',
+    category: 'Consumable',
+    basePrice: 20,
+    inStock: 3
+  },
+  {
+    id: 'sword_iron',
+    name: 'Iron Sword',
+    description: 'A sturdy blade forged from quality iron. +5 Attack.',
+    category: 'Weapon',
+    basePrice: 100,
+    inStock: 1
+  },
+  {
+    id: 'shield_wooden',
+    name: 'Wooden Shield',
+    description: 'Basic protection from physical attacks. +3 Defense.',
+    category: 'Armor',
+    basePrice: 40,
+    inStock: 2
+  },
+  {
+    id: 'herb_rare',
+    name: 'Moonleaf Herb',
+    description: 'A rare herb that glows softly under moonlight. Used in advanced alchemy.',
+    category: 'Material',
+    basePrice: 75,
+    inStock: 0
+  },
+  {
+    id: 'gem_small',
+    name: 'Small Ruby',
+    description: 'A small but beautiful ruby. Can be used for crafting or decoration.',
+    category: 'Gem',
+    basePrice: 150,
+    inStock: 1
+  }
+];
 
 /**
  * NPCTradeTab - Handles trading interactions with NPCs
  */
-const NPCTradeTab: React.FC<NPCTradeTabProps> = ({ npcId }) => {
+const NPCTradeTab: React.FC<NPCTradeTabProps> = React.memo(({ npcId }) => {
   // Mock NPC data - in a real application, this would be fetched from the server
   const npc = {
     id: npcId,

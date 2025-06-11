@@ -1,214 +1,167 @@
-import { Trait, TraitEffect, TraitEffectValues } from '../../Traits/state/TraitsTypes';
-import { PlayerStats } from '../state/PlayerTypes';
+import type { Trait, TraitEffect, TraitEffectValues } from '../../Traits/state/TraitsTypes';
+import type { PlayerStats } from '../state/PlayerTypes';
 
 /**
- * Processed trait effects interface for applying trait modifications to player stats
+ * Processes trait effects and applies them to player stats
+ * @param traits Array of traits to process
+ * @param baseStats Base player stats before trait modifications
+ * @returns Modified stats with trait effects applied
  */
-export interface ProcessedTraitEffects {
-  statModifiers: Record<string, number>;
-  multipliers: Record<string, number>;
-  specialEffects: string[];
-}
+export function processTraitEffects(traits: Trait[], baseStats: PlayerStats): PlayerStats {
+  let modifiedStats = { ...baseStats };
 
-/**
- * Defines the aggregated effects from traits.
- * - statModifiers: Direct additions/subtractions to base stats.
- * - multipliers: Percentage-based multipliers for stats.
- * - specialEffects: Flags or values for unique, non-stat-modifying effects.
- */
-export interface AggregatedTraitEffects {
-  statModifiers: Partial<PlayerStats>;
-  multipliers: {
-    [key: string]: number; // e.g., 'essenceGainMultiplier', 'skillXpMultiplier'
-  };
-  specialEffects: {
-    [key: string]: any; // e.g., 'passiveRelationshipGrowth': 1
-  };
-  warnings?: string[]; // To log any issues during processing
-}
-
-/**
- * Aggregates effects from a list of active traits.
- * @param activeTraits An array of Trait objects that are currently active (equipped or permanent).
- * @param baseStats The player's current base stats (after attributes, before traits/status effects). Used for validation/context.
- * @returns An object containing aggregated stat modifiers, multipliers, and special effects.
- */
-export const processTraitEffects = (
-  activeTraits: Trait[],
-  baseStats: Partial<PlayerStats> // Can be used for validation or dynamic effects
-): AggregatedTraitEffects => {
-  const aggregatedEffects: AggregatedTraitEffects = {
-    statModifiers: {},
-    multipliers: {},
-    specialEffects: {},
-    warnings: []
-  };
-
-  activeTraits.forEach(trait => {
+  traits.forEach(trait => {
     if (!trait.effects) return;
 
+    // Handle different effect formats
     if (Array.isArray(trait.effects)) {
-      // Handle array of TraitEffect objects
-      trait.effects.forEach(effect => {
-        if (effect.type in baseStats) {
-          // Direct stat modifier
-          aggregatedEffects.statModifiers[effect.type as keyof PlayerStats] = 
-            (aggregatedEffects.statModifiers[effect.type as keyof PlayerStats] || 0) + effect.magnitude;
-        } else if (effect.type.endsWith('Multiplier')) {
-          // Multiplier effect
-          aggregatedEffects.multipliers[effect.type] = 
-            (aggregatedEffects.multipliers[effect.type] || 1) * (1 + effect.magnitude); // Assuming magnitude is a percentage (0.15 for 15%)
-        } else {
-          // Special effect
-          aggregatedEffects.specialEffects[effect.type] = effect.magnitude; // Or more complex handling
-        }
+      // TraitEffect[] format
+      trait.effects.forEach((effect: TraitEffect) => {
+        modifiedStats = applyEffect(modifiedStats, effect.type, effect.magnitude);
       });
     } else {
-      // Handle TraitEffectValues object
-      Object.entries(trait.effects).forEach(([effectName, value]) => {
-        if (effectName in baseStats) {
-          // Direct stat modifier
-          aggregatedEffects.statModifiers[effectName as keyof PlayerStats] = 
-            (aggregatedEffects.statModifiers[effectName as keyof PlayerStats] || 0) + (value as number);
-        } else if (effectName.endsWith('Multiplier')) {
-          // Multiplier effect
-          aggregatedEffects.multipliers[effectName] = 
-            (aggregatedEffects.multipliers[effectName] || 1) * (1 + (value as number));
-        } else {
-          // Special effect
-          aggregatedEffects.specialEffects[effectName] = value;
-        }
+      // TraitEffectValues format (object with effect names as keys)
+      Object.entries(trait.effects as TraitEffectValues).forEach(([effectType, magnitude]) => {
+        modifiedStats = applyEffect(modifiedStats, effectType, magnitude);
       });
     }
   });
 
-  return aggregatedEffects;
-};
+  return modifiedStats;
+}
 
 /**
- * Applies processed trait effects to a set of player stats.
- * @param currentStats The player's current stats (e.g., after attributes, before status effects).
- * @param traitEffects The aggregated trait effects from processTraitEffects.
- * @returns A new PlayerStats object with trait effects applied.
+ * Applies a single effect to player stats
+ * @param stats Current player stats
+ * @param effectType Type of effect to apply
+ * @param magnitude Effect magnitude
+ * @returns Updated stats with effect applied
  */
-export const applyTraitEffectsToStats = (
-  currentStats: PlayerStats,
-  traitEffects: ProcessedTraitEffects
-): PlayerStats => {
-  const newStats = { ...currentStats };
+function applyEffect(stats: PlayerStats, effectType: string, magnitude: number): PlayerStats {
+  const updatedStats = { ...stats };
 
-  // Apply direct stat modifiers
-  Object.entries(traitEffects.statModifiers).forEach(([stat, modifier]) => {
-    if (typeof newStats[stat as keyof PlayerStats] === 'number' && typeof modifier === 'number') {
-      (newStats[stat as keyof PlayerStats] as number) += modifier;
-    }
-  });
+  switch (effectType.toLowerCase()) {
+    case 'health':
+    case 'max_health':
+    case 'maxhealth':
+      updatedStats.maxHealth += magnitude;
+      break;
+    
+    case 'mana':
+    case 'max_mana':
+    case 'maxmana':
+      updatedStats.maxMana += magnitude;
+      break;
+    
+    case 'attack':
+    case 'damage':
+      updatedStats.attack += magnitude;
+      break;
+    
+    case 'defense':
+    case 'armor':
+      updatedStats.defense += magnitude;
+      break;
+    
+    case 'speed':
+    case 'agility':
+      updatedStats.speed += magnitude;
+      break;
+    
+    case 'health_regen':
+    case 'healthregen':
+    case 'health_regeneration':
+      updatedStats.healthRegen += magnitude;
+      break;
+    
+    case 'mana_regen':
+    case 'manaregen':
+    case 'mana_regeneration':
+      updatedStats.manaRegen += magnitude;
+      break;
+    
+    case 'critical_chance':
+    case 'criticalchance':
+    case 'crit_chance':
+      updatedStats.criticalChance += magnitude;
+      break;
+    
+    case 'critical_damage':
+    case 'criticaldamage':
+    case 'crit_damage':
+      updatedStats.criticalDamage += magnitude;
+      break;
+    
+    default:
+      console.warn(`Unknown trait effect type: ${effectType}`);
+      break;
+  }
 
-  // Apply multipliers
-  Object.entries(traitEffects.multipliers).forEach(([multiplierName, multiplierValue]) => {
-    // This part needs careful mapping from multiplierName to actual stat
-    // For example, 'essenceGainMultiplier' doesn't directly affect PlayerStats.
-    // This function should only apply to PlayerStats. Other multipliers might be handled elsewhere.
-    // For now, let's assume multipliers here are for stats like attack, defense, etc.
-    // If a multiplier is for a stat, apply it. Otherwise, it's a special effect.
-    if (multiplierName.includes('attack')) { // Example: if 'attackMultiplier'
-      newStats.attack *= multiplierValue;
-    }
-    // Add more specific multiplier handling as needed
-  });
-
-  return newStats;
-};
+  return updatedStats;
+}
 
 /**
- * Default empty processed trait effects
+ * Calculates total trait bonuses for display purposes
+ * @param traits Array of traits to analyze
+ * @returns Object containing total bonuses by stat type
  */
-export const EMPTY_PROCESSED_TRAIT_EFFECTS: ProcessedTraitEffects = {
-  statModifiers: {},
-  multipliers: {},
-  specialEffects: []
-};
+export function calculateTraitBonuses(traits: Trait[]): Partial<PlayerStats> {
+  const bonuses: Partial<PlayerStats> = {};
+  const emptyStats: PlayerStats = {
+    health: 0,
+    maxHealth: 0,
+    mana: 0,
+    maxMana: 0,
+    attack: 0,
+    defense: 0,
+    speed: 0,
+    healthRegen: 0,
+    manaRegen: 0,
+    criticalChance: 0,
+    criticalDamage: 0
+  };
 
-/**
- * Processes trait effects from equipped and permanent traits
- * @param equippedTraits Array of equipped trait objects
- * @param permanentTraits Array of permanent trait objects
- * @returns Aggregated trait effects ready for application
- */
-export const processTraitEffects = (
-  equippedTraits: Trait[],
-  permanentTraits: Trait[]
-): ProcessedTraitEffects => {
-  const processedEffects: ProcessedTraitEffects = {};
+  const modifiedStats = processTraitEffects(traits, emptyStats);
   
-  // Process effects from equipped traits
-  equippedTraits.forEach(trait => {
-    if (trait && trait.effects) {
-      applyTraitEffects(trait.effects, processedEffects);
+  // Return only non-zero bonuses
+  Object.entries(modifiedStats).forEach(([key, value]) => {
+    if (value !== 0) {
+      (bonuses as any)[key] = value;
     }
   });
-  
-  // Process effects from permanent traits
-  permanentTraits.forEach(trait => {
-    if (trait && trait.effects) {
-      applyTraitEffects(trait.effects, processedEffects);
-    }
-  });
-  
-  return processedEffects;
-};
+
+  return bonuses;
+}
 
 /**
- * Applies individual trait effects to the processed effects object
- * @param traitEffects Effects from a single trait
- * @param processedEffects Accumulator for all effects
+ * Validates trait effects for consistency and correctness
+ * @param trait Trait to validate
+ * @returns Array of validation warnings
  */
-const applyTraitEffects = (
-  traitEffects: any,
-  processedEffects: ProcessedTraitEffects
-): void => {
-  // Handle array of TraitEffect objects
-  if (Array.isArray(traitEffects)) {
-    traitEffects.forEach(effect => {
-      if (effect.type === 'STAT_MODIFIER' && typeof effect.magnitude === 'number') {
-        const statName = effect.target || effect.description?.toLowerCase().replace(/\s+/g, '');
-        if (statName) {
-          processedEffects[statName] = (processedEffects[statName] || 0) + effect.magnitude;
-        }
+export function validateTraitEffects(trait: Trait): string[] {
+  const warnings: string[] = [];
+
+  if (!trait.effects) {
+    warnings.push(`Trait ${trait.name} has no effects defined`);
+    return warnings;
+  }
+
+  if (Array.isArray(trait.effects)) {
+    trait.effects.forEach((effect, index) => {
+      if (!effect.type) {
+        warnings.push(`Effect ${index} in trait ${trait.name} missing type`);
+      }
+      if (typeof effect.magnitude !== 'number') {
+        warnings.push(`Effect ${index} in trait ${trait.name} has invalid magnitude`);
+      }
+    });
+  } else {
+    Object.entries(trait.effects).forEach(([effectType, magnitude]) => {
+      if (typeof magnitude !== 'number') {
+        warnings.push(`Effect ${effectType} in trait ${trait.name} has invalid magnitude`);
       }
     });
   }
-  
-  // Handle object with direct stat mappings
-  else if (typeof traitEffects === 'object' && traitEffects !== null) {
-    Object.entries(traitEffects).forEach(([statName, value]) => {
-      if (typeof value === 'number') {
-        processedEffects[statName] = (processedEffects[statName] || 0) + value;
-      }
-    });
-  }
-};
 
-/**
- * Validates that processed trait effects contain only valid stat names
- * @param effects Processed trait effects to validate
- * @returns Validated and filtered effects
- */
-export const validateTraitEffects = (effects: ProcessedTraitEffects): ProcessedTraitEffects => {
-  const validStats = new Set([
-    'health', 'maxHealth', 'mana', 'maxMana',
-    'attack', 'defense', 'speed',
-    'healthRegen', 'manaRegen',
-    'criticalChance', 'criticalDamage'
-  ]);
-  
-  const validatedEffects: ProcessedTraitEffects = {};
-  
-  Object.entries(effects).forEach(([statName, value]) => {
-    if (validStats.has(statName) && typeof value === 'number' && !isNaN(value)) {
-      validatedEffects[statName] = value;
-    }
-  });
-  
-  return validatedEffects;
-};
+  return warnings;
+}
