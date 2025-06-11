@@ -1,178 +1,88 @@
 /**
- * Type definitions for the Traits system
+ * @file TraitsTypes.ts
+ * @description Type definitions for the Traits system
  */
 
-/**
- * Interface for trait effects that can be applied to player
- */
+// Base trait effect definition
 export interface TraitEffect {
-  type: string;
-  magnitude: number;
-  duration?: number;
-  description?: string;
+  type: string;            // Type of effect (e.g., "STAT_MODIFIER", "ABILITY_GRANT")
+  magnitude: number;       // Effect magnitude
+  duration?: number;       // Effect duration (permanent if omitted)
+  description?: string;    // Optional description of the specific effect instance
 }
 
-/**
- * Interface for direct effect values (used for simple effects storage)
- */
+// Alternative effect format using key-value pairs
 export interface TraitEffectValues {
   [effectName: string]: number;
 }
 
-/**
- * Comprehensive trait rarity enumeration
- */
-export type TraitRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
-
-/**
- * Trait category enumeration
- */
-export type TraitCategory = 'combat' | 'social' | 'mental' | 'physical' | 'magical' | 'utility';
-
-/**
- * Trait acquisition prerequisites interface
- */
-export interface TraitRequirements {
-  level?: number;
-  attributes?: Partial<Record<string, number>>;
-  prerequisiteTraits?: string[];
-  relationshipLevel?: number;
-  questCompletion?: string[];
-  essence?: number;
-  npcId?: string;
-  quest?: string;
-  [key: string]: any;
-}
-
-/**
- * Interface defining a trait in the game (Stored in Redux state)
- * Ensure this matches the structure produced by fetchTraitsThunk
- */
+// Core trait definition matching data model specification
 export interface Trait {
-  /** Unique identifier for the trait (matches the key in the JSON) */
-  id: string;
-  
-  /** Display name of the trait */
-  name: string;
-  
-  /** Description of what the trait does */
-  description: string;
-  
-  /** Category/type of the trait (e.g., Combat, Knowledge, Social) */
-  category: string; 
-  
-  /** Effects provided by this trait (can be array or object) */
-  effects: TraitEffect[] | TraitEffectValues;
-  
-  /** Rarity classification (Common, Uncommon, Rare, etc.) */
-  rarity: string; 
-  
-  /** Tier level of the trait (optional) */
-  tier?: number;
-  
-  /** Source NPC where the trait can be obtained (optional) */
-  sourceNpc?: string; 
-  
-  /** Cost in essence to acquire the trait (optional) */
-  essenceCost?: number;
-  
-  /** Optional icon identifier for UI (optional) */
-  iconPath?: string; 
-  
-  /** Requirements for obtaining this trait (optional) */
-  requirements?: {
-    level?: number;
-    relationshipLevel?: number; 
-    npcId?: string;
-    prerequisiteTraits?: string[]; 
-    quest?: string;
-    [key: string]: any;
-  };
-
-  /** Level of the trait if traits can be leveled up (optional) */
-  level?: number;
-
-  /** Cost to make trait permanent (optional) */
-  permanenceCost?: number;
-
-  /** Source description (optional) */
-  source?: string;
+  id: string;              // Unique trait identifier
+  name: string;            // Display name
+  description: string;     // Detailed description
+  category: string;        // Grouping category (combat, physical, social, etc.)
+  rarity: string;          // Trait rarity level (common, rare, epic, legendary, mythic)
+  effects: TraitEffect[] | TraitEffectValues;  // Stat modifications
+  requirements?: Record<string, any>; // Acquisition requirements
+  essenceCost?: number;    // Acquisition cost for Resonance
+  permanenceCost?: number; // Cost to make permanent (deprecated)
+  source?: string;         // Acquisition source (NPC ID, quest, etc.)
+  tier?: number;           // Optional trait tier
+  iconPath?: string;       // Optional icon path
+  level?: number;          // Optional trait level
 }
 
-/**
- * Interface for a trait with active status (used potentially in UI state, not core state)
- */
-export interface ActiveTrait extends Trait {
-  isActive: boolean;
-}
-
-/**
- * Interface for trait filtering criteria
- */
-export interface TraitFilters {
-  maxCost?: number; 
-  searchTerm?: string;
-}
-
-/**
- * Robust TraitSlot interface for trait slot management
- * 
- * @interface TraitSlot
- * @property {string} id - Unique identifier for this slot
- * @property {number} index - Zero-based position in trait slot array
- * @property {boolean} isUnlocked - Whether this slot is accessible
- * @property {string | null} traitId - ID of equipped trait (null if empty)
- * @property {string} [unlockRequirement] - Optional description of unlock condition
- */
-export interface TraitSlot {
-  id: string;
-  index: number;
-  isUnlocked: boolean;
-  traitId: string | null;
-  unlockRequirement?: string;
-}
-
-/**
- * Interface for trait progression
- */
-export interface TraitProgression {
-  discovered: number;
-  total: number;
-  slotsUnlocked: number;
-  maxSlots: number;
-}
-
-/**
- * Extended trait effect interface for complex trait mechanics
- */
-export interface TraitEffectDetails {
-  type: string;
-  magnitude: number;
-  duration?: number;
-  description?: string;
-  target?: 'self' | 'ally' | 'enemy' | 'area';
-  condition?: string;
-}
-
-/**
- * Trait preset for saving/loading trait configurations
- */
+// Trait preset for saved loadouts
 export interface TraitPreset {
-  id: string;
-  name: string;
-  traits: string[];
-  description?: string;
-  created: number;
+  id: string;              // Unique identifier for this preset
+  name: string;            // Name of this preset
+  traits: string[];        // Array of trait IDs in this preset
+  description?: string;    // Optional description
+  created: number;         // Created timestamp
 }
 
-/**
- * Main traits state interface - now focuses on slot management
- */
+// Main traits state
 export interface TraitsState {
-  traits: Record<string, Trait>;
-  acquiredTraits: string[];
-  discoveredTraits: string[];
-  presets: TraitPreset[];
+  traits: Record<string, Trait>; // All trait definitions
+  acquiredTraits: string[];      // IDs of traits the player has generally acquired/learned
+  presets: TraitPreset[];        // Trait presets
+  discoveredTraits: string[];    // IDs of traits the player has discovered
   loading: boolean;
   error: string | null;
+}
+
+// Action payload types
+export interface AcquireTraitPayload {
+  traitId: string;
+  essenceCost?: number;
+}
+
+export interface DiscoverTraitPayload {
+  traitId: string;
+}
+
+export interface SaveTraitPresetPayload {
+  preset: TraitPreset;
+}
+
+export interface LoadTraitPresetPayload {
+  presetId: string;
+}
+
+export interface DeleteTraitPresetPayload {
+  presetId: string;
+}
+
+// Acquisition thunk payload
+export interface AcquireTraitWithEssencePayload {
+  traitId: string;
+  essenceCost: number;
+}
+
+// Trait validation result
+export interface TraitValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
 }

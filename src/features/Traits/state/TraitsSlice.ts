@@ -1,46 +1,59 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TraitsState, Trait, TraitPreset } from './TraitsTypes';
+import type { 
+  TraitsState, 
+  AcquireTraitPayload, 
+  DiscoverTraitPayload,
+  SaveTraitPresetPayload,
+  LoadTraitPresetPayload,
+  DeleteTraitPresetPayload 
+} from './TraitsTypes';
 
+// Initial state
 const initialState: TraitsState = {
   traits: {},
   acquiredTraits: [],
-  discoveredTraits: [],
   presets: [],
+  discoveredTraits: [],
   loading: false,
   error: null,
 };
 
-export const traitsSlice = createSlice({
+const traitsSlice = createSlice({
   name: 'traits',
   initialState,
   reducers: {
-    acquireTrait: (state, action: PayloadAction<string>) => {
-      const traitId = action.payload;
-      if (!state.acquiredTraits.includes(traitId)) {
-        state.acquiredTraits.push(traitId);
-      }
+    // Load trait definitions
+    loadTraits: (state, action: PayloadAction<Record<string, any>>) => {
+      state.traits = action.payload;
+      state.loading = false;
+      state.error = null;
     },
 
-    discoverTrait: (state, action: PayloadAction<string>) => {
-      const traitId = action.payload;
+    // Discover a trait
+    discoverTrait: (state, action: PayloadAction<DiscoverTraitPayload>) => {
+      const { traitId } = action.payload;
       if (!state.discoveredTraits.includes(traitId)) {
         state.discoveredTraits.push(traitId);
       }
     },
 
-    equipTrait: (state, action: PayloadAction<{ traitId: string; slotIndex: number }>) => {
-      // This action is handled by PlayerSlice for trait slot management
-      // No direct state changes needed here
+    // Acquire a trait (add to general acquired pool)
+    acquireTrait: (state, action: PayloadAction<AcquireTraitPayload>) => {
+      const { traitId } = action.payload;
+      if (!state.acquiredTraits.includes(traitId)) {
+        state.acquiredTraits.push(traitId);
+      }
+      // Also mark as discovered if not already
+      if (!state.discoveredTraits.includes(traitId)) {
+        state.discoveredTraits.push(traitId);
+      }
     },
 
-    unequipTrait: (state, action: PayloadAction<number>) => {
-      // This action is handled by PlayerSlice for trait slot management
-      // No direct state changes needed here
-    },
-
-    saveTraitPreset: (state, action: PayloadAction<TraitPreset>) => {
-      const preset = action.payload;
+    // Save trait preset
+    saveTraitPreset: (state, action: PayloadAction<SaveTraitPresetPayload>) => {
+      const { preset } = action.payload;
       const existingIndex = state.presets.findIndex(p => p.id === preset.id);
+      
       if (existingIndex >= 0) {
         state.presets[existingIndex] = preset;
       } else {
@@ -48,47 +61,44 @@ export const traitsSlice = createSlice({
       }
     },
 
-    loadTraitPreset: (state, action: PayloadAction<string>) => {
-      // Preset loading logic is handled by PlayerSlice
-      // This action triggers the loading process
+    // Load trait preset
+    loadTraitPreset: (state, action: PayloadAction<LoadTraitPresetPayload>) => {
+      // This action might trigger other effects in thunks or sagas
+      // The actual loading logic would be handled by the calling component
     },
 
-    deleteTraitPreset: (state, action: PayloadAction<string>) => {
-      state.presets = state.presets.filter(preset => preset.id !== action.payload);
+    // Delete trait preset
+    deleteTraitPreset: (state, action: PayloadAction<DeleteTraitPresetPayload>) => {
+      const { presetId } = action.payload;
+      state.presets = state.presets.filter(preset => preset.id !== presetId);
     },
 
-    unlockTraitSlot: (state, action: PayloadAction<number>) => {
-      // Trait slot unlocking is handled by PlayerSlice
-      // No direct state changes needed here
+    // Loading states
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
     },
 
-    clearError: (state) => {
-      state.error = null;
+    // Error handling
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
+      state.loading = false;
     },
 
-    // Set traits data (typically loaded from JSON)
-    setTraits: (state, action: PayloadAction<Record<string, Trait>>) => {
-      state.traits = action.payload;
-    },
-  },
-  
-  extraReducers: (builder) => {
-    // Remove references to non-existent thunks
-    // Future thunk integrations can be added here when TraitsThunks.ts is created
+    // Reset state
+    resetTraitsState: () => initialState,
   },
 });
 
 export const {
-  acquireTrait,
+  loadTraits,
   discoverTrait,
-  equipTrait,
-  unequipTrait,
+  acquireTrait,
   saveTraitPreset,
   loadTraitPreset,
   deleteTraitPreset,
-  unlockTraitSlot,
-  clearError,
-  setTraits,
+  setLoading,
+  setError,
+  resetTraitsState,
 } = traitsSlice.actions;
 
 export default traitsSlice.reducer;

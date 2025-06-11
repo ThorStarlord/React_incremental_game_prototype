@@ -4,6 +4,7 @@
  * Centralized constants for player mechanics, formulas, and limits.
  * Following best practices from the coding guidelines.
  */
+import { PlayerAttributes, PlayerStats } from '../features/Player/state/PlayerTypes';
 
 /**
  * Attribute modifier calculation
@@ -70,7 +71,7 @@ export const PLAYER_BASE_STATS = {
   criticalDamage: 1.5,
 } satisfies Record<string, number>;
 
-import { PlayerAttributes, PlayerStats } from '../features/Player/state/PlayerTypes';
+
 
 export const INITIAL_ATTRIBUTES: PlayerAttributes = {
   strength: 10,

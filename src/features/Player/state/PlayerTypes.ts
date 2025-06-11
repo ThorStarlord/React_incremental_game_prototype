@@ -38,24 +38,25 @@ export interface PlayerAttributes {
  * Temporary status effect that modifies player stats
  */
 export interface StatusEffect {
-  id: string;
-  name: string;
-  effects: Partial<PlayerStats>; // Can modify any player stat
-  duration: number; // in game ticks or seconds
-  remainingDuration: number;
-  source?: string; // e.g., trait ID, item ID
-  isBuff: boolean;
+  id: string;                    // Unique identifier
+  name: string;                  // Display name
+  description: string;           // Effect description
+  duration: number;              // Duration in milliseconds (-1 = permanent)
+  effects: Partial<PlayerStats>; // Stat modifications
+  startTime: number;             // Application timestamp
+  type?: string;                 // Effect type (buff, debuff, neutral)
+  category?: string;             // Effect category (combat, social, magical, etc.)
 }
 
 /**
  * Trait slot interface for player trait management
  */
 export interface TraitSlot {
-  id: string;
-  slotIndex: number;
-  traitId: string | null;
-  isLocked: boolean;
-  unlockRequirement?: string;
+  id: string;                // Unique slot identifier
+  slotIndex: number;         // Position in trait array
+  traitId: string | null;    // Equipped trait ID (null = empty)
+  isLocked: boolean;         // Whether slot is accessible
+  unlockRequirement?: string; // Condition to unlock slot
 }
 
 /**

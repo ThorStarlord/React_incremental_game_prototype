@@ -1,171 +1,204 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { selectCurrentEssence } from '../../Essence/state/EssenceSelectors';
-import { spendEssence } from '../../Essence/state/EssenceSlice';
-import { addPermanentTrait } from '../../Player/state/PlayerSlice';
-import { recalculateStatsThunk } from '../../Player/state/PlayerThunks';
-import { selectTraits, selectAcquiredTraits, selectTraitPresetById } from './TraitsSelectors';
-import { acquireTrait, loadTraitPreset } from './TraitsSlice';
-import type { Trait, TraitEffect, TraitEffectValues, TraitPreset } from '../../Traits/state/TraitsTypes';
+import { 
+  loadTraits, 
+  discoverTrait, 
+  acquireTrait, 
+  setLoading, 
+  setError 
+} from './TraitsSlice';
+import { 
+  spendEssence 
+} from '../../Essence/state/EssenceSlice';
+import { 
+  addPermanentTrait 
+} from '../../Player/state/PlayerSlice';
+import type { 
+  Trait, 
+  AcquireTraitWithEssencePayload 
+} from './TraitsTypes';
 
 /**
- * Thunk for acquiring a trait from an NPC via Resonance, making it PERMANENT for the player.
+ * Fetch and load trait definitions from data source
+ */
+export const fetchTraitsThunk = createAsyncThunk(
+  'traits/fetchTraits',
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoading(true));
+      
+      // Fetch traits from public data
+      const response = await fetch('/data/traits.json');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch traits: ${response.statusText}`);
+      }
+      
+      const traitsData = await response.json();
+      
+      // Validate and normalize trait data
+      const normalizedTraits: Record<string, Trait> = {};
+      
+      for (const [id, traitData] of Object.entries(traitsData)) {
+        normalizedTraits[id] = {
+          id,
+          ...(traitData as Omit<Trait, 'id'>)
+        };
+      }
+      
+      dispatch(loadTraits(normalizedTraits));
+      return normalizedTraits;
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load traits';
+      dispatch(setError(errorMessage));
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Acquire trait with Essence cost (Resonance mechanic)
+ * This action permanently adds the trait to the player
  */
 export const acquireTraitWithEssenceThunk = createAsyncThunk(
   'traits/acquireTraitWithEssence',
-  async (traitId: string, { getState, dispatch, rejectWithValue }) => {
+  async (
+    { traitId, essenceCost }: AcquireTraitWithEssencePayload,
+    { getState, dispatch, rejectWithValue }
+  ) => {
     try {
       const state = getState() as RootState;
-      const currentEssence = selectCurrentEssence(state);
-      const traits = selectTraits(state);
-      const trait = traits[traitId];
-
+      const currentEssence = state.essence.currentEssence;
+      const trait = state.traits.traits[traitId];
+      
+      // Validate trait exists
       if (!trait) {
-        return rejectWithValue('Trait not found');
+        throw new Error(`Trait with ID ${traitId} not found`);
       }
-
-      const essenceCost = trait.essenceCost || 0;
       
-      if (currentEssence < essenceCost) {
-        return rejectWithValue('Insufficient Essence');
+      // Validate essence cost
+      const actualCost = essenceCost || trait.essenceCost || 0;
+      if (currentEssence < actualCost) {
+        throw new Error(`Insufficient Essence. Required: ${actualCost}, Available: ${currentEssence}`);
       }
-
-      // Deduct essence cost with proper payload structure
-      if (essenceCost > 0) {
-        dispatch(spendEssence({
-          amount: essenceCost,
-          description: `Resonated with trait: ${trait.name}`
-        }));
-      }
-
-      // Add to acquired traits in TraitsSlice
-      dispatch(acquireTrait(traitId));
       
-      // Add to permanent traits in PlayerSlice (Resonance makes it permanent)
-      dispatch(addPermanentTrait(traitId));
-
-      return { 
-        traitId, 
-        essenceCost,
-        message: `Successfully resonated with trait: ${trait.name}`,
-        success: true
+      // Check if already permanently acquired
+      if (state.player.permanentTraits.includes(traitId)) {
+        throw new Error('Trait is already permanently acquired');
+      }
+      
+      // Spend essence
+      if (actualCost > 0) {
+        dispatch(spendEssence({ amount: actualCost }));
+      }
+      
+      // Add to general acquired traits
+      dispatch(acquireTrait({ traitId }));
+      
+      // Add to player's permanent traits
+      dispatch(addPermanentTrait({ traitId }));
+      
+      return {
+        traitId,
+        essenceCost: actualCost,
+        trait
       };
+      
     } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown error occurred');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to acquire trait';
+      return rejectWithValue(errorMessage);
     }
   }
 );
 
 /**
- * Thunk for loading a trait preset and applying it to the player.
+ * Discover a trait (make it visible to the player)
  */
-export const loadTraitPresetThunk = createAsyncThunk<
-  { preset: TraitPreset; message: string },
-  string,
-  { state: RootState }
->(
-  'traits/loadTraitPreset',
-  async (presetId: string, { getState, dispatch, rejectWithValue }) => {
-    const state = getState() as RootState;
-    const preset = selectTraitPresetById(state, presetId);
-    
-    if (!preset) {
-      return rejectWithValue('Preset not found');
+export const discoverTraitThunk = createAsyncThunk(
+  'traits/discoverTrait',
+  async (traitId: string, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const trait = state.traits.traits[traitId];
+      
+      if (!trait) {
+        throw new Error(`Trait with ID ${traitId} not found`);
+      }
+      
+      // Check if already discovered
+      if (state.traits.discoveredTraits.includes(traitId)) {
+        return { traitId, alreadyDiscovered: true };
+      }
+      
+      dispatch(discoverTrait({ traitId }));
+      
+      return {
+        traitId,
+        trait,
+        alreadyDiscovered: false
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to discover trait';
+      return rejectWithValue(errorMessage);
     }
-    
-    // Validate that all traits in preset are still available (acquired by player)
-    const acquiredTraits = selectAcquiredTraits(state);
-    const validTraits = preset.traits.filter((traitId: string) => acquiredTraits.includes(traitId));
-    
-    if (validTraits.length < preset.traits.length) {
-      console.warn(`Some traits from preset "${preset.name}" are no longer available`);
-    }
-    
-    // Mark preset as used in TraitsSlice
-    dispatch(loadTraitPreset(presetId));
-    
-    // Note: Preset loading would need to integrate with Player trait slot management
-    // This is simplified for now - actual implementation would need to coordinate
-    // with PlayerSlice for trait slot management
-    
-    dispatch(recalculateStatsThunk());
-
-    return {
-      preset,
-      message: `Preset "${preset.name}" loaded successfully!`
-    };
   }
 );
 
-interface RawTraitJsonData {
-  name: string;
-  description: string;
-  category?: string; 
-  type?: string;    
-  effects?: TraitEffect[] | TraitEffectValues;
-  rarity?: string;
-  essenceCost?: number;
-  permanenceCost?: number; 
-  tier?: number;
-  iconPath?: string;
-  sourceNpc?: string; 
-  requirements?: {
-    level?: number;
-    relationshipLevel?: number; 
-    npcId?: string;
-    prerequisiteTraits?: string[]; 
-    quest?: string;
-    [key: string]: any;
-  };
-  level?: number;
-}
-
-export const fetchTraitsThunk = createAsyncThunk<
-  Record<string, Trait>,
-  void,
-  { rejectValue: string }
->(
-  'traits/fetchTraits',
-  async (_, { rejectWithValue }) => {
+/**
+ * Validate trait data structure
+ */
+export const validateTraitThunk = createAsyncThunk(
+  'traits/validateTrait',
+  async (traitId: string, { getState, rejectWithValue }) => {
     try {
-      const response = await fetch('/data/traits.json');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch traits from /data/traits.json: ${response.status} ${response.statusText}`);
+      const state = getState() as RootState;
+      const trait = state.traits.traits[traitId];
+      
+      if (!trait) {
+        throw new Error(`Trait with ID ${traitId} not found`);
       }
-      const rawTraitsData: Record<string, RawTraitJsonData> = await response.json();
-
-      const processedTraits: Record<string, Trait> = {};
-      for (const [id, rawData] of Object.entries(rawTraitsData)) {
-        const traitData: Trait = {
-          id: id,
-          name: rawData.name,
-          description: rawData.description,
-          category: rawData.category || rawData.type || 'General',
-          effects: rawData.effects || {},
-          rarity: rawData.rarity || 'Common',
-          tier: rawData.tier,
-          sourceNpc: rawData.sourceNpc,
-          essenceCost: rawData.essenceCost,
-          iconPath: rawData.iconPath,
-          level: rawData.level,
-          requirements: rawData.requirements ? {
-            level: rawData.requirements.level,
-            relationshipLevel: rawData.requirements.relationshipLevel,
-            npcId: rawData.requirements.npcId,
-            prerequisiteTraits: rawData.requirements.prerequisiteTraits,
-            quest: rawData.requirements.quest
-          } : undefined
-        };
-        processedTraits[id] = traitData;
+      
+      const errors: string[] = [];
+      const warnings: string[] = [];
+      
+      // Validate required fields
+      if (!trait.name || trait.name.trim() === '') {
+        errors.push('Trait name is required');
       }
-      return processedTraits;
+      
+      if (!trait.description || trait.description.trim() === '') {
+        errors.push('Trait description is required');
+      }
+      
+      if (!trait.category || trait.category.trim() === '') {
+        errors.push('Trait category is required');
+      }
+      
+      if (!trait.rarity || trait.rarity.trim() === '') {
+        errors.push('Trait rarity is required');
+      }
+      
+      // Validate effects
+      if (!trait.effects || (Array.isArray(trait.effects) && trait.effects.length === 0)) {
+        warnings.push('Trait has no effects defined');
+      }
+      
+      // Validate essence cost
+      if (trait.essenceCost !== undefined && trait.essenceCost < 0) {
+        errors.push('Essence cost cannot be negative');
+      }
+      
+      return {
+        traitId,
+        isValid: errors.length === 0,
+        errors,
+        warnings
+      };
+      
     } catch (error) {
-      let message = 'Unknown error fetching traits';
-      if (error instanceof Error) {
-        message = error.message;
-      }
-      console.error('Fetch Traits Error:', message);
-      return rejectWithValue(message);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to validate trait';
+      return rejectWithValue(errorMessage);
     }
   }
 );
