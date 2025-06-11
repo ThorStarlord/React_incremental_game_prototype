@@ -1,33 +1,47 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { 
   selectTraits, 
   selectAvailableTraitObjects, 
-  selectTraitLoading, 
+  selectEquippedTraitObjects,
+  selectTraitLoading,
   selectTraitError 
 } from '../../state/TraitsSelectors';
+import { selectPermanentTraits } from '../../../Player/state/PlayerSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice';
-import { 
-  selectTraitSlots, 
-  selectEquippedTraitIds,
-  selectPermanentTraits as selectPlayerPermanentTraitIds 
-} from '../../../Player/state/PlayerSelectors';
-import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
-import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks'; // Corrected import path
+import { equipTrait, unequipTrait } from '../../state/TraitsSlice';
+import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks';
 import TraitSlots from '../ui/TraitSlots';
 
-const TraitSlotsContainer: React.FC = () => {
+export const TraitSlotsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const traitsData = useAppSelector(selectTraits);
-  const playerTraitSlots = useAppSelector(selectTraitSlots);
-  const equippedTraitIds = useAppSelector(selectEquippedTraitIds);
-  const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
+  const allTraits = useAppSelector(selectTraits);
+  const availableTraits = useAppSelector(selectAvailableTraitObjects);
+  const equippedTraitObjects = useAppSelector(selectEquippedTraitObjects);
+  const permanentTraitIds = useAppSelector(selectPermanentTraits);
   const essence = useAppSelector(selectCurrentEssence);
-  const availableTraits = useAppSelector(selectAvailableTraitObjects); 
+  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC);
+
+  // Create trait slots array - hardcoded structure since Player doesn't export trait slots
+  const traitSlots = useMemo(() => {
+    const totalSlots = 6; // Standard number of trait slots
+    const unlockedSlots = 3; // Default unlocked slots
+    
+    return Array.from({ length: totalSlots }, (_, index) => ({
+      id: `slot_${index}`,
+      index,
+      traitId: equippedTraitObjects[index]?.id || null,
+      isUnlocked: index < unlockedSlots,
+      unlockRequirement: index >= unlockedSlots ? `Unlock at slot ${index + 1}` : undefined
+    }));
+  }, [equippedTraitObjects]);
+
+  const equippedTraitIds = useMemo(() => {
+    return equippedTraitObjects.map(trait => trait.id);
+  }, [equippedTraitObjects]);
 
   const [showSelector, setShowSelector] = useState(false);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
@@ -40,22 +54,19 @@ const TraitSlotsContainer: React.FC = () => {
 
   const onConfirmAssign = useCallback(() => { 
     if (selectedTraitId && activeSlotId) {
-      const targetSlot = playerTraitSlots.find(s => s.id === activeSlotId);
+      const targetSlot = traitSlots.find((s: any) => s.id === activeSlotId);
       if (targetSlot) {
         dispatch(equipTrait({ traitId: selectedTraitId, slotIndex: targetSlot.index }));
-        dispatch(recalculateStatsThunk()); // Recalculate stats after equipping
+        dispatch(recalculateStatsThunk());
       }
     }
     onCloseSelector();
-  }, [selectedTraitId, activeSlotId, dispatch, onCloseSelector, playerTraitSlots]);
+  }, [selectedTraitId, activeSlotId, dispatch, onCloseSelector, traitSlots]);
 
   const onRemove = useCallback((slotIndex: number) => {
-    const targetSlot = playerTraitSlots.find(slot => slot.index === slotIndex);
-    if (targetSlot && targetSlot.traitId) {
-      dispatch(unequipTrait({ slotIndex: targetSlot.index }));
-      dispatch(recalculateStatsThunk()); // Recalculate stats after unequipping
-    }
-  }, [dispatch, playerTraitSlots]);
+    dispatch(unequipTrait(slotIndex));
+    dispatch(recalculateStatsThunk());
+  }, [dispatch]);
 
   const onCloseNotification = useCallback(() => setNotification(prev => ({ ...prev, show: false })), []);
 
@@ -65,13 +76,9 @@ const TraitSlotsContainer: React.FC = () => {
       !permanentTraitIds.includes(trait.id) 
     );
   }, [availableTraits, equippedTraitIds, permanentTraitIds]);
-  
-  const equippedTraitObjects = useMemo(() => {
-    return equippedTraitIds.map(id => traitsData[id]).filter(Boolean);
-  }, [equippedTraitIds, traitsData]);
 
   const traitSlotsProps = {
-    traitSlots: playerTraitSlots,
+    traitSlots: traitSlots,
     equippedTraits: equippedTraitObjects, 
     availableTraits: eligibleTraitsForEquip, 
     permanentTraitIds, 
@@ -95,7 +102,7 @@ const TraitSlotsContainer: React.FC = () => {
     onCancelPermanent: () => { console.warn("onCancelPermanent called in TraitSlotsContainer, but action is deprecated."); },
   };
 
-  if (isLoading && Object.keys(traitsData).length === 0) { 
+  if (isLoading && Object.keys(allTraits).length === 0) { 
     return <TraitSlots {...traitSlotsProps} />; 
   }
   

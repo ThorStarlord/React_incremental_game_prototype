@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import {
   Box,
   Card,
@@ -11,15 +11,12 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Chip,
   Grid,
   Alert,
   IconButton,
   Tooltip,
-  Divider,
   List,
   ListItem,
-  ListItemText,
   ListItemSecondaryAction,
   FormControl,
   InputLabel,
@@ -27,7 +24,6 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
-  Badge,
   Stack
 } from '@mui/material';
 import {
@@ -36,81 +32,70 @@ import {
   Delete as DeleteIcon,
   ClearAll as ClearAllIcon,
   FilterList as FilterIcon,
-  Sort as SortIcon,
   Settings as SettingsIcon,
-  LockOpen as UnlockIcon,
-  Star as FavoriteIcon,
-  Category as CategoryIcon,
-  Speed as OptimizeIcon
+  Star as FavoriteIcon
 } from '@mui/icons-material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // Added import
-import StarIcon from '@mui/icons-material/Star'; // Added import
 
 import {
-  selectAcquiredTraits,
-  selectTraitPresets,
-  selectDiscoveredTraits,
   selectTraits,
-  selectEquippedTraitObjects,
-  selectPermanentTraitObjects
+  selectTraitPresets,
+  selectEquippedTraitObjects
 } from '../../state/TraitsSelectors';
-import { selectTraitSlots } from '../../../Player/state/PlayerSelectors'; // Add import
+import {
+  selectPermanentTraits
+} from '../../../Player/state/PlayerSelectors';
 import {
   saveTraitPreset,
   loadTraitPreset,
   deleteTraitPreset,
-  clearAllEquippedTraits
+  equipTrait,
+  unequipTrait
 } from '../../state/TraitsSlice';
-import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
-import type { TraitPreset, Trait, TraitEffect, TraitEffectValues } from '../../state/TraitsTypes'; // Corrected import path and added TraitEffect, TraitEffectValues
+import type { TraitPreset, Trait } from '../../state/TraitsTypes';
+import TraitCard from './TraitCard';
 
 /**
- * Props for the TraitManagement component
+ * Fixed props interface - only accept what parent actually passes
  */
 export interface TraitManagementProps {
-  // Data (props that are actually passed from parent)
-  acquiredTraits: string[]; // This should be string[] (IDs) from TraitsSlice
-  permanentTraits: string[]; // This should be string[] (IDs) from PlayerSlice
   currentEssence: number;
-  
-  // No longer passing equippedTraitIds or permanentTraitIds as props, selecting internally
-  // No longer passing onAcquireTrait, onMakeTraitPermanent, canMakePermanent, getTraitAffordability, isInProximityToNPC
+  onEquipTrait?: (traitId: string, slotIndex: number) => void;
+  onUnequipTrait?: (slotIndex: number) => void;
 }
 
-type SortOption = 'name' | 'category' | 'rarity' | 'recent'; // Defined SortOption
-type FilterOption = 'all' | 'equipped' | 'unequipped' | 'permanent' | 'temporary'; // Defined FilterOption
+type SortOption = 'name' | 'category' | 'rarity' | 'recent';
+type FilterOption = 'all' | 'equipped' | 'unequipped' | 'permanent' | 'temporary';
 
 /**
- * Trait management interface for acquired traits.
- * "Make Permanent" functionality is now deprecated as Resonance handles it.
+ * Enhanced trait management interface with preset support and organization
  */
 export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
-  acquiredTraits: acquiredTraitIdsFromProps,
-  permanentTraits: permanentTraitIdsFromProps,
-  currentEssence, 
+  currentEssence,
+  onEquipTrait,
+  onUnequipTrait
 }) => {
   const dispatch = useAppDispatch();
-  
-  // State selections
-  const allTraits = useAppSelector(selectTraits);
   const equippedTraitObjects = useAppSelector(selectEquippedTraitObjects);
-  const permanentTraitObjects = useAppSelector(selectPermanentTraitObjects);
+  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const allTraits = useAppSelector(selectTraits);
   const traitPresets = useAppSelector(selectTraitPresets);
-  const discoveredTraits = useAppSelector(selectDiscoveredTraits);
-  const playerTraitSlots = useAppSelector(selectTraitSlots); // Move hook call to component level
 
-  // Convert trait objects to IDs for compatibility with existing logic
-  const equippedTraitIds = useMemo(() => 
-    equippedTraitObjects.map(trait => trait.id), 
-    [equippedTraitObjects]
-  );
-  
-  const permanentTraitIds = useMemo(() => 
-    permanentTraitObjects.map(trait => trait.id), 
-    [permanentTraitObjects]
-  );
+  // Calculate available slots based on default game design
+  const unlockedSlotCount = useMemo(() => {
+    return 6; // Default max trait slots for the player
+  }, []);
 
-  // Local state
+  // Extract equipped trait IDs from trait objects
+  const equippedTraitIds = useMemo(() => {
+    return equippedTraitObjects.map(trait => trait.id);
+  }, [equippedTraitObjects]);
+
+  // Get trait objects from equipped traits (already have them)
+  const acquiredTraitObjects = useMemo(() => {
+    return equippedTraitObjects;
+  }, [equippedTraitObjects]);
+
+  // Local state for UI controls
   const [presetDialogOpen, setPresetDialogOpen] = useState(false);
   const [presetName, setPresetName] = useState('');
   const [presetDescription, setPresetDescription] = useState('');
@@ -119,34 +104,43 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
   const [sortBy, setSortBy] = useState<SortOption>('name');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [showAdvanced, setShowAdvanced] = useState(false);
-
-  // Get trait objects from IDs
-  const acquiredTraitObjects = useMemo(() => {
-    // Use acquiredTraitIdsFromProps (from TraitsSlice) to map to actual Trait objects
-    return acquiredTraitIdsFromProps.map(id => allTraits[id]).filter(Boolean) as Trait[];
-  }, [acquiredTraitIdsFromProps, allTraits]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Filter and sort traits
   const filteredAndSortedTraits = useMemo(() => {
     let filtered = [...acquiredTraitObjects];
 
-    // Apply filters
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(trait => 
+        trait.name.toLowerCase().includes(query) ||
+        trait.description.toLowerCase().includes(query) ||
+        trait.category?.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply status filters
     switch (filterBy) {
       case 'equipped':
         filtered = filtered.filter(trait => equippedTraitIds.includes(trait.id));
         break;
       case 'unequipped':
-        filtered = filtered.filter(trait => !equippedTraitIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
+        filtered = filtered.filter(trait => 
+          !equippedTraitIds.includes(trait.id) && !permanentTraitIds.includes(trait.id)
+        );
         break;
       case 'permanent':
         filtered = filtered.filter(trait => permanentTraitIds.includes(trait.id));
         break;
       case 'temporary':
-        filtered = filtered.filter(trait => equippedTraitIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
+        filtered = filtered.filter(trait => 
+          equippedTraitIds.includes(trait.id) && !permanentTraitIds.includes(trait.id)
+        );
         break;
       case 'all':
       default:
-        // No filtering
+        // No additional filtering
         break;
     }
 
@@ -158,24 +152,23 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
         case 'category':
           return (a.category || '').localeCompare(b.category || '');
         case 'rarity':
-          const rarityOrder = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic']; // Added uncommon, mythic
+          const rarityOrder = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
           const aRarity = rarityOrder.indexOf(a.rarity?.toLowerCase() || 'common');
           const bRarity = rarityOrder.indexOf(b.rarity?.toLowerCase() || 'common');
           return bRarity - aRarity; // Highest rarity first
         case 'recent':
-          // Sort by discovery order (most recently discovered first)
-          const aIndex = discoveredTraits.indexOf(a.id);
-          const bIndex = discoveredTraits.indexOf(b.id);
-          return bIndex - aIndex;
+          const aIndex = equippedTraitIds.indexOf(a.id);
+          const bIndex = equippedTraitIds.indexOf(b.id);
+          return bIndex - aIndex; // Most recent first
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [acquiredTraitObjects, filterBy, sortBy, equippedTraitIds, permanentTraitIds, discoveredTraits]);
+  }, [acquiredTraitObjects, searchQuery, filterBy, sortBy, equippedTraitIds, permanentTraitIds]);
 
-  // Save current loadout as preset
+  // Preset management functions
   const handleSavePreset = useCallback(() => {
     if (!presetName.trim()) return;
 
@@ -183,7 +176,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
       id: `preset_${Date.now()}`,
       name: presetName.trim(),
       description: presetDescription.trim() || undefined,
-      traits: [...equippedTraitIds],
+      traits: [...equippedTraitIds], // Use trait IDs for preset
       created: Date.now()
     };
 
@@ -193,12 +186,10 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
     setPresetDescription('');
   }, [presetName, presetDescription, equippedTraitIds, dispatch]);
 
-  // Load preset configuration
   const handleLoadPreset = useCallback((presetId: string) => {
     dispatch(loadTraitPreset(presetId));
   }, [dispatch]);
 
-  // Delete preset
   const handleDeletePreset = useCallback(() => {
     if (selectedPresetId) {
       dispatch(deleteTraitPreset(selectedPresetId));
@@ -207,171 +198,36 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
     }
   }, [selectedPresetId, dispatch]);
 
-  // Clear all equipped traits
-  const handleClearAll = useCallback(() => {
-    dispatch(clearAllEquippedTraits());
-  }, [dispatch]);
+  const handleClearAllEquipped = useCallback(() => {
+    // TODO: Implement clear all equipped functionality when the correct action is available
+    console.log('Clear all equipped functionality - to be implemented');
+    
+    // When the correct action is available, it might look like:
+    // dispatch(clearAllPlayerEquippedTraits());
+  }, []);
 
-  // Toggle trait equipment - Fixed logic
+  // Enhanced trait toggle with proper slot management
   const handleToggleTrait = useCallback((traitId: string) => {
     if (equippedTraitIds.includes(traitId)) {
       // Find the slot index for this trait and unequip it
-      const equippedSlot = playerTraitSlots.find(slot => slot.traitId === traitId);
-      if (equippedSlot) {
-        dispatch(unequipTrait({ slotIndex: equippedSlot.index }));
+      const slotIndex = equippedTraitIds.indexOf(traitId);
+      if (slotIndex !== -1) {
+        dispatch(unequipTrait(slotIndex)); // Pass slot index directly
       }
     } else {
       // Equip the trait to an available slot
-      dispatch(equipTrait({ traitId, slotIndex: -1 })); // -1 means auto-assign
+      dispatch(equipTrait({ traitId, slotIndex: -1 })); // Use TraitsSlice action
     }
-  }, [equippedTraitIds, playerTraitSlots, dispatch]);
+  }, [equippedTraitIds, dispatch]);
 
-  // Get trait status
-  const getTraitStatus = useCallback((trait: Trait) => {
-    if (permanentTraitIds.includes(trait.id)) {
-      return { type: 'permanent', label: 'Permanent', color: 'success' as const };
-    }
-    if (equippedTraitIds.includes(trait.id)) {
-      return { type: 'equipped', label: 'Equipped', color: 'primary' as const };
-    }
-    return { type: 'available', label: 'Acquired', color: 'default' as const }; // Changed label to Acquired
-  }, [permanentTraitIds, equippedTraitIds]);
-
-  // Statistics
+  // Statistics calculations
   const stats = useMemo(() => ({
     total: acquiredTraitObjects.length,
     equipped: equippedTraitIds.length,
     permanent: permanentTraitIds.length,
     available: acquiredTraitObjects.length - permanentTraitIds.length,
-    temporary: equippedTraitIds.filter(id => !permanentTraitIds.includes(id)).length // Added temporary count
+    temporary: equippedTraitIds.filter((id: string) => !permanentTraitIds.includes(id)).length
   }), [acquiredTraitObjects.length, equippedTraitIds.length, permanentTraitIds.length]);
-
-  const getRarityColor = (rarity: string) => {
-    switch (rarity.toLowerCase()) {
-      case 'legendary': return 'error';
-      case 'epic': return 'secondary';
-      case 'rare': return 'primary';
-      case 'uncommon': return 'info'; // Added uncommon
-      default: return 'default';
-    }
-  };
-
-  const getStatusChip = (trait: Trait) => {
-    if (permanentTraitIds.includes(trait.id)) {
-      return (
-        <Chip
-          icon={<CheckCircleIcon />}
-          label="Permanent"
-          color="success"
-          size="small"
-          variant="filled"
-        />
-      );
-    }
-    
-    if (equippedTraitIds.includes(trait.id)) {
-      return (
-        <Chip
-          icon={<StarIcon />}
-          label="Equipped"
-          color="primary"
-          size="small"
-          variant="outlined"
-        />
-      );
-    }
-    
-    return (
-      <Chip
-        label="Acquired"
-        color="default"
-        size="small"
-        variant="outlined"
-      />
-    );
-  };
-
-  const renderTraitItem = (trait: Trait) => {
-    const isPermanentByPlayer = permanentTraitIds.includes(trait.id); // Use internal permanentTraitIds
-
-    return (
-      <ListItem
-        key={trait.id}
-        sx={{
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: 1,
-          mb: 1,
-          bgcolor: 'background.paper'
-        }}
-      >
-        <Box sx={{ width: '100%' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {trait.name}
-            </Typography>
-            <Chip
-              label={trait.rarity}
-              color={getRarityColor(trait.rarity)}
-              size="small"
-            />
-            {getStatusChip(trait)}
-          </Box>
-          
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {trait.description}
-          </Typography>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="caption" color="text.secondary">
-                Category: {trait.category}
-              </Typography>
-              {trait.sourceNpc && (
-                <Typography variant="caption" color="text.secondary">
-                  • Source: {trait.sourceNpc}
-                </Typography>
-              )}
-            </Box>
-            
-            {isPermanentByPlayer && (
-                 <Typography variant="caption" color="success.main">
-                    (Permanently active)
-                 </Typography>
-            )}
-          </Box>
-          {/* Display effects */}
-          {showAdvanced && trait.effects && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" color="text.secondary">
-                Effects:
-              </Typography>
-              <Box sx={{ ml: 1 }}>
-                {Array.isArray(trait.effects) ? (
-                  trait.effects.map((effect: TraitEffect, index: number) => ( // Explicitly type effect and index
-                    <Typography key={index} variant="caption" display="block">
-                      • {effect.type}: {effect.magnitude > 0 ? '+' : ''}{effect.magnitude}
-                    </Typography>
-                  ))
-                ) : (
-                  Object.entries(trait.effects).map(([key, value]: [string, number]) => ( // Explicitly type key and value
-                    <Typography key={key} variant="caption" display="block">
-                      • {key}: {value > 0 ? '+' : ''}{value}
-                    </Typography>
-                  ))
-                )}
-              </Box>
-            </Box>
-          )}
-        </Box>
-      </ListItem>
-    );
-  };
-
-  // Filter acquired traits to display (excluding permanent ones, as they are displayed separately)
-  // This is for traits that can be equipped/unequipped
-  const displayableAcquiredTraits = acquiredTraitObjects.filter(t => !permanentTraitIds.includes(t.id));
-
 
   return (
     <Box>
@@ -423,19 +279,11 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
             <Button
               variant="outlined"
               startIcon={<ClearAllIcon />}
-              onClick={handleClearAll}
+              onClick={handleClearAllEquipped}
               disabled={equippedTraitIds.length === 0}
               color="warning"
             >
               Clear All
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<OptimizeIcon />}
-              disabled
-              title="Auto-optimize coming soon"
-            >
-              Optimize
             </Button>
           </Stack>
         </CardContent>
@@ -451,26 +299,15 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
             </Typography>
             
             <List dense>
-              {traitPresets.map((preset: TraitPreset) => ( // Explicitly type preset
+              {traitPresets.map((preset: TraitPreset) => (
                 <ListItem key={preset.id} divider>
-                  <ListItemText
-                    primary={preset.name}
-                    secondary={
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography variant="caption">
-                          {preset.traits.length} traits
-                        </Typography>
-                        {preset.description && (
-                          <Typography variant="caption" color="text.secondary">
-                            • {preset.description}
-                          </Typography>
-                        )}
-                        <Typography variant="caption" color="text.secondary">
-                          • {new Date(preset.created).toLocaleDateString()}
-                        </Typography>
-                      </Stack>
-                    }
-                  />
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle1">{preset.name}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {preset.traits.length} traits • Created {new Date(preset.created).toLocaleDateString()}
+                      {preset.description && ` • ${preset.description}`}
+                    </Typography>
+                  </Box>
                   <ListItemSecondaryAction>
                     <Tooltip title="Load preset">
                       <IconButton 
@@ -514,13 +351,23 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
 
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Search Traits"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by name, description, or category"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={3}>
               <FormControl fullWidth size="small">
                 <InputLabel>Sort By</InputLabel>
                 <Select
                   value={sortBy}
                   label="Sort By"
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  startAdornment={<SortIcon sx={{ mr: 1, color: 'action.active' }} />}
                 >
                   <MenuItem value="name">Name</MenuItem>
                   <MenuItem value="category">Category</MenuItem>
@@ -530,33 +377,24 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={3}>
               <FormControl fullWidth size="small">
                 <InputLabel>Filter</InputLabel>
                 <Select
                   value={filterBy}
                   label="Filter"
                   onChange={(e) => setFilterBy(e.target.value as FilterOption)}
-                  startAdornment={<CategoryIcon sx={{ mr: 1, color: 'action.active' }} />}
                 >
                   <MenuItem value="all">All Traits</MenuItem>
-                  <MenuItem value="equipped">
-                    <Badge badgeContent={stats.equipped} color="primary">
-                      Equipped
-                    </Badge>
-                  </MenuItem>
+                  <MenuItem value="equipped">Equipped</MenuItem>
                   <MenuItem value="unequipped">Unequipped</MenuItem>
-                  <MenuItem value="permanent">
-                    <Badge badgeContent={stats.permanent} color="success">
-                      Permanent
-                    </Badge>
-                  </MenuItem>
+                  <MenuItem value="permanent">Permanent</MenuItem>
                   <MenuItem value="temporary">Temporary</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={2}>
               <FormControlLabel
                 control={
                   <Switch
@@ -575,131 +413,28 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Acquired Traits ({filteredAndSortedTraits.length})
+            Acquired Traits ({filteredAndSortedTraits.length} / {stats.total})
           </Typography>
 
           {filteredAndSortedTraits.length === 0 ? (
             <Alert severity="info">
-              No traits match the current filter criteria.
+              {searchQuery || filterBy !== 'all' 
+                ? "No traits match the current filter criteria."
+                : "No traits acquired yet. Visit NPCs to discover and acquire traits through Resonance."
+              }
             </Alert>
           ) : (
             <Grid container spacing={2}>
-              {filteredAndSortedTraits.map((trait) => {
-                const status = getTraitStatus(trait);
-                const isEquippable = status.type === 'available';
-                const isUnequippable = status.type === 'equipped';
-
-                return (
-                  <Grid item xs={12} sm={6} md={4} key={trait.id}>
-                    <Card
-                      variant="outlined"
-                      sx={{
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        position: 'relative',
-                        transition: 'transform 0.2s',
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: 2
-                        }
-                      }}
-                    >
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                          <Typography variant="h6" component="h3">
-                            {trait.name}
-                          </Typography>
-                          <Chip
-                            label={status.label}
-                            color={status.color}
-                            size="small"
-                          />
-                        </Box>
-
-                        <Box sx={{ mb: 2 }}>
-                          <Chip
-                            label={trait.category || 'Uncategorized'}
-                            size="small"
-                            variant="outlined"
-                            sx={{ mr: 1 }}
-                          />
-                          <Chip
-                            label={trait.rarity || 'Common'}
-                            size="small"
-                            color={
-                              trait.rarity === 'legendary' ? 'warning' :
-                              trait.rarity === 'epic' ? 'secondary' :
-                              trait.rarity === 'rare' ? 'primary' : 'default'
-                            }
-                          />
-                        </Box>
-
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                          {trait.description}
-                        </Typography>
-
-                        {showAdvanced && trait.effects && (
-                          <Box sx={{ mb: 2 }}>
-                            <Typography variant="caption" color="text.secondary">
-                              Effects:
-                            </Typography>
-                            <Box sx={{ ml: 1 }}>
-                              {Array.isArray(trait.effects) ? (
-                                trait.effects.map((effect: TraitEffect, index: number) => (
-                                  <Typography key={index} variant="caption" display="block">
-                                    • {effect.type}: {effect.magnitude > 0 ? '+' : ''}{effect.magnitude}
-                                  </Typography>
-                                ))
-                              ) : (
-                                Object.entries(trait.effects).map(([key, value]: [string, number]) => (
-                                  <Typography key={key} variant="caption" display="block">
-                                    • {key}: {value > 0 ? '+' : ''}{value}
-                                  </Typography>
-                                ))
-                              )}
-                            </Box>
-                          </Box>
-                        )}
-
-                        <Box sx={{ display: 'flex', gap: 1, mt: 'auto' }}>
-                          {isEquippable && (
-                            <Button
-                              size="small"
-                              variant="contained"
-                              onClick={() => handleToggleTrait(trait.id)}
-                              fullWidth
-                            >
-                              Equip
-                            </Button>
-                          )}
-                          {isUnequippable && (
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              onClick={() => handleToggleTrait(trait.id)}
-                              fullWidth
-                            >
-                              Unequip
-                            </Button>
-                          )}
-                          {status.type === 'permanent' && (
-                            <Button
-                              size="small"
-                              variant="contained"
-                              color="success"
-                              disabled
-                              fullWidth
-                            >
-                              Permanent
-                            </Button>
-                          )}
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
+              {filteredAndSortedTraits.map((trait) => (
+                <Grid item xs={12} sm={6} md={4} key={trait.id}>
+                  <TraitCard
+                    trait={trait}
+                    onClick={() => handleToggleTrait(trait.id)}
+                    isEquipped={equippedTraitIds.includes(trait.id)}
+                    isPermanent={permanentTraitIds.includes(trait.id)}
+                  />
+                </Grid>
+              ))}
             </Grid>
           )}
         </CardContent>

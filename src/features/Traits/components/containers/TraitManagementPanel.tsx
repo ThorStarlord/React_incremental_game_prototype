@@ -21,15 +21,12 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import {
   selectTraits,
   selectTraitLoading,
-  selectTraitError
-} from '../../state/TraitsSlice';
-import {
+  selectTraitError,
   selectEquippedTraitObjects,
   selectPermanentTraitObjects,
   selectAvailableTraitObjects
 } from '../../state/TraitsSelectors';
-import { selectTraitSlots } from '../../../Player/state/PlayerSelectors'; // Fixed import name
-import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
+import { equipTrait, unequipTrait } from '../../state/TraitsSlice';
 import { Trait } from '../../state/TraitsTypes';
 
 /**
@@ -65,15 +62,15 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   
-  // Use selector from PlayerSelectors for trait slots
-  const playerTraitSlots = useAppSelector(selectTraitSlots);
-  const totalSlots = playerTraitSlots.length;
-  const usedSlots = playerTraitSlots.filter(slot => slot.traitId !== null).length;
-
-  // Use selectors that return full trait objects
+  // Use Traits selectors for slot information
   const equippedTraits = useAppSelector(selectEquippedTraitObjects);
   const permanentTraits = useAppSelector(selectPermanentTraitObjects);
   const availableTraits = useAppSelector(selectAvailableTraitObjects);
+
+  // Calculate slot information from equipped traits
+  const totalSlots = 6; // Standard trait slot count
+  const unlockedSlotCount = 3; // Default unlocked slots (should come from Player state if available)
+  const usedSlots = equippedTraits.length;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number): void => {
     setActiveTab(newValue);
@@ -121,12 +118,14 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   // Handle Loading State
   if (isLoading) {
     return (
-      <Panel title={
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <AutoFixHighIcon sx={{ mr: 1 }} />
-          <Typography variant="h6">Character Traits</Typography>
-        </Box>
-      }>
+      <Panel 
+        title={
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <AutoFixHighIcon sx={{ mr: 1 }} />
+            <Typography variant="h6">Character Traits</Typography>
+          </Box>
+        }
+      >
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3, minHeight: '150px' }}>
           <CircularProgress />
           <Typography sx={{ ml: 2 }} color="text.secondary">Loading Traits...</Typography>
@@ -138,12 +137,14 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   // Handle Error State
   if (error) {
      return (
-      <Panel title={
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <AutoFixHighIcon sx={{ mr: 1 }} />
-          <Typography variant="h6">Character Traits</Typography>
-        </Box>
-      }>
+      <Panel 
+        title={
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <AutoFixHighIcon sx={{ mr: 1 }} />
+            <Typography variant="h6">Character Traits</Typography>
+          </Box>
+        }
+      >
         <Alert severity="error" sx={{ m: 1 }}>
            Failed to load trait data: {error}
         </Alert>
@@ -151,15 +152,17 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
     );
   }
 
-  // Handle Case Where Data Might Be Empty After Loading (optional but good)
-  if (!isLoading && !error && Object.keys(allTraitsData).length === 0) {
+  // Handle Case Where Data Might Be Empty After Loading
+  if (!isLoading && !error && allTraitsData && Object.keys(allTraitsData).length === 0) {
      return (
-      <Panel title={
+      <Panel 
+        title={
          <Box sx={{ display: 'flex', alignItems: 'center' }}>
            <AutoFixHighIcon sx={{ mr: 1 }} />
            <Typography variant="h6">Character Traits</Typography>
          </Box>
-      }>
+        }
+      >
         <Alert severity="warning" sx={{ m: 1 }}>No trait definitions loaded.</Alert>
       </Panel>
     );
@@ -173,7 +176,7 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
           <Typography variant="h6">Character Traits</Typography>
           <Chip 
             size="small"
-            label={`${usedSlots}/${totalSlots}`}
+            label={`${usedSlots}/${unlockedSlotCount}`}
             color="primary"
             sx={{ ml: 2 }}
           />
@@ -291,19 +294,13 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
       )}
       
       <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'flex-end' }}>
-        {selectedTrait && activeTab === 1 && usedSlots < totalSlots && (
+        {selectedTrait && activeTab === 1 && usedSlots < unlockedSlotCount && (
           <Button 
             variant="contained" 
             color="primary"
             onClick={() => {
-              // Find the first available slot index
-              const availableSlot = playerTraitSlots.find(slot => slot.isUnlocked && !slot.traitId);
-              if (availableSlot) {
-                dispatch(equipTrait({ traitId: selectedTrait.id, slotIndex: availableSlot.index }));
-                setSelectedTrait(null);
-              } else {
-                console.warn("No available slots to equip trait.");
-              }
+              dispatch(equipTrait({ traitId: selectedTrait.id, slotIndex: -1 }));
+              setSelectedTrait(null);
             }}
           >
             Equip Selected
@@ -316,9 +313,9 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
             color="secondary"
             onClick={() => {
               // Find the slot index of the equipped trait
-              const equippedSlot = playerTraitSlots.find(slot => slot.traitId === selectedTrait.id);
-              if (equippedSlot) {
-                dispatch(unequipTrait({ slotIndex: equippedSlot.index }));
+              const slotIndex = equippedTraits.findIndex(t => t.id === selectedTrait.id);
+              if (slotIndex !== -1) {
+                dispatch(unequipTrait(slotIndex));
                 setSelectedTrait(null);
               } else {
                 console.warn("Selected trait is not equipped.");

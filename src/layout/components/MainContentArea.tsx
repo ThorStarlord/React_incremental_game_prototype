@@ -9,9 +9,8 @@ import {
 import { useTheme } from '@mui/material/styles';
 
 // Page imports
-import { CharacterPage } from '../../pages/CharacterPage';
-import { TraitSystemWrapper } from '../../features/Traits/components/containers/TraitSystemWrapper';
-import NPCsPage from '../../pages/NPCsPage'; // Updated from NPCPage
+import CharacterPage from '../../pages/CharacterPage';
+import NPCsPage from '../../pages/NPCsPage';
 import EssencePage from '../../pages/EssencePage';
 import SettingsPage from '../../pages/SettingsPage';
 import { DashboardPage } from '../../pages/DashboardPage';
@@ -128,14 +127,6 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
       showContainer: true,
       maxWidth: 'lg',
       loadingText: 'Loading character data...',
-      enableSuspense: true,
-      preloadable: true
-    },
-    traits: {
-      component: TraitSystemWrapper,
-      showContainer: true,
-      maxWidth: 'lg',
-      loadingText: 'Loading trait system...',
       enableSuspense: true,
       preloadable: true
     },

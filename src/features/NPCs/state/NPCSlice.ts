@@ -301,71 +301,23 @@ const npcSlice = createSlice({
         }
       })
 
-      .addCase(shareTraitWithNPCThunk.fulfilled, (state, action: PayloadAction<InteractionResult, string, { arg: ShareTraitPayload; requestId: string; requestStatus: "fulfilled"; }, never>) => {
+      .addCase(shareTraitWithNPCThunk.fulfilled, (state, action) => {
+        // The actual trait sharing was already handled by the reducer action
+        // Here we can handle any additional side effects from the InteractionResult
         const result = action.payload;
-        const { npcId, traitId, slotIndex } = action.meta.arg;
-        
-        const npc = state.npcs[npcId];
-        if (npc) {
-          if (result.affinityDelta) {
-            const oldValue = npc.relationshipValue;
-            const newValue = Math.max(-100, Math.min(100, oldValue + result.affinityDelta));
-            npc.relationshipValue = newValue;
-            npc.lastInteraction = Date.now();
-            // Also check for slot unlocks after sharing affinity change
-            if (npc.sharedTraitSlots) {
-              npc.sharedTraitSlots.forEach(slot => {
-                if (!slot.isUnlocked && slot.unlockRequirement !== undefined && newValue >= slot.unlockRequirement) {
-                  slot.isUnlocked = true;
-                  console.log(`NPC ${npcId} unlocked trait slot ${slot.index} at relationship ${newValue} (trait share)`);
-                }
-              });
-            }
-            state.relationshipHistory.push({
-              id: `${npcId}-${Date.now()}`,
-              npcId,
-              timestamp: Date.now(),
-              oldValue,
-              newValue,
-              reason: 'Trait sharing interaction'
-            });
-          }
-
-          if (!npc.sharedTraitSlots) {
-            npc.sharedTraitSlots = [];
-          }
-          let targetSlot = npc.sharedTraitSlots.find(slot => slot.index === slotIndex);
-          if (!targetSlot) {
-            console.error(`[NPCSlice] Share/Unshare failed: Target slot with index ${slotIndex} not found for NPC ${npcId}. Slots must be predefined.`);
-            return;
-          }
-          if (traitId === '') {
-            targetSlot.traitId = null;
-          } else {
-            targetSlot.traitId = traitId;
+        if (result.success && result.relationshipChange) {
+          // Apply any relationship changes if specified in the result
+          const npcId = action.meta.arg.npcId;
+          const npc = state.npcs[npcId];
+          if (npc) {
+            npc.relationshipValue += result.relationshipChange;
           }
         }
       })
-
-      .addMatcher(
-        (action): action is RejectedAction => action.type.endsWith('/rejected'),
-        (state, action) => {
-          if (action.type.startsWith('npcs/initializeNPCs/rejected') || action.type.startsWith('npcs/fetchNPCs/rejected')) {
-            state.loading = false;
-            if (action.payload && typeof action.payload === 'string') {
-              state.error = action.payload;
-            } else if (action.error?.message) {
-              state.error = action.error.message;
-            } else {
-              state.error = 'An unknown error occurred while loading NPCs.';
-            }
-          } else {
-            state.loading = false; 
-            console.warn(`NPC Thunk Rejected: ${action.type}`, action.payload || action.error);
-          }
-        }
-      );
-  }
+      .addCase(shareTraitWithNPCThunk.rejected, (state, action) => {
+        state.error = action.payload || 'Failed to share trait with NPC';
+      });
+  },
 });
 
 export const {

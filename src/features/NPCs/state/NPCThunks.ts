@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import type { RootState } from '../../../app/store';
+import { RootState } from '../../../app/store';
+import { NPC, NPCInteraction, InteractionResult, InteractionType, NPCSharedTraitSlot } from './NPCTypes';
+import { npcSlice } from './NPCSlice'; // Import the slice
 import { setNPCs, setLoading, setError, updateNpcConnectionDepth, addDialogueEntry, completeDialogueTopic } from './NPCSlice'; // Added completeDialogueTopic
-import type { NPC, RelationshipChangeEntry, DialogueEntry, InteractionResult, DialogueResult, ProcessDialoguePayload } from './NPCTypes';
 import { getRelationshipTier, RELATIONSHIP_THRESHOLDS } from './NPCTypes';
 import { mockDialogues } from '../data/mockNPCData';
 
@@ -245,11 +246,11 @@ export const endNPCInteractionThunk = createAsyncThunk<
  */
 export const processDialogueChoiceThunk = createAsyncThunk<
   DialogueResult,
-  ProcessDialoguePayload, // Use ProcessDialoguePayload for args
+  ProcessDialoguePayload,
   { state: RootState }
 >(
   'npcs/processDialogueChoice',
-  async ({ npcId, choiceId, playerText }, { getState, dispatch, rejectWithValue }) => { // Added playerText
+  async ({ npcId, choiceId, dialogueData }, { getState, dispatch, rejectWithValue }) => {
     try {
       const state = getState();
       const npc = state.npcs.npcs[npcId];
@@ -258,15 +259,18 @@ export const processDialogueChoiceThunk = createAsyncThunk<
         return rejectWithValue(`NPC with ID ${npcId} not found`);
       }
 
+      // Extract player message from dialogueData
+      const playerText = dialogueData?.playerMessage || '';
+
       // Get dialogue data based on choiceId
-      const dialogueData = mockDialogues[choiceId];
-      if (!dialogueData) {
+      const dialogueDataFromMock = mockDialogues[choiceId];
+      if (!dialogueDataFromMock) {
         return rejectWithValue(`Dialogue choice with ID ${choiceId} not found`);
       }
 
       // Determine NPC response based on relationship level
       const currentRelationshipTier = getRelationshipTier(npc.relationshipValue);
-      let responseText = dialogueData.responses[currentRelationshipTier] || dialogueData.responses['NEUTRAL']; // Fallback to NEUTRAL
+      let responseText = dialogueDataFromMock.responses[currentRelationshipTier] || dialogueDataFromMock.responses['NEUTRAL'];
 
       // If the choiceId is 'generic_talk', use a generic response if no specific one is found
       if (choiceId === 'generic_talk') {
@@ -326,41 +330,70 @@ export const processDialogueChoiceThunk = createAsyncThunk<
  * Share trait with NPC
  */
 export const shareTraitWithNPCThunk = createAsyncThunk<
-  InteractionResult, // Changed return type
-  { npcId: string; traitId: string; slotIndex: number },
-  { state: RootState }
+  InteractionResult, // Changed from simple object to InteractionResult
+  { npcId: string; traitId: string; slotIndex: number }, // Arguments
+  { state: RootState; rejectValue: string }
 >(
-  'npcs/shareTrait',
-  async ({ npcId, traitId, slotIndex }, { getState, rejectWithValue }) => {
-    try {
-      const state = getState();
-      const npc = state.npcs.npcs[npcId];
-      
-      if (!npc) {
-        return rejectWithValue(`NPC with ID ${npcId} not found`);
-      }
+  'npcs/shareTraitWithNPC',
+  async ({ npcId, traitId, slotIndex }, { getState, dispatch, rejectWithValue }) => {
+    const state = getState();
+    const npc = state.npcs.npcs[npcId];
 
-      // Check if player has sufficient relationship level (removed for testing)
-      // if (npc.relationshipValue < 50) {
-      //   return rejectWithValue('Insufficient relationship level for trait sharing');
-      // }
-
-      // Check if player has the trait
-      // Assuming player traits are stored in player slice, adjust path if necessary
-      const playerAcquiredTraits = state.player.permanentTraits.concat(state.player.traitSlots.filter(s => s.traitId).map(s => s.traitId as string));
-      if (!playerAcquiredTraits.includes(traitId)) {
-        return rejectWithValue('Player does not have this trait');
-      }
-
-      return {
-        success: true,
-        message: `Successfully shared trait with ${npc.name}`,
-        affinityDelta: 1, // Renamed from relationshipChange
-        rewards: ['Trait sharing bond']
-      };
-    } catch (error) {
-      return rejectWithValue('Failed to share trait with NPC');
+    if (!npc) {
+      return rejectWithValue('NPC not found');
     }
+
+    // Validate slotIndex
+    if (slotIndex < 0 || slotIndex >= npc.sharedTraitSlots.length) {
+      return rejectWithValue('Invalid trait slot index');
+    }
+
+    // Check if the slot is unlocked
+    if (!npc.sharedTraitSlots[slotIndex].isUnlocked) {
+      return rejectWithValue('Trait slot is locked');
+    }
+
+    // Check if the slot is already occupied
+    if (npc.sharedTraitSlots[slotIndex].traitId !== null) {
+      return rejectWithValue('Trait slot is already occupied');
+    }
+    
+    // Check if player has the trait
+    // Player's traits are permanent traits + equipped traits in slots
+    const playerEquippedTraits = state.player.traitSlots.filter((s): s is string => s !== null);
+    const playerAcquiredTraits = [...state.player.permanentTraits, ...playerEquippedTraits];
+
+    if (!playerAcquiredTraits.includes(traitId)) {
+      return rejectWithValue('Player does not have this trait or it is not equipped/permanent');
+    }
+
+    // Check if the NPC already has this trait (either innate or shared)
+    const npcInnateTraitIds = npc.innateTraits?.map((t: any) => t.id) || [];
+    const npcSharedTraitIdsInOtherSlots = npc.sharedTraitSlots
+        ?.filter((slot: NPCSharedTraitSlot, index: number) => index !== slotIndex && slot.traitId !== null)
+        .map((slot: NPCSharedTraitSlot) => slot.traitId as string) || [];
+
+    if (npcInnateTraitIds.includes(traitId) || npcSharedTraitIdsInOtherSlots.includes(traitId)) {
+        return rejectWithValue('NPC already possesses this trait (innate or shared in another slot)');
+    }
+
+    // Dispatch action to update NPC state
+    dispatch(npcSlice.actions.shareTraitWithNPC({ npcId, traitId, slotIndex }));
+    
+    // Potentially, dispatch an action to recalculate NPC stats if shared traits affect them
+    // dispatch(recalculateNPCStatsThunk(npcId));
+
+    // Optionally, update relationship or trigger other side effects
+    // dispatch(updateNPCRelationshipThunk({ npcId, affinityChange: 5, connectionDepthChange: 1 }));
+
+    // Return InteractionResult instead of simple object
+    return {
+      success: true,
+      message: `Successfully shared trait ${traitId} with ${npc.name}`,
+      relationshipChange: 2, // Small relationship bonus for sharing
+      unlockRewards: [], // No immediate unlocks from sharing
+      rewards: [`Shared trait: ${traitId}`]
+    };
   }
 );
 

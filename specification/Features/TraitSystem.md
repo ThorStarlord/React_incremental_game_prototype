@@ -82,7 +82,6 @@ There are now two primary ways for the player to gain the benefits of traits fro
 *   **Growing Affinity:** ✅ **IMPLEMENTED** - Trait example included in current trait definitions
 
 ## 6. UI/UX Implementation ✅ COMPLETED
-(Formerly Section 7 - Renumbered. Content needs review for new mechanics.)
 
 The trait system UI has been fully implemented with modern, accessible patterns. Key components include:
 *   **NPC Interaction Panel ("Traits" and "Overview" tabs):**
@@ -93,6 +92,10 @@ The trait system UI has been fully implemented with modern, accessible patterns.
     *   Manages player's active trait slots (equipping/unequipping traits borrowed from NPCs or other non-permanent acquired traits, if any).
     *   Displays player's permanent traits (acquired via Resonance).
     *   Trait Codex for browsing all known traits.
+*   **TraitsPage Integration:**
+    *   Direct integration with TraitSystemUI component for comprehensive trait management
+    *   Tabbed interface with Slots, Management, and Codex sections
+    *   Full Redux integration and state management
 
 *(Detailed subsections 7.1 to 7.6 need review and update to reflect the new mechanics, especially regarding what `TraitManagement` now handles if "Make Permanent" is gone, and how "Resonance" and "Equip NPC Trait" are presented.)*
 

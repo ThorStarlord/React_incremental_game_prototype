@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import { TraitSystemWrapper } from '../features/Traits';
+import { TraitSystemUI } from '../features/Traits';
 
 /**
  * @fileoverview TraitsPage Component - Manages and displays character traits
@@ -31,36 +26,7 @@ import { TraitSystemWrapper } from '../features/Traits';
  * @returns {JSX.Element} A page displaying trait management interface using MUI
  */
 const TraitsPage: React.FC = () => {
-  const theme = useTheme();
-
-  return (
-    <Box sx={{ p: 3 }}>
-      {/* Page Header */}
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
-        sx={{
-          fontWeight: 600,
-          color: theme.palette.text.primary,
-          mb: 3,
-        }}
-      >
-        Trait Management
-      </Typography>
-
-      {/* Trait System Integration */}
-      <Box
-        sx={{
-          '& .MuiPaper-root': {
-            backgroundColor: theme.palette.background.paper,
-          },
-        }}
-      >
-        <TraitSystemWrapper />
-      </Box>
-    </Box>
-  );
+  return <TraitSystemUI />;
 };
 
 export default TraitsPage;

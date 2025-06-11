@@ -15,10 +15,12 @@ import {
 
 // Import player specific selectors directly
 import { 
-  selectTraitSlots as selectPlayerTraitSlotsFromPlayer, 
-  selectPermanentTraits as selectPlayerPermanentTraitIds 
+  selectPermanentTraits 
 } from '../../state/PlayerSelectors';
-import { equipTrait, unequipTrait } from '../../state/PlayerSlice'; 
+import { 
+  selectUnlockedSlotCount, 
+  selectEquippedTraitObjects 
+} from '../../../Traits/state/TraitsSelectors';
 import { recalculateStatsThunk } from '../../state/PlayerThunks'; 
 
 
@@ -32,25 +34,26 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   
-  const rawTraitSlots = useAppSelector(selectPlayerTraitSlotsFromPlayer); 
-  const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
+  const permanentTraitIds = useAppSelector(selectPermanentTraits); 
+  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
+  const unlockedSlotCount = useAppSelector(selectUnlockedSlotCount);
   const allTraits = useAppSelector(selectTraits); // Updated variable name for clarity
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError); 
 
   const traitSlots: TraitSlotData[] = useMemo(() => {
-    if (!Array.isArray(rawTraitSlots)) {
+    if (!Array.isArray(equippedTraits)) {
       return [];
     }
-    return rawTraitSlots.map((slot, index) => ({
+    return equippedTraits.map((slot, index) => ({
       id: slot?.id || `slot-${index}`, 
       index: slot?.index ?? index,
       isUnlocked: slot?.isUnlocked ?? false,
       traitId: slot?.traitId || null
     }));
-  }, [rawTraitSlots]);
+  }, [equippedTraits]);
 
-  const equippedTraits = useMemo(() => {
+  const equippedTraitsList = useMemo(() => {
     return traitSlots
       .filter(slot => slot.traitId)
       .map(slot => allTraits[slot.traitId!]) 
@@ -65,36 +68,38 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
 
   // Adjusted signature to match PlayerTraitsUIProps: (traitId: string, slotIndex: number)
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
-    dispatch(equipTrait({ slotIndex, traitId })); 
-    console.log('PlayerTraitsContainer: Equipping trait:', traitId, 'to slot index:', slotIndex);
-    onTraitChange?.('equip', traitId); 
-    dispatch(recalculateStatsThunk()); 
-  }, [onTraitChange, dispatch]); 
+    // TODO: Implement trait equipping when the correct action is available
+    console.log(`Equipping trait ${traitId} - functionality pending`);
+    
+    // When the correct action is available, it might look like:
+    // dispatch(equipPlayerTrait({ traitId, slotIndex: availableSlotIndex }));
+  }, []);
 
   // Adjusted signature to match PlayerTraitsUIProps: (slotIndex: number)
   const handleUnequipTrait = useCallback((slotIndex: number) => { 
     const slot = traitSlots.find(s => s.index === slotIndex); 
     if (slot && slot.traitId) {
-      dispatch(unequipTrait({ slotIndex })); 
-      console.log('PlayerTraitsContainer: Unequipping trait from slot index:', slotIndex);
-      onTraitChange?.('unequip', slot.traitId); 
-      dispatch(recalculateStatsThunk()); 
+      // TODO: Implement trait unequipping when the correct action is available
+      console.log(`Unequipping trait ${slot.traitId} - functionality pending`);
+      
+      // When the correct action is available, it might look like:
+      // dispatch(unequipPlayerTrait({ traitId }));
     } else {
       console.warn('PlayerTraitsContainer: Slot not found or no trait to unequip at index:', slotIndex);
     }
-  }, [onTraitChange, traitSlots, dispatch]); 
+  }, [traitSlots]); 
 
   // handleMakePermanent is removed.
 
   const totalSlots = traitSlots.length;
   const unlockedSlots = traitSlots.filter(slot => slot.isUnlocked).length;
-  const equippedCount = equippedTraits.length;
+  const equippedCount = equippedTraitsList.length;
   const permanentCount = permanentTraits.length;
 
   return (
     <PlayerTraitsUI
       traitSlots={traitSlots}
-      equippedTraits={equippedTraits} 
+      equippedTraits={equippedTraitsList} 
       permanentTraits={permanentTraits} 
       availableTraits={[]} 
       onEquipTrait={handleEquipTrait}

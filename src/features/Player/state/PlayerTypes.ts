@@ -1,7 +1,3 @@
-import type { Trait } from '../../Traits';
-import type { TraitSlot } from '../../Traits/state/TraitsTypes';
-import type { ProcessedTraitEffects } from '../utils/traitEffectProcessor';
-
 /**
  * Core player statistics interface
  */
@@ -44,31 +40,48 @@ export interface PlayerAttributes {
 export interface StatusEffect {
   id: string;
   name: string;
-  description: string;
-  category: 'buff' | 'debuff' | 'consumable' | 'fatigue' | 'equipment' | 'trait';
-  type?: string; // Added: General type of effect (e.g., 'healing', 'damage', 'control')
-  effects?: Partial<PlayerStats>;
-  duration: number;
-  startTime: number;
-  isActive: boolean;
+  effects: Partial<PlayerStats>; // Can modify any player stat
+  duration: number; // in game ticks or seconds
+  remainingDuration: number;
+  source?: string; // e.g., trait ID, item ID
+  isBuff: boolean;
+}
+
+/**
+ * Trait slot interface for player trait management
+ */
+export interface TraitSlot {
+  id: string;
+  slotIndex: number;
+  traitId: string | null;
+  isLocked: boolean;
+  unlockRequirement?: string;
 }
 
 /**
  * Main player state interface
  */
 export interface PlayerState {
-  stats: PlayerStats;
   attributes: PlayerAttributes;
-  availableAttributePoints: number;
-  availableSkillPoints: number;
+  baseStats: PlayerStats; // Stats before attributes, traits, or status effects
+  calculatedStats: PlayerStats; // Final stats after all modifiers
+  currentHealth: number;
+  currentMana: number;
   statusEffects: StatusEffect[];
-  permanentTraits: string[];
-  traitSlots: TraitSlot[]; // Player's equipped trait slots
-  maxTraitSlots: number; // Maximum number of player trait slots
-  totalPlaytime: number; // in milliseconds
-  isAlive: boolean;
-  resonanceLevel: number; // New: Player's Resonance Level
-  activeTraitEffects: ProcessedTraitEffects;
+  activeTraitEffects: ProcessedTraitEffects; // Effects from equipped/permanent traits
+  traitSlots: Array<string | null>; // IDs of equipped traits
+  maxTraitSlots: number;
+  permanentTraits: string[]; // IDs of permanently learned traits
+  
+  // Progression related
+  resonanceLevel: number;
+  attributePoints: number;
+  skillPoints: number; // If a skill system is added
+  playtime: number; // Total playtime in seconds
+
+  lastStatsUpdate: number; // Timestamp of the last recalculateStats
+  isLoading: boolean;
+  error: string | null;
 }
 
 /**
@@ -93,15 +106,6 @@ export interface PlayerProgressionData {
 
 export interface AllocateAttributePointPayload {
   attribute: keyof PlayerAttributes;
-}
-
-export interface EquipTraitPayload {
-  slotIndex: number;
-  traitId: string;
-}
-
-export interface UnequipTraitPayload {
-  slotIndex: number;
 }
 
 // ============================================================================
@@ -204,20 +208,6 @@ export interface PlayerStatsUIProps {
 }
 
 /**
- * Interface for trait slot data used in UI components
- */
-export interface TraitSlotData {
-  id: string;
-  index: number;
-  isUnlocked: boolean;
-  traitId?: string | null;
-  unlockRequirements?: {
-    type: 'resonanceLevel' | 'quest' | 'relationshipLevel';
-    value: number | string;
-  };
-}
-
-/**
  * Props interface for PlayerTraitsContainer component
  */
 export interface PlayerTraitsContainerProps {
@@ -251,3 +241,43 @@ export interface PlayerTraitsUIProps {
 // ============================================================================
 
 export type PlayerInitialState = PlayerState;
+
+// ============================================================================
+// Additional required interfaces for component props
+// ============================================================================
+
+export interface TraitSlotData {
+  id: string;
+  slotIndex: number;
+  traitId: string | null;
+  isLocked: boolean;
+  unlockRequirement?: string;
+}
+
+export interface Trait {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  rarity: string;
+  effects: Record<string, number>;
+}
+
+/**
+ * Represents processed trait effects ready to be applied to player stats
+ * Maps stat names to their modifier values
+ */
+export interface ProcessedTraitEffects {
+  health?: number;
+  maxHealth?: number;
+  mana?: number;
+  maxMana?: number;
+  attack?: number;
+  defense?: number;
+  speed?: number;
+  healthRegen?: number;
+  manaRegen?: number;
+  criticalChance?: number;
+  criticalDamage?: number;
+  [statName: string]: number | undefined;
+}

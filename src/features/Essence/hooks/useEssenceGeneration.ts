@@ -1,110 +1,117 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
-import { gainEssence, updateGenerationRate, updateEssenceConnection } from '../state/EssenceSlice'; 
-import { selectEquippedTraitIds } from '../../Player/state/PlayerSelectors'; // Corrected import
-import { selectEssenceState, selectGenerationRate } from '../state/EssenceSelectors';
-import { selectGameLoop } from '../../GameLoop/state/GameLoopSelectors'; // Corrected import
+import { selectEssenceState, selectCurrentEssence, selectGenerationRate, selectPerClickValue } from '../state/EssenceSelectors';
+import { selectGameLoop } from '../../GameLoop/state/GameLoopSelectors';
+import { gainEssence } from '../state/EssenceSlice';
+import { selectPermanentTraits } from '../../Player/state/PlayerSelectors';
+import { selectEquippedTraitObjects } from '../../Traits/state/TraitsSelectors';
 
 /**
- * Custom hook to manage essence generation based on game state.
- * 
- * Provides manual essence generation functionality and calculates
- * generation rates based on player progression and equipped traits.
+ * Hook for managing essence generation mechanics
+ * Handles both passive generation from NPC connections and manual generation
  */
-const useEssenceGeneration = () => {
+export const useEssenceGeneration = () => {
   const dispatch = useAppDispatch();
   
-  // Get essence state using selectors
-  const essence = useAppSelector(selectEssenceState);
-  const currentGenerationRate = useAppSelector(selectGenerationRate);
+  // Get essence state and current amount
+  const essenceState = useAppSelector(selectEssenceState);
+  const currentEssenceAmount = useAppSelector(selectCurrentEssence);
+  const generationRate = useAppSelector(selectGenerationRate);
+  const perClickValue = useAppSelector(selectPerClickValue);
   
-  // Get traits that might affect essence generation
-  const equippedTraitIds = useAppSelector(selectEquippedTraitIds); 
-  
-  // Calculate trait bonuses for essence generation
-  const calculateTraitBonus = useCallback(() => {
-    return equippedTraitIds.reduce((bonus: number, traitId: string) => {
-      // Example trait bonuses - adjust based on actual trait definitions
-      switch (traitId) {
-        case 'essence_boost':
-          return bonus + 0.1; // 10% bonus
-        case 'growing_affinity':
-          return bonus + 0.05; // 5% bonus
-        default:
-          return bonus;
-      }
-    }, 1.0); // Start with 1.0 (no bonus)
-  }, [equippedTraitIds]);
+  // Get trait data for bonuses
+  const permanentTraits = useAppSelector(selectPermanentTraits);
+  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
 
-  // Calculate total generation rate from NPC connections and apply trait bonuses
+  // Calculate trait-based generation bonuses
+  const calculateTraitBonus = useCallback((): number => {
+    let multiplier = 1.0;
+    
+    // Check permanent traits for essence generation bonuses
+    permanentTraits.forEach(traitId => {
+      // This would check trait definitions for essence generation effects
+      // For now, simplified - traits like "Growing Affinity" might provide bonuses
+      if (traitId === 'growing_affinity') {
+        multiplier += 0.1; // 10% bonus
+      }
+    });
+    
+    // Check equipped traits for bonuses
+    equippedTraits.forEach(trait => {
+      if (trait.id === 'essence_amplifier') {
+        multiplier += 0.15; // 15% bonus
+      }
+    });
+    
+    return multiplier;
+  }, [permanentTraits, equippedTraits]);
+
+  // Calculate total generation rate from all connections
   const calculateTotalRate = useCallback(() => {
     let totalBaseRateFromConnections = 0;
-    Object.values(essence.npcConnections).forEach(connection => {
-      totalBaseRateFromConnections += connection.baseGenerationRate;
-    });
-
-    // If essence.generationRate was meant as a global base, it would be added here.
-    // For now, let's make it purely connection-driven for clarity.
-    const baseRate = totalBaseRateFromConnections; 
+    
+    // Note: The current EssenceState doesn't include npcConnections
+    // This is planned for future implementation when NPC connections are integrated
+    // For now, use the base generationRate from state
+    totalBaseRateFromConnections = generationRate || 0;
+    
     const traitMultiplier = calculateTraitBonus();
-    return baseRate * traitMultiplier;
-  }, [essence.npcConnections, calculateTraitBonus]);
+    return totalBaseRateFromConnections * traitMultiplier;
+  }, [generationRate, calculateTraitBonus]);
 
   // Update generation rate when connections or bonuses change
   useEffect(() => {
     const newRate = calculateTotalRate();
-    // Only dispatch if the rate has significantly changed to avoid unnecessary re-renders
-    if (Math.abs(newRate - currentGenerationRate) > 0.001) { 
-      dispatch(updateGenerationRate(newRate));
-    }
-  }, [calculateTotalRate, currentGenerationRate, dispatch]);
+    // Could dispatch an action to update the stored generation rate if needed
+    // For now, we'll use the calculated rate directly in generation logic
+  }, [calculateTotalRate]);
 
-  // Auto-generation hook for passive essence gain (modified to use tick-based generation per connection)
-  const gameLoop = useAppSelector(selectGameLoop); // Corrected selector
-  const currentTick = gameLoop.currentTick;
-
+  // Auto-generation hook for passive essence gain
+  const gameLoop = useAppSelector(selectGameLoop);
+  
   useEffect(() => {
-    if (!gameLoop.isRunning || gameLoop.isPaused) return;
+    if (!gameLoop || !gameLoop.isRunning || gameLoop.isPaused) return;
 
-    // Iterate over each NPC connection and generate essence if due
-    Object.values(essence.npcConnections).forEach(connection => {
-      // Assuming 1 essence per tick for simplicity, or based on connection.baseGenerationRate
-      // For now, let's use connection.baseGenerationRate per tick
-      const ticksSinceLastGeneration = currentTick - connection.lastGeneratedTick;
+    // Simple time-based generation using the game loop
+    // This is a basic implementation - future versions will use NPC connections
+    const generationInterval = 1000; // Generate every second
+    const generationAmount = calculateTotalRate() / 10; // Per 100ms (1/10th of a second)
+    
+    if (generationAmount > 0) {
+      const intervalId = setInterval(() => {
+        dispatch(gainEssence({
+          amount: generationAmount,
+          source: 'passive_generation',
+          description: 'Passive essence generation'
+        }));
+      }, 100); // Generate every 100ms for smooth updates
       
-      if (ticksSinceLastGeneration >= 1) { // If at least one tick has passed
-        const amountToGenerate = connection.baseGenerationRate * ticksSinceLastGeneration;
-        if (amountToGenerate > 0) {
-          dispatch(gainEssence({ 
-            amount: amountToGenerate, 
-            source: `npc_connection_${connection.npcId}`,
-            description: `Essence from ${connection.npcId} connection`
-          }));
-          // Update the lastGeneratedTick for this specific connection
-          dispatch(updateEssenceConnection({
-            npcId: connection.npcId,
-            updates: { lastGeneratedTick: currentTick }
-          }));
-        }
-      }
-    });
-  }, [dispatch, essence.npcConnections, currentTick, gameLoop.isRunning, gameLoop.isPaused]);
+      return () => clearInterval(intervalId);
+    }
+  }, [dispatch, gameLoop, calculateTotalRate]);
 
   // Manual essence generation function
   const generateEssence = useCallback((amount: number) => {
-    dispatch(gainEssence({ amount, source: 'manual_generation' }));
+    dispatch(gainEssence({
+      amount,
+      source: 'manual_click',
+      description: 'Manual essence generation'
+    }));
   }, [dispatch]);
 
-  // Return generation utilities
-  return { 
+  // Auto-click generation based on current per-click value
+  const generateManualEssence = useCallback(() => {
+    const amount = perClickValue || 1;
+    generateEssence(amount);
+  }, [generateEssence, perClickValue]);
+
+  return {
+    currentEssence: currentEssenceAmount,
+    generationRate: calculateTotalRate(),
     generateEssence,
-    currentRate: currentGenerationRate,
-    traitBonus: calculateTraitBonus()
+    generateManualEssence,
+    traitMultiplier: calculateTraitBonus()
   };
 };
-
-// The useAutoGenerateEssence hook is now integrated into useEssenceGeneration's useEffect
-// and will be removed or refactored.
-// export const useAutoGenerateEssence = () => { ... }; // Removed or refactored
 
 export default useEssenceGeneration;

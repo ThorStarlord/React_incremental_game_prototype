@@ -42,7 +42,7 @@ import {
   selectAcquiredTraits,
   selectTraitLoading,
   selectTraitError
-} from '../../state/TraitsSlice'; 
+} from '../../state/TraitsSelectors'; 
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';

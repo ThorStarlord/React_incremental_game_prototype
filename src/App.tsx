@@ -20,8 +20,8 @@ const App: React.FC = () => {
 
   // Game loop for passive generation and time-based events
   const handleGameTick = useCallback(async (tickData: TickData) => { // Accept tickData
-    // Dispatch passive essence generation
-    await dispatch(passiveGenerateEssenceThunk());
+    // Dispatch passive essence generation with deltaTime from tickData
+    await dispatch(passiveGenerateEssenceThunk(tickData.deltaTime));
     // After passive essence is generated and state updated, check for resonance level up
     dispatch(checkAndProcessResonanceLevelUpThunk());
 
@@ -29,7 +29,7 @@ const App: React.FC = () => {
     await dispatch(processStatusEffectsThunk());
 
     // Regenerate health and mana
-    await dispatch(regenerateVitalsThunk(tickData.deltaTime)); // Pass deltaTime
+    await dispatch(regenerateVitalsThunk()); // Remove deltaTime parameter
 
     // Recalculate all player stats after all time-based effects
     dispatch(recalculateStatsThunk());

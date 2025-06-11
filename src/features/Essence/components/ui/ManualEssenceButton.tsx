@@ -4,7 +4,7 @@ import { TouchApp as TouchAppIcon } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 // Removed direct gainEssence import, will use thunk
 import { selectPerClickValue } from '../../state/EssenceSelectors';
-import { manualGenerateEssenceThunk, checkAndProcessResonanceLevelUpThunk } from '../../state/EssenceThunks';
+import { manualEssenceGenerationThunk, processResonanceLevelThunk } from '../../state/EssenceThunks';
 
 /**
  * ManualEssenceButton - Simplified manual essence generation component
@@ -17,12 +17,10 @@ export const ManualEssenceButton: React.FC = React.memo(() => {
   const perClickValue = useAppSelector(selectPerClickValue);
   const theme = useTheme();
 
-  const handleGenerateEssence = useCallback(async () => {
-    // Dispatch the thunk for manual generation.
-    // manualGenerateEssenceThunk's fulfilled reducer in EssenceSlice will update currentEssence and totalCollected.
-    await dispatch(manualGenerateEssenceThunk(perClickValue));
+  const handleClick = useCallback(async () => {
+    await dispatch(manualEssenceGenerationThunk(perClickValue));
     // After the state is updated, dispatch the thunk to check for resonance level up.
-    dispatch(checkAndProcessResonanceLevelUpThunk());
+    dispatch(processResonanceLevelThunk());
   }, [dispatch, perClickValue]);
 
   return (
@@ -53,7 +51,7 @@ export const ManualEssenceButton: React.FC = React.memo(() => {
         color="primary"
         size="large"
         startIcon={<TouchAppIcon />}
-        onClick={handleGenerateEssence}
+        onClick={handleClick}
         sx={{
           minWidth: 180,
           transition: 'transform 0.1s ease-in-out',

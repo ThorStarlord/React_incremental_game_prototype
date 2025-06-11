@@ -33,9 +33,7 @@ export {
   selectPerformanceStats,
   selectAvailableAttributePoints,
   selectAvailableSkillPoints,
-  selectEquippedTraitIds, // Renamed from selectEquippedTraits
   selectPermanentTraits,
-  selectTraitSlots,
   selectIsPlayerAlive,
   selectTotalPlaytime,
   // Legacy selectors for backward compatibility

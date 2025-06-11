@@ -1,125 +1,173 @@
 import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Button, TextField, List, ListItem, ListItemText, Divider, Grid } from '@mui/material'; // Added Grid
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  Grid,
+  Paper,
+  Divider
+} from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import SendIcon from '@mui/icons-material/Send';
-
-import type { NPC, DialogueEntry } from '../../../state/NPCTypes';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
+import { selectNPCById, selectDialogueHistory } from '../../../state/NPCSelectors';
 import { processDialogueChoiceThunk } from '../../../state/NPCThunks';
-import { mockDialogues } from '../../../data'; // Import from index.ts
-import { selectNPCDialogueHistory } from '../../../state/NPCSelectors'; // Corrected selector name
+import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCDialogueTabProps {
-  npc: NPC;
-  onInteraction: (data: { choiceId: string; playerText: string }) => void;
+  npcId: string;
 }
 
-const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {
-  const dispatch = useAppDispatch();
-  const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npc.id)); // Use global history
+interface MockDialogue {
+  id: string;
+  title: string;
+  responses: Record<string, string>;
+}
 
-  const [message, setMessage] = useState(''); // For free-text input, if still desired
+// Mock dialogue data for development
+const mockDialogues: Record<string, MockDialogue> = {
+  greeting: {
+    id: 'greeting',
+    title: 'Greetings',
+    responses: {
+      friendly: "Hello there! It's good to see you.",
+      formal: "Good day to you.",
+      curious: "What brings you here today?"
+    }
+  }
+};
+
+/**
+ * NPCDialogueTab - Handles dialogue interactions with NPCs
+ */
+const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
+  const dispatch = useAppDispatch();
+  const [message, setMessage] = useState('');
+  
+  // Get NPC data and dialogue history
+  const npc = useAppSelector(state => selectNPCById(state, npcId));
+  const dialogueHistory = useAppSelector(selectDialogueHistory);
+  
+  if (!npc) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography color="error">NPC not found</Typography>
+      </Box>
+    );
+  }
+
+  // Filter dialogue history for this NPC
+  const npcDialogueHistory = dialogueHistory.filter(entry => entry.npcId === npcId);
 
   // Filter available dialogues based on NPC's availableDialogues array
   const availableDialogueChoices = React.useMemo(() => {
+    if (!npc.availableDialogues) return [];
+    
     return npc.availableDialogues
-      .map(dialogueId => mockDialogues[dialogueId])
+      .map((dialogueId: string) => mockDialogues[dialogueId])
       .filter(Boolean); // Filter out undefined entries if ID not found in mockDialogues
   }, [npc.availableDialogues]);
 
   const handleSendFreeTextMessage = async () => {
     if (!message.trim()) return;
 
-    const playerMessageText = message;
-    setMessage(''); // Clear input immediately
-
     try {
-      // Use a generic choiceId for free text, or remove free text if not desired
       await dispatch(processDialogueChoiceThunk({
-        npcId: npc.id,
-        choiceId: 'generic_talk', // Keep 'generic_talk' for free text
-        playerText: playerMessageText,
-      }));
+        npcId,
+        choiceId: 'freetext',
+        dialogueData: {
+          playerMessage: message,
+          timestamp: Date.now()
+        }
+      })).unwrap();
+      
+      setMessage('');
     } catch (error) {
-      console.error("Error dispatching free text dialogue thunk:", error);
-      // Error handling for UI could be added here, e.g., a temporary system message
+      console.error('Failed to send message:', error);
     }
   };
 
-  const handleSelectDialogueChoice = async (choiceId: string, playerText: string) => {
+  const handleDialogueChoice = async (choice: MockDialogue, responseKey: string) => {
     try {
       await dispatch(processDialogueChoiceThunk({
-        npcId: npc.id,
-        choiceId: choiceId,
-        playerText: playerText,
-      }));
+        npcId,
+        choiceId: choice.id,
+        dialogueData: {
+          selectedResponse: responseKey,
+          timestamp: Date.now()
+        }
+      })).unwrap();
     } catch (error) {
-      console.error("Error dispatching dialogue choice thunk:", error);
-      // Error handling for UI
+      console.error('Failed to process dialogue choice:', error);
     }
   };
 
   return (
-    <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: 2, 
+      p: 2,
+      height: '100%'
+    }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
         <ChatIcon color="primary" />
         <Typography variant="h6">Conversation with {npc.name}</Typography>
       </Box>
 
       {/* Dialogue History */}
-      <Card sx={{ flexGrow: 1, mb: 2, overflow: 'hidden' }}>
-        <CardContent sx={{ height: '100%', overflow: 'auto', p: 1 }}>
-          <List dense>
-            {dialogueHistory.map((msg: DialogueEntry, index: number) => ( // Explicitly type msg and index
-              <React.Fragment key={msg.id}>
-                <ListItem
-                  sx={{
-                    flexDirection: 'column',
-                    alignItems: msg.speaker === 'player' ? 'flex-end' : 'flex-start',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      maxWidth: '80%',
-                      p: 1.5,
-                      borderRadius: 2,
-                      bgcolor: msg.speaker === 'player' ? 'primary.main' : 'grey.100',
-                      color: msg.speaker === 'player' ? 'primary.contrastText' : 'text.primary',
-                    }}
-                  >
-                    <Typography variant="body2">
-                      {msg.speaker === 'player' ? msg.playerText : msg.npcResponse}
-                    </Typography>
-                  </Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                    {msg.speaker === 'player' ? 'You' : npc.name} • {new Date(msg.timestamp).toLocaleTimeString()}
-                    {msg.speaker === 'npc' && msg.affinityDelta && (
-                      <Typography variant="caption" component="span" sx={{ ml: 1, color: msg.affinityDelta > 0 ? 'success.main' : 'error.main' }}>
-                        ({msg.affinityDelta > 0 ? '+' : ''}{msg.affinityDelta} Rel)
-                      </Typography>
-                    )}
+      <Paper sx={{ p: 2, mb: 2, maxHeight: 300, overflowY: 'auto' }}>
+        <Typography variant="subtitle2" gutterBottom>Recent Conversations</Typography>
+        {npcDialogueHistory.length > 0 ? (
+          npcDialogueHistory.map((msg) => (
+            <Box key={msg.id} sx={{ mb: 2 }}>
+              <Paper 
+                elevation={1}
+                sx={{ 
+                  p: 1.5, 
+                  bgcolor: msg.speaker === 'player' ? 'primary.light' : 'grey.100',
+                  color: msg.speaker === 'player' ? 'primary.contrastText' : 'text.primary'
+                }}
+              >
+                <Typography variant="body2">
+                  {msg.speaker === 'player' ? msg.playerText : msg.npcResponse}
+                </Typography>
+              </Paper>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                {msg.speaker === 'player' ? 'You' : npc.name} • {new Date(msg.timestamp).toLocaleTimeString()}
+                {msg.speaker === 'npc' && msg.affinityDelta && (
+                  <Typography variant="caption" component="span" sx={{ ml: 1, color: msg.affinityDelta > 0 ? 'success.main' : 'error.main' }}>
+                    ({msg.affinityDelta > 0 ? '+' : ''}{msg.affinityDelta} Rel)
                   </Typography>
-                </ListItem>
-                {index < dialogueHistory.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
-        </CardContent>
-      </Card>
+                )}
+              </Typography>
+            </Box>
+          ))
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No previous conversations. Start a dialogue below!
+          </Typography>
+        )}
+      </Paper>
 
-      {/* Dialogue Choices */}
+      {/* Available Dialogue Choices */}
       {availableDialogueChoices.length > 0 && (
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2" gutterBottom>
-            Choose a topic:
+            Conversation Topics
           </Typography>
           <Grid container spacing={1}>
-            {availableDialogueChoices.map((choice) => (
+            {availableDialogueChoices.map((choice: MockDialogue) => (
               <Grid item key={choice.id}>
                 <Button
                   variant="outlined"
-                  onClick={() => handleSelectDialogueChoice(choice.id, choice.title)} // Pass choice.id and choice.title as playerText
+                  size="small"
+                  onClick={() => {
+                    const responseKeys = Object.keys(choice.responses);
+                    const randomResponse = responseKeys[Math.floor(Math.random() * responseKeys.length)];
+                    handleDialogueChoice(choice, randomResponse);
+                  }}
                 >
                   {choice.title}
                 </Button>
@@ -129,7 +177,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {
         </Box>
       )}
 
-      {/* Free-text Message Input (Optional, can be removed if only choices are desired) */}
+      <Divider sx={{ my: 2 }} />
+
+      {/* Free Text Input */}
       <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField
           fullWidth
@@ -143,21 +193,20 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npc }) => {
               handleSendFreeTextMessage();
             }
           }}
-          multiline
-          maxRows={3}
         />
         <Button
           variant="contained"
           onClick={handleSendFreeTextMessage}
           disabled={!message.trim()}
-          startIcon={<SendIcon />}
-          sx={{ alignSelf: 'flex-end' }}
+          sx={{ minWidth: 'auto', px: 2 }}
         >
-          Send
+          <SendIcon />
         </Button>
       </Box>
     </Box>
   );
-};
+};;;;
+
+NPCDialogueTab.displayName = 'NPCDialogueTab';
 
 export default React.memo(NPCDialogueTab);

@@ -19,44 +19,24 @@ import {
 import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCTradeTabProps {
-  npc: NPC;
-  relationshipLevel: number;
-  onInteraction: (data: { itemId: string; price: number }) => void;
+  npcId: string; // Add the missing npcId prop
 }
 
-// Mock trade items for demonstration
-const mockTradeItems = [
-  {
-    id: 'potion_health',
-    name: 'Health Potion',
-    description: 'Restores 50 health points',
-    basePrice: 25,
-    category: 'Consumable',
-    inStock: 5
-  },
-  {
-    id: 'sword_iron',
-    name: 'Iron Sword',
-    description: 'A reliable weapon for combat',
-    basePrice: 100,
-    category: 'Weapon',
-    inStock: 2
-  },
-  {
-    id: 'scroll_wisdom',
-    name: 'Scroll of Wisdom',
-    description: 'Temporarily increases wisdom',
-    basePrice: 75,
-    category: 'Consumable',
-    inStock: 3
-  }
-];
+/**
+ * NPCTradeTab - Handles trading interactions with NPCs
+ */
+const NPCTradeTab: React.FC<NPCTradeTabProps> = ({ npcId }) => {
+  // Mock NPC data - in a real application, this would be fetched from the server
+  const npc = {
+    id: npcId,
+    name: 'Eldrin',
+    relationshipLevel: 5 // Mock relationship level
+  };
 
-const NPCTradeTab: React.FC<NPCTradeTabProps> = React.memo(({ npc, relationshipLevel }) => {
   // Calculate discount based on relationship level (up to 20% discount)
   const discountPercentage = useMemo(() => {
-    return Math.min(relationshipLevel * 2, 20);
-  }, [relationshipLevel]);
+    return Math.min(npc.relationshipLevel * 2, 20);
+  }, [npc.relationshipLevel]);
 
   const calculateFinalPrice = (basePrice: number): number => {
     return Math.round(basePrice * (1 - discountPercentage / 100));

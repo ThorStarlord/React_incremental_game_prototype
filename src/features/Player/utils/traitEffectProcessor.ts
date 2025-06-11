@@ -2,12 +2,21 @@ import { Trait, TraitEffect, TraitEffectValues } from '../../Traits/state/Traits
 import { PlayerStats } from '../state/PlayerTypes';
 
 /**
+ * Processed trait effects interface for applying trait modifications to player stats
+ */
+export interface ProcessedTraitEffects {
+  statModifiers: Record<string, number>;
+  multipliers: Record<string, number>;
+  specialEffects: string[];
+}
+
+/**
  * Defines the aggregated effects from traits.
  * - statModifiers: Direct additions/subtractions to base stats.
  * - multipliers: Percentage-based multipliers for stats.
  * - specialEffects: Flags or values for unique, non-stat-modifying effects.
  */
-export interface ProcessedTraitEffects {
+export interface AggregatedTraitEffects {
   statModifiers: Partial<PlayerStats>;
   multipliers: {
     [key: string]: number; // e.g., 'essenceGainMultiplier', 'skillXpMultiplier'
@@ -27,8 +36,8 @@ export interface ProcessedTraitEffects {
 export const processTraitEffects = (
   activeTraits: Trait[],
   baseStats: Partial<PlayerStats> // Can be used for validation or dynamic effects
-): ProcessedTraitEffects => {
-  const aggregatedEffects: ProcessedTraitEffects = {
+): AggregatedTraitEffects => {
+  const aggregatedEffects: AggregatedTraitEffects = {
     statModifiers: {},
     multipliers: {},
     specialEffects: {},
@@ -109,4 +118,97 @@ export const applyTraitEffectsToStats = (
   });
 
   return newStats;
+};
+
+/**
+ * Default empty processed trait effects
+ */
+export const EMPTY_PROCESSED_TRAIT_EFFECTS: ProcessedTraitEffects = {
+  statModifiers: {},
+  multipliers: {},
+  specialEffects: []
+};
+
+/**
+ * Processes trait effects from equipped and permanent traits
+ * @param equippedTraits Array of equipped trait objects
+ * @param permanentTraits Array of permanent trait objects
+ * @returns Aggregated trait effects ready for application
+ */
+export const processTraitEffects = (
+  equippedTraits: Trait[],
+  permanentTraits: Trait[]
+): ProcessedTraitEffects => {
+  const processedEffects: ProcessedTraitEffects = {};
+  
+  // Process effects from equipped traits
+  equippedTraits.forEach(trait => {
+    if (trait && trait.effects) {
+      applyTraitEffects(trait.effects, processedEffects);
+    }
+  });
+  
+  // Process effects from permanent traits
+  permanentTraits.forEach(trait => {
+    if (trait && trait.effects) {
+      applyTraitEffects(trait.effects, processedEffects);
+    }
+  });
+  
+  return processedEffects;
+};
+
+/**
+ * Applies individual trait effects to the processed effects object
+ * @param traitEffects Effects from a single trait
+ * @param processedEffects Accumulator for all effects
+ */
+const applyTraitEffects = (
+  traitEffects: any,
+  processedEffects: ProcessedTraitEffects
+): void => {
+  // Handle array of TraitEffect objects
+  if (Array.isArray(traitEffects)) {
+    traitEffects.forEach(effect => {
+      if (effect.type === 'STAT_MODIFIER' && typeof effect.magnitude === 'number') {
+        const statName = effect.target || effect.description?.toLowerCase().replace(/\s+/g, '');
+        if (statName) {
+          processedEffects[statName] = (processedEffects[statName] || 0) + effect.magnitude;
+        }
+      }
+    });
+  }
+  
+  // Handle object with direct stat mappings
+  else if (typeof traitEffects === 'object' && traitEffects !== null) {
+    Object.entries(traitEffects).forEach(([statName, value]) => {
+      if (typeof value === 'number') {
+        processedEffects[statName] = (processedEffects[statName] || 0) + value;
+      }
+    });
+  }
+};
+
+/**
+ * Validates that processed trait effects contain only valid stat names
+ * @param effects Processed trait effects to validate
+ * @returns Validated and filtered effects
+ */
+export const validateTraitEffects = (effects: ProcessedTraitEffects): ProcessedTraitEffects => {
+  const validStats = new Set([
+    'health', 'maxHealth', 'mana', 'maxMana',
+    'attack', 'defense', 'speed',
+    'healthRegen', 'manaRegen',
+    'criticalChance', 'criticalDamage'
+  ]);
+  
+  const validatedEffects: ProcessedTraitEffects = {};
+  
+  Object.entries(effects).forEach(([statName, value]) => {
+    if (validStats.has(statName) && typeof value === 'number' && !isNaN(value)) {
+      validatedEffects[statName] = value;
+    }
+  });
+  
+  return validatedEffects;
 };

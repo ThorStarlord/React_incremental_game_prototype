@@ -3,7 +3,7 @@
  * @description Main NPC interaction panel UI component
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Box,
   Card,
@@ -17,6 +17,7 @@ import {
   InputLabel,
   IconButton,
   Alert,
+  AlertTitle,
   CircularProgress,
   Divider
 } from '@mui/material';
@@ -37,6 +38,14 @@ import NPCTraitsTab from './tabs/NPCTraitsTab';
 import NPCRelationshipTab from './tabs/NPCRelationshipTab';
 import NPCHeader from './NPCHeader';
 import type { NPC } from '../../state/NPCTypes';
+
+// Simple TabLockMessage component for locked tabs
+const TabLockMessage: React.FC<{ requiredLevel: number }> = ({ requiredLevel }) => (
+  <Alert severity="warning">
+    <AlertTitle>Tab Locked</AlertTitle>
+    This tab requires relationship level {requiredLevel} or higher to access.
+  </Alert>
+);
 
 export interface NPCPanelUIProps {
   npc?: NPC;
@@ -84,8 +93,9 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
     setActiveTab('overview'); 
   }, [onNPCSelect]);
   
-  const isTabUnlocked = useCallback((minLevel: number) => {
-    return npc ? npc.relationshipValue >= minLevel : false;
+  // Relationship-based tab unlocking
+  const isTabUnlocked = useCallback((requiredLevel: number): boolean => {
+    return npc ? npc.relationshipValue >= requiredLevel : false;
   }, [npc]);
   
   const getAvailableTabs = useCallback(() => {
@@ -93,54 +103,61 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
   }, [isTabUnlocked]);
   
   const renderTabContent = useCallback(() => {
-    if (!npc) return null;
-    
+    // Add null check for npc
+    if (!npc) {
+      return (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          <AlertTitle>NPC Not Found</AlertTitle>
+          The selected NPC could not be loaded. Please try selecting a different NPC.
+        </Alert>
+      );
+    }
+
     switch (activeTab) {
       case 'overview':
         return <NPCOverviewTab npc={npc} />;
       case 'dialogue':
         return isTabUnlocked(1) ? (
           <NPCDialogueTab 
-            npc={npc} 
-            onInteraction={(data: any) => onInteraction(npc.id, 'dialogue', data)}
+            npcId={npc.id}
           />
-        ) : null;
+        ) : (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            <AlertTitle>Dialogue Locked</AlertTitle>
+            Reach relationship level 1+ to unlock dialogue options.
+          </Alert>
+        );
       case 'trade':
         return isTabUnlocked(2) ? (
           <NPCTradeTab 
-            npc={npc} 
-            relationshipLevel={npc.relationshipValue}
-            onInteraction={(data: any) => onInteraction(npc.id, 'trade', data)}
+            npcId={npc.id}
           />
-        ) : null;
+        ) : (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            <AlertTitle>Trade Locked</AlertTitle>
+            Reach relationship level 2+ to unlock trading.
+          </Alert>
+        );
       case 'quests':
         return isTabUnlocked(3) ? (
           <NPCQuestsTab 
-            npc={npc} 
-            relationshipLevel={npc.relationshipValue}
-            onInteraction={(data: any) => onInteraction(npc.id, 'quest', data)}
+            npcId={npc.id}
           />
-        ) : null;
+        ) : (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            <AlertTitle>Quests Locked</AlertTitle>
+            Reach relationship level 3+ to unlock quest management.
+          </Alert>
+        );
       case 'traits':
-        const traitsTabConfig = TAB_CONFIG.find(tab => tab.id === 'traits');
-        const traitsMinLevel = traitsTabConfig ? traitsTabConfig.minLevel : 0;
-        return isTabUnlocked(traitsMinLevel) ? (
-          <NPCTraitsTab 
-            npcId={npc.id} 
-            // Removed onInteraction prop as NPCTraitsTab handles its own dispatches
-          />
-        ) : null;
-      case 'relationship':
-        return isTabUnlocked(1) ? (
-          <NPCRelationshipTab 
-            npc={npc} 
-            // Pass the onRelationshipChange from NPCPanelUIProps, which expects npcId as first param
-            // NPCRelationshipTab's prop expects (change, reason)
-            // So we adapt it here:
-            onRelationshipChange={(change: number, reason: string) => onRelationshipChange(npc.id, change, reason)}
-            // onImproveRelationship is also a prop of NPCRelationshipTab, if NPCPanelUI needs to pass it, it should be added to NPCPanelUIProps
-          />
-        ) : null;
+        return <NPCTraitsTab 
+          npcId={npc.id}
+        />;
+      case 'unknown':
+        return <Alert severity="error">
+          <AlertTitle>Unknown Tab</AlertTitle>
+          This tab type is not recognized.
+        </Alert>;
       default:
         return <NPCOverviewTab npc={npc} />;
     }

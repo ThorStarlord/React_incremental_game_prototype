@@ -187,7 +187,7 @@ This document lists the functional requirements for the React Incremental RPG Pr
 *   **FR-UI-019:** ✅ **IMPLEMENTED** - The system shall provide comprehensive page shell architecture with placeholder components for all major game sections.
 *   **FR-UI-020:** ✅ **IMPLEMENTED** - The system shall implement dynamic content rendering through MainContentArea with switch-based page management.
 *   **FR-UI-021:** ✅ **IMPLEMENTED** - The system shall provide consistent placeholder messaging with development status indicators and feature roadmaps.
-*   **FR-UI-022:** ✅ **IMPLEMENTED** - The system shall integrate existing feature components (TraitSystemWrapper, GameControlPanel) with the page shell architecture.
+*   **FR-UI-022:** ✅ **IMPLEMENTED** - The system shall integrate existing feature components (TraitSlotsContainer, GameControlPanel) with the page shell architecture.
 *   **FR-UI-023:** ✅ **IMPLEMENTED** - The system shall provide reusable PlaceholderPage component with configurable status, timeline, and feature information.
 *   **FR-UI-024:** ✅ **IMPLEMENTED** - The system shall provide centralized layout state management through custom hooks for navigation and sidebar control.
 *   **FR-UI-025:** ✅ **IMPLEMENTED** - The system shall implement persistent sidebar state that survives browser sessions while maintaining user preferences.

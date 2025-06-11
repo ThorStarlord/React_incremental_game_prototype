@@ -1,10 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { EssenceState, EssenceTransactionPayload, EssenceConnection } from './EssenceTypes';
 import { 
-  saveEssenceThunk, 
-  loadEssenceThunk, 
-  manualGenerateEssenceThunk, // Renamed import
-  passiveGenerateEssenceThunk // Added import
+  processEssenceGenerationThunk,
+  updateEssenceGenerationRateThunk,
+  spendEssenceThunk,
+  acquireTraitWithEssenceThunk,
+  processResonanceLevelThunk,
+  initializeEssenceSystemThunk,
+  manualEssenceGenerationThunk
 } from './EssenceThunks';
 
 /**
@@ -110,50 +113,43 @@ const essenceSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Save essence thunk
-      .addCase(saveEssenceThunk.pending, (state) => {
+      // Manual essence generation
+      .addCase(manualEssenceGenerationThunk.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
-      .addCase(saveEssenceThunk.fulfilled, (state) => {
+      .addCase(manualEssenceGenerationThunk.fulfilled, (state, action) => {
         state.loading = false;
+        // Handle successful manual generation
       })
-      .addCase(saveEssenceThunk.rejected, (state, action) => {
+      .addCase(manualEssenceGenerationThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to save essence data';
+        state.error = action.payload as string || 'Manual generation failed';
       })
       
-      // Load essence thunk
-      .addCase(loadEssenceThunk.pending, (state) => {
+      // Passive essence generation
+      .addCase(processEssenceGenerationThunk.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
-      .addCase(loadEssenceThunk.fulfilled, (state, action) => {
+      .addCase(processEssenceGenerationThunk.fulfilled, (state, action) => {
         state.loading = false;
-        if (action.payload) {
-          Object.assign(state, action.payload);
-        }
+        // Handle successful passive generation
       })
-      .addCase(loadEssenceThunk.rejected, (state, action) => {
+      .addCase(processEssenceGenerationThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to load essence data';
+        state.error = action.payload as string || 'Passive generation failed';
       })
       
-      // Manual Generate essence thunk
-      .addCase(manualGenerateEssenceThunk.fulfilled, (state, action: PayloadAction<number>) => {
-        // Essence gain is now handled by gainEssence action dispatched in the thunk.
-        // This reducer can be used for other side effects related to manual generation completion if needed.
-        // For example, logging or specific UI updates not covered by gainEssence.
-        // state.lastGenerationTime = Date.now(); // gainEssence handles this
+      // Initialize essence system
+      .addCase(initializeEssenceSystemThunk.pending, (state) => {
+        state.loading = true;
       })
-      // Passive Generate essence thunk
-      .addCase(passiveGenerateEssenceThunk.fulfilled, (state, action: PayloadAction<number>) => {
-        // Essence gain is now handled by gainEssence action dispatched in the thunk.
-        // This reducer can be used for other side effects related to passive generation completion.
-        // const amount = action.payload;
-        // if (amount > 0) { 
-        //   state.lastGenerationTime = Date.now(); // gainEssence handles this
-        // }
+      .addCase(initializeEssenceSystemThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        // Handle successful initialization
+      })
+      .addCase(initializeEssenceSystemThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string || 'Initialization failed';
       });
   },
 });

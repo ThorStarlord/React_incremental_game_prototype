@@ -9,19 +9,22 @@ import {
   Typography,
   Card,
   CardContent,
-  Grid,
   Chip,
+  Button,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
+  Collapse,
+  IconButton,
+  Tooltip,
   Alert,
+  AlertTitle,
+  Grid,
   CircularProgress,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button, 
-  Tooltip, 
 } from '@mui/material';
 import {
   Assignment as QuestIcon,
@@ -31,21 +34,27 @@ import {
   Lock as LockedIcon,
   CheckCircle as CompletedIcon,
   ExpandMore as ExpandMoreIcon,
-  FitnessCenter as EquipIcon, 
+  ExpandLess as ExpandLessIcon,
+  Psychology as PsychologyIcon,
+  Share as ShareIcon,
+  Star as StarIcon,
 } from '@mui/icons-material';
-import type { NPC } from '../../../state/NPCTypes';
-import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
-import { 
-  selectTraits, 
+import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
+import {
+  selectTraits,
   selectTraitLoading,
 } from '../../../../Traits/state/TraitsSelectors';
 import { fetchTraitsThunk } from '../../../../Traits/state/TraitThunks';
-import { 
-  selectTraitSlots as selectPlayerTraitSlots, 
-  selectPermanentTraits as selectPlayerPermanentTraitIds 
+import {
+  selectPermanentTraits as selectPlayerPermanentTraitIds
 } from '../../../../Player/state/PlayerSelectors';
-import { equipTrait as equipPlayerTraitAction } from '../../../../Player/state/PlayerSlice';
-import { TraitSlot } from '../../../../Traits/state/TraitsTypes'; 
+import {
+  selectSelectedNPCId,
+  selectNPCById
+} from '../../../state/NPCSelectors';
+import { equipTrait } from '../../../../Traits/state/TraitsSlice'; // Updated import
+import { recalculateStatsThunk } from '../../../../Player/state/PlayerThunks';
+import type { NPCTraitInfo } from '../../../state/NPCTypes';
 
 interface NPCOverviewTabProps {
   npc: NPC;
@@ -53,10 +62,11 @@ interface NPCOverviewTabProps {
 
 const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
   const dispatch = useAppDispatch();
+  const selectedNPCId = useAppSelector(selectSelectedNPCId);
   const allTraits = useAppSelector(selectTraits);
   const traitsLoading = useAppSelector(selectTraitLoading);
-  const playerTraitSlots = useAppSelector(selectPlayerTraitSlots);
   const playerPermanentTraits = useAppSelector(selectPlayerPermanentTraitIds);
+  const playerEquippedTraits = useAppSelector(state => state.player.traits); // Assuming this is how equipped traits are accessed
 
   useEffect(() => {
     if (Object.keys(allTraits).length === 0 && !traitsLoading) {
@@ -80,35 +90,70 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
       .filter(trait => trait && trait.name);
   }, [npc.sharedTraits, allTraits]);
 
-  const availableTraitsDisplay = useMemo(() => { 
+  const availableTraitsDisplay = useMemo(() => {
     if (!npc.availableTraits || !allTraits) return [];
     return npc.availableTraits
       .map((traitId: string) => allTraits[traitId])
       .filter((trait: any) => trait && trait.name);
   }, [npc.availableTraits, allTraits]);
 
-  const innateTraitsDisplay = useMemo(() => { 
-    if (!npc.innateTraits || !allTraits) return [];
-    return npc.innateTraits
-      .map((traitId: string) => allTraits[traitId])
-      .filter(trait => trait && trait.name);
-  }, [npc.innateTraits, allTraits]);
+  // Get available traits (traits the player can acquire from this NPC)
+  const availableTraitsForResonance = useMemo(() => {
+    if (!npc?.availableTraits) return [];
+    return npc.availableTraits.map(traitId => allTraits[traitId]).filter(Boolean);
+  }, [npc?.availableTraits, allTraits]);
 
-  const handleEquipInnateTrait = useCallback((traitId: string) => {
-    const emptyPlayerSlot = playerTraitSlots.find((slot: TraitSlot) => !slot.traitId && slot.isUnlocked);
-    if (emptyPlayerSlot) {
-      dispatch(equipPlayerTraitAction({ traitId, slotIndex: emptyPlayerSlot.index }));
-    } else {
-      console.warn("Cannot equip NPC innate trait: No empty player trait slot available or slot not found.");
+  // Get NPC's innate traits for display (from availableTraits since traits property doesn't exist)
+  const npcInnateTraitsDisplay = npc?.availableTraits
+    ? npc.availableTraits.map(traitId => {
+        const trait = allTraits[traitId];
+        return trait ? {
+          id: traitId,
+          name: trait.name,
+          description: trait.description,
+          category: trait.category,
+          rarity: trait.rarity
+        } : null;
+      }).filter(Boolean)
+    : [];
+
+  const handleEquipInnateTraitToPlayer = useCallback((traitId: string) => {
+    // TODO: Implement trait equipping when the action is available
+    // For now, show a placeholder message
+    console.log(`Equipping trait ${traitId} to player - functionality pending`);
+
+    // When the correct action is available, it might look like:
+    // dispatch(equipTraitToPlayer({ traitId, slotIndex: availableSlotIndex }));
+  }, []);
+
+  // Handle equipping an NPC's innate trait to player's slot
+  const handleEquipNPCTrait = useCallback((traitId: string) => {
+    // Check if player has available trait slots
+    const usedSlots = playerEquippedTraits.length;
+    const maxSlots = 6; // Standard trait slot count
+    
+    if (usedSlots < maxSlots) {
+      dispatch(equipTrait({ traitId, slotIndex: -1 })); // -1 indicates auto-assign to next available slot
+      dispatch(recalculateStatsThunk());
     }
-  }, [dispatch, playerTraitSlots]);
+  }, [dispatch, playerEquippedTraits]);
 
-
-  if (traitsLoading && Object.keys(allTraits).length === 0) { 
+  if (traitsLoading && Object.keys(allTraits).length === 0) {
     return (
       <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
         <CircularProgress />
         <Typography sx={{ ml: 2 }}>Loading traits...</Typography>
+      </Box>
+    );
+  }
+
+  // If no NPC is found, show error state
+  if (!npc) {
+    return (
+      <Box p={3}>
+        <Typography color="error" variant="h6">
+          NPC not found
+        </Typography>
       </Box>
     );
   }
@@ -166,38 +211,56 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                 </Accordion>
               )}
 
-              {innateTraitsDisplay.length > 0 && (
-                <Accordion defaultExpanded sx={{ boxShadow: 'none', '&:before': { display: 'none' }, mb: 1 }}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="subtitle2">Innate Traits ({innateTraitsDisplay.length})</Typography></AccordionSummary>
-                  <AccordionDetails sx={{ p: 0 }}>
-                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>Traits {npc.name} possesses. You can temporarily equip these if you have a free slot.</Typography>
-                    <List dense>
-                      {innateTraitsDisplay.map((trait: any) => {
-                        const isEquippedByPlayer = playerTraitSlots.some(slot => slot.traitId === trait.id);
-                        const isPermanentForPlayer = playerPermanentTraits.includes(trait.id);
-                        const hasFreePlayerSlot = playerTraitSlots.some(slot => !slot.traitId && slot.isUnlocked);
-                        const canEquip = !isEquippedByPlayer && !isPermanentForPlayer && hasFreePlayerSlot;
-                        let tooltipTitle = `Equip ${trait.name}`;
-                        if (isEquippedByPlayer) tooltipTitle = "Already equipped by you";
-                        else if (isPermanentForPlayer) tooltipTitle = "You already possess this trait permanently";
-                        else if (!hasFreePlayerSlot) tooltipTitle = "No free player trait slots";
-
-                        return (
-                          <ListItem key={trait.id} sx={{ pl: 0 }}
-                            secondaryAction={
-                              <Tooltip title={tooltipTitle}>
-                                <span>
-                                  <Button size="small" variant="outlined" startIcon={<EquipIcon />} onClick={() => handleEquipInnateTrait(trait.id)} disabled={!canEquip}>Equip</Button>
-                                </span>
-                              </Tooltip>
-                            }
-                          >
-                            <ListItemIcon sx={{minWidth: 'auto', mr: 1}}><TraitIcon fontSize="small" color="primary" /></ListItemIcon>
-                            <ListItemText primary={trait.name || trait.id} secondary={<Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>{trait.category && (<Typography variant="caption" color="text.secondary" component="span">{trait.category}</Typography>)}{trait.rarity && (<Chip component="span" label={trait.rarity} size="small" variant="outlined" />)}</Box>} />
-                          </ListItem>
-                        );
-                      })}
-                    </List>
+              {/* NPC's Innate Traits Section */}
+              {npcInnateTraitsDisplay.length > 0 && (
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                      <StarIcon sx={{ mr: 1, color: 'primary.main' }} />
+                      NPC's Innate Traits ({npcInnateTraitsDisplay.length})
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      These are traits this NPC naturally possesses. You can temporarily equip them to your character.
+                    </Typography>
+                    <Grid container spacing={2}>
+                      {npcInnateTraitsDisplay.map((trait) => (
+                        <Grid item xs={12} sm={6} md={4} key={trait.id}>
+                          <Card variant="outlined" sx={{ height: '100%' }}>
+                            <CardContent>
+                              <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
+                                {trait.name}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                {trait.description}
+                              </Typography>
+                              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                                <Chip 
+                                  label={trait.category} 
+                                  size="small" 
+                                  color="secondary"
+                                />
+                                <Chip 
+                                  label={trait.rarity} 
+                                  size="small" 
+                                  color="primary"
+                                />
+                              </Box>
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                onClick={() => handleEquipNPCTrait(trait.id)}
+                                disabled={playerEquippedTraits.length >= 6 || playerEquippedTraits.some(t => t.id === trait.id)}
+                              >
+                                {playerEquippedTraits.some(t => t.id === trait.id) ? 'Already Equipped' : 'Equip Trait'}
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
                   </AccordionDetails>
                 </Accordion>
               )}

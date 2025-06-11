@@ -12,6 +12,7 @@ import {
   CombatStats,
   PerformanceStats
 } from './PlayerTypes';
+import { selectAllTraits } from '../../Traits/state/TraitSelectors';
 
 // Basic selectors
 export const selectPlayer = (state: RootState): PlayerState => state.player;
@@ -112,11 +113,11 @@ export const selectPerformanceStats = createSelector(
 
     return {
       totalPlaytime: player.totalPlaytime,
-      formattedPlaytime: formatPlaytime(player.totalPlaytime), // Added missing property
-      powerLevel: Math.floor(player.totalPlaytime / 3600000) + 1, // Basic power level calculation
+      formattedPlaytime: formatPlaytime(player.totalPlaytime),
+      powerLevel: Math.floor(player.totalPlaytime / 3600000) + 1,
       availableAttributePoints: player.availableAttributePoints,
       availableSkillPoints: player.availableSkillPoints,
-      resonanceLevel: player.resonanceLevel, // Include resonanceLevel
+      resonanceLevel: player.resonanceLevel,
     };
   }
 );
@@ -132,21 +133,9 @@ export const selectAvailableSkillPoints = createSelector(
   (player) => player.availableSkillPoints
 );
 
-// Selects the IDs of currently equipped traits from traitSlots
-export const selectEquippedTraitIds = createSelector(
-  [selectPlayer],
-  (player) => player.traitSlots.filter(slot => slot.traitId !== null).map(slot => slot.traitId as string)
-);
-
-export const selectPermanentTraits = createSelector(
-  [selectPlayer],
-  (player) => player.permanentTraits
-);
-
-export const selectTraitSlots = createSelector(
-  [selectPlayer],
-  (player) => player.traitSlots
-);
+// Keep permanent traits selector as this is still player-specific
+export const selectPermanentTraits = (state: RootState): string[] => 
+  state.player.permanentTraits;
 
 export const selectIsPlayerAlive = createSelector(
   [selectPlayerStats],
@@ -158,16 +147,66 @@ export const selectTotalPlaytime = createSelector(
   (player) => player.totalPlaytime
 );
 
-export const selectMaxTraitSlots = createSelector(
+/**
+ * Select active trait effects applied to the player
+ */
+export const selectActiveTraitEffects = createSelector(
   [selectPlayer],
-  (player) => player.maxTraitSlots
+  (player) => player.activeTraitEffects || {}
 );
 
-export const selectPlayerResonanceLevel = createSelector(
-  [selectPlayer],
-  (player) => player.resonanceLevel
+/**
+ * Select whether trait effects need recalculation
+ * This can be used to trigger effect updates when traits change
+ */
+export const selectTraitEffectsNeedUpdate = createSelector(
+  [selectPlayer, (state: RootState) => state.traits.lastModified],
+  (player, traitsLastModified) => {
+    // Simple heuristic: if traits were modified after player's last update
+    return traitsLastModified > (player.lastStatsUpdate || 0);
+  }
 );
 
 // Legacy selectors for backward compatibility
 export const selectPlayerHealthData = selectHealthData;
 export const selectPlayerManaData = selectManaData;
+
+/**
+ * Selects equipped trait objects by mapping IDs from player state to full trait objects.
+ */
+export const selectEquippedTraitObjects = createSelector(
+  [selectPlayer, selectAllTraits],
+  (player, allTraits) => {
+    if (!player || !player.traitSlots || !allTraits) {
+      return [];
+    }
+    return player.traitSlots
+      .map(traitId => {
+        if (traitId && allTraits[traitId]) {
+          return allTraits[traitId];
+        }
+        return null;
+      })
+      .filter(trait => trait !== null) as Trait[]; // Type assertion after filtering nulls
+  }
+);
+
+/**
+ * Selects permanent trait objects by mapping IDs from player state to full trait objects.
+ */
+export const selectPermanentTraitObjects = createSelector(
+  [selectPlayer, selectAllTraits],
+  (player, allTraits) => {
+    if (!player || !player.permanentTraits || !allTraits) {
+      return [];
+    }
+    return player.permanentTraits
+      .map(traitId => {
+        if (allTraits[traitId]) {
+          return allTraits[traitId];
+        }
+        return null;
+      })
+      .filter(trait => trait !== null) as Trait[]; // Type assertion after filtering nulls
+  }
+);

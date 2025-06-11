@@ -28,51 +28,13 @@ import {
 import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCQuestsTabProps {
-  npc: NPC;
-  relationshipLevel: number;
-  onInteraction: (data: { questId: string; actionType: 'accept' | 'complete' }) => void;
+  npcId: string; // Add the missing npcId prop
 }
 
-// Mock quest data for demonstration
-const mockQuests = [
-  {
-    id: 'gather_herbs',
-    title: 'Gather Healing Herbs',
-    description: 'Collect 10 healing herbs from the nearby forest to help with my research.',
-    objectives: [
-      { text: 'Collect healing herbs', current: 7, required: 10, completed: false }
-    ],
-    rewards: ['50 XP', '25 Gold', '+5 Relationship'],
-    status: 'accepted',
-    difficulty: 'Easy'
-  },
-  {
-    id: 'ancient_artifact',
-    title: 'Retrieve Ancient Artifact',
-    description: 'Venture into the old ruins and retrieve the crystalline artifact.',
-    objectives: [
-      { text: 'Enter the ancient ruins', current: 1, required: 1, completed: true },
-      { text: 'Find the crystalline artifact', current: 0, required: 1, completed: false },
-      { text: 'Return safely', current: 0, required: 1, completed: false }
-    ],
-    rewards: ['100 XP', '75 Gold', 'Rare Trait: Explorer', '+10 Relationship'],
-    status: 'available',
-    difficulty: 'Hard'
-  },
-  {
-    id: 'deliver_message',
-    title: 'Deliver Important Message',
-    description: 'Take this sealed letter to the merchant in the town square.',
-    objectives: [
-      { text: 'Deliver message to merchant', current: 1, required: 1, completed: true }
-    ],
-    rewards: ['25 XP', '15 Gold', '+3 Relationship'],
-    status: 'completed',
-    difficulty: 'Easy'
-  }
-];
-
-const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npc, relationshipLevel }) => {
+/**
+ * NPCQuestsTab - Handles quest management with NPCs
+ */
+const NPCQuestsTab: React.FC<NPCQuestsTabProps> = ({ npcId }) => {
   const handleAcceptQuest = (questId: string) => {
     // TODO: Implement quest acceptance logic
     console.log(`Accepting quest: ${questId}`);
@@ -116,12 +78,12 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npc, relationshi
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <QuestIcon color="primary" />
-          Quests from {npc.name}
+          Quests from {npcId}
         </Typography>
         
         <Alert severity="info" sx={{ mb: 2 }}>
           <Typography variant="body2">
-            Complete quests to earn rewards and strengthen your relationship with {npc.name}.
+            Complete quests to earn rewards and strengthen your relationship with {npcId}.
           </Typography>
         </Alert>
       </Box>

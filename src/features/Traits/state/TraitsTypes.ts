@@ -20,6 +20,31 @@ export interface TraitEffectValues {
 }
 
 /**
+ * Comprehensive trait rarity enumeration
+ */
+export type TraitRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+
+/**
+ * Trait category enumeration
+ */
+export type TraitCategory = 'combat' | 'social' | 'mental' | 'physical' | 'magical' | 'utility';
+
+/**
+ * Trait acquisition prerequisites interface
+ */
+export interface TraitRequirements {
+  level?: number;
+  attributes?: Partial<Record<string, number>>;
+  prerequisiteTraits?: string[];
+  relationshipLevel?: number;
+  questCompletion?: string[];
+  essence?: number;
+  npcId?: string;
+  quest?: string;
+  [key: string]: any;
+}
+
+/**
  * Interface defining a trait in the game (Stored in Redux state)
  * Ensure this matches the structure produced by fetchTraitsThunk
  */
@@ -66,6 +91,12 @@ export interface Trait {
 
   /** Level of the trait if traits can be leveled up (optional) */
   level?: number;
+
+  /** Cost to make trait permanent (optional) */
+  permanenceCost?: number;
+
+  /** Source description (optional) */
+  source?: string;
 }
 
 /**
@@ -79,23 +110,26 @@ export interface ActiveTrait extends Trait {
  * Interface for trait filtering criteria
  */
 export interface TraitFilters {
-  type?: string; 
   maxCost?: number; 
   searchTerm?: string;
 }
 
 /**
- * Interface for a trait slot
+ * Robust TraitSlot interface for trait slot management
+ * 
+ * @interface TraitSlot
+ * @property {string} id - Unique identifier for this slot
+ * @property {number} index - Zero-based position in trait slot array
+ * @property {boolean} isUnlocked - Whether this slot is accessible
+ * @property {string | null} traitId - ID of equipped trait (null if empty)
+ * @property {string} [unlockRequirement] - Optional description of unlock condition
  */
 export interface TraitSlot {
   id: string;
   index: number;
   isUnlocked: boolean;
-  traitId?: string | null;
-  unlockRequirements?: {
-    type: 'resonanceLevel' | 'quest' | 'relationshipLevel'; 
-    value: number | string; 
-  };
+  traitId: string | null;
+  unlockRequirement?: string;
 }
 
 /**
@@ -109,56 +143,36 @@ export interface TraitProgression {
 }
 
 /**
- * Trait preset for saving and loading trait configurations
+ * Extended trait effect interface for complex trait mechanics
+ */
+export interface TraitEffectDetails {
+  type: string;
+  magnitude: number;
+  duration?: number;
+  description?: string;
+  target?: 'self' | 'ally' | 'enemy' | 'area';
+  condition?: string;
+}
+
+/**
+ * Trait preset for saving/loading trait configurations
  */
 export interface TraitPreset {
   id: string;
   name: string;
+  traits: string[];
   description?: string;
-  traits: string[]; // Array of trait IDs
-  created: number; // Timestamp
-  lastUsed?: number; // Timestamp of last use
+  created: number;
 }
 
 /**
- * Enhanced trait information for management UI
- */
-export interface ManageableTrait extends Trait {
-  isEquipped: boolean;
-  isPermanent: boolean;
-  isManageable: boolean;
-}
-
-/**
- * Trait statistics for management overview
- */
-export interface TraitStatistics {
-  total: number;
-  equipped: number;
-  permanent: number;
-  available: number;
-  temporary: number;
-}
-
-/**
- * Interface for the traits state
+ * Main traits state interface - now focuses on slot management
  */
 export interface TraitsState {
-  /** All available trait definitions in the game, keyed by ID. */
   traits: Record<string, Trait>;
-  
-  /** IDs of traits the player has acquired */
   acquiredTraits: string[];
-  
-  /** Currently active presets */
-  presets: TraitPreset[];
-  
-  /** Trait discovery status */
   discoveredTraits: string[];
-  
-  /** Loading state for async operations */
+  presets: TraitPreset[];
   loading: boolean;
-  
-  /** Error message if any */
   error: string | null;
 }

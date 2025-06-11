@@ -1,64 +1,46 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../../app/store';
-import {
-  Trait,
-  TraitPreset,
-  TraitsState
-} from './TraitsTypes';
-// Import the thunks
-import { fetchTraitsThunk, acquireTraitWithEssenceThunk } from './TraitThunks';
+import { TraitsState, Trait, TraitPreset } from './TraitsTypes';
 
-// Initial state
 const initialState: TraitsState = {
-  traits: {}, 
+  traits: {},
   acquiredTraits: [],
-  // permanentTraits: [], // Removed: Player's permanent traits are managed in PlayerSlice
-  presets: [],
   discoveredTraits: [],
+  presets: [],
   loading: false,
-  error: null
+  error: null,
 };
 
-// Create the traits slice
 export const traitsSlice = createSlice({
   name: 'traits',
   initialState,
   reducers: {
-    setTraits: (state, action: PayloadAction<Record<string, Trait>>) => {
-      state.traits = action.payload; 
+    acquireTrait: (state, action: PayloadAction<string>) => {
+      const traitId = action.payload;
+      if (!state.acquiredTraits.includes(traitId)) {
+        state.acquiredTraits.push(traitId);
+      }
     },
+
     discoverTrait: (state, action: PayloadAction<string>) => {
       const traitId = action.payload;
       if (!state.discoveredTraits.includes(traitId)) {
         state.discoveredTraits.push(traitId);
       }
     },
-    acquireTrait: (state, action: PayloadAction<string>) => {
-      const traitId = action.payload;
-      if (!state.discoveredTraits.includes(traitId)) {
-        state.discoveredTraits.push(traitId);
-      }
-      if (!state.acquiredTraits.includes(traitId)) {
-        state.acquiredTraits.push(traitId);
-      }
+
+    equipTrait: (state, action: PayloadAction<{ traitId: string; slotIndex: number }>) => {
+      // This action is handled by PlayerSlice for trait slot management
+      // No direct state changes needed here
     },
-    // makePermanent reducer removed as it's deprecated
-    // makePermanent: (state, action: PayloadAction<string>) => {
-    //   const traitId = action.payload;
-    //   if (!state.acquiredTraits.includes(traitId)) {
-    //     return;
-    //   }
-    //   if (!state.permanentTraits.includes(traitId)) { // This referred to TraitsSlice.permanentTraits
-    //     state.permanentTraits.push(traitId);
-    //   }
-    // },
-    /**
-     * Save a trait preset configuration
-     */
+
+    unequipTrait: (state, action: PayloadAction<number>) => {
+      // This action is handled by PlayerSlice for trait slot management
+      // No direct state changes needed here
+    },
+
     saveTraitPreset: (state, action: PayloadAction<TraitPreset>) => {
       const preset = action.payload;
       const existingIndex = state.presets.findIndex(p => p.id === preset.id);
-      
       if (existingIndex >= 0) {
         state.presets[existingIndex] = preset;
       } else {
@@ -66,101 +48,47 @@ export const traitsSlice = createSlice({
       }
     },
 
-    /**
-     * Load a trait preset configuration
-     * Note: This action only manages the preset data. 
-     * The actual trait equipping is handled by PlayerSlice actions.
-     */
     loadTraitPreset: (state, action: PayloadAction<string>) => {
-      const presetId = action.payload;
-      const preset = state.presets.find(p => p.id === presetId);
-      
-      if (preset) {
-        // Mark preset as recently used (for future sorting/UI features)
-        preset.lastUsed = Date.now();
-      }
+      // Preset loading logic is handled by PlayerSlice
+      // This action triggers the loading process
     },
 
-    /**
-     * Delete a trait preset
-     */
     deleteTraitPreset: (state, action: PayloadAction<string>) => {
-      const presetId = action.payload;
-      state.presets = state.presets.filter(preset => preset.id !== presetId);
+      state.presets = state.presets.filter(preset => preset.id !== action.payload);
     },
 
-    /**
-     * Clear all equipped traits
-     * Note: This is a convenience action that will be handled by PlayerSlice
-     */
-    clearAllEquippedTraits: (state) => {
-      // This reducer doesn't actually modify state - it's handled by PlayerSlice
-      // But we keep it here for action consistency
+    unlockTraitSlot: (state, action: PayloadAction<number>) => {
+      // Trait slot unlocking is handled by PlayerSlice
+      // No direct state changes needed here
     },
 
-    /**
-     * Reset trait management state
-     */
-    resetTraitManagement: (state) => {
-      state.presets = [];
+    clearError: (state) => {
+      state.error = null;
+    },
+
+    // Set traits data (typically loaded from JSON)
+    setTraits: (state, action: PayloadAction<Record<string, Trait>>) => {
+      state.traits = action.payload;
     },
   },
-
+  
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchTraitsThunk.pending, (state) => {
-        state.loading = true; 
-        state.error = null; 
-      })
-      .addCase(fetchTraitsThunk.fulfilled, (state, action: PayloadAction<Record<string, Trait>>) => {
-        state.loading = false;
-        state.traits = action.payload; 
-        state.discoveredTraits = Object.keys(action.payload);
-        state.error = null;
-      })
-      .addCase(fetchTraitsThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : action.error.message || 'Failed to fetch traits';
-      })
-      .addCase(acquireTraitWithEssenceThunk.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(acquireTraitWithEssenceThunk.fulfilled, (state, action) => {
-        // Access the correct property from the returned payload
-        console.log(`Trait Resonated (TraitsSlice handling): ${action.payload.message}`);
-      })
-      .addCase(acquireTraitWithEssenceThunk.rejected, (state, action) => {
-        state.error = typeof action.payload === 'string' 
-          ? action.payload 
-          : action.error.message || 'Failed to resonate trait';
-        console.error('Failed to resonate trait (TraitsSlice handling):', state.error);
-      });
-  }
+    // Remove references to non-existent thunks
+    // Future thunk integrations can be added here when TraitsThunks.ts is created
+  },
 });
 
 export const {
-  setTraits,
-  discoverTrait,
   acquireTrait,
-  // makePermanent, // Removed
+  discoverTrait,
+  equipTrait,
+  unequipTrait,
   saveTraitPreset,
   loadTraitPreset,
   deleteTraitPreset,
-  clearAllEquippedTraits,
-  resetTraitManagement,
+  unlockTraitSlot,
+  clearError,
+  setTraits,
 } = traitsSlice.actions;
-
-// Selectors
-export const selectTraits = (state: RootState) => state.traits.traits;
-export const selectAcquiredTraits = (state: RootState) => state.traits.acquiredTraits;
-// export const selectPermanentTraits = (state: RootState) => state.traits.permanentTraits; // Removed: Use PlayerSelectors.selectPermanentTraits for player's permanent traits
-export const selectTraitPresets = (state: RootState) => state.traits.presets;
-export const selectTraitLoading = (state: RootState) => state.traits.loading;
-export const selectTraitError = (state: RootState) => state.traits.error;
-export const selectDiscoveredTraits = (state: RootState) => state.traits.discoveredTraits;
-
-export const selectTraitsByIds = (state: RootState, traitIds: string[]) => {
-  return traitIds.map(id => state.traits.traits[id]).filter(Boolean);
-};
 
 export default traitsSlice.reducer;

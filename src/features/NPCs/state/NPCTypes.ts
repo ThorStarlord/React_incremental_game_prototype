@@ -122,8 +122,7 @@ export interface NPCSharedTraitSlot {
  */
 export interface InteractionResult {
   success: boolean;
-  affinityDelta?: number; 
-  connectionDepthChange?: number; 
+  relationshipChange?: number;  // Add this missing property
   essenceGained?: number;
   unlockRewards?: string[];
   message?: string;
@@ -212,7 +211,12 @@ export interface StartInteractionPayload {
 export interface ProcessDialoguePayload {
   npcId: string;
   choiceId: string;
-  playerText: string;
+  playerText?: string;
+  dialogueData?: {
+    playerMessage?: string;
+    selectedResponse?: string;
+    timestamp: number;
+  };
 }
 
 /**
