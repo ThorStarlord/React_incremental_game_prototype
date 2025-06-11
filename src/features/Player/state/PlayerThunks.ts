@@ -1,407 +1,343 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { selectPlayer, selectPlayerStats } from './PlayerSelectors';
-import { PlayerState, PlayerStats, StatusEffect } from './PlayerTypes';
-import { Trait } from '../../Traits/state/TraitsTypes';
 import { 
-  calculateAttributeModifier, 
-  STAT_FORMULAS, 
-  STAT_LIMITS, 
-  PLAYER_BASE_STATS 
-} from '../../../constants/playerConstants';
-
-// Import the slice properly - import the slice object that contains both reducer and actions
-import { playerSlice } from './PlayerSlice';
-
-/**
- * Initial state for base stats calculation
- */
-const getPlayerInitialStats = (): PlayerStats => ({ ...PLAYER_BASE_STATS });
+  modifyHealth, 
+  modifyEnergy, 
+  addStatusEffect, 
+  removeStatusEffect,
+  updatePlayer,
+  recalculateStats,
+  allocateAttribute
+} from './PlayerSlice';
+import type { StatusEffect, PlayerAttributes } from './PlayerTypes';
 
 /**
- * Simple trait effect processing
+ * Async thunk for regenerating player vitals over time
+ * Applies health and mana regeneration based on current regen rates
  */
-const processTraitEffects = (activeTraits: Trait[], baseStats: PlayerStats) => {
-  const effects: Record<string, number> = {};
-  const warnings: string[] = [];
+export const regenerateVitalsThunk = createAsyncThunk(
+  'player/regenerateVitals',
+  async (deltaTime: number, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const player = state.player;
 
-  activeTraits.forEach(trait => {
-    if (trait.effects) {
-      if (Array.isArray(trait.effects)) {
-        trait.effects.forEach(effect => {
-          if (typeof effect === 'object' && 'type' in effect && 'magnitude' in effect) {
-            // Handle TraitEffect objects
-            const statName = effect.type.toLowerCase();
-            if (statName in baseStats) {
-              effects[statName] = (effects[statName] || 0) + effect.magnitude;
-            }
-          }
-        });
-      } else if (typeof trait.effects === 'object') {
-        // Handle TraitEffectValues (key-value pairs)
-        Object.entries(trait.effects).forEach(([statName, value]) => {
-          if (statName in baseStats && typeof value === 'number') {
-            effects[statName] = (effects[statName] || 0) + value;
-          }
-        });
-      }
-    }
-  });
-
-  return { effects, warnings };
-};
-
-const applyTraitEffectsToStats = (baseStats: PlayerStats, traitEffects: { effects: Record<string, number> }): PlayerStats => {
-  const result = { ...baseStats };
-  
-  Object.entries(traitEffects.effects).forEach(([stat, modifier]) => {
-    if (stat in result && typeof result[stat as keyof PlayerStats] === 'number') {
-      (result[stat as keyof PlayerStats] as number) += modifier;
-    }
-  });
-
-  return result;
-};
-
-/**
- * Enhanced async thunk for recalculating all player stats using centralized constants
- */
-export const recalculateStatsThunk = createAsyncThunk<
-  void,
-  void,
-  { state: RootState }
->(
-  'player/recalculateStatsThunk', 
-  async (_, { getState, dispatch }) => {
-    const state = getState();
-    const playerState = state.player;
-    const allTraits = state.traits.traits;
-
-    // 1. Start with fresh base stats
-    const baseStats = { ...PLAYER_BASE_STATS };
-
-    // 2. Apply attribute bonuses using centralized formulas
-    const { attributes } = playerState;
-    const strengthBonus = calculateAttributeModifier(attributes.strength);
-    const dexterityBonus = calculateAttributeModifier(attributes.dexterity);
-    const intelligenceBonus = calculateAttributeModifier(attributes.intelligence);
-    const constitutionBonus = calculateAttributeModifier(attributes.constitution);
-    const wisdomBonus = calculateAttributeModifier(attributes.wisdom);
-    const charismaBonus = calculateAttributeModifier(attributes.charisma);
-
-    // Apply attribute-derived stats using constants
-    baseStats.maxHealth += constitutionBonus * STAT_FORMULAS.HEALTH_PER_CONSTITUTION;
-    baseStats.maxMana += intelligenceBonus * STAT_FORMULAS.MANA_PER_INTELLIGENCE;
-    baseStats.attack += strengthBonus;
-    baseStats.defense += constitutionBonus;
-    baseStats.speed += dexterityBonus;
-    baseStats.healthRegen += constitutionBonus * STAT_FORMULAS.HEALTH_REGEN_PER_CONSTITUTION;
-    baseStats.manaRegen += wisdomBonus * STAT_FORMULAS.MANA_REGEN_PER_WISDOM;
-    baseStats.criticalChance += dexterityBonus * STAT_FORMULAS.CRIT_CHANCE_PER_DEXTERITY;
-    baseStats.criticalDamage += strengthBonus * STAT_FORMULAS.CRIT_DAMAGE_PER_STRENGTH;
-
-    // 3. Get all active traits (simplified - no trait slots in current PlayerState)
-    const permanentTraitIds = playerState.permanentTraits || [];
-    const activeTraitIds = [...permanentTraitIds];
-
-    const activeTraits = activeTraitIds
-      .map(id => allTraits[id])
-      .filter(Boolean) as Trait[];
-
-    // 4. Process trait effects with validation
-    const traitEffects = processTraitEffects(activeTraits, baseStats);
-    
-    // Log any warnings from trait processing
-    if (traitEffects.warnings && traitEffects.warnings.length > 0) {
-      console.warn('Trait effect processing warnings:', traitEffects.warnings);
+    if (!player.isAlive) {
+      return { healthGained: 0, manaGained: 0 };
     }
 
-    const statsWithTraitEffects = applyTraitEffectsToStats(baseStats, traitEffects);
+    // Calculate regeneration amounts based on delta time (in seconds)
+    const timeInSeconds = deltaTime / 1000;
+    const healthRegen = Math.floor(player.stats.healthRegen * timeInSeconds);
+    const manaRegen = Math.floor(player.stats.manaRegen * timeInSeconds);
 
-    // 5. Apply status effect modifiers
-    const statusModifiers: Partial<PlayerStats> = {};
-    playerState.statusEffects.forEach(effect => {
-      if (effect.effects) {
-        Object.entries(effect.effects).forEach(([stat, value]) => {
-          if (stat in statsWithTraitEffects) {
-            statusModifiers[stat as keyof PlayerStats] = 
-              (statusModifiers[stat as keyof PlayerStats] || 0) + (value as number);
-          }
-        });
-      }
-    });
+    let healthGained = 0;
+    let manaGained = 0;
 
-    // 6. Apply status effects to get final stats
-    const finalStats: PlayerStats = { ...statsWithTraitEffects };
-    Object.entries(statusModifiers).forEach(([stat, modifier]) => {
-      const statKey = stat as keyof PlayerStats;
-      if (typeof finalStats[statKey] === 'number' && typeof modifier === 'number') {
-        (finalStats[statKey] as number) += modifier;
-      }
-    });
+    // Apply health regeneration if needed and possible
+    if (healthRegen > 0 && player.stats.health < player.stats.maxHealth) {
+      const actualHealthGain = Math.min(healthRegen, player.stats.maxHealth - player.stats.health);
+      dispatch(modifyHealth({ amount: actualHealthGain }));
+      healthGained = actualHealthGain;
+    }
 
-    // 7. Apply final constraints using constants
-    finalStats.maxHealth = Math.max(STAT_LIMITS.MIN_MAX_HEALTH, finalStats.maxHealth);
-    finalStats.maxMana = Math.max(STAT_LIMITS.MIN_MAX_MANA, finalStats.maxMana);
-    finalStats.attack = Math.max(STAT_LIMITS.MIN_ATTACK, finalStats.attack);
-    finalStats.defense = Math.max(STAT_LIMITS.MIN_DEFENSE, finalStats.defense);
-    finalStats.speed = Math.max(STAT_LIMITS.MIN_SPEED, finalStats.speed);
-    finalStats.healthRegen = Math.max(STAT_LIMITS.MIN_HEALTH_REGEN, finalStats.healthRegen);
-    finalStats.manaRegen = Math.max(STAT_LIMITS.MIN_MANA_REGEN, finalStats.manaRegen);
-    finalStats.criticalChance = Math.max(STAT_LIMITS.MIN_CRIT_CHANCE, Math.min(STAT_LIMITS.MAX_CRIT_CHANCE, finalStats.criticalChance));
-    finalStats.criticalDamage = Math.max(STAT_LIMITS.MIN_CRIT_DAMAGE, finalStats.criticalDamage);
+    // Apply mana regeneration if needed and possible
+    if (manaRegen > 0 && player.stats.mana < player.stats.maxMana) {
+      const actualManaGain = Math.min(manaRegen, player.stats.maxMana - player.stats.mana);
+      dispatch(modifyEnergy({ amount: actualManaGain }));
+      manaGained = actualManaGain;
+    }
 
-    // 8. Preserve current health/mana within new limits
-    finalStats.health = Math.max(STAT_LIMITS.MIN_HEALTH, Math.min(
-      playerState.stats.health + (statusModifiers.health || 0),
-      finalStats.maxHealth
-    ));
-    finalStats.mana = Math.max(STAT_LIMITS.MIN_MANA, Math.min(
-      playerState.stats.mana + (statusModifiers.mana || 0),
-      finalStats.maxMana
-    ));
-
-    // 9. Update state
-    dispatch(playerSlice.actions.updateStats(finalStats));
+    return { healthGained, manaGained };
   }
 );
 
 /**
- * Process status effects and remove expired ones
+ * Async thunk for processing status effects over time
+ * Handles duration countdown and effect expiration
  */
-export const processStatusEffectsThunk = createAsyncThunk<
-  void,
-  void,
-  { state: RootState }
->(
-  'player/processStatusEffectsThunk',
-  async (_, { getState, dispatch }) => {
-    const state = getState();
+export const processStatusEffectsThunk = createAsyncThunk(
+  'player/processStatusEffects',
+  async (deltaTime: number, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const player = state.player;
     const currentTime = Date.now();
     
-    // Remove expired effects individually
-    state.player.statusEffects.forEach(effect => {
-      const elapsed = currentTime - effect.startTime;
-      if (effect.duration !== -1 && elapsed >= effect.duration) {
-        dispatch(playerSlice.actions.removeStatusEffect(effect.id));
+    let effectsProcessed = 0;
+    let effectsExpired = 0;
+
+    // Process each status effect
+    for (const effect of player.statusEffects) {
+      // Skip permanent effects (duration -1)
+      if (effect.duration === -1) {
+        continue;
       }
-    });
-    
-    // Recalculate stats after removing expired effects
-    dispatch(recalculateStatsThunk());
+
+      const elapsedTime = currentTime - effect.startTime;
+      
+      // Check if effect has expired
+      if (elapsedTime >= effect.duration) {
+        dispatch(removeStatusEffect({ effectId: effect.id }));
+        effectsExpired++;
+      }
+
+      effectsProcessed++;
+    }
+
+    // Recalculate stats after effect changes
+    if (effectsExpired > 0) {
+      dispatch(recalculateStats());
+    }
+
+    return { effectsProcessed, effectsExpired };
   }
 );
 
 /**
- * Auto-regeneration thunk for health and mana over time
+ * Async thunk for using consumable items with effects
+ * Applies item effects and manages duration-based status effects
  */
-export const regenerateVitalsThunk = createAsyncThunk<
-  void,
-  void,
-  { state: RootState }
->(
-  'player/regenerateVitals',
-  async (_, { getState, dispatch }) => {
-    const state = getState();
-    const player = selectPlayer(state);
-    const stats = selectPlayerStats(state);
-    
-    // Calculate regeneration amounts (assuming per-second rates)
-    const healthRegen = Math.min(stats.healthRegen, stats.maxHealth - stats.health);
-    const manaRegen = Math.min(stats.manaRegen, stats.maxMana - stats.mana);
-    
-    if (healthRegen > 0) {
-      dispatch(playerSlice.actions.restoreHealth(healthRegen));
-    }
-    
-    if (manaRegen > 0) {
-      dispatch(playerSlice.actions.restoreMana(manaRegen));
-    }
-  }
-);
+export const useConsumableItemThunk = createAsyncThunk(
+  'player/useConsumableItem',
+  async (
+    itemData: {
+      name: string;
+      effects: Partial<{ health: number; mana: number; [key: string]: number }>;
+      duration?: number;
+      type?: string;
+    },
+    { getState, dispatch }
+  ) => {
+    const state = getState() as RootState;
+    const player = state.player;
 
-/**
- * Use a consumable item with validation
- */
-export const useConsumableItemThunk = createAsyncThunk<
-  void,
-  { itemId: string; effects: Partial<PlayerStats>; duration?: number },
-  { state: RootState }
->(
-  'player/useConsumableItemThunk',
-  async ({ itemId, effects, duration }, { getState, dispatch }) => {
-    const state = getState();
-    
-    if (!state.player.isAlive) {
-      throw new Error('Cannot use items when character is not alive');
+    if (!player.isAlive) {
+      throw new Error('Cannot use items while defeated');
     }
 
     // Apply immediate effects
-    Object.entries(effects).forEach(([stat, value]) => {
-      if (typeof value === 'number') {
-        switch (stat) {
-          case 'health':
-            if (value > 0) dispatch(playerSlice.actions.restoreHealth(value));
-            else dispatch(playerSlice.actions.takeDamage(Math.abs(value)));
-            break;
-          case 'mana':
-            if (value > 0) dispatch(playerSlice.actions.restoreMana(value));
-            else dispatch(playerSlice.actions.consumeMana(Math.abs(value)));
-            break;
-          // Add other immediate stat effects as needed
-        }
-      }
-    });
+    if (itemData.effects.health) {
+      dispatch(modifyHealth({ amount: itemData.effects.health }));
+    }
 
-    // Add temporary status effect if duration is specified
-    if (duration && duration > 0) {
+    if (itemData.effects.mana) {
+      dispatch(modifyEnergy({ amount: itemData.effects.mana }));
+    }
+
+    // Apply status effect if duration is specified
+    if (itemData.duration && itemData.duration > 0) {
       const statusEffect: StatusEffect = {
-        id: `consumable_${itemId}_${Date.now()}`,
-        name: `Consumable Effect: ${itemId}`,
-        description: `Temporary effect from using ${itemId}`,
-        category: 'consumable',
-        effects,
-        duration,
+        id: `consumable_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: `${itemData.name} Effect`,
+        description: `Temporary effect from ${itemData.name}`,
+        duration: itemData.duration,
+        effects: itemData.effects,
         startTime: Date.now(),
-        isActive: true,
+        type: itemData.type || 'consumable',
+        category: 'consumable'
       };
 
-      dispatch(playerSlice.actions.addStatusEffect(statusEffect));
-      dispatch(recalculateStatsThunk());
+      dispatch(addStatusEffect({ effect: statusEffect }));
     }
+
+    // Recalculate stats to apply any changes
+    dispatch(recalculateStats());
+
+    return {
+      itemUsed: itemData.name,
+      effectsApplied: Object.keys(itemData.effects),
+      statusEffectApplied: !!itemData.duration
+    };
   }
 );
 
 /**
- * Enhanced rest mechanic with customizable effects
+ * Async thunk for enhanced rest mechanics
+ * Provides significant healing and status effect removal
  */
 export const restThunk = createAsyncThunk(
   'player/rest',
-  async (_, { dispatch, getState }) => {
+  async (restQuality: 'basic' | 'good' | 'excellent' = 'basic', { getState, dispatch }) => {
     const state = getState() as RootState;
     const player = state.player;
-    
-    // Use hardcoded initial stats for restoration
-    const initialStats = PLAYER_BASE_STATS;
-    
-    // Restore health and mana to maximum
-    dispatch(playerSlice.actions.restoreHealth(initialStats.maxHealth));
-    dispatch(playerSlice.actions.restoreMana(initialStats.maxMana));
-    
-    // Remove temporary status effects
-    player.statusEffects.forEach(effect => {
-      if (effect.duration > 0) {
-        dispatch(playerSlice.actions.removeStatusEffect(effect.id));
+
+    // Calculate rest effectiveness based on quality
+    const restMultipliers = {
+      basic: 0.5,
+      good: 0.8,
+      excellent: 1.0
+    };
+
+    const multiplier = restMultipliers[restQuality];
+    const healthRestored = Math.floor((player.stats.maxHealth - player.stats.health) * multiplier);
+    const manaRestored = Math.floor((player.stats.maxMana - player.stats.mana) * multiplier);
+
+    // Apply healing
+    if (healthRestored > 0) {
+      dispatch(modifyHealth({ amount: healthRestored }));
+    }
+
+    if (manaRestored > 0) {
+      dispatch(modifyEnergy({ amount: manaRestored }));
+    }
+
+    // Remove negative status effects based on rest quality
+    const effectsToRemove = player.statusEffects.filter(effect => {
+      // Remove debuffs on good or excellent rest
+      if (restQuality === 'good' || restQuality === 'excellent') {
+        return effect.type === 'debuff' || effect.category === 'negative';
       }
+      // Remove only minor debuffs on basic rest
+      return effect.category === 'minor_negative';
     });
-    
-    return { success: true, message: 'Player has rested and recovered.' };
+
+    effectsToRemove.forEach(effect => {
+      dispatch(removeStatusEffect({ effectId: effect.id }));
+    });
+
+    // Add rest bonus effect for excellent rest
+    if (restQuality === 'excellent') {
+      const restBonus: StatusEffect = {
+        id: `rest_bonus_${Date.now()}`,
+        name: 'Well Rested',
+        description: 'Feeling refreshed and energized from excellent rest',
+        duration: 3600000, // 1 hour
+        effects: {
+          healthRegen: player.stats.healthRegen * 0.5,
+          manaRegen: player.stats.manaRegen * 0.5
+        },
+        startTime: Date.now(),
+        type: 'buff',
+        category: 'rest'
+      };
+
+      dispatch(addStatusEffect({ effect: restBonus }));
+    }
+
+    // Recalculate stats after all changes
+    dispatch(recalculateStats());
+
+    return {
+      restQuality,
+      healthRestored,
+      manaRestored,
+      effectsRemoved: effectsToRemove.length,
+      bonusApplied: restQuality === 'excellent'
+    };
   }
 );
 
 /**
- * Auto-allocate attribute points based on a simple strategy
+ * Async thunk for automated attribute allocation
+ * Distributes available attribute points according to specified strategy
  */
-export const autoAllocateAttributesThunk = createAsyncThunk<
-  void,
-  { strategy?: 'balanced' | 'combat' | 'magic' | 'social' },
-  { state: RootState }
->(
-  'player/autoAllocateAttributesThunk',
-  async ({ strategy = 'balanced' }, { getState, dispatch }) => {
-    const state = getState();
-    const { availableAttributePoints, attributes } = state.player;
+export const autoAllocateAttributesThunk = createAsyncThunk(
+  'player/autoAllocateAttributes',
+  async (
+    strategy: 'balanced' | 'combat' | 'social' | 'magical' = 'balanced',
+    { getState, dispatch }
+  ) => {
+    const state = getState() as RootState;
+    const player = state.player;
 
-    if (availableAttributePoints <= 0) return;
+    if (player.availableAttributePoints <= 0) {
+      throw new Error('No attribute points available');
+    }
 
     // Define allocation strategies
     const strategies = {
-      balanced: { str: 1, dex: 1, int: 1, con: 1, wis: 1, cha: 1 },
-      combat: { str: 3, dex: 2, int: 0, con: 2, wis: 0, cha: 1 },
-      magic: { str: 0, dex: 1, int: 3, con: 1, wis: 2, cha: 1 },
-      social: { str: 1, dex: 1, int: 1, con: 1, wis: 1, cha: 3 },
+      balanced: {
+        strength: 1,
+        dexterity: 1,
+        intelligence: 1,
+        constitution: 1,
+        wisdom: 1,
+        charisma: 1
+      },
+      combat: {
+        strength: 3,
+        dexterity: 2,
+        constitution: 2,
+        intelligence: 0,
+        wisdom: 0,
+        charisma: 0
+      },
+      social: {
+        charisma: 3,
+        wisdom: 2,
+        intelligence: 1,
+        strength: 0,
+        dexterity: 0,
+        constitution: 1
+      },
+      magical: {
+        intelligence: 3,
+        wisdom: 2,
+        constitution: 1,
+        strength: 0,
+        dexterity: 1,
+        charisma: 0
+      }
     };
 
     const allocation = strategies[strategy];
     const totalWeight = Object.values(allocation).reduce((sum, weight) => sum + weight, 0);
+    let pointsToAllocate = player.availableAttributePoints;
+    const allocatedPoints: Partial<PlayerAttributes> = {};
 
-    // Distribute points proportionally
-    Object.entries(allocation).forEach(([stat, weight]) => {
-      const pointsToAllocate = Math.floor((availableAttributePoints * weight) / totalWeight);
-      
-      for (let i = 0; i < pointsToAllocate; i++) {
-        // Use existing allocateAttributePoint action through the slice
-        // This would need to be called multiple times or batch processed
+    // Distribute points according to strategy weights
+    for (const [attribute, weight] of Object.entries(allocation)) {
+      if (weight > 0 && pointsToAllocate > 0) {
+        const pointsForAttribute = Math.floor((weight / totalWeight) * player.availableAttributePoints);
+        const actualPoints = Math.min(pointsForAttribute, pointsToAllocate);
+        
+        if (actualPoints > 0) {
+          dispatch(allocateAttribute({ 
+            attribute: attribute as keyof PlayerAttributes, 
+            amount: actualPoints 
+          }));
+          allocatedPoints[attribute as keyof PlayerAttributes] = actualPoints;
+          pointsToAllocate -= actualPoints;
+        }
       }
-    });
-
-    // Recalculate stats after allocation
-    dispatch(recalculateStatsThunk());
-  }
-);
-
-/**
- * Processes all active trait effects and updates the player's active trait effects
- */
-export const updateActiveTraitEffectsThunk = createAsyncThunk<
-  ProcessedTraitEffects,
-  void,
-  { state: RootState }
->(
-  'player/updateActiveTraitEffects',
-  async (_, { getState }) => {
-    const state = getState();
-    
-    // Get equipped and permanent trait objects
-    const equippedTraits = selectEquippedTraitObjects(state);
-    const permanentTraits = selectPermanentTraitObjects(state);
-    
-    // Process and validate trait effects
-    const rawEffects = processTraitEffects(equippedTraits, permanentTraits);
-    const validatedEffects = validateTraitEffects(rawEffects);
-    
-    return validatedEffects;
-  }
-);
-
-/**
- * Recalculates player stats based on current attributes, traits, and status effects
- */
-export const recalculatePlayerStatsThunk = createAsyncThunk<
-  void,
-  void,
-  { state: RootState }
->(
-  'player/recalculateStats',
-  async (_, { dispatch }) => {
-    // First update active trait effects
-    const result = await dispatch(updateActiveTraitEffectsThunk());
-    
-    if (updateActiveTraitEffectsThunk.fulfilled.match(result)) {
-      // Then trigger stat recalculation in the slice
-      dispatch({ type: 'player/recalculateStats' });
     }
+
+    return {
+      strategy,
+      pointsAllocated: player.availableAttributePoints - pointsToAllocate,
+      distribution: allocatedPoints
+    };
   }
 );
 
-// Export individual actions for convenience
-export const {
-  addAttributePoints,
-  addPermanentTrait,
-  addSkillPoints,
-  addStatusEffect,
-  allocateAttributePoint,
-  consumeMana,
-  incrementResonanceLevel,
-  recalculateStats,
-  removePermanentTrait,
-  removeStatusEffect,
-  resetPlayer,
-  restoreHealth,
-  restoreMana,
-  setPlayerAlive,
-  setResonanceLevel,
-  takeDamage,
-  updateStats,
-  updateTotalPlaytime
-} = playerSlice.actions;
+/**
+ * Async thunk for level-up processing (if leveling system is implemented)
+ * Handles attribute point awards and stat recalculation
+ */
+export const levelUpThunk = createAsyncThunk(
+  'player/levelUp',
+  async (newLevel: number, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const player = state.player;
+
+    // Award attribute points (typically 1-2 per level)
+    const attributePointsGained = 2;
+    
+    // Award skill points (if skill system exists)
+    const skillPointsGained = 1;
+
+    // Update player level and points
+    dispatch(updatePlayer({
+      availableAttributePoints: player.availableAttributePoints + attributePointsGained,
+      availableSkillPoints: player.availableSkillPoints + skillPointsGained
+    }));
+
+    // Recalculate stats for new level
+    dispatch(recalculateStats());
+
+    return {
+      newLevel,
+      attributePointsGained,
+      skillPointsGained
+    };
+  }
+);
