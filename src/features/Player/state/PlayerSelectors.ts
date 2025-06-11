@@ -3,7 +3,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { PlayerState } from './PlayerTypes';
-import { selectTraits } from '../../Traits/state/TraitSelectors';
+import { selectTraits } from '../../Traits/index';
 
 // Basic selectors
 export const selectPlayer = (state: RootState): PlayerState => state.player;
