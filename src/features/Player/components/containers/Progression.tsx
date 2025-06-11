@@ -20,7 +20,6 @@ import {
 import { useAppSelector } from '../../../../app/hooks';
 import { selectPlayer } from '../../state/PlayerSelectors';
 import { StatDisplay } from '../ui/StatDisplay';
-import type { PlayerProgressionData } from '../../state/PlayerTypes';
 
 interface ProgressionProps {
   showDetails?: boolean;
@@ -75,6 +74,22 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
                 label="Status"
                 value={playerState.isAlive ? 'Alive' : 'Defeated'}
                 color={playerState.isAlive ? 'success' : 'error'}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <StatDisplay
+                label="Resonance Level"
+                value={playerState.resonanceLevel}
+                color="secondary"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <StatDisplay
+                label="Max Trait Slots"
+                value={playerState.maxTraitSlots}
+                color="info"
               />
             </Grid>
           </Grid>
@@ -139,6 +154,22 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
                   label="Unspent Skill Points"
                   value={playerState.availableSkillPoints}
                   color={playerState.availableSkillPoints > 0 ? 'info' : 'secondary'}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <StatDisplay
+                  label="Permanent Traits"
+                  value={playerState.permanentTraits.length}
+                  color="success"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <StatDisplay
+                  label="Active Trait Slots"
+                  value={`${playerState.traitSlots.filter(slot => slot.traitId !== null).length}/${playerState.traitSlots.length}`}
+                  color="primary"
                 />
               </Grid>
               
