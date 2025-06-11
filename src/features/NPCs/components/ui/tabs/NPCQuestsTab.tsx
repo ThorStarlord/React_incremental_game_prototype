@@ -28,13 +28,42 @@ import {
 import type { NPC } from '../../../state/NPCTypes';
 
 interface NPCQuestsTabProps {
-  npcId: string; // Add the missing npcId prop
+  npcId: string;
 }
+
+// Mock quest data for development
+const mockQuests = [
+  {
+    id: 'quest_1',
+    title: 'Gather Forest Herbs',
+    description: 'Collect medicinal herbs from the nearby forest for brewing potions.',
+    difficulty: 'easy',
+    status: 'available',
+    objectives: [
+      { text: 'Collect Moonleaf', current: 0, required: 5, completed: false },
+      { text: 'Collect Silverroot', current: 0, required: 3, completed: false }
+    ],
+    rewards: ['10 Essence', '5 Gold', 'Herbalism Experience']
+  },
+  {
+    id: 'quest_2',
+    title: 'Ancient Artifact Recovery',
+    description: 'Retrieve a lost artifact from the old ruins. Be careful of the guardians.',
+    difficulty: 'hard',
+    status: 'accepted',
+    objectives: [
+      { text: 'Explore Ancient Ruins', current: 1, required: 1, completed: true },
+      { text: 'Defeat Stone Guardian', current: 0, required: 1, completed: false },
+      { text: 'Retrieve Crystal Orb', current: 0, required: 1, completed: false }
+    ],
+    rewards: ['50 Essence', 'Ancient Knowledge', 'Rare Trait']
+  }
+];
 
 /**
  * NPCQuestsTab - Handles quest management with NPCs
  */
-const NPCQuestsTab: React.FC<NPCQuestsTabProps> = ({ npcId }) => {
+const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const handleAcceptQuest = (questId: string) => {
     // TODO: Implement quest acceptance logic
     console.log(`Accepting quest: ${questId}`);
