@@ -32,11 +32,11 @@ import { useTheme } from '@mui/material/styles';
 
 // App hooks and selectors
 import { useAppSelector } from '../app/hooks';
-import { selectPlayer } from '../features/Player';
-import { selectEssence } from '../features/Essence';
-import { selectGameLoop } from '../features/GameLoop';
-import { selectEquippedTraitObjects } from '../features/Traits'; // Fixed import
-import { selectNPCs } from '../features/NPCs'; // Fixed import
+import { selectPlayer } from '../features/Player/state/PlayerSelectors';
+import { selectEssence } from '../features/Essence/state/EssenceSelectors';
+import { selectGameLoop } from '../features/GameLoop/state/GameLoopSelectors';
+import { selectEquippedTraitObjects } from '../features/Traits/state/TraitsSelectors';
+import { selectTraitsState } from '../features/Traits/state/TraitsSelectors';
 
 // Feature components
 import { GameControlPanel } from '../features/GameLoop/components/ui/GameControlPanel';
@@ -81,14 +81,14 @@ export const DashboardPage: React.FC = React.memo(() => {
   const player = useAppSelector(selectPlayer);
   const essence = useAppSelector(selectEssence);
   const gameLoop = useAppSelector(selectGameLoop);
-  const traits = useAppSelector(selectEquippedTraitObjects); // Fixed usage
-  const npcs = useAppSelector(selectNPCs); // Fixed usage
+  const traits = useAppSelector(selectEquippedTraitObjects);
+  const traitsState = useAppSelector(selectTraitsState);
 
   // Computed dashboard statistics
   const dashboardStats = useMemo((): DashboardStatCard[] => [
     {
       title: 'Current Essence',
-      value: essence.currentEssence.toLocaleString(), // Changed
+      value: essence.currentEssence.toLocaleString(),
       subtitle: `+${essence.generationRate.toFixed(2)}/sec`,
       color: 'secondary',
       icon: EssenceIcon
@@ -101,13 +101,13 @@ export const DashboardPage: React.FC = React.memo(() => {
       icon: StarIcon
     },
     {
-      title: 'NPC Relationships',
-      value: Object.keys(npcs).length,
-      subtitle: `${Object.keys(npcs).length} known`, // Changed
+      title: 'Known Traits',
+      value: traitsState.acquiredTraits.length,
+      subtitle: `${traitsState.discoveredTraits.length} discovered`,
       color: 'warning',
       icon: GroupIcon
     }
-  ], [player, essence, traits, npcs]);
+  ], [essence, traits, traitsState]);
 
   // Quick action items
   const quickActions = useMemo((): QuickActionItem[] => [
@@ -123,12 +123,12 @@ export const DashboardPage: React.FC = React.memo(() => {
       icon: TrendingUpIcon,
       color: player.stats.mana < player.stats.maxMana * 0.3 ? 'warning' : 'primary'
     },
-    // { // Commented out Gold section
-    //   label: 'Gold',
-    //   value: player.gold.toLocaleString(),
-    //   icon: TrendingUpIcon,
-    //   color: 'warning'
-    // },
+    {
+      label: 'Attribute Points',
+      value: player.availableAttributePoints.toString(),
+      icon: TrendingUpIcon,
+      color: player.availableAttributePoints > 0 ? 'success' : 'secondary'
+    },
     {
       label: 'Game Time',
       value: formatGameTime(gameLoop.totalGameTime),
@@ -204,7 +204,7 @@ export const DashboardPage: React.FC = React.memo(() => {
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    <strong>{'Unnamed Character'}</strong> 
+                    <strong>Resonance Level {player.resonanceLevel}</strong> 
                   </Typography>
                   
                   <Box sx={{ mb: 1 }}>
