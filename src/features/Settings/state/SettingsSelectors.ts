@@ -1,14 +1,66 @@
-import { RootState } from '../../../app/store';
-import { SettingsState, AudioSettings, GraphicsSettings, GameplaySettings, UISettings } from './SettingsTypes';
+import { createSelector } from '@reduxjs/toolkit';
+import type { RootState } from '../../../app/store';
+import type { SettingsState, AudioSettings, GraphicsSettings, GameplaySettings, UISettings } from './SettingsTypes';
 
 // Selector for the entire settings state
-export const selectSettings = (state: RootState): SettingsState => state.settings;
+export const selectSettingsState = (state: RootState): SettingsState => state.settings;
 
-// Selectors for specific categories
-export const selectAudioSettings = (state: RootState): AudioSettings => state.settings.audio;
-export const selectGraphicsSettings = (state: RootState): GraphicsSettings => state.settings.graphics;
-export const selectGameplaySettings = (state: RootState): GameplaySettings => state.settings.gameplay;
-export const selectUISettings = (state: RootState): UISettings => state.settings.ui;
+export const selectSettings = selectSettingsState;
+
+export const selectAudioSettings = createSelector(
+  [selectSettingsState],
+  (settings) => settings.audio
+);
+
+export const selectGraphicsSettings = createSelector(
+  [selectSettingsState],
+  (settings) => settings.graphics
+);
+
+export const selectGameplaySettings = createSelector(
+  [selectSettingsState],
+  (settings) => settings.gameplay
+);
+
+export const selectUISettings = createSelector(
+  [selectSettingsState],
+  (settings) => settings.ui
+);
+
+export const selectMasterVolume = createSelector(
+  [selectAudioSettings],
+  (audio) => audio.masterVolume
+);
+
+export const selectMusicVolume = createSelector(
+  [selectAudioSettings],
+  (audio) => audio.musicVolume
+);
+
+export const selectEffectsVolume = createSelector(
+  [selectAudioSettings],
+  (audio) => audio.effectsVolume
+);
+
+export const selectDarkMode = createSelector(
+  [selectGraphicsSettings],
+  (graphics) => graphics.darkMode
+);
+
+export const selectTheme = createSelector(
+  [selectUISettings],
+  (ui) => ui.theme
+);
+
+export const selectAutosaveEnabled = createSelector(
+  [selectGameplaySettings],
+  (gameplay) => gameplay.autosaveEnabled
+);
+
+export const selectAutosaveInterval = createSelector(
+  [selectGameplaySettings],
+  (gameplay) => gameplay.autosaveInterval
+);
 
 // --- Gameplay Selectors ---
 

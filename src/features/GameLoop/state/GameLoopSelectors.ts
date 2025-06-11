@@ -1,11 +1,27 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
+import type { GameLoopState } from './GameLoopTypes';
 
-export const selectGameLoop = (state: RootState) => state.gameLoop;
+export const selectGameLoop = (state: RootState): GameLoopState => state.gameLoop;
 
-export const selectIsGameRunning = createSelector(
+export const selectIsRunning = createSelector(
   [selectGameLoop],
-  (gameLoop) => gameLoop.isRunning && !gameLoop.isPaused
+  (gameLoop) => gameLoop.isRunning
+);
+
+export const selectIsPaused = createSelector(
+  [selectGameLoop],
+  (gameLoop) => gameLoop.isPaused
+);
+
+export const selectCurrentTick = createSelector(
+  [selectGameLoop],
+  (gameLoop) => gameLoop.currentTick
+);
+
+export const selectTotalGameTime = createSelector(
+  [selectGameLoop],
+  (gameLoop) => gameLoop.totalGameTime
 );
 
 export const selectGameSpeed = createSelector(
@@ -13,25 +29,36 @@ export const selectGameSpeed = createSelector(
   (gameLoop) => gameLoop.gameSpeed
 );
 
-export const selectFormattedGameTime = createSelector(
+export const selectTickRate = createSelector(
   [selectGameLoop],
-  (gameLoop) => {
-    const seconds = Math.floor(gameLoop.totalGameTime / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds % 60}s`;
-    } else {
-      return `${seconds}s`;
-    }
-  }
+  (gameLoop) => gameLoop.tickRate
 );
 
-export const selectShouldAutoSave = createSelector(
+export const selectAutoSaveInterval = createSelector(
   [selectGameLoop],
-  (gameLoop) => 
-    gameLoop.totalGameTime - gameLoop.lastAutoSave >= gameLoop.autoSaveInterval
+  (gameLoop) => gameLoop.autoSaveInterval
+);
+
+export const selectLastAutoSave = createSelector(
+  [selectGameLoop],
+  (gameLoop) => gameLoop.lastAutoSave
+);
+
+export const selectGameLoopStatus = createSelector(
+  [selectIsRunning, selectIsPaused],
+  (isRunning, isPaused) => ({
+    isRunning,
+    isPaused,
+    status: !isRunning ? 'stopped' : isPaused ? 'paused' : 'running'
+  })
+);
+
+export const selectGameTiming = createSelector(
+  [selectTotalGameTime, selectCurrentTick, selectTickRate],
+  (totalGameTime, currentTick, tickRate) => ({
+    totalGameTime,
+    currentTick,
+    tickRate,
+    averageTickTime: totalGameTime / Math.max(currentTick, 1)
+  })
 );

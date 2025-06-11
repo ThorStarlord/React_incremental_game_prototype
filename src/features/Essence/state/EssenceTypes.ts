@@ -15,29 +15,40 @@ export interface EssenceConnection {
 export interface EssenceState {
   currentEssence: number;
   totalCollected: number;
-  generationRate: number; // overall passive generation rate per second (sum of all active connections + other bonuses)
-  perClickValue: number;
-  lastGenerationTime: number; // Timestamp of the last time passive essence was generated
+  generationRate: number; // Essence per second
+  perClickValue: number; // Manual generation amount
+  lastGenerationTime: number;
   isGenerating: boolean;
   loading: boolean;
   error: string | null;
-  npcConnections: Record<string, EssenceConnection>; // Map of NPC ID to their EssenceConnection data
-  currentResonanceLevel: number; // Player's current resonance level
-  maxResonanceLevel: number; // Maximum achievable resonance level
-  resonanceThresholds: number[]; // Array of totalCollected essence needed for each level [level1_threshold, level2_threshold, ...]
 }
 
-export interface EssenceGenerationSource {
-  id: string;
-  type: 'npc_connection' | 'manual' | 'quest_reward' | 'achievement';
+export interface EssenceTransaction {
   amount: number;
-  description: string;
-}
-
-export interface EssenceTransactionPayload {
-  amount: number;
-  source?: string;
+  type: 'gain' | 'spend';
+  source: string;
+  timestamp: number;
   description?: string;
+}
+
+export interface EssenceSource {
+  id: string;
+  name: string;
+  baseRate: number;
+  multiplier: number;
+  isActive: boolean;
+}
+
+export interface EssenceUpgrade {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  effect: {
+    type: 'generation_rate' | 'click_value' | 'multiplier';
+    value: number;
+  };
+  purchased: boolean;
 }
 
 export interface EssenceDisplayProps {

@@ -3,11 +3,11 @@
  */
 
 export interface AudioSettings {
-  masterVolume: number;
-  musicVolume: number;
-  effectsVolume: number;
-  ambientVolume: number;
-  dialogueVolume: number;
+  masterVolume: number; // 0-100
+  musicVolume: number; // 0-100
+  effectsVolume: number; // 0-100
+  ambientVolume: number; // 0-100
+  dialogueVolume: number; // 0-100
   muteWhenInactive: boolean;
 }
 
@@ -42,7 +42,6 @@ export interface SettingsState {
   graphics: GraphicsSettings;
   gameplay: GameplaySettings;
   ui: UISettings;
-  // Add other categories as needed
 }
 
 // Payload for updating a specific setting
@@ -56,4 +55,13 @@ export interface UpdateSettingPayload<T = any> {
 export interface UpdateCategorySettingsPayload<T> {
   category: keyof SettingsState;
   settings: Partial<T>;
+}
+
+export type SettingsCategory = keyof SettingsState;
+
+export interface SettingsValidation {
+  category: SettingsCategory;
+  field: string;
+  isValid: boolean;
+  errorMessage?: string;
 }
