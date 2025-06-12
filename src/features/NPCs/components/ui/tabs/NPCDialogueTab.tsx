@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -11,9 +11,10 @@ import {
 import ChatIcon from '@mui/icons-material/Chat';
 import SendIcon from '@mui/icons-material/Send';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
-import { selectNPCById, selectDialogueHistory } from '../../../state/NPCSelectors';
-import { processDialogueChoiceThunk } from '../../../state/NPCThunks';
-import type { NPC } from '../../../state/NPCTypes';
+// FIXED: Importing the correct parameterized selector
+import { selectNPCById, selectNPCDialogueHistory } from '../../../state/NPCSelectors';
+import { processNPCInteractionThunk } from '../../../state/NPCThunks';
+import type { NPC, DialogueEntry } from '../../../state/NPCTypes';
 
 interface NPCDialogueTabProps {
   npcId: string;
@@ -25,7 +26,6 @@ interface MockDialogue {
   responses: Record<string, string>;
 }
 
-// Mock dialogue data for development
 const mockDialogues: Record<string, MockDialogue> = {
   greeting: {
     id: 'greeting',
@@ -44,11 +44,19 @@ const mockDialogues: Record<string, MockDialogue> = {
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
   const [message, setMessage] = useState('');
-  
-  // Get NPC data and dialogue history
+
   const npc = useAppSelector(state => selectNPCById(state, npcId));
-  const dialogueHistory = useAppSelector(selectDialogueHistory);
-  
+  // FIXED: Correctly calling the parameterized selector inside useAppSelector
+  const dialogueHistory = useAppSelector((state) => selectNPCDialogueHistory(state, npcId));
+
+  const availableDialogueChoices = useMemo(() => {
+    if (!npc?.availableDialogues) return [];
+    
+    return npc.availableDialogues
+      .map((dialogueId: string) => mockDialogues[dialogueId])
+      .filter(Boolean);
+  }, [npc?.availableDialogues]);
+
   if (!npc) {
     return (
       <Box sx={{ p: 2 }}>
@@ -57,26 +65,15 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
     );
   }
 
-  // Filter dialogue history for this NPC
-  const npcDialogueHistory = dialogueHistory.filter(entry => entry.npcId === npcId);
-
-  // Filter available dialogues based on NPC's availableDialogues array
-  const availableDialogueChoices = React.useMemo(() => {
-    if (!npc.availableDialogues) return [];
-    
-    return npc.availableDialogues
-      .map((dialogueId: string) => mockDialogues[dialogueId])
-      .filter(Boolean); // Filter out undefined entries if ID not found in mockDialogues
-  }, [npc.availableDialogues]);
-
   const handleSendFreeTextMessage = async () => {
     if (!message.trim()) return;
 
     try {
-      await dispatch(processDialogueChoiceThunk({
+      await dispatch(processNPCInteractionThunk({
         npcId,
-        choiceId: 'freetext',
-        dialogueData: {
+        interactionType: 'dialogue',
+        context: {
+          choiceId: 'freetext',
           playerMessage: message,
           timestamp: Date.now()
         }
@@ -90,10 +87,11 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
 
   const handleDialogueChoice = async (choice: MockDialogue, responseKey: string) => {
     try {
-      await dispatch(processDialogueChoiceThunk({
+      await dispatch(processNPCInteractionThunk({
         npcId,
-        choiceId: choice.id,
-        dialogueData: {
+        interactionType: 'dialogue',
+        context: {
+          choiceId: choice.id,
           selectedResponse: responseKey,
           timestamp: Date.now()
         }
@@ -104,31 +102,20 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   };
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      gap: 2, 
-      p: 2,
-      height: '100%'
-    }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, height: '100%' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
         <ChatIcon color="primary" />
         <Typography variant="h6">Conversation with {npc.name}</Typography>
       </Box>
 
-      {/* Dialogue History */}
       <Paper sx={{ p: 2, mb: 2, maxHeight: 300, overflowY: 'auto' }}>
         <Typography variant="subtitle2" gutterBottom>Recent Conversations</Typography>
-        {npcDialogueHistory.length > 0 ? (
-          npcDialogueHistory.map((msg) => (
+        {dialogueHistory.length > 0 ? (
+          dialogueHistory.map((msg: DialogueEntry) => (
             <Box key={msg.id} sx={{ mb: 2 }}>
-              <Paper 
+              <Paper
                 elevation={1}
-                sx={{ 
-                  p: 1.5, 
-                  bgcolor: msg.speaker === 'player' ? 'primary.light' : 'grey.100',
-                  color: msg.speaker === 'player' ? 'primary.contrastText' : 'text.primary'
-                }}
+                sx={{ p: 1.5, bgcolor: msg.speaker === 'player' ? 'primary.light' : 'grey.100', color: msg.speaker === 'player' ? 'primary.contrastText' : 'text.primary' }}
               >
                 <Typography variant="body2">
                   {msg.speaker === 'player' ? msg.playerText : msg.npcResponse}
@@ -136,9 +123,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
               </Paper>
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
                 {msg.speaker === 'player' ? 'You' : npc.name} • {new Date(msg.timestamp).toLocaleTimeString()}
-                {msg.speaker === 'npc' && msg.affinityDelta && (
-                  <Typography variant="caption" component="span" sx={{ ml: 1, color: msg.affinityDelta > 0 ? 'success.main' : 'error.main' }}>
-                    ({msg.affinityDelta > 0 ? '+' : ''}{msg.affinityDelta} Rel)
+                {msg.speaker === 'npc' && msg.relationshipChange && (
+                  <Typography variant="caption" component="span" sx={{ ml: 1, color: msg.relationshipChange > 0 ? 'success.main' : 'error.main' }}>
+                    ({msg.relationshipChange > 0 ? '+' : ''}{msg.relationshipChange} Rel)
                   </Typography>
                 )}
               </Typography>
@@ -151,12 +138,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         )}
       </Paper>
 
-      {/* Available Dialogue Choices */}
       {availableDialogueChoices.length > 0 && (
         <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Conversation Topics
-          </Typography>
+          <Typography variant="subtitle2" gutterBottom>Conversation Topics</Typography>
           <Grid container spacing={1}>
             {availableDialogueChoices.map((choice: MockDialogue) => (
               <Grid item key={choice.id}>
@@ -179,7 +163,6 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
 
       <Divider sx={{ my: 2 }} />
 
-      {/* Free Text Input */}
       <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField
           fullWidth
@@ -187,12 +170,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           placeholder={`Type a message to ${npc.name}...`}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSendFreeTextMessage();
-            }
-          }}
+          onKeyPress={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendFreeTextMessage(); } }}
         />
         <Button
           variant="contained"
@@ -205,8 +183,6 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
       </Box>
     </Box>
   );
-};;;;
-
-NPCDialogueTab.displayName = 'NPCDialogueTab';
+};
 
 export default React.memo(NPCDialogueTab);

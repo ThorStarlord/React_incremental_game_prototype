@@ -6,7 +6,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Grid, // Keep Grid for mobile or other potential uses, though not for main desktop layout
   Paper,
   Typography,
   Button,
@@ -17,6 +16,7 @@ import {
   useMediaQuery,
   CircularProgress,
   Alert,
+  Grid, // Import Grid as it might be used by NPCListView
 } from '@mui/material';
 import {
   Home,
@@ -27,10 +27,11 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { 
-  selectNPCs, 
-  selectNPCById, 
-  fetchNPCsThunk,
+// FIXED: Changed fetchNPCsThunk to initializeNPCsThunk
+import {
+  selectNPCs,
+  selectNPCById,
+  initializeNPCsThunk,
   selectNPCLoading,
   selectNPCError
 } from '../features/NPCs';
@@ -42,27 +43,25 @@ const NPCsPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const dispatch = useAppDispatch();
-  
+
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedNPCId, setSelectedNPCId] = useState<string | null>(npcId || null);
-  
+
   const npcs = useAppSelector(selectNPCs);
   const isLoading = useAppSelector(selectNPCLoading);
   const error = useAppSelector(selectNPCError);
-  const selectedNPC = useAppSelector(state => 
+  const selectedNPC = useAppSelector(state =>
     selectedNPCId ? selectNPCById(state, selectedNPCId) : null
   );
 
   useEffect(() => {
-    dispatch(fetchNPCsThunk());
+    // FIXED: Dispatch the correct thunk to load NPC data
+    dispatch(initializeNPCsThunk());
   }, [dispatch]);
 
   useEffect(() => {
-    // Directly sync selectedNPCId state with the npcId from the URL.
-    // If npcId from URL exists, set selectedNPCId to it.
-    // If npcId from URL is undefined (e.g., navigated to /game/npcs), set selectedNPCId to null.
     setSelectedNPCId(npcId || null);
-  }, [npcId]); // Only re-run when the npcId from the URL (useParams) changes
+  }, [npcId]);
 
   const handleSelectNPC = (id: string) => {
     setSelectedNPCId(id);
@@ -97,12 +96,8 @@ const NPCsPage: React.FC = () => {
       </Box>
     );
   }
-
-  // Mobile view: (Remains largely the same, shows list or panel based on selection, but panel needs to be implemented)
-  // For now, mobile view will show NPCListView. If an NPC is selected, it shows "Back to NPCs".
-  // The actual display of NPCPanelContainer on mobile would typically involve navigating to a new screen
-  // or a more complex conditional rendering within this Box.
-  // The current request is focused on Desktop layout.
+  
+  // The rest of the component remains the same...
   if (isMobile) {
     return (
       <Box sx={{ p: 2, height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -162,8 +157,8 @@ const NPCsPage: React.FC = () => {
           ) : hasNPCs ? (
             <NPCListView
               onSelectNPC={handleSelectNPC}
-              selectedNPCId={selectedNPCId || undefined} // Pass undefined if null
-              viewMode={viewMode} // Consider if viewMode toggle is needed for mobile list
+              selectedNPCId={selectedNPCId || undefined}
+              viewMode={viewMode}
             />
           ) : (
             <Paper sx={{ p: 3, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -181,11 +176,9 @@ const NPCsPage: React.FC = () => {
     );
   }
 
-  // Desktop view: Full screen panel or full screen list
   return (
     <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      {/* Desktop Header */}
-      <Box sx={{ mb: 2 /* Reduced margin slightly */ }}>
+      <Box sx={{ mb: 2 }}>
         <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
           <Link
             color="inherit"
@@ -227,7 +220,7 @@ const NPCsPage: React.FC = () => {
             {selectedNPCId && selectedNPC ? selectedNPC.name : 'NPC Directory'}
           </Typography>
           
-          {hasNPCs && !selectedNPCId && ( // Show view mode toggle only when NPC list is visible
+          {hasNPCs && !selectedNPCId && (
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 variant={viewMode === 'grid' ? 'contained' : 'outlined'}
@@ -247,7 +240,7 @@ const NPCsPage: React.FC = () => {
               </Button>
             </Box>
           )}
-           {selectedNPCId && selectedNPC && ( // Show Back to List button when an NPC panel is visible
+           {selectedNPCId && selectedNPC && (
             <Button
               startIcon={<ArrowBack />}
               onClick={handleBackToList}
@@ -259,18 +252,15 @@ const NPCsPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Desktop Content Area: Full screen panel or full screen list */}
-      <Box sx={{ flexGrow: 1, overflowY: 'auto' /* Let Paper handle its own scroll if needed */ }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
         {hasNPCs ? (
           selectedNPCId && selectedNPC ? (
             <Fade in={true} timeout={300} key={selectedNPCId}>
-              {/* Paper for NPCPanelContainer to fill height and manage its own scroll */}
               <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <NPCPanelContainer npcId={selectedNPCId} />
               </Paper>
             </Fade>
           ) : (
-            // Paper for NPCListView to fill height and manage its own scroll
             <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
               <NPCListView
                 onSelectNPC={handleSelectNPC}
@@ -280,7 +270,6 @@ const NPCsPage: React.FC = () => {
             </Paper>
           )
         ) : (
-          // No NPCs available message
           <Paper 
             sx={{ 
               height: '100%', 

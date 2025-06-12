@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -18,66 +18,68 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import InfoIcon from '@mui/icons-material/Info';
 import Panel from '../../../../shared/components/layout/Panel';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+// FIXED: Importing correct selectors from the right files
 import {
   selectTraits,
   selectTraitLoading,
   selectTraitError,
-  selectEquippedTraitObjects,
-  selectPermanentTraitObjects,
-  selectAvailableTraitObjects
+  selectEquippedTraits,
+  selectAcquiredTraitObjects
 } from '../../state/TraitsSelectors';
-import { equipTrait, unequipTrait } from '../../state/TraitsSlice';
+import {
+  selectPermanentTraits as selectPermanentTraitIds, // Renamed to clarify it returns IDs
+  selectPlayerTraitSlots
+} from '../../../Player/state/PlayerSelectors';
+// FIXED: Importing actions from the correct slice (PlayerSlice)
+import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import { Trait } from '../../state/TraitsTypes';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import AvailableTraitList from './AvailableTraitList';
 
-/**
- * Props for the IntegratedTraitsPanel component
- */
 interface IntegratedTraitsPanelProps {
-  /** Function to close the panel */
   onClose: () => void;
 }
 
-/**
- * Props for the TraitItem component
- */
 interface TraitItemProps {
   trait: Trait;
   isEquipped?: boolean;
   isPermanent?: boolean;
 }
 
-/**
- * IntegratedTraitsPanel - Comprehensive panel for managing character traits
- * 
- * Allows players to view, equip, and manage their character traits in a single interface.
- * Provides information about trait effects and requirements.
- */
 const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<number>(0);
   const [selectedTrait, setSelectedTrait] = useState<Trait | null>(null);
 
-  // Select state including loading and error
+  // Correctly use selectors
   const allTraitsData = useAppSelector(selectTraits);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  
-  // Create hardcoded trait slots since Player doesn't export trait slots
-  const totalSlots = 6; // Standard number of trait slots
-  const unlockedSlots = 3; // Default unlocked slots
 
-  // Use selectors that return full trait objects
-  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
-  const permanentTraits = useAppSelector(selectPermanentTraitObjects);
-  const availableTraits = useAppSelector(selectAvailableTraitObjects);
+  const equippedTraits = useAppSelector(selectEquippedTraits);
+  const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
+  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const playerSlots = useAppSelector(selectPlayerTraitSlots);
+
+  // Get full trait objects for permanent traits
+  const permanentTraits = React.useMemo(() => {
+    return permanentTraitIds.map(id => allTraitsData[id]).filter(Boolean) as Trait[];
+  }, [permanentTraitIds, allTraitsData]);
   
+  // Get traits available for equipping (known but not equipped or permanent)
+  const availableTraits = React.useMemo(() => {
+    const equippedIds = equippedTraits.map(t => t.id);
+    return acquiredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
+  }, [acquiredTraits, equippedTraits, permanentTraitIds]);
+
+  const unlockedSlotCount = playerSlots.filter(s => !s.isLocked).length;
   const usedSlots = equippedTraits.length;
 
   useEffect(() => {
-    dispatch(fetchTraitsThunk());
-  }, [dispatch]);
+    if (Object.keys(allTraitsData).length === 0 && !isLoading) {
+      dispatch(fetchTraitsThunk());
+    }
+  }, [dispatch, allTraitsData, isLoading]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number): void => {
     setActiveTab(newValue);
@@ -85,10 +87,10 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   };
 
   const TraitItem: React.FC<TraitItemProps> = ({ trait, isEquipped = false, isPermanent = false }) => (
-    <Paper 
+    <Paper
       elevation={1}
-      sx={{ 
-        p: 2, 
+      sx={{
+        p: 2,
         cursor: 'pointer',
         border: selectedTrait?.id === trait.id ? '2px solid' : '1px solid',
         borderColor: selectedTrait?.id === trait.id ? 'primary.main' : 'divider',
@@ -98,112 +100,46 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
     >
       <Typography variant="subtitle1" fontWeight="medium">{trait.name}</Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-        {trait.description?.substring(0, 60)}
-        {trait.description?.length > 60 ? '...' : ''}
+        {trait.description?.substring(0, 60)}{trait.description?.length > 60 ? '...' : ''}
       </Typography>
-      
-      {isEquipped && (
-        <Chip 
-          label="Equipped" 
-          color="primary" 
-          size="small"
-          sx={{ mr: 1 }} 
-        />
-      )}
-      {isPermanent && (
-        <Chip 
-          label="Permanent" 
-          color="success" 
-          size="small" 
-        />
-      )}
+      {isEquipped && (<Chip label="Equipped" color="primary" size="small" sx={{ mr: 1 }} />)}
+      {isPermanent && (<Chip label="Permanent" color="success" size="small" />)}
     </Paper>
   );
 
-  // --- Render Logic ---
-
-  // Handle Loading State
+  const panelTitle = (
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <AutoFixHighIcon sx={{ mr: 1 }} />
+      <Typography variant="h6">Character Traits</Typography>
+      {!isLoading && !error && (
+        <Chip
+          size="small"
+          label={`${usedSlots}/${unlockedSlotCount}`}
+          color="primary"
+          sx={{ ml: 2 }}
+        />
+      )}
+    </Box>
+  );
+  
   if (isLoading) {
-    return (
-      <Panel 
-        title={
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <AutoFixHighIcon sx={{ mr: 1 }} />
-            <Typography variant="h6">Character Traits</Typography>
-          </Box>
-        }
-      >
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3, minHeight: '150px' }}>
-          <CircularProgress />
-          <Typography sx={{ ml: 2 }} color="text.secondary">Loading Traits...</Typography>
-        </Box>
-      </Panel>
-    );
+    return <Panel title={panelTitle}><Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box></Panel>;
   }
 
-  // Handle Error State
   if (error) {
-     return (
-      <Panel 
-        title={
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <AutoFixHighIcon sx={{ mr: 1 }} />
-            <Typography variant="h6">Character Traits</Typography>
-          </Box>
-        }
-      >
-        <Alert severity="error" sx={{ m: 1 }}>
-           Failed to load trait data: {error}
-        </Alert>
-      </Panel>
-    );
+     return <Panel title={panelTitle}><Alert severity="error" sx={{ m: 1 }}>Failed to load trait data: {error}</Alert></Panel>;
   }
 
-  // Handle Case Where Data Might Be Empty After Loading
-  if (!isLoading && !error && allTraitsData && Object.keys(allTraitsData).length === 0) {
-     return (
-      <Panel 
-        title={
-         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-           <AutoFixHighIcon sx={{ mr: 1 }} />
-           <Typography variant="h6">Character Traits</Typography>
-         </Box>
-        }
-      >
-        <Alert severity="warning" sx={{ m: 1 }}>No trait definitions loaded.</Alert>
-      </Panel>
-    );
+  if (!isLoading && Object.keys(allTraitsData).length === 0) {
+     return <Panel title={panelTitle}><Alert severity="warning" sx={{ m: 1 }}>No trait definitions loaded.</Alert></Panel>;
   }
 
   return (
-    <Panel 
-      title={
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <AutoFixHighIcon sx={{ mr: 1 }} />
-          <Typography variant="h6">Character Traits</Typography>
-          <Chip 
-            size="small"
-            label={`${usedSlots}/${unlockedSlots}`}
-            color="primary"
-            sx={{ ml: 2 }}
-          />
-        </Box>
-      }
-    >
-      <Tabs 
-        value={activeTab} 
-        onChange={handleTabChange}
-        variant="fullWidth"
-        sx={{ mb: 2 }}
-      >
+    <Panel title={panelTitle}>
+      <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" sx={{ mb: 2 }}>
         <Tab label="Equipped" />
-        <Tab label={
-          <Badge badgeContent={availableTraits.length} color="secondary">
-            Available
-          </Badge>
-        } />
+        <Tab label={ <Badge badgeContent={availableTraits.length} color="secondary">Available</Badge> } />
       </Tabs>
-      
       <Box role="tabpanel" hidden={activeTab !== 0}>
         {activeTab === 0 && (
           <>
@@ -216,17 +152,11 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
                 ))}
               </Grid>
             ) : (
-              <Alert severity="info">
-                You don't have any traits equipped. Equip traits to gain special abilities and bonuses.
-              </Alert>
+              <Alert severity="info">You have no traits equipped.</Alert>
             )}
-            
             {permanentTraits.length > 0 && (
               <Box sx={{ mt: 3 }}>
-                <Divider sx={{ my: 2 }}>
-                  <Chip label="Permanent Traits" />
-                </Divider>
-                
+                <Divider sx={{ my: 2 }}><Chip label="Permanent Traits" /></Divider>
                 <Grid container spacing={2}>
                   {permanentTraits.map(trait => (
                     <Grid item xs={12} sm={6} md={4} key={trait.id}>
@@ -239,15 +169,9 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
           </>
         )}
       </Box>
-      
-      <Box role="tabpanel" hidden={activeTab !== 1}>
-        {activeTab === 1 && (
-          <>
-            <AvailableTraitList />
-          </>
-        )}
+      <Box role="tabpanel" hidden={activeTab !== 1} sx={{p:1}}>
+        {activeTab === 1 && ( <AvailableTraitList /> )}
       </Box>
-      
       {selectedTrait && (
         <Box sx={{ mt: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -255,74 +179,40 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
             <Typography variant="h6">{selectedTrait.name} Details</Typography>
           </Box>
           <Typography variant="body1" gutterBottom>{selectedTrait.description}</Typography>
-          
           {selectedTrait.effects && (
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle2" gutterBottom>Effects:</Typography>
               <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                {Object.entries(selectedTrait.effects).map(([key, value], index) => (
-                  <li key={index}>
-                    <Typography variant="body2">
-                      {key}: {typeof value === 'number' ? (value > 0 ? '+' : '') + value : value}
-                    </Typography>
-                  </li>
-                ))}
+                {Object.entries(selectedTrait.effects).map(([key, value]) => (<li key={key}><Typography variant="body2">{key}: {typeof value === 'number' && value > 0 ? '+' : ''}{value}</Typography></li>))}
               </ul>
             </Box>
           )}
-          
           {selectedTrait.requirements && Object.keys(selectedTrait.requirements).length > 0 && (
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle2" color="warning.main" gutterBottom>Requirements:</Typography>
               <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                {Object.entries(selectedTrait.requirements).map(([key, value], index) => (
-                  <li key={index}>
-                    <Typography variant="body2">
-                      {`${key}: ${value}`}
-                    </Typography>
-                  </li>
-                ))}
+                {Object.entries(selectedTrait.requirements).map(([key, value]) => (<li key={key}><Typography variant="body2">{`${key}: ${value}`}</Typography></li>))}
               </ul>
             </Box>
           )}
         </Box>
       )}
-      
       <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'flex-end' }}>
-        {selectedTrait && activeTab === 1 && usedSlots < unlockedSlots && (
-          <Button 
-            variant="contained" 
-            color="primary"
-            onClick={() => {
-              // Find next available slot index
-              const slotIndex = usedSlots; // Simple slot assignment based on current count
-              dispatch(equipTrait({ traitId: selectedTrait.id, slotIndex }));
-              setSelectedTrait(null);
-            }}
-          >
-            Equip Selected
-          </Button>
+        {selectedTrait && activeTab === 1 && usedSlots < unlockedSlotCount && (
+          <Button variant="contained" color="primary" onClick={() => {
+            dispatch(equipTrait({ traitId: selectedTrait.id, slotIndex: -1 }));
+            setSelectedTrait(null);
+          }}>Equip Selected</Button>
         )}
-        
         {selectedTrait && activeTab === 0 && !permanentTraits.some(t => t.id === selectedTrait.id) && (
-          <Button 
-            variant="outlined" 
-            color="secondary"
-            onClick={() => {
-              // Find the slot index of the equipped trait
-              const slotIndex = equippedTraits.findIndex(t => t.id === selectedTrait.id);
-              if (slotIndex !== -1) {
-                dispatch(unequipTrait(slotIndex));
-                setSelectedTrait(null);
-              } else {
-                console.warn("Selected trait is not equipped.");
-              }
-            }}
-          >
-            Unequip Selected
-          </Button>
+          <Button variant="outlined" color="secondary" onClick={() => {
+            const slotIndex = equippedTraits.findIndex(t => t.id === selectedTrait.id);
+            if (slotIndex !== -1) {
+              dispatch(unequipTrait({ slotIndex }));
+              setSelectedTrait(null);
+            }
+          }}>Unequip Selected</Button>
         )}
-        
         <Button onClick={onClose} variant="outlined">Close</Button>
       </Stack>
     </Panel>

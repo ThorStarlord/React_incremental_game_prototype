@@ -7,15 +7,20 @@ import React, { useMemo, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
 import type { Trait, TraitSlot } from '../../../Traits/state/TraitsTypes';
-import { 
+
+// FIXED: Importing Trait-specific selectors from the Traits feature
+import {
   selectAllTraits,
-  selectTraitsLoading,
-  selectTraitsError,
-  selectEquippedTraitObjects
+  selectTraitLoading,
+  selectTraitError,
 } from '../../../Traits/state/TraitsSelectors';
-import { 
+
+// FIXED: Importing Player-specific selectors from the Player feature
+import {
   selectPermanentTraits,
-  selectMaxTraitSlots
+  selectMaxTraitSlots,
+  selectPlayerTraitSlots, // Use the correct selector for slots
+  selectEquippedTraits,     // Use the correct selector for equipped objects
 } from '../../state/PlayerSelectors';
 
 /**
@@ -32,63 +37,41 @@ interface PlayerTraitsContainerProps {
  */
 export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   showLoading = false,
-  onTraitChange, 
+  onTraitChange,
   className,
 }) => {
   const dispatch = useAppDispatch();
-  
-  // Use proper selectors for trait data
-  const permanentTraitIds = useAppSelector(selectPermanentTraits); 
-  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
+
+  // Use proper selectors from their correct locations
+  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const equippedTraits = useAppSelector(selectEquippedTraits);
   const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
   const allTraits = useAppSelector(selectAllTraits);
-  const isLoading = useAppSelector(selectTraitsLoading);
-  const error = useAppSelector(selectTraitsError); 
+  const isLoading = useAppSelector(selectTraitLoading);
+  const error = useAppSelector(selectTraitError);
+  const traitSlots = useAppSelector(selectPlayerTraitSlots);
 
-  // Create trait slots using proper TraitSlot interface
-  const traitSlots: TraitSlot[] = useMemo(() => {
-    const slots: TraitSlot[] = [];
-    
-    for (let i = 0; i < maxTraitSlots; i++) {
-      const equippedTrait = equippedTraits.find(trait => trait && trait.slotIndex === i);
-      
-      slots.push({
-        id: `slot-${i}`,
-        slotIndex: i,
-        traitId: equippedTrait?.id || null,
-        isLocked: i >= 3, // First 3 slots unlocked by default
-        unlockRequirement: i >= 3 ? 'Resonance Level ' + Math.ceil(i / 2) : undefined
-      });
-    }
-    
-    return slots;
-  }, [maxTraitSlots, equippedTraits]);
-
-  // Get permanent traits as Trait objects
-  const permanentTraits = useMemo(() => {
-    return permanentTraitIds
-      .map((traitId: string) => allTraits[traitId]) 
-      .filter(Boolean); 
-  }, [permanentTraitIds, allTraits]);
-
-  // Get available traits (for future trait selection)
+  // Get available traits (all known traits that aren't equipped or permanent)
   const availableTraits = useMemo(() => {
-    return Object.values(allTraits);
-  }, [allTraits]);
+    const equippedIds = equippedTraits.map(t => t.id);
+    const permanentIds = permanentTraitIds;
+    const allAcquiredTraits = Object.values(allTraits); // Assuming all traits in store are "acquired" for this context
+    return allAcquiredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentIds.includes(trait.id));
+  }, [allTraits, equippedTraits, permanentTraitIds]);
+
 
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
-    // TODO: Implement trait equipping when the correct action is available
     console.log(`Equipping trait ${traitId} to slot ${slotIndex} - functionality pending`);
     onTraitChange?.(traitId);
   }, [onTraitChange]);
 
-  const handleUnequipTrait = useCallback((slotIndex: number) => { 
-    const slot = traitSlots.find(s => s.slotIndex === slotIndex); 
+  const handleUnequipTrait = useCallback((slotIndex: number) => {
+    const slot = traitSlots.find(s => s.slotIndex === slotIndex);
     if (slot && slot.traitId) {
       console.log(`Unequipping trait ${slot.traitId} from slot ${slotIndex} - functionality pending`);
       onTraitChange?.(slot.traitId);
     }
-  }, [traitSlots, onTraitChange]); 
+  }, [traitSlots, onTraitChange]);
 
   const handleTraitSelect = useCallback((traitId: string) => {
     console.log(`Trait selected: ${traitId} - functionality pending`);

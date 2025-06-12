@@ -43,7 +43,7 @@ import {
 } from '../features/Player/state/PlayerSelectors';
 import { selectEssence } from '../features/Essence/state/EssenceSelectors';
 import { selectGameLoop } from '../features/GameLoop/state/GameLoopSelectors';
-import { selectEquippedTraitObjects } from '../features/Traits/state/TraitsSelectors';
+import { selectEquippedTraits } from '../features/Traits/state/TraitsSelectors';
 import { selectTraitsState } from '../features/Traits/state/TraitsSelectors';
 
 // Feature components
@@ -95,7 +95,7 @@ export const DashboardPage: React.FC = React.memo(() => {
   const resonanceLevel = useAppSelector(selectResonanceLevel);
   const essence = useAppSelector(selectEssence);
   const gameLoop = useAppSelector(selectGameLoop);
-  const traits = useAppSelector(selectEquippedTraitObjects);
+  const traits = useAppSelector(selectEquippedTraits);
   const traitsState = useAppSelector(selectTraitsState);
 
   // Computed dashboard statistics

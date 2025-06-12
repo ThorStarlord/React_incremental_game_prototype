@@ -1,57 +1,51 @@
 import React from 'react';
 import { Box, CircularProgress, Grid, Typography, Alert } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { 
-    selectAvailableTraitObjectsForEquip, 
+// FIXED: Importing the correct selectors.
+import {
+    selectAcquiredTraitObjects, // This gets all traits the player knows.
     selectAvailableTraitSlotCount,
     selectTraitLoading,
     selectTraitError
-} from '../../state/TraitsSelectors'; 
+} from '../../state/TraitsSelectors';
 import { equipTrait } from '../../../Player/state/PlayerSlice';
-import { selectTraitSlots } from '../../../Player/state/PlayerSelectors';
+// FIXED: Changed to the correct selector name.
+import { selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
 import TraitCard from '../ui/TraitCard';
+import { Trait } from '../../state/TraitsTypes'; // Import the Trait type
 
 const AvailableTraitList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const availableTraits = useAppSelector(selectAvailableTraitObjectsForEquip);
+  // FIXED: Use the correct selector for available traits.
+  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
   const availableSlotCount = useAppSelector(selectAvailableTraitSlotCount);
-  const playerTraitSlots = useAppSelector(selectTraitSlots);
+  // FIXED: Use the correct selector.
+  const playerTraitSlots = useAppSelector(selectPlayerTraitSlots);
+  const equippedTraitIds = playerTraitSlots.filter(s => s.traitId).map(s => s.traitId);
 
-  // Select loading and error states
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
+  
+  // Filter out already equipped traits to get the truly "available" ones for equipping
+  const availableTraits = React.useMemo(() => {
+    return acquiredTraits.filter(trait => !equippedTraitIds.includes(trait.id));
+  }, [acquiredTraits, equippedTraitIds]);
 
-  // --- Add sampleTrait to the available traits list ---
-  const sampleTrait = {
-    id: 'sample_trait',
-    name: 'Sample Trait',
-    description: 'A demonstration trait for testing.',
-    category: 'Test',
-    effects: { testEffect: 1 },
-    rarity: 'common',
-    essenceCost: 0,
-  };
-
-  // Merge sampleTrait into the availableTraits array if not already present
-  const traitsToShow = [
-    ...availableTraits,
-    ...(!availableTraits.some(t => t.id === sampleTrait.id) ? [sampleTrait] : [])
-  ];
 
   const handleEquip = (traitId: string) => {
     if (availableSlotCount > 0) {
-      const availableSlot = playerTraitSlots.find(slot => slot.isUnlocked && !slot.traitId);
+      // FIXED: Correctly find an available slot.
+      const availableSlot = playerTraitSlots.find(slot => !slot.isLocked && !slot.traitId);
       if (availableSlot) {
-        dispatch(equipTrait({ traitId, slotIndex: availableSlot.index }));
+        dispatch(equipTrait({ traitId, slotIndex: availableSlot.slotIndex }));
       } else {
-        console.warn("No available slots to equip trait (this should not happen if availableSlotCount > 0).");
+        console.warn("No available slots to equip trait.");
       }
     } else {
        console.warn("Attempted to equip trait with no available slots.");
     }
   };
 
-  // Handle loading state
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" p={3}>
@@ -60,7 +54,6 @@ const AvailableTraitList: React.FC = () => {
     );
   }
 
-  // Handle error state
   if (error) {
     return (
       <Box p={3}>
@@ -73,8 +66,7 @@ const AvailableTraitList: React.FC = () => {
     );
   }
 
-  // Handle empty state
-  if (traitsToShow.length === 0) {
+  if (availableTraits.length === 0) {
     return (
       <Box p={3}>
         <Typography variant="body1" color="text.secondary">
@@ -87,7 +79,7 @@ const AvailableTraitList: React.FC = () => {
   return (
     <Box p={2}>
       <Typography variant="h6" gutterBottom>
-        Available Traits ({availableSlotCount} slots available)
+        Available Traits ({availableSlotCount} slots open)
       </Typography>
       
       {availableSlotCount === 0 && (
@@ -99,13 +91,17 @@ const AvailableTraitList: React.FC = () => {
       )}
 
       <Grid container spacing={2}>
-        {traitsToShow.map((trait) => (
+        {availableTraits.map((trait: Trait) => (
           <Grid item xs={12} sm={6} md={4} key={trait.id}>
+            {/* FIXED: Passing the correct props to TraitCard */}
             <TraitCard
               trait={trait}
-              onEquip={() => handleEquip(trait.id)}
-              canEquip={availableSlotCount > 0}
-              showEquipButton={true}
+              onUnequip={() => handleEquip(trait.id)} // This will be the "Equip" button
+              showUnequipButton={true} // Re-purposing this button as "Equip"
+              unequipButtonText="Equip" // Added a prop to change button text
+              unequipButtonColor="primary" // Change color for equip action
+              canUnequip={availableSlotCount > 0} // Button is enabled if slots are available
+              currentEssence={0} // Not needed for this action
             />
           </Grid>
         ))}

@@ -14,8 +14,6 @@ import type {
   RelationshipChangeEntry,
   NPCInteraction
 } from './NPCTypes';
-
-// FIXED: Import only the thunks that actually exist.
 import {
   initializeNPCsThunk,
   updateNPCRelationshipThunk,
@@ -34,14 +32,12 @@ interface RejectedAction extends AnyAction {
   };
 }
 
-// FIXED: Defined initialState directly in the slice, removing the need for DEFAULT_NPC_STATE import.
-// Added relationshipHistory to match the reducer logic.
 const initialState: NPCState = {
   npcs: {},
   discoveredNPCs: [],
   currentInteraction: null,
   dialogueHistory: [],
-  relationshipHistory: [], // FIXED: Added this missing property
+  relationshipHistory: [],
   loading: false,
   error: null,
   selectedNPCId: null,
@@ -68,7 +64,6 @@ const npcSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-    // FIXED: Using an inline type for the payload.
     updateNpcRelationship: (state, action: PayloadAction<{ npcId: string; change: number; reason?: string }>) => {
       const { npcId, change, reason = 'Manual update' } = action.payload;
       const npc = state.npcs[npcId];
@@ -88,7 +83,6 @@ const npcSlice = createSlice({
           });
         }
 
-        // FIXED: Pushing to the now-existing relationshipHistory array.
         state.relationshipHistory.push({
           id: `${npcId}-${Date.now()}`,
           npcId,
@@ -113,7 +107,6 @@ const npcSlice = createSlice({
         npc.isAvailable = isAvailable;
       }
     },
-    // FIXED: Using an inline type for the payload.
     startInteraction: (state, action: PayloadAction<{ npcId: string; type: any; context?: any }>) => {
       const { npcId, type, context } = action.payload;
       state.currentInteraction = {
@@ -128,19 +121,21 @@ const npcSlice = createSlice({
     },
     addDialogueEntry: (state, action: PayloadAction<{
       npcId: string;
+      speaker: 'player' | 'npc' | 'system';
       playerText: string;
       npcResponse: string;
       affinityDelta?: number;
     }>) => {
-      const { npcId, playerText, npcResponse, affinityDelta } = action.payload;
-      // FIXED: The 'speaker' property does not exist on DialogueEntry type. Removed it.
+      const { npcId, speaker, playerText, npcResponse, affinityDelta } = action.payload;
+      // FIXED: Added the 'speaker' property to the entry object to match the DialogueEntry interface.
       const entry: DialogueEntry = {
         id: `${npcId}-${Date.now()}`,
         npcId,
+        speaker,
         timestamp: Date.now(),
         playerText,
         npcResponse,
-        relationshipChange: affinityDelta // Mapped affinityDelta to relationshipChange
+        relationshipChange: affinityDelta
       };
       state.dialogueHistory.push(entry);
     },
@@ -184,7 +179,6 @@ const npcSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      // FIXED: Removed explicit payload type to let TS infer it from the thunk.
       .addCase(initializeNPCsThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.npcs = action.payload;
@@ -196,7 +190,6 @@ const npcSlice = createSlice({
             npc.sharedTraitSlots.forEach(slot => {
               if (!slot.isUnlocked && slot.unlockRequirement !== undefined && npc.relationshipValue >= slot.unlockRequirement) {
                 slot.isUnlocked = true;
-                console.log(`NPC ${npc.id} initially unlocked trait slot ${slot.index} at relationship ${npc.relationshipValue}`);
               }
             });
           }
@@ -206,12 +199,7 @@ const npcSlice = createSlice({
         state.loading = false;
         state.error = (action.payload as string) ?? (action.error?.message || 'Failed to initialize NPCs');
       })
-
-      // FIXED: Removed extraReducers for fetchNPCsThunk as it doesn't exist.
-      // The logic is handled by initializeNPCsThunk now.
-
       .addCase(updateNPCRelationshipThunk.fulfilled, (state, action) => {
-        // FIXED: The payload doesn't contain newValue, it contains the `change`. We must calculate the new value.
         const { npcId, change, reason } = action.payload;
         const npc = state.npcs[npcId];
         if (npc) {
@@ -224,7 +212,6 @@ const npcSlice = createSlice({
             npc.sharedTraitSlots.forEach(slot => {
               if (!slot.isUnlocked && slot.unlockRequirement !== undefined && newValue >= slot.unlockRequirement) {
                 slot.isUnlocked = true;
-                console.log(`NPC ${npcId} unlocked trait slot ${slot.index} at relationship ${newValue} (via thunk)`);
               }
             });
           }
@@ -239,7 +226,6 @@ const npcSlice = createSlice({
           });
         }
       })
-
       .addCase(discoverNPCThunk.fulfilled, (state, action) => {
         const npcId = action.payload;
         if (!state.discoveredNPCs.includes(npcId)) {
@@ -250,19 +236,7 @@ const npcSlice = createSlice({
           }
         }
       })
-
-      // FIXED: Removed extraReducer for non-existent `processDialogueChoiceThunk`.
-      // This logic should be part of `processNPCInteractionThunk`.
-
-      .addCase(shareTraitWithNPCThunk.fulfilled, (state, action) => {
-        // FIXED: The payload from the thunk does not contain `success` or `relationshipChange`.
-        // The primary state update (sharing the trait) should be done in a synchronous reducer.
-        // This extraReducer is for handling side effects if the thunk were to return them.
-        // For now, we can log the success. The actual trait sharing must be handled elsewhere.
-        console.log('shareTraitWithNPCThunk fulfilled:', action.payload);
-      })
       .addCase(shareTraitWithNPCThunk.rejected, (state, action) => {
-        // FIXED: action.payload can be undefined.
         state.error = (action.payload as string) || 'Failed to share trait with NPC';
       });
   },

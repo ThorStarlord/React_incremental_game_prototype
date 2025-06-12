@@ -49,6 +49,7 @@ export interface NPC {
   completedQuests: string[];
   traits?: Record<string, NPCTraitInfo>;
   availableTraits: string[];
+  innateTraits?: string[]; // <--- ADD THIS LINE
   sharedTraitSlots?: NPCSharedTraitSlot[];
   inventory?: NPCInventory;
   services?: NPCService[];
@@ -162,6 +163,7 @@ export interface DialogueEntry {
   id: string;
   npcId: string;
   timestamp: number;
+  speaker: 'player' | 'npc' | 'system'; // ADD THIS LINE
   playerText: string;
   npcResponse: string;
   relationshipChange?: number;

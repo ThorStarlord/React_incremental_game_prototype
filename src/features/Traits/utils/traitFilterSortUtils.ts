@@ -1,4 +1,12 @@
-import { Trait, TraitFilters } from '../state/TraitsTypes'; // Assuming TraitDefinition is now Trait, and TraitFilters is moved
+// FIXED: Removed the non-existent 'TraitFilters' from the import.
+import { Trait } from '../state/TraitsTypes';
+
+// FIXED: Defined the missing interface directly in this file.
+interface TraitFilters {
+  type?: string;
+  maxCost?: number;
+  searchTerm?: string;
+}
 
 /**
  * Filters traits based on specified criteria
@@ -56,7 +64,7 @@ export const sortTraits = (
   sortBy: keyof Trait = 'name',
   ascending: boolean = true
 ): [string, Trait][] => {
-  return Object.entries(traits).sort(([idA, traitA], [idB, traitB]) => {
+  return Object.entries(traits).sort(([_idA, traitA], [_idB, traitB]) => {
     const valueA = traitA[sortBy];
     const valueB = traitB[sortBy];
 

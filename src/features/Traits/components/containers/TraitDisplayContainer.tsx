@@ -3,12 +3,17 @@
  * @description Container component for displaying player traits in the right sidebar.
  * Connects to the Redux store to fetch trait data and passes it to the UI component.
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Box, Typography, Paper, Chip, Divider } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectAcquiredTraits, selectTraits } from '../../state/TraitsSlice';
-import { selectEquippedTraitIds } from '../../../Player/state/PlayerSelectors'; // Import from PlayerSelectors
+// FIXED: Importing selectors from the correct file: TraitsSelectors.ts
+import {
+  selectTraits,
+  selectAcquiredTraits, // This selector gives IDs of all known traits
+  selectEquippedTraits // This gives full objects of equipped traits
+} from '../../state/TraitsSelectors';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
+import { Trait } from '../../state/TraitsTypes'; // Import the Trait type
 
 /**
  * TraitDisplayContainer Component
@@ -26,7 +31,10 @@ const TraitDisplayContainer: React.FC = () => {
   // Select the necessary data from the Redux store
   const allTraits = useAppSelector(selectTraits);
   const acquiredTraitIds = useAppSelector(selectAcquiredTraits);
-  const equippedTraitIds = useAppSelector(selectEquippedTraitIds);
+  const equippedTraits = useAppSelector(selectEquippedTraits); // This is an array of Trait objects
+
+  // Memoize the IDs of equipped traits for easy lookup
+  const equippedTraitIds = useMemo(() => equippedTraits.map(trait => trait.id), [equippedTraits]);
 
   return (
     <Paper sx={{ p: 2 }}>
@@ -35,19 +43,19 @@ const TraitDisplayContainer: React.FC = () => {
       {/* Equipped Traits Section */}
       <Box sx={{ mb: 2 }}>
         <Typography variant="subtitle2" color="primary" gutterBottom>
-          Equipped Traits ({equippedTraitIds.length})
+          Equipped Traits ({equippedTraits.length})
         </Typography>
         
-        {equippedTraitIds.length > 0 ? (
-          equippedTraitIds.map(traitId => {
-            const trait = allTraits[traitId];
-            return trait ? (
-              <Box key={traitId} sx={{ mb: 1 }}>
-                <Typography variant="body2" fontWeight="medium">{trait.name}</Typography>
-                <Typography variant="caption" color="text.secondary">{trait.description.substring(0, 60)}...</Typography>
-              </Box>
-            ) : null;
-          })
+        {equippedTraits.length > 0 ? (
+          // We already have the full Trait objects, so we can map directly
+          equippedTraits.map((trait: Trait) => (
+            <Box key={trait.id} sx={{ mb: 1 }}>
+              <Typography variant="body2" fontWeight="medium">{trait.name}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {trait.description.substring(0, 60)}...
+              </Typography>
+            </Box>
+          ))
         ) : (
           <Typography variant="body2" color="text.secondary">
             No traits equipped
@@ -63,7 +71,8 @@ const TraitDisplayContainer: React.FC = () => {
           Available Traits
         </Typography>
         <Chip 
-          size="small" 
+          size="small"
+          // Calculate available by subtracting equipped from total acquired
           label={`${acquiredTraitIds.length - equippedTraitIds.length} available`} 
         />
       </Box>

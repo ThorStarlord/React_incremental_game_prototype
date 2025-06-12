@@ -1,6 +1,6 @@
 /**
  * Player Constants
- * 
+ *
  * Centralized constants for player mechanics, formulas, and limits.
  * Following best practices from the coding guidelines.
  */
@@ -71,8 +71,6 @@ export const PLAYER_BASE_STATS = {
   criticalDamage: 1.5,
 } satisfies Record<string, number>;
 
-
-
 export const INITIAL_ATTRIBUTES: PlayerAttributes = {
   strength: 10,
   dexterity: 10,
@@ -99,5 +97,20 @@ export const BASE_STATS: PlayerStats = {
 export const MAX_TRAIT_SLOTS = 5;
 export const INITIAL_TRAIT_SLOTS = 3;
 
-// Attribute point cost or effect scaling can be defined here if needed
-// Example: export const ATTRIBUTE_HEALTH_SCALE = 10; // 1 constitution = 10 maxHealth
+export const TRAIT_EFFECT_CONSTANTS = {
+  DIRECT_STATS: [
+    'health', 'maxHealth', 'mana', 'maxMana',
+    'attack', 'defense', 'speed',
+    'healthRegen', 'manaRegen',
+    'criticalChance', 'criticalDamage',
+    'strength', 'dexterity', 'intelligence', 'constitution', 'wisdom', 'charisma'
+  ],
+  SPECIAL_EFFECTS: [
+    'shopDiscount', 'skillXpMultiplier', 'essenceGainMultiplier',
+    'essenceSiphonChance', 'essenceSiphonAmount',
+    'relationshipGainMultiplier', 'essenceGenerationMultiplier',
+    'dodgeChance', 'passiveRelationshipGrowth', 'learningSpeed',
+    'knowledgeEssence', 'craftingQualityBonus', 'stealthEffectiveness',
+    'magicDamageBonus'
+  ],
+} as const;

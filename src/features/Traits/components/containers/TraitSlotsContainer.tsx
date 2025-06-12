@@ -1,43 +1,38 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { 
-  selectTraits, 
-  selectAvailableTraitObjects, 
-  selectEquippedTraitObjects,
+// FIXED: Importing the correct selectors
+import {
+  selectTraits,
+  selectAcquiredTraitObjects, // This gets all traits the player has learned
+  selectEquippedTraits,
   selectTraitLoading,
-  selectTraitError 
+  selectTraitError
 } from '../../state/TraitsSelectors';
-import { selectPermanentTraits } from '../../../Player/state/PlayerSelectors';
+// FIXED: Importing from PlayerSelectors to get player-specific data
+import {
+  selectPermanentTraits,
+  selectPlayerTraitSlots // Use this selector to get the official slot structure
+} from '../../../Player/state/PlayerSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice';
-import { equipTrait, unequipTrait } from '../../state/TraitsSlice';
+// FIXED: Importing actions from the correct slice (PlayerSlice)
+import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks';
 import TraitSlots from '../ui/TraitSlots';
 
 export const TraitSlotsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const allTraits = useAppSelector(selectTraits);
-  const availableTraits = useAppSelector(selectAvailableTraitObjects);
-  const equippedTraitObjects = useAppSelector(selectEquippedTraitObjects);
+  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const equippedTraitObjects = useAppSelector(selectEquippedTraits);
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
   const essence = useAppSelector(selectCurrentEssence);
   const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
 
-  // Create trait slots array - hardcoded structure since Player doesn't export trait slots
-  const traitSlots = useMemo(() => {
-    const totalSlots = 6; // Standard number of trait slots
-    const unlockedSlots = 3; // Default unlocked slots
-    
-    return Array.from({ length: totalSlots }, (_, index) => ({
-      id: `slot_${index}`,
-      index,
-      traitId: equippedTraitObjects[index]?.id || null,
-      isUnlocked: index < unlockedSlots,
-      unlockRequirement: index >= unlockedSlots ? `Unlock at slot ${index + 1}` : undefined
-    }));
-  }, [equippedTraitObjects]);
+  // FIXED: Use the official player trait slots from the selector
+  const traitSlots = useAppSelector(selectPlayerTraitSlots);
 
   const equippedTraitIds = useMemo(() => {
     return equippedTraitObjects.map(trait => trait.id);
@@ -52,11 +47,12 @@ export const TraitSlotsContainer: React.FC = () => {
   const onCloseSelector = useCallback(() => { setShowSelector(false); setActiveSlotId(null); setSelectedTraitId(null); }, []);
   const onSelectTrait = useCallback((traitId: string) => setSelectedTraitId(traitId), []);
 
-  const onConfirmAssign = useCallback(() => { 
+  const onConfirmAssign = useCallback(() => {
     if (selectedTraitId && activeSlotId) {
-      const targetSlot = traitSlots.find((s: any) => s.id === activeSlotId);
+      const targetSlot = traitSlots.find((s) => s.id === activeSlotId);
       if (targetSlot) {
-        dispatch(equipTrait({ traitId: selectedTraitId, slotIndex: targetSlot.index }));
+        // FIXED: Dispatching the correct equipTrait action from PlayerSlice
+        dispatch(equipTrait({ traitId: selectedTraitId, slotIndex: targetSlot.slotIndex }));
         dispatch(recalculateStatsThunk());
       }
     }
@@ -64,50 +60,55 @@ export const TraitSlotsContainer: React.FC = () => {
   }, [selectedTraitId, activeSlotId, dispatch, onCloseSelector, traitSlots]);
 
   const onRemove = useCallback((slotIndex: number) => {
-    dispatch(unequipTrait(slotIndex));
+    // FIXED: Dispatching the correct unequipTrait action from PlayerSlice
+    dispatch(unequipTrait({ slotIndex }));
     dispatch(recalculateStatsThunk());
   }, [dispatch]);
 
   const onCloseNotification = useCallback(() => setNotification(prev => ({ ...prev, show: false })), []);
 
   const eligibleTraitsForEquip = useMemo(() => {
-    return availableTraits.filter(trait => 
-      !equippedTraitIds.includes(trait.id) && 
-      !permanentTraitIds.includes(trait.id) 
+    // Use the `acquiredTraits` (all known traits) instead of the old `availableTraits`
+    return acquiredTraits.filter(trait =>
+      !equippedTraitIds.includes(trait.id) &&
+      !permanentTraitIds.includes(trait.id)
     );
-  }, [availableTraits, equippedTraitIds, permanentTraitIds]);
+  }, [acquiredTraits, equippedTraitIds, permanentTraitIds]);
 
+  // The props object passed to the UI component
   const traitSlotsProps = {
-    traitSlots: traitSlots,
-    equippedTraits: equippedTraitObjects, 
-    availableTraits: eligibleTraitsForEquip, 
-    permanentTraitIds, 
-    essence,
+    traitSlots,
+    equippedTraits: equippedTraitObjects,
+    availableTraits: eligibleTraitsForEquip,
+    onEquipTrait: onConfirmAssign,
+    onUnequipTrait: onRemove,
+    isInProximityToNPC,
+    // --- The following are props required by TraitSlotsUI that were missing or need defaults ---
     showSelector,
     notification,
     selectedTraitId,
     onOpenSelector,
     onCloseSelector,
     onSelectTrait,
-    onEquipTrait: onConfirmAssign,
-    onUnequipTrait: onRemove,
     onCloseNotification,
-    isInProximityToNPC,
-    onMakePermanent: (traitId: string) => { 
+    // Dummy props for deprecated functionality
+    permanentTraitIds,
+    essence,
+    onMakePermanent: (traitId: string) => {
       console.warn("MakePermanent UI clicked in TraitSlotsContainer, but action is deprecated. Trait ID:", traitId);
       setNotification({ show: true, message: "'Make Permanent' action here is deprecated. Resonate traits from NPCs to make them permanent.", severity: 'info' });
     },
-    confirmPermanent: { open: false, traitId: null }, 
+    confirmPermanent: { open: false, traitId: null },
     onConfirmPermanent: () => { console.warn("onConfirmPermanent called in TraitSlotsContainer, but action is deprecated."); },
     onCancelPermanent: () => { console.warn("onCancelPermanent called in TraitSlotsContainer, but action is deprecated."); },
   };
 
-  if (isLoading && Object.keys(allTraits).length === 0) { 
-    return <TraitSlots {...traitSlotsProps} />; 
+  if (isLoading && Object.keys(allTraits).length === 0) {
+    return <TraitSlots {...traitSlotsProps} />;
   }
   
   if (error) {
-    return <TraitSlots {...traitSlotsProps} />; 
+    return <TraitSlots {...traitSlotsProps} />;
   }
 
   return <TraitSlots {...traitSlotsProps} />;

@@ -4,7 +4,7 @@ import { selectEssenceState, selectCurrentEssence, selectGenerationRate, selectP
 import { selectGameLoop } from '../../GameLoop/state/GameLoopSelectors';
 import { gainEssence } from '../state/EssenceSlice';
 import { selectPermanentTraits } from '../../Player/state/PlayerSelectors';
-import { selectEquippedTraitObjects } from '../../Traits/state/TraitsSelectors';
+import { selectEquippedTraits } from '../../Player/state/PlayerSelectors';
 
 /**
  * Hook for managing essence generation mechanics
@@ -21,7 +21,7 @@ export const useEssenceGeneration = () => {
   
   // Get trait data for bonuses
   const permanentTraits = useAppSelector(selectPermanentTraits);
-  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
+  const equippedTraits = useAppSelector(selectEquippedTraits);
 
   // Calculate trait-based generation bonuses
   const calculateTraitBonus = useCallback((): number => {

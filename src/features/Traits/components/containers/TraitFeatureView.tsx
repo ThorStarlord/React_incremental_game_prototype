@@ -9,8 +9,8 @@ import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
 import { selectPlayer } from '../../../Player/state/PlayerSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
-import { selectTraits } from '../../state/TraitsSlice';
-import { selectAcquiredTraitObjects } from '../../state/TraitsSelectors';
+// FIXED: Changed the import path for selectTraits
+import { selectTraits, selectAcquiredTraitObjects } from '../../state/TraitsSelectors';
 import { TraitEffect } from '../../state/TraitsTypes';
 
 /**
@@ -26,7 +26,7 @@ const TraitSystemWrapper: React.FC = React.memo(() => {
 
   // Select required data from Redux store
   const player = useAppSelector(selectPlayer);
-  const allTraits = useAppSelector(selectTraits);
+  const allTraits = useAppSelector(selectTraits); // This import is now correct
   const acquiredTraitsObjects = useAppSelector(selectAcquiredTraitObjects);
   const currentEssence = useAppSelector(selectCurrentEssence);
 
@@ -45,6 +45,7 @@ const TraitSystemWrapper: React.FC = React.memo(() => {
 
   // Format trait effects for display
   const formatTraitEffects = useCallback((effects: unknown): string => {
+    if (!effects) return 'No effects';
     if (Array.isArray(effects)) {
       return effects
         .map((e: TraitEffect) => `${e.type}: ${e.magnitude > 0 ? '+' : ''}${e.magnitude}`)
@@ -75,7 +76,7 @@ const TraitSystemWrapper: React.FC = React.memo(() => {
       type: trait.category || 'unknown'
     })),
     onTraitLevelUp: handleTraitLevelUp,
-    pointsAvailable: 0, // TODO: Implement trait points system
+    pointsAvailable: 0,
   }), [acquiredTraitsObjects, formatTraitEffects, handleTraitLevelUp]);
 
   return (

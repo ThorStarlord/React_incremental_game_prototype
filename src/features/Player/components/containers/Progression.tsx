@@ -18,17 +18,18 @@ import {
   Psychology as SkillIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
-import { 
+// FIXED: Removed selectAvailableSkillPoints and corrected selectEquippedTraits to selectEquippedTraits
+import {
   selectTotalPlaytime,
   selectIsPlayerAlive,
   selectAvailableAttributePoints,
-  selectAvailableSkillPoints,
   selectResonanceLevel,
   selectMaxTraitSlots,
   selectPermanentTraits,
-  selectEquippedTraitObjects
+  selectEquippedTraits // Corrected name
 } from '../../state/PlayerSelectors';
 import { StatDisplay } from '../ui/StatDisplay';
+import { PlayerState } from '../../state/PlayerTypes'; // Import PlayerState to get availableSkillPoints
 
 interface ProgressionProps {
   showDetails?: boolean;
@@ -47,17 +48,18 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
   const totalPlaytime = useAppSelector(selectTotalPlaytime);
   const isAlive = useAppSelector(selectIsPlayerAlive);
   const attributePoints = useAppSelector(selectAvailableAttributePoints);
-  const skillPoints = useAppSelector(selectAvailableSkillPoints);
+  // FIXED: Get availableSkillPoints from the main player state
+  const skillPoints = useAppSelector((state: {player: PlayerState}) => state.player.availableSkillPoints);
   const resonanceLevel = useAppSelector(selectResonanceLevel);
   const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
   const permanentTraits = useAppSelector(selectPermanentTraits);
-  const equippedTraits = useAppSelector(selectEquippedTraitObjects);
+  const equippedTraits = useAppSelector(selectEquippedTraits); // Corrected selector
 
   // Format total playtime for display
   const formatPlaytime = (milliseconds: number): string => {
     const hours = Math.floor(milliseconds / (1000 * 60 * 60));
     const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     } else {
@@ -77,7 +79,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <TimeIcon color="primary" sx={{ mr: 1 }} />
             <Typography variant="h6">Character Progress</Typography>
           </Box>
-          
+
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <StatDisplay
@@ -86,7 +88,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
                 color="primary"
               />
             </Grid>
-            
+
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Status"
@@ -121,7 +123,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
             <PointsIcon color="warning" sx={{ mr: 1 }} />
             <Typography variant="h6">Available Points</Typography>
           </Box>
-          
+
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <StatDisplay
@@ -130,7 +132,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
                 color="warning"
               />
             </Grid>
-            
+
             <Grid item xs={12} sm={6}>
               <StatDisplay
                 label="Skill Points"
@@ -150,7 +152,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
               <SkillIcon color="secondary" sx={{ mr: 1 }} />
               <Typography variant="h6">Character Statistics</Typography>
             </Box>
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -158,7 +160,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <StatDisplay
                   label="Unspent Attribute Points"
@@ -166,7 +168,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
                   color={attributePoints > 0 ? 'warning' : 'secondary'}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <StatDisplay
                   label="Unspent Skill Points"
@@ -190,7 +192,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
                   color="primary"
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                   Time Played: {formattedPlaytime}

@@ -13,37 +13,45 @@ import {
   Star as StarIcon,
   Remove as RemoveIcon,
   Lock as LockIcon,
+  Add as AddIcon,
 } from '@mui/icons-material';
+import { SxProps, Theme } from '@mui/material/styles';
 import { Trait } from '../../state/TraitsTypes';
 
 interface TraitCardProps {
   trait: Trait;
+  isEquipped?: boolean; // ADDED
+  isPermanent?: boolean; // ADDED
   showUnequipButton?: boolean;
+  canUnequip?: boolean;
+  unequipButtonText?: string;
+  unequipButtonColor?: 'primary' | 'secondary' | 'error';
   showMakePermanentButton?: boolean;
   currentEssence: number;
   permanenceCost?: number;
   onUnequip?: (traitId: string) => void;
   onMakePermanent?: (traitId: string) => void;
   className?: string;
+  sx?: SxProps<Theme>;
 }
 
-/**
- * TraitCard Component
- * 
- * A standardized, reusable component to display a single trait with action buttons.
- * Displays trait name, description, effects, and provides contextual action buttons.
- */
 const TraitCard: React.FC<TraitCardProps> = ({
   trait,
+  isEquipped = false, // ADDED default value
+  isPermanent = false, // ADDED default value
   showUnequipButton = false,
+  canUnequip = true,
+  unequipButtonText = "Unequip",
+  unequipButtonColor = "secondary",
   showMakePermanentButton = false,
   currentEssence,
   permanenceCost = 150,
   onUnequip,
   onMakePermanent,
   className,
+  sx
 }) => {
-  const handleUnequip = () => {
+  const handleAction = () => {
     if (onUnequip) {
       onUnequip(trait.id);
     }
@@ -57,26 +65,19 @@ const TraitCard: React.FC<TraitCardProps> = ({
 
   const canAffordPermanence = currentEssence >= permanenceCost;
 
-  // Determine rarity color
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
-      case 'common':
-        return 'default';
-      case 'rare':
-        return 'primary';
-      case 'epic':
-        return 'secondary';
-      case 'legendary':
-        return 'warning';
-      case 'mythic':
-        return 'error';
-      default:
-        return 'default';
+      case 'common': return 'default';
+      case 'rare': return 'primary';
+      case 'epic': return 'secondary';
+      case 'legendary': return 'warning';
+      case 'mythic': return 'error';
+      default: return 'default';
     }
   };
 
-  // Format trait effects for display
   const formatEffects = () => {
+    if (!trait.effects) return null;
     if (Array.isArray(trait.effects)) {
       return trait.effects.map((effect, index) => (
         <Typography key={index} variant="body2" component="div">
@@ -94,23 +95,20 @@ const TraitCard: React.FC<TraitCardProps> = ({
   };
 
   return (
-    <Card 
+    <Card
       className={className}
-      sx={{ 
+      sx={{
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        '&:hover': {
-          boxShadow: 2,
-        }
+        border: isPermanent ? '2px solid' : (isEquipped ? '1px solid' : '1px solid'),
+        borderColor: isPermanent ? 'success.main' : (isEquipped ? 'primary.main' : 'divider'),
+        ...sx
       }}
     >
       <CardContent sx={{ flexGrow: 1 }}>
-        {/* Header with name and rarity */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-          <Typography variant="h6" component="h3" noWrap>
-            {trait.name}
-          </Typography>
+          <Typography variant="h6" component="h3" noWrap>{trait.name}</Typography>
           <Chip
             label={trait.rarity}
             color={getRarityColor(trait.rarity) as any}
@@ -118,54 +116,31 @@ const TraitCard: React.FC<TraitCardProps> = ({
             icon={<StarIcon />}
           />
         </Box>
-
-        {/* Category */}
-        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-          {trait.category}
-        </Typography>
-
-        {/* Description */}
-        <Typography variant="body2" color="text.secondary" paragraph>
-          {trait.description}
-        </Typography>
-
-        {/* Effects */}
+        <Typography variant="subtitle2" color="text.secondary" gutterBottom>{trait.category}</Typography>
+        <Typography variant="body2" color="text.secondary" paragraph>{trait.description}</Typography>
         <Box>
-          <Typography variant="subtitle2" gutterBottom>
-            Effects:
-          </Typography>
+          <Typography variant="subtitle2" gutterBottom>Effects:</Typography>
           {formatEffects()}
         </Box>
-
-        {/* Essence Cost (if applicable) */}
-        {trait.essenceCost && (
-          <Typography variant="body2" color="primary" sx={{ mt: 1 }}>
-            Essence Cost: {trait.essenceCost}
-          </Typography>
-        )}
       </CardContent>
 
-      {/* Action Buttons */}
       {(showUnequipButton || showMakePermanentButton) && (
         <CardActions>
           {showUnequipButton && (
             <Button
               size="small"
-              startIcon={<RemoveIcon />}
-              onClick={handleUnequip}
-              color="secondary"
+              startIcon={unequipButtonText === "Equip" ? <AddIcon /> : <RemoveIcon />}
+              onClick={handleAction}
+              color={unequipButtonColor}
+              disabled={!canUnequip}
             >
-              Unequip
+              {unequipButtonText}
             </Button>
           )}
-          
+
           {showMakePermanentButton && (
             <Tooltip
-              title={
-                canAffordPermanence
-                  ? `Make permanent for ${permanenceCost} Essence`
-                  : `Need ${permanenceCost} Essence (${permanenceCost - currentEssence} more)`
-              }
+              title={canAffordPermanence ? `Make permanent for ${permanenceCost} Essence` : `Need ${permanenceCost} Essence`}
             >
               <span>
                 <Button

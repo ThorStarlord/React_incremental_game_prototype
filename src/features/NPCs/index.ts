@@ -4,6 +4,7 @@
  */
 
 // Types
+// FIXED: Removed non-existent payload and result types. Exporting only the core interfaces.
 export type {
   NPC,
   NPCState,
@@ -16,18 +17,14 @@ export type {
   RelationshipChangeEntry,
   NPCStatus,
   InteractionType,
-  UpdateNPCRelationshipPayload,
-  DiscoverNPCPayload,
-  StartInteractionPayload,
-  ProcessDialoguePayload,
-  ShareTraitPayload,
-  InteractionResult,
-  DialogueResult
+  InteractionResult, // This one exists, so we keep it.
 } from './state/NPCTypes';
 
 // State management
-export { default as npcReducer,
-  // Regular action creators
+export {
+  default as npcReducer,
+  // Exporting all actions from the slice
+  npcActions,
   updateNpcRelationship,
   setNpcStatus,
   setNpcAvailability,
@@ -35,28 +32,33 @@ export { default as npcReducer,
   endInteraction,
   addDialogueEntry,
   clearError,
-  setLoading, // Added
-  setError,   // Added
-  setNPCs     // Added
+  setLoading,
+  setError,
+  setNPCs,
+  selectNPC,
+  debugUnlockAllSharedSlots,
+  completeDialogueTopic,
+  updateNpcConnectionDepth,
 } from './state/NPCSlice';
 
 // Async thunks
+// FIXED: Removed non-existent thunks and added the correct ones.
 export {
   initializeNPCsThunk,
   updateNPCRelationshipThunk,
   processNPCInteractionThunk,
   discoverNPCThunk,
-  processDialogueChoiceThunk,
   shareTraitWithNPCThunk,
-  fetchNPCsThunk // Added
 } from './state/NPCThunks';
 
 // Selectors
+// Exporting all selectors is clean and efficient.
 export * from './state/NPCSelectors';
 
-// Components - Only export components that actually exist
+// Components
 export { default as NPCListView } from './components/containers/NPCListView';
 export { default as NPCPanelContainer } from './components/containers/NPCPanelContainer';
+export type { NPCPanelContainerProps } from './components/containers/NPCPanelContainer';
 
-// Mock data - Export the actual mockNPCs export
+// Mock data (for development/testing)
 export { mockNPCs } from './data/mockNPCData';

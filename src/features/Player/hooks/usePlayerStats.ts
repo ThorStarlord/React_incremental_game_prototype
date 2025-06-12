@@ -1,52 +1,60 @@
 /**
- * Custom hook for player statistics management
- * 
- * This file contains placeholder hook definitions.
- * Implementation pending based on Player system requirements.
+ * Custom hooks for player statistics management
  */
 
 import { useAppSelector } from '../../../app/hooks';
+import {
+  selectPlayer,
+  selectPlayerHealth,
+  selectPlayerMaxHealth,
+  selectPlayerMana,
+  selectPlayerMaxMana,
+  selectPlayerAttributes,
+  selectCombatStats
+} from '../state/PlayerSelectors';
 
 /**
- * Placeholder hook for player statistics
+ * Hook to get the entire player state object.
+ * Useful for components that need multiple pieces of player data.
  */
-export const usePlayerStats = () => {
-  // TODO: Implement player stats hook
-  const playerState = useAppSelector(state => state.player);
-  
+export const usePlayer = () => {
+  return useAppSelector(selectPlayer);
+};
+
+/**
+ * FIXED: This hook is now a combination of several specific hooks
+ * that correctly select data from the flattened PlayerState.
+ * It's renamed to usePlayerVitals for clarity.
+ */
+export const usePlayerVitals = () => {
+  const health = useAppSelector(selectPlayerHealth);
+  const maxHealth = useAppSelector(selectPlayerMaxHealth);
+  const mana = useAppSelector(selectPlayerMana);
+  const maxMana = useAppSelector(selectPlayerMaxMana);
+
   return {
-    stats: playerState?.stats || {},
-    attributes: playerState?.attributes || {},
-    // Add more computed values as needed
+    health,
+    maxHealth,
+    mana,
+    maxMana,
+    healthPercentage: maxHealth > 0 ? (health / maxHealth) * 100 : 0,
+    manaPercentage: maxMana > 0 ? (mana / maxMana) * 100 : 0,
   };
 };
 
 /**
- * Placeholder hook for player health management
+ * Hook to get player attributes.
  */
-export const usePlayerHealth = () => {
-  // TODO: Implement player health hook
-  const playerState = useAppSelector(state => state.player);
-  
-  return {
-    health: playerState?.health || 0,
-    maxHealth: playerState?.maxHealth || 100,
-    healthPercentage: 0,
-    // Add health-related computations
-  };
+export const usePlayerAttributes = () => {
+  return useAppSelector(selectPlayerAttributes);
 };
 
 /**
- * Placeholder hook for player mana management
+ * Hook to get player combat stats.
  */
-export const usePlayerMana = () => {
-  // TODO: Implement player mana hook
-  const playerState = useAppSelector(state => state.player);
-  
-  return {
-    mana: playerState?.mana || 0,
-    maxMana: playerState?.maxMana || 50,
-    manaPercentage: 0,
-    // Add mana-related computations
-  };
+export const usePlayerCombatStats = () => {
+  return useAppSelector(selectCombatStats);
 };
+
+// The old usePlayerStats, usePlayerHealth, and usePlayerMana hooks are now
+// replaced by the more specific and correct hooks above.

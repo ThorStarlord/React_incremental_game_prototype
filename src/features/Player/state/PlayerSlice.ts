@@ -120,7 +120,26 @@ const playerSlice = createSlice({
     incrementResonanceLevel: (state) => {
       state.resonanceLevel += 1;
     },
-    // --- END OF FIX ---
+    equipTrait: (state, action: PayloadAction<{ traitId: string; slotIndex: number }>) => {
+      const { traitId, slotIndex } = action.payload;
+      let targetIndex = slotIndex;
+
+      // If slotIndex is -1, find the next available unlocked slot
+      if (targetIndex === -1) {
+        targetIndex = state.traitSlots.findIndex(slot => !slot.isLocked && slot.traitId === null);
+      }
+
+      // If a valid slot is found, equip the trait
+      if (targetIndex !== -1 && state.traitSlots[targetIndex] && !state.traitSlots[targetIndex].isLocked) {
+        state.traitSlots[targetIndex].traitId = traitId;
+      }
+    },
+    unequipTrait: (state, action: PayloadAction<{ slotIndex: number }>) => {
+      const { slotIndex } = action.payload;
+      if (state.traitSlots[slotIndex]) {
+        state.traitSlots[slotIndex].traitId = null;
+      }
+    },
   },
 });
 
@@ -134,6 +153,9 @@ export const {
   // FIXED: Ensure these newly defined actions are included in the export list.
   addPermanentTrait,
   incrementResonanceLevel,
+    // FIXED: Export the new actions
+  equipTrait,
+  unequipTrait,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

@@ -1,127 +1,78 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Grid, Box, Typography } from '@mui/material';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { 
-  selectTraits, 
-  selectAvailableTraitObjects, 
-  selectPlayerPermanentTraitIdsFromPlayer,
-  selectTraitPresets,
-  selectEquippedTraitObjects
+// FIXED: Importing correct selectors
+import {
+  selectTraits,
+  selectAcquiredTraitObjects,
+  selectEquippedTraits
 } from '../../state/TraitsSelectors';
-import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
-import { equipTrait, unequipTrait } from '../../state/TraitsSlice';
+import { selectPermanentTraits, selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
+// FIXED: Importing actions from PlayerSlice
+import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import EquippedSlotsPanel from '../ui/EquippedSlotsPanel';
 import AvailableTraitsPanel from '../ui/AvailableTraitsPanel';
 import TraitCard from '../ui/TraitCard';
+import { Trait } from '../../state/TraitsTypes';
 
-/**
- * ManageTraitsTab Container
- * 
- * Primary container for the entire "Manage Traits" tab experience.
- * Provides drag-and-drop functionality for trait management and handles
- * all state updates through Redux actions.
- */
 const ManageTraitsTab: React.FC = () => {
   const dispatch = useAppDispatch();
-  
+
   // State selectors
-  const availableTraits = useAppSelector(selectAvailableTraitObjects);
-  const equippedTraitObjects = useAppSelector(selectEquippedTraitObjects);
-  const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIdsFromPlayer);
   const allTraits = useAppSelector(selectTraits);
-  const currentEssence = useAppSelector(selectCurrentEssence);
+  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const equippedTraitObjects = useAppSelector(selectEquippedTraits);
+  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const traitSlots = useAppSelector(selectPlayerTraitSlots); // Get official slots
 
-  // Create hardcoded trait slots since Player doesn't export trait slots
-  const traitSlots = React.useMemo(() => {
-    const totalSlots = 6;
-    const unlockedSlots = 3;
-    
-    return Array.from({ length: totalSlots }, (_, index) => ({
-      id: `slot_${index}`,
-      index,
-      traitId: equippedTraitObjects[index]?.id || null,
-      isUnlocked: index < unlockedSlots,
-      unlockRequirement: index >= unlockedSlots ? `Unlock at slot ${index + 1}` : undefined
-    }));
-  }, [equippedTraitObjects]);
+  // Filter for traits that are acquired but not equipped or permanent
+  const availableTraits = useMemo(() => {
+    const equippedIds = equippedTraitObjects.map(t => t.id);
+    return acquiredTraits.filter(trait =>
+      !equippedIds.includes(trait.id) &&
+      !permanentTraitIds.includes(trait.id)
+    );
+  }, [acquiredTraits, equippedTraitObjects, permanentTraitIds]);
 
-  // Drag state
-  const [activeTraitId, setActiveTraitId] = React.useState<string | null>(null);
+  const [activeTraitId, setActiveTraitId] = useState<string | null>(null);
 
-  /**
-   * Handle drag start - track which trait is being dragged
-   */
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    const { active } = event;
-    setActiveTraitId(active.id as string);
+    setActiveTraitId(event.active.id as string);
   }, []);
 
-  /**
-   * Handle drag end - core logic for trait slot management
-   * Checks if a trait was dropped onto a valid slot and dispatches equipTrait action
-   */
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
-    
-    // Clear active drag state
     setActiveTraitId(null);
 
-    if (!over) {
-      return; // Drag was cancelled or dropped outside droppable area
-    }
+    if (!over) return;
 
     const traitId = active.id as string;
     const targetId = over.id as string;
 
-    // Handle dropping onto trait slots
     if (targetId.startsWith('slot-')) {
       const slotIndex = parseInt(targetId.replace('slot-', ''), 10);
-      
       if (!isNaN(slotIndex) && slotIndex >= 0 && slotIndex < traitSlots.length) {
         const targetSlot = traitSlots[slotIndex];
-        
-        // Check if slot is unlocked
-        if (!targetSlot.isUnlocked) {
-          console.warn(`Cannot equip trait to locked slot ${slotIndex}`);
-          return;
+        if (!targetSlot.isLocked) {
+          if (targetSlot.traitId) {
+            dispatch(unequipTrait({ slotIndex }));
+          }
+          dispatch(equipTrait({ traitId, slotIndex }));
         }
-
-        // If slot already has a trait, unequip it first
-        if (targetSlot.traitId) {
-          dispatch(unequipTrait(slotIndex));
-        }
-
-        // Equip the new trait
-        dispatch(equipTrait({ traitId, slotIndex }));
       }
-    }
-
-    // Handle dropping onto unequip area
-    if (targetId === 'unequip-zone') {
-      // Find which slot contains this trait and unequip it
+    } else if (targetId === 'unequip-zone') {
       const slotIndex = traitSlots.findIndex(slot => slot.traitId === traitId);
       if (slotIndex !== -1) {
-        dispatch(unequipTrait(slotIndex));
+        dispatch(unequipTrait({ slotIndex }));
       }
     }
   }, [dispatch, traitSlots]);
 
-  /**
-   * Handle trait unequip action
-   */
-  const handleUnequip = useCallback((slotIndex: number, traitId: string) => {
-    dispatch(unequipTrait(slotIndex));
+  const handleUnequip = useCallback((slotIndex: number) => {
+    dispatch(unequipTrait({ slotIndex }));
   }, [dispatch]);
 
-  /**
-   * Handle make trait permanent action - deprecated
-   */
-  const handleMakePermanent = useCallback((traitId: string) => {
-    console.warn('Make permanent action is deprecated. Use Resonance from NPCs instead.');
-  }, []);
-
-  // Get the currently dragged trait for drag overlay
   const activeTrait = activeTraitId ? allTraits[activeTraitId] : null;
 
   return (
@@ -129,43 +80,43 @@ const ManageTraitsTab: React.FC = () => {
       <Typography variant="h6" gutterBottom>
         Manage Traits
       </Typography>
-      
-      <DndContext
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
+
+      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <Grid container spacing={3}>
-          {/* Equipped Traits Section */}
           <Grid item xs={12} md={6}>
             <EquippedSlotsPanel
               slots={traitSlots}
-              equippedTraits={equippedTraitObjects.reduce((acc: Record<string, any>, trait: any) => {
+              equippedTraits={equippedTraitObjects.reduce((acc, trait) => {
                 acc[trait.id] = trait;
                 return acc;
-              }, {})}
-              onSlotClick={(slotIndex: number, traitId: string | null) => {
-                // Handle slot click for trait selection
-                console.log('Slot clicked:', slotIndex, traitId);
+              }, {} as Record<string, Trait>)}
+              onSlotClick={(slotIndex, traitId) => {
+                if (traitId) {
+                  handleUnequip(slotIndex);
+                }
               }}
-              onTraitUnequip={handleUnequip}
+              onTraitUnequip={(slotIndex, _) => handleUnequip(slotIndex)}
             />
           </Grid>
 
-          {/* Available Traits Section */}
           <Grid item xs={12} md={6}>
             <AvailableTraitsPanel
               availableTraits={availableTraits}
+              onTraitSelect={(traitId) => {
+                const availableSlot = traitSlots.find(s => !s.isLocked && !s.traitId);
+                if (availableSlot) {
+                  dispatch(equipTrait({ traitId, slotIndex: availableSlot.slotIndex }));
+                }
+              }}
             />
           </Grid>
         </Grid>
 
-        {/* Drag Overlay */}
         <DragOverlay>
           {activeTrait ? (
             <TraitCard
               trait={activeTrait}
-              isEquipped={false}
-              isPermanent={false}
+              currentEssence={0} // Not needed for drag overlay
               sx={{
                 opacity: 0.8,
                 transform: 'rotate(5deg)',

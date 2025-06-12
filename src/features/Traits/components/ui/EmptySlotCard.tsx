@@ -7,31 +7,10 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
-/**
- * Props for the EmptySlotCard component
- */
-interface EmptySlotCardProps {
-  /** Function called when a trait is dropped in this slot */
-  onDrop?: () => void;
-}
+// FIXED: Removed onDrop as it's not used by the parent anymore
+interface EmptySlotCardProps {}
 
-/**
- * A component that displays an empty trait slot where traits can be dragged
- * 
- * @param props - Component props
- * @returns React component
- */
-const EmptySlotCard: React.FC<EmptySlotCardProps> = ({ onDrop }) => {
-  // Drag event handlers
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-  };
-  
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    if (onDrop) onDrop();
-  };
-  
+const EmptySlotCard: React.FC<EmptySlotCardProps> = () => {
   return (
     <Paper
       elevation={0}
@@ -47,16 +26,11 @@ const EmptySlotCard: React.FC<EmptySlotCardProps> = ({ onDrop }) => {
         bgcolor: 'action.hover',
         cursor: 'default',
         minHeight: 140,
-        '&:hover': {
-          borderColor: 'primary.main',
-          bgcolor: 'action.selected'
-        },
+        '&:hover': { borderColor: 'primary.main', bgcolor: 'action.selected' },
         transition: 'border-color 0.2s, background-color 0.2s'
       }}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
     >
-      <Tooltip title="Drag a trait here to equip">
+      <Tooltip title="Click to equip a trait">
         <Box sx={{ textAlign: 'center' }}>
           <AddIcon color="disabled" sx={{ mb: 1 }} />
           <Typography variant="body2" color="text.secondary">

@@ -19,28 +19,16 @@ export const mockNPCs: Record<string, NPC> = {
     loyalty: 12,
     lastInteraction: Date.now() - 3600000,
     discoveredAt: Date.now() - 86400000,
-    // Added: Missing required properties for dialogue system
     availableDialogues: ['intro-greeting', 'essence-wisdom', 'ancient-knowledge'],
     completedDialogues: ['first-meeting'],
-    // Added: Missing required properties for quest system
     availableQuests: ['gather-essence-crystals', 'library-research'],
     completedQuests: [],
-    // Updated: teachableTraits to availableTraits, and traits to sharedTraits
     availableTraits: ['EssenceAffinity', 'ScholarlyInsight', 'MentalFocus'],
-    sharedTraits: {
-      'EssenceAffinity': {
-        id: 'EssenceAffinity',
-        name: 'Essence Affinity',
-        description: 'Natural connection to essence energy, improving generation and control.',
-        category: 'Essence',
-        rarity: 'rare',
-        effects: { essenceGeneration: 1.2, essenceCapacity: 50 },
-        requirements: { relationshipLevel: 10 },
-        isVisible: true, // Assuming all available traits are visible on first meeting
-        discovered: true,
-        cost: 25
-      }
-    }
+    // FIXED: Renamed 'sharedTraits' to 'sharedTraitSlots' and changed the structure to an array of objects.
+    sharedTraitSlots: [
+      { id: 'elena_slot_0', index: 0, traitId: null, isUnlocked: true },
+      { id: 'elena_slot_1', index: 1, traitId: null, isUnlocked: false, unlockRequirement: 20 },
+    ],
   },
 
   'npc-002': {
@@ -56,30 +44,18 @@ export const mockNPCs: Record<string, NPC> = {
     loyalty: 6,
     lastInteraction: Date.now() - 7200000,
     discoveredAt: Date.now() - 172800000,
-    // Added: Missing required properties for dialogue system
     availableDialogues: ['warrior-greeting', 'combat-training', 'strength-philosophy'],
     completedDialogues: [],
-    // Added: Missing required properties for quest system
     availableQuests: ['combat-trial', 'weapon-mastery-test'],
     completedQuests: [],
-    // Updated: teachableTraits to availableTraits, and traits to sharedTraits
     availableTraits: ['BattleHardened', 'ResilientConstitution'],
-    sharedTraits: {
-      'BattleHardened': {
-        id: 'BattleHardened',
-        name: 'Battle Hardened',
-        description: 'Your combat experience grants you increased attack and defense capabilities.',
-        category: 'combat',
-        rarity: 'uncommon',
-        effects: { attack: 5, defense: 3 },
-        requirements: { relationshipLevel: 5 },
-        isVisible: true, // Assuming all available traits are visible on first meeting
-        discovered: false,
-        cost: 15
-      }
-    }
+    // FIXED: Renamed 'sharedTraits' to 'sharedTraitSlots' and updated structure.
+    sharedTraitSlots: [
+      { id: 'marcus_slot_0', index: 0, traitId: 'BattleHardened', isUnlocked: true }, // Example with an equipped trait
+      { id: 'marcus_slot_1', index: 1, traitId: null, isUnlocked: false, unlockRequirement: 25 },
+    ],
   },
-
+  
   'npc-003': {
     id: 'npc-003',
     name: 'Lyra the Swift',
@@ -93,42 +69,20 @@ export const mockNPCs: Record<string, NPC> = {
     loyalty: 18,
     lastInteraction: Date.now() - 1800000,
     discoveredAt: Date.now() - 259200000,
-    // Added: Missing required properties for dialogue system
     availableDialogues: ['scout-report', 'stealth-techniques', 'forest-wisdom'],
     completedDialogues: ['initial-contact', 'trust-building'],
-    // Added: Missing required properties for quest system
     availableQuests: ['forest-patrol', 'stealth-mission', 'rare-herb-gathering'],
     completedQuests: ['introduction-task'],
-    // Added: Missing required property for trait sharing
-    availableTraits: ['SwiftMovement', 'ShadowWalker', 'ElementalAffinity'],
-    sharedTraits: {
-      'SwiftMovement': {
-        id: 'SwiftMovement',
-        name: 'Swift Movement',
-        description: 'Incredible speed and agility for rapid traversal.',
-        category: 'physical',
-        rarity: 'rare',
-        effects: { speed: 25, dodge: 10 },
-        requirements: { relationshipLevel: 15 },
-        isVisible: true, // Assuming all available traits are visible on first meeting
-        discovered: true,
-        cost: 30
-      },
-      'ShadowWalker': {
-        id: 'ShadowWalker',
-        name: 'Shadow Walker',
-        description: 'Expert concealment and silent movement abilities.',
-        category: 'physical',
-        rarity: 'rare',
-        effects: { stealthEffectiveness: 0.20 },
-        requirements: { relationshipLevel: 20 },
-        isVisible: true, // Assuming all available traits are visible on first meeting
-        discovered: false,
-        cost: 45
-      }
-    }
+    availableTraits: ['SwiftStrikes', 'ShadowWalker', 'ElementalAffinity'],
+    // FIXED: Renamed 'sharedTraits' to 'sharedTraitSlots' and updated structure.
+    sharedTraitSlots: [
+        { id: 'lyra_slot_0', index: 0, traitId: null, isUnlocked: true },
+        { id: 'lyra_slot_1', index: 1, traitId: null, isUnlocked: true },
+        { id: 'lyra_slot_2', index: 2, traitId: null, isUnlocked: false, unlockRequirement: 40 },
+    ]
   },
 
+  // ... (You can apply the same fix for npc-004 and npc-005 if needed, or remove their sharedTraits property for now)
   'npc-004': {
     id: 'npc-004',
     name: 'Thorne the Merchant',
@@ -142,28 +96,12 @@ export const mockNPCs: Record<string, NPC> = {
     loyalty: 10,
     lastInteraction: Date.now() - 5400000,
     discoveredAt: Date.now() - 345600000,
-    // Added: Missing required properties for dialogue system
     availableDialogues: ['trade-offers', 'market-rumors', 'business-opportunities'],
     completedDialogues: ['first-transaction'],
-    // Added: Missing required properties for quest system
     availableQuests: ['trade-route-security', 'rare-item-procurement'],
     completedQuests: [],
-    // Added: Missing required property for trait sharing
     availableTraits: ['BargainingMaster', 'MasterCraftsman', 'SilverTongue'],
-    sharedTraits: {
-      'BargainingMaster': {
-        id: 'BargainingMaster',
-        name: 'Bargaining Master',
-        description: 'Your keen business sense allows you to get better deals from merchants.',
-        category: 'social',
-        rarity: 'common',
-        effects: { shopDiscount: 0.05 },
-        requirements: { relationshipLevel: 8 },
-        isVisible: true, // Assuming all available traits are visible on first meeting
-        discovered: true,
-        cost: 20
-      }
-    }
+    sharedTraitSlots: [] // Example with no slots initially
   },
 
   'npc-005': {
@@ -179,31 +117,16 @@ export const mockNPCs: Record<string, NPC> = {
     loyalty: 3,
     lastInteraction: Date.now() - 10800000,
     discoveredAt: Date.now() - 432000000,
-    // Added: Missing required properties for dialogue system
     availableDialogues: ['mystical-riddles', 'magical-theory', 'cosmic-insights'],
     completedDialogues: [],
-    // Added: Missing required properties for quest system
     availableQuests: ['magical-trial', 'crystal-attunement'],
     completedQuests: [],
-    // Added: Missing required property for trait sharing
     availableTraits: ['ArcaneIntellect', 'WhispersOfTheVoid', 'ElementalAffinity'],
-    sharedTraits: {
-      'ArcaneIntellect': {
-        id: 'ArcaneIntellect',
-        name: 'Arcane Knowledge',
-        description: 'Deep understanding of magical principles and mystical forces.',
-        category: 'Mental',
-        rarity: 'rare',
-        effects: { mana: 50, spellPower: 20, mysticalInsight: 15 },
-        requirements: { relationshipLevel: 25 },
-        isVisible: true, // Assuming all available traits are visible on first meeting
-        discovered: false,
-        cost: 75
-      }
-    }
+    sharedTraitSlots: []
   }
 };
 
+// ... (the rest of the file can remain the same)
 // Additional helper data for development and testing
 export const mockDialogues: Record<string, { id: string; title: string; responses: Record<string, string> }> = {
   'intro-greeting': {

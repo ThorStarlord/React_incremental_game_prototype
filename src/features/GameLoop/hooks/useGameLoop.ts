@@ -12,7 +12,7 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
   const dispatch = useAppDispatch();
   const gameLoop = useAppSelector((state) => state.gameLoop);
   const { onTick, onAutoSave } = options;
-  
+
   const animationFrameRef = useRef<number | undefined>(undefined);
   const lastFrameTimeRef = useRef<number>(0);
   const accumulatorRef = useRef<number>(0);
@@ -26,28 +26,25 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
     const deltaTime = timestamp - lastFrameTimeRef.current;
     lastFrameTimeRef.current = timestamp;
 
-    // Apply game speed multiplier
     const adjustedDeltaTime = deltaTime * gameLoop.gameSpeed;
     accumulatorRef.current += adjustedDeltaTime;
 
-    // Fixed timestep for game logic
     const fixedTimeStep = 1000 / gameLoop.tickRate;
 
     while (accumulatorRef.current >= fixedTimeStep) {
-      // Dispatch tick action
       dispatch(tick({ deltaTime: fixedTimeStep, timestamp }));
 
-      // Call custom tick handler
       if (onTick) {
+        // FIXED: The object literal now perfectly matches the TickData interface.
+        // Removed `totalGameTime` and added the required `gameSpeed`.
         const tickData: TickData = {
           deltaTime: fixedTimeStep,
           currentTick: gameLoop.currentTick + 1,
-          totalGameTime: gameLoop.totalGameTime + fixedTimeStep,
+          gameSpeed: gameLoop.gameSpeed,
         };
         onTick(tickData);
       }
 
-      // Check for auto-save
       if (gameLoop.totalGameTime - gameLoop.lastAutoSave >= gameLoop.autoSaveInterval) {
         dispatch(updateAutoSave(gameLoop.totalGameTime));
         if (onAutoSave) {
@@ -75,7 +72,6 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
     };
   }, [gameLoop.isRunning, gameLoopStep]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
@@ -92,22 +88,3 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
     gameSpeed: gameLoop.gameSpeed,
   };
 };
-
-/**
- * Example usage in other components:
- * 
- * function GameComponent() {
- *   const { isRunning, currentTick } = useGameLoop({
- *     onTick: (tickData) => {
- *       // Generate essence every tick
- *       // Update trait cooldowns
- *       // Process time-based events
- *     },
- *     onAutoSave: () => {
- *       // Save game state to localStorage
- *     }
- *   });
- *   
- *   return <div>Game running: {isRunning}</div>;
- * }
- */

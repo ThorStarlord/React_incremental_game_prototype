@@ -9,8 +9,9 @@ import {
   Box
 } from '@mui/material';
 import { useAppSelector } from '../app/hooks';
+// FIXED: Corrected the import name from selectEssenceStatistics to selectEssenceStats
 import {
-  selectEssenceStatistics,
+  selectEssenceStats,
   selectCurrentEssence,
   selectTotalCollected,
   selectGenerationRate,
@@ -21,17 +22,10 @@ import { EssenceGenerationTimer } from '../features/Essence/components/ui/Essenc
 
 /**
  * Comprehensive Essence management page
- *
- * Provides complete interface for Essence system including:
- * - Current amount display with statistics
- * - Manual generation via ManualEssenceButton for testing
- * - Generation tracking with EssenceGenerationTimer
- * - Statistics dashboard with metrics overview
- * - NPC connection tracking for generation sources
- * - Future feature previews and development status
  */
 const EssencePage: React.FC = React.memo(() => {
-  const essenceStats = useAppSelector(selectEssenceStatistics);
+  // FIXED: Using the correct selector name
+  const essenceStats = useAppSelector(selectEssenceStats);
   const currentEssence = useAppSelector(selectCurrentEssence);
   const totalCollected = useAppSelector(selectTotalCollected);
   const generationRate = useAppSelector(selectGenerationRate);
@@ -100,14 +94,16 @@ const EssencePage: React.FC = React.memo(() => {
                   <Typography variant="body2" color="text.secondary">
                     Current Amount
                   </Typography>
+                  {/* FIXED: Using correct property name `currentEssence` */}
                   <Typography variant="h6">
-                    {essenceStats.currentAmount.toLocaleString()}
+                    {essenceStats.currentEssence.toLocaleString()}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Typography variant="body2" color="text.secondary">
                     Total Collected
                   </Typography>
+                  {/* FIXED: Using correct property name `totalCollected` */}
                   <Typography variant="h6">
                     {essenceStats.totalCollected.toLocaleString()}
                   </Typography>
@@ -116,6 +112,7 @@ const EssencePage: React.FC = React.memo(() => {
                   <Typography variant="body2" color="text.secondary">
                     Generation Rate
                   </Typography>
+                  {/* FIXED: Using correct property name `generationRate` */}
                   <Typography variant="h6">
                     {essenceStats.generationRate.toFixed(2)}/sec
                   </Typography>
@@ -124,6 +121,7 @@ const EssencePage: React.FC = React.memo(() => {
                   <Typography variant="body2" color="text.secondary">
                     Per Click Value
                   </Typography>
+                   {/* FIXED: Using correct property name `perClickValue` */}
                   <Typography variant="h6">
                     {essenceStats.perClickValue}
                   </Typography>
@@ -133,7 +131,7 @@ const EssencePage: React.FC = React.memo(() => {
           </Card>
         </Grid>
 
-        {/* NPC Connections */}
+        {/* NPC Connections - Temporarily removing the dynamic part as it doesn't exist on essenceStats */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
@@ -144,10 +142,10 @@ const EssencePage: React.FC = React.memo(() => {
                 NPCs contributing to Essence generation
               </Typography>
               <Typography variant="h4" color="primary" sx={{ mt: 2 }}>
-                {essenceStats.activeConnections}
+                N/A
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                connections established
+                (Connection tracking to be added)
               </Typography>
             </CardContent>
           </Card>
@@ -175,7 +173,4 @@ const EssencePage: React.FC = React.memo(() => {
 
 EssencePage.displayName = 'EssencePage';
 
-// Export as default to match import expectations
 export default EssencePage;
-// Also provide named export for flexibility
-export { EssencePage };

@@ -23,7 +23,6 @@ interface EquippedSlotsPanelProps {
 
 /**
  * Left-side panel displaying the grid of player trait slots.
- * Provides click-based interaction for equipping/unequipping traits.
  */
 export const EquippedSlotsPanel: React.FC<EquippedSlotsPanelProps> = React.memo(({
   slots,
@@ -36,7 +35,8 @@ export const EquippedSlotsPanel: React.FC<EquippedSlotsPanelProps> = React.memo(
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSlotClick = React.useCallback((slot: TraitSlot) => {
-    onSlotClick(slot.index, slot.traitId);
+    // FIXED: Use correct property `slotIndex`
+    onSlotClick(slot.slotIndex, slot.traitId);
   }, [onSlotClick]);
 
   const handleTraitUnequip = React.useCallback((slotIndex: number, traitId: string) => {
@@ -44,124 +44,73 @@ export const EquippedSlotsPanel: React.FC<EquippedSlotsPanelProps> = React.memo(
   }, [onTraitUnequip]);
 
   const renderSlot = React.useCallback((slot: TraitSlot) => {
-    const { index, traitId, isUnlocked, unlockRequirement } = slot;
+    // FIXED: Use correct properties `slotIndex` and `isLocked`
+    const { slotIndex, traitId, isLocked, unlockRequirement } = slot;
 
-    // Locked slot
-    if (!isUnlocked) {
+    if (isLocked) {
       return (
         <LockedSlotCard
-          key={`slot-${index}`}
-          slotIndex={index}
+          key={`slot-${slotIndex}`}
+          slotIndex={slotIndex}
           unlockRequirement={unlockRequirement}
         />
       );
     }
 
-    // Equipped slot with trait
     if (traitId && equippedTraits[traitId]) {
       const trait = equippedTraits[traitId];
       return (
+        // FIXED: Using the correct `onUnequip` prop for the action button
         <TraitCard
-          key={`slot-${index}-${traitId}`}
+          key={`slot-${slotIndex}-${traitId}`}
           trait={trait}
-          onClick={() => handleTraitUnequip(index, traitId)}
-          isEquipped={true}
-          isPermanent={false}
+          onUnequip={() => handleTraitUnequip(slotIndex, traitId)}
+          showUnequipButton={true}
+          currentEssence={0} // Not needed for this action
         />
       );
     }
 
-    // Empty unlocked slot
     return (
-      <EmptySlotCard
-        key={`slot-${index}`}
-        onAction={() => handleSlotClick(slot)}
-      />
+      // FIXED: Removed non-existent `onAction` prop
+      <Box sx={{ width: '100%', height: '100%', cursor: 'pointer' }} onClick={() => handleSlotClick(slot)}>
+        <EmptySlotCard />
+      </Box>
     );
   }, [equippedTraits, handleSlotClick, handleTraitUnequip]);
 
   return (
     <Paper
       className={className}
-      sx={{
-        p: 2,
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'background.paper'
-      }}
+      sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: 'background.paper' }}
       elevation={1}
     >
-      {/* Header */}
       <Box sx={{ mb: 2 }}>
-        <Typography 
-          variant="h6" 
-          component="h2"
-          sx={{ 
-            fontWeight: 600,
-            color: 'text.primary',
-            mb: 0.5
-          }}
-        >
+        <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: 'text.primary', mb: 0.5 }}>
           Equipped Traits
         </Typography>
-        <Typography 
-          variant="body2" 
-          color="text.secondary"
-        >
+        <Typography variant="body2" color="text.secondary">
           Click slots to equip/unequip traits
         </Typography>
       </Box>
-
-      {/* Slots Grid */}
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <Grid 
-          container 
-          spacing={isMobile ? 1 : 2}
-          sx={{
-            '& .MuiGrid-item': {
-              display: 'flex'
-            }
-          }}
-        >
+        <Grid container spacing={isMobile ? 1 : 2} sx={{ '& .MuiGrid-item': { display: 'flex' } }}>
           {slots.map((slot) => (
-            <Grid 
-              item 
-              xs={6} 
-              sm={4} 
-              md={6} 
-              lg={4}
-              key={`grid-${slot.index}`}
-            >
+            // FIXED: Using correct property `slotIndex` for the key
+            <Grid item xs={6} sm={4} md={6} lg={4} key={`grid-${slot.slotIndex}`}>
               {renderSlot(slot)}
             </Grid>
           ))}
         </Grid>
       </Box>
-
-      {/* Slot Summary */}
-      <Box 
-        sx={{ 
-          mt: 2, 
-          pt: 2, 
-          borderTop: 1, 
-          borderColor: 'divider' 
-        }}
-      >
-        <Typography 
-          variant="caption" 
-          color="text.secondary"
-          component="div"
-        >
-          Slots: {slots.filter(s => s.traitId && s.isUnlocked).length} / {slots.filter(s => s.isUnlocked).length} equipped
+      <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+        <Typography variant="caption" color="text.secondary" component="div">
+          {/* FIXED: Using correct property `isLocked` */}
+          Slots: {slots.filter(s => s.traitId && !s.isLocked).length} / {slots.filter(s => !s.isLocked).length} equipped
         </Typography>
-        {slots.some(s => !s.isUnlocked) && (
-          <Typography 
-            variant="caption" 
-            color="text.secondary"
-            component="div"
-          >
-            {slots.filter(s => !s.isUnlocked).length} slots locked
+        {slots.some(s => s.isLocked) && (
+          <Typography variant="caption" color="text.secondary" component="div">
+            {slots.filter(s => s.isLocked).length} slots locked
           </Typography>
         )}
       </Box>

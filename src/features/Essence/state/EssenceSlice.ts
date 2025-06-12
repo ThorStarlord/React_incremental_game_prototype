@@ -13,7 +13,7 @@ const initialState: EssenceState = {
   isGenerating: false,
   loading: false,
   error: null,
-  currentResonanceLevel: 0, // FIXED: Added missing initial value
+  currentResonanceLevel: 0,
 };
 
 /**
@@ -85,9 +85,6 @@ const essenceSlice = createSlice({
       state.currentResonanceLevel = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    // Note: Thunk handlers can be added here as needed
-  },
 });
 
 export const {
@@ -101,6 +98,6 @@ export const {
   updateResonanceLevel,
 } = essenceSlice.actions;
 
-export const selectEssence = (state: { essence: EssenceState }) => state.essence;
+// FIXED: The redundant selector that was here has been removed.
 
 export default essenceSlice.reducer;

@@ -13,13 +13,14 @@ import {
 } from '@mui/material';
 import {
   Favorite,
-  FavoriteBorder,
   SentimentVeryDissatisfied,
   SentimentNeutral,
   SentimentSatisfied,
   SentimentVerySatisfied
 } from '@mui/icons-material';
-import { getRelationshipTier, RELATIONSHIP_THRESHOLDS } from '../../state/NPCTypes';
+// FIXED: Changed the import path from NPCTypes.ts to the correct config file.
+// Also changed RELATIONSHIP_THRESHOLDS to RELATIONSHIP_TIERS.
+import { getRelationshipTier, RELATIONSHIP_TIERS } from '../../../../config/relationshipConstants';
 
 interface RelationshipProgressProps {
   value: number;
@@ -30,13 +31,6 @@ interface RelationshipProgressProps {
 
 /**
  * RelationshipProgress - Visual representation of NPC relationship status
- * 
- * Features:
- * - Progress bar with tier indicators
- * - Current relationship value and tier
- * - Recent relationship changes
- * - Next tier progress indication
- * - Optional detailed breakdown
  */
 const RelationshipProgress: React.FC<RelationshipProgressProps> = ({
   value,
@@ -48,19 +42,21 @@ const RelationshipProgress: React.FC<RelationshipProgressProps> = ({
   const tier = getRelationshipTier(value);
   
   const getRelationshipIcon = () => {
-    if (value >= RELATIONSHIP_THRESHOLDS.BELOVED) return <Favorite color="error" />;
-    if (value >= RELATIONSHIP_THRESHOLDS.FRIEND) return <SentimentVerySatisfied color="success" />;
-    if (value >= RELATIONSHIP_THRESHOLDS.ACQUAINTANCE) return <SentimentSatisfied color="primary" />;
-    if (value >= RELATIONSHIP_THRESHOLDS.NEUTRAL) return <SentimentNeutral color="action" />;
+    // FIXED: Using RELATIONSHIP_TIERS.TIER_NAME.min instead of the old constant.
+    if (value >= RELATIONSHIP_TIERS.BELOVED.min) return <Favorite color="error" />;
+    if (value >= RELATIONSHIP_TIERS.FRIEND.min) return <SentimentVerySatisfied color="success" />;
+    if (value >= RELATIONSHIP_TIERS.ACQUAINTANCE.min) return <SentimentSatisfied color="primary" />;
+    if (value >= RELATIONSHIP_TIERS.NEUTRAL.min) return <SentimentNeutral color="action" />;
     return <SentimentVeryDissatisfied color="error" />;
   };
 
   const getRelationshipColor = (): 'success' | 'primary' | 'secondary' | 'error' | 'warning' => {
-    if (value >= RELATIONSHIP_THRESHOLDS.BELOVED) return 'error';
-    if (value >= RELATIONSHIP_THRESHOLDS.TRUSTED) return 'success';
-    if (value >= RELATIONSHIP_THRESHOLDS.FRIEND) return 'primary';
-    if (value >= RELATIONSHIP_THRESHOLDS.ACQUAINTANCE) return 'secondary';
-    if (value >= RELATIONSHIP_THRESHOLDS.NEUTRAL) return 'warning';
+    // FIXED: Using RELATIONSHIP_TIERS.TIER_NAME.min instead of the old constant.
+    if (value >= RELATIONSHIP_TIERS.BELOVED.min) return 'error';
+    if (value >= RELATIONSHIP_TIERS.TRUSTED.min) return 'success';
+    if (value >= RELATIONSHIP_TIERS.FRIEND.min) return 'primary';
+    if (value >= RELATIONSHIP_TIERS.ACQUAINTANCE.min) return 'secondary';
+    if (value >= RELATIONSHIP_TIERS.NEUTRAL.min) return 'warning';
     return 'error';
   };
 
@@ -70,7 +66,7 @@ const RelationshipProgress: React.FC<RelationshipProgressProps> = ({
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         {getRelationshipIcon()}
-        <Tooltip title={`${tier}: ${value}/100`}>
+        <Tooltip title={`${tier.name}: ${value}/100`}>
           <LinearProgress
             variant="determinate"
             value={percentage}
@@ -100,7 +96,7 @@ const RelationshipProgress: React.FC<RelationshipProgressProps> = ({
           </Typography>
           <Chip
             icon={getRelationshipIcon()}
-            label={tier}
+            label={tier.name}
             size="small"
             color={getRelationshipColor()}
             variant="outlined"
