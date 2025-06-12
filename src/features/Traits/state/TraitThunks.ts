@@ -96,7 +96,7 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
       dispatch(acquireTrait({ traitId }));
       
       // Add to player's permanent traits
-      dispatch(addPermanentTrait({ traitId }));
+      dispatch(addPermanentTrait(traitId));
       
       return {
         traitId,

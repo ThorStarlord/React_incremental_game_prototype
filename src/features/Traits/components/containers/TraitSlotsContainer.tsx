@@ -19,7 +19,7 @@ import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice';
 // FIXED: Importing actions from the correct slice (PlayerSlice)
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks';
-import TraitSlots from '../ui/TraitSlots';
+import TraitSlots from '../ui/TraitSlotsUI';
 
 export const TraitSlotsContainer: React.FC = () => {
   const dispatch = useAppDispatch();

@@ -1,8 +1,3 @@
-/**
- * @file Progression.tsx
- * @description Container component for player progression and experience tracking
- */
-
 import React from 'react';
 import {
   Box,
@@ -18,7 +13,7 @@ import {
   Psychology as SkillIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
-// FIXED: Removed selectAvailableSkillPoints and corrected selectEquippedTraits to selectEquippedTraits
+import { RootState } from '../../../../app/store'; // Import RootState
 import {
   selectTotalPlaytime,
   selectIsPlayerAlive,
@@ -26,10 +21,9 @@ import {
   selectResonanceLevel,
   selectMaxTraitSlots,
   selectPermanentTraits,
-  selectEquippedTraits // Corrected name
+  selectEquippedTraits
 } from '../../state/PlayerSelectors';
 import { StatDisplay } from '../ui/StatDisplay';
-import { PlayerState } from '../../state/PlayerTypes'; // Import PlayerState to get availableSkillPoints
 
 interface ProgressionProps {
   showDetails?: boolean;
@@ -48,12 +42,12 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
   const totalPlaytime = useAppSelector(selectTotalPlaytime);
   const isAlive = useAppSelector(selectIsPlayerAlive);
   const attributePoints = useAppSelector(selectAvailableAttributePoints);
-  // FIXED: Get availableSkillPoints from the main player state
-  const skillPoints = useAppSelector((state: {player: PlayerState}) => state.player.availableSkillPoints);
+  // FIXED: Correctly type the state parameter for the inline selector
+  const skillPoints = useAppSelector((state: RootState) => state.player.availableSkillPoints);
   const resonanceLevel = useAppSelector(selectResonanceLevel);
   const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
   const permanentTraits = useAppSelector(selectPermanentTraits);
-  const equippedTraits = useAppSelector(selectEquippedTraits); // Corrected selector
+  const equippedTraits = useAppSelector(selectEquippedTraits);
 
   // Format total playtime for display
   const formatPlaytime = (milliseconds: number): string => {

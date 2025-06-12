@@ -3,8 +3,26 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PlayerState, PlayerAttributes } from './PlayerTypes';
+import { PlayerState, PlayerAttributes, TraitSlot, StatusEffect } from './PlayerTypes';
+import { MAX_TRAIT_SLOTS, INITIAL_TRAIT_SLOTS } from '../../../constants/playerConstants';
 
+/**
+ * Helper function to create the initial array of trait slots.
+ * This ensures the player starts with the correct number of locked/unlocked slots.
+ */
+const createInitialTraitSlots = (): TraitSlot[] => {
+  const slots: TraitSlot[] = [];
+  for (let i = 0; i < MAX_TRAIT_SLOTS; i++) {
+    slots.push({
+      id: `player_trait_slot_${i}`,
+      slotIndex: i,
+      traitId: null,
+      isLocked: i >= INITIAL_TRAIT_SLOTS,
+      unlockRequirement: i >= INITIAL_TRAIT_SLOTS ? `Unlock at Resonance Level ${i + 1}` : undefined,
+    });
+  }
+  return slots;
+};
 /**
  * Initial state for the Player system
  */
@@ -36,12 +54,12 @@ const initialState: PlayerState = {
   availableAttributePoints: 0,
   availableSkillPoints: 0,
   resonanceLevel: 0,
-  maxTraitSlots: 3,
+  maxTraitSlots: 5,
 
   // Traits and effects
   statusEffects: [],
   permanentTraits: [],
-  traitSlots: [],
+  traitSlots: createInitialTraitSlots(),
 
   // Character state
   totalPlaytime: 0,
@@ -99,45 +117,74 @@ const playerSlice = createSlice({
     /**
      * Reset player state
      */
-    resetPlayer: (state) => {
+    resetPlayerState: (state) => {
       Object.assign(state, initialState);
     },
 
-    // --- START OF FIX ---
-    /**
-     * FIXED: Add the missing reducer for adding a permanent trait.
-     */
-    addPermanentTrait: (state, action: PayloadAction<{ traitId: string }>) => {
-      const { traitId } = action.payload;
+    addPermanentTrait: (state, action: PayloadAction<string>) => {
+      const traitId = action.payload;
       if (!state.permanentTraits.includes(traitId)) {
         state.permanentTraits.push(traitId);
       }
     },
-
-    /**
-     * FIXED: Add the missing reducer for incrementing resonance level.
-     */
-    incrementResonanceLevel: (state) => {
-      state.resonanceLevel += 1;
+    
+    removePermanentTrait: (state, action: PayloadAction<string>) => {
+        state.permanentTraits = state.permanentTraits.filter(id => id !== action.payload);
     },
+
+    setResonanceLevel: (state, action: PayloadAction<number>) => {
+      state.resonanceLevel = action.payload;
+    },
+    
+    addAvailableAttributePoints: (state, action: PayloadAction<number>) => {
+        state.availableAttributePoints += action.payload;
+    },
+    
+    addAvailableSkillPoints: (state, action: PayloadAction<number>) => {
+        state.availableSkillPoints += action.payload;
+    },
+
+    setIsAlive: (state, action: PayloadAction<boolean>) => {
+      state.isAlive = action.payload;
+    },
+    
+    addStatusEffect: (state, action: PayloadAction<StatusEffect>) => {
+      const existingIndex = state.statusEffects.findIndex(effect => effect.id === action.payload.id);
+      if (existingIndex > -1) {
+        state.statusEffects[existingIndex] = action.payload;
+      } else {
+        state.statusEffects.push(action.payload);
+      }
+    },
+
+    removeStatusEffect: (state, action: PayloadAction<string>) => {
+      state.statusEffects = state.statusEffects.filter(effect => effect.id !== action.payload);
+    },
+
     equipTrait: (state, action: PayloadAction<{ traitId: string; slotIndex: number }>) => {
       const { traitId, slotIndex } = action.payload;
       let targetIndex = slotIndex;
 
-      // If slotIndex is -1, find the next available unlocked slot
       if (targetIndex === -1) {
         targetIndex = state.traitSlots.findIndex(slot => !slot.isLocked && slot.traitId === null);
       }
 
-      // If a valid slot is found, equip the trait
       if (targetIndex !== -1 && state.traitSlots[targetIndex] && !state.traitSlots[targetIndex].isLocked) {
         state.traitSlots[targetIndex].traitId = traitId;
       }
     },
+    
     unequipTrait: (state, action: PayloadAction<{ slotIndex: number }>) => {
       const { slotIndex } = action.payload;
       if (state.traitSlots[slotIndex]) {
         state.traitSlots[slotIndex].traitId = null;
+      }
+    },
+    
+    unlockTraitSlot: (state, action: PayloadAction<number>) => {
+      const slot = state.traitSlots.find(s => s.slotIndex === action.payload);
+      if (slot && slot.isLocked) {
+        slot.isLocked = false;
       }
     },
   },
@@ -149,13 +196,18 @@ export const {
   addAttributePoints,
   allocateAttributePoint,
   updatePlaytime,
-  resetPlayer,
-  // FIXED: Ensure these newly defined actions are included in the export list.
+  resetPlayerState,
   addPermanentTrait,
-  incrementResonanceLevel,
-    // FIXED: Export the new actions
+  removePermanentTrait,
+  setResonanceLevel,
+  addAvailableAttributePoints,
+  addAvailableSkillPoints,
+  setIsAlive,
+  addStatusEffect,
+  removeStatusEffect,
   equipTrait,
   unequipTrait,
+  unlockTraitSlot,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

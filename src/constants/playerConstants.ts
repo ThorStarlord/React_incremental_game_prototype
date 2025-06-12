@@ -95,7 +95,7 @@ export const BASE_STATS: PlayerStats = {
 };
 
 export const MAX_TRAIT_SLOTS = 5;
-export const INITIAL_TRAIT_SLOTS = 3;
+export const INITIAL_TRAIT_SLOTS = 1;
 
 export const TRAIT_EFFECT_CONSTANTS = {
   DIRECT_STATS: [

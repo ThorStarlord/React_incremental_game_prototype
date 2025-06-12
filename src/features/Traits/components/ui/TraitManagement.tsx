@@ -13,6 +13,7 @@ import {
   TextField,
   Grid,
   Alert,
+  AlertTitle,
   IconButton,
   Tooltip,
   List,
@@ -24,7 +25,8 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
-  Stack
+  Stack,
+  Chip
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -33,7 +35,9 @@ import {
   ClearAll as ClearAllIcon,
   FilterList as FilterIcon,
   Settings as SettingsIcon,
-  Star as FavoriteIcon
+  Star,
+  Psychology,
+  Lock
 } from '@mui/icons-material';
 
 import {
@@ -202,101 +206,92 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
   }), [acquiredTraitObjects.length, equippedTraitIds.length, permanentTraitIds.length]);
 
   return (
-    <Box>
-      {/* ... (rest of the JSX code remains the same, but the TraitCard onClick is now fixed) ... */}
-      <Card sx={{ mb: 2 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SettingsIcon color="primary" />
-            Trait Management
-          </Typography>
-          <Grid container spacing={2} sx={{ mb: 2 }}>
-            <Grid item xs={6} sm={3}>
-              <Box textAlign="center">
-                <Typography variant="h4" color="primary">{stats.total}</Typography>
-                <Typography variant="caption">Total Acquired</Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Box textAlign="center">
-                <Typography variant="h4" color="success.main">{stats.permanent}</Typography>
-                <Typography variant="caption">Permanent</Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Box textAlign="center">
-                <Typography variant="h4" color="info.main">{stats.equipped}</Typography>
-                <Typography variant="caption">Equipped</Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Box textAlign="center">
-                <Typography variant="h4" color="warning.main">{stats.available}</Typography>
-                <Typography variant="caption">Available</Typography>
-              </Box>
-            </Grid>
-          </Grid>
-          <Stack direction="row" spacing={1} flexWrap="wrap">
-            <Button
-              variant="outlined"
-              startIcon={<SaveIcon />}
-              onClick={() => setPresetDialogOpen(true)}
-              disabled={equippedTraitIds.length === 0}
-            >
-              Save Preset
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<ClearAllIcon />}
-              onClick={handleClearAllEquipped}
-              disabled={equippedTraitIds.length === 0}
-              color="warning"
-            >
-              Clear All
-            </Button>
-          </Stack>
-        </CardContent>
-      </Card>
-      
-      {traitPresets.length > 0 && (
-        <Card sx={{ mb: 2 }}>
-          {/* ... (preset list JSX remains the same) ... */}
-        </Card>
-      )}
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Psychology color="primary" />
+        Trait Management
+      </Typography>
 
-      <Card sx={{ mb: 2 }}>
-        {/* ... (filters JSX remains the same) ... */}
-      </Card>
-
-      <Card>
+      {/* Current Status */}
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Acquired Traits ({filteredAndSortedTraits.length} / {stats.total})
+            Current Status
           </Typography>
-          {filteredAndSortedTraits.length === 0 ? (
-            <Alert severity="info">
-              {/* ... (alert JSX remains the same) ... */}
-            </Alert>
-          ) : (
-            <Grid container spacing={2}>
-              {filteredAndSortedTraits.map((trait) => (
-                <Grid item xs={12} sm={6} md={4} key={trait.id}>
-                  {/* FIXED: Removed the invalid `onClick` prop from TraitCard */}
-                  <TraitCard
-                    trait={trait}
-                    showUnequipButton={equippedTraitIds.includes(trait.id)}
-                    onUnequip={() => handleToggleTrait(trait.id)}
-                    showMakePermanentButton={false} // This functionality is deprecated here
-                    currentEssence={currentEssence}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          )}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <Chip 
+              icon={<Star />}
+              label={`Current Essence: ${currentEssence}`}
+              color="primary"
+              variant="outlined"
+            />
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            Essence is used for trait acquisition and permanent trait unlocking.
+          </Typography>
         </CardContent>
       </Card>
 
-      {/* ... (dialogs JSX remains the same) ... */}
+      {/* Trait Acquisition */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Psychology />
+            Trait Acquisition
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Acquire new traits through NPC interactions and Resonance mechanics.
+          </Typography>
+          <Button
+            variant="outlined"
+            disabled
+            startIcon={<Lock />}
+            sx={{ mb: 1 }}
+          >
+            Browse Available Traits
+          </Button>
+          <Typography variant="caption" display="block" color="text.secondary">
+            Visit NPCs to discover and acquire new traits through interaction.
+          </Typography>
+        </CardContent>
+      </Card>
+
+      {/* Trait Permanence */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Trait Permanence
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Make acquired traits permanent to free up active trait slots.
+          </Typography>
+          <Button
+            variant="outlined"
+            disabled
+            startIcon={<Lock />}
+            sx={{ mb: 1 }}
+          >
+            Manage Permanent Traits
+          </Button>
+          <Typography variant="caption" display="block" color="text.secondary">
+            Permanent traits provide benefits without occupying active slots.
+          </Typography>
+        </CardContent>
+      </Card>
+
+      {/* Development Status */}
+      <Alert severity="info">
+        <AlertTitle>Feature Development Status</AlertTitle>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          <strong>✅ Implemented:</strong> Basic trait slot management, trait discovery system
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          <strong>🔄 In Progress:</strong> Advanced trait acquisition, permanence system integration
+        </Typography>
+        <Typography variant="body2">
+          <strong>📋 Planned:</strong> Trait combinations, advanced trait effects, trait crafting
+        </Typography>
+      </Alert>
     </Box>
   );
 });

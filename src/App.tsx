@@ -4,8 +4,9 @@ import { fetchTraitsThunk } from './features/Traits/state/TraitThunks';
 // FIXED: Changed fetchNPCsThunk to initializeNPCsThunk
 import { initializeNPCsThunk } from './features/NPCs/state/NPCThunks';
 import { useGameLoop } from './features/GameLoop/hooks/useGameLoop';
-import { TickData } from './features/GameLoop/state/GameLoopTypes';
-import { passiveGenerateEssenceThunk, checkAndProcessResonanceLevelUpThunk } from './features/Essence/state/EssenceThunks';
+import type { TickData } from './features/GameLoop/state/GameLoopTypes';
+// FIXED: Corrected the import name to use the actual exported thunk name
+import { processPassiveGenerationThunk, processResonanceLevelThunk } from './features/Essence/state/EssenceThunks';
 import { processStatusEffectsThunk, regenerateVitalsThunk, recalculateStatsThunk } from './features/Player/state/PlayerThunks';
 import { AppRouter } from './routes/AppRouter';
 import { ThemeProviderWrapper as ThemeProvider } from './theme/provider';
@@ -13,17 +14,17 @@ import { ThemeProviderWrapper as ThemeProvider } from './theme/provider';
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  // Initialize core game data on app start
+  // Initialize application data on startup
   useEffect(() => {
     dispatch(fetchTraitsThunk());
-    // FIXED: Changed fetchNPCsThunk to initializeNPCsThunk
     dispatch(initializeNPCsThunk());
   }, [dispatch]);
 
   // Game loop for passive generation and time-based events
   const handleGameTick = useCallback(async (tickData: TickData) => {
-    await dispatch(passiveGenerateEssenceThunk(tickData.deltaTime));
-    dispatch(checkAndProcessResonanceLevelUpThunk());
+    // FIXED: Use the correct thunk name that actually exists in EssenceThunks
+    await dispatch(processPassiveGenerationThunk());
+    dispatch(processResonanceLevelThunk());
     await dispatch(processStatusEffectsThunk());
     await dispatch(regenerateVitalsThunk());
     dispatch(recalculateStatsThunk());
