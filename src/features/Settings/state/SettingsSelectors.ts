@@ -7,6 +7,8 @@ export const selectSettingsState = (state: RootState): SettingsState => state.se
 
 export const selectSettings = selectSettingsState;
 
+// --- CATEGORY SELECTORS using createSelector (Good for performance) ---
+
 export const selectAudioSettings = createSelector(
   [selectSettingsState],
   (settings) => settings.audio
@@ -27,10 +29,7 @@ export const selectUISettings = createSelector(
   (settings) => settings.ui
 );
 
-export const selectMasterVolume = createSelector(
-  [selectAudioSettings],
-  (audio) => audio.masterVolume
-);
+// --- SPECIFIC SELECTORS (Memoized versions - remove duplicates below) ---
 
 export const selectMusicVolume = createSelector(
   [selectAudioSettings],
@@ -47,22 +46,8 @@ export const selectDarkMode = createSelector(
   (graphics) => graphics.darkMode
 );
 
-export const selectTheme = createSelector(
-  [selectUISettings],
-  (ui) => ui.theme
-);
-
-export const selectAutosaveEnabled = createSelector(
-  [selectGameplaySettings],
-  (gameplay) => gameplay.autosaveEnabled
-);
-
-export const selectAutosaveInterval = createSelector(
-  [selectGameplaySettings],
-  (gameplay) => gameplay.autosaveInterval
-);
-
-// --- Gameplay Selectors ---
+// --- SIMPLE FUNCTION SELECTORS WITH DEFAULTS (Robust for UI) ---
+// FIXED: Removed all duplicate declarations from this section onwards.
 
 /**
  * Selects the autosave interval in minutes from gameplay settings.
@@ -87,8 +72,6 @@ export const selectDifficulty = (state: RootState): GameplaySettings['difficulty
   return state.settings.gameplay?.difficulty ?? 'normal';
 };
 
-// --- Graphics Selectors ---
-
 export const selectIsDarkMode = (state: RootState): boolean => {
   return state.settings.graphics?.darkMode ?? false;
 };
@@ -97,13 +80,9 @@ export const selectGraphicsQuality = (state: RootState): GraphicsSettings['quali
   return state.settings.graphics?.quality ?? 'high';
 };
 
-// --- Audio Selectors ---
-
 export const selectMasterVolume = (state: RootState): number => {
   return state.settings.audio?.masterVolume ?? 80;
 };
-
-// --- UI Selectors ---
 
 export const selectTheme = (state: RootState): string => {
   return state.settings.ui?.theme ?? 'default';
