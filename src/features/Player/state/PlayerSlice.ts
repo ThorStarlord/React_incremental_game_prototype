@@ -1,8 +1,5 @@
 /**
  * Redux slice for Player state management
- * 
- * This file contains placeholder slice definition.
- * Implementation pending based on Player system requirements.
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -24,7 +21,7 @@ const initialState: PlayerState = {
   manaRegen: 0.5,
   criticalChance: 0.05,
   criticalDamage: 1.5,
-  
+
   // Attributes
   attributes: {
     strength: 10,
@@ -34,18 +31,18 @@ const initialState: PlayerState = {
     wisdom: 10,
     charisma: 10,
   },
-  
+
   // Progression
   availableAttributePoints: 0,
   availableSkillPoints: 0,
   resonanceLevel: 0,
   maxTraitSlots: 3,
-  
+
   // Traits and effects
   statusEffects: [],
   permanentTraits: [],
   traitSlots: [],
-  
+
   // Character state
   totalPlaytime: 0,
   isAlive: true,
@@ -105,6 +102,25 @@ const playerSlice = createSlice({
     resetPlayer: (state) => {
       Object.assign(state, initialState);
     },
+
+    // --- START OF FIX ---
+    /**
+     * FIXED: Add the missing reducer for adding a permanent trait.
+     */
+    addPermanentTrait: (state, action: PayloadAction<{ traitId: string }>) => {
+      const { traitId } = action.payload;
+      if (!state.permanentTraits.includes(traitId)) {
+        state.permanentTraits.push(traitId);
+      }
+    },
+
+    /**
+     * FIXED: Add the missing reducer for incrementing resonance level.
+     */
+    incrementResonanceLevel: (state) => {
+      state.resonanceLevel += 1;
+    },
+    // --- END OF FIX ---
   },
 });
 
@@ -115,6 +131,9 @@ export const {
   allocateAttributePoint,
   updatePlaytime,
   resetPlayer,
+  // FIXED: Ensure these newly defined actions are included in the export list.
+  addPermanentTrait,
+  incrementResonanceLevel,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

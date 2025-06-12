@@ -10,9 +10,9 @@
 /**
  * NPC status enumeration
  */
-export type NPCStatus = 
+export type NPCStatus =
   | 'available'
-  | 'busy' 
+  | 'busy'
   | 'traveling'
   | 'sleeping'
   | 'hostile'
@@ -22,7 +22,7 @@ export type NPCStatus =
 /**
  * Interaction type enumeration
  */
-export type InteractionType = 
+export type InteractionType =
   | 'dialogue'
   | 'trade'
   | 'quest'
@@ -181,13 +181,14 @@ export interface RelationshipChangeEntry {
 
 /**
  * Core NPCs state interface
+ * FIXED: Renamed relationshipChanges to relationshipHistory to match the slice logic.
  */
 export interface NPCState {
   npcs: Record<string, NPC>;
   discoveredNPCs: string[];
   currentInteraction: NPCInteraction | null;
   dialogueHistory: DialogueEntry[];
-  relationshipChanges: RelationshipChangeEntry[];
+  relationshipHistory: RelationshipChangeEntry[]; // FIXED: This property was missing/mismatched.
   loading: boolean;
   error: string | null;
   selectedNPCId: string | null;

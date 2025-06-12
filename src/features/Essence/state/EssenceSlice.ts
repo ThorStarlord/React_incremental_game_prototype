@@ -13,6 +13,7 @@ const initialState: EssenceState = {
   isGenerating: false,
   loading: false,
   error: null,
+  currentResonanceLevel: 0, // FIXED: Added missing initial value
 };
 
 /**
@@ -77,13 +78,15 @@ const essenceSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    /**
+     * Update the player's resonance level.
+     */
+    updateResonanceLevel: (state, action: PayloadAction<number>) => {
+      state.currentResonanceLevel = action.payload;
+    },
   },
   extraReducers: (builder) => {
-    // Note: Thunk handlers removed as the imported thunks don't exist
-    // When thunks are implemented, add handlers here following the pattern:
-    // .addCase(thunkName.pending, (state) => { state.loading = true; })
-    // .addCase(thunkName.fulfilled, (state, action) => { state.loading = false; /* handle success */ })
-    // .addCase(thunkName.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+    // Note: Thunk handlers can be added here as needed
   },
 });
 
@@ -95,6 +98,7 @@ export const {
   toggleGeneration,
   resetEssence,
   clearError,
+  updateResonanceLevel,
 } = essenceSlice.actions;
 
 export const selectEssence = (state: { essence: EssenceState }) => state.essence;

@@ -21,6 +21,8 @@ export interface EssenceState {
   isGenerating: boolean;
   loading: boolean;
   error: string | null;
+  // FIXED: Added the missing property to track the resonance level within the essence state.
+  currentResonanceLevel: number;
 }
 
 export interface EssenceTransaction {
@@ -86,7 +88,12 @@ export interface EssenceState {
 /**
  * Payload for essence transaction actions
  */
+/**
+ * FIXED: Updated the payload to include optional source and description fields.
+ * This makes the transaction actions more informative and fixes the payload errors.
+ */
 export interface EssenceTransactionPayload {
   amount: number;
-  reason?: string;
+  source?: string;
+  description?: string;
 }

@@ -102,20 +102,22 @@ export const selectTotalPlaytime = createSelector(
 
 /**
  * Combat stats selector for grouped combat-related statistics
+ * FIXED: Changed player.stats.property to player.property
  */
 export const selectCombatStats = createSelector(
   [selectPlayer],
   (player) => ({
-    attack: player.stats.attack,
-    defense: player.stats.defense,
-    speed: player.stats.speed,
-    criticalChance: player.stats.criticalChance,
-    criticalDamage: player.stats.criticalDamage
+    attack: player.attack,
+    defense: player.defense,
+    speed: player.speed,
+    criticalChance: player.criticalChance,
+    criticalDamage: player.criticalDamage
   })
 );
 
 /**
  * Performance stats selector for progression and advancement metrics
+ * FIXED: Changed player.stats.property to player.property and added availableSkillPoints
  */
 export const selectPerformanceStats = createSelector(
   [selectPlayer],
@@ -125,10 +127,10 @@ export const selectPerformanceStats = createSelector(
     availableSkillPoints: player.availableSkillPoints,
     isAlive: player.isAlive,
     powerLevel: Math.floor(
-      player.stats.attack + 
-      player.stats.defense + 
-      player.stats.maxHealth / 10 + 
-      player.stats.maxMana / 5
+      player.attack +
+      player.defense +
+      player.maxHealth / 10 +
+      player.maxMana / 5
     )
   })
 );
@@ -148,14 +150,7 @@ export const selectEquippedTraits = createSelector(
   }
 );
 
-export const selectPermanentTraits = createSelector(
-  [selectPlayer, selectTraits],
-  (player, allTraits) => {
-    return player.permanentTraits
-      .map(traitId => allTraits[traitId])
-      .filter(Boolean); // Remove any undefined traits
-  }
-);
+// REMOVED DUPLICATE: A second selectPermanentTraits was here.
 
 export const selectAvailableTraitSlots = createSelector(
   [selectPlayerTraitSlots],
@@ -167,10 +162,7 @@ export const selectUsedTraitSlots = createSelector(
   (traitSlots) => traitSlots.filter(slot => slot.traitId !== null).length
 );
 
-export const selectMaxTraitSlots = createSelector(
-  [selectPlayer],
-  (player) => player.maxTraitSlots
-);
+// REMOVED DUPLICATE: A second selectMaxTraitSlots was here.
 
 export const selectStatusEffects = createSelector(
   [selectPlayer],
