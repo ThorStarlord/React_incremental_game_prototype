@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import {
   selectTraits,
@@ -20,13 +20,13 @@ import {
 } from '../../state/TraitThunks';
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import type { Trait } from '../../state/TraitsTypes';
-import TraitSystemErrorBoundary from '../ui/TraitSystemErrorBoundary'; // Corrected path
-import TraitSystemUI from '../ui/TraitSystemUI'; // Use the correct UI component
+import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
+import TraitSystemTabs from '../ui/TraitSystemTabs';
 
 /**
  * TraitSystemContainer Component
  *
- * This is the primary "smart" component for the Traits feature. It is responsible for:
+ * This container component is responsible for:
  * 1. Fetching all necessary data from the Redux store.
  * 2. Defining all action handlers that dispatch to Redux.
  * 3. Passing all the data and handlers down to the presentational TraitSystemUI component.
@@ -119,7 +119,7 @@ const TraitSystemContainer: React.FC = React.memo(() => {
 
   return (
     <TraitSystemErrorBoundary>
-      <TraitSystemUI {...traitSystemProps} />
+      <TraitSystemTabs {...traitSystemProps} />
     </TraitSystemErrorBoundary>
   );
 });

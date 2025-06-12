@@ -1,19 +1,19 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   Box,
-  Typography,
   Tabs,
   Tab,
+  Typography,
   CircularProgress,
   Alert,
   AlertTitle,
-  Paper,
-  Grid,
+  Paper
 } from '@mui/material';
 // ...existing imports...
 import TraitCodex from './TraitCodex';
 import EquippedSlotsPanel from './EquippedSlotsPanel';
-import TraitManagement from './TraitManagement';
+import TraitManagement, { TraitManagementProps } from './TraitManagement';
+import type { Trait, TraitSlot } from '../../state/TraitsTypes';
 
 // Define the props interface for TraitSystemTabs (formerly TraitSystemUI)
 export interface TraitSystemTabsProps {
@@ -42,9 +42,8 @@ export interface TraitSystemTabsProps {
 }
 
 
-// Rename the component from TraitSystemUI to TraitSystemTabs
-- const TraitSystemUI: React.FC<TraitSystemTabsProps> = React.memo(({
-+ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
+// Renamed the component from TraitSystemUI to TraitSystemTabs
+const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
   allTraits,
   traitSlots,
   equippedTraits,
@@ -71,59 +70,42 @@ export interface TraitSystemTabsProps {
 
   // Define the tabs and their corresponding components
   const tabs = useMemo(() => [
-    { label: 'Slots', component: EquippedSlotsPanel },
-    { label: 'Management', component: TraitManagement },
-    { label: 'Codex', component: TraitCodex },
+    { id: 'slots', label: 'Slots', component: EquippedSlotsPanel },
+    { id: 'management', label: 'Management', component: TraitManagement },
+    { id: 'codex', label: 'Codex', component: TraitCodex },
   ], []);
 
   // Pass necessary props down to the tab components if they need them.
   // Note: This assumes the tab components are designed to receive these props.
   // If they are containers that fetch their own data, props might not be needed here.
   const renderTabContent = useCallback(() => {
-    const TabComponent = tabs[activeTab].component;
-     return <TabComponent
-       allTraits={allTraits}
-       traitSlots={traitSlots}
-       equippedTraits={equippedTraits}
-       permanentTraits={permanentTraits}
-       acquiredTraits={acquiredTraits}
-       discoveredTraits={discoveredTraits}
-       availableTraitsForEquip={availableTraitsForEquip}
-       currentEssence={currentEssence}
-       isInProximityToNPC={isInProximityToNPC}
-       loading={loading}
-       error={error}
-       onEquipTrait={onEquipTrait}
-       onUnequipTrait={onUnequipTrait}
-       onAcquireTrait={onAcquireTrait}
-       onDiscoverTrait={onDiscoverTrait}
-       canAcquireTrait={canAcquireTrait}
-       getTraitAffordability={getTraitAffordability}
-     />;
+    switch (activeTab) {
+      case 0: // Slots
+        // EquippedSlotsPanel is a container, doesn't need props here
+        return <EquippedSlotsPanel />;
+      case 1: // Management
+        // TraitManagement needs currentEssence
+        return <TraitManagement currentEssence={currentEssence} />;
+      case 2: // Codex
+        // TraitCodex needs various props for display and actions
+        return <TraitCodex {...{ allTraits, discoveredTraits, acquiredTraitIds: acquiredTraits.map(t => t.id), permanentTraitIds: permanentTraits.map(t => t.id), currentEssence, onAcquireTrait, onDiscoverTrait, canAcquireTrait, getTraitAffordability }} />;
+      default:
+        return null;
+    }
   }, [
     activeTab,
-    tabs,
     allTraits,
-    traitSlots,
-    equippedTraits,
-    permanentTraits,
     acquiredTraits,
+    permanentTraits,
     discoveredTraits,
-    availableTraitsForEquence,
     currentEssence,
-    isInProximityToNPC,
-    loading,
-    error,
-    onEquipTrait,
-    onUnequipTrait,
     onAcquireTrait,
     onDiscoverTrait,
     canAcquireTrait,
     getTraitAffordability,
   ]);
 
-
-  if (loading) {
+  if (loading && Object.keys(allTraits).length === 0) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
         <CircularProgress />
@@ -153,21 +135,16 @@ export interface TraitSystemTabsProps {
           allowScrollButtonsMobile
         >
           {tabs.map((tab, index) => (
+            // Use index as key for tabs array
             <Tab key={index} label={tab.label} />
           ))}
         </Tabs>
       </Paper>
-      <Box sx={{ p: 2 }}>
-        {renderTabContent()}
+      <Box sx={{ p: 2 }}>{renderTabContent()}
       </Box>
     </Box>
   );
 });
 
-// Update displayName
-- TraitSystemUI.displayName = 'TraitSystemUI';
-+ TraitSystemTabs.displayName = 'TraitSystemTabs';
-
-// Update export
-- export default TraitSystemUI;
-+ export default TraitSystemTabs;
+TraitSystemTabs.displayName = 'TraitSystemTabs';
+export default TraitSystemTabs;
