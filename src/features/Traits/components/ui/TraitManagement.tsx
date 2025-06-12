@@ -39,9 +39,9 @@ import {
 import {
   selectTraits,
   selectTraitPresets,
-  selectEquippedTraits
 } from '../../state/TraitsSelectors';
 import {
+  selectEquippedTraits,
   selectPermanentTraits
 } from '../../../Player/state/PlayerSelectors';
 // FIXED: Import actions that expect specific payload shapes

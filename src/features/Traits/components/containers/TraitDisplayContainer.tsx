@@ -9,9 +9,9 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 // FIXED: Importing selectors from the correct file: TraitsSelectors.ts
 import {
   selectTraits,
-  selectAcquiredTraits, // This selector gives IDs of all known traits
-  selectEquippedTraits // This gives full objects of equipped traits
+  selectAcquiredTraits, // This selector gives IDs of all known traits // This gives full objects of equipped traits
 } from '../../state/TraitsSelectors';
+import { selectEquippedTraits } from '../../../Player/state/PlayerSelectors'; // This gives full objects of equipped traits
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes'; // Import the Trait type
 

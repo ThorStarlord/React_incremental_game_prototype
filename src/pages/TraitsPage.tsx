@@ -7,11 +7,11 @@ import {
   selectTraits,
   selectAcquiredTraitObjects,
   selectDiscoveredTraitObjects,
-  selectEquippedTraits,
   selectTraitLoading,
   selectTraitError,
 } from '../features/Traits/state/TraitsSelectors';
 import {
+  selectEquippedTraits,
   selectPlayerTraitSlots,
   selectPermanentTraits as selectPermanentTraitIds,
 } from '../features/Player/state/PlayerSelectors';

@@ -22,12 +22,12 @@ import {
   selectTraits,
   selectTraitLoading,
   selectTraitError,
-  selectEquippedTraits,
   selectAcquiredTraitObjects
 } from '../../state/TraitsSelectors';
 import {
   selectPermanentTraits,
-  selectPlayerTraitSlots
+  selectPlayerTraitSlots,
+  selectEquippedTraits
 } from '../../../Player/state/PlayerSelectors';
 import {
   equipTrait,

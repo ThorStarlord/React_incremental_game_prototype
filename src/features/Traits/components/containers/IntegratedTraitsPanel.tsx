@@ -23,12 +23,13 @@ import {
   selectTraits,
   selectTraitLoading,
   selectTraitError,
-  selectEquippedTraits,
+  
   selectAcquiredTraitObjects
 } from '../../state/TraitsSelectors';
 import {
   selectPermanentTraits as selectPermanentTraitIds, // Renamed to clarify it returns IDs
-  selectPlayerTraitSlots
+  selectPlayerTraitSlots,
+  selectEquippedTraits
 } from '../../../Player/state/PlayerSelectors';
 // FIXED: Importing actions from the correct slice (PlayerSlice)
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';

@@ -1,25 +1,23 @@
 import React from 'react';
 import { Box, CircularProgress, Grid, Typography, Alert } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-// FIXED: Importing the correct selectors.
+// FIXED: Importing the correct selectors without duplicates
 import {
-    selectAcquiredTraitObjects, // This gets all traits the player knows.
-    selectAvailableTraitSlotCount,
+    selectAcquiredTraitObjects,
     selectTraitLoading,
     selectTraitError
 } from '../../state/TraitsSelectors';
 import { equipTrait } from '../../../Player/state/PlayerSlice';
-// FIXED: Changed to the correct selector name.
-import { selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
+// FIXED: Use correct selector name - selectAvailableTraitSlots (not selectAvailableTraitSlotCount)
+import { selectPlayerTraitSlots, selectAvailableTraitSlots } from '../../../Player/state/PlayerSelectors';
 import TraitCard from '../ui/TraitCard';
 import { Trait } from '../../state/TraitsTypes'; // Import the Trait type
 
 const AvailableTraitList: React.FC = () => {
   const dispatch = useAppDispatch();
-  // FIXED: Use the correct selector for available traits.
   const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
-  const availableSlotCount = useAppSelector(selectAvailableTraitSlotCount);
-  // FIXED: Use the correct selector.
+  // FIXED: Use the correct selector name
+  const availableSlotCount = useAppSelector(selectAvailableTraitSlots);
   const playerTraitSlots = useAppSelector(selectPlayerTraitSlots);
   const equippedTraitIds = playerTraitSlots.filter(s => s.traitId).map(s => s.traitId);
 

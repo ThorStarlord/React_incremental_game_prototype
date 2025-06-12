@@ -43,7 +43,7 @@ import {
 } from '../features/Player/state/PlayerSelectors';
 import { selectEssence } from '../features/Essence/state/EssenceSelectors';
 import { selectGameLoop } from '../features/GameLoop/state/GameLoopSelectors';
-import { selectEquippedTraits } from '../features/Traits/state/TraitsSelectors';
+import { selectEquippedTraits } from '../features/Player/state/PlayerSelectors';
 import { selectTraitsState } from '../features/Traits/state/TraitsSelectors';
 
 // Feature components

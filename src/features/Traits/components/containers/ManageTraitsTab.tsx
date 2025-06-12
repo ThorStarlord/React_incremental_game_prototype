@@ -6,9 +6,8 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import {
   selectTraits,
   selectAcquiredTraitObjects,
-  selectEquippedTraits
 } from '../../state/TraitsSelectors';
-import { selectPermanentTraits, selectPlayerTraitSlots } from '../../../Player/state/PlayerSelectors';
+import { selectPermanentTraits, selectPlayerTraitSlots, selectEquippedTraits } from '../../../Player/state/PlayerSelectors';
 // FIXED: Importing actions from PlayerSlice
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import EquippedSlotsPanel from '../ui/EquippedSlotsPanel';

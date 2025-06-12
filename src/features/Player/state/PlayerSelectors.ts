@@ -4,8 +4,8 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { PlayerState } from './PlayerTypes';
-// FIXED: This is the correct one-way dependency. Player selectors can import from Traits.
-import { selectTraits, selectAcquiredTraits } from '../../Player/state/PlayerSelectors';
+// FIXED: Import from the correct Traits feature selectors
+import { selectTraits } from '../../Traits/state/TraitsSelectors';;
 
 // Base player state selector
 export const selectPlayer = (state: RootState): PlayerState => state.player;

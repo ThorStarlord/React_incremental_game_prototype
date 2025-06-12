@@ -5,8 +5,8 @@
 
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import type { NPC, NPCState, Trait } from './NPCTypes';
-// FIXED: Importing selectTraits from the correct location
+import type { NPC, NPCState } from './NPCTypes';
+import type { Trait } from '../../Traits/state/TraitsTypes'; // FIXED: Importing Trait from the correct location
 import { selectTraits } from '../../Traits/state/TraitsSelectors';
 
 // Base selectors

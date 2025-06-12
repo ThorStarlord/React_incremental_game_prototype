@@ -4,12 +4,13 @@ import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import {
   selectTraits,
   selectAcquiredTraitObjects, // This gets all traits the player has learned
-  selectEquippedTraits,
+  
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSelectors';
 // FIXED: Importing from PlayerSelectors to get player-specific data
 import {
+  selectEquippedTraits,
   selectPermanentTraits,
   selectPlayerTraitSlots // Use this selector to get the official slot structure
 } from '../../../Player/state/PlayerSelectors';
