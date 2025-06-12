@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { TraitSystemUI } from '../features/Traits';
+// Update import path and name for the container component
+import TraitSystemContainer from '../features/Traits/components/containers/TraitSystemContainer';
 
 // Import all necessary selectors
 import {
@@ -95,7 +96,7 @@ const TraitsPage: React.FC = () => {
     };
   }, [currentEssence]);
 
-  // Construct the props object for TraitSystemUI
+  // Construct the props object for TraitSystemContainer
   const traitSystemProps = {
     allTraits,
     traitSlots,
@@ -116,7 +117,8 @@ const TraitsPage: React.FC = () => {
     getTraitAffordability,
   };
 
-  return <TraitSystemUI {...traitSystemProps} />;
+  // Use the renamed container component
+  return <TraitSystemContainer {...traitSystemProps} />;
 };
 
 export default TraitsPage;

@@ -13,7 +13,7 @@ import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import EquippedSlotsPanel from '../ui/EquippedSlotsPanel';
 import AvailableTraitsPanel from '../ui/AvailableTraitsPanel';
 import TraitCard from '../ui/TraitCard';
-import { Trait } from '../../state/TraitsTypes';
+import type { TraitSlot, Trait } from '../../state/TraitsTypes';
 
 const ManageTraitsTab: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -83,19 +83,7 @@ const ManageTraitsTab: React.FC = () => {
       <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <EquippedSlotsPanel
-              slots={traitSlots}
-              equippedTraits={equippedTraitObjects.reduce((acc, trait) => {
-                acc[trait.id] = trait;
-                return acc;
-              }, {} as Record<string, Trait>)}
-              onSlotClick={(slotIndex, traitId) => {
-                if (traitId) {
-                  handleUnequip(slotIndex);
-                }
-              }}
-              onTraitUnequip={(slotIndex, _) => handleUnequip(slotIndex)}
-            />
+            <EquippedSlotsPanel />
           </Grid>
 
           <Grid item xs={12} md={6}>

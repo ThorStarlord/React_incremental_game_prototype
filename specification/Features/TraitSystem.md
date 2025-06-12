@@ -22,7 +22,7 @@ There are now two primary ways for the player to gain the benefits of traits fro
 *   **Concept:** Players can permanently learn and internalize a trait from a target (primarily NPCs) by performing a "Resonance" action. This action requires **close proximity** to the target and the expenditure of **Essence**.
 *   **Proximity:** The player must be in close proximity to the target NPC to perform the Resonance action (typically via the NPC's "Traits" tab).
 *   **Resonance Action:**
-    *   This is the process of spending Essence to permanently learn a trait listed in an NPC's "Available Traits for Resonance."
+    *   This is the process of spending Essence to copy an observed trait from an NPC. This action requires a sufficient level of **Emotional Connection** (`connectionDepth`) with the NPC.
     *   The `Trait` data model includes an `essenceCost` property for this.
     *   Upon successful Resonance:
         *   The trait ID is added to the player's list of **permanent traits** (stored in `PlayerSlice.permanentTraits`).
