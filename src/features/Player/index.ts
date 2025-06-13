@@ -28,7 +28,7 @@ export {
 export { default as PlayerStatsContainer } from './components/containers/PlayerStatsContainer';
 export { default as PlayerTraitsContainer } from './components/containers/PlayerTraitsContainer';
 export { default as Progression } from './components/containers/Progression';
-export { default as PlayerStatsUI } from './components/ui/PlayerStatsUI';
-export { default as PlayerTraitsUI } from './components/ui/PlayerTraitsUI';
-export { default as StatDisplay } from './components/ui/StatDisplay';
-export { default as ProgressBar } from './components/ui/ProgressBar';
+export { PlayerStatsUI } from './components/ui/PlayerStatsUI';
+export { PlayerTraitsUI } from './components/ui/PlayerTraitsUI';
+export { StatDisplay } from './components/ui/StatDisplay';
+export { ProgressBar } from './components/ui/ProgressBar';

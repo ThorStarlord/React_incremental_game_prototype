@@ -13,15 +13,18 @@ import {
   Chip,
   Button,
   CircularProgress,
-  Alert
+  Alert,
+  Divider,
 } from '@mui/material';
 import type { Trait, TraitSlot } from '../../../Traits/state/TraitsTypes';
+import { Star as StarIcon } from '@mui/icons-material';
 
 /**
  * Props interface for PlayerTraitsUI component
  */
 interface PlayerTraitsUIProps {
   traitSlots: TraitSlot[];
+  permanentTraits: Trait[]; // Changed to expect full Trait objects
   availableTraits: Trait[];
   onEquipTrait?: (traitId: string, slotIndex: number) => void;
   onUnequipTrait?: (slotIndex: number) => void;
@@ -39,6 +42,7 @@ interface PlayerTraitsUIProps {
  */
 export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
   traitSlots,
+  permanentTraits, // Added prop
   availableTraits,
   onEquipTrait,
   onUnequipTrait,
@@ -49,11 +53,12 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
 }) => {
   const getTraitById = useMemo(() => {
     const traitMap = new Map();
-    availableTraits.forEach(trait => {
-      traitMap.set(trait.id, trait);
+    // Combine all known traits for lookup
+    [...availableTraits, ...permanentTraits, ...traitSlots.map(s => s.traitId ? allTraits[s.traitId] : null).filter(Boolean)].forEach(trait => {
+        if(trait) traitMap.set(trait.id, trait);
     });
-    return (id: string) => traitMap.get(id);
-  }, [availableTraits]);
+    return (id: string | null): Trait | undefined => id ? traitMap.get(id) : undefined;
+  }, [availableTraits, permanentTraits, traitSlots]);
 
   if (isLoading) {
     return (
@@ -77,12 +82,12 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
   return (
     <Box className={className}>
       <Typography variant="h6" gutterBottom>
-        Trait Slots
+        Active Trait Slots
       </Typography>
       
       <Grid container spacing={2}>
         {traitSlots.map((slot) => {
-          const equippedTrait = slot.traitId ? getTraitById(slot.traitId) : null;
+          const equippedTrait = getTraitById(slot.traitId);
           
           return (
             <Grid item xs={12} sm={6} md={4} key={slot.id}>
@@ -91,9 +96,9 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
                 sx={{
                   minHeight: 150,
                   opacity: !slot.isLocked ? 1 : 0.6,
-                  cursor: !slot.isLocked ? 'pointer' : 'default',
-                  border: !slot.isLocked && slot.traitId ? '2px solid' : undefined,
-                  borderColor: !slot.isLocked && slot.traitId ? 'primary.main' : undefined,
+                  cursor: !slot.isLocked && slot.traitId ? 'pointer' : 'default',
+                  border: !slot.isLocked && slot.traitId ? '2px solid' : '1px dashed',
+                  borderColor: !slot.isLocked && slot.traitId ? 'primary.main' : 'divider',
                   '&:hover': !slot.isLocked ? {
                     transform: 'translateY(-2px)',
                     boxShadow: 2
@@ -160,7 +165,7 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
                           sx={{ mt: 1 }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            // Open trait selection dialog
+                            // This would ideally open a selection dialog
                             console.log('Open trait selection for slot', slot.slotIndex);
                           }}
                         >
@@ -187,41 +192,22 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
         })}
       </Grid>
 
-      {availableTraits.length > 0 && (
-        <Box mt={3}>
-          <Typography variant="h6" gutterBottom>
-            Available Traits
-          </Typography>
-          <Grid container spacing={2}>
-            {availableTraits.slice(0, 6).map((trait) => ( // Show first 6 traits
+      {/* Permanent Traits Section */}
+      {permanentTraits.length > 0 && (
+        <Box mt={4}>
+          <Divider sx={{ mb: 2 }}>
+            <Chip icon={<StarIcon />} label="Permanent Traits" />
+          </Divider>
+          <Grid container spacing={1}>
+            {permanentTraits.map((trait) => (
               <Grid item xs={12} sm={6} md={4} key={trait.id}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {trait.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      {trait.description}
-                    </Typography>
-                    <Box display="flex" gap={1} alignItems="center">
-                      <Chip 
-                        label={trait.rarity} 
-                        size="small" 
-                        color="secondary" 
-                        variant="outlined"
-                      />
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => {
-                          onTraitSelect?.(trait.id);
-                        }}
-                      >
-                        Select
-                      </Button>
-                    </Box>
-                  </CardContent>
-                </Card>
+                <Chip
+                  icon={<StarIcon fontSize="small" />}
+                  label={trait.name}
+                  color="success"
+                  variant="outlined"
+                  sx={{ width: '100%', justifyContent: 'flex-start' }}
+                />
               </Grid>
             ))}
           </Grid>
@@ -233,4 +219,5 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
 
 PlayerTraitsUI.displayName = 'PlayerTraitsUI';
 
-export default PlayerTraitsUI;
+// This needs to be at the top of the file now
+let allTraits: any;

@@ -20,29 +20,36 @@ import {
   List,
   ListItem,
   ListItemText,
+  Divider,
+  Tooltip,
+  Paper,
+  IconButton,
+  ListItemButton, // Added missing import
 } from '@mui/material';
 import {
   Share as ShareIcon,
   GetApp as GetAppIcon,
   CheckCircle as CheckCircleIcon,
   Lock as LockIcon,
+  HelpOutline as HelpIcon,
+  Add as AddIcon,
+  Remove as RemoveIcon,
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
-import { selectSelectedNPCId, selectNPCById } from '../../../state/NPCSelectors';
-// FIXED: Importing from PlayerSelectors
+import { selectNPCById } from '../../../state/NPCSelectors';
 import {
   selectPermanentTraits,
   selectEquippedTraits,
-  selectPlayerTraitSlots
+  selectPlayerTraitSlots,
 } from '../../../../Player/state/PlayerSelectors';
-// FIXED: Importing from TraitsSelectors
-import { selectTraits } from '../../../../Traits/state/TraitsSelectors';
+import { selectTraits, selectAcquiredTraits } from '../../../../Traits/state/TraitsSelectors';
 import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors';
 import { shareTraitWithNPCThunk } from '../../../state/NPCThunks';
 import { acquireTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
-import type { NPCSharedTraitSlot } from '../../../state/NPCTypes';
-import { equipTrait } from '../../../../Player/state/PlayerSlice';
+import TraitSlotItem from '../../../../Traits/components/ui/TraitSlotItem';
+import EmptySlotCard from '../../../../Traits/components/ui/EmptySlotCard';
+import LockedSlotCard from '../../../../Traits/components/ui/LockedSlotCard';
 
 interface NPCTraitsTabProps {
   npcId: string;
@@ -52,116 +59,185 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
   const currentNPC = useAppSelector(state => selectNPCById(state, npcId));
   const allTraits = useAppSelector(selectTraits);
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
-  const equippedTraits = useAppSelector(selectEquippedTraits);
+  const playerAcquiredTraitIds = useAppSelector(selectAcquiredTraits);
+  const playerPermanentTraitIds = useAppSelector(selectPermanentTraits);
+  const playerEquippedTraits = useAppSelector(selectEquippedTraits);
   const currentEssence = useAppSelector(selectCurrentEssence);
-  
-  const [acquisitionDialogOpen, setAcquisitionDialogOpen] = useState(false);
+  const playerSlots = useAppSelector(selectPlayerTraitSlots);
+
+  const [acquireDialogOpen, setAcquireDialogOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedTraitForDialog, setSelectedTraitForDialog] = useState<Trait | null>(null);
-  const [shareError, setShareError] = useState<string | null>(null);
-  const [acquireError, setAcquireError] = useState<string | null>(null);
+  const [targetSlotForShare, setTargetSlotForShare] = useState<number | null>(null);
 
-  const playerAcquiredTraitIds = useMemo(() =>
-    [...equippedTraits.map(t => t.id), ...permanentTraitIds],
-    [equippedTraits, permanentTraitIds]
-  );
-
-  const availableTraitsDetails = useMemo(() => {
+  // Memoize lists for performance
+  const availableTraitsForResonance = useMemo(() => {
     if (!currentNPC?.availableTraits || !allTraits) return [];
     return currentNPC.availableTraits
-      .map((traitId: string) => allTraits[traitId])
-      .filter((trait): trait is Trait => !!trait);
-  }, [currentNPC?.availableTraits, allTraits]);
+      .map(traitId => allTraits[traitId])
+      .filter((trait): trait is Trait => !!trait && !playerAcquiredTraitIds.includes(trait.id) && !playerPermanentTraitIds.includes(trait.id));
+  }, [currentNPC?.availableTraits, allTraits, playerAcquiredTraitIds, playerPermanentTraitIds]);
 
-  const sharedTraitIds = useMemo(() =>
-    currentNPC?.sharedTraitSlots?.map(slot => slot.traitId).filter(Boolean) as string[] || [],
-    [currentNPC?.sharedTraitSlots]
-  );
+  const shareablePlayerTraits = useMemo(() => {
+    const npcSharedIds = currentNPC?.sharedTraitSlots?.map(s => s.traitId).filter(Boolean) || [];
+    return playerEquippedTraits.filter(t => !npcSharedIds.includes(t.id));
+  }, [playerEquippedTraits, currentNPC?.sharedTraitSlots]);
 
-  const shareableTraits = useMemo(() =>
-    equippedTraits.filter(trait => !sharedTraitIds.includes(trait.id)),
-    [equippedTraits, sharedTraitIds]
-  );
-
-  const canPlayerAcquireTrait = useCallback((trait: Trait): boolean => {
-    if (playerAcquiredTraitIds.includes(trait.id)) return false;
-    const essenceCost = trait.essenceCost || 0;
-    return currentEssence >= essenceCost;
-  }, [playerAcquiredTraitIds, currentEssence]);
-
-  const handleAcquireTrait = useCallback(async (trait: Trait) => {
-    if (!currentNPC) return;
-    setAcquireError(null);
-    try {
-      await dispatch(acquireTraitWithEssenceThunk({
-        traitId: trait.id,
-        essenceCost: trait.essenceCost || 0
-      })).unwrap();
-    } catch (error: any) {
-      setAcquireError(error?.message || 'Failed to acquire trait.');
-    }
-  }, [dispatch, currentNPC]);
-
-  const handleShareTrait = useCallback(async (traitId: string, targetSlotIndex?: number) => {
-    if (!currentNPC) return;
-    setShareError(null);
-    try {
-      let actualSlotIndex: number;
-      if (traitId === '') {
-        if (targetSlotIndex === undefined) {
-          setShareError('Internal error: Slot index missing for unshare operation.');
-          return;
-        }
-        actualSlotIndex = targetSlotIndex;
-      } else {
-        const emptyUnlockedSlot = currentNPC.sharedTraitSlots?.find(slot => slot.isUnlocked && !slot.traitId);
-        if (emptyUnlockedSlot) {
-          actualSlotIndex = emptyUnlockedSlot.index;
-        } else {
-          setShareError(`No available unlocked trait slots on ${currentNPC.name}.`);
-          return;
-        }
-      }
-      await dispatch(shareTraitWithNPCThunk({ npcId: currentNPC.id, traitId, slotIndex: actualSlotIndex })).unwrap();
-    } catch (error: any) {
-      const errorMessage = error?.message || 'Failed to share/unshare trait.';
-      setShareError(errorMessage);
-    }
-  }, [dispatch, currentNPC]);
-
-  const handleOpenAcquisitionDialog = useCallback((trait: Trait) => {
+  // Handlers
+  const handleOpenAcquireDialog = useCallback((trait: Trait) => {
     setSelectedTraitForDialog(trait);
-    setAcquisitionDialogOpen(true);
-  }, []);
-
-  const handleCloseAcquisitionDialog = useCallback(() => {
-    setSelectedTraitForDialog(null);
-    setAcquisitionDialogOpen(false);
+    setAcquireDialogOpen(true);
   }, []);
 
   const handleConfirmAcquisition = useCallback(async () => {
     if (selectedTraitForDialog) {
-      await handleAcquireTrait(selectedTraitForDialog);
-      handleCloseAcquisitionDialog();
+      await dispatch(acquireTraitWithEssenceThunk({
+        traitId: selectedTraitForDialog.id,
+        essenceCost: selectedTraitForDialog.essenceCost || 0
+      }));
     }
-  }, [selectedTraitForDialog, handleAcquireTrait, handleCloseAcquisitionDialog]);
+    setAcquireDialogOpen(false);
+    setSelectedTraitForDialog(null);
+  }, [dispatch, selectedTraitForDialog]);
+  
+  const handleShareClick = useCallback((slotIndex: number) => {
+    setTargetSlotForShare(slotIndex);
+    setShareDialogOpen(true);
+  }, []);
+
+  const handleConfirmShare = useCallback(async (traitId: string) => {
+    if (targetSlotForShare !== null) {
+      await dispatch(shareTraitWithNPCThunk({ npcId, traitId, slotIndex: targetSlotForShare }));
+    }
+    setShareDialogOpen(false);
+    setTargetSlotForShare(null);
+  }, [dispatch, npcId, targetSlotForShare]);
+
+  const handleUnshare = useCallback(async (slotIndex: number) => {
+     await dispatch(shareTraitWithNPCThunk({ npcId, traitId: '', slotIndex }));
+  }, [dispatch, npcId]);
 
   if (!currentNPC) {
     return <Alert severity="warning">NPC data not available.</Alert>;
   }
 
   return (
-    <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-      {/* ... (rest of the JSX code) ... */}
-       <Card sx={{ mb: 2 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>Traits for Resonance</Typography>
-          {availableTraitsDetails.map((trait: Trait) => (
-             <Typography key={trait.id}>{trait.name}</Typography>
-          ))}
-        </CardContent>
-      </Card>
+    <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
+      <Grid container spacing={4}>
+        {/* Traits for Resonance Section */}
+        <Grid item xs={12} md={6}>
+          <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+              <GetAppIcon sx={{ mr: 1, color: 'primary.main' }} />
+              Traits for Resonance
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Use Essence to permanently learn these traits from {currentNPC.name}.
+            </Typography>
+            <List dense>
+              {availableTraitsForResonance.length > 0 ? availableTraitsForResonance.map(trait => {
+                const canAfford = (trait.essenceCost || 0) <= currentEssence;
+                return (
+                  <ListItem key={trait.id} divider secondaryAction={
+                    <Tooltip title={!canAfford ? `Requires ${trait.essenceCost} Essence` : ''}>
+                      <span>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => handleOpenAcquireDialog(trait)}
+                          disabled={!canAfford}
+                        >
+                          Acquire
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  }>
+                    <ListItemText primary={trait.name} secondary={`${trait.essenceCost || 0} Essence`} />
+                  </ListItem>
+                );
+              }) : (
+                <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>No new traits available to learn from {currentNPC.name}.</Typography>
+              )}
+            </List>
+          </Paper>
+        </Grid>
+
+        {/* Shared Trait Slots Section */}
+        <Grid item xs={12} md={6}>
+          <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+              <ShareIcon sx={{ mr: 1, color: 'secondary.main' }} />
+              Shared Trait Slots
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Share your equipped traits to empower {currentNPC.name}. Unlock more slots by increasing your relationship.
+            </Typography>
+            <Grid container spacing={2}>
+              {currentNPC.sharedTraitSlots?.map(slot => (
+                <Grid item xs={12} sm={6} key={slot.id}>
+                  {slot.isUnlocked ? (
+                    slot.traitId ? (
+                      <TraitSlotItem 
+                        traitId={slot.traitId} 
+                        trait={allTraits[slot.traitId]} 
+                        onRemove={() => handleUnshare(slot.index)}
+                        onMakePermanent={() => {}} // Not applicable here
+                        essence={0} // Not applicable here
+                      />
+                    ) : (
+                      <Button fullWidth sx={{ minHeight: 120, borderStyle: 'dashed' }} onClick={() => handleShareClick(slot.index)}>
+                          <AddIcon /> Empty Slot
+                      </Button>
+                    )
+                  ) : (
+                    <LockedSlotCard slotIndex={slot.index} unlockRequirement={`Affinity: ${slot.unlockRequirement}`} />
+                  )}
+                </Grid>
+              ))}
+              {(!currentNPC.sharedTraitSlots || currentNPC.sharedTraitSlots.length === 0) && (
+                 <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>{currentNPC.name} has no slots for shared traits.</Typography>
+                 </Grid>
+              )}
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
       
+      {/* DIALOGS */}
+      <Dialog open={acquireDialogOpen} onClose={() => setAcquireDialogOpen(false)}>
+        <DialogTitle>Confirm Trait Resonance</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to spend {selectedTraitForDialog?.essenceCost || 0} Essence to permanently acquire the trait "{selectedTraitForDialog?.name}"?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAcquireDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleConfirmAcquisition} variant="contained" color="primary">Confirm</Button>
+        </DialogActions>
+      </Dialog>
+      
+      <Dialog open={shareDialogOpen} onClose={() => setShareDialogOpen(false)}>
+        <DialogTitle>Share a Trait</DialogTitle>
+        <DialogContent>
+           <Typography sx={{mb: 2}}>Select a trait to share with {currentNPC.name}.</Typography>
+           <List>
+            {shareablePlayerTraits.length > 0 ? shareablePlayerTraits.map(trait => (
+              <ListItem key={trait.id} disablePadding>
+                <ListItemButton onClick={() => handleConfirmShare(trait.id)}>
+                   <ListItemText primary={trait.name} secondary={trait.description} />
+                </ListItemButton>
+              </ListItem>
+            )) : (
+              <Typography color="text.secondary">No available traits to share.</Typography>
+            )}
+           </List>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShareDialogOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

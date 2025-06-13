@@ -1,19 +1,22 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   Box,
+  Typography,
   Tabs,
   Tab,
-  Typography,
   CircularProgress,
   Alert,
   AlertTitle,
-  Paper
+  Paper,
+  Grid,
+  Button, // Added Button
 } from '@mui/material';
-// ...existing imports...
+import BookIcon from '@mui/icons-material/Book'; // Added for the Codex button
 import TraitCodex from './TraitCodex';
 import EquippedSlotsPanel from './EquippedSlotsPanel';
 import TraitManagement, { TraitManagementProps } from './TraitManagement';
 import type { Trait, TraitSlot } from '../../state/TraitsTypes';
+import TraitCodexDrawer from '../containers/TraitCodexDrawer'; // Import the drawer
 
 // Define the props interface for TraitSystemTabs (formerly TraitSystemUI)
 export interface TraitSystemTabsProps {
@@ -41,8 +44,6 @@ export interface TraitSystemTabsProps {
   };
 }
 
-
-// Renamed the component from TraitSystemUI to TraitSystemTabs
 const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
   allTraits,
   traitSlots,
@@ -63,47 +64,48 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
   getTraitAffordability,
 }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const [isCodexDrawerOpen, setIsCodexDrawerOpen] = useState(false); // State for the drawer
 
   const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   }, []);
 
+  const handleOpenCodex = () => setIsCodexDrawerOpen(true);
+  const handleCloseCodex = () => setIsCodexDrawerOpen(false);
+
   // Define the tabs and their corresponding components
   const tabs = useMemo(() => [
     { id: 'slots', label: 'Slots', component: EquippedSlotsPanel },
     { id: 'management', label: 'Management', component: TraitManagement },
-    { id: 'codex', label: 'Codex', component: TraitCodex },
+    { id: 'codex', label: 'Codex', component: 'codex_placeholder' }, // Special case for the codex
   ], []);
 
-  // Pass necessary props down to the tab components if they need them.
-  // Note: This assumes the tab components are designed to receive these props.
-  // If they are containers that fetch their own data, props might not be needed here.
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case 0: // Slots
-        // EquippedSlotsPanel is a container, doesn't need props here
         return <EquippedSlotsPanel />;
       case 1: // Management
-        // TraitManagement needs currentEssence
         return <TraitManagement currentEssence={currentEssence} />;
       case 2: // Codex
-        // TraitCodex needs various props for display and actions
-        return <TraitCodex {...{ allTraits, discoveredTraits, acquiredTraitIds: acquiredTraits.map(t => t.id), permanentTraitIds: permanentTraits.map(t => t.id), currentEssence, onAcquireTrait, onDiscoverTrait, canAcquireTrait, getTraitAffordability }} />;
+        return (
+          <Box sx={{ textAlign: 'center', p: 4 }}>
+            <Typography variant="h6" gutterBottom>Trait Codex</Typography>
+            <Typography color="text.secondary" sx={{ mb: 2 }}>
+              Browse all discovered and available traits in the game.
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<BookIcon />}
+              onClick={handleOpenCodex}
+            >
+              Open Codex
+            </Button>
+          </Box>
+        );
       default:
         return null;
     }
-  }, [
-    activeTab,
-    allTraits,
-    acquiredTraits,
-    permanentTraits,
-    discoveredTraits,
-    currentEssence,
-    onAcquireTrait,
-    onDiscoverTrait,
-    canAcquireTrait,
-    getTraitAffordability,
-  ]);
+  }, [activeTab, currentEssence, handleOpenCodex]);
 
   if (loading && Object.keys(allTraits).length === 0) {
     return (
@@ -125,6 +127,9 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
 
   return (
     <Box sx={{ width: '100%' }}>
+      {/* The Drawer is rendered here, but only visible when isCodexDrawerOpen is true */}
+      <TraitCodexDrawer open={isCodexDrawerOpen} onClose={handleCloseCodex} />
+
       <Paper elevation={1} sx={{ mb: 2 }}>
         <Tabs
           value={activeTab}
@@ -135,13 +140,12 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
           allowScrollButtonsMobile
         >
           {tabs.map((tab, index) => (
-            // Use index as key for tabs array
             <Tab key={index} label={tab.label} />
-          ))}
+          ))}  
         </Tabs>
       </Paper>
       <Box sx={{ p: 2 }}>{renderTabContent()}
-      </Box>
+      </Box>  
     </Box>
   );
 });

@@ -43,7 +43,7 @@ import {
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSelectors'; 
-import { fetchTraitsThunk } from '../../state/TraitThunks';
+import { fetchTraitsThunk, acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { selectPermanentTraits as selectPlayerPermanentTraitIds } from '../../../Player/state/PlayerSelectors';
@@ -122,6 +122,11 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
       showUndiscovered: false,
     });
   }, []);
+
+  const handleAcquireTrait = useCallback((trait: Trait) => {
+    const cost = trait.essenceCost ?? 0;
+    dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id, essenceCost: cost }));
+  }, [dispatch]);
 
   const filteredAndSortedTraits = useMemo(() => {
     let traitsArray = Object.values(allTraits); 
@@ -231,7 +236,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
                         edge="end"
                         color="primary"
                         disabled={!canAfford}
-                        // onClick={() => dispatch(acquireTraitWithEssenceThunk(trait.id))} // Example action for future
+                        onClick={() => handleAcquireTrait(trait)}
                       >
                         <AddCircleIcon />
                       </IconButton>

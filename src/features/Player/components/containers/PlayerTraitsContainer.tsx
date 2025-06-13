@@ -8,19 +8,18 @@ import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
 import type { Trait, TraitSlot } from '../../../Traits/state/TraitsTypes';
 
-// FIXED: Importing Trait-specific selectors from the Traits feature
 import {
-  selectAllTraits,
-  selectTraitLoading,
-  selectTraitError,
+    selectAllTraits,
+    selectTraitLoading,
+    selectTraitError,
+    selectAcquiredTraitObjects,
 } from '../../../Traits/state/TraitsSelectors';
 
-// FIXED: Importing Player-specific selectors from the Player feature
 import {
-  selectPermanentTraits,
+  selectPermanentTraits as selectPermanentTraitIds, // Keep as IDs for filtering
   selectMaxTraitSlots,
-  selectPlayerTraitSlots, // Use the correct selector for slots
-  selectEquippedTraits,     // Use the correct selector for equipped objects
+  selectPlayerTraitSlots,
+  selectEquippedTraits,
 } from '../../state/PlayerSelectors';
 
 /**
@@ -43,21 +42,25 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   const dispatch = useAppDispatch();
 
   // Use proper selectors from their correct locations
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
   const equippedTraits = useAppSelector(selectEquippedTraits);
   const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
   const allTraits = useAppSelector(selectAllTraits);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
+  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+
+  // Memoize the full permanent trait objects for display
+  const permanentTraits = useMemo(() => {
+    return permanentTraitIds.map(id => allTraits[id]).filter(Boolean) as Trait[];
+  }, [permanentTraitIds, allTraits]);
 
   // Get available traits (all known traits that aren't equipped or permanent)
   const availableTraits = useMemo(() => {
     const equippedIds = equippedTraits.map(t => t.id);
-    const permanentIds = permanentTraitIds;
-    const allAcquiredTraits = Object.values(allTraits); // Assuming all traits in store are "acquired" for this context
-    return allAcquiredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentIds.includes(trait.id));
-  }, [allTraits, equippedTraits, permanentTraitIds]);
+    return acquiredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
+  }, [acquiredTraits, equippedTraits, permanentTraitIds]);
 
 
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
@@ -81,6 +84,7 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   return (
     <PlayerTraitsUI
       traitSlots={traitSlots}
+      permanentTraits={permanentTraits} // Pass the full objects
       availableTraits={availableTraits}
       onEquipTrait={handleEquipTrait}
       onUnequipTrait={handleUnequipTrait}
