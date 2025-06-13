@@ -26,7 +26,8 @@ import {
   Switch,
   FormControlLabel,
   Stack,
-  Chip
+  Chip,
+  Divider
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -37,7 +38,8 @@ import {
   Settings as SettingsIcon,
   Star,
   Psychology,
-  Lock
+  Lock,
+  TrendingUp
 } from '@mui/icons-material';
 
 import {
@@ -218,78 +220,170 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
           <Typography variant="h6" gutterBottom>
             Current Status
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <Chip 
-              icon={<Star />}
-              label={`Current Essence: ${currentEssence}`}
-              color="primary"
-              variant="outlined"
-            />
-          </Box>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Chip 
+                icon={<Star />}
+                label={`Current Essence: ${currentEssence}`}
+                color="primary"
+                variant="outlined"
+                sx={{ width: '100%' }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Chip 
+                icon={<Psychology />}
+                label="Trait System: Active"
+                color="success"
+                variant="outlined"
+                sx={{ width: '100%' }}
+              />
+            </Grid>
+          </Grid>
           <Typography variant="body2" color="text.secondary">
-            Essence is used for trait acquisition and permanent trait unlocking.
+            Essence is used for trait acquisition through Resonance with NPCs and trait permanence operations.
           </Typography>
         </CardContent>
       </Card>
 
-      {/* Trait Acquisition */}
+      {/* Trait Acquisition Section */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Psychology />
-            Trait Acquisition
+            Trait Acquisition (Resonance)
           </Typography>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            Acquire new traits through NPC interactions and Resonance mechanics.
+            Acquire new traits permanently through Resonance with NPCs. Visit NPCs and use their Traits tab to resonate with available traits.
           </Typography>
+          
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <AlertTitle>How Resonance Works</AlertTitle>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Visit an NPC through the NPCs navigation tab
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Open the NPC's "Traits" tab to see available traits for Resonance
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Pay the Essence cost to permanently acquire the trait
+            </Typography>
+            <Typography variant="body2">
+              • Permanent traits are always active and don't require trait slots
+            </Typography>
+          </Alert>
+
           <Button
             variant="outlined"
             disabled
             startIcon={<Lock />}
             sx={{ mb: 1 }}
           >
-            Browse Available Traits
+            Browse Available Traits (Visit NPCs)
           </Button>
           <Typography variant="caption" display="block" color="text.secondary">
-            Visit NPCs to discover and acquire new traits through interaction.
+            Trait acquisition is handled through NPC interaction interfaces.
           </Typography>
         </CardContent>
       </Card>
 
-      {/* Trait Permanence */}
+      {/* Trait Slot Management */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TrendingUp />
+            Trait Slot Management
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Manage your active trait slots for temporary trait effects. Use the "Slots" tab to equip and unequip traits.
+          </Typography>
+          
+          <Alert severity="success" sx={{ mb: 2 }}>
+            <AlertTitle>Slot Management Features</AlertTitle>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Click empty slots to equip available traits
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Click equipped traits to unequip them
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Locked slots can be unlocked through progression
+            </Typography>
+            <Typography variant="body2">
+              • Permanent traits don't require slots and are always active
+            </Typography>
+          </Alert>
+
+          <Button
+            variant="outlined"
+            disabled
+            startIcon={<Lock />}
+            sx={{ mb: 1 }}
+          >
+            Advanced Slot Management (Future)
+          </Button>
+          <Typography variant="caption" display="block" color="text.secondary">
+            Advanced slot features are planned for future implementation.
+          </Typography>
+        </CardContent>
+      </Card>
+
+      {/* Trait Enhancement */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Trait Permanence
+            Trait Enhancement & Synergies
           </Typography>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            Make acquired traits permanent to free up active trait slots.
+            Advanced trait mechanics including trait combinations, enhancement effects, and synergy bonuses.
           </Typography>
+          
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            <AlertTitle>Planned Features</AlertTitle>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Trait combination effects for equipped trait sets
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Enhancement using Essence to improve trait effectiveness
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              • Synergy bonuses between related traits
+            </Typography>
+            <Typography variant="body2">
+              • Advanced trait crafting and modification systems
+            </Typography>
+          </Alert>
+
           <Button
             variant="outlined"
             disabled
             startIcon={<Lock />}
             sx={{ mb: 1 }}
           >
-            Manage Permanent Traits
+            Trait Enhancement Laboratory
           </Button>
           <Typography variant="caption" display="block" color="text.secondary">
-            Permanent traits provide benefits without occupying active slots.
+            Enhancement features are planned for future implementation.
           </Typography>
         </CardContent>
       </Card>
 
+      <Divider sx={{ my: 3 }} />
+
       {/* Development Status */}
       <Alert severity="info">
-        <AlertTitle>Feature Development Status</AlertTitle>
+        <AlertTitle>Trait System Development Status</AlertTitle>
         <Typography variant="body2" sx={{ mb: 1 }}>
-          <strong>✅ Implemented:</strong> Basic trait slot management, trait discovery system
+          <strong>✅ Implemented:</strong> Basic trait slot management, trait discovery system, NPC Resonance interface
         </Typography>
         <Typography variant="body2" sx={{ mb: 1 }}>
-          <strong>🔄 In Progress:</strong> Advanced trait acquisition, permanence system integration
+          <strong>🔄 Active:</strong> Trait acquisition through NPC Resonance, slot-based trait management, trait sharing with NPCs
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          <strong>📋 Planned:</strong> Advanced trait combinations, enhancement systems, synergy mechanics, trait crafting
         </Typography>
         <Typography variant="body2">
-          <strong>📋 Planned:</strong> Trait combinations, advanced trait effects, trait crafting
+          <strong>🎯 Future:</strong> Dynamic trait evolution, player-created traits, advanced trait interaction systems
         </Typography>
       </Alert>
     </Box>

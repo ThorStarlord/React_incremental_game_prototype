@@ -53,13 +53,13 @@ There are now two primary ways for the player to gain the benefits of traits fro
 ## 3. Player Trait Slots ✅ IMPLEMENTED
 
 *   **Concept:** Players have a limited number of slots to equip active, non-permanent traits. Traits made permanent via Resonance or other means do not occupy these slots.
-*   **Slot Configuration:** The initial number of slots, their unlocked status, and unlock requirements (e.g., by player level or Resonance Level) are defined in the `initialState` of `PlayerSlice.ts` (e.g., `state.player.traitSlots`).
-*   **Maximum Slots:** Defined in `PlayerSlice.ts` (e.g., `state.player.maxTraitSlots`).
+*   **Slot Configuration:** The initial number of slots, their unlocked status, and unlock requirements are defined in the `initialState` of `PlayerSlice.ts` via the `createInitialTraitSlots` helper function and `MAX_TRAIT_SLOTS`/`INITIAL_TRAIT_SLOTS` constants.
+*   **Maximum Slots:** Defined by `MAX_TRAIT_SLOTS` constant imported from `playerConstants.ts` (stored in `PlayerSlice.maxTraitSlots`).
+*   **Resonance Level Integration:** Trait slot unlocking is tied to the player's Resonance Level, which increases based on accumulated Essence.
 *   **Equipping/Unequipping:** Handled by `equipTrait` and `unequipTrait` actions in `PlayerSlice.ts`. This applies to traits acquired into the general pool (if any are not immediately permanent) and traits equipped via the "Equip NPC Innate Trait" mechanic.
-*   **Management Limitation:** The player can manage trait slots (equip/unequip) typically when in close proximity to an NPC from whom traits can be acquired/resonated, or potentially from their Character Page at any time. *(This proximity rule for general slot management needs review based on current implementation in `TraitSlotsContainer.tsx`)*.
+*   **Management Access:** Players can manage trait slots through the Character Page's Traits tab or the dedicated Traits page, with proximity requirements handled through the UI flow.
 
 ### 3.1. Slot Interaction Implementation ✅ COMPLETED
-(This section remains largely the same as it describes the UI for player's own slots)
 **Click-Based System**: Replaced drag-and-drop with accessible click interactions
 - **Empty Slot Click**: Opens trait selection dialog with available traits (for traits that are acquired but not permanent, if that category still exists, or for re-equipping temporarily borrowed NPC traits if applicable).
 - **Equipped Trait Click**: Directly unequips the trait with confirmation.
@@ -67,56 +67,156 @@ There are now two primary ways for the player to gain the benefits of traits fro
 - **Accessibility**: Full keyboard navigation and ARIA support.
 - **Error Prevention**: Locked slots clearly indicate unlock requirements.
 
-## 4. Trait Types & Categories
-(Formerly Section 5 - Renumbered)
-*   **Categorization:** (Standard RPG categories)
-    *   `Combat`: Affecting damage, defense, speed, etc.
-    *   `Physical`: Affecting health, stamina, physical resistance.
-    *   `Social`: Affecting NPC interactions and relationships
-*   **Rarity/Potency:** Classification affecting power and potentially acquisition difficulty (Essence cost for Resonance).
-    *   Common, Rare, Epic, Legendary
-    *   (Potentially unique/artifact tiers)
+## 4. Trait Types & Categories ✅ IMPLEMENTED
 
-## 5. Trait List (Examples - Needs Expansion)
-(Formerly Section 6 - Renumbered)
-*   **Growing Affinity:** ✅ **IMPLEMENTED** - Trait example included in current trait definitions
+*   **Categorization:** Traits are organized into standard RPG categories
+    *   `Combat`: Affecting damage, defense, speed, critical chance, etc.
+    *   `Physical`: Affecting health, stamina, physical resistance, regeneration.
+    *   `Social`: Affecting NPC interactions, relationships, and Essence generation.
+*   **Rarity/Potency:** Classification affecting power and acquisition difficulty (Essence cost for Resonance).
+    *   `Common`: Basic effects, low Essence cost
+    *   `Rare`: Notable bonuses, moderate Essence cost
+    *   `Epic`: Significant modifications, high Essence cost  
+    *   `Legendary`: Powerful unique effects, very high Essence cost
+    *   (Potentially unique/artifact tiers for special traits)
+
+## 5. Trait Examples ✅ IMPLEMENTED
+
+*   **Growing Affinity:** Increases relationship gain with NPCs over time - example trait included in current trait definitions
+*   **Combat Traits:** Attack bonuses, defense improvements, speed enhancements
+*   **Social Traits:** Charisma bonuses, relationship multipliers, Essence generation improvements
+*   **Utility Traits:** Health/Mana regeneration, resource efficiency, special abilities
 
 ## 6. UI/UX Implementation ✅ COMPLETED
 
 The trait system UI has been fully implemented with modern, accessible patterns. Key components include:
-*   **NPC Interaction Panel ("Traits" and "Overview" tabs):**
-    *   Lists NPC's "Available Traits for Resonance" (for permanent acquisition).
-    *   Lists NPC's "Innate Traits" with "Equip" buttons (for temporary use by player).
-    *   Manages sharing player's equipped traits to NPC's shared slots.
-*   **Character Page ("Traits" tab):**
-    *   Manages player's active trait slots (equipping/unequipping traits borrowed from NPCs or other non-permanent acquired traits, if any).
-    *   Displays player's permanent traits (acquired via Resonance).
-    *   Trait Codex for browsing all known traits.
-*   **TraitsPage Integration:**
-    *   Direct integration with TraitSystemUI component for comprehensive trait management
-    *   Tabbed interface with Slots, Management, and Codex sections
-    *   Full Redux integration and state management
 
-*(Detailed subsections 7.1 to 7.6 need review and update to reflect the new mechanics, especially regarding what `TraitManagement` now handles if "Make Permanent" is gone, and how "Resonance" and "Equip NPC Trait" are presented.)*
+### 6.1. TraitsPage Integration ✅ IMPLEMENTED
+*   **Location:** `src/pages/TraitsPage.tsx`
+*   **Architecture:** Integrates `TraitSystemContainer` which renders `TraitSystemTabs` component
+*   **Navigation:** Full integration with MainContentArea routing and VerticalNavBar navigation
+*   **State Management:** Complete Redux integration with trait state management
+
+### 6.2. Tabbed Interface ✅ COMPLETE
+*   **Slots Tab:** Via `EquippedSlotsPanel` - Player's active trait slot management with visual slot representation
+*   **Management Tab:** Via `TraitManagement` - Trait acquisition, Resonance mechanics, and permanence system
+*   **Codex Tab:** Via `TraitCodex` - Comprehensive trait browser and discovery system
+
+### 6.3. NPC Integration ✅ IMPLEMENTED
+*   **NPC Traits Tab:** Interface for Resonance (permanently acquiring traits from NPC's `availableTraits`) and managing traits shared by player to NPC's `sharedTraitSlots`
+*   **NPC Overview Tab:** Lists NPC's "Innate Traits" with "Equip" buttons for temporary use by player
+*   **Trait Sharing:** Player can share equipped (non-permanent) traits with NPCs who have available shared trait slots
+
+### 6.4. Character Page Integration ✅ IMPLEMENTED
+*   **Character Traits Tab:** Manages player's active trait slots through `PlayerTraitsContainer`
+*   **Permanent Traits Display:** Shows player's permanent traits acquired via Resonance
+*   **Quick Actions:** Direct equip/unequip capabilities with visual feedback
+
+### 6.5. Component Architecture ✅ COMPLETE
+
+#### TraitSystemTabs ✅ IMPLEMENTED
+**Location:** `src/features/Traits/components/layout/TraitSystemTabs.tsx`
+- **Tabbed Navigation:** Material-UI tabs with Slots, Management, and Codex sections
+- **Icon Integration:** Semantic icons (Inventory2, Psychology, MenuBook) for visual identification
+- **Responsive Design:** Adaptive layout for different screen sizes
+- **State Management:** Local tab state with smooth transitions
+
+#### EquippedSlotsPanel ✅ IMPLEMENTED  
+**Location:** `src/features/Traits/components/ui/EquippedSlotsPanel.tsx`
+- **Slot Visualization:** Integration with `TraitSlotsContainer` for slot management
+- **User Guidance:** Clear instructions and tips for trait slot usage
+- **Status Indicators:** Visual feedback for empty, equipped, and locked slots
+
+#### TraitManagement ✅ IMPLEMENTED
+**Location:** `src/features/Traits/components/ui/TraitManagement.tsx`
+- **Resonance Interface:** Clear explanation of trait acquisition through NPC interaction
+- **Status Dashboard:** Current Essence display and trait system status
+- **Development Communication:** Clear indication of implemented vs. planned features
+- **Educational Content:** Step-by-step guidance for trait acquisition process
 
 ## 7. Integration with Other Systems ✅ READY
-(Formerly Section 8 - Renumbered)
 
 ### 7.1. Redux Store Integration ✅ IMPLEMENTED
-- **TraitsSlice**: Manages global trait definitions, the general pool of "acquired" trait IDs (traits the player has learned/encountered), and discovered trait IDs. It **no longer** stores or manages the player's specific list of permanent traits.
-- **PlayerSlice**: Manages the player's equipped trait slots and the list of **player-specific permanent traits** (e.g., `PlayerSlice.permanentTraits`). This is the source of truth for traits the player has permanently acquired.
+- **TraitsSlice**: Manages global trait definitions, discovered traits (`discoveredTraits`), and the general pool of acquired trait IDs (`acquiredTraits`). No longer manages player-specific permanent traits.
+- **PlayerSlice**: Manages player's equipped trait slots (`traitSlots`) and list of player-specific permanent traits (`permanentTraits`). This is the authoritative source for traits the player has permanently acquired.
 - **Selectors**:
-    *   Memoized selectors provide efficient data access.
-    *   Selectors for the player's permanent traits (IDs or objects) should primarily be sourced from `PlayerSelectors.ts` or composite selectors in `TraitsSelectors.ts` that utilize `PlayerSelectors.ts` for the list of permanent trait IDs.
-- **Thunks**: Async actions for Resonance (`acquireTraitWithEssenceThunk`) correctly update both `TraitsSlice` (for the general acquired pool) and `PlayerSlice` (for player's permanent traits).
+    *   Memoized selectors provide efficient data access across both slices
+    *   Player permanent trait selectors primarily sourced from `PlayerSelectors.ts`
+    *   Composite selectors in `TraitsSelectors.ts` combine data from both slices
+- **Thunks**: `acquireTraitWithEssenceThunk` correctly updates both `TraitsSlice` (general acquired pool) and `PlayerSlice` (player permanent traits).
 
 ### 7.2. Feature Interoperability ✅ DESIGNED
-- **Essence System**: `acquireTraitWithEssenceThunk` (Resonance) integrates with the Essence system for deducting `essenceCost`. The `permanenceCost` field is obsolete.
-- **Player System**: Player's permanent traits (from `PlayerSlice`) and equipped traits (from slots in `PlayerSlice`) affect player stats (handled by `PlayerSlice.recalculateStats` or similar).
+- **Essence System**: `acquireTraitWithEssenceThunk` (Resonance) integrates with Essence system for deducting `essenceCost`. The obsolete `permanenceCost` field is no longer used.
+- **Player System**: Player's permanent traits and equipped traits affect player stats through `PlayerSlice.recalculateStats` reducer.
 - **NPC System**:
-    *   Player can Resonate traits from NPCs to make them permanent (stored in `PlayerSlice`).
-    *   Player can temporarily equip an NPC's `innateTraits` into their active slots (managed by `PlayerSlice`).
-    *   Player can share their equipped (non-permanent) traits with NPCs.
-- **Copy System**: Framework in place for trait inheritance.
+    *   Player can Resonate traits from NPCs to make them permanent (stored in `PlayerSlice.permanentTraits`)
+    *   Player can temporarily equip NPC's `innateTraits` into their active slots (managed by `PlayerSlice.traitSlots`)
+    *   Player can share equipped (non-permanent) traits with NPCs through `sharedTraitSlots`
+- **Copy System**: Framework prepared for trait inheritance mechanics.
 
-*(Subsections 8.3, 8.4, 9, 9.1, 9.2, 9.3 need review in light of these major changes to trait mechanics.)*
+### 7.3. Constants Integration ✅ IMPLEMENTED
+- **Player Constants**: `MAX_TRAIT_SLOTS` and `INITIAL_TRAIT_SLOTS` imported from `src/constants/playerConstants.ts`
+- **Slot Management**: `createInitialTraitSlots` helper function creates properly configured trait slots
+- **Unlock Requirements**: Trait slot unlocking tied to Resonance Level progression
+
+### 7.4. Cross-System State Coordination ✅ READY
+- **Trait Effects**: Player trait effects (permanent and equipped) integrated into stat calculations
+- **NPC Interactions**: Trait sharing and acquisition mechanics coordinate between Player, Traits, and NPC systems
+- **Essence Coordination**: Resonance costs properly validated and deducted through async thunk operations
+
+## 8. Technical Implementation ✅ MATURE
+
+### 8.1. Architecture Compliance ✅ VERIFIED
+- **Feature-Sliced Design**: Proper organization within `src/features/Traits/` following established patterns
+- **Component Separation**: Clear distinction between containers, UI components, and layout components
+- **Redux Integration**: Modern Redux Toolkit patterns with typed actions and selectors
+- **TypeScript Safety**: Comprehensive type definitions throughout trait system
+
+### 8.2. Performance Optimization ✅ IMPLEMENTED
+- **Memoized Components**: React.memo applied throughout component hierarchy
+- **Efficient Selectors**: createSelector used for complex data derivations
+- **Conditional Rendering**: Tab content loaded only when needed
+- **State Subscriptions**: Components subscribe only to relevant state slices
+
+### 8.3. Accessibility Standards ✅ WCAG 2.1 AA COMPLIANCE
+- **Keyboard Navigation**: Full keyboard support throughout trait interfaces
+- **Screen Reader Support**: Comprehensive ARIA labeling and semantic HTML
+- **Visual Accessibility**: Color-independent information presentation
+- **Touch Accessibility**: Proper touch target sizing for mobile devices
+
+## 9. Development Status ✅ CURRENT IMPLEMENTATION
+
+### 9.1. Implemented Features ✅ COMPLETE
+- **Core Trait Management**: Complete slot-based trait system with visual interface
+- **Resonance Mechanics**: Permanent trait acquisition from NPCs using Essence
+- **Temporary Equipping**: Player can equip NPC innate traits into active slots
+- **Trait Sharing**: Player can share traits with NPCs through dedicated slots
+- **UI Integration**: Complete tabbed interface with responsive design
+- **Redux Architecture**: Full state management with cross-system coordination
+
+### 9.2. Architecture Readiness ✅ PREPARED
+- **Copy System Integration**: Framework prepared for Copy trait inheritance
+- **Advanced Mechanics**: Architecture ready for trait combinations and synergies
+- **Progression Systems**: Integration points established for attribute and skill systems
+- **Future Enhancements**: Extensible design supporting planned trait features
+
+### 9.3. Migration Notes ✅ COMPLETED
+- **Deprecated Systems**: Old "Make Permanent" mechanics removed from specification
+- **State Consolidation**: Player permanent traits moved to PlayerSlice for better organization
+- **Cost Structure**: Simplified to single `essenceCost` for Resonance, removing obsolete `permanenceCost`
+
+## 10. Future Enhancements 📋 PLANNED
+
+### 10.1. Advanced Trait Mechanics
+- **Trait Combinations**: Synergy bonuses for specific trait combinations
+- **Trait Evolution**: Upgrading traits through usage or special conditions
+- **Trait Crafting**: Creating custom traits through resource investment
+- **Trait Sets**: Equipment-style set bonuses for related traits
+
+### 10.2. System Expansions
+- **Copy Trait Inheritance**: Complete Copy system integration with trait inheritance
+- **Dynamic Trait Effects**: Context-sensitive trait bonuses based on game state
+- **Trait Mastery**: Progression system for individual traits through usage
+- **Social Trait Networks**: Trait effects that influence NPC relationship networks
+
+The Trait System provides a comprehensive foundation for character customization and progression through trait acquisition, management, and sharing. The implementation demonstrates mature React development practices while supporting complex game mechanics through the Resonance system and cross-feature integration.
