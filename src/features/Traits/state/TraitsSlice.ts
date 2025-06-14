@@ -8,7 +8,7 @@ import type {
   DeleteTraitPresetPayload 
 } from './TraitsTypes';
 
-// Initial state
+// The initial state should be clean.
 const initialState: TraitsState = {
   traits: {},
   acquiredTraits: [],
@@ -27,6 +27,16 @@ const traitsSlice = createSlice({
       state.traits = action.payload;
       state.loading = false;
       state.error = null;
+      
+      // --- TEMPORARY DEVELOPER SHORTCUT ---
+      // When traits are loaded, we will temporarily treat all of them
+      // as "acquired" and "discovered" so the UI can be tested.
+      const allTraitIds = Object.keys(action.payload);
+      state.acquiredTraits = allTraitIds;
+      state.discoveredTraits = allTraitIds;
+      // TODO: Remove this logic once the "learn" and "discover" mechanics
+      // are fully implemented and triggered by user actions.
+      // --- END OF TEMPORARY FIX ---
     },
 
     // Discover a trait
@@ -38,7 +48,7 @@ const traitsSlice = createSlice({
     },
 
     // Acquire a trait (add to general acquired pool)
-    acquireTrait: (state, action: PayloadAction<AcquireTraitPayload>) => {
+    acquireTrait: (state, action:PayloadAction<AcquireTraitPayload>) => {
       const { traitId } = action.payload;
       if (!state.acquiredTraits.includes(traitId)) {
         state.acquiredTraits.push(traitId);
@@ -85,7 +95,16 @@ const traitsSlice = createSlice({
     },
 
     // Reset state
-    resetTraitsState: () => initialState,
+    resetTraitsState: (state) => {
+      const traits = state.traits; // Keep the definitions
+      Object.assign(state, initialState);
+      state.traits = traits;
+      
+      // Re-apply the temporary fix after reset if needed for dev
+      const allTraitIds = Object.keys(traits);
+      state.acquiredTraits = allTraitIds;
+      state.discoveredTraits = allTraitIds;
+    },
   },
 });
 

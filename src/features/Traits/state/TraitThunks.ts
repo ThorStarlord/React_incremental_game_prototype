@@ -19,6 +19,39 @@ import type {
 } from './TraitsTypes';
 
 /**
+ * NEW THUNK: Learn a trait (add to acquired pool, not permanent)
+ */
+export const learnTraitThunk = createAsyncThunk(
+  'traits/learnTrait',
+  async (
+    { traitId, essenceCost }: AcquireTraitWithEssencePayload,
+    { getState, dispatch, rejectWithValue }
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const currentEssence = state.essence.currentEssence;
+      
+      if (currentEssence < essenceCost) {
+        return rejectWithValue(`Insufficient Essence. Required: ${essenceCost}`);
+      }
+      
+      if (state.traits.acquiredTraits.includes(traitId)) {
+        return rejectWithValue('Trait already learned.');
+      }
+      
+      dispatch(spendEssence({ amount: essenceCost }));
+      dispatch(acquireTrait({ traitId })); // Only adds to the general acquired pool
+      
+      return { traitId, essenceCost };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to learn trait';
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+
+/**
  * Fetch and load trait definitions from data source
  */
 export const fetchTraitsThunk = createAsyncThunk(
