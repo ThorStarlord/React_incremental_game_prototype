@@ -71,7 +71,7 @@ interface FilterOptions {
 const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focusedId }) => {
   const dispatch = useAppDispatch();
   const allTraits = useAppSelector(selectTraits); 
-  const acquiredTraitIds = useAppSelector(selectDiscoveredTraits); 
+  const discoveredTraitIds = useAppSelector(selectDiscoveredTraits); 
   const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
@@ -132,8 +132,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
     let traitsArray = Object.values(allTraits); 
 
     if (!filterState.showUndiscovered) {
-      // Assuming all traits in allTraits are "discovered" for codex purposes
-      // If a specific "isDiscovered" flag exists on Trait, filter here
+      traitsArray = traitsArray.filter(trait => discoveredTraitIds.includes(trait.id));
     }
 
     if (filterState.searchQuery) {
@@ -149,13 +148,15 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
       const cost = trait.essenceCost || 0;
       if (cost < filterState.traitCostRange[0] || cost > filterState.traitCostRange[1]) return false;
 
-      const isAcquired = acquiredTraitIds.includes(trait.id); 
+      const isDiscovered = discoveredTraitIds.includes(trait.id);
       const isPermanent = permanentTraitIds.includes(trait.id); 
 
-      if (filterState.traitStatusFilter === 'acquired' && !(isAcquired && !isPermanent)) return false;
       if (filterState.traitStatusFilter === 'permanent' && !isPermanent) return false;
-      if (filterState.traitStatusFilter === 'available' && (isAcquired || isPermanent)) return false; 
-      if (filterState.traitStatusFilter === 'unlocked' && (isAcquired || isPermanent)) return false; // 'unlocked' might mean discovered but not acquired/permanent
+      if (filterState.traitStatusFilter === 'available' && (isPermanent || !isDiscovered)) return false; 
+      
+      // "Acquired" is now "Discovered but not permanent"
+      if (filterState.traitStatusFilter === 'acquired' && (!isDiscovered || isPermanent)) return false;
+
 
       return true;
     });
@@ -179,7 +180,6 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
           valB = b.category || '';
           break;
         default:
-          // Should not happen with restricted SortableTraitKey
           return 0;
       }
       
@@ -198,7 +198,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
     });
 
     return traitsArray;
-  }, [allTraits, acquiredTraitIds, permanentTraitIds, filterState]);
+  }, [allTraits, discoveredTraitIds, permanentTraitIds, filterState]);
 
   const renderTraitList = () => {
     if (isLoading && Object.keys(allTraits).length === 0) { 
@@ -214,11 +214,11 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
     return (
       <List dense>
         {filteredAndSortedTraits.map(trait => {
-          const isAcquired = acquiredTraitIds.includes(trait.id);
+          const isDiscovered = discoveredTraitIds.includes(trait.id);
           const isPermanent = permanentTraitIds.includes(trait.id);
           const cost = trait.essenceCost || 0;
           const canAfford = currentEssence >= cost;
-          const canBeAcquiredNow = !isAcquired && !isPermanent && trait.essenceCost !== undefined;
+          const canBeMadePermanent = isDiscovered && !isPermanent && trait.essenceCost !== undefined;
 
           return (
             <ListItem
@@ -226,11 +226,11 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               divider
               sx={{
                 bgcolor: focusedId === trait.id ? 'action.selected' : 'inherit',
-                opacity: (isAcquired || isPermanent) ? 0.7 : 1,
+                opacity: isPermanent ? 0.6 : 1,
               }}
               secondaryAction={
-                canBeAcquiredNow ? (
-                  <Tooltip title={canAfford ? "Acquire Trait (Resonate)" : `Requires ${cost} Essence`}>
+                canBeMadePermanent ? (
+                  <Tooltip title={canAfford ? "Make Trait Permanent (Resonate)" : `Requires ${cost} Essence`}>
                     <span> 
                       <IconButton
                         edge="end"
@@ -260,7 +260,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
                     <br />
                     {trait.essenceCost !== undefined && <Chip label={`Cost: ${trait.essenceCost}`} size="small" sx={{ mr: 0.5 }} />}
                     {isPermanent && <Chip label="Permanent" color="success" size="small" sx={{ mr: 0.5 }} />}
-                    {isAcquired && !isPermanent && <Chip label="Acquired" color="primary" size="small" sx={{ mr: 0.5 }} />}
+                    {isDiscovered && !isPermanent && <Chip label="Discovered" color="primary" variant="outlined" size="small" sx={{ mr: 0.5 }} />}
                     <Chip label={`Type: ${trait.category || 'General'}`} size="small" />
                   </>
                 }
@@ -298,8 +298,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               onChange={(e) => setFilter('traitStatusFilter', e.target.value)}
             >
               <MenuItem value="all">All Statuses</MenuItem>
-              <MenuItem value="available">Available to Acquire</MenuItem>
-              <MenuItem value="acquired">Acquired (Not Permanent)</MenuItem>
+              <MenuItem value="available">Available (Not Permanent)</MenuItem>
               <MenuItem value="permanent">Permanent</MenuItem>
             </Select>
           </FormControl>
