@@ -12,7 +12,7 @@ import {
     selectAllTraits,
     selectTraitLoading,
     selectTraitError,
-    selectAcquiredTraitObjects,
+    selectDiscoveredTraitObjects,
 } from '../../../Traits/state/TraitsSelectors';
 
 import {
@@ -49,7 +49,7 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
-  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
 
   // Memoize the full permanent trait objects for display
   const permanentTraits = useMemo(() => {

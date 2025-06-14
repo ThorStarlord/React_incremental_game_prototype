@@ -15,11 +15,6 @@ export const selectTraits = createSelector(
 
 export const selectAllTraits = selectTraits; // Alias for consistency
 
-export const selectAcquiredTraits = createSelector(
-  [selectTraitsState],
-  (traitsState) => traitsState.acquiredTraits
-);
-
 export const selectDiscoveredTraits = createSelector(
   [selectTraitsState],
   (traitsState) => traitsState.discoveredTraits
@@ -46,25 +41,16 @@ export const selectTraitById = createSelector(
   (traits, traitId) => traits[traitId] || null
 );
 
-export const selectAcquiredTraitObjects = createSelector(
-  [selectTraits, selectAcquiredTraits],
-  (allTraits, acquiredTraitIds) => {
-    return acquiredTraitIds
-      .map(traitId => allTraits[traitId])
-      .filter(Boolean) as Trait[];
-  }
-);
-
 export const selectDiscoveredTraitObjects = createSelector(
   [selectTraits, selectDiscoveredTraits],
   (allTraits, discoveredTraitIds) => {
     return discoveredTraitIds
-      .map(traitId => allTraits[traitId])
+      .map((traitId: string) => allTraits[traitId])
       .filter(Boolean) as Trait[];
   }
 );
 
 export const selectTraitPresetById = createSelector(
   [selectTraitPresets, (state: RootState, presetId: string) => presetId],
-  (presets, presetId) => presets.find(preset => preset.id === presetId) || null
+  (presets, presetId) => presets.find((preset: TraitPreset) => preset.id === presetId) || null
 );

@@ -101,10 +101,10 @@ Players should feel like they're building a network of meaningful relationships 
 **Concept**: Abilities, characteristics, and passive bonuses that define character capabilities. Traits are acquired from NPCs and equipped to enhance the player.
 
 **Acquisition Methods**:
-- **Resonance** - The primary method for acquiring traits. This is an **action** where the player spends **Essence** to copy an observed trait from an NPC. This action requires a sufficient level of **Emotional Connection** (`connectionDepth`) with the NPC.
-- **Quest Rewards** - Direct grants from significant achievements.
-- **Research** - Future system for discovering abstract or unique traits.
-- **Copy Inheritance** - Traits passed to created entities.
+- **Discovery**: The player becomes aware of a trait, typically by interacting with an NPC. Discovered traits can be equipped into active slots.
+- **Equipping**: A temporary, strategic choice to place a discovered trait into a limited active slot to gain its benefits. This is free.
+- **Resonance (Permanent Acquisition)**: The primary method for permanently mastering a trait. This is an **action** where the player spends **Essence** to make a *discovered* trait a permanent, innate ability that no longer requires a slot.
+- **Quest Rewards**: Direct grants from significant achievements, which could grant either discovered or permanent traits.
 
 **Management**:
 - **Limited Slots** - Players start with few trait slots, unlock more through progression

@@ -19,9 +19,9 @@ import Panel from '../../../../shared/components/layout/Panel';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 // FIXED: Thunk import is correct.
 import { acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
-// FIXED: Corrected selector imports. `selectAcquiredTraitObjects` gives us the list of all known traits.
+// FIXED: Corrected selector imports. `selectDiscoveredTraitObjects` gives us the list of all known traits.
 import {
-  selectAcquiredTraitObjects,
+  selectDiscoveredTraitObjects,
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSelectors';
@@ -32,7 +32,7 @@ const TraitAcquisitionPanel: React.FC = React.memo(() => {
 
   const essenceAmount = useAppSelector(selectCurrentEssence);
   // FIXED: Using the correct selector.
-  const allAcquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const allAcquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
 

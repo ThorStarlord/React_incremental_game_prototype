@@ -24,7 +24,7 @@ import {
   selectTraitLoading,
   selectTraitError,
   
-  selectAcquiredTraitObjects
+  selectDiscoveredTraitObjects
 } from '../../state/TraitsSelectors';
 import {
   selectPermanentTraits as selectPermanentTraitIds, // Renamed to clarify it returns IDs
@@ -59,7 +59,7 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
 
   const equippedTraits = useAppSelector(selectEquippedTraits);
   const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
-  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const playerSlots = useAppSelector(selectPlayerTraitSlots);
 
   // Get full trait objects for permanent traits

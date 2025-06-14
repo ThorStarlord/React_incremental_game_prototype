@@ -39,7 +39,8 @@ import {
   selectPlayerMaxMana,
   selectAvailableAttributePoints,
   selectIsPlayerAlive,
-  selectResonanceLevel
+  selectResonanceLevel,
+  selectPermanentTraits // Added import for permanent traits
 } from '../features/Player/state/PlayerSelectors';
 import { selectEssence } from '../features/Essence/state/EssenceSelectors';
 import { selectGameLoop } from '../features/GameLoop/state/GameLoopSelectors';
@@ -85,7 +86,7 @@ interface QuickActionItem {
 export const DashboardPage: React.FC = React.memo(() => {
   const theme = useTheme();
   
-  // Redux state selection - use individual selectors instead of nested stats
+  // Redux state selection
   const health = useAppSelector(selectPlayerHealth);
   const maxHealth = useAppSelector(selectPlayerMaxHealth);
   const mana = useAppSelector(selectPlayerMana);
@@ -97,6 +98,7 @@ export const DashboardPage: React.FC = React.memo(() => {
   const gameLoop = useAppSelector(selectGameLoop);
   const traits = useAppSelector(selectEquippedTraits);
   const traitsState = useAppSelector(selectTraitsState);
+  const permanentTraits = useAppSelector(selectPermanentTraits); // Get permanent traits
 
   // Computed dashboard statistics
   const dashboardStats = useMemo((): DashboardStatCard[] => [
@@ -115,13 +117,13 @@ export const DashboardPage: React.FC = React.memo(() => {
       icon: StarIcon
     },
     {
-      title: 'Known Traits',
-      value: traitsState.acquiredTraits.length,
-      subtitle: `${traitsState.discoveredTraits.length} discovered`,
+      title: 'Discovered Traits',
+      value: traitsState.discoveredTraits.length,
+      subtitle: `${permanentTraits.length} permanent`,
       color: 'warning',
       icon: GroupIcon
     }
-  ], [essence, traits, traitsState]);
+  ], [essence, traits, traitsState, permanentTraits]);
 
   // Quick action items
   const quickActions = useMemo((): QuickActionItem[] => [

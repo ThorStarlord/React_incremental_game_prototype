@@ -28,13 +28,10 @@ import {
 } from '@mui/material';
 import {
   Share as ShareIcon,
-  GetApp as GetAppIcon,
   CheckCircle as CheckCircleIcon,
   Lock as LockIcon,
-  HelpOutline as HelpIcon,
   Add as AddIcon,
-  Remove as RemoveIcon,
-  School as LearnIcon, // New Icon
+  AutoAwesome as ResonateIcon, // Using a new icon for "Resonate"
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
 import { selectNPCById } from '../../../state/NPCSelectors';
@@ -43,13 +40,12 @@ import {
   selectEquippedTraits,
   selectPlayerTraitSlots,
 } from '../../../../Player/state/PlayerSelectors';
-import { selectTraits, selectAcquiredTraits } from '../../../../Traits/state/TraitsSelectors';
+import { selectTraits, selectDiscoveredTraits } from '../../../../Traits/state/TraitsSelectors';
 import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors';
 import { shareTraitWithNPCThunk } from '../../../state/NPCThunks';
-import { learnTraitThunk } from '../../../../Traits/state/TraitThunks'; // Using the new learn thunk
+import { acquireTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
 import TraitSlotItem from '../../../../Traits/components/ui/TraitSlotItem';
-import EmptySlotCard from '../../../../Traits/components/ui/EmptySlotCard';
 import LockedSlotCard from '../../../../Traits/components/ui/LockedSlotCard';
 
 interface NPCTraitsTabProps {
@@ -60,24 +56,27 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
   const currentNPC = useAppSelector(state => selectNPCById(state, npcId));
   const allTraits = useAppSelector(selectTraits);
-  const playerAcquiredTraitIds = useAppSelector(selectAcquiredTraits);
+  const playerDiscoveredTraitIds = useAppSelector(selectDiscoveredTraits);
   const playerPermanentTraitIds = useAppSelector(selectPermanentTraits);
   const playerEquippedTraits = useAppSelector(selectEquippedTraits);
   const currentEssence = useAppSelector(selectCurrentEssence);
-  const playerSlots = useAppSelector(selectPlayerTraitSlots);
 
-  const [learnDialogOpen, setLearnDialogOpen] = useState(false);
+  const [resonateDialogOpen, setResonateDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedTraitForDialog, setSelectedTraitForDialog] = useState<Trait | null>(null);
   const [targetSlotForShare, setTargetSlotForShare] = useState<number | null>(null);
 
   // Memoize lists for performance
-  const availableTraitsForLearning = useMemo(() => {
+  const availableTraitsForResonance = useMemo(() => {
     if (!currentNPC?.availableTraits || !allTraits) return [];
+    // A trait is available to be made permanent if it's discoverable from this NPC,
+    // and the player has NOT already made it permanent.
     return currentNPC.availableTraits
       .map(traitId => allTraits[traitId])
-      .filter((trait): trait is Trait => !!trait && !playerAcquiredTraitIds.includes(trait.id));
-  }, [currentNPC?.availableTraits, allTraits, playerAcquiredTraitIds]);
+      .filter((trait): trait is Trait => 
+        !!trait && !playerPermanentTraitIds.includes(trait.id)
+      );
+  }, [currentNPC?.availableTraits, allTraits, playerPermanentTraitIds]);
 
   const shareablePlayerTraits = useMemo(() => {
     const npcSharedIds = currentNPC?.sharedTraitSlots?.map(s => s.traitId).filter(Boolean) || [];
@@ -85,19 +84,19 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   }, [playerEquippedTraits, currentNPC?.sharedTraitSlots]);
 
   // Handlers
-  const handleOpenLearnDialog = useCallback((trait: Trait) => {
+  const handleOpenResonateDialog = useCallback((trait: Trait) => {
     setSelectedTraitForDialog(trait);
-    setLearnDialogOpen(true);
+    setResonateDialogOpen(true);
   }, []);
 
-  const handleConfirmLearning = useCallback(async () => {
+  const handleConfirmResonance = useCallback(async () => {
     if (selectedTraitForDialog) {
-      await dispatch(learnTraitThunk({
+      await dispatch(acquireTraitWithEssenceThunk({
         traitId: selectedTraitForDialog.id,
         essenceCost: selectedTraitForDialog.essenceCost || 0
       }));
     }
-    setLearnDialogOpen(false);
+    setResonateDialogOpen(false);
     setSelectedTraitForDialog(null);
   }, [dispatch, selectedTraitForDialog]);
   
@@ -125,18 +124,18 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   return (
     <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
       <Grid container spacing={4}>
-        {/* Traits for Learning Section */}
+        {/* Traits for Resonance Section */}
         <Grid item xs={12} md={6}>
           <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-              <LearnIcon sx={{ mr: 1, color: 'primary.main' }} />
-              Learnable Traits
+              <ResonateIcon sx={{ mr: 1, color: 'primary.main' }} />
+              Traits for Resonance
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Spend Essence to learn these traits from {currentNPC.name}. Learned traits can be equipped in your active slots.
+              Spend Essence to permanently learn these traits from {currentNPC.name}. Permanent traits are always active and do not require a slot.
             </Typography>
             <List dense>
-              {availableTraitsForLearning.length > 0 ? availableTraitsForLearning.map(trait => {
+              {availableTraitsForResonance.length > 0 ? availableTraitsForResonance.map(trait => {
                 const canAfford = (trait.essenceCost || 0) <= currentEssence;
                 return (
                   <ListItem key={trait.id} divider secondaryAction={
@@ -145,10 +144,10 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                         <Button
                           size="small"
                           variant="outlined"
-                          onClick={() => handleOpenLearnDialog(trait)}
+                          onClick={() => handleOpenResonateDialog(trait)}
                           disabled={!canAfford}
                         >
-                          Learn
+                          Resonate
                         </Button>
                       </span>
                     </Tooltip>
@@ -157,7 +156,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                   </ListItem>
                 );
               }) : (
-                <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>No new traits available to learn from {currentNPC.name}.</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>You have resonated with all of {currentNPC.name}'s available traits.</Typography>
               )}
             </List>
           </Paper>
@@ -206,19 +205,19 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
       </Grid>
       
       {/* DIALOGS */}
-      <Dialog open={learnDialogOpen} onClose={() => setLearnDialogOpen(false)}>
-        <DialogTitle>Confirm Learning Trait</DialogTitle>
+      <Dialog open={resonateDialogOpen} onClose={() => setResonateDialogOpen(false)}>
+        <DialogTitle>Confirm Trait Resonance</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to spend {selectedTraitForDialog?.essenceCost || 0} Essence to learn the trait "{selectedTraitForDialog?.name}"?
+            Are you sure you want to spend {selectedTraitForDialog?.essenceCost || 0} Essence to permanently acquire the trait "{selectedTraitForDialog?.name}"?
           </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{mt: 1, display: 'block'}}>
-            This will add the trait to your pool of available traits to equip.
+           <Typography variant="caption" color="text.secondary" sx={{mt: 1, display: 'block'}}>
+            This action cannot be undone. The trait will become a permanent part of your character.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setLearnDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleConfirmLearning} variant="contained" color="primary">Confirm</Button>
+          <Button onClick={() => setResonateDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleConfirmResonance} variant="contained" color="primary">Confirm & Resonate</Button>
         </DialogActions>
       </Dialog>
       

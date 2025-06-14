@@ -66,7 +66,6 @@ export interface TraitPreset {
  */
 export interface TraitsState {
   traits: Record<string, Trait>; // All trait definitions
-  acquiredTraits: string[];      // IDs of traits the player has generally acquired/learned
   presets: TraitPreset[];        // Trait presets
   discoveredTraits: string[];    // IDs of traits the player has discovered
   loading: boolean;

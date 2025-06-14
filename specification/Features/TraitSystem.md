@@ -5,33 +5,41 @@ This document details the design and mechanics of the Trait system, which allows
 ## 1. Overview
 
 *   **Purpose:** Traits provide passive modifications to character stats, abilities, or game mechanics. They allow for build diversity, character customization, and influencing NPCs/**Copies**.
-*   **Core Loop:** Discover/Target -> Acquire (Resonate for permanent, or Equip NPC Trait for temporary) -> Equip (if not permanent) / Share (with NPCs/**Copies**).
+*   **Core Loop:** Discover -> Equip (for temporary use) / Resonate (for permanent acquisition).
 *   **Key Mechanics:**
-    *   **Resonance:** Player permanently learns a trait from an NPC at the cost of Essence.
-    *   **Equip NPC Trait:** Player temporarily uses one of an NPC's innate traits by equipping it into one of their own active slots (no cost).
-    *   **Player Trait Slots:** Limited active slots for non-permanent traits.
-    *   **Sharing with NPCs:** Player can share their equipped (non-permanent) traits with NPCs who have available shared trait slots.
+    *   **Discovery:** The player learns that a trait exists, typically by interacting with an NPC who possesses it. Discovered traits can be equipped.
+    *   **Equipping:** The player places a discovered (but not permanent) trait into one of their limited active slots to gain its benefits. This is a temporary, strategic choice with no Essence cost.
+    *   **Resonance (Permanent Acquisition):** The player spends a significant amount of Essence to make a discovered trait a permanent part of their character, freeing up the slot it occupied (if any) and making its effects always active.
 
-**Implementation Status**: ✅ **UI IMPLEMENTED** for core trait management, resonance, and sharing. "Equip NPC Trait" UI implemented in NPC Overview.
+**Implementation Status**: ✅ **UI IMPLEMENTED** for core trait management, equipping, and the new Resonance flow via the NPC panel.
 
-## 2. Trait Acquisition & Permanence
+## 2. Trait Lifecycle: Discover, Equip, Resonate
 
-There are now two primary ways for the player to gain the benefits of traits from NPCs: Resonating for permanent acquisition, and temporarily equipping an NPC's innate trait.
+The player's journey with a trait now follows a clear three-stage path.
 
-### 2.1. Permanent Acquisition via Resonance ✅ IMPLEMENTED
-*   **Concept:** Players can permanently learn and internalize a trait from a target (primarily NPCs) by performing a "Resonance" action. This action requires **close proximity** to the target and the expenditure of **Essence**.
-*   **Proximity:** The player must be in close proximity to the target NPC to perform the Resonance action (typically via the NPC's "Traits" tab).
-*   **Resonance Action:**
-    *   This is the process of spending Essence to copy an observed trait from an NPC. This action requires a sufficient level of **Emotional Connection** (`connectionDepth`) with the NPC.
-    *   The `Trait` data model includes an `essenceCost` property for this.
-    *   Upon successful Resonance:
-        *   The trait ID is added to the player's list of **permanent traits** (stored in `PlayerSlice.permanentTraits`).
-        *   The player gains the trait's benefits permanently **without needing to equip it** in an active player trait slot.
-        *   The trait is also marked as "known" or "acquired" in a general sense (e.g., `TraitsSlice.acquiredTraits`).
-*   **Implementation:** The `acquireTraitWithEssenceThunk` handles Essence cost deduction and dispatches actions to both `TraitsSlice` (to mark as acquired) and `PlayerSlice` (to add to permanent traits).
-*   **Obsolete System:** The previous system of a separate "Make Permanent" action (with a high `permanenceCost`) for already acquired traits is now **deprecated and removed**. The `permanenceCost` field on traits is obsolete.
+### 2.1. Discovery ✅ IMPLEMENTED
+*   **Concept:** This is the first step where a player becomes aware of a trait.
+*   **Trigger:** Typically occurs when interacting with an NPC. All of the NPC's `availableTraits` are automatically added to the player's `discoveredTraits` list in the Redux store.
+*   **Implementation:** The `discoverTraitThunk` is dispatched from `NPCPanelContainer` when an NPC is viewed, ensuring their traits are added to the `traits.discoveredTraits` array if not already present.
+*   **Result:** A discovered trait appears in the Trait Codex and becomes available to be equipped into an active slot.
 
-### 2.2. Temporary Use via Equipping NPC Innate Traits ✅ IMPLEMENTED
+### 2.2. Equipping ✅ IMPLEMENTED
+*   **Concept:** The player actively uses a discovered trait by placing it into one of their limited `traitSlots`. This is the primary way to get temporary benefits from a wide range of discovered abilities.
+*   **Trigger:** The player clicks on an empty trait slot, which opens a dialog listing all discovered traits that are not already permanent or equipped.
+*   **Implementation:** The `equipTrait` action in `PlayerSlice.ts` handles placing a `traitId` into a specific slot in the `player.traitSlots` array.
+*   **Result:** The trait's effects are applied to the player's stats. The trait occupies a slot. It can be unequipped at any time to free up the slot for another trait.
+
+### 2.3. Resonance (Permanent Acquisition) ✅ IMPLEMENTED
+*   **Concept:** This is the mastery step. The player spends Essence to make a discovered trait a permanent, innate part of their character. This is the "Resonance" mechanic.
+*   **Trigger:** The player interacts with an NPC who can teach a specific trait. On the NPC's "Traits" tab, the player clicks a "Resonate" button.
+*   **Implementation:** The button dispatches the `acquireTraitWithEssenceThunk`. This thunk:
+    1.  Validates the player has enough essence.
+    2.  Dispatches `spendEssence`.
+    3.  Dispatches `discoverTrait` (to ensure it's marked as known, if not already).
+    4.  Dispatches `addPermanentTrait`, which adds the trait's ID to the `player.permanentTraits` array.
+*   **Result:** The trait is now always active and **does not require a slot**. If it was previously equipped, that slot is now free.
+
+### 2.4. NPC Innate Trait Equipping ✅ IMPLEMENTED
 *   **Concept:** Players can temporarily benefit from certain traits an NPC innately possesses by "equipping" them into one of their own active trait slots.
 *   **NPC Innate Traits:** NPCs can have a list of `innateTraits` defined in their data (e.g., `npcs.json`). These are traits the NPC inherently has.
 *   **Equipping Mechanic:**
@@ -43,25 +51,21 @@ There are now two primary ways for the player to gain the benefits of traits fro
 *   **UI:** This is typically initiated from the NPC's panel (e.g., a button next to listed innate traits on the "Overview" tab), conditional on the player having a free slot and not already having the trait equipped or permanently.
 *   **Implementation:** The UI dispatches `PlayerSlice.actions.equipTrait` with the NPC's innate trait ID and an available player slot index.
 
-### 2.3. Other Acquisition Methods (Future)
-*   Completing specific quests or achievements might grant certain traits directly (potentially as permanent traits).
-*   (Future) Research or crafting systems could yield traits.
-
-### 2.4. General Requirements
+### 2.5. General Requirements
 *   Global prerequisite traits (defined on the trait itself in `traits.json`) still apply for a trait to be effective.
 
 ## 3. Player Trait Slots ✅ IMPLEMENTED
 
-*   **Concept:** Players have a limited number of slots to equip active, non-permanent traits. Traits made permanent via Resonance or other means do not occupy these slots.
-*   **Slot Configuration:** The initial number of slots, their unlocked status, and unlock requirements are defined in the `initialState` of `PlayerSlice.ts` via the `createInitialTraitSlots` helper function and `MAX_TRAIT_SLOTS`/`INITIAL_TRAIT_SLOTS` constants.
+*   **Concept:** Players have a limited number of slots to equip active, non-permanent traits. Traits made permanent via Resonance do not occupy these slots.
+*   **Slot Configuration:** The initial number of slots and their unlock requirements are defined in the `initialState` of `PlayerSlice.ts` via the `createInitialTraitSlots` helper function and `MAX_TRAIT_SLOTS`/`INITIAL_TRAIT_SLOTS` constants.
 *   **Maximum Slots:** Defined by `MAX_TRAIT_SLOTS` constant imported from `playerConstants.ts` (stored in `PlayerSlice.maxTraitSlots`).
 *   **Resonance Level Integration:** Trait slot unlocking is tied to the player's Resonance Level, which increases based on accumulated Essence.
-*   **Equipping/Unequipping:** Handled by `equipTrait` and `unequipTrait` actions in `PlayerSlice.ts`. This applies to traits acquired into the general pool (if any are not immediately permanent) and traits equipped via the "Equip NPC Innate Trait" mechanic.
-*   **Management Access:** Players can manage trait slots through the Character Page's Traits tab or the dedicated Traits page, with proximity requirements handled through the UI flow.
+*   **Equipping/Unequipping:** Handled by `equipTrait` and `unequipTrait` actions in `PlayerSlice.ts`. This applies to discovered traits and traits equipped via the "Equip NPC Innate Trait" mechanic.
+*   **Management Access:** Players can manage trait slots through the Character Page's Traits tab or the dedicated Traits page.
 
 ### 3.1. Slot Interaction Implementation ✅ COMPLETED
 **Click-Based System**: Replaced drag-and-drop with accessible click interactions
-- **Empty Slot Click**: Opens trait selection dialog with available traits (for traits that are acquired but not permanent, if that category still exists, or for re-equipping temporarily borrowed NPC traits if applicable).
+- **Empty Slot Click**: Opens trait selection dialog with available discovered traits that are not already permanent or equipped.
 - **Equipped Trait Click**: Directly unequips the trait with confirmation.
 - **Visual Feedback**: Clear hover states and action indicators.
 - **Accessibility**: Full keyboard navigation and ARIA support.
@@ -99,8 +103,8 @@ The trait system UI has been fully implemented with modern, accessible patterns.
 
 ### 6.2. Tabbed Interface ✅ COMPLETE
 *   **Slots Tab:** Via `EquippedSlotsPanel` - Player's active trait slot management with visual slot representation
-*   **Management Tab:** Via `TraitManagement` - Trait acquisition, Resonance mechanics, and permanence system
-*   **Codex Tab:** Via `TraitCodex` - Comprehensive trait browser and discovery system
+*   **Management Tab:** Via `TraitManagement` - Trait system overview and explanation of mechanics
+*   **Codex Tab:** Via `TraitCodex` - Comprehensive trait browser and discovery system for all discovered traits
 
 ### 6.3. NPC Integration ✅ IMPLEMENTED
 *   **NPC Traits Tab:** Interface for Resonance (permanently acquiring traits from NPC's `availableTraits`) and managing traits shared by player to NPC's `sharedTraitSlots`
@@ -129,26 +133,27 @@ The trait system UI has been fully implemented with modern, accessible patterns.
 
 #### TraitManagement ✅ IMPLEMENTED
 **Location:** `src/features/Traits/components/ui/TraitManagement.tsx`
-- **Resonance Interface:** Clear explanation of trait acquisition through NPC interaction
+- **System Overview:** Clear explanation of trait discovery, equipping, and Resonance mechanics
 - **Status Dashboard:** Current Essence display and trait system status
 - **Development Communication:** Clear indication of implemented vs. planned features
-- **Educational Content:** Step-by-step guidance for trait acquisition process
+- **Educational Content:** Step-by-step guidance for trait lifecycle process
 
 ## 7. Integration with Other Systems ✅ READY
 
 ### 7.1. Redux Store Integration ✅ IMPLEMENTED
-- **TraitsSlice**: Manages global trait definitions, discovered traits (`discoveredTraits`), and the general pool of acquired trait IDs (`acquiredTraits`). No longer manages player-specific permanent traits.
+- **TraitsSlice**: Manages global trait definitions and discovered traits (`discoveredTraits`). No longer manages player-specific permanent traits or a general acquired traits list.
 - **PlayerSlice**: Manages player's equipped trait slots (`traitSlots`) and list of player-specific permanent traits (`permanentTraits`). This is the authoritative source for traits the player has permanently acquired.
 - **Selectors**:
     *   Memoized selectors provide efficient data access across both slices
     *   Player permanent trait selectors primarily sourced from `PlayerSelectors.ts`
     *   Composite selectors in `TraitsSelectors.ts` combine data from both slices
-- **Thunks**: `acquireTraitWithEssenceThunk` correctly updates both `TraitsSlice` (general acquired pool) and `PlayerSlice` (player permanent traits).
+- **Thunks**: `discoverTraitThunk` adds to discovered traits. `acquireTraitWithEssenceThunk` handles Resonance, updating both `TraitsSlice` (discovery) and `PlayerSlice` (permanent traits).
 
 ### 7.2. Feature Interoperability ✅ DESIGNED
-- **Essence System**: `acquireTraitWithEssenceThunk` (Resonance) integrates with Essence system for deducting `essenceCost`. The obsolete `permanenceCost` field is no longer used.
+- **Essence System**: `acquireTraitWithEssenceThunk` (Resonance) integrates with Essence system for deducting `essenceCost`.
 - **Player System**: Player's permanent traits and equipped traits affect player stats through `PlayerSlice.recalculateStats` reducer.
 - **NPC System**:
+    *   Player can discover traits by viewing NPCs with `availableTraits`
     *   Player can Resonate traits from NPCs to make them permanent (stored in `PlayerSlice.permanentTraits`)
     *   Player can temporarily equip NPC's `innateTraits` into their active slots (managed by `PlayerSlice.traitSlots`)
     *   Player can share equipped (non-permanent) traits with NPCs through `sharedTraitSlots`
@@ -188,8 +193,10 @@ The trait system UI has been fully implemented with modern, accessible patterns.
 
 ### 9.1. Implemented Features ✅ COMPLETE
 - **Core Trait Management**: Complete slot-based trait system with visual interface
+- **Discovery Mechanics**: Trait discovery through NPC interactions
+- **Equipping System**: Temporary trait usage through limited active slots
 - **Resonance Mechanics**: Permanent trait acquisition from NPCs using Essence
-- **Temporary Equipping**: Player can equip NPC innate traits into active slots
+- **Temporary NPC Trait Equipping**: Player can equip NPC innate traits into active slots
 - **Trait Sharing**: Player can share traits with NPCs through dedicated slots
 - **UI Integration**: Complete tabbed interface with responsive design
 - **Redux Architecture**: Full state management with cross-system coordination
@@ -201,9 +208,10 @@ The trait system UI has been fully implemented with modern, accessible patterns.
 - **Future Enhancements**: Extensible design supporting planned trait features
 
 ### 9.3. Migration Notes ✅ COMPLETED
-- **Deprecated Systems**: Old "Make Permanent" mechanics removed from specification
+- **Simplified Lifecycle**: Moved from complex acquisition/permanence system to streamlined Discover -> Equip -> Resonate flow
 - **State Consolidation**: Player permanent traits moved to PlayerSlice for better organization
-- **Cost Structure**: Simplified to single `essenceCost` for Resonance, removing obsolete `permanenceCost`
+- **Removed Deprecated Systems**: Eliminated separate "Make Permanent" actions and obsolete `permanenceCost` field
+- **Discovery Integration**: Automatic trait discovery through NPC interactions
 
 ## 10. Future Enhancements 📋 PLANNED
 
@@ -219,4 +227,4 @@ The trait system UI has been fully implemented with modern, accessible patterns.
 - **Trait Mastery**: Progression system for individual traits through usage
 - **Social Trait Networks**: Trait effects that influence NPC relationship networks
 
-The Trait System provides a comprehensive foundation for character customization and progression through trait acquisition, management, and sharing. The implementation demonstrates mature React development practices while supporting complex game mechanics through the Resonance system and cross-feature integration.
+The Trait System provides a comprehensive foundation for character customization and progression through the streamlined Discover -> Equip -> Resonate lifecycle. The implementation demonstrates mature React development practices while supporting complex game mechanics through the simplified trait acquisition flow and cross-feature integration.

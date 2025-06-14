@@ -169,10 +169,9 @@ interface PlayerState {
 **State Structure**:
 ```typescript
 interface TraitsState {
-  traits: Record<string, Trait>; // All trait definitions
-  acquiredTraits: string[];      // IDs of traits the player has generally acquired/learned
-  presets: TraitPreset[];        // Trait presets
-  discoveredTraits: string[];    // IDs of traits the player has discovered
+  traits: Record<string, Trait>; // All trait definitions loaded from data
+  presets: TraitPreset[];        // Saved trait loadouts
+  discoveredTraits: string[];    // IDs of traits the player has discovered (e.g., seen on an NPC)
   loading: boolean;
   error: string | null;
 }
@@ -180,9 +179,9 @@ interface TraitsState {
 
 **Key Features**:
 - **Trait Definitions & Discovery**: Manages all trait definitions (loaded via `fetchTraitsThunk`) and tracks discovered traits (`discoverTrait`, `discoveredTraits` state)
-- **General Acquisition System**: Handles adding traits to the general "acquired" pool (`acquireTrait`). This signifies a trait is known to the player, but not necessarily active or permanent
+- **Streamlined Lifecycle**: Follows the simplified Discover -> Equip -> Resonate flow without intermediate acquisition states
 - **Trait Permanence (Player-Specific)**: Player-specific permanent traits are managed in `PlayerSlice`. The "Resonance" mechanic (`acquireTraitWithEssenceThunk`) makes traits permanent for the player by updating `PlayerSlice.permanentTraits`
-- **Codex Data**: Provides the necessary data (`traits`, `discoveredTraits`, `acquiredTraits`) for a Trait Codex UI
+- **Codex Data**: Provides the necessary data (`traits`, `discoveredTraits`) for a Trait Codex UI displaying all discovered traits
 - **Trait Presets**: Manages saving, loading, and deleting trait presets (`saveTraitPreset`, `loadTraitPreset`, `deleteTraitPreset`)
 
 ### 4.3. NPCs Slice ✅ COMPLETE
@@ -391,26 +390,47 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
 );
 ```
 
-## 7. Performance Optimization
+## 7. Integration Architecture
 
-### 7.1. Selector Memoization ✅ IMPLEMENTED
+### 7.1. Redux Store Integration ✅ IMPLEMENTED
+- **TraitsSlice**: Manages global trait definitions and discovered traits (`discoveredTraits`). No longer manages player-specific permanent traits or a general acquired traits list.
+- **PlayerSlice**: Manages player's equipped trait slots (`traitSlots`) and list of player-specific permanent traits (`permanentTraits`). This is the authoritative source for traits the player has permanently acquired.
+- **Selectors**:
+    *   Memoized selectors provide efficient data access across both slices
+    *   Player permanent trait selectors primarily sourced from `PlayerSelectors.ts`
+    *   Composite selectors in `TraitsSelectors.ts` combine data from both slices
+- **Thunks**: `discoverTraitThunk` adds to discovered traits. `acquireTraitWithEssenceThunk` handles Resonance, updating both `TraitsSlice` (discovery) and `PlayerSlice` (permanent traits).
+
+### 7.2. Feature Interoperability ✅ DESIGNED
+- **Essence System**: `acquireTraitWithEssenceThunk` (Resonance) integrates with Essence system for deducting `essenceCost`.
+- **Player System**: Player's permanent traits and equipped traits affect player stats through `PlayerSlice.recalculateStats` reducer.
+- **NPC System**:
+    *   Player can discover traits by viewing NPCs with `availableTraits`
+    *   Player can Resonate traits from NPCs to make them permanent (stored in `PlayerSlice.permanentTraits`)
+    *   Player can temporarily equip NPC's `innateTraits` into their active slots (managed by `PlayerSlice.traitSlots`)
+    *   Player can share equipped (non-permanent) traits with NPCs through `sharedTraitSlots`
+- **Copy System**: Framework prepared for trait inheritance mechanics.
+
+## 8. Performance Optimization
+
+### 8.1. Selector Memoization ✅ IMPLEMENTED
 - **createSelector**: Prevents unnecessary recalculations
 - **Shallow Equality**: Efficient comparison for object selectors
 - **Dependency Arrays**: Minimal selector dependencies
 
-### 7.2. Component Integration ✅ IMPLEMENTED
+### 8.2. Component Integration ✅ IMPLEMENTED
 - **useAppSelector**: Typed selector hook usage
 - **Subscription Targeting**: Components subscribe only to relevant state slices
 - **React.memo**: Component memoization for selector-dependent components
 
-### 7.3. Thunk Optimization ✅ IMPLEMENTED
+### 8.3. Thunk Optimization ✅ IMPLEMENTED
 - **Error Boundaries**: Isolated error handling in thunks
 - **State Validation**: Thunks validate prerequisites before mutations
 - **Batched Updates**: Multiple related state updates in single thunks
 
-## 8. Error Handling
+## 9. Error Handling
 
-### 8.1. Thunk Error Management ✅ IMPLEMENTED
+### 9.1. Thunk Error Management ✅ IMPLEMENTED
 ```typescript
 // ✅ Comprehensive error handling pattern
 export const riskyOperationThunk = createAsyncThunk(
@@ -428,14 +448,14 @@ export const riskyOperationThunk = createAsyncThunk(
 );
 ```
 
-### 8.2. State Error Recovery ✅ IMPLEMENTED
+### 9.2. State Error Recovery ✅ IMPLEMENTED
 - **Error State**: Each slice includes error state for failed operations
 - **Reset Actions**: Clear error states for retry mechanisms
 - **Fallback Values**: Default states for corrupted or missing data
 
-## 9. Testing Strategy
+## 10. Testing Strategy
 
-### 9.1. Slice Testing ✅ READY
+### 10.1. Slice Testing ✅ READY
 ```typescript
 // ✅ Testing pattern for reducers
 describe('featureSlice', () => {
@@ -449,7 +469,7 @@ describe('featureSlice', () => {
 });
 ```
 
-### 9.2. Selector Testing ✅ READY
+### 10.2. Selector Testing ✅ READY
 ```typescript
 // ✅ Testing pattern for selectors
 describe('feature selectors', () => {
@@ -462,7 +482,7 @@ describe('feature selectors', () => {
 });
 ```
 
-### 9.3. Thunk Testing ✅ READY
+### 10.3. Thunk Testing ✅ READY
 ```typescript
 // ✅ Testing pattern for thunks
 describe('fetchDataThunk', () => {
@@ -479,35 +499,35 @@ describe('fetchDataThunk', () => {
 });
 ```
 
-## 10. Future Enhancements
+## 11. Future Enhancements
 
-### 10.1. Planned Slices 📋
+### 11.1. Planned Slices 📋
 - **Quest System**: Quest management and progression tracking
 - **Copy System**: Player-created entity management
 - **Inventory System**: Item storage and equipment management
 - **Achievement System**: Player accomplishment tracking
 
-### 10.2. Advanced Features 📋
+### 11.2. Advanced Features 📋
 - **Real-time Sync**: Multi-device state synchronization
 - **Optimistic Updates**: Immediate UI updates with server reconciliation
 - **State Persistence**: Enhanced save/load with compression and migration
 - **Analytics Integration**: State change tracking for game balance
 
-## 11. Best Practices Summary
+## 12. Best Practices Summary
 
-### 11.1. State Organization ✅ IMPLEMENTED
+### 12.1. State Organization ✅ IMPLEMENTED
 - **Feature-Sliced**: Clear domain boundaries prevent coupling
 - **Normalized Data**: Efficient data structures for complex relationships
 - **Minimal State**: Only store what cannot be computed
 - **Immutable Updates**: Immer-powered safe mutations
 
-### 11.2. Performance Patterns ✅ IMPLEMENTED
+### 12.2. Performance Patterns ✅ IMPLEMENTED
 - **Memoized Selectors**: Prevent unnecessary recalculations
 - **Targeted Subscriptions**: Components subscribe to minimal state
 - **Batched Operations**: Group related updates in thunks
 - **Error Isolation**: Errors don't cascade across features
 
-### 11.3. Developer Experience ✅ IMPLEMENTED
+### 12.3. Developer Experience ✅ IMPLEMENTED
 - **Type Safety**: Comprehensive TypeScript throughout
 - **Dev Tools**: Redux DevTools integration for debugging
 - **Consistent Patterns**: Standardized slice and thunk structure

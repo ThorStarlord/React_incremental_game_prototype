@@ -22,7 +22,7 @@ import {
   selectTraits,
   selectTraitLoading,
   selectTraitError,
-  selectAcquiredTraitObjects
+  selectDiscoveredTraitObjects
 } from '../../state/TraitsSelectors';
 import {
   selectPermanentTraits,
@@ -53,7 +53,7 @@ const TraitManagementPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose })
 
   const equippedTraits = useAppSelector(selectEquippedTraits);
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
-  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const playerSlots = useAppSelector(selectPlayerTraitSlots);
 
   const permanentTraits = useMemo(() => {

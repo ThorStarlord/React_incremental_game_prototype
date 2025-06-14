@@ -192,6 +192,28 @@ interface TraitPreset {
 }
 ```
 
+### 4.6. Core Traits State
+**Location**: `src/features/Traits/state/TraitsTypes.ts`
+
+```typescript
+/**
+ * Core Traits state interface for streamlined trait lifecycle
+ */
+interface TraitsState {
+  traits: Record<string, Trait>; // All trait definitions loaded from data
+  presets: TraitPreset[];        // Saved trait loadouts
+  discoveredTraits: string[];    // IDs of traits the player has discovered (e.g., seen on an NPC)
+  loading: boolean;
+  error: string | null;
+}
+```
+
+**Key Changes**:
+- **Removed `acquiredTraits`**: The general acquired traits list has been eliminated as part of the streamlined trait lifecycle
+- **Discovery Focus**: Only `discoveredTraits` tracks trait awareness for the Trait Codex
+- **Player-Specific Traits**: Player permanent traits are managed in `PlayerSlice.permanentTraits`
+- **Simplified Flow**: Follows the Discover -> Equip -> Resonate lifecycle without intermediate acquisition states
+
 ## 5. NPC Data Model ✅ IMPLEMENTED
 
 ### 5.1. NPC Definition

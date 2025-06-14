@@ -3,7 +3,7 @@ import { Box, CircularProgress, Grid, Typography, Alert } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 // FIXED: Importing the correct selectors without duplicates
 import {
-    selectAcquiredTraitObjects,
+    selectDiscoveredTraitObjects,
     selectTraitLoading,
     selectTraitError
 } from '../../state/TraitsSelectors';
@@ -15,7 +15,7 @@ import { Trait } from '../../state/TraitsTypes'; // Import the Trait type
 
 const AvailableTraitList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
   // FIXED: Use the correct selector name
   const availableSlotCount = useAppSelector(selectAvailableTraitSlots);
   const playerTraitSlots = useAppSelector(selectPlayerTraitSlots);

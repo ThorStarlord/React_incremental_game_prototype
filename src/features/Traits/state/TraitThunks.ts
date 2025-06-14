@@ -3,7 +3,6 @@ import type { RootState } from '../../../app/store';
 import { 
   loadTraits, 
   discoverTrait, 
-  acquireTrait, 
   setLoading, 
   setError 
 } from './TraitsSlice';
@@ -17,38 +16,6 @@ import type {
   Trait, 
   AcquireTraitWithEssencePayload 
 } from './TraitsTypes';
-
-/**
- * NEW THUNK: Learn a trait (add to acquired pool, not permanent)
- */
-export const learnTraitThunk = createAsyncThunk(
-  'traits/learnTrait',
-  async (
-    { traitId, essenceCost }: AcquireTraitWithEssencePayload,
-    { getState, dispatch, rejectWithValue }
-  ) => {
-    try {
-      const state = getState() as RootState;
-      const currentEssence = state.essence.currentEssence;
-      
-      if (currentEssence < essenceCost) {
-        return rejectWithValue(`Insufficient Essence. Required: ${essenceCost}`);
-      }
-      
-      if (state.traits.acquiredTraits.includes(traitId)) {
-        return rejectWithValue('Trait already learned.');
-      }
-      
-      dispatch(spendEssence({ amount: essenceCost }));
-      dispatch(acquireTrait({ traitId })); // Only adds to the general acquired pool
-      
-      return { traitId, essenceCost };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to learn trait';
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
 
 
 /**
@@ -125,8 +92,8 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
         dispatch(spendEssence({ amount: actualCost }));
       }
       
-      // Add to general acquired traits
-      dispatch(acquireTrait({ traitId }));
+      // Mark the trait as discovered, since making it permanent implies discovery.
+      dispatch(discoverTrait({ traitId }));
       
       // Add to player's permanent traits
       dispatch(addPermanentTrait(traitId));

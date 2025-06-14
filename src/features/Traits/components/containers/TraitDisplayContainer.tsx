@@ -9,7 +9,7 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 // FIXED: Importing selectors from the correct file: TraitsSelectors.ts
 import {
   selectTraits,
-  selectAcquiredTraits, // This selector gives IDs of all known traits // This gives full objects of equipped traits
+  selectDiscoveredTraits, // This selector gives IDs of all known traits // This gives full objects of equipped traits
 } from '../../state/TraitsSelectors';
 import { selectEquippedTraits } from '../../../Player/state/PlayerSelectors'; // This gives full objects of equipped traits
 import { fetchTraitsThunk } from '../../state/TraitThunks';
@@ -30,7 +30,7 @@ const TraitDisplayContainer: React.FC = () => {
 
   // Select the necessary data from the Redux store
   const allTraits = useAppSelector(selectTraits);
-  const acquiredTraitIds = useAppSelector(selectAcquiredTraits);
+  const acquiredTraitIds = useAppSelector(selectDiscoveredTraits);
   const equippedTraits = useAppSelector(selectEquippedTraits); // This is an array of Trait objects
 
   // Memoize the IDs of equipped traits for easy lookup

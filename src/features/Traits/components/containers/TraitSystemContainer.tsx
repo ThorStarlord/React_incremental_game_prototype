@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import {
   selectTraits,
-  selectAcquiredTraitObjects,
   selectDiscoveredTraitObjects,
   selectTraitLoading,
   selectTraitError,
@@ -26,10 +25,10 @@ import TraitSystemTabs from '../ui/TraitSystemTabs';
 /**
  * TraitSystemContainer Component
  *
- * This container component is responsible for:
+ * This is the primary "smart" component for the Traits feature. It is responsible for:
  * 1. Fetching all necessary data from the Redux store.
  * 2. Defining all action handlers that dispatch to Redux.
- * 3. Passing all the data and handlers down to the presentational TraitSystemUI component.
+ * 3. Passing all the data and handlers down to the presentational TraitSystemTabs component.
  */
 const TraitSystemContainer: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
@@ -44,7 +43,6 @@ const TraitSystemContainer: React.FC = React.memo(() => {
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
   const equippedTraits = useAppSelector(selectEquippedTraits);
   const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
-  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const currentEssence = useAppSelector(selectCurrentEssence);
   const loading = useAppSelector(selectTraitLoading);
@@ -56,11 +54,11 @@ const TraitSystemContainer: React.FC = React.memo(() => {
 
   const availableTraitsForEquip = useMemo(() => {
     const equippedIds = equippedTraits.map(t => t.id);
-    return acquiredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
-  }, [acquiredTraits, equippedTraits, permanentTraitIds]);
+    return discoveredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
+  }, [discoveredTraits, equippedTraits, permanentTraitIds]);
 
 
-  // Define action handlers to be passed to TraitSystemUI
+  // Define action handlers
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
     dispatch(equipTrait({ traitId, slotIndex }));
   }, [dispatch]);
@@ -80,10 +78,13 @@ const TraitSystemContainer: React.FC = React.memo(() => {
     dispatch(discoverTraitThunk(traitId));
   }, [dispatch]);
 
+  // Define utility functions to pass as props
   const canAcquireTrait = useCallback((trait: Trait) => {
-    const isAcquired = acquiredTraits.some(t => t.id === trait.id);
-    return !isAcquired;
-  }, [acquiredTraits]);
+    // A trait can be "acquired" (made permanent) if it's discovered and not already permanent.
+    const isDiscovered = discoveredTraits.some(t => t.id === trait.id);
+    const isPermanent = permanentTraits.some(t => t.id === trait.id);
+    return isDiscovered && !isPermanent;
+  }, [discoveredTraits, permanentTraits]);
 
   const getTraitAffordability = useCallback((trait: Trait) => {
     const cost = trait.essenceCost || 0;
@@ -96,17 +97,17 @@ const TraitSystemContainer: React.FC = React.memo(() => {
     };
   }, [currentEssence]);
 
-  // Construct the props object for TraitSystemUI
+  // Construct the props object for TraitSystemTabs
   const traitSystemProps = {
     allTraits,
     traitSlots,
     equippedTraits,
     permanentTraits,
-    acquiredTraits,
+    acquiredTraits: discoveredTraits, // Pass discovered traits as the base for "acquired" logic
     discoveredTraits,
     availableTraitsForEquip,
     currentEssence,
-    isInProximityToNPC: true,
+    isInProximityToNPC: true, // Assuming default proximity or get from meta state
     loading,
     error,
     onEquipTrait: handleEquipTrait,

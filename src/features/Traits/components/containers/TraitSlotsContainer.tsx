@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 // Selectors
 import {
   selectTraits,
-  selectAcquiredTraitObjects,
+  selectDiscoveredTraitObjects, // Changed from selectDiscoveredTraitObjects
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSelectors';
@@ -25,7 +25,7 @@ export const TraitSlotsContainer: React.FC = () => {
 
   // --- Data selection from Redux ---
   const allTraits = useAppSelector(selectTraits);
-  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects); // Use discovered traits
   const equippedTraits = useAppSelector(selectEquippedTraits);
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
@@ -43,12 +43,13 @@ export const TraitSlotsContainer: React.FC = () => {
     return equippedTraits.map(trait => trait.id);
   }, [equippedTraits]);
 
+  // THIS IS THE KEY CHANGE: Base the list of equippable traits on what has been discovered.
   const availableTraitsForEquip = useMemo(() => {
-    return acquiredTraits.filter(trait =>
+    return discoveredTraits.filter(trait =>
       !equippedTraitIds.includes(trait.id) &&
       !permanentTraitIds.includes(trait.id)
     );
-  }, [acquiredTraits, equippedTraitIds, permanentTraitIds]);
+  }, [discoveredTraits, equippedTraitIds, permanentTraitIds]);
 
   // --- Callback Handlers ---
   const handleSlotClick = useCallback((slot: TraitSlot) => {
@@ -100,9 +101,8 @@ export const TraitSlotsContainer: React.FC = () => {
       availableTraits={[]}
       isInProximityToNPC={isInProximityToNPC}
       isLoading={true}
-      error={null} // Provide null for error prop
-      onSlotClick={() => {}} // Provide empty function for onSlotClick
-      // Provide all other required props even in loading state
+      error={null} 
+      onSlotClick={() => {}} 
       selectedSlotIndexForModal={selectedSlotIndex}
       isTraitSelectionModalOpen={selectedSlotIndex !== null}
       onOpenTraitSelectionModal={() => {}}
@@ -129,7 +129,6 @@ export const TraitSlotsContainer: React.FC = () => {
       isInProximityToNPC={isInProximityToNPC}
       isLoading={false}
       error={error}
-      // Pass state and handlers for the selection modal
       selectedSlotIndexForModal={selectedSlotIndex}
       isTraitSelectionModalOpen={selectedSlotIndex !== null}
       onOpenTraitSelectionModal={(slotIndex) => setSelectedSlotIndex(slotIndex)}
@@ -137,12 +136,10 @@ export const TraitSlotsContainer: React.FC = () => {
       onSelectTraitInModal={handleTraitSelectInDialog}
       selectedTraitIdInModal={selectedTraitId}
       onConfirmEquip={handleEquipConfirm}
-      // Pass state and handlers for the unequip confirmation
       unequipDialogState={unequipDialog}
       onOpenUnequipDialog={(trait, slotIndex) => setUnequipDialog({ open: true, trait, slotIndex })}
       onConfirmUnequip={handleUnequipConfirm}
       onCloseUnequipDialog={handleCloseUnequipDialog}
-      // Pass the main slot click handler
       onSlotClick={handleSlotClick}
     />
   );

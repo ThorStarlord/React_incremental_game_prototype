@@ -5,7 +5,7 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 // FIXED: Importing correct selectors
 import {
   selectTraits,
-  selectAcquiredTraitObjects,
+  selectDiscoveredTraitObjects,
 } from '../../state/TraitsSelectors';
 import { selectPermanentTraits, selectPlayerTraitSlots, selectEquippedTraits } from '../../../Player/state/PlayerSelectors';
 // FIXED: Importing actions from PlayerSlice
@@ -20,7 +20,7 @@ const ManageTraitsTab: React.FC = () => {
 
   // State selectors
   const allTraits = useAppSelector(selectTraits);
-  const acquiredTraits = useAppSelector(selectAcquiredTraitObjects);
+  const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const equippedTraitObjects = useAppSelector(selectEquippedTraits);
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
   const traitSlots = useAppSelector(selectPlayerTraitSlots); // Get official slots

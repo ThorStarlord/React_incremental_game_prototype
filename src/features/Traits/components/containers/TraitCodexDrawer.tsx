@@ -39,7 +39,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {
   selectTraits,
-  selectAcquiredTraits,
+  selectDiscoveredTraits,
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSelectors'; 
@@ -71,7 +71,7 @@ interface FilterOptions {
 const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focusedId }) => {
   const dispatch = useAppDispatch();
   const allTraits = useAppSelector(selectTraits); 
-  const acquiredTraitIds = useAppSelector(selectAcquiredTraits); 
+  const acquiredTraitIds = useAppSelector(selectDiscoveredTraits); 
   const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
