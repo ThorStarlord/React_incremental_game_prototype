@@ -2,43 +2,48 @@
 
 This document outlines the design and mechanics of the Essence system in the game. Essence is the core metaphysical resource representing potential, connection, and the capacity for influence and growth.
 
-**Implementation Status**: ✅ **UI IMPLEMENTED + STATE MANAGEMENT** - Complete Essence management interface with integrated display components, generation tracking, statistics dashboard, and Redux state management.
+**Implementation Status**: ✅ **UI IMPLEMENTED + STATE MANAGEMENT + PASSIVE GENERATION** - Complete Essence management interface with integrated display components, generation tracking, statistics dashboard, Redux state management, and active passive generation based on NPC connections.
 
 ## 1. Overview
 
 *   **Purpose:** Essence fuels the player's unique abilities related to emotional connection, trait manipulation, and the creation/enhancement of Copies. It serves as the primary currency for advanced progression and interaction mechanics.
-*   **Core Loop:** Establish Emotional Connections -> Generate Essence passively -> Spend Essence on Influence, Trait Acquisition/Permanence, **Accelerated Copy Growth**, and potentially other upgrades.
+*   **Core Loop:** Establish Emotional Connections -> Generate Essence passively -> Spend Essence on Trait Resonance, **Accelerated Copy Growth**, and potentially other upgrades.
 
-**UI Implementation**: ✅ **COMPLETE** - EssencePage provides comprehensive interface for all Essence-related functionality with integrated components, statistics tracking, and a manual generation button for testing.
+**UI Implementation**: ✅ **COMPLETE** - `EssencePage` provides a comprehensive interface for all Essence-related functionality with integrated components, statistics tracking, and a manual generation button for testing.
 
 ## 2. Essence Sources
 
 *   **Primary Source: Emotional Connection** ✅ **IMPLEMENTED**
-    *   **Formation:** Connections are established and deepened through meaningful interactions with targets (NPCs, potentially other entities). Key actions include:
-        *   Dialogue choices that resonate with the target.
-        *   Completing quests or tasks for the target.
-        *   Sharing beneficial traits with the target (see Trait System).
-        *   Demonstrating understanding or empathy towards the target's goals or state.
-    *   **Connection Depth:** The strength of the connection is tracked (details likely in `NPCSystem.md` or `RelationshipSystem.md`). This depth directly influences Essence generation.
-    *   **Generation:** Once a connection is formed, Essence is generated passively over time. The rate depends on:
-        *   **Target Complexity/Power Level:** More significant or powerful targets generate more base Essence.
-        *   **Connection Depth:** Deeper connections yield a higher generation rate.
-        *   *(Formula TBD: e.g., `Rate = BaseTargetValue * ConnectionDepthMultiplier * GlobalModifiers`)*
+    *   **Formation:** Connections are established and deepened through meaningful interactions with targets (NPCs).
+    *   **Connection Depth:** The strength of the connection is tracked via `connectionDepth` and `relationshipValue` on the NPC object. These values directly influence Essence generation.
+    *   **Generation:** Essence is generated passively over time based on active NPC relationships. The rate is calculated using relationship values and connection depths.
 *   **Secondary Sources:**
-*   **Manual Actions:** Manual Essence gain through a dedicated button on the Essence Page for testing and prototyping.
-    *   **Rewards:** One-time gains from completing significant quests, achievements, or overcoming major challenges.
-    *   **Combat/Defeat:** Minor Essence gain from defeating enemies, representing absorbed potential (less significant than connections).
+    *   **Manual Actions:** Manual Essence gain through a dedicated button on the `EssencePage` for testing and prototyping.
+    *   **Rewards:** One-time gains from quests, achievements, etc. (Planned).
 
-## 3. Essence Generation Mechanics
+## 3. Essence Generation Mechanics ✅ FULLY IMPLEMENTED
 
-*   **Connection-Based Generation:** ✅ **IMPLEMENTED**
-    *   Passive, continuous generation from all active emotional connections.
-    *   The total passive generation rate is the sum of rates from all individual connections.
+*   **Connection-Based Generation:** ✅ **ACTIVE**
+    *   Passive, continuous generation from all active emotional connections with NPCs
+    *   The `isGenerating` flag in the `EssenceState` defaults to `true` and is automatically managed
+    *   Generation occurs every game loop tick when the game is running
+*   **Rate Calculation:** ✅ **IMPLEMENTED**
+    *   The total passive generation rate is calculated based on the **`connectionDepth`** of each NPC, making each level of connection a significant milestone.
+    *   The formula is: `Total Rate = BASE_RATE + Σ (for each NPC: connectionDepth * NPC_CONTRIBUTION_MULTIPLIER)`
+    *   Base generation rate provides minimum essence per second
+*   **Game Loop Integration:** ✅ **IMPLEMENTED**
+    *   `generateEssenceThunk` is called automatically during game loop ticks
+    *   Generation respects game speed multipliers and pause states
+    *   Smooth, consistent generation tied to actual elapsed time
+*   **Real-time Updates:** ✅ **IMPLEMENTED**
+    *   Generation rate recalculated when NPC relationships change
+    *   UI displays current generation rate and updates in real-time
+    *   Last generation timestamp tracked for accurate calculations
 *   **Multipliers:**
-    *   Global multipliers affecting all Essence generation (e.g., from player traits, temporary buffs, game progression milestones).
-    *   Source-specific multipliers (less common, maybe a trait enhancing generation from specific connection types).
-    *   Stacking: Define how multipliers combine (likely multiplicative).
-*   **Offline Progress:** Calculate passive generation based on connection rates and global multipliers while the game is closed (standard offline progress calculation).
+    *   Global multipliers from player traits (e.g., social traits affecting essence generation) can be applied to the total rate
+    *   NPC-specific multipliers based on relationship types or special conditions
+*   **Recalculation Trigger:** The `updateEssenceGenerationRateThunk` is called automatically whenever an NPC's relationship value "levels up" their connection depth, ensuring the generation rate is always synchronized.
+*   **Offline Progress:** Calculate passive generation based on connection rates and global multipliers while the game is closed (Planned for future implementation)
 
 ## 4. Essence Costs & Spending (Sinks)
 
@@ -138,24 +143,63 @@ This document outlines the design and mechanics of the Essence system in the gam
 *   **Visual Feedback**: ✅ **IMPLEMENTED** - Visual feedback for gaining/spending Essence through UI updates and number formatting
 *   **Future Integration**: 📋 **PLANNED** - Interface prepared for advanced Essence features including emotional connections and trait acquisition
 
-## 9. Technical Implementation ✅ COMPLETE
+## 7. Game Loop Integration ✅ IMPLEMENTED
 
-### 9.1. Component Architecture
+### 7.1. Passive Generation System ✅ ACTIVE
+
+**Automatic Generation**: Essence generation is now fully automated and integrated with the game loop
+- **Tick-Based Generation**: `generateEssenceThunk` called during game loop ticks
+- **Time-Based Calculation**: Generation based on actual elapsed time since last update
+- **Game Speed Integration**: Respects game speed multipliers and pause states
+- **Performance Optimized**: Efficient generation calculations with minimal overhead
+
+**State Management**: Complete integration with Redux state
+- **Generation Rate Tracking**: Current generation rate stored and updated automatically
+- **Last Generation Time**: Timestamp tracking for accurate time-based calculations
+- **Generation Status**: `isGenerating` flag indicates active/inactive generation state
+- **Error Handling**: Robust error handling for generation failures
+
+### 7.2. NPC Relationship Integration ✅ IMPLEMENTED
+
+**Dynamic Rate Calculation**: Generation rate updates based on NPC relationships
+- **Relationship Tracking**: Monitors all NPC relationship values and connection depths
+- **Automatic Recalculation**: Rate recalculated when relationships change
+- **Multi-Source Generation**: Combines base generation with NPC-based generation
+- **Real-time Feedback**: UI updates immediately when generation rate changes
+
+## 8. Technical Implementation ✅ COMPLETE
+
+### 8.1. Component Architecture
 - **Location**: `src/pages/EssencePage.tsx`
 - **Integration**: Complete integration with existing Essence UI components
 - **State Management**: Redux Toolkit integration with selectEssence selector
 - **Performance**: Memoized component with efficient rendering patterns
 
-### 9.2. Feature Integration
+### 8.2. Feature Integration
 - **Navigation**: Full integration with VerticalNavBar and MainContentArea
 - **Routing**: Proper route handling in page shell architecture
 - **State Synchronization**: Real-time updates from Essence Redux state
 - **Error Handling**: Robust error boundaries and graceful degradation
+- **Game Loop**: Seamless integration with GameLoop system for passive generation
 
-### 9.3. Development Status
-- **Current Functionality**: Complete UI for existing Essence features
-- **Testing Interface**: ✅ **IMPLEMENTED** - Manual generation button (`ManualEssenceButton`) added to EssencePage for development and testing.
-- **Future Readiness**: Architecture prepared for advanced Essence mechanics
+### 8.3. Development Status
+- **Current Functionality**: Complete UI for existing Essence features with active passive generation
+- **Testing Interface**: ✅ **IMPLEMENTED** - Manual generation button (`ManualEssenceButton`) added to EssencePage for development and testing
+- **Future Readiness**: Architecture prepared for advanced Essence mechanics including offline progress
 - **Documentation**: Clear indication of implemented vs. planned features
 
-The Essence System UI implementation is complete and provides a comprehensive interface for all current Essence functionality while maintaining readiness for future enhancements including emotional connections, trait acquisition costs, and Copy system integration.
+## 9. Future Enhancements 📋 PLANNED
+
+### 9.1. Advanced Generation Features
+- **Offline Progress**: Calculate passive generation during game closure
+- **Generation Multipliers**: Trait-based and achievement-based generation bonuses
+- **Connection Quality**: Different types of relationships providing varied generation rates
+- **Generation Events**: Special events or milestones that boost generation temporarily
+
+### 9.2. Enhanced UI Features
+- **Generation History**: Charts and graphs showing generation over time
+- **Connection Details**: Detailed breakdown of each NPC's contribution to generation
+- **Generation Predictions**: Forecasting future essence based on current connections
+- **Efficiency Metrics**: Analysis of essence generation vs. spending patterns
+
+The Essence System now provides a complete, actively generating resource system that forms the core of the game's progression mechanics. The implementation demonstrates the successful integration of passive generation, NPC relationships, and game loop systems while maintaining excellent performance and user experience standards.

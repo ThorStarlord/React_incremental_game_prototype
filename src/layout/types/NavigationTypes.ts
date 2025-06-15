@@ -20,7 +20,8 @@ export type TabId =
   | 'settings'      // Game settings and configuration
   | 'saves'         // Save management interface
   | 'crafting'      // Crafting system (recipes, materials, management)
-  | 'save-load';    // Save and load game interface
+  | 'save-load'     // Save and load game interface
+  | 'debug';        // Development and testing tools
 
 /**
  * Navigation item configuration

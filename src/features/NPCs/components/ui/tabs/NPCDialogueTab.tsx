@@ -11,9 +11,12 @@ import {
 import ChatIcon from '@mui/icons-material/Chat';
 import SendIcon from '@mui/icons-material/Send';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
-// FIXED: Importing the correct parameterized selector
-import { selectNPCById, selectNPCDialogueHistory } from '../../../state/NPCSelectors';
-import { processNPCInteractionThunk } from '../../../state/NPCThunks';
+// Corrected: Import from the feature's public API
+import {
+  selectNPCById,
+  selectNPCDialogueHistory,
+  processNPCInteractionThunk
+} from '../../../';
 import type { NPC, DialogueEntry } from '../../../state/NPCTypes';
 
 interface NPCDialogueTabProps {
@@ -46,7 +49,6 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const [message, setMessage] = useState('');
 
   const npc = useAppSelector(state => selectNPCById(state, npcId));
-  // FIXED: Correctly calling the parameterized selector inside useAppSelector
   const dialogueHistory = useAppSelector((state) => selectNPCDialogueHistory(state, npcId));
 
   const availableDialogueChoices = useMemo(() => {
@@ -115,15 +117,15 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
             <Box key={msg.id} sx={{ mb: 2 }}>
               <Paper
                 elevation={1}
-                sx={{ p: 1.5, bgcolor: msg.speaker === 'player' ? 'primary.light' : 'grey.100', color: msg.speaker === 'player' ? 'primary.contrastText' : 'text.primary' }}
+                sx={{ p: 1.5, bgcolor: msg.playerText ? 'primary.light' : 'grey.100', color: msg.playerText ? 'primary.contrastText' : 'text.primary' }}
               >
                 <Typography variant="body2">
-                  {msg.speaker === 'player' ? msg.playerText : msg.npcResponse}
+                  {msg.playerText || msg.npcResponse}
                 </Typography>
               </Paper>
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                {msg.speaker === 'player' ? 'You' : npc.name} • {new Date(msg.timestamp).toLocaleTimeString()}
-                {msg.speaker === 'npc' && msg.relationshipChange && (
+                {msg.playerText ? 'You' : npc.name} • {new Date(msg.timestamp).toLocaleTimeString()}
+                {!msg.playerText && msg.relationshipChange && (
                   <Typography variant="caption" component="span" sx={{ ml: 1, color: msg.relationshipChange > 0 ? 'success.main' : 'error.main' }}>
                     ({msg.relationshipChange > 0 ? '+' : ''}{msg.relationshipChange} Rel)
                   </Typography>

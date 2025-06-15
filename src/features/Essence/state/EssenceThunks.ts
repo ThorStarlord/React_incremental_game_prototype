@@ -1,166 +1,244 @@
 /**
  * Redux Thunks for Essence-related async operations
  */
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { 
-  gainEssence, 
-  spendEssence, 
+import { createAsyncThunk, AsyncThunk } from '@reduxjs/toolkit';
+import type { RootState } from '../../../app/store';
+import {
+  gainEssence,
+  spendEssence,
   updateGenerationRate,
-  updateResonanceLevel
+  updateResonanceLevel,
 } from './EssenceSlice';
-import { RootState } from '../../../app/store';
 import { EssenceState } from './EssenceTypes';
-// FIXED: Import the correct action that exists in PlayerSlice
 import { addPermanentTrait, setResonanceLevel } from '../../Player/state/PlayerSlice';
 import { selectPlayer } from '../../Player/state/PlayerSelectors';
+import { ESSENCE_GENERATION } from '../../../constants/gameConstants';
+import { NPC } from '../../NPCs/state/NPCTypes';
+import { Trait } from '../../Traits/state/TraitsTypes';
 
 /**
- * Initialize the essence system with default values
+ * Async thunk for processing essence generation over time
  */
-export const initializeEssenceSystemThunk = createAsyncThunk<void, void, { state: RootState }>(
-  'essence/initializeSystem',
-  async (_, { dispatch, getState }) => {
-    const state = getState();
+export const processPassiveGenerationThunk: AsyncThunk<{ generated: number; newTotal: number; }, number, { state: RootState }> = createAsyncThunk(
+  'essence/processGeneration',
+  async (deltaTime: number, { getState, dispatch }) => {
+    const state = getState() as RootState;
     const essenceState = state.essence;
-    
-    // Set initial generation rate if not already set
-    if (essenceState.generationRate === 0) {
-      dispatch(updateGenerationRate(1)); // Base rate of 1 essence per second
+
+    // We check isRunning in the game loop hook, but it's safe to double-check here.
+    // The key check is generationRate > 0.
+    if (state.gameLoop.isRunning && !state.gameLoop.isPaused && essenceState.generationRate > 0) {
+      const generatedAmount = (essenceState.generationRate * deltaTime) / 1000; // deltaTime in ms
+      dispatch(gainEssence({ amount: generatedAmount, source: 'passive_generation' }));
+
+      return {
+        generated: generatedAmount,
+        newTotal: essenceState.currentEssence + generatedAmount
+      };
     }
-    
-    // Process initial resonance level
-    await dispatch(processResonanceLevelThunk());
-  }
-);
 
-/**
- * Generate essence manually (for testing/clicking)
- */
-export const generateEssenceManuallyThunk = createAsyncThunk<void, void, { state: RootState }>(
-  'essence/generateManually',
-  async (_, { dispatch, getState }) => {
-    const state = getState();
-    const essenceState = state.essence;
-    
-    // Use gainEssence which automatically updates lastGenerationTime
-    dispatch(gainEssence({ amount: essenceState.perClickValue }));
-  }
-);
-
-/**
- * Update generation rate based on NPC connections
- */
-export const updateGenerationRateThunk = createAsyncThunk<void, number, { state: RootState }>(
-  'essence/updateGenerationRate',
-  async (newRate, { dispatch }) => {
-    dispatch(updateGenerationRate(newRate));
-  }
-);
-
-/**
- * Acquire trait with essence cost (Resonance mechanic)
- */
-export const acquireTraitWithEssenceThunk = createAsyncThunk<
-  { traitId: string; essenceSpent: number },
-  { traitId: string; essenceCost: number },
-  { state: RootState }
->(
-  'essence/acquireTraitWithEssence',
-  async ({ traitId, essenceCost }, { dispatch, getState, rejectWithValue }) => {
-    const state = getState();
-    const currentEssence = state.essence.currentEssence;
-    
-    // Check if player has enough essence
-    if (currentEssence < essenceCost) {
-      return rejectWithValue(`Insufficient essence. Required: ${essenceCost}, Available: ${currentEssence}`);
-    }
-    
-    // Spend the essence
-    dispatch(spendEssence({ amount: essenceCost }));
-    
-    // FIXED: Use the correct payload type - PlayerSlice expects just the traitId string
-    dispatch(addPermanentTrait(traitId));
-    
     return {
-      traitId,
-      essenceSpent: essenceCost
+      generated: 0,
+      newTotal: essenceState.currentEssence
     };
   }
 );
 
 /**
- * Process Resonance Level updates based on total Essence collected
+ * Async thunk for updating essence generation rate based on NPC connections and traits.
  */
-export const processResonanceLevelThunk = createAsyncThunk<
-  { newLevel: number; previousLevel: number; levelUp: boolean } | null,
-  void,
-  { state: RootState }
->(
+export const updateEssenceGenerationRateThunk = createAsyncThunk(
+  'essence/updateGenerationRate',
+  async (_, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const npcs = state.npcs?.npcs || {};
+    const player = state.player;
+    const allTraits = state.traits.traits;
+
+    // 1. Start with the base generation rate
+    let totalRate = ESSENCE_GENERATION.BASE_RATE_PER_SECOND;
+    
+    // 2. Calculate total contribution from all NPC connections
+    const npcContribution = Object.values(npcs).reduce((total, npc: NPC) => {
+      // Ensure relationship contributes positively
+      if (npc.connectionDepth > 0 && npc.relationshipValue > 0) {
+        const relationshipMultiplier = npc.relationshipValue / 100.0; // Normalize to 0-1
+        const connectionMultiplier = npc.connectionDepth / 10.0; // Normalize to 0-1, assuming max depth is 10
+        
+        const npcRate = connectionMultiplier * relationshipMultiplier * ESSENCE_GENERATION.NPC_CONTRIBUTION_MULTIPLIER;
+        return total + npcRate;
+      }
+      return total;
+    }, 0);
+
+    totalRate += npcContribution;
+    
+    // 3. Calculate global multipliers from player traits
+    let traitMultiplier = 1.0;
+    const activeTraitIds = [...player.permanentTraits, ...player.traitSlots.map(s => s.traitId).filter(Boolean) as string[]];
+    
+    activeTraitIds.forEach(traitId => {
+      const trait: Trait = allTraits[traitId];
+      if (trait && trait.effects && typeof trait.effects === 'object' && !Array.isArray(trait.effects)) {
+        if (trait.effects.essenceGenerationMultiplier) {
+          // Multipliers are cumulative (e.g., 1.1 * 1.15)
+          traitMultiplier *= trait.effects.essenceGenerationMultiplier;
+        }
+      }
+    });
+
+    // 4. Apply the total trait multiplier to the calculated rate
+    totalRate *= traitMultiplier;
+
+    // 5. Dispatch the update action
+    dispatch(updateGenerationRate(totalRate));
+
+    return {
+      newRate: totalRate,
+      connectionCount: Object.values(npcs).filter((npc: NPC) => npc.connectionDepth > 0).length
+    };
+  }
+);
+
+/**
+ * Async thunk for spending essence with validation
+ */
+export const spendEssenceThunk = createAsyncThunk(
+  'essence/spendEssence',
+  async (amount: number, { getState, dispatch, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const currentEssence = state.essence.currentEssence;
+
+    if (currentEssence < amount) {
+      return rejectWithValue(`Insufficient essence. Required: ${amount}, Available: ${currentEssence}`);
+    }
+
+    dispatch(spendEssence({ amount }));
+
+    return {
+      spent: amount,
+      remaining: currentEssence - amount
+    };
+  }
+);
+
+/**
+ * Async thunk for acquiring traits with essence cost (Resonance)
+ */
+export const acquireTraitWithEssenceThunk = createAsyncThunk(
+  'essence/acquireTraitWithEssence',
+  async (
+    { traitId, essenceCost }: { traitId: string; essenceCost: number },
+    { getState, dispatch, rejectWithValue }
+  ) => {
+    const state = getState() as RootState;
+    const currentEssence = state.essence.currentEssence;
+
+    if (currentEssence < essenceCost) {
+      return rejectWithValue(`Insufficient essence. Required: ${essenceCost}, Available: ${currentEssence}`);
+    }
+
+    dispatch(spendEssence({ amount: essenceCost }));
+    dispatch(addPermanentTrait(traitId));
+
+    return {
+      traitId,
+      essenceSpent: essenceCost,
+      remainingEssence: currentEssence - essenceCost
+    };
+  }
+);
+
+/**
+ * Async thunk for processing resonance level updates
+ */
+export const processResonanceLevelThunk: AsyncThunk<{ newLevel: number; previousLevel: number; levelUp: boolean; }, void, { state: RootState }> = createAsyncThunk(
   'essence/processResonanceLevel',
   async (_, { getState, dispatch }) => {
-    const state = getState();
-    const essenceState = state.essence;
-    const playerState = selectPlayer(state);
+    const state = getState() as RootState;
+    const essenceState = state.essence as EssenceState;
     
-    // Calculate new resonance level based on total essence collected
     const newCalculatedResonanceLevel = Math.floor(essenceState.totalCollected / 100);
-    
-    // Check if resonance level should increase
+
     if (newCalculatedResonanceLevel > essenceState.currentResonanceLevel) {
-      const previousLevel = essenceState.currentResonanceLevel;
-      
-      // Update essence resonance level
       dispatch(updateResonanceLevel(newCalculatedResonanceLevel));
-      
-      // FIXED: Use the correct action with the calculated value
       dispatch(setResonanceLevel(newCalculatedResonanceLevel));
 
       return {
         newLevel: newCalculatedResonanceLevel,
-        previousLevel,
+        previousLevel: essenceState.currentResonanceLevel,
         levelUp: true
       };
     }
-    
-    return null;
+
+    return {
+      newLevel: newCalculatedResonanceLevel,
+      previousLevel: essenceState.currentResonanceLevel,
+      levelUp: false
+    };
   }
 );
 
 /**
- * Manually increase resonance level (for testing/admin purposes)
+ * SIMPLIFIED Async thunk for initializing essence system
  */
-export const increaseResonanceLevelThunk = createAsyncThunk<void, void, { state: RootState }>(
+export const initializeEssenceSystemThunk = createAsyncThunk(
+  'essence/initializeSystem',
+  async (_, { dispatch }) => {
+    // The actual update logic is now triggered by other events.
+    // This thunk can be used for any one-time setup if needed in the future.
+    console.log("Essence system initialized.");
+    return {
+      initialized: true,
+      timestamp: Date.now()
+    };
+  }
+);
+
+/**
+ * Async thunk for manual essence generation (testing/development)
+ */
+export const generateEssenceManuallyThunk = createAsyncThunk(
+  'essence/manualGeneration',
+  async (amount: number, { dispatch }) => {
+    dispatch(gainEssence({ amount, source: 'manual_generation' }));
+
+    return {
+      generated: amount,
+      timestamp: Date.now()
+    };
+  }
+);
+
+/**
+ * Async thunk for increasing player resonance level with essence cost
+ */
+export const increaseResonanceLevelThunk = createAsyncThunk<
+  void,
+  { essenceCost: number },
+  { state: RootState }
+>(
   'essence/increaseResonanceLevel',
-  async (_, { getState, dispatch }) => {
+  async ({ essenceCost }, { getState, dispatch }) => {
     const state = getState();
-    const currentResonanceLevel = state.essence.currentResonanceLevel;
+    const currentEssence = state.essence.currentEssence;
+    const player = selectPlayer(state);
     
-    // Update essence resonance level
-    dispatch(updateResonanceLevel(currentResonanceLevel + 1));
-    
-    // FIXED: Use the correct action with the incremented value
-    dispatch(setResonanceLevel(currentResonanceLevel + 1));
-  }
-);
-
-/**
- * Process passive essence generation based on connections
- */
-export const processPassiveGenerationThunk = createAsyncThunk<void, void, { state: RootState }>(
-  'essence/processPassiveGeneration',
-  async (_, { dispatch, getState }) => {
-    const state = getState();
-    const essenceState = state.essence;
-    const currentTime = Date.now();
-    
-    if (essenceState.isGenerating && essenceState.generationRate > 0) {
-      const timeDelta = (currentTime - essenceState.lastGenerationTime) / 1000; // Convert to seconds
-      const generatedAmount = Math.floor(essenceState.generationRate * timeDelta);
-      
-      if (generatedAmount > 0) {
-        // gainEssence automatically updates lastGenerationTime
-        dispatch(gainEssence({ amount: generatedAmount }));
-      }
+    if (currentEssence < essenceCost) {
+      throw new Error('Insufficient essence for resonance level increase');
     }
+
+    const currentResonanceLevel = player.resonanceLevel || 0;
+    if (currentResonanceLevel >= 50) {
+      throw new Error('Maximum resonance level reached');
+    }
+
+    dispatch(spendEssence({
+      amount: essenceCost,
+      source: 'resonance_level_increase',
+      description: `Increased resonance level to ${currentResonanceLevel + 1}`
+    }));
+    
+    dispatch(setResonanceLevel(currentResonanceLevel + 1));
   }
 );

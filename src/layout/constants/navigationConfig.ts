@@ -13,10 +13,11 @@ import {
   Build as CraftingIcon,
   Settings as SettingsIcon,
   Save as SaveLoadIcon,
-  Dashboard as DashboardIcon, // Added
-  School as SkillsIcon, // Added
-  LocalFireDepartment as EssenceIcon, // Added
-  SaveAlt as SavesIcon // Added
+  Dashboard as DashboardIcon,
+  School as SkillsIcon,
+  LocalFireDepartment as EssenceIcon,
+  SaveAlt as SavesIcon,
+  BugReport as DebugIcon, // Icon is already here, which is good
 } from '@mui/icons-material';
 
 import type { 
@@ -43,129 +44,129 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
  * Defines all available navigation destinations
  */
 export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
-  character: {
-    id: 'character',
-    label: 'Character',
-    icon: CharacterIcon,
-    route: '/game/character',
-    isImplemented: true, // Player state management implemented
-    tooltip: 'View character stats and attributes',
-    section: 'character-management',
-  },
-  
-  traits: {
-    id: 'traits',
-    label: 'Traits',
-    icon: TraitsIcon,
-    route: '/game/traits',
-    isImplemented: true, // UI fully implemented
-    tooltip: 'Manage acquired traits and abilities',
-    section: 'character-management',
-  },
-  
-  npcs: {
-    id: 'npcs',
-    label: 'NPCs',
-    icon: NPCsIcon,
-    route: '/game/npcs',
-    isImplemented: true, // UI fully implemented
-    tooltip: 'Interact with non-player characters',
-    section: 'world-interaction',
-  },
-  
-  quests: {
-    id: 'quests',
-    label: 'Quests',
-    icon: QuestsIcon,
-    route: '/game/quests',
-    isImplemented: false, // Planned
-    tooltip: 'Track active and completed quests',
-    section: 'world-interaction',
-  },
-  
-  copies: {
-    id: 'copies',
-    label: 'Copies',
-    icon: CopiesIcon,
-    route: '/game/copies',
-    isImplemented: false, // Planned
-    tooltip: 'Manage created copies',
-    section: 'world-interaction',
-  },
-  
-  inventory: {
-    id: 'inventory',
-    label: 'Inventory',
-    icon: InventoryIcon,
-    route: '/game/inventory',
-    isImplemented: false, // 📋 Future feature
-    tooltip: 'Manage items and equipment'
-  },
-  
-  crafting: {
-    id: 'crafting',
-    label: 'Crafting',
-    icon: CraftingIcon,
-    route: '/game/crafting',
-    isImplemented: false, // 📋 Future feature
-    tooltip: 'Craft items and equipment'
-  },
-  
-  settings: {
-    id: 'settings',
-    label: 'Settings',
-    icon: SettingsIcon,
-    route: '/game/settings',
-    isImplemented: true, // ✅ Implemented
-    tooltip: 'Configure game settings',
-    section: 'systems',
-  },
-  
-  'save-load': {
-    id: 'save-load',
-    label: 'Save/Load',
-    icon: SaveLoadIcon,
-  route: '/game/save-load',
-  isImplemented: true, // ✅ Implemented
-  tooltip: 'Save and load game progress'
-  },
-  // Added missing TabIds
   dashboard: {
     id: 'dashboard',
     label: 'Dashboard',
     icon: DashboardIcon,
     route: '/game/dashboard',
-    isImplemented: true, // Dashboard page is implemented
+    isImplemented: true,
     tooltip: 'View game overview and statistics',
     section: 'systems',
+  },
+  character: {
+    id: 'character',
+    label: 'Character',
+    icon: CharacterIcon,
+    route: '/game/character',
+    isImplemented: true,
+    tooltip: 'View character stats and attributes',
+    section: 'character-management',
+  },
+  traits: {
+    id: 'traits',
+    label: 'Traits',
+    icon: TraitsIcon,
+    route: '/game/traits',
+    isImplemented: true,
+    tooltip: 'Manage acquired traits and abilities',
+    section: 'character-management',
   },
   skills: {
     id: 'skills',
     label: 'Skills',
     icon: SkillsIcon,
     route: '/game/skills',
-    isImplemented: false, // Assuming not yet
+    isImplemented: false,
     tooltip: 'Manage character skills',
     section: 'character-management',
+  },
+  npcs: {
+    id: 'npcs',
+    label: 'NPCs',
+    icon: NPCsIcon,
+    route: '/game/npcs',
+    isImplemented: true,
+    tooltip: 'Interact with non-player characters',
+    section: 'world-interaction',
+  },
+  quests: {
+    id: 'quests',
+    label: 'Quests',
+    icon: QuestsIcon,
+    route: '/game/quests',
+    isImplemented: false,
+    tooltip: 'Track active and completed quests',
+    section: 'world-interaction',
+  },
+  copies: {
+    id: 'copies',
+    label: 'Copies',
+    icon: CopiesIcon,
+    route: '/game/copies',
+    isImplemented: false,
+    tooltip: 'Manage created copies',
+    section: 'world-interaction',
   },
   essence: {
     id: 'essence',
     label: 'Essence',
     icon: EssenceIcon,
     route: '/game/essence',
-    isImplemented: true, // Essence page exists
+    isImplemented: true,
     tooltip: 'Manage essence and related mechanics',
-    section: 'character-management', // Or a new section like 'core-systems'
+    section: 'character-management',
+  },
+  inventory: {
+    id: 'inventory',
+    label: 'Inventory',
+    icon: InventoryIcon,
+    route: '/game/inventory',
+    isImplemented: false,
+    tooltip: 'Manage items and equipment'
+  },
+  crafting: {
+    id: 'crafting',
+    label: 'Crafting',
+    icon: CraftingIcon,
+    route: '/game/crafting',
+    isImplemented: false,
+    tooltip: 'Craft items and equipment'
+  },
+  settings: {
+    id: 'settings',
+    label: 'Settings',
+    icon: SettingsIcon,
+    route: '/game/settings',
+    isImplemented: true,
+    tooltip: 'Configure game settings',
+    section: 'systems',
   },
   saves: {
     id: 'saves',
     label: 'Manage Saves',
     icon: SavesIcon,
-    route: '/game/saves', // Distinct from save-load page
-    isImplemented: false, // Assuming this is for a dedicated save slot management UI
+    route: '/game/saves',
+    isImplemented: false,
     tooltip: 'Manage multiple save game slots',
     section: 'systems',
-  }
+  },
+  'save-load': {
+    id: 'save-load',
+    label: 'Save/Load',
+    icon: SaveLoadIcon,
+    route: '/game/save-load',
+    isImplemented: true,
+    tooltip: 'Save and load game progress'
+  },
+  debug: {
+    id: 'debug',
+    label: 'Debug',
+    icon: DebugIcon,
+    route: '/game/debug',
+    isImplemented: process.env.NODE_ENV === 'development',
+    tooltip: 'Access development and testing tools',
+    section: 'systems',
+  },
 };
 
 /**
@@ -179,8 +180,8 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     items: [
       NAVIGATION_ITEMS.character,
       NAVIGATION_ITEMS.traits,
-      NAVIGATION_ITEMS.skills, // Added skills
-      NAVIGATION_ITEMS.essence, // Added essence
+      NAVIGATION_ITEMS.skills,
+      NAVIGATION_ITEMS.essence,
       NAVIGATION_ITEMS.inventory
     ]
   },
@@ -199,11 +200,12 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     id: 'systems',
     title: 'Systems',
     items: [
-      NAVIGATION_ITEMS.dashboard, // Added dashboard
+      NAVIGATION_ITEMS.dashboard,
       NAVIGATION_ITEMS.crafting,
       NAVIGATION_ITEMS.settings,
       NAVIGATION_ITEMS['save-load'],
-      NAVIGATION_ITEMS.saves // Added saves
+      NAVIGATION_ITEMS.saves,
+      NAVIGATION_ITEMS.debug, // Added Debug to this section
     ]
   }
 ];
@@ -239,82 +241,11 @@ export function getItemsBySection(sectionId: string): NavItem[] {
  */
 export function isItemAvailable(id: TabId): boolean {
   const item = NAVIGATION_ITEMS[id];
-  return item?.isImplemented && (!item.requiresCondition || item.requiresCondition());
+  return !!item?.isImplemented && (!item.requiresCondition || item.requiresCondition());
 }
 
 /**
  * Default navigation items for initial load
+ * (This is a fallback and might be deprecated in favor of the full sections)
  */
-export const DEFAULT_NAV_ITEMS: NavItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: DashboardIcon,
-    route: '/game/dashboard',
-    isImplemented: true,
-    tooltip: 'View game overview and statistics',
-    section: 'systems',
-  },
-  {
-    id: 'character',
-    label: 'Character',
-    icon: CharacterIcon, // Changed to alias
-    route: '/game/character',
-    isImplemented: true, // Player state management implemented
-    tooltip: 'View character stats and attributes',
-    section: 'character-management',
-  },
-  {
-    id: 'traits',
-    label: 'Traits',
-    icon: TraitsIcon, // Changed to alias
-    route: '/game/traits',
-    isImplemented: true, // UI fully implemented
-    tooltip: 'Manage acquired traits and abilities',
-    section: 'character-management',
-  },
-  {
-    id: 'npcs',
-    label: 'NPCs',
-    icon: NPCsIcon, // Changed to alias
-    route: '/game/npcs',
-    isImplemented: true, // UI fully implemented
-    tooltip: 'Interact with non-player characters',
-    section: 'world-interaction',
-  },
-  {
-    id: 'quests',
-    label: 'Quests',
-    icon: QuestsIcon, // Changed to alias
-    route: '/game/quests',
-    isImplemented: false, // Planned
-    tooltip: 'Track active and completed quests',
-    section: 'world-interaction',
-  },
-  {
-    id: 'copies',
-    label: 'Copies',
-    icon: CopiesIcon, // Changed to alias
-    route: '/game/copies',
-    isImplemented: false, // Planned
-    tooltip: 'Manage created copies',
-    section: 'world-interaction',
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: SettingsIcon,
-    route: '/game/settings',
-    isImplemented: true, // ✅ Implemented
-    tooltip: 'Configure game settings',
-    section: 'systems',
-  },
-  {
-    id: 'save-load',
-    label: 'Save/Load',
-    icon: SaveLoadIcon,
-    route: '/game/save-load',
-    isImplemented: true, // ✅ Implemented
-    tooltip: 'Save and load game progress'
-  }
-];
+export const DEFAULT_NAV_ITEMS: NavItem[] = Object.values(NAVIGATION_ITEMS);

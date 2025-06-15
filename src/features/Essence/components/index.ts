@@ -13,3 +13,4 @@ export { EssenceGenerationTimer } from './ui/EssenceGenerationTimer';
 
 // Container Components
 export { default as EssencePanel } from './containers/EssencePanel';
+export { default as EssenceDisplayContainer } from './containers/EssenceDisplayContainer';

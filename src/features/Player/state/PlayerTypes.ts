@@ -2,10 +2,8 @@
  * Type definitions for the Player system
  */
 
-/**
- * Player statistics interface
- */
-export interface PlayerStats {
+// This represents the player's stats WITHOUT any modifiers
+export interface PlayerBaseStats {
   health: number;
   maxHealth: number;
   mana: number;
@@ -18,6 +16,9 @@ export interface PlayerStats {
   criticalChance: number;
   criticalDamage: number;
 }
+
+// PlayerStats now represents the FINAL, calculated stats
+export type PlayerStats = PlayerBaseStats;
 
 /**
  * Player attributes interface
@@ -60,34 +61,20 @@ export interface TraitSlot {
  * Core Player state interface
  */
 export interface PlayerState {
-  // Direct stat properties (flattened from nested stats object)
-  health: number;
-  maxHealth: number;
-  mana: number;
-  maxMana: number;
-  attack: number;
-  defense: number;
-  speed: number;
-  healthRegen: number;
-  manaRegen: number;
-  criticalChance: number;
-  criticalDamage: number;
+  baseStats: PlayerBaseStats; // Holds the stats before trait/effect modifications
+  stats: PlayerStats;         // Holds the final, calculated stats
   
-  // Attributes
   attributes: PlayerAttributes;
   
-  // Progression
   availableAttributePoints: number;
   availableSkillPoints: number;
   resonanceLevel: number;
   maxTraitSlots: number;
   
-  // Traits and effects
   statusEffects: StatusEffect[];
   permanentTraits: string[];
   traitSlots: TraitSlot[];
   
-  // Character state
   totalPlaytime: number;
   isAlive: boolean;
 }

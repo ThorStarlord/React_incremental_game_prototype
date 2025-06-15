@@ -14,23 +14,8 @@ import type {
   RelationshipChangeEntry,
   NPCInteraction
 } from './NPCTypes';
-import {
-  initializeNPCsThunk,
-  updateNPCRelationshipThunk,
-  processNPCInteractionThunk,
-  discoverNPCThunk,
-  shareTraitWithNPCThunk
-} from './NPCThunks';
-
-// Define RejectedAction type for the matcher
-interface RejectedAction extends AnyAction {
-  payload?: any;
-  error: {
-    name?: string;
-    message?: string;
-    stack?: string;
-  };
-}
+// Import the thunk to handle its lifecycle actions
+import { initializeNPCsThunk } from './NPCThunks';
 
 const initialState: NPCState = {
   npcs: {},
@@ -43,8 +28,6 @@ const initialState: NPCState = {
   selectedNPCId: null,
 };
 
-
-// Create the slice
 const npcSlice = createSlice({
   name: 'npcs',
   initialState,
@@ -65,33 +48,28 @@ const npcSlice = createSlice({
       state.error = null;
     },
     updateNpcRelationship: (state, action: PayloadAction<{ npcId: string; change: number; reason?: string }>) => {
-      const { npcId, change, reason = 'Manual update' } = action.payload;
+      const { npcId, change } = action.payload;
       const npc = state.npcs[npcId];
-
       if (npc) {
-        const oldValue = npc.relationshipValue;
-        const newValue = Math.max(-100, Math.min(100, oldValue + change));
-        npc.relationshipValue = newValue;
-        npc.lastInteraction = Date.now();
-
-        if (npc.sharedTraitSlots) {
-          npc.sharedTraitSlots.forEach(slot => {
-            if (!slot.isUnlocked && slot.unlockRequirement !== undefined && newValue >= slot.unlockRequirement) {
-              slot.isUnlocked = true;
-              console.log(`NPC ${npcId} unlocked trait slot ${slot.index} at relationship ${newValue}`);
-            }
-          });
-        }
-
-        state.relationshipHistory.push({
-          id: `${npcId}-${Date.now()}`,
-          npcId,
-          timestamp: Date.now(),
-          oldValue,
-          newValue,
-          reason
-        });
+        npc.relationshipValue = Math.max(-100, Math.min(100, npc.relationshipValue + change));
       }
+    },
+    setRelationshipValue: (state, action: PayloadAction<{ npcId: string; value: number }>) => {
+        const { npcId, value } = action.payload;
+        const npc = state.npcs[npcId];
+        if (npc) {
+            npc.relationshipValue = Math.max(0, Math.min(100, value));
+        }
+    },
+    increaseConnectionDepth: (state, action: PayloadAction<{ npcId: string; amount: number }>) => {
+        const { npcId, amount } = action.payload;
+        const npc = state.npcs[npcId];
+        if (npc) {
+            npc.connectionDepth = (npc.connectionDepth || 0) + amount;
+        }
+    },
+    addRelationshipChangeEntry: (state, action: PayloadAction<RelationshipChangeEntry>) => {
+        state.relationshipHistory.push(action.payload);
     },
     setNpcStatus: (state, action: PayloadAction<{ npcId: string; status: NPCStatus }>) => {
       const { npcId, status } = action.payload;
@@ -107,46 +85,23 @@ const npcSlice = createSlice({
         npc.isAvailable = isAvailable;
       }
     },
-    startInteraction: (state, action: PayloadAction<{ npcId: string; type: any; context?: any }>) => {
-      const { npcId, type, context } = action.payload;
-      state.currentInteraction = {
-        npcId,
-        type,
-        startTime: Date.now(),
-        context
-      };
+    startInteraction: (state, action: PayloadAction<NPCInteraction>) => {
+      state.currentInteraction = action.payload;
     },
     endInteraction: (state) => {
       state.currentInteraction = null;
     },
-    addDialogueEntry: (state, action: PayloadAction<{
-      npcId: string;
-      speaker: 'player' | 'npc' | 'system';
-      playerText: string;
-      npcResponse: string;
-      affinityDelta?: number;
-    }>) => {
-      const { npcId, speaker, playerText, npcResponse, affinityDelta } = action.payload;
-      // FIXED: Added the 'speaker' property to the entry object to match the DialogueEntry interface.
-      const entry: DialogueEntry = {
-        id: `${npcId}-${Date.now()}`,
-        npcId,
-        speaker,
-        timestamp: Date.now(),
-        playerText,
-        npcResponse,
-        relationshipChange: affinityDelta
-      };
-      state.dialogueHistory.push(entry);
+    addDialogueEntry: (state, action: PayloadAction<DialogueEntry>) => {
+      state.dialogueHistory.push(action.payload);
     },
     clearError: (state) => {
       state.error = null;
     },
-    updateNpcConnectionDepth: (state, action: PayloadAction<{ npcId: string; change: number }>) => {
-      const { npcId, change } = action.payload;
+    updateNpcConnectionDepth: (state, action: PayloadAction<{ npcId: string; newDepth: number }>) => {
+      const { npcId, newDepth } = action.payload;
       const npc = state.npcs[npcId];
       if (npc) {
-        npc.connectionDepth = Math.max(0, npc.connectionDepth + change);
+        npc.connectionDepth = Math.max(0, Math.min(10, newDepth));
       }
     },
     completeDialogueTopic: (state, action: PayloadAction<{ npcId: string; dialogueId: string }>) => {
@@ -169,11 +124,11 @@ const npcSlice = createSlice({
         npc.sharedTraitSlots.forEach(slot => {
           slot.isUnlocked = true;
         });
-        console.log(`DEBUG: All shared trait slots unlocked for NPC ${npcId}`);
       }
     }
   },
   extraReducers: (builder) => {
+    // RESTORED: This block handles the async lifecycle of initializeNPCsThunk.
     builder
       .addCase(initializeNPCsThunk.pending, (state) => {
         state.loading = true;
@@ -182,62 +137,12 @@ const npcSlice = createSlice({
       .addCase(initializeNPCsThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.npcs = action.payload;
-        Object.values(state.npcs).forEach(npc => {
-          if (npc.isDiscovered && !state.discoveredNPCs.includes(npc.id)) {
-            state.discoveredNPCs.push(npc.id);
-          }
-          if (npc.sharedTraitSlots) {
-            npc.sharedTraitSlots.forEach(slot => {
-              if (!slot.isUnlocked && slot.unlockRequirement !== undefined && npc.relationshipValue >= slot.unlockRequirement) {
-                slot.isUnlocked = true;
-              }
-            });
-          }
-        });
+        // Also populate the discovered list for developer convenience
+        state.discoveredNPCs = Object.keys(action.payload);
       })
       .addCase(initializeNPCsThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) ?? (action.error?.message || 'Failed to initialize NPCs');
-      })
-      .addCase(updateNPCRelationshipThunk.fulfilled, (state, action) => {
-        const { npcId, change, reason } = action.payload;
-        const npc = state.npcs[npcId];
-        if (npc) {
-          const oldValue = npc.relationshipValue;
-          const newValue = Math.max(-100, Math.min(100, oldValue + change));
-          npc.relationshipValue = newValue;
-          npc.lastInteraction = Date.now();
-
-          if (npc.sharedTraitSlots) {
-            npc.sharedTraitSlots.forEach(slot => {
-              if (!slot.isUnlocked && slot.unlockRequirement !== undefined && newValue >= slot.unlockRequirement) {
-                slot.isUnlocked = true;
-              }
-            });
-          }
-
-          state.relationshipHistory.push({
-            id: `${npcId}-${Date.now()}`,
-            npcId,
-            timestamp: Date.now(),
-            oldValue,
-            newValue,
-            reason: reason || 'Relationship update'
-          });
-        }
-      })
-      .addCase(discoverNPCThunk.fulfilled, (state, action) => {
-        const npcId = action.payload;
-        if (!state.discoveredNPCs.includes(npcId)) {
-          state.discoveredNPCs.push(npcId);
-          const npc = state.npcs[npcId];
-          if (npc) {
-            npc.isDiscovered = true;
-          }
-        }
-      })
-      .addCase(shareTraitWithNPCThunk.rejected, (state, action) => {
-        state.error = (action.payload as string) || 'Failed to share trait with NPC';
+        state.error = action.payload || 'Failed to initialize NPCs';
       });
   },
 });
@@ -247,6 +152,9 @@ export const {
   setError,
   setNPCs,
   updateNpcRelationship,
+  setRelationshipValue,
+  increaseConnectionDepth,
+  addRelationshipChangeEntry,
   setNpcStatus,
   setNpcAvailability,
   startInteraction,
@@ -260,5 +168,4 @@ export const {
 } = npcSlice.actions;
 
 export const npcActions = npcSlice.actions;
-export { npcSlice };
 export default npcSlice.reducer;

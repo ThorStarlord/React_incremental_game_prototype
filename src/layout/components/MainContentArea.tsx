@@ -14,7 +14,8 @@ import NPCsPage from '../../pages/NPCsPage';
 import EssencePage from '../../pages/EssencePage';
 import SettingsPage from '../../pages/SettingsPage';
 import { DashboardPage } from '../../pages/DashboardPage';
-import TraitsPage from '../../pages/TraitsPage'; // Import TraitsPage
+import TraitsPage from '../../pages/TraitsPage';
+import DebugPage from '../../pages/DebugPage'; // Import the new DebugPage
 
 // Shared components
 import { PlaceholderPage } from '../../shared/components/PlaceholderPage';
@@ -22,7 +23,6 @@ import { PlaceholderPage } from '../../shared/components/PlaceholderPage';
 // Types
 import type { TabId } from '../types/NavigationTypes';
 
-// ... (interfaces remain the same) ...
 export interface MainContentAreaProps {
   activeTabId?: TabId;
   changeTab?: (tabId: TabId) => void;
@@ -72,17 +72,7 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
   const contentConfig = useMemo((): Record<TabId, ContentConfig> => ({
     dashboard: { component: DashboardPage, showContainer: true, maxWidth: 'xl', loadingText: 'Loading dashboard...', enableSuspense: true, preloadable: true },
     character: { component: CharacterPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading character data...', enableSuspense: true, preloadable: true },
-    
-    // FIXED: Added the missing 'traits' configuration
-    traits: {
-      component: TraitsPage,
-      showContainer: true,
-      maxWidth: 'lg',
-      loadingText: 'Loading traits system...',
-      enableSuspense: true,
-      preloadable: true
-    },
-
+    traits: { component: TraitsPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading traits system...', enableSuspense: true, preloadable: true },
     skills: { component: PlaceholderPage, props: { title: 'Skills System', message: 'Character skill trees and progression system', status: 'planned', timeline: 'Phase 3 Development', features: ['Skill tree visualization', 'Skill point allocation', 'Mastery progression', 'Synergy system'] }, showContainer: true, loadingText: 'Loading skills interface...', enableSuspense: false },
     npcs: { component: NPCsPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading NPC data...', enableSuspense: true, preloadable: true },
     quests: { component: PlaceholderPage, props: { title: 'Quest System', message: 'Quest management and tracking interface', status: 'in-development', timeline: 'Phase 2 Development', features: ['Quest log management', 'Objective tracking', 'Reward system', 'NPC quest integration'] }, showContainer: true, loadingText: 'Loading quest system...', enableSuspense: false },
@@ -92,10 +82,10 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
     crafting: { component: PlaceholderPage, props: { title: 'Crafting System', message: 'Item creation and enhancement interface', status: 'planned', timeline: 'Phase 3 Development', features: ['Recipe management', 'Material collection', 'Quality enhancement', 'Advanced crafting'] }, showContainer: true, loadingText: 'Loading crafting system...', enableSuspense: false },
     settings: { component: SettingsPage, showContainer: true, maxWidth: 'md', loadingText: 'Loading settings...', enableSuspense: true, preloadable: false },
     saves: { component: PlaceholderPage, props: { title: 'Save Management', message: 'Game save and load management interface', status: 'in-development', timeline: 'Current Development', features: ['Save slot management', 'Import/Export functionality', 'Backup system', 'Cloud sync (future)'] }, showContainer: true, loadingText: 'Loading save management...', enableSuspense: false },
-    'save-load': { component: PlaceholderPage, props: { title: 'Save/Load System', message: 'Advanced save and load management', status: 'in-development', timeline: 'Current Development', features: ['Multiple save slots', 'Quick save/load', 'Export/Import saves', 'Version compatibility'] }, showContainer: true, loadingText: 'Loading save/load system...', enableSuspense: false }
+    'save-load': { component: PlaceholderPage, props: { title: 'Save/Load System', message: 'Advanced save and load management', status: 'in-development', timeline: 'Current Development', features: ['Multiple save slots', 'Quick save/load', 'Export/Import saves', 'Version compatibility'] }, showContainer: true, loadingText: 'Loading save/load system...', enableSuspense: false },
+    debug: { component: DebugPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading debug tools...', enableSuspense: false, preloadable: false },
   }), []);
 
-  // ... (rest of the component remains the same) ...
   const currentConfig = useMemo(() => {
     const isValidTabId = (tabId: string): tabId is TabId => tabId in contentConfig;
     if (isValidTabId(activeTabId)) return contentConfig[activeTabId];

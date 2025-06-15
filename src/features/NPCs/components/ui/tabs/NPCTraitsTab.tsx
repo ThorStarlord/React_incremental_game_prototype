@@ -28,13 +28,21 @@ import {
 } from '@mui/material';
 import {
   Share as ShareIcon,
+  GetApp as GetAppIcon,
   CheckCircle as CheckCircleIcon,
   Lock as LockIcon,
+  HelpOutline as HelpIcon,
   Add as AddIcon,
-  AutoAwesome as ResonateIcon, // Using a new icon for "Resonate"
+  Remove as RemoveIcon,
+  School as LearnIcon,
+  AutoAwesome as ResonateIcon,
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
-import { selectNPCById } from '../../../state/NPCSelectors';
+// Corrected: Import from the feature's public API
+import {
+  selectNPCById,
+  shareTraitWithNPCThunk
+} from '../../../';
 import {
   selectPermanentTraits,
   selectEquippedTraits,
@@ -42,7 +50,6 @@ import {
 } from '../../../../Player/state/PlayerSelectors';
 import { selectTraits, selectDiscoveredTraits } from '../../../../Traits/state/TraitsSelectors';
 import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors';
-import { shareTraitWithNPCThunk } from '../../../state/NPCThunks';
 import { acquireTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
 import TraitSlotItem from '../../../../Traits/components/ui/TraitSlotItem';
@@ -69,8 +76,6 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   // Memoize lists for performance
   const availableTraitsForResonance = useMemo(() => {
     if (!currentNPC?.availableTraits || !allTraits) return [];
-    // A trait is available to be made permanent if it's discoverable from this NPC,
-    // and the player has NOT already made it permanent.
     return currentNPC.availableTraits
       .map(traitId => allTraits[traitId])
       .filter((trait): trait is Trait => 

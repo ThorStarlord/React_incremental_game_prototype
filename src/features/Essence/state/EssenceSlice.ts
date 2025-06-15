@@ -7,10 +7,10 @@ import { EssenceState, EssenceTransactionPayload } from './EssenceTypes';
 const initialState: EssenceState = {
   currentEssence: 0,
   totalCollected: 0,
-  generationRate: 0.1, // 0.1 essence per second
+  generationRate: 0.1, // Start with a base rate
   perClickValue: 1,
   lastGenerationTime: Date.now(),
-  isGenerating: false,
+  isGenerating: true, // FIXED: Set to true by default to enable passive generation
   loading: false,
   error: null,
   currentResonanceLevel: 0,
@@ -62,7 +62,9 @@ const essenceSlice = createSlice({
      */
     toggleGeneration: (state) => {
       state.isGenerating = !state.isGenerating;
-      state.lastGenerationTime = Date.now();
+      if (state.isGenerating) {
+        state.lastGenerationTime = Date.now();
+      }
     },
 
     /**
@@ -97,7 +99,5 @@ export const {
   clearError,
   updateResonanceLevel,
 } = essenceSlice.actions;
-
-// FIXED: The redundant selector that was here has been removed.
 
 export default essenceSlice.reducer;

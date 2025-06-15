@@ -15,14 +15,16 @@ export {
 } from './components';
 
 // Types
-export type { EssenceState } from './state/EssenceTypes';
+export type { EssenceState, EssenceTransactionPayload } from './state/EssenceTypes';
 
 // Selectors
 export * from './state/EssenceSelectors';
+
+// Thunks - ADDED EXPORT FOR THUNKS
+export * from './state/EssenceThunks';
 
 // Actions and Slice
 export * from './state/EssenceSlice';
 
 // Hooks
 export { default as useEssenceGeneration } from './hooks/useEssenceGeneration';
-// The useAutoGenerateEssence hook is now integrated into useEssenceGeneration

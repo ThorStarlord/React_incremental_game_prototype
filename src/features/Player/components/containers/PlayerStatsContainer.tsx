@@ -6,8 +6,8 @@
 import React from 'react';
 import { Box, Alert, AlertTitle, CircularProgress } from '@mui/material';
 import { useAppSelector } from '../../../../app/hooks';
-// FIXED: Changed selectPlayerStats to selectPlayer, which returns the entire PlayerState object.
-import { selectPlayer } from '../../state/PlayerSelectors';
+// Corrected: Import the new, specific selector for final stats
+import { selectFinalStats } from '../../state/PlayerSelectors';
 import { PlayerStatsUI } from '../ui/PlayerStatsUI';
 
 /**
@@ -27,8 +27,8 @@ export const PlayerStatsContainer: React.FC<PlayerStatsContainerProps> = React.m
   showDetails = true,
   className,
 }) => {
-  // FIXED: Using the correct `selectPlayer` selector. The returned object is compatible with the PlayerStats type.
-  const stats = useAppSelector(selectPlayer);
+  // FIXED: Use the correct `selectFinalStats` selector.
+  const stats = useAppSelector(selectFinalStats);
   const isLoading = false; // Placeholder for future implementation
   const error = null;     // Placeholder for future implementation
 
@@ -43,7 +43,7 @@ export const PlayerStatsContainer: React.FC<PlayerStatsContainerProps> = React.m
     );
   }
 
-  if (isLoading) {
+  if (isLoading || !stats) { // Add a check for stats existence
     return (
       <Box
         className={className}

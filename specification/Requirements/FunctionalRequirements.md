@@ -6,7 +6,7 @@ This document lists the functional requirements for the React Incremental RPG Pr
 
 ## FR-GAMELOOP: Game Loop System ✅ IMPLEMENTED
 
-*   **FR-GAMELOOP-001:** ✅ **IMPLEMENTED** - The system shall provide a fixed timestep game loop running at configurable tick rates (default 10 TPS).
+*   **FR-GAMELOOP-001:** ✅ **IMPLEMENTED** - The system shall provide a fixed timestep game loop that starts automatically and runs at a configurable tick rate (default 10 TPS).
 *   **FR-GAMELOOP-002:** ✅ **IMPLEMENTED** - The system shall allow variable game speed control with multipliers ranging from 0.1x to 5.0x.
 *   **FR-GAMELOOP-003:** ✅ **IMPLEMENTED** - The system shall provide pause and resume functionality for the game state.
 *   **FR-GAMELOOP-004:** ✅ **IMPLEMENTED** - The system shall implement automatic saving at configurable intervals (default 30 seconds).

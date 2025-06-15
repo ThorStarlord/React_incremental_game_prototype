@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-The Non-Player Character (NPC) System governs the behavior, interaction, and relationships between the player and the game's inhabitants. NPCs populate the world, offer quests, provide services, and react to the player's actions.
+The Non-Player Character (NPC) System governs the behavior, interaction, and relationships between the player and the game's inhabitants. NPCs populate the world, offer quests, provide services, and react to the player's actions. The core of the NPC system is a two-tiered relationship model that drives player progression.
 
 ## 1.1. Naming Conventions ✅ ESTABLISHED
 
@@ -22,9 +22,31 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 
 **Implementation Status**: ✅ **CONSISTENTLY APPLIED** across the entire NPC feature following Feature-Sliced Design principles.
 
-## 2. Features
+## 2. Core Mechanics
 
-*   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions. This is quantified by an "Affinity" score.
+### 2.1. Two-Tiered Relationship Model ✅ IMPLEMENTED
+
+The relationship system is now built on a "level up" mechanic, providing clear goals and satisfying progression milestones.
+
+*   **Relationship Value (Affinity):**
+    *   **Role:** Acts as the "Experience Bar" for the relationship. It's a value from 0 to 99.
+    *   **Progression:** The player increases this value through positive interactions (dialogue, quests, etc.).
+    *   **Gating:** Specific relationship values are still used to unlock certain interactions or tabs (e.g., trading might unlock at an Affinity of 40).
+
+*   **Connection Depth:**
+    *   **Role:** Acts as the "Level" of the relationship. This is the primary stat that influences long-term game mechanics.
+    *   **Progression:** When `relationshipValue` reaches 100, it "levels up":
+        1.  `connectionDepth` increases by 1.
+        2.  `relationshipValue` resets to 0, allowing the progression to begin again for the next level.
+    *   **Impact:** The `connectionDepth` is the primary factor used in the **Essence Generation** formula. Higher connection levels provide significant, tiered boosts to the player's passive essence gain.
+
+*   **Implementation:**
+    *   The `updateNPCRelationshipThunk` contains the core logic for this "level up" mechanic.
+    *   The UI (`NPCRelationshipTab` and `NPCHeader`) visually represents the `relationshipValue` as a progress bar towards the next `connectionDepth` level.
+
+### 2.2. Features ✅ IMPLEMENTED
+
+*   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions. This is quantified by an "Affinity" score (Relationship Value).
 *   **Emotional Connections (Connection Depth):** NPCs exhibit a range of emotions and can form deep connections with the player. This connection is quantified by the `connectionDepth` stat, which affects their behavior, dialogue, and contributes to passive Essence generation.
 *   **Trait Acquisition (Resonance):** Players **permanently learn** traits *from* NPCs (traits listed in `availableTraits`) using the Resonance ability. This action costs Essence and requires proximity. The acquired trait becomes a permanent part of the player's abilities and does not need to be equipped in an active slot.
 *   **Temporary Trait Attunement (Equip NPC Innate Trait):** Players can temporarily equip an NPC's `innateTraits` into one of their own active player trait slots. This provides the trait's benefits to the player while equipped, has no Essence cost, and the NPC also retains their trait.
@@ -128,24 +150,31 @@ Information about known NPCs and management of relationships is primarily handle
     *   Player shares their equipped traits into NPC's `sharedTraitSlots`.
 *   **Essence System:** Integrated cost calculations for "Resonance".
 
-## 7. State Management
-(No direct changes to this section's structure, but the described interactions with traits are now different)
+## 7. State Management ✅ IMPLEMENTED
 
-### 7.1. NPCSlice.ts
-(No direct changes to this section's structure)
+### 7.1. NPCSlice.ts ✅ ENHANCED
+*   **Core State Management:** Complete NPC data management with relationship tracking and trait integration
+*   **Relationship System:** Now includes reducers for `setRelationshipValue` and `increaseConnectionDepth` to handle the new tiered progression
+*   **Two-Tiered Model:** Support for both Relationship Value (experience bar) and Connection Depth (level) mechanics
 
-### 7.2. NPCThunks.ts
-(No direct changes to this section's structure, but `acquireTraitWithEssenceThunk` in `TraitThunks.ts` is the relevant thunk for Resonance)
+### 7.2. NPCThunks.ts ✅ COMPREHENSIVE + RELATIONSHIP-MECHANICS
+*   **Async Operations:** Complete suite of async operations for NPC management, interaction processing, and cross-system coordination
+*   **Relationship Level-Up:** The `updateNPCRelationshipThunk` now contains the primary logic for calculating relationship "level ups" and triggering essence rate recalculations
+*   **Cross-System Integration:** Sophisticated coordination between NPC, Essence, and Trait systems through async thunk operations
 
-### 7.3. NPCSelectors.ts
-(No direct changes to this section's structure)
+### 7.3. NPCSelectors.ts ✅ ENHANCED
+*   **Efficient Data Access:** Memoized selectors for NPC data and relationship calculations
+*   **Essence Integration:** Includes `selectActiveConnectionCount` to provide other systems with the number of NPCs currently contributing to essence generation
+*   **Relationship Queries:** Selectors supporting the two-tiered relationship model with Connection Depth and Relationship Value access
 
 ## 8. Integration Points ✅ **THUNK-ENHANCED**
 
 ### 8.1. Cross-Feature Integration ✅ **ASYNC-READY**
 
-**Essence System Integration**: ✅ **THUNK-COORDINATED**
+**Essence System Integration**: ✅ **THUNK-COORDINATED + LEVEL-UP-MECHANICS**
 - **Spending Integration:** "Resonance" (via `acquireTraitWithEssenceThunk`) deducts Essence cost.
+- **Generation Integration:** Connection Depth directly influences passive Essence generation through the relationship level-up system
+- **Real-time Updates:** Essence generation rate recalculated automatically when Connection Depth increases
 
 **Trait System Integration**: ✅ **THUNK-ENABLED**
 - **Permanent Acquisition (Resonance):** Player uses Essence to Resonate with NPC's `availableTraits`, making them permanent player traits (managed in `PlayerSlice`).
@@ -154,10 +183,22 @@ Information about known NPCs and management of relationships is primarily handle
 - **Relationship Gating:** General tab access gated through relationship thresholds (Affinity tiers).
 
 **Player System Integration**: ✅ **STATE-COORDINATED**
-(No direct changes needed here, but player's trait list is now more dynamic)
+- **Progression Integration:** Relationship level-ups provide clear progression milestones and long-term character development goals
+- **Essence Generation:** Connection Depth levels directly contribute to player's passive resource generation
 
 ### 8.2. Future Thunk Extensions 📋 **ARCHITECTURALLY PREPARED**
 (No changes needed)
 
-## 9. Implementation Excellence ✅ **THUNK-COMPLETE**
-(No changes needed)
+## 9. Implementation Excellence ✅ **THUNK-COMPLETE + RELATIONSHIP-MECHANICS**
+
+**Advanced Relationship System**: ✅ **IMPLEMENTED**
+- **Two-Tiered Progression:** Complete level-up mechanics with Relationship Value as experience and Connection Depth as relationship level
+- **Automatic Level-Up:** Seamless progression from Relationship Value 100 to Connection Depth increase with value reset
+- **Visual Feedback:** Progress bars and level indicators provide clear progression visualization
+- **Essence Integration:** Connection Depth directly drives passive Essence generation, creating meaningful long-term progression
+
+**Sophisticated State Coordination**: ✅ **ACHIEVED**
+- **Cross-System Updates:** Relationship changes automatically trigger Essence generation recalculation
+- **Performance Optimized:** Efficient thunk operations with minimal state overhead
+- **Error Handling:** Comprehensive error management with graceful degradation
+- **Type Safety:** Full TypeScript integration throughout relationship mechanics and async operations

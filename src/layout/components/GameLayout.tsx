@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react'; // Added useEffect
 import { Box, useTheme, useMediaQuery } from '@mui/material';
+import { useAppDispatch } from '../../app/hooks'; // Added useAppDispatch
+import { startGame } from '../../features/GameLoop/state/GameLoopSlice'; // Added startGame
 import { useLayoutState } from '../hooks/useLayoutState';
 import { VerticalNavBar } from './VerticalNavBar/VerticalNavBar';
 import { MainContentArea } from './MainContentArea';
@@ -7,17 +9,16 @@ import { MainContentArea } from './MainContentArea';
 /**
  * New GameLayout component that integrates with useLayoutState hook
  * and provides responsive layout management with sidebar collapse functionality.
- * 
- * This component replaces the legacy GameLayout and provides:
- * - Centralized layout state management via useLayoutState hook
- * - Responsive navigation with automatic device detection
- * - Dynamic content rendering through MainContentArea
- * - Sidebar collapse with smooth transitions and margin adjustments
- * - Performance-optimized rendering with memoized callbacks
  */
 export const GameLayout: React.FC = React.memo(() => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const dispatch = useAppDispatch(); // Get the dispatch function
+
+  // Automatically start the game loop when the layout mounts
+  useEffect(() => {
+    dispatch(startGame());
+  }, [dispatch]);
   
   // Use the centralized layout state management
   const {
@@ -25,7 +26,6 @@ export const GameLayout: React.FC = React.memo(() => {
     sidebarCollapsed,
     setActiveTab,
     setSidebarCollapsed,
-    toggleSidebar
   } = useLayoutState({
     defaultTab: 'dashboard',
     persistSidebar: true,
@@ -35,12 +35,10 @@ export const GameLayout: React.FC = React.memo(() => {
   // Calculate main content margin based on sidebar state and device type
   const getMainContentMargin = () => {
     if (isMobile) {
-      // Mobile uses drawer overlay, no margin adjustment needed
       return 0;
     }
     
-    // Desktop: adjust margin based on sidebar collapse state
-    return sidebarCollapsed ? 64 : 240; // Collapsed width: 64px, Expanded width: 240px
+    return sidebarCollapsed ? 64 : 240;
   };
 
   return (
@@ -71,7 +69,7 @@ export const GameLayout: React.FC = React.memo(() => {
           }),
           padding: theme.spacing(3),
           paddingTop: theme.spacing(4),
-          minWidth: 0, // Prevent flex item overflow
+          minWidth: 0,
         }}
       >
         <MainContentArea 

@@ -6,7 +6,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, NPCState } from './NPCTypes';
-import type { Trait } from '../../Traits/state/TraitsTypes'; // FIXED: Importing Trait from the correct location
+import type { Trait } from '../../Traits/state/TraitsTypes';
 import { selectTraits } from '../../Traits/state/TraitsSelectors';
 
 // Base selectors
@@ -19,16 +19,13 @@ export const selectNPCs = createSelector(
 
 export const selectAllNPCs = selectNPCs; // Alias
 
-// ... other selectors from your file should be here ...
-
 export const selectNPCById = createSelector(
   [selectNPCs, (state: RootState, npcId: string) => npcId],
   (npcs, npcId) => npcs[npcId] || null
 );
 
-// FIXED: This selector now correctly gets its dependencies
 export const selectNPCSharedTraits = createSelector(
-  [selectNPCById, selectTraits], // Depends on a local selector and one from Traits
+  [selectNPCById, selectTraits],
   (npc, allTraits) => {
     if (!npc || !npc.sharedTraitSlots) {
       return [];
@@ -39,7 +36,6 @@ export const selectNPCSharedTraits = createSelector(
   }
 );
 
-// ... (The rest of your selectors from the file)
 export const selectDiscoveredNPCs = createSelector(
   [selectNPCState],
   (npcState) => npcState.discoveredNPCs
@@ -98,4 +94,10 @@ export const selectNPCsWithSharedTraits = createSelector(
     (npcs) => Object.values(npcs).filter(npc =>
       npc.sharedTraitSlots && npc.sharedTraitSlots.some(slot => !!slot.traitId)
     )
+);
+
+// NEW SELECTOR
+export const selectActiveConnectionCount = createSelector(
+  [selectAllNPCs],
+  (npcs) => Object.values(npcs).filter(npc => npc.connectionDepth > 0).length
 );

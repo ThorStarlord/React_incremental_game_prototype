@@ -61,35 +61,35 @@ const routeToTabMap: Record<string, TabId> = {
   '/game/dashboard': 'dashboard',
   '/game/traits': 'traits',
   '/game/npcs': 'npcs',
-  '/game/character': 'character', // Changed
-  '/game/player': 'character',    // Changed
+  '/game/character': 'character',
+  '/game/player': 'character',
   '/game/essence': 'essence',
   '/game/copies': 'copies',
   '/game/quests': 'quests',
   '/game/inventory': 'inventory',
   '/game/settings': 'settings',
   '/game/save-load': 'save-load',
-  // '/game/debug': 'debug', // Removed, 'debug' is not a valid TabId
+  '/game/debug': 'debug', // Added debug route mapping
 };
 
 /**
  * Maps TabId values to route paths for navigation
  */
 const tabToRouteMap: Record<TabId, string> = {
-  dashboard: '/game',
-  character: '/game/character', // Changed
+  dashboard: '/game/dashboard',
+  character: '/game/character',
   traits: '/game/traits',
-  skills: '/game/skills', // Added for completeness, ensure it's in TabId
+  skills: '/game/skills',
   npcs: '/game/npcs',
   essence: '/game/essence',
   copies: '/game/copies',
   quests: '/game/quests',
   inventory: '/game/inventory',
   settings: '/game/settings',
-  saves: '/game/saves', // Added for completeness, ensure it's in TabId
-  crafting: '/game/crafting', // Added for completeness, ensure it's in TabId
+  saves: '/game/saves',
+  crafting: '/game/crafting',
   'save-load': '/game/save-load',
-  // debug: '/game/debug', // Removed, 'debug' is not a valid TabId
+  debug: '/game/debug', // Added debug tab-to-route mapping
 };
 
 /**
@@ -126,7 +126,7 @@ const getTabFromRoute = (pathname: string, defaultTab: TabId): TabId => {
   
   // Check for partial matches (e.g., /game/traits/slots -> traits)
   for (const [route, tabId] of Object.entries(routeToTabMap)) {
-    if (pathname.startsWith(route) && route !== '/game') {
+    if (pathname.startsWith(route) && route !== '/game/dashboard') { // prevent /game from matching everything
       return tabId;
     }
   }
@@ -229,7 +229,7 @@ export const isTabId = (value: unknown): value is TabId => {
  * Utility function to get the route for a given tab
  */
 export const getRouteForTab = (tabId: TabId): string => {
-  return tabToRouteMap[tabId] || '/game';
+  return tabToRouteMap[tabId] || '/game/dashboard';
 };
 
 /**

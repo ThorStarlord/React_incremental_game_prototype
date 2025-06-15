@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { GameLoopState, TickData } from './GameLoopTypes';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { GameLoopState } from './GameLoopTypes';
 
 const initialState: GameLoopState = {
-  isRunning: false,
+  isRunning: true, // FIXED: Set to true by default
   isPaused: false,
   currentTick: 0,
   tickRate: 10, // 10 ticks per second
@@ -17,18 +17,24 @@ export const gameLoopSlice = createSlice({
   name: 'gameLoop',
   initialState,
   reducers: {
+    // This action is now more of a "reset and start" if needed
     startGame: (state) => {
       state.isRunning = true;
       state.isPaused = false;
       state.lastUpdateTime = Date.now();
     },
     pauseGame: (state) => {
-      state.isPaused = true;
+      if (state.isRunning) { // Can only pause if running
+        state.isPaused = true;
+      }
     },
     resumeGame: (state) => {
-      state.isPaused = false;
-      state.lastUpdateTime = Date.now();
+      if (state.isRunning) { // Can only resume if running
+        state.isPaused = false;
+        state.lastUpdateTime = Date.now();
+      }
     },
+    // Stop game now means to halt the loop entirely
     stopGame: (state) => {
       state.isRunning = false;
       state.isPaused = false;

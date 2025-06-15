@@ -2,9 +2,7 @@ import React, { useCallback } from 'react';
 import { Button, Chip, Box, Typography, useTheme } from '@mui/material';
 import { TouchApp as TouchAppIcon } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-// Removed direct gainEssence import, will use thunk
 import { selectPerClickValue } from '../../state/EssenceSelectors';
-// FIXED: Corrected thunk import name to match actual export
 import { generateEssenceManuallyThunk, processResonanceLevelThunk } from '../../state/EssenceThunks';
 
 /**
@@ -19,11 +17,11 @@ export const ManualEssenceButton: React.FC = React.memo(() => {
   const theme = useTheme();
 
   const handleClick = useCallback(async () => {
-    // FIXED: Use the correct thunk name
-    await dispatch(generateEssenceManuallyThunk());
+    // FIXED: Pass the required `perClickValue` as an argument
+    await dispatch(generateEssenceManuallyThunk(perClickValue));
     // After the state is updated, dispatch the thunk to check for resonance level up.
     dispatch(processResonanceLevelThunk());
-  }, [dispatch]);
+  }, [dispatch, perClickValue]);
 
   return (
     <Box

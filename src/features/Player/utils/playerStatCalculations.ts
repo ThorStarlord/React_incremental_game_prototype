@@ -7,7 +7,7 @@ import { PlayerState, PlayerStats } from '../state/PlayerTypes';
 export const PLAYER_STAT_FACTORS = {
   HEALTH: {
     BASE: 100,
-    CONSTITUTION_MULTIPLIER: 5
+    CONSTITUTION_MULTIPLIER: 10 // A more significant value
   },
   HEALTH_REGEN: {
     BASE: 1.0,
@@ -15,7 +15,7 @@ export const PLAYER_STAT_FACTORS = {
   },
   MANA: {
     BASE: 50,
-    INTELLIGENCE_MULTIPLIER: 3
+    INTELLIGENCE_MULTIPLIER: 5 // A more significant value
   },
   MANA_REGEN: {
     BASE: 0.5,
@@ -47,39 +47,40 @@ export const PLAYER_STAT_FACTORS = {
  */
 export const recalculatePlayerStats = (player: PlayerState): PlayerStats => {
   const { HEALTH, HEALTH_REGEN, MANA, MANA_REGEN, ATTACK, DEFENSE, SPEED, CRITICAL_CHANCE, CRITICAL_DAMAGE } = PLAYER_STAT_FACTORS;
+  
+  // FIXED: Access stats from the 'baseStats' nested object
+  const base = player.baseStats;
 
-  // Access attribute values directly (they are numbers, not objects with .value property)
   const constitutionValue = player.attributes.constitution;
   const intelligenceValue = player.attributes.intelligence;
   const strengthValue = player.attributes.strength;
   const dexterityValue = player.attributes.dexterity;
   const wisdomValue = player.attributes.wisdom;
 
-  // Calculate attribute bonuses (D&D style: (attribute - 10) / 2)
   const strengthBonus = Math.floor((strengthValue - 10) / 2);
   const dexterityBonus = Math.floor((dexterityValue - 10) / 2);
   const intelligenceBonus = Math.floor((intelligenceValue - 10) / 2);
   const constitutionBonus = Math.floor((constitutionValue - 10) / 2);
   const wisdomBonus = Math.floor((wisdomValue - 10) / 2);
 
-  // Calculate derived stats from player attributes
+  // Calculate derived stats from attributes and base stats
   const derivedStats = {
-    maxHealth: Math.max(1, HEALTH.BASE + (constitutionBonus * HEALTH.CONSTITUTION_MULTIPLIER)),
-    healthRegen: Math.max(0, HEALTH_REGEN.BASE + (constitutionBonus * HEALTH_REGEN.CONSTITUTION_MULTIPLIER)),
-    maxMana: Math.max(0, MANA.BASE + (intelligenceBonus * MANA.INTELLIGENCE_MULTIPLIER)),
-    manaRegen: Math.max(0, MANA_REGEN.BASE + (wisdomBonus * MANA_REGEN.WISDOM_MULTIPLIER)),
-    attack: Math.max(0, player.attack + strengthBonus),
-    defense: Math.max(0, player.defense + constitutionBonus),
-    speed: Math.max(0, player.speed + dexterityBonus),
-    criticalChance: Math.max(0, Math.min(1, CRITICAL_CHANCE.BASE + (dexterityBonus * CRITICAL_CHANCE.DEXTERITY_MULTIPLIER))),
-    criticalDamage: Math.max(1, CRITICAL_DAMAGE.BASE + (strengthBonus * CRITICAL_DAMAGE.STRENGTH_MULTIPLIER)),
+    maxHealth: Math.max(1, base.maxHealth + (constitutionBonus * HEALTH.CONSTITUTION_MULTIPLIER)),
+    healthRegen: Math.max(0, base.healthRegen + (constitutionBonus * HEALTH_REGEN.CONSTITUTION_MULTIPLIER)),
+    maxMana: Math.max(0, base.maxMana + (intelligenceBonus * MANA.INTELLIGENCE_MULTIPLIER)),
+    manaRegen: Math.max(0, base.manaRegen + (wisdomBonus * MANA_REGEN.WISDOM_MULTIPLIER)),
+    attack: Math.max(0, base.attack + strengthBonus),
+    defense: Math.max(0, base.defense + constitutionBonus),
+    speed: Math.max(0, base.speed + dexterityBonus),
+    criticalChance: Math.max(0, Math.min(1, base.criticalChance + (dexterityBonus * CRITICAL_CHANCE.DEXTERITY_MULTIPLIER))),
+    criticalDamage: Math.max(1, base.criticalDamage + (strengthBonus * CRITICAL_DAMAGE.STRENGTH_MULTIPLIER)),
   };
 
-  // Return updated stats with proper PlayerStats interface properties
   const updatedStats: PlayerStats = {
-    health: Math.min(player.health, derivedStats.maxHealth),
+    // Current health and mana are preserved, but capped by new max values
+    health: Math.min(player.stats.health, derivedStats.maxHealth),
     maxHealth: derivedStats.maxHealth,
-    mana: Math.min(player.mana, derivedStats.maxMana),
+    mana: Math.min(player.stats.mana, derivedStats.maxMana),
     maxMana: derivedStats.maxMana,
     attack: derivedStats.attack,
     defense: derivedStats.defense,
@@ -100,44 +101,17 @@ export const recalculatePlayerStats = (player: PlayerState): PlayerStats => {
  * @returns {PlayerStats} Final player stats with status effect bonuses
  */
 export const applyStatusEffectModifiers = (baseStats: PlayerStats, player: PlayerState): PlayerStats => {
-  // Initialize stat modifiers
-  let statusModifiers = {
-    health: 0,
-    mana: 0,
-    attack: 0,
-    defense: 0,
-    speed: 0,
-    healthRegen: 0,
-    manaRegen: 0,
-    criticalChance: 0,
-    criticalDamage: 0
-  };
+  const finalStats = { ...baseStats };
 
-  // Apply status effect modifiers
   player.statusEffects.forEach(effect => {
     if (effect.effects) {
-      Object.entries(effect.effects).forEach(([stat, value]) => {
-        if (stat in statusModifiers) {
-          statusModifiers[stat as keyof typeof statusModifiers] += value as number;
+      for (const [stat, value] of Object.entries(effect.effects)) {
+        if (stat in finalStats && typeof value === 'number') {
+            (finalStats as any)[stat] += value;
         }
-      });
+      }
     }
   });
-
-  // Apply modifiers to final stats
-  const finalStats: PlayerStats = {
-    health: Math.max(0, Math.min(baseStats.maxHealth, baseStats.health + statusModifiers.health)),
-    maxHealth: baseStats.maxHealth,
-    mana: Math.max(0, Math.min(baseStats.maxMana, baseStats.mana + statusModifiers.mana)),
-    maxMana: baseStats.maxMana,
-    attack: Math.max(0, baseStats.attack + statusModifiers.attack),
-    defense: Math.max(0, baseStats.defense + statusModifiers.defense),
-    speed: Math.max(0, baseStats.speed + statusModifiers.speed),
-    healthRegen: Math.max(0, baseStats.healthRegen + statusModifiers.healthRegen),
-    manaRegen: Math.max(0, baseStats.manaRegen + statusModifiers.manaRegen),
-    criticalChance: Math.max(0, Math.min(1, baseStats.criticalChance + statusModifiers.criticalChance)),
-    criticalDamage: Math.max(1, baseStats.criticalDamage + statusModifiers.criticalDamage),
-  };
 
   return finalStats;
 };
@@ -148,11 +122,8 @@ export const applyStatusEffectModifiers = (baseStats: PlayerStats, player: Playe
  * @returns {PlayerStats} Final calculated player stats
  */
 export const calculateCompletePlayerStats = (player: PlayerState): PlayerStats => {
-  // First calculate base stats from attributes
-  const baseStats = recalculatePlayerStats(player);
-  
-  // Then apply status effect modifiers
-  const finalStats = applyStatusEffectModifiers(baseStats, player);
+  const statsFromAttributes = recalculatePlayerStats(player);
+  const finalStats = applyStatusEffectModifiers(statsFromAttributes, player);
   
   return finalStats;
 };

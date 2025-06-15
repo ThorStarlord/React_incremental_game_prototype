@@ -5,13 +5,12 @@
  * This component connects to Redux to get essence data and provides controls for interacting
  * with essence, such as gaining essence through buttons and displaying current essence levels.
  */
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Box, Paper, Typography } from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+import { useAppSelector } from '../../../../app/hooks';
 import { selectEssenceState } from '../../state/EssenceSelectors';
-import EssenceDisplayUI from '../ui/EssenceDisplayUI';
-import ConfigurableEssenceButton from '../ui/ConfigurableEssenceButton';
-import EssenceGenerationTimer from './EssenceGenerationTimer';
+// Corrected: Import UI components from the component barrel file
+import { EssenceDisplayUI, ConfigurableEssenceButton, EssenceGenerationTimer } from '../';
 
 /**
  * Props for the EssencePanel component
@@ -36,14 +35,10 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
 }) => {
   // Get data from Redux store using the correct selector
   const essenceState = useAppSelector(selectEssenceState);
-  const essenceAmount = essenceState.currentEssence; // Changed to use the correct property name
+  const essenceAmount = essenceState.currentEssence;
   const totalCollected = essenceState.totalCollected || 0;
   const maxEssence = 1000; // Default max since maxAmount doesn't exist in state
-  const generationRate = essenceState.generationRate || 1;
-  const dispatch = useAppDispatch();
-  
-  // Calculate the percentage of essence to max
-  const essencePercentage = Math.min(100, (essenceAmount / maxEssence) * 100);
+  const generationRate = essenceState.generationRate || 0; // Use 0 as default if undefined
   
   return (
     <Box sx={{ width: '100%' }}>
@@ -57,7 +52,7 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
       />
       
       {/* Show timer if enabled */}
-      {showTimer && <EssenceGenerationTimer rate={generationRate} />}
+      {showTimer && <EssenceGenerationTimer />}
       
       {/* Action buttons */}
       <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'center' }}>

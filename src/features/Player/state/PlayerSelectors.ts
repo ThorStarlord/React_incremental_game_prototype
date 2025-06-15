@@ -3,18 +3,24 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import type { PlayerState } from './PlayerTypes';
-// FIXED: Import from the correct Traits feature selectors
-import { selectTraits } from '../../Traits/state/TraitsSelectors';;
+import type { PlayerState, PlayerStats } from './PlayerTypes'; // Import PlayerStats
+import { selectTraits } from '../../Traits/state/TraitsSelectors';
 
 // Base player state selector
 export const selectPlayer = (state: RootState): PlayerState => state.player;
 
+// NEW: Selector for the final, calculated stats object
+export const selectFinalStats = createSelector(
+  [selectPlayer],
+  (player) => player.stats
+);
+
 // Basic Player Selectors
-export const selectPlayerHealth = createSelector([selectPlayer], (player) => player.health);
-export const selectPlayerMaxHealth = createSelector([selectPlayer], (player) => player.maxHealth);
-export const selectPlayerMana = createSelector([selectPlayer], (player) => player.mana);
-export const selectPlayerMaxMana = createSelector([selectPlayer], (player) => player.maxMana);
+export const selectPlayerHealth = createSelector([selectFinalStats], (stats) => stats.health);
+export const selectPlayerMaxHealth = createSelector([selectFinalStats], (stats) => stats.maxHealth);
+export const selectPlayerMana = createSelector([selectFinalStats], (stats) => stats.mana);
+export const selectPlayerMaxMana = createSelector([selectFinalStats], (stats) => stats.maxMana);
+
 export const selectAvailableAttributePoints = createSelector([selectPlayer], (player) => player.availableAttributePoints);
 export const selectIsPlayerAlive = createSelector([selectPlayer], (player) => player.isAlive);
 export const selectResonanceLevel = createSelector([selectPlayer], (player) => player.resonanceLevel);
@@ -51,7 +57,7 @@ export const selectPlayerTraitInfo = createSelector(
   [selectEquippedTraits, selectPermanentTraits, selectAvailableTraitSlots, selectUsedTraitSlots, selectMaxTraitSlots],
   (equippedTraits, permanentTraits, availableSlots, usedSlots, maxSlots) => ({
     equipped: equippedTraits,
-    permanent: permanentTraits, // This is an array of IDs
+    permanent: permanentTraits,
     availableSlots,
     usedSlots,
     maxSlots,
@@ -62,24 +68,24 @@ export const selectPlayerTraitInfo = createSelector(
 // --- OTHER COMPUTED SELECTORS ---
 
 export const selectCombatStats = createSelector(
-  [selectPlayer],
-  (player) => ({
-    attack: player.attack,
-    defense: player.defense,
-    speed: player.speed,
-    criticalChance: player.criticalChance,
-    criticalDamage: player.criticalDamage
+  [selectFinalStats], // Use the final stats selector
+  (stats) => ({
+    attack: stats.attack,
+    defense: stats.defense,
+    speed: stats.speed,
+    criticalChance: stats.criticalChance,
+    criticalDamage: stats.criticalDamage
   })
 );
 
 export const selectPerformanceStats = createSelector(
-  [selectPlayer],
-  (player) => ({
+  [selectPlayer, selectFinalStats], // Depends on both player and final stats
+  (player, stats) => ({
     totalPlaytime: player.totalPlaytime,
     availableAttributePoints: player.availableAttributePoints,
     availableSkillPoints: player.availableSkillPoints,
     isAlive: player.isAlive,
-    powerLevel: Math.floor(player.attack + player.defense + player.maxHealth / 10 + player.maxMana / 5)
+    powerLevel: Math.floor(stats.attack + stats.defense + stats.maxHealth / 10 + stats.maxMana / 5)
   })
 );
 
