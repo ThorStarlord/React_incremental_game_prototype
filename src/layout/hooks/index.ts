@@ -1,4 +1,4 @@
-export { useLayoutState, isTabId, getRouteForTab, getTabForRoute } from './useLayoutState';
+export { useLayoutState, isTabId, getRouteForTab } from './useLayoutState';
 export type { 
   LayoutState, 
   LayoutActions, 

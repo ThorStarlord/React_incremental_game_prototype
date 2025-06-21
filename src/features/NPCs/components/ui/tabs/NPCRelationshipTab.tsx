@@ -1,9 +1,9 @@
 /**
  * @file NPCRelationshipTab.tsx
- * @description Tab component for managing NPC relationships
+ * @description Tab component for managing NPC relationships and triggering high-level actions.
  */
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -20,7 +20,8 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Stack, 
+  Stack,
+  Divider,
 } from '@mui/material';
 import {
   Favorite,
@@ -30,7 +31,8 @@ import {
   Schedule,
   ExpandMore as ExpandMoreIcon,
   AddCircleOutline as AddCircleOutlineIcon,
-  LockOpen as LockOpenIcon, 
+  LockOpen as LockOpenIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import type { NPC, RelationshipChangeEntry } from '../../../state/NPCTypes';
 import { 
@@ -38,64 +40,68 @@ import {
   getTierBenefits 
 } from '../../../../../config/relationshipConstants';
 import { useAppDispatch } from '../../../../../app/hooks';
-import { updateNpcRelationship, debugUnlockAllSharedSlots } from '../../../state/NPCSlice';
+import { updateNPCRelationshipThunk, debugUnlockAllSharedSlots } from '../../../state/NPCThunks';
+import { createCopyThunk } from '../../../../Copy/state/CopyThunks';
 
 interface NPCRelationshipTabProps {
   npc: NPC;
   relationshipChanges?: RelationshipChangeEntry[];
   onImproveRelationship?: (npcId: string) => void;
-  onRelationshipChange: (change: number, reason: string) => void; // Added this prop back
 }
 
 const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({ 
   npc, 
   relationshipChanges = [],
   onImproveRelationship,
-  // onRelationshipChange is now a prop but not directly used by elements in this tab currently
 }) => {
   const dispatch = useAppDispatch();
   const currentTierInfo = getTierBenefits(npc.relationshipValue);
-  const currentTierName = currentTierInfo.name;
+  
+  const SEDUCTION_CONNECTION_REQUIREMENT = 5;
 
-  let pointsInCurrentTier = 0;
-  let totalPointsInTier = 0;
-  let progressPercentageInTier = 0;
-  let progressLabelText = `${currentTierName}`;
+  const canAttemptSeduction = npc.connectionDepth >= SEDUCTION_CONNECTION_REQUIREMENT;
 
-  if (currentTierInfo.nextTier) {
-    const currentTierMin = currentTierInfo.threshold;
-    const nextTierMin = currentTierInfo.nextTier.threshold;
-    
-    pointsInCurrentTier = npc.relationshipValue - currentTierMin;
-    totalPointsInTier = nextTierMin - currentTierMin;
-
-    if (totalPointsInTier > 0) {
-      progressPercentageInTier = Math.max(0, Math.min(100, (pointsInCurrentTier / totalPointsInTier) * 100));
-    } else {
-      progressPercentageInTier = 100;
+  const handleSeductionAttempt = () => {
+    if (canAttemptSeduction) {
+      dispatch(createCopyThunk({ npcId: npc.id }));
     }
-    progressLabelText = `To ${currentTierInfo.nextTier.name}: ${pointsInCurrentTier} / ${totalPointsInTier} Affinity`;
-  } else {
-    progressPercentageInTier = 100;
-    progressLabelText = `${currentTierName} (Max)`;
-  }
-
-  const recentChanges = relationshipChanges
-    .filter(change => change.npcId === npc.id)
-    .slice(-5)
-    .reverse();
+  };
 
   const handleDebugIncreaseAffinity = () => {
-    dispatch(updateNpcRelationship({
+    dispatch(updateNPCRelationshipThunk({
       npcId: npc.id,
       change: 10,
       reason: 'Debug: +10 Affinity'
     }));
   };
-
+  
   const handleDebugUnlockSlots = () => {
+    // This thunk doesn't exist, but the reducer action does.
+    // However, it's better practice to create a thunk for this debug action if it might have side effects.
+    // For now, let's assume a thunk should exist for it.
     dispatch(debugUnlockAllSharedSlots(npc.id));
   };
+
+  const { progressPercentageInTier, progressLabelText } = useMemo(() => {
+    const currentTierName = currentTierInfo.name;
+    if (currentTierInfo.nextTier) {
+      const currentTierMin = currentTierInfo.threshold;
+      const nextTierMin = currentTierInfo.nextTier.threshold;
+      const pointsInCurrentTier = npc.relationshipValue - currentTierMin;
+      const totalPointsInTier = nextTierMin - currentTierMin;
+      const progressPercentage = totalPointsInTier > 0
+        ? Math.max(0, Math.min(100, (pointsInCurrentTier / totalPointsInTier) * 100))
+        : 100;
+      return {
+        progressPercentageInTier: progressPercentage,
+        progressLabelText: `To ${currentTierInfo.nextTier.name}: ${pointsInCurrentTier} / ${totalPointsInTier} Affinity`,
+      };
+    }
+    return {
+      progressPercentageInTier: 100,
+      progressLabelText: `${currentTierInfo.name} (Max)`,
+    };
+  }, [npc.relationshipValue, currentTierInfo]);
 
   return (
     <Box sx={{ p: 2 }}>
@@ -112,7 +118,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                   <Typography variant="body1" fontWeight="medium">
-                    {currentTierName}
+                    {currentTierInfo.name}
                   </Typography>
                   <Typography variant="h5" sx={{ color: currentTierInfo.color || 'primary.main' }}>
                     Affinity: {npc.relationshipValue}
@@ -173,7 +179,6 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                 >
                   {npc.relationshipValue >= 100 ? 'Maximum Relationship' : 'Spend Time Together'}
                 </Button>
-                {/* Debug Buttons */}
                 <Button
                   variant="outlined"
                   color="secondary"
@@ -249,6 +254,34 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
             </AccordionDetails>
           </Accordion>
         </Grid>
+        
+        {/* Seduction / Create Copy Card */}
+        <Grid item xs={12}>
+            <Card>
+                <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                        <CopyIcon sx={{ mr: 1, color: 'secondary.main' }} />
+                        Create a Copy
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        When your bond is strong enough, you can attempt to create a Copy of this NPC. This is a difficult action based on your Charisma. A success will create a loyal Copy, but failure may damage your relationship.
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleSeductionAttempt}
+                        disabled={!canAttemptSeduction}
+                    >
+                        Attempt to Create Copy
+                    </Button>
+                    {!canAttemptSeduction && (
+                        <Typography variant="caption" display="block" sx={{ mt: 1, fontStyle: 'italic' }}>
+                            Requires Connection Depth Level {SEDUCTION_CONNECTION_REQUIREMENT} or higher. (Current: {npc.connectionDepth.toFixed(1)})
+                        </Typography>
+                    )}
+                </CardContent>
+            </Card>
+        </Grid>
 
         {/* Recent Activity */}
         <Grid item xs={12}>
@@ -259,13 +292,13 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                 Recent Relationship Changes
               </Typography>
 
-              {recentChanges.length === 0 ? (
+              {relationshipChanges.length === 0 ? (
                 <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
                   No recent relationship changes
                 </Typography>
               ) : (
                 <List>
-                  {recentChanges.map((change) => (
+                  {relationshipChanges.map((change) => (
                     <ListItem key={change.id} divider>
                       <ListItemIcon>
                         <Schedule />

@@ -17,7 +17,7 @@ import {
   School as SkillsIcon,
   LocalFireDepartment as EssenceIcon,
   SaveAlt as SavesIcon,
-  BugReport as DebugIcon, // Icon is already here, which is good
+  BugReport as DebugIcon,
 } from '@mui/icons-material';
 
 import type { 
@@ -103,7 +103,7 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     label: 'Copies',
     icon: CopiesIcon,
     route: '/game/copies',
-    isImplemented: false,
+    isImplemented: true, // Set to true since the page now exists
     tooltip: 'Manage created copies',
     section: 'world-interaction',
   },
@@ -205,7 +205,7 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
       NAVIGATION_ITEMS.settings,
       NAVIGATION_ITEMS['save-load'],
       NAVIGATION_ITEMS.saves,
-      NAVIGATION_ITEMS.debug, // Added Debug to this section
+      NAVIGATION_ITEMS.debug,
     ]
   }
 ];

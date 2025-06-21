@@ -9,6 +9,7 @@ import essenceReducer from '../features/Essence/state/EssenceSlice';
 import settingsReducer from '../features/Settings/state/SettingsSlice';
 import metaReducer from '../features/Meta/state/MetaSlice';
 import npcsReducer from '../features/NPCs/state/NPCSlice';
+import copyReducer from '../features/Copy/state/CopySlice'; // Corrected import path
 
 // Combine all feature reducers
 const combinedReducer = combineReducers({
@@ -19,6 +20,7 @@ const combinedReducer = combineReducers({
   settings: settingsReducer,
   meta: metaReducer,
   npcs: npcsReducer,
+  copy: copyReducer, // Corrected reducer name
 });
 
 // Root state type from combined reducers
@@ -32,19 +34,12 @@ interface ReplaceStateAction {
 
 /**
  * Root reducer that handles the combined reducers and special actions
- *
- * Handles the special 'meta/replaceState' action for save/load operations
- * by completely replacing the current state with the provided payload.
- * All other actions are delegated to the combined reducer.
  */
 const rootReducer = (state: RootState | undefined, action: PayloadAction<any>): RootState => {
-  // Handle the special replaceState action for save/load operations
   if (action.type === 'meta/replaceState') {
     const replaceAction = action as ReplaceStateAction;
     return replaceAction.payload;
   }
-
-  // Otherwise, delegate to the combined reducer
   return combinedReducer(state, action);
 };
 
@@ -56,9 +51,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore the replaceState action as it contains the entire state tree
         ignoredActions: ['meta/replaceState'],
-        // Allow functions in state for thunks and selectors
         ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
       },
     }),

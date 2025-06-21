@@ -5,10 +5,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
-// Corrected: Import from the Essence feature's public API (barrel file)
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-// Corrected: Import reducer actions from the local slice file
-import { setRelationshipValue, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth } from './NPCSlice';
+import { setRelationshipValue, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction } from './NPCSlice';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -103,6 +101,17 @@ export const updateNPCConnectionDepthThunk = createAsyncThunk(
     await dispatch(updateEssenceGenerationRateThunk());
     return payload;
   }
+);
+
+/**
+ * NEW THUNK: Debug action to unlock all of an NPC's shared trait slots.
+ */
+export const debugUnlockAllSharedSlots = createAsyncThunk(
+    'npcs/debugUnlockSlots',
+    async (npcId: string, { dispatch }) => {
+        dispatch(debugUnlockAllSharedSlotsAction(npcId));
+        return { npcId };
+    }
 );
 
 /**
