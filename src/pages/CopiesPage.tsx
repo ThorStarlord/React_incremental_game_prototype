@@ -6,9 +6,24 @@ import {
   Paper,
   Alert,
   AlertTitle,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Chip,
+  LinearProgress,
 } from '@mui/material';
-import { ContentCopy as CopiesIcon } from '@mui/icons-material';
-// This page does not need to import other pages.
+import { ContentCopy as CopiesIcon, Person as PersonIcon, Loyalty as LoyaltyIcon } from '@mui/icons-material';
+import { useAppSelector } from '../app/hooks';
+import { selectAllCopies } from '../features/Copy/state/CopySelectors';
+import { Copy } from '../features/Copy/state/CopyTypes';
+
+const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label, value }) => (
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 0.5 }}>
+    <Typography variant="body2" color="text.secondary">{label}</Typography>
+    <Typography variant="body2">{value}</Typography>
+  </Box>
+);
 
 /**
  * CopiesPage component.
@@ -17,8 +32,7 @@ import { ContentCopy as CopiesIcon } from '@mui/icons-material';
  * to view, manage, and interact with their created Copies.
  */
 export const CopiesPage: React.FC = React.memo(() => {
-  // In the future, we will use selectors to get the list of copies
-  // const copies = useAppSelector(selectAllCopies);
+  const copies = useAppSelector(selectAllCopies);
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
@@ -34,19 +48,37 @@ export const CopiesPage: React.FC = React.memo(() => {
         </Box>
       </Box>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <AlertTitle>Feature In Development</AlertTitle>
-        The Copy System is a core upcoming feature. This page will be where you manage everything related to your Copies. The Redux slice and data types have been created.
-      </Alert>
-      
-      {/* This is where the main UI for the Copy system will go. */}
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h6">My Copies</Typography>
-        <Typography color="text.secondary" sx={{mt: 2, textAlign: 'center'}}>
-            (The list of created Copies will be displayed here in a future update.)
-        </Typography>
-        {/* Example of future component: <CopiesList copies={copies} /> */}
-      </Paper>
+      {copies.length === 0 ? (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <AlertTitle>No Copies Created</AlertTitle>
+          You have not created any Copies yet. Explore the world and build deep connections to unlock this potential.
+        </Alert>
+      ) : (
+        <Paper sx={{ p: 2 }}>
+          <List disablePadding>
+            {copies.map((copy, index) => (
+              <React.Fragment key={copy.id}>
+                <ListItem sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'flex-start', gap: 2, py: 2 }}>
+                  <Box sx={{ flex: 1, width: '100%' }}>
+                    <Typography variant="h6" component="div">{copy.name}</Typography>
+                    <Typography variant="caption" color="text.secondary">ID: {copy.id}</Typography>
+                    {copy.currentTask && <Chip label={`Task: ${copy.currentTask}`} size="small" sx={{ mt: 1 }}/>}
+                  </Box>
+                  <Box sx={{ flex: 2, width: '100%' }}>
+                    <CopyStat label="Maturity" value={`${copy.maturity}%`} />
+                    <LinearProgress variant="determinate" value={copy.maturity} sx={{ mb: 1 }} />
+                    <CopyStat label="Loyalty" value={`${copy.loyalty}%`} />
+                    <LinearProgress variant="determinate" value={copy.loyalty} color="secondary" sx={{ mb: 2 }} />
+                    <CopyStat label="Location" value={copy.location} />
+                    <CopyStat label="Parent NPC" value={copy.parentNPCId} />
+                  </Box>
+                </ListItem>
+                {index < copies.length - 1 && <Divider />}
+              </React.Fragment>
+            ))}
+          </List>
+        </Paper>
+      )}
 
     </Container>
   );
