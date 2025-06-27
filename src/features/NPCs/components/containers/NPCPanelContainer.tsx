@@ -80,13 +80,13 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({ onBack }) 
         <NPCOverviewTab npc={npc} />
       </TabPanel>
       <TabPanel value={currentTab} index={1}>
-        <NPCQuestsTab npc={npc} />
+        <NPCQuestsTab npcId={npc.id} />
       </TabPanel>
       <TabPanel value={currentTab} index={2}>
-        <NPCTradeTab npc={npc} />
+        <NPCTradeTab npcId={npc.id} />
       </TabPanel>
       <TabPanel value={currentTab} index={3}>
-        <NPCTraitsTab npc={npc} />
+        <NPCTraitsTab npcId={npc.id} />
       </TabPanel>
     </Paper>
   );

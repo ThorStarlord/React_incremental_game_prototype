@@ -63,7 +63,7 @@ const NPCsPage: React.FC = () => {
             <Box sx={{p: 2, borderBottom: 1, borderColor: 'divider'}}>
                 <Button onClick={handleBackToList}>← Back to NPC List</Button>
             </Box>
-            <NPCPanelContainer npcId={npcId} onClose={handleBackToList} />
+            <NPCPanelContainer onBack={handleBackToList} />
         </Paper>
     );
   }
