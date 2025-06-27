@@ -66,9 +66,15 @@ export const selectRelationshipHistory = createSelector(
   (npcState) => npcState.relationshipHistory || []
 );
 
-export const selectSelectedNPCId = createSelector(
-  [selectNPCState],
-  (npcState) => npcState.selectedNPCId
+export const selectSelectedNPCId = (state: RootState) => state.npcs.selectedNPCId;
+
+/**
+ * NEW: Selects the full object for the currently selected NPC.
+ * This is a memoized selector that will only recompute when the underlying data changes.
+ */
+export const selectCurrentNPC = createSelector(
+  [selectAllNPCs, selectSelectedNPCId],
+  (npcs, selectedId) => (selectedId ? npcs[selectedId] : undefined)
 );
 
 export const selectNPCDialogueHistory = createSelector(

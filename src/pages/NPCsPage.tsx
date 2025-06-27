@@ -16,6 +16,7 @@ import {
   selectNPCError,
   NPCPanelContainer,
   NPCListView,
+  setSelectedNPCId, // Import the action
 } from '../features/NPCs';
 
 const NPCsPage: React.FC = () => {
@@ -32,10 +33,12 @@ const NPCsPage: React.FC = () => {
 
   // This is the only handler we need. It changes the URL.
   const handleSelectNPC = (id: string) => {
+    dispatch(setSelectedNPCId(id));
     navigate(`/game/npcs/${id}`);
   };
 
   const handleBackToList = () => {
+    dispatch(setSelectedNPCId(null));
     navigate('/game/npcs');
   };
 
@@ -68,7 +71,7 @@ const NPCsPage: React.FC = () => {
   // Otherwise, show the list view.
   return (
     <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-      <NPCListView onSelectNPC={handleSelectNPC} />
+      <NPCListView onSelectNPC={handleSelectNPC} selectedNPCId={npcId} />
     </Paper>
   );
 };

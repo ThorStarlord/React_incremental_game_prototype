@@ -3,7 +3,7 @@
  * @description Container component that connects NPCPanelUI to Redux state
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 // Corrected: Import everything from the feature's public API (index.ts)
 import {
@@ -17,6 +17,12 @@ import {
 } from '../../';
 import { NPCPanelUI } from '../ui/NPCPanelUI';
 import type { NPC } from '../../state/NPCTypes';
+import { selectCurrentNPC } from '../../state/NPCSelectors';
+import { Box, Paper, Typography, Button, Tabs, Tab } from '@mui/material';
+import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
+import NPCTradeTab from '../ui/tabs/NPCTradeTab';
+import NPCQuestsTab from '../ui/tabs/NPCQuestsTab';
+import NPCTraitsTab from '../ui/tabs/NPCTraitsTab';
 
 export interface NPCPanelContainerProps {
   /** ID of the NPC to display */
@@ -25,6 +31,7 @@ export interface NPCPanelContainerProps {
   className?: string;
   /** Callback when NPC panel is closed */
   onClose?: () => void;
+  onBack?: () => void;
 }
 
 /**
@@ -33,7 +40,8 @@ export interface NPCPanelContainerProps {
 export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({
   npcId,
   className,
-  onClose
+  onClose,
+  onBack
 }) => {
   const dispatch = useAppDispatch();
 
@@ -41,6 +49,8 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({
   const selectedNPCId = useAppSelector(selectSelectedNPCId);
   const loading = useAppSelector(selectNPCLoading);
   const error = useAppSelector(selectNPCError);
+  const npc = useAppSelector(selectCurrentNPC);
+  const [currentTab, setCurrentTab] = useState(0);
 
   const currentNPCId = npcId || selectedNPCId;
   const currentNPC = currentNPCId ? allNPCs[currentNPCId] as NPC : undefined;
@@ -51,7 +61,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({
   );
 
   const handleNPCSelect = useCallback((selectedId: string) => {
-    dispatch(npcActions.selectNPC(selectedId));
+    dispatch(npcActions.setSelectedNPCId(selectedId));
   }, [dispatch]);
 
   const handleRelationshipChange = useCallback((npcId: string, change: number, reason: string) => {
@@ -77,11 +87,25 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({
     }
   }, [dispatch]);
 
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
+  };
+
   React.useEffect(() => {
     if (!currentNPCId && npcList.length > 0 && !loading) {
       handleNPCSelect(npcList[0].id);
     }
   }, [currentNPCId, npcList, loading, handleNPCSelect]);
+
+  if (!npc) {
+    return (
+      <Paper sx={{ p: 2, textAlign: 'center' }}>
+        <Typography variant="h6">NPC not found</Typography>
+        <Typography>The selected NPC could not be found. They might not be discovered yet.</Typography>
+        <Button onClick={onBack} sx={{ mt: 2 }}>Back to List</Button>
+      </Paper>
+    );
+  }
 
   return (
     <NPCPanelUI

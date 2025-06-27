@@ -36,10 +36,9 @@ export {
   setLoading,
   setError,
   setNPCs,
-  selectNPC,
+  setSelectedNPCId,
   debugUnlockAllSharedSlots,
   updateNpcConnectionDepth,
-  completeDialogueTopic,
 } from './state/NPCSlice';
 
 // Async thunks

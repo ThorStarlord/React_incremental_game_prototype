@@ -98,28 +98,16 @@ const npcSlice = createSlice({
       state.error = null;
     },
     updateNpcConnectionDepth: (state, action: PayloadAction<{ npcId: string; newDepth: number }>) => {
-      const { npcId, newDepth } = action.payload;
-      const npc = state.npcs[npcId];
+      const npc = state.npcs[action.payload.npcId];
       if (npc) {
-        npc.connectionDepth = Math.max(0, Math.min(10, newDepth));
+        npc.connectionDepth = action.payload.newDepth;
       }
     },
-    completeDialogueTopic: (state, action: PayloadAction<{ npcId: string; dialogueId: string }>) => {
-      const { npcId, dialogueId } = action.payload;
-      const npc = state.npcs[npcId];
-      if (npc) {
-        npc.availableDialogues = npc.availableDialogues.filter(id => id !== dialogueId);
-        if (!npc.completedDialogues.includes(dialogueId)) {
-          npc.completedDialogues.push(dialogueId);
-        }
-      }
-    },
-    selectNPC: (state, action: PayloadAction<string | null>) => {
+    setSelectedNPCId: (state, action: PayloadAction<string | null>) => {
       state.selectedNPCId = action.payload;
     },
     debugUnlockAllSharedSlots: (state, action: PayloadAction<string>) => {
-      const npcId = action.payload;
-      const npc = state.npcs[npcId];
+      const npc = state.npcs[action.payload];
       if (npc && npc.sharedTraitSlots) {
         npc.sharedTraitSlots.forEach(slot => {
           slot.isUnlocked = true;
@@ -162,9 +150,8 @@ export const {
   addDialogueEntry,
   clearError,
   updateNpcConnectionDepth,
-  completeDialogueTopic,
-  selectNPC,
-  debugUnlockAllSharedSlots
+  debugUnlockAllSharedSlots,
+  setSelectedNPCId,
 } = npcSlice.actions;
 
 export const npcActions = npcSlice.actions;
