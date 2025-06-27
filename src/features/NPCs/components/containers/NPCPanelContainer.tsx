@@ -3,20 +3,8 @@
  * @description Container component that connects NPCPanelUI to Redux state
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
-import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-// Corrected: Import everything from the feature's public API (index.ts)
-import {
-    selectAllNPCs,
-    selectSelectedNPCId,
-    selectNPCLoading,
-    selectNPCError,
-    npcActions,
-    updateNPCRelationshipThunk,
-    processNPCInteractionThunk,
-} from '../../';
-import { NPCPanelUI } from '../ui/NPCPanelUI';
-import type { NPC } from '../../state/NPCTypes';
+import React, { useState } from 'react';
+import { useAppSelector } from '../../../../app/hooks';
 import { selectCurrentNPC } from '../../state/NPCSelectors';
 import { Box, Paper, Typography, Button, Tabs, Tab } from '@mui/material';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
@@ -24,102 +12,83 @@ import NPCTradeTab from '../ui/tabs/NPCTradeTab';
 import NPCQuestsTab from '../ui/tabs/NPCQuestsTab';
 import NPCTraitsTab from '../ui/tabs/NPCTraitsTab';
 
-export interface NPCPanelContainerProps {
-  /** ID of the NPC to display */
-  npcId?: string;
-  /** Additional CSS class name */
-  className?: string;
-  /** Callback when NPC panel is closed */
-  onClose?: () => void;
-  onBack?: () => void;
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
-/**
- * Container component that manages NPC panel state and provides data to NPCPanelUI
- */
-export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({
-  npcId,
-  className,
-  onClose,
-  onBack
-}) => {
-  const dispatch = useAppDispatch();
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
 
-  const allNPCs = useAppSelector(selectAllNPCs);
-  const selectedNPCId = useAppSelector(selectSelectedNPCId);
-  const loading = useAppSelector(selectNPCLoading);
-  const error = useAppSelector(selectNPCError);
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`npc-tabpanel-${index}`}
+      aria-labelledby={`npc-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+export interface NPCPanelContainerProps {
+  onBack: () => void;
+}
+
+export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({ onBack }) => {
   const npc = useAppSelector(selectCurrentNPC);
   const [currentTab, setCurrentTab] = useState(0);
-
-  const currentNPCId = npcId || selectedNPCId;
-  const currentNPC = currentNPCId ? allNPCs[currentNPCId] as NPC : undefined;
-
-  const npcList = useMemo(() =>
-    Object.values(allNPCs).sort((a, b) => a.name.localeCompare(b.name)),
-    [allNPCs]
-  );
-
-  const handleNPCSelect = useCallback((selectedId: string) => {
-    dispatch(npcActions.setSelectedNPCId(selectedId));
-  }, [dispatch]);
-
-  const handleRelationshipChange = useCallback((npcId: string, change: number, reason: string) => {
-    dispatch(updateNPCRelationshipThunk({ npcId, change, reason }));
-  }, [dispatch]);
-
-  const handleInteraction = useCallback((npcId: string, interactionType: string, data?: any) => {
-    switch (interactionType) {
-      case 'dialogue':
-        dispatch(processNPCInteractionThunk({ npcId, interactionType: 'dialogue', context: data }));
-        break;
-      case 'trade':
-        dispatch(processNPCInteractionThunk({ npcId, interactionType: 'trade', context: data }));
-        break;
-      case 'quest':
-        dispatch(processNPCInteractionThunk({ npcId, interactionType: 'quest', context: data }));
-        break;
-      case 'trait':
-        dispatch(processNPCInteractionThunk({ npcId, interactionType: 'trait_sharing', context: data }));
-        break;
-      default:
-        console.warn(`Unknown interaction type: ${interactionType}`);
-    }
-  }, [dispatch]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
 
-  React.useEffect(() => {
-    if (!currentNPCId && npcList.length > 0 && !loading) {
-      handleNPCSelect(npcList[0].id);
-    }
-  }, [currentNPCId, npcList, loading, handleNPCSelect]);
-
   if (!npc) {
     return (
-      <Paper sx={{ p: 2, textAlign: 'center' }}>
-        <Typography variant="h6">NPC not found</Typography>
-        <Typography>The selected NPC could not be found. They might not be discovered yet.</Typography>
+      <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+        <Typography variant="h6">NPC Not Found</Typography>
+        <Typography paragraph>
+          The selected NPC could not be found. They may not have been discovered yet.
+        </Typography>
         <Button onClick={onBack} sx={{ mt: 2 }}>Back to List</Button>
       </Paper>
     );
   }
 
   return (
-    <NPCPanelUI
-      npc={currentNPC}
-      npcList={npcList}
-      selectedNPCId={currentNPCId}
-      loading={loading}
-      error={error}
-      className={className}
-      onNPCSelect={handleNPCSelect}
-      onRelationshipChange={handleRelationshipChange}
-      onInteraction={handleInteraction}
-      onClose={onClose}
-    />
+    <Paper sx={{ p: 2, height: '100%' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h5">{npc.name}</Typography>
+        <Button onClick={onBack}>Back to List</Button>
+      </Box>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
+        <Tabs value={currentTab} onChange={handleTabChange} aria-label="npc details tabs">
+          <Tab label="Overview" id="npc-tab-0" />
+          <Tab label="Quests" id="npc-tab-1" />
+          <Tab label="Trade" id="npc-tab-2" />
+          <Tab label="Traits" id="npc-tab-3" />
+        </Tabs>
+      </Box>
+      <TabPanel value={currentTab} index={0}>
+        <NPCOverviewTab npc={npc} />
+      </TabPanel>
+      <TabPanel value={currentTab} index={1}>
+        <NPCQuestsTab npc={npc} />
+      </TabPanel>
+      <TabPanel value={currentTab} index={2}>
+        <NPCTradeTab npc={npc} />
+      </TabPanel>
+      <TabPanel value={currentTab} index={3}>
+        <NPCTraitsTab npc={npc} />
+      </TabPanel>
+    </Paper>
   );
 };
 
