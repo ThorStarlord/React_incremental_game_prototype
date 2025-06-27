@@ -23,8 +23,8 @@ export type {
 export {
   default as npcReducer,
   npcActions,
-  updateNpcRelationship,
-  setRelationshipValue,
+  updateNpcAffinity,
+  setAffinity,
   increaseConnectionDepth,
   addRelationshipChangeEntry,
   setNpcStatus,

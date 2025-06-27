@@ -39,18 +39,6 @@ const NPCsPage: React.FC = () => {
     navigate('.');
   };
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return <Alert severity="error">Failed to load NPCs: {error}</Alert>;
-  }
-
   return (
     <Routes>
       <Route path="/" element={
@@ -63,13 +51,11 @@ const NPCsPage: React.FC = () => {
           <Box sx={{p: 2, borderBottom: 1, borderColor: 'divider'}}>
             <Button onClick={handleBackToList}>← Back to NPC List</Button>
           </Box>
-          <NPCPanelContainer npcId={npcId} onClose={handleBackToList} />
+          <NPCPanelContainer npcId={npcId} onBack={handleBackToList} isLoading={isLoading} error={error} />
         </Paper>
       } />
     </Routes>
   );
 };
-
-export default NPCsPage;
 
 export default NPCsPage;

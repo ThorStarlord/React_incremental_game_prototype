@@ -55,7 +55,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
   onImproveRelationship,
 }) => {
   const dispatch = useAppDispatch();
-  const currentTierInfo = getTierBenefits(npc.relationshipValue);
+  const currentTierInfo = getTierBenefits(npc.affinity);
   
   const SEDUCTION_CONNECTION_REQUIREMENT = 5;
 
@@ -87,7 +87,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
     if (currentTierInfo.nextTier) {
       const currentTierMin = currentTierInfo.threshold;
       const nextTierMin = currentTierInfo.nextTier.threshold;
-      const pointsInCurrentTier = npc.relationshipValue - currentTierMin;
+      const pointsInCurrentTier = npc.affinity - currentTierMin;
       const totalPointsInTier = nextTierMin - currentTierMin;
       const progressPercentage = totalPointsInTier > 0
         ? Math.max(0, Math.min(100, (pointsInCurrentTier / totalPointsInTier) * 100))
@@ -101,7 +101,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
       progressPercentageInTier: 100,
       progressLabelText: `${currentTierInfo.name} (Max)`,
     };
-  }, [npc.relationshipValue, currentTierInfo]);
+  }, [npc.affinity, currentTierInfo]);
 
   return (
     <Box sx={{ p: 2 }}>
@@ -121,7 +121,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                     {currentTierInfo.name}
                   </Typography>
                   <Typography variant="h5" sx={{ color: currentTierInfo.color || 'primary.main' }}>
-                    Affinity: {npc.relationshipValue}
+                    Affinity: {npc.affinity}
                   </Typography>
                 </Box>
                 
@@ -175,9 +175,9 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                   fullWidth
                   startIcon={<TrendingUp />}
                   onClick={() => onImproveRelationship?.(npc.id)}
-                  disabled={npc.relationshipValue >= 100}
+                  disabled={npc.affinity >= 100}
                 >
-                  {npc.relationshipValue >= 100 ? 'Maximum Relationship' : 'Spend Time Together'}
+                  {npc.affinity >= 100 ? 'Maximum Relationship' : 'Spend Time Together'}
                 </Button>
                 <Button
                   variant="outlined"
@@ -185,7 +185,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                   fullWidth
                   startIcon={<AddCircleOutlineIcon />}
                   onClick={handleDebugIncreaseAffinity}
-                  disabled={npc.relationshipValue >= 100}
+                  disabled={npc.affinity >= 100}
                   sx={{textTransform: 'none'}}
                 >
                   Debug: +10 Affinity
@@ -219,7 +219,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
               <List dense>
                 {Object.values(RELATIONSHIP_TIERS).sort((a,b) => a.min - b.min).map((tier) => {
                   const thresholdValue = tier.min;
-                  const isUnlocked = npc.relationshipValue >= thresholdValue;
+                  const isUnlocked = npc.affinity >= thresholdValue;
                   const tierSpecificBenefits = getTierBenefits(thresholdValue).benefits; 
 
                   return (
@@ -310,13 +310,13 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                               {change.reason}
                             </Typography>
                             <Chip
-                              label={change.newValue > change.oldValue ? `+${change.newValue - change.oldValue}` : `${change.newValue - change.oldValue}`}
+                              label={change.newAffinity > change.oldValue ? `+${change.newAffinity - change.oldValue}` : `${change.newAffinity - change.oldValue}`}
                               size="small"
-                              color={change.newValue > change.oldValue ? 'success' : 'error'}
+                              color={change.newAffinity > change.oldValue ? 'success' : 'error'}
                             />
                           </Box>
                         }
-                        secondary={`${change.oldValue} → ${change.newValue} • ${new Date(change.timestamp).toLocaleString()}`}
+                        secondary={`${change.oldValue} → ${change.newAffinity} • ${new Date(change.timestamp).toLocaleString()}`}
                       />
                     </ListItem>
                   ))}

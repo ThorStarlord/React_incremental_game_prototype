@@ -12,10 +12,7 @@ import {
 } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../app/hooks';
-import {
-  updateNPCRelationshipThunk,
-  updateNPCConnectionDepthThunk
-} from '../../';
+import { updateNpcAffinity, updateNPCConnectionDepthThunk } from '../../';
 import type { NPC } from '../../state/NPCTypes';
 
 /**
@@ -25,7 +22,7 @@ const NPCDebugRow: React.FC<{ npc: NPC }> = ({ npc }) => {
   const dispatch = useAppDispatch();
 
   const handleRelationshipChange = (amount: number) => {
-    dispatch(updateNPCRelationshipThunk({ npcId: npc.id, change: amount, reason: `Debug Panel (${amount > 0 ? '+' : ''}${amount})` }));
+    dispatch(updateNpcAffinity({ npcId: npc.id, change: amount, reason: `Debug Panel (${amount > 0 ? '+' : ''}${amount})` }));
   };
 
   const handleConnectionChange = (amount: number) => {
@@ -44,7 +41,7 @@ const NPCDebugRow: React.FC<{ npc: NPC }> = ({ npc }) => {
         <Grid item xs={6} sm={4} md={4.5}>
            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body2" sx={{ minWidth: 120 }}>
-              Relationship: <strong>{npc.relationshipValue}</strong>
+              Relationship: <strong>{npc.affinity}</strong>
             </Typography>
             <ButtonGroup size="small" variant="outlined">
               <Button onClick={() => handleRelationshipChange(-10)}>-10</Button>

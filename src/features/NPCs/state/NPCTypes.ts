@@ -40,7 +40,7 @@ export interface NPC {
   location: string;
   avatar?: string;
   faction?: string;
-  relationshipValue: number;
+  affinity: number;
   connectionDepth: number;
   loyalty: number;
   availableDialogues: string[];
@@ -177,7 +177,7 @@ export interface RelationshipChangeEntry {
   npcId: string;
   timestamp: number;
   oldValue: number;
-  newValue: number;
+  newAffinity: number;
   reason: string;
 }
 

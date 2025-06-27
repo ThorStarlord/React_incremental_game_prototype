@@ -61,8 +61,8 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
     // 2. Calculate total contribution from all NPC connections
     const npcContribution = Object.values(npcs).reduce((total, npc: NPC) => {
       // Ensure relationship contributes positively
-      if (npc.connectionDepth > 0 && npc.relationshipValue > 0) {
-        const relationshipMultiplier = npc.relationshipValue / 100.0; // Normalize to 0-1
+      if (npc.connectionDepth > 0 && npc.affinity > 0) {
+        const relationshipMultiplier = npc.affinity / 100.0; // Normalize to 0-1
         const connectionMultiplier = npc.connectionDepth / 10.0; // Normalize to 0-1, assuming max depth is 10
         
         const npcRate = connectionMultiplier * relationshipMultiplier * ESSENCE_GENERATION.NPC_CONTRIBUTION_MULTIPLIER;

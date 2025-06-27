@@ -65,7 +65,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
   }, [dispatch, allTraits, traitsLoading]);
 
   const isTabUnlocked = (requirement: number) => {
-    return npc.relationshipValue >= requirement;
+    return npc.affinity >= requirement;
   };
 
   const npcInnateTraitsDisplay = useMemo(() => {
@@ -117,7 +117,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
               <Typography variant="h6" gutterBottom>Character Information</Typography>
               <Typography variant="body2" color="text.secondary">Loyalty: {npc.loyalty || 0}/100</Typography>
               <Typography variant="body2" color="text.secondary">Connection Depth: {npc.connectionDepth?.toFixed(1) || '0.0'}</Typography>
-              <Typography variant="body2" color="text.secondary">Affinity: {npc.relationshipValue || 0}</Typography>
+              <Typography variant="body2" color="text.secondary">Affinity: {npc.affinity || 0}</Typography>
             </CardContent>
           </Card>
         </Grid>

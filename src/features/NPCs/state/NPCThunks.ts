@@ -6,7 +6,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setRelationshipValue, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction } from './NPCSlice';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -60,25 +60,25 @@ export const updateNPCRelationshipThunk = createAsyncThunk(
         return;
     }
 
-    const oldValue = npc.relationshipValue;
-    let newValue = oldValue + change;
+    const oldValue = npc.affinity;
+    let newAffinity = oldValue + change;
     let connectionDepthIncrease = 0;
 
-    if (newValue >= 100) {
-        connectionDepthIncrease = Math.floor(newValue / 100);
-        newValue = newValue % 100;
+    if (newAffinity >= 100) {
+        connectionDepthIncrease = Math.floor(newAffinity / 100);
+        newAffinity = newAffinity % 100;
 
         dispatch(increaseConnectionDepth({ npcId, amount: connectionDepthIncrease }));
     }
     
-    dispatch(setRelationshipValue({ npcId, value: newValue }));
+    dispatch(setAffinity({ npcId, value: newAffinity }));
 
     const logEntry: RelationshipChangeEntry = {
         id: `${npcId}-${Date.now()}`,
         npcId,
         timestamp: Date.now(),
         oldValue,
-        newValue,
+        newAffinity,
         reason: connectionDepthIncrease > 0 
             ? `${reason} & Connection Level Up! (+${connectionDepthIncrease})` 
             : reason,

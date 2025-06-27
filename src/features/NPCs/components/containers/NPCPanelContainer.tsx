@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectCurrentNPC } from '../../state/NPCSelectors';
-import { Box, Paper, Typography, Button, Tabs, Tab } from '@mui/material';
+import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress } from '@mui/material';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
 import NPCTradeTab from '../ui/tabs/NPCTradeTab';
 import NPCQuestsTab from '../ui/tabs/NPCQuestsTab';
@@ -40,15 +40,37 @@ function TabPanel(props: TabPanelProps) {
 
 export interface NPCPanelContainerProps {
   onBack: () => void;
+  npcId?: string;
+  isLoading: boolean;
+  error: string | null;
 }
 
-export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({ onBack }) => {
+export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({ onBack, isLoading, error }) => {
   const npc = useAppSelector(selectCurrentNPC);
   const [currentTab, setCurrentTab] = useState(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
+
+  if (isLoading) {
+    return (
+      <Paper sx={{ p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <CircularProgress />
+        <Typography sx={{ mt: 2 }}>Loading NPC data...</Typography>
+      </Paper>
+    );
+  }
+
+  if (error) {
+    return (
+      <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+        <Typography variant="h6" color="error">Error Loading NPC</Typography>
+        <Typography paragraph color="error">{error}</Typography>
+        <Button onClick={onBack} sx={{ mt: 2 }}>Back to List</Button>
+      </Paper>
+    );
+  }
 
   if (!npc) {
     return (

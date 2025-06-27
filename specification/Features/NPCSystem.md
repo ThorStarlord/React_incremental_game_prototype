@@ -18,7 +18,9 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 *   **Intimacy (`connectionDepth`):**
     *   **Role:** The core of the NPC's relationship with the player, representing a deep, metaphysical bond. It is a "level up" mechanic (0-10+ integer levels). Increases by 1 each time Affinity reaches 100 (Affinity then resets to 0).
     *   **Function:** Drives the player's metaphysical and core progression. It directly influences passive Essence generation and gates access to advanced Trait Resonance.
-*   **`NPCSelectors.ts`**: Contains `selectActiveConnectionCount` to provide other systems with the number of NPCs currently contributing to essence generation based on their `connectionDepth`.
+*   **Implementation:**
+    *   The `updateNPCRelationshipThunk` contains the core logic for this "level up" mechanic.
+    *   The UI (`NPCRelationshipTab` and `NPCHeader`) visually represents the `affinity` as a progress bar towards the next `connectionDepth` level.
 
 ### 2.2. Features ✅ IMPLEMENTED
 

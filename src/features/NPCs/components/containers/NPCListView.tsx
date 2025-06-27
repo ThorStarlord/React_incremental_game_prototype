@@ -89,7 +89,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList = npcList.filter(npc => npc.isAvailable);
         break;
       case 'high_relationship':
-        npcList = npcList.filter(npc => npc.relationshipValue >= 60);
+        npcList = npcList.filter(npc => npc.affinity >= 60);
         break;
       case 'same_location':
         break;
@@ -102,7 +102,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'relationship':
-        npcList.sort((a, b) => b.relationshipValue - a.relationshipValue);
+        npcList.sort((a, b) => b.affinity - a.affinity);
         break;
       case 'location':
         npcList.sort((a, b) => a.location.localeCompare(b.location));
@@ -117,7 +117,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   }, [npcs, discoveredNPCIds, searchTerm, filterBy, sortBy]);
 
   const renderNPCCard = (npc: NPC) => {
-    const currentTier = getCentralRelationshipTier(npc.relationshipValue);
+    const currentTier = getCentralRelationshipTier(npc.affinity);
     const isSelected = selectedNPCId === npc.id;
 
     return (
@@ -186,7 +186,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   };
 
   const renderNPCListItem = (npc: NPC) => {
-    const currentTier = getCentralRelationshipTier(npc.relationshipValue);
+    const currentTier = getCentralRelationshipTier(npc.affinity);
     const isSelected = selectedNPCId === npc.id;
 
     return (

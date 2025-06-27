@@ -26,7 +26,7 @@ interface NPCHeaderProps {
 }
 
 const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
-  const currentTierInfo = getTierBenefits(npc.relationshipValue);
+  const currentTierInfo = getTierBenefits(npc.affinity);
   const currentTierName = currentTierInfo.name;
   
   let pointsInCurrentTier = 0;
@@ -38,7 +38,7 @@ const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
     const currentTierMin = currentTierInfo.threshold; // Min value of current tier
     const nextTierMin = currentTierInfo.nextTier.threshold; // Min value of next tier (start of next tier)
     
-    pointsInCurrentTier = npc.relationshipValue - currentTierMin;
+    pointsInCurrentTier = npc.affinity - currentTierMin;
     totalPointsInTier = nextTierMin - currentTierMin;
 
     if (totalPointsInTier > 0) {

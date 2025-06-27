@@ -95,7 +95,7 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
   
   // Relationship-based tab unlocking
   const isTabUnlocked = useCallback((requiredLevel: number): boolean => {
-    return npc ? npc.relationshipValue >= requiredLevel : false;
+    return npc ? npc.affinity >= requiredLevel : false;
   }, [npc]);
   
   const getAvailableTabs = useCallback(() => {

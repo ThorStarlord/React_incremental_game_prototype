@@ -47,18 +47,18 @@ const npcSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-    updateNpcRelationship: (state, action: PayloadAction<{ npcId: string; change: number; reason?: string }>) => {
+    updateNpcAffinity: (state, action: PayloadAction<{ npcId: string; change: number; reason?: string }>) => {
       const { npcId, change } = action.payload;
       const npc = state.npcs[npcId];
       if (npc) {
-        npc.relationshipValue = Math.max(-100, Math.min(100, npc.relationshipValue + change));
+        npc.affinity = Math.max(-100, Math.min(100, npc.affinity + change));
       }
     },
-    setRelationshipValue: (state, action: PayloadAction<{ npcId: string; value: number }>) => {
+    setAffinity: (state, action: PayloadAction<{ npcId: string; value: number }>) => {
         const { npcId, value } = action.payload;
         const npc = state.npcs[npcId];
         if (npc) {
-            npc.relationshipValue = Math.max(0, Math.min(100, value));
+            npc.affinity = Math.max(0, Math.min(100, value));
         }
     },
     increaseConnectionDepth: (state, action: PayloadAction<{ npcId: string; amount: number }>) => {
@@ -139,8 +139,8 @@ export const {
   setLoading,
   setError,
   setNPCs,
-  updateNpcRelationship,
-  setRelationshipValue,
+  updateNpcAffinity,
+  setAffinity,
   increaseConnectionDepth,
   addRelationshipChangeEntry,
   setNpcStatus,
