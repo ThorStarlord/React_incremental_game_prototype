@@ -230,8 +230,8 @@ interface NPC {
   faction?: string;     // New optional in code
   
   // Relationship and connection data
-  relationshipValue: number; // New in code
-  connectionDepth: number;   // New in code
+  affinity: number;          // Represents opinion/friendliness (-100 to 100)
+  connectionDepth: number;   // Represents intimacy/bond level (0+)
   loyalty: number;           // New in code
   
   // Interaction tracking

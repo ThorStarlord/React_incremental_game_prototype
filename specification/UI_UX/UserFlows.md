@@ -36,9 +36,9 @@ User Access → AppRouter Evaluation → Route Delegation → Interface Renderin
 ```
 GameLayout Mount → Initial State Setup → Navigation Ready → User Interaction
       ↓                   ↓                 ↓                ↓
-  Route Delegation  → useLayoutState    → Tab System    → Content Updates
+  Route Delegation  → useLayoutState    → Nested Routes → Component Rendering
       ↓                   ↓                 ↓                ↓
-  /game/* received  → Layout State Init → Default Tab   → MainContentArea
+  /game/* received  → Layout State Init → Route Match   → Page Component
       ↓                   ↓                 ↓                ↓
   GameLayout Active → Navigation Ready  → User Clicks   → Internal Navigation
 ```
@@ -46,7 +46,7 @@ GameLayout Mount → Initial State Setup → Navigation Ready → User Interacti
 #### Internal Navigation Benefits ✅ NEWLY IMPLEMENTED
 
 **Performance-Optimized Flow**:
-- **No Route Changes**: Tab navigation handled internally without browser navigation
+- **Nested Routing**: Specific pages handle their own sub-routes (e.g., NPCsPage for /npcs and /npcs/:npcId)
 - **Component Stability**: GameLayout remains mounted during all internal navigation
 - **State Persistence**: Navigation preferences persist without URL dependency
 - **Smooth Transitions**: Material-UI transitions without route evaluation overhead
@@ -118,13 +118,13 @@ Delegation  → Mounted     → Configured    → Event Handlers   → User Acti
 **Navigation to Traits**: ✅ **ENHANCED WITH GAMELAYOUT + APPROUTER**
 
 ```
-User Navigation → GameLayout → Traits Tab → TraitSystemWrapper → Feature Interface
-       ↓              ↓           ↓              ↓                    ↓
-   Click "Traits" → Internal   → setActiveTab → Component Load → Tabbed Interface
-       ↓              ↓           ↓              ↓                    ↓
-   Navigation     → No Route   → State Update → TraitSlots     → User Interaction
-       ↓              ↓           ↓              ↓                    ↓
-   Visual Update  → Change     → MainContent  → Management     → Click Actions
+User Navigation → GameLayout → Component Rendering → Feature Interface
+       ↓              ↓           ↓                    ↓
+   Click "Traits" → Route Match   → TraitsPage       → Tabbed Interface
+       ↓              ↓           ↓                    ↓
+   Navigation     → Efficient   → TraitSlots     → User Interaction
+       ↓              ↓           ↓                    ↓
+   Visual Update  → Rendering   → Management     → Click Actions
 ```
 
 ### 3.2. NPC System Integration ✅ COMPLETE + ROUTER-INTEGRATION
@@ -132,13 +132,13 @@ User Navigation → GameLayout → Traits Tab → TraitSystemWrapper → Feature
 **Navigation to NPCs**: ✅ **ENHANCED WITH GAMELAYOUT + APPROUTER**
 
 ```
-User Navigation → GameLayout → NPCs Tab → NPCsPage → NPC Interaction
-       ↓              ↓          ↓          ↓            ↓
-   Click "NPCs"   → Internal  → setActiveTab → Component → NPCPanel
-       ↓              ↓          ↓          ↓            ↓
-   Navigation     → No Route  → State Update → NPC List → Tabbed Interface
-       ↓              ↓          ↓          ↓            ↓
-   Visual Update  → Change    → MainContent → Selection → Relationship UI
+User Navigation → GameLayout → Component Rendering → NPC Interaction
+       ↓              ↓          ↓            ↓
+   Click "NPCs"   → Route Match  → NPCsPage       → NPCPanel
+       ↓              ↓          ↓            ↓
+   Navigation     → Efficient  → NPC List     → Tabbed Interface
+       ↓              ↓          ↓            ↓
+   Visual Update  → Rendering  → Selection    → Relationship UI
 ```
 
 ### 3.3. Feature Loading Flow ✅ ENHANCED + ROUTER-INTEGRATION
@@ -146,13 +146,13 @@ User Navigation → GameLayout → NPCs Tab → NPCsPage → NPC Interaction
 **Dynamic Content Loading**: ✅ **COMPLETE WITH GAMELAYOUT + APPROUTER**
 
 ```
-Navigation Event → GameLayout → MainContentArea → Feature Loading → User Interface
+Navigation Event → GameLayout → Component Rendering → Feature Loading → User Interface
        ↓               ↓             ↓               ↓                 ↓
-   User Action    → State Update → Switch Logic → Component Mount → Rendered Feature
+   User Action    → Route Match   → Component Mount → Rendered Feature
        ↓               ↓             ↓               ↓                 ↓
-   Tab Selection  → activeTab    → Route Switch → Feature Component → Interactive UI
+   Tab Selection  → Efficient     → Feature Component → Interactive UI
        ↓               ↓             ↓               ↓                 ↓
-   Internal Nav   → No Router    → Efficient    → Memoized Render → Optimized UX
+   Internal Nav   → Rendering     → Memoized Render → Optimized UX
 ```
 
 ## 4. User Experience Flows ✅ COMPLETE + ROUTER-INTEGRATION

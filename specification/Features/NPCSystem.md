@@ -2,47 +2,23 @@
 
 ## 1. Overview
 
-The Non-Player Character (NPC) System governs the behavior, interaction, and relationships between the player and the game's inhabitants. NPCs populate the world, offer quests, provide services, and react to the player's actions. The core of the NPC system is a two-tiered relationship model that drives player progression.
+The Non-Player Character (NPC) System governs the behavior, interaction, and relationships between the player and the game's inhabitants. The system is built on a two-tiered model of **Affinity** (opinion) and **Intimacy** (connection).
 
-## 1.1. Naming Conventions ✅ ESTABLISHED
-
-**Feature Folder Structure**: The NPC system follows a specific naming pattern for consistency and clarity:
-
-- **Feature Folder**: `src/features/NPCs/` (plural)
-- **Component Files**: Use singular `NPC` prefix (e.g., `NPCPanel.tsx`, `NPCHeader.tsx`, `NPCListView.tsx`)
-- **State Files**: Use singular `NPC` prefix (e.g., `NPCTypes.ts`, `NPCSlice.ts`, `NPCSelectors.ts`)
-- **Interface Names**: Use singular `NPC` for types (e.g., `NPC`, `NPCState`, `NPCTraitInfo`)
-- **Page Components**: Use plural for page-level components (e.g., `NPCsPage.tsx`, `NpcsPage.tsx`)
-
-**Rationale**: 
-- **Folder**: `NPCs` 
-- **Files**: `NPC` prefix maintains clear semantic meaning for individual entity components
-- **Types**: Singular interfaces represent individual entities consistently
-- **Pages**: Plural pages indicate management of multiple NPCs
-
-**Implementation Status**: ✅ **CONSISTENTLY APPLIED** across the entire NPC feature following Feature-Sliced Design principles.
+### 1.1. Naming Conventions ✅ ESTABLISHED
+(No changes here)
 
 ## 2. Core Mechanics
 
 ### 2.1. Two-Tiered Relationship Model ✅ IMPLEMENTED
 
-The relationship system is now built on a "level up" mechanic, providing clear goals and satisfying progression milestones.
+*   **Affinity (`affinity`):**
+    *   **Role:** The NPC's opinion of the player, ranging from Hostile to Beloved (-100 to +100).
+    *   **Function:** Acts as an "experience bar" for the relationship. It is increased or decreased by quests, dialogue, and other transactional events. It primarily gates access to services (trading, quests, etc.) and modifies their effectiveness (e.g., shop prices).
 
-*   **Relationship Value (Affinity):**
-    *   **Role:** Acts as the "Experience Bar" for the relationship. It's a value from 0 to 99.
-    *   **Progression:** The player increases this value through positive interactions (dialogue, quests, etc.).
-    *   **Gating:** Specific relationship values are still used to unlock certain interactions or tabs (e.g., trading might unlock at an Affinity of 40).
-
-*   **Connection Depth:**
-    *   **Role:** Acts as the "Level" of the relationship. This is the primary stat that influences long-term game mechanics.
-    *   **Progression:** When `relationshipValue` reaches 100, it "levels up":
-        1.  `connectionDepth` increases by 1.
-        2.  `relationshipValue` resets to 0, allowing the progression to begin again for the next level.
-    *   **Impact:** The `connectionDepth` is the primary factor used in the **Essence Generation** formula. Higher connection levels provide significant, tiered boosts to the player's passive essence gain.
-
-*   **Implementation:**
-    *   The `updateNPCRelationshipThunk` contains the core logic for this "level up" mechanic.
-    *   The UI (`NPCRelationshipTab` and `NPCHeader`) visually represents the `relationshipValue` as a progress bar towards the next `connectionDepth` level.
+*   **Intimacy (`connectionDepth`):**
+    *   **Role:** The core of the NPC's relationship with the player, representing a deep, metaphysical bond. It is a "level up" mechanic (0-10+ integer levels). Increases by 1 each time Affinity reaches 100 (Affinity then resets to 0).
+    *   **Function:** Drives the player's metaphysical and core progression. It directly influences passive Essence generation and gates access to advanced Trait Resonance.
+*   **`NPCSelectors.ts`**: Contains `selectActiveConnectionCount` to provide other systems with the number of NPCs currently contributing to essence generation based on their `connectionDepth`.
 
 ### 2.2. Features ✅ IMPLEMENTED
 

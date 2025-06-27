@@ -58,16 +58,10 @@ Players should feel like they're building a network of meaningful relationships 
 **Concept**: The foundation of all progression, representing the depth of understanding and bond between player and NPCs. This connection is crucial for unlocking interactions and generating Essence.
 
 **Implementation**:
-- **Connection Depth** - Numerical representation of relationship strength (0-100). This is the primary stat for tracking Emotional Connection.
-- **Connection Quality** - Categorical assessment of relationship type (friendship, mentorship, rivalry) - *Planned for future implementation.*
-- **Essence Generation** - Passive resource production directly linked to the `connectionDepth` of active emotional connections.
-- **Unlock Gates** - Deeper connections unlock new interaction options and content (e.g., tabs in the NPC panel).
-
-**Player Actions**:
-- Engage in meaningful dialogue choices that resonate with NPC personalities
-- Complete personal quests or favors that matter to the NPC
-- Share beneficial traits to demonstrate care and investment
-- Spend time in activities the NPC enjoys or values
+- **Affinity**: Represents the player's current standing or favorability with an NPC. It's a dynamic, often fluctuating value (0-99). Increases through positive interactions, decreases through negative actions. Primarily impacts gameplay services (unlocks trading, quests, dialogue options; affects shop prices).
+- **Intimacy (Connection Depth)**: Represents the depth of the metaphysical or emotional bond. It's a "level up" mechanic (0-10+ integer levels). Increases by 1 each time Affinity reaches 100 (Affinity then resets to 0). Primarily drives metaphysical and core progression (Essence Generation, Trait Resonance).
+- **Essence Generation**: Passive resource production directly linked to the sum of `connectionDepth` levels from all connected NPCs.
+- **Unlock Gates**: Deeper connections (both Affinity and Intimacy) unlock new interaction options and content (e.g., tabs in the NPC panel).
 
 **Player Actions**:
 - Engage in meaningful dialogue choices that resonate with NPC personalities
@@ -103,7 +97,7 @@ Players should feel like they're building a network of meaningful relationships 
 **Acquisition Methods**:
 - **Discovery**: The player becomes aware of a trait, typically by interacting with an NPC. Discovered traits can be equipped into active slots.
 - **Equipping**: A temporary, strategic choice to place a discovered trait into a limited active slot to gain its benefits. This is free.
-- **Resonance (Permanent Acquisition)**: The primary method for permanently mastering a trait. This is an **action** where the player spends **Essence** to make a *discovered* trait a permanent, innate ability that no longer requires a slot.
+- **Resonance (Permanent Acquisition)**: The primary method for permanently mastering a trait. This is an **action** where the player spends **Essence** to make a *discovered* trait a permanent, innate ability that no longer requires a slot. This action is gated by the **Intimacy (`connectionDepth`) level** with the source NPC.
 - **Quest Rewards**: Direct grants from significant achievements, which could grant either discovered or permanent traits.
 
 **Management**:
@@ -132,7 +126,7 @@ Players should feel like they're building a network of meaningful relationships 
 **Concept**: Transform deep emotional connections into allied entities that assist the player. Copies inherit aspects of the player and their "parent" NPC.
 
 **Creation Process**:
-- **Seduction Outcome** - A successful outcome of a specific deep relationship interaction with an NPC creates the opportunity to create a Copy.
+*   **Seduction Outcome**: This high-level interaction is only possible once a very high **Intimacy (`connectionDepth`) level** is achieved with an NPC. Affinity is a secondary factor, or may not be required at all.
 - **Growth Options** - Choose between time-intensive natural growth or Essence-accelerated development.
 - **Trait Inheritance** - A new Copy inherits a snapshot of traits the player had actively shared with the parent NPC at the moment of creation.
 - **Loyalty System** - Ongoing relationship maintenance is required for reliable Copy behavior.
@@ -244,7 +238,7 @@ Players should feel like they're building a network of meaningful relationships 
 - ✅ Advanced NPC dialogue systems (Basic implementation complete)
 - ✅ Trait acquisition and permanence mechanics (Essence cost for acquisition and permanence implemented)
 - ✅ Enhanced Essence generation from relationships (Passive generation now based on NPC connection depth)
-- 📋 Copy creation system implementation (Planned)
+- 📋 Copy creation system implementation (Basic UI and state management implemented)
 - 📋 Quest system foundation (Planned)
 
 ### Phase 3: Polish & Expansion 📋 **PLANNED**

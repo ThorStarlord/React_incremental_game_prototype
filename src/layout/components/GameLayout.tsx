@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'; // Added useEffect
+import React, { useEffect } from 'react';
 import { Box, useTheme, useMediaQuery } from '@mui/material';
-import { useAppDispatch } from '../../app/hooks'; // Added useAppDispatch
-import { startGame } from '../../features/GameLoop/state/GameLoopSlice'; // Added startGame
+import { useAppDispatch } from '../../app/hooks';
+import { startGame } from '../../features/GameLoop/state/GameLoopSlice';
 import { useLayoutState } from '../hooks/useLayoutState';
 import { VerticalNavBar } from './VerticalNavBar/VerticalNavBar';
 import { MainContentArea } from './MainContentArea';
@@ -13,7 +13,7 @@ import { MainContentArea } from './MainContentArea';
 export const GameLayout: React.FC = React.memo(() => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const dispatch = useAppDispatch(); // Get the dispatch function
+  const dispatch = useAppDispatch();
 
   // Automatically start the game loop when the layout mounts
   useEffect(() => {

@@ -197,7 +197,7 @@ interface NPCState {
   relationshipChanges: RelationshipChangeEntry[]; 
   loading: boolean;
   error: string | null;
-  selectedNPCId: string | null;
+  selectedNPCId: string | null; // Added to track selected NPC for detail view
 }
 ```
 
@@ -207,10 +207,11 @@ interface NPCState {
 - **Relationship Tracking**: Manages NPC relationship values and logs changes
 - **Interaction Management**: Handles current interaction sessions and logs dialogue history
 - **Status & Availability**: Manages NPC status and availability
-- **Trait System Integration**:
+- **Trait System Integration**: 
     *   NPCs have `availableTraits` for player "Resonance" (leading to permanent player traits in `PlayerSlice`)
     *   NPCs have `innateTraits` that players can temporarily equip into their `PlayerSlice.traitSlots`
     *   NPCs have `sharedTraitSlots` for traits shared by the player
+- **Selected NPC Tracking**: `selectedNPCId` added to manage the currently viewed NPC in the detail panel.
 
 ### 4.4. Essence Slice ✅ COMPLETE
 **Location**: `src/features/Essence/state/EssenceSlice.ts`

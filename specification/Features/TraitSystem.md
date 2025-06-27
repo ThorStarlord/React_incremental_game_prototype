@@ -9,7 +9,7 @@ This document details the design and mechanics of the Trait system, which allows
 *   **Key Mechanics:**
     *   **Discovery:** The player learns that a trait exists, typically by interacting with an NPC who possesses it. Discovered traits can be equipped.
     *   **Equipping:** The player places a discovered (but not permanent) trait into one of their limited active slots to gain its benefits. This is a temporary, strategic choice with no Essence cost.
-    *   **Resonance (Permanent Acquisition):** The player spends a significant amount of Essence to make a discovered trait a permanent part of their character, freeing up the slot it occupied (if any) and making its effects always active.
+    *   **Resonance (Permanent Acquisition):** The player spends a significant amount of Essence to make a discovered trait a permanent part of their character, freeing up the slot it occupied (if any) and making its effects always active. This action is gated by the **Intimacy (`connectionDepth`) level** with the source NPC.
 
 **Implementation Status**: ✅ **UI IMPLEMENTED** for core trait management, equipping, and the new Resonance flow via the NPC panel.
 
