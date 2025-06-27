@@ -74,7 +74,13 @@ export const selectSelectedNPCId = (state: RootState) => state.npcs.selectedNPCI
  */
 export const selectCurrentNPC = createSelector(
   [selectAllNPCs, selectSelectedNPCId],
-  (npcs, selectedId) => (selectedId ? npcs[selectedId] : undefined)
+  (npcs, selectedId) => {
+    if (!selectedId) {
+      return undefined;
+    }
+    // Find the NPC in the array by its ID
+    return Object.values(npcs).find(npc => npc.id === selectedId);
+  }
 );
 
 export const selectNPCDialogueHistory = createSelector(
