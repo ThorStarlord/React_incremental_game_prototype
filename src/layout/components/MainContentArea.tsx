@@ -7,6 +7,7 @@ import {
   Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { Outlet, useOutlet } from 'react-router-dom';
 
 // Page imports
 import CharacterPage from '../../pages/CharacterPage';
@@ -32,6 +33,7 @@ export interface MainContentAreaProps {
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
   debugMode?: boolean;
   LoadingComponent?: React.ComponentType<{ text?: string }>;
+  children?: React.ReactNode;
 }
 
 interface ContentConfig {
@@ -60,9 +62,11 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
   enableTransitions = true,
   maxWidth = 'lg',
   debugMode = process.env.NODE_ENV === 'development',
-  LoadingComponent = ContentLoadingFallback
+  LoadingComponent = ContentLoadingFallback,
+  children
 }) => {
   const theme = useTheme();
+  const outlet = useOutlet();
 
   useEffect(() => {
     if (debugMode) {
@@ -108,6 +112,11 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
   }, [changeTab, activeTabId, contentConfig, debugMode]);
 
   const renderContent = useCallback(() => {
+    // If a routed component is being rendered via <Outlet>, prioritize it.
+    if (outlet) {
+      return <Suspense fallback={<LoadingComponent text="Loading page..." />}>{children}</Suspense>;
+    }
+
     const { component: Component, props: componentProps = {}, enableSuspense } = currentConfig;
     const enhancedProps = { ...componentProps, onTabChange: handleTabChange, activeTab: activeTabId, debugMode };
     const content = <Component {...enhancedProps} />;
@@ -115,7 +124,7 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
       return <Suspense fallback={<LoadingComponent text={currentConfig.loadingText} />}>{content}</Suspense>;
     }
     return content;
-  }, [currentConfig, handleTabChange, activeTabId, debugMode, LoadingComponent]);
+  }, [currentConfig, handleTabChange, activeTabId, debugMode, LoadingComponent, children, outlet]);
 
   const content = useMemo(() => {
     const renderedContent = renderContent();

@@ -5,6 +5,7 @@ import { startGame } from '../../features/GameLoop/state/GameLoopSlice';
 import { useLayoutState } from '../hooks/useLayoutState';
 import { VerticalNavBar } from './VerticalNavBar/VerticalNavBar';
 import { MainContentArea } from './MainContentArea';
+import { Outlet } from 'react-router-dom';
 
 /**
  * New GameLayout component that integrates with useLayoutState hook
@@ -29,7 +30,7 @@ export const GameLayout: React.FC = React.memo(() => {
   } = useLayoutState({
     defaultTab: 'dashboard',
     persistSidebar: true,
-    syncWithRouter: true
+    syncWithRouter: true,
   });
 
   // Calculate main content margin based on sidebar state and device type
@@ -75,7 +76,9 @@ export const GameLayout: React.FC = React.memo(() => {
         <MainContentArea 
           activeTabId={activeTab}
           changeTab={setActiveTab}
-        />
+        >
+          <Outlet />
+        </MainContentArea>
       </Box>
     </Box>
   );

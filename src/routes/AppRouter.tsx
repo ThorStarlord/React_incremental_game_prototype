@@ -2,6 +2,8 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom'; // Removed BrowserRouter as Router
 import MainMenu from '../pages/MainMenu';
 import { GameLayout } from '../layout/components/GameLayout';
+import NPCsPage from '../pages/NPCsPage';
+import { NPCPanelContainer } from '../features/NPCs';
 
 /**
  * Main application router component
@@ -16,7 +18,13 @@ export const AppRouter: React.FC = () => {
       <Route path="/menu" element={<MainMenu />} />
       
       {/* Game Routes - Use GameLayout for all game-related paths */}
-      <Route path="/game/*" element={<GameLayout />} />
+      <Route path="/game" element={<GameLayout />}>
+        {/* Nested route for NPCs to handle list and detail views */}
+        <Route path="npcs" element={<NPCsPage />}>
+          <Route path=":npcId" element={<NPCPanelContainer />} />
+        </Route>
+        {/* Other game routes can be nested here */}
+      </Route>
       
       {/* Default redirect to main menu */}
       <Route path="*" element={<Navigate to="/" replace />} />

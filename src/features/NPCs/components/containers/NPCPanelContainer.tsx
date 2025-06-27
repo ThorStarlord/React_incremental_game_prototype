@@ -4,8 +4,9 @@
  */
 
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectCurrentNPC } from '../../state/NPCSelectors';
+import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
 import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress } from '@mui/material';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
 import NPCTradeTab from '../ui/tabs/NPCTradeTab';
@@ -39,14 +40,14 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export interface NPCPanelContainerProps {
-  onBack: () => void;
-  npcId?: string;
-  isLoading: boolean;
-  error: string | null;
+  // Props are no longer needed as they are derived from the route/redux
 }
 
-export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({ onBack, isLoading, error }) => {
-  const npc = useAppSelector(selectCurrentNPC);
+export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
+  const { npcId } = useParams<{ npcId: string }>();
+  const npc = useAppSelector((state) => selectNPCById(state, npcId!));
+  const isLoading = useAppSelector(selectNPCLoading);
+  const error = useAppSelector(selectNPCError);
   const [currentTab, setCurrentTab] = useState(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -67,7 +68,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({ onBack, is
       <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
         <Typography variant="h6" color="error">Error Loading NPC</Typography>
         <Typography paragraph color="error">{error}</Typography>
-        <Button onClick={onBack} sx={{ mt: 2 }}>Back to List</Button>
+        {/* The back button is now handled by the parent NPCsPage */}
       </Paper>
     );
   }
@@ -79,16 +80,15 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({ onBack, is
         <Typography paragraph>
           The selected NPC could not be found. They may not have been discovered yet.
         </Typography>
-        <Button onClick={onBack} sx={{ mt: 2 }}>Back to List</Button>
+        {/* The back button is now handled by the parent NPCsPage */}
       </Paper>
     );
   }
 
   return (
-    <Paper sx={{ p: 2, height: '100%' }}>
+    <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5">{npc.name}</Typography>
-        <Button onClick={onBack}>Back to List</Button>
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
         <Tabs value={currentTab} onChange={handleTabChange} aria-label="npc details tabs">
@@ -110,7 +110,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = ({ onBack, is
       <TabPanel value={currentTab} index={3}>
         <NPCTraitsTab npcId={npc.id} />
       </TabPanel>
-    </Paper>
+    </Box>
   );
 };
 

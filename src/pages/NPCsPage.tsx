@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import {
-  Box,
-  Paper,
-  Button,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
+  Routes,
+  Route,
+  useNavigate,
+  useParams,
+  Outlet,
+} from 'react-router-dom';
+import { Box, Paper, Button, CircularProgress, Alert } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import {
   initializeNPCsThunk,
@@ -22,9 +22,6 @@ const NPCsPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { npcId } = useParams<{ npcId?: string }>();
 
-  const isLoading = useAppSelector(selectNPCLoading);
-  const error = useAppSelector(selectNPCError);
-  
   useEffect(() => {
     dispatch(initializeNPCsThunk());
   }, [dispatch]);
@@ -36,25 +33,41 @@ const NPCsPage: React.FC = () => {
 
   const handleBackToList = () => {
     dispatch(setSelectedNPCId(null));
-    navigate('.');
+    navigate('/game/npcs');
   };
 
+  // If we have an npcId in the URL, show the detail panel via the Outlet.
+  // The back button is now part of the panel itself.
+  if (npcId) {
+    return (
+      <Paper
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Button onClick={handleBackToList}>← Back to NPC List</Button>
+        </Box>
+        <Outlet />
+      </Paper>
+    );
+  }
+
+  // Otherwise, show the list view.
   return (
-    <Routes>
-      <Route path="/" element={
-        <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-          <NPCListView onSelectNPC={handleSelectNPC} selectedNPCId={npcId} />
-        </Paper>
-      } />
-      <Route path=":npcId" element={
-        <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box sx={{p: 2, borderBottom: 1, borderColor: 'divider'}}>
-            <Button onClick={handleBackToList}>← Back to NPC List</Button>
-          </Box>
-          <NPCPanelContainer npcId={npcId} onBack={handleBackToList} isLoading={isLoading} error={error} />
-        </Paper>
-      } />
-    </Routes>
+    <Paper
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'auto',
+      }}
+    >
+      <NPCListView onSelectNPC={handleSelectNPC} selectedNPCId={npcId} />
+    </Paper>
   );
 };
 
