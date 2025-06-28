@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Routes,
   Route,
@@ -21,10 +21,6 @@ const NPCsPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { npcId } = useParams<{ npcId?: string }>();
-
-  useEffect(() => {
-    dispatch(initializeNPCsThunk());
-  }, [dispatch]);
 
   const handleSelectNPC = (id: string) => {
     dispatch(setSelectedNPCId(id));

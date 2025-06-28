@@ -19,6 +19,7 @@ interface DesktopNavBarProps {
   activeTabId: TabId | null;
   onTabChange: (tabId: TabId) => void;
   collapsed: boolean;
+  onCollapseChange: (collapsed: boolean) => void;
 }
 
 const StyledList = styled(List)<{ collapsed: boolean }>(({ theme, collapsed }) => ({
@@ -86,6 +87,7 @@ export const DesktopNavBar: React.FC<DesktopNavBarProps> = ({
   activeTabId,
   onTabChange,
   collapsed,
+  onCollapseChange,
 }) => {
   // Group items by section for better organization
   const groupedItems = React.useMemo(() => {

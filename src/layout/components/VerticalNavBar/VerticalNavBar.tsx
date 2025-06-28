@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { Box, useMediaQuery, useTheme } from '@mui/material';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DesktopNavBar } from './DesktopNavBar';
 import { MobileNavDrawer } from './MobileNavDrawer';
 import { getImplementedItems } from '../../constants/navigationConfig';
@@ -60,6 +60,7 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Use custom nav items or get implemented items from config
   const navigationItems = useMemo(() => {
@@ -83,6 +84,9 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
 
   // Handle tab changes
   const handleTabChange = useCallback((tabId: TabId) => {
+    // Navigate to the corresponding route
+    navigate(`/game/${tabId}`);
+
     if (onTabChange) {
       onTabChange(tabId);
     }
@@ -90,7 +94,7 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
     if (isMobile) {
       closeDrawer();
     }
-  }, [onTabChange, isMobile, closeDrawer]);
+  }, [onTabChange, isMobile, closeDrawer, navigate]);
 
   // Handle collapse changes (desktop only)
   const handleCollapseChange = useCallback((newCollapsed: boolean) => {
@@ -115,6 +119,7 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
           activeTabId={currentTab}
           onTabChange={handleTabChange}
           collapsed={collapsed}
+          onCollapseChange={handleCollapseChange}
         />
       )}
     </Box>

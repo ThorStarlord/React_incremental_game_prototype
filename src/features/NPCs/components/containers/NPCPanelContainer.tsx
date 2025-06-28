@@ -3,10 +3,11 @@
  * @description Container component that connects NPCPanelUI to Redux state
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAppSelector } from '../../../../app/hooks';
+import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
+import { initializeNPCsThunk } from '../../'; // Corrected import path
 import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress } from '@mui/material';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
 import NPCTradeTab from '../ui/tabs/NPCTradeTab';
@@ -45,7 +46,14 @@ export interface NPCPanelContainerProps {
 
 export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   const { npcId } = useParams<{ npcId: string }>();
-  const npc = useAppSelector((state) => selectNPCById(state, npcId!));
+  const dispatch = useAppDispatch();
+
+  // Ensure NPC data is loaded
+  useEffect(() => {
+    dispatch(initializeNPCsThunk());
+  }, [dispatch]);
+
+  const npc = useAppSelector((state) => (npcId ? selectNPCById(state, npcId) : undefined));
   const isLoading = useAppSelector(selectNPCLoading);
   const error = useAppSelector(selectNPCError);
   const [currentTab, setCurrentTab] = useState(0);
@@ -69,6 +77,16 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
         <Typography variant="h6" color="error">Error Loading NPC</Typography>
         <Typography paragraph color="error">{error}</Typography>
         {/* The back button is now handled by the parent NPCsPage */}
+      </Paper>
+    );
+  }
+
+  // Add a guard for missing npcId from the URL params
+  if (!npcId) {
+    return (
+      <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+        <Typography variant="h6" color="error">Invalid NPC ID</Typography>
+        <Typography paragraph>No NPC ID was provided in the URL.</Typography>
       </Paper>
     );
   }

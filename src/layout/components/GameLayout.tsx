@@ -68,8 +68,6 @@ export const GameLayout: React.FC = React.memo(() => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          padding: theme.spacing(3),
-          paddingTop: theme.spacing(4),
           minWidth: 0,
         }}
       >
