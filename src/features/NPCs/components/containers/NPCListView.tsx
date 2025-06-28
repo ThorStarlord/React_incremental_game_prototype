@@ -21,14 +21,18 @@ import {
   Avatar,
   ListItemText,
   ListItemSecondaryAction,
-  IconButton,
   Tooltip,
   Divider,
   ListItemButton,
+  ToggleButtonGroup,
+  ToggleButton,
+  Toolbar,
+  Paper,
 } from '@mui/material';
-import { Search, Person, Star } from '@mui/icons-material';
+import { Search, Person, Star, ViewList, ViewModule } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
+import { selectPlayerLocation } from '../../../Player/state/PlayerSelectors';
 import { NPC } from '../../state/NPCTypes';
 import { initializeNPCsThunk } from '../..';
 import { NPCListCard } from '../ui/NPCListCard';
@@ -36,28 +40,37 @@ import { NPCListCard } from '../ui/NPCListCard';
 interface NPCListViewProps {
   onSelectNPC: (npcId: string) => void;
   selectedNPCId?: string;
-  viewMode?: 'grid' | 'list';
 }
 
-type SortOption = 'name' | 'relationship' | 'location' | 'recent';
-type FilterOption = 'all' | 'available' | 'high_relationship' | 'same_location';
+type SortOption = 'name' | 'relationship' | 'location' | 'recent' | 'connection';
+type FilterOption = 'all' | 'available' | 'high_relationship' | 'same_location' | 'connected';
 
 export const NPCListView: React.FC<NPCListViewProps> = ({
   onSelectNPC,
   selectedNPCId,
-  viewMode = 'grid'
 }) => {
   const npcs = useAppSelector(selectNPCs);
   const discoveredNPCIds = useAppSelector(selectDiscoveredNPCs);
+  const playerLocation = useAppSelector(selectPlayerLocation);
   const dispatch = useAppDispatch();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     dispatch(initializeNPCsThunk());
   }, [dispatch]);
+
+  const handleViewChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newViewMode: 'grid' | 'list' | null,
+  ) => {
+    if (newViewMode !== null) {
+      setViewMode(newViewMode);
+    }
+  };
 
   const filteredAndSortedNPCs = useMemo(() => {
     let npcList = discoveredNPCIds
@@ -82,7 +95,10 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList = npcList.filter(npc => npc.affinity >= 60);
         break;
       case 'same_location':
-        // Placeholder for future location-based filtering
+        npcList = npcList.filter(npc => npc.location === playerLocation);
+        break;
+      case 'connected':
+        npcList = npcList.filter(npc => npc.connectionDepth > 0);
         break;
       default:
         break;
@@ -101,11 +117,14 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
       case 'recent':
         npcList.sort((a, b) => (b.lastInteraction || 0) - (a.lastInteraction || 0));
         break;
+      case 'connection':
+        npcList.sort((a, b) => b.connectionDepth - a.connectionDepth);
+        break;
       default:
         break;
     }
     return npcList;
-  }, [npcs, discoveredNPCIds, searchTerm, filterBy, sortBy]);
+  }, [npcs, discoveredNPCIds, searchTerm, filterBy, sortBy, playerLocation]);
 
   const renderNPCListItem = (npc: NPC) => {
     const isSelected = selectedNPCId === npc.id;
@@ -142,42 +161,62 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
     <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h5" gutterBottom>Discovered NPCs</Typography>
       
-      {/* Toolbar for filtering and sorting */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-        <TextField
-          label="Search NPCs"
-          variant="outlined"
-          size="small"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ flexGrow: 1, minWidth: '200px' }}
-        />
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Sort By</InputLabel>
-          <Select value={sortBy} label="Sort By" onChange={(e) => setSortBy(e.target.value as SortOption)}>
-            <MenuItem value="name">Name</MenuItem>
-            <MenuItem value="relationship">Relationship</MenuItem>
-            <MenuItem value="location">Location</MenuItem>
-            <MenuItem value="recent">Recent Interaction</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Filter By</InputLabel>
-          <Select value={filterBy} label="Filter By" onChange={(e) => setFilterBy(e.target.value as FilterOption)}>
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="available">Available</MenuItem>
-            <MenuItem value="high_relationship">High Affinity</MenuItem>
-            <MenuItem value="same_location" disabled>Same Location</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      <Paper sx={{ mb: 2 }}>
+        <Toolbar>
+          <Box sx={{ flexGrow: 1, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+            <TextField
+              label="Search NPCs"
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ flexGrow: 1, minWidth: '200px' }}
+            />
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Sort By</InputLabel>
+              <Select value={sortBy} label="Sort By" onChange={(e) => setSortBy(e.target.value as SortOption)}>
+                <MenuItem value="name">Name</MenuItem>
+                <MenuItem value="relationship">Relationship</MenuItem>
+                <MenuItem value="connection">Connection Depth</MenuItem>
+                <MenuItem value="location">Location</MenuItem>
+                <MenuItem value="recent">Recent Interaction</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Filter By</InputLabel>
+              <Select value={filterBy} label="Filter By" onChange={(e) => setFilterBy(e.target.value as FilterOption)}>
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="available">Available</MenuItem>
+                <MenuItem value="high_relationship">High Affinity</MenuItem>
+                <MenuItem value="same_location">Same Location</MenuItem>
+                <MenuItem value="connected">Connected</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewChange}
+            aria-label="view mode"
+            size="small"
+            sx={{ ml: 2 }}
+          >
+            <ToggleButton value="list" aria-label="list view">
+              <ViewList />
+            </ToggleButton>
+            <ToggleButton value="grid" aria-label="grid view">
+              <ViewModule />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Toolbar>
+      </Paper>
 
       {/* Content Area */}
       <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>

@@ -9,6 +9,11 @@ import { selectTraits } from '../../Traits/state/TraitsSelectors';
 // Base player state selector
 export const selectPlayer = (state: RootState): PlayerState => state.player;
 
+export const selectPlayerLocation = createSelector(
+    [selectPlayer],
+    (player) => player.location
+);
+
 // NEW: Selector for the final, calculated stats object
 export const selectFinalStats = createSelector(
   [selectPlayer],

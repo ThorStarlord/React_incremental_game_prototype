@@ -77,4 +77,5 @@ export interface PlayerState {
   
   totalPlaytime: number;
   isAlive: boolean;
+  location: string; // Current location of the player
 }

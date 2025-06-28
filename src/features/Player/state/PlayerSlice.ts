@@ -71,6 +71,7 @@ const initialState: PlayerState = {
   traitSlots: createInitialTraitSlots(),
   totalPlaytime: 0,
   isAlive: true,
+  location: 'Starting Area',
 };
 
 /**
@@ -167,6 +168,9 @@ const playerSlice = createSlice({
         slot.isLocked = false;
       }
     },
+    setLocation: (state, action: PayloadAction<string>) => {
+      state.location = action.payload;
+    },
   },
 });
 
@@ -189,6 +193,7 @@ export const {
   equipTrait,
   unequipTrait,
   unlockTraitSlot,
+  setLocation,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;
