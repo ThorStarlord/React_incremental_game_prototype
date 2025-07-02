@@ -5,6 +5,7 @@ This document outlines best practices and conventions to follow while developing
 ## 1. Project Structure and Organization
 
 *   **Feature-Sliced Structure:** Continue using the feature-sliced approach (`src/features/FeatureName/`). This promotes modularity and scalability.
+    *   **Convention:** Feature directories should be **singular and `PascalCase`** (e.g., `src/features/Player`, `src/features/Trait`, `src/features/Copy`). The corresponding Redux slice key should be **singular and `camelCase`** (e.g., `player`, `trait`, `copy`).
 *   **Inside Features:** Maintain a consistent internal structure within each feature folder:
     *   `components/`: Contains UI components specific to the feature.
         *   `containers/`: Smart components connected to Redux or managing complex logic.
