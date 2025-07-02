@@ -1,8 +1,10 @@
-Implementation Status: ✅ UI IMPLEMENTED + BASIC STATE MANAGEMENT
+Implementation Status: ✅ **BASIC STATE/UI IMPLEMENTED**
 
 # Copy System Specification
 
 This document details the mechanics for creating, managing, and utilizing "Copies" – entities created by the player through a unique process, inheriting aspects of the player and potentially a target.
+
+**Implementation Note:** The feature slice for this system is located at `src/features/Copy/` (singular), and its state is managed under the `copy` key in the Redux store.
 
 ## 1. Overview
 

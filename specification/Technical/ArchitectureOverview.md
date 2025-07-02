@@ -30,12 +30,13 @@ The project follows a Feature-Sliced Design approach to promote modularity, scal
     *   **`features/`**: ✅ **IMPLEMENTED** - Contains self-contained feature modules following consistent internal structure.
         *   **`GameLoop/`**: ✅ **IMPLEMENTED** - Core timing and game state management
         *   **`Player/`**: ✅ **STATE IMPLEMENTED** - Player character data with comprehensive types and selectors
-        *   **`Traits/`**: ✅ **UI IMPLEMENTED** - Complete trait management system with click-based interactions
+        *   **`Trait/`**: ✅ **UI IMPLEMENTED** - Complete trait management system with click-based interactions
         *   **`Essence/`**: ✅ **STATE IMPLEMENTED** - Core metaphysical resource management
         *   **`Settings/`**: ✅ **UI IMPLEMENTED + COMPLETE** - Comprehensive user configuration management with audio, graphics, gameplay, and UI settings
         *   **`Meta/`**: ✅ **IMPLEMENTED** - Application metadata and save/load functionality
-        *   **`Npcs/`**: ✅ **UI IMPLEMENTED + THUNKS** - Complete NPC interaction system with tabbed interface, relationship progression, and comprehensive async operations through NPCThunks.ts
-        *   **Future Features**: `Copy/`, `Quest/` (planned)
+        *   **`NPC/`**: ✅ **UI IMPLEMENTED + THUNKS** - Complete NPC interaction system with tabbed interface, relationship progression, and comprehensive async operations through NPCThunks.ts
+        *   **`Copy/`**: ✅ **BASIC UI/STATE** - Player-created entity management.
+        *   **Future Features**: `Quest/` (planned)
     *   **`gameLogic/`**: Core game logic, systems, and calculations not tied to a specific UI feature.
     *   **`hooks/`**: Global/shared custom React hooks.
     *   **`layout/`**: ✅ **COMPLETE** - Global layout components and column structures with **MainContentArea implementation**.
@@ -637,23 +638,38 @@ The architecture now provides a **complete, mature Player UI system** with compr
 
 ### Naming Conventions
 
-**Feature Folder Naming**: Features use specific naming patterns for consistency and cross-platform compatibility:
+**Feature Folder Naming**: To ensure consistency and predictability, feature slices are named after the singular entity they manage.
 
-#### NPCs Feature Example ✅ IMPLEMENTED
-- **Feature Root**: `src/features/NPCs/` (plural)
-- **Component Files**: `NPC` prefix for individual entity components
-  - `NPCPanel.tsx`, `NPCHeader.tsx`, `NPCListView.tsx`
-- **State Management**: `NPC` prefix for state files
-  - `NPCTypes.ts`, `NPCSlice.ts`, `NPCSelectors.ts`
-- **Type Definitions**: Singular interfaces for entity types
-  - `NPC`, `NPCState`, `NPCTraitInfo`
-- **Page Components**: Plural naming for collection management
-  - `NPCsPage.tsx` (manages multiple NPCs)
+*   **Feature Directory:** Singular, PascalCase (e.g., `src/features/Player`, `src/features/Trait`, `src/features/Copy`).
+*   **Redux Slice Key:** Singular, camelCase (e.g., `player`, `trait`, `copy` in the root reducer).
+*   **Page Components:** Can be plural if they manage a list of entities (e.g., `NPCsPage`, `CopiesPage`).
 
-#### General Pattern
-- **Feature Folders**: Plural, PascalCase with lowercase accommodation (`Traits/`, `Npcs/`, `Settings/`)
-- **Component Files**: Singular entity prefix, descriptive suffix (`TraitPanel.tsx`, `NPCHeader.tsx`)
-- **State Files**: Match component naming (`TraitsSlice.ts`, `NPCSelectors.ts`)
-- **Page Files**: Plural for collection views (`TraitsPage.tsx`, `NPCsPage.tsx`)
+#### NPC Feature Example ✅ IMPLEMENTED
+ - **Feature Root**: `src/features/NPC/` (singular)
+ - **Component Files**: `NPC` prefix for individual entity components
+   - `NPCPanel.tsx`, `NPCHeader.tsx`, `NPCListView.tsx`
+ - **State Management**: `NPC` prefix for state files
+   - `NPCTypes.ts`, `NPCSlice.ts`, `NPCSelectors.ts`
+ - **Type Definitions**: Singular interfaces for entity types
+   - `NPC`, `NPCState`, `NPCTraitInfo`
+ - **Page Components**: Plural naming for collection management
+   - `NPCsPage.tsx` (manages multiple NPCs)
+
++#### Copy Feature Example ✅ IMPLEMENTED
++ - **Feature Root**: `src/features/Copy/` (singular)
++ - **Component Files**: `Copy` prefix for individual entity components
++   - `CopyPanel.tsx`, `CopyOverview.tsx`
++ - **State Management**: `Copy` prefix for state files
++   - `CopyTypes.ts`, `CopySlice.ts`, `CopySelectors.ts`
++ - **Type Definitions**: Singular interfaces for entity types
++   - `Copy`, `CopyState`
++ - **Page Components**: Plural naming for collection management
++   - `CopiesPage.tsx` (manages multiple Copies)
++
+ #### General Pattern
+  - **Feature Folders**: Singular, PascalCase (`Player/`, `Trait/`, `NPC/`, `Copy/`)
+  - **Component Files**: Singular entity prefix, descriptive suffix (`TraitPanel.tsx`, `NPCHeader.tsx`)
+  - **State Files**: Match component naming (`TraitSlice.ts`, `NPCSelectors.ts`)
+  - **Page Files**: Plural for collection views (`TraitsPage.tsx`, `NPCsPage.tsx`)
 
 **Cross-Platform Compatibility**: Folder naming avoids case sensitivity conflicts while maintaining semantic clarity in file and type names.

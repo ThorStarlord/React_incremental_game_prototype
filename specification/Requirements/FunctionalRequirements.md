@@ -103,13 +103,15 @@ This document lists the functional requirements for the React Incremental RPG Pr
 - ✅ **Navigation Integration**: Complete integration with MainContentArea routing and VerticalNavBar navigation system
 - ✅ **Accessibility Compliant**: Full WCAG 2.1 AA compliance with keyboard navigation and screen reader support
 
-## FR-COPY: Copy System 📋 PLANNED
+## FR-COPY: Copy System ✅ BASIC STATE/UI IMPLEMENTED
+
+**Implementation Note:** The feature slice for this system is located at `src/features/Copy/` (singular), and its state is managed under the `copy` key in the Redux store.
 
 *   **FR-COPY-001:** ✅ **IMPLEMENTED** - The system shall allow the player to create a Copy as an outcome of a successful "Seduction" interaction with an NPC.
-*   **FR-COPY-002:** ✅ **IMPLEMENTED** - The system shall allow the player to choose between "Normal Growth" (time-based) and "Accelerated Growth" (Essence-cost based) for a new Copy.
-*   **FR-COPY-003:** ✅ **IMPLEMENTED** - The system shall track the state of each Copy, including stats, loyalty, assigned task, growth status, and inherited/shared traits.
-*   **FR-COPY-004:** ✅ **IMPLEMENTED** - Copies shall inherit traits shared with their parent target at the moment of creation.
-*   **FR-COPY-005:** ✅ **IMPLEMENTED** - The system shall allow the player to manage Copies through a dedicated UI.
+*   **FR-COPY-002:** 📋 **PLANNED** - The system shall allow the player to choose between "Normal Growth" (time-based) and "Accelerated Growth" (Essence-cost based) for a new Copy.
+*   **FR-COPY-003:** 📋 **PLANNED** - The system shall track the state of each Copy, including stats, loyalty, assigned task, growth status, and inherited/shared traits.
+*   **FR-COPY-004:** 📋 **PLANNED** - Copies shall inherit traits shared with their parent target at the moment of creation.
+*   **FR-COPY-005:** 📋 **PLANNED** - The system shall allow the player to manage Copies through a dedicated UI.
 *   **FR-COPY-006:** 📋 **PLANNED** - The system shall allow the player to assign tasks to mature Copies.
 *   **FR-COPY-007:** 📋 **PLANNED** - The system shall model Copy loyalty, influenced by shared traits and task outcomes.
 *   **FR-COPY-008:** 📋 **PLANNED** - The system shall limit the number of active Copies the player can maintain.

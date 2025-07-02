@@ -29,7 +29,8 @@ export const store = configureStore({
     gameLoop: gameLoopSlice.reducer,
     settings: settingsSlice.reducer,
     meta: metaSlice.reducer,
-    // Future: quests, copies, inventory
+    copy: copySlice.reducer,
+    // Future: quests, inventory
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -209,8 +210,7 @@ interface NPCState {
 - **Status & Availability**: Manages NPC status and availability
 - **Trait System Integration**: 
     *   NPCs have `availableTraits` for player "Resonance" (leading to permanent player traits in `PlayerSlice`)
-    *   NPCs have `innateTraits` that players can temporarily equip into their `PlayerSlice.traitSlots`
-    *   NPCs have `sharedTraitSlots` for traits shared by the player
+    *   NPCs have `innateTraits` that players can temporarily equip into their `PlayerSlice.t
 - **Selected NPC Tracking**: `selectedNPCId` added to manage the currently viewed NPC in the detail panel.
 
 ### 4.4. Essence Slice ✅ COMPLETE
@@ -504,7 +504,7 @@ describe('fetchDataThunk', () => {
 
 ### 11.1. Planned Slices 📋
 - **Quest System**: Quest management and progression tracking
-- **Copy System**: Player-created entity management
+- **Copy System**: Player-created entity management (slice name: `copy`)
 - **Inventory System**: Item storage and equipment management
 - **Achievement System**: Player accomplishment tracking
 

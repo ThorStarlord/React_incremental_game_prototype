@@ -556,14 +556,12 @@ interface Copy {
   parentNPCId: string;       // Source NPC for creation
   createdAt: number;         // Creation timestamp
   growthType: 'normal' | 'accelerated'; // Growth method
-  maturityLevel: number;     // Development progress (0-100)
+  maturity: number;          // Development progress (0-100)
   loyalty: number;           // Loyalty to player (0-100)
-  stats: CopyStats;          // Individual statistics
+  stats: PlayerStats;        // Individual statistics (updated to use PlayerStats for consistency)
   inheritedTraits: string[]; // Traits from creation
-  sharedTraits: string[];    // Traits shared by player
-  currentTask?: CopyTask;    // Active assignment
+  currentTask?: string;      // Active assignment (simplified to string)
   location: string;          // Current location
-  isActive: boolean;         // Operational status
 }
 ```
 
