@@ -6,7 +6,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { addCopy } from '../../../Copy/state/CopySlice';
+// FIXED: Import the correct thunk for creating a copy
+import { createCopyThunk } from '../../../Copy/state/CopyThunks';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
 import { initializeNPCsThunk } from '../../'; // Corrected import path
 import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress } from '@mui/material';
@@ -63,6 +64,14 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
     setCurrentTab(newValue);
   };
 
+  // Handler for creating a copy
+  const handleCreateCopy = () => {
+    if (npc) {
+      // FIXED: Dispatch the thunk with the correct payload
+      dispatch(createCopyThunk({ npcId: npc.id }));
+    }
+  };
+
   if (isLoading) {
     return (
       <Paper sx={{ p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -111,7 +120,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
         <Button
           variant="contained"
           color="secondary"
-          onClick={() => dispatch(addCopy({ sourceNpcId: npc.id }))}
+          onClick={handleCreateCopy} // FIXED: Use the correct handler
         >
           Create Copy
         </Button>
