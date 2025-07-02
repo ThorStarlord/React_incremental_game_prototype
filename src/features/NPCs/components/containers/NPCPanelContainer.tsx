@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+import { addCopy } from '../../../Copy/state/CopySlice';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
 import { initializeNPCsThunk } from '../../'; // Corrected import path
 import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress } from '@mui/material';
@@ -107,6 +108,13 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
     <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5">{npc.name}</Typography>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => dispatch(addCopy({ sourceNpcId: npc.id }))}
+        >
+          Create Copy
+        </Button>
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
         <Tabs value={currentTab} onChange={handleTabChange} aria-label="npc details tabs">
