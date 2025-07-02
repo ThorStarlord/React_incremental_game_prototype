@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "file-system": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@mcp/server-fs"],
+      "env": {}
+    },
+    "react-analyzer": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mcp/server-react-analyzer"
+      ]
+    }
+  }
+}
