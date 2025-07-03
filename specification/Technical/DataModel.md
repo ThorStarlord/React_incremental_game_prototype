@@ -217,7 +217,7 @@ interface TraitsState {
 ## 5. NPC Data Model ✅ IMPLEMENTED
 
 ### 5.1. NPC Definition
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 
 ```typescript
 interface NPC {
@@ -264,7 +264,7 @@ interface NPC {
 
 ### 5.2. NPC Status
 This type defines the possible statuses for an NPC.
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 type NPCStatus = 
   | 'available'
@@ -277,8 +277,8 @@ type NPCStatus =
 ```
 
 ### 5.3. NPC Trait Information
-Trait information specific to NPCs, including acquisition requirements.
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+Trait information specific to an NPC, including acquisition requirements.
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 interface NPCTraitInfo {
   id: string;
@@ -301,7 +301,7 @@ interface NPCTraitInfo {
 
 ### 5.4. NPC Shared Trait Slot
 Defines a slot where the player can share traits with an NPC.
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 interface NPCSharedTraitSlot {
   id: string;
@@ -314,7 +314,7 @@ interface NPCSharedTraitSlot {
 
 ### 5.5. NPC Personality (Placeholder in Code)
 The current `NPCPersonality` in `NPCTypes.ts` is a placeholder. The specification's original version was more detailed. For now, reflecting the code:
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 interface NPCPersonality { // Placeholder structure from code
   traits: string[];
@@ -327,7 +327,7 @@ interface NPCPersonality { // Placeholder structure from code
 ### 5.6. Relationship Data
 In the codebase, direct relationship metrics like `relationshipValue` are stored on the `NPC` object itself. A history of changes is maintained via `RelationshipChangeEntry`. The `NPCRelationship` object from the original spec is not directly used.
 
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 interface RelationshipChangeEntry {
   id: string;
@@ -347,7 +347,7 @@ The interaction system in code has several parts:
 - `DialogueEntry`: For logging dialogue.
 
 **InteractionType (Code uses a type alias)**
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 type InteractionType = 
   | 'dialogue'
@@ -359,7 +359,7 @@ type InteractionType =
 ```
 
 **Current Interaction Session (NPCInteraction in code)**
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 interface NPCInteraction { // Represents current interaction session
   npcId: string;
@@ -370,7 +370,7 @@ interface NPCInteraction { // Represents current interaction session
 ```
 
 **Interaction Result**
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 interface InteractionResult {
   success: boolean;
@@ -383,7 +383,7 @@ interface InteractionResult {
 ```
 
 **Dialogue Entry**
-**Location**: `src/features/NPCs/state/NPCTypes.ts`
+**Location**: `src/features/NPC/state/NPCTypes.ts`
 ```typescript
 interface DialogueEntry {
   id: string;

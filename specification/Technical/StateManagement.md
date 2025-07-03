@@ -24,7 +24,7 @@ export const store = configureStore({
   reducer: {
     player: playerSlice.reducer,
     traits: traitsSlice.reducer,
-    npcs: npcsSlice.reducer,
+    npc: npcsSlice.reducer,
     essence: essenceSlice.reducer,
     gameLoop: gameLoopSlice.reducer,
     settings: settingsSlice.reducer,
@@ -186,7 +186,7 @@ interface TraitsState {
 - **Trait Presets**: Manages saving, loading, and deleting trait presets (`saveTraitPreset`, `loadTraitPreset`, `deleteTraitPreset`)
 
 ### 4.3. NPCs Slice ✅ COMPLETE
-**Location**: `src/features/NPCs/state/NPCSlice.ts`
+**Location**: `src/features/NPC/state/NPCSlice.ts`
 
 **State Structure**:
 ```typescript

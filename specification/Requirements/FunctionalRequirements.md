@@ -118,6 +118,8 @@ This document lists the functional requirements for the React Incremental RPG Pr
 
 ## FR-NPC: Non-Player Characters ✅ UI IMPLEMENTED + **THUNKS**
 
+**Implementation Note:** The feature slice for this system is located at `src/features/NPC/` (singular), and its state is managed under the `npc` key in the Redux store.
+
 *   **FR-NPC-001:** ✅ **IMPLEMENTED** - The system shall represent NPCs with basic state (location, name, relationship status).
 *   **FR-NPC-002:** ✅ **IMPLEMENTED + THUNKS** - The system shall track the player's relationship value and connection depth with individual NPCs. *Enhanced with updateNPCRelationshipThunk for validated relationship updates with boundary checking and side effect management.*
 *   **FR-NPC-003:** ✅ **UI IMPLEMENTED + THUNKS** - NPC relationship/connection shall influence interactions (dialogue availability, trade pricing, quest access, trait acquisition). *UI framework fully implemented with processNPCInteractionThunk handling complex interaction processing and unlock rewards.*

@@ -34,7 +34,7 @@ The project follows a Feature-Sliced Design approach to promote modularity, scal
         *   **`Essence/`**: ✅ **STATE IMPLEMENTED** - Core metaphysical resource management
         *   **`Settings/`**: ✅ **UI IMPLEMENTED + COMPLETE** - Comprehensive user configuration management with audio, graphics, gameplay, and UI settings
         *   **`Meta/`**: ✅ **IMPLEMENTED** - Application metadata and save/load functionality
-        *   **`NPC/`**: ✅ **UI IMPLEMENTED + THUNKS** - Complete NPC interaction system with tabbed interface, relationship progression, and comprehensive async operations through NPCThunks.ts
+        *   **`NPC/`**: ✅ **UI IMPLEMENTED + THUNKS** - Complete NPC interaction system with tabbed interface, relationship progression, and comprehensive async operations through `NPCThunks.ts`.
         *   **`Copy/`**: ✅ **BASIC UI/STATE** - Player-created entity management.
         *   **Future Features**: `Quest/` (planned)
     *   **`gameLogic/`**: Core game logic, systems, and calculations not tied to a specific UI feature.
@@ -655,17 +655,17 @@ The architecture now provides a **complete, mature Player UI system** with compr
  - **Page Components**: Plural naming for collection management
    - `NPCsPage.tsx` (manages multiple NPCs)
 
-+#### Copy Feature Example ✅ IMPLEMENTED
-+ - **Feature Root**: `src/features/Copy/` (singular)
-+ - **Component Files**: `Copy` prefix for individual entity components
-+   - `CopyPanel.tsx`, `CopyOverview.tsx`
-+ - **State Management**: `Copy` prefix for state files
-+   - `CopyTypes.ts`, `CopySlice.ts`, `CopySelectors.ts`
-+ - **Type Definitions**: Singular interfaces for entity types
-+   - `Copy`, `CopyState`
-+ - **Page Components**: Plural naming for collection management
-+   - `CopiesPage.tsx` (manages multiple Copies)
-+
+#### Copy Feature Example ✅ IMPLEMENTED
+ - **Feature Root**: `src/features/Copy/` (singular)
+ - **Component Files**: `Copy` prefix for individual entity components
+   - `CopyPanel.tsx`, `CopyOverview.tsx`
+ - **State Management**: `Copy` prefix for state files
+   - `CopyTypes.ts`, `CopySlice.ts`, `CopySelectors.ts`
+ - **Type Definitions**: Singular interfaces for entity types
+   - `Copy`, `CopyState`
+ - **Page Components**: Plural naming for collection management
+   - `CopiesPage.tsx` (manages multiple Copies)
+
  #### General Pattern
   - **Feature Folders**: Singular, PascalCase (`Player/`, `Trait/`, `NPC/`, `Copy/`)
   - **Component Files**: Singular entity prefix, descriptive suffix (`TraitPanel.tsx`, `NPCHeader.tsx`)
