@@ -3,7 +3,7 @@
     "file-system": {
       "type": "stdio",
       "command": "npx",
-      "args": ["@mcp/server-fs"],
+      "args": ["@vscode/mcp-fs"], // Make absolutely sure this line is correct
       "env": {}
     },
     "react-analyzer": {

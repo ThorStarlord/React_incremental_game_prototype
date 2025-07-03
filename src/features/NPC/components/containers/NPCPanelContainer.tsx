@@ -9,7 +9,7 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 // FIXED: Import the correct thunk for creating a copy
 import { createCopyThunk } from '../../../Copy/state/CopyThunks';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
-import { initializeNPCsThunk } from '../../'; // Corrected import path
+import { initializeNPCsThunk } from '../..'; // Corrected import path
 import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress } from '@mui/material';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
 import NPCTradeTab from '../ui/tabs/NPCTradeTab';

@@ -15,7 +15,7 @@ import {
   NPCPanelContainer,
   NPCListView,
   setSelectedNPCId,
-} from '../features/NPCs';
+} from '../features/NPC';
 
 const NPCsPage: React.FC = () => {
   const navigate = useNavigate();

@@ -14,7 +14,7 @@ import {
   selectCurrentEssence,
   selectGenerationRate,
 } from '../features/Essence/state/EssenceSelectors';
-import { selectActiveConnectionCount } from '../features/NPCs/state/NPCSelectors';
+import { selectActiveConnectionCount } from '../features/NPC/state/NPCSelectors';
 // Ensure imports point to the correct components from the barrel file
 import { ManualEssenceButton, EssenceGenerationTimer } from '../features/Essence/components';
 

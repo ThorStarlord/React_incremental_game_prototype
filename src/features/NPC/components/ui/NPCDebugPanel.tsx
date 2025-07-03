@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../app/hooks';
-import { updateNpcAffinity, updateNPCConnectionDepthThunk } from '../../';
+import { updateNpcAffinity, updateNPCConnectionDepthThunk } from '../..';
 import type { NPC } from '../../state/NPCTypes';
 
 /**

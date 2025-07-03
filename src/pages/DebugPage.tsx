@@ -10,9 +10,9 @@ import {
 } from '@mui/material';
 import { BugReport as DebugIcon } from '@mui/icons-material';
 // Import the UI component and the necessary hooks/selectors
-import NPCDebugPanel from '../features/NPCs/components/ui/NPCDebugPanel';
+import NPCDebugPanel from '../features/NPC/components/ui/NPCDebugPanel';
 import { useAppSelector } from '../app/hooks';
-import { selectAllNPCs, selectNPCLoading } from '../features/NPCs';
+import { selectAllNPCs, selectNPCLoading } from '../features/NPC';
 
 /**
  * DebugPage component.

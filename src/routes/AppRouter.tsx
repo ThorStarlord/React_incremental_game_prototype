@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'; // Removed BrowserRo
 import MainMenu from '../pages/MainMenu';
 import { GameLayout } from '../layout/components/GameLayout';
 import NPCsPage from '../pages/NPCsPage';
-import { NPCPanelContainer } from '../features/NPCs';
+import { NPCPanelContainer } from '../features/NPC';
 import { DashboardPage } from '../pages/DashboardPage';
 import CharacterPage from '../pages/CharacterPage';
 import TraitsPage from '../pages/TraitsPage';

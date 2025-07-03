@@ -5,7 +5,7 @@ import { useAppSelector } from '../../../../app/hooks';
 // Corrected: Import the selector for the generation rate
 import { selectGenerationRate } from '../../state/EssenceSelectors';
 // Corrected: Import the new selector for connection count
-import { selectActiveConnectionCount } from '../../../NPCs/state/NPCSelectors';
+import { selectActiveConnectionCount } from '../../../NPC/state/NPCSelectors';
 
 /**
  * EssenceGenerationTimer - Passive generation tracking component

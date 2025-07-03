@@ -13,7 +13,7 @@ import { EssenceState } from './EssenceTypes';
 import { addPermanentTrait, setResonanceLevel } from '../../Player/state/PlayerSlice';
 import { selectPlayer } from '../../Player/state/PlayerSelectors';
 import { ESSENCE_GENERATION } from '../../../constants/gameConstants';
-import { NPC } from '../../NPCs/state/NPCTypes';
+import { NPC } from '../../NPC/state/NPCTypes';
 import { Trait } from '../../Traits/state/TraitsTypes';
 
 /**

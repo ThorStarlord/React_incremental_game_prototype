@@ -42,7 +42,7 @@ import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
 import {
   selectNPCById,
   shareTraitWithNPCThunk
-} from '../../../';
+} from '../../..';
 import {
   selectPermanentTraits,
   selectEquippedTraits,

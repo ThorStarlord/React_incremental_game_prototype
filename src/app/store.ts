@@ -8,7 +8,7 @@ import traitsReducer from '../features/Traits/state/TraitsSlice';
 import essenceReducer from '../features/Essence/state/EssenceSlice';
 import settingsReducer from '../features/Settings/state/SettingsSlice';
 import metaReducer from '../features/Meta/state/MetaSlice';
-import npcsReducer from '../features/NPCs/state/NPCSlice';
+import npcsReducer from '../features/NPC/state/NPCSlice';
 import copyReducer from '../features/Copy/state/CopySlice'; // Corrected import path
 
 // Combine all feature reducers

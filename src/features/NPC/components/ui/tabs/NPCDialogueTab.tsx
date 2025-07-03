@@ -16,7 +16,7 @@ import {
   selectNPCById,
   selectNPCDialogueHistory,
   processNPCInteractionThunk
-} from '../../../';
+} from '../../..';
 import type { NPC, DialogueEntry } from '../../../state/NPCTypes';
 
 interface NPCDialogueTabProps {
