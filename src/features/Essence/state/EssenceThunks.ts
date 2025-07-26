@@ -57,6 +57,15 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
 
     // 1. Start with the base generation rate
     let totalRate = ESSENCE_GENERATION.BASE_RATE_PER_SECOND;
+
+    // 0. Add bonus from mature, loyal Copies
+    const copies = state.copy?.copies || {};
+    // Each qualifying Copy gives a flat bonus (e.g., 0.2/sec)
+    const COPY_BONUS = 0.2;
+    const qualifyingCopies = Object.values(copies).filter(
+      (copy) => copy.maturity >= 100 && copy.loyalty > 50
+    );
+    totalRate += qualifyingCopies.length * COPY_BONUS;
     
     // 2. Calculate total contribution from all NPC connections
     const npcContribution = Object.values(npcs).reduce((total, npc: NPC) => {
