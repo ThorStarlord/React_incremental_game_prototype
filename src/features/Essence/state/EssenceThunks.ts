@@ -67,7 +67,7 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
     );
     totalRate += qualifyingCopies.length * ESSENCE_GENERATION_BONUS;
     
-    // 2. Calculate total contribution from all NPC connections
+    // 3. Calculate total contribution from all NPC connections
     const npcContribution = Object.values(npcs).reduce((total, npc: NPC) => {
       // Ensure relationship contributes positively
       if (npc.connectionDepth > 0 && npc.affinity > 0) {
@@ -82,7 +82,7 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
 
     totalRate += npcContribution;
     
-    // 3. Calculate global multipliers from player traits
+    // 4. Calculate global multipliers from player traits
     let traitMultiplier = 1.0;
     const activeTraitIds = [...player.permanentTraits, ...player.traitSlots.map(s => s.traitId).filter(Boolean) as string[]];
     
@@ -96,10 +96,10 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
       }
     });
 
-    // 4. Apply the total trait multiplier to the calculated rate
+    // 5. Apply the total trait multiplier to the calculated rate
     totalRate *= traitMultiplier;
 
-    // 5. Dispatch the update action
+    // 6. Dispatch the update action
     dispatch(updateGenerationRate(totalRate));
 
     return {
