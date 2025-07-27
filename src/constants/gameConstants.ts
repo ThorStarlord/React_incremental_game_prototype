@@ -22,3 +22,18 @@ export const ESSENCE_GENERATION = {
    */
   NPC_CONTRIBUTION_MULTIPLIER: 0.5,
 };
+/**
+ * Constants for the Copy System
+ */
+export const COPY_SYSTEM = {
+  /** Growth rate for a Copy's maturity per second. */
+  GROWTH_RATE_PER_SECOND: 0.1,
+  /** Loyalty decay rate for a Copy per second. */
+  DECAY_RATE_PER_SECOND: 0.05,
+  /** Essence cost to use the 'Bolster Loyalty' action. */
+  BOLSTER_LOYALTY_COST: 25,
+  /** Amount of loyalty gained from the 'Bolster Loyalty' action. */
+  BOLSTER_LOYALTY_GAIN: 10,
+  /** Flat bonus to Essence generation per second from a mature, loyal Copy. */
+  ESSENCE_GENERATION_BONUS: 0.2,
+};
