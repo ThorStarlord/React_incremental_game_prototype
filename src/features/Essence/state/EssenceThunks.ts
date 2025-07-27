@@ -58,7 +58,7 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
     // 1. Start with the base generation rate
     let totalRate = ESSENCE_GENERATION.BASE_RATE_PER_SECOND;
 
-    // 0. Add bonus from mature, loyal Copies
+    // 2. Add bonus from mature, loyal Copies
     const copies = state.copy?.copies || {};
     // Each qualifying Copy gives a flat bonus (e.g., 0.2/sec)
     const { ESSENCE_GENERATION_BONUS } = COPY_SYSTEM;
