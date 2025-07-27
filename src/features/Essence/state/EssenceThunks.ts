@@ -12,7 +12,7 @@ import {
 import { EssenceState } from './EssenceTypes';
 import { addPermanentTrait, setResonanceLevel } from '../../Player/state/PlayerSlice';
 import { selectPlayer } from '../../Player/state/PlayerSelectors';
-import { ESSENCE_GENERATION } from '../../../constants/gameConstants';
+import { COPY_SYSTEM, ESSENCE_GENERATION } from '../../../constants/gameConstants';
 import { NPC } from '../../NPCs/state/NPCTypes';
 import { Trait } from '../../Traits/state/TraitsTypes';
 
@@ -61,11 +61,11 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
     // 0. Add bonus from mature, loyal Copies
     const copies = state.copy?.copies || {};
     // Each qualifying Copy gives a flat bonus (e.g., 0.2/sec)
-    const COPY_BONUS = 0.2;
+    const { ESSENCE_GENERATION_BONUS } = COPY_SYSTEM;
     const qualifyingCopies = Object.values(copies).filter(
       (copy) => copy.maturity >= 100 && copy.loyalty > 50
     );
-    totalRate += qualifyingCopies.length * COPY_BONUS;
+    totalRate += qualifyingCopies.length * ESSENCE_GENERATION_BONUS;
     
     // 2. Calculate total contribution from all NPC connections
     const npcContribution = Object.values(npcs).reduce((total, npc: NPC) => {

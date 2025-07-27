@@ -4,6 +4,7 @@
  */
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
@@ -40,8 +41,7 @@ export const processCopyGrowthThunk = createAsyncThunk(
     const copies = state.copy.copies;
     // Growth rate: 0.01 per second. Adjust for balance.
     // deltaTime is in ms, so divide by 1000 to get seconds.
-    const GROWTH_RATE_PER_SECOND = 0.1; 
-    const growthThisTick = GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
+    const growthThisTick = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
 
     for (const copy of Object.values(copies)) {
       if (copy.maturity < 100) {
@@ -62,8 +62,7 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     const state = getState() as RootState;
     const copies = state.copy.copies;
     // Decay rate: 0.05 per second. Adjust for balance.
-    const DECAY_RATE_PER_SECOND = 0.05;
-    const decayThisTick = DECAY_RATE_PER_SECOND * (deltaTime / 1000);
+    const decayThisTick = COPY_SYSTEM.DECAY_RATE_PER_SECOND * (deltaTime / 1000);
 
     for (const copy of Object.values(copies)) {
       if (copy.loyalty > 0) {
@@ -85,8 +84,8 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
     const copy = state.copy.copies[copyId];
     const essence = state.essence.currentEssence;
     
-    const essenceCost = 25;
-    const loyaltyGain = 10;
+    const essenceCost = COPY_SYSTEM.BOLSTER_LOYALTY_COST;
+    const loyaltyGain = COPY_SYSTEM.BOLSTER_LOYALTY_GAIN;
 
     if (!copy) {
       return rejectWithValue('Copy not found.');
