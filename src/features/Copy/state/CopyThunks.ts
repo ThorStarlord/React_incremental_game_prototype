@@ -39,7 +39,7 @@ export const processCopyGrowthThunk = createAsyncThunk(
   async (deltaTime: number, { getState, dispatch }) => {
     const state = getState() as RootState;
     const copies = state.copy.copies;
-    // Growth rate: 0.01 per second. Adjust for balance.
+    // Growth rate: 0.1 per second. Adjust for balance.
     // deltaTime is in ms, so divide by 1000 to get seconds.
     const growthThisTick = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
 
