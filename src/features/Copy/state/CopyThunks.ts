@@ -61,7 +61,7 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
   async (deltaTime: number, { getState, dispatch }) => {
     const state = getState() as RootState;
     const copies = state.copy.copies;
-    // Decay rate: COPY_SYSTEM.DECAY_RATE_PER_SECOND per second. Adjust for balance.
+    // Decay rate: COPY_SYSTEM.DECAY_RATE_PER_SECOND per second. This value can be adjusted to fine-tune gameplay difficulty or to align with design goals for loyalty decay.
     const decayThisTick = COPY_SYSTEM.DECAY_RATE_PER_SECOND * (deltaTime / 1000);
 
     for (const copy of Object.values(copies)) {
