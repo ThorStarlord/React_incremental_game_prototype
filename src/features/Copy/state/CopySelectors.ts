@@ -6,6 +6,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { CopiesState } from './CopyTypes';
+import { COPY_SYSTEM } from '../../../constants/gameConstants';
 
 /** Root selector for the Copy slice. */
 const selectCopiesState = (state: RootState): CopiesState => state.copy;
@@ -40,3 +41,23 @@ export const selectCopiesError = createSelector(
     [selectCopiesState],
     (copiesState) => copiesState.error
 );
+
+/** Internal: all copies array (non-memoized helper). */
+const _allCopies = (state: RootState) => Object.values(state.copy.copies);
+
+/** Select number of copies that qualify for the essence bonus. */
+export const selectQualifyingCopyCount = createSelector([_allCopies], (copies) =>
+  copies.reduce((acc, c) => acc + (c.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && c.loyalty > COPY_SYSTEM.LOYALTY_THRESHOLD ? 1 : 0), 0)
+);
+
+/** Segmented lists for UI tabs (mature, growing, low loyalty). */
+export const selectCopySegments = createSelector([_allCopies], (copies) => {
+  const mature: typeof copies = [];
+  const growing: typeof copies = [];
+  const lowLoyalty: typeof copies = [];
+  for (const c of copies) {
+    if (c.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD) mature.push(c); else growing.push(c);
+    if (c.loyalty <= COPY_SYSTEM.LOYALTY_THRESHOLD) lowLoyalty.push(c);
+  }
+  return { mature, growing, lowLoyalty };
+});
