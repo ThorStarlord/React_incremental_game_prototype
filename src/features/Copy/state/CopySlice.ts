@@ -92,7 +92,7 @@ const copiesSlice = createSlice({
         }
         if (updates.loyalty !== undefined) {
           existing.loyalty = clamp(existing.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
-        }
+        applyClampedCopyFields(existing, updates);
       }
     },
 
