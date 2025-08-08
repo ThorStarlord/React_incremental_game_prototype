@@ -1,4 +1,12 @@
-Implementation Status: ✅ **BASIC STATE/UI IMPLEMENTED**
+Implementation Status: ✅ **BASIC STATE/UI IMPLEMENTED (Phase 1–7 + Phase 10 Docs)**
+
+> Current Build Summary (Aug 2025):
+> * Slice + thunks for growth, decay, creation, loyalty bolster, promotion (accelerated growth) implemented.
+> * Constants centralized in `COPY_SYSTEM` within `gameConstants.ts`.
+> * UI list (basic) + actions wired (bolster loyalty, promote) – advanced segmented UI planned.
+> * Notification system added (`notifications` slice) replacing console logs for success/failure feedback.
+> * JSDoc added for thunks, selectors, utilities.
+> * Essence integration (bonus per qualifying Copy) present via selectors (qualifying = maturity ≥ threshold & loyalty > threshold).
 
 # Copy System Specification
 
@@ -20,14 +28,19 @@ This document details the mechanics for creating, managing, and utilizing "Copie
 
 ## 3. Growth Options
 
-*   **Normal Growth:**
-    *   **Time:** Takes a significant amount of in-game time (e.g., equivalent to 18-20 years, represented abstractly over days/weeks of gameplay).
-    *   **Essence Cost:** Minimal or zero ongoing Essence cost.
-    *   **Purpose:** Primarily for long-term goals, infiltration, developing deep-cover agents, or when Essence is scarce. The Copy grows organically within the game world.
-*   **Accelerated Growth:**
-    *   **Time:** Drastically reduced time (e.g., 1 week of in-game time).
-    *   **Essence Cost:** Requires a significant upfront Essence investment (e.g., 50 Essence - needs balancing).
-    *   **Purpose:** Rapid deployment, creating specialized agents quickly, filling immediate needs. The growth is magically/metaphysically forced.
+| Mode | Mechanic | Current Constant(s) | Notes |
+|------|----------|---------------------|-------|
+| Normal | Base per‑second maturity increase | `GROWTH_RATE_PER_SECOND = 0.1` | Applied every game loop tick (delta‑time scaled). |
+| Accelerated | Normal * multiplier | `ACCELERATED_GROWTH_MULTIPLIER = 2` | Set via promotion action (one‑time essence spend). |
+
+**Normal Growth**  
+* Scales with real time via game loop delta; no essence upkeep.  
+* Suited for background progression; cheaper but slower.
+
+**Accelerated Growth**  
+* Activated by spending Essence (`PROMOTE_ACCELERATED_COST = 150`).  
+* Doubles effective maturity gain rate (current multiplier = 2).  
+* Strategic for rushing a Copy to maturity threshold.
 
 ## 4. Inheritance
 
@@ -65,10 +78,11 @@ This document details the mechanics for creating, managing, and utilizing "Copie
 
 *   **Concept:** A measure of the Copy's alignment with the player's goals and resistance to external influence or deviation. Crucial for reliable function.
 *   **Maintenance:**
-    *   **Trait Sharing:** Sharing beneficial traits via Copy Trait Slots increases Loyalty (links to `TraitSystem.md` / `SlotSharingSystem.md`). The "Growing Affinity" trait likely affects Copies too.
-    *   **Task Completion:** Successfully completing assigned tasks maintains/increases Loyalty.
-    *   **Player Interaction:** Positive direct interaction (if implemented) could boost Loyalty.
-    *   **Essence Investment:** Spending Essence on Accelerated Growth or other enhancements might provide a Loyalty boost.
+    *   **Trait Sharing:** Planned – not yet implemented. (Hooks into Trait system later.)
+    *   **Task Completion:** Planned – tasks presently stored as `currentTask` only.
+    *   **Player Interaction:** Planned future enhancement.
+    *   **Essence Investment:** Promotion + bolster actions.
+    *   **Bolster Action (Implemented):** Spend Essence to raise loyalty: cost `BOLSTER_LOYALTY_COST = 25`, gain `BOLSTER_LOYALTY_GAIN = 10` (clamped at 100).
 *   **Decay/Loss:**
     *   Neglect (lack of tasks or interaction).
     *   Failure on critical tasks.
@@ -87,7 +101,7 @@ This document details the mechanics for creating, managing, and utilizing "Copie
 *   Management screen listing all Copies, their status, and key info.
 *   Interface for assigning tasks and managing shared traits for each Copy.
 *   Visual representation of Copies in the game world (if applicable) or on maps.
-*   Notifications for Copy creation, task completion, low loyalty warnings.
+*   Notifications for Copy creation, promotion, bolster success/failure (implemented through notifications slice). Low loyalty warnings: TODO (selector + threshold trigger to dispatch notification when crossing below X%).
 
 ## 9. Balancing Notes
 
@@ -95,5 +109,93 @@ This document details the mechanics for creating, managing, and utilizing "Copie
 *   Essence cost of Accelerated Growth vs. time saved.
 *   Impact of inherited traits vs. traits shared later.
 *   Scaling of Copy stats/power relative to player and enemies.
-*   Loyalty gain/loss rates need careful tuning.
+*   Loyalty gain/loss rates need careful tuning. Current passive decay: `DECAY_RATE_PER_SECOND = 0.05` (evaluated each tick, delta scaled). Bolster provides discrete recovery.
 *   The limit on the number of Copies needs to be balanced against their utility.
+
+---
+
+## 10. Implemented Constants (COPY_SYSTEM)
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `GROWTH_RATE_PER_SECOND` | 0.1 | Base maturity gain per second. |
+| `ACCELERATED_GROWTH_MULTIPLIER` | 2 | Multiplies base growth when accelerated. |
+| `DECAY_RATE_PER_SECOND` | 0.05 | Base loyalty decay per second. |
+| `BOLSTER_LOYALTY_COST` | 25 | Essence cost to bolster loyalty. |
+| `BOLSTER_LOYALTY_GAIN` | 10 | Loyalty restored per bolster action. |
+| `ESSENCE_GENERATION_BONUS` | 0.2 | Flat essence/sec per qualifying Copy. |
+| `MATURITY_THRESHOLD` | 100 | Maturity threshold for bonus qualification. |
+| `LOYALTY_THRESHOLD` | 50 | Loyalty must be strictly greater than this for bonus. |
+| `MATURITY_MIN/MAX` | 0 / 100 | Clamp boundaries for maturity. |
+| `LOYALTY_MIN/MAX` | 0 / 100 | Clamp boundaries for loyalty. |
+| `PROMOTE_ACCELERATED_COST` | 150 | Essence cost to enable accelerated growth. |
+
+Qualification rule for essence bonus: maturity ≥ `MATURITY_THRESHOLD` AND loyalty > `LOYALTY_THRESHOLD`.
+
+## 11. Current Implementation Summary
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Slice (CRUD + batch update) | Implemented | Batch reducer `updateMultipleCopies`. |
+| Growth Thunk | Implemented | Uses delta time & accelerated multiplier. |
+| Loyalty Decay Thunk | Implemented | Flat decay; batched updates. |
+| Creation Thunk | Implemented | Charisma-based success chance formula; inherits player trait slot IDs snapshot. |
+| Bolster Loyalty Thunk | Implemented | Essence spend + clamp. |
+| Promotion Thunk | Implemented | Adds accelerated growth state + notification. |
+| Selectors (basic) | Implemented | Advanced segmentation (mature/loyal, etc.) pending merge in later phase. |
+| Essence Bonus Integration | Partial | Bonus constant defined; recalculation logic lives in Essence selectors/thunks (qualifying count). |
+| Notifications | Implemented | Replaces console logs for Copy actions. |
+| UI List Page | Basic | Detailed card & segmentation in roadmap. |
+| Task System | Minimal | `currentTask` string only; task mechanics TBD. |
+| Low Loyalty Alerts | TODO | Needs threshold watcher + notification dispatch. |
+
+## 12. Player-Facing UI Actions (Implemented)
+
+| Action | Trigger | Cost | Effect | Source Code |
+|--------|---------|------|--------|------------|
+| Create Copy | `createCopyThunk` success (Seduction roll) | None (roll only) | Adds new Copy at 0 maturity / 50 loyalty | `CopyThunks.ts` |
+| Bolster Loyalty | User action (UI button) | 25 Essence | +10 loyalty (clamped) | `bolsterCopyLoyaltyThunk` |
+| Promote to Accelerated | User action (UI button) | 150 Essence | Sets `growthType = accelerated` | `promoteCopyToAcceleratedThunk` |
+
+Planned actions: Assign Task (task catalog), Share Trait, Revoke Trait, Recall / Release Copy, Suspend Growth.
+
+## 13. Lifecycle & Game Loop Integration
+
+1. Game loop tick computes `deltaTime` (ms).  
+2. Dispatch order (current):
+    * `processCopyGrowthThunk(deltaTime)` – batches maturity changes.
+    * `processCopyLoyaltyDecayThunk(deltaTime)` – batches loyalty decay.
+3. Essence system periodically recalculates generation rate using selector counting qualifying Copies.  
+4. UI re-renders only on batch reducer invocation (single state change for many Copies).  
+
+Edge Cases Considered:
+* Idle: No maturity update if already at max.
+* Loyalty floor at 0 prevents negative accumulation.
+* Accelerated promotion is idempotent (rejects if already accelerated).
+
+## 14. Notifications & Feedback
+
+Added lightweight `notifications` slice (array queue) with `addNotification` for:  
+* Copy creation success / failure (chance shown on failure).  
+* Promotion success.  
+* Bolster success / rejection reasons (handled via thunk reject values).  
+
+Upcoming: automatic notifications for low loyalty (< configurable threshold), maturity completion, task completion.
+
+## 15. Future / TODO Roadmap
+
+| Area | Planned Work |
+|------|--------------|
+| Advanced Selectors | Segment Copies (growing, mature, low loyalty) and memoized essence bonus recalculation. |
+| Task System | Define task schema, execution loop, reward hooks (loyalty/essence/traits). |
+| Low Loyalty Alerts | Threshold crossing detection + debounce to avoid spam. |
+| Trait Integration | Copy trait slots & sharing UI. |
+| Essence Scaling | Non-linear bonuses / diminishing returns for many Copies. |
+| Save/Load | Ensure backward-compatible migrations when adding new Copy fields. |
+| Testing | Unit tests for thunks (growth/decay/promotion), selector coverage. |
+| Performance | Potential Web Worker for large Copy counts; virtualization in UI. |
+| Security | Validate NPC existence & uniqueness before creation (prevent duplicates). |
+
+---
+
+Revision: Updated for Phase 10 documentation (final constants & implemented actions).

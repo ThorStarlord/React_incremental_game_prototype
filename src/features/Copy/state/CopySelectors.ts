@@ -5,19 +5,22 @@
 
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { CopiesState, Copy } from './CopyTypes';
-import { COPY_SYSTEM } from '../../../constants/gameConstants';
+import { CopiesState } from './CopyTypes';
 
-// Default threshold for considering a Copy "low loyalty" (can be overridden)
-export const LOW_LOYALTY_THRESHOLD_DEFAULT = 30;
-
+/** Root selector for the Copy slice. */
 const selectCopiesState = (state: RootState): CopiesState => state.copy;
 
+/**
+ * Select all Copy entities as an array (unordered).
+ */
 export const selectAllCopies = createSelector(
   [selectCopiesState],
   (copiesState) => Object.values(copiesState.copies)
 );
 
+/**
+ * Select a Copy by ID or null if it doesn't exist.
+ */
 export const selectCopyById = createSelector(
   [
     selectCopiesState,
@@ -26,71 +29,14 @@ export const selectCopyById = createSelector(
   (copiesState, copyId) => copiesState.copies[copyId] || null
 );
 
+/** Select loading flag for async Copy operations. */
 export const selectCopiesLoading = createSelector(
     [selectCopiesState],
     (copiesState) => copiesState.isLoading
 );
 
+/** Select last error string for Copy operations (or null). */
 export const selectCopiesError = createSelector(
     [selectCopiesState],
     (copiesState) => copiesState.error
-);
-
-// --- Advanced / Derived Selectors ---
-
-export const selectMatureCopies = createSelector(
-  [selectAllCopies],
-  (copies) => copies.filter(c => c.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD)
-);
-
-export const selectLoyalCopies = createSelector(
-  [selectAllCopies],
-  (copies) => copies.filter(c => c.loyalty > COPY_SYSTEM.LOYALTY_THRESHOLD)
-);
-
-export const selectQualifyingCopiesForEssence = createSelector(
-  [selectAllCopies],
-  (copies) => copies.filter(c => c.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && c.loyalty > COPY_SYSTEM.LOYALTY_THRESHOLD)
-);
-
-export const selectQualifyingCopyCount = createSelector(
-  [selectQualifyingCopiesForEssence],
-  (copies) => copies.length
-);
-
-export const selectCopiesByNPC = createSelector(
-  [selectAllCopies, (_: RootState, npcId: string) => npcId],
-  (copies, npcId) => copies.filter(c => c.parentNPCId === npcId)
-);
-
-// Factory selector (static threshold)
-export const makeSelectLowLoyaltyCopies = (threshold: number = LOW_LOYALTY_THRESHOLD_DEFAULT) => createSelector(
-  [selectAllCopies],
-  (copies) => copies.filter(c => c.loyalty <= threshold)
-);
-
-// Parametric selector (dynamic threshold from caller)
-export const selectLowLoyaltyCopies = createSelector(
-  [selectAllCopies, (_: RootState, threshold: number = LOW_LOYALTY_THRESHOLD_DEFAULT) => threshold],
-  (copies, threshold) => copies.filter(c => c.loyalty <= threshold)
-);
-
-export const selectCopyEssenceBonusTotal = createSelector(
-  [selectQualifyingCopiesForEssence],
-  (qualifying) => qualifying.length * COPY_SYSTEM.ESSENCE_GENERATION_BONUS
-);
-
-// For potential UI segmentation
-export const selectCopySegments = createSelector(
-  [selectAllCopies],
-  (copies) => {
-    const mature: Copy[] = [];
-    const growing: Copy[] = [];
-    const lowLoyalty: Copy[] = [];
-    copies.forEach(c => {
-      if (c.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD) mature.push(c); else growing.push(c);
-      if (c.loyalty <= COPY_SYSTEM.LOYALTY_THRESHOLD) lowLoyalty.push(c);
-    });
-    return { mature, growing, lowLoyalty };
-  }
 );
