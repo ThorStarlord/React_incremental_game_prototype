@@ -28,7 +28,24 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
   const handlePromote = useCallback(async () => {
     setBusy(true);
     await dispatch(promoteCopyToAcceleratedThunk(copy.id));
-    setBusy(false);
+    try {
+      await dispatch(bolsterCopyLoyaltyThunk(copy.id));
+    } catch (error) {
+      console.error('Failed to bolster copy loyalty:', error);
+    } finally {
+      setBusy(false);
+    }
+  }, [dispatch, copy.id]);
+
+  const handlePromote = useCallback(async () => {
+    setBusy(true);
+    try {
+      await dispatch(promoteCopyToAcceleratedThunk(copy.id));
+    } catch (error) {
+      console.error('Failed to promote copy to accelerated:', error);
+    } finally {
+      setBusy(false);
+    }
   }, [dispatch, copy.id]);
 
   const handleSaveTask = useCallback(() => {
