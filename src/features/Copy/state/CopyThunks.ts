@@ -157,22 +157,22 @@ export const createCopyThunk = createAsyncThunk(
       return rejectWithValue('Seduction attempt failed.');
     }
 
-    // --- Create the Copy Object ---
-    const newCopy: Copy = {
-  id: `copy_${Date.now()}`,
-      name: `Copy of ${npc.name}`,
-      createdAt: Date.now(),
-      parentNPCId: npc.id,
-      growthType: 'normal', // Can be changed later via another action
-      maturity: 0,
-      loyalty: 50, // Start at a neutral loyalty
-      stats: { ...defaultCopyStats },
-      // Inherit a snapshot of traits the player has equipped
-      inheritedTraits: player.traitSlots
-        .map(slot => slot.traitId)
-        .filter(Boolean) as string[],
-      location: npc.location, // Starts at the parent's location
-    };
+  // --- Create the Copy Object ---
+  const newCopy: Copy = {
+    id: `copy_${crypto.randomUUID()}`,
+    name: `Copy of ${npc.name}`,
+    createdAt: Date.now(),
+    parentNPCId: npc.id,
+    growthType: 'normal', // Can be changed later via another action
+    maturity: 0,
+    loyalty: 50, // Start at a neutral loyalty
+    stats: { ...defaultCopyStats },
+    // Inherit a snapshot of traits the player has equipped
+    inheritedTraits: player.traitSlots
+      .map(slot => slot.traitId)
+      .filter(Boolean) as string[],
+    location: npc.location, // Starts at the parent's location
+  };
 
     // --- Dispatch the action to add the new copy ---
     dispatch(addCopy(newCopy));
