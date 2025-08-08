@@ -198,4 +198,8 @@ Upcoming: automatic notifications for low loyalty (< configurable threshold), ma
 
 ---
 
+<<<<<<< HEAD
 Revision: Updated for Phase 10 documentation (final constants & implemented actions).
+=======
+Revision: Updated for Phase 10 documentation (final constants & implemented actions).
+>>>>>>> 38cfadfbeef14e3b51d6b57848a65993384c43f7

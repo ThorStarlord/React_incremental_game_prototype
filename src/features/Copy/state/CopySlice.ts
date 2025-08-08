@@ -88,7 +88,7 @@ const copiesSlice = createSlice({
         if (!existing) continue;
         Object.assign(existing, updates);
         if (updates.maturity !== undefined) {
-          existing.maturity = clamp(updates.maturity, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX);
+          existing.maturity = clamp(existing.maturity, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX);
         }
         if (updates.loyalty !== undefined) {
           existing.loyalty = clamp(updates.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
