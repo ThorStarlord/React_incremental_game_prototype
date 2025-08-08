@@ -8,8 +8,7 @@ import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
-import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated } from './CopySlice';
-import { applyGrowth, applyLoyaltyDecay } from '../utils/copyUtils';
+import { addCopy, updateCopy, promoteCopyToAccelerated } from './CopySlice';
 import type { Copy } from './CopyTypes';
 
 // Default starting stats for a new Copy
@@ -40,18 +39,14 @@ export const processCopyGrowthThunk = createAsyncThunk(
   async (deltaTime: number, { getState, dispatch }) => {
     const state = getState() as RootState;
     const copies = state.copy.copies;
-    const baseGrowth = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
-    const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
+    // Calculate growth per tick based on the growth rate and elapsed time in seconds.
+    const growthThisTick = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
+
     for (const copy of Object.values(copies)) {
-      if (copy.maturity < COPY_SYSTEM.MATURITY_MAX) {
-        const newMaturity = applyGrowth(copy.maturity, baseGrowth, copy.growthType === 'accelerated');
-        if (newMaturity !== copy.maturity) {
-          batched.push({ copyId: copy.id, updates: { maturity: newMaturity } });
-        }
+      if (copy.maturity < 100) {
+        const newMaturity = Math.min(100, copy.maturity + growthThisTick);
+        dispatch(updateCopy({ copyId: copy.id, updates: { maturity: newMaturity } }));
       }
-    }
-    if (batched.length) {
-      dispatch(updateMultipleCopies(batched));
     }
   }
 );
@@ -66,17 +61,12 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     const state = getState() as RootState;
     const copies = state.copy.copies;
     const decayThisTick = COPY_SYSTEM.DECAY_RATE_PER_SECOND * (deltaTime / 1000);
-    const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
+
     for (const copy of Object.values(copies)) {
-      if (copy.loyalty > COPY_SYSTEM.LOYALTY_MIN) {
-        const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
-        if (newLoyalty !== copy.loyalty) {
-          batched.push({ copyId: copy.id, updates: { loyalty: newLoyalty } });
-        }
+      if (copy.loyalty > 0) {
+        const newLoyalty = Math.max(0, copy.loyalty - decayThisTick);
+        dispatch(updateCopy({ copyId: copy.id, updates: { loyalty: newLoyalty } }));
       }
-    }
-    if (batched.length) {
-      dispatch(updateMultipleCopies(batched));
     }
   }
 );
@@ -141,7 +131,7 @@ export const createCopyThunk = createAsyncThunk(
 
     // --- Create the Copy Object ---
     const newCopy: Copy = {
-  id: `copy_${Date.now()}`,
+      id: `copy_${Date.now()}`,
       name: `Copy of ${npc.name}`,
       createdAt: Date.now(),
       parentNPCId: npc.id,
