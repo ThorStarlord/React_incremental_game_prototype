@@ -198,7 +198,7 @@ export const promoteCopyToAcceleratedThunk = createAsyncThunk(
     }
     dispatch(spendEssence({ amount: COPY_SYSTEM.PROMOTE_ACCELERATED_COST, source: 'promote_copy' }));
     dispatch(promoteCopyToAccelerated({ copyId }));
-   dispatch(addNotification({ message: `Copy promoted to accelerated growth: ${copy.name}`, type: 'info' }));
+    dispatch(addNotification({ message: `Copy promoted to accelerated growth: ${copy.name}`, type: 'info' }));
     return { success: true };
   }
 );
