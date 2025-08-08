@@ -17,24 +17,24 @@ export const generateCopyName = (npcName: string, sequence?: number): string => 
   return sequence ? `${npcName} Echo ${sequence}` : `Copy of ${npcName}`;
 };
 
-/** Return true if copy meets maturity & loyalty thresholds for essence bonus. */
+/** Return true if a Copy meets maturity & loyalty thresholds for essence bonus qualification. */
 export const isQualifyingForEssenceBonus = (copy: Copy): boolean =>
   copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && copy.loyalty > COPY_SYSTEM.LOYALTY_THRESHOLD;
 
-/** Ensure maturity / loyalty values are clamped to system limits. */
+/** Produce a shallow copy of the Copy with maturity & loyalty clamped to bounds. */
 export const normalizeCopyProgress = (copy: Copy): Copy => ({
   ...copy,
   maturity: clamp(copy.maturity, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX),
   loyalty: clamp(copy.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX),
 });
 
-/** Apply growth to a copy returning new maturity (already clamped). */
+/** Apply maturity growth (respecting accelerated multiplier) and return clamped value. */
 export const applyGrowth = (current: number, delta: number, accelerated: boolean): number => {
   const base = current + delta * (accelerated ? COPY_SYSTEM.ACCELERATED_GROWTH_MULTIPLIER : 1);
   return clamp(base, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX);
 };
 
-/** Apply loyalty decay returning new loyalty value (already clamped). */
+/** Apply loyalty decay and return clamped value. */
 export const applyLoyaltyDecay = (current: number, delta: number): number => {
   const value = current - delta;
   return clamp(value, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
