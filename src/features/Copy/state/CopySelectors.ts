@@ -77,6 +77,13 @@ export const selectLowLoyaltyCopies = createSelector(
 export const selectLowLoyaltyCopies = createSelector(
   [selectAllCopies, (_: RootState, threshold: number = LOW_LOYALTY_THRESHOLD_DEFAULT) => threshold],
   (copies, threshold) => copies.filter(c => c.loyalty <= threshold)
+ * Selects copies with loyalty less than or equal to the given threshold.
+ * @param state The root state.
+ * @param threshold The loyalty threshold (defaults to LOW_LOYALTY_THRESHOLD_DEFAULT).
+ */
+export const selectLowLoyaltyCopies = createSelector(
+  [selectAllCopies, (_: RootState, threshold: number = LOW_LOYALTY_THRESHOLD_DEFAULT) => threshold],
+  (copies, threshold) => copies.filter(c => c.loyalty <= threshold)
 );
 
 export const selectCopyEssenceBonusTotal = createSelector(
