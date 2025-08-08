@@ -23,7 +23,13 @@ export const CopiesPage: React.FC = React.memo(() => {
   const segments = useAppSelector(selectCopySegments);
   const [tab, setTab] = React.useState(0);
 
-  const currentList = tab === 0 ? copies : tab === 1 ? segments.mature : tab === 2 ? segments.growing : segments.lowLoyalty;
+  const tabToList: { [key: number]: typeof copies } = {
+    0: copies,
+    1: segments.mature,
+    2: segments.growing,
+    3: segments.lowLoyalty,
+  };
+  const currentList = tabToList[tab] || [];
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
