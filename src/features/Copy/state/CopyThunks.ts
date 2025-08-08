@@ -8,7 +8,7 @@ import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
-import { addCopy, updateCopy } from './CopySlice';
+import { addCopy, updateCopy, promoteCopyToAccelerated } from './CopySlice';
 import type { Copy } from './CopyTypes';
 
 // Default starting stats for a new Copy

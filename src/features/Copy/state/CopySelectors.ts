@@ -8,6 +8,9 @@ import { RootState } from '../../../app/store';
 import { CopiesState, Copy } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 
+// Default threshold for considering a Copy "low loyalty" (can be overridden)
+export const LOW_LOYALTY_THRESHOLD_DEFAULT = 30;
+
 const selectCopiesState = (state: RootState): CopiesState => state.copy;
 
 export const selectAllCopies = createSelector(
@@ -60,27 +63,13 @@ export const selectCopiesByNPC = createSelector(
   (copies, npcId) => copies.filter(c => c.parentNPCId === npcId)
 );
 
-export const makeSelectLowLoyaltyCopies = (threshold: number = 30) => createSelector(
+// Factory selector (static threshold)
+export const makeSelectLowLoyaltyCopies = (threshold: number = LOW_LOYALTY_THRESHOLD_DEFAULT) => createSelector(
   [selectAllCopies],
-/**
- * Selects copies with loyalty less than or equal to the given threshold.
- * @param state The root state.
- * @param threshold The loyalty threshold (defaults to LOW_LOYALTY_THRESHOLD_DEFAULT).
- */
-export const selectLowLoyaltyCopies = createSelector(
-  [selectAllCopies, (_: RootState, threshold: number = LOW_LOYALTY_THRESHOLD_DEFAULT) => threshold],
-  (copies, threshold) => copies.filter(c => c.loyalty <= threshold)
- * Selects copies with loyalty less than or equal to the given threshold.
- * @param state The root state.
- * @param threshold The loyalty threshold (defaults to LOW_LOYALTY_THRESHOLD_DEFAULT).
- */
-export const selectLowLoyaltyCopies = createSelector(
-  [selectAllCopies, (_: RootState, threshold: number = LOW_LOYALTY_THRESHOLD_DEFAULT) => threshold],
-  (copies, threshold) => copies.filter(c => c.loyalty <= threshold)
- * Selects copies with loyalty less than or equal to the given threshold.
- * @param state The root state.
- * @param threshold The loyalty threshold (defaults to LOW_LOYALTY_THRESHOLD_DEFAULT).
- */
+  (copies) => copies.filter(c => c.loyalty <= threshold)
+);
+
+// Parametric selector (dynamic threshold from caller)
 export const selectLowLoyaltyCopies = createSelector(
   [selectAllCopies, (_: RootState, threshold: number = LOW_LOYALTY_THRESHOLD_DEFAULT) => threshold],
   (copies, threshold) => copies.filter(c => c.loyalty <= threshold)
