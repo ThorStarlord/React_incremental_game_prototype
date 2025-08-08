@@ -55,7 +55,7 @@ export const selectQualifyingCopyCount = createSelector(
   (copies) => copies.length
 );
 
-export const makeSelectCopiesByNPC = () => createSelector(
+export const selectCopiesByNPC = createSelector(
   [selectAllCopies, (_: RootState, npcId: string) => npcId],
   (copies, npcId) => copies.filter(c => c.parentNPCId === npcId)
 );
