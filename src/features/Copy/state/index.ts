@@ -14,7 +14,7 @@ export * from '../state/CopyTypes';
 export * from '../state/CopyThunks';
 
 // Selectors (will be created later)
-// export * from './state/CopySelectors';
+export * from './CopySelectors';
 
 // Components (will be created later)
 // export * from './components/ui/CopyList';

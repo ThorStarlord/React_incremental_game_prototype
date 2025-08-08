@@ -28,6 +28,8 @@ export const ESSENCE_GENERATION = {
 export const COPY_SYSTEM = {
   /** Growth rate for a Copy's maturity per second. */
   GROWTH_RATE_PER_SECOND: 0.1,
+  /** Multiplier applied to base growth rate when growthType === 'accelerated'. */
+  ACCELERATED_GROWTH_MULTIPLIER: 2,
   /** Loyalty decay rate for a Copy per second. */
   DECAY_RATE_PER_SECOND: 0.05,
   /** Essence cost to use the 'Bolster Loyalty' action. */
@@ -36,4 +38,15 @@ export const COPY_SYSTEM = {
   BOLSTER_LOYALTY_GAIN: 10,
   /** Flat bonus to Essence generation per second from a mature, loyal Copy. */
   ESSENCE_GENERATION_BONUS: 0.2,
+  /** Maturity threshold (inclusive) at which a Copy is considered fully mature. */
+  MATURITY_THRESHOLD: 100,
+  /** Loyalty threshold (strictly greater than) required to qualify for essence bonus. */
+  LOYALTY_THRESHOLD: 50,
+  /** Hard clamps for percentage-like stats. */
+  MATURITY_MAX: 100,
+  LOYALTY_MAX: 100,
+  MATURITY_MIN: 0,
+  LOYALTY_MIN: 0,
+  /** Essence cost to promote a Copy to accelerated growth (placeholder). */
+  PROMOTE_ACCELERATED_COST: 150,
 };
