@@ -91,7 +91,7 @@ const copiesSlice = createSlice({
           existing.maturity = clamp(updates.maturity, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX);
         }
         if (updates.loyalty !== undefined) {
-          existing.loyalty = clamp(existing.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
+          existing.loyalty = clamp(updates.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
         }
       }
     },
