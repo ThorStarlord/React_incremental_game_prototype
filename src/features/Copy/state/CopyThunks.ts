@@ -8,9 +8,7 @@ import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
-import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated } from './CopySlice';
-import { updateEssenceGenerationRateThunk } from '../../Essence/state/EssenceThunks';
-import { applyGrowth, applyLoyaltyDecay } from '../utils/copyUtils';
+import { addCopy, updateCopy } from './CopySlice';
 import type { Copy } from './CopyTypes';
 
 // Default starting stats for a new Copy
@@ -41,24 +39,13 @@ export const processCopyGrowthThunk = createAsyncThunk(
   async (deltaTime: number, { getState, dispatch }) => {
     const state = getState() as RootState;
     const copies = state.copy.copies;
-    const baseGrowth = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
-    const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
-    let thresholdsChanged = false;
+    // Calculate growth per tick based on the growth rate and elapsed time in seconds.
+    const growthThisTick = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
+
     for (const copy of Object.values(copies)) {
-      if (copy.maturity < COPY_SYSTEM.MATURITY_MAX) {
-        const newMaturity = applyGrowth(copy.maturity, baseGrowth, copy.growthType === 'accelerated');
-        if (newMaturity !== copy.maturity) {
-          batched.push({ copyId: copy.id, updates: { maturity: newMaturity } });
-          if (!thresholdsChanged && copy.maturity < COPY_SYSTEM.MATURITY_THRESHOLD && newMaturity >= COPY_SYSTEM.MATURITY_THRESHOLD && copy.loyalty > COPY_SYSTEM.LOYALTY_THRESHOLD) {
-            thresholdsChanged = true; // copy newly qualifies
-          }
-        }
-      }
-    }
-    if (batched.length) {
-      dispatch(updateMultipleCopies(batched));
-      if (thresholdsChanged) {
-        dispatch(updateEssenceGenerationRateThunk());
+      if (copy.maturity < 100) {
+        const newMaturity = Math.min(100, copy.maturity + growthThisTick);
+        dispatch(updateCopy({ copyId: copy.id, updates: { maturity: newMaturity } }));
       }
     }
   }
@@ -74,26 +61,11 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     const state = getState() as RootState;
     const copies = state.copy.copies;
     const decayThisTick = COPY_SYSTEM.DECAY_RATE_PER_SECOND * (deltaTime / 1000);
-    const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
-    let thresholdsChanged = false;
+
     for (const copy of Object.values(copies)) {
-      if (copy.loyalty > COPY_SYSTEM.LOYALTY_MIN) {
-        const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
-        if (newLoyalty !== copy.loyalty) {
-          batched.push({ copyId: copy.id, updates: { loyalty: newLoyalty } });
-          if (!thresholdsChanged) {
-            // If a copy was qualifying and now drops below threshold
-            const wasQualifying = copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && copy.loyalty > COPY_SYSTEM.LOYALTY_THRESHOLD;
-            const nowQualifying = copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && newLoyalty > COPY_SYSTEM.LOYALTY_THRESHOLD;
-            if (wasQualifying !== nowQualifying) thresholdsChanged = true;
-          }
-        }
-      }
-    }
-    if (batched.length) {
-      dispatch(updateMultipleCopies(batched));
-      if (thresholdsChanged) {
-        dispatch(updateEssenceGenerationRateThunk());
+      if (copy.loyalty > 0) {
+        const newLoyalty = Math.max(0, copy.loyalty - decayThisTick);
+        dispatch(updateCopy({ copyId: copy.id, updates: { loyalty: newLoyalty } }));
       }
     }
   }
@@ -157,22 +129,22 @@ export const createCopyThunk = createAsyncThunk(
       return rejectWithValue('Seduction attempt failed.');
     }
 
-  // --- Create the Copy Object ---
-  const newCopy: Copy = {
-    id: `copy_${crypto.randomUUID()}`,
-    name: `Copy of ${npc.name}`,
-    createdAt: Date.now(),
-    parentNPCId: npc.id,
-    growthType: 'normal', // Can be changed later via another action
-    maturity: 0,
-    loyalty: 50, // Start at a neutral loyalty
-    stats: { ...defaultCopyStats },
-    // Inherit a snapshot of traits the player has equipped
-    inheritedTraits: player.traitSlots
-      .map(slot => slot.traitId)
-      .filter(Boolean) as string[],
-    location: npc.location, // Starts at the parent's location
-  };
+    // --- Create the Copy Object ---
+    const newCopy: Copy = {
+      id: `copy_${Date.now()}`,
+      name: `Copy of ${npc.name}`,
+      createdAt: Date.now(),
+      parentNPCId: npc.id,
+      growthType: 'normal', // Can be changed later via another action
+      maturity: 0,
+      loyalty: 50, // Start at a neutral loyalty
+      stats: { ...defaultCopyStats },
+      // Inherit a snapshot of traits the player has equipped
+      inheritedTraits: player.traitSlots
+        .map(slot => slot.traitId)
+        .filter(Boolean) as string[],
+      location: npc.location, // Starts at the parent's location
+    };
 
     // --- Dispatch the action to add the new copy ---
     dispatch(addCopy(newCopy));
