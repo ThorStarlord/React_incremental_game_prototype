@@ -8,7 +8,9 @@ import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
-import { addCopy, updateCopy } from './CopySlice';
+import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated } from './CopySlice';
+import { updateEssenceGenerationRateThunk } from '../../Essence/state/EssenceThunks';
+import { applyGrowth, applyLoyaltyDecay } from '../utils/copyUtils';
 import type { Copy } from './CopyTypes';
 
 // Default starting stats for a new Copy
@@ -39,13 +41,24 @@ export const processCopyGrowthThunk = createAsyncThunk(
   async (deltaTime: number, { getState, dispatch }) => {
     const state = getState() as RootState;
     const copies = state.copy.copies;
-    // Calculate growth per tick based on the growth rate and elapsed time in seconds.
-    const growthThisTick = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
-
+    const baseGrowth = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
+    const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
+    let thresholdsChanged = false;
     for (const copy of Object.values(copies)) {
-      if (copy.maturity < 100) {
-        const newMaturity = Math.min(100, copy.maturity + growthThisTick);
-        dispatch(updateCopy({ copyId: copy.id, updates: { maturity: newMaturity } }));
+      if (copy.maturity < COPY_SYSTEM.MATURITY_MAX) {
+        const newMaturity = applyGrowth(copy.maturity, baseGrowth, copy.growthType === 'accelerated');
+        if (newMaturity !== copy.maturity) {
+          batched.push({ copyId: copy.id, updates: { maturity: newMaturity } });
+          if (!thresholdsChanged && copy.maturity < COPY_SYSTEM.MATURITY_THRESHOLD && newMaturity >= COPY_SYSTEM.MATURITY_THRESHOLD && copy.loyalty > COPY_SYSTEM.LOYALTY_THRESHOLD) {
+            thresholdsChanged = true; // copy newly qualifies
+          }
+        }
+      }
+    }
+    if (batched.length) {
+      dispatch(updateMultipleCopies(batched));
+      if (thresholdsChanged) {
+        dispatch(updateEssenceGenerationRateThunk());
       }
     }
   }
@@ -60,13 +73,27 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
   async (deltaTime: number, { getState, dispatch }) => {
     const state = getState() as RootState;
     const copies = state.copy.copies;
-    // Calculate decay rate based on COPY_SYSTEM.DECAY_RATE_PER_SECOND and deltaTime (in seconds).
     const decayThisTick = COPY_SYSTEM.DECAY_RATE_PER_SECOND * (deltaTime / 1000);
-
+    const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
+    let thresholdsChanged = false;
     for (const copy of Object.values(copies)) {
-      if (copy.loyalty > 0) {
-        const newLoyalty = Math.max(0, copy.loyalty - decayThisTick);
-        dispatch(updateCopy({ copyId: copy.id, updates: { loyalty: newLoyalty } }));
+      if (copy.loyalty > COPY_SYSTEM.LOYALTY_MIN) {
+        const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
+        if (newLoyalty !== copy.loyalty) {
+          batched.push({ copyId: copy.id, updates: { loyalty: newLoyalty } });
+          if (!thresholdsChanged) {
+            // If a copy was qualifying and now drops below threshold
+            const wasQualifying = copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && copy.loyalty > COPY_SYSTEM.LOYALTY_THRESHOLD;
+            const nowQualifying = copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && newLoyalty > COPY_SYSTEM.LOYALTY_THRESHOLD;
+            if (wasQualifying !== nowQualifying) thresholdsChanged = true;
+          }
+        }
+      }
+    }
+    if (batched.length) {
+      dispatch(updateMultipleCopies(batched));
+      if (thresholdsChanged) {
+        dispatch(updateEssenceGenerationRateThunk());
       }
     }
   }
@@ -132,7 +159,7 @@ export const createCopyThunk = createAsyncThunk(
 
     // --- Create the Copy Object ---
     const newCopy: Copy = {
-      id: `copy_${Date.now()}`,
+  id: `copy_${Date.now()}`,
       name: `Copy of ${npc.name}`,
       createdAt: Date.now(),
       parentNPCId: npc.id,
@@ -154,5 +181,23 @@ export const createCopyThunk = createAsyncThunk(
     console.log(`Seduction successful! Created: ${newCopy.name}`);
 
     return newCopy;
+  }
+);
+
+/** Thunk to promote a copy to accelerated growth consuming essence. */
+export const promoteCopyToAcceleratedThunk = createAsyncThunk(
+  'copy/promoteAccelerated',
+  async (copyId: string, { getState, dispatch, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const copy = state.copy.copies[copyId];
+    if (!copy) return rejectWithValue('Copy not found.');
+    if (copy.growthType === 'accelerated') return rejectWithValue('Already accelerated.');
+    const essence = state.essence.currentEssence;
+    if (essence < COPY_SYSTEM.PROMOTE_ACCELERATED_COST) {
+      return rejectWithValue('Not enough essence.');
+    }
+    dispatch(spendEssence({ amount: COPY_SYSTEM.PROMOTE_ACCELERATED_COST, source: 'promote_copy' }));
+    dispatch(promoteCopyToAccelerated({ copyId }));
+    return { success: true };
   }
 );
