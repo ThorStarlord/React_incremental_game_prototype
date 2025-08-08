@@ -28,7 +28,7 @@ export const ESSENCE_GENERATION = {
 export const COPY_SYSTEM = {
   /** Growth rate for a Copy's maturity per second. */
   GROWTH_RATE_PER_SECOND: 0.1,
-  /** Multiplier applied to base growth rate when growthType === 'accelerated'. */
+  /** Multiplier applied to base growth rate when growthType === 'accelerated'.  */
   ACCELERATED_GROWTH_MULTIPLIER: 2,
   /** Loyalty decay rate for a Copy per second. */
   DECAY_RATE_PER_SECOND: 0.05,
