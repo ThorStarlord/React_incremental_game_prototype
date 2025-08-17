@@ -9,7 +9,7 @@ import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
 import { addCopy, updateCopy } from './CopySlice';
-import type { Copy } from './CopyTypes';
+import type { Copy, CopyGrowthType } from './CopyTypes';
 
 // Default starting stats for a new Copy
 const defaultCopyStats: PlayerStats = {
@@ -28,6 +28,7 @@ const defaultCopyStats: PlayerStats = {
 
 interface CreateCopyPayload {
   npcId: string;
+  growthType: CopyGrowthType;
 }
 
 /**
@@ -87,19 +88,26 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
     const loyaltyGain = COPY_SYSTEM.BOLSTER_LOYALTY_GAIN;
 
     if (!copy) {
-      return rejectWithValue('Copy not found.');
+      const message = 'Copy not found.';
+      window.alert(`Failed to bolster loyalty: ${message}`);
+      return rejectWithValue(message);
     }
     if (copy.loyalty >= 100) {
-      return rejectWithValue('Loyalty already at maximum.');
+      const message = 'Loyalty already at maximum.';
+      window.alert(`Failed to bolster loyalty: ${message}`);
+      return rejectWithValue(message);
     }
     if (essence < essenceCost) {
-      return rejectWithValue('Not enough essence.');
+      const message = 'Not enough essence.';
+      window.alert(`Failed to bolster loyalty: ${message}`);
+      return rejectWithValue(message);
     }
 
     dispatch(spendEssence({ amount: essenceCost, source: 'bolster_loyalty' }));
     const newLoyalty = Math.min(100, copy.loyalty + loyaltyGain);
     dispatch(updateCopy({ copyId, updates: { loyalty: newLoyalty } }));
 
+    window.alert(`${copy.name}'s loyalty has been bolstered!`);
     return { success: true };
   }
 );
@@ -109,13 +117,23 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
  */
 export const createCopyThunk = createAsyncThunk(
   'copy/create',
-  async ({ npcId }: CreateCopyPayload, { getState, dispatch, rejectWithValue }) => {
+  async ({ npcId, growthType }: CreateCopyPayload, { getState, dispatch, rejectWithValue }) => {
     const state = getState() as RootState;
     const player = state.player;
     const npc = state.npcs.npcs[npcId];
+    const essence = state.essence.currentEssence;
 
     if (!npc) {
       return rejectWithValue('Target NPC not found.');
+    }
+
+    // --- Handle Accelerated Growth Cost ---
+    if (growthType === 'accelerated') {
+      const essenceCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
+      if (essence < essenceCost) {
+        return rejectWithValue('Not enough essence for accelerated growth.');
+      }
+      dispatch(spendEssence({ amount: essenceCost, source: 'accelerated_copy_growth' }));
     }
 
     // --- Success Check ---
@@ -125,8 +143,7 @@ export const createCopyThunk = createAsyncThunk(
     const successChance = (5 + (charismaModifier * 10)) / 100; // Base 5% + 10% per modifier point
 
     if (Math.random() > successChance) {
-      // TODO: Dispatch a failure notification
-      console.log(`Seduction failed. Chance was ${successChance * 100}%.`);
+      window.alert(`Seduction failed. Your charm wasn't enough this time.`);
       return rejectWithValue('Seduction attempt failed.');
     }
 
@@ -136,22 +153,21 @@ export const createCopyThunk = createAsyncThunk(
       name: `Copy of ${npc.name}`,
       createdAt: Date.now(),
       parentNPCId: npc.id,
-      growthType: 'normal', // Can be changed later via another action
-      maturity: 0,
+      growthType: growthType,
+      maturity: growthType === 'accelerated' ? 90 : 0, // Accelerated copies start almost mature
       loyalty: 50, // Start at a neutral loyalty
       stats: { ...defaultCopyStats },
-      // Inherit a snapshot of traits the player has equipped
-      inheritedTraits: player.traitSlots
+      // Inherit a snapshot of traits the player has shared with the NPC
+      inheritedTraits: (npc.sharedTraitSlots ?? [])
         .map(slot => slot.traitId)
-        .filter(Boolean) as string[],
+        .filter((traitId): traitId is string => !!traitId),
       location: npc.location, // Starts at the parent's location
     };
 
     // --- Dispatch the action to add the new copy ---
     dispatch(addCopy(newCopy));
     
-    // TODO: Dispatch a success notification
-    console.log(`Seduction successful! Created: ${newCopy.name}`);
+    window.alert(`Seduction successful! A new copy, ${newCopy.name}, has been created.`);
 
     return newCopy;
   }

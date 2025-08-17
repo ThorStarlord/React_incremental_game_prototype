@@ -34,6 +34,8 @@ export const COPY_SYSTEM = {
   BOLSTER_LOYALTY_COST: 25,
   /** Amount of loyalty gained from the 'Bolster Loyalty' action. */
   BOLSTER_LOYALTY_GAIN: 10,
+  /** The upfront Essence cost to choose accelerated growth for a new Copy. */
+  ACCELERATED_GROWTH_COST: 50,
   /** Flat bonus to Essence generation per second from a mature, loyal Copy. */
   ESSENCE_GENERATION_BONUS: 0.2,
 };
