@@ -76,7 +76,7 @@ export const CopyTraitSlots: React.FC<CopyTraitSlotsProps> = ({ copyId }) => {
                       <Box sx={{ minWidth: 160 }}>
                         <CompactTraitCard traitId={slot.traitId!} />
                       </Box>
-                      <Button size="small" variant="outlined" onClick={() => onUnshare(slot.slotIndex ?? idx)}>
+                      <Button size="small" variant="outlined" onClick={() => onUnshare(slot.slotIndex !== undefined ? slot.slotIndex : idx)}>
                         Unshare
                       </Button>
                     </Stack>
@@ -95,7 +95,7 @@ export const CopyTraitSlots: React.FC<CopyTraitSlotsProps> = ({ copyId }) => {
                               </Box>
                               <Tooltip title={copyAllTraitIds.has(tid) ? 'Already present on this Copy' : ''}>
                                 <span>
-                                  <Button size="small" variant="outlined" onClick={() => onShare(slot.slotIndex ?? idx, tid)} disabled={copyAllTraitIds.has(tid)}>
+                                  <Button size="small" variant="outlined" onClick={() => onShare(slot.slotIndex !== undefined ? slot.slotIndex : idx, tid)} disabled={copyAllTraitIds.has(tid)}>
                                     Share
                                   </Button>
                                 </span>

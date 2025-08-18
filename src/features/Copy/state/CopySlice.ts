@@ -8,6 +8,22 @@ import { CopiesState, Copy, CopyTraitSlot } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import { clamp } from '../utils/copyUtils';
 
+/**
+ * Unlock any eligible trait slots for a given metric update.
+ */
+const unlockEligibleTraitSlots = (
+  slots: CopyTraitSlot[] | undefined,
+  type: 'maturity' | 'loyalty',
+  value: number
+) => {
+  if (!slots) return;
+  for (const slot of slots) {
+    if (!slot.isLocked || !slot.unlockRequirement) continue;
+    const meets = slot.unlockRequirement.type === type && value >= slot.unlockRequirement.value;
+    if (meets) slot.isLocked = false;
+  }
+};
+
 const createInitialCopyTraitSlots = (): CopyTraitSlot[] => {
   const slots: CopyTraitSlot[] = [];
   for (let i = 0; i < COPY_SYSTEM.MAX_TRAIT_SLOTS; i++) {
@@ -142,24 +158,12 @@ const copiesSlice = createSlice({
         if (updates.maturity !== undefined) {
           existing.maturity = clamp(existing.maturity, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX);
           // Check slot unlocks when maturity changes
-          if (existing.traitSlots) {
-            for (const slot of existing.traitSlots) {
-              if (!slot.isLocked || !slot.unlockRequirement) continue;
-              const meets = slot.unlockRequirement.type === 'maturity' && existing.maturity >= slot.unlockRequirement.value;
-              if (meets) slot.isLocked = false;
-            }
-          }
+          unlockEligibleTraitSlots(existing.traitSlots, 'maturity', existing.maturity);
         }
         if (updates.loyalty !== undefined) {
           existing.loyalty = clamp(updates.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
           // Check slot unlocks when loyalty changes
-          if (existing.traitSlots) {
-            for (const slot of existing.traitSlots) {
-              if (!slot.isLocked || !slot.unlockRequirement) continue;
-              const meets = slot.unlockRequirement.type === 'loyalty' && existing.loyalty >= slot.unlockRequirement.value;
-              if (meets) slot.isLocked = false;
-            }
-          }
+          unlockEligibleTraitSlots(existing.traitSlots, 'loyalty', existing.loyalty);
         }
       }
     },
@@ -188,10 +192,9 @@ const copiesSlice = createSlice({
         state.isLoading = action.payload;
     },
     
-    setCopiesError: (state, action: PayloadAction<string | null>) => {
-        state.error = action.payload;
-    }
-    ,
+  setCopiesError: (state, action: PayloadAction<string | null>) => {
+    state.error = action.payload;
+  },
     /** Ensure a Copy has initialized trait slots (migration safety for older saves). */
     ensureCopyTraitSlots: (state, action: PayloadAction<{ copyId: string }>) => {
       const { copyId } = action.payload;
