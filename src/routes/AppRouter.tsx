@@ -9,6 +9,7 @@ import CharacterPage from '../pages/CharacterPage';
 import TraitsPage from '../pages/TraitsPage';
 import CopiesPage from '../pages/CopiesPage';
 import EssencePage from '../pages/EssencePage';
+import QuestsPage from '../pages/QuestsPage';
 import SettingsPage from '../pages/SettingsPage';
 import DebugPage from '../pages/DebugPage';
 import { PlaceholderPage } from '../shared/components/PlaceholderPage';
@@ -40,7 +41,7 @@ export const AppRouter: React.FC = () => {
           <Route path=":npcId" element={<NPCPanelContainer />} />
         </Route>
 
-        <Route path="quests" element={<PlaceholderPage title="Quest System" description="Quest management and tracking interface" status="in-progress" features={['Quest log management', 'Objective tracking', 'Reward system', 'NPC quest integration']} />} />
+        <Route path="quests" element={<QuestsPage />} />
         <Route path="copies" element={<CopiesPage />} />
         <Route path="essence" element={<EssencePage />} />
         <Route path="inventory" element={<PlaceholderPage title="Inventory System" description="Item management and storage interface" status="planned" features={['Item organization', 'Equipment management', 'Storage expansion', 'Item crafting']} />} />

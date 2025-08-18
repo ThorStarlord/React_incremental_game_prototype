@@ -94,7 +94,7 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     label: 'Quests',
     icon: QuestsIcon,
     route: '/game/quests',
-    isImplemented: false,
+    isImplemented: true,
     tooltip: 'Track active and completed quests',
     section: 'world-interaction',
   },
