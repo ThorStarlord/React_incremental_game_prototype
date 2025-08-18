@@ -75,7 +75,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <Typography variant="h6">{quest.title}</Typography>
                 <Chip
-                  label={quest.status.replace('_', ' ')}
+                  label={formatQuestStatusLabel(quest.status)}
                   color={getStatusColor(quest.status)}
                   size="small"
                   variant="outlined"
