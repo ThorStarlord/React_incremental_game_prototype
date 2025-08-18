@@ -12,7 +12,7 @@
 			"group": "build"
 		},
 		{
-			"label": "build-react-app",
+			"label": "build-react-app-alt",
 			"type": "shell",
 			"command": "npm run build",
 			"args": [],
