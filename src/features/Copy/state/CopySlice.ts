@@ -4,9 +4,24 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CopiesState, Copy } from './CopyTypes';
+import { CopiesState, Copy, CopyTraitSlot } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import { clamp } from '../utils/copyUtils';
+
+const createInitialCopyTraitSlots = (): CopyTraitSlot[] => {
+  const slots: CopyTraitSlot[] = [];
+  for (let i = 0; i < COPY_SYSTEM.MAX_TRAIT_SLOTS; i++) {
+    const unlock = COPY_SYSTEM.TRAIT_SLOT_UNLOCKS.find(u => u.slotIndex === i);
+    slots.push({
+      id: `copy_trait_slot_${i}`,
+      slotIndex: i,
+      traitId: null,
+      isLocked: i >= COPY_SYSTEM.INITIAL_TRAIT_SLOTS,
+      unlockRequirement: unlock ? { type: unlock.type, value: unlock.value } : undefined,
+    });
+  }
+  return slots;
+};
 
 const initialState: CopiesState = {
   copies: {
@@ -24,7 +39,8 @@ const initialState: CopiesState = {
         healthRegen: 1, manaRegen: 2,
         criticalChance: 0.1, criticalDamage: 1.5,
       },
-      inheritedTraits: ['trait-resilience', 'trait-cunning'],
+  inheritedTraits: ['trait-resilience', 'trait-cunning'],
+  traitSlots: createInitialCopyTraitSlots(),
       location: 'City Center',
     },
     'copy-002': {
@@ -41,7 +57,8 @@ const initialState: CopiesState = {
         healthRegen: 0.8, manaRegen: 2.5,
         criticalChance: 0.15, criticalDamage: 1.6,
       },
-      inheritedTraits: ['trait-swiftness', 'trait-arcane-potency'],
+  inheritedTraits: ['trait-swiftness', 'trait-arcane-potency'],
+  traitSlots: createInitialCopyTraitSlots(),
       location: 'Library Archives',
       currentTask: 'Researching ancient texts',
     },
@@ -57,6 +74,7 @@ const copiesSlice = createSlice({
     // Action to add a new copy to the state
     addCopy: (state, action: PayloadAction<Copy>) => {
       const newCopy = action.payload;
+  if (!newCopy.traitSlots) newCopy.traitSlots = createInitialCopyTraitSlots();
       state.copies[newCopy.id] = newCopy;
     },
     
@@ -81,6 +99,40 @@ const copiesSlice = createSlice({
       }
     },
 
+    /** Share a trait to a Copy's slot (assumes validation in thunk). */
+    shareTraitToCopy: (state, action: PayloadAction<{ copyId: string; slotIndex: number; traitId: string }>) => {
+      const { copyId, slotIndex, traitId } = action.payload;
+      const copy = state.copies[copyId];
+      if (!copy || !copy.traitSlots) return;
+      const slot = copy.traitSlots[slotIndex];
+      if (!slot || slot.isLocked) return;
+      slot.traitId = traitId;
+    },
+
+    /** Remove a shared trait from a Copy slot. */
+    unshareTraitFromCopy: (state, action: PayloadAction<{ copyId: string; slotIndex: number }>) => {
+      const { copyId, slotIndex } = action.payload;
+      const copy = state.copies[copyId];
+      if (!copy || !copy.traitSlots) return;
+      const slot = copy.traitSlots[slotIndex];
+      if (!slot) return;
+      slot.traitId = null;
+    },
+
+    /** Unlock any eligible trait slots based on maturity/loyalty. */
+    unlockCopySlotsIfEligible: (state, action: PayloadAction<{ copyId: string }>) => {
+      const { copyId } = action.payload;
+      const copy = state.copies[copyId];
+      if (!copy || !copy.traitSlots) return;
+      for (const slot of copy.traitSlots) {
+        if (!slot.isLocked || !slot.unlockRequirement) continue;
+        const meets =
+          (slot.unlockRequirement.type === 'maturity' && copy.maturity >= slot.unlockRequirement.value) ||
+          (slot.unlockRequirement.type === 'loyalty' && copy.loyalty >= slot.unlockRequirement.value);
+        if (meets) slot.isLocked = false;
+      }
+    },
+
     // Batch update multiple copies at once for performance (used in growth/decay loops)
     updateMultipleCopies: (state, action: PayloadAction<Array<{ copyId: string; updates: Partial<Copy> }>>) => {
       for (const { copyId, updates } of action.payload) {
@@ -89,9 +141,25 @@ const copiesSlice = createSlice({
         Object.assign(existing, updates);
         if (updates.maturity !== undefined) {
           existing.maturity = clamp(existing.maturity, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX);
+          // Check slot unlocks when maturity changes
+          if (existing.traitSlots) {
+            for (const slot of existing.traitSlots) {
+              if (!slot.isLocked || !slot.unlockRequirement) continue;
+              const meets = slot.unlockRequirement.type === 'maturity' && existing.maturity >= slot.unlockRequirement.value;
+              if (meets) slot.isLocked = false;
+            }
+          }
         }
         if (updates.loyalty !== undefined) {
           existing.loyalty = clamp(updates.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
+          // Check slot unlocks when loyalty changes
+          if (existing.traitSlots) {
+            for (const slot of existing.traitSlots) {
+              if (!slot.isLocked || !slot.unlockRequirement) continue;
+              const meets = slot.unlockRequirement.type === 'loyalty' && existing.loyalty >= slot.unlockRequirement.value;
+              if (meets) slot.isLocked = false;
+            }
+          }
         }
       }
     },
@@ -134,7 +202,10 @@ export const {
   promoteCopyToAccelerated,
   setCopyTask,
     setCopiesLoading,
-    setCopiesError
+  setCopiesError,
+  shareTraitToCopy,
+  unshareTraitFromCopy,
+  unlockCopySlotsIfEligible,
 } = copiesSlice.actions;
 
 export default copiesSlice.reducer;

@@ -61,3 +61,25 @@ export const selectCopySegments = createSelector([_allCopies], (copies) => {
   }
   return { mature, growing, lowLoyalty };
 });
+
+/** Select all trait IDs affecting a Copy (inherited + shared). */
+export const selectCopyTraitIds = createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+  ],
+  (copy) => {
+    if (!copy) return [] as string[];
+    const shared = (copy.traitSlots ?? [])
+      .map(s => s.traitId)
+      .filter((id): id is string => !!id);
+    return [...copy.inheritedTraits, ...shared];
+  }
+);
+
+/** Select Copy's trait slots with lock status for rendering. */
+export const selectCopyTraitSlots = createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+  ],
+  (copy) => copy?.traitSlots ?? []
+);
