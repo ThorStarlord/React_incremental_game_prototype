@@ -13,7 +13,8 @@ import { EssenceState } from './EssenceTypes';
 import { addPermanentTrait, setResonanceLevel } from '../../Player/state/PlayerSlice';
 import { selectPlayer } from '../../Player/state/PlayerSelectors';
 import { COPY_SYSTEM, ESSENCE_GENERATION } from '../../../constants/gameConstants';
-import { selectQualifyingCopyCount } from '../../Copy/state/CopySelectors';
+import { selectAllCopies } from '../../Copy/state/CopySelectors';
+import { calculateCopyEssenceGeneration } from '../../Copy/utils/copyUtils';
 import { NPC } from '../../NPCs/state/NPCTypes';
 import { Trait } from '../../Traits/state/TraitsTypes';
 
@@ -52,55 +53,24 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
   'essence/updateGenerationRate',
   async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
-    const npcs = state.npcs?.npcs || {};
-    const player = state.player;
-    const allTraits = state.traits.traits;
+  const allTraits = state.traits.traits;
+  const copies = selectAllCopies(state);
 
     // 1. Start with the base generation rate
     let totalRate = ESSENCE_GENERATION.BASE_RATE_PER_SECOND;
 
-    // 2. Add bonus from mature, loyal Copies
-  const qualifyingCount = selectQualifyingCopyCount(state);
-  totalRate += qualifyingCount * COPY_SYSTEM.ESSENCE_GENERATION_BONUS;
-    
-    // 3. Calculate total contribution from all NPC connections
-    const npcContribution = Object.values(npcs).reduce((total, npc: NPC) => {
-      // Ensure relationship contributes positively
-      if (npc.connectionDepth > 0 && npc.affinity > 0) {
-        const relationshipMultiplier = npc.affinity / 100.0; // Normalize to 0-1
-        const connectionMultiplier = npc.connectionDepth / 10.0; // Normalize to 0-1, assuming max depth is 10
-        
-        const npcRate = connectionMultiplier * relationshipMultiplier * ESSENCE_GENERATION.NPC_CONTRIBUTION_MULTIPLIER;
-        return total + npcRate;
+    // 2. Add contribution from qualifying Copies (maturity >= threshold)
+    for (const copy of copies) {
+      if (copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD) {
+        totalRate += calculateCopyEssenceGeneration(copy, allTraits);
       }
-      return total;
-    }, 0);
+    }
 
-    totalRate += npcContribution;
-    
-    // 4. Calculate global multipliers from player traits
-    let traitMultiplier = 1.0;
-    const activeTraitIds = [...player.permanentTraits, ...player.traitSlots.map(s => s.traitId).filter(Boolean) as string[]];
-    
-    activeTraitIds.forEach(traitId => {
-      const trait: Trait = allTraits[traitId];
-      if (trait && trait.effects && typeof trait.effects === 'object' && !Array.isArray(trait.effects)) {
-        if (trait.effects.essenceGenerationMultiplier) {
-          // Multipliers are cumulative (e.g., 1.1 * 1.15)
-          traitMultiplier *= trait.effects.essenceGenerationMultiplier;
-        }
-      }
-    });
-
-    // 5. Apply the total trait multiplier to the calculated rate
-    totalRate *= traitMultiplier;
-
-    // 6. Dispatch the update action
+    // 3. Dispatch the update action
     dispatch(updateGenerationRate(totalRate));
 
     return {
       newRate: totalRate,
-      connectionCount: Object.values(npcs).filter((npc: NPC) => npc.connectionDepth > 0).length
     };
   }
 );

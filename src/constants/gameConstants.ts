@@ -38,6 +38,8 @@ export const COPY_SYSTEM = {
   BOLSTER_LOYALTY_GAIN: 10,
   /** The upfront Essence cost to choose accelerated growth for a new Copy. */
   ACCELERATED_GROWTH_COST: 50,
+  /** Base essence generated per second by a qualifying Copy before modifiers. */
+  BASE_ESSENCE_GENERATION: 0.1,
   /** Flat bonus to Essence generation per second from a mature, loyal Copy. */
   ESSENCE_GENERATION_BONUS: 0.2,
   /** Maturity threshold (inclusive) at which a Copy is considered fully mature. */

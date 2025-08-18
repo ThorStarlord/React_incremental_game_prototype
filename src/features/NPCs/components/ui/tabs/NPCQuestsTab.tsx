@@ -47,11 +47,13 @@ const formatObjectiveText = (objective: QuestObjective) => {
 
 const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const dispatch = useAppDispatch();
-  const npc = useAppSelector((state) => selectNPCById(state, npcId));
-  const availableQuests: Quest[] =
-    npc?.availableQuests
-      .map((questId: string) => useAppSelector((state) => selectQuestById(state, questId)))
-      .filter((quest: Quest | undefined): quest is Quest => quest !== undefined) || [];
+  const { npc, availableQuests } = useAppSelector((state) => {
+    const n = selectNPCById(state, npcId);
+    const quests: Quest[] = (n?.availableQuests ?? [])
+      .map((questId: string) => selectQuestById(state, questId))
+      .filter((quest: Quest | undefined): quest is Quest => quest !== undefined);
+    return { npc: n, availableQuests: quests };
+  });
 
   const handleAcceptQuest = (questId: string) => {
     dispatch(startQuestThunk(questId));

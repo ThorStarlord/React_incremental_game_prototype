@@ -107,7 +107,7 @@ copyListeners.startListening({
         if (slot.traitId === traitId) {
           api.dispatch(unshareTraitFromCopy({ copyId: copy.id, slotIndex: slot.slotIndex }));
           unsharedCount++;
-      affected.add(copy.id);
+          affected.add(copy.id);
         }
       }
     }
