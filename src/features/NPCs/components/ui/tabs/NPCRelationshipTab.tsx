@@ -63,7 +63,8 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
 
   const handleSeductionAttempt = () => {
     if (canAttemptSeduction) {
-      dispatch(createCopyThunk({ npcId: npc.id }));
+  // Default to 'normal' growth for quick creation from this tab; the modal offers choice elsewhere
+  dispatch(createCopyThunk({ npcId: npc.id, growthType: 'normal' }));
     }
   };
 
