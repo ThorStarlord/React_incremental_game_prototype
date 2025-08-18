@@ -7,6 +7,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { CopiesState, Copy } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
+import { isQualifyingForEssenceBonus } from '../utils/copyUtils';
 
 /** Root selector for the Copy slice. */
 const selectCopiesState = (state: RootState): CopiesState => state.copy;
@@ -107,3 +108,36 @@ export const selectCopyEffectiveTraits = createSelector(
   ],
   (traitsById, ids) => ids.map((id) => traitsById[id]).filter((t) => !!t)
 );
+
+/**
+ * Eligible player trait IDs that could be shared to this Copy now.
+ * Rules: player has it equipped (non-permanent) and Copy doesn't already have it (inherited/shared).
+ */
+export const selectCopyEligibleShareTraitIds = createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+    (state: RootState) => state.player.traitSlots,
+    (state: RootState) => state.player.permanentTraits,
+  ],
+  (copy, playerSlots, permanent) => {
+    if (!copy) return [] as string[];
+    const equipped = playerSlots.map(s => s.traitId).filter((id): id is string => !!id);
+    const already = new Set([...(copy.inheritedTraits ?? []), ...((copy.traitSlots ?? []).map(s => s.traitId).filter(Boolean) as string[])]);
+    return equipped.filter(id => !permanent.includes(id) && !already.has(id));
+  }
+);
+
+/** Copy share preferences map (default empty object). */
+export const selectCopySharePreferences = createSelector(
+  [selectCopyById],
+  (copy) => copy?.sharePreferences ?? {}
+);
+
+/** Progress summary for a Copy. */
+export const selectCopyProgress = createSelector(
+  [selectCopyById],
+  (copy) => copy ? { maturity: copy.maturity, loyalty: copy.loyalty } : { maturity: 0, loyalty: 0 }
+);
+
+/** All qualifying copies as an array. */
+export const selectQualifyingCopies = createSelector([_allCopies], (copies) => copies.filter(isQualifyingForEssenceBonus));

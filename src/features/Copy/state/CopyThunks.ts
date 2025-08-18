@@ -8,10 +8,11 @@ import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
-import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated, shareTraitToCopy, unshareTraitFromCopy, unlockCopySlotsIfEligible } from './CopySlice';
+import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated, shareTraitToCopy, unshareTraitFromCopy, unlockCopySlotsIfEligible, assignCopyRole, startCopyTask, progressCopyTask, clearCopyActiveTask, setCopySharePreference } from './CopySlice';
 import { applyGrowth, applyLoyaltyDecay } from '../utils/copyUtils';
-import type { Copy, CopyGrowthType } from './CopyTypes';
+import type { Copy, CopyGrowthType, CopyTask } from './CopyTypes';
 import { addNotification } from '../../../shared/state/NotificationSlice';
+import { generateCopyId, generateCopyName } from '../utils/copyUtils';
 
 // Default starting stats for a new Copy
 const defaultCopyStats: PlayerStats = {
@@ -167,8 +168,8 @@ export const createCopyThunk = createAsyncThunk(
 
     // --- Create the Copy Object ---
     const newCopy: Copy = {
-  id: `copy_${Date.now()}`,
-      name: `Copy of ${npc.name}`,
+  id: generateCopyId(),
+      name: generateCopyName(npc.name),
       createdAt: Date.now(),
       parentNPCId: npc.id,
       growthType: growthType,
@@ -189,6 +190,72 @@ export const createCopyThunk = createAsyncThunk(
     dispatch(addNotification({ type: 'success', message: `Created ${newCopy.name}.` }));
 
     return newCopy;
+  }
+);
+
+/** Assign a role to a Copy (thin thunk with feedback). */
+export const assignCopyRoleThunk = createAsyncThunk(
+  'copy/assignRole',
+  async ({ copyId, role }: { copyId: string; role: import('./CopyTypes').CopyRole }, { getState, dispatch, rejectWithValue }) => {
+    const state = getState() as RootState;
+    if (!state.copy.copies[copyId]) return rejectWithValue('Copy not found');
+    dispatch(assignCopyRole({ copyId, role }));
+    dispatch(addNotification({ type: 'success', message: 'Role assigned.' }));
+    return { success: true };
+  }
+);
+
+/** Start an MVP timed task on a Copy. */
+export const startCopyTimedTaskThunk = createAsyncThunk(
+  'copy/startTimedTask',
+  async ({ copyId, durationSeconds, type = 'timed' as const }: { copyId: string; durationSeconds: number; type?: 'timed' }, { getState, dispatch, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const copy = state.copy.copies[copyId];
+    if (!copy) return rejectWithValue('Copy not found');
+    const task: CopyTask = {
+      id: `task_${Date.now()}`,
+      type,
+      durationSeconds,
+      progressSeconds: 0,
+      status: 'running',
+      startedAt: Date.now(),
+    };
+    dispatch(startCopyTask({ copyId, task }));
+    dispatch(addNotification({ type: 'info', message: 'Task started.' }));
+    return { success: true };
+  }
+);
+
+/** Tick active tasks for all Copies based on deltaTime. */
+export const processCopyTasksThunk = createAsyncThunk(
+  'copy/processTasks',
+  async (deltaTime: number, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const seconds = deltaTime / 1000;
+    for (const copy of Object.values(state.copy.copies)) {
+      const task = copy.activeTask;
+      if (task && task.status === 'running') {
+        dispatch(progressCopyTask({ copyId: copy.id, deltaSeconds: seconds }));
+        const updated = (getState() as RootState).copy.copies[copy.id].activeTask;
+        if (updated && updated.status === 'completed') {
+          dispatch(addNotification({ type: 'success', message: `${copy.name} completed a task.` }));
+          dispatch(clearCopyActiveTask({ copyId: copy.id }));
+        }
+      }
+    }
+  }
+);
+
+/** Update a share preference with validation and feedback. */
+export const setCopySharePreferenceThunk = createAsyncThunk(
+  'copy/setSharePreference',
+  async ({ copyId, traitId, enabled }: { copyId: string; traitId: string; enabled: boolean }, { getState, dispatch, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const copy = state.copy.copies[copyId];
+    if (!copy) return rejectWithValue('Copy not found');
+    dispatch(setCopySharePreference({ copyId, traitId, enabled }));
+    dispatch(addNotification({ type: 'info', message: enabled ? 'Share preference enabled.' : 'Share preference disabled.' }));
+    return { success: true };
   }
 );
 

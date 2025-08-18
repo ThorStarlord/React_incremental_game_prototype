@@ -4,7 +4,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CopiesState, Copy, CopyTraitSlot } from './CopyTypes';
+import { CopiesState, Copy, CopyTraitSlot, CopyRole, CopyTask } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import { clamp } from '../utils/copyUtils';
 
@@ -57,6 +57,9 @@ const initialState: CopiesState = {
       },
   inheritedTraits: ['trait-resilience', 'trait-cunning'],
   traitSlots: createInitialCopyTraitSlots(),
+      sharePreferences: {},
+      role: 'none',
+      activeTask: null,
       location: 'City Center',
     },
     'copy-002': {
@@ -75,6 +78,9 @@ const initialState: CopiesState = {
       },
   inheritedTraits: ['trait-swiftness', 'trait-arcane-potency'],
   traitSlots: createInitialCopyTraitSlots(),
+      sharePreferences: {},
+      role: 'none',
+      activeTask: null,
       location: 'Library Archives',
       currentTask: 'Researching ancient texts',
     },
@@ -91,6 +97,9 @@ const copiesSlice = createSlice({
     addCopy: (state, action: PayloadAction<Copy>) => {
       const newCopy = action.payload;
   if (!newCopy.traitSlots) newCopy.traitSlots = createInitialCopyTraitSlots();
+      if (!newCopy.sharePreferences) newCopy.sharePreferences = {};
+      if (newCopy.role === undefined) newCopy.role = 'none';
+      if (newCopy.activeTask === undefined) newCopy.activeTask = null;
       state.copies[newCopy.id] = newCopy;
     },
     
@@ -147,6 +156,51 @@ const copiesSlice = createSlice({
           (slot.unlockRequirement.type === 'loyalty' && copy.loyalty >= slot.unlockRequirement.value);
         if (meets) slot.isLocked = false;
       }
+    },
+
+    /**
+     * Assign a role to a Copy (pure assignment, no side-effects here).
+     */
+    assignCopyRole: (state, action: PayloadAction<{ copyId: string; role: CopyRole }>) => {
+      const { copyId, role } = action.payload;
+      const copy = state.copies[copyId];
+      if (copy) copy.role = role;
+    },
+
+    /** Set a user preference for sharing a given trait to this copy when available. */
+    setCopySharePreference: (state, action: PayloadAction<{ copyId: string; traitId: string; enabled: boolean }>) => {
+      const { copyId, traitId, enabled } = action.payload;
+      const copy = state.copies[copyId];
+      if (!copy) return;
+      if (!copy.sharePreferences) copy.sharePreferences = {};
+      copy.sharePreferences[traitId] = enabled;
+    },
+
+    /** Start a task on a copy, replacing any existing active task. */
+    startCopyTask: (state, action: PayloadAction<{ copyId: string; task: CopyTask }>) => {
+      const { copyId, task } = action.payload;
+      const copy = state.copies[copyId];
+      if (!copy) return;
+      copy.activeTask = { ...task };
+    },
+
+    /** Progress an active task by deltaSeconds; complete if finished. */
+    progressCopyTask: (state, action: PayloadAction<{ copyId: string; deltaSeconds: number }>) => {
+      const { copyId, deltaSeconds } = action.payload;
+      const copy = state.copies[copyId];
+      const task = copy?.activeTask;
+      if (!copy || !task || task.status !== 'running') return;
+      task.progressSeconds = Math.min(task.durationSeconds, task.progressSeconds + deltaSeconds);
+      if (task.progressSeconds >= task.durationSeconds) {
+        task.status = 'completed';
+      }
+    },
+
+    /** Clear the active task (e.g., after handling completion). */
+    clearCopyActiveTask: (state, action: PayloadAction<{ copyId: string }>) => {
+      const { copyId } = action.payload;
+      const copy = state.copies[copyId];
+      if (copy) copy.activeTask = null;
     },
 
     // Batch update multiple copies at once for performance (used in growth/decay loops)
@@ -219,6 +273,11 @@ export const {
   unshareTraitFromCopy,
   unlockCopySlotsIfEligible,
   ensureCopyTraitSlots,
+    assignCopyRole,
+    setCopySharePreference,
+    startCopyTask,
+    progressCopyTask,
+    clearCopyActiveTask,
 } = copiesSlice.actions;
 
 export default copiesSlice.reducer;
