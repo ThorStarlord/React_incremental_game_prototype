@@ -9,6 +9,7 @@ import { CopiesState, Copy } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import { isQualifyingForEssenceBonus } from '../utils/copyUtils';
 import { calculateCopyEssenceGeneration } from '../utils/copyUtils';
+import type { Trait } from '../../Traits/state/TraitsTypes';
 
 /** Root selector for the Copy slice. */
 const selectCopiesState = (state: RootState): CopiesState => state.copy;
@@ -195,12 +196,12 @@ export const selectQualifyingCopies = createSelector([_allCopies], (copies) => c
 export const makeSelectCopyEssenceGeneration = () => createSelector(
   [
     (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
-    (state: RootState) => state.traits.traits,
+  (state: RootState) => state.traits.traits as Record<string, Trait>,
   ],
   (copy, traitsById) => {
     if (!copy) return 0;
     if (copy.maturity < COPY_SYSTEM.MATURITY_THRESHOLD) return 0;
-    return calculateCopyEssenceGeneration(copy, traitsById as any);
+  return calculateCopyEssenceGeneration(copy, traitsById);
   }
 );
 

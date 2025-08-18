@@ -5,7 +5,7 @@
 
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { Copy } from '../state/CopyTypes';
-import type { Trait } from '../../Traits/state/TraitsTypes';
+import type { Trait, TraitEffect, TraitEffectValues } from '../../Traits/state/TraitsTypes';
 import type { NPC } from '../../NPCs/state/NPCTypes';
 
 /** Clamp a number between min and max. */
@@ -89,23 +89,12 @@ export const calculateCopyEssenceGeneration = (
     .filter((id): id is string => !!id);
   const activeIds = [...(copy.inheritedTraits ?? []), ...sharedIds];
 
-  // Sum essenceGenerationMultiplier contributions.
-  // Effects may be array or object; if object, read property essenceGenerationMultiplier.
+  // Sum essenceGenerationMultiplier contributions using helper.
   let additiveMultiplier = 0; // we'll add to 1.0 later
   for (const id of activeIds) {
     const trait = allTraits[id];
     if (!trait || !trait.effects) continue;
-    const eff = trait.effects as any;
-    if (Array.isArray(eff)) {
-      for (const e of eff) {
-        if (e && typeof e === 'object' && 'type' in e) {
-          // Not a key-value map; skip unless a specific type is defined in the future
-        }
-      }
-    } else if (typeof eff === 'object') {
-      const val = Number(eff.essenceGenerationMultiplier ?? 0);
-      if (!Number.isNaN(val)) additiveMultiplier += val;
-    }
+    additiveMultiplier += getEssenceGenerationMultiplierFromEffects(trait.effects);
   }
   const traitMultiplier = 1 + additiveMultiplier;
 
@@ -113,4 +102,38 @@ export const calculateCopyEssenceGeneration = (
   const loyaltyModifier = copy.loyalty < COPY_SYSTEM.LOYALTY_THRESHOLD ? 0.5 : 1.0;
 
   return base * traitMultiplier * loyaltyModifier;
+};
+
+/** Type guard: effects object is a key-value map (TraitEffectValues), not an array. */
+const isTraitEffectValues = (effects: Trait['effects']): effects is TraitEffectValues =>
+  !!effects && typeof effects === 'object' && !Array.isArray(effects);
+
+/** Narrower helper to detect an arbitrary object with an essenceGenerationMultiplier number. */
+const hasEssenceGenMultiplier = (obj: unknown): obj is { essenceGenerationMultiplier: number } =>
+  !!obj && typeof obj === 'object' && 'essenceGenerationMultiplier' in (obj as Record<string, unknown>)
+  && typeof (obj as { essenceGenerationMultiplier: unknown }).essenceGenerationMultiplier === 'number';
+
+/**
+ * Helper: Sum all essenceGenerationMultiplier contributions from a trait's effects.
+ * - If effects is a key-value map, reads effects.essenceGenerationMultiplier if present.
+ * - If it's an array, future-proof by scanning entries for an essenceGenerationMultiplier number.
+ */
+export const getEssenceGenerationMultiplierFromEffects = (effects: TraitEffect[] | TraitEffectValues): number => {
+  if (!effects) return 0;
+  if (isTraitEffectValues(effects)) {
+    const val = Number((effects as TraitEffectValues).essenceGenerationMultiplier ?? 0);
+    return Number.isNaN(val) ? 0 : val;
+  }
+  // effects is TraitEffect[] (or array-like). Officially TraitEffect doesn't include the multiplier,
+  // but we defensively scan objects that may carry it in the future.
+  let sum = 0;
+  if (Array.isArray(effects)) {
+    for (const e of effects) {
+      if (hasEssenceGenMultiplier(e)) {
+        const v = Number(e.essenceGenerationMultiplier);
+        if (!Number.isNaN(v)) sum += v;
+      }
+    }
+  }
+  return sum;
 };

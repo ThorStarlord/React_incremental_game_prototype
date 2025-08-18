@@ -93,24 +93,7 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
           <LinearProgress value={copy.loyalty} color="secondary" variant="determinate" sx={{ mt: 0.5 }} />
           <Typography variant="body2" sx={{ mt: 0.5 }}>{copy.loyalty.toFixed(1)}%</Typography>
         </Box>
-        {/* Active traits summary */}
-        {(copy.inheritedTraits?.length || (copy.traitSlots?.some(s => s.traitId))) ? (
-          <Box sx={{ mt: 1 }}>
-            <Typography variant="subtitle2">Active Traits</Typography>
-            <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: 'wrap' }}>
-              {(copy.inheritedTraits || []).map(tid => (
-                <Box key={`inh-${tid}`} sx={{ minWidth: 140 }}>
-                  <CompactTraitCard traitId={tid} />
-                </Box>
-              ))}
-              {(copy.traitSlots || []).filter(s => s.traitId).map(s => (
-                <Box key={`slot-${s.slotIndex}-${s.traitId}`} sx={{ minWidth: 140 }}>
-                  <CompactTraitCard traitId={s.traitId!} />
-                </Box>
-              ))}
-            </Stack>
-          </Box>
-        ) : null}
+  <ActiveTraitsDisplay copy={copy} />
 
         {/* Trait slots management */}
         <Divider sx={{ my: 1 }} />
@@ -163,3 +146,27 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
 };
 
 export default CopyCard;
+
+// Small extracted component to display active traits for a Copy
+const ActiveTraitsDisplay: React.FC<{ copy: Copy }> = ({ copy }) => {
+  const hasTraits = (copy.inheritedTraits?.length || (copy.traitSlots?.some(s => s.traitId)));
+  if (!hasTraits) return null;
+  return (
+    <Box sx={{ mt: 1 }}>
+      <Typography variant="subtitle2">Active Traits</Typography>
+      <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: 'wrap' }}>
+        {(copy.inheritedTraits || []).map(tid => (
+          <Box key={`inh-${tid}`} sx={{ minWidth: 140 }}>
+            <CompactTraitCard traitId={tid} />
+          </Box>
+        ))}
+        {(copy.traitSlots || []).filter(s => s.traitId).map(s => (
+          <Box key={`slot-${s.slotIndex}-${s.traitId}`} sx={{ minWidth: 140 }}>
+            {/* Non-null asserted because we filtered truthy traitId above */}
+            <CompactTraitCard traitId={s.traitId!} />
+          </Box>
+        ))}
+      </Stack>
+    </Box>
+  );
+};
