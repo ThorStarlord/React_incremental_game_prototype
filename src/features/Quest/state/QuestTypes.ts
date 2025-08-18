@@ -1,6 +1,6 @@
 // As per DataModel.md, defining placeholder types for now.
 export type QuestType = 'MAIN_STORY' | 'SIDE' | 'REPEATABLE' | 'TUTORIAL';
-export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM' | 'ESCORT';
+export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM' | 'ESCORT' | 'DELIVER';
 export type QuestStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'READY_TO_COMPLETE' | 'COMPLETED' | 'FAILED';
 
 // Placeholder for requirements, e.g., level, previous quest, etc.
@@ -28,6 +28,9 @@ export interface QuestObjective {
   currentCount: number;
   isHidden: boolean;
   isComplete: boolean;
+  // For DELIVER objectives
+  hasItem?: boolean;
+  delivered?: boolean;
 }
 
 export interface Quest {

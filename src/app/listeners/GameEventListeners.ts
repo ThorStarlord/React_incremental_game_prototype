@@ -1,34 +1,54 @@
 import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import { addItem } from '../../features/Inventory/state/InventorySlice';
+import { addItem, removeItem } from '../../features/Inventory/state/InventorySlice';
 import { setLocation } from '../../features/Player/state/PlayerSlice';
 import { updateNpcLocation } from '../../features/NPCs/state/NPCSlice';
 import { targetKilled } from '../../features/Combat/CombatSlice';
-import { updateObjectiveProgress } from '../../features/Quest/state/QuestSlice';
+import { failQuest, updateObjectiveProgress } from '../../features/Quest/state/QuestSlice';
 import { Quest, QuestObjective } from '../../features/Quest/state/QuestTypes';
 
 export const gameEventListeners = createListenerMiddleware();
 
-// Listener for item additions (GATHER objectives)
+// Listener for item additions (GATHER and DELIVER objectives)
 gameEventListeners.startListening({
-  matcher: isAnyOf(addItem),
-  effect: async (action: ReturnType<typeof addItem>, listenerApi) => {
+  matcher: isAnyOf(addItem, removeItem),
+  effect: async (action, listenerApi) => {
     const state = listenerApi.getState() as RootState;
-  const { itemId } = action.payload as { itemId: string; quantity: number };
     const activeQuests = state.quest.activeQuestIds.map(id => state.quest.quests[id]);
 
     for (const quest of activeQuests) {
       if (!quest) continue;
       for (const objective of quest.objectives) {
-        if (objective.type === 'GATHER' && objective.target === itemId) {
-          const currentQuantity = state.inventory.items[itemId] || 0;
-          listenerApi.dispatch(
-            updateObjectiveProgress({
-              questId: quest.id,
-              objectiveId: objective.objectiveId,
-              progress: currentQuantity,
-            })
-          );
+        if (objective.type === 'GATHER' && action.type === 'inventory/addItem') {
+          const { itemId } = action.payload as { itemId: string; quantity: number };
+          if (objective.target === itemId) {
+            const currentQuantity = state.inventory.items[itemId] || 0;
+            listenerApi.dispatch(
+              updateObjectiveProgress({
+                questId: quest.id,
+                objectiveId: objective.objectiveId,
+                progress: currentQuantity,
+              })
+            );
+          }
+        } else if (objective.type === 'DELIVER') {
+          const requiredItemId = objective.target;
+          const playerHasItem = !!state.inventory.items[requiredItemId] && state.inventory.items[requiredItemId] > 0;
+
+          if (objective.hasItem !== playerHasItem) {
+            listenerApi.dispatch(
+              updateObjectiveProgress({
+                questId: quest.id,
+                objectiveId: objective.objectiveId,
+                progress: { ...objective, hasItem: playerHasItem },
+              })
+            );
+          }
+
+          // Failure condition
+          if (action.type === 'inventory/removeItem' && objective.hasItem && !playerHasItem) {
+            listenerApi.dispatch(failQuest(quest.id));
+          }
         }
       }
     }

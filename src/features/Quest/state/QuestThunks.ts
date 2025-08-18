@@ -7,7 +7,9 @@ import { gainGold } from '../../Player/state/PlayerSlice';
 import { addAvailableQuestToNPC } from '../../NPCs/state/NPCSlice';
 import { updateNPCRelationshipThunk } from '../../NPCs/state/NPCThunks';
 import { addNotification } from '../../../shared/state/NotificationSlice';
-import { addItem } from '../../Inventory/state/InventorySlice';
+import { addItem, removeItem } from '../../Inventory/state/InventorySlice';
+import { v4 as uuidv4 } from 'uuid';
+import { updateObjectiveProgress } from './QuestSlice';
 
 export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
   try {
@@ -31,6 +33,88 @@ export const startQuestThunk = createAsyncThunk(
   async (questId: string, { dispatch }) => {
     dispatch(startQuest(questId));
     return questId;
+  }
+);
+
+export const deliverQuestItemThunk = createAsyncThunk(
+  'quest/deliverQuestItem',
+  async ({ questId, objectiveId }: { questId: string, objectiveId: string }, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const quest = state.quest.quests[questId];
+    const objective = quest?.objectives.find(obj => obj.objectiveId === objectiveId);
+
+    if (quest && objective && objective.type === 'DELIVER' && objective.hasItem && !objective.delivered) {
+      const itemId = objective.target;
+
+      // Remove item from inventory
+      dispatch(removeItem({ itemId, quantity: 1 }));
+
+      // Update objective progress
+      dispatch(updateObjectiveProgress({
+        questId,
+        objectiveId,
+        progress: { ...objective, delivered: true, isComplete: true, currentCount: 1 },
+      }));
+    }
+  }
+);
+
+export const generateRadiantQuestThunk = createAsyncThunk(
+  'quest/generateRadiantQuest',
+  async (_, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const allNpcs = Object.values(state.npcs.npcs);
+    const guildMasterId = 'npc_guild_master_rook';
+
+    // Exclude the Guild Master himself from being a target
+    const targetableNpcs = allNpcs.filter(npc => npc.id !== guildMasterId);
+    if (targetableNpcs.length === 0) {
+      console.error("No targetable NPCs found for radiant quest.");
+      return;
+    }
+
+    // Randomly select a target NPC
+    const targetNpc = targetableNpcs[Math.floor(Math.random() * targetableNpcs.length)];
+
+    // Predefined list of fetchable items
+    const fetchableItems = ['item_ancient_relic', 'item_glowing_crystal'];
+    const targetItemId = fetchableItems[Math.floor(Math.random() * fetchableItems.length)];
+
+    const questId = `radiant_quest_${uuidv4()}`;
+    const objectiveId = `objective_${uuidv4()}`;
+
+    const newQuest: Quest = {
+      id: questId,
+      title: `Item Delivery: ${targetItemId} for ${targetNpc.name}`,
+      description: `Guild Master Rook has tasked you with delivering a ${targetItemId} to ${targetNpc.name} in ${targetNpc.location}.`,
+      giver: guildMasterId,
+      type: 'REPEATABLE',
+      status: 'IN_PROGRESS',
+      objectives: [
+        {
+          objectiveId,
+          description: `Deliver ${targetItemId} to ${targetNpc.name}.`,
+          type: 'DELIVER',
+          target: targetItemId,
+          destination: targetNpc.id, // Storing NPC id in destination
+          requiredCount: 1,
+          currentCount: 0,
+          isComplete: false,
+          isHidden: false,
+          hasItem: false,
+          delivered: false,
+        },
+      ],
+      prerequisites: [],
+      rewards: [
+        { type: 'GOLD', value: 100 },
+        { type: 'REPUTATION', value: 10, faction: "Adventurer's Guild" }
+      ],
+      isAutoComplete: false,
+    };
+
+    dispatch(addQuest(newQuest));
+    dispatch(startQuest(questId));
   }
 );
 
