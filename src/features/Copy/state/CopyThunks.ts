@@ -261,6 +261,40 @@ export const setCopySharePreferenceThunk = createAsyncThunk(
   }
 );
 
+/** Try to apply enabled share preferences to the first available slot(s) for a copy. */
+export const applySharePreferencesForCopyThunk = createAsyncThunk(
+  'copy/applySharePreferencesForCopy',
+  async (copyId: string, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const copy = state.copy.copies[copyId];
+    if (!copy) return { applied: 0 };
+    const prefs = copy.sharePreferences || {};
+    const enabledTraitIds = Object.keys(prefs).filter(tid => prefs[tid]);
+    if (!enabledTraitIds.length) return { applied: 0 };
+
+    const playerEquipped = state.player.traitSlots.map(s => s.traitId).filter((id): id is string => !!id);
+    const permanent = state.player.permanentTraits;
+    let applied = 0;
+
+    for (const traitId of enabledTraitIds) {
+      const already = new Set([...(copy.inheritedTraits || []), ...((copy.traitSlots || []).map(s => s.traitId).filter(Boolean) as string[])]);
+      if (already.has(traitId)) continue;
+      if (permanent.includes(traitId)) continue;
+      if (!playerEquipped.includes(traitId)) continue;
+      const empty = (copy.traitSlots || []).find(s => !s.isLocked && !s.traitId);
+      if (!empty) continue;
+      // Use the validated thunk to share (will ensure correctness and notify)
+      // eslint-disable-next-line no-await-in-loop
+      const result = await (dispatch as unknown as import('../../../app/store').AppDispatch)(
+        shareTraitWithCopyThunk({ copyId, slotIndex: empty.slotIndex ?? 0, traitId })
+      );
+      if (shareTraitWithCopyThunk.fulfilled.match(result)) applied += 1;
+    }
+    if (applied > 0) dispatch(addNotification({ type: 'success', message: `Applied ${applied} share preference(s).` }));
+    return { applied };
+  }
+);
+
 /**
  * Promote a Copy to accelerated growth by spending Essence.
  * Validation: copy exists, not already accelerated, sufficient Essence.

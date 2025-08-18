@@ -14,11 +14,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+  Divider,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { RootState } from '../../../../app/store';
-import { selectCopyById, selectCopyEffectiveTraitsWithSource } from '../../state/CopySelectors';
-import { assignCopyRoleThunk, startCopyTimedTaskThunk } from '../../state/CopyThunks';
+import { selectCopyById, selectCopyEffectiveTraitsWithSource, selectCopyEligibleShareTraitIds, selectCopySharePreferences } from '../../state/CopySelectors';
+import { assignCopyRoleThunk, startCopyTimedTaskThunk, setCopySharePreferenceThunk, applySharePreferencesForCopyThunk } from '../../state/CopyThunks';
+import { selectTraits } from '../../../Traits/state/TraitsSelectors';
 import type { CopyRole } from '../../state/CopyTypes';
 
 interface CopyDetailPanelProps {
@@ -33,6 +38,9 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const dispatch = useAppDispatch();
   const copy = useAppSelector((s: RootState) => selectCopyById(s, copyId));
   const traits = useAppSelector((s: RootState) => selectCopyEffectiveTraitsWithSource(s, copyId));
+  const eligibleShareIds = useAppSelector((s: RootState) => selectCopyEligibleShareTraitIds(s, copyId));
+  const sharePrefs = useAppSelector((s: RootState) => selectCopySharePreferences(s, copyId));
+  const allTraits = useAppSelector(selectTraits);
   const [taskSeconds, setTaskSeconds] = useState<number>(60);
 
   const title = useMemo(() => (copy ? `${copy.name}` : 'Copy Details'), [copy]);
@@ -48,6 +56,9 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   };
 
   const active = copy?.activeTask;
+  const unlockedSlots = (copy?.traitSlots || []).filter(s => !s.isLocked);
+  const emptySlots = unlockedSlots.filter(s => !s.traitId).length;
+  const anyPrefEnabled = Object.values(sharePrefs).some(Boolean);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -104,6 +115,36 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                 <LinearProgress variant="determinate" value={(active.progressSeconds / active.durationSeconds) * 100} sx={{ mt: 0.5 }} />
               </Box>
             )}
+
+            <Divider flexItem sx={{ my: 1 }} />
+
+            <Box>
+              <Typography variant="overline" color="text.secondary">Share Preferences</Typography>
+              <Typography variant="caption" color="text.secondary">Available slots: {emptySlots}</Typography>
+              <FormGroup sx={{ mt: 1 }}>
+                {eligibleShareIds.map((id) => {
+                  const t = allTraits[id];
+                  const label = t?.name ?? id;
+                  const checked = !!sharePrefs[id];
+                  return (
+                    <FormControlLabel
+                      key={id}
+                      control={<Switch size="small" checked={checked} onChange={(e) => dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: e.target.checked }))} />}
+                      label={label}
+                    />
+                  );
+                })}
+                {eligibleShareIds.length === 0 && (
+                  <Typography variant="caption" color="text.secondary">No eligible player traits to share right now.</Typography>
+                )}
+              </FormGroup>
+              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                <Button size="small" variant="contained" onClick={() => dispatch(applySharePreferencesForCopyThunk(copyId))} disabled={!anyPrefEnabled || emptySlots === 0}>
+                  Apply Now
+                </Button>
+                <Typography variant="caption" color="text.secondary">Will try to fill empty slots with enabled preferences.</Typography>
+              </Stack>
+            </Box>
 
             <Box>
               <Typography variant="overline" color="text.secondary">Effective Traits</Typography>
