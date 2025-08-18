@@ -69,6 +69,24 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const unlockedSlots = (copy?.traitSlots || []).filter(s => !s.isLocked);
   const emptySlots = emptySlotCount;
   const anyPrefEnabled = Object.values(sharePrefs).some(Boolean);
+  const enableAll = () => {
+    if (!copy) return;
+    // enable all currently eligible
+    eligibleShareIds.forEach((id) => {
+      if (!sharePrefs[id]) {
+        dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: true }));
+      }
+    });
+  };
+  const disableAll = () => {
+    if (!copy) return;
+    // disable everything currently enabled
+    Object.keys(sharePrefs).forEach((id) => {
+      if (sharePrefs[id]) {
+        dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: false }));
+      }
+    });
+  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -175,7 +193,9 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                   <Typography variant="caption" color="text.secondary">No eligible player traits to share right now.</Typography>
                 )}
               </FormGroup>
-              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+              <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>
+                <Button size="small" onClick={enableAll} disabled={eligibleShareIds.length === 0}>Enable all eligible</Button>
+                <Button size="small" onClick={disableAll} disabled={!anyPrefEnabled}>Disable all</Button>
                 <Button size="small" variant="contained" onClick={() => dispatch(applySharePreferencesForCopyThunk(copyId))} disabled={!anyPrefEnabled || emptySlots === 0}>
                   Apply Now
                 </Button>

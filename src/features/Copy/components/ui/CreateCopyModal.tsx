@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -12,10 +12,12 @@ import {
   Typography,
   Box,
 } from '@mui/material';
-import { useAppDispatch } from '../../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { createCopyThunk } from '../../state/CopyThunks';
 import { CopyGrowthType } from '../../state/CopyTypes';
 import { COPY_SYSTEM } from '../../../../constants/gameConstants';
+import { selectPlayerAttributes } from '../../../Player/state/PlayerSelectors';
+import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 
 interface CreateCopyModalProps {
   open: boolean;
@@ -32,6 +34,18 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [growthType, setGrowthType] = useState<CopyGrowthType>('normal');
+  const attributes = useAppSelector(selectPlayerAttributes);
+  const currentEssence = useAppSelector(selectCurrentEssence);
+
+  const essenceCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
+  const lacksEssence = currentEssence < essenceCost;
+
+  const successChancePct = useMemo(() => {
+    const charisma = attributes.charisma ?? 10;
+    const charismaModifier = Math.floor((charisma - 10) / 2);
+    const chance = 5 + charismaModifier * 10; // as used in createCopyThunk
+    return Math.max(0, Math.min(95, chance));
+  }, [attributes.charisma]);
 
   const handleCreate = () => {
     dispatch(createCopyThunk({ npcId, growthType }));
@@ -46,6 +60,12 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
           Choose the growth method for your new copy. Accelerated growth is much
           faster but requires a significant Essence investment.
         </DialogContentText>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2">Estimated success chance: <b>{successChancePct}%</b> (based on Charisma)</Typography>
+          <Typography variant="caption" color="text.secondary">
+            Current Essence: {currentEssence} {lacksEssence && `(need ${essenceCost} for accelerated)`}
+          </Typography>
+        </Box>
         <RadioGroup
           aria-label="growth-type"
           name="growth-type-radio-buttons-group"
@@ -66,6 +86,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
           />
           <FormControlLabel
             value="accelerated"
+            disabled={lacksEssence}
             control={<Radio />}
             label={
               <Box>
@@ -73,6 +94,11 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
                 <Typography variant="caption" color="text.secondary">
                   The copy will mature rapidly. Costs {COPY_SYSTEM.ACCELERATED_GROWTH_COST} Essence.
                 </Typography>
+                {lacksEssence && (
+                  <Typography variant="caption" color="error.main">
+                    Insufficient Essence for accelerated growth.
+                  </Typography>
+                )}
               </Box>
             }
           />
@@ -80,7 +106,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleCreate} variant="contained">
+        <Button onClick={handleCreate} variant="contained" disabled={growthType === 'accelerated' && lacksEssence}>
           Create
         </Button>
       </DialogActions>

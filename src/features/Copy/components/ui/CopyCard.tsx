@@ -7,7 +7,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import BoltIcon from '@mui/icons-material/Bolt';
 import type { Copy } from '../../state/CopyTypes';
 import { useAppDispatch } from '../../../../app/hooks';
-import { bolsterCopyLoyaltyThunk, promoteCopyToAcceleratedThunk } from '../../state/CopyThunks';
+import { applySharePreferencesForCopyThunk, bolsterCopyLoyaltyThunk, promoteCopyToAcceleratedThunk } from '../../state/CopyThunks';
 import { setCopyTask } from '../../state/CopySlice';
 import CopyDetailPanel from './CopyDetailPanel';
 
@@ -21,6 +21,7 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
   const [taskValue, setTaskValue] = useState(copy.currentTask || '');
   const [busy, setBusy] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [busyApply, setBusyApply] = useState(false);
 
   const handleBolster = useCallback(async () => {
     setBusy(true);
@@ -43,6 +44,15 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
     dispatch(setCopyTask({ copyId: copy.id, task: taskValue.trim() || null }));
     setTaskEditOpen(false);
   }, [dispatch, copy.id, taskValue]);
+
+  const handleApplyPrefs = useCallback(async () => {
+    setBusyApply(true);
+    try {
+      await (dispatch as unknown as import('../../../../app/store').AppDispatch)(applySharePreferencesForCopyThunk(copy.id));
+    } finally {
+      setBusyApply(false);
+    }
+  }, [dispatch, copy.id]);
 
   return (
     <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -102,7 +112,8 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
             <Button size="small" disabled={busy || copy.growthType === 'accelerated'} variant="outlined" color="warning" onClick={handlePromote} startIcon={<RocketLaunchIcon />}>Promote</Button>
           </span>
         </Tooltip>
-        <Button size="small" variant="text" onClick={() => setTaskEditOpen(o => !o)}>{taskEditOpen ? 'Hide Task' : (copy.currentTask ? 'Edit Task' : 'Assign Task')}</Button>
+  <Button size="small" variant="outlined" onClick={handleApplyPrefs} disabled={busyApply}>Apply Prefs</Button>
+  <Button size="small" variant="text" onClick={() => setTaskEditOpen(o => !o)}>{taskEditOpen ? 'Hide Task' : (copy.currentTask ? 'Edit Task' : 'Assign Task')}</Button>
         <Button size="small" variant="text" onClick={() => setDetailsOpen(true)}>Details</Button>
       </CardActions>
       <CopyDetailPanel copyId={copy.id} open={detailsOpen} onClose={() => setDetailsOpen(false)} />
