@@ -7,13 +7,15 @@ import {
   AlertTitle,
   Paper,
   CircularProgress,
+  Button,
 } from '@mui/material';
 import { BugReport as DebugIcon } from '@mui/icons-material';
 // Import the UI component and the necessary hooks/selectors
 import NPCDebugPanel from '../features/NPCs/components/ui/NPCDebugPanel';
 import InventoryDebugPanel from '../features/Inventory/components/ui/InventoryDebugPanel';
-import { useAppSelector } from '../app/hooks';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAllNPCs, selectNPCLoading } from '../features/NPCs';
+import { generateRadiantQuestThunk } from '../features/Quest/state/QuestThunks';
 
 /**
  * DebugPage component.
@@ -22,6 +24,7 @@ import { selectAllNPCs, selectNPCLoading } from '../features/NPCs';
  * It is only accessible in a development environment and now handles loading state.
  */
 export const DebugPage: React.FC = React.memo(() => {
+  const dispatch = useAppDispatch();
   // Fetch the necessary data at the page level
   const npcs = useAppSelector(selectAllNPCs);
   const isLoading = useAppSelector(selectNPCLoading);
@@ -72,6 +75,15 @@ export const DebugPage: React.FC = React.memo(() => {
       </Alert>
 
       {renderContent()}
+
+      <Paper sx={{ p: 2, mt: 2 }}>
+        <Typography variant="h6">Quest Debug</Typography>
+        <Box sx={{ mt: 2 }}>
+          <Button variant="contained" onClick={() => dispatch(generateRadiantQuestThunk())}>
+            Generate Radiant Quest
+          </Button>
+        </Box>
+      </Paper>
 
       <InventoryDebugPanel />
 

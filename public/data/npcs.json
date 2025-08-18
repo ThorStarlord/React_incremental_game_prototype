@@ -177,5 +177,36 @@
     "isDiscovered": true,
     "isAvailable": true,
     "discoveredAt": 1672531200000
+  },
+  "npc_guild_master_rook": {
+    "id": "npc_guild_master_rook",
+    "name": "Guild Master Rook",
+    "description": "The stoic and experienced Guild Master of the Adventurer's Guild. He's seen it all and offers bounties to promising adventurers.",
+    "category": "Quests",
+    "location": "Adventurer's Guild - Hall",
+    "avatar": "avatars/npcs/guild_master_rook_avatar.png",
+    "spritePath": "sprites/npcs/guild_master_rook.png",
+    "faction": "Adventurer's Guild",
+    "interactionPrompt": "Speak with Guild Master Rook",
+    "affinity": 50,
+    "connectionDepth": 10,
+    "loyalty": 30,
+    "availableDialogues": ["rook_greeting", "rook_bounty_explanation"],
+    "completedDialogues": [],
+    "availableQuests": [],
+    "completedQuests": [],
+    "traits": {},
+    "availableTraits": ["Leadership", "ExperiencedAdventurer"],
+    "sharedTraitSlots": [],
+    "innateTraits": ["Leadership"],
+    "inventory": { "items": [], "currency": 1000 },
+    "services": [
+      { "id": "radiant_quest_provider", "name": "Offer Bounties", "description": "Take on dynamically generated quests for rewards.", "basePrice": 0, "currentPrice": 0, "isAvailable": true }
+    ],
+    "status": "available",
+    "lastInteraction": 0,
+    "isDiscovered": true,
+    "isAvailable": true,
+    "discoveredAt": 1672531200000
   }
 }

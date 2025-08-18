@@ -14,16 +14,23 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
+  Button,
 } from '@mui/material';
-import { useAppSelector } from '../app/hooks';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAllQuests } from '../features/Quest/state/QuestSelectors';
 import { Quest, QuestStatus } from '../features/Quest/state/QuestTypes';
 import { getTimeRemaining } from '../shared/utils/time';
+import { deliverQuestItemThunk } from '../features/Quest/state/QuestThunks';
+import { selectPlayerLocation } from '../features/Player/state/PlayerSelectors';
+import { selectAllNPCs } from '../features/NPCs';
 
 type SortKey = 'title' | 'status';
 
 const QuestsPage: React.FC = () => {
+  const dispatch = useAppDispatch();
   const allQuests = useAppSelector(selectAllQuests);
+  const playerLocation = useAppSelector(selectPlayerLocation);
+  const allNpcs = useAppSelector(selectAllNPCs);
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<QuestStatus | 'ALL'>('ALL');
   const [sortKey, setSortKey] = useState<SortKey>('title');
@@ -123,15 +130,34 @@ const QuestsPage: React.FC = () => {
 
                   <Typography variant="h6" sx={{ mt: 3 }}>Objectives</Typography>
                   <ul>
-                    {selectedQuest.objectives.map((obj) => (
-                      <li key={obj.objectiveId}>
-                        <Typography
-                          sx={{ textDecoration: obj.isComplete ? 'line-through' : 'none' }}
-                        >
-                          {obj.description} ({obj.currentCount}/{obj.requiredCount})
-                        </Typography>
-                      </li>
-                    ))}
+                    {selectedQuest.objectives.map((obj) => {
+                      const canDeliver =
+                        selectedQuest.status === 'IN_PROGRESS' &&
+                        obj.type === 'DELIVER' &&
+                        obj.hasItem &&
+                        !obj.delivered &&
+                        playerLocation === allNpcs[obj.destination!]?.location;
+
+                      return (
+                        <li key={obj.objectiveId}>
+                          <Typography
+                            sx={{ textDecoration: obj.isComplete ? 'line-through' : 'none' }}
+                          >
+                            {obj.description} ({obj.currentCount}/{obj.requiredCount})
+                          </Typography>
+                          {canDeliver && (
+                            <Button
+                              variant="contained"
+                              size="small"
+                              sx={{ mt: 1 }}
+                              onClick={() => dispatch(deliverQuestItemThunk({ questId: selectedQuest.id, objectiveId: obj.objectiveId }))}
+                            >
+                              Deliver Item
+                            </Button>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
 
                   <Typography variant="h6" sx={{ mt: 3 }}>Rewards</Typography>
