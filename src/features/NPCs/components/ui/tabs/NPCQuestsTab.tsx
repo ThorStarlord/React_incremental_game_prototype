@@ -144,7 +144,6 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                   <Button
                     variant="contained"
                     onClick={() => handleAcceptQuest(quest.id)}
-                    disabled={quest.status !== 'NOT_STARTED'}
                   >
                     Accept Quest
                   </Button>
