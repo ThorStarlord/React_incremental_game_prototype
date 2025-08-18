@@ -55,7 +55,11 @@ The React Incremental RPG Prototype is an incremental/idle game featuring emotio
 - **[Settings System](Features/SettingsSystem.md)** - Game configuration and preferences ✅ **COMPLETE**
 - **[Save/Load System](Features/SaveLoadSystem.md)** - Game state persistence and import/export ✅ **COMPLETE**
 - **[Quest System](Features/QuestSystem.md)** - Objective and narrative progression 📋 **PLANNED**
-- **[Copy System](Features/CopySystem.md)** - Character duplication and management ✅ BASIC UI AND STATE MANAGEMENT
+- **[Copy System](Features/CopySystem.md)** - Character duplication and management ✅ BASIC UI/STATE + TRAIT SHARING AUTO‑SYNC
+
+## ⚠️ Project Constraints (Prototype Phase)
+
+- Automated tests are intentionally out of scope for this prototype. See Non-Functional Requirements → NFR-QA: Testing Policy (NFR-QA-001).
 
 ## ✅ Implementation Status
 
@@ -109,7 +113,7 @@ The React Incremental RPG Prototype is an incremental/idle game featuring emotio
 2. **State Design**: Define Redux slice, types, and selectors
 3. **Component Architecture**: Create container and UI components
 4. **Integration**: Connect components to state and implement interactions
-5. **Testing**: Unit and integration testing for critical functionality
+5. **Testing**: (Prototype note) Automated tests deferred; rely on manual QA checklist and runtime validation
 6. **Documentation**: Update specification with implementation status
 
 ## 🚀 Getting Started

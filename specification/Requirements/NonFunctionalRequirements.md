@@ -16,7 +16,7 @@ This document lists the non-functional requirements for the React Incremental RP
 *   **NFR-MAINT-001:** The codebase shall adhere to the principles of Feature-Sliced Design, promoting modularity and low coupling between features.
 *   **NFR-MAINT-002:** Code shall follow established coding standards and best practices outlined in the project's contribution guidelines (e.g., TypeScript usage, component design patterns, Redux Toolkit conventions).
 *   **NFR-MAINT-003:** Code shall be well-documented, particularly for complex logic, public APIs of features (via `index.ts`), and type definitions. JSDoc comments should be used where appropriate.
-*   **NFR-MAINT-004:** Automated tests (unit, integration) shall be implemented for critical game logic, state management (reducers, selectors), and utility functions to ensure stability and facilitate refactoring.
+*   **NFR-MAINT-004:** Deferred this prototype phase per NFR-QA-001 — automated tests (unit/integration/e2e) are out of scope; verification is via manual exploratory testing and smoke checks.
 *   **NFR-MAINT-005:** Dependencies shall be kept up-to-date where feasible, and unused dependencies should be removed.
 
 ## NFR-SCAL: Scalability
@@ -50,3 +50,6 @@ This document lists the non-functional requirements for the React Incremental RP
 *   **NFR-ACC-002:** Ensure interactive elements are keyboard navigable.
 *   **NFR-ACC-003:** Maintain sufficient color contrast, especially when customizing the theme.
 *   **NFR-ACC-004:** Add ARIA attributes where necessary for custom interactive components that lack clear semantics.
+## NFR-QA: Testing Policy
+
+*   **NFR-QA-001:** Automated tests (unit/integration/e2e) are out of scope for this prototype phase. Verification will be done via manual exploratory testing and smoke checks.

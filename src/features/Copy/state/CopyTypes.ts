@@ -10,6 +10,15 @@ import { PlayerStats } from '../../Player/state/PlayerTypes';
  */
 export type CopyGrowthType = 'normal' | 'accelerated';
 
+/** A single shareable trait slot on a Copy. */
+export interface CopyTraitSlot {
+  id: string;
+  slotIndex: number;
+  traitId: string | null;      // Trait shared from the player
+  isLocked: boolean;
+  unlockRequirement?: { type: 'maturity' | 'loyalty'; value: number };
+}
+
 /**
  * Represents a single Copy entity.
  */
@@ -28,6 +37,9 @@ export interface Copy {
   
   // Traits the Copy inherited at creation
   inheritedTraits: string[];
+
+  /** Player-shared traits applied to this Copy via slots. */
+  traitSlots?: CopyTraitSlot[];
   
   // The current task the copy is assigned to (optional)
   currentTask?: string;

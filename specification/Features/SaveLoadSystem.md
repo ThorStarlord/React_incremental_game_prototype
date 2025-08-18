@@ -30,6 +30,12 @@ This document details the mechanics for saving and loading game progress, includ
 ## 4. Settings Persistence ✅ NEWLY IMPLEMENTED
 
 *   **Separate Storage:** Settings stored independently from game saves in localStorage
+
+## 5. Migration Notes (Copy Trait Slots)
+
+*   Copy–Trait sharing introduced a `traitSlots` structure on Copies. Older saves may lack this field.
+*   The Copy feature includes a defensive initializer (`ensureCopyTraitSlots`) and a post-load hook (after `meta/replaceState`) that automatically initializes missing slots based on `COPY_SYSTEM` thresholds.
+*   No save format bump required; initialization is idempotent and safe to run on every load/import.
 *   **Immediate Updates:** Settings changes take effect and persist immediately
 *   **Category Organization:** Audio, Graphics, Gameplay, and UI settings managed separately
 *   **Default Recovery:** Settings reset functionality with confirmation dialogs
