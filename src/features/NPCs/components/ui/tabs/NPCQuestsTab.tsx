@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import type { NPC } from '../../../state/NPCTypes';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
-import { selectNpcById } from '../../../state/NPCSelectors';
+import { selectNPCById } from '../../../state/NPCSelectors';
 import { selectQuestById } from '../../../../Quest/state/QuestSelectors';
 import { startQuestThunk, turnInQuestThunk } from '../../../../Quest/state/QuestThunks';
 import { Quest, QuestObjective, QuestStatus } from '../../../../Quest/state/QuestTypes';
@@ -47,10 +47,11 @@ const formatObjectiveText = (objective: QuestObjective) => {
 
 const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const dispatch = useAppDispatch();
-  const npc = useAppSelector((state) => selectNpcById(state, npcId));
-  const availableQuests = npc?.availableQuests.map(questId =>
-    useAppSelector(state => selectQuestById(state, questId))
-  ).filter((quest): quest is Quest => quest !== undefined) || [];
+  const npc = useAppSelector((state) => selectNPCById(state, npcId));
+  const availableQuests: Quest[] =
+    npc?.availableQuests
+      .map((questId: string) => useAppSelector((state) => selectQuestById(state, questId)))
+      .filter((quest: Quest | undefined): quest is Quest => quest !== undefined) || [];
 
   const handleAcceptQuest = (questId: string) => {
     dispatch(startQuestThunk(questId));
@@ -62,15 +63,22 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
 
   const getStatusColor = (status: QuestStatus) => {
     switch (status) {
-      case 'COMPLETE': return 'success';
-      case 'IN_PROGRESS': return 'primary';
-      case 'NOT_STARTED': return 'secondary';
-      default: return 'default';
+      case 'READY_TO_COMPLETE':
+      case 'COMPLETED':
+        return 'success';
+      case 'IN_PROGRESS':
+        return 'primary';
+      case 'NOT_STARTED':
+        return 'secondary';
+      default:
+        return 'default';
     }
   };
 
   const formatQuestStatusLabel = (status: QuestStatus): string => {
     switch (status) {
+      case 'READY_TO_COMPLETE':
+        return 'Ready to Turn In';
       case 'COMPLETED':
         return 'Completed';
       case 'IN_PROGRESS':
@@ -98,7 +106,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
       </Box>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {availableQuests.map((quest) => (
+  {availableQuests.map((quest: Quest) => (
           <Accordion key={quest.id} sx={{ '&:before': { display: 'none' }, border: '1px solid', borderColor: 'divider' }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -121,8 +129,8 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                   Objectives:
                 </Typography>
                 <List dense>
-                  {quest.objectives.map((objective, index) => (
-                    <ListItem key={index} sx={{ pl: 0 }}>
+                  {quest.objectives.map((objective: QuestObjective) => (
+                    <ListItem key={objective.objectiveId} sx={{ pl: 0 }}>
                       <ListItemIcon sx={{ minWidth: 32 }}>
                         {objective.isComplete ? (
                           <CompleteIcon color="success" fontSize="small" />
@@ -156,7 +164,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                   Rewards:
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {quest.rewards.map((reward, index) => (
+                  {quest.rewards.map((reward: any, index: number) => (
                     <Chip 
                       key={index}
                       label={`${reward.value} ${reward.type}`}
@@ -178,7 +186,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                   </Button>
                 )}
 
-                {quest.status === 'IN_PROGRESS' && quest.objectives.every(o => o.isComplete) && (
+                {quest.status === 'READY_TO_COMPLETE' && (
                   <Button
                     variant="contained"
                     color="primary"

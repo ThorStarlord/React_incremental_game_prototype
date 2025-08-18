@@ -4,8 +4,9 @@ import { addQuest, completeQuest, startQuest } from './QuestSlice';
 import { Quest } from './QuestTypes';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold } from '../../Player/state/PlayerSlice';
-import { addAvailableQuestToNPC, updateNPCRelationshipThunk } from '../../NPCs/state/NPCSlice';
-import { addNotification } from '../../Notification/state/NotificationSlice';
+import { addAvailableQuestToNPC } from '../../NPCs/state/NPCSlice';
+import { updateNPCRelationshipThunk } from '../../NPCs/state/NPCThunks';
+import { addNotification } from '../../../shared/state/NotificationSlice';
 import { addItem } from '../../Inventory/state/InventorySlice';
 
 export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
@@ -39,33 +40,43 @@ export const turnInQuestThunk = createAsyncThunk(
     const state = getState() as RootState;
     const quest = state.quest.quests[questId];
 
-    if (quest && quest.status === 'COMPLETE') {
+    if (quest && quest.status === 'READY_TO_COMPLETE') {
       const rewards = quest.rewards;
       const rewardSummaries: string[] = [];
 
       for (const reward of rewards) {
         switch (reward.type) {
           case 'ESSENCE':
-            dispatch(gainEssence(reward.value));
-            rewardSummaries.push(`${reward.value} Essence`);
+            {
+              const amount = Number(reward.value) || 0;
+              dispatch(gainEssence({ amount, source: 'quest_reward', description: quest.id }));
+              rewardSummaries.push(`${amount} Essence`);
+            }
             break;
           case 'GOLD':
-            dispatch(gainGold(reward.value));
-            rewardSummaries.push(`${reward.value} Gold`);
+            {
+              const amount = Number(reward.value) || 0;
+              dispatch(gainGold(amount));
+              rewardSummaries.push(`${amount} Gold`);
+            }
             break;
           case 'REPUTATION':
             dispatch(
               updateNPCRelationshipThunk({
                 npcId: quest.giver,
-                change: reward.value,
+                change: Number(reward.value) || 0,
                 reason: 'Quest Reward',
               })
             );
             rewardSummaries.push(`+${reward.value} Reputation with ${quest.giver}`);
             break;
           case 'ITEM':
-            dispatch(addItem({ itemId: reward.value, quantity: reward.amount || 1 }));
-            rewardSummaries.push(`${reward.amount || 1}x ${reward.value}`);
+            {
+              const itemId = String(reward.value);
+              const qty = reward.amount || 1;
+              dispatch(addItem({ itemId, quantity: qty }));
+              rewardSummaries.push(`${qty}x ${itemId}`);
+            }
             break;
           default:
             break;
@@ -79,10 +90,13 @@ export const turnInQuestThunk = createAsyncThunk(
 
       dispatch(completeQuest(questId));
 
-      // Quest Chaining Logic
+      // Quest Chaining Logic: unlock quests that require this quest to be completed
       const allQuests = Object.values(state.quest.quests);
       for (const nextQuest of allQuests) {
-        if (nextQuest.prerequisites?.quests?.includes(questId)) {
+        const requiresThisQuest = (nextQuest.prerequisites || []).some(
+          (req) => req.type === 'QUEST_COMPLETED' && String(req.value) === questId
+        );
+        if (requiresThisQuest) {
           dispatch(addAvailableQuestToNPC({ npcId: nextQuest.giver, questId: nextQuest.id }));
         }
       }
