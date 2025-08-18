@@ -41,10 +41,10 @@ const questSlice = createSlice({
       const { questId, objectiveId, progress } = action.payload;
       const quest = state.quests[questId];
       if (quest) {
-        const objective = quest.objectives.find((o) => o.objectiveId === objectiveId);
+        const objective = quest.objectives.find((o) => o.id === objectiveId);
         if (objective) {
-          objective.currentCount = progress;
-          if (objective.currentCount >= objective.requiredCount) {
+          objective.progress = progress;
+          if (objective.progress >= objective.targetValue) {
             objective.isComplete = true;
           }
         }

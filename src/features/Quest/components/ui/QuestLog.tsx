@@ -27,6 +27,13 @@ const QuestLog: React.FC<QuestLogProps> = ({ quests }) => {
                 >
                   {quest.description}
                 </Typography>
+                <ul>
+                  {quest.objectives.map((objective) => (
+                    <li key={objective.id}>
+                      {objective.description} {objective.type === 'GATHER' && `(${objective.progress}/${objective.targetValue})`}
+                    </li>
+                  ))}
+                </ul>
               </React.Fragment>
             }
           />

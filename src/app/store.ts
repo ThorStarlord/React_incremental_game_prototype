@@ -12,7 +12,9 @@ import npcsReducer from '../features/NPCs/state/NPCSlice';
 import copyReducer from '../features/Copy/state/CopySlice'; // Corrected import path
 import questReducer from '../features/Quest/state/QuestSlice';
 import notificationsReducer from '../shared/state/NotificationSlice';
+import { inventoryReducer } from '../features/Inventory/state/InventorySlice';
 import { copyListeners } from '../features/Copy/state/CopyListeners';
+import { inventoryListeners } from '../features/Inventory/state/InventoryListeners';
 
 // Combine all feature reducers
 const combinedReducer = combineReducers({
@@ -26,6 +28,7 @@ const combinedReducer = combineReducers({
   copy: copyReducer, // Corrected reducer name
   quest: questReducer,
   notifications: notificationsReducer,
+  inventory: inventoryReducer,
 });
 
 // Root state type from combined reducers
@@ -59,7 +62,7 @@ export const store = configureStore({
         ignoredActions: ['meta/replaceState'],
         ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
       },
-  }).prepend(copyListeners.middleware),
+  }).prepend(copyListeners.middleware, inventoryListeners.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
 

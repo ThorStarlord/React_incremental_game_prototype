@@ -35,7 +35,7 @@ export const turnInQuestThunk = createAsyncThunk(
     const state = getState() as RootState;
     const quest = state.quest.quests[questId];
 
-    if (quest && quest.status === 'READY_TO_COMPLETE') {
+    if (quest && quest.status === 'IN_PROGRESS' && quest.objectives.every(o => o.isComplete)) {
       // In the future, this would grant rewards, update game state, etc.
       dispatch(completeQuest(questId));
       return { questId, rewards: quest.rewards };
