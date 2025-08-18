@@ -61,6 +61,7 @@ export const turnInQuestThunk = createAsyncThunk(
                 reason: 'Quest Reward',
               })
             );
+            rewardSummaries.push(`+${reward.value} Reputation with ${quest.giver}`);
             break;
           default:
             break;
