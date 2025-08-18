@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { RootState } from '../../../../app/store';
-import { selectCopyById, selectCopyEffectiveTraitsWithSource, selectCopyEligibleShareTraitIds, selectCopySharePreferences, selectCopyShareEligibilityContext, selectCopyUnlockedEmptySlotCount } from '../../state/CopySelectors';
+import { selectCopyById, selectCopyEffectiveTraitsWithSource, selectCopyEligibleShareTraitIds, selectCopySharePreferences, selectCopyShareEligibilityContext, selectCopyUnlockedEmptySlotCount, selectCopyHasRunningTask } from '../../state/CopySelectors';
 import { assignCopyRoleThunk, startCopyTimedTaskThunk, setCopySharePreferenceThunk, applySharePreferencesForCopyThunk } from '../../state/CopyThunks';
 import { selectTraits } from '../../../Traits/state/TraitsSelectors';
 import type { CopyRole } from '../../state/CopyTypes';
@@ -52,6 +52,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const emptySlotCount = useAppSelector((s: RootState) => selectCopyUnlockedEmptySlotCount(s, copyId));
   const allTraits = useAppSelector(selectTraits);
   const [taskSeconds, setTaskSeconds] = useState<number>(60);
+  const hasRunningTask = useAppSelector((s: RootState) => selectCopyHasRunningTask(s, copyId));
 
   const title = useMemo(() => (copy ? `${copy.name}` : 'Copy Details'), [copy]);
 
@@ -136,7 +137,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                     <Button key={s} size="small" variant={taskSeconds === s ? 'contained' : 'outlined'} onClick={() => setTaskSeconds(s)}>{s}s</Button>
                   ))}
                 </Stack>
-                <Button size="small" variant="contained" onClick={startTask} disabled={!!active && active.status === 'running'}>Start</Button>
+                <Button size="small" variant="contained" onClick={startTask} disabled={hasRunningTask}>Start</Button>
               </Stack>
             </Stack>
 

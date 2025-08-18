@@ -73,4 +73,9 @@ export const COPY_SYSTEM = {
   ] as Array<{ depth: number; cap: number }>,
   /** Minimum connection depth required to attempt seduction/create a Copy. */
   SEDUCTION_CONNECTION_REQUIREMENT: 5,
+  /** Rewards for completing a timed Copy task (baseline; subject to future role modifiers). */
+  TASK_REWARDS: {
+    GOLD: 10,
+    ESSENCE: 5,
+  },
 };

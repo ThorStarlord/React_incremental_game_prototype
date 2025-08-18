@@ -215,3 +215,19 @@ export const makeSelectCopyIsActive = () => createSelector(
     return copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && copy.loyalty >= COPY_SYSTEM.LOYALTY_THRESHOLD;
   }
 );
+
+/** Whether the given Copy currently has a running task. */
+export const selectCopyHasRunningTask = createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+  ],
+  (copy) => !!copy && copy.activeTask?.status === 'running'
+);
+
+/** Whether the given Copy can start a new task right now (i.e., no running task). */
+export const selectCopyCanStartTask = createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+  ],
+  (copy) => !!copy && (!copy.activeTask || copy.activeTask.status !== 'running')
+);
