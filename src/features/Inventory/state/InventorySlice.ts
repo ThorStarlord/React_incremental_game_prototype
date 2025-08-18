@@ -18,7 +18,10 @@ const inventorySlice = createSlice({
       if (state.items[itemId]) {
         state.items[itemId] -= quantity;
         if (state.items[itemId] <= 0) {
+        if (quantity >= state.items[itemId]) {
           delete state.items[itemId];
+        } else {
+          state.items[itemId] -= quantity;
         }
       }
     },
