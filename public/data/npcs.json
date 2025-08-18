@@ -52,7 +52,7 @@
     "loyalty": 10,
     "availableDialogues": ["scholar_elara_intro", "scholar_elara_research_task", "scholar_elara_trait_teach"],
     "completedDialogues": [],
-    "availableQuests": ["quest_elara_lost_tome"],
+    "availableQuests": ["quest_elara_lost_tome", "quest_elara_chain_1"],
     "completedQuests": [],
     "traits": {},
     "availableTraits": ["ScholarlyInsight", "QuickLearner", "MentorsInsight"],

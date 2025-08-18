@@ -27,11 +27,23 @@ import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import { selectNpcById } from '../../../state/NPCSelectors';
 import { selectQuestById } from '../../../../Quest/state/QuestSelectors';
 import { startQuestThunk, turnInQuestThunk } from '../../../../Quest/state/QuestThunks';
-import { Quest, QuestStatus } from '../../../../Quest/state/QuestTypes';
+import { Quest, QuestObjective, QuestStatus } from '../../../../Quest/state/QuestTypes';
 
 interface NPCQuestsTabProps {
   npcId: string;
 }
+
+const formatObjectiveText = (objective: QuestObjective) => {
+  switch (objective.type) {
+    case 'GATHER':
+    case 'KILL':
+      return `${objective.description} (${objective.currentCount}/${objective.requiredCount})`;
+    case 'REACH_LOCATION':
+      return objective.description;
+    default:
+      return objective.description;
+  }
+};
 
 const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const dispatch = useAppDispatch();
@@ -50,7 +62,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
 
   const getStatusColor = (status: QuestStatus) => {
     switch (status) {
-      case 'COMPLETED': return 'success';
+      case 'COMPLETE': return 'success';
       case 'IN_PROGRESS': return 'primary';
       case 'NOT_STARTED': return 'secondary';
       default: return 'default';
@@ -127,7 +139,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                               color: objective.isComplete ? 'text.secondary' : 'text.primary'
                             }}
                           >
-                            {objective.description} ({objective.progress}/{objective.targetValue})
+                            {formatObjectiveText(objective)}
                           </Typography>
                         }
                       />

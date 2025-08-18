@@ -14,7 +14,7 @@ import questReducer from '../features/Quest/state/QuestSlice';
 import notificationsReducer from '../shared/state/NotificationSlice';
 import { inventoryReducer } from '../features/Inventory/state/InventorySlice';
 import { copyListeners } from '../features/Copy/state/CopyListeners';
-import { inventoryListeners } from '../features/Inventory/state/InventoryListeners';
+import { gameEventListeners } from './listeners/GameEventListeners';
 
 // Combine all feature reducers
 const combinedReducer = combineReducers({
@@ -62,7 +62,7 @@ export const store = configureStore({
         ignoredActions: ['meta/replaceState'],
         ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
       },
-  }).prepend(copyListeners.middleware, inventoryListeners.middleware),
+  }).prepend(copyListeners.middleware, gameEventListeners.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
 

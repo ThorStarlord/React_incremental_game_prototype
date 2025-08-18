@@ -4,8 +4,9 @@ import { addQuest, completeQuest, startQuest } from './QuestSlice';
 import { Quest } from './QuestTypes';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold } from '../../Player/state/PlayerSlice';
-import { updateNPCRelationshipThunk } from '../../NPC/state/NPCSlice';
+import { addAvailableQuestToNPC, updateNPCRelationshipThunk } from '../../NPCs/state/NPCSlice';
 import { addNotification } from '../../Notification/state/NotificationSlice';
+import { addItem } from '../../Inventory/state/InventorySlice';
 
 export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
   try {
@@ -32,7 +33,6 @@ export const startQuestThunk = createAsyncThunk(
   }
 );
 
-// Placeholder thunk for turning in a completed quest
 export const turnInQuestThunk = createAsyncThunk(
   'quest/turnInQuest',
   async (questId: string, { dispatch, getState }) => {
@@ -63,6 +63,10 @@ export const turnInQuestThunk = createAsyncThunk(
             );
             rewardSummaries.push(`+${reward.value} Reputation with ${quest.giver}`);
             break;
+          case 'ITEM':
+            dispatch(addItem({ itemId: reward.value, quantity: reward.amount || 1 }));
+            rewardSummaries.push(`${reward.amount || 1}x ${reward.value}`);
+            break;
           default:
             break;
         }
@@ -74,10 +78,18 @@ export const turnInQuestThunk = createAsyncThunk(
       }
 
       dispatch(completeQuest(questId));
+
+      // Quest Chaining Logic
+      const allQuests = Object.values(state.quest.quests);
+      for (const nextQuest of allQuests) {
+        if (nextQuest.prerequisites?.quests?.includes(questId)) {
+          dispatch(addAvailableQuestToNPC({ npcId: nextQuest.giver, questId: nextQuest.id }));
+        }
+      }
+
       return { questId, rewards: quest.rewards };
     }
 
-    // Handle cases where the quest isn't ready to be turned in
     return Promise.reject(new Error('Quest not ready to be turned in.'));
   }
 );

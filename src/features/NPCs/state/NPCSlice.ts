@@ -113,7 +113,14 @@ const npcSlice = createSlice({
           slot.isUnlocked = true;
         });
       }
-    }
+    },
+    addAvailableQuestToNPC: (state, action: PayloadAction<{ npcId: string; questId: string }>) => {
+      const { npcId, questId } = action.payload;
+      const npc = state.npcs[npcId];
+      if (npc && !npc.availableQuests.includes(questId)) {
+        npc.availableQuests.push(questId);
+      }
+    },
   },
   extraReducers: (builder) => {
     // RESTORED: This block handles the async lifecycle of initializeNPCsThunk.
@@ -152,6 +159,7 @@ export const {
   updateNpcConnectionDepth,
   debugUnlockAllSharedSlots,
   setSelectedNPCId,
+  addAvailableQuestToNPC,
 } = npcSlice.actions;
 
 export const npcActions = npcSlice.actions;
