@@ -64,7 +64,7 @@ export const CopiesPage: React.FC = React.memo(() => {
   return [...list].sort((a, b) => {
       switch (sortBy) {
         case 'name':
-      return dir * a.name.localeCompare(b.name);
+          return cmp(a.name.localeCompare(b.name), 0);
         case 'maturity':
       return dir * (a.maturity - b.maturity);
         case 'loyalty':
