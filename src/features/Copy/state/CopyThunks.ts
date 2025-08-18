@@ -8,7 +8,8 @@ import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
-import { addCopy, updateCopy } from './CopySlice';
+import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated } from './CopySlice';
+import { applyGrowth, applyLoyaltyDecay } from '../utils/copyUtils';
 import type { Copy, CopyGrowthType } from './CopyTypes';
 
 // Default starting stats for a new Copy
@@ -42,14 +43,18 @@ export const processCopyGrowthThunk = createAsyncThunk(
   async (deltaTime: number, { getState, dispatch }) => {
     const state = getState() as RootState;
     const copies = state.copy.copies;
-    // Calculate growth per tick based on the growth rate and elapsed time in seconds.
-    const growthThisTick = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
-
+    const baseGrowth = COPY_SYSTEM.GROWTH_RATE_PER_SECOND * (deltaTime / 1000);
+    const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
     for (const copy of Object.values(copies)) {
-      if (copy.maturity < 100) {
-        const newMaturity = Math.min(100, copy.maturity + growthThisTick);
-        dispatch(updateCopy({ copyId: copy.id, updates: { maturity: newMaturity } }));
+      if (copy.maturity < COPY_SYSTEM.MATURITY_MAX) {
+  const newMaturity = applyGrowth(copy.maturity, baseGrowth, copy.growthType === 'accelerated');
+        if (newMaturity !== copy.maturity) {
+          batched.push({ copyId: copy.id, updates: { maturity: newMaturity } });
+        }
       }
+    }
+    if (batched.length) {
+      dispatch(updateMultipleCopies(batched));
     }
   }
 );
@@ -65,14 +70,18 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
   async (deltaTime: number, { getState, dispatch }) => {
     const state = getState() as RootState;
     const copies = state.copy.copies;
-    // Calculate decay rate based on COPY_SYSTEM.DECAY_RATE_PER_SECOND and deltaTime (in seconds).
     const decayThisTick = COPY_SYSTEM.DECAY_RATE_PER_SECOND * (deltaTime / 1000);
-
+    const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
     for (const copy of Object.values(copies)) {
-      if (copy.loyalty > 0) {
-        const newLoyalty = Math.max(0, copy.loyalty - decayThisTick);
-        dispatch(updateCopy({ copyId: copy.id, updates: { loyalty: newLoyalty } }));
+      if (copy.loyalty > COPY_SYSTEM.LOYALTY_MIN) {
+  const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
+        if (newLoyalty !== copy.loyalty) {
+          batched.push({ copyId: copy.id, updates: { loyalty: newLoyalty } });
+        }
       }
+    }
+    if (batched.length) {
+      dispatch(updateMultipleCopies(batched));
     }
   }
 );
@@ -150,8 +159,6 @@ export const createCopyThunk = createAsyncThunk(
     const successChance = (5 + (charismaModifier * 10)) / 100; // Base 5% + 10% per modifier point
 
     if (Math.random() > successChance) {
-      // TODO: Dispatch a failure notification
-      console.log(`Seduction failed. Chance was ${successChance * 100}%.`);
       return rejectWithValue('Seduction attempt failed.');
     }
 
@@ -172,11 +179,8 @@ export const createCopyThunk = createAsyncThunk(
       location: npc.location, // Starts at the parent's location
     };
 
-    // --- Dispatch the action to add the new copy ---
-    dispatch(addCopy(newCopy));
-    
-    // TODO: Dispatch a success notification
-    console.log(`Seduction successful! Created: ${newCopy.name}`);
+    // --- Dispatch the action & notify ---
+  dispatch(addCopy(newCopy));
 
     return newCopy;
   }
@@ -194,13 +198,11 @@ export const promoteCopyToAcceleratedThunk = createAsyncThunk(
     if (!copy) return rejectWithValue('Copy not found.');
     if (copy.growthType === 'accelerated') return rejectWithValue('Already accelerated.');
     const essence = state.essence.currentEssence;
-  // Reuse ACCELERATED_GROWTH_COST for promotion cost
-  if (essence < COPY_SYSTEM.ACCELERATED_GROWTH_COST) {
+    if (essence < COPY_SYSTEM.PROMOTE_ACCELERATED_COST) {
       return rejectWithValue('Not enough essence.');
     }
-  dispatch(spendEssence({ amount: COPY_SYSTEM.ACCELERATED_GROWTH_COST, source: 'promote_copy' }));
-  // Update the copy directly since there's no promote action in the slice
-  dispatch(updateCopy({ copyId, updates: { growthType: 'accelerated' as CopyGrowthType } }));
+    dispatch(spendEssence({ amount: COPY_SYSTEM.PROMOTE_ACCELERATED_COST, source: 'promote_copy' }));
+    dispatch(promoteCopyToAccelerated({ copyId }));
     return { success: true };
   }
 );

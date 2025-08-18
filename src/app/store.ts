@@ -10,6 +10,7 @@ import settingsReducer from '../features/Settings/state/SettingsSlice';
 import metaReducer from '../features/Meta/state/MetaSlice';
 import npcsReducer from '../features/NPCs/state/NPCSlice';
 import copyReducer from '../features/Copy/state/CopySlice'; // Corrected import path
+import notificationsReducer from '../shared/state/NotificationSlice';
 
 // Combine all feature reducers
 const combinedReducer = combineReducers({
@@ -21,6 +22,7 @@ const combinedReducer = combineReducers({
   meta: metaReducer,
   npcs: npcsReducer,
   copy: copyReducer, // Corrected reducer name
+  notifications: notificationsReducer,
 });
 
 // Root state type from combined reducers

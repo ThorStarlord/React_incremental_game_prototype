@@ -5,6 +5,8 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CopiesState, Copy } from './CopyTypes';
+import { COPY_SYSTEM } from '../../../constants/gameConstants';
+import { clamp } from '../utils/copyUtils';
 
 const initialState: CopiesState = {
   copies: {
@@ -66,8 +68,51 @@ const copiesSlice = createSlice({
     // Action to update a copy's properties
     updateCopy: (state, action: PayloadAction<{ copyId: string; updates: Partial<Copy> }>) => {
       const { copyId, updates } = action.payload;
-      if (state.copies[copyId]) {
-        Object.assign(state.copies[copyId], updates);
+      const existing = state.copies[copyId];
+      if (existing) {
+        Object.assign(existing, updates);
+        // Clamp maturity & loyalty if provided
+        if (updates.maturity !== undefined) {
+          existing.maturity = clamp(updates.maturity, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX);
+        }
+        if (updates.loyalty !== undefined) {
+          existing.loyalty = clamp(updates.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
+        }
+      }
+    },
+
+    // Batch update multiple copies at once for performance (used in growth/decay loops)
+    updateMultipleCopies: (state, action: PayloadAction<Array<{ copyId: string; updates: Partial<Copy> }>>) => {
+      for (const { copyId, updates } of action.payload) {
+        const existing = state.copies[copyId];
+        if (!existing) continue;
+        Object.assign(existing, updates);
+        if (updates.maturity !== undefined) {
+          existing.maturity = clamp(existing.maturity, COPY_SYSTEM.MATURITY_MIN, COPY_SYSTEM.MATURITY_MAX);
+        }
+        if (updates.loyalty !== undefined) {
+          existing.loyalty = clamp(updates.loyalty, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
+        }
+      }
+    },
+
+    // Promote a copy to accelerated growth type
+    promoteCopyToAccelerated: (state, action: PayloadAction<{ copyId: string }>) => {
+      const existing = state.copies[action.payload.copyId];
+      if (existing) {
+        existing.growthType = 'accelerated';
+      }
+    },
+
+    // Assign or clear a task
+    setCopyTask: (state, action: PayloadAction<{ copyId: string; task: string | null }>) => {
+      const existing = state.copies[action.payload.copyId];
+      if (existing) {
+        if (action.payload.task) {
+          existing.currentTask = action.payload.task;
+        } else {
+          delete existing.currentTask;
+        }
       }
     },
     
@@ -85,6 +130,9 @@ export const {
     addCopy, 
     removeCopy, 
     updateCopy,
+  updateMultipleCopies,
+  promoteCopyToAccelerated,
+  setCopyTask,
     setCopiesLoading,
     setCopiesError
 } = copiesSlice.actions;
