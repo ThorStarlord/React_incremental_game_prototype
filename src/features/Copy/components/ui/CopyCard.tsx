@@ -9,6 +9,7 @@ import type { Copy } from '../../state/CopyTypes';
 import { useAppDispatch } from '../../../../app/hooks';
 import { bolsterCopyLoyaltyThunk, promoteCopyToAcceleratedThunk } from '../../state/CopyThunks';
 import { setCopyTask } from '../../state/CopySlice';
+import CopyDetailPanel from './CopyDetailPanel';
 
 interface CopyCardProps {
   copy: Copy;
@@ -19,6 +20,7 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
   const [taskEditOpen, setTaskEditOpen] = useState(false);
   const [taskValue, setTaskValue] = useState(copy.currentTask || '');
   const [busy, setBusy] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const handleBolster = useCallback(async () => {
     setBusy(true);
@@ -98,7 +100,9 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
           </span>
         </Tooltip>
         <Button size="small" variant="text" onClick={() => setTaskEditOpen(o => !o)}>{taskEditOpen ? 'Hide Task' : (copy.currentTask ? 'Edit Task' : 'Assign Task')}</Button>
+        <Button size="small" variant="text" onClick={() => setDetailsOpen(true)}>Details</Button>
       </CardActions>
+      <CopyDetailPanel copyId={copy.id} open={detailsOpen} onClose={() => setDetailsOpen(false)} />
     </Card>
   );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Container,
@@ -12,11 +12,15 @@ import {
   Chip,
   LinearProgress,
   Button,
+  Tabs,
+  Tab,
+  Grid,
 } from '@mui/material';
 import { ContentCopy as CopiesIcon, Favorite as LoyaltyIcon } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { selectAllCopies } from '../features/Copy/state/CopySelectors';
+import { selectAllCopies, selectCopySegments } from '../features/Copy/state/CopySelectors';
 import { bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
+import CopyCard from '../features/Copy/components/ui/CopyCard';
 import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
 import { COPY_SYSTEM } from '../constants/gameConstants';
 
@@ -36,7 +40,9 @@ const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label,
 export const CopiesPage: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
   const copies = useAppSelector(selectAllCopies);
+  const segments = useAppSelector(selectCopySegments);
   const currentEssence = useAppSelector(selectCurrentEssence);
+  const [tab, setTab] = useState(0);
 
   const handleBolsterLoyalty = (copyId: string) => {
     dispatch(bolsterCopyLoyaltyThunk(copyId));
@@ -69,39 +75,18 @@ export const CopiesPage: React.FC = React.memo(() => {
         </Alert>
       ) : (
         <Paper sx={{ p: 2 }}>
-          <List disablePadding>
-            {copies.map((copy, index) => (
-              <React.Fragment key={copy.id}>
-                <ListItem sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'stretch', gap: 2, py: 2 }}>
-                  <Box sx={{ flex: 1, width: '100%' }}>
-                    <Typography variant="h6" component="div">{copy.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">ID: {copy.id}</Typography>
-                    {copy.currentTask && <Chip label={`Task: ${copy.currentTask}`} size="small" sx={{ mt: 1 }}/>}
-                  </Box>
-                  <Box sx={{ flex: 2, width: '100%' }}>
-                    <CopyStat label="Maturity" value={`${copy.maturity.toFixed(2)}%`} />
-                    <LinearProgress variant="determinate" value={copy.maturity} sx={{ mb: 1 }} />
-                    <CopyStat label="Loyalty" value={`${copy.loyalty.toFixed(2)}%`} />
-                    <LinearProgress variant="determinate" value={copy.loyalty} color="secondary" sx={{ mb: 2 }} />
-                    <CopyStat label="Location" value={copy.location} />
-                    <CopyStat label="Parent NPC" value={copy.parentNPCId} />
-                  </Box>
-                  <Box sx={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      startIcon={<LoyaltyIcon />}
-                      onClick={() => handleBolsterLoyalty(copy.id)}
-                      disabled={copy.loyalty >= 100 || currentEssence < COPY_SYSTEM.BOLSTER_LOYALTY_COST}
-                    >
-                      Bolster Loyalty ({COPY_SYSTEM.BOLSTER_LOYALTY_COST} E)
-                    </Button>
-                  </Box>
-                </ListItem>
-                {index < copies.length - 1 && <Divider />}
-              </React.Fragment>
+          <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
+            <Tab label={`Mature (${segments.mature.length})`} />
+            <Tab label={`Growing (${segments.growing.length})`} />
+            <Tab label={`Low Loyalty (${segments.lowLoyalty.length})`} />
+          </Tabs>
+          <Grid container spacing={2}>
+            {(tab === 0 ? segments.mature : tab === 1 ? segments.growing : segments.lowLoyalty).map((copy) => (
+              <Grid item xs={12} md={6} lg={4} key={copy.id}>
+                <CopyCard copy={copy} />
+              </Grid>
             ))}
-          </List>
+          </Grid>
         </Paper>
       )}
 
