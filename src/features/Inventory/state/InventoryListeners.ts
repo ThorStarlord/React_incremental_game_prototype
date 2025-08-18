@@ -31,6 +31,33 @@ inventoryListeners.startListening({
           }
         });
       }
+    // Build an index of objectives by itemId for active quests
+    const objectivesByItem: Record<string, Array<{ questId: string, objective: QuestObjective }>> = {};
+    for (const questId of activeQuestIds) {
+      const quest: Quest | undefined = state.quest.quests[questId];
+      if (quest) {
+        quest.objectives.forEach((objective: QuestObjective) => {
+          if (objective.type === 'GATHER') {
+            if (!objectivesByItem[objective.target]) {
+              objectivesByItem[objective.target] = [];
+            }
+            objectivesByItem[objective.target].push({ questId, objective });
+          }
+        });
+      }
+    }
+
+    // Only process objectives that care about this itemId
+    const relevantObjectives = objectivesByItem[itemId] || [];
+    const currentQuantity = state.inventory.items[itemId] || 0;
+    for (const { questId, objective } of relevantObjectives) {
+      listenerApi.dispatch(
+        updateObjectiveProgress({
+          questId,
+          objectiveId: objective.id,
+          progress: currentQuantity,
+        })
+      );
     }
   },
 });
