@@ -22,6 +22,8 @@ export interface QuestObjective {
   description: string;
   type: ObjectiveType;
   target: string; // e.g., 'item_id', 'npc_id', 'location_id'
+  /** Optional destination for objectives like ESCORT where target is the NPC and destination is a location */
+  destination?: string;
   requiredCount: number;
   currentCount: number;
   isHidden: boolean;
@@ -41,6 +43,8 @@ export interface Quest {
   isAutoComplete: boolean;
   timeLimitSeconds?: number;
   startedAt?: number;
+  /** Accumulated elapsed time (in seconds) for timed quests; used instead of wall-clock deltas. */
+  elapsedSeconds?: number;
 }
 
 export interface QuestState {

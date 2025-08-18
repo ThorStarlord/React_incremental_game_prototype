@@ -14,7 +14,7 @@ gameEventListeners.startListening({
   matcher: isAnyOf(addItem),
   effect: async (action, listenerApi) => {
     const state = listenerApi.getState() as RootState;
-    const { itemId } = action.payload;
+  const { itemId } = action.payload as { itemId: string; quantity: number };
     const activeQuests = state.quest.activeQuestIds.map(id => state.quest.quests[id]);
 
     for (const quest of activeQuests) {
@@ -64,8 +64,8 @@ gameEventListeners.startListening({
           listenerApi.dispatch(updateNpcLocation({ npcId, location: newLocation }));
 
           // Check if the destination is reached
-          const destination = objective.description.split(' to ')[1]; // brittle, but works for now
-          if (newLocation === destination) {
+          const destination = objective.destination ?? objective.description.split(' to ')[1]; // prefer explicit field, fallback to legacy parse
+          if (destination && newLocation === destination) {
             listenerApi.dispatch(
               updateObjectiveProgress({
                 questId: quest.id,

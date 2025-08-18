@@ -18,6 +18,7 @@ import {
 import { useAppSelector } from '../app/hooks';
 import { selectAllQuests } from '../features/Quest/state/QuestSelectors';
 import { Quest, QuestStatus } from '../features/Quest/state/QuestTypes';
+import { getTimeRemaining } from '../shared/utils/time';
 
 type SortKey = 'title' | 'status';
 
@@ -57,16 +58,10 @@ const QuestsPage: React.FC = () => {
   const selectedQuest = selectedQuestId ? allQuests[selectedQuestId] : null;
 
   const renderTimeRemaining = (quest: Quest) => {
-    if (!quest.timeLimitSeconds || !quest.startedAt) return null;
-
-    const elapsedTime = (Date.now() - quest.startedAt) / 1000;
-    const timeRemaining = Math.max(0, quest.timeLimitSeconds - elapsedTime);
-
-    if (timeRemaining === 0) {
-      return <Typography color="error">Time is up!</Typography>;
-    }
-
-    return <Typography>Time Remaining: {Math.ceil(timeRemaining)} seconds</Typography>;
+    const remaining = getTimeRemaining(quest.startedAt, quest.timeLimitSeconds, quest.elapsedSeconds);
+    if (remaining === null) return null;
+    if (remaining === 0) return <Typography color="error">Time is up!</Typography>;
+    return <Typography>Time Remaining: {remaining} seconds</Typography>;
   };
 
   return (
