@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { addQuest, completeQuest, startQuest, failQuest, incrementQuestElapsed } from './QuestSlice';
+import { addQuest, completeQuest, startQuest, incrementQuestElapsed } from './QuestSlice';
 import { Quest } from './QuestTypes';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold } from '../../Player/state/PlayerSlice';
@@ -9,7 +9,8 @@ import { updateNPCRelationshipThunk } from '../../NPCs/state/NPCThunks';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { addItem, removeItem } from '../../Inventory/state/InventorySlice';
 import { v4 as uuidv4 } from 'uuid';
-import { updateObjectiveProgress } from './QuestSlice';
+import { updateObjectiveProgress, patchObjectiveFields } from './QuestSlice';
+import { toDisplayNameFromId } from '../../../shared/utils/formatUtils';
 
 export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
   try {
@@ -49,12 +50,10 @@ export const deliverQuestItemThunk = createAsyncThunk(
       // Remove item from inventory
       dispatch(removeItem({ itemId, quantity: 1 }));
 
-      // Update objective progress
-      dispatch(updateObjectiveProgress({
-        questId,
-        objectiveId,
-        progress: { ...objective, delivered: true, isComplete: true, currentCount: 1 },
-      }));
+  // Mark delivered and complete
+  dispatch(patchObjectiveFields({ questId, objectiveId, changes: { delivered: true, isComplete: true, currentCount: 1 } }));
+  // Also normalize numeric progress to 1/1
+  dispatch(updateObjectiveProgress({ questId, objectiveId, progress: 1 }));
     }
   }
 );
@@ -80,20 +79,21 @@ export const generateRadiantQuestThunk = createAsyncThunk(
     const fetchableItems = ['item_ancient_relic', 'item_glowing_crystal'];
     const targetItemId = fetchableItems[Math.floor(Math.random() * fetchableItems.length)];
 
-    const questId = `radiant_quest_${uuidv4()}`;
-    const objectiveId = `objective_${uuidv4()}`;
+  const questId = `radiant_quest_${uuidv4()}`;
+  const objectiveId = `objective_${uuidv4()}`;
+  const targetItemDisplayName = toDisplayNameFromId(targetItemId, 'item_');
 
     const newQuest: Quest = {
       id: questId,
-      title: `Item Delivery: ${targetItemId} for ${targetNpc.name}`,
-      description: `Guild Master Rook has tasked you with delivering a ${targetItemId} to ${targetNpc.name} in ${targetNpc.location}.`,
+      title: `Item Delivery: ${targetItemDisplayName} for ${targetNpc.name}`,
+      description: `Guild Master Rook has tasked you with delivering a ${targetItemDisplayName} to ${targetNpc.name} in ${targetNpc.location}.`,
       giver: guildMasterId,
       type: 'REPEATABLE',
       status: 'IN_PROGRESS',
       objectives: [
         {
           objectiveId,
-          description: `Deliver ${targetItemId} to ${targetNpc.name}.`,
+          description: `Deliver ${targetItemDisplayName} to ${targetNpc.name}.`,
           type: 'DELIVER',
           target: targetItemId,
           destination: targetNpc.id, // Storing NPC id in destination
@@ -154,12 +154,13 @@ export const turnInQuestThunk = createAsyncThunk(
             );
             rewardSummaries.push(`+${reward.value} Reputation with ${quest.giver}`);
             break;
-          case 'ITEM':
+      case 'ITEM':
             {
               const itemId = String(reward.value);
               const qty = reward.amount || 1;
               dispatch(addItem({ itemId, quantity: qty }));
-              rewardSummaries.push(`${qty}x ${itemId}`);
+        const disp = toDisplayNameFromId(itemId, 'item_');
+        rewardSummaries.push(`${qty}x ${disp}`);
             }
             break;
           default:

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Quest, QuestState, QuestStatus } from './QuestTypes';
+import { Quest, QuestObjective, QuestState, QuestStatus } from './QuestTypes';
 
 const initialState: QuestState = {
   quests: {},
@@ -80,6 +80,21 @@ const questSlice = createSlice({
         quest.status = 'READY_TO_COMPLETE';
       }
     },
+    /**
+     * Patch arbitrary fields on a specific objective (e.g., hasItem, delivered)
+     * without interfering with numeric progress handling.
+     */
+    patchObjectiveFields: (
+      state,
+      action: PayloadAction<{ questId: string; objectiveId: string; changes: Partial<QuestObjective> }>
+    ) => {
+      const { questId, objectiveId, changes } = action.payload;
+      const quest = state.quests[questId];
+      if (!quest) return;
+      const objective = quest.objectives.find((o) => o.objectiveId === objectiveId);
+      if (!objective) return;
+      Object.assign(objective, changes);
+    },
     completeQuest: (state, action: PayloadAction<string>) => {
       const questId = action.payload;
       const quest = state.quests[questId];
@@ -99,6 +114,6 @@ const questSlice = createSlice({
   },
 });
 
-export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, completeQuest, failQuest, incrementQuestElapsed } = questSlice.actions;
+export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, patchObjectiveFields, completeQuest, failQuest, incrementQuestElapsed } = questSlice.actions;
 
 export default questSlice.reducer;

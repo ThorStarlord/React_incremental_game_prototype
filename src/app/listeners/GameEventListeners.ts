@@ -4,8 +4,7 @@ import { addItem, removeItem } from '../../features/Inventory/state/InventorySli
 import { setLocation } from '../../features/Player/state/PlayerSlice';
 import { updateNpcLocation } from '../../features/NPCs/state/NPCSlice';
 import { targetKilled } from '../../features/Combat/CombatSlice';
-import { failQuest, updateObjectiveProgress } from '../../features/Quest/state/QuestSlice';
-import { Quest, QuestObjective } from '../../features/Quest/state/QuestTypes';
+import { failQuest, updateObjectiveProgress, patchObjectiveFields } from '../../features/Quest/state/QuestSlice';
 
 export const gameEventListeners = createListenerMiddleware();
 
@@ -37,16 +36,22 @@ gameEventListeners.startListening({
 
           if (objective.hasItem !== playerHasItem) {
             listenerApi.dispatch(
-              updateObjectiveProgress({
+              patchObjectiveFields({
                 questId: quest.id,
                 objectiveId: objective.objectiveId,
-                progress: { ...objective, hasItem: playerHasItem },
+                changes: { hasItem: playerHasItem },
               })
             );
           }
 
           // Failure condition
-          if (action.type === 'inventory/removeItem' && objective.hasItem && !playerHasItem) {
+          if (
+            action.type === 'inventory/removeItem' &&
+            (action.payload as { itemId: string; quantity: number }).itemId === requiredItemId &&
+            objective.hasItem &&
+            !playerHasItem &&
+            !objective.delivered
+          ) {
             listenerApi.dispatch(failQuest(quest.id));
           }
         }

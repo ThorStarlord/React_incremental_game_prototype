@@ -36,3 +36,25 @@ export const formatSaveDate = (timestamp: number = Date.now()): string => {
   const date = new Date(timestamp);
   return date.toLocaleString(); // Uses locale-specific format
 };
+
+/**
+ * Convert an internal identifier to a user-friendly display name.
+ * - Optionally strips a known prefix (e.g., "item_").
+ * - Replaces underscores with spaces and Title-Cases the words.
+ *
+ * Examples:
+ *  toDisplayNameFromId('item_ancient_relic', 'item_') => 'Ancient Relic'
+ *  toDisplayNameFromId('glowing_crystal') => 'Glowing Crystal'
+ */
+export const toDisplayNameFromId = (id: string, prefix?: string): string => {
+  if (!id) return '';
+  let core = id;
+  if (prefix && core.startsWith(prefix)) {
+    core = core.slice(prefix.length);
+  }
+  return core
+    .split(/[_-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+};
