@@ -121,6 +121,13 @@ const npcSlice = createSlice({
         npc.availableQuests.push(questId);
       }
     },
+    updateNpcLocation: (state, action: PayloadAction<{ npcId: string; location: string }>) => {
+      const { npcId, location } = action.payload;
+      const npc = state.npcs[npcId];
+      if (npc) {
+        npc.location = location;
+      }
+    },
   },
   extraReducers: (builder) => {
     // RESTORED: This block handles the async lifecycle of initializeNPCsThunk.
@@ -160,6 +167,7 @@ export const {
   debugUnlockAllSharedSlots,
   setSelectedNPCId,
   addAvailableQuestToNPC,
+  updateNpcLocation,
 } = npcSlice.actions;
 
 export const npcActions = npcSlice.actions;

@@ -13,7 +13,7 @@ const questSlice = createSlice({
     addQuest: (state, action: PayloadAction<Quest>) => {
       const quest = action.payload;
       state.quests[quest.id] = quest;
-  if ((quest.status === 'IN_PROGRESS' || quest.status === 'READY_TO_COMPLETE') && !state.activeQuestIds.includes(quest.id)) {
+      if ((quest.status === 'IN_PROGRESS' || quest.status === 'READY_TO_COMPLETE') && !state.activeQuestIds.includes(quest.id)) {
         state.activeQuestIds.push(quest.id);
       }
     },
@@ -22,9 +22,22 @@ const questSlice = createSlice({
       const quest = state.quests[questId];
       if (quest && quest.status === 'NOT_STARTED') {
         quest.status = 'IN_PROGRESS';
+        quest.startedAt = Date.now();
+        quest.elapsedSeconds = 0;
         if (!state.activeQuestIds.includes(questId)) {
           state.activeQuestIds.push(questId);
         }
+      }
+    },
+    incrementQuestElapsed: (state, action: PayloadAction<{ questId: string; deltaSeconds: number }>) => {
+      const { questId, deltaSeconds } = action.payload;
+      const quest = state.quests[questId];
+      if (!quest || quest.status !== 'IN_PROGRESS') return;
+      if (typeof quest.timeLimitSeconds !== 'number') return;
+      quest.elapsedSeconds = Math.max(0, (quest.elapsedSeconds || 0) + Math.max(0, deltaSeconds));
+      if (quest.elapsedSeconds >= quest.timeLimitSeconds) {
+        quest.status = 'FAILED';
+        state.activeQuestIds = state.activeQuestIds.filter((id) => id !== questId);
       }
     },
     updateQuestStatus: (state, action: PayloadAction<{ questId: string; status: QuestStatus }>) => {
@@ -75,9 +88,17 @@ const questSlice = createSlice({
         state.activeQuestIds = state.activeQuestIds.filter((id) => id !== questId);
       }
     },
+    failQuest: (state, action: PayloadAction<string>) => {
+      const questId = action.payload;
+      const quest = state.quests[questId];
+      if (quest) {
+        quest.status = 'FAILED';
+        state.activeQuestIds = state.activeQuestIds.filter((id) => id !== questId);
+      }
+    },
   },
 });
 
-export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, completeQuest } = questSlice.actions;
+export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, completeQuest, failQuest, incrementQuestElapsed } = questSlice.actions;
 
 export default questSlice.reducer;

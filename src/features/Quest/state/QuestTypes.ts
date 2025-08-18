@@ -1,6 +1,6 @@
 // As per DataModel.md, defining placeholder types for now.
 export type QuestType = 'MAIN_STORY' | 'SIDE' | 'REPEATABLE' | 'TUTORIAL';
-export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM';
+export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM' | 'ESCORT';
 export type QuestStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'READY_TO_COMPLETE' | 'COMPLETED' | 'FAILED';
 
 // Placeholder for requirements, e.g., level, previous quest, etc.
@@ -22,6 +22,8 @@ export interface QuestObjective {
   description: string;
   type: ObjectiveType;
   target: string; // e.g., 'item_id', 'npc_id', 'location_id'
+  /** Optional destination for objectives like ESCORT where target is the NPC and destination is a location */
+  destination?: string;
   requiredCount: number;
   currentCount: number;
   isHidden: boolean;
@@ -39,7 +41,10 @@ export interface Quest {
   rewards: QuestReward[];
   status: QuestStatus;
   isAutoComplete: boolean;
-  timeLimit?: number; // in seconds
+  timeLimitSeconds?: number;
+  startedAt?: number;
+  /** Accumulated elapsed time (in seconds) for timed quests; used instead of wall-clock deltas. */
+  elapsedSeconds?: number;
 }
 
 export interface QuestState {
