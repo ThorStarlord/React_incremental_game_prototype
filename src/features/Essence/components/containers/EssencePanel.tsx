@@ -6,7 +6,7 @@
  * with essence, such as gaining essence through buttons and displaying current essence levels.
  */
 import React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectEssenceState } from '../../state/EssenceSelectors';
 // Corrected: Import UI components from the component barrel file

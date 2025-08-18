@@ -66,7 +66,6 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   };
 
   const active = copy?.activeTask;
-  const unlockedSlots = (copy?.traitSlots || []).filter(s => !s.isLocked);
   const emptySlots = emptySlotCount;
   const anyPrefEnabled = Object.values(sharePrefs).some(Boolean);
   const enableAll = () => {

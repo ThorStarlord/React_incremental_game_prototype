@@ -6,11 +6,6 @@ import {
   Paper,
   Alert,
   AlertTitle,
-  List,
-  ListItem,
-  Divider,
-  Chip,
-  LinearProgress,
   Button,
   Tabs,
   Tab,
@@ -18,20 +13,21 @@ import {
   TextField,
   MenuItem,
 } from '@mui/material';
-import { ContentCopy as CopiesIcon, Favorite as LoyaltyIcon } from '@mui/icons-material';
+import { ContentCopy as CopiesIcon } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAllCopies, selectCopySegments } from '../features/Copy/state/CopySelectors';
 import { applySharePreferencesForCopyThunk, bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
 import CopyCard from '../features/Copy/components/ui/CopyCard';
 import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
-import { COPY_SYSTEM } from '../constants/gameConstants';
+// import { COPY_SYSTEM } from '../constants/gameConstants';
 
-const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label, value }) => (
-  <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 0.5 }}>
-    <Typography variant="body2" color="text.secondary">{label}</Typography>
-    <Typography variant="body2">{value}</Typography>
-  </Box>
-);
+// Reserved for future copy stats summary UI
+// const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label, value }) => (
+//   <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 0.5 }}>
+//     <Typography variant="body2" color="text.secondary">{label}</Typography>
+//     <Typography variant="body2">{value}</Typography>
+//   </Box>
+// );
 
 /**
  * CopiesPage component.
@@ -52,9 +48,9 @@ export const CopiesPage: React.FC = React.memo(() => {
   const [sortBy, setSortBy] = useState<'name' | 'maturity' | 'loyalty' | 'createdAt'>('createdAt');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
-  const handleBolsterLoyalty = (copyId: string) => {
-    dispatch(bolsterCopyLoyaltyThunk(copyId));
-  };
+  // const handleBolsterLoyalty = (copyId: string) => {
+  //   dispatch(bolsterCopyLoyaltyThunk(copyId));
+  // };
 
   const baseList = useMemo(() => (tab === 0 ? segments.mature : tab === 1 ? segments.growing : segments.lowLoyalty), [tab, segments]);
 
