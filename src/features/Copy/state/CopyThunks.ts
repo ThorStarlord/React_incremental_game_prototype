@@ -224,25 +224,30 @@ export const shareTraitWithCopyThunk = createAsyncThunk<
     const { copyId, slotIndex, traitId } = payload;
     const state = getState();
     const copy = state.copy.copies[copyId];
-    if (!copy) return rejectWithValue('Copy not found');
+    const reject = (message: string) => {
+      dispatch(addNotification({ type: 'error', message }));
+      return rejectWithValue(message);
+    };
+
+    if (!copy) return reject('Copy not found');
     const slot = copy.traitSlots?.[slotIndex];
-    if (!slot) return rejectWithValue('Invalid slot');
-    if (slot.isLocked) return rejectWithValue('Slot is locked');
-    if (slot.traitId === traitId) return rejectWithValue('Trait already shared to this slot');
+    if (!slot) return reject('Invalid slot');
+    if (slot.isLocked) return reject('Slot is locked');
+    if (slot.traitId === traitId) return reject('Trait already shared to this slot');
 
     // Prevent sharing traits the copy already has via another slot or inherited
     const inheritedHas = (copy.inheritedTraits || []).includes(traitId);
     const otherSlotHas = (copy.traitSlots || []).some((s, i) => i !== slotIndex && s.traitId === traitId);
     if (inheritedHas || otherSlotHas) {
-      return rejectWithValue('Trait already present on this Copy');
+      return reject('Trait already present on this Copy');
     }
 
     const equippedIds = state.player.traitSlots
       .map(s => s.traitId)
       .filter((id): id is string => !!id);
     const isPermanent = state.player.permanentTraits.includes(traitId);
-    if (isPermanent) return rejectWithValue('Permanent traits are not shareable');
-    if (!equippedIds.includes(traitId)) return rejectWithValue('Trait must be equipped to share');
+  if (isPermanent) return reject('Permanent traits are not shareable');
+  if (!equippedIds.includes(traitId)) return reject('Trait must be equipped to share');
 
     dispatch(shareTraitToCopy({ copyId, slotIndex, traitId }));
     dispatch(addNotification({ type: 'success', message: 'Trait shared to Copy.' }));

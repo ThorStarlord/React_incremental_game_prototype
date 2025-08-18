@@ -95,3 +95,15 @@ export const selectCopyTraitIds = createSelector(
 
 /** Select Copy's trait slots with lock status for rendering. */
 // Note: unified above as selectCopyTraitSlots(copyId) using selectCopyById
+
+/**
+ * Select effective trait objects for a Copy (resolved from global trait catalog).
+ * Returns an array of trait definitions in the order of IDs from selectCopyAllTraitIds.
+ */
+export const selectCopyEffectiveTraits = createSelector(
+  [
+    (state: RootState) => state.traits.traits as Record<string, any>,
+    selectCopyAllTraitIds,
+  ],
+  (traitsById, ids) => ids.map((id) => traitsById[id]).filter((t) => !!t)
+);

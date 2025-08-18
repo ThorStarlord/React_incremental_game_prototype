@@ -11,7 +11,7 @@ This document details the design and mechanics of the Trait system, which allows
     *   **Equipping:** The player places a discovered (but not permanent) trait into one of their limited active slots to gain its benefits. This is a temporary, strategic choice with no Essence cost.
     *   **Resonance (Permanent Acquisition):** The player spends a significant amount of Essence to make a discovered trait a permanent part of their character, freeing up the slot it occupied (if any) and making its effects always active. This action is gated by the **Intimacy (`connectionDepth`) level** with the source NPC.
 
-**Implementation Status**: ✅ **UI IMPLEMENTED** for core trait management, equipping, and the new Resonance flow via the NPC panel.
+**Implementation Status**: ✅ **UI IMPLEMENTED** for core trait management, equipping, and the new Resonance flow via the NPC panel; ✅ **COPY SHARING INTEGRATION** with auto‑unshare on unequip/replace/permanence.
 
 ## 2. Trait Lifecycle: Discover, Equip, Resonate
 
@@ -28,6 +28,7 @@ The player's journey with a trait now follows a clear three-stage path.
 *   **Trigger:** The player clicks on an empty trait slot, which opens a dialog listing all discovered traits that are not already permanent or equipped.
 *   **Implementation:** The `equipTrait` action in `PlayerSlice.ts` handles placing a `traitId` into a specific slot in the `player.traitSlots` array.
 *   **Result:** The trait's effects are applied to the player's stats. The trait occupies a slot. It can be unequipped at any time to free up the slot for another trait.
+*   **Copy Sharing Note:** Traits that are equipped and not permanent may be shared to Copy trait slots. If the player later unequips or replaces that trait, it is automatically unshared from all Copies.
 
 ### 2.3. Resonance (Permanent Acquisition) ✅ IMPLEMENTED
 *   **Concept:** This is the mastery step. The player spends Essence to make a discovered trait a permanent, innate part of their character. This is the "Resonance" mechanic.
@@ -37,7 +38,7 @@ The player's journey with a trait now follows a clear three-stage path.
     2.  Dispatches `spendEssence`.
     3.  Dispatches `discoverTrait` (to ensure it's marked as known, if not already).
     4.  Dispatches `addPermanentTrait`, which adds the trait's ID to the `player.permanentTraits` array.
-*   **Result:** The trait is now always active and **does not require a slot**. If it was previously equipped, that slot is now free.
+*   **Result:** The trait is now always active and **does not require a slot**. If it was previously equipped, that slot is now free. Permanent traits are not shareable to Copies; any existing shares are automatically removed at the moment of resonance.
 
 ### 2.4. NPC Innate Trait Equipping ✅ IMPLEMENTED
 *   **Concept:** Players can temporarily benefit from certain traits an NPC innately possesses by "equipping" them into one of their own active trait slots.
