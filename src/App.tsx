@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useAppDispatch } from './app/hooks';
 import { fetchTraitsThunk } from './features/Traits/state/TraitThunks';
+import { initializeQuestsThunk } from './features/Quest/state/QuestThunks';
 // FIXED: Import from the feature's barrel file, not deep inside.
 import { initializeNPCsThunk } from './features/NPCs';
 import { useGameLoop } from './features/GameLoop/hooks/useGameLoop';
@@ -18,6 +19,7 @@ const App: React.FC = () => {
   useEffect(() => {
     dispatch(fetchTraitsThunk());
     dispatch(initializeNPCsThunk());
+    dispatch(initializeQuestsThunk());
   }, [dispatch]);
 
   // Game loop for passive generation and time-based events

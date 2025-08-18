@@ -1,16 +1,30 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { addQuest, completeQuest } from './QuestSlice';
+import { addQuest, completeQuest, startQuest } from './QuestSlice';
 import { Quest } from './QuestTypes';
 
-// Placeholder thunk for starting a quest
+export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
+  try {
+    const response = await fetch('/data/quests.json');
+    const quests: Record<string, Quest> = await response.json();
+    Object.values(quests).forEach(quest => {
+      dispatch(addQuest(quest));
+    });
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error(
+      `Failed to initialize quests. Reason: ${errorMsg}
+Possible causes: network error, missing or invalid /data/quests.json file, or JSON parse error.
+Next steps: Check your network connection, ensure /data/quests.json exists and is valid JSON.`
+    );
+  }
+});
+
 export const startQuestThunk = createAsyncThunk(
   'quest/startQuest',
-  async (quest: Quest, { dispatch }) => {
-    // In the future, this could involve checks for prerequisites,
-    // updating NPC dialogue, etc.
-    dispatch(addQuest(quest));
-    return quest;
+  async (questId: string, { dispatch }) => {
+    dispatch(startQuest(questId));
+    return questId;
   }
 );
 

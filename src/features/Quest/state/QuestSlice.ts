@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Quest, QuestState } from './QuestTypes';
+import { Quest, QuestState, QuestStatus } from './QuestTypes';
 
 const initialState: QuestState = {
   quests: {},
@@ -15,6 +15,23 @@ const questSlice = createSlice({
       state.quests[quest.id] = quest;
       if (quest.status === 'IN_PROGRESS' && !state.activeQuestIds.includes(quest.id)) {
         state.activeQuestIds.push(quest.id);
+      }
+    },
+    startQuest: (state, action: PayloadAction<string>) => {
+      const questId = action.payload;
+      const quest = state.quests[questId];
+      if (quest && quest.status === 'NOT_STARTED') {
+        quest.status = 'IN_PROGRESS';
+        if (!state.activeQuestIds.includes(questId)) {
+          state.activeQuestIds.push(questId);
+        }
+      }
+    },
+    updateQuestStatus: (state, action: PayloadAction<{ questId: string; status: QuestStatus }>) => {
+      const { questId, status } = action.payload;
+      const quest = state.quests[questId];
+      if (quest) {
+        quest.status = status;
       }
     },
     updateObjectiveProgress: (
@@ -44,6 +61,6 @@ const questSlice = createSlice({
   },
 });
 
-export const { addQuest, updateObjectiveProgress, completeQuest } = questSlice.actions;
+export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, completeQuest } = questSlice.actions;
 
 export default questSlice.reducer;

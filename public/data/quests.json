@@ -1,0 +1,58 @@
+{
+  "quest_willow_ancient_seed": {
+    "id": "quest_willow_ancient_seed",
+    "title": "The Ancient Seed",
+    "description": "Elder Willow speaks of a dormant seed with immense potential. Find a sunstone to awaken it.",
+    "giver": "npc_elder_willow",
+    "type": "SIDE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Find a Sunstone", "type": "GATHER", "target": "item_sunstone", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [{ "type": "ESSENCE", "value": 100 }],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_elara_lost_tome": {
+    "id": "quest_elara_lost_tome",
+    "title": "The Lost Tome",
+    "description": "Scholar Elara is missing a rare book from her collection. She believes it was stolen and taken to the city slums.",
+    "giver": "npc_scholar_elara",
+    "type": "SIDE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Find the Lost Tome", "type": "GATHER", "target": "item_lost_tome", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [{ "type": "GOLD", "value": 50 }],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_silas_retrieve_item": {
+    "id": "quest_silas_retrieve_item",
+    "title": "A Shady Delivery",
+    "description": "Silas needs a package retrieved from a drop point in the sewers. He warns it's best not to ask what's inside.",
+    "giver": "npc_rogue_silas",
+    "type": "SIDE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Retrieve the package", "type": "GATHER", "target": "item_shady_package", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [{ "type": "GOLD", "value": 100 }],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_valerius_patrol_duty": {
+    "id": "quest_valerius_patrol_duty",
+    "title": "Patrol the City Streets",
+    "description": "Captain Valerius needs a capable individual to patrol the merchant district and ensure the peace is kept.",
+    "giver": "npc_captain_valerius",
+    "type": "REPEATABLE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Patrol the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [{ "type": "REPUTATION", "value": 10, "faction": "City Watch" }],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  }
+}
