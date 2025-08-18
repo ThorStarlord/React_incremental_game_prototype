@@ -1,5 +1,3 @@
-import { EntityState } from '@reduxjs/toolkit';
-
 // As per DataModel.md, defining placeholder types for now.
 export type QuestType = 'MAIN_STORY' | 'SIDE' | 'REPEATABLE' | 'TUTORIAL';
 export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM';
@@ -43,7 +41,7 @@ export interface Quest {
   timeLimit?: number; // in seconds
 }
 
-export interface QuestsState {
+export interface QuestState {
   quests: Record<string, Quest>;
   activeQuestIds: string[];
 }

@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Quest, QuestsState } from './QuestTypes';
+import { Quest, QuestState } from './QuestTypes';
 
-const initialState: QuestsState = {
+const initialState: QuestState = {
   quests: {},
   activeQuestIds: [],
 };
 
-const questsSlice = createSlice({
-  name: 'quests',
+const questSlice = createSlice({
+  name: 'quest',
   initialState,
   reducers: {
     addQuest: (state, action: PayloadAction<Quest>) => {
@@ -44,6 +44,6 @@ const questsSlice = createSlice({
   },
 });
 
-export const { addQuest, updateObjectiveProgress, completeQuest } = questsSlice.actions;
+export const { addQuest, updateObjectiveProgress, completeQuest } = questSlice.actions;
 
-export default questsSlice.reducer;
+export default questSlice.reducer;

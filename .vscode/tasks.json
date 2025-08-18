@@ -20,6 +20,13 @@
 				"$tsc"
 			],
 			"group": "build"
+		},
+		{
+			"label": "build-react-app",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"group": "build"
 		}
 	]
 }

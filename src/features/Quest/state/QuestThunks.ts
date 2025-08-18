@@ -5,7 +5,7 @@ import { Quest } from './QuestTypes';
 
 // Placeholder thunk for starting a quest
 export const startQuestThunk = createAsyncThunk(
-  'quests/startQuest',
+  'quest/startQuest',
   async (quest: Quest, { dispatch }) => {
     // In the future, this could involve checks for prerequisites,
     // updating NPC dialogue, etc.
@@ -16,10 +16,10 @@ export const startQuestThunk = createAsyncThunk(
 
 // Placeholder thunk for turning in a completed quest
 export const turnInQuestThunk = createAsyncThunk(
-  'quests/turnInQuest',
+  'quest/turnInQuest',
   async (questId: string, { dispatch, getState }) => {
     const state = getState() as RootState;
-    const quest = state.quests.quests[questId];
+    const quest = state.quest.quests[questId];
 
     if (quest && quest.status === 'READY_TO_COMPLETE') {
       // In the future, this would grant rewards, update game state, etc.

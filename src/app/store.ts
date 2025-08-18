@@ -10,7 +10,7 @@ import settingsReducer from '../features/Settings/state/SettingsSlice';
 import metaReducer from '../features/Meta/state/MetaSlice';
 import npcsReducer from '../features/NPCs/state/NPCSlice';
 import copyReducer from '../features/Copy/state/CopySlice'; // Corrected import path
-import questsReducer from '../features/Quests/state/QuestSlice';
+import questReducer from '../features/Quest/state/QuestSlice';
 import notificationsReducer from '../shared/state/NotificationSlice';
 
 // Combine all feature reducers
@@ -23,7 +23,7 @@ const combinedReducer = combineReducers({
   meta: metaReducer,
   npcs: npcsReducer,
   copy: copyReducer, // Corrected reducer name
-  quests: questsReducer,
+  quest: questReducer,
   notifications: notificationsReducer,
 });
 

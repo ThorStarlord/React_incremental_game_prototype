@@ -1,17 +1,17 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { QuestsState } from './QuestTypes';
+import { QuestState } from './QuestTypes';
 
-const selectQuestsState = (state: RootState): QuestsState => state.quests;
+const selectQuestState = (state: RootState): QuestState => state.quest;
 
 export const selectAllQuests = createSelector(
-  [selectQuestsState],
-  (questsState) => questsState.quests
+  [selectQuestState],
+  (questState) => questState.quests
 );
 
 export const selectActiveQuestIds = createSelector(
-  [selectQuestsState],
-  (questsState) => questsState.activeQuestIds
+  [selectQuestState],
+  (questState) => questState.activeQuestIds
 );
 
 export const selectActiveQuests = createSelector(

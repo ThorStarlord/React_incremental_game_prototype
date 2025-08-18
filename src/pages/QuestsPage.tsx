@@ -1,8 +1,8 @@
 import React from 'react';
 import { Container, Typography, Card, CardContent } from '@mui/material';
 import { useAppSelector } from '../app/hooks';
-import { selectActiveQuests } from '../features/Quests/state/QuestSelectors';
-import QuestLog from '../features/Quests/components/ui/QuestLog';
+import { selectActiveQuests } from '../features/Quest/state/QuestSelectors';
+import QuestLog from '../features/Quest/components/ui/QuestLog';
 
 const QuestsPage: React.FC = () => {
   const activeQuests = useAppSelector(selectActiveQuests);
