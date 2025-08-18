@@ -26,7 +26,7 @@ import type { NPC } from '../../../state/NPCTypes';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import { selectNpcById } from '../../../state/NPCSelectors';
 import { selectQuestById } from '../../../../Quest/state/QuestSelectors';
-import { startQuestThunk } from '../../../../Quest/state/QuestThunks';
+import { startQuestThunk, turnInQuestThunk } from '../../../../Quest/state/QuestThunks';
 import { Quest, QuestStatus } from '../../../../Quest/state/QuestTypes';
 
 interface NPCQuestsTabProps {
@@ -44,12 +44,29 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
     dispatch(startQuestThunk(questId));
   };
 
+  const handleTurnInQuest = (questId: string) => {
+    dispatch(turnInQuestThunk(questId));
+  };
+
   const getStatusColor = (status: QuestStatus) => {
     switch (status) {
       case 'COMPLETED': return 'success';
       case 'IN_PROGRESS': return 'primary';
       case 'NOT_STARTED': return 'secondary';
       default: return 'default';
+    }
+  };
+
+  const formatQuestStatusLabel = (status: QuestStatus): string => {
+    switch (status) {
+      case 'COMPLETED':
+        return 'Completed';
+      case 'IN_PROGRESS':
+        return 'In Progress';
+      case 'NOT_STARTED':
+        return 'Not Started';
+      default:
+        return 'Unknown';
     }
   };
 
@@ -110,7 +127,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                               color: objective.isComplete ? 'text.secondary' : 'text.primary'
                             }}
                           >
-                            {objective.description} ({objective.currentCount}/{objective.requiredCount})
+                            {objective.description} ({objective.progress}/{objective.targetValue})
                           </Typography>
                         }
                       />
@@ -149,6 +166,15 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                   </Button>
                 )}
 
+                {quest.status === 'IN_PROGRESS' && quest.objectives.every(o => o.isComplete) && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleTurnInQuest(quest.id)}
+                  >
+                    Turn In Quest
+                  </Button>
+                )}
                 {quest.status === 'COMPLETED' && (
                   <Chip
                     icon={<CompleteIcon />}
