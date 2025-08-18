@@ -7,8 +7,9 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import { unequipTrait, equipTrait, addPermanentTrait } from '../../Player/state/PlayerSlice';
-import { unshareTraitFromCopy, ensureCopyTraitSlots } from './CopySlice';
+import { unshareTraitFromCopy, ensureCopyTraitSlots, unlockCopySlotsIfEligible, setCopySharePreference } from './CopySlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
+import { applySharePreferencesForCopyThunk } from './CopyThunks';
 
 // Create a dedicated listener middleware instance for the Copy feature cross-slice sync.
 export const copyListeners = createListenerMiddleware<RootState>();
@@ -75,6 +76,16 @@ copyListeners.startListening({
     if (unsharedCount > 0) {
       api.dispatch(addNotification({ type: 'info', message: `Unshared replaced trait from ${unsharedCount} Copy slot(s).` }));
     }
+
+    // Auto-apply preferences for the newly equipped trait where enabled
+    const stateNow = api.getState();
+    for (const copy of Object.values(stateNow.copy.copies)) {
+      const prefs = copy.sharePreferences || {};
+      if (prefs[newTraitId]) {
+        // fire and forget
+        api.dispatch(applySharePreferencesForCopyThunk(copy.id) as any);
+      }
+    }
   },
 });
 
@@ -87,6 +98,7 @@ copyListeners.startListening({
     const state = api.getState();
     const copies = Object.values(state.copy.copies);
     let unsharedCount = 0;
+    const affected = new Set<string>();
     for (const copy of copies) {
       if (!copy.traitSlots) {
         api.dispatch(ensureCopyTraitSlots({ copyId: copy.id }));
@@ -95,12 +107,16 @@ copyListeners.startListening({
         if (slot.traitId === traitId) {
           api.dispatch(unshareTraitFromCopy({ copyId: copy.id, slotIndex: slot.slotIndex }));
           unsharedCount++;
+      affected.add(copy.id);
         }
       }
     }
     if (unsharedCount > 0) {
       api.dispatch(addNotification({ type: 'info', message: `Unshared trait from ${unsharedCount} Copy slot(s) due to permanence.` }));
     }
+
+    // Try to fill freed slots with other enabled preferences
+    affected.forEach((copyId) => api.dispatch(applySharePreferencesForCopyThunk(copyId) as any));
   },
 });
 
@@ -113,9 +129,27 @@ copyListeners.startListening({
     const state = api.getState();
     const copies = Object.values(state.copy.copies);
     for (const copy of copies) {
-      if (!copy.traitSlots) {
+      if (!copy.traitSlots || !(copy as any).sharePreferences) {
         api.dispatch(ensureCopyTraitSlots({ copyId: copy.id }));
       }
     }
+  },
+});
+
+// When copy slots may unlock, attempt to auto-apply share preferences to fill empties.
+copyListeners.startListening({
+  actionCreator: unlockCopySlotsIfEligible,
+  effect: async (action, api) => {
+    const { copyId } = action.payload;
+    if (copyId) api.dispatch(applySharePreferencesForCopyThunk(copyId) as any);
+  },
+});
+
+// When a share preference is enabled, attempt to apply immediately for that copy.
+copyListeners.startListening({
+  actionCreator: setCopySharePreference,
+  effect: async (action, api) => {
+    const { copyId, enabled } = action.payload;
+    if (enabled) api.dispatch(applySharePreferencesForCopyThunk(copyId) as any);
   },
 });

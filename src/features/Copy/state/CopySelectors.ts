@@ -133,6 +133,12 @@ export const selectCopyEffectiveTraitsWithSource = createSelector(
   }
 );
 
+/** Number of unlocked empty trait slots available on a Copy. */
+export const selectCopyUnlockedEmptySlotCount = createSelector([selectCopyById], (copy) => {
+  if (!copy) return 0;
+  return (copy.traitSlots ?? []).filter((s) => !s.isLocked && !s.traitId).length;
+});
+
 /**
  * Eligible player trait IDs that could be shared to this Copy now.
  * Rules: player has it equipped (non-permanent) and Copy doesn't already have it (inherited/shared).
@@ -148,6 +154,24 @@ export const selectCopyEligibleShareTraitIds = createSelector(
     const equipped = playerSlots.map(s => s.traitId).filter((id): id is string => !!id);
     const already = new Set([...(copy.inheritedTraits ?? []), ...((copy.traitSlots ?? []).map(s => s.traitId).filter(Boolean) as string[])]);
     return equipped.filter(id => !permanent.includes(id) && !already.has(id));
+  }
+);
+
+/** Aggregate context to compute per-trait share eligibility reasons in UI. */
+export const selectCopyShareEligibilityContext = createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+    (state: RootState) => state.player.traitSlots,
+    (state: RootState) => state.player.permanentTraits,
+  ],
+  (copy, playerSlots, permanent) => {
+    const equipped = playerSlots.map(s => s.traitId).filter((id): id is string => !!id);
+    const already = new Set<string>([
+      ...((copy?.inheritedTraits ?? []) as string[]),
+      ...(((copy?.traitSlots ?? []).map(s => s.traitId).filter(Boolean) as string[])),
+    ]);
+    const emptySlots = (copy?.traitSlots ?? []).filter(s => !s.isLocked && !s.traitId).length;
+    return { equipped, permanent, already, emptySlots };
   }
 );
 

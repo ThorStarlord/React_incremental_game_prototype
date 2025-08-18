@@ -253,8 +253,13 @@ const copiesSlice = createSlice({
     ensureCopyTraitSlots: (state, action: PayloadAction<{ copyId: string }>) => {
       const { copyId } = action.payload;
       const copy = state.copies[copyId];
-      if (copy && !copy.traitSlots) {
-        copy.traitSlots = createInitialCopyTraitSlots();
+      if (copy) {
+        if (!copy.traitSlots) {
+          copy.traitSlots = createInitialCopyTraitSlots();
+        }
+        if (!copy.sharePreferences) {
+          copy.sharePreferences = {};
+        }
       }
     }
   },

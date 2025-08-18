@@ -18,10 +18,11 @@ import {
   FormControlLabel,
   Switch,
   Divider,
+  Tooltip,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { RootState } from '../../../../app/store';
-import { selectCopyById, selectCopyEffectiveTraitsWithSource, selectCopyEligibleShareTraitIds, selectCopySharePreferences } from '../../state/CopySelectors';
+import { selectCopyById, selectCopyEffectiveTraitsWithSource, selectCopyEligibleShareTraitIds, selectCopySharePreferences, selectCopyShareEligibilityContext, selectCopyUnlockedEmptySlotCount } from '../../state/CopySelectors';
 import { assignCopyRoleThunk, startCopyTimedTaskThunk, setCopySharePreferenceThunk, applySharePreferencesForCopyThunk } from '../../state/CopyThunks';
 import { selectTraits } from '../../../Traits/state/TraitsSelectors';
 import type { CopyRole } from '../../state/CopyTypes';
@@ -40,6 +41,8 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const traits = useAppSelector((s: RootState) => selectCopyEffectiveTraitsWithSource(s, copyId));
   const eligibleShareIds = useAppSelector((s: RootState) => selectCopyEligibleShareTraitIds(s, copyId));
   const sharePrefs = useAppSelector((s: RootState) => selectCopySharePreferences(s, copyId));
+  const eligibility = useAppSelector((s: RootState) => selectCopyShareEligibilityContext(s, copyId));
+  const emptySlotCount = useAppSelector((s: RootState) => selectCopyUnlockedEmptySlotCount(s, copyId));
   const allTraits = useAppSelector(selectTraits);
   const [taskSeconds, setTaskSeconds] = useState<number>(60);
 
@@ -57,7 +60,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
 
   const active = copy?.activeTask;
   const unlockedSlots = (copy?.traitSlots || []).filter(s => !s.isLocked);
-  const emptySlots = unlockedSlots.filter(s => !s.traitId).length;
+  const emptySlots = emptySlotCount;
   const anyPrefEnabled = Object.values(sharePrefs).some(Boolean);
 
   return (
@@ -122,16 +125,38 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
               <Typography variant="overline" color="text.secondary">Share Preferences</Typography>
               <Typography variant="caption" color="text.secondary">Available slots: {emptySlots}</Typography>
               <FormGroup sx={{ mt: 1 }}>
-                {eligibleShareIds.map((id) => {
+                {(copy?.traitSlots ?? []) && Object.keys(allTraits).length > 0 && eligibleShareIds.concat(
+                  // Include prefs that are currently ineligible to show guidance
+                  Object.keys(sharePrefs).filter((id) => sharePrefs[id] && !eligibleShareIds.includes(id))
+                ).filter((v, i, a) => a.indexOf(v) === i).map((id) => {
                   const t = allTraits[id];
                   const label = t?.name ?? id;
                   const checked = !!sharePrefs[id];
-                  return (
-                    <FormControlLabel
-                      key={id}
-                      control={<Switch size="small" checked={checked} onChange={(e) => dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: e.target.checked }))} />}
-                      label={label}
+                  const eligible = eligibleShareIds.includes(id);
+                  let reason = '';
+                  if (!eligible) {
+                    const reasons: string[] = [];
+                    if (!eligibility.equipped.includes(id)) reasons.push('not equipped');
+                    if (eligibility.permanent.includes(id)) reasons.push('made permanent');
+                    if (eligibility.already.has(id)) reasons.push('already present');
+                    if (eligibility.emptySlots === 0) reasons.push('no empty slots');
+                    reason = `Not eligible: ${reasons.join(', ')}`;
+                  }
+                  const control = (
+                    <Switch
+                      size="small"
+                      checked={checked}
+                      disabled={!eligible && !checked}
+                      onChange={(e) => dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: e.target.checked }))}
                     />
+                  );
+                  const labelNode = (
+                    <FormControlLabel key={id} control={control} label={label} />
+                  );
+                  return eligible ? labelNode : (
+                    <Tooltip key={id} title={reason} placement="right" arrow>
+                      <Box component="span">{labelNode}</Box>
+                    </Tooltip>
                   );
                 })}
                 {eligibleShareIds.length === 0 && (
