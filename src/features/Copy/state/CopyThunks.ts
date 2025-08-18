@@ -230,6 +230,13 @@ export const shareTraitWithCopyThunk = createAsyncThunk<
     if (slot.isLocked) return rejectWithValue('Slot is locked');
     if (slot.traitId === traitId) return rejectWithValue('Trait already shared to this slot');
 
+    // Prevent sharing traits the copy already has via another slot or inherited
+    const inheritedHas = (copy.inheritedTraits || []).includes(traitId);
+    const otherSlotHas = (copy.traitSlots || []).some((s, i) => i !== slotIndex && s.traitId === traitId);
+    if (inheritedHas || otherSlotHas) {
+      return rejectWithValue('Trait already present on this Copy');
+    }
+
     const equippedIds = state.player.traitSlots
       .map(s => s.traitId)
       .filter((id): id is string => !!id);

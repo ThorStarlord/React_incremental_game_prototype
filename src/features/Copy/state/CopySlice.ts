@@ -191,6 +191,15 @@ const copiesSlice = createSlice({
     setCopiesError: (state, action: PayloadAction<string | null>) => {
         state.error = action.payload;
     }
+    ,
+    /** Ensure a Copy has initialized trait slots (migration safety for older saves). */
+    ensureCopyTraitSlots: (state, action: PayloadAction<{ copyId: string }>) => {
+      const { copyId } = action.payload;
+      const copy = state.copies[copyId];
+      if (copy && !copy.traitSlots) {
+        copy.traitSlots = createInitialCopyTraitSlots();
+      }
+    }
   },
 });
 
@@ -206,6 +215,7 @@ export const {
   shareTraitToCopy,
   unshareTraitFromCopy,
   unlockCopySlotsIfEligible,
+  ensureCopyTraitSlots,
 } = copiesSlice.actions;
 
 export default copiesSlice.reducer;

@@ -6,8 +6,8 @@
 
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { unequipTrait, equipTrait } from '../../Player/state/PlayerSlice';
-import { unshareTraitFromCopy } from './CopySlice';
+import { unequipTrait, equipTrait, addPermanentTrait } from '../../Player/state/PlayerSlice';
+import { unshareTraitFromCopy, ensureCopyTraitSlots } from './CopySlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 
 // Create a dedicated listener middleware instance for the Copy feature cross-slice sync.
@@ -28,6 +28,10 @@ copyListeners.startListening({
     let unsharedCount = 0;
 
     for (const copy of copies) {
+      // Ensure slots exist for older saves
+      if (!copy.traitSlots) {
+        api.dispatch(ensureCopyTraitSlots({ copyId: copy.id }));
+      }
       const slots = copy.traitSlots ?? [];
       for (const slot of slots) {
         if (slot.traitId === traitId) {
@@ -57,6 +61,9 @@ copyListeners.startListening({
     const copies = Object.values(stateAfter.copy.copies);
     let unsharedCount = 0;
     for (const copy of copies) {
+      if (!copy.traitSlots) {
+        api.dispatch(ensureCopyTraitSlots({ copyId: copy.id }));
+      }
       const slots = copy.traitSlots ?? [];
       for (const slot of slots) {
         if (slot.traitId === prevTraitId) {
@@ -71,4 +78,44 @@ copyListeners.startListening({
   },
 });
 
+// When a trait is made permanent, it ceases to be shareable; unshare from all copies.
+copyListeners.startListening({
+  actionCreator: addPermanentTrait,
+  effect: async (action, api) => {
+    const { payload: traitId } = action;
+    if (!traitId) return;
+    const state = api.getState();
+    const copies = Object.values(state.copy.copies);
+    let unsharedCount = 0;
+    for (const copy of copies) {
+      if (!copy.traitSlots) {
+        api.dispatch(ensureCopyTraitSlots({ copyId: copy.id }));
+      }
+      for (const slot of copy.traitSlots ?? []) {
+        if (slot.traitId === traitId) {
+          api.dispatch(unshareTraitFromCopy({ copyId: copy.id, slotIndex: slot.slotIndex }));
+          unsharedCount++;
+        }
+      }
+    }
+    if (unsharedCount > 0) {
+      api.dispatch(addNotification({ type: 'info', message: `Unshared trait from ${unsharedCount} Copy slot(s) due to permanence.` }));
+    }
+  },
+});
+
 export default copyListeners;
+
+// Reinitialize trait slots after a full state replace (load/import) for migration safety.
+copyListeners.startListening({
+  predicate: (action) => action.type === 'meta/replaceState',
+  effect: async (action, api) => {
+    const state = api.getState();
+    const copies = Object.values(state.copy.copies);
+    for (const copy of copies) {
+      if (!copy.traitSlots) {
+        api.dispatch(ensureCopyTraitSlots({ copyId: copy.id }));
+      }
+    }
+  },
+});

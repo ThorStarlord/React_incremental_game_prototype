@@ -27,6 +27,8 @@ export const CopyTraitSlots: React.FC<CopyTraitSlotsProps> = ({ copyId }) => {
     .map(ts => ts.traitId)
     .filter((id): id is string => !!id && !permanent.includes(id));
 
+  const copyAllTraitIds = new Set([...(copy.inheritedTraits || []), ...slots.map(s => s.traitId).filter((t): t is string => !!t)]);
+
   const onShare = (slotIndex: number, traitId: string) => {
     dispatch(shareTraitWithCopyThunk({ copyId, slotIndex, traitId }));
   };
@@ -91,9 +93,13 @@ export const CopyTraitSlots: React.FC<CopyTraitSlotsProps> = ({ copyId }) => {
                               <Box sx={{ minWidth: 160 }}>
                                 <CompactTraitCard traitId={tid} />
                               </Box>
-                              <Button size="small" variant="outlined" onClick={() => onShare(slot.slotIndex ?? idx, tid)}>
-                                Share
-                              </Button>
+                              <Tooltip title={copyAllTraitIds.has(tid) ? 'Already present on this Copy' : ''}>
+                                <span>
+                                  <Button size="small" variant="outlined" onClick={() => onShare(slot.slotIndex ?? idx, tid)} disabled={copyAllTraitIds.has(tid)}>
+                                    Share
+                                  </Button>
+                                </span>
+                              </Tooltip>
                             </Stack>
                           ))}
                         </Stack>
