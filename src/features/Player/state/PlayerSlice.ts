@@ -72,6 +72,7 @@ const initialState: PlayerState = {
   totalPlaytime: 0,
   isAlive: true,
   location: 'Starting Area',
+  gold: 100,
 };
 
 /**
@@ -171,6 +172,9 @@ const playerSlice = createSlice({
     setLocation: (state, action: PayloadAction<string>) => {
       state.location = action.payload;
     },
+    gainGold: (state, action: PayloadAction<number>) => {
+      state.gold += action.payload;
+    },
   },
 });
 
@@ -194,6 +198,7 @@ export const {
   unequipTrait,
   unlockTraitSlot,
   setLocation,
+  gainGold,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

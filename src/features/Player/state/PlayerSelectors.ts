@@ -14,6 +14,11 @@ export const selectPlayerLocation = createSelector(
     (player) => player.location
 );
 
+export const selectGold = createSelector(
+    [selectPlayer],
+    (player) => player.gold
+);
+
 // NEW: Selector for the final, calculated stats object
 export const selectFinalStats = createSelector(
   [selectPlayer],

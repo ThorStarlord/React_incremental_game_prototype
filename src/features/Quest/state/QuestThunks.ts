@@ -2,6 +2,10 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { addQuest, completeQuest, startQuest } from './QuestSlice';
 import { Quest } from './QuestTypes';
+import { gainEssence } from '../../Essence/state/EssenceSlice';
+import { gainGold } from '../../Player/state/PlayerSlice';
+import { updateNPCRelationshipThunk } from '../../NPC/state/NPCSlice';
+import { addNotification } from '../../Notification/state/NotificationSlice';
 
 export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
   try {
@@ -35,8 +39,39 @@ export const turnInQuestThunk = createAsyncThunk(
     const state = getState() as RootState;
     const quest = state.quest.quests[questId];
 
-    if (quest && isQuestComplete(quest)) {
-      // In the future, this would grant rewards, update game state, etc.
+    if (quest && quest.status === 'ACTIVE') {
+      const rewards = quest.rewards;
+      const rewardSummaries: string[] = [];
+
+      for (const reward of rewards) {
+        switch (reward.type) {
+          case 'ESSENCE':
+            dispatch(gainEssence(reward.value));
+            rewardSummaries.push(`${reward.value} Essence`);
+            break;
+          case 'GOLD':
+            dispatch(gainGold(reward.value));
+            rewardSummaries.push(`${reward.value} Gold`);
+            break;
+          case 'REPUTATION':
+            dispatch(
+              updateNPCRelationshipThunk({
+                npcId: quest.giver,
+                change: reward.value,
+                reason: 'Quest Reward',
+              })
+            );
+            break;
+          default:
+            break;
+        }
+      }
+
+      if (rewardSummaries.length > 0) {
+        const summaryMessage = `Quest Complete! Rewards: ${rewardSummaries.join(', ')}.`;
+        dispatch(addNotification({ message: summaryMessage, type: 'success' }));
+      }
+
       dispatch(completeQuest(questId));
       return { questId, rewards: quest.rewards };
     }
