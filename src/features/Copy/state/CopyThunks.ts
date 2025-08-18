@@ -14,6 +14,7 @@ import type { Copy, CopyGrowthType, CopyTask } from './CopyTypes';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { generateCopyId, generateCopyName } from '../utils/copyUtils';
 import { gainGold } from '../../Player/state/PlayerSlice';
+import { selectCopyHasRunningTask } from './CopySelectors';
 
 // Default starting stats for a new Copy
 const defaultCopyStats: PlayerStats = {
@@ -268,7 +269,7 @@ export const startCopyTimedTaskThunk = createAsyncThunk(
     const state = getState() as RootState;
     const copy = state.copy.copies[copyId];
     if (!copy) return rejectWithValue('Copy not found');
-    if (copy.activeTask && copy.activeTask.status === 'running') {
+  if (selectCopyHasRunningTask(getState() as RootState, copyId)) {
       dispatch(addNotification({ type: 'warning', message: 'A task is already running for this Copy.' }));
       return rejectWithValue('Task already running');
     }
@@ -310,9 +311,9 @@ export const processCopyTasksThunk = createAsyncThunk(
           }
           const suffix = bonus.text ? ` (${bonus.text})` : '';
           dispatch(addNotification({ type: 'success', message: `${copy.name} completed a task${suffix}.` }));
-          // Rewards on completion
-          dispatch(gainGold(10));
-          dispatch(gainEssence({ amount: 5, source: 'copy_task' }));
+          // Rewards on completion (use constants)
+          dispatch(gainGold(COPY_SYSTEM.TASK_REWARDS.GOLD));
+          dispatch(gainEssence({ amount: COPY_SYSTEM.TASK_REWARDS.ESSENCE, source: 'copy_task' }));
           dispatch(clearCopyActiveTask({ copyId: copy.id }));
         }
       }
