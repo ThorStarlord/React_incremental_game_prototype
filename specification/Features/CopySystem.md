@@ -216,6 +216,38 @@ Added lightweight `notifications` slice (array queue) with `addNotification` for
 
 Upcoming: automatic notifications for low loyalty (< configurable threshold), maturity completion, task completion.
 
+## 16. Role Effects (MVP implemented)
+
+Roles provide lightweight flavor and small mechanical modifiers to Copies. The goal is to add personality and subtle differentiation without deep balance dependencies at this stage.
+
+Current behavior (implemented in `CopyThunks.ts`):
+- Task duration multipliers
+    - infiltrator: 0.90× duration (faster timed tasks)
+    - researcher: 0.95× duration
+    - guardian: 1.05× duration (slower, methodical)
+    - agent/none: 1.00× duration
+- Task completion bonuses
+    - infiltrator: +2 loyalty on completion (clamped to 100)
+    - researcher: +1 maturity on completion (respects `MATURITY_MAX`; unlock checks run)
+    - guardian: +1 loyalty on completion
+    - agent: +1 loyalty and +0.5 maturity on completion
+- Sharing synergy
+    - researcher: When a trait is shared to a slot, the Copy gains +0.5 maturity (clamped), then runs slot‑unlock checks.
+
+Notifications:
+- Starting a task shows an info toast.
+- On completion, a single success notification is emitted with any role bonus summarized (e.g., “completed a task (+2 loyalty)”).
+
+Assignment:
+- Role is assigned via `assignCopyRoleThunk` and surfaced in the Copy detail UI. A small success toast confirms changes.
+
+Future directions (considered, not yet implemented):
+- Role‑themed task catalog: infiltrator (intel, disguise), researcher (analysis, training), guardian (patrol, escort), agent (missions).
+- Role XP and rank: completing role‑themed tasks levels up the role to amplify bonuses.
+- Synergies with Player traits: certain player traits enhance role effects (e.g., faster infil tasks when player equips “Shadowed Step”).
+- Risk/reward tasks: daring infil missions with higher loyalty gains but failure risk.
+- Team tasks: multiple Copies with complementary roles executing linked operations for combo bonuses.
+
 ## 15. Future / TODO Roadmap
 
 | Area | Planned Work |
