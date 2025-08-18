@@ -62,4 +62,11 @@ export const COPY_SYSTEM = {
     { slotIndex: 2, type: 'loyalty' as const, value: 60 },
     { slotIndex: 3, type: 'maturity' as const, value: 80 },
   ],
+  /** Inherited trait cap per NPC connectionDepth threshold (Phase 2). Ordered ascending by depth. */
+  INHERITED_TRAIT_CAPS: [
+    { depth: 0, cap: 1 },
+    { depth: 3, cap: 2 },
+    { depth: 5, cap: 3 },
+    { depth: 8, cap: 4 },
+  ] as Array<{ depth: number; cap: number }>,
 };

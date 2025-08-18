@@ -9,7 +9,7 @@ import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
 import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated, shareTraitToCopy, unshareTraitFromCopy, unlockCopySlotsIfEligible, assignCopyRole, startCopyTask, progressCopyTask, clearCopyActiveTask, setCopySharePreference } from './CopySlice';
-import { applyGrowth, applyLoyaltyDecay } from '../utils/copyUtils';
+import { applyGrowth, applyLoyaltyDecay, computeInheritedTraits } from '../utils/copyUtils';
 import type { Copy, CopyGrowthType, CopyTask } from './CopyTypes';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { generateCopyId, generateCopyName } from '../utils/copyUtils';
@@ -57,6 +57,8 @@ export const processCopyGrowthThunk = createAsyncThunk(
     }
   if (batched.length) {
       dispatch(updateMultipleCopies(batched));
+  // After maturity changes, ensure any eligible slots unlock
+  for (const b of batched) dispatch(unlockCopySlotsIfEligible({ copyId: b.copyId }));
     }
   }
 );
@@ -84,6 +86,8 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     }
   if (batched.length) {
       dispatch(updateMultipleCopies(batched));
+  // After loyalty changes, ensure any eligible slots unlock
+  for (const b of batched) dispatch(unlockCopySlotsIfEligible({ copyId: b.copyId }));
     }
   }
 );
@@ -176,10 +180,8 @@ export const createCopyThunk = createAsyncThunk(
       maturity: growthType === 'accelerated' ? 90 : 0, // Accelerated copies start almost mature
       loyalty: 50, // Start at a neutral loyalty
       stats: { ...defaultCopyStats },
-      // Inherit a snapshot of traits the player has shared with the NPC
-      inheritedTraits: (npc.sharedTraitSlots ?? [])
-        .map(slot => slot.traitId)
-        .filter((traitId): traitId is string => !!traitId),
+      // Inherit a capped snapshot of traits informed by NPC connectionDepth
+      inheritedTraits: computeInheritedTraits(npc),
       traitSlots: undefined,
       location: npc.location, // Starts at the parent's location
     };

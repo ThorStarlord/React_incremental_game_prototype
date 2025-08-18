@@ -109,6 +109,30 @@ export const selectCopyEffectiveTraits = createSelector(
   (traitsById, ids) => ids.map((id) => traitsById[id]).filter((t) => !!t)
 );
 
+/** Effective trait metadata including source (inherited/shared) and optional slotIndex for shared. */
+export const selectCopyEffectiveTraitsWithSource = createSelector(
+  [
+    (state: RootState) => state.traits.traits as Record<string, any>,
+    selectCopyById,
+  ],
+  (traitsById, copy) => {
+    if (!copy) return [] as Array<{ trait: any; source: 'inherited' | 'shared'; slotIndex?: number }>;
+    const results: Array<{ trait: any; source: 'inherited' | 'shared'; slotIndex?: number }> = [];
+    const inheritedSet = new Set(copy.inheritedTraits ?? []);
+    for (const id of copy.inheritedTraits ?? []) {
+      const trait = traitsById[id];
+      if (trait) results.push({ trait, source: 'inherited' });
+    }
+    for (const slot of copy.traitSlots ?? []) {
+      if (!slot.traitId) continue;
+      if (inheritedSet.has(slot.traitId)) continue; // avoid duplicates
+      const trait = traitsById[slot.traitId];
+      if (trait) results.push({ trait, source: 'shared', slotIndex: slot.slotIndex });
+    }
+    return results;
+  }
+);
+
 /**
  * Eligible player trait IDs that could be shared to this Copy now.
  * Rules: player has it equipped (non-permanent) and Copy doesn't already have it (inherited/shared).
