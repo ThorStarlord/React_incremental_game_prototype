@@ -11,7 +11,12 @@ export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', 
       dispatch(addQuest(quest));
     });
   } catch (error) {
-    console.error('Failed to initialize quests:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error(
+      `Failed to initialize quests. Reason: ${errorMsg}
+Possible causes: network error, missing or invalid /data/quests.json file, or JSON parse error.
+Next steps: Check your network connection, ensure /data/quests.json exists and is valid JSON.`
+    );
   }
 });
 
