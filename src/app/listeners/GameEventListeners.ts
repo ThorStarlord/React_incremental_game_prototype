@@ -20,7 +20,7 @@ gameEventListeners.startListening({
       if (!quest) continue;
       for (const objective of quest.objectives) {
         if (objective.type === 'GATHER' && objective.target === itemId) {
-          const currentQuantity = state.inventory.items[itemId]?.quantity || 0;
+          const currentQuantity = state.inventory.items[itemId] || 0;
           listenerApi.dispatch(
             updateObjectiveProgress({
               questId: quest.id,
