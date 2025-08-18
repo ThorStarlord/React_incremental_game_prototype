@@ -60,19 +60,18 @@ export const CopiesPage: React.FC = React.memo(() => {
     let list = baseList;
     if (q) list = list.filter(c => c.name.toLowerCase().includes(q));
     if (roleFilter !== 'all') list = list.filter(c => (c.role ?? 'none') === roleFilter);
-    const dir = sortDir === 'asc' ? 1 : -1;
-    const cmp = (a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0) * dir;
-    return [...list].sort((a, b) => {
+  const dir = sortDir === 'asc' ? 1 : -1;
+  return [...list].sort((a, b) => {
       switch (sortBy) {
         case 'name':
-          return cmp(a.name.localeCompare(b.name), 0);
+      return dir * a.name.localeCompare(b.name);
         case 'maturity':
-          return cmp(a.maturity, b.maturity);
+      return dir * (a.maturity - b.maturity);
         case 'loyalty':
-          return cmp(a.loyalty, b.loyalty);
+      return dir * (a.loyalty - b.loyalty);
         case 'createdAt':
         default:
-          return cmp(a.createdAt, b.createdAt);
+      return dir * (a.createdAt - b.createdAt);
       }
     });
   }, [baseList, search, roleFilter, sortBy, sortDir]);
@@ -81,8 +80,8 @@ export const CopiesPage: React.FC = React.memo(() => {
     setBusyApplyAll(true);
     try {
       for (const c of visibleCopies) {
-        // eslint-disable-next-line no-await-in-loop
-        await (dispatch as unknown as import('../app/store').AppDispatch)(applySharePreferencesForCopyThunk({ copyId: c.id, suppressNotify: true }));
+  // eslint-disable-next-line no-await-in-loop
+  await dispatch(applySharePreferencesForCopyThunk({ copyId: c.id, suppressNotify: true }));
       }
       // Single coalesced notification
       dispatch(addNotification({
@@ -98,8 +97,8 @@ export const CopiesPage: React.FC = React.memo(() => {
     setBusyBolsterAll(true);
     try {
       for (const c of visibleCopies) {
-        // eslint-disable-next-line no-await-in-loop
-        await (dispatch as unknown as import('../app/store').AppDispatch)(bolsterCopyLoyaltyThunk({ copyId: c.id, suppressNotify: true }));
+  // eslint-disable-next-line no-await-in-loop
+  await dispatch(bolsterCopyLoyaltyThunk({ copyId: c.id, suppressNotify: true }));
       }
       dispatch(addNotification({
         type: 'success',

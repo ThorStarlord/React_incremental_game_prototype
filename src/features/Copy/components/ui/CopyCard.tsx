@@ -48,7 +48,7 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
   const handleApplyPrefs = useCallback(async () => {
     setBusyApply(true);
     try {
-      await (dispatch as unknown as import('../../../../app/store').AppDispatch)(applySharePreferencesForCopyThunk(copy.id));
+  await dispatch(applySharePreferencesForCopyThunk(copy.id));
     } finally {
       setBusyApply(false);
     }

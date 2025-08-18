@@ -5,7 +5,7 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
-import type { RootState } from '../../../app/store';
+import type { RootState, AppDispatch } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
 import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated, shareTraitToCopy, unshareTraitFromCopy, unlockCopySlotsIfEligible, assignCopyRole, startCopyTask, progressCopyTask, clearCopyActiveTask, setCopySharePreference } from './CopySlice';
@@ -331,10 +331,14 @@ export const setCopySharePreferenceThunk = createAsyncThunk(
 );
 
 /** Try to apply enabled share preferences to the first available slot(s) for a copy. */
-export const applySharePreferencesForCopyThunk = createAsyncThunk(
+export const applySharePreferencesForCopyThunk = createAsyncThunk<
+  { applied: number },
+  string | { copyId: string; suppressNotify?: boolean },
+  { state: RootState; dispatch: AppDispatch }
+>(
   'copy/applySharePreferencesForCopy',
   async (
-    payload: string | { copyId: string; suppressNotify?: boolean },
+    payload,
     { getState, dispatch }
   ) => {
     const copyId = typeof payload === 'string' ? payload : payload.copyId;
@@ -359,13 +363,13 @@ export const applySharePreferencesForCopyThunk = createAsyncThunk(
       if (!empty) continue;
       // Use the validated thunk to share (will ensure correctness and notify)
       // eslint-disable-next-line no-await-in-loop
-      const result = await (dispatch as unknown as import('../../../app/store').AppDispatch)(
+      const result = await dispatch(
         shareTraitWithCopyThunk({ copyId, slotIndex: empty.slotIndex ?? 0, traitId, suppressNotify: true })
       );
       if (shareTraitWithCopyThunk.fulfilled.match(result)) applied += 1;
     }
-    if (!suppressNotify && applied > 0) dispatch(addNotification({ type: 'success', message: `Applied ${applied} share preference(s).` }));
-    return { applied };
+  if (!suppressNotify && applied > 0) dispatch(addNotification({ type: 'success', message: `Applied ${applied} share preference(s).` }));
+  return { applied };
   }
 );
 
