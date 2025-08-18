@@ -7,10 +7,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 // FIXED: Import the correct thunk for creating a copy
-import { createCopyThunk } from '../../../Copy/state/CopyThunks';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
 import { initializeNPCsThunk } from '../../'; // Corrected import path
 import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress } from '@mui/material';
+import { CreateCopyModal } from '../../../Copy/components/ui/CreateCopyModal';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
 import NPCTradeTab from '../ui/tabs/NPCTradeTab';
 import NPCQuestsTab from '../ui/tabs/NPCQuestsTab';
@@ -59,17 +59,15 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   const isLoading = useAppSelector(selectNPCLoading);
   const error = useAppSelector(selectNPCError);
   const [currentTab, setCurrentTab] = useState(0);
+  const [isCreateCopyModalOpen, setCreateCopyModalOpen] = useState(false);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
 
-  // Handler for creating a copy
-  const handleCreateCopy = () => {
-    if (npc) {
-      // FIXED: Dispatch the thunk with the correct payload
-      dispatch(createCopyThunk({ npcId: npc.id }));
-    }
+  // Handler for opening the copy creation modal
+  const handleOpenCreateCopyModal = () => {
+    setCreateCopyModalOpen(true);
   };
 
   if (isLoading) {
@@ -114,18 +112,19 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   }
 
   return (
-    <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">{npc.name}</Typography>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleCreateCopy} // FIXED: Use the correct handler
-        >
-          Create Copy
-        </Button>
-      </Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
+    <>
+      <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h5">{npc.name}</Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleOpenCreateCopyModal}
+          >
+            Create Copy
+          </Button>
+        </Box>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
         <Tabs value={currentTab} onChange={handleTabChange} aria-label="npc details tabs">
           <Tab label="Overview" id="npc-tab-0" />
           <Tab label="Quests" id="npc-tab-1" />
@@ -146,6 +145,13 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
         <NPCTraitsTab npcId={npc.id} />
       </TabPanel>
     </Box>
+    <CreateCopyModal
+        open={isCreateCopyModalOpen}
+        onClose={() => setCreateCopyModalOpen(false)}
+        npcId={npc.id}
+        npcName={npc.name}
+      />
+    </>
   );
 };
 

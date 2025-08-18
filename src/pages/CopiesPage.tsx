@@ -1,9 +1,24 @@
 import React from 'react';
-import { Box, Container, Typography, Alert, AlertTitle, Grid, Divider, Tabs, Tab } from '@mui/material';
-import { ContentCopy as CopiesIcon } from '@mui/icons-material';
-import { useAppSelector } from '../app/hooks';
-import { selectAllCopies, selectCopySegments } from '../features/Copy/state/CopySelectors';
-import CopyCard from '../features/Copy/components/ui/CopyCard';
+import {
+  Box,
+  Container,
+  Typography,
+  Paper,
+  Alert,
+  AlertTitle,
+  List,
+  ListItem,
+  Divider,
+  Chip,
+  LinearProgress,
+  Button,
+} from '@mui/material';
+import { ContentCopy as CopiesIcon, Favorite as LoyaltyIcon } from '@mui/icons-material';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
+import { selectAllCopies } from '../features/Copy/state/CopySelectors';
+import { bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
+import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
+import { COPY_SYSTEM } from '../constants/gameConstants';
 
 const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label, value }) => (
   <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 0.5 }}>
@@ -19,29 +34,31 @@ const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label,
  * to view, manage, and interact with their created Copies.
  */
 export const CopiesPage: React.FC = React.memo(() => {
+  const dispatch = useAppDispatch();
   const copies = useAppSelector(selectAllCopies);
-  const segments = useAppSelector(selectCopySegments);
-  const [tab, setTab] = React.useState(0);
+  const currentEssence = useAppSelector(selectCurrentEssence);
 
-  const tabToList: { [key: number]: typeof copies } = {
-    0: copies,
-    1: segments.mature,
-    2: segments.growing,
-    3: segments.lowLoyalty,
+  const handleBolsterLoyalty = (copyId: string) => {
+    dispatch(bolsterCopyLoyaltyThunk(copyId));
   };
-  const currentList = tabToList[tab] || [];
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <CopiesIcon color="primary" sx={{ fontSize: '2.5rem' }} />
-        <Box>
-          <Typography variant="h4" component="h1">
-            Copy Management
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            View and manage your created Copies. Assign tasks and develop their abilities.
-          </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <CopiesIcon color="primary" sx={{ fontSize: '2.5rem' }} />
+          <Box>
+            <Typography variant="h4" component="h1">
+              Copy Management
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              View and manage your created Copies. Assign tasks and develop their abilities.
+            </Typography>
+          </Box>
+        </Box>
+        <Box sx={{ textAlign: 'right' }}>
+            <Typography variant="h6">{currentEssence.toFixed(2)}</Typography>
+            <Typography variant="caption" color="text.secondary">Current Essence</Typography>
         </Box>
       </Box>
 
@@ -51,21 +68,41 @@ export const CopiesPage: React.FC = React.memo(() => {
           You have not created any Copies yet. Explore the world and build deep connections to unlock this potential.
         </Alert>
       ) : (
-        <Box>
-          <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }} variant="scrollable" allowScrollButtonsMobile>
-            <Tab label={`All (${copies.length})`} />
-            <Tab label={`Mature (${segments.mature.length})`} />
-            <Tab label={`Growing (${segments.growing.length})`} />
-            <Tab label={`Low Loyalty (${segments.lowLoyalty.length})`} />
-          </Tabs>
-          <Grid container spacing={2}>
-            {currentList.map(copy => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={copy.id}>
-                <CopyCard copy={copy} />
-              </Grid>
+        <Paper sx={{ p: 2 }}>
+          <List disablePadding>
+            {copies.map((copy, index) => (
+              <React.Fragment key={copy.id}>
+                <ListItem sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'stretch', gap: 2, py: 2 }}>
+                  <Box sx={{ flex: 1, width: '100%' }}>
+                    <Typography variant="h6" component="div">{copy.name}</Typography>
+                    <Typography variant="caption" color="text.secondary">ID: {copy.id}</Typography>
+                    {copy.currentTask && <Chip label={`Task: ${copy.currentTask}`} size="small" sx={{ mt: 1 }}/>}
+                  </Box>
+                  <Box sx={{ flex: 2, width: '100%' }}>
+                    <CopyStat label="Maturity" value={`${copy.maturity.toFixed(2)}%`} />
+                    <LinearProgress variant="determinate" value={copy.maturity} sx={{ mb: 1 }} />
+                    <CopyStat label="Loyalty" value={`${copy.loyalty.toFixed(2)}%`} />
+                    <LinearProgress variant="determinate" value={copy.loyalty} color="secondary" sx={{ mb: 2 }} />
+                    <CopyStat label="Location" value={copy.location} />
+                    <CopyStat label="Parent NPC" value={copy.parentNPCId} />
+                  </Box>
+                  <Box sx={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<LoyaltyIcon />}
+                      onClick={() => handleBolsterLoyalty(copy.id)}
+                      disabled={copy.loyalty >= 100 || currentEssence < COPY_SYSTEM.BOLSTER_LOYALTY_COST}
+                    >
+                      Bolster Loyalty ({COPY_SYSTEM.BOLSTER_LOYALTY_COST} E)
+                    </Button>
+                  </Box>
+                </ListItem>
+                {index < copies.length - 1 && <Divider />}
+              </React.Fragment>
             ))}
-          </Grid>
-        </Box>
+          </List>
+        </Paper>
       )}
 
     </Container>

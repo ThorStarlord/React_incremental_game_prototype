@@ -318,4 +318,9 @@ const characterTabs = [
 - **Accessibility Tests**: Screen reader and keyboard navigation testing
 - **Visual Regression**: Component appearance and responsive behavior
 
+## Notifications and Dialogs (Global Policy)
+- Use non-blocking in-app notifications (MUI Snackbar/Alert) for success/info/warnings/errors.
+- Use MUI Dialog for confirmations; never use native `window.alert/confirm/prompt`.
+- Error text comes from Redux state or thunk `rejectWithValue` payloads; components should not trigger browser dialogs.
+
 The Player UI component system provides a comprehensive foundation for character management with modern React patterns, accessibility compliance, and performance optimization throughout the implementation.

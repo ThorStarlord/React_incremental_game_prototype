@@ -9,9 +9,8 @@ import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
 import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated } from './CopySlice';
-import { addNotification } from '../../../shared/state/NotificationSlice';
 import { applyGrowth, applyLoyaltyDecay } from '../utils/copyUtils';
-import type { Copy } from './CopyTypes';
+import type { Copy, CopyGrowthType } from './CopyTypes';
 
 // Default starting stats for a new Copy
 const defaultCopyStats: PlayerStats = {
@@ -30,6 +29,7 @@ const defaultCopyStats: PlayerStats = {
 
 interface CreateCopyPayload {
   npcId: string;
+  growthType: CopyGrowthType;
 }
 
 /**
@@ -47,7 +47,7 @@ export const processCopyGrowthThunk = createAsyncThunk(
     const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
     for (const copy of Object.values(copies)) {
       if (copy.maturity < COPY_SYSTEM.MATURITY_MAX) {
-        const newMaturity = applyGrowth(copy.maturity, baseGrowth, copy.growthType === 'accelerated');
+  const newMaturity = applyGrowth(copy.maturity, baseGrowth, copy.growthType === 'accelerated');
         if (newMaturity !== copy.maturity) {
           batched.push({ copyId: copy.id, updates: { maturity: newMaturity } });
         }
@@ -74,7 +74,7 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
     for (const copy of Object.values(copies)) {
       if (copy.loyalty > COPY_SYSTEM.LOYALTY_MIN) {
-        const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
+  const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
         if (newLoyalty !== copy.loyalty) {
           batched.push({ copyId: copy.id, updates: { loyalty: newLoyalty } });
         }
@@ -105,13 +105,16 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
     const loyaltyGain = COPY_SYSTEM.BOLSTER_LOYALTY_GAIN;
 
     if (!copy) {
-      return rejectWithValue('Copy not found.');
+      const message = 'Copy not found.';
+      return rejectWithValue(message);
     }
     if (copy.loyalty >= 100) {
-      return rejectWithValue('Loyalty already at maximum.');
+      const message = 'Loyalty already at maximum.';
+      return rejectWithValue(message);
     }
     if (essence < essenceCost) {
-      return rejectWithValue('Not enough essence.');
+      const message = 'Not enough essence.';
+      return rejectWithValue(message);
     }
 
     dispatch(spendEssence({ amount: essenceCost, source: 'bolster_loyalty' }));
@@ -130,13 +133,23 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
  */
 export const createCopyThunk = createAsyncThunk(
   'copy/create',
-  async ({ npcId }: CreateCopyPayload, { getState, dispatch, rejectWithValue }) => {
+  async ({ npcId, growthType }: CreateCopyPayload, { getState, dispatch, rejectWithValue }) => {
     const state = getState() as RootState;
     const player = state.player;
     const npc = state.npcs.npcs[npcId];
+    const essence = state.essence.currentEssence;
 
     if (!npc) {
       return rejectWithValue('Target NPC not found.');
+    }
+
+    // --- Handle Accelerated Growth Cost ---
+    if (growthType === 'accelerated') {
+      const essenceCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
+      if (essence < essenceCost) {
+        return rejectWithValue('Not enough essence for accelerated growth.');
+      }
+      dispatch(spendEssence({ amount: essenceCost, source: 'accelerated_copy_growth' }));
     }
 
     // --- Success Check ---
@@ -146,10 +159,6 @@ export const createCopyThunk = createAsyncThunk(
     const successChance = (5 + (charismaModifier * 10)) / 100; // Base 5% + 10% per modifier point
 
     if (Math.random() > successChance) {
-      dispatch(addNotification({
-        message: `Copy creation failed (Chance ${(successChance * 100).toFixed(1)}%).`,
-        type: 'warning'
-      }));
       return rejectWithValue('Seduction attempt failed.');
     }
 
@@ -159,23 +168,19 @@ export const createCopyThunk = createAsyncThunk(
       name: `Copy of ${npc.name}`,
       createdAt: Date.now(),
       parentNPCId: npc.id,
-      growthType: 'normal', // Can be changed later via another action
-      maturity: 0,
+      growthType: growthType,
+      maturity: growthType === 'accelerated' ? 90 : 0, // Accelerated copies start almost mature
       loyalty: 50, // Start at a neutral loyalty
       stats: { ...defaultCopyStats },
-      // Inherit a snapshot of traits the player has equipped
-      inheritedTraits: player.traitSlots
+      // Inherit a snapshot of traits the player has shared with the NPC
+      inheritedTraits: (npc.sharedTraitSlots ?? [])
         .map(slot => slot.traitId)
-        .filter(Boolean) as string[],
+        .filter((traitId): traitId is string => !!traitId),
       location: npc.location, // Starts at the parent's location
     };
 
     // --- Dispatch the action & notify ---
-    dispatch(addCopy(newCopy));
-    dispatch(addNotification({
-      message: `Copy created: ${newCopy.name}`,
-      type: 'success'
-    }));
+  dispatch(addCopy(newCopy));
 
     return newCopy;
   }
@@ -198,7 +203,6 @@ export const promoteCopyToAcceleratedThunk = createAsyncThunk(
     }
     dispatch(spendEssence({ amount: COPY_SYSTEM.PROMOTE_ACCELERATED_COST, source: 'promote_copy' }));
     dispatch(promoteCopyToAccelerated({ copyId }));
-    dispatch(addNotification({ message: `Copy promoted to accelerated growth: ${copy.name}`, type: 'info' }));
     return { success: true };
   }
 );
