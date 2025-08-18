@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useAppDispatch } from './app/hooks';
 import { fetchTraitsThunk } from './features/Traits/state/TraitThunks';
-import { initializeQuestsThunk } from './features/Quest/state/QuestThunks';
+import { initializeQuestsThunk, processQuestTimersThunk } from './features/Quest/state/QuestThunks';
 // FIXED: Import from the feature's barrel file, not deep inside.
 import { initializeNPCsThunk } from './features/NPCs';
 import { useGameLoop } from './features/GameLoop/hooks/useGameLoop';
@@ -32,6 +32,7 @@ const App: React.FC = () => {
     await dispatch(processStatusEffectsThunk());
     await dispatch(regenerateVitalsThunk());
     dispatch(recalculateStatsThunk());
+    await dispatch(processQuestTimersThunk(tickData.deltaTime));
   }, [dispatch]);
 
   // Use the game loop hook

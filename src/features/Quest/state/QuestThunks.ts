@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { addQuest, completeQuest, startQuest } from './QuestSlice';
+import { addQuest, completeQuest, startQuest, failQuest } from './QuestSlice';
 import { Quest } from './QuestTypes';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold } from '../../Player/state/PlayerSlice';
@@ -105,5 +105,23 @@ export const turnInQuestThunk = createAsyncThunk(
     }
 
     return Promise.reject(new Error('Quest not ready to be turned in.'));
+  }
+);
+
+export const processQuestTimersThunk = createAsyncThunk(
+  'quest/processQuestTimers',
+  async (deltaTime: number, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const activeQuests = state.quest.activeQuestIds.map(id => state.quest.quests[id]);
+
+    for (const quest of activeQuests) {
+      if (quest && quest.timeLimitSeconds && quest.startedAt) {
+        const elapsedTime = (Date.now() - quest.startedAt) / 1000;
+        if (elapsedTime > quest.timeLimitSeconds) {
+          dispatch(failQuest(quest.id));
+          dispatch(addNotification({ message: `Quest Failed: ${quest.title}`, type: 'error' }));
+        }
+      }
+    }
   }
 );

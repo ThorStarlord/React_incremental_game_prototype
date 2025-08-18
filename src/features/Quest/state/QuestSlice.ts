@@ -22,6 +22,7 @@ const questSlice = createSlice({
       const quest = state.quests[questId];
       if (quest && quest.status === 'NOT_STARTED') {
         quest.status = 'IN_PROGRESS';
+        quest.startedAt = Date.now();
         if (!state.activeQuestIds.includes(questId)) {
           state.activeQuestIds.push(questId);
         }
@@ -75,9 +76,17 @@ const questSlice = createSlice({
         state.activeQuestIds = state.activeQuestIds.filter((id) => id !== questId);
       }
     },
+    failQuest: (state, action: PayloadAction<string>) => {
+      const questId = action.payload;
+      const quest = state.quests[questId];
+      if (quest) {
+        quest.status = 'FAILED';
+        state.activeQuestIds = state.activeQuestIds.filter((id) => id !== questId);
+      }
+    },
   },
 });
 
-export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, completeQuest } = questSlice.actions;
+export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, completeQuest, failQuest } = questSlice.actions;
 
 export default questSlice.reducer;
