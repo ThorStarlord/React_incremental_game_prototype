@@ -17,12 +17,14 @@ import {
   Button,
 } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { selectAllQuests } from '../features/Quest/state/QuestSelectors';
-import { Quest, QuestStatus } from '../features/Quest/state/QuestTypes';
+import { selectAllQuests, selectQuestById } from '../features/Quest/state/QuestSelectors';
+import { Quest, QuestObjective, QuestStatus } from '../features/Quest/state/QuestTypes';
 import { getTimeRemaining } from '../shared/utils/time';
-import { deliverQuestItemThunk } from '../features/Quest/state/QuestThunks';
+import { deliverQuestItemThunk, solveQuestPuzzleThunk } from '../features/Quest/state/QuestThunks';
 import { selectPlayerLocation } from '../features/Player/state/PlayerSelectors';
 import { selectAllNPCs } from '../features/NPCs';
+import QuestPuzzleModal from '../features/Quest/components/ui/QuestPuzzleModal';
+import QuestLog from '../features/Quest/components/ui/QuestLog';
 
 type SortKey = 'title' | 'status';
 
@@ -32,8 +34,39 @@ const QuestsPage: React.FC = () => {
   const playerLocation = useAppSelector(selectPlayerLocation);
   const allNpcs = useAppSelector(selectAllNPCs);
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<QuestStatus | 'ALL'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<QuestStatus | 'ALL'>('IN_PROGRESS');
   const [sortKey, setSortKey] = useState<SortKey>('title');
+  const [puzzleModalOpen, setPuzzleModalOpen] = useState(false);
+  const [activeObjective, setActiveObjective] = useState<QuestObjective | null>(null);
+
+  const selectedQuest = useAppSelector((state) => (selectedQuestId ? selectQuestById(state, selectedQuestId) : null));
+
+  const handleSolvePuzzle = (questId: string, objectiveId: string) => {
+    const quest = allQuests[questId];
+    const objective = quest.objectives.find((o) => o.objectiveId === objectiveId);
+    if (objective) {
+      setActiveObjective(objective);
+      setPuzzleModalOpen(true);
+    }
+  };
+
+  const handleModalClose = () => {
+    setPuzzleModalOpen(false);
+    setActiveObjective(null);
+  };
+
+  const handleSolve = (solution: string) => {
+    if (selectedQuestId && activeObjective) {
+      dispatch(
+        solveQuestPuzzleThunk({
+          questId: selectedQuestId,
+          objectiveId: activeObjective.objectiveId,
+          solution,
+        }),
+      );
+    }
+    handleModalClose();
+  };
 
   const handleStatusFilterChange = (event: SelectChangeEvent<QuestStatus | 'ALL'>) => {
     setStatusFilter(event.target.value as QuestStatus | 'ALL');
@@ -61,8 +94,6 @@ const QuestsPage: React.FC = () => {
 
     return quests;
   }, [allQuests, statusFilter, sortKey]);
-
-  const selectedQuest = selectedQuestId ? allQuests[selectedQuestId] : null;
 
   const renderTimeRemaining = (quest: Quest) => {
     const remaining = getTimeRemaining(quest.startedAt, quest.timeLimitSeconds, quest.elapsedSeconds);
@@ -129,42 +160,15 @@ const QuestsPage: React.FC = () => {
                   <Typography sx={{ mt: 2 }}>{selectedQuest.description}</Typography>
 
                   <Typography variant="h6" sx={{ mt: 3 }}>Objectives</Typography>
-                  <ul>
-                    {selectedQuest.objectives.map((obj) => {
-                      const canDeliver =
-                        selectedQuest.status === 'IN_PROGRESS' &&
-                        obj.type === 'DELIVER' &&
-                        obj.hasItem &&
-                        !obj.delivered &&
-                        playerLocation === allNpcs[obj.destination!]?.location;
-
-                      return (
-                        <li key={obj.objectiveId}>
-                          <Typography
-                            sx={{ textDecoration: obj.isComplete ? 'line-through' : 'none' }}
-                          >
-                            {obj.description} ({obj.currentCount}/{obj.requiredCount})
-                          </Typography>
-                          {canDeliver && (
-                            <Button
-                              variant="contained"
-                              size="small"
-                              sx={{ mt: 1 }}
-                              onClick={() => dispatch(deliverQuestItemThunk({ questId: selectedQuest.id, objectiveId: obj.objectiveId }))}
-                            >
-                              Deliver Item
-                            </Button>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
+                  <QuestLog quests={[selectedQuest]} onSolvePuzzle={handleSolvePuzzle} />
 
                   <Typography variant="h6" sx={{ mt: 3 }}>Rewards</Typography>
                   <ul>
                     {selectedQuest.rewards.map((reward, index) => (
                       <li key={index}>
-                        <Typography>{reward.type}: {reward.value}</Typography>
+                        <Typography>
+                          {reward.type}: {reward.value}
+                        </Typography>
                       </li>
                     ))}
                   </ul>
@@ -176,6 +180,12 @@ const QuestsPage: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+      <QuestPuzzleModal
+        open={puzzleModalOpen}
+        onClose={handleModalClose}
+        objective={activeObjective}
+        onSolve={handleSolve}
+      />
     </Container>
   );
 };

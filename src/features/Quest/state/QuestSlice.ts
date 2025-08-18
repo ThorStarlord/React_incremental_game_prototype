@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Quest, QuestObjective, QuestState, QuestStatus } from './QuestTypes';
+import { solveQuestPuzzleThunk } from './QuestThunks';
 
 const initialState: QuestState = {
   quests: {},
@@ -111,6 +112,12 @@ const questSlice = createSlice({
         state.activeQuestIds = state.activeQuestIds.filter((id) => id !== questId);
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(solveQuestPuzzleThunk.fulfilled, (state, action) => {
+      // The thunk itself handles the logic, so we may not need to do anything here
+      // unless we want to update the quest state in a way that's not already handled.
+    });
   },
 });
 

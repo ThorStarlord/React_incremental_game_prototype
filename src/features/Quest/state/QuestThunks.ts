@@ -3,7 +3,7 @@ import { RootState } from '../../../app/store';
 import { addQuest, completeQuest, startQuest, incrementQuestElapsed } from './QuestSlice';
 import { Quest } from './QuestTypes';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
-import { gainGold } from '../../Player/state/PlayerSlice';
+import { gainGold, addStatusEffect } from '../../Player/state/PlayerSlice';
 import { addAvailableQuestToNPC } from '../../NPCs/state/NPCSlice';
 import { updateNPCRelationshipThunk } from '../../NPCs/state/NPCThunks';
 import { addNotification } from '../../../shared/state/NotificationSlice';
@@ -11,6 +11,7 @@ import { addItem, removeItem } from '../../Inventory/state/InventorySlice';
 import { v4 as uuidv4 } from 'uuid';
 import { updateObjectiveProgress, patchObjectiveFields } from './QuestSlice';
 import { toDisplayNameFromId } from '../../../shared/utils/formatUtils';
+import { StatusEffect } from '../../Player/state/PlayerTypes';
 
 export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
   try {
@@ -55,6 +56,53 @@ export const deliverQuestItemThunk = createAsyncThunk(
   // Also normalize numeric progress to 1/1
   dispatch(updateObjectiveProgress({ questId, objectiveId, progress: 1 }));
     }
+  }
+);
+
+export const solveQuestPuzzleThunk = createAsyncThunk(
+  'quest/solveQuestPuzzle',
+  async ({ questId, objectiveId, solution }: { questId: string; objectiveId: string; solution: string }, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const quest = state.quest.quests[questId];
+    const objective = quest?.objectives.find((obj) => obj.objectiveId === objectiveId);
+
+    if (!quest || !objective || !objective.outcomes) {
+      dispatch(addNotification({ message: 'Failed to solve puzzle: Invalid quest or objective.', type: 'error' }));
+      return;
+    }
+
+    const outcome = objective.outcomes.find((o) => o.solution === solution);
+
+    if (!outcome) {
+      dispatch(addNotification({ message: 'Incorrect solution.', type: 'error' }));
+      return;
+    }
+
+    // Process rewards
+    for (const reward of outcome.rewards) {
+      switch (reward.type) {
+        case 'GOLD':
+          dispatch(gainGold(reward.value));
+          break;
+        // Add other reward types here
+      }
+    }
+
+    // Process effects
+    for (const effect of outcome.effects) {
+      if (effect.type === 'STATUS_EFFECT') {
+        const newEffect: StatusEffect = {
+          id: uuidv4(),
+          name: effect.value,
+          duration: 60, // Example duration
+          potency: -5, // Example potency
+        };
+        dispatch(addStatusEffect(newEffect));
+      }
+    }
+
+    dispatch(addNotification({ message: outcome.logMessage, type: 'success' }));
+    dispatch(updateObjectiveProgress({ questId, objectiveId, progress: 1 }));
   }
 );
 

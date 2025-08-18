@@ -80,5 +80,43 @@
     "prerequisites": { "quests": ["quest_elara_chain_1"] },
     "rewards": [{ "type": "ITEM", "value": "item_rare_book_page", "amount": 1 }],
     "status": "NOT_STARTED"
+  },
+  "quest_willow_disarm_traps": {
+    "id": "quest_willow_disarm_traps",
+    "title": "A Delicate Situation",
+    "description": "Elder Willow has found a magically trapped chest. She needs someone to disarm it. A brute-force approach might work, but a careful touch with the right tools would be better.",
+    "giver": "npc_elder_willow",
+    "type": "SIDE",
+    "status": "NOT_STARTED",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Disarm the magically trapped chest.",
+        "type": "INTERACT_PUZZLE",
+        "target": "chest_ancient_oak",
+        "requiredCount": 1, "currentCount": 0, "isComplete": false,
+        "puzzleData": {
+          "type": "sequence",
+          "prompt": "Enter the sequence of runes: Sun, Moon, Star",
+          "options": ["Sun", "Moon", "Star", "Leaf"],
+          "solution": "Sun,Moon,Star"
+        },
+        "outcomes": [
+          {
+            "solution": "Sun,Moon,Star",
+            "rewards": [{ "type": "GOLD", "value": 150 }],
+            "effects": [],
+            "logMessage": "You carefully disarmed the trap!"
+          },
+          {
+            "solution": "force",
+            "rewards": [{ "type": "GOLD", "value": 50 }],
+            "effects": [{ "type": "STATUS_EFFECT", "value": "cursed_hands_debuff" }],
+            "logMessage": "You forced the chest open, triggering a minor curse!"
+          }
+        ]
+      }
+    ],
+    "rewards": []
   }
 }
