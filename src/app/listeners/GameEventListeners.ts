@@ -11,7 +11,7 @@ export const gameEventListeners = createListenerMiddleware();
 // Listener for item additions (GATHER objectives)
 gameEventListeners.startListening({
   matcher: isAnyOf(addItem),
-  effect: async (action, listenerApi) => {
+  effect: async (action: ReturnType<typeof addItem>, listenerApi) => {
     const state = listenerApi.getState() as RootState;
     const { itemId } = action.payload;
     const activeQuests = state.quest.activeQuestIds.map(id => state.quest.quests[id]);
@@ -37,7 +37,7 @@ gameEventListeners.startListening({
 // Listener for location changes (REACH_LOCATION objectives)
 gameEventListeners.startListening({
   actionCreator: setLocation,
-  effect: async (action, listenerApi) => {
+  effect: async (action: ReturnType<typeof setLocation>, listenerApi) => {
     const state = listenerApi.getState() as RootState;
     const newLocation = action.payload;
     const activeQuests = state.quest.activeQuestIds.map(id => state.quest.quests[id]);
@@ -62,7 +62,7 @@ gameEventListeners.startListening({
 // Listener for combat victories (KILL objectives)
 gameEventListeners.startListening({
   actionCreator: targetKilled,
-  effect: async (action, listenerApi) => {
+  effect: async (action: ReturnType<typeof targetKilled>, listenerApi) => {
     const state = listenerApi.getState() as RootState;
     const { targetId } = action.payload;
     const activeQuests = state.quest.activeQuestIds.map(id => state.quest.quests[id]);

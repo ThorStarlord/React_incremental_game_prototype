@@ -16,8 +16,6 @@ const inventorySlice = createSlice({
     removeItem: (state, action: PayloadAction<{ itemId: string; quantity: number }>) => {
       const { itemId, quantity } = action.payload;
       if (state.items[itemId]) {
-        state.items[itemId] -= quantity;
-        if (state.items[itemId] <= 0) {
         if (quantity >= state.items[itemId]) {
           delete state.items[itemId];
         } else {

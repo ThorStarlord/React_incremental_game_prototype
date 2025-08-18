@@ -8,6 +8,7 @@ import { RootState } from '../../../app/store';
 import { CopiesState, Copy } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import { isQualifyingForEssenceBonus } from '../utils/copyUtils';
+import { calculateCopyEssenceGeneration } from '../utils/copyUtils';
 
 /** Root selector for the Copy slice. */
 const selectCopiesState = (state: RootState): CopiesState => state.copy;
@@ -189,3 +190,27 @@ export const selectCopyProgress = createSelector(
 
 /** All qualifying copies as an array. */
 export const selectQualifyingCopies = createSelector([_allCopies], (copies) => copies.filter(isQualifyingForEssenceBonus));
+
+/** Selector to compute a single Copy's essence generation rate. */
+export const makeSelectCopyEssenceGeneration = () => createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+    (state: RootState) => state.traits.traits,
+  ],
+  (copy, traitsById) => {
+    if (!copy) return 0;
+    if (copy.maturity < COPY_SYSTEM.MATURITY_THRESHOLD) return 0;
+    return calculateCopyEssenceGeneration(copy, traitsById as any);
+  }
+);
+
+/** Selector to determine if a Copy is active for generation (maturity and loyalty thresholds). */
+export const makeSelectCopyIsActive = () => createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+  ],
+  (copy) => {
+    if (!copy) return false;
+    return copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD && copy.loyalty >= COPY_SYSTEM.LOYALTY_THRESHOLD;
+  }
+);

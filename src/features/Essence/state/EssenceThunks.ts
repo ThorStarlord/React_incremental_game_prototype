@@ -13,7 +13,8 @@ import { EssenceState } from './EssenceTypes';
 import { addPermanentTrait, setResonanceLevel } from '../../Player/state/PlayerSlice';
 import { selectPlayer } from '../../Player/state/PlayerSelectors';
 import { COPY_SYSTEM, ESSENCE_GENERATION } from '../../../constants/gameConstants';
-import { selectQualifyingCopyCount } from '../../Copy/state/CopySelectors';
+import { selectAllCopies } from '../../Copy/state/CopySelectors';
+import { calculateCopyEssenceGeneration } from '../../Copy/utils/copyUtils';
 import { NPC } from '../../NPCs/state/NPCTypes';
 import { Trait } from '../../Traits/state/TraitsTypes';
 
@@ -55,13 +56,17 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
     const npcs = state.npcs?.npcs || {};
     const player = state.player;
     const allTraits = state.traits.traits;
+    const copies = selectAllCopies(state);
 
     // 1. Start with the base generation rate
     let totalRate = ESSENCE_GENERATION.BASE_RATE_PER_SECOND;
 
-    // 2. Add bonus from mature, loyal Copies
-  const qualifyingCount = selectQualifyingCopyCount(state);
-  totalRate += qualifyingCount * COPY_SYSTEM.ESSENCE_GENERATION_BONUS;
+    // 2. Add contribution from qualifying Copies (maturity >= threshold)
+    for (const copy of copies) {
+      if (copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD) {
+        totalRate += calculateCopyEssenceGeneration(copy, allTraits);
+      }
+    }
     
     // 3. Calculate total contribution from all NPC connections
     const npcContribution = Object.values(npcs).reduce((total, npc: NPC) => {
@@ -92,7 +97,7 @@ export const updateEssenceGenerationRateThunk = createAsyncThunk(
       }
     });
 
-    // 5. Apply the total trait multiplier to the calculated rate
+  // 5. Apply the total trait multiplier to the calculated rate
     totalRate *= traitMultiplier;
 
     // 6. Dispatch the update action

@@ -1,15 +1,18 @@
-import React, { useState, useCallback } from 'react';
-import { Card, CardHeader, CardContent, CardActions, LinearProgress, Typography, Box, Button, Tooltip, TextField, Collapse, Stack, Chip } from '@mui/material';
+import React, { useState, useCallback, useMemo } from 'react';
+import { Card, CardHeader, CardContent, CardActions, LinearProgress, Typography, Box, Button, Tooltip, TextField, Collapse, Stack, Chip, Divider } from '@mui/material';
 import CopyTraitSlots from './CopyTraitSlots';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import BoltIcon from '@mui/icons-material/Bolt';
 import type { Copy } from '../../state/CopyTypes';
-import { useAppDispatch } from '../../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { applySharePreferencesForCopyThunk, bolsterCopyLoyaltyThunk, promoteCopyToAcceleratedThunk } from '../../state/CopyThunks';
 import { setCopyTask } from '../../state/CopySlice';
 import CopyDetailPanel from './CopyDetailPanel';
+import CompactTraitCard from '../../../Traits/components/ui/CompactTraitCard';
+import { makeSelectCopyEssenceGeneration, makeSelectCopyIsActive } from '../../state/CopySelectors';
+import { RootState } from '../../../../app/store';
 
 interface CopyCardProps {
   copy: Copy;
@@ -22,6 +25,12 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
   const [busy, setBusy] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [busyApply, setBusyApply] = useState(false);
+
+  // Memoized selectors for per-copy computed values
+  const selectGen = useMemo(makeSelectCopyEssenceGeneration, []);
+  const selectActive = useMemo(makeSelectCopyIsActive, []);
+  const generation = useAppSelector((s: RootState) => selectGen(s, copy.id));
+  const isActive = useAppSelector((s: RootState) => selectActive(s, copy.id));
 
   const handleBolster = useCallback(async () => {
     setBusy(true);
@@ -64,6 +73,11 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
             {copy.role && copy.role !== 'none' && (
               <Chip size="small" color="info" variant="outlined" label={copy.role.charAt(0).toUpperCase() + copy.role.slice(1)} />
             )}
+            {isActive ? (
+              <Chip size="small" color="success" variant="filled" label="Active" />
+            ) : (
+              <Chip size="small" color="default" variant="outlined" label="Inactive" />
+            )}
           </Box>
         }
         subheader={`ID: ${copy.id}`}
@@ -79,7 +93,34 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
           <LinearProgress value={copy.loyalty} color="secondary" variant="determinate" sx={{ mt: 0.5 }} />
           <Typography variant="body2" sx={{ mt: 0.5 }}>{copy.loyalty.toFixed(1)}%</Typography>
         </Box>
-  <CopyTraitSlots copyId={copy.id} />
+        {/* Active traits summary */}
+        {(copy.inheritedTraits?.length || (copy.traitSlots?.some(s => s.traitId))) ? (
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="subtitle2">Active Traits</Typography>
+            <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: 'wrap' }}>
+              {(copy.inheritedTraits || []).map(tid => (
+                <Box key={`inh-${tid}`} sx={{ minWidth: 140 }}>
+                  <CompactTraitCard traitId={tid} />
+                </Box>
+              ))}
+              {(copy.traitSlots || []).filter(s => s.traitId).map(s => (
+                <Box key={`slot-${s.slotIndex}-${s.traitId}`} sx={{ minWidth: 140 }}>
+                  <CompactTraitCard traitId={s.traitId!} />
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        ) : null}
+
+        {/* Trait slots management */}
+        <Divider sx={{ my: 1 }} />
+        <CopyTraitSlots copyId={copy.id} />
+
+        {/* Per-copy essence generation */}
+        <Box sx={{ mt: 1 }}>
+          <Typography variant="caption" color="text.secondary">Essence/s</Typography>
+          <Typography variant="body2">{generation.toFixed(3)} /s</Typography>
+        </Box>
         <Typography variant="body2" color="text.secondary">Location: {copy.location}</Typography>
         <Typography variant="body2" color="text.secondary">Parent NPC: {copy.parentNPCId}</Typography>
         {copy.currentTask && !taskEditOpen && (
