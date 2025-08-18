@@ -7,6 +7,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
 import { CopiesState, Copy } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
+import { isQualifyingForEssenceBonus } from '../utils/copyUtils';
 
 /** Root selector for the Copy slice. */
 const selectCopiesState = (state: RootState): CopiesState => state.copy;
@@ -107,3 +108,84 @@ export const selectCopyEffectiveTraits = createSelector(
   ],
   (traitsById, ids) => ids.map((id) => traitsById[id]).filter((t) => !!t)
 );
+
+/** Effective trait metadata including source (inherited/shared) and optional slotIndex for shared. */
+export const selectCopyEffectiveTraitsWithSource = createSelector(
+  [
+    (state: RootState) => state.traits.traits as Record<string, any>,
+    selectCopyById,
+  ],
+  (traitsById, copy) => {
+    if (!copy) return [] as Array<{ trait: any; source: 'inherited' | 'shared'; slotIndex?: number }>;
+    const results: Array<{ trait: any; source: 'inherited' | 'shared'; slotIndex?: number }> = [];
+    const inheritedSet = new Set(copy.inheritedTraits ?? []);
+    for (const id of copy.inheritedTraits ?? []) {
+      const trait = traitsById[id];
+      if (trait) results.push({ trait, source: 'inherited' });
+    }
+    for (const slot of copy.traitSlots ?? []) {
+      if (!slot.traitId) continue;
+      if (inheritedSet.has(slot.traitId)) continue; // avoid duplicates
+      const trait = traitsById[slot.traitId];
+      if (trait) results.push({ trait, source: 'shared', slotIndex: slot.slotIndex });
+    }
+    return results;
+  }
+);
+
+/** Number of unlocked empty trait slots available on a Copy. */
+export const selectCopyUnlockedEmptySlotCount = createSelector([selectCopyById], (copy) => {
+  if (!copy) return 0;
+  return (copy.traitSlots ?? []).filter((s) => !s.isLocked && !s.traitId).length;
+});
+
+/**
+ * Eligible player trait IDs that could be shared to this Copy now.
+ * Rules: player has it equipped (non-permanent) and Copy doesn't already have it (inherited/shared).
+ */
+export const selectCopyEligibleShareTraitIds = createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+    (state: RootState) => state.player.traitSlots,
+    (state: RootState) => state.player.permanentTraits,
+  ],
+  (copy, playerSlots, permanent) => {
+    if (!copy) return [] as string[];
+    const equipped = playerSlots.map(s => s.traitId).filter((id): id is string => !!id);
+    const already = new Set([...(copy.inheritedTraits ?? []), ...((copy.traitSlots ?? []).map(s => s.traitId).filter(Boolean) as string[])]);
+    return equipped.filter(id => !permanent.includes(id) && !already.has(id));
+  }
+);
+
+/** Aggregate context to compute per-trait share eligibility reasons in UI. */
+export const selectCopyShareEligibilityContext = createSelector(
+  [
+    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
+    (state: RootState) => state.player.traitSlots,
+    (state: RootState) => state.player.permanentTraits,
+  ],
+  (copy, playerSlots, permanent) => {
+    const equipped = playerSlots.map(s => s.traitId).filter((id): id is string => !!id);
+    const already = new Set<string>([
+      ...((copy?.inheritedTraits ?? []) as string[]),
+      ...(((copy?.traitSlots ?? []).map(s => s.traitId).filter(Boolean) as string[])),
+    ]);
+    const emptySlots = (copy?.traitSlots ?? []).filter(s => !s.isLocked && !s.traitId).length;
+    return { equipped, permanent, already, emptySlots };
+  }
+);
+
+/** Copy share preferences map (default empty object). */
+export const selectCopySharePreferences = createSelector(
+  [selectCopyById],
+  (copy) => copy?.sharePreferences ?? {}
+);
+
+/** Progress summary for a Copy. */
+export const selectCopyProgress = createSelector(
+  [selectCopyById],
+  (copy) => copy ? { maturity: copy.maturity, loyalty: copy.loyalty } : { maturity: 0, loyalty: 0 }
+);
+
+/** All qualifying copies as an array. */
+export const selectQualifyingCopies = createSelector([_allCopies], (copies) => copies.filter(isQualifyingForEssenceBonus));

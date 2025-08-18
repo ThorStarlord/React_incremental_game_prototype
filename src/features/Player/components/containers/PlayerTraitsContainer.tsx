@@ -4,7 +4,7 @@
  */
 
 import React, { useMemo, useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
+import { useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
 import type { Trait, TraitSlot } from '../../../Traits/state/TraitsTypes';
 
@@ -39,8 +39,6 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   onTraitChange,
   className,
 }) => {
-  const dispatch = useAppDispatch();
-
   // Use proper selectors from their correct locations
   const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
   const equippedTraits = useAppSelector(selectEquippedTraits);

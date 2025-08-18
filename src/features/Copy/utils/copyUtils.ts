@@ -5,6 +5,7 @@
 
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { Copy } from '../state/CopyTypes';
+import type { NPC } from '../../NPCs/state/NPCTypes';
 
 /** Clamp a number between min and max. */
 export const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
@@ -38,4 +39,31 @@ export const applyGrowth = (current: number, delta: number, accelerated: boolean
 export const applyLoyaltyDecay = (current: number, delta: number): number => {
   const value = current - delta;
   return clamp(value, COPY_SYSTEM.LOYALTY_MIN, COPY_SYSTEM.LOYALTY_MAX);
+};
+
+/** Given an NPC connectionDepth, return the max inherited trait count allowed. */
+export const getInheritedTraitCap = (connectionDepth: number): number => {
+  let cap = 0;
+  for (const rule of COPY_SYSTEM.INHERITED_TRAIT_CAPS) {
+    if (connectionDepth >= rule.depth) cap = rule.cap; else break;
+  }
+  return cap;
+};
+
+/**
+ * Compute the list of inherited trait IDs for a new Copy based on NPC data.
+ * - Takes at most cap traits from npc.availableTraits that are actually slotted in npc.sharedTraitSlots (if present).
+ * - Falls back to npc.availableTraits order if sharedTraitSlots not present.
+ */
+export const computeInheritedTraits = (npc: NPC): string[] => {
+  const cap = getInheritedTraitCap(npc.connectionDepth ?? 0);
+  if (cap <= 0) return [];
+  const shared = (npc.sharedTraitSlots ?? [])
+    .map(s => s.traitId)
+    .filter((id): id is string => !!id);
+  if (shared.length > 0) {
+    return shared.slice(0, cap);
+  }
+  const av = npc.availableTraits ?? [];
+  return av.slice(0, cap);
 };

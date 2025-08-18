@@ -7,8 +7,9 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import BoltIcon from '@mui/icons-material/Bolt';
 import type { Copy } from '../../state/CopyTypes';
 import { useAppDispatch } from '../../../../app/hooks';
-import { bolsterCopyLoyaltyThunk, promoteCopyToAcceleratedThunk } from '../../state/CopyThunks';
+import { applySharePreferencesForCopyThunk, bolsterCopyLoyaltyThunk, promoteCopyToAcceleratedThunk } from '../../state/CopyThunks';
 import { setCopyTask } from '../../state/CopySlice';
+import CopyDetailPanel from './CopyDetailPanel';
 
 interface CopyCardProps {
   copy: Copy;
@@ -19,6 +20,8 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
   const [taskEditOpen, setTaskEditOpen] = useState(false);
   const [taskValue, setTaskValue] = useState(copy.currentTask || '');
   const [busy, setBusy] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [busyApply, setBusyApply] = useState(false);
 
   const handleBolster = useCallback(async () => {
     setBusy(true);
@@ -42,6 +45,15 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
     setTaskEditOpen(false);
   }, [dispatch, copy.id, taskValue]);
 
+  const handleApplyPrefs = useCallback(async () => {
+    setBusyApply(true);
+    try {
+  await dispatch(applySharePreferencesForCopyThunk(copy.id));
+    } finally {
+      setBusyApply(false);
+    }
+  }, [dispatch, copy.id]);
+
   return (
     <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <CardHeader
@@ -49,6 +61,9 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h6">{copy.name}</Typography>
             {copy.growthType === 'accelerated' && <Chip size="small" color="warning" label="Accelerated" icon={<BoltIcon fontSize="small"/>} />}
+            {copy.role && copy.role !== 'none' && (
+              <Chip size="small" color="info" variant="outlined" label={copy.role.charAt(0).toUpperCase() + copy.role.slice(1)} />
+            )}
           </Box>
         }
         subheader={`ID: ${copy.id}`}
@@ -97,8 +112,11 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
             <Button size="small" disabled={busy || copy.growthType === 'accelerated'} variant="outlined" color="warning" onClick={handlePromote} startIcon={<RocketLaunchIcon />}>Promote</Button>
           </span>
         </Tooltip>
-        <Button size="small" variant="text" onClick={() => setTaskEditOpen(o => !o)}>{taskEditOpen ? 'Hide Task' : (copy.currentTask ? 'Edit Task' : 'Assign Task')}</Button>
+  <Button size="small" variant="outlined" onClick={handleApplyPrefs} disabled={busyApply}>Apply Prefs</Button>
+  <Button size="small" variant="text" onClick={() => setTaskEditOpen(o => !o)}>{taskEditOpen ? 'Hide Task' : (copy.currentTask ? 'Edit Task' : 'Assign Task')}</Button>
+        <Button size="small" variant="text" onClick={() => setDetailsOpen(true)}>Details</Button>
       </CardActions>
+      <CopyDetailPanel copyId={copy.id} open={detailsOpen} onClose={() => setDetailsOpen(false)} />
     </Card>
   );
 };

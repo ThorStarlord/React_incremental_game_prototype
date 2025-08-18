@@ -80,7 +80,7 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
   }, [activeTab, location.pathname]);
 
   // Mobile navigation state
-  const { isDrawerOpen, openDrawer, closeDrawer } = useMobileNavigation();
+  const { isDrawerOpen, closeDrawer } = useMobileNavigation();
 
   // Handle tab changes
   const handleTabChange = useCallback((tabId: TabId) => {

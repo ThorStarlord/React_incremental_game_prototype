@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
-import { selectEssenceState, selectCurrentEssence, selectGenerationRate, selectPerClickValue } from '../state/EssenceSelectors';
+import { selectCurrentEssence, selectGenerationRate, selectPerClickValue } from '../state/EssenceSelectors';
 import { selectGameLoop } from '../../GameLoop/state/GameLoopSelectors';
 import { gainEssence } from '../state/EssenceSlice';
 import { selectPermanentTraits } from '../../Player/state/PlayerSelectors';
@@ -14,7 +14,6 @@ export const useEssenceGeneration = () => {
   const dispatch = useAppDispatch();
   
   // Get essence state and current amount
-  const essenceState = useAppSelector(selectEssenceState);
   const currentEssenceAmount = useAppSelector(selectCurrentEssence);
   const generationRate = useAppSelector(selectGenerationRate);
   const perClickValue = useAppSelector(selectPerClickValue);
@@ -59,12 +58,7 @@ export const useEssenceGeneration = () => {
     return totalBaseRateFromConnections * traitMultiplier;
   }, [generationRate, calculateTraitBonus]);
 
-  // Update generation rate when connections or bonuses change
-  useEffect(() => {
-    const newRate = calculateTotalRate();
-    // Could dispatch an action to update the stored generation rate if needed
-    // For now, we'll use the calculated rate directly in generation logic
-  }, [calculateTotalRate]);
+  // Note: If we later store calculated rate in state, add an effect here to dispatch it.
 
   // Auto-generation hook for passive essence gain
   const gameLoop = useAppSelector(selectGameLoop);
@@ -74,8 +68,7 @@ export const useEssenceGeneration = () => {
 
     // Simple time-based generation using the game loop
     // This is a basic implementation - future versions will use NPC connections
-    const generationInterval = 1000; // Generate every second
-    const generationAmount = calculateTotalRate() / 10; // Per 100ms (1/10th of a second)
+  const generationAmount = calculateTotalRate() / 10; // Per 100ms (1/10th of a second)
     
     if (generationAmount > 0) {
       const intervalId = setInterval(() => {

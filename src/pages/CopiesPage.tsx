@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Container,
@@ -6,26 +6,29 @@ import {
   Paper,
   Alert,
   AlertTitle,
-  List,
-  ListItem,
-  Divider,
-  Chip,
-  LinearProgress,
   Button,
+  Tabs,
+  Tab,
+  Grid,
+  TextField,
+  MenuItem,
 } from '@mui/material';
-import { ContentCopy as CopiesIcon, Favorite as LoyaltyIcon } from '@mui/icons-material';
+import { ContentCopy as CopiesIcon } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { selectAllCopies } from '../features/Copy/state/CopySelectors';
-import { bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
+import { selectAllCopies, selectCopySegments } from '../features/Copy/state/CopySelectors';
+import { applySharePreferencesForCopyThunk, bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
+import CopyCard from '../features/Copy/components/ui/CopyCard';
 import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
-import { COPY_SYSTEM } from '../constants/gameConstants';
+import { addNotification } from '../shared/state/NotificationSlice';
+// import { COPY_SYSTEM } from '../constants/gameConstants';
 
-const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label, value }) => (
-  <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 0.5 }}>
-    <Typography variant="body2" color="text.secondary">{label}</Typography>
-    <Typography variant="body2">{value}</Typography>
-  </Box>
-);
+// Reserved for future copy stats summary UI
+// const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label, value }) => (
+//   <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 0.5 }}>
+//     <Typography variant="body2" color="text.secondary">{label}</Typography>
+//     <Typography variant="body2">{value}</Typography>
+//   </Box>
+// );
 
 /**
  * CopiesPage component.
@@ -36,10 +39,74 @@ const CopyStat: React.FC<{ label: string; value: React.ReactNode; }> = ({ label,
 export const CopiesPage: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
   const copies = useAppSelector(selectAllCopies);
+  const segments = useAppSelector(selectCopySegments);
   const currentEssence = useAppSelector(selectCurrentEssence);
+  const [tab, setTab] = useState(0);
+  const [busyApplyAll, setBusyApplyAll] = useState(false);
+  const [busyBolsterAll, setBusyBolsterAll] = useState(false);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'infiltrator' | 'researcher' | 'guardian' | 'agent' | 'none'>('all');
+  const [sortBy, setSortBy] = useState<'name' | 'maturity' | 'loyalty' | 'createdAt'>('createdAt');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
-  const handleBolsterLoyalty = (copyId: string) => {
-    dispatch(bolsterCopyLoyaltyThunk(copyId));
+  // const handleBolsterLoyalty = (copyId: string) => {
+  //   dispatch(bolsterCopyLoyaltyThunk(copyId));
+  // };
+
+  const baseList = useMemo(() => (tab === 0 ? segments.mature : tab === 1 ? segments.growing : segments.lowLoyalty), [tab, segments]);
+
+  const visibleCopies = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = baseList;
+    if (q) list = list.filter(c => c.name.toLowerCase().includes(q));
+    if (roleFilter !== 'all') list = list.filter(c => (c.role ?? 'none') === roleFilter);
+  const dir = sortDir === 'asc' ? 1 : -1;
+  return [...list].sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return dir * a.name.localeCompare(b.name);
+        case 'maturity':
+      return dir * (a.maturity - b.maturity);
+        case 'loyalty':
+      return dir * (a.loyalty - b.loyalty);
+        case 'createdAt':
+        default:
+      return dir * (a.createdAt - b.createdAt);
+      }
+    });
+  }, [baseList, search, roleFilter, sortBy, sortDir]);
+
+  const handleApplyPrefsAll = async () => {
+    setBusyApplyAll(true);
+    try {
+      for (const c of visibleCopies) {
+  // eslint-disable-next-line no-await-in-loop
+  await dispatch(applySharePreferencesForCopyThunk({ copyId: c.id, suppressNotify: true }));
+      }
+      // Single coalesced notification
+      dispatch(addNotification({
+        type: 'success',
+        message: `Applied share preferences to ${visibleCopies.length} cop${visibleCopies.length === 1 ? 'y' : 'ies'}.`,
+      }));
+    } finally {
+      setBusyApplyAll(false);
+    }
+  };
+
+  const handleBolsterAll = async () => {
+    setBusyBolsterAll(true);
+    try {
+      for (const c of visibleCopies) {
+  // eslint-disable-next-line no-await-in-loop
+  await dispatch(bolsterCopyLoyaltyThunk({ copyId: c.id, suppressNotify: true }));
+      }
+      dispatch(addNotification({
+        type: 'success',
+        message: `Bolstered loyalty for ${visibleCopies.length} low-loyalty cop${visibleCopies.length === 1 ? 'y' : 'ies'}.`,
+      }));
+    } finally {
+      setBusyBolsterAll(false);
+    }
   };
 
   return (
@@ -69,39 +136,68 @@ export const CopiesPage: React.FC = React.memo(() => {
         </Alert>
       ) : (
         <Paper sx={{ p: 2 }}>
-          <List disablePadding>
-            {copies.map((copy, index) => (
-              <React.Fragment key={copy.id}>
-                <ListItem sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'stretch', gap: 2, py: 2 }}>
-                  <Box sx={{ flex: 1, width: '100%' }}>
-                    <Typography variant="h6" component="div">{copy.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">ID: {copy.id}</Typography>
-                    {copy.currentTask && <Chip label={`Task: ${copy.currentTask}`} size="small" sx={{ mt: 1 }}/>}
-                  </Box>
-                  <Box sx={{ flex: 2, width: '100%' }}>
-                    <CopyStat label="Maturity" value={`${copy.maturity.toFixed(2)}%`} />
-                    <LinearProgress variant="determinate" value={copy.maturity} sx={{ mb: 1 }} />
-                    <CopyStat label="Loyalty" value={`${copy.loyalty.toFixed(2)}%`} />
-                    <LinearProgress variant="determinate" value={copy.loyalty} color="secondary" sx={{ mb: 2 }} />
-                    <CopyStat label="Location" value={copy.location} />
-                    <CopyStat label="Parent NPC" value={copy.parentNPCId} />
-                  </Box>
-                  <Box sx={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      startIcon={<LoyaltyIcon />}
-                      onClick={() => handleBolsterLoyalty(copy.id)}
-                      disabled={copy.loyalty >= 100 || currentEssence < COPY_SYSTEM.BOLSTER_LOYALTY_COST}
-                    >
-                      Bolster Loyalty ({COPY_SYSTEM.BOLSTER_LOYALTY_COST} E)
-                    </Button>
-                  </Box>
-                </ListItem>
-                {index < copies.length - 1 && <Divider />}
-              </React.Fragment>
+          <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
+            <Tab label={`Mature (${segments.mature.length})`} />
+            <Tab label={`Growing (${segments.growing.length})`} />
+            <Tab label={`Low Loyalty (${segments.lowLoyalty.length})`} />
+          </Tabs>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2, alignItems: 'center' }}>
+            <TextField
+              size="small"
+              label="Search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              sx={{ minWidth: 200 }}
+            />
+            <TextField
+              select
+              size="small"
+              label="Role"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value as any)}
+              sx={{ minWidth: 160 }}
+            >
+              <MenuItem value="all">All roles</MenuItem>
+              <MenuItem value="infiltrator">Infiltrator</MenuItem>
+              <MenuItem value="researcher">Researcher</MenuItem>
+              <MenuItem value="guardian">Guardian</MenuItem>
+              <MenuItem value="agent">Agent</MenuItem>
+              <MenuItem value="none">None</MenuItem>
+            </TextField>
+            <TextField
+              select
+              size="small"
+              label="Sort by"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              sx={{ minWidth: 160 }}
+            >
+              <MenuItem value="createdAt">Created</MenuItem>
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="maturity">Maturity</MenuItem>
+              <MenuItem value="loyalty">Loyalty</MenuItem>
+            </TextField>
+            <TextField
+              select
+              size="small"
+              label="Order"
+              value={sortDir}
+              onChange={(e) => setSortDir(e.target.value as any)}
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value="desc">Desc</MenuItem>
+              <MenuItem value="asc">Asc</MenuItem>
+            </TextField>
+            <Button size="small" variant="contained" onClick={handleApplyPrefsAll} disabled={busyApplyAll || visibleCopies.length === 0}>Apply Share Prefs to All</Button>
+            <Button size="small" variant="outlined" color="secondary" onClick={handleBolsterAll} disabled={busyBolsterAll || tab !== 2 || visibleCopies.length === 0}>Bolster All (Low Loyalty)</Button>
+          </Box>
+          <Grid container spacing={2}>
+            {visibleCopies.map((copy) => (
+              <Grid item xs={12} md={6} lg={4} key={copy.id}>
+                <CopyCard copy={copy} />
+              </Grid>
             ))}
-          </List>
+          </Grid>
         </Paper>
       )}
 

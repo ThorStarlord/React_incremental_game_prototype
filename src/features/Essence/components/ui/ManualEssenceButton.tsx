@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Button, Chip, Box, Typography, useTheme } from '@mui/material';
+import { Button, Chip, Box, Typography } from '@mui/material';
 import { TouchApp as TouchAppIcon } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { selectPerClickValue } from '../../state/EssenceSelectors';
@@ -14,7 +14,6 @@ import { generateEssenceManuallyThunk, processResonanceLevelThunk } from '../../
 export const ManualEssenceButton: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
   const perClickValue = useAppSelector(selectPerClickValue);
-  const theme = useTheme();
 
   const handleClick = useCallback(async () => {
     // FIXED: Pass the required `perClickValue` as an argument

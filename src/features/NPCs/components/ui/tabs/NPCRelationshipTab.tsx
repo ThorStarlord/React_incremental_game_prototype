@@ -3,7 +3,7 @@
  * @description Tab component for managing NPC relationships and triggering high-level actions.
  */
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import {
   Box,
   Typography,
@@ -42,6 +42,8 @@ import {
 import { useAppDispatch } from '../../../../../app/hooks';
 import { updateNPCRelationshipThunk, debugUnlockAllSharedSlots } from '../../../state/NPCThunks';
 import { createCopyThunk } from '../../../../Copy/state/CopyThunks';
+import { COPY_SYSTEM } from '../../../../../constants/gameConstants';
+import { CreateCopyModal } from '../../../../Copy/components/ui/CreateCopyModal';
 
 interface NPCRelationshipTabProps {
   npc: NPC;
@@ -57,16 +59,12 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
   const dispatch = useAppDispatch();
   const currentTierInfo = getTierBenefits(npc.affinity);
   
-  const SEDUCTION_CONNECTION_REQUIREMENT = 5;
+  const SEDUCTION_CONNECTION_REQUIREMENT = COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT;
 
   const canAttemptSeduction = npc.connectionDepth >= SEDUCTION_CONNECTION_REQUIREMENT;
-
-  const handleSeductionAttempt = () => {
-    if (canAttemptSeduction) {
-  // Default to 'normal' growth for quick creation from this tab; the modal offers choice elsewhere
-  dispatch(createCopyThunk({ npcId: npc.id, growthType: 'normal' }));
-    }
-  };
+  const [openCreate, setOpenCreate] = useState(false);
+  const handleOpenCreate = () => setOpenCreate(true);
+  const handleCloseCreate = () => setOpenCreate(false);
 
   const handleDebugIncreaseAffinity = () => {
     dispatch(updateNPCRelationshipThunk({
@@ -270,11 +268,17 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                     <Button
                         variant="contained"
                         color="secondary"
-                        onClick={handleSeductionAttempt}
+                            onClick={handleOpenCreate}
                         disabled={!canAttemptSeduction}
                     >
                         Attempt to Create Copy
                     </Button>
+                        <CreateCopyModal
+                          open={openCreate}
+                          onClose={handleCloseCreate}
+                          npcId={npc.id}
+                          npcName={npc.name}
+                        />
                     {!canAttemptSeduction && (
                         <Typography variant="caption" display="block" sx={{ mt: 1, fontStyle: 'italic' }}>
                             Requires Connection Depth Level {SEDUCTION_CONNECTION_REQUIREMENT} or higher. (Current: {npc.connectionDepth.toFixed(1)})

@@ -7,7 +7,7 @@ import {
   Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Outlet, useOutlet } from 'react-router-dom';
+import { useOutlet } from 'react-router-dom';
 
 // Page imports
 import CharacterPage from '../../pages/CharacterPage';

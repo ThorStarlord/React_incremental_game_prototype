@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -12,10 +12,15 @@ import {
   Typography,
   Box,
 } from '@mui/material';
-import { useAppDispatch } from '../../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { createCopyThunk } from '../../state/CopyThunks';
 import { CopyGrowthType } from '../../state/CopyTypes';
 import { COPY_SYSTEM } from '../../../../constants/gameConstants';
+import { selectPlayerAttributes } from '../../../Player/state/PlayerSelectors';
+import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
+import { selectNPCById } from '../../../NPCs/state/NPCSelectors';
+import { selectTraits } from '../../../Traits/state/TraitsSelectors';
+import { computeInheritedTraits, getInheritedTraitCap } from '../../utils/copyUtils';
 
 interface CreateCopyModalProps {
   open: boolean;
@@ -32,6 +37,29 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [growthType, setGrowthType] = useState<CopyGrowthType>('normal');
+  const attributes = useAppSelector(selectPlayerAttributes);
+  const currentEssence = useAppSelector(selectCurrentEssence);
+  const npc = useAppSelector((state) => selectNPCById(state, npcId));
+  const allTraits = useAppSelector(selectTraits);
+
+  const essenceCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
+  const lacksEssence = currentEssence < essenceCost;
+  const connectionOk = (npc?.connectionDepth ?? 0) >= COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT;
+
+  const successChancePct = useMemo(() => {
+    const charisma = attributes.charisma ?? 10;
+    const charismaModifier = Math.floor((charisma - 10) / 2);
+    const chance = 5 + charismaModifier * 10; // as used in createCopyThunk
+    return Math.max(0, Math.min(95, chance));
+  }, [attributes.charisma]);
+
+  const inheritanceInfo = useMemo(() => {
+    if (!npc) return { cap: 0, ids: [] as string[], names: [] as string[] };
+    const cap = getInheritedTraitCap(npc.connectionDepth ?? 0);
+    const ids = computeInheritedTraits(npc).slice(0, cap);
+    const names = ids.map(id => allTraits[id]?.name || id);
+    return { cap, ids, names };
+  }, [npc, allTraits]);
 
   const handleCreate = () => {
     dispatch(createCopyThunk({ npcId, growthType }));
@@ -46,6 +74,34 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
           Choose the growth method for your new copy. Accelerated growth is much
           faster but requires a significant Essence investment.
         </DialogContentText>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2">Estimated success chance: <b>{successChancePct}%</b> (based on Charisma)</Typography>
+          <Typography variant="caption" color="text.secondary">
+            Current Essence: {currentEssence} {lacksEssence && `(need ${essenceCost} for accelerated)`}
+          </Typography>
+        </Box>
+        {!connectionOk && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="caption" color="error.main">
+              Requires Connection Depth Level {COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT} or higher to attempt creation. (Current: {npc?.connectionDepth ?? 0})
+            </Typography>
+          </Box>
+        )}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle2">Inheritance Preview</Typography>
+          <Typography variant="caption" color="text.secondary">
+            At connection depth {npc?.connectionDepth ?? 0}, up to {inheritanceInfo.cap} trait{inheritanceInfo.cap === 1 ? '' : 's'} can be inherited.
+          </Typography>
+          {inheritanceInfo.names.length > 0 ? (
+            <Typography variant="body2" sx={{ mt: 0.5 }}>
+              Predicted: {inheritanceInfo.names.join(', ')}
+            </Typography>
+          ) : (
+            <Typography variant="body2" sx={{ mt: 0.5 }} color="text.secondary">
+              No traits eligible to inherit at this connection depth.
+            </Typography>
+          )}
+        </Box>
         <RadioGroup
           aria-label="growth-type"
           name="growth-type-radio-buttons-group"
@@ -54,6 +110,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
         >
           <FormControlLabel
             value="normal"
+            disabled={!connectionOk}
             control={<Radio />}
             label={
               <Box>
@@ -65,7 +122,8 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
             }
           />
           <FormControlLabel
-            value="accelerated"
+      value="accelerated"
+      disabled={lacksEssence || !connectionOk}
             control={<Radio />}
             label={
               <Box>
@@ -73,6 +131,11 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
                 <Typography variant="caption" color="text.secondary">
                   The copy will mature rapidly. Costs {COPY_SYSTEM.ACCELERATED_GROWTH_COST} Essence.
                 </Typography>
+                {lacksEssence && (
+                  <Typography variant="caption" color="error.main">
+                    Insufficient Essence for accelerated growth.
+                  </Typography>
+                )}
               </Box>
             }
           />
@@ -80,7 +143,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleCreate} variant="contained">
+    <Button onClick={handleCreate} variant="contained" disabled={!connectionOk || (growthType === 'accelerated' && lacksEssence)}>
           Create
         </Button>
       </DialogActions>
