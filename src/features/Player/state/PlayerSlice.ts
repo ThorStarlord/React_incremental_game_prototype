@@ -71,7 +71,7 @@ const initialState: PlayerState = {
   traitSlots: createInitialTraitSlots(),
   totalPlaytime: 0,
   isAlive: true,
-  location: 'Starting Area',
+  location: 'City Center',
   gold: 100,
 };
 

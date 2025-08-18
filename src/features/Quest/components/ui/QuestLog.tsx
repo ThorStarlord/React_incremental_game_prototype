@@ -1,10 +1,30 @@
 import React from 'react';
 import { List, ListItem, ListItemText, Typography } from '@mui/material';
-import { Quest } from '../../state/QuestTypes';
+import { Quest, QuestObjective } from '../../state/QuestTypes';
 
 interface QuestLogProps {
   quests: Quest[];
 }
+
+const renderObjective = (objective: QuestObjective) => {
+  const baseStyle = {
+    textDecoration: objective.isComplete ? 'line-through' : 'none',
+  };
+
+  switch (objective.type) {
+    case 'GATHER':
+    case 'KILL':
+      return (
+        <span style={baseStyle}>
+          {objective.description} ({objective.currentCount}/{objective.requiredCount})
+        </span>
+      );
+    case 'REACH_LOCATION':
+      return <span style={baseStyle}>{objective.description}</span>;
+    default:
+      return <span style={baseStyle}>{objective.description}</span>;
+  }
+};
 
 const QuestLog: React.FC<QuestLogProps> = ({ quests }) => {
   if (quests.length === 0) {
@@ -29,8 +49,8 @@ const QuestLog: React.FC<QuestLogProps> = ({ quests }) => {
                 </Typography>
                 <ul>
                   {quest.objectives.map((objective) => (
-                    <li key={objective.id}>
-                      {objective.description} {objective.type === 'GATHER' && `(${objective.progress}/${objective.targetValue})`}
+                    <li key={objective.objectiveId}>
+                      {renderObjective(objective)}
                     </li>
                   ))}
                 </ul>

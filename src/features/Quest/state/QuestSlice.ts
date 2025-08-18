@@ -13,7 +13,7 @@ const questSlice = createSlice({
     addQuest: (state, action: PayloadAction<Quest>) => {
       const quest = action.payload;
       state.quests[quest.id] = quest;
-      if (quest.status === 'IN_PROGRESS' && !state.activeQuestIds.includes(quest.id)) {
+  if ((quest.status === 'IN_PROGRESS' || quest.status === 'READY_TO_COMPLETE') && !state.activeQuestIds.includes(quest.id)) {
         state.activeQuestIds.push(quest.id);
       }
     },
@@ -40,14 +40,31 @@ const questSlice = createSlice({
     ) => {
       const { questId, objectiveId, progress } = action.payload;
       const quest = state.quests[questId];
-      if (quest) {
-        const objective = quest.objectives.find((o) => o.id === objectiveId);
-        if (objective) {
-          objective.progress = progress;
-          if (objective.progress >= objective.targetValue) {
-            objective.isComplete = true;
-          }
-        }
+      if (!quest) return;
+
+      const objective = quest.objectives.find((o) => o.objectiveId === objectiveId);
+      if (!objective) return;
+
+      // Normalize progress across objective types
+      if (objective.type === 'REACH_LOCATION') {
+        // One-and-done objective
+        objective.currentCount = progress >= 1 ? 1 : 0;
+        objective.isComplete = progress >= 1;
+      } else {
+        // Count-based objectives
+        const target = Math.max(1, objective.requiredCount || 1);
+        const next = Math.min(Math.max(0, progress), target);
+        objective.currentCount = next;
+        objective.isComplete = next >= target;
+      }
+
+      // If all objectives complete and quest is in progress, mark ready to turn in
+      if (
+        quest.status === 'IN_PROGRESS' &&
+        quest.objectives.length > 0 &&
+        quest.objectives.every((o) => o.isComplete)
+      ) {
+        quest.status = 'READY_TO_COMPLETE';
       }
     },
     completeQuest: (state, action: PayloadAction<string>) => {
