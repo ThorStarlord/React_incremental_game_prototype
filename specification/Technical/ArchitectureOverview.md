@@ -36,7 +36,7 @@ The project follows a Feature-Sliced Design approach to promote modularity, scal
         *   **`Meta/`**: ✅ **IMPLEMENTED** - Application metadata and save/load functionality
         *   **`NPC/`**: ✅ **UI IMPLEMENTED + THUNKS** - Complete NPC interaction system with tabbed interface, relationship progression, and comprehensive async operations through NPCThunks.ts
         *   **`Copy/`**: ✅ **BASIC UI/STATE** - Player-created entity management.
-        *   **Future Features**: `Quest/` (planned)
+  *   **Quest/**: ✅ FOUNDATION - Quest management slice and basic UI
     *   **`gameLogic/`**: Core game logic, systems, and calculations not tied to a specific UI feature.
     *   **`hooks/`**: Global/shared custom React hooks.
     *   **`layout/`**: ✅ **COMPLETE** - Global layout components and column structures with **MainContentArea implementation**.
@@ -641,7 +641,7 @@ The architecture now provides a **complete, mature Player UI system** with compr
 **Feature Folder Naming**: To ensure consistency and predictability, feature slices are named after the singular entity they manage.
 
 *   **Feature Directory:** Singular, PascalCase (e.g., `src/features/Player`, `src/features/Trait`, `src/features/Copy`).
-*   **Redux Slice Key:** Singular, camelCase (e.g., `player`, `trait`, `copy` in the root reducer).
+*   **Redux Slice Key:** Singular, camelCase (e.g., `player`, `trait`, `copy`, `quest` in the root reducer).
 *   **Page Components:** Can be plural if they manage a list of entities (e.g., `NPCsPage`, `CopiesPage`).
 
 #### NPC Feature Example ✅ IMPLEMENTED
@@ -671,5 +671,11 @@ The architecture now provides a **complete, mature Player UI system** with compr
   - **Component Files**: Singular entity prefix, descriptive suffix (`TraitPanel.tsx`, `NPCHeader.tsx`)
   - **State Files**: Match component naming (`TraitSlice.ts`, `NPCSelectors.ts`)
   - **Page Files**: Plural for collection views (`TraitsPage.tsx`, `NPCsPage.tsx`)
+
+#### Quest Feature Example ✅ FOUNDATION
+ - **Feature Root**: `src/features/Quest/` (singular)
+ - **Slice Key**: `quest`
+ - **State Management**: `QuestSlice.ts`, `QuestSelectors.ts`, `QuestThunks.ts`
+ - **UI**: `components/ui/QuestLog.tsx` (basic list)
 
 **Cross-Platform Compatibility**: Folder naming avoids case sensitivity conflicts while maintaining semantic clarity in file and type names.

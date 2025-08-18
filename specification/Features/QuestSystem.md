@@ -1,11 +1,28 @@
 # Quest System Specification
 
+Implementation Status: ✅ FOUNDATION IMPLEMENTED (slice + selectors + thunks + basic QuestLog UI)
+
+Implementation Notes:
+- Feature directory: `src/features/Quest/` (singular)
+- Redux slice key: `quest` (singular, camelCase)
+
 This document outlines the design for the quest system, including types, structure, progression, and rewards.
 
 ## 1. Overview
 
 *   **Purpose:** Provide goals, narrative progression, challenges, and rewards for the player. Guide player activity and world exploration.
 *   **Core Loop:** Discovery -> Acceptance -> Progress Tracking -> Completion -> Rewards.
+
+### Current Implementation (Foundation)
+- Redux slice with basic reducers for adding quests, updating objective progress, and completing quests.
+- Selectors targeting `state.quest` for active quests and lookups.
+- Thunks prefixed with `quest/*` for starting/turning-in quests (basic scaffolding).
+- Quest Log UI component renders a simple list of active quests.
+
+Deferred (Planned next phases):
+- Full acceptance/turn-in UX flows and NPC hand-in rules (auto-complete vs. return-to-giver).
+- Dynamic/repeatable generation, rewards payout integration, and notifications.
+- Map markers and richer objective types.
 
 ## 2. Quest Types
 
@@ -46,6 +63,8 @@ This document outlines the design for the quest system, including types, structu
     *   Objective Updates: Game systems notify the Quest System when progress is made (e.g., item gathered, enemy killed).
 *   **Completion:** Turning in the quest to the giver or automatic completion.
 *   **Failure Conditions:** Time limits (rare), essential NPC death, specific player actions.
+
+Implementation (current): Foundation supports adding/tracking/completing quests and rendering in a basic Quest Log.
 
 ## 5. Rewards
 

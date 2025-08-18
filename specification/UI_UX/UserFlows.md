@@ -236,3 +236,15 @@ User Action → Minimal Processing → Efficient Update → Fast Response
 3. **Analytics Integration** - Navigation flow tracking ready for implementation
 
 The user flow architecture now provides **complete, optimized navigation** with **GameLayout + AppRouter integration**, ensuring excellent user experience, optimal performance, and seamless interaction across all features and device form factors. The **AppRouter integration** represents the final component of the navigation architecture, providing simplified routing with enhanced performance characteristics.
+
+## 7. Quest Flow (Foundation)
+
+### 7.1. High-level Flow
+```
+Discover → Accept → Track → Complete → Reward
+```
+
+### 7.2. Current Scope
+- Track: QuestLog lists active quests; objective progress updates reflected via Redux.
+- Complete: Slice supports completing quests; UI is minimal list view.
+- Accept/Reward UI: Planned; handled via future NPC interactions and notifications.

@@ -29,8 +29,9 @@ export const store = configureStore({
     gameLoop: gameLoopSlice.reducer,
     settings: settingsSlice.reducer,
     meta: metaSlice.reducer,
-    copy: copySlice.reducer,
-    // Future: quests, inventory
+  copy: copySlice.reducer,
+  quest: questSlice.reducer,
+  // Future: inventory
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -301,6 +302,15 @@ interface MetaState {
 - **Import/Export**: Game state import/export functionality with validation
 - **Persistence**: Integration with localStorage and save file management
 - **Version Control**: Save format versioning for compatibility
+
+### 4.8. Quest Slice ✅ FOUNDATION
+**Location**: `src/features/Quest/state/QuestSlice.ts`
+
+**Overview**:
+- Slice name: `quest`; registered under `state.quest`.
+- Selectors: `selectQuestState`, `selectAllQuests`, `selectActiveQuests`, `selectQuestById` (target `state.quest`).
+- Thunks: Prefixed with `quest/*` for lifecycle actions like starting and turning in quests.
+- UI: Basic `QuestLog` renders active quests list.
 
 ## 5. Selector Architecture
 

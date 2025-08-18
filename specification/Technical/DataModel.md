@@ -546,6 +546,10 @@ interface QuestObjective {
 }
 ```
 
+### 9.3. Implementation Note ✅ FOUNDATION
+- The current implementation includes foundational types aligned with the Slice in `src/features/Quest/state/QuestTypes.ts` and supports objective progress tracking.
+- Additional fields (rewards, prerequisites, timers) may be introduced incrementally as features land.
+
 ## 10. Copy Data Model 📋 PLANNED
 
 ### 10.1. Copy Structure
