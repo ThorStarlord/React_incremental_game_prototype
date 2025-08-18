@@ -11,9 +11,10 @@ export interface QuestRequirement {
 
 // Placeholder for rewards
 export interface QuestReward {
-  type: 'XP' | 'GOLD' | 'ITEM' | 'REPUTATION';
+  type: 'XP' | 'GOLD' | 'ITEM' | 'REPUTATION' | 'ESSENCE';
   value: string | number;
   amount?: number;
+  faction?: string;
 }
 
 export interface QuestObjective {
