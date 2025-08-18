@@ -1,4 +1,4 @@
-Implementation Status: ✅ **BASIC STATE/UI IMPLEMENTED (Phase 1–7 + Phase 10 Docs)**
+Implementation Status: ✅ **BASIC STATE/UI + TRAIT SHARING AUTO‑SYNC IMPLEMENTED (Phase 1–7 + Phase 10–11)**
 
 > Current Build Summary (Aug 2025):
 > * Slice + thunks for growth, decay, creation, loyalty bolster, promotion (accelerated growth) implemented.
@@ -7,6 +7,7 @@ Implementation Status: ✅ **BASIC STATE/UI IMPLEMENTED (Phase 1–7 + Phase 10 
 > * Notification system added (`notifications` slice) replacing console logs for success/failure feedback.
 > * JSDoc added for thunks, selectors, utilities.
 > * Essence integration (bonus per qualifying Copy) present via selectors (qualifying = maturity ≥ threshold & loyalty > threshold).
+> * ✅ Copy–Trait integration: Copies have trait slots with maturity/loyalty unlocks, can receive shared traits from the Player (while equipped), and auto‑sync unshares on player unequip/replace/permanence.
 
 # Copy System Specification
 
@@ -20,6 +21,39 @@ This document details the mechanics for creating, managing, and utilizing "Copie
 *   **Core Loop:** Target -> Seduction Interaction -> Creation -> Growth (Normal/Accelerated) -> Management/Deployment -> Loyalty Maintenance.
 
 ## 2. Creation Method: Seduction Outcome
+
+## 3. Traits on Copies (Inherited + Shared) ✅ IMPLEMENTED
+
+Copies gain traits from two sources:
+
+- Inherited Traits (read‑only): On creation, a Copy snapshots any traits that the parent NPC was receiving from the Player at that moment. These are immutable on the Copy and always count toward its effective trait list.
+- Shared Traits (player‑controlled): Each Copy has a set of trait slots. Unlocked slots can receive one of the Player’s currently equipped, non‑permanent traits. Shared traits remain active on the Copy while the Player keeps that trait equipped and non‑permanent.
+
+### 3.1 Slot Unlock Rules
+- Configuration lives in `COPY_SYSTEM.TRAIT_SLOT_UNLOCKS` with per‑slot requirements (maturity or loyalty thresholds). Initial locked/unlocked count is defined by `INITIAL_TRAIT_SLOTS` and capped by `MAX_TRAIT_SLOTS`.
+- Unlocks are one‑way in this prototype: once a slot unlocks, it stays unlocked even if metrics later decline.
+
+### 3.2 Share Validation
+- Trait must be equipped on the Player.
+- Trait must not be permanent on the Player (permanent traits are not shareable).
+- The Copy must not already have the trait (inherited or in another slot). Duplicate shares are blocked.
+
+### 3.3 Auto‑Unshare Invariants (Listener Middleware) ✅ IMPLEMENTED
+Cross‑slice listener middleware enforces these invariants automatically:
+- Player unequips a trait → it is unshared from all Copy slots that had it.
+- Player replaces a trait in a slot → the replaced (old) trait is unshared from all Copies.
+- Player resonates a trait (makes it permanent) → that trait is unshared from all Copies and cannot be shared again.
+
+Notifications are emitted to provide user feedback on auto‑unshare events.
+
+### 3.4 Migration Safety & Save/Load
+- Older saves may lack `copy.traitSlots`. On load/import or any share/unshare sweep, the system initializes missing slots using the current `COPY_SYSTEM` configuration.
+- A minimal post‑load pass ensures all Copies have `traitSlots` before UI renders share options.
+
+### 3.5 UI Behavior (Phase 1)
+- Locked slots show a tooltip with the unlock requirement (e.g., “maturity ≥ 80”).
+- Share list shows only player‑equipped, non‑permanent traits.
+- Traits already present on the Copy (inherited/shared) render the Share button disabled with a tooltip explaining the reason.
 
 *   **Trigger:** Successfully completing a "Seduction" interaction path with a suitable target (likely an NPC, potentially other entities based on game design). This is a high-level social/interaction challenge outcome, not necessarily literal seduction.
 *   **Result:** Instead of typical relationship gains, a successful Seduction outcome results in the creation of a nascent Copy.

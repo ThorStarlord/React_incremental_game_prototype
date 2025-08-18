@@ -51,4 +51,15 @@ export const COPY_SYSTEM = {
   LOYALTY_MIN: 0,
   /** Essence cost to promote a Copy to accelerated growth (placeholder). */
   PROMOTE_ACCELERATED_COST: 150,
+
+  /** Trait Slots config for Copies */
+  MAX_TRAIT_SLOTS: 4,
+  INITIAL_TRAIT_SLOTS: 2,
+  /** Unlock rules for each slot by index */
+  TRAIT_SLOT_UNLOCKS: [
+    { slotIndex: 0, type: 'maturity' as const, value: 0 },
+    { slotIndex: 1, type: 'maturity' as const, value: 25 },
+    { slotIndex: 2, type: 'loyalty' as const, value: 60 },
+    { slotIndex: 3, type: 'maturity' as const, value: 80 },
+  ],
 };

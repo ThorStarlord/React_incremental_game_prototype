@@ -11,6 +11,7 @@ import metaReducer from '../features/Meta/state/MetaSlice';
 import npcsReducer from '../features/NPCs/state/NPCSlice';
 import copyReducer from '../features/Copy/state/CopySlice'; // Corrected import path
 import notificationsReducer from '../shared/state/NotificationSlice';
+import { copyListeners } from '../features/Copy/state/CopyListeners';
 
 // Combine all feature reducers
 const combinedReducer = combineReducers({
@@ -37,7 +38,7 @@ interface ReplaceStateAction {
 /**
  * Root reducer that handles the combined reducers and special actions
  */
-const rootReducer = (state: RootState | undefined, action: PayloadAction<any>): RootState => {
+export const rootReducer = (state: RootState | undefined, action: PayloadAction<any>): RootState => {
   if (action.type === 'meta/replaceState') {
     const replaceAction = action as ReplaceStateAction;
     return replaceAction.payload;
@@ -56,7 +57,7 @@ export const store = configureStore({
         ignoredActions: ['meta/replaceState'],
         ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
       },
-    }),
+  }).prepend(copyListeners.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
 

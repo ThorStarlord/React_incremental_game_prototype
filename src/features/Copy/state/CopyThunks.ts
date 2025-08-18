@@ -8,9 +8,10 @@ import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState } from '../../../app/store';
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
-import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated } from './CopySlice';
+import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated, shareTraitToCopy, unshareTraitFromCopy, unlockCopySlotsIfEligible } from './CopySlice';
 import { applyGrowth, applyLoyaltyDecay } from '../utils/copyUtils';
 import type { Copy, CopyGrowthType } from './CopyTypes';
+import { addNotification } from '../../../shared/state/NotificationSlice';
 
 // Default starting stats for a new Copy
 const defaultCopyStats: PlayerStats = {
@@ -53,7 +54,7 @@ export const processCopyGrowthThunk = createAsyncThunk(
         }
       }
     }
-    if (batched.length) {
+  if (batched.length) {
       dispatch(updateMultipleCopies(batched));
     }
   }
@@ -80,7 +81,7 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
         }
       }
     }
-    if (batched.length) {
+  if (batched.length) {
       dispatch(updateMultipleCopies(batched));
     }
   }
@@ -117,9 +118,11 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
       return rejectWithValue(message);
     }
 
-    dispatch(spendEssence({ amount: essenceCost, source: 'bolster_loyalty' }));
+  dispatch(spendEssence({ amount: essenceCost, source: 'bolster_loyalty' }));
     const newLoyalty = Math.min(100, copy.loyalty + loyaltyGain);
     dispatch(updateCopy({ copyId, updates: { loyalty: newLoyalty } }));
+  dispatch(unlockCopySlotsIfEligible({ copyId }));
+  dispatch(addNotification({ type: 'success', message: 'Loyalty bolstered.' }));
 
     return { success: true };
   }
@@ -176,11 +179,14 @@ export const createCopyThunk = createAsyncThunk(
       inheritedTraits: (npc.sharedTraitSlots ?? [])
         .map(slot => slot.traitId)
         .filter((traitId): traitId is string => !!traitId),
+      traitSlots: undefined,
       location: npc.location, // Starts at the parent's location
     };
 
     // --- Dispatch the action & notify ---
   dispatch(addCopy(newCopy));
+    dispatch(unlockCopySlotsIfEligible({ copyId: newCopy.id }));
+    dispatch(addNotification({ type: 'success', message: `Created ${newCopy.name}.` }));
 
     return newCopy;
   }
@@ -204,5 +210,64 @@ export const promoteCopyToAcceleratedThunk = createAsyncThunk(
     dispatch(spendEssence({ amount: COPY_SYSTEM.PROMOTE_ACCELERATED_COST, source: 'promote_copy' }));
     dispatch(promoteCopyToAccelerated({ copyId }));
     return { success: true };
+  }
+);
+
+/** Share a player-equipped, non-permanent trait to a Copy slot. */
+export const shareTraitWithCopyThunk = createAsyncThunk<
+  { copyId: string; slotIndex: number; traitId: string },
+  { copyId: string; slotIndex: number; traitId: string },
+  { state: RootState; rejectValue: string }
+>(
+  'copy/shareTraitWithCopy',
+  async (payload, { getState, dispatch, rejectWithValue }) => {
+    const { copyId, slotIndex, traitId } = payload;
+    const state = getState();
+    const copy = state.copy.copies[copyId];
+    const reject = (message: string) => {
+      dispatch(addNotification({ type: 'error', message }));
+      return rejectWithValue(message);
+    };
+
+    if (!copy) return reject('Copy not found');
+    const slot = copy.traitSlots?.[slotIndex];
+    if (!slot) return reject('Invalid slot');
+    if (slot.isLocked) return reject('Slot is locked');
+    if (slot.traitId === traitId) return reject('Trait already shared to this slot');
+
+    // Prevent sharing traits the copy already has via another slot or inherited
+    const inheritedHas = (copy.inheritedTraits || []).includes(traitId);
+    const otherSlotHas = (copy.traitSlots || []).some((s, i) => i !== slotIndex && s.traitId === traitId);
+    if (inheritedHas || otherSlotHas) {
+      return reject('Trait already present on this Copy');
+    }
+
+    const equippedIds = state.player.traitSlots
+      .map(s => s.traitId)
+      .filter((id): id is string => !!id);
+    const isPermanent = state.player.permanentTraits.includes(traitId);
+  if (isPermanent) return reject('Permanent traits are not shareable');
+  if (!equippedIds.includes(traitId)) return reject('Trait must be equipped to share');
+
+    dispatch(shareTraitToCopy({ copyId, slotIndex, traitId }));
+    dispatch(addNotification({ type: 'success', message: 'Trait shared to Copy.' }));
+    return payload;
+  }
+);
+
+/** Unshare a trait from a Copy slot. */
+export const unshareTraitFromCopyThunk = createAsyncThunk<
+  { copyId: string; slotIndex: number },
+  { copyId: string; slotIndex: number },
+  { state: RootState; rejectValue: string }
+>(
+  'copy/unshareTraitFromCopy',
+  async (payload, { getState, dispatch, rejectWithValue }) => {
+    const { copyId, slotIndex } = payload;
+    const copy = getState().copy.copies[copyId];
+    if (!copy) return rejectWithValue('Copy not found');
+    dispatch(unshareTraitFromCopy({ copyId, slotIndex }));
+    dispatch(addNotification({ type: 'info', message: 'Trait unshared from Copy.' }));
+    return payload;
   }
 );

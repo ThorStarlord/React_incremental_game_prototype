@@ -17,8 +17,8 @@ This document provides a high-level overview of the technical architecture, tech
     *   MUI's styling solutions (`sx`, `styled`, Theme).
     *   CSS Modules (`.module.css`) for component-specific styles where needed.
     *   Global styles (`index.css`) for base resets and body styles.
-*   **Build Tool:** Create React App (CRA) or Vite. Provides development server, build optimization, and testing setup.
-*   **Testing:** Jest and React Testing Library for unit and integration/component testing.
+*   **Build Tool:** Create React App (CRA) or Vite. Provides development server and build optimization.
+*   **Testing:** For this prototype phase, automated tests are not required (see NFR-QA-001). Validation is performed via manual exploratory testing and smoke checks.
 
 ## 2. Project Structure (Feature-Sliced Design) ✅ IMPLEMENTED
 
