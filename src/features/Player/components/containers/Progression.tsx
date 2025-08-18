@@ -11,6 +11,7 @@ import {
   Schedule as TimeIcon,
   Star as PointsIcon,
   Psychology as SkillIcon,
+  MonetizationOn as GoldIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
 import { RootState } from '../../../../app/store'; // Import RootState
@@ -21,7 +22,8 @@ import {
   selectResonanceLevel,
   selectMaxTraitSlots,
   selectPermanentTraits,
-  selectEquippedTraits
+  selectEquippedTraits,
+  selectGold,
 } from '../../state/PlayerSelectors';
 import { StatDisplay } from '../ui/StatDisplay';
 
@@ -48,6 +50,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
   const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
   const permanentTraits = useAppSelector(selectPermanentTraits);
   const equippedTraits = useAppSelector(selectEquippedTraits);
+  const gold = useAppSelector(selectGold);
 
   // Format total playtime for display
   const formatPlaytime = (milliseconds: number): string => {
@@ -135,6 +138,21 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
               />
             </Grid>
           </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Wealth */}
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" mb={2}>
+            <GoldIcon color="action" sx={{ mr: 1 }} />
+            <Typography variant="h6">Wealth</Typography>
+          </Box>
+          <StatDisplay
+            label="Gold"
+            value={gold.toLocaleString()}
+            color="warning"
+          />
         </CardContent>
       </Card>
 
