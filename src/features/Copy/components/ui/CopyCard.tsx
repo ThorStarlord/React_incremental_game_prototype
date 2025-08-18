@@ -51,6 +51,9 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h6">{copy.name}</Typography>
             {copy.growthType === 'accelerated' && <Chip size="small" color="warning" label="Accelerated" icon={<BoltIcon fontSize="small"/>} />}
+            {copy.role && copy.role !== 'none' && (
+              <Chip size="small" color="info" variant="outlined" label={copy.role.charAt(0).toUpperCase() + copy.role.slice(1)} />
+            )}
           </Box>
         }
         subheader={`ID: ${copy.id}`}

@@ -19,7 +19,7 @@ import {
 import { ContentCopy as CopiesIcon, Favorite as LoyaltyIcon } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAllCopies, selectCopySegments } from '../features/Copy/state/CopySelectors';
-import { bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
+import { applySharePreferencesForCopyThunk, bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
 import CopyCard from '../features/Copy/components/ui/CopyCard';
 import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
 import { COPY_SYSTEM } from '../constants/gameConstants';
@@ -43,9 +43,37 @@ export const CopiesPage: React.FC = React.memo(() => {
   const segments = useAppSelector(selectCopySegments);
   const currentEssence = useAppSelector(selectCurrentEssence);
   const [tab, setTab] = useState(0);
+  const [busyApplyAll, setBusyApplyAll] = useState(false);
+  const [busyBolsterAll, setBusyBolsterAll] = useState(false);
 
   const handleBolsterLoyalty = (copyId: string) => {
     dispatch(bolsterCopyLoyaltyThunk(copyId));
+  };
+
+  const visibleCopies = useMemo(() => (tab === 0 ? segments.mature : tab === 1 ? segments.growing : segments.lowLoyalty), [tab, segments]);
+
+  const handleApplyPrefsAll = async () => {
+    setBusyApplyAll(true);
+    try {
+      for (const c of visibleCopies) {
+        // eslint-disable-next-line no-await-in-loop
+        await (dispatch as unknown as import('../app/store').AppDispatch)(applySharePreferencesForCopyThunk(c.id));
+      }
+    } finally {
+      setBusyApplyAll(false);
+    }
+  };
+
+  const handleBolsterAll = async () => {
+    setBusyBolsterAll(true);
+    try {
+      for (const c of visibleCopies) {
+        // eslint-disable-next-line no-await-in-loop
+        await (dispatch as unknown as import('../app/store').AppDispatch)(bolsterCopyLoyaltyThunk(c.id));
+      }
+    } finally {
+      setBusyBolsterAll(false);
+    }
   };
 
   return (
@@ -80,8 +108,12 @@ export const CopiesPage: React.FC = React.memo(() => {
             <Tab label={`Growing (${segments.growing.length})`} />
             <Tab label={`Low Loyalty (${segments.lowLoyalty.length})`} />
           </Tabs>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+            <Button size="small" variant="contained" onClick={handleApplyPrefsAll} disabled={busyApplyAll || visibleCopies.length === 0}>Apply Share Prefs to All</Button>
+            <Button size="small" variant="outlined" color="secondary" onClick={handleBolsterAll} disabled={busyBolsterAll || tab !== 2 || visibleCopies.length === 0}>Bolster All (Low Loyalty)</Button>
+          </Box>
           <Grid container spacing={2}>
-            {(tab === 0 ? segments.mature : tab === 1 ? segments.growing : segments.lowLoyalty).map((copy) => (
+            {visibleCopies.map((copy) => (
               <Grid item xs={12} md={6} lg={4} key={copy.id}>
                 <CopyCard copy={copy} />
               </Grid>

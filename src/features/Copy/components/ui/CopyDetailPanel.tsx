@@ -34,6 +34,13 @@ interface CopyDetailPanelProps {
 }
 
 const ROLE_OPTIONS: CopyRole[] = ['none', 'infiltrator', 'researcher', 'guardian', 'agent'];
+const ROLE_DESCRIPTIONS: Record<CopyRole, string> = {
+  none: 'No specialization. Manual task assignment only.',
+  infiltrator: 'Focus on stealth and social blending. Better at intel tasks.',
+  researcher: 'Focus on analysis and study. Better at training and discovery.',
+  guardian: 'Protective stance. Better at defense and safeguarding roles.',
+  agent: 'Balanced field operative. Good at a bit of everything.'
+};
 
 const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose }) => {
   const dispatch = useAppDispatch();
@@ -86,7 +93,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
             </Box>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
-              <FormControl size="small" sx={{ minWidth: 180 }}>
+              <FormControl size="small" sx={{ minWidth: 220 }}>
                 <InputLabel id="copy-role-label">Role</InputLabel>
                 <Select
                   labelId="copy-role-label"
@@ -95,7 +102,12 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                   onChange={(e) => handleRoleChange(e.target.value as CopyRole)}
                 >
                   {ROLE_OPTIONS.map(r => (
-                    <MenuItem key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</MenuItem>
+                    <MenuItem key={r} value={r}>
+                      <Box display="flex" flexDirection="column">
+                        <Typography>{r.charAt(0).toUpperCase() + r.slice(1)}</Typography>
+                        <Typography variant="caption" color="text.secondary">{ROLE_DESCRIPTIONS[r]}</Typography>
+                      </Box>
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
