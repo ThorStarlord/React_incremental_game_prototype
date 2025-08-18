@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Card, CardHeader, CardContent, CardActions, LinearProgress, Typography, Box, Button, Tooltip, TextField, Collapse, Stack, Chip } from '@mui/material';
+import CopyTraitSlots from './CopyTraitSlots';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
@@ -63,6 +64,7 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
           <LinearProgress value={copy.loyalty} color="secondary" variant="determinate" sx={{ mt: 0.5 }} />
           <Typography variant="body2" sx={{ mt: 0.5 }}>{copy.loyalty.toFixed(1)}%</Typography>
         </Box>
+  <CopyTraitSlots copyId={copy.id} />
         <Typography variant="body2" color="text.secondary">Location: {copy.location}</Typography>
         <Typography variant="body2" color="text.secondary">Parent NPC: {copy.parentNPCId}</Typography>
         {copy.currentTask && !taskEditOpen && (

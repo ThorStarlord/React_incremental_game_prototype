@@ -5,7 +5,7 @@
 
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { CopiesState } from './CopyTypes';
+import { CopiesState, Copy } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 
 /** Root selector for the Copy slice. */
@@ -62,6 +62,23 @@ export const selectCopySegments = createSelector([_allCopies], (copies) => {
   return { mature, growing, lowLoyalty };
 });
 
+/** Select trait slots for a given Copy ID (or empty array). */
+export const selectCopyTraitSlots = createSelector(
+  [selectCopyById],
+  (copy): NonNullable<Copy['traitSlots']> => copy?.traitSlots ?? []
+);
+
+/** Select shared trait IDs for a Copy (from slots). */
+export const selectCopySharedTraitIds = createSelector([selectCopyTraitSlots], (slots) =>
+  slots.map(s => s.traitId).filter((id): id is string => !!id)
+);
+
+/** All trait IDs affecting a Copy (inherited + shared). */
+export const selectCopyAllTraitIds = createSelector(
+  [selectCopyById, selectCopySharedTraitIds],
+  (copy, shared) => ([...(copy?.inheritedTraits ?? []), ...shared])
+);
+
 /** Select all trait IDs affecting a Copy (inherited + shared). */
 export const selectCopyTraitIds = createSelector(
   [
@@ -77,9 +94,4 @@ export const selectCopyTraitIds = createSelector(
 );
 
 /** Select Copy's trait slots with lock status for rendering. */
-export const selectCopyTraitSlots = createSelector(
-  [
-    (state: RootState, copyId: string) => state.copy.copies[copyId] || null,
-  ],
-  (copy) => copy?.traitSlots ?? []
-);
+// Note: unified above as selectCopyTraitSlots(copyId) using selectCopyById
