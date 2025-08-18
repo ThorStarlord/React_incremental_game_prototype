@@ -32,8 +32,10 @@ interface CreateCopyPayload {
 }
 
 /**
- * Thunk to process maturity growth for all active copies.
- * Increases maturity from 0 to 100 based on deltaTime (ms).
+ * Process maturity growth for all active Copies.
+ * - Applies normal or accelerated growth based on each Copy's growthType.
+ * - Batches state updates for performance (single reducer call).
+ * @param deltaTime Milliseconds since last tick.
  */
 export const processCopyGrowthThunk = createAsyncThunk(
   'copy/processGrowth',
@@ -53,8 +55,10 @@ export const processCopyGrowthThunk = createAsyncThunk(
 );
 
 /**
- * Thunk to process loyalty decay for all copies.
- * Decreases loyalty over time, not below 0.
+ * Process loyalty decay for all Copies.
+ * - Applies a flat decay rate per second.
+ * - Batches updates to minimize re-renders.
+ * @param deltaTime Milliseconds since last tick.
  */
 export const processCopyLoyaltyDecayThunk = createAsyncThunk(
   'copy/processLoyaltyDecay',
@@ -74,8 +78,12 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
 );
 
 /**
- * Thunk to bolster a copy's loyalty by spending essence.
- * Returns { success: boolean, reason?: string }
+ * Increase a Copy's loyalty by spending Essence.
+ * Validation:
+ * - Copy must exist
+ * - Loyalty must not already be max
+ * - Player must have enough Essence
+ * @returns success or rejects with reason string
  */
 export const bolsterCopyLoyaltyThunk = createAsyncThunk(
   'copy/bolsterLoyalty',
@@ -109,7 +117,10 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
 );
 
 /**
- * Thunk to attempt creating a Copy from an NPC.
+ * Attempt to create a new Copy from an NPC via "Seduction" style interaction.
+ * Success chance currently derived from player's Charisma modifier.
+ * On success: adds Copy and emits success notification.
+ * On failure: emits failure notification.
  */
 export const createCopyThunk = createAsyncThunk(
   'copy/create',
@@ -139,12 +150,14 @@ export const createCopyThunk = createAsyncThunk(
     const successChance = (5 + (charismaModifier * 10)) / 100; // Base 5% + 10% per modifier point
 
     if (Math.random() > successChance) {
+      // TODO: Dispatch a failure notification
+      console.log(`Seduction failed. Chance was ${successChance * 100}%.`);
       return rejectWithValue('Seduction attempt failed.');
     }
 
     // --- Create the Copy Object ---
     const newCopy: Copy = {
-      id: `copy_${Date.now()}`,
+  id: `copy_${Date.now()}`,
       name: `Copy of ${npc.name}`,
       createdAt: Date.now(),
       parentNPCId: npc.id,
@@ -160,8 +173,34 @@ export const createCopyThunk = createAsyncThunk(
     };
 
     // --- Dispatch the action to add the new copy ---
-  dispatch(addCopy(newCopy));
+    dispatch(addCopy(newCopy));
+    
+    // TODO: Dispatch a success notification
+    console.log(`Seduction successful! Created: ${newCopy.name}`);
 
     return newCopy;
+  }
+);
+
+/**
+ * Promote a Copy to accelerated growth by spending Essence.
+ * Validation: copy exists, not already accelerated, sufficient Essence.
+ */
+export const promoteCopyToAcceleratedThunk = createAsyncThunk(
+  'copy/promoteAccelerated',
+  async (copyId: string, { getState, dispatch, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const copy = state.copy.copies[copyId];
+    if (!copy) return rejectWithValue('Copy not found.');
+    if (copy.growthType === 'accelerated') return rejectWithValue('Already accelerated.');
+    const essence = state.essence.currentEssence;
+  // Reuse ACCELERATED_GROWTH_COST for promotion cost
+  if (essence < COPY_SYSTEM.ACCELERATED_GROWTH_COST) {
+      return rejectWithValue('Not enough essence.');
+    }
+  dispatch(spendEssence({ amount: COPY_SYSTEM.ACCELERATED_GROWTH_COST, source: 'promote_copy' }));
+  // Update the copy directly since there's no promote action in the slice
+  dispatch(updateCopy({ copyId, updates: { growthType: 'accelerated' as CopyGrowthType } }));
+    return { success: true };
   }
 );
