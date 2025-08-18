@@ -69,4 +69,6 @@ export const COPY_SYSTEM = {
     { depth: 5, cap: 3 },
     { depth: 8, cap: 4 },
   ] as Array<{ depth: number; cap: number }>,
+  /** Minimum connection depth required to attempt seduction/create a Copy. */
+  SEDUCTION_CONNECTION_REQUIREMENT: 5,
 };

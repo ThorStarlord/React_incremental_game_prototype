@@ -44,6 +44,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
 
   const essenceCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
   const lacksEssence = currentEssence < essenceCost;
+  const connectionOk = (npc?.connectionDepth ?? 0) >= COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT;
 
   const successChancePct = useMemo(() => {
     const charisma = attributes.charisma ?? 10;
@@ -79,6 +80,13 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
             Current Essence: {currentEssence} {lacksEssence && `(need ${essenceCost} for accelerated)`}
           </Typography>
         </Box>
+        {!connectionOk && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="caption" color="error.main">
+              Requires Connection Depth Level {COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT} or higher to attempt creation. (Current: {npc?.connectionDepth ?? 0})
+            </Typography>
+          </Box>
+        )}
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2">Inheritance Preview</Typography>
           <Typography variant="caption" color="text.secondary">
@@ -102,6 +110,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
         >
           <FormControlLabel
             value="normal"
+            disabled={!connectionOk}
             control={<Radio />}
             label={
               <Box>
@@ -113,8 +122,8 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
             }
           />
           <FormControlLabel
-            value="accelerated"
-            disabled={lacksEssence}
+      value="accelerated"
+      disabled={lacksEssence || !connectionOk}
             control={<Radio />}
             label={
               <Box>
@@ -134,7 +143,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleCreate} variant="contained" disabled={growthType === 'accelerated' && lacksEssence}>
+    <Button onClick={handleCreate} variant="contained" disabled={!connectionOk || (growthType === 'accelerated' && lacksEssence)}>
           Create
         </Button>
       </DialogActions>

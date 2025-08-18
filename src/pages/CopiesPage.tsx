@@ -15,6 +15,8 @@ import {
   Tabs,
   Tab,
   Grid,
+  TextField,
+  MenuItem,
 } from '@mui/material';
 import { ContentCopy as CopiesIcon, Favorite as LoyaltyIcon } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
@@ -45,12 +47,38 @@ export const CopiesPage: React.FC = React.memo(() => {
   const [tab, setTab] = useState(0);
   const [busyApplyAll, setBusyApplyAll] = useState(false);
   const [busyBolsterAll, setBusyBolsterAll] = useState(false);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'infiltrator' | 'researcher' | 'guardian' | 'agent' | 'none'>('all');
+  const [sortBy, setSortBy] = useState<'name' | 'maturity' | 'loyalty' | 'createdAt'>('createdAt');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const handleBolsterLoyalty = (copyId: string) => {
     dispatch(bolsterCopyLoyaltyThunk(copyId));
   };
 
-  const visibleCopies = useMemo(() => (tab === 0 ? segments.mature : tab === 1 ? segments.growing : segments.lowLoyalty), [tab, segments]);
+  const baseList = useMemo(() => (tab === 0 ? segments.mature : tab === 1 ? segments.growing : segments.lowLoyalty), [tab, segments]);
+
+  const visibleCopies = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = baseList;
+    if (q) list = list.filter(c => c.name.toLowerCase().includes(q));
+    if (roleFilter !== 'all') list = list.filter(c => (c.role ?? 'none') === roleFilter);
+    const dir = sortDir === 'asc' ? 1 : -1;
+    const cmp = (a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0) * dir;
+    return [...list].sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return cmp(a.name.localeCompare(b.name), 0);
+        case 'maturity':
+          return cmp(a.maturity, b.maturity);
+        case 'loyalty':
+          return cmp(a.loyalty, b.loyalty);
+        case 'createdAt':
+        default:
+          return cmp(a.createdAt, b.createdAt);
+      }
+    });
+  }, [baseList, search, roleFilter, sortBy, sortDir]);
 
   const handleApplyPrefsAll = async () => {
     setBusyApplyAll(true);
@@ -108,7 +136,53 @@ export const CopiesPage: React.FC = React.memo(() => {
             <Tab label={`Growing (${segments.growing.length})`} />
             <Tab label={`Low Loyalty (${segments.lowLoyalty.length})`} />
           </Tabs>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2, alignItems: 'center' }}>
+            <TextField
+              size="small"
+              label="Search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              sx={{ minWidth: 200 }}
+            />
+            <TextField
+              select
+              size="small"
+              label="Role"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value as any)}
+              sx={{ minWidth: 160 }}
+            >
+              <MenuItem value="all">All roles</MenuItem>
+              <MenuItem value="infiltrator">Infiltrator</MenuItem>
+              <MenuItem value="researcher">Researcher</MenuItem>
+              <MenuItem value="guardian">Guardian</MenuItem>
+              <MenuItem value="agent">Agent</MenuItem>
+              <MenuItem value="none">None</MenuItem>
+            </TextField>
+            <TextField
+              select
+              size="small"
+              label="Sort by"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              sx={{ minWidth: 160 }}
+            >
+              <MenuItem value="createdAt">Created</MenuItem>
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="maturity">Maturity</MenuItem>
+              <MenuItem value="loyalty">Loyalty</MenuItem>
+            </TextField>
+            <TextField
+              select
+              size="small"
+              label="Order"
+              value={sortDir}
+              onChange={(e) => setSortDir(e.target.value as any)}
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value="desc">Desc</MenuItem>
+              <MenuItem value="asc">Asc</MenuItem>
+            </TextField>
             <Button size="small" variant="contained" onClick={handleApplyPrefsAll} disabled={busyApplyAll || visibleCopies.length === 0}>Apply Share Prefs to All</Button>
             <Button size="small" variant="outlined" color="secondary" onClick={handleBolsterAll} disabled={busyBolsterAll || tab !== 2 || visibleCopies.length === 0}>Bolster All (Low Loyalty)</Button>
           </Box>

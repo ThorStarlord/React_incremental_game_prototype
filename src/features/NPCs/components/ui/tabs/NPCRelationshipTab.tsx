@@ -42,6 +42,7 @@ import {
 import { useAppDispatch } from '../../../../../app/hooks';
 import { updateNPCRelationshipThunk, debugUnlockAllSharedSlots } from '../../../state/NPCThunks';
 import { createCopyThunk } from '../../../../Copy/state/CopyThunks';
+import { COPY_SYSTEM } from '../../../../../constants/gameConstants';
 
 interface NPCRelationshipTabProps {
   npc: NPC;
@@ -57,7 +58,7 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
   const dispatch = useAppDispatch();
   const currentTierInfo = getTierBenefits(npc.affinity);
   
-  const SEDUCTION_CONNECTION_REQUIREMENT = 5;
+  const SEDUCTION_CONNECTION_REQUIREMENT = COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT;
 
   const canAttemptSeduction = npc.connectionDepth >= SEDUCTION_CONNECTION_REQUIREMENT;
 

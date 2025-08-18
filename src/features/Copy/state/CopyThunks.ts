@@ -151,6 +151,11 @@ export const createCopyThunk = createAsyncThunk(
       return rejectWithValue('Target NPC not found.');
     }
 
+    // --- Connection depth gating for seduction/create ---
+    if ((npc.connectionDepth ?? 0) < COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT) {
+      return rejectWithValue(`Requires connection depth ${COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT} or higher.`);
+    }
+
     // --- Handle Accelerated Growth Cost ---
     if (growthType === 'accelerated') {
       const essenceCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
