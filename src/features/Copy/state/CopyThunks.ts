@@ -89,17 +89,14 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
 
     if (!copy) {
       const message = 'Copy not found.';
-      window.alert(`Failed to bolster loyalty: ${message}`);
       return rejectWithValue(message);
     }
     if (copy.loyalty >= 100) {
       const message = 'Loyalty already at maximum.';
-      window.alert(`Failed to bolster loyalty: ${message}`);
       return rejectWithValue(message);
     }
     if (essence < essenceCost) {
       const message = 'Not enough essence.';
-      window.alert(`Failed to bolster loyalty: ${message}`);
       return rejectWithValue(message);
     }
 
@@ -107,7 +104,6 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
     const newLoyalty = Math.min(100, copy.loyalty + loyaltyGain);
     dispatch(updateCopy({ copyId, updates: { loyalty: newLoyalty } }));
 
-    window.alert(`${copy.name}'s loyalty has been bolstered!`);
     return { success: true };
   }
 );
@@ -143,7 +139,6 @@ export const createCopyThunk = createAsyncThunk(
     const successChance = (5 + (charismaModifier * 10)) / 100; // Base 5% + 10% per modifier point
 
     if (Math.random() > successChance) {
-      window.alert(`Seduction failed. Your charm wasn't enough this time.`);
       return rejectWithValue('Seduction attempt failed.');
     }
 
@@ -165,9 +160,7 @@ export const createCopyThunk = createAsyncThunk(
     };
 
     // --- Dispatch the action to add the new copy ---
-    dispatch(addCopy(newCopy));
-    
-    window.alert(`Seduction successful! A new copy, ${newCopy.name}, has been created.`);
+  dispatch(addCopy(newCopy));
 
     return newCopy;
   }

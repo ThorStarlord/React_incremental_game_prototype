@@ -453,6 +453,10 @@ export const riskyOperationThunk = createAsyncThunk(
 - **Error State**: Each slice includes error state for failed operations
 - **Reset Actions**: Clear error states for retry mechanisms
 - **Fallback Values**: Default states for corrupted or missing data
+### 9.3. UI Messaging Policy (No native alerts)
+- Thunks and reducers must not call `window.alert/confirm/prompt`.
+- Propagate failures with `rejectWithValue` or slice `error` fields.
+- UI layers display messages using a centralized notification pattern (e.g., MUI Snackbar/Alert or a Notifications slice) and confirmation via MUI Dialogs.
 
 ## 10. Testing Strategy
 

@@ -42,6 +42,7 @@ This document lists the non-functional requirements for the React Incremental RP
 *   **NFR-UX-001:** The user interface should be intuitive and consistent, following the guidelines established in `UI_UX_Guidelines.md` and leveraging MUI components effectively.
 *   **NFR-UX-002:** Clear feedback should be provided for user actions (e.g., button presses, save/load operations, errors).
 *   **NFR-UX-003:** The game should be playable across different screen sizes (desktop, potentially tablet/mobile) with appropriate layout adjustments (Responsiveness).
+*   **NFR-UX-004:** Do not use native blocking browser dialogs (`window.alert`, `window.confirm`, `window.prompt`). Surface feedback via in-app notifications/toasts or MUI Dialogs. Async thunks must return errors via `rejectWithValue` or set error state; UI components render messages accordingly.
 
 ## NFR-ACC: Accessibility
 
