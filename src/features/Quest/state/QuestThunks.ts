@@ -39,7 +39,7 @@ export const turnInQuestThunk = createAsyncThunk(
     const state = getState() as RootState;
     const quest = state.quest.quests[questId];
 
-    if (quest && quest.status === 'ACTIVE') {
+    if (quest && quest.status === 'COMPLETE') {
       const rewards = quest.rewards;
       const rewardSummaries: string[] = [];
 
