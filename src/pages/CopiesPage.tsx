@@ -19,6 +19,7 @@ import { selectAllCopies, selectCopySegments } from '../features/Copy/state/Copy
 import { applySharePreferencesForCopyThunk, bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
 import CopyCard from '../features/Copy/components/ui/CopyCard';
 import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
+import { addNotification } from '../shared/state/NotificationSlice';
 // import { COPY_SYSTEM } from '../constants/gameConstants';
 
 // Reserved for future copy stats summary UI
@@ -81,8 +82,13 @@ export const CopiesPage: React.FC = React.memo(() => {
     try {
       for (const c of visibleCopies) {
         // eslint-disable-next-line no-await-in-loop
-        await (dispatch as unknown as import('../app/store').AppDispatch)(applySharePreferencesForCopyThunk(c.id));
+        await (dispatch as unknown as import('../app/store').AppDispatch)(applySharePreferencesForCopyThunk({ copyId: c.id, suppressNotify: true }));
       }
+      // Single coalesced notification
+      dispatch(addNotification({
+        type: 'success',
+        message: `Applied share preferences to ${visibleCopies.length} cop${visibleCopies.length === 1 ? 'y' : 'ies'}.`,
+      }));
     } finally {
       setBusyApplyAll(false);
     }
@@ -93,8 +99,12 @@ export const CopiesPage: React.FC = React.memo(() => {
     try {
       for (const c of visibleCopies) {
         // eslint-disable-next-line no-await-in-loop
-        await (dispatch as unknown as import('../app/store').AppDispatch)(bolsterCopyLoyaltyThunk(c.id));
+        await (dispatch as unknown as import('../app/store').AppDispatch)(bolsterCopyLoyaltyThunk({ copyId: c.id, suppressNotify: true }));
       }
+      dispatch(addNotification({
+        type: 'success',
+        message: `Bolstered loyalty for ${visibleCopies.length} low-loyalty cop${visibleCopies.length === 1 ? 'y' : 'ies'}.`,
+      }));
     } finally {
       setBusyBolsterAll(false);
     }

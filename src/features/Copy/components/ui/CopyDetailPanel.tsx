@@ -73,7 +73,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
     // enable all currently eligible
     eligibleShareIds.forEach((id) => {
       if (!sharePrefs[id]) {
-        dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: true }));
+        dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: true, suppressNotify: true }));
       }
     });
   };
@@ -82,7 +82,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
     // disable everything currently enabled
     Object.keys(sharePrefs).forEach((id) => {
       if (sharePrefs[id]) {
-        dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: false }));
+        dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: false, suppressNotify: true }));
       }
     });
   };
@@ -195,7 +195,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
               <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>
                 <Button size="small" onClick={enableAll} disabled={eligibleShareIds.length === 0}>Enable all eligible</Button>
                 <Button size="small" onClick={disableAll} disabled={!anyPrefEnabled}>Disable all</Button>
-                <Button size="small" variant="contained" onClick={() => dispatch(applySharePreferencesForCopyThunk(copyId))} disabled={!anyPrefEnabled || emptySlots === 0}>
+                <Button size="small" variant="contained" onClick={() => dispatch(applySharePreferencesForCopyThunk({ copyId, suppressNotify: false }))} disabled={!anyPrefEnabled || emptySlots === 0}>
                   Apply Now
                 </Button>
                 <Typography variant="caption" color="text.secondary">Will try to fill empty slots with enabled preferences.</Typography>
