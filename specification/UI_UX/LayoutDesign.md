@@ -2,9 +2,9 @@
 
 This document outlines the user interface layout structure and design principles for the React Incremental RPG Prototype.
 
-## 1. Layout Architecture Overview ✅ COMPLETE + MIGRATED
+## 1. Layout Architecture Overview ✅ COMPLETE + MIGRATED (Legacy Deprecated)
 
-The application has successfully migrated from a legacy 3-column layout system to a modern, flexible layout architecture. Legacy components have been **✅ FULLY REMOVED**.
+The application has migrated from a legacy 3-column layout system to a modern, flexible layout architecture. Legacy components remain in the repository as clearly marked, deprecated stubs to aid migration, but all active routing and pages use the new system.
 
 ### 1.1. Modern Layout System ✅ IMPLEMENTED
 
@@ -15,17 +15,15 @@ The application has successfully migrated from a legacy 3-column layout system t
 - **Router Integration**: Seamless AppRouter coordination for `/game/*` routes
 - **Responsive Design**: Automatic desktop/mobile adaptation with proper breakpoints
 
-### 1.2. Legacy Layout Components ✅ REMOVED
+### 1.2. Legacy Layout Components ⚠️ DEPRECATED (kept as stubs)
 
-**Removed Components** - No longer present in the codebase
-- **GameContainer**: Legacy main container component
-- **LeftColumn**: Legacy navigation column
-- **MiddleColumn**: Legacy content column  
-- **RightColumn**: Legacy activity/logging column
+**Deprecated Components** - Present only as warning stubs with migration guidance
+- **GameContainer** (`src/layout/components/GameContainer.tsx`): Deprecated in favor of `GameLayout`
+- **LeftColumn / MiddleColumn / RightColumn** (`src/layout/components/columns/`): Deprecated in favor of `VerticalNavBar` + `MainContentArea`
 
-**Removal Strategy**:
-- ✅ **Complete Removal**: Components and their associated files have been removed from the codebase.
-- ✅ **Migration Complete**: All relevant functionality has been migrated to the new `GameLayout` and `MainContentArea` components.
+**Deprecation Strategy**:
+- ✅ **Migration Complete**: All functionality has been migrated to `GameLayout` and `MainContentArea`.
+- ⚠️ **Graceful Degradation**: Legacy files render warnings and are scheduled for removal after downstream consumers migrate.
 
 ## 2. Component Architecture ✅ COMPLETE + DEPRECATION-AWARE
 

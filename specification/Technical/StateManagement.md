@@ -19,24 +19,55 @@ The application uses Redux Toolkit for centralized state management, following m
 **Location**: `src/app/store.ts`
 
 ```typescript
-// ✅ Implemented store configuration
+// ✅ Implemented store configuration with full-state replacement and listeners
+import { configureStore, combineReducers, type PayloadAction } from '@reduxjs/toolkit';
+import { copyListeners } from '../features/Copy/state/CopyListeners';
+import { gameEventListeners } from './listeners/GameEventListeners';
+
+// Combine feature reducers
+const combinedReducer = combineReducers({
+  gameLoop: gameLoopReducer,
+  player: playerReducer,
+  traits: traitsReducer,
+  essence: essenceReducer,
+  settings: settingsReducer,
+  meta: metaReducer,
+  npcs: npcsReducer,
+  copy: copyReducer,
+  quest: questReducer,
+  notifications: notificationsReducer,
+  inventory: inventoryReducer,
+});
+
+// Root state type
+export type RootState = ReturnType<typeof combinedReducer>;
+
+// Special action to replace the entire Redux state (used by save/load)
+interface ReplaceStateAction {
+  type: 'meta/replaceState';
+  payload: RootState;
+}
+
+export const rootReducer = (
+  state: RootState | undefined,
+  action: PayloadAction<any>
+): RootState => {
+  if (action.type === 'meta/replaceState') {
+    const replace = action as ReplaceStateAction;
+    return replace.payload;
+  }
+  return combinedReducer(state, action);
+};
+
 export const store = configureStore({
-  reducer: {
-    player: playerSlice.reducer,
-    traits: traitsSlice.reducer,
-    npcs: npcsSlice.reducer,
-    essence: essenceSlice.reducer,
-    gameLoop: gameLoopSlice.reducer,
-    settings: settingsSlice.reducer,
-    meta: metaSlice.reducer,
-  copy: copySlice.reducer,
-  quest: questSlice.reducer,
-  // Future: inventory
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Disabled for performance with complex state
-    }),
+      serializableCheck: {
+        ignoredActions: ['meta/replaceState'],
+        ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
+      },
+    }).prepend(copyListeners.middleware, gameEventListeners.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
 ```
@@ -46,7 +77,6 @@ export const store = configureStore({
 
 ```typescript
 // ✅ Implemented type safety
-export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
@@ -54,6 +84,17 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   Action<string>
 >;
+```
+
+### 2.4. Replace State Helper
+**Location**: `src/app/store.ts`
+
+```typescript
+// ✅ Exported helper to replace entire Redux state (used by load/import)
+export const replaceState = (newState: RootState): ReplaceStateAction => ({
+  type: 'meta/replaceState',
+  payload: newState,
+});
 ```
 
 ### 2.3. Typed Hooks
@@ -204,14 +245,8 @@ interface NPCState {
 ```
 
 **Key Features**:
-- **NPC Data Management**: Initializes and stores core NPC data
-- **Discovery**: Tracks discovered NPCs
-- **Relationship Tracking**: Manages NPC relationship values and logs changes
-- **Interaction Management**: Handles current interaction sessions and logs dialogue history
-- **Status & Availability**: Manages NPC status and availability
-- **Trait System Integration**: 
-    *   NPCs have `availableTraits` for player "Resonance" (leading to permanent player traits in `PlayerSlice`)
-    *   NPCs have `innateTraits` that players can temporarily equip into their `PlayerSlice.t
+  *   NPCs expose `availableTraits` that the player can discover and, via Resonance, make permanent (recorded in `PlayerSlice.permanentTraits`).
+  *   NPC `innateTraits` influence encounters; discovered traits can be equipped by the player into `PlayerSlice.traitSlots` when game rules allow.
 - **Selected NPC Tracking**: `selectedNPCId` added to manage the currently viewed NPC in the detail panel.
 
 ### 4.4. Essence Slice ✅ COMPLETE
@@ -303,14 +338,16 @@ interface MetaState {
 - **Persistence**: Integration with localStorage and save file management
 - **Version Control**: Save format versioning for compatibility
 
-### 4.8. Quest Slice ✅ FOUNDATION
+### 4.8. Quest Slice ✅ EXPANDED
 **Location**: `src/features/Quest/state/QuestSlice.ts`
 
 **Overview**:
 - Slice name: `quest`; registered under `state.quest`.
-- Selectors: `selectQuestState`, `selectAllQuests`, `selectActiveQuests`, `selectQuestById` (target `state.quest`).
-- Thunks: Prefixed with `quest/*` for lifecycle actions like starting and turning in quests.
-- UI: Basic `QuestLog` renders active quests list.
+- Selectors: `selectQuestState`, `selectAllQuests`, `selectActiveQuests`, `selectQuestById`.
+- Thunks: `initializeQuestsThunk`, `startQuestThunk`, `deliverQuestItemThunk`, `solveQuestPuzzleThunk`, `generateRadiantQuestThunk`, `turnInQuestThunk`, `processQuestTimersThunk`.
+- Timers & Failure: `incrementQuestElapsed` updates timers and can auto-fail timed quests.
+- Rewards & Effects: Puzzle outcomes and quest turn-in dispatch rewards (Essence, items, etc.) and status effects.
+- UI: `QuestPuzzleModal` provides interactive puzzle input; `QuestLog` lists active quests.
 
 ## 5. Selector Architecture
 
@@ -418,8 +455,7 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
 - **NPC System**:
     *   Player can discover traits by viewing NPCs with `availableTraits`
     *   Player can Resonate traits from NPCs to make them permanent (stored in `PlayerSlice.permanentTraits`)
-    *   Player can temporarily equip NPC's `innateTraits` into their active slots (managed by `PlayerSlice.traitSlots`)
-    *   Player can share equipped (non-permanent) traits with NPCs through `sharedTraitSlots`
+  *   Discovered traits can be equipped into the player's active slots (managed by `PlayerSlice.traitSlots`) when game rules allow
 - **Copy System**: Framework prepared for trait inheritance mechanics.
 
 ## 8. Performance Optimization
@@ -517,9 +553,6 @@ describe('fetchDataThunk', () => {
 ## 11. Future Enhancements
 
 ### 11.1. Planned Slices 📋
-- **Quest System**: Quest management and progression tracking
-- **Copy System**: Player-created entity management (slice name: `copy`)
-- **Inventory System**: Item storage and equipment management
 - **Achievement System**: Player accomplishment tracking
 
 ### 11.2. Advanced Features 📋

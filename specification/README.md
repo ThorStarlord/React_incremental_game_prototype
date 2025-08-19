@@ -17,10 +17,10 @@ The React Incremental RPG Prototype is an incremental/idle game featuring emotio
 
 ### Technology Stack
 - **Frontend Framework**: React 18+ with TypeScript
-- **State Management**: Redux Toolkit with RTK Query
+- **State Management**: Redux Toolkit (slices, thunks, selectors, listener middleware)
 - **UI Framework**: Material-UI (MUI) with custom theming
 - **Styling**: CSS Modules + Material-UI sx prop system
-- **Routing**: React Router v6 with nested layouts
+- **Routing**: React Router v6 with centralized `AppRouter` and `GameLayout` delegation for `/game/*`
 - **Build Tool**: Create React App with TypeScript template
 
 ### Design Patterns

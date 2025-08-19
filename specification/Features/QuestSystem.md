@@ -1,6 +1,6 @@
 # Quest System Specification
 
-Implementation Status: ✅ FOUNDATION IMPLEMENTED (slice + selectors + thunks + basic QuestLog UI)
+Implementation Status: ✅ EXPANDED FOUNDATION (slice + selectors + thunks + QuestLog UI + puzzle modal + radiant quests + timers)
 
 Implementation Notes:
 - Feature directory: `src/features/Quest/` (singular)
@@ -13,16 +13,24 @@ This document outlines the design for the quest system, including types, structu
 *   **Purpose:** Provide goals, narrative progression, challenges, and rewards for the player. Guide player activity and world exploration.
 *   **Core Loop:** Discovery -> Acceptance -> Progress Tracking -> Completion -> Rewards.
 
-### Current Implementation (Foundation)
-- Redux slice with basic reducers for adding quests, updating objective progress, and completing quests.
+### Current Implementation (Expanded Foundation)
+- Redux slice with reducers for quest lifecycle: add/start/complete/fail, objective progress, objective field patching, and elapsed-time tracking with fail-on-timeout.
 - Selectors targeting `state.quest` for active quests and lookups.
-- Thunks prefixed with `quest/*` for starting/turning-in quests (basic scaffolding).
-- Quest Log UI component renders a simple list of active quests.
+- Thunks:
+    - `initializeQuestsThunk` loads quests from `/data/quests.json`.
+    - `startQuestThunk`, `turnInQuestThunk` (rewards: Essence, Gold, Reputation, Items; NPC unlock chaining).
+    - `deliverQuestItemThunk` integrates with Inventory for DELIVER objectives.
+    - `solveQuestPuzzleThunk` handles PUZZLE objectives via outcomes → rewards (Gold), effects (adds StatusEffect), notifications, and marks completion.
+    - `generateRadiantQuestThunk` creates repeatable delivery quests targeting random NPCs.
+    - `processQuestTimersThunk` advances timers per tick and triggers fail with notification.
+- UI:
+    - Quest Log list.
+    - `QuestPuzzleModal` for interactive branching/sequence-based puzzle input.
 
 Deferred (Planned next phases):
 - Full acceptance/turn-in UX flows and NPC hand-in rules (auto-complete vs. return-to-giver).
-- Dynamic/repeatable generation, rewards payout integration, and notifications.
-- Map markers and richer objective types.
+- Richer reward types in puzzle outcomes (Essence, Items, Reputation) and broader branching graphs.
+- Map markers and richer objective types; quest graph authoring tools.
 
 ## 2. Quest Types
 
