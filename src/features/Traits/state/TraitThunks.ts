@@ -12,6 +12,8 @@ import {
 import { 
   addPermanentTrait 
 } from '../../Player/state/PlayerSlice';
+import { addNotification } from '../../../shared/state/NotificationSlice';
+import { TRAIT_RESONANCE } from '../../../constants/gameConstants';
 import type { 
   Trait, 
   AcquireTraitWithEssencePayload 
@@ -67,7 +69,7 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
     { getState, dispatch, rejectWithValue }
   ) => {
     try {
-      const state = getState() as RootState;
+  const state = getState() as RootState;
       const currentEssence = state.essence.currentEssence;
       const trait = state.traits.traits[traitId];
       
@@ -79,7 +81,9 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
       // Validate essence cost
       const actualCost = essenceCost || trait.essenceCost || 0;
       if (currentEssence < actualCost) {
-        throw new Error(`Insufficient Essence. Required: ${actualCost}, Available: ${currentEssence}`);
+        const msg = `Insufficient Essence. Required: ${actualCost}, Available: ${currentEssence}`;
+        dispatch(addNotification({ message: msg, type: 'warning' }));
+        throw new Error(msg);
       }
       
       // Check if already permanently acquired
@@ -87,6 +91,19 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
         throw new Error('Trait is already permanently acquired');
       }
       
+      // If trait is tied to an NPC, ensure sufficient connectionDepth with that NPC
+      // Traits may indicate their source via `sourceNpc` or `source` fields in the trait data.
+      const sourceNpcId = (trait as any).sourceNpc || (trait as any).source;
+      if (sourceNpcId) {
+        const npc = state.npcs.npcs[sourceNpcId];
+        const requiredDepth = TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
+        if (!npc || (npc.connectionDepth ?? 0) < requiredDepth) {
+          const msg = `Increase your connection with this NPC (required depth ${requiredDepth}) before resonating.`;
+          dispatch(addNotification({ message: msg, type: 'info' }));
+          throw new Error('Insufficient connectionDepth for resonance');
+        }
+      }
+
       // Spend essence
       if (actualCost > 0) {
         dispatch(spendEssence({ amount: actualCost }));
@@ -96,7 +113,8 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
       dispatch(discoverTrait({ traitId }));
       
       // Add to player's permanent traits
-      dispatch(addPermanentTrait(traitId));
+  dispatch(addPermanentTrait(traitId));
+  dispatch(addNotification({ message: `Resonated ${trait.name}`, type: 'success' }));
       
       return {
         traitId,

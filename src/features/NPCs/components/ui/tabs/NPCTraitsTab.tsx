@@ -51,6 +51,7 @@ import {
 import { selectTraits, selectDiscoveredTraits } from '../../../../Traits/state/TraitsSelectors';
 import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors';
 import { acquireTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks';
+import { TRAIT_RESONANCE } from '../../../../../constants/gameConstants';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
 import TraitSlotItem from '../../../../Traits/components/ui/TraitSlotItem';
 import LockedSlotCard from '../../../../Traits/components/ui/LockedSlotCard';
@@ -142,15 +143,17 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
             <List dense>
               {availableTraitsForResonance.length > 0 ? availableTraitsForResonance.map(trait => {
                 const canAfford = (trait.essenceCost || 0) <= currentEssence;
+                const requiresNpcDepth = !!((trait as any).sourceNpc || (trait as any).source);
+                const depthOk = !requiresNpcDepth || (currentNPC.connectionDepth ?? 0) >= TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
                 return (
                   <ListItem key={trait.id} divider secondaryAction={
-                    <Tooltip title={!canAfford ? `Requires ${trait.essenceCost} Essence` : ''}>
+                    <Tooltip title={!canAfford ? `Requires ${trait.essenceCost} Essence` : (!depthOk ? `Requires connection depth ${TRAIT_RESONANCE.MIN_CONNECTION_DEPTH}` : '')}>
                       <span>
                         <Button
                           size="small"
                           variant="outlined"
                           onClick={() => handleOpenResonateDialog(trait)}
-                          disabled={!canAfford}
+                          disabled={!canAfford || !depthOk}
                         >
                           Resonate
                         </Button>

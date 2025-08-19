@@ -10,6 +10,14 @@
 export const TRAIT_PERMANENT_ESSENCE_COST = 250;
 
 /**
+ * Constants for Trait Resonance gating and tuning
+ */
+export const TRAIT_RESONANCE = {
+  /** Minimum NPC connectionDepth required to resonate a trait tied to an NPC. */
+  MIN_CONNECTION_DEPTH: 1,
+} as const;
+
+/**
  * Constants for Essence Generation
  */
 export const ESSENCE_GENERATION = {
