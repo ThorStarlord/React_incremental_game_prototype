@@ -222,11 +222,12 @@ export const createCopyThunk = createAsyncThunk(
     const successChance = (5 + (charismaModifier * 10)) / 100; // Base 5% + 10% per modifier point
 
     if (Math.random() > successChance) {
+      const successChancePercent = Math.round(successChance * 100);
       dispatch(addNotification({
-        message: `Seduction attempt on ${npc.name} failed. (Success Chance: ${Math.round(successChance * 100)}%)`,
+        message: `Seduction attempt on ${npc.name} failed. (Success Chance: ${successChancePercent}%)`,
         type: 'error',
       }));
-      return rejectWithValue(`Seduction attempt failed. (Success Chance: ${Math.round(successChance * 100)}%)`);
+      return rejectWithValue(`Seduction attempt failed. (Success Chance: ${successChancePercent}%)`);
     }
 
     // --- Create the Copy Object ---
