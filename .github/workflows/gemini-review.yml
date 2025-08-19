@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize]
 
 permissions:
-  pull-requests: write # This permission is required for the action to comment on PRs
+  pull-requests: write
 
 jobs:
   gemini-review:
@@ -16,16 +16,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetches all history for a better diff
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      # CORRECTED STEP BELOW
       - name: Run Gemini CLI for Code Review
-        # Use the full GitHub URL instead of the NPM package name
-        run: npx https://github.com/google-gemini/gemini-cli review
+        # We now use the -p flag to pass a non-interactive prompt
+        run: |
+          npx https://github.com/google-gemini/gemini-cli -p "Please act as a senior software engineer. Review the changes in this pull request for code quality, adherence to our project's conventions (see GEMINI.md), potential bugs, and clarity. Provide feedback as a list of suggestions. The git diff is available in the context."
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
