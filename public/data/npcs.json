@@ -14,7 +14,7 @@
     "loyalty": 15,
     "availableDialogues": ["elder_willow_greeting", "elder_willow_lore_query", "elder_willow_trait_offer"],
     "completedDialogues": [],
-    "availableQuests": ["quest_willow_ancient_seed"],
+    "availableQuests": ["quest_willow_ancient_seed", "quest_willow_disarm_traps"],
     "completedQuests": [],
     "traits": {},
     "availableTraits": ["WillowsWisdom", "EssenceFlow"],

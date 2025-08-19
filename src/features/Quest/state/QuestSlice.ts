@@ -112,6 +112,7 @@ const questSlice = createSlice({
       }
     },
   },
+  extraReducers: () => {},
 });
 
 export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, patchObjectiveFields, completeQuest, failQuest, incrementQuestElapsed } = questSlice.actions;

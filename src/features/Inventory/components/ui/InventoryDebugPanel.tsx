@@ -20,6 +20,9 @@ const InventoryDebugPanel: React.FC = () => {
         <Button variant="contained" onClick={() => handleAddItem('item_glowing_crystal')}>
           Add Glowing Crystal
         </Button>
+        <Button variant="contained" onClick={() => handleAddItem('item_disarm_kit')}>
+          Add Disarm Kit
+        </Button>
       </Box>
     </Paper>
   );

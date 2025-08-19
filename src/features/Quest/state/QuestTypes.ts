@@ -1,6 +1,6 @@
 // As per DataModel.md, defining placeholder types for now.
 export type QuestType = 'MAIN_STORY' | 'SIDE' | 'REPEATABLE' | 'TUTORIAL';
-export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM' | 'ESCORT' | 'DELIVER';
+export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM' | 'ESCORT' | 'DELIVER' | 'PUZZLE';
 export type QuestStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'READY_TO_COMPLETE' | 'COMPLETED' | 'FAILED';
 
 // Placeholder for requirements, e.g., level, previous quest, etc.
@@ -17,6 +17,31 @@ export interface QuestReward {
   faction?: string;
 }
 
+// Puzzle-related types used by puzzle objectives
+export interface PuzzleData {
+  prompt: string;
+  options: string[];
+}
+
+export interface PuzzleEffect {
+  type: 'STATUS_EFFECT';
+  value: string; // Status effect identifier
+}
+
+export interface PuzzleReward {
+  type: 'XP' | 'GOLD' | 'ITEM' | 'REPUTATION' | 'ESSENCE';
+  value: string | number;
+  amount?: number;
+  faction?: string;
+}
+
+export interface PuzzleOutcome {
+  solution: string; // e.g., comma-joined string of options or keyword like 'force'
+  rewards: PuzzleReward[];
+  effects: PuzzleEffect[];
+  logMessage: string;
+}
+
 export interface QuestObjective {
   objectiveId: string;
   description: string;
@@ -31,6 +56,9 @@ export interface QuestObjective {
   // For DELIVER objectives
   hasItem?: boolean;
   delivered?: boolean;
+  // For PUZZLE objectives
+  puzzleData?: PuzzleData;
+  outcomes?: PuzzleOutcome[];
 }
 
 export interface Quest {
