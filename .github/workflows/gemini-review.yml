@@ -23,9 +23,8 @@ jobs:
         with:
           node-version: '20'
 
-      # CORRECTED STEP BELOW
       - name: Run Gemini CLI for Code Review
-        # We now use the -p flag to pass a non-interactive prompt
+        # This is the corrected step. We use the -p flag for a prompt.
         run: |
           npx https://github.com/google-gemini/gemini-cli -p "Please act as a senior software engineer. Review the changes in this pull request for code quality, adherence to our project's conventions (see GEMINI.md), potential bugs, and clarity. Provide feedback as a list of suggestions. The git diff is available in the context."
         env:
