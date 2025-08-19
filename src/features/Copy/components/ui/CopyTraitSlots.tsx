@@ -24,6 +24,30 @@ import { Lock, AddCircleOutline, Cancel } from '@mui/icons-material';
 import { Trait } from '../../../Traits/state/TraitsTypes';
 import { RootState } from '../../../../app/store';
 import { selectCopyById } from '../../state/CopySelectors';
+import { styled } from '@mui/material/styles';
+
+// Styled components for maintainability and consistent theming
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(1),
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: 70,
+  position: 'relative',
+}));
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  // theme.spacing returns a string like '12px'; use string template for negative values
+  top: `-${theme.spacing(1.5)}`,
+  right: `-${theme.spacing(1.5)}`,
+  zIndex: 1,
+  backgroundColor: theme.palette.background.paper,
+  '&:hover': {
+    backgroundColor: theme.palette.grey[200],
+  },
+}));
 
 interface CopyTraitSlotsProps {
   copyId: string;
@@ -89,27 +113,38 @@ const TraitSlotCard: React.FC<{
                     <Tooltip title={trait.description}>
                         <Typography variant="body2" fontWeight="bold">{trait.name}</Typography>
                     </Tooltip>
-                    <IconButton size="small" onClick={onUnshare} sx={{ position: 'absolute', top: -12, right: -12, zIndex: 1, backgroundColor: 'background.paper', '&:hover': { backgroundColor: 'grey.200'} }}>
+                    <StyledIconButton size="small" onClick={onUnshare} aria-label="Unshare trait">
                         <Cancel fontSize="small" color="error" />
-                    </IconButton>
+                    </StyledIconButton>
                 </Box>
             );
         }
 
         return (
              <Tooltip title="Share a Trait">
-                <Box sx={{ textAlign: 'center', cursor: 'pointer', width: '100%' }} onClick={onShare}>
-                    <AddCircleOutline color="primary" sx={{ fontSize: 40 }}/>
-                    <Typography variant="caption" display="block" color="text.secondary">Share</Typography>
-                </Box>
+                <Button
+                  onClick={onShare}
+                  variant="text"
+                  aria-label="Share a trait"
+                  sx={{
+                    textAlign: 'center',
+                    width: '100%',
+                    flexDirection: 'column',
+                    py: 2,
+                    minHeight: 70,
+                  }}
+                >
+                  <AddCircleOutline color="primary" sx={{ fontSize: 40 }} />
+                  <Typography variant="caption" display="block" color="text.secondary">Share</Typography>
+                </Button>
             </Tooltip>
         );
     };
 
     return (
-        <Paper variant="outlined" sx={{ p: 1, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '70px', position: 'relative' }}>
+        <StyledPaper variant="outlined">
             {renderContent()}
-        </Paper>
+        </StyledPaper>
     );
 };
 
@@ -123,7 +158,30 @@ export const CopyTraitSlots: React.FC<CopyTraitSlotsProps> = ({ copyId }) => {
   const player = useAppSelector(selectPlayer);
   const allTraits = useAppSelector(selectAllTraits);
 
-  if (!copy) return null;
+  // Memoized derived data (placed before any early returns to satisfy hooks rule)
+  const eligibleTraitsForSharing = useMemo(() => {
+    if (!copy) return [] as Trait[];
+
+    const equippedPlayerTraitIds = player.traitSlots
+      .map(slot => slot.traitId)
+      .filter((id): id is string => !!id);
+
+    const permanentPlayerTraits = new Set(player.permanentTraits);
+    const copyTraits = new Set([
+      ...(copy.inheritedTraits || []),
+      ...(copy.traitSlots?.map(slot => slot.traitId).filter(Boolean) as string[] || [])
+    ]);
+
+    return equippedPlayerTraitIds
+      .filter(traitId => !permanentPlayerTraits.has(traitId) && !copyTraits.has(traitId))
+      .map(traitId => allTraits[traitId])
+      .filter((t): t is Trait => !!t);
+  }, [player.traitSlots, player.permanentTraits, copy, allTraits]);
+
+  const inheritedTraitObjects = useMemo(() => {
+      if (!copy) return [] as Trait[];
+      return (copy.inheritedTraits || []).map(id => allTraits[id]).filter(Boolean) as Trait[];
+  }, [copy, allTraits]);
 
   const handleOpenShareDialog = (slotIndex: number) => {
     setSelectedSlotIndex(slotIndex);
@@ -146,26 +204,7 @@ export const CopyTraitSlots: React.FC<CopyTraitSlotsProps> = ({ copyId }) => {
     dispatch(unshareTraitFromCopyThunk({ copyId: copy.id, slotIndex }));
   };
 
-  const eligibleTraitsForSharing = useMemo(() => {
-    const equippedPlayerTraitIds = player.traitSlots
-      .map(slot => slot.traitId)
-      .filter((id): id is string => !!id);
-
-    const permanentPlayerTraits = new Set(player.permanentTraits);
-    const copyTraits = new Set([
-      ...(copy.inheritedTraits || []),
-      ...(copy.traitSlots?.map(slot => slot.traitId).filter(Boolean) as string[] || [])
-    ]);
-
-    return equippedPlayerTraitIds
-      .filter(traitId => !permanentPlayerTraits.has(traitId) && !copyTraits.has(traitId))
-      .map(traitId => allTraits[traitId])
-      .filter((t): t is Trait => !!t);
-  }, [player.traitSlots, player.permanentTraits, copy.inheritedTraits, copy.traitSlots, allTraits]);
-
-  const inheritedTraitObjects = useMemo(() => {
-      return (copy.inheritedTraits || []).map(id => allTraits[id]).filter(Boolean) as Trait[];
-  }, [copy.inheritedTraits, allTraits]);
+  if (!copy) return null;
 
   return (
     <Box sx={{ p: 1 }}>
