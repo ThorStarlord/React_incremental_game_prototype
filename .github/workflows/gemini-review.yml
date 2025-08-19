@@ -24,7 +24,8 @@ jobs:
           node-version: '20'
 
       - name: Run Gemini CLI for Code Review
-        run: npx @google-gemini/cli review
+        # Use the full GitHub URL instead of the NPM package name
+        run: npx https://github.com/google-gemini/gemini-cli review
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
