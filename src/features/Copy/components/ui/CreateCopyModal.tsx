@@ -20,7 +20,7 @@ import { selectPlayerAttributes } from '../../../Player/state/PlayerSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { selectNPCById } from '../../../NPCs/state/NPCSelectors';
 import { selectTraits } from '../../../Traits/state/TraitsSelectors';
-import { computeInheritedTraits, getInheritedTraitCap } from '../../utils/copyUtils';
+import { computeInheritedTraits, getInheritedTraitCap, getCopyCreationCost } from '../../utils/copyUtils';
 
 interface CreateCopyModalProps {
   open: boolean;
@@ -42,9 +42,10 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
   const npc = useAppSelector((state) => selectNPCById(state, npcId));
   const allTraits = useAppSelector(selectTraits);
 
-  const essenceCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
-  const lacksEssence = currentEssence < essenceCost;
-  const connectionOk = (npc?.connectionDepth ?? 0) >= COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT;
+  const creationCost = getCopyCreationCost(npc?.connectionDepth);
+  const accelCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
+  const totalCost = growthType === 'accelerated' ? creationCost + accelCost : creationCost;
+  const lacksEssence = currentEssence < totalCost;
 
   const successChancePct = useMemo(() => {
     const charisma = attributes.charisma ?? 10;
@@ -76,17 +77,18 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
         </DialogContentText>
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2">Estimated success chance: <b>{successChancePct}%</b> (based on Charisma)</Typography>
-          <Typography variant="caption" color="text.secondary">
-            Current Essence: {currentEssence} {lacksEssence && `(need ${essenceCost} for accelerated)`}
+          <Typography variant="caption" color="text.secondary" display="block">
+            Base creation cost scales with connection depth. Current cost: <b>{creationCost}</b> Essence
+          </Typography>
+          {growthType === 'accelerated' && (
+            <Typography variant="caption" color="text.secondary" display="block">
+              Accelerated growth additional cost: <b>{accelCost}</b> Essence
+            </Typography>
+          )}
+          <Typography variant="caption" color={lacksEssence ? 'error.main' : 'text.secondary'} display="block">
+            Total cost: <b>{totalCost}</b> Essence — You have {currentEssence}
           </Typography>
         </Box>
-        {!connectionOk && (
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="caption" color="error.main">
-              Requires Connection Depth Level {COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT} or higher to attempt creation. (Current: {npc?.connectionDepth ?? 0})
-            </Typography>
-          </Box>
-        )}
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2">Inheritance Preview</Typography>
           <Typography variant="caption" color="text.secondary">
@@ -110,7 +112,6 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
         >
           <FormControlLabel
             value="normal"
-            disabled={!connectionOk}
             control={<Radio />}
             label={
               <Box>
@@ -123,17 +124,17 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
           />
           <FormControlLabel
       value="accelerated"
-      disabled={lacksEssence || !connectionOk}
+      disabled={lacksEssence}
             control={<Radio />}
             label={
               <Box>
                 <Typography>Accelerated Growth</Typography>
                 <Typography variant="caption" color="text.secondary">
-                  The copy will mature rapidly. Costs {COPY_SYSTEM.ACCELERATED_GROWTH_COST} Essence.
+                  The copy will mature rapidly. Additional cost {accelCost} Essence.
                 </Typography>
                 {lacksEssence && (
                   <Typography variant="caption" color="error.main">
-                    Insufficient Essence for accelerated growth.
+                    Insufficient Essence for selected option.
                   </Typography>
                 )}
               </Box>
@@ -143,7 +144,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-    <Button onClick={handleCreate} variant="contained" disabled={!connectionOk || (growthType === 'accelerated' && lacksEssence)}>
+  <Button onClick={handleCreate} variant="contained" disabled={lacksEssence}>
           Create
         </Button>
       </DialogActions>

@@ -53,6 +53,10 @@ export const COPY_SYSTEM = {
   LOYALTY_MIN: 0,
   /** Essence cost to promote a Copy to accelerated growth (placeholder). */
   PROMOTE_ACCELERATED_COST: 150,
+  /** Essence-only creation cost tuning: cost decreases with NPC connection depth. */
+  CREATION_BASE_COST: 150,
+  CREATION_DISCOUNT_PER_DEPTH: 15, // each connectionDepth level reduces cost by this amount
+  CREATION_MIN_COST: 25,
 
   /** Trait Slots config for Copies */
   MAX_TRAIT_SLOTS: 4,
@@ -71,8 +75,8 @@ export const COPY_SYSTEM = {
     { depth: 5, cap: 3 },
     { depth: 8, cap: 4 },
   ] as Array<{ depth: number; cap: number }>,
-  /** Minimum connection depth required to attempt seduction/create a Copy. */
-  SEDUCTION_CONNECTION_REQUIREMENT: 5,
+  /** Deprecated: connection depth is no longer required to attempt creation (essence-only). */
+  SEDUCTION_CONNECTION_REQUIREMENT: 0,
   /** Rewards for completing a timed Copy task (baseline; subject to future role modifiers). */
   TASK_REWARDS: {
     GOLD: 10,

@@ -9,7 +9,7 @@ import type { RootState, AppDispatch } from '../../../app/store';
 import { spendEssence, gainEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
 import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated, shareTraitToCopy, unshareTraitFromCopy, unlockCopySlotsIfEligible, assignCopyRole, startCopyTask, progressCopyTask, clearCopyActiveTask, setCopySharePreference } from './CopySlice';
-import { applyGrowth, applyLoyaltyDecay, computeInheritedTraits } from '../utils/copyUtils';
+import { applyGrowth, applyLoyaltyDecay, computeInheritedTraits, getCopyCreationCost } from '../utils/copyUtils';
 import type { Copy, CopyGrowthType, CopyTask } from './CopyTypes';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { generateCopyId, generateCopyName } from '../utils/copyUtils';
@@ -201,19 +201,14 @@ export const createCopyThunk = createAsyncThunk(
       return rejectWithValue('Target NPC not found.');
     }
 
-    // --- Connection depth gating for seduction/create ---
-    if ((npc.connectionDepth ?? 0) < COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT) {
-      return rejectWithValue(`Requires connection depth ${COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT} or higher.`);
+    // --- Essence-only creation cost (scaled by connection depth) ---
+    const creationCost = getCopyCreationCost(npc.connectionDepth);
+    let totalCost = creationCost;
+    if (growthType === 'accelerated') totalCost += COPY_SYSTEM.ACCELERATED_GROWTH_COST;
+    if (essence < totalCost) {
+      return rejectWithValue('Not enough essence to create this Copy.');
     }
-
-    // --- Handle Accelerated Growth Cost ---
-    if (growthType === 'accelerated') {
-      const essenceCost = COPY_SYSTEM.ACCELERATED_GROWTH_COST;
-      if (essence < essenceCost) {
-        return rejectWithValue('Not enough essence for accelerated growth.');
-      }
-      dispatch(spendEssence({ amount: essenceCost, source: 'accelerated_copy_growth' }));
-    }
+    dispatch(spendEssence({ amount: totalCost, source: growthType === 'accelerated' ? 'create_copy_accelerated' : 'create_copy' }));
 
     // --- Success Check ---
     // Example: Success chance is based on player's Charisma.
