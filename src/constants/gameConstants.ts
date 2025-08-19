@@ -79,3 +79,11 @@ export const COPY_SYSTEM = {
     ESSENCE: 5,
   },
 };
+
+/**
+ * Constants for the Quest System
+ */
+export const QUEST_CONSTANTS = {
+  DEFAULT_STATUS_EFFECT_DURATION: 60,
+  DEFAULT_STATUS_EFFECT_POTENCY: -5,
+} as const;

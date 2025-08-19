@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Stack } from '@mui/material';
 import { QuestObjective } from '../../state/QuestTypes';
 
 interface QuestPuzzleModalProps {
@@ -30,24 +31,26 @@ const QuestPuzzleModal: React.FC<QuestPuzzleModalProps> = ({ open, onClose, obje
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h2>{puzzleData.prompt}</h2>
-        <div>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{puzzleData.prompt}</DialogTitle>
+      <DialogContent>
+        <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 1, mb: 2 }}>
           {puzzleData.options.map((option) => (
-            <button key={option} onClick={() => handleOptionClick(option)}>
+            <Button key={option} onClick={() => handleOptionClick(option)} variant="outlined" sx={{ m: 0.5 }}>
               {option}
-            </button>
+            </Button>
           ))}
-        </div>
-        <div>
-          <p>Current Sequence: {inputSequence.join(', ')}</p>
-        </div>
-        <button onClick={handleSubmit}>Submit</button>
-        <button onClick={handleForce}>Force It</button>
-        <button onClick={onClose}>Close</button>
-      </div>
-    </div>
+        </Stack>
+        <Typography variant="body2" color="text.secondary">
+          Current Sequence: {inputSequence.join(', ')}
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleSubmit} variant="contained" color="primary">Submit</Button>
+        <Button onClick={handleForce} variant="contained" color="secondary">Force It</Button>
+        <Button onClick={onClose} variant="text">Close</Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

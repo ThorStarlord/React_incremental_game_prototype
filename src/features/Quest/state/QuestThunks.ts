@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { updateObjectiveProgress, patchObjectiveFields } from './QuestSlice';
 import { toDisplayNameFromId } from '../../../shared/utils/formatUtils';
 import { StatusEffect } from '../../Player/state/PlayerTypes';
+import { QUEST_CONSTANTS } from '../../../constants/gameConstants';
 
 export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
   try {
@@ -82,7 +83,7 @@ export const solveQuestPuzzleThunk = createAsyncThunk(
     for (const reward of outcome.rewards) {
       switch (reward.type) {
         case 'GOLD':
-          dispatch(gainGold(reward.value));
+          dispatch(gainGold(Number(reward.value) || 0));
           break;
         // Add other reward types here
       }
@@ -94,8 +95,8 @@ export const solveQuestPuzzleThunk = createAsyncThunk(
         const newEffect: StatusEffect = {
           id: uuidv4(),
           name: effect.value,
-          duration: 60, // Example duration
-          potency: -5, // Example potency
+          duration: QUEST_CONSTANTS.DEFAULT_STATUS_EFFECT_DURATION,
+          potency: QUEST_CONSTANTS.DEFAULT_STATUS_EFFECT_POTENCY,
         };
         dispatch(addStatusEffect(newEffect));
       }

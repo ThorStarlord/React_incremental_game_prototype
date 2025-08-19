@@ -37,7 +37,7 @@ export interface PlayerAttributes {
  */
 export interface StatusEffect {
   id: string;
-  name: 'cursed_hands_debuff' | string;
+  name: string;
   description?: string;
   duration: number;
   effects?: Partial<PlayerStats>;
