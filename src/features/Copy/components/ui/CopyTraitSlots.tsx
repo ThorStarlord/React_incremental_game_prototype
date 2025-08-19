@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { Copy, CopyTraitSlot } from '../../state/CopyTypes';
+import { CopyTraitSlot } from '../../state/CopyTypes';
 import { shareTraitWithCopyThunk, unshareTraitFromCopyThunk } from '../../state/CopyThunks';
 import { selectPlayer } from '../../../Player/state/PlayerSelectors';
 import { selectAllTraits, selectTraitById } from '../../../Traits/state/TraitsSelectors';

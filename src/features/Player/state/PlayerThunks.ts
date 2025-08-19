@@ -30,13 +30,14 @@ export const recalculateStatsThunk = createAsyncThunk(
     finalStats = processTraitEffects(activeTraits, finalStats);
 
     // --- Step 4: Process status effects (buffs/debuffs) ---
-    player.statusEffects.forEach(effect => {
-        for (const [stat, value] of Object.entries(effect.effects)) {
-            if (stat in finalStats && typeof value === 'number') {
-                (finalStats as any)[stat] += value;
-            }
-        }
-    });
+  player.statusEffects.forEach(effect => {
+    if (!effect.effects) return;
+    for (const [stat, value] of Object.entries(effect.effects)) {
+      if (stat in finalStats && typeof value === 'number') {
+        (finalStats as any)[stat] += value;
+      }
+    }
+  });
 
     // --- Step 5: Dispatch the final calculated stats to the store ---
     dispatch(applyCalculatedStats(finalStats));

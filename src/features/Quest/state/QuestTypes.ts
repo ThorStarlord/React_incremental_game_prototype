@@ -1,6 +1,6 @@
 // As per DataModel.md, defining placeholder types for now.
 export type QuestType = 'MAIN_STORY' | 'SIDE' | 'REPEATABLE' | 'TUTORIAL';
-export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM' | 'ESCORT' | 'DELIVER' | 'PUZZLE';
+export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM' | 'ESCORT' | 'DELIVER' | 'PUZZLE' | 'INTERACT_PUZZLE';
 export type QuestStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'READY_TO_COMPLETE' | 'COMPLETED' | 'FAILED';
 
 // Placeholder for requirements, e.g., level, previous quest, etc.
