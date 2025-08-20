@@ -6,7 +6,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, setDialogueNodes, incrementNpcShopItem, markNpcRestock } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from '../../Player/state/PlayerSlice';
 import { TRADING } from '../../../constants/gameConstants';
@@ -155,7 +155,7 @@ export const processNPCInteractionThunk = createAsyncThunk<
       let npcText = '';
       const node = choiceId ? (nodes as any)[choiceId] : undefined;
 
-      if (node) {
+  if (node) {
         // Gate checks
         if (typeof node.minAffinity === 'number' && (npc.affinity || 0) < node.minAffinity) {
           dispatch(addNotification({ type: 'info', message: 'They are not ready to discuss that yet.' }));
@@ -167,8 +167,11 @@ export const processNPCInteractionThunk = createAsyncThunk<
           if (eff.type === 'AFFINITY_DELTA') {
             relDelta += Number(eff.value) || 0;
           } else if (eff.type === 'UNLOCK_QUEST') {
-            // Minimal: surface as notification; actual quest unlocking handled elsewhere
-            dispatch(addNotification({ type: 'info', message: `Quest unlocked: ${eff.questId}` }));
+            // Mark quest as available from this NPC (quest giver assumed to be current NPC)
+            if (eff.questId) {
+              dispatch(addAvailableQuestToNPC({ npcId: npc.id, questId: eff.questId }));
+              dispatch(addNotification({ type: 'success', message: `Quest available: ${eff.questId}` }));
+            }
           } else if (eff.type === 'GIVE_ITEM') {
             const qty = eff.amount || 1;
             dispatch(addItem({ itemId: eff.itemId, quantity: qty }));

@@ -31,6 +31,21 @@
       { "type": "OPEN_SERVICE", "serviceId": "lore_provider_willow" }
     ]
   },
+  "elder_willow_offer_seed": {
+    "id": "elder_willow_offer_seed",
+    "npcId": "npc_elder_willow",
+    "title": "A Seed of Potential",
+    "text": "There is a dormant seed that calls to the sun. Will you help awaken it?",
+    "responses": {
+      "accept": "I will find what it needs.",
+      "decline": "Not right now."
+    },
+    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_willow_ancient_seed" } ],
+    "next": {
+      "accept": null,
+      "decline": null
+    }
+  },
   "gronk_greeting": {
     "id": "gronk_greeting",
     "npcId": "npc_blacksmith_gronk",
@@ -51,5 +66,55 @@
     "npcId": "npc_blacksmith_gronk",
     "text": "Hmph. You got taste.",
     "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
+  }
+  ,
+  "elara_greeting": {
+    "id": "elara_greeting",
+    "npcId": "npc_scholar_elara",
+    "title": "A Keen Mind",
+    "text": "Ah, an inquisitive traveler. Perhaps you can assist with a missing tome?",
+    "responses": {
+      "offer": "Tell me about the tome.",
+      "later": "Maybe later."
+    },
+    "effects": [],
+    "next": {
+      "offer": "elara_offer_tome",
+      "later": null
+    }
+  },
+  "elara_offer_tome": {
+    "id": "elara_offer_tome",
+    "npcId": "npc_scholar_elara",
+    "text": "A rare volume has gone missing. I suspect the slums. Will you retrieve it?",
+    "responses": {
+      "accept": "I'll find your book.",
+      "decline": "Not now."
+    },
+    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_elara_lost_tome" } ],
+    "next": { "accept": null, "decline": null }
+  },
+  "valerius_greeting": {
+    "id": "valerius_greeting",
+    "npcId": "npc_captain_valerius",
+    "title": "On Duty",
+    "text": "Citizen. The streets need watchful eyes. Care to assist?",
+    "responses": {
+      "offer": "What's needed?",
+      "pass": "I'm busy."
+    },
+    "effects": [],
+    "next": { "offer": "valerius_offer_patrol", "pass": null }
+  },
+  "valerius_offer_patrol": {
+    "id": "valerius_offer_patrol",
+    "npcId": "npc_captain_valerius",
+    "text": "Patrol the merchant district and report back.",
+    "responses": {
+      "accept": "I'll do the rounds.",
+      "decline": "Not now."
+    },
+    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_valerius_patrol_duty" } ],
+    "next": { "accept": null, "decline": null }
   }
 }
