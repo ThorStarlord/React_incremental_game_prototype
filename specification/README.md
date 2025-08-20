@@ -48,14 +48,14 @@ The React Incremental RPG Prototype is an incremental/idle game featuring emotio
 ### Feature Specifications
 - **[Game Design Document](GameDesignDocument.md)** - High-level game design and mechanics
 - **[Player System](Features/PlayerSystem.md)** - Character stats, attributes, and progression ✅ **COMPLETE**
-- **[Trait System](Features/TraitSystem.md)** - Trait acquisition, management, and effects ✅ **COMPLETE**
+- **[Trait System](Features/TraitSystem.md)** - Trait acquisition, management, and effects ✅ **COMPLETE** (includes resonance gating by intimacy via `TRAIT_RESONANCE.MIN_CONNECTION_DEPTH`)
 - **[NPC System](Features/NPCSystem.md)** - Non-player character interactions and relationships ✅ **COMPLETE**
 - **[Essence System](Features/EssenceSystem.md)** - Core resource generation and consumption ✅ **COMPLETE**
 - **[GameLoop System](Features/GameLoopSystem.md)** - Time management and game progression ✅ **COMPLETE**
 - **[Settings System](Features/SettingsSystem.md)** - Game configuration and preferences ✅ **COMPLETE**
 - **[Save/Load System](Features/SaveLoadSystem.md)** - Game state persistence and import/export ✅ **COMPLETE**
-- **[Quest System](Features/QuestSystem.md)** - Objective and narrative progression 📋 **PLANNED**
-	- Status update: ✅ FOUNDATION IMPLEMENTED (slice + selectors + thunks + basic QuestLog UI)
+- **[Quest System](Features/QuestSystem.md)** - Objective and narrative progression � **EXPANDED FOUNDATION**
+	- Status: ✅ Expanded foundation (slice, selectors, thunks, timers, puzzle modal, basic QuestLog UI)
 - **[Copy System](Features/CopySystem.md)** - Character duplication and management ✅ BASIC UI/STATE + TRAIT SHARING AUTO‑SYNC
 
 ## ⚠️ Project Constraints (Prototype Phase)

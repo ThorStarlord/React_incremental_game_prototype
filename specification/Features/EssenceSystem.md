@@ -49,12 +49,10 @@ This document outlines the design and mechanics of the Essence system in the gam
 
 *   **Emotional Influence:** *(Planned for Future Implementation)*
     *   Spending Essence to perform actions that directly (but subtly) influence a target's emotional state or favorability towards the player (e.g., accelerating relationship gain, calming hostility). Cost scales with desired effect intensity and target resistance.
-*   **Trait Acquisition:** ✅ **IMPLEMENTED**
-    *   **Design Intent:** The primary cost for resonating with and acquiring a trait blueprint from a target. Cost determined by trait rarity/complexity and potentially reduced by connection depth.
-    *   **Current Implementation:** The `acquireTraitWithEssenceThunk` implements this, checking for sufficient essence and deducting the `trait.essenceCost`.
-*   **Trait Permanence:** ✅ **IMPLEMENTED**
-    *   Significant Essence cost to make an acquired trait permanently active for the player without requiring an equip slot.
-    *   **Current Implementation:** The `makeTraitPermanentThunk` in `TraitThunks.ts` implements this, using a flat cost (`MAKE_PERMANENT_COST`).
+*   **Trait Acquisition (Resonance):** ✅ **IMPLEMENTED**
+    *   **Design Intent:** Spend Essence to permanently acquire a trait from an NPC via emotional resonance.
+    *   **Current Implementation:** Centralized in `src/features/Traits/state/TraitThunks.ts#acquireTraitWithEssenceThunk`, which validates Essence, enforces NPC Intimacy gating when applicable, and updates Player permanent traits. Cost comes from `trait.essenceCost`.
+    *   **Gating Constant:** `TRAIT_RESONANCE.MIN_CONNECTION_DEPTH` in `gameConstants.ts` governs the minimum required Intimacy level with the source NPC.
 *   **Accelerated Copy Growth:** *(Planned for Future Implementation)*
     *   Spending Essence to speed up the development, training, or task performance of player-created Copies. A significant upfront cost is required to choose the accelerated path upon creation. (See `CopySystem.md`).
 *   **Standard Upgrades (Optional):**

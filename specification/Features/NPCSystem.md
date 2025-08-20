@@ -26,7 +26,7 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 
 *   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions. This is quantified by an "Affinity" score (Relationship Value).
 *   **Emotional Connections (Connection Depth):** NPCs exhibit a range of emotions and can form deep connections with the player. This connection is quantified by the `connectionDepth` stat, which affects their behavior, dialogue, and contributes to passive Essence generation.
-*   **Trait Acquisition (Resonance):** Players **permanently learn** traits *from* NPCs (traits listed in `availableTraits`) using the Resonance ability. This action costs Essence and requires proximity. The acquired trait becomes a permanent part of the player's abilities and does not need to be equipped in an active slot.
+*   **Trait Acquisition (Resonance):** Players **permanently learn** traits *from* NPCs (traits listed in `availableTraits`) using the Resonance ability. This action costs Essence and is **gated by Intimacy** (minimum `connectionDepth`) with the source NPC. The acquired trait becomes a permanent part of the player's abilities and does not need to be equipped in an active slot.
 *   **Temporary Trait Attunement (Equip NPC Innate Trait):** Players can temporarily equip an NPC's `innateTraits` into one of their own active player trait slots. This provides the trait's benefits to the player while equipped, has no Essence cost, and the NPC also retains their trait.
 *   **Trait Sharing:** Players can share their equipped (non-permanent) traits *with* NPCs. NPCs have a predefined number of shared trait slots (up to 5) which become usable (`isUnlocked: true`) based on meeting specific requirements (typically relationship Affinity milestones). Successful sharing depends on an available, unlocked slot on the NPC.
 *   **Social Interactions:** NPCs can interact with each other and the player in a variety of social contexts, including trading, gifting, and collaborative activities.
@@ -112,6 +112,7 @@ Information about known NPCs and management of relationships is primarily handle
 
 **NPCTraitsTab:** ✅ **IMPLEMENTED**
 - **Trait Resonance Interface:** For "Available Traits for Resonance" from the NPC. Using "Resonate" costs Essence and **permanently adds the trait to the player's abilities** (does not require an active player slot).
+- **Intimacy Gating:** The Resonate action is disabled until `connectionDepth >= TRAIT_RESONANCE.MIN_CONNECTION_DEPTH`; tooltip indicates the required depth.
 - **Shared Trait Slot Management:** For traits the player shares *to* the NPC. NPCs have predefined, unlockable slots.
 - Player trait sharing capabilities (sharing player's equipped, non-permanent traits).
 - Acquisition (Resonance) validation and cost transparency.

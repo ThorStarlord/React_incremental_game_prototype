@@ -10,13 +10,12 @@ import {
   updateResonanceLevel,
 } from './EssenceSlice';
 import { EssenceState } from './EssenceTypes';
-import { addPermanentTrait, setResonanceLevel } from '../../Player/state/PlayerSlice';
+import { setResonanceLevel } from '../../Player/state/PlayerSlice';
 import { selectPlayer } from '../../Player/state/PlayerSelectors';
 import { COPY_SYSTEM, ESSENCE_GENERATION } from '../../../constants/gameConstants';
 import { selectAllCopies } from '../../Copy/state/CopySelectors';
 import { calculateCopyEssenceGeneration } from '../../Copy/utils/copyUtils';
-import { NPC } from '../../NPCs/state/NPCTypes';
-import { Trait } from '../../Traits/state/TraitsTypes';
+// Removed unused types
 
 /**
  * Async thunk for processing essence generation over time
@@ -97,32 +96,7 @@ export const spendEssenceThunk = createAsyncThunk(
   }
 );
 
-/**
- * Async thunk for acquiring traits with essence cost (Resonance)
- */
-export const acquireTraitWithEssenceThunk = createAsyncThunk(
-  'essence/acquireTraitWithEssence',
-  async (
-    { traitId, essenceCost }: { traitId: string; essenceCost: number },
-    { getState, dispatch, rejectWithValue }
-  ) => {
-    const state = getState() as RootState;
-    const currentEssence = state.essence.currentEssence;
-
-    if (currentEssence < essenceCost) {
-      return rejectWithValue(`Insufficient essence. Required: ${essenceCost}, Available: ${currentEssence}`);
-    }
-
-    dispatch(spendEssence({ amount: essenceCost }));
-    dispatch(addPermanentTrait(traitId));
-
-    return {
-      traitId,
-      essenceSpent: essenceCost,
-      remainingEssence: currentEssence - essenceCost
-    };
-  }
-);
+// NOTE: Resonance acquisition now lives under Traits/state/TraitThunks.ts to centralize validation and notifications.
 
 /**
  * Async thunk for processing resonance level updates

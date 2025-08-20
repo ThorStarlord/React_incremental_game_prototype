@@ -33,12 +33,23 @@ The player's journey with a trait now follows a clear three-stage path.
 ### 2.3. Resonance (Permanent Acquisition) ✅ IMPLEMENTED
 *   **Concept:** This is the mastery step. The player spends Essence to make a discovered trait a permanent, innate part of their character. This is the "Resonance" mechanic.
 *   **Trigger:** The player interacts with an NPC who can teach a specific trait. On the NPC's "Traits" tab, the player clicks a "Resonate" button.
-*   **Implementation:** The button dispatches the `acquireTraitWithEssenceThunk`. This thunk:
+*   **Implementation:** The button dispatches the `acquireTraitWithEssenceThunk` (authoritative implementation under `src/features/Traits/state/TraitThunks.ts`). This thunk:
     1.  Validates the player has enough essence.
+    2.  If the trait has a source NPC (`sourceNpc` or `source`), validates the player's Intimacy (`connectionDepth`) with that NPC meets the minimum requirement.
     2.  Dispatches `spendEssence`.
     3.  Dispatches `discoverTrait` (to ensure it's marked as known, if not already).
     4.  Dispatches `addPermanentTrait`, which adds the trait's ID to the `player.permanentTraits` array.
+    5.  Emits notifications for success and error conditions (insufficient essence or connection depth).
 *   **Result:** The trait is now always active and **does not require a slot**. If it was previously equipped, that slot is now free. Permanent traits are not shareable to Copies; any existing shares are automatically removed at the moment of resonance.
+
+#### 2.3.1. Resonance Gating by Intimacy ✅ IMPLEMENTED
+*   **Requirement:** Resonating a trait that originates from an NPC requires a minimum Intimacy (`connectionDepth`) with that NPC.
+*   **Constant:** `TRAIT_RESONANCE.MIN_CONNECTION_DEPTH` (default: `1`), defined in `src/constants/gameConstants.ts`.
+*   **Data Indicator:** Traits that are gated include a `sourceNpc` (preferred) or `source` field in `traits.json`.
+*   **UI Behavior:**
+    *   The "Resonate" button is disabled when the requirement is not met.
+    *   Tooltip explains the unmet requirement: e.g., "Requires connection depth 1".
+    *   Attempting to bypass via other entry points produces a user notification.
 
 ### 2.4. NPC Innate Trait Equipping ✅ IMPLEMENTED
 *   **Concept:** Players can temporarily benefit from certain traits an NPC innately possesses by "equipping" them into one of their own active trait slots.
