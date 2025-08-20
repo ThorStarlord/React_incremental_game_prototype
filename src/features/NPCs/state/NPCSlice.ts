@@ -178,6 +178,39 @@ const npcSlice = createSlice({
         slot.traitId = null;
       }
     },
+    /**
+     * Seed or update an NPC's shop stock map.
+     */
+    setNpcShopStock: (state, action: PayloadAction<{ npcId: string; stock: Record<string, number> }>) => {
+      const { npcId, stock } = action.payload;
+      const npc = state.npcs[npcId];
+      if (npc) {
+        npc.shopStock = { ...(npc.shopStock || {}), ...stock };
+      }
+    },
+    /**
+     * Decrement stock for an item if available; no-op when out of stock or stock unknown.
+     */
+    decrementNpcShopItem: (state, action: PayloadAction<{ npcId: string; itemId: string; quantity?: number }>) => {
+      const { npcId, itemId, quantity = 1 } = action.payload;
+      const npc = state.npcs[npcId];
+      if (!npc) return;
+      if (!npc.shopStock) npc.shopStock = {};
+      const current = npc.shopStock[itemId] ?? 0;
+      if (current <= 0) return;
+      const next = current - quantity;
+      npc.shopStock[itemId] = next > 0 ? next : 0;
+    },
+    /**
+     * Increment stock for an item (e.g., when the player sells an item to the NPC).
+     */
+    incrementNpcShopItem: (state, action: PayloadAction<{ npcId: string; itemId: string; quantity?: number }>) => {
+      const { npcId, itemId, quantity = 1 } = action.payload;
+      const npc = state.npcs[npcId];
+      if (!npc) return;
+      if (!npc.shopStock) npc.shopStock = {};
+      npc.shopStock[itemId] = (npc.shopStock[itemId] ?? 0) + Math.max(0, quantity);
+    },
   },
   extraReducers: (builder) => {
     // RESTORED: This block handles the async lifecycle of initializeNPCsThunk.
@@ -191,6 +224,21 @@ const npcSlice = createSlice({
         state.npcs = action.payload;
         // Also populate the discovered list for developer convenience
         state.discoveredNPCs = Object.keys(action.payload);
+        // Seed shop stock from inventory lists if provided and not already present
+        for (const npcId of Object.keys(state.npcs)) {
+          const npc = state.npcs[npcId];
+          if (!npc.shopStock) {
+            const list = Array.isArray(npc.inventory?.items) ? (npc.inventory!.items as any[]) : [];
+            if (list.length > 0) {
+              const stock: Record<string, number> = {};
+              for (const itemId of list) {
+                const id = String(itemId);
+                stock[id] = (stock[id] || 0) + 1;
+              }
+              npc.shopStock = stock;
+            }
+          }
+        }
       })
       .addCase(initializeNPCsThunk.rejected, (state, action) => {
         state.loading = false;
@@ -219,6 +267,9 @@ export const {
   addAvailableQuestToNPC,
   updateNpcLocation,
   setNPCSharedTraitInSlot,
+  setNpcShopStock,
+  decrementNpcShopItem,
+  incrementNpcShopItem,
 } = npcSlice.actions;
 
 export const npcActions = npcSlice.actions;

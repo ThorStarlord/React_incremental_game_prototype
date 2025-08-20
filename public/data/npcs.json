@@ -105,8 +105,8 @@
     "innateTraits": ["MasterCraftsman", "BattleHardened"],
     "inventory": { "items": ["item_iron_sword", "item_steel_shield"], "currency": 200 },
     "services": [
-      { "id": "merchant_gronk", "name": "Sell Weapons & Armor", "description": "Buy and sell combat gear.", "basePrice": 0, "currentPrice": 0, "isAvailable": true },
-      { "id": "crafter_gronk", "name": "Craft Equipment", "description": "Commission custom gear.", "basePrice": 50, "currentPrice": 50, "isAvailable": true }
+  { "id": "merchant_gronk", "name": "Sell Weapons & Armor", "description": "Buy and sell combat gear.", "basePrice": 0, "currentPrice": 0, "isAvailable": true, "minAffinity": 2 },
+  { "id": "crafter_gronk", "name": "Craft Equipment", "description": "Commission custom gear.", "basePrice": 50, "currentPrice": 50, "isAvailable": true, "minAffinity": 5 }
     ],
     "status": "available",
     "lastInteraction": 0,
@@ -137,8 +137,8 @@
     "innateTraits": ["ShadowWalker"], 
     "inventory": { "items": ["item_lockpicks", "item_poison_vial"], "currency": 75 },
     "services": [
-      { "id": "information_broker_silas", "name": "Sell Information", "description": "Buy secrets and rumors.", "basePrice": 30, "currentPrice": 30, "isAvailable": true },
-      { "id": "trait_teacher_rare_silas", "name": "Teach Shadow Arts", "description": "Learn traits of the unseen.", "basePrice": 100, "currentPrice": 100, "isAvailable": true }
+  { "id": "information_broker_silas", "name": "Sell Information", "description": "Buy secrets and rumors.", "basePrice": 30, "currentPrice": 30, "isAvailable": true, "minAffinity": 0 },
+  { "id": "trait_teacher_rare_silas", "name": "Teach Shadow Arts", "description": "Learn traits of the unseen.", "basePrice": 100, "currentPrice": 100, "isAvailable": true, "minAffinity": 10 }
     ],
     "status": "available",
     "lastInteraction": 0,
@@ -169,8 +169,8 @@
     "innateTraits": ["IronWill", "BattleHardened"],
     "inventory": { "items": [], "currency": 150 },
     "services": [
-      { "id": "quest_giver_valerius", "name": "Assign Guard Duties", "description": "Take on tasks for the City Watch.", "basePrice": 0, "currentPrice": 0, "isAvailable": true },
-      { "id": "combat_trainer_valerius", "name": "Combat Training", "description": "Improve your combat skills.", "basePrice": 25, "currentPrice": 25, "isAvailable": true }
+  { "id": "quest_giver_valerius", "name": "Assign Guard Duties", "description": "Take on tasks for the City Watch.", "basePrice": 0, "currentPrice": 0, "isAvailable": true, "minAffinity": 3 },
+  { "id": "combat_trainer_valerius", "name": "Combat Training", "description": "Improve your combat skills.", "basePrice": 25, "currentPrice": 25, "isAvailable": true, "minAffinity": 5 }
     ],
     "status": "available",
     "lastInteraction": 0,

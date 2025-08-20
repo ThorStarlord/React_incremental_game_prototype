@@ -8,6 +8,7 @@ import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes
 import { updateEssenceGenerationRateThunk } from '../../Essence';
 import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
+import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from '../../Player/state/PlayerSlice';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -235,5 +236,85 @@ export const shareTraitWithNPCThunk = createAsyncThunk(
   dispatch(setNPCSharedTraitInSlot({ npcId, slotIndex, traitId }));
   dispatch(addNotification({ type: 'success', message: `Shared trait to ${npc.name} (slot ${slot.index + 1}).` }));
     return payload;
+  }
+);
+
+/**
+ * Thunk: Purchase an NPC service
+ * - Validates NPC and service existence
+ * - Calculates price (uses priceOverride from UI, otherwise currentPrice/basePrice with relationship discount)
+ * - Ensures sufficient player gold, deducts on success
+ * - Applies a minimal side-effect based on service kind (trainer/info/teacher)
+ * - Emits user notifications
+ */
+export const purchaseNPCServiceThunk = createAsyncThunk(
+  'npcs/purchaseService',
+  async (
+    payload: { npcId: string; serviceId: string; priceOverride?: number },
+    { getState, dispatch }
+  ) => {
+    const { npcId, serviceId, priceOverride } = payload;
+    const state = getState() as RootState;
+    const npc = state.npcs.npcs[npcId];
+    if (!npc) {
+      dispatch(addNotification({ type: 'error', message: `NPC not found: ${npcId}` }));
+      return payload;
+    }
+
+    const service = (npc.services || []).find(s => s.id === serviceId && s.isAvailable !== false);
+    if (!service) {
+      dispatch(addNotification({ type: 'warning', message: 'Service is not available.' }));
+      return payload;
+    }
+
+    // Gating by minimum affinity if specified
+    if (typeof service.minAffinity === 'number' && (npc.affinity || 0) < service.minAffinity) {
+      dispatch(addNotification({ type: 'warning', message: `Requires affinity ${service.minAffinity} to use ${service.name}.` }));
+      return payload;
+    }
+
+    // Special zero-cost routing services (e.g., merchant links) just inform the user
+    const isRoutingService = /merchant_/i.test(serviceId) || /quest_giver_/i.test(serviceId) || /radiant_quest_provider/i.test(serviceId);
+    if (isRoutingService && (service.basePrice || 0) === 0) {
+      dispatch(addNotification({ type: 'info', message: `${service.name}: check the relevant tab to proceed.` }));
+      return payload;
+    }
+
+    // Calculate final price with affinity-based discount
+    const base = typeof service.currentPrice === 'number' ? service.currentPrice : (service.basePrice || 0);
+    const discountPct = Math.min(Math.floor((npc.affinity || 0) / 5), 20);
+    let price = Math.max(0, Math.floor(base * (1 - discountPct / 100)));
+
+    if (price <= 0) {
+      // Free service
+      price = 0;
+    }
+
+    const playerGold = state.player.gold;
+    if (price > playerGold) {
+      dispatch(addNotification({ type: 'warning', message: 'Not enough gold.' }));
+      return payload;
+    }
+
+    if (price > 0) {
+      dispatch(spendGold(price));
+    }
+
+    // Minimal service-specific side effects
+    if (/combat_trainer|trainer_/i.test(serviceId)) {
+      dispatch(addAvailableAttributePoints(1));
+      dispatch(addNotification({ type: 'success', message: `${service.name} completed: +1 Attribute Point.` }));
+    } else if (/information_broker|lore_provider/i.test(serviceId)) {
+      dispatch(addNotification({ type: 'success', message: `${service.name}: You gained useful information.` }));
+    } else if (/trait_teacher/i.test(serviceId)) {
+      dispatch(addAvailableSkillPoints(1));
+      dispatch(addNotification({ type: 'success', message: `${service.name} completed: +1 Skill Point.` }));
+    } else if (/crafter_/i.test(serviceId)) {
+      dispatch(addNotification({ type: 'success', message: `${service.name} commissioned. It will be ready soon.` }));
+    } else {
+      dispatch(addNotification({ type: 'success', message: `Purchased: ${service.name}.` }));
+    }
+
+    return { npcId, serviceId, price };
   }
 );

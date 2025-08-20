@@ -52,6 +52,10 @@ export interface NPC {
   innateTraits?: string[];
   sharedTraitSlots?: NPCSharedTraitSlot[];
   inventory?: NPCInventory;
+  /**
+   * Persistent NPC shop stock: itemId -> quantity. If undefined, NPC doesn't sell items by default.
+   */
+  shopStock?: Record<string, number>;
   services?: NPCService[];
   personality?: NPCPersonality;
   schedule?: NPCSchedule;
@@ -121,6 +125,8 @@ export interface NPCService {
   basePrice: number;
   currentPrice: number;
   isAvailable: boolean;
+  /** Minimum affinity required to access this service (optional) */
+  minAffinity?: number;
 }
 
 /**

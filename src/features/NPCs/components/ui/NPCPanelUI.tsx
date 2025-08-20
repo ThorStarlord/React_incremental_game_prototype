@@ -30,10 +30,12 @@ import {
   Extension as TraitIcon,
   Favorite as RelationshipIcon
 } from '@mui/icons-material';
+import { BuildCircle as ServiceIcon } from '@mui/icons-material';
 import NPCOverviewTab from './tabs/NPCOverviewTab';
 import NPCDialogueTab from './tabs/NPCDialogueTab';
 import NPCQuestsTab from './tabs/NPCQuestsTab';
 import NPCTradeTab from './tabs/NPCTradeTab';
+import NPCServicesTab from './tabs/NPCServicesTab';
 import NPCTraitsTab from './tabs/NPCTraitsTab';
 import NPCRelationshipTab from './tabs/NPCRelationshipTab';
 import NPCHeader from './NPCHeader';
@@ -64,6 +66,7 @@ const TAB_CONFIG = [
   { id: 'overview', label: 'Overview', icon: PersonIcon, minLevel: 0 },
   { id: 'dialogue', label: 'Dialogue', icon: ChatIcon, minLevel: 1 },
   { id: 'trade', label: 'Trade', icon: TradeIcon, minLevel: 2 },
+  { id: 'services', label: 'Services', icon: ServiceIcon, minLevel: 2 },
   { id: 'quests', label: 'Quests', icon: QuestIcon, minLevel: 3 },
   { id: 'traits', label: 'Traits', icon: TraitIcon, minLevel: 0 },
   { id: 'relationship', label: 'Relationship', icon: RelationshipIcon, minLevel: 1 }
@@ -147,6 +150,17 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
           <Alert severity="warning" sx={{ mt: 2 }}>
             <AlertTitle>Quests Locked</AlertTitle>
             Reach relationship level 3+ to unlock quest management.
+          </Alert>
+        );
+      case 'services':
+        return isTabUnlocked(2) ? (
+          <NPCServicesTab 
+            npcId={npc.id}
+          />
+        ) : (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            <AlertTitle>Services Locked</AlertTitle>
+            Reach relationship level 2+ to unlock services.
           </Alert>
         );
       case 'traits':

@@ -174,6 +174,17 @@ export const turnInQuestThunk = createAsyncThunk(
     const quest = state.quest.quests[questId];
 
     if (quest && quest.status === 'READY_TO_COMPLETE') {
+      // Enforce return-to-giver rule unless quest.isAutoComplete is true
+      if (!quest.isAutoComplete) {
+        const selectedNpcId = state.npcs.selectedNPCId;
+        if (selectedNpcId !== quest.giver) {
+          dispatch(addNotification({
+            message: 'Return to the quest giver to turn in this quest.',
+            type: 'info',
+          }));
+          return Promise.reject(new Error('Must return to quest giver.'));
+        }
+      }
       const rewards = quest.rewards;
       const rewardSummaries: string[] = [];
 
