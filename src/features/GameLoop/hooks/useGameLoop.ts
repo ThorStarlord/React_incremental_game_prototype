@@ -1,17 +1,16 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { tick, updateAutoSave } from '../state/GameLoopSlice';
+import { tick } from '../state/GameLoopSlice';
 import { TickData } from '../state/GameLoopTypes';
 
 interface UseGameLoopOptions {
   onTick?: (tickData: TickData) => void;
-  onAutoSave?: () => void;
 }
 
 export const useGameLoop = (options: UseGameLoopOptions = {}) => {
   const dispatch = useAppDispatch();
   const gameLoop = useAppSelector((state) => state.gameLoop);
-  const { onTick, onAutoSave } = options;
+  const { onTick } = options;
 
   const animationFrameRef = useRef<number | undefined>(undefined);
   const lastFrameTimeRef = useRef<number>(0);
@@ -45,18 +44,13 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
         onTick(tickData);
       }
 
-      if (gameLoop.totalGameTime - gameLoop.lastAutoSave >= gameLoop.autoSaveInterval) {
-        dispatch(updateAutoSave(gameLoop.totalGameTime));
-        if (onAutoSave) {
-          onAutoSave();
-        }
-      }
+  // Autosave timing is now handled by the settings-driven autosave system.
 
       accumulatorRef.current -= fixedTimeStep;
     }
 
     animationFrameRef.current = requestAnimationFrame(gameLoopStep);
-  }, [dispatch, gameLoop, onTick, onAutoSave]);
+  }, [dispatch, gameLoop, onTick]);
 
   useEffect(() => {
     if (gameLoop.isRunning) {

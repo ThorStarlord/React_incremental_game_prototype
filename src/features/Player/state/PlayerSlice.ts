@@ -175,6 +175,10 @@ const playerSlice = createSlice({
     gainGold: (state, action: PayloadAction<number>) => {
       state.gold += action.payload;
     },
+    spendGold: (state, action: PayloadAction<number>) => {
+      const amount = Math.max(0, action.payload);
+      state.gold = Math.max(0, state.gold - amount);
+    },
   },
 });
 
@@ -199,6 +203,7 @@ export const {
   unlockTraitSlot,
   setLocation,
   gainGold,
+  spendGold,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

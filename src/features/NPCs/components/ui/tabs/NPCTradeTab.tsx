@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -17,6 +17,10 @@ import {
   TrendingDown as DiscountIcon
 } from '@mui/icons-material';
 import type { NPC } from '../../../state/NPCTypes';
+import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
+import { selectNPCById } from '../../../state/NPCSelectors';
+import { addItem } from '../../../../Inventory/state/InventorySlice';
+import { spendGold } from '../../../../Player/state/PlayerSlice';
 
 interface NPCTradeTabProps {
   npcId: string;
@@ -78,27 +82,33 @@ const mockTradeItems = [
  * NPCTradeTab - Handles trading interactions with NPCs
  */
 const NPCTradeTab: React.FC<NPCTradeTabProps> = React.memo(({ npcId }) => {
-  // Mock NPC data - in a real application, this would be fetched from the server
-  const npc = {
-    id: npcId,
-    name: 'Eldrin',
-    relationshipLevel: 5 // Mock relationship level
-  };
-
-  // Calculate discount based on relationship level (up to 20% discount)
+  const dispatch = useAppDispatch();
+  const npc = useAppSelector(state => selectNPCById(state, npcId));
+  const playerGold = useAppSelector(state => state.player.gold);
+  
   const discountPercentage = useMemo(() => {
-    return Math.min(npc.relationshipLevel * 2, 20);
-  }, [npc.relationshipLevel]);
+    if (!npc) return 0;
+    // Simple rule: 1% per 5 affinity, up to 20%
+    return Math.min(Math.floor((npc.affinity || 0) / 5), 20);
+  }, [npc]);
 
-  const calculateFinalPrice = (basePrice: number): number => {
+  const calculateFinalPrice = useCallback((basePrice: number): number => {
     return Math.round(basePrice * (1 - discountPercentage / 100));
-  };
+  }, [discountPercentage]);
 
-  const handlePurchase = (itemId: string, price: number) => {
-    // TODO: Implement purchase logic
-    console.log(`Purchasing item ${itemId} for ${price} gold`);
-  };
+  const handlePurchase = useCallback((itemId: string, price: number) => {
+    if (price > playerGold) return;
+    dispatch(spendGold(price));
+    dispatch(addItem({ itemId, quantity: 1 }));
+  }, [dispatch, playerGold]);
 
+  if (!npc) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Alert severity="error">NPC not found.</Alert>
+      </Box>
+    );
+  }
   return (
     <Box sx={{ p: 2 }}>
       {/* Trade Header */}

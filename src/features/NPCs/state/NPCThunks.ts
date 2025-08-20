@@ -6,7 +6,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 
 /**
@@ -120,14 +120,67 @@ export const debugUnlockAllSharedSlots = createAsyncThunk(
  */
 export const processNPCInteractionThunk = createAsyncThunk<
   InteractionResult,
-  { npcId: string; interactionType: string; context?: any }
+  { npcId: string; interactionType: string; context?: any },
+  { state: RootState }
 >(
   'npcs/processInteraction',
-  async (payload) => {
-    return {
-      success: true,
-      message: `Interaction '${payload.interactionType}' with ${payload.npcId} processed.`,
-    };
+  async ({ npcId, interactionType, context }, { getState, dispatch }) => {
+    const state = getState();
+    const npc = state.npcs.npcs[npcId];
+    if (!npc) {
+      return { success: false, message: `NPC not found: ${npcId}` };
+    }
+
+    if (interactionType === 'dialogue') {
+      const now = Date.now();
+      // Determine relationship change based on simple rules
+      let relDelta = 0;
+      const choiceId = context?.choiceId as string | undefined;
+      const selectedResponse = context?.selectedResponse as string | undefined;
+      const playerMessage = context?.playerMessage as string | undefined;
+
+      if (choiceId === 'greeting') {
+        if (selectedResponse === 'friendly') relDelta = 2;
+        else if (selectedResponse === 'formal') relDelta = 1;
+        else if (selectedResponse === 'curious') relDelta = 1;
+      } else if (choiceId === 'freetext') {
+        // Very simple heuristic: positive words grant small affinity
+        const text = (playerMessage || '').toLowerCase();
+        if (text.includes('thanks') || text.includes('hello') || text.includes('help')) relDelta = 1;
+      }
+
+      // Apply affinity change via existing relationship thunk for consistency
+      if (relDelta !== 0) {
+        await dispatch(updateNPCRelationshipThunk({ npcId, change: relDelta, reason: 'Dialogue' }));
+      }
+
+      // Log entries: player message (if present) and NPC response
+      if (playerMessage) {
+        dispatch(addDialogueEntry({
+          id: `${npcId}-player-${now}`,
+          npcId,
+          timestamp: now,
+          speaker: 'player',
+          playerText: playerMessage,
+          npcResponse: '',
+        }));
+      }
+
+      const npcResponse = relDelta > 0 ? 'They seem pleased.' : (relDelta < 0 ? 'They seem offended.' : 'They acknowledge you.');
+      dispatch(addDialogueEntry({
+        id: `${npcId}-npc-${now + 1}`,
+        npcId,
+        timestamp: now + 1,
+        speaker: 'npc',
+        playerText: '',
+        npcResponse,
+        relationshipChange: relDelta || undefined,
+      }));
+
+      return { success: true, relationshipChange: relDelta, message: 'Dialogue processed.' };
+    }
+
+    return { success: true, message: `Interaction '${interactionType}' with ${npcId} processed.` };
   }
 );
 
