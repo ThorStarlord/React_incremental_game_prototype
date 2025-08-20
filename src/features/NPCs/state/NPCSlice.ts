@@ -52,6 +52,16 @@ const npcSlice = createSlice({
       const npc = state.npcs[npcId];
       if (npc) {
         npc.affinity = Math.max(-100, Math.min(100, npc.affinity + change));
+        // Auto-unlock shared trait slots based on affinity thresholds
+        if (npc.sharedTraitSlots && npc.sharedTraitSlots.length > 0) {
+          npc.sharedTraitSlots.forEach(slot => {
+            if (!slot.isUnlocked && typeof slot.unlockRequirement === 'number') {
+              if (npc.affinity >= slot.unlockRequirement) {
+                slot.isUnlocked = true;
+              }
+            }
+          });
+        }
       }
     },
     setAffinity: (state, action: PayloadAction<{ npcId: string; value: number }>) => {
@@ -59,6 +69,16 @@ const npcSlice = createSlice({
         const npc = state.npcs[npcId];
         if (npc) {
             npc.affinity = Math.max(0, Math.min(100, value));
+            // Auto-unlock shared trait slots based on affinity thresholds
+            if (npc.sharedTraitSlots && npc.sharedTraitSlots.length > 0) {
+              npc.sharedTraitSlots.forEach(slot => {
+                if (!slot.isUnlocked && typeof slot.unlockRequirement === 'number') {
+                  if (npc.affinity >= slot.unlockRequirement) {
+                    slot.isUnlocked = true;
+                  }
+                }
+              });
+            }
         }
     },
     increaseConnectionDepth: (state, action: PayloadAction<{ npcId: string; amount: number }>) => {
