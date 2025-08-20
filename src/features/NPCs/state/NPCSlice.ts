@@ -128,6 +128,36 @@ const npcSlice = createSlice({
         npc.location = location;
       }
     },
+    /**
+     * Assign or clear a shared trait in a specific NPC slot.
+     * - Prevents duplicates across slots by clearing any existing slot with the same traitId first.
+     * - No-op if the slot is locked or doesn't exist.
+     */
+    setNPCSharedTraitInSlot: (
+      state,
+      action: PayloadAction<{ npcId: string; slotIndex: number; traitId: string | null }>
+    ) => {
+      const { npcId, slotIndex, traitId } = action.payload;
+      const npc = state.npcs[npcId];
+      if (!npc || !npc.sharedTraitSlots || slotIndex < 0 || slotIndex >= npc.sharedTraitSlots.length) {
+        return;
+      }
+      const slot = npc.sharedTraitSlots[slotIndex];
+      if (!slot.isUnlocked) {
+        return;
+      }
+      // If assigning a trait, ensure it's not duplicated in another slot
+      if (traitId) {
+        const existingIndex = npc.sharedTraitSlots.findIndex(s => s.traitId === traitId);
+        if (existingIndex !== -1 && existingIndex !== slotIndex) {
+          npc.sharedTraitSlots[existingIndex].traitId = null;
+        }
+        slot.traitId = traitId;
+      } else {
+        // Clearing the slot
+        slot.traitId = null;
+      }
+    },
   },
   extraReducers: (builder) => {
     // RESTORED: This block handles the async lifecycle of initializeNPCsThunk.
@@ -168,6 +198,7 @@ export const {
   setSelectedNPCId,
   addAvailableQuestToNPC,
   updateNpcLocation,
+  setNPCSharedTraitInSlot,
 } = npcSlice.actions;
 
 export const npcActions = npcSlice.actions;

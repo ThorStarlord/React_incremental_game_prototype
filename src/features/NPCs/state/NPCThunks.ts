@@ -6,7 +6,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot } from './NPCSlice';
+import { addNotification } from '../../../shared/state/NotificationSlice';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -135,7 +136,51 @@ export const processNPCInteractionThunk = createAsyncThunk<
  */
 export const shareTraitWithNPCThunk = createAsyncThunk(
   'npcs/shareTrait',
-  async (payload: { npcId: string; traitId: string; slotIndex: number }) => {
+  async (
+    payload: { npcId: string; traitId: string; slotIndex: number },
+    { getState, dispatch }
+  ) => {
+    const { npcId, traitId, slotIndex } = payload;
+    const state = getState() as RootState;
+    const npc = state.npcs.npcs[npcId];
+    if (!npc) {
+      dispatch(addNotification({ type: 'error', message: `NPC not found: ${npcId}` }));
+      return payload;
+    }
+    const slots = npc.sharedTraitSlots ?? [];
+    if (slotIndex < 0 || slotIndex >= slots.length) {
+      dispatch(addNotification({ type: 'error', message: 'Invalid slot selected.' }));
+      return payload;
+    }
+    const slot = slots[slotIndex];
+    if (!slot.isUnlocked) {
+      dispatch(addNotification({ type: 'warning', message: 'That slot is locked.' }));
+      return payload;
+    }
+
+    // Unshare if empty traitId provided
+    if (!traitId) {
+  dispatch(setNPCSharedTraitInSlot({ npcId, slotIndex, traitId: null }));
+  dispatch(addNotification({ type: 'info', message: `Removed shared trait from ${npc.name}'s slot ${slot.index + 1}.` }));
+      return payload;
+    }
+
+    // Validate: player must have trait equipped or permanent
+    const playerPermanent = new Set(state.player.permanentTraits);
+    const equippedTraitIds = new Set(
+      state.player.traitSlots
+        .filter(s => !!s.traitId)
+        .map(s => s.traitId as string)
+    );
+    const playerHasTrait = playerPermanent.has(traitId) || equippedTraitIds.has(traitId);
+    if (!playerHasTrait) {
+      dispatch(addNotification({ type: 'warning', message: 'You must have this trait equipped or permanent to share it.' }));
+      return payload;
+    }
+
+    // Apply: de-duplicate across slots and set into target slot
+  dispatch(setNPCSharedTraitInSlot({ npcId, slotIndex, traitId }));
+  dispatch(addNotification({ type: 'success', message: `Shared trait to ${npc.name} (slot ${slot.index + 1}).` }));
     return payload;
   }
 );

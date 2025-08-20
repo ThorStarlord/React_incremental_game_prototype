@@ -11,9 +11,12 @@ import { processCopyGrowthThunk, processCopyLoyaltyDecayThunk, processCopyTasksT
 import { processStatusEffectsThunk, regenerateVitalsThunk, recalculateStatsThunk } from './features/Player/state/PlayerThunks';
 import { AppRouter } from './routes/AppRouter';
 import { ThemeProviderWrapper as ThemeProvider } from './theme/provider';
+import { useAutosaveSystem } from './gameLogic/systems/autosaveSystem';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
+  // Enable settings-driven autosave
+  useAutosaveSystem();
 
   // Initialize application data on startup
   useEffect(() => {
