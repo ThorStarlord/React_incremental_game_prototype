@@ -14,6 +14,7 @@ import questReducer from '../features/Quest/state/QuestSlice';
 import notificationsReducer from '../shared/state/NotificationSlice';
 import { inventoryReducer } from '../features/Inventory/state/InventorySlice';
 import { copyListeners } from '../features/Copy/state/CopyListeners';
+import { npcListeners } from '../features/NPCs/state/NPCListeners';
 import { gameEventListeners } from './listeners/GameEventListeners';
 
 // Combine all feature reducers
@@ -62,7 +63,7 @@ export const store = configureStore({
         ignoredActions: ['meta/replaceState'],
         ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
       },
-  }).prepend(copyListeners.middleware, gameEventListeners.middleware),
+    }).prepend(npcListeners.middleware, copyListeners.middleware, gameEventListeners.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
 
