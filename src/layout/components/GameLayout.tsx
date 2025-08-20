@@ -6,6 +6,7 @@ import { useLayoutState } from '../hooks/useLayoutState';
 import { VerticalNavBar } from './VerticalNavBar/VerticalNavBar';
 import { MainContentArea } from './MainContentArea';
 import { Outlet } from 'react-router-dom';
+import { useNpcShopRestock } from '../../features/NPCs/hooks/useNpcShopRestock';
 
 /**
  * New GameLayout component that integrates with useLayoutState hook
@@ -20,6 +21,8 @@ export const GameLayout: React.FC = React.memo(() => {
   useEffect(() => {
     dispatch(startGame());
   }, [dispatch]);
+  // Periodic NPC shop restock
+  useNpcShopRestock();
   
   // Use the centralized layout state management
   const {

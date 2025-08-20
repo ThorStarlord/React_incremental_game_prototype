@@ -6,9 +6,12 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, setDialogueNodes, incrementNpcShopItem, markNpcRestock } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from '../../Player/state/PlayerSlice';
+import { TRADING } from '../../../constants/gameConstants';
+import { getItemDef } from '../../../shared/data/itemCatalog';
+import { addItem } from '../../Inventory/state/InventorySlice';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -28,6 +31,14 @@ export const initializeNPCsThunk = createAsyncThunk<
       const data: Record<string, NPC> = await response.json();
       
       dispatch(updateEssenceGenerationRateThunk());
+      // Load dialogue nodes (best-effort)
+      try {
+        const dres = await fetch('/data/dialogues.json');
+        if (dres.ok) {
+          const nodes = await dres.json();
+          dispatch(setDialogueNodes(nodes));
+        }
+      } catch {}
       
       return data;
     } catch (error) {
@@ -134,54 +145,114 @@ export const processNPCInteractionThunk = createAsyncThunk<
 
     if (interactionType === 'dialogue') {
       const now = Date.now();
-      // Determine relationship change based on simple rules
-      let relDelta = 0;
       const choiceId = context?.choiceId as string | undefined;
       const selectedResponse = context?.selectedResponse as string | undefined;
       const playerMessage = context?.playerMessage as string | undefined;
 
-      if (choiceId === 'greeting') {
-        if (selectedResponse === 'friendly') relDelta = 2;
-        else if (selectedResponse === 'formal') relDelta = 1;
-        else if (selectedResponse === 'curious') relDelta = 1;
-      } else if (choiceId === 'freetext') {
-        // Very simple heuristic: positive words grant small affinity
+      // Data-driven node support
+      const nodes = (getState() as RootState).npcs.dialogueNodes || {};
+      let relDelta = 0;
+      let npcText = '';
+      const node = choiceId ? (nodes as any)[choiceId] : undefined;
+
+      if (node) {
+        // Gate checks
+        if (typeof node.minAffinity === 'number' && (npc.affinity || 0) < node.minAffinity) {
+          dispatch(addNotification({ type: 'info', message: 'They are not ready to discuss that yet.' }));
+          return { success: false, message: 'Dialogue gate not met.' } as InteractionResult;
+        }
+        npcText = node.text || node.title || '';
+        const effects = Array.isArray(node.effects) ? node.effects : [];
+        for (const eff of effects) {
+          if (eff.type === 'AFFINITY_DELTA') {
+            relDelta += Number(eff.value) || 0;
+          } else if (eff.type === 'UNLOCK_QUEST') {
+            // Minimal: surface as notification; actual quest unlocking handled elsewhere
+            dispatch(addNotification({ type: 'info', message: `Quest unlocked: ${eff.questId}` }));
+          } else if (eff.type === 'GIVE_ITEM') {
+            const qty = eff.amount || 1;
+            dispatch(addItem({ itemId: eff.itemId, quantity: qty }));
+          } else if (eff.type === 'OPEN_SERVICE') {
+            // Inform user to check Services tab
+            dispatch(addNotification({ type: 'info', message: 'A service is now available.' }));
+          }
+        }
+
+        // Determine next node
+        const nextId = selectedResponse && node.next ? node.next[selectedResponse] : undefined;
+        if (nextId) {
+          // Fire-and-forget next node text as an additional response line for feedback
+          const nextNode = (nodes as any)[nextId];
+          if (nextNode && nextNode.text) {
+            npcText = nextNode.text;
+          }
+        }
+      } else if (playerMessage) {
+        // Fallback heuristic for free text
         const text = (playerMessage || '').toLowerCase();
         if (text.includes('thanks') || text.includes('hello') || text.includes('help')) relDelta = 1;
+        npcText = relDelta > 0 ? 'They seem pleased.' : 'They acknowledge you.';
+      } else {
+        npcText = 'They acknowledge you.';
       }
 
-      // Apply affinity change via existing relationship thunk for consistency
       if (relDelta !== 0) {
         await dispatch(updateNPCRelationshipThunk({ npcId, change: relDelta, reason: 'Dialogue' }));
       }
 
-      // Log entries: player message (if present) and NPC response
       if (playerMessage) {
-        dispatch(addDialogueEntry({
-          id: `${npcId}-player-${now}`,
-          npcId,
-          timestamp: now,
-          speaker: 'player',
-          playerText: playerMessage,
-          npcResponse: '',
-        }));
+        dispatch(addDialogueEntry({ id: `${npcId}-player-${now}`, npcId, timestamp: now, speaker: 'player', playerText: playerMessage, npcResponse: '' }));
       }
-
-      const npcResponse = relDelta > 0 ? 'They seem pleased.' : (relDelta < 0 ? 'They seem offended.' : 'They acknowledge you.');
-      dispatch(addDialogueEntry({
-        id: `${npcId}-npc-${now + 1}`,
-        npcId,
-        timestamp: now + 1,
-        speaker: 'npc',
-        playerText: '',
-        npcResponse,
-        relationshipChange: relDelta || undefined,
-      }));
+      dispatch(addDialogueEntry({ id: `${npcId}-npc-${now + 1}`, npcId, timestamp: now + 1, speaker: 'npc', playerText: '', npcResponse: npcText, relationshipChange: relDelta || undefined }));
 
       return { success: true, relationshipChange: relDelta, message: 'Dialogue processed.' };
     }
 
     return { success: true, message: `Interaction '${interactionType}' with ${npcId} processed.` };
+  }
+);
+
+/**
+ * Thunk: Shop restock processing. Call periodically (e.g., from game loop tick handler) to refresh NPC stocks.
+ */
+export const processNpcShopRestockThunk = createAsyncThunk(
+  'npcs/processShopRestock',
+  async (_, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const now = Date.now();
+    const npcs = Object.values(state.npcs.npcs);
+    for (const npc of npcs) {
+      if (!npc) continue;
+      if (!npc.shopStock) continue;
+      const last = npc.lastRestockAt || 0;
+      if (now - last < TRADING.REFRESH_INTERVAL_MS) continue;
+
+      // Try to increment a few random items that this NPC already deals with
+      const itemIds = Object.keys(npc.shopStock);
+      if (itemIds.length > 0) {
+        const picks = [...itemIds].sort(() => Math.random() - 0.5).slice(0, TRADING.MAX_ITEMS_PER_REFRESH);
+        for (const id of picks) {
+          const def = getItemDef(id);
+          if (!def) continue;
+          dispatch(incrementNpcShopItem({ npcId: npc.id, itemId: id, quantity: 1 }));
+        }
+      }
+
+      // Affinity-gated: introduce new items from NPC inventory list
+      const aff = npc.affinity || 0;
+      if (aff >= TRADING.AFFINITY_TO_UNLOCK_NEW_ITEMS) {
+        const invList = Array.isArray(npc.inventory?.items) ? (npc.inventory!.items as any[]) : [];
+        const missing = invList.filter((id: string) => !(npc.shopStock as Record<string, number>)[String(id)]);
+        if (missing.length > 0) {
+          const pick = String(missing[Math.floor(Math.random() * missing.length)]);
+          if (getItemDef(pick)) {
+            dispatch(incrementNpcShopItem({ npcId: npc.id, itemId: pick, quantity: 1 }));
+          }
+        }
+      }
+
+      dispatch(markNpcRestock({ npcId: npc.id, at: now }));
+    }
   }
 );
 

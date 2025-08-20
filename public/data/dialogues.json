@@ -1,0 +1,55 @@
+{
+  "elder_willow_greeting": {
+    "id": "elder_willow_greeting",
+    "npcId": "npc_elder_willow",
+    "title": "A Gentle Rustle",
+    "text": "Welcome, child. The forest remembers your footsteps.",
+    "responses": {
+      "respect": "I come seeking wisdom.",
+      "casual": "Hey there, big tree!",
+      "inquire_lore": "Can you share some lore?"
+    },
+    "effects": [],
+    "next": {
+      "respect": "elder_willow_wisdom",
+      "casual": null,
+      "inquire_lore": "elder_willow_lore"
+    }
+  },
+  "elder_willow_wisdom": {
+    "id": "elder_willow_wisdom",
+    "npcId": "npc_elder_willow",
+    "text": "Wisdom grows like rings—in time and patience.",
+    "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
+  },
+  "elder_willow_lore": {
+    "id": "elder_willow_lore",
+    "npcId": "npc_elder_willow",
+    "text": "Long before the city, roots held secrets.",
+    "effects": [
+      { "type": "AFFINITY_DELTA", "value": 1 },
+      { "type": "OPEN_SERVICE", "serviceId": "lore_provider_willow" }
+    ]
+  },
+  "gronk_greeting": {
+    "id": "gronk_greeting",
+    "npcId": "npc_blacksmith_gronk",
+    "text": "Need steel? I got steel.",
+    "responses": {
+      "ask_trade": "Show me what you've got.",
+      "compliment": "Your craft is unmatched.",
+      "banter": "Bet you can't bend a spoon."
+    },
+    "next": {
+      "ask_trade": null,
+      "compliment": "gronk_smile",
+      "banter": null
+    }
+  },
+  "gronk_smile": {
+    "id": "gronk_smile",
+    "npcId": "npc_blacksmith_gronk",
+    "text": "Hmph. You got taste.",
+    "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
+  }
+}

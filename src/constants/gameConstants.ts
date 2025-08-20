@@ -99,3 +99,17 @@ export const QUEST_CONSTANTS = {
   DEFAULT_STATUS_EFFECT_DURATION: 60,
   DEFAULT_STATUS_EFFECT_POTENCY: -5,
 } as const;
+
+/**
+ * Constants for Trading/Shop systems
+ */
+export const TRADING = {
+  /** How often NPC shops attempt to restock (ms). */
+  REFRESH_INTERVAL_MS: 5 * 60 * 1000, // 5 minutes
+  /** Max distinct items to increment per refresh tick. */
+  MAX_ITEMS_PER_REFRESH: 2,
+  /** Maximum stock per item an NPC shop will hold. */
+  STOCK_CAP_PER_ITEM: 10,
+  /** Minimum affinity required to introduce new items from an NPC's inventory list into shop stock. */
+  AFFINITY_TO_UNLOCK_NEW_ITEMS: 5,
+} as const;

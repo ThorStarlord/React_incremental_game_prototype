@@ -45,6 +45,8 @@ export interface NPC {
   loyalty: number;
   availableDialogues: string[];
   completedDialogues: string[];
+  /** Optional authored dialogue graph ids available for this NPC. */
+  dialogueNodes?: string[];
   availableQuests: string[];
   completedQuests: string[];
   traits?: Record<string, NPCTraitInfo>;
@@ -56,6 +58,8 @@ export interface NPC {
    * Persistent NPC shop stock: itemId -> quantity. If undefined, NPC doesn't sell items by default.
    */
   shopStock?: Record<string, number>;
+  /** Timestamp of last shop restock attempt (ms). */
+  lastRestockAt?: number;
   services?: NPCService[];
   personality?: NPCPersonality;
   schedule?: NPCSchedule;
@@ -176,6 +180,30 @@ export interface DialogueEntry {
 }
 
 /**
+ * Data-driven dialogue node definition (authoring format)
+ */
+export interface DialogueNode {
+  id: string;
+  npcId?: string;
+  title?: string;
+  text?: string;
+  /** Response options keyed by response id -> label */
+  responses?: Record<string, string>;
+  /** Effects executed when this node is selected/answered */
+  effects?: Array<
+    | { type: 'AFFINITY_DELTA'; value: number }
+    | { type: 'UNLOCK_QUEST'; questId: string }
+    | { type: 'GIVE_ITEM'; itemId: string; amount?: number }
+    | { type: 'OPEN_SERVICE'; serviceId: string }
+  >;
+  /** Next node mapping by response id; if missing, conversation ends */
+  next?: Record<string, string | null>;
+  /** Optional gating */
+  minAffinity?: number;
+  minConnectionDepth?: number;
+}
+
+/**
  * Relationship change entry interface
  */
 export interface RelationshipChangeEntry {
@@ -200,4 +228,6 @@ export interface NPCState {
   loading: boolean;
   error: string | null;
   selectedNPCId: string | null;
+  /** Loaded dialogue nodes by id for data-driven conversations */
+  dialogueNodes?: Record<string, DialogueNode>;
 }

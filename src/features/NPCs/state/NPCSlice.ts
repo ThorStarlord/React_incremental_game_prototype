@@ -16,6 +16,7 @@ import type {
 } from './NPCTypes';
 // Import the thunk to handle its lifecycle actions
 import { initializeNPCsThunk } from './NPCThunks';
+import { TRADING } from '../../../constants/gameConstants';
 
 const initialState: NPCState = {
   npcs: {},
@@ -26,6 +27,7 @@ const initialState: NPCState = {
   loading: false,
   error: null,
   selectedNPCId: null,
+  dialogueNodes: {},
 };
 
 const npcSlice = createSlice({
@@ -116,6 +118,10 @@ const npcSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    /** Replace or merge dialogue nodes */
+    setDialogueNodes: (state, action: PayloadAction<Record<string, any>>) => {
+      state.dialogueNodes = { ...(state.dialogueNodes || {}), ...action.payload } as any;
     },
     updateNpcConnectionDepth: (state, action: PayloadAction<{ npcId: string; newDepth: number }>) => {
       const npc = state.npcs[action.payload.npcId];
@@ -209,7 +215,14 @@ const npcSlice = createSlice({
       const npc = state.npcs[npcId];
       if (!npc) return;
       if (!npc.shopStock) npc.shopStock = {};
-      npc.shopStock[itemId] = (npc.shopStock[itemId] ?? 0) + Math.max(0, quantity);
+      const next = (npc.shopStock[itemId] ?? 0) + Math.max(0, quantity);
+      npc.shopStock[itemId] = Math.min(TRADING.STOCK_CAP_PER_ITEM, next);
+    },
+    /** Mark the time of a restock attempt */
+    markNpcRestock: (state, action: PayloadAction<{ npcId: string; at: number }>) => {
+      const { npcId, at } = action.payload;
+      const npc = state.npcs[npcId];
+      if (npc) npc.lastRestockAt = at;
     },
   },
   extraReducers: (builder) => {
@@ -219,7 +232,7 @@ const npcSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(initializeNPCsThunk.fulfilled, (state, action) => {
+    .addCase(initializeNPCsThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.npcs = action.payload;
         // Also populate the discovered list for developer convenience
@@ -238,6 +251,8 @@ const npcSlice = createSlice({
               npc.shopStock = stock;
             }
           }
+      // initialize lastRestockAt to now to avoid immediate restock burst
+      if (!npc.lastRestockAt) npc.lastRestockAt = Date.now();
         }
       })
       .addCase(initializeNPCsThunk.rejected, (state, action) => {
@@ -261,6 +276,7 @@ export const {
   endInteraction,
   addDialogueEntry,
   clearError,
+  setDialogueNodes,
   updateNpcConnectionDepth,
   debugUnlockAllSharedSlots,
   setSelectedNPCId,
@@ -270,6 +286,7 @@ export const {
   setNpcShopStock,
   decrementNpcShopItem,
   incrementNpcShopItem,
+  markNpcRestock,
 } = npcSlice.actions;
 
 export const npcActions = npcSlice.actions;

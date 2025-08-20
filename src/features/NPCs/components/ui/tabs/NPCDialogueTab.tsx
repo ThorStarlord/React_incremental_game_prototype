@@ -23,23 +23,7 @@ interface NPCDialogueTabProps {
   npcId: string;
 }
 
-interface MockDialogue {
-  id: string;
-  title: string;
-  responses: Record<string, string>;
-}
-
-const mockDialogues: Record<string, MockDialogue> = {
-  greeting: {
-    id: 'greeting',
-    title: 'Greetings',
-    responses: {
-      friendly: "Hello there! It's good to see you.",
-      formal: "Good day to you.",
-      curious: "What brings you here today?"
-    }
-  }
-};
+type Choice = { id: string; title: string; responseKeys: string[] };
 
 /**
  * NPCDialogueTab - Handles dialogue interactions with NPCs
@@ -50,14 +34,23 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
 
   const npc = useAppSelector(state => selectNPCById(state, npcId));
   const dialogueHistory = useAppSelector((state) => selectNPCDialogueHistory(state, npcId));
+  const dialogueNodes = useAppSelector((state) => state.npcs.dialogueNodes || {});
 
-  const availableDialogueChoices = useMemo(() => {
+  const availableDialogueChoices: Choice[] = useMemo(() => {
     if (!npc?.availableDialogues) return [];
-    
     return npc.availableDialogues
-      .map((dialogueId: string) => mockDialogues[dialogueId])
-      .filter(Boolean);
-  }, [npc?.availableDialogues]);
+      .map((dialogueId: string) => {
+        const node: any = (dialogueNodes as any)[dialogueId];
+        if (!node) return null;
+        const responses = node.responses || {};
+        return {
+          id: node.id,
+          title: node.title || node.text || node.id,
+          responseKeys: Object.keys(responses),
+        } as Choice;
+      })
+      .filter(Boolean) as Choice[];
+  }, [npc?.availableDialogues, dialogueNodes]);
 
   if (!npc) {
     return (
@@ -87,7 +80,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
     }
   };
 
-  const handleDialogueChoice = async (choice: MockDialogue, responseKey: string) => {
+  const handleDialogueChoice = async (choice: Choice, responseKey: string) => {
     try {
       await dispatch(processNPCInteractionThunk({
         npcId,
@@ -144,14 +137,14 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2" gutterBottom>Conversation Topics</Typography>
           <Grid container spacing={1}>
-            {availableDialogueChoices.map((choice: MockDialogue) => (
+      {availableDialogueChoices.map((choice: Choice) => (
               <Grid item key={choice.id}>
                 <Button
                   variant="outlined"
                   size="small"
                   onClick={() => {
-                    const responseKeys = Object.keys(choice.responses);
-                    const randomResponse = responseKeys[Math.floor(Math.random() * responseKeys.length)];
+        const keys = choice.responseKeys.length > 0 ? choice.responseKeys : [''];
+        const randomResponse = keys[Math.floor(Math.random() * keys.length)];
                     handleDialogueChoice(choice, randomResponse);
                   }}
                 >
