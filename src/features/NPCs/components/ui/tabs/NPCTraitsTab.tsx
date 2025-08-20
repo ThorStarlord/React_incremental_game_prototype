@@ -8,8 +8,6 @@ import {
   Box,
   Typography,
   Grid,
-  Card,
-  CardContent,
   Button,
   Chip,
   Alert,
@@ -20,21 +18,14 @@ import {
   List,
   ListItem,
   ListItemText,
-  Divider,
   Tooltip,
   Paper,
-  IconButton,
   ListItemButton,
 } from '@mui/material';
 import {
   Share as ShareIcon,
-  GetApp as GetAppIcon,
-  CheckCircle as CheckCircleIcon,
   Lock as LockIcon,
-  HelpOutline as HelpIcon,
   Add as AddIcon,
-  Remove as RemoveIcon,
-  School as LearnIcon,
   AutoAwesome as ResonateIcon,
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
@@ -46,7 +37,6 @@ import {
 import {
   selectPermanentTraits,
   selectEquippedTraits,
-  selectPlayerTraitSlots,
 } from '../../../../Player/state/PlayerSelectors';
 import { selectTraits, selectDiscoveredTraits } from '../../../../Traits/state/TraitsSelectors';
 import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors';
@@ -64,7 +54,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
   const currentNPC = useAppSelector(state => selectNPCById(state, npcId));
   const allTraits = useAppSelector(selectTraits);
-  const playerDiscoveredTraitIds = useAppSelector(selectDiscoveredTraits);
+  // const playerDiscoveredTraitIds = useAppSelector(selectDiscoveredTraits); // not used in this tab
   const playerPermanentTraitIds = useAppSelector(selectPermanentTraits);
   const playerEquippedTraits = useAppSelector(selectEquippedTraits);
   const currentEssence = useAppSelector(selectCurrentEssence);
@@ -160,7 +150,23 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                       </span>
                     </Tooltip>
                   }>
-                    <ListItemText primary={trait.name} secondary={`${trait.essenceCost || 0} Essence`} />
+                    <ListItemText 
+                      primary={trait.name} 
+                      secondary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                          <Typography variant="caption" color="text.secondary">{`${trait.essenceCost || 0} Essence`}</Typography>
+                          {requiresNpcDepth && !depthOk && (
+                            <Chip
+                              size="small"
+                              icon={<LockIcon fontSize="small" />}
+                              label={`Requires depth ${TRAIT_RESONANCE.MIN_CONNECTION_DEPTH} (you: ${currentNPC.connectionDepth ?? 0})`}
+                              variant="outlined"
+                              color="default"
+                            />
+                          )}
+                        </Box>
+                      }
+                    />
                   </ListItem>
                 );
               }) : (
