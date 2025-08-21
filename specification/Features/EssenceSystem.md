@@ -29,7 +29,8 @@ This document outlines the design and mechanics of the Essence system in the gam
     *   Generation occurs every game loop tick when the game is running
 *   **Rate Calculation:** ✅ **IMPLEMENTED**
     *   The total passive generation rate is calculated based on the **`connectionDepth`** of each NPC, making each level of connection a significant milestone.
-    *   The formula is: `Total Rate = BASE_RATE + Σ (for each NPC: connectionDepth * NPC_CONTRIBUTION_MULTIPLIER)`
+    *   The base relationship formula is: `Total Rate = BASE_RATE + Σ (for each NPC: connectionDepth * NPC_CONTRIBUTION_MULTIPLIER)`
+    *   Copy contribution: `+ (qualifyingCopyCount * COPY_SYSTEM.ESSENCE_GENERATION_BONUS)` where qualifying means maturity and loyalty thresholds met.
     *   Base generation rate provides minimum essence per second
 *   **Game Loop Integration:** ✅ **IMPLEMENTED**
     *   `generateEssenceThunk` is called automatically during game loop ticks

@@ -1,4 +1,4 @@
-Implementation Status: 📋 FOUNDATION SPEC COMPLETE (state + UI planned)
+Implementation Status: ✅ SPEC ALIGNED (state implemented; UI panel planned)
 
 # Inventory System Specification
 
@@ -20,21 +20,18 @@ This document defines the Inventory system: item representation, storage, transf
 	- value: number (base price for trading; see Trading spec)
 	- tags?: string[] (for filters/search)
 	- effects?: Array<{ type: string; magnitude?: number; durationMs?: number }>
-- Inventory storage structure:
-	- entities: Record<string, { itemId: string; quantity: number }>
-	- order: string[] (stable ordering for UI; optional)
-	- capacity: number | null (null = unlimited for prototype)
-	- currency: Record<string, number> (e.g., { gold: 0 }) — optional for MVP, can be modeled as items too.
+- Inventory storage structure (implemented MVP):
+	- items: Record<string, number>  // itemId -> quantity
+	- (order/capacity/currency planned; not stored yet)
 
 ## 3. State & Slice
 - Slice directory: `src/features/Inventory/` (singular feature folder)
 - Slice key: `inventory` (camelCase)
-- Core reducers/actions (planned):
-	- addItem({ itemId, quantity }): adds or stacks quantity; respects maxStack if enforced.
-	- removeItem({ itemId, quantity }): decrements or removes entry; no negative quantities.
-	- setItemQuantity({ itemId, quantity }): admin/debug convenience.
-	- clearInventory(): empties all items (debug/reset).
-	- sortInventory({ by, direction }): optional client-side ordering.
+- Core reducers/actions (implemented subset):
+	- addItem({ itemId, quantity }): adds or stacks quantity
+	- removeItem({ itemId, quantity }): decrements or deletes when reaches zero
+	Planned:
+	- setItemQuantity, clearInventory, sortInventory
 - Thunks/listeners (planned):
 	- grantQuestRewardThunk(questId) → add items based on quest data.
 	- handleDialogueGiveItem(effect) → add item(s) on dialogue effect.
@@ -45,8 +42,9 @@ This document defines the Inventory system: item representation, storage, transf
 	- selectHasItem(itemId, qty=1): boolean.
 
 ## 4. Item Catalog Data
-- Source of truth: `/public/data/items.json` (planned) or embedded constants for prototype.
-- Validation: Unknown `itemId` guarded with notification warning and ignored.
+- Source of truth (prototype): `src/shared/data/itemCatalog.ts`
+- Interface: `ItemDef { id, name, description, category, basePrice }`
+- Helper: `getItemDef(itemId)` used by NPC trades/restock logic
 
 ## 5. UI/UX
 - Inventory Panel (planned):
@@ -56,15 +54,15 @@ This document defines the Inventory system: item representation, storage, transf
 - Quick Actions: grant/remove buttons in Debug page for prototyping.
 
 ## 6. Integration Points
-- Dialogue: GIVE_ITEM effects route to inventory add; TAKE_ITEM effects remove.
-- Quests: objective checks `selectHasItem` for turn-ins; rewards grant items.
-- Trading: buy/sell transfers items and currency between player and shop.
-- Notification: success/error toasts upon add/remove/insufficient quantity.
-- Save/Load: fully serialized within root save; no side-car needed.
+- Dialogue: `GIVE_ITEM` effects add items via `addItem` during `processNPCInteractionThunk`.
+- Quests: turn-ins and rewards (planned) will use add/remove flows.
+- Trading: buy/sell transfers items and currency between player and shop (planned UI); restock already integrates with catalog.
+- Notifications: success/error toasts upon add/remove/insufficient quantity.
+- Save/Load: included in root Redux state serialization.
 
 ## 7. Constants & Balancing
-- `INVENTORY` in `src/constants/gameConstants.ts` (planned):
-	- DEFAULT_MAX_STACK, DEFAULT_CAPACITY, DROP_ENABLED, SELL_PRICE_MULTIPLIER.
+- `TRADING` constants control restock cadence and affinity gates.
+- Future `INVENTORY` constants (planned): DEFAULT_MAX_STACK, DEFAULT_CAPACITY, DROP_ENABLED.
 - Price/value baseline lives in item catalog; Trading applies modifiers.
 
 ## 8. Error Handling

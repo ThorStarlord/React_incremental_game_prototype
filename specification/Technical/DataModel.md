@@ -242,8 +242,10 @@ interface NPC {
   
   // Trait system integration
   traits?: Record<string, NPCTraitInfo>; // New optional in code, uses NPCTraitInfo
-  availableTraits: string[];            // Renamed from teachableTraits to align with NPCTypes.ts
+  availableTraits: string[];            // Traits the player can resonate
   sharedTraitSlots?: NPCSharedTraitSlot[]; // New optional in code, array of NPCSharedTraitSlot
+  shopStock?: Record<string, number>;   // ItemId -> quantity (for vendor UI)
+  lastRestockAt?: number;               // Epoch ms timestamp of last restock
   
   // Commerce and services (placeholders in code)
   inventory?: NPCInventory;   // New optional in code
@@ -408,8 +410,9 @@ interface NPCService {
   name: string;
   description: string;
   basePrice: number;
-  currentPrice: number;
-  isAvailable: boolean;
+  currentPrice?: number;         // Optional override
+  isAvailable?: boolean;         // Optional availability flag
+  minAffinity?: number;          // Optional gate
 }
 
 interface NPCSchedule {
@@ -651,6 +654,43 @@ interface SaveData {
 - **Migration**: Automatic format version migration
 
 ## 14. Future Enhancements
+## 15. Dialogue Data Model ✅ IMPLEMENTED (subset)
+
+```typescript
+interface DialogueNode {
+  id: string;
+  text?: string;
+  title?: string;
+  effects?: Array<
+    | { type: 'AFFINITY_DELTA'; value: number }
+    | { type: 'UNLOCK_QUEST'; questId: string }
+    | { type: 'GIVE_ITEM'; itemId: string; amount?: number }
+    | { type: 'OPEN_SERVICE'; id: string }
+  >;
+  next?: Record<string, string>; // responseKey -> nextNodeId
+  minAffinity?: number;          // gate for showing/selecting this node
+}
+```
+
+Stored under `npcs.dialogueNodes` after loading `/data/dialogues.json`.
+
+## 16. Inventory Data Model ✅ IMPLEMENTED (MVP)
+
+```typescript
+interface InventoryState {
+  items: Record<string, number>; // itemId -> quantity
+}
+
+interface ItemDef {
+  id: string;
+  name: string;
+  description: string;
+  category: 'Consumable' | 'Weapon' | 'Armor' | 'Material' | 'Gem' | 'Tool' | 'Other';
+  basePrice: number;
+}
+```
+
+Authoritative catalog lives in `src/shared/data/itemCatalog.ts`.
 
 ### 14.1. Planned Extensions
 - **Inventory System**: Item storage and management

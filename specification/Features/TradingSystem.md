@@ -1,4 +1,4 @@
-Implementation Status: 📋 SPEC READY (UI + slice planned)
+Implementation Status: ✅ SPEC UPDATED (restock rules, affinity gates, constants; UI + dedicated slice still planned)
 
 # Trading System Specification
 
@@ -17,13 +17,19 @@ This document specifies how players buy/sell items with NPCs, including shop inv
 	- buybackPool?: Array<{ itemId: string; quantity: number; pricePaid: number }> (optional)
 - Price baseline sourced from item catalog `value` field.
 
-## 3. Pricing Formula
-- Base: `basePrice = item.value`
-- Affinity modifier: `affinityMod = 1 - clamp(affinity, -100, 100) * A`, where A ≈ 0.001–0.003 (config).
-- Trait discounts/surcharges: multiplicative modifiers via selectors.
-- Final buy price: `ceil(basePrice * affinityMod * traitMods * GLOBAL_BUY_MULT)`
-- Final sell price: `floor(basePrice * GLOBAL_SELL_MULT * traitModsSell)`
-- All coefficients configured in `TRADING` constants.
+## 3. Pricing & Services
+There are two price domains in the current implementation:
+
+1) NPC Services (implemented)
+- Base price uses `service.currentPrice` if present, else `service.basePrice`.
+- Affinity discount: `discountPct = min(floor(affinity/5), 20)`; final price = `floor(base * (1 - discountPct/100))`.
+- Zero-cost routing services (merchant/quest links) emit an info toast and require no payment.
+- Success effects: training -> +1 attribute point; trait teacher -> +1 skill point; info/crafter -> informative/toast.
+
+2) Item Trading (planned)
+- Base: `basePrice = item.value` (item catalog).
+- Discount: future-friendly formula (affinity coefficient) to be defined; re-use `TRADING` constants.
+- Final buy/sell multipliers are configured in `TRADING`.
 
 ## 4. Slice & Thunks (Planned)
 - Slice key: `trading` or colocate under `npc` vendors; prefer `trading` for separation.
@@ -42,15 +48,20 @@ This document specifies how players buy/sell items with NPCs, including shop inv
 
 ## 6. Integration
 - Inventory: transfer items on buy/sell; check capacity (if enabled).
-- NPC System: read `affinity` for pricing; vendors tied to specific NPCs.
-- Trait System: discount traits affect pricing; shopkeeper traits may affect stock.
-- GameLoop: invokes restock processing at intervals.
-- Notifications: confirmations and errors.
+- NPC System: affinity is used for service discounts now; vendors tie to NPCs.
+- Trait System: discount traits may affect pricing later; shopkeeper traits may affect stock.
+- GameLoop: invokes restock processing (implemented in NPC thunks).
+- Notifications: confirmations and errors via `notifications` slice.
 
 ## 7. Constants
-- `TRADING` in `src/constants/gameConstants.ts`:
-	- GLOBAL_BUY_MULT, GLOBAL_SELL_MULT, AFFINITY_COEFF, RESTOCK_INTERVAL_MS_DEFAULT,
-		MAX_BUY_PER_TX, MAX_SELL_PER_TX.
+`TRADING` in `src/constants/gameConstants.ts` (implemented subset):
+- `REFRESH_INTERVAL_MS`: 5 min default restock cadence
+- `MAX_ITEMS_PER_REFRESH`: max distinct stock increments per refresh
+- `STOCK_CAP_PER_ITEM`: per-item cap in vendor stock
+- `AFFINITY_TO_UNLOCK_NEW_ITEMS`: at/above this affinity, vendors can introduce new catalog items from their inventory list
+
+Planned additions:
+- GLOBAL_BUY_MULT, GLOBAL_SELL_MULT, AFFINITY_COEFF, MAX_BUY_PER_TX, MAX_SELL_PER_TX
 
 ## 8. Error Handling
 - Guard against negative quantities, missing stock, or insufficient funds.

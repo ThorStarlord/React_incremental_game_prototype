@@ -25,6 +25,19 @@ This document details the mechanics for creating, managing, and utilizing "Copie
 ## 3. Traits on Copies (Inherited + Shared) ✅ IMPLEMENTED
 
 Copies gain traits from two sources:
+### 3.1 Slot Unlocks and Limits
+- Slots unlock by maturity/loyalty thresholds per `COPY_SYSTEM.TRAIT_SLOT_UNLOCKS`.
+- Initial unlocked slots = `COPY_SYSTEM.INITIAL_TRAIT_SLOTS`; max = `COPY_SYSTEM.MAX_TRAIT_SLOTS`.
+- Unlocks are one-way in MVP; once unlocked they remain available.
+
+### 3.2 Share Preconditions & Auto‑sync
+- Shareable only if the trait is equipped on the player and is not permanent.
+- De-duplicated: a Copy can’t receive the same trait twice (including inherited snapshot).
+- Auto‑unshare via listener middleware when the player unequips/replaces a trait or makes it permanent.
+
+### 3.3 Essence Bonus Qualification
+- Qualifying Copy = maturity ≥ `MATURITY_THRESHOLD` AND loyalty > `LOYALTY_THRESHOLD`.
+- Each qualifying Copy adds a flat `ESSENCE_GENERATION_BONUS` to passive Essence.
 
 - Inherited Traits (read‑only): On creation, a Copy snapshots any traits that the parent NPC was receiving from the Player at that moment. These are immutable on the Copy and always count toward its effective trait list.
 - Shared Traits (player‑controlled): Each Copy has a set of trait slots. Unlocked slots can receive one of the Player’s currently equipped, non‑permanent traits. Shared traits remain active on the Copy while the Player keeps that trait equipped and non‑permanent.

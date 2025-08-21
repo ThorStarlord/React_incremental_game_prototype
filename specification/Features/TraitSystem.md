@@ -42,6 +42,10 @@ The player's journey with a trait now follows a clear three-stage path.
     5.  Emits notifications for success and error conditions (insufficient essence or connection depth).
 *   **Result:** The trait is now always active and **does not require a slot**. If it was previously equipped, that slot is now free. Permanent traits are not shareable to Copies; any existing shares are automatically removed at the moment of resonance.
 
+#### 2.3.2. Share Validation & Auto‑Unshare ✅ IMPLEMENTED
+- Shareable only when the trait is equipped on the player and not permanent.
+- Listener middleware removes shares on player unequip/replace/permanence, with notifications.
+
 #### 2.3.1. Resonance Gating by Intimacy ✅ IMPLEMENTED
 *   **Requirement:** Resonating a trait that originates from an NPC requires a minimum Intimacy (`connectionDepth`) with that NPC.
 *   **Constant:** `TRAIT_RESONANCE.MIN_CONNECTION_DEPTH` (default: `1`), defined in `src/constants/gameConstants.ts`.
@@ -82,6 +86,11 @@ The player's journey with a trait now follows a clear three-stage path.
 - **Visual Feedback**: Clear hover states and action indicators.
 - **Accessibility**: Full keyboard navigation and ARIA support.
 - **Error Prevention**: Locked slots clearly indicate unlock requirements.
+
+### 3.2. UX Helpers
+- Hotkeys: Basic navigation and quick equip/unequip supported via hooks (`useTraitHotkeys`).
+- Filtering: Trait lists support category/rarity filters (`useTraitFiltering`).
+- Notifications: Success/warn/error toasts for equip, resonance, and share changes (`useTraitNotifications`).
 
 ## 4. Trait Types & Categories ✅ IMPLEMENTED
 

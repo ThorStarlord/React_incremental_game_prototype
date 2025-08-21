@@ -26,6 +26,30 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 
 *   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions. This is quantified by an "Affinity" score (Relationship Value).
 *   **Emotional Connections (Connection Depth):** NPCs exhibit a range of emotions and can form deep connections with the player. This connection is quantified by the `connectionDepth` stat, which affects their behavior, dialogue, and contributes to passive Essence generation.
+### 2.3. Services & Pricing ✅ IMPLEMENTED (subset)
+
+*   **Services:** NPCs may expose services (training, information, trait teaching, crafting). Zero-cost routing services simply inform the user to use another tab.
+*   **Affinity Gate:** A service can require a minimum affinity (`minAffinity`).
+*   **Discount Rule:** Final price = floor(base * (1 - min(floor(affinity/5), 20)/100)).
+*   **Outcomes:**
+    - Training → +1 attribute point
+    - Trait Teacher → +1 skill point
+    - Information/Crafting → informational or progress toasts
+*   **Errors:** Insufficient funds or unavailable service produce notifications.
+
+### 2.4. Shops & Restock ✅ IMPLEMENTED (subset)
+
+*   **Restock Cadence:** Vendors restock every `TRADING.REFRESH_INTERVAL_MS`.
+*   **Incremental Refill:** Up to `TRADING.MAX_ITEMS_PER_REFRESH` existing items incremented, capped by `TRADING.STOCK_CAP_PER_ITEM`.
+*   **New Items:** At `TRADING.AFFINITY_TO_UNLOCK_NEW_ITEMS` or higher, vendors can introduce new items from their inventory list into shop stock.
+*   **Catalog:** Items validated via `shared/data/itemCatalog.ts`.
+
+### 2.5. Dialogue Effects Integration ✅ IMPLEMENTED (subset)
+
+*   **AFFINITY_DELTA:** Adjusts the NPC’s affinity.
+*   **UNLOCK_QUEST:** Marks a quest available from this NPC and notifies the player.
+*   **GIVE_ITEM:** Adds items directly to the player’s inventory.
+*   **OPEN_SERVICE:** Informs about a newly available tab/service.
 *   **Trait Acquisition (Resonance):** Players **permanently learn** traits *from* NPCs (traits listed in `availableTraits`) using the Resonance ability. This action costs Essence and is **gated by Intimacy** (minimum `connectionDepth`) with the source NPC. The acquired trait becomes a permanent part of the player's abilities and does not need to be equipped in an active slot.
 *   **Temporary Trait Attunement (Equip NPC Innate Trait):** Players can temporarily equip an NPC's `innateTraits` into one of their own active player trait slots. This provides the trait's benefits to the player while equipped, has no Essence cost, and the NPC also retains their trait.
 *   **Trait Sharing:** Players can share their equipped (non-permanent) traits *with* NPCs. NPCs have a predefined number of shared trait slots (up to 5) which become usable (`isUnlocked: true`) based on meeting specific requirements (typically relationship Affinity milestones). Successful sharing depends on an available, unlocked slot on the NPC.

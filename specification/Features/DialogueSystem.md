@@ -1,4 +1,4 @@
-Implementation Status: 📋 SPEC COMPLETE (runtime + UI wired in NPCs page planned)
+Implementation Status: ✅ SPEC UPDATED (JSON schema, gates, and effects aligned to code; runtime + UI embedded in NPC page)
 
 # Dialogue System Specification
 
@@ -40,18 +40,17 @@ Branching conversation system that drives relationships, quest flow, and service
 	- `CONNECTION_DEPTH_AT_LEAST { npcId, level }`
 
 ### 2.2 Effects (applied on choice select)
-- `AFFINITY_DELTA { npcId, amount }`
-- `UNLOCK_QUEST { questId }`
-- `ADVANCE_QUEST { questId, objectiveId }`
-- `GIVE_ITEM { itemId, quantity }`
-- `TAKE_ITEM { itemId, quantity }`
-- `OPEN_SERVICE { service: 'shop'|'training'|'resonance' }`
-- `DISCOVER_TRAITS { traitIds: string[] }`
+- `AFFINITY_DELTA { value }` – adds to current NPC’s affinity (code currently reads `value`)
+- `UNLOCK_QUEST { questId }` – adds quest to NPC availability and toasts
+- `GIVE_ITEM { itemId, amount }` – grants items to inventory
+- `OPEN_SERVICE { id }` – notifies to use the relevant tab (routing-only in MVP)
+Notes:
+- Additional planned types (ADVANCE_QUEST, TAKE_ITEM, DISCOVER_TRAITS) are reserved for future phases.
 
 ## 3. Runtime & Slice
-- Dialogue runtime held transiently in UI state (no dedicated Redux slice required for MVP).
-- Selector helpers read NPC relationship and inventory to evaluate conditions.
-- Effects are dispatched via domain thunks (Quest, Inventory, NPC, Traits, Trading).
+- Dialogue runtime is transient UI state (no dedicated slice in MVP).
+- The code loads `/data/dialogues.json` during NPC initialization and stores nodes in `npcs.dialogueNodes`.
+- Effects are dispatched via domain thunks: `updateNPCRelationshipThunk`, `addAvailableQuestToNPC`, `addItem`, notifications.
 
 ## 4. UI/UX
 - Panel embedded in NPC view with:
@@ -67,9 +66,9 @@ Branching conversation system that drives relationships, quest flow, and service
 - Trait System: discovery on interaction.
 
 ## 6. Error Handling
-- Missing `next` node ends conversation gracefully.
-- Unknown effect/condition logs a warning and is skipped.
-- Circular references detection (dev-only) to avoid infinite loops.
+- Missing `next` node ends the conversation gracefully.
+- Unknown effect/condition is skipped; a notification may inform the user.
+- Defensive gating: insufficient affinity blocks gated choices and toasts a hint.
 
 ## 7. Roadmap (Deferred)
 - Localized strings with i18n and variable interpolation.
