@@ -25,6 +25,9 @@ The Non-Player Character (NPC) System governs the behavior, interaction, and rel
 ### 2.2. Features ✅ IMPLEMENTED
 
 *   **Dynamic Relationships:** NPCs have complex, evolving relationships with the player, influenced by player actions, dialogue choices, and quest completions. This is quantified by an "Affinity" score (Relationship Value).
+\n+### 2.3 Narrative Integration (NEW)
+- Canonical bios and long-form motivational arcs for principal NPCs (e.g., Lyra, Alliance Command Triad, Relic specialists) are maintained in `specification/Narrative/Characters.md`.
+- System-level relationship mechanics (Affinity → Connection Depth) should remain agnostic to narrative specifics; narrative files inform quest & dialogue authoring but must not hardcode mechanical exceptions here.
 *   **Emotional Connections (Connection Depth):** NPCs exhibit a range of emotions and can form deep connections with the player. This connection is quantified by the `connectionDepth` stat, which affects their behavior, dialogue, and contributes to passive Essence generation.
 ### 2.3. Services & Pricing ✅ IMPLEMENTED (subset)
 

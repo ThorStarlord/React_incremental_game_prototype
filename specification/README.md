@@ -58,6 +58,12 @@ The React Incremental RPG Prototype is an incremental/idle game featuring emotio
 	- Status: ✅ Expanded foundation (slice, selectors, thunks, timers, puzzle modal, basic QuestLog UI)
 - **[Copy System](Features/CopySystem.md)** - Character duplication and management ✅ BASIC UI/STATE + TRAIT SHARING AUTO‑SYNC
 
+### Narrative Documentation (NEW)
+- **[Synopsis](Narrative/Synopsis.md)** – Macro plot beats & act structure
+- **[Characters](Narrative/Characters.md)** – Bios, arcs, mechanical hooks
+- **[World Lore](Narrative/WorldLore.md)** – Cosmology, factions, relic taxonomy, ethical axes
+These documents ground mechanical systems (Essence, Traits, Copies, Quests) in consistent narrative context and should be updated when story-driven mechanics evolve.
+
 ## ⚠️ Project Constraints (Prototype Phase)
 
 - Automated tests are intentionally out of scope for this prototype. See Non-Functional Requirements → NFR-QA: Testing Policy (NFR-QA-001).

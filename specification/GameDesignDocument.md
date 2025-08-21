@@ -33,6 +33,12 @@ Players should feel like they're building a network of meaningful relationships 
 
 ### Primary Loop (5-10 minutes)
 1. **Discover NPCs** - Encounter new characters with unique traits and personalities
+\n+## 📖 Narrative Documentation
+Detailed story, character bios, and world lore have been externalized into the new `specification/Narrative/` folder:
+- `Narrative/Synopsis.md` – Act structure & macro beats
+- `Narrative/Characters.md` – Key character bios & progression flags
+- `Narrative/WorldLore.md` – Cosmology, factions, relic taxonomy, systemic hooks
+These documents serve as the canonical narrative reference for quest design, dialogue authoring, trait sourcing rationale, and future feature gating.
 2. **Build Relationships** - Engage in dialogue and activities to deepen connections
 3. **Generate Essence** - Passive resource generation from active emotional connections
 4. **Acquire Traits** - Spend Essence to learn abilities from connected NPCs
