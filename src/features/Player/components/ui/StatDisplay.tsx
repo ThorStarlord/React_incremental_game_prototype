@@ -95,7 +95,7 @@ export const StatDisplay: React.FC<StatDisplayProps> = React.memo(({
               transition: 'opacity 0.4s',
             }}
           >
-            {flash === 'up' ? '+' : ''}{delta?.toFixed?.(delta % 1 ? 2 : 0)}
+            {flash === 'up' ? '+' : ''}{delta.toFixed(delta % 1 ? 2 : 0)}
           </Typography>
         )}
 
