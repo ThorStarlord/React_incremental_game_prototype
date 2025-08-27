@@ -1,0 +1,17 @@
+{
+  "relationship:first_interaction": {
+    "category": "relationship",
+    "narrativeCopy": "A faint sympathetic echo acknowledges the attempt.",
+    "telemetryKey": "rel_first_interaction"
+  },
+  "resonance:first": {
+    "category": "resonance",
+    "narrativeCopy": "A subtle chord vibrates—identity shaping begins.",
+    "telemetryKey": "res_first"
+  },
+  "unlock:npc_scholar_elara": {
+    "category": "unlock",
+    "narrativeCopy": "Scholarly curiosity drifts into reach.",
+    "telemetryKey": "unlock_second_npc"
+  }
+}

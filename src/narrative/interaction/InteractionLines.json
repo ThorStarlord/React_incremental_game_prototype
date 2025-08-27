@@ -1,0 +1,22 @@
+{
+  "generic": [
+    "They acknowledge you with a subtle shift of presence.",
+    "Silence stretches—yet something observes.",
+    "A quiet resonance flickers, awaiting intent."
+  ],
+  "npc_elder_willow": {
+    "greetings": [
+      "Sap remembers—what do you seek?",
+      "The grove listens.",
+      "Roots carry your arrival."    
+    ],
+    "affinityUpMinor": [
+      "Leaves rustle in mild approval.",
+      "The bark warms almost imperceptibly."
+    ],
+    "affinityUpMajor": [
+      "Branches arc, embracing hidden light.",
+      "A low hum deepens through the trunk."    
+    ]
+  }
+}

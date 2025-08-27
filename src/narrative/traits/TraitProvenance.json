@@ -1,0 +1,20 @@
+{
+  "WillowsWisdom": {
+    "source": "npc_elder_willow",
+    "narrativeHook": "Knowledge carried in sap-rings, distilled into teachable insight.",
+    "firstOfferAffinity": 30,
+    "resonanceFlavor": "The grove murmurs approval as wisdom crystallizes."
+  },
+  "EssenceFlow": {
+    "source": "npc_elder_willow",
+    "narrativeHook": "Subtle root-channel diagrams guiding ambient currents.",
+    "firstOfferAffinity": 45,
+    "resonanceFlavor": "Currents align, your breath syncing with the grove's pulse."
+  },
+  "MentorsInsight": {
+    "source": "system_generic",
+    "narrativeHook": "Refined reflection practices heighten absorption of lessons.",
+    "firstOfferAffinity": 0,
+    "resonanceFlavor": "Patterns of past mistakes reorganize into a lattice of foresight."
+  }
+}
