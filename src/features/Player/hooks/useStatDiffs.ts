@@ -31,8 +31,15 @@ export function useStatDiffs<T extends Record<string, number | undefined>>(stats
         delta,
         direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'none'
       });
+      // Incrementally update prevRef.current
+      prev[k] = vRaw;
     }
-    prevRef.current = Object.fromEntries(Object.entries(stats).filter(([, v]) => typeof v === 'number') as [string, number][]);
+    // Remove keys from prevRef.current that are no longer present or not a number
+    for (const k of Object.keys(prev)) {
+      if (!(k in stats) || typeof stats[k] !== 'number') {
+        delete prev[k];
+      }
+    }
     setDiffs(nextDiffs);
   }, [stats]);
 
