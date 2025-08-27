@@ -40,7 +40,7 @@ const metaSlice = createSlice({
       state.isInProximityToNPC = action.payload;
     },
     setHasSeenIntro: (state, action: PayloadAction<boolean>) => {
-      (state as any).hasSeenIntro = action.payload;
+      state.hasSeenIntro = action.payload;
     },
   },
 });
@@ -62,6 +62,6 @@ export const selectIsImported = (state: RootState) => state.meta.isImported;
 export const selectGameVersion = (state: RootState) => state.meta.gameVersion;
 export const selectSessionStartTime = (state: RootState) => state.meta.sessionStartTime;
 export const selectIsInProximityToNPC = (state: RootState) => state.meta.isInProximityToNPC;
-export const selectHasSeenIntro = (state: RootState) => (state.meta as any).hasSeenIntro === true;
+export const selectHasSeenIntro = (state: RootState) => state.meta.hasSeenIntro === true;
 
 export default metaSlice.reducer;

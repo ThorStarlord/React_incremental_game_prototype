@@ -75,7 +75,7 @@ export const selectResonanceETAs = createSelector(
       if (permanentTraits.includes(id)) continue; // skip already permanent
       const trait = allTraits[id];
       if (!trait) continue;
-      const cost = (trait as any).essenceCost || 0;
+      const cost = trait.essenceCost ?? 0;
       if (cost <= 0) continue;
       const remaining = Math.max(0, cost - currentEssence);
       const etaSeconds = remaining === 0 ? 0 : (generationRate > 0 ? remaining / generationRate : Number.POSITIVE_INFINITY);
