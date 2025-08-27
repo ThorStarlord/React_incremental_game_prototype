@@ -5,6 +5,9 @@ import { DialogState } from './useDialogManager';
 import { loadSavedGame } from '../../../shared/utils/saveUtils'; // Import load function
 import { useAppDispatch } from '../../../app/hooks'; // Import typed dispatch
 import { replaceState, RootState } from '../../../app/store'; // Import action creator and RootState type
+import { resetPlayerState } from '../../../features/Player/state/PlayerSlice';
+import { setHasSeenIntro } from '../../../features/Meta/state/MetaSlice';
+import { newGameSeedNPCsThunk } from '../../../features/NPCs';
 
 interface GameActionsProps {
   mostRecentSave: SavedGame | null;
@@ -31,8 +34,12 @@ export function useGameActions({
   const dispatch = useAppDispatch(); // Use typed dispatch
 
   const handleNewGame = useCallback(() => {
-    navigate('/game');
-  }, [navigate]);
+    // Reset key slices (player) and intro flag, then seed onboarding NPC and navigate directly to NPCs view
+    dispatch(resetPlayerState());
+    dispatch(setHasSeenIntro(false));
+    dispatch(newGameSeedNPCsThunk());
+    navigate('/game/npcs');
+  }, [navigate, dispatch]);
 
   const handleLoadGame = useCallback(async (saveId: string) => {
     console.log('Attempting to load game:', saveId);
