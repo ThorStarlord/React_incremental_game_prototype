@@ -10,7 +10,8 @@ import {
   Avatar,
   Chip,
   LinearProgress,
-  Paper
+  Paper,
+  Button
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -19,13 +20,16 @@ import {
 } from '@mui/icons-material';
 import type { NPC } from '../../state/NPCTypes';
 // Import getTierBenefits for comprehensive tier information
-import { getTierBenefits, RELATIONSHIP_TIERS } from '../../../../config/relationshipConstants'; 
+import { getTierBenefits } from '../../../../config/relationshipConstants'; 
+import { useAppDispatch } from '../../../../app/hooks';
+import { updateNPCRelationshipThunk } from '../../state/NPCThunks';
 
 interface NPCHeaderProps {
   npc: NPC;
 }
 
 const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
+  const dispatch = useAppDispatch();
   const currentTierInfo = getTierBenefits(npc.affinity);
   const currentTierName = currentTierInfo.name;
   
@@ -52,6 +56,11 @@ const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
     progressPercentageInTier = 100;
     progressLabel = `${currentTierName} (Max)`;
   }
+
+  const handleBond = () => {
+    // Simple vertical-slice friendly bonding: +5 affinity per click
+    dispatch(updateNPCRelationshipThunk({ npcId: npc.id, change: 5, reason: 'Bonding' }));
+  };
 
   return (
     <Paper 
@@ -123,7 +132,7 @@ const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
         </Box>
 
         {/* Relationship Info */}
-        <Box sx={{ minWidth: 200 }}>
+  <Box sx={{ minWidth: 200, display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
             <FavoriteIcon color="action" />
             <Typography variant="subtitle2">
@@ -158,10 +167,19 @@ const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
           </Typography>
 
           {npc.connectionDepth !== undefined && (
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
               Connection Depth: {npc.connectionDepth.toFixed(1)}
             </Typography>
           )}
+          <Button
+            variant="contained"
+            size="small"
+            color="secondary"
+            onClick={handleBond}
+            sx={{ mt: 0.5, textTransform: 'none' }}
+          >
+            Bond (+5)
+          </Button>
         </Box>
       </Box>
     </Paper>
