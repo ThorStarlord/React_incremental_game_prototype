@@ -18,6 +18,8 @@ export interface StatDisplayProps {
   maxValue?: number;
   color?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
   size?: 'small' | 'medium' | 'large';
+  delta?: number; // optional recent change
+  highlightDeltaMs?: number; // how long to highlight in ms
 }
 
 /**
@@ -31,7 +33,18 @@ export const StatDisplay: React.FC<StatDisplayProps> = React.memo(({
   maxValue,
   color = 'primary',
   size = 'medium',
+  delta = 0,
+  highlightDeltaMs = 2000,
 }) => {
+  const [flash, setFlash] = useState<'up' | 'down' | 'none'>('none');
+
+  useEffect(() => {
+    if (delta && delta !== 0) {
+      setFlash(delta > 0 ? 'up' : 'down');
+      const t = setTimeout(() => setFlash('none'), highlightDeltaMs);
+      return () => clearTimeout(t);
+    }
+  }, [delta, highlightDeltaMs]);
   const numericValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
   const displayValue = typeof value === 'string' ? value : value.toLocaleString();
 
@@ -73,6 +86,18 @@ export const StatDisplay: React.FC<StatDisplayProps> = React.memo(({
         >
           {displayValue}{unit}
         </Typography>
+        {flash !== 'none' && typeof value === 'number' && (
+          <Typography
+            variant="caption"
+            sx={{
+              color: flash === 'up' ? 'success.main' : 'error.main',
+              fontWeight: 600,
+              transition: 'opacity 0.4s',
+            }}
+          >
+            {flash === 'up' ? '+' : ''}{delta.toFixed(delta % 1 ? 2 : 0)}
+          </Typography>
+        )}
 
         {showProgress && maxValue && typeof value === 'number' && (
           <Box sx={{ flex: 1, ml: 1 }}>

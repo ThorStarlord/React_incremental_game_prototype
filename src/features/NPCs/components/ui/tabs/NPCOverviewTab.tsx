@@ -3,7 +3,7 @@
  * @description Overview tab showing basic NPC information and available interactions
  */
 
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import {
   Box,
   Typography,
@@ -43,6 +43,7 @@ import {
 } from '../../../../Traits/state/TraitsSelectors';
 import { fetchTraitsThunk } from '../../../../Traits/state/TraitThunks';
 import { equipTrait } from '../../../../Player/state/PlayerSlice';
+import { updateNPCRelationshipThunk } from '../../../state/NPCThunks';
 import { recalculateStatsThunk } from '../../../../Player/state/PlayerThunks';
 import type { NPC } from '../../../state/NPCTypes';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
@@ -53,6 +54,7 @@ interface NPCOverviewTabProps {
 
 const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
   const dispatch = useAppDispatch();
+  const [cooldown, setCooldown] = useState(false);
 
   const allTraits = useAppSelector(selectTraits);
   const traitsLoading = useAppSelector(selectTraitLoading);
@@ -89,6 +91,21 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
 
   return (
     <Box sx={{ p: 3 }}>
+      <Box sx={{ mb: 3 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          disabled={cooldown}
+          onClick={() => {
+            if (cooldown) return;
+            setCooldown(true);
+            dispatch(updateNPCRelationshipThunk({ npcId: npc.id, change: 10, reason: 'Interaction' }));
+            setTimeout(() => setCooldown(false), 1200);
+          }}
+        >
+          {cooldown ? 'Cooling...' : 'Interact'}
+        </Button>
+      </Box>
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Card>

@@ -6,7 +6,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from '../../Player/state/PlayerSlice';
 import { TRADING } from '../../../constants/gameConstants';
@@ -59,6 +59,44 @@ export const discoverNPCThunk = createAsyncThunk(
 );
 
 /**
+ * NEW GAME THUNK: Seeds the world with only the Elder Willow NPC in a stripped-down state for onboarding.
+ * Fetches the full NPC dataset, extracts npc_elder_willow, normalizes starting values, and dispatches setNPCs.
+ */
+export const newGameSeedNPCsThunk = createAsyncThunk(
+  'npcs/newGameSeed',
+  async (_, { dispatch }) => {
+    try {
+      const res = await fetch('/data/npcs.json');
+      if (!res.ok) throw new Error('Failed to fetch npc data');
+      const data: Record<string, NPC> = await res.json();
+      const elder = data['npc_elder_willow'];
+      if (!elder) throw new Error('Elder Willow NPC definition missing');
+      // Override starting relationship values for onboarding clarity
+      const seeded: Record<string, NPC> = {
+        npc_elder_willow: {
+          ...elder,
+          affinity: 0,
+          connectionDepth: 0,
+          loyalty: 0,
+          isDiscovered: true,
+          discoveredAt: Date.now(),
+          availableQuests: [],
+          completedQuests: [],
+          availableDialogues: elder.availableDialogues?.slice(0,1) || [],
+          completedDialogues: [],
+        }
+      } as Record<string, NPC>;
+      dispatch(setNPCs(seeded));
+      await dispatch(updateEssenceGenerationRateThunk());
+      return Object.keys(seeded);
+    } catch (e) {
+      console.error('newGameSeedNPCsThunk failed', e);
+      return [] as string[];
+    }
+  }
+);
+
+/**
  * REWRITTEN THUNK: Handles relationship updates with "level up" logic for connection depth.
  */
 export const updateNPCRelationshipThunk = createAsyncThunk(
@@ -81,7 +119,8 @@ export const updateNPCRelationshipThunk = createAsyncThunk(
         connectionDepthIncrease = Math.floor(newAffinity / 100);
         newAffinity = newAffinity % 100;
 
-        dispatch(increaseConnectionDepth({ npcId, amount: connectionDepthIncrease }));
+  dispatch(increaseConnectionDepth({ npcId, amount: connectionDepthIncrease }));
+  dispatch(addNotification({ type: 'success', message: `Your bond with ${npc.name} has deepened. Essence now flows more strongly. (Depth ${(npc.connectionDepth || 0) + connectionDepthIncrease})` }));
     }
     
     dispatch(setAffinity({ npcId, value: newAffinity }));

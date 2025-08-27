@@ -48,6 +48,7 @@ export {
   updateNPCConnectionDepthThunk,
   processNPCInteractionThunk,
   discoverNPCThunk,
+  newGameSeedNPCsThunk,
   shareTraitWithNPCThunk,
 } from './state/NPCThunks';
 

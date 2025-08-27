@@ -9,7 +9,7 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 // FIXED: Import the correct thunk for creating a copy
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
 import { initializeNPCsThunk } from '../../'; // Corrected import path
-import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress } from '@mui/material';
+import { Box, Paper, Typography, Button, Tabs, Tab, CircularProgress, Tooltip } from '@mui/material';
 import { CreateCopyModal } from '../../../Copy/components/ui/CreateCopyModal';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
 import NPCTradeTab from '../ui/tabs/NPCTradeTab';
@@ -127,9 +127,15 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
         <Tabs value={currentTab} onChange={handleTabChange} aria-label="npc details tabs">
           <Tab label="Overview" id="npc-tab-0" />
-          <Tab label="Quests" id="npc-tab-1" />
-          <Tab label="Trade" id="npc-tab-2" />
-          <Tab label="Traits" id="npc-tab-3" />
+          <Tooltip title={npc.affinity < 20 ? 'Requires Affinity 20' : ''} disableHoverListener={npc.affinity >= 20}>
+            <span><Tab disabled={npc.affinity < 20} label="Quests" id="npc-tab-1" /></span>
+          </Tooltip>
+          <Tooltip title={npc.affinity < 40 ? 'Requires Affinity 40' : ''} disableHoverListener={npc.affinity >= 40}>
+            <span><Tab disabled={npc.affinity < 40} label="Trade" id="npc-tab-2" /></span>
+          </Tooltip>
+          <Tooltip title={npc.connectionDepth < 1 ? 'Requires Connection Depth 1' : ''} disableHoverListener={npc.connectionDepth >= 1}>
+            <span><Tab disabled={npc.connectionDepth < 1} label="Traits" id="npc-tab-3" /></span>
+          </Tooltip>
         </Tabs>
       </Box>
       <TabPanel value={currentTab} index={0}>

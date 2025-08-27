@@ -19,7 +19,7 @@ import { initializeNPCsThunk } from './NPCThunks';
 import { TRADING } from '../../../constants/gameConstants';
 
 const initialState: NPCState = {
-  npcs: {},
+  npcs: {}, // start empty; first NPC discovered via new game logic
   discoveredNPCs: [],
   currentInteraction: null,
   dialogueHistory: [],

@@ -72,7 +72,7 @@ const initialState: PlayerState = {
   totalPlaytime: 0,
   isAlive: true,
   location: 'City Center',
-  gold: 100,
+  gold: 25,
 };
 
 /**
