@@ -36,9 +36,9 @@ export const StatDisplay: React.FC<StatDisplayProps> = React.memo(({
   delta = 0,
   highlightDeltaMs = 2000,
 }) => {
-  const [flash, setFlash] = React.useState<'up' | 'down' | 'none'>('none');
+  const [flash, setFlash] = useState<'up' | 'down' | 'none'>('none');
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (delta && delta !== 0) {
       setFlash(delta > 0 ? 'up' : 'down');
       const t = setTimeout(() => setFlash('none'), highlightDeltaMs);
