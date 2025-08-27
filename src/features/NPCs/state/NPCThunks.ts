@@ -119,10 +119,8 @@ export const updateNPCRelationshipThunk = createAsyncThunk(
         connectionDepthIncrease = Math.floor(newAffinity / 100);
         newAffinity = newAffinity % 100;
 
-  const oldDepth = npc.connectionDepth || 0;
   dispatch(increaseConnectionDepth({ npcId, amount: connectionDepthIncrease }));
-  const newDepth = oldDepth + connectionDepthIncrease;
-  dispatch(addNotification({ type: 'success', message: `Your bond with ${npc.name} has deepened. Essence now flows more strongly. (Depth ${newDepth})` }));
+  dispatch(addNotification({ type: 'success', message: `Your bond with ${npc.name} has deepened. Essence now flows more strongly. (Depth ${(npc.connectionDepth || 0) + connectionDepthIncrease})` }));
     }
     
     dispatch(setAffinity({ npcId, value: newAffinity }));
