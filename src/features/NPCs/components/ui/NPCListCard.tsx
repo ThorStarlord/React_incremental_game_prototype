@@ -20,9 +20,10 @@ interface NPCListCardProps {
   npc: NPC;
   onSelectNPC: (npcId: string) => void;
   isSelected: boolean;
+  isGlowing?: boolean;
 }
 
-export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected }) => {
+export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing }) => {
   const currentTier = getCentralRelationshipTier(npc.affinity);
 
   return (
@@ -34,10 +35,17 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
           borderColor: isSelected ? 'primary.main' : 'divider',
           cursor: 'pointer',
           transition: 'all 0.2s',
+          boxShadow: isGlowing ? '0 0 0 0 rgba(255,255,255,0.7)' : undefined,
+          animation: isGlowing ? 'glowPulse 2s infinite' : undefined,
           '&:hover': {
             borderColor: 'primary.light',
             transform: 'translateY(-2px)',
             boxShadow: 3,
+          },
+          '@keyframes glowPulse': {
+            '0%': { boxShadow: '0 0 0 0 rgba(255,255,255,0.5)' },
+            '70%': { boxShadow: '0 0 12px 4px rgba(255,255,255,0.2)' },
+            '100%': { boxShadow: '0 0 0 0 rgba(255,255,255,0)' },
           },
         }}
         onClick={() => onSelectNPC(npc.id)}

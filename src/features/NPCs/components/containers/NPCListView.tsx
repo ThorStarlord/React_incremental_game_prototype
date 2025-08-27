@@ -32,6 +32,7 @@ import {
 import { Search, Person, Star, ViewList, ViewModule } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
+import { selectHasSeenIntro } from '../../../Meta/state/MetaSlice';
 import { selectPlayerLocation } from '../../../Player/state/PlayerSelectors';
 import { NPC } from '../../state/NPCTypes';
 import { initializeNPCsThunk } from '../..';
@@ -52,6 +53,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   const npcs = useAppSelector(selectNPCs);
   const discoveredNPCIds = useAppSelector(selectDiscoveredNPCs);
   const playerLocation = useAppSelector(selectPlayerLocation);
+  const hasSeenIntro = useAppSelector(selectHasSeenIntro);
   const dispatch = useAppDispatch();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -228,11 +230,12 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
           viewMode === 'grid' ? (
             <Grid container spacing={2}>
               {filteredAndSortedNPCs.map(npc => (
-                <NPCListCard 
-                  key={npc.id} 
-                  npc={npc} 
-                  onSelectNPC={onSelectNPC} 
-                  isSelected={selectedNPCId === npc.id} 
+                <NPCListCard
+                  key={npc.id}
+                  npc={npc}
+                  onSelectNPC={onSelectNPC}
+                  isSelected={selectedNPCId === npc.id}
+                  isGlowing={!hasSeenIntro && filteredAndSortedNPCs.length === 1}
                 />
               ))}
             </Grid>

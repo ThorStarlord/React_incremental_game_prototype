@@ -16,4 +16,5 @@ export interface MetaState {
   saveInProgress: boolean;
   loadInProgress: boolean;
   error: string | null;
+  hasSeenIntro: boolean;
 }
