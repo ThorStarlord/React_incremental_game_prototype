@@ -239,6 +239,17 @@ const willowWisdom: Trait = {
 
 const makeStore = () => configureStore({ reducer: rootReducer });
 
+const initializeM4 = async (store: ReturnType<typeof makeStore>) => {
+  await store.dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: true })).unwrap();
+};
+
+const recordAuthored = async (
+  store: ReturnType<typeof makeStore>,
+  experienceId: string
+) => {
+  return store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId })).unwrap();
+};
+
 const recordFullWillowPath = async (store: ReturnType<typeof makeStore>) => {
   const ids = [
     'willow_exp_first_question_admit',
@@ -250,7 +261,7 @@ const recordFullWillowPath = async (store: ReturnType<typeof makeStore>) => {
     'willow_exp_independent_application',
   ];
   for (const experienceId of ids) {
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId }));
+    await recordAuthored(store, experienceId);
   }
 };
 
@@ -292,12 +303,21 @@ describe('Relationship M4 reducer invariants', () => {
     expect(state.bondProfilesByNpc[WILLOW_ID].dimensions.affinity).toBe(100);
     expect(state.bondProfilesByNpc[WILLOW_ID].dimensions.trust).toBe(0);
 
-    const repeatableOne = { ...base, id: 'repeat-1', uniqueKey: undefined, relationshipEffects: { understanding: 2 } };
+    const repeatableOne = {
+      ...base,
+      id: 'repeat-1',
+      uniqueKey: undefined,
+      relationshipEffects: { understanding: 2 },
+    };
     const repeatableTwo = { ...repeatableOne, id: 'repeat-2', timestamp: 3 };
     state = relationshipReducer(state, recordRelationshipExperience(repeatableOne));
     state = relationshipReducer(state, recordRelationshipExperience(repeatableTwo));
 
-    expect(state.experienceIdsByNpc[WILLOW_ID]).toEqual(['stable-1', 'repeat-1', 'repeat-2']);
+    expect(state.experienceIdsByNpc[WILLOW_ID]).toEqual([
+      'stable-1',
+      'repeat-1',
+      'repeat-2',
+    ]);
     expect(state.bondProfilesByNpc[WILLOW_ID].dimensions.understanding).toBe(4);
   });
 
@@ -360,7 +380,7 @@ describe('Relationship M4 reducer invariants', () => {
 describe('Relationship M4 integration', () => {
   test('Affinity alone cannot level Willow Connection; qualifying evidence can', async () => {
     const store = makeStore();
-    await store.dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: true }));
+    await initializeM4(store);
 
     store.dispatch(
       recordRelationshipExperience({
@@ -380,20 +400,20 @@ describe('Relationship M4 integration', () => {
 
     expect(selectBondProfileByNpcId(store.getState(), WILLOW_ID).connectionLevel).toBe(0);
 
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId: 'willow_exp_first_question_admit' }));
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId: 'willow_exp_first_lesson' }));
+    await recordAuthored(store, 'willow_exp_first_question_admit');
+    await recordAuthored(store, 'willow_exp_first_lesson');
 
     expect(selectBondProfileByNpcId(store.getState(), WILLOW_ID).connectionLevel).toBe(1);
   });
 
   test('adversarial disagreement lowers Affinity while increasing Connection progress', async () => {
     const store = makeStore();
-    await store.dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: true }));
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId: 'willow_exp_first_question_admit' }));
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId: 'willow_exp_first_lesson' }));
+    await initializeM4(store);
+    await recordAuthored(store, 'willow_exp_first_question_admit');
+    await recordAuthored(store, 'willow_exp_first_lesson');
 
     const before = selectBondProfileByNpcId(store.getState(), WILLOW_ID);
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId: 'willow_exp_willow_disagrees' }));
+    await recordAuthored(store, 'willow_exp_willow_disagrees');
     const after = selectBondProfileByNpcId(store.getState(), WILLOW_ID);
 
     expect(after.dimensions.affinity).toBeLessThan(before.dimensions.affinity);
@@ -402,12 +422,12 @@ describe('Relationship M4 integration', () => {
 
   test('relationship Experience changes passive rate without minting current Essence or double-counting', async () => {
     const store = makeStore();
-    await store.dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: true }));
+    await initializeM4(store);
     const balanceBefore = store.getState().essence.currentEssence;
 
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId: 'willow_exp_first_question_admit' }));
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({ experienceId: 'willow_exp_first_lesson' }));
-    await store.dispatch(updateEssenceGenerationRateThunk());
+    await recordAuthored(store, 'willow_exp_first_question_admit');
+    await recordAuthored(store, 'willow_exp_first_lesson');
+    await store.dispatch(updateEssenceGenerationRateThunk()).unwrap();
 
     const state = store.getState();
     const contribution = selectRelationshipEssenceContributionByNpcId(state, WILLOW_ID);
@@ -424,9 +444,11 @@ describe('Relationship M4 integration', () => {
     store.dispatch(loadTraits({ [WISDOM_ID]: willowWisdom }));
     store.dispatch(discoverTrait({ traitId: WISDOM_ID }));
     store.dispatch(gainEssence({ amount: 100, source: 'test' }));
-    await store.dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: true }));
+    await initializeM4(store);
 
-    store.dispatch(recordConnectionQualification({ npcId: WILLOW_ID, level: 2, evidenceIds: ['test'] }));
+    store.dispatch(
+      recordConnectionQualification({ npcId: WILLOW_ID, level: 2, evidenceIds: ['test'] })
+    );
     let result = await store.dispatch(
       acquireTraitWithEssenceThunk({ traitId: WISDOM_ID, essenceCost: 40 })
     );
@@ -444,12 +466,16 @@ describe('Relationship M4 integration', () => {
         significance: 'meaningful',
         relationshipEffects: {},
         resonanceTags: [],
-        traitEffects: [{ traitId: WISDOM_ID, assimilationDelta: 100, compatibilityDelta: 25 }],
+        traitEffects: [
+          { traitId: WISDOM_ID, assimilationDelta: 100, compatibilityDelta: 25 },
+        ],
         memoryCandidate: false,
       })
     );
 
-    expect(selectTraitAssimilationState(store.getState(), WILLOW_ID, WISDOM_ID).progress).toBe(100);
+    expect(
+      selectTraitAssimilationState(store.getState(), WILLOW_ID, WISDOM_ID).progress
+    ).toBe(100);
     result = await store.dispatch(
       acquireTraitWithEssenceThunk({ traitId: WISDOM_ID, essenceCost: 40 })
     );
@@ -463,7 +489,7 @@ describe('Relationship M4 integration', () => {
     store.dispatch(loadTraits({ [WISDOM_ID]: willowWisdom }));
     store.dispatch(discoverTrait({ traitId: WISDOM_ID }));
     store.dispatch(gainEssence({ amount: 100, source: 'test' }));
-    await store.dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: true }));
+    await initializeM4(store);
     await recordFullWillowPath(store);
 
     const profile = selectBondProfileByNpcId(store.getState(), WILLOW_ID);
@@ -477,22 +503,24 @@ describe('Relationship M4 integration', () => {
     );
     expect(acquireTraitWithEssenceThunk.fulfilled.match(first)).toBe(true);
     expect(store.getState().essence.currentEssence).toBe(60);
-    expect(store.getState().player.permanentTraits.filter(id => id === WISDOM_ID)).toHaveLength(1);
+    expect(
+      store.getState().player.permanentTraits.filter(id => id === WISDOM_ID)
+    ).toHaveLength(1);
 
     const second = await store.dispatch(
       acquireTraitWithEssenceThunk({ traitId: WISDOM_ID, essenceCost: 40 })
     );
     expect(acquireTraitWithEssenceThunk.rejected.match(second)).toBe(true);
     expect(store.getState().essence.currentEssence).toBe(60);
-    expect(store.getState().player.permanentTraits.filter(id => id === WISDOM_ID)).toHaveLength(1);
+    expect(
+      store.getState().player.permanentTraits.filter(id => id === WISDOM_ID)
+    ).toHaveLength(1);
   });
 
   test('M3-style save state upgrades lazily without fabricating Memories', async () => {
     const store = makeStore();
     const full = store.getState();
-    const m3Profile = {
-      ...selectBondProfileByNpcId(full, WILLOW_ID),
-    } as any;
+    const m3Profile = { ...selectBondProfileByNpcId(full, WILLOW_ID) } as any;
     delete m3Profile.connectionQualificationEvidence;
     delete m3Profile.tetherState;
 
@@ -513,7 +541,9 @@ describe('Relationship M4 integration', () => {
       } as RootState)
     );
 
-    await store.dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: false }));
+    await store
+      .dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: false }))
+      .unwrap();
     const repaired = selectBondProfileByNpcId(store.getState(), WILLOW_ID);
 
     expect(repaired.connectionQualificationEvidence).toEqual({});
