@@ -23,8 +23,9 @@ const inventorySlice = createSlice({
         }
       }
     },
+    resetInventory: () => initialState,
   },
 });
 
-export const { addItem, removeItem } = inventorySlice.actions;
+export const { addItem, removeItem, resetInventory } = inventorySlice.actions;
 export const inventoryReducer = inventorySlice.reducer;
