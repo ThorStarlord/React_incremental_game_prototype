@@ -3,7 +3,7 @@
  * @description Reusable component for displaying individual player statistics with visual indicators
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, LinearProgress } from '@mui/material';
 // FIXED: Removed the incorrect import from PlayerTypes.ts
 // import type { StatDisplayProps } from '../../state/PlayerTypes';
