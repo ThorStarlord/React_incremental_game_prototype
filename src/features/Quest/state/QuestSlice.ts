@@ -58,20 +58,16 @@ const questSlice = createSlice({
       const objective = quest.objectives.find((o) => o.objectiveId === objectiveId);
       if (!objective) return;
 
-      // Normalize progress across objective types
       if (objective.type === 'REACH_LOCATION') {
-        // One-and-done objective
         objective.currentCount = progress >= 1 ? 1 : 0;
         objective.isComplete = progress >= 1;
       } else {
-        // Count-based objectives
         const target = Math.max(1, objective.requiredCount || 1);
         const next = Math.min(Math.max(0, progress), target);
         objective.currentCount = next;
         objective.isComplete = next >= target;
       }
 
-      // If all objectives complete and quest is in progress, mark ready to turn in
       if (
         quest.status === 'IN_PROGRESS' &&
         quest.objectives.length > 0 &&
@@ -80,10 +76,6 @@ const questSlice = createSlice({
         quest.status = 'READY_TO_COMPLETE';
       }
     },
-    /**
-     * Patch arbitrary fields on a specific objective (e.g., hasItem, delivered)
-     * without interfering with numeric progress handling.
-     */
     patchObjectiveFields: (
       state,
       action: PayloadAction<{ questId: string; objectiveId: string; changes: Partial<QuestObjective> }>
@@ -94,6 +86,14 @@ const questSlice = createSlice({
       const objective = quest.objectives.find((o) => o.objectiveId === objectiveId);
       if (!objective) return;
       Object.assign(objective, changes);
+    },
+    setQuestResolution: (
+      state,
+      action: PayloadAction<{ questId: string; resolutionId: string }>
+    ) => {
+      const quest = state.quests[action.payload.questId];
+      if (!quest || quest.selectedResolutionId) return;
+      quest.selectedResolutionId = action.payload.resolutionId;
     },
     completeQuest: (state, action: PayloadAction<string>) => {
       const questId = action.payload;
@@ -115,6 +115,16 @@ const questSlice = createSlice({
   extraReducers: () => {},
 });
 
-export const { addQuest, startQuest, updateQuestStatus, updateObjectiveProgress, patchObjectiveFields, completeQuest, failQuest, incrementQuestElapsed } = questSlice.actions;
+export const {
+  addQuest,
+  startQuest,
+  updateQuestStatus,
+  updateObjectiveProgress,
+  patchObjectiveFields,
+  setQuestResolution,
+  completeQuest,
+  failQuest,
+  incrementQuestElapsed,
+} = questSlice.actions;
 
 export default questSlice.reducer;
