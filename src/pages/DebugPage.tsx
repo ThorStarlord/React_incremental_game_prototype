@@ -13,6 +13,7 @@ import { BugReport as DebugIcon } from '@mui/icons-material';
 // Import the UI component and the necessary hooks/selectors
 import NPCDebugPanel from '../features/NPCs/components/ui/NPCDebugPanel';
 import InventoryDebugPanel from '../features/Inventory/components/ui/InventoryDebugPanel';
+import RelationshipDebugPanel from '../features/Relationships/components/RelationshipDebugPanel';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAllNPCs, selectNPCLoading } from '../features/NPCs';
 import { generateRadiantQuestThunk } from '../features/Quest/state/QuestThunks';
@@ -75,6 +76,8 @@ export const DebugPage: React.FC = React.memo(() => {
       </Alert>
 
       {renderContent()}
+
+      <RelationshipDebugPanel />
 
       <Paper sx={{ p: 2, mt: 2 }}>
         <Typography variant="h6">Quest Debug</Typography>
