@@ -1,0 +1,1 @@
+M4 rate calculation must remain selector-free during store bootstrap. See `essenceRateRaw.ts` and `Relationships/utils/relationshipProgression.ts`.
