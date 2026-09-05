@@ -1,9 +1,7 @@
 /**
  * @file RelationshipTypes.ts
- * @description Runtime types for relationship Experiences, Memories, and Bond Profiles.
- *
- * During the migration these types are additive. Legacy NPC affinity/connectionDepth
- * remains authoritative until the explicit Connection cutover phase.
+ * @description Runtime types for relationship Experiences, Memories, Bond Profiles,
+ * qualified Connection, relationship-derived Essence, and Trait assimilation.
  */
 
 export type RelationshipDimensionKey =
@@ -46,6 +44,16 @@ export type RelationshipStability =
   | 'strained'
   | 'stable'
   | 'reinforced';
+
+export type RelationshipConnectionAuthority = 'legacy' | 'relationships';
+
+export type RelationshipTetherState =
+  | 'absent'
+  | 'remote'
+  | 'nearby'
+  | 'present'
+  | 'engaged'
+  | 'deeplyEngaged';
 
 export interface RelationshipDimensions {
   affinity: number;
@@ -113,16 +121,54 @@ export interface BondProfile {
   dimensions: RelationshipDimensions;
   connectionLevel: number;
   connectionProgress: number;
+  connectionQualificationEvidence: Record<string, string[]>;
   bondArchetypes: string[];
   activeMemoryIds: string[];
   unresolvedTensions: string[];
   recentExperienceIds: string[];
   resonanceQuality: number;
   stability: RelationshipStability;
+  tetherState: RelationshipTetherState;
+}
+
+export interface TraitAssimilationState {
+  traitId: string;
+  sourceNpcId: string;
+  progress: number;
+  compatibility: number;
+  lastUpdatedAt: number;
+  qualifyingMemoryIds: string[];
+}
+
+export interface ConnectionQualificationRule {
+  level: number;
+  minimumProgress: number;
+  minimumExperienceCount?: number;
+  requiredExperienceIds?: string[];
+  anyOfExperienceIds?: string[];
+  requiredMemoryIds?: string[];
+  requiredMemoryTags?: string[];
+  minimumDimensions?: Partial<Record<RelationshipDimensionKey, number>>;
+}
+
+export interface RelationshipEssenceDefinition {
+  enabled: boolean;
+  startingTetherState?: RelationshipTetherState;
+}
+
+export interface RelationshipProgressionDefinition {
+  npcId: string;
+  connectionAuthority: RelationshipConnectionAuthority;
+  startingProfile?: Omit<InitializeBondProfilePayload, 'npcId'>;
+  qualificationRules?: ConnectionQualificationRule[];
+  essence?: RelationshipEssenceDefinition;
 }
 
 export interface RelationshipState {
-  /** Migration marker: this slice is evidence-only until Connection cutover. */
+  /**
+   * Broad migration marker. `true` means at least some NPCs are still legacy-authoritative.
+   * Individual NPC authority is defined by progressionByNpc.
+   */
   shadowMode: boolean;
   experiencesById: Record<string, RelationshipExperience>;
   experienceIdsByNpc: Record<string, string[]>;
@@ -130,6 +176,8 @@ export interface RelationshipState {
   memoryIdsByNpc: Record<string, string[]>;
   bondProfilesByNpc: Record<string, BondProfile>;
   appliedUniqueKeys: Record<string, true>;
+  progressionByNpc: Record<string, RelationshipProgressionDefinition>;
+  traitAssimilationByKey: Record<string, TraitAssimilationState>;
 }
 
 export interface InitializeBondProfilePayload {
@@ -139,6 +187,7 @@ export interface InitializeBondProfilePayload {
   };
   connectionLevel?: number;
   connectionProgress?: number;
+  tetherState?: RelationshipTetherState;
 }
 
 /**
@@ -157,7 +206,23 @@ export interface AuthoredRelationshipMemoryDefinition
 export interface RelationshipDefinitionBundle {
   experiences: Record<string, AuthoredRelationshipExperienceDefinition>;
   memories: Record<string, AuthoredRelationshipMemoryDefinition>;
+  progression?: Record<string, RelationshipProgressionDefinition>;
 }
+
+export const traitAssimilationKey = (sourceNpcId: string, traitId: string) =>
+  `${sourceNpcId}::${traitId}`;
+
+export const createDefaultTraitAssimilationState = (
+  sourceNpcId: string,
+  traitId: string
+): TraitAssimilationState => ({
+  traitId,
+  sourceNpcId,
+  progress: 0,
+  compatibility: 0,
+  lastUpdatedAt: 0,
+  qualifyingMemoryIds: [],
+});
 
 export const createDefaultBondProfile = (
   npcId: string,
@@ -176,10 +241,12 @@ export const createDefaultBondProfile = (
   },
   connectionLevel: overrides?.connectionLevel ?? 0,
   connectionProgress: overrides?.connectionProgress ?? 0,
+  connectionQualificationEvidence: {},
   bondArchetypes: [],
   activeMemoryIds: [],
   unresolvedTensions: [],
   recentExperienceIds: [],
   resonanceQuality: 0,
   stability: 'stable',
+  tetherState: overrides?.tetherState ?? 'present',
 });
