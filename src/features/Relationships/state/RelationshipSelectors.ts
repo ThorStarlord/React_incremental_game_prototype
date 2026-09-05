@@ -201,7 +201,7 @@ export const checkConnectionQualificationRule = (
 
   return {
     passed: missing.length === 0,
-    evidenceIds: [...new Set(evidenceIds)],
+    evidenceIds: Array.from(new Set(evidenceIds)),
     missing,
   };
 };
