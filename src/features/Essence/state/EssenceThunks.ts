@@ -12,10 +12,7 @@ import {
 import { EssenceState } from './EssenceTypes';
 import { setResonanceLevel } from '../../Player/state/PlayerSlice';
 import { selectPlayer } from '../../Player/state/PlayerSelectors';
-import { COPY_SYSTEM, ESSENCE_GENERATION } from '../../../constants/gameConstants';
-import { selectAllCopies } from '../../Copy/state/CopySelectors';
-import { calculateCopyEssenceGeneration } from '../../Copy/utils/copyUtils';
-import { selectAllRelationshipEssenceContributions } from '../../Relationships/state/RelationshipSelectors';
+import { calculateEssenceGenerationRate } from '../utils/essenceRate';
 
 /**
  * Async thunk for processing essence generation over time
@@ -26,10 +23,8 @@ export const processPassiveGenerationThunk: AsyncThunk<{ generated: number; newT
     const state = getState() as RootState;
     const essenceState = state.essence;
 
-    // We check isRunning in the game loop hook, but it's safe to double-check here.
-    // The key check is generationRate > 0.
     if (state.gameLoop.isRunning && !state.gameLoop.isPaused && essenceState.generationRate > 0) {
-      const generatedAmount = (essenceState.generationRate * deltaTime) / 1000; // deltaTime in ms
+      const generatedAmount = (essenceState.generationRate * deltaTime) / 1000;
       dispatch(gainEssence({ amount: generatedAmount, source: 'passive_generation' }));
 
       return {
@@ -46,48 +41,16 @@ export const processPassiveGenerationThunk: AsyncThunk<{ generated: number; newT
 );
 
 /**
- * Update the passive Essence rate from explicit sources.
- *
- * M4 adds the first relationship-derived source. Only NPCs whose relationship
- * progression config is explicitly cut over contribute through the new model,
- * so there is no double-counting with unmigrated NPCs.
+ * Update the passive Essence rate from explicit current sources.
+ * The calculation is pure and shared with relationship orchestration so the
+ * two feature modules do not import each other's thunks.
  */
 export const updateEssenceGenerationRateThunk = createAsyncThunk(
   'essence/updateGenerationRate',
   async (_, { getState, dispatch }) => {
-    const state = getState() as RootState;
-    const allTraits = state.traits.traits;
-    const copies = selectAllCopies(state);
-
-    // 1. Preserve the prototype's global baseline.
-    let totalRate = ESSENCE_GENERATION.BASE_RATE_PER_SECOND;
-
-    // 2. Add explicitly migrated relationship-derived NPC contributions.
-    const relationshipContributions = selectAllRelationshipEssenceContributions(state);
-    const relationshipRate = relationshipContributions.reduce(
-      (total, contribution) => total + contribution.effectiveRate,
-      0
-    );
-    totalRate += relationshipRate;
-
-    // 3. Preserve qualifying Copy contributions.
-    let copyRate = 0;
-    for (const copy of copies) {
-      if (copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD) {
-        copyRate += calculateCopyEssenceGeneration(copy, allTraits);
-      }
-    }
-    totalRate += copyRate;
-
-    // 4. Dispatch the authoritative passive rate.
-    dispatch(updateGenerationRate(totalRate));
-
-    return {
-      newRate: totalRate,
-      relationshipRate,
-      copyRate,
-      relationshipContributions,
-    };
+    const calculation = calculateEssenceGenerationRate(getState() as RootState);
+    dispatch(updateGenerationRate(calculation.newRate));
+    return calculation;
   }
 );
 
@@ -151,8 +114,6 @@ export const processResonanceLevelThunk: AsyncThunk<{ newLevel: number; previous
 export const initializeEssenceSystemThunk = createAsyncThunk(
   'essence/initializeSystem',
   async (_, { dispatch }) => {
-    // The actual update logic is now triggered by other events.
-    // This thunk can be used for any one-time setup if needed in the future.
     console.log("Essence system initialized.");
     return {
       initialized: true,
