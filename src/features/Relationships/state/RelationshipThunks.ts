@@ -55,7 +55,7 @@ const loadRelationshipDefinitions = async (): Promise<RelationshipDefinitionBund
 export const initializeRelationshipRuntimeThunk = createAsyncThunk<
   { registeredNpcIds: string[] },
   { seedProfiles?: boolean } | undefined,
-  { state: RootState; rejectValue: string }
+  { rejectValue: string }
 >(
   'relationships/initializeRuntime',
   async (options, { dispatch, rejectWithValue }) => {
@@ -92,7 +92,7 @@ export const initializeRelationshipRuntimeThunk = createAsyncThunk<
 export const evaluateConnectionQualificationThunk = createAsyncThunk<
   { npcId: string; previousLevel: number; newLevel: number },
   { npcId: string },
-  { state: RootState; rejectValue: string }
+  { rejectValue: string }
 >(
   'relationships/evaluateConnectionQualification',
   async ({ npcId }, { dispatch, getState, rejectWithValue }) => {
@@ -132,8 +132,6 @@ export const evaluateConnectionQualificationThunk = createAsyncThunk<
           })
         );
 
-        // BondProfile is authoritative for migrated NPCs. Keep the legacy field as
-        // a compatibility projection until all old consumers have migrated.
         dispatch({
           type: 'npcs/updateNpcConnectionDepth',
           payload: { npcId, newDepth: rule.level },
@@ -164,7 +162,7 @@ export const evaluateConnectionQualificationThunk = createAsyncThunk<
 export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
   { experienceId: string; recorded: boolean; memoryId?: string },
   { experienceId: string; timestamp?: number },
-  { state: RootState; rejectValue: string }
+  { rejectValue: string }
 >(
   'relationships/recordAuthoredExperience',
   async ({ experienceId, timestamp }, { dispatch, getState, rejectWithValue }) => {
@@ -221,10 +219,6 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
 
       dispatch(recordRelationshipExperience(experience));
 
-      // Some legacy UI/service gates still read `npc.affinity`. For a migrated NPC,
-      // project the authored Affinity consequence there without invoking the old
-      // Affinity->connectionDepth rollover path. This keeps one semantic Affinity
-      // visible while BondProfile remains the relationship authority.
       const config = selectRelationshipProgressionDefinition(
         getState() as RootState,
         experience.primaryTargetId
@@ -274,8 +268,6 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
       await dispatch(
         evaluateConnectionQualificationThunk({ npcId: experience.primaryTargetId })
       );
-      // M4 changes the future passive rate only; it never directly grants Essence
-      // for recording a relationship Experience.
       await dispatch(updateEssenceGenerationRateThunk());
 
       return { experienceId: experience.id, recorded: true, memoryId };
