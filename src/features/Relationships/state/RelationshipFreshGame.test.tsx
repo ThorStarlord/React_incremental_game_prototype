@@ -68,6 +68,7 @@ const willowWisdom = {
   effects: { learningSpeed: 0.15 },
   essenceCost: 40,
   sourceNpc: WILLOW_ID,
+  discoveryMode: 'authored',
   minimumConnectionLevel: 2,
   requiredMemoryTags: ['Application'],
   assimilationThreshold: 100,
@@ -235,7 +236,7 @@ const relationshipBundle: RelationshipDefinitionBundle = {
       relationshipEffects: { trust: 2, understanding: 6, sharedMeaning: 3 },
       connectionProgressDelta: 8,
       resonanceTags: ['Wisdom', 'PatternRecognition'],
-      traitEffects: [{ traitId: WISDOM_ID, compatibilityDelta: 5, assimilationDelta: 10 }],
+      traitEffects: [{ traitId: WISDOM_ID, discover: true, compatibilityDelta: 5, assimilationDelta: 10 }],
       memoryCandidate: false,
     },
     willow_exp_seed_offered: {
