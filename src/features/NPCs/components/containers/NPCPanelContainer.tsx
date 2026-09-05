@@ -24,6 +24,7 @@ import NPCRelationshipTab from '../ui/tabs/NPCRelationshipTab';
 import NPCTradeTab from '../ui/tabs/NPCTradeTab';
 import NPCQuestsTab from '../ui/tabs/NPCQuestsTab';
 import NPCTraitsTab from '../ui/tabs/NPCTraitsTab';
+import MigratedRelationshipSummary from '../../../Relationships/components/MigratedRelationshipSummary';
 import { selectUsesRelationshipConnectionAuthority } from '../../../Relationships/state/RelationshipSelectors';
 
 interface TabPanelProps {
@@ -174,7 +175,11 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
           <NPCDialogueTab npcId={npc.id} />
         </TabPanel>
         <TabPanel value={currentTab} index={2}>
-          <NPCRelationshipTab npc={npc} />
+          {usesRelationshipAuthority ? (
+            <MigratedRelationshipSummary npc={npc} />
+          ) : (
+            <NPCRelationshipTab npc={npc} />
+          )}
         </TabPanel>
         <TabPanel value={currentTab} index={3}>
           <NPCQuestsTab npcId={npc.id} />
