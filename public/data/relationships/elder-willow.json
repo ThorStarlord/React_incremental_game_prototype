@@ -1,0 +1,293 @@
+{
+  "experiences": {
+    "willow_exp_first_question_admit": {
+      "id": "willow_exp_first_question_admit",
+      "uniqueKey": "willow:we01:admit",
+      "title": "She Saw Through the Question",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "dialogue",
+      "sourceId": "elder_willow_greeting",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 3,
+        "understanding": 4,
+        "sharedMeaning": 1,
+        "vulnerability": 1
+      },
+      "connectionProgressDelta": 7,
+      "resonanceTags": ["Truth", "Instrumentalism", "Wisdom"],
+      "memoryCandidate": false,
+      "interpretation": "Willow accurately names the protagonist's instrumental search for useful knowledge, and the protagonist answers candidly."
+    },
+    "willow_exp_first_question_deflect": {
+      "id": "willow_exp_first_question_deflect",
+      "uniqueKey": "willow:we01:deflect",
+      "title": "She Saw Through the Question",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "dialogue",
+      "sourceId": "elder_willow_greeting",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -1,
+        "understanding": 2
+      },
+      "connectionProgressDelta": 3,
+      "resonanceTags": ["Guardedness"],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist resists Willow's reading but still reveals enough for Willow to refine her model."
+    },
+    "willow_exp_first_question_challenge": {
+      "id": "willow_exp_first_question_challenge",
+      "uniqueKey": "willow:we01:challenge",
+      "title": "She Saw Through the Question",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "dialogue",
+      "sourceId": "elder_willow_greeting",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 1,
+        "understanding": 5,
+        "sharedMeaning": 2
+      },
+      "connectionProgressDelta": 7,
+      "resonanceTags": ["Curiosity", "Challenge", "Wisdom"],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist turns Willow's observation into a serious intellectual challenge."
+    },
+    "willow_exp_first_lesson": {
+      "id": "willow_exp_first_lesson",
+      "uniqueKey": "willow:we02:first-lesson",
+      "title": "The First Lesson",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "dialogue",
+      "sourceId": "elder_willow_wisdom",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 6,
+        "sharedMeaning": 3
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["Wisdom", "PatternRecognition", "Patience"],
+      "traitEffects": [
+        {
+          "traitId": "WillowsWisdom",
+          "compatibilityDelta": 5,
+          "note": "First meaningful exposure to Willow's slow-pattern cognition."
+        }
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Willow demonstrates that immediate appearances are poor evidence for slow systems."
+    },
+    "willow_exp_seed_offered": {
+      "id": "willow_exp_seed_offered",
+      "uniqueKey": "willow:we03:seed-offered",
+      "title": "A Seed of Potential",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "quest",
+      "sourceId": "quest_willow_ancient_seed",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "understanding": 2,
+        "sharedMeaning": 1
+      },
+      "connectionProgressDelta": 4,
+      "resonanceTags": ["Wisdom", "Potential", "Choice"],
+      "memoryCandidate": false,
+      "interpretation": "Willow presents a delayed-value problem without prescribing the answer."
+    },
+    "willow_exp_sunstone_decision_preserve": {
+      "id": "willow_exp_sunstone_decision_preserve",
+      "uniqueKey": "willow:we04:sunstone-preserve",
+      "title": "The Sunstone Decision",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "quest",
+      "sourceId": "quest_willow_ancient_seed",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 4,
+        "trust": 8,
+        "understanding": 10,
+        "sharedMeaning": 12,
+        "reliance": 1,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 22,
+      "resonanceTags": ["Wisdom", "Patience", "Stewardship", "CostlyChoice", "Application"],
+      "traitEffects": [
+        {
+          "traitId": "WillowsWisdom",
+          "compatibilityDelta": 15,
+          "note": "The protagonist acts on Willow's pattern when immediate utility points elsewhere."
+        }
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "willow_memory_seed_preserved",
+      "interpretation": "The protagonist chooses uncertain long-horizon value over an immediate extraction opportunity."
+    },
+    "willow_exp_sunstone_decision_consume": {
+      "id": "willow_exp_sunstone_decision_consume",
+      "uniqueKey": "willow:we04:sunstone-consume",
+      "title": "The Sunstone Decision",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "quest",
+      "sourceId": "quest_willow_ancient_seed",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -2,
+        "trust": 1,
+        "understanding": 4,
+        "sharedMeaning": 2
+      },
+      "connectionProgressDelta": 7,
+      "resonanceTags": ["Instrumentalism", "ImmediateUtility"],
+      "traitEffects": [
+        {
+          "traitId": "WillowsWisdom",
+          "compatibilityDelta": 1,
+          "note": "Clear choice, but weak evidence that Willow's pattern has been internalized."
+        }
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist knowingly prefers immediate power to Willow's delayed-value model."
+    },
+    "willow_exp_willow_disagrees": {
+      "id": "willow_exp_willow_disagrees",
+      "uniqueKey": "willow:we05:disagreement",
+      "title": "Willow Disagrees",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "dialogue",
+      "sourceId": "willow_disagreement",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -3,
+        "trust": -1,
+        "understanding": 8,
+        "sharedMeaning": 5
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["Contradiction", "Wisdom", "IdeologicalFriction"],
+      "memoryCandidate": false,
+      "interpretation": "Conflict lowers immediate warmth while deepening the protagonist's model of Willow's actual principle."
+    },
+    "willow_exp_three_nights_teaching": {
+      "id": "willow_exp_three_nights_teaching",
+      "uniqueKey": "willow:we06:three-nights",
+      "title": "Three Nights of Teaching",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "other",
+      "sourceId": "willow_tether_teaching",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 8,
+        "sharedMeaning": 5,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 12,
+      "resonanceTags": ["Teaching", "Practice", "Wisdom", "Tether"],
+      "traitEffects": [
+        {
+          "traitId": "WillowsWisdom",
+          "assimilationDelta": 45,
+          "note": "Primary authored tether/practice segment for the first vertical slice."
+        }
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Sustained practice converts abstract exposure into working prediction skill."
+    },
+    "willow_exp_independent_application": {
+      "id": "willow_exp_independent_application",
+      "uniqueKey": "willow:we07:independent-application",
+      "title": "The Lesson Made Yours",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "quest",
+      "sourceId": "willow_independent_application",
+      "significance": "defining",
+      "relationshipEffects": {
+        "affinity": 3,
+        "trust": 7,
+        "understanding": 12,
+        "sharedMeaning": 10,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 20,
+      "resonanceTags": ["Wisdom", "Application", "Transformation", "IndependentUnderstanding"],
+      "traitEffects": [
+        {
+          "traitId": "WillowsWisdom",
+          "compatibilityDelta": 20,
+          "assimilationDelta": 35,
+          "note": "Independent application supplies the core proof that the pattern is becoming the protagonist's own."
+        }
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "willow_memory_lesson_made_yours",
+      "interpretation": "The protagonist recognizes and acts on Willow's pattern without Willow being present to point it out."
+    },
+    "willow_exp_resonance_wisdom": {
+      "id": "willow_exp_resonance_wisdom",
+      "uniqueKey": "willow:we08:wisdom-resonance",
+      "title": "Resonance: Willow's Wisdom",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "system",
+      "sourceId": "WillowsWisdom",
+      "significance": "defining",
+      "relationshipEffects": {
+        "sharedMeaning": 4
+      },
+      "connectionProgressDelta": 0,
+      "resonanceTags": ["Wisdom", "Resonance", "Transformation"],
+      "memoryCandidate": false,
+      "interpretation": "Essence stabilizes a cognitive pattern already earned through exposure, practice, and application."
+    }
+  },
+  "memories": {
+    "willow_memory_seed_preserved": {
+      "id": "willow_memory_seed_preserved",
+      "originExperienceId": "willow_exp_sunstone_decision_preserve",
+      "title": "The Seed Preserved",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "memoryType": "shared",
+      "significance": "major",
+      "playerVisible": true,
+      "summary": "You gave up an immediate advantage to protect something whose value was still only potential.",
+      "protagonistView": "A delayed system can be more valuable than an immediate extraction.",
+      "targetView": "The student acted on the lesson instead of merely agreeing with it.",
+      "resonanceTags": ["Wisdom", "Patience", "Stewardship", "CostlyChoice", "Application"],
+      "bondContribution": "Mentor / Student — emerging",
+      "traitRelevance": ["WillowsWisdom"],
+      "persistence": "stable"
+    },
+    "willow_memory_lesson_made_yours": {
+      "id": "willow_memory_lesson_made_yours",
+      "originExperienceId": "willow_exp_independent_application",
+      "title": "The Lesson Made Yours",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "You recognized Willow's pattern where Willow was not present to point it out.",
+      "protagonistView": "The method had become useful enough to become automatic.",
+      "targetView": "The student no longer needed the teacher to see.",
+      "resonanceTags": ["Wisdom", "Understanding", "Application", "Transformation", "IndependentUnderstanding"],
+      "bondContribution": "Mentor / Student — established",
+      "traitRelevance": ["WillowsWisdom"],
+      "persistence": "stable"
+    }
+  }
+}
