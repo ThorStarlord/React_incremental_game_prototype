@@ -118,6 +118,16 @@ export interface RelationshipMemory {
   notes?: string;
 }
 
+/**
+ * Provenance is deliberately orthogonal to current Bond state. A legacy-derived
+ * baseline may later accumulate real modern Experiences, but the preserved level
+ * still came from historical `connectionDepth` rather than reconstructed evidence.
+ */
+export interface BondProfileProvenance {
+  legacyDerived: boolean;
+  legacyConnectionDepth?: number;
+}
+
 export interface BondProfile {
   npcId: string;
   dimensions: RelationshipDimensions;
@@ -131,6 +141,7 @@ export interface BondProfile {
   resonanceQuality: number;
   stability: RelationshipStability;
   tetherState: RelationshipTetherState;
+  provenance: BondProfileProvenance;
 }
 
 export interface TraitAssimilationState {
@@ -190,6 +201,15 @@ export interface InitializeBondProfilePayload {
   connectionLevel?: number;
   connectionProgress?: number;
   tetherState?: RelationshipTetherState;
+  provenance?: BondProfileProvenance;
+}
+
+export interface LegacyBondProfileMigrationPayload {
+  npcId: string;
+  affinity: number;
+  legacyConnectionDepth: number;
+  mappedConnectionLevel: number;
+  tetherState?: RelationshipTetherState;
 }
 
 export interface RelationshipExperienceDefinition
@@ -246,4 +266,5 @@ export const createDefaultBondProfile = (
   resonanceQuality: 0,
   stability: 'stable',
   tetherState: seed?.tetherState ?? 'present',
+  provenance: seed?.provenance ?? { legacyDerived: false },
 });
