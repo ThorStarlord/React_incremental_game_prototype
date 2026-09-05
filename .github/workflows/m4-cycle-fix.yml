@@ -1,0 +1,158 @@
+name: M4 Cycle Fix
+
+on:
+  push:
+    branches:
+      - feature/relationship-memory-vertical-slice
+
+permissions:
+  contents: write
+
+jobs:
+  patch-qualify-and-self-delete:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/relationship-memory-vertical-slice
+          fetch-depth: 0
+
+      - name: Replace Essence rate calculator with selector-free implementation
+        shell: bash
+        run: |
+          cat > src/features/Essence/utils/essenceRate.ts <<'EOF'
+          import type { RootState } from '../../../app/store';
+          import { COPY_SYSTEM, ESSENCE_GENERATION } from '../../../constants/gameConstants';
+          import { calculateCopyEssenceGeneration } from '../../Copy/utils/copyUtils';
+          import {
+            createDefaultBondProfile,
+            type BondProfile,
+          } from '../../Relationships/state/RelationshipTypes';
+          import {
+            calculateRelationshipEssenceContribution,
+            type RelationshipEssenceContribution,
+          } from '../../Relationships/utils/relationshipProgression';
+
+          export interface EssenceRateCalculation {
+            newRate: number;
+            relationshipRate: number;
+            copyRate: number;
+            relationshipContributions: RelationshipEssenceContribution[];
+          }
+
+          const normalizeBondProfile = (
+            raw: Partial<BondProfile> | undefined,
+            npcId: string
+          ): BondProfile => {
+            const defaults = createDefaultBondProfile(npcId);
+            if (!raw) return defaults;
+            return {
+              ...defaults,
+              ...raw,
+              dimensions: {
+                ...defaults.dimensions,
+                ...(raw.dimensions ?? {}),
+                custom: {
+                  ...defaults.dimensions.custom,
+                  ...(raw.dimensions?.custom ?? {}),
+                },
+              },
+              connectionQualificationEvidence: raw.connectionQualificationEvidence ?? {},
+              bondArchetypes: raw.bondArchetypes ?? [],
+              activeMemoryIds: raw.activeMemoryIds ?? [],
+              unresolvedTensions: raw.unresolvedTensions ?? [],
+              recentExperienceIds: raw.recentExperienceIds ?? [],
+              tetherState: raw.tetherState ?? defaults.tetherState,
+            };
+          };
+
+          /**
+           * Pure passive-Essence rate calculation over raw Redux state.
+           *
+           * This deliberately imports no Redux selector modules. Relationship thunks call
+           * this during store bootstrap, and selector-module imports can re-enter
+           * `app/store` through feature graphs and create a runtime temporal-dead-zone cycle.
+           */
+          export const calculateEssenceGenerationRate = (
+            state: RootState
+          ): EssenceRateCalculation => {
+            const allTraits = state.traits.traits;
+            let totalRate = ESSENCE_GENERATION.BASE_RATE_PER_SECOND;
+
+            const relationshipContributions: RelationshipEssenceContribution[] = [];
+            const relationshipState = state.relationships;
+            for (const npcId of Object.keys(relationshipState?.progressionByNpc ?? {})) {
+              const config = relationshipState?.progressionByNpc?.[npcId];
+              const profile = normalizeBondProfile(
+                relationshipState?.bondProfilesByNpc?.[npcId],
+                npcId
+              );
+              const contribution = calculateRelationshipEssenceContribution(profile, config);
+              if (contribution.enabled && contribution.effectiveRate > 0) {
+                relationshipContributions.push(contribution);
+              }
+            }
+
+            const relationshipRate = relationshipContributions.reduce(
+              (total, contribution) => total + contribution.effectiveRate,
+              0
+            );
+            totalRate += relationshipRate;
+
+            let copyRate = 0;
+            for (const copy of Object.values(state.copy.copies)) {
+              if (copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD) {
+                copyRate += calculateCopyEssenceGeneration(copy, allTraits);
+              }
+            }
+            totalRate += copyRate;
+
+            return {
+              newRate: totalRate,
+              relationshipRate,
+              copyRate,
+              relationshipContributions,
+            };
+          };
+          EOF
+
+          rm -f src/features/Essence/utils/essenceRateRaw.ts
+          rm -f src/features/Essence/utils/README_M4_RATE_REFACTOR.md
+          git rm --ignore-unmatch .github/workflows/m4-cycle-fix.yml
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Relationship runtime tests
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts
+        env:
+          CI: true
+
+      - name: Production build
+        run: npm run build
+        env:
+          CI: false
+
+      - name: Commit qualified fix
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No patch required.'
+            exit 0
+          fi
+          git commit -m 'fix(m4): eliminate Essence relationship bootstrap cycle'
+          git push origin HEAD:feature/relationship-memory-vertical-slice
