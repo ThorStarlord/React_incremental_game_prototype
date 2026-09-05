@@ -2,7 +2,7 @@
   "experiences": {
     "willow_exp_first_question_admit": {
       "id": "willow_exp_first_question_admit",
-      "uniqueKey": "willow:we01:admit",
+      "uniqueKey": "willow:we01:first-question",
       "title": "She Saw Through the Question",
       "primaryTargetId": "npc_elder_willow",
       "participantIds": ["player", "npc_elder_willow"],
@@ -23,7 +23,7 @@
     },
     "willow_exp_first_question_deflect": {
       "id": "willow_exp_first_question_deflect",
-      "uniqueKey": "willow:we01:deflect",
+      "uniqueKey": "willow:we01:first-question",
       "title": "She Saw Through the Question",
       "primaryTargetId": "npc_elder_willow",
       "participantIds": ["player", "npc_elder_willow"],
@@ -41,7 +41,7 @@
     },
     "willow_exp_first_question_challenge": {
       "id": "willow_exp_first_question_challenge",
-      "uniqueKey": "willow:we01:challenge",
+      "uniqueKey": "willow:we01:first-question",
       "title": "She Saw Through the Question",
       "primaryTargetId": "npc_elder_willow",
       "participantIds": ["player", "npc_elder_willow"],
@@ -104,7 +104,7 @@
     },
     "willow_exp_sunstone_decision_preserve": {
       "id": "willow_exp_sunstone_decision_preserve",
-      "uniqueKey": "willow:we04:sunstone-preserve",
+      "uniqueKey": "willow:we04:sunstone-decision",
       "title": "The Sunstone Decision",
       "primaryTargetId": "npc_elder_willow",
       "participantIds": ["player", "npc_elder_willow"],
@@ -134,7 +134,7 @@
     },
     "willow_exp_sunstone_decision_consume": {
       "id": "willow_exp_sunstone_decision_consume",
-      "uniqueKey": "willow:we04:sunstone-consume",
+      "uniqueKey": "willow:we04:sunstone-decision",
       "title": "The Sunstone Decision",
       "primaryTargetId": "npc_elder_willow",
       "participantIds": ["player", "npc_elder_willow"],
