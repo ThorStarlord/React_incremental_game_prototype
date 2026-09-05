@@ -1,17 +1,17 @@
 # Relationship Progression Redesign
 
-**Status:** Target design approved for implementation planning  
-**Runtime status:** Not yet implemented  
+**Status:** Target design approved; staged runtime migration in progress  
+**Runtime status:** M3 shadow runtime implemented; legacy Affinity/Connection authority intentionally retained  
 **Purpose:** Provide one authority/index for the relationship, Essence, Memory, and Trait Resonance redesign while migration is in progress.
 
 ## Why this document exists
 
 The repository currently contains two kinds of truth that must not be confused:
 
-1. **Implemented behavior** — documented in `Features/NPCSystem.md`, `Features/EssenceSystem.md`, `Features/TraitSystem.md`, and the current TypeScript runtime.
-2. **Approved target design** — documented by the relationship redesign package below.
+1. **Implemented legacy behavior** — documented in `Features/NPCSystem.md`, `Features/EssenceSystem.md`, `Features/TraitSystem.md`, and the existing Affinity/`connectionDepth` runtime.
+2. **Approved target design** — documented by the relationship redesign package below and now partially represented by the additive Relationships shadow runtime.
 
-Until the migration is complete, implementation-status documents remain accurate descriptions of what the game does today. The redesign documents define what the relationship progression loop is intended to become.
+Until explicit cutover phases land, implementation-status documents remain accurate descriptions of authoritative gameplay behavior. The redesign documents define what relationship progression is intended to become.
 
 ## Approved target-design package
 
@@ -23,10 +23,11 @@ Until the migration is complete, implementation-status documents remain accurate
 
 ## Authority during migration
 
-When the documents conflict:
+When the documents or runtime layers conflict:
 
-- for **current runtime behavior**, the current implementation and implementation-status feature specs win;
+- for **current gameplay authority**, legacy NPC Affinity/`connectionDepth`, current Essence generation, and current Trait Resonance behavior win until their explicit cutover phase;
 - for **new relationship-system implementation work**, the target-design package above wins;
+- the `relationships` Redux slice is currently **shadow evidence**, not authoritative gameplay state;
 - temporary compatibility behavior must be marked as transitional and should not silently redefine the target ontology.
 
 ## Core target loop
@@ -45,7 +46,7 @@ Narrative interaction
 
 ## Key changes from the current prototype
 
-### Current
+### Current authoritative gameplay
 
 ```text
 Affinity
@@ -81,6 +82,40 @@ Meaningful Experiences
 8. Trait Resonance requires relationship evidence and assimilation, not only currency and a scalar relationship level.
 9. Manipulative/instrumental relationships remain mechanically viable.
 10. Reciprocal/authentic relationships may later unlock qualitatively different outcomes rather than receiving a simplistic universal bonus.
+
+## M3 implementation status — Shadow Runtime
+
+M3 is implemented as an additive validation layer.
+
+### Implemented
+
+- `src/features/Relationships/` domain with serializable TypeScript types, normalized Redux state, selectors, and authored-event thunk;
+- `relationships` reducer registered in the root store;
+- durable Relationship Experience ledger with stable unique-key idempotency;
+- seven universal relationship dimensions plus custom-dimension support;
+- shadow Bond Profiles with Connection Progress, recent Experiences, Memories, archetypes, simple explainable Resonance Quality, and Stability projections;
+- explicit authored Memory formation, including repair when an Experience exists but its Memory projection is missing;
+- authored Elder Willow Experience/Memory bundle under `public/data/relationships/elder-willow.json`;
+- `RELATIONSHIP_EXPERIENCE` dialogue effects supporting fixed and response-specific authored events;
+- deterministic response buttons in the dialogue UI so the recorded Experience matches the player's actual choice;
+- New Game shadow-state reset and Willow seed profile (`Trust: 5`, other new dimensions at baseline);
+- debug comparison between legacy Willow Affinity/Depth and the shadow Bond Profile;
+- debug injection for landmark Willow events to exercise idempotency and Memory formation;
+- production-build CI gate via `.github/workflows/build-validation.yml`.
+
+### Intentionally still legacy-authoritative
+
+- automatic `Affinity >= 100 -> connectionDepth +1`;
+- Essence generation from legacy `connectionDepth`;
+- Trait Resonance gate based on minimum `connectionDepth` + Essence balance;
+- current Ancient Seed quest reward, including its direct Essence payout;
+- broad NPC relationship migration.
+
+### Willow runtime reachability in M3
+
+The first Willow dialogue can now create response-specific WE-01 shadow Experiences, and the visible teaching continuation can create WE-02 evidence. Later authored beats (Seed decision, disagreement, tether teaching, independent application) exist in the authoring bundle and can be exercised through the debug panel, but they are **not yet all wired into complete playable quest/story delivery**.
+
+That distinction is deliberate: M3 proves the relationship evidence runtime before changing quest and progression authority.
 
 ## Validation order
 
@@ -126,16 +161,28 @@ If Lyra requires hard-coded exceptions in generic relationship mechanics, the mo
 - large-scale authenticity/endgame mechanics;
 - migration of every NPC before Willow is proven.
 
-## Next engineering milestone
+## Current engineering gate
 
-Implement **M3 — Runtime Foundation** from `Technical/RelationshipSystemMigrationPlan.md`:
+Before the first authority cutover:
 
-1. add `Relationships` domain types/slice/selectors;
-2. register the reducer;
-3. record Willow Experiences in shadow mode;
-4. add idempotency;
-5. add explicit authored Memory formation;
-6. add debug visibility;
-7. keep current Affinity/Connection behavior intact until shadow-state validation passes.
+1. production build must pass on the exact PR head;
+2. Willow shadow Experiences must remain idempotent under repeated dialogue/debug attempts;
+3. Memories must always reference recorded Experiences and survive later negative deltas;
+4. debug comparison must make legacy-vs-shadow divergence explainable;
+5. no relationship-shadow event may alter legacy `connectionDepth` merely by being recorded.
 
-Do not cut over Essence or Trait Resonance until the shadow relationship state can reproduce the intended Willow causal history reliably.
+The first build-validation run exposed a baseline `StatDisplay.tsx` compile defect (`useState`/`useEffect` used without imports); that unrelated defect is fixed on this branch so subsequent build qualification can reach the new relationship code.
+
+## Next engineering milestone after M3 qualification
+
+Proceed to the **first authority cutover and M4 integration** in staged order rather than all at once:
+
+1. implement qualified Connection evaluation from Experience/Memory evidence;
+2. stop Affinity from automatically leveling Connection only after Willow shadow behavior is validated;
+3. migrate Willow Essence contribution to Bond-derived rate inputs;
+4. introduce Trait compatibility/assimilation state for `WillowsWisdom`;
+5. wire the Ancient Seed and independent-application beats into playable delivery;
+6. replace immediate Willow Trait purchase semantics with Memory/assimilation/Connection evidence + final Essence expenditure;
+7. only then use Lyra as the adversarial generalization test.
+
+Do not cut over all NPCs, Essence generation, and Trait Resonance simultaneously. The migration remains Willow-first and evidence-driven.
