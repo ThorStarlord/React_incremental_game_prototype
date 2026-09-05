@@ -44,7 +44,6 @@ const loadRelationshipDefinitions = async (): Promise<RelationshipDefinitionBund
     )
       .then(mergeBundles)
       .catch(error => {
-        // Allow a later interaction to retry after a transient asset-load failure.
         definitionBundlePromise = null;
         throw error;
       });
@@ -176,7 +175,6 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
       }
 
       const definition = definitions.experiences[experienceId];
-
       if (!definition) {
         return rejectWithValue(`Unknown authored relationship experience: ${experienceId}`);
       }
@@ -189,8 +187,6 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
       );
 
       if (alreadyApplied) {
-        // If a prior version recorded the Experience but failed before forming its
-        // authored Memory, repair the projection without applying event deltas again.
         if (definition.memoryDefinitionId && existingExperience) {
           const memoryDefinition = definitions.memories[definition.memoryDefinitionId];
           const memoryExists = relationships?.memoriesById?.[definition.memoryDefinitionId];
@@ -225,6 +221,30 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
 
       dispatch(recordRelationshipExperience(experience));
 
+      // Some legacy UI/service gates still read `npc.affinity`. For a migrated NPC,
+      // project the authored Affinity consequence there without invoking the old
+      // Affinity->connectionDepth rollover path. This keeps one semantic Affinity
+      // visible while BondProfile remains the relationship authority.
+      const config = selectRelationshipProgressionDefinition(
+        getState() as RootState,
+        experience.primaryTargetId
+      );
+      const affinityDelta = experience.relationshipEffects.affinity;
+      if (
+        config?.connectionAuthority === 'relationships' &&
+        typeof affinityDelta === 'number' &&
+        affinityDelta !== 0
+      ) {
+        dispatch({
+          type: 'npcs/updateNpcAffinity',
+          payload: {
+            npcId: experience.primaryTargetId,
+            change: affinityDelta,
+            reason: `Relationship Experience: ${experience.id}`,
+          },
+        });
+      }
+
       let memoryId: string | undefined;
       if (memoryDefinitionId) {
         const memoryDefinition = definitions.memories[memoryDefinitionId];
@@ -254,8 +274,8 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
       await dispatch(
         evaluateConnectionQualificationThunk({ npcId: experience.primaryTargetId })
       );
-      // M4 integration changes the future passive rate only; it never directly
-      // grants Essence for recording a relationship Experience.
+      // M4 changes the future passive rate only; it never directly grants Essence
+      // for recording a relationship Experience.
       await dispatch(updateEssenceGenerationRateThunk());
 
       return { experienceId: experience.id, recorded: true, memoryId };
