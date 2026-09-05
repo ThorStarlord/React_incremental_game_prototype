@@ -1,18 +1,74 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { RootState } from '../../../app/store';
-import { addQuest, completeQuest, startQuest, incrementQuestElapsed } from './QuestSlice';
-import { Quest } from './QuestTypes';
+import type { RootState } from '../../../app/store';
+import {
+  addQuest,
+  completeQuest,
+  startQuest,
+  incrementQuestElapsed,
+  updateObjectiveProgress,
+  patchObjectiveFields,
+  setQuestResolution,
+} from './QuestSlice';
+import type { Quest, QuestReward } from './QuestTypes';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold, addStatusEffect } from '../../Player/state/PlayerSlice';
 import { addAvailableQuestToNPC } from '../../NPCs/state/NPCSlice';
 import { updateNPCRelationshipThunk } from '../../NPCs/state/NPCThunks';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { addItem, removeItem } from '../../Inventory/state/InventorySlice';
+import { recordAuthoredRelationshipExperienceThunk } from '../../Relationships/state/RelationshipThunks';
 import { v4 as uuidv4 } from 'uuid';
-import { updateObjectiveProgress, patchObjectiveFields } from './QuestSlice';
 import { toDisplayNameFromId } from '../../../shared/utils/formatUtils';
-import { StatusEffect } from '../../Player/state/PlayerTypes';
+import type { StatusEffect } from '../../Player/state/PlayerTypes';
 import { QUEST_CONSTANTS } from '../../../constants/gameConstants';
+
+const applyQuestRewards = async (
+  rewards: QuestReward[],
+  quest: Quest,
+  dispatch: any,
+  essenceSource: string
+): Promise<string[]> => {
+  const rewardSummaries: string[] = [];
+
+  for (const reward of rewards) {
+    switch (reward.type) {
+      case 'ESSENCE': {
+        const amount = Number(reward.value) || 0;
+        dispatch(gainEssence({ amount, source: essenceSource, description: quest.id }));
+        rewardSummaries.push(`${amount} Essence`);
+        break;
+      }
+      case 'GOLD': {
+        const amount = Number(reward.value) || 0;
+        dispatch(gainGold(amount));
+        rewardSummaries.push(`${amount} Gold`);
+        break;
+      }
+      case 'REPUTATION': {
+        dispatch(
+          updateNPCRelationshipThunk({
+            npcId: quest.giver,
+            change: Number(reward.value) || 0,
+            reason: 'Quest Reward',
+          })
+        );
+        rewardSummaries.push(`+${reward.value} Reputation with ${quest.giver}`);
+        break;
+      }
+      case 'ITEM': {
+        const itemId = String(reward.value);
+        const qty = reward.amount || 1;
+        dispatch(addItem({ itemId, quantity: qty }));
+        rewardSummaries.push(`${qty}x ${toDisplayNameFromId(itemId, 'item_')}`);
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  return rewardSummaries;
+};
 
 export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
   try {
@@ -24,9 +80,7 @@ export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     console.error(
-      `Failed to initialize quests. Reason: ${errorMsg}
-Possible causes: network error, missing or invalid /data/quests.json file, or JSON parse error.
-Next steps: Check your network connection, ensure /data/quests.json exists and is valid JSON.`
+      `Failed to initialize quests. Reason: ${errorMsg}\nPossible causes: network error, missing or invalid /data/quests.json file, or JSON parse error.\nNext steps: Check your network connection, ensure /data/quests.json exists and is valid JSON.`
     );
   }
 });
@@ -48,14 +102,9 @@ export const deliverQuestItemThunk = createAsyncThunk(
 
     if (quest && objective && objective.type === 'DELIVER' && objective.hasItem && !objective.delivered) {
       const itemId = objective.target;
-
-      // Remove item from inventory
       dispatch(removeItem({ itemId, quantity: 1 }));
-
-  // Mark delivered and complete
-  dispatch(patchObjectiveFields({ questId, objectiveId, changes: { delivered: true, isComplete: true, currentCount: 1 } }));
-  // Also normalize numeric progress to 1/1
-  dispatch(updateObjectiveProgress({ questId, objectiveId, progress: 1 }));
+      dispatch(patchObjectiveFields({ questId, objectiveId, changes: { delivered: true, isComplete: true, currentCount: 1 } }));
+      dispatch(updateObjectiveProgress({ questId, objectiveId, progress: 1 }));
     }
   }
 );
@@ -79,17 +128,22 @@ export const solveQuestPuzzleThunk = createAsyncThunk(
       return;
     }
 
-    // Process rewards
     for (const reward of outcome.rewards) {
       switch (reward.type) {
         case 'GOLD':
           dispatch(gainGold(Number(reward.value) || 0));
           break;
-        // Add other reward types here
+        case 'ESSENCE':
+          dispatch(gainEssence({ amount: Number(reward.value) || 0, source: 'puzzle_reward', description: quest.id }));
+          break;
+        case 'ITEM':
+          dispatch(addItem({ itemId: String(reward.value), quantity: reward.amount || 1 }));
+          break;
+        default:
+          break;
       }
     }
 
-    // Process effects
     for (const effect of outcome.effects) {
       if (effect.type === 'STATUS_EFFECT') {
         const newEffect: StatusEffect = {
@@ -107,30 +161,108 @@ export const solveQuestPuzzleThunk = createAsyncThunk(
   }
 );
 
+/**
+ * Resolve an authored quest decision after objectives are complete and before
+ * ordinary turn-in. This keeps narrative/relationship evidence separate from
+ * immediately consumable resource rewards.
+ */
+export const resolveQuestOutcomeThunk = createAsyncThunk<
+  { questId: string; resolutionId: string; rewards: string[] },
+  { questId: string; resolutionId: string },
+  { state: RootState; rejectValue: string }
+>(
+  'quest/resolveOutcome',
+  async ({ questId, resolutionId }, { dispatch, getState, rejectWithValue }) => {
+    try {
+      let state = getState() as RootState;
+      const quest = state.quest.quests[questId];
+
+      if (!quest) throw new Error(`Quest not found: ${questId}`);
+      if (quest.status !== 'READY_TO_COMPLETE') {
+        throw new Error('Quest objectives must be complete before choosing a resolution.');
+      }
+      if (quest.selectedResolutionId) {
+        if (quest.selectedResolutionId === resolutionId) {
+          return { questId, resolutionId, rewards: [] };
+        }
+        throw new Error('This quest resolution has already been chosen.');
+      }
+
+      const option = quest.resolutionOptions?.find(candidate => candidate.id === resolutionId);
+      if (!option) throw new Error(`Unknown quest resolution: ${resolutionId}`);
+
+      for (const cost of option.consumeItems ?? []) {
+        const available = state.inventory.items[cost.itemId] ?? 0;
+        if (available < cost.quantity) {
+          throw new Error(
+            `Resolution requires ${cost.quantity}x ${toDisplayNameFromId(cost.itemId, 'item_')}.`
+          );
+        }
+      }
+
+      // Relationship evidence is recorded before irreversible resource changes so a
+      // failed authored-data lookup cannot consume the player's item/reward choice.
+      if (option.relationshipExperienceId) {
+        const result = await dispatch(
+          recordAuthoredRelationshipExperienceThunk({
+            experienceId: option.relationshipExperienceId,
+          })
+        );
+        if (recordAuthoredRelationshipExperienceThunk.rejected.match(result)) {
+          throw new Error(String(result.payload ?? 'Failed to record relationship consequence.'));
+        }
+      }
+
+      for (const cost of option.consumeItems ?? []) {
+        dispatch(removeItem({ itemId: cost.itemId, quantity: cost.quantity }));
+      }
+
+      const rewardSummaries = await applyQuestRewards(
+        option.rewards ?? [],
+        quest,
+        dispatch,
+        'quest_resolution'
+      );
+
+      dispatch(setQuestResolution({ questId, resolutionId }));
+      dispatch(addNotification({
+        message: option.logMessage ?? `Decision recorded: ${option.label}`,
+        type: 'success',
+      }));
+
+      state = getState() as RootState;
+      return {
+        questId,
+        resolutionId: state.quest.quests[questId]?.selectedResolutionId ?? resolutionId,
+        rewards: rewardSummaries,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      dispatch(addNotification({ message, type: 'warning' }));
+      return rejectWithValue(message);
+    }
+  }
+);
+
 export const generateRadiantQuestThunk = createAsyncThunk(
   'quest/generateRadiantQuest',
   async (_, { dispatch, getState }) => {
     const state = getState() as RootState;
     const allNpcs = Object.values(state.npcs.npcs);
     const guildMasterId = 'npc_guild_master_rook';
-
-    // Exclude the Guild Master himself from being a target
     const targetableNpcs = allNpcs.filter(npc => npc.id !== guildMasterId);
     if (targetableNpcs.length === 0) {
-      console.error("No targetable NPCs found for radiant quest.");
+      console.error('No targetable NPCs found for radiant quest.');
       return;
     }
 
-    // Randomly select a target NPC
     const targetNpc = targetableNpcs[Math.floor(Math.random() * targetableNpcs.length)];
-
-    // Predefined list of fetchable items
     const fetchableItems = ['item_ancient_relic', 'item_glowing_crystal'];
     const targetItemId = fetchableItems[Math.floor(Math.random() * fetchableItems.length)];
 
-  const questId = `radiant_quest_${uuidv4()}`;
-  const objectiveId = `objective_${uuidv4()}`;
-  const targetItemDisplayName = toDisplayNameFromId(targetItemId, 'item_');
+    const questId = `radiant_quest_${uuidv4()}`;
+    const objectiveId = `objective_${uuidv4()}`;
+    const targetItemDisplayName = toDisplayNameFromId(targetItemId, 'item_');
 
     const newQuest: Quest = {
       id: questId,
@@ -145,7 +277,7 @@ export const generateRadiantQuestThunk = createAsyncThunk(
           description: `Deliver ${targetItemDisplayName} to ${targetNpc.name}.`,
           type: 'DELIVER',
           target: targetItemId,
-          destination: targetNpc.id, // Storing NPC id in destination
+          destination: targetNpc.id,
           requiredCount: 1,
           currentCount: 0,
           isComplete: false,
@@ -157,7 +289,7 @@ export const generateRadiantQuestThunk = createAsyncThunk(
       prerequisites: [],
       rewards: [
         { type: 'GOLD', value: 100 },
-        { type: 'REPUTATION', value: 10, faction: "Adventurer's Guild" }
+        { type: 'REPUTATION', value: 10, faction: "Adventurer's Guild" },
       ],
       isAutoComplete: false,
     };
@@ -174,7 +306,14 @@ export const turnInQuestThunk = createAsyncThunk(
     const quest = state.quest.quests[questId];
 
     if (quest && quest.status === 'READY_TO_COMPLETE') {
-      // Enforce return-to-giver rule unless quest.isAutoComplete is true
+      if (quest.resolutionRequired && !quest.selectedResolutionId) {
+        dispatch(addNotification({
+          message: 'Choose how to resolve this quest before turning it in.',
+          type: 'info',
+        }));
+        return Promise.reject(new Error('Quest resolution required.'));
+      }
+
       if (!quest.isAutoComplete) {
         const selectedNpcId = state.npcs.selectedNPCId;
         if (selectedNpcId !== quest.giver) {
@@ -185,68 +324,42 @@ export const turnInQuestThunk = createAsyncThunk(
           return Promise.reject(new Error('Must return to quest giver.'));
         }
       }
-      const rewards = quest.rewards;
-      const rewardSummaries: string[] = [];
 
-      for (const reward of rewards) {
-        switch (reward.type) {
-          case 'ESSENCE':
-            {
-              const amount = Number(reward.value) || 0;
-              dispatch(gainEssence({ amount, source: 'quest_reward', description: quest.id }));
-              rewardSummaries.push(`${amount} Essence`);
-            }
-            break;
-          case 'GOLD':
-            {
-              const amount = Number(reward.value) || 0;
-              dispatch(gainGold(amount));
-              rewardSummaries.push(`${amount} Gold`);
-            }
-            break;
-          case 'REPUTATION':
-            dispatch(
-              updateNPCRelationshipThunk({
-                npcId: quest.giver,
-                change: Number(reward.value) || 0,
-                reason: 'Quest Reward',
-              })
-            );
-            rewardSummaries.push(`+${reward.value} Reputation with ${quest.giver}`);
-            break;
-      case 'ITEM':
-            {
-              const itemId = String(reward.value);
-              const qty = reward.amount || 1;
-              dispatch(addItem({ itemId, quantity: qty }));
-        const disp = toDisplayNameFromId(itemId, 'item_');
-        rewardSummaries.push(`${qty}x ${disp}`);
-            }
-            break;
-          default:
-            break;
-        }
-      }
+      const rewardSummaries = await applyQuestRewards(
+        quest.rewards,
+        quest,
+        dispatch,
+        'quest_reward'
+      );
 
       if (rewardSummaries.length > 0) {
-        const summaryMessage = `Quest Complete! Rewards: ${rewardSummaries.join(', ')}.`;
-        dispatch(addNotification({ message: summaryMessage, type: 'success' }));
+        dispatch(addNotification({
+          message: `Quest Complete! Rewards: ${rewardSummaries.join(', ')}.`,
+          type: 'success',
+        }));
+      } else {
+        dispatch(addNotification({
+          message: `Quest Complete: ${quest.title}.`,
+          type: 'success',
+        }));
       }
 
       dispatch(completeQuest(questId));
 
-      // Quest Chaining Logic: unlock quests that require this quest to be completed
       const allQuests = Object.values(state.quest.quests);
       for (const nextQuest of allQuests) {
-        const requiresThisQuest = (nextQuest.prerequisites || []).some(
-          (req) => req.type === 'QUEST_COMPLETED' && String(req.value) === questId
+        const prerequisites = Array.isArray(nextQuest.prerequisites)
+          ? nextQuest.prerequisites
+          : [];
+        const requiresThisQuest = prerequisites.some(
+          req => req.type === 'QUEST_COMPLETED' && String(req.value) === questId
         );
         if (requiresThisQuest) {
           dispatch(addAvailableQuestToNPC({ npcId: nextQuest.giver, questId: nextQuest.id }));
         }
       }
 
-      return { questId, rewards: quest.rewards };
+      return { questId, rewards: quest.rewards, resolutionId: quest.selectedResolutionId };
     }
 
     return Promise.reject(new Error('Quest not ready to be turned in.'));
