@@ -13,6 +13,8 @@ export type {
   NPCPersonality,
   NPCInteraction,
   DialogueEntry,
+  DialogueEffect,
+  DialogueNode,
   RelationshipChangeEntry,
   NPCStatus,
   InteractionType,
