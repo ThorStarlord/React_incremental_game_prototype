@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import type { InitializeBondProfilePayload, RelationshipDimensionKey } from '../state/RelationshipTypes';
 import {
   initializeBondProfile,
   resetRelationships,
@@ -23,7 +24,7 @@ import { recordAuthoredRelationshipExperienceThunk } from '../state/Relationship
 
 const WILLOW_ID = 'npc_elder_willow';
 
-const DIMENSION_LABELS: Array<[keyof ReturnType<typeof selectBondProfileByNpcId>['dimensions'], string]> = [
+const DIMENSION_LABELS: Array<[RelationshipDimensionKey, string]> = [
   ['affinity', 'Affinity'],
   ['trust', 'Trust'],
   ['understanding', 'Understanding'],
@@ -33,7 +34,7 @@ const DIMENSION_LABELS: Array<[keyof ReturnType<typeof selectBondProfileByNpcId>
   ['reciprocity', 'Reciprocity'],
 ];
 
-const willowSeedProfile = {
+const willowSeedProfile: InitializeBondProfilePayload = {
   npcId: WILLOW_ID,
   dimensions: {
     affinity: 0,
@@ -46,7 +47,7 @@ const willowSeedProfile = {
   },
   connectionLevel: 0,
   connectionProgress: 0,
-} as const;
+};
 
 const RelationshipDebugPanel: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
@@ -99,13 +100,9 @@ const RelationshipDebugPanel: React.FC = React.memo(() => {
             <Typography variant="subtitle1" gutterBottom>Shadow Bond Profile</Typography>
             <Grid container spacing={1}>
               {DIMENSION_LABELS.map(([key, label]) => (
-                <Grid item xs={6} sm={4} key={String(key)}>
+                <Grid item xs={6} sm={4} key={key}>
                   <Typography variant="caption" color="text.secondary">{label}</Typography>
-                  <Typography variant="body1">
-                    {typeof profile.dimensions[key] === 'number'
-                      ? profile.dimensions[key]
-                      : 0}
-                  </Typography>
+                  <Typography variant="body1">{profile.dimensions[key]}</Typography>
                 </Grid>
               ))}
             </Grid>
