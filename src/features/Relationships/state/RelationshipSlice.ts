@@ -5,10 +5,16 @@ import type {
   RelationshipDimensionKey,
   RelationshipExperience,
   RelationshipMemory,
+  RelationshipProgressionDefinition,
   RelationshipState,
   RelationshipStability,
+  RelationshipTetherState,
 } from './RelationshipTypes';
-import { createDefaultBondProfile } from './RelationshipTypes';
+import {
+  createDefaultBondProfile,
+  createDefaultTraitAssimilationState,
+  traitAssimilationKey,
+} from './RelationshipTypes';
 
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
@@ -21,6 +27,8 @@ const createInitialState = (): RelationshipState => ({
   memoryIdsByNpc: {},
   bondProfilesByNpc: {},
   appliedUniqueKeys: {},
+  progressionByNpc: {},
+  traitAssimilationByKey: {},
 });
 
 export const initialRelationshipState: RelationshipState = createInitialState();
@@ -43,12 +51,14 @@ const deriveStability = (profile: BondProfile): RelationshipStability => {
 };
 
 /**
- * Temporary shadow-mode heuristic. This is intentionally simple and explainable.
- * It is not the final Essence formula and must not become a hidden balancing law.
+ * First explainable implementation of Resonance Quality. Memories matter, but
+ * current liking remains deliberately weaker than Understanding/Shared Meaning.
  */
 const deriveResonanceQuality = (profile: BondProfile): number => {
   const { trust, understanding, sharedMeaning, reciprocity } = profile.dimensions;
-  return Math.round((trust + understanding + sharedMeaning + reciprocity) / 4);
+  const dimensionScore = (trust + understanding + sharedMeaning + reciprocity) / 4;
+  const memoryEvidenceBonus = Math.min(10, profile.activeMemoryIds.length * 5);
+  return clamp(Math.round(dimensionScore + memoryEvidenceBonus), 0, 100);
 };
 
 const recalculateDerivedProfile = (profile: BondProfile) => {
@@ -74,6 +84,16 @@ const relationshipSlice = createSlice({
   initialState: initialRelationshipState,
   reducers: {
     resetRelationships: () => createInitialState(),
+
+    registerRelationshipProgressionDefinitions: (
+      state,
+      action: PayloadAction<Record<string, RelationshipProgressionDefinition>>
+    ) => {
+      state.progressionByNpc = {
+        ...state.progressionByNpc,
+        ...action.payload,
+      };
+    },
 
     initializeBondProfile: (
       state,
@@ -124,6 +144,32 @@ const relationshipSlice = createSlice({
         );
       }
 
+      if (experience.traitEffects) {
+        for (const traitEffect of experience.traitEffects) {
+          const key = traitAssimilationKey(experience.primaryTargetId, traitEffect.traitId);
+          const assimilation =
+            state.traitAssimilationByKey[key] ??
+            createDefaultTraitAssimilationState(experience.primaryTargetId, traitEffect.traitId);
+
+          if (typeof traitEffect.compatibilityDelta === 'number') {
+            assimilation.compatibility = clamp(
+              assimilation.compatibility + traitEffect.compatibilityDelta,
+              0,
+              100
+            );
+          }
+          if (typeof traitEffect.assimilationDelta === 'number') {
+            assimilation.progress = clamp(
+              assimilation.progress + traitEffect.assimilationDelta,
+              0,
+              100
+            );
+          }
+          assimilation.lastUpdatedAt = experience.timestamp;
+          state.traitAssimilationByKey[key] = assimilation;
+        }
+      }
+
       profile.recentExperienceIds = [
         ...profile.recentExperienceIds.filter(id => id !== experience.id),
         experience.id,
@@ -157,9 +203,46 @@ const relationshipSlice = createSlice({
         profile.bondArchetypes.push(memory.bondContribution);
       }
 
+      for (const traitId of memory.traitRelevance ?? []) {
+        const key = traitAssimilationKey(memory.primaryTargetId, traitId);
+        const assimilation =
+          state.traitAssimilationByKey[key] ??
+          createDefaultTraitAssimilationState(memory.primaryTargetId, traitId);
+        if (!assimilation.qualifyingMemoryIds.includes(memory.id)) {
+          assimilation.qualifyingMemoryIds.push(memory.id);
+        }
+        assimilation.lastUpdatedAt = Math.max(assimilation.lastUpdatedAt, memory.timestamp);
+        state.traitAssimilationByKey[key] = assimilation;
+      }
+
       recalculateDerivedProfile(profile);
     },
 
+    recordConnectionQualification: (
+      state,
+      action: PayloadAction<{ npcId: string; level: number; evidenceIds: string[] }>
+    ) => {
+      const { npcId, level, evidenceIds } = action.payload;
+      const profile = ensureBondProfile(state, npcId);
+      const normalizedLevel = clamp(Math.floor(level), 0, 10);
+      if (normalizedLevel <= profile.connectionLevel) return;
+      profile.connectionLevel = normalizedLevel;
+      profile.connectionQualificationEvidence[String(normalizedLevel)] = [
+        ...new Set(evidenceIds),
+      ];
+      recalculateDerivedProfile(profile);
+    },
+
+    setRelationshipTetherState: (
+      state,
+      action: PayloadAction<{ npcId: string; tetherState: RelationshipTetherState }>
+    ) => {
+      const profile = ensureBondProfile(state, action.payload.npcId);
+      profile.tetherState = action.payload.tetherState;
+      recalculateDerivedProfile(profile);
+    },
+
+    /** Development compatibility action retained for the debug panel. */
     setShadowConnectionLevel: (
       state,
       action: PayloadAction<{ npcId: string; level: number }>
@@ -173,9 +256,12 @@ const relationshipSlice = createSlice({
 
 export const {
   resetRelationships,
+  registerRelationshipProgressionDefinitions,
   initializeBondProfile,
   recordRelationshipExperience,
   formRelationshipMemory,
+  recordConnectionQualification,
+  setRelationshipTetherState,
   setShadowConnectionLevel,
 } = relationshipSlice.actions;
 
