@@ -45,15 +45,43 @@
   },
   "quest_elara_lost_tome": {
     "id": "quest_elara_lost_tome",
-    "title": "The Lost Tome",
-    "description": "Scholar Elara is missing a rare book from her collection. She believes it was stolen and taken to the city slums.",
+    "title": "The Contradictory Tome",
+    "description": "Elara gives you the recovered source volume behind her published chronology. Compare it against the contradictory marginal note and decide whether the evidence is strong enough to overturn the accepted model.",
     "giver": "npc_scholar_elara",
     "type": "SIDE",
     "objectives": [
-      { "objectiveId": "1", "description": "Find the Lost Tome", "type": "GATHER", "target": "item_lost_tome", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+      {
+        "objectiveId": "1",
+        "description": "Examine the recovered source against the contradictory footnote",
+        "type": "GATHER",
+        "target": "item_elara_contradictory_tome",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
     ],
     "prerequisites": [],
     "rewards": [{ "type": "GOLD", "value": 50 }],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "follow_evidence",
+        "label": "Publish the Correction",
+        "description": "Treat the contradiction as decisive and revise the chronology even though Elara's published conclusion will be wrong.",
+        "relationshipExperienceId": "elara_exp_follow_evidence",
+        "rewards": [],
+        "logMessage": "The footnote survives every check. Elara signs the correction beside you: the evidence wins, even over her own published conclusion."
+      },
+      {
+        "id": "protect_consensus",
+        "label": "Preserve the Accepted Chronology",
+        "description": "Document the anomaly but refuse to overturn the consensus until stronger corroboration exists.",
+        "relationshipExperienceId": "elara_exp_protect_consensus",
+        "rewards": [],
+        "logMessage": "You preserve the accepted chronology and archive the contradiction for later review. Elara accepts the caution, but the collaboration remains less tested."
+      }
+    ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
