@@ -107,9 +107,14 @@ describe('M7 Elara collaborative relationship migration', () => {
 
     const insight = traits[INSIGHT_ID];
     expect(insight.sourceNpc).toBe(ELARA_ID);
+    expect(insight.discoveryMode).toBe('authored');
     expect(insight.minimumConnectionLevel).toBe(2);
     expect(insight.requiredMemoryTags).toContain('IndependentVerification');
     expect(insight.resonanceExperienceId).toBe('elara_exp_resonance_scholarly_insight');
+    expect(
+      elaraBundle.experiences.elara_exp_contradictory_footnote.traitEffects
+        .find((effect: any) => effect.traitId === INSIGHT_ID).discover
+    ).toBe(true);
 
     for (const sourceFile of [
       'src/features/Relationships/state/RelationshipSlice.ts',
@@ -120,11 +125,12 @@ describe('M7 Elara collaborative relationship migration', () => {
     }
   });
 
-  test('reciprocal inquiry reaches Connection II, passive Essence, full assimilation, and permanent Scholarly Insight', async () => {
+  test('reciprocal inquiry discovers the pattern, reaches Connection II, passive Essence, full assimilation, and permanent Scholarly Insight', async () => {
     const store = makeStore();
     await initialize(store);
 
     expect(selectUsesRelationshipConnectionAuthority(store.getState(), ELARA_ID)).toBe(true);
+    expect(store.getState().traits.discoveredTraits).not.toContain(INSIGHT_ID);
 
     store.dispatch(gainEssence({ amount: 100 }));
     const premature = await store.dispatch(
@@ -134,7 +140,27 @@ describe('M7 Elara collaborative relationship migration', () => {
     expect(store.getState().player.permanentTraits).not.toContain(INSIGHT_ID);
     expect(store.getState().essence.currentEssence).toBe(100);
 
-    await recordPath(store, 'elara_exp_follow_evidence');
+    await store.dispatch(
+      recordAuthoredRelationshipExperienceThunk({ experienceId: 'elara_exp_model_challenged' })
+    ).unwrap();
+    expect(store.getState().traits.discoveredTraits).not.toContain(INSIGHT_ID);
+
+    await store.dispatch(
+      recordAuthoredRelationshipExperienceThunk({ experienceId: 'elara_exp_contradictory_footnote' })
+    ).unwrap();
+    expect(store.getState().traits.discoveredTraits).toContain(INSIGHT_ID);
+
+    for (const experienceId of [
+      'elara_exp_tome_committed',
+      'elara_exp_follow_evidence',
+      'elara_exp_revision_mutual',
+      'elara_exp_theory_neither_owned',
+      'elara_exp_independent_verification',
+    ]) {
+      await store.dispatch(
+        recordAuthoredRelationshipExperienceThunk({ experienceId })
+      ).unwrap();
+    }
 
     const profile = selectBondProfileByNpcId(store.getState(), ELARA_ID);
     expect(profile.connectionLevel).toBe(2);
@@ -171,8 +197,11 @@ describe('M7 Elara collaborative relationship migration', () => {
   test('the cautious branch can recover through later reciprocal revision rather than becoming a permanent dead end', async () => {
     const store = makeStore();
     await initialize(store);
+    expect(store.getState().traits.discoveredTraits).not.toContain(INSIGHT_ID);
+
     await recordPath(store, 'elara_exp_protect_consensus');
 
+    expect(store.getState().traits.discoveredTraits).toContain(INSIGHT_ID);
     const profile = selectBondProfileByNpcId(store.getState(), ELARA_ID);
     expect(profile.connectionLevel).toBe(2);
     expect(profile.dimensions.reciprocity).toBeGreaterThanOrEqual(25);
