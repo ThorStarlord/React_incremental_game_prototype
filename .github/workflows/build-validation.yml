@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - feature/relationship-memory-vertical-slice
 
 permissions:
   contents: read
@@ -28,7 +29,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Relationship runtime tests
-        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts
         env:
           CI: true
 
