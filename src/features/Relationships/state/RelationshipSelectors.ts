@@ -2,6 +2,7 @@ import type { RootState } from '../../../app/store';
 import type {
   BondProfile,
   ConnectionQualificationRule,
+  RelationshipDimensionKey,
   RelationshipMemory,
   RelationshipState,
   RelationshipStability,
@@ -171,8 +172,8 @@ export const checkConnectionQualificationRule = (
 
   for (const [key, minimum] of Object.entries(rule.minimumDimensions ?? {})) {
     if (typeof minimum !== 'number') continue;
-    const current = profile.dimensions[key as keyof typeof rule.minimumDimensions] as number;
-    if ((current ?? 0) < minimum) {
+    const current = profile.dimensions[key as RelationshipDimensionKey] ?? 0;
+    if (current < minimum) {
       missing.push(`${key} ${minimum}`);
     }
   }
