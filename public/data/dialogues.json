@@ -2,7 +2,7 @@
   "elder_willow_greeting": {
     "id": "elder_willow_greeting",
     "npcId": "npc_elder_willow",
-    "title": "A Gentle Rustle",
+    "title": "She Saw Through the Question",
     "text": "You do not ask what the forest knows. You ask which part of knowing can be used.",
     "responses": {
       "respect": "Knowledge that cannot alter action is decoration.",
@@ -21,18 +21,95 @@
     ],
     "next": {
       "respect": "elder_willow_wisdom",
-      "casual": null,
-      "inquire_lore": "elder_willow_lore"
+      "casual": "elder_willow_wisdom",
+      "inquire_lore": "elder_willow_wisdom"
     }
   },
   "elder_willow_wisdom": {
     "id": "elder_willow_wisdom",
     "npcId": "npc_elder_willow",
+    "title": "The First Lesson",
     "text": "Look there: two groves, green alike. One will be dead by winter. The difference began below the soil seasons ago. Immediate appearances are poor evidence for slow systems.",
     "effects": [
-      { "type": "AFFINITY_DELTA", "value": 2 },
       { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_first_lesson" }
     ]
+  },
+  "elder_willow_offer_seed": {
+    "id": "elder_willow_offer_seed",
+    "npcId": "npc_elder_willow",
+    "title": "A Seed of Potential",
+    "text": "A dormant seed waits beneath these roots. A Sunstone can wake it, but the same stone can be broken down for immediate Essence. If I tell you which use is correct, you will have learned obedience, not sight.",
+    "requiredExperienceIds": ["willow_exp_first_lesson"],
+    "responses": {
+      "accept": "Show me the Sunstone. I will decide what its value is.",
+      "decline": "I am not ready to spend it yet."
+    },
+    "effects": [
+      { "type": "UNLOCK_QUEST", "questId": "quest_willow_ancient_seed", "responseId": "accept" },
+      { "type": "GIVE_ITEM", "itemId": "item_sunstone", "amount": 1, "responseId": "accept" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_seed_offered", "responseId": "accept" }
+    ],
+    "next": {
+      "accept": null,
+      "decline": null
+    }
+  },
+  "willow_disagreement": {
+    "id": "willow_disagreement",
+    "npcId": "npc_elder_willow",
+    "title": "Willow Disagrees",
+    "text": "You have mistaken the lesson if you think I worship preservation. A diseased branch that poisons the trunk should be cut before its rot becomes visible. Long horizons sometimes demand destruction.",
+    "anyOfExperienceIds": [
+      "willow_exp_sunstone_decision_preserve",
+      "willow_exp_sunstone_decision_consume"
+    ],
+    "responses": {
+      "challenge": "Then preservation was never the rule. Pattern-sensitive judgment was.",
+      "push_back": "Convenient. Your principle changes when the conclusion does."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_willow_disagrees" }
+    ],
+    "next": {
+      "challenge": null,
+      "push_back": null
+    }
+  },
+  "willow_three_nights_teaching": {
+    "id": "willow_three_nights_teaching",
+    "npcId": "npc_elder_willow",
+    "title": "Three Nights of Teaching",
+    "text": "Willow offers no new maxim. For three nights she presents slow systems, asks you to predict their outcomes, and waits while your mistakes expose which patterns you still fail to see.",
+    "requiredExperienceIds": ["willow_exp_willow_disagrees"],
+    "responses": {
+      "begin": "Begin. I want the pattern, not the slogan.",
+      "later": "Not yet."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_three_nights_teaching", "responseId": "begin" }
+    ],
+    "next": {
+      "begin": null,
+      "later": null
+    }
+  },
+  "willow_independent_application_report": {
+    "id": "willow_independent_application_report",
+    "npcId": "npc_elder_willow",
+    "title": "The Lesson Made Yours",
+    "text": "Away from Willow, you found a failing water channel whose obvious repair would have bought a season and killed the root-bed a year later. You changed the deeper flow instead. When you return, Willow asks only why.",
+    "requiredExperienceIds": ["willow_exp_three_nights_teaching"],
+    "responses": {
+      "explain": "Because the visible break was downstream of the real failure. Repairing it would only hide the cause.",
+      "withhold": "The repair worked. That is enough for now."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_independent_application", "responseId": "explain" }
+    ],
+    "next": {
+      "explain": null,
+      "withhold": null
+    }
   },
   "elder_willow_lore": {
     "id": "elder_willow_lore",
@@ -42,24 +119,6 @@
       { "type": "AFFINITY_DELTA", "value": 1 },
       { "type": "OPEN_SERVICE", "serviceId": "lore_provider_willow" }
     ]
-  },
-  "elder_willow_offer_seed": {
-    "id": "elder_willow_offer_seed",
-    "npcId": "npc_elder_willow",
-    "title": "A Seed of Potential",
-    "text": "There is a dormant seed that calls to the sun. Will you help awaken it?",
-    "responses": {
-      "accept": "I will find what it needs.",
-      "decline": "Not right now."
-    },
-    "effects": [
-      { "type": "UNLOCK_QUEST", "questId": "quest_willow_ancient_seed" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_seed_offered" }
-    ],
-    "next": {
-      "accept": null,
-      "decline": null
-    }
   },
   "gronk_greeting": {
     "id": "gronk_greeting",
@@ -105,7 +164,7 @@
       "accept": "I'll find your book.",
       "decline": "Not now."
     },
-    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_elara_lost_tome" } ],
+    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_elara_lost_tome", "responseId": "accept" } ],
     "next": { "accept": null, "decline": null }
   },
   "valerius_greeting": {
@@ -128,7 +187,7 @@
       "accept": "I'll do the rounds.",
       "decline": "Not now."
     },
-    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_valerius_patrol_duty" } ],
+    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_valerius_patrol_duty", "responseId": "accept" } ],
     "next": { "accept": null, "decline": null }
   }
 }
