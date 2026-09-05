@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/relationship-memory-vertical-slice
+      - feature/elara-collaborative-relationship
 
 permissions:
   contents: read
@@ -28,8 +29,8 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
-      - name: Relationship runtime tests
-        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts
+      - name: Relationship and Trait discovery tests
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts TraitDiscovery.test.ts
         env:
           CI: true
 
