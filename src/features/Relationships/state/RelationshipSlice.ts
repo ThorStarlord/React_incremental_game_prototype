@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type {
   BondProfile,
   InitializeBondProfilePayload,
+  LegacyBondProfileMigrationPayload,
   RelationshipDimensionKey,
   RelationshipExperience,
   RelationshipMemory,
@@ -53,6 +54,7 @@ const ensureBondProfile = (state: RelationshipState, npcId: string): BondProfile
   if (!profile.unresolvedTensions) profile.unresolvedTensions = [];
   if (!profile.recentExperienceIds) profile.recentExperienceIds = [];
   if (!profile.tetherState) profile.tetherState = defaults.tetherState;
+  if (!profile.provenance) profile.provenance = { legacyDerived: false };
 
   return profile;
 };
@@ -115,6 +117,42 @@ const relationshipSlice = createSlice({
       const { npcId } = action.payload;
       state.bondProfilesByNpc[npcId] = createDefaultBondProfile(npcId, action.payload);
       recalculateDerivedProfile(state.bondProfilesByNpc[npcId]);
+    },
+
+    migrateLegacyBondProfile: (
+      state,
+      action: PayloadAction<LegacyBondProfileMigrationPayload>
+    ) => {
+      ensureM4Collections(state);
+      const {
+        npcId,
+        affinity,
+        legacyConnectionDepth,
+        mappedConnectionLevel,
+        tetherState,
+      } = action.payload;
+
+      // A real modern profile is authoritative. Migration is only allowed to fill
+      // an absent Relationship representation; it must never rewrite authored
+      // Experience/Memory history or a profile already built from that history.
+      if (state.bondProfilesByNpc[npcId]) return;
+
+      const profile = createDefaultBondProfile(npcId, {
+        dimensions: { affinity: clamp(affinity, -100, 100) },
+        connectionLevel: clamp(Math.floor(mappedConnectionLevel), 0, 10),
+        connectionProgress: 0,
+        tetherState: tetherState ?? 'present',
+        provenance: {
+          legacyDerived: true,
+          legacyConnectionDepth: Math.max(0, legacyConnectionDepth),
+        },
+      });
+
+      // Intentionally leave Experience, Memory, qualification evidence, and all
+      // semantic dimensions except Affinity empty/neutral. Preserving a level is
+      // compatibility; it is not permission to fabricate why that level existed.
+      recalculateDerivedProfile(profile);
+      state.bondProfilesByNpc[npcId] = profile;
     },
 
     recordRelationshipExperience: (
@@ -268,6 +306,7 @@ export const {
   resetRelationships,
   registerRelationshipProgressionDefinitions,
   initializeBondProfile,
+  migrateLegacyBondProfile,
   recordRelationshipExperience,
   formRelationshipMemory,
   recordConnectionQualification,
