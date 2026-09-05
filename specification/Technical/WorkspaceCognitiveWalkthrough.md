@@ -264,4 +264,6 @@ PR #25 may therefore be evaluated on:
 
 A future human playtest remains valuable product research, but it is no longer a prerequisite for claiming that this PR implements and exposes the relationship progression model.
 
+Issue #26 retains the blind-human protocol as optional future research and is explicitly non-blocking for PR #25.
+
 If a future human session reveals a misconception, classify and fix it as usability/product evidence rather than retroactively treating this workspace qualification as a human study.
