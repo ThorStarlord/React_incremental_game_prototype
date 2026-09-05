@@ -21,8 +21,18 @@ import type {
   RelationshipMemory,
 } from './RelationshipTypes';
 
-const AUTHORING_BUNDLE_URLS = ['/data/relationships/elder-willow.json'];
+const AUTHORING_MANIFEST_URL = '/data/relationships/index.json';
 let definitionBundlePromise: Promise<RelationshipDefinitionBundle> | null = null;
+
+interface RelationshipDefinitionManifest {
+  bundles: string[];
+}
+
+const isDefinitionBundle = (value: unknown): value is RelationshipDefinitionBundle => {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<RelationshipDefinitionBundle>;
+  return Boolean(candidate.experiences && candidate.memories);
+};
 
 const mergeBundles = (
   bundles: RelationshipDefinitionBundle[]
@@ -32,22 +42,45 @@ const mergeBundles = (
   progression: Object.assign({}, ...bundles.map(bundle => bundle.progression ?? {})),
 });
 
+const fetchDefinitionBundle = async (url: string): Promise<RelationshipDefinitionBundle> => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to load relationship definitions: ${url}`);
+  }
+  const payload = await response.json();
+  if (!isDefinitionBundle(payload)) {
+    throw new Error(`Invalid relationship definition bundle: ${url}`);
+  }
+  return payload;
+};
+
 const loadRelationshipDefinitions = async (): Promise<RelationshipDefinitionBundle> => {
   if (!definitionBundlePromise) {
-    definitionBundlePromise = Promise.all(
-      AUTHORING_BUNDLE_URLS.map(async url => {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Failed to load relationship definitions: ${url}`);
-        }
-        return (await response.json()) as RelationshipDefinitionBundle;
-      })
-    )
-      .then(mergeBundles)
-      .catch(error => {
-        definitionBundlePromise = null;
-        throw error;
-      });
+    definitionBundlePromise = (async () => {
+      const response = await fetch(AUTHORING_MANIFEST_URL);
+      if (!response.ok) {
+        throw new Error(`Failed to load relationship definition manifest: ${AUTHORING_MANIFEST_URL}`);
+      }
+
+      const payload = await response.json();
+
+      // Migration compatibility: the original runtime loaded one Willow bundle
+      // directly. Accepting that shape keeps old saves/tests and temporary hosts
+      // functional while production authoring moves to the manifest registry.
+      if (isDefinitionBundle(payload)) return payload;
+
+      const manifest = payload as Partial<RelationshipDefinitionManifest>;
+      if (!Array.isArray(manifest.bundles) || manifest.bundles.length === 0) {
+        throw new Error(`Invalid relationship definition manifest: ${AUTHORING_MANIFEST_URL}`);
+      }
+
+      const urls = Array.from(new Set(manifest.bundles));
+      const bundles = await Promise.all(urls.map(fetchDefinitionBundle));
+      return mergeBundles(bundles);
+    })().catch(error => {
+      definitionBundlePromise = null;
+      throw error;
+    });
   }
 
   return definitionBundlePromise;
