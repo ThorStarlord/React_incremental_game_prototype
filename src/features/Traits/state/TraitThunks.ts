@@ -25,9 +25,6 @@ import {
 } from '../../Relationships/state/RelationshipSelectors';
 import { recordAuthoredRelationshipExperienceThunk } from '../../Relationships/state/RelationshipThunks';
 
-/**
- * Fetch and load trait definitions from data source
- */
 export const fetchTraitsThunk = createAsyncThunk(
   'traits/fetchTraits',
   async (_, { dispatch, rejectWithValue }) => {
@@ -166,6 +163,22 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
         throw new Error(msg);
       }
 
+      // Validate and durably record the authored Resonance beat before committing
+      // irreversible currency/permanence reducers. The event thunk is idempotent,
+      // so a retried acquisition after an interrupted client turn remains safe.
+      if (trait.resonanceExperienceId) {
+        const resonanceResult = await dispatch(
+          recordAuthoredRelationshipExperienceThunk({
+            experienceId: trait.resonanceExperienceId,
+          })
+        );
+        if (recordAuthoredRelationshipExperienceThunk.rejected.match(resonanceResult)) {
+          throw new Error(
+            String(resonanceResult.payload ?? 'Failed to record authored Resonance event.')
+          );
+        }
+      }
+
       if (actualCost > 0) {
         dispatch(spendEssence({ amount: actualCost }));
       }
@@ -178,14 +191,6 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
         if (slot.traitId === traitId) {
           dispatch(unequipTrait({ slotIndex: slot.slotIndex }));
         }
-      }
-
-      if (trait.resonanceExperienceId) {
-        await dispatch(
-          recordAuthoredRelationshipExperienceThunk({
-            experienceId: trait.resonanceExperienceId,
-          })
-        );
       }
 
       dispatch(addNotification({ message: `Resonated ${trait.name}`, type: 'success' }));
@@ -202,9 +207,6 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
   }
 );
 
-/**
- * Discover a trait (make it visible to the player)
- */
 export const discoverTraitThunk = createAsyncThunk(
   'traits/discoverTrait',
   async (traitId: string, { getState, dispatch, rejectWithValue }) => {
@@ -234,9 +236,6 @@ export const discoverTraitThunk = createAsyncThunk(
   }
 );
 
-/**
- * Validate trait data structure
- */
 export const validateTraitThunk = createAsyncThunk(
   'traits/validateTrait',
   async (traitId: string, { getState, rejectWithValue }) => {
