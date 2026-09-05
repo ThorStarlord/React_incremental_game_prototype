@@ -6,18 +6,17 @@ import {
   TextField,
   Grid,
   Paper,
-  Divider
+  Divider,
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import SendIcon from '@mui/icons-material/Send';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
-// Corrected: Import from the feature's public API
 import {
   selectNPCById,
   selectNPCDialogueHistory,
-  processNPCInteractionThunk
+  processNPCInteractionThunk,
 } from '../../../';
-import type { NPC, DialogueEntry } from '../../../state/NPCTypes';
+import type { DialogueEntry } from '../../../state/NPCTypes';
 
 interface NPCDialogueTabProps {
   npcId: string;
@@ -27,15 +26,20 @@ type DialogueResponse = { id: string; label: string };
 type Choice = { id: string; title: string; responses: DialogueResponse[] };
 
 /**
- * NPCDialogueTab - Handles dialogue interactions with NPCs
+ * NPCDialogueTab - Handles dialogue interactions with NPCs.
+ * Authored relationship topics can declare Experience prerequisites so future
+ * beats do not spoil themselves or become clickable out of causal order.
  */
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
   const [message, setMessage] = useState('');
 
   const npc = useAppSelector(state => selectNPCById(state, npcId));
-  const dialogueHistory = useAppSelector((state) => selectNPCDialogueHistory(state, npcId));
-  const dialogueNodes = useAppSelector((state) => state.npcs.dialogueNodes || {});
+  const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npcId));
+  const dialogueNodes = useAppSelector(state => state.npcs.dialogueNodes || {});
+  const recordedExperiences = useAppSelector(
+    state => state.relationships?.experiencesById ?? {}
+  );
 
   const availableDialogueChoices: Choice[] = useMemo(() => {
     if (!npc?.availableDialogues) return [];
@@ -43,6 +47,24 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
       .map((dialogueId: string) => {
         const node: any = (dialogueNodes as any)[dialogueId];
         if (!node) return null;
+
+        const requiredExperienceIds = Array.isArray(node.requiredExperienceIds)
+          ? node.requiredExperienceIds as string[]
+          : [];
+        if (requiredExperienceIds.some(id => !recordedExperiences[id])) {
+          return null;
+        }
+
+        const anyOfExperienceIds = Array.isArray(node.anyOfExperienceIds)
+          ? node.anyOfExperienceIds as string[]
+          : [];
+        if (
+          anyOfExperienceIds.length > 0 &&
+          !anyOfExperienceIds.some(id => Boolean(recordedExperiences[id]))
+        ) {
+          return null;
+        }
+
         const responses = node.responses || {};
         return {
           id: node.id,
@@ -54,7 +76,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         } as Choice;
       })
       .filter(Boolean) as Choice[];
-  }, [npc?.availableDialogues, dialogueNodes]);
+  }, [npc?.availableDialogues, dialogueNodes, recordedExperiences]);
 
   if (!npc) {
     return (
@@ -74,10 +96,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         context: {
           choiceId: 'freetext',
           playerMessage: message,
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       })).unwrap();
-      
       setMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -92,8 +113,8 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         context: {
           choiceId: choice.id,
           selectedResponse: responseKey,
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       })).unwrap();
     } catch (error) {
       console.error('Failed to process dialogue choice:', error);
@@ -183,7 +204,12 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           placeholder={`Type a message to ${npc.name}...`}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendFreeTextMessage(); } }}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSendFreeTextMessage();
+            }
+          }}
         />
         <Button
           variant="contained"
