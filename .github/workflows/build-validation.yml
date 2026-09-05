@@ -27,6 +27,11 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: Relationship runtime tests
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts
+        env:
+          CI: true
+
       - name: Production build
         run: npm run build
         env:
