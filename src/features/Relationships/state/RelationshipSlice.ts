@@ -33,11 +33,35 @@ const createInitialState = (): RelationshipState => ({
 
 export const initialRelationshipState: RelationshipState = createInitialState();
 
+/**
+ * `meta/replaceState` can hydrate an M3 save object that predates M4 fields.
+ * Reducers repair the missing additive collections lazily instead of requiring
+ * destructive save migration.
+ */
+const ensureM4Collections = (state: RelationshipState) => {
+  if (!state.progressionByNpc) state.progressionByNpc = {};
+  if (!state.traitAssimilationByKey) state.traitAssimilationByKey = {};
+};
+
 const ensureBondProfile = (state: RelationshipState, npcId: string): BondProfile => {
   if (!state.bondProfilesByNpc[npcId]) {
     state.bondProfilesByNpc[npcId] = createDefaultBondProfile(npcId);
   }
-  return state.bondProfilesByNpc[npcId];
+
+  const profile = state.bondProfilesByNpc[npcId];
+  const defaults = createDefaultBondProfile(npcId);
+
+  if (!profile.dimensions.custom) profile.dimensions.custom = {};
+  if (!profile.connectionQualificationEvidence) {
+    profile.connectionQualificationEvidence = {};
+  }
+  if (!profile.bondArchetypes) profile.bondArchetypes = [];
+  if (!profile.activeMemoryIds) profile.activeMemoryIds = [];
+  if (!profile.unresolvedTensions) profile.unresolvedTensions = [];
+  if (!profile.recentExperienceIds) profile.recentExperienceIds = [];
+  if (!profile.tetherState) profile.tetherState = defaults.tetherState;
+
+  return profile;
 };
 
 const deriveStability = (profile: BondProfile): RelationshipStability => {
@@ -50,10 +74,6 @@ const deriveStability = (profile: BondProfile): RelationshipStability => {
   return 'stable';
 };
 
-/**
- * First explainable implementation of Resonance Quality. Memories matter, but
- * current liking remains deliberately weaker than Understanding/Shared Meaning.
- */
 const deriveResonanceQuality = (profile: BondProfile): number => {
   const { trust, understanding, sharedMeaning, reciprocity } = profile.dimensions;
   const dimensionScore = (trust + understanding + sharedMeaning + reciprocity) / 4;
@@ -89,6 +109,7 @@ const relationshipSlice = createSlice({
       state,
       action: PayloadAction<Record<string, RelationshipProgressionDefinition>>
     ) => {
+      ensureM4Collections(state);
       state.progressionByNpc = {
         ...state.progressionByNpc,
         ...action.payload,
@@ -99,6 +120,7 @@ const relationshipSlice = createSlice({
       state,
       action: PayloadAction<InitializeBondProfilePayload>
     ) => {
+      ensureM4Collections(state);
       const { npcId } = action.payload;
       state.bondProfilesByNpc[npcId] = createDefaultBondProfile(npcId, action.payload);
       recalculateDerivedProfile(state.bondProfilesByNpc[npcId]);
@@ -108,6 +130,7 @@ const relationshipSlice = createSlice({
       state,
       action: PayloadAction<RelationshipExperience>
     ) => {
+      ensureM4Collections(state);
       const experience = action.payload;
 
       if (state.experiencesById[experience.id]) return;
@@ -182,6 +205,7 @@ const relationshipSlice = createSlice({
       state,
       action: PayloadAction<RelationshipMemory>
     ) => {
+      ensureM4Collections(state);
       const memory = action.payload;
 
       if (state.memoriesById[memory.id]) return;
@@ -222,6 +246,7 @@ const relationshipSlice = createSlice({
       state,
       action: PayloadAction<{ npcId: string; level: number; evidenceIds: string[] }>
     ) => {
+      ensureM4Collections(state);
       const { npcId, level, evidenceIds } = action.payload;
       const profile = ensureBondProfile(state, npcId);
       const normalizedLevel = clamp(Math.floor(level), 0, 10);
@@ -237,16 +262,17 @@ const relationshipSlice = createSlice({
       state,
       action: PayloadAction<{ npcId: string; tetherState: RelationshipTetherState }>
     ) => {
+      ensureM4Collections(state);
       const profile = ensureBondProfile(state, action.payload.npcId);
       profile.tetherState = action.payload.tetherState;
       recalculateDerivedProfile(profile);
     },
 
-    /** Development compatibility action retained for the debug panel. */
     setShadowConnectionLevel: (
       state,
       action: PayloadAction<{ npcId: string; level: number }>
     ) => {
+      ensureM4Collections(state);
       const profile = ensureBondProfile(state, action.payload.npcId);
       profile.connectionLevel = clamp(Math.floor(action.payload.level), 0, 10);
       recalculateDerivedProfile(profile);
