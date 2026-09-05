@@ -9,7 +9,16 @@
       "casual": "Hey there, big tree!",
       "inquire_lore": "Can you share some lore?"
     },
-    "effects": [],
+    "effects": [
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceIdByResponse": {
+          "respect": "willow_exp_first_question_admit",
+          "casual": "willow_exp_first_question_deflect",
+          "inquire_lore": "willow_exp_first_question_challenge"
+        }
+      }
+    ],
     "next": {
       "respect": "elder_willow_wisdom",
       "casual": null,
@@ -20,7 +29,10 @@
     "id": "elder_willow_wisdom",
     "npcId": "npc_elder_willow",
     "text": "Wisdom grows like rings—in time and patience.",
-    "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
+    "effects": [
+      { "type": "AFFINITY_DELTA", "value": 2 },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_first_lesson" }
+    ]
   },
   "elder_willow_lore": {
     "id": "elder_willow_lore",
@@ -40,7 +52,10 @@
       "accept": "I will find what it needs.",
       "decline": "Not right now."
     },
-    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_willow_ancient_seed" } ],
+    "effects": [
+      { "type": "UNLOCK_QUEST", "questId": "quest_willow_ancient_seed" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_seed_offered" }
+    ],
     "next": {
       "accept": null,
       "decline": null
@@ -66,8 +81,7 @@
     "npcId": "npc_blacksmith_gronk",
     "text": "Hmph. You got taste.",
     "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
-  }
-  ,
+  },
   "elara_greeting": {
     "id": "elara_greeting",
     "npcId": "npc_scholar_elara",
