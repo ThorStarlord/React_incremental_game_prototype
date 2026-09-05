@@ -1,8 +1,10 @@
 # Fresh-Player Willow Qualification
 
-**Status:** Mechanical routed qualification PASS; human comprehension qualification pending  
+**Status:** Mechanical routed qualification PASS; human comprehension study deferred from PR #25 merge claim  
 **Scope:** M5 Elder Willow relationship vertical slice  
 **Purpose:** Record what has actually been proven about the fresh-player Willow experience without treating automated UI traversal as evidence of human understanding.
+
+> **Scope update:** The original stronger M5 wording required a fresh human participant to complete the slice and explain the causal model. PR #25 now intentionally makes a narrower claim that can be qualified from the workspace: the loop is mechanically traversable through normal player UI and the intended causal model is present and reconstructible from player-facing evidence. See [`WorkspaceCognitiveWalkthrough.md`](WorkspaceCognitiveWalkthrough.md). A real human comprehension study remains useful future product research but is not a merge prerequisite for this PR.
 
 ---
 
@@ -28,14 +30,13 @@ New Game
 -> Resonate Willow's Wisdom permanently
 ```
 
-The strongest M5 exit wording also asks whether a real fresh player can **explain why** each transition happened. Automated testing can prove reachability, state causality, and the presence of explanatory UI. It cannot prove that a human actually understood the explanation.
+The original strongest M5 exit wording also asked whether a real fresh player can **explain why** each transition happened. Automated testing can prove reachability, state causality, and the presence of explanatory UI. It cannot prove that a human actually understood the explanation.
 
-Accordingly this qualification separates two claims:
+Accordingly qualification is separated into three claims:
 
-1. **Mechanical routed qualification:** can the normal player-facing route complete the causal loop without debug injection?  
-2. **Human comprehension qualification:** after doing so, can an actual fresh player accurately explain Connection, Memories, passive Essence, assimilation, and Resonance?
-
-Claim 1 is now qualified. Claim 2 remains pending.
+1. **Mechanical routed qualification:** can the normal player-facing route complete the causal loop without debug injection? **PASS.**
+2. **Workspace causal-legibility qualification:** is the intended causal model present and reconstructible from normal player-facing evidence? **PASS.**
+3. **Human comprehension study:** does a genuinely fresh participant actually notice/internalize that model? **Deferred future research; not claimed by PR #25.**
 
 ---
 
@@ -43,258 +44,201 @@ Claim 1 is now qualified. Claim 2 remains pending.
 
 The routed qualification exposed several defects that lower-level relationship tests could not detect.
 
-### 2.1 NPC detail route overwrote the New Game seed
+### 2.1 NPC detail route overwrote New Game onboarding state
 
-The routed NPC detail container re-ran full NPC initialization on mount. New Game deliberately seeds only Elder Willow at:
+The routed NPC detail screen re-ran full NPC initialization on mount. New Game deliberately seeds Willow alone with reset relationship state; the route-level fetch could silently replace that controlled onboarding state with the complete NPC catalog.
 
-```text
-Affinity: 0
-legacy connectionDepth: 0
-Bond Connection: 0
-```
+**Correction:** the routed detail screen now uses the already-initialized store instead of fetching the catalog again.
 
-Opening the detail route could therefore replace the onboarding seed with the full NPC catalog and restore Willow's legacy fixture values.
+### 2.2 The actual route lacked Dialogue and Relationship surfaces
 
-**Correction:** the detail route no longer reinitializes the NPC catalog. App startup owns global data initialization; New Game is allowed to replace it with the Willow onboarding state.
+The live `/game/npcs/:npcId` detail route did not expose the new Dialogue and Relationship surfaces even though other NPC panel code did.
 
-### 2.2 The live NPC detail route did not expose Dialogue or Relationship
-
-The real `/game/npcs/:npcId` screen previously exposed Overview, Quests, Traits, and Trade, but not the Dialogue and Relationship surfaces required by the Willow causal loop.
-
-**Correction:** the routed screen now exposes:
+**Correction:** the normal routed tab set now includes:
 
 ```text
-Overview
-Dialogue
-Relationship
-Quests
-Traits
-Trade
+Overview / Dialogue / Relationship / Quests / Traits / Trade
 ```
 
-### 2.3 Coarse legacy tab gates made Connection-0 onboarding unreachable
+### 2.3 Coarse legacy gates blocked the new causal path
 
-The routed UI initially used raw Affinity / legacy `connectionDepth` thresholds to lock Quests and Traits. A migrated relationship must allow the player to enter the surfaces that explain how evidence is earned.
+Quest and Trait tabs were still gated by raw Affinity or legacy `connectionDepth`, making a fresh migrated Willow relationship inaccessible from Connection 0.
 
-**Correction:** for NPCs whose `connectionAuthority` is `relationships`, Dialogue, Relationship, Quests, and Traits are available from Connection 0. Their actual content remains gated by authored Experience / Memory / Trait rules.
+**Correction:** migrated relationships expose Dialogue, Relationship, Quests, and Traits immediately; authored content and Trait-specific evidence gates determine actual availability.
 
-Legacy NPCs retain the old coarse gates during migration.
+### 2.4 Overview taught the legacy Affinity-grind mental model
 
-### 2.4 Overview taught the wrong progression model
+Overview still exposed a generic `Interact` action that granted +10 Affinity and described Dialogue/Quest access through Affinity thresholds.
 
-The Overview tab offered a generic `+10 Affinity` interaction and described Dialogue / Quests in Affinity-threshold terms. That implicitly taught players to grind the very scalar that no longer controls Willow Connection.
+**Correction:** migrated Overview explicitly states that Affinity is current disposition, not Connection XP, and points the player toward meaningful Dialogue/Quest history.
 
-**Correction:** migrated NPC Overview now explicitly states that:
+### 2.5 Relationship causality existed only in Debug
 
-- Affinity is current disposition;
-- deep Connection comes from meaningful Experiences, choices, and landmark Memories;
-- filling Affinity does not level the Bond;
-- Dialogue and Quests are the places where relationship history is created.
+The new model was mechanically real but the normal player could not inspect why Connection or passive Essence changed.
 
-The generic Affinity-grind button remains available only for legacy-authority NPCs.
+**Correction:** migrated NPCs now have a normal player-facing Relationship summary showing:
 
-### 2.5 Relationship explanation existed only in Debug
-
-M4 made the causal state inspectable in developer tools, but normal players still lacked a clear answer to:
-
-- why did Connection deepen?
-- what Memory mattered?
-- why did passive Essence change?
-
-**Correction:** migrated NPCs now use a player-facing Relationship summary that shows:
-
-- Connection Level;
-- Bond interpretation;
-- Stability;
+- Connection and bond interpretation;
 - Affinity, Trust, Understanding, Shared Meaning, Reciprocity;
-- progress toward the next authored Connection threshold;
-- a warning that numeric progress alone is insufficient;
-- the evidence that qualified the current Connection level;
-- player-visible landmark Memories;
+- progress toward the next Connection level;
+- the warning that progress alone is insufficient;
+- evidence that qualified the current level;
+- landmark Memories;
 - recent meaningful Experiences;
-- current passive Essence contribution and explanation.
+- passive Essence contribution and explanation.
 
-This is intentionally less verbose than the Debug panel while preserving causal legibility.
+### 2.6 New Game did not fully reset onboarding-affecting state
 
-### 2.6 New Game leaked previous in-memory progression
+Existing Essence, Inventory, Quest state, selected-NPC state, and Copies could leak into a fresh Willow run.
 
-New Game previously reset the player and Willow seed but could leave prior Essence, Inventory, Quest state, selected NPC, and Copies in memory. This could make onboarding appear to work for the wrong reason—for example, old Essence could satisfy a Resonance cost immediately.
+**Correction:** New Game now clears those in-memory systems and rebuilds canonical quest definitions before Willow seeding.
 
-**Correction:** New Game now clears the onboarding-affecting state before rebuilding canonical quests and seeding Willow:
+### 2.7 MUI tab composition made Quests/Traits visually clickable but functionally inert
 
-- Player;
-- Essence;
-- Inventory;
-- Quest state;
-- selected NPC;
-- Copies;
-- intro state;
-- Relationships (through the Willow seed path).
-
-The broader Trait-discovery model remains a separate known limitation.
-
-### 2.7 Wrapped MUI Tabs were visually enabled but did not select
-
-Quests, Traits, and Trade were rendered as:
+Disabled-capable tabs had been wrapped as:
 
 ```text
-Tabs
--> Tooltip
-   -> span
-      -> Tab
+Tooltip
+  -> span
+     -> Tab
 ```
 
-MUI `Tabs` requires `Tab` components as direct children. The wrapper received cloned tab-control props and the inner button did not participate correctly in tab selection. In practice the Quests control could look available while Dialogue remained selected.
+MUI `Tabs` expects its `Tab` children directly. The wrappers received Tabs-internal props and clicking Quests/Traits could leave Dialogue selected.
 
-**Correction:** all routed `Tab` components are now direct children of `Tabs`. Legacy lock hints use the native `title` attribute instead of wrapping a Tab.
+**Correction:** `Tab` elements are direct `Tabs` children; lock explanations use accessible labels rather than wrapper structure.
 
-This was the direct cause of the first genuinely routed Ancient Seed failure.
+### 2.8 CRA/Jest setup drift blocked routed UI qualification
 
-### 2.8 CRA test setup was not actually loaded
+The repository's Jest-DOM setup existed under `src/tests/setupTests.ts`, while Create React App automatically loads `src/setupTests.ts`. The setup also referenced the removed Jest-DOM v6 `extend-expect` subpath.
 
-The repository stored Jest setup under `src/tests/setupTests.ts`, while Create React App automatically loads `src/setupTests.ts`. The existing setup also referenced the removed Jest-DOM v6 subpath `@testing-library/jest-dom/extend-expect`.
-
-**Correction:**
-
-- `src/setupTests.ts` now delegates to the existing setup file;
-- Jest-DOM uses the installed v6 root import `@testing-library/jest-dom`;
-- TypeScript sees the same matcher augmentation.
-
-This is test infrastructure, but fixing it was required before the routed test could become trustworthy.
+**Correction:** CRA now loads the setup and the package is imported through `@testing-library/jest-dom`.
 
 ---
 
-## 3. Routed M5 test
+## 3. Automated routed qualification
 
-`src/features/Relationships/state/RelationshipFreshGame.test.tsx` exercises the actual routed NPC player surface with a real Redux store and real relationship / quest / Essence / Trait thunks.
+`src/features/Relationships/state/RelationshipFreshGame.test.tsx` renders the real routed `NPCPanelContainer` with the real Redux root reducer.
 
-It does **not** inject WE-01 through WE-08 directly from the Debug panel.
+It does not inject authored relationship events directly.
 
-The qualified path is:
+The test traverses normal player-facing controls:
 
-1. seed fresh Willow-only New Game state;
-2. verify Willow starts at Affinity 0 / legacy depth 0 / Connection 0;
-3. open `/game/npcs/npc_elder_willow`;
-4. verify Dialogue, Relationship, Quests, and Traits are reachable at Connection 0;
-5. choose the first authored Dialogue response;
-6. complete `The First Lesson` and reach Connection I;
-7. accept the Seed challenge and receive the tutorial Sunstone;
-8. open the actual Quests tab;
-9. accept `The Ancient Seed`;
-10. resolve it with `Awaken the Seed`;
-11. verify Sunstone consumption and `The Seed Preserved` Memory;
-12. turn in the quest;
+1. initialize canonical Traits/Quests;
+2. execute New Game reset + Willow seed;
+3. enter Willow's actual NPC route at Connection 0;
+4. select **Dialogue**;
+5. answer `She Saw Through the Question`;
+6. receive `The First Lesson`;
+7. verify Connection I derives from authored evidence;
+8. accept `A Seed of Potential`;
+9. select **Quests**;
+10. accept `The Ancient Seed`;
+11. choose **Awaken the Seed**;
+12. verify `The Seed Preserved` Memory;
 13. continue through `Willow Disagrees`;
-14. complete `Three Nights of Teaching`;
-15. report `The Lesson Made Yours` independent application;
-16. verify Connection II, 100% assimilation, and sufficient compatibility;
-17. open the normal Relationship tab and verify causal evidence, landmark Memory, and passive Essence explanation are present;
-18. simulate passive game time rather than granting Essence directly;
-19. verify the resulting balance can fund the 40-Essence Resonance cost;
-20. open the actual Traits tab;
-21. select `Resonate` and confirm the real confirmation dialog;
-22. verify `WillowsWisdom` becomes permanent and WE-08 is recorded.
+14. continue through `Three Nights of Teaching`;
+15. complete `The Lesson Made Yours` through the explanatory response;
+16. verify Connection II + 100% assimilation + application Memory evidence;
+17. select **Relationship** and verify causal/passive-Essence explanation is rendered;
+18. simulate ordinary passive game time until enough Essence exists;
+19. select **Traits**;
+20. open the normal `WillowsWisdom` Resonate confirmation;
+21. confirm permanent Resonance;
+22. verify permanent Trait state and WE-08 authored Experience.
 
-This gives stronger evidence than the M4 domain suite because it traverses the same route/tab/component boundaries a player uses.
+### Qualified assertion
 
----
-
-## 4. What the automated M5 result proves
-
-The routed qualification proves that, on the tested preserve branch:
-
-- the Willow-only New Game state survives navigation into the NPC detail route;
-- a player does not need debug tooling to generate the relationship evidence;
-- authored Dialogue choices cause the expected Experiences;
-- the Ancient Seed quest is reachable and resolvable through normal UI;
-- the landmark Memory forms through the player decision;
-- Connection I / II are reachable through authored evidence rather than Affinity grinding;
-- Trait assimilation reaches its requirement through teaching/application beats;
-- the normal Relationship UI exposes causal evidence and passive Essence information;
-- Essence required for Resonance can be accumulated passively from the resulting game rate rather than injected as relationship loot;
-- the actual Trait UI can complete permanent `WillowsWisdom` Resonance;
-- M4 Willow runtime invariants and M6 Lyra universality continue to pass alongside this routed path.
-
----
-
-## 5. What it does not prove
-
-The routed test does **not** prove that a human player:
-
-- noticed the explanatory Relationship tab at the right time;
-- understood the distinction between Affinity and Connection;
-- understood why a Memory, rather than raw progress alone, mattered;
-- connected the passive Essence-rate increase to the changed Bond;
-- understood assimilation as learning/internalization rather than another bar;
-- could explain why `WillowsWisdom` became Resonance-eligible;
-- found the pacing, prose, choices, or feedback emotionally convincing.
-
-Those are comprehension / UX / narrative-experience claims and require a real fresh-player session.
-
-The correct status is therefore:
-
-> **M5 mechanical routed qualification: PASS.**  
-> **M5 human comprehension qualification: PENDING.**
-
----
-
-## 6. Automated qualification record
-
-The first candidate that completed the full routed sequence was:
+The normal player route can therefore complete:
 
 ```text
-Head: 1e3fefdea69f8a120724909fb497ce9c51731ffa
-Build Validation: #85
+meaningful choice
+-> Experience
+-> evidence-qualified Connection
+-> Memory
+-> passive relationship Essence
+-> assimilation through teaching/application
+-> final Essence-funded Resonance
 ```
 
-That run passed:
-
-```text
-npm ci
-npx tsc --noEmit
-RelationshipRuntime.test.ts
-RelationshipLyraUniversality.test.ts
-RelationshipFreshGame.test.tsx
-npm run build
-```
-
-Any later documentation or code commit must receive its own exact-head Build Validation before being called qualified.
+without Debug/event injection.
 
 ---
 
-## 7. Remaining human test
+## 4. Workspace causal-legibility qualification
 
-A human M5 session should start from New Game with no design explanation from the facilitator.
+The separate [`WorkspaceCognitiveWalkthrough.md`](WorkspaceCognitiveWalkthrough.md) reviews only player-facing Overview, Dialogue, Quest, Relationship, Memory, Experience, Trait, and Resonance-confirmation evidence.
 
-After the player permanently Resonates `WillowsWisdom`, ask them to explain in their own words:
+It concludes **PASS** for the narrower claim that the intended causal model is present, coherent, non-contradictory, and reconstructible from the game itself.
 
-1. **Why did your Connection with Willow increase?**
-2. **How is Affinity different from Connection?**
-3. **What did `The Seed Preserved` Memory do or represent?**
-4. **Why did Willow start contributing more passive Essence?**
-5. **Why couldn't you permanently Resonate `WillowsWisdom` at the beginning?**
-6. **What did teaching / independent application change?**
-7. **What role did Essence play in final Resonance?**
+Key player-facing evidence includes:
 
-Do not lead the player toward the canonical terminology before collecting their answers.
+- explicit text that Affinity does not level Connection;
+- explicit text that Connection progress alone is insufficient and requires meaningful Experience/Memory evidence;
+- explicit description of Memories as defining relationship evidence;
+- explicit description of passive Essence as an ongoing bond consequence, not scene loot;
+- visible independent Connection / Assimilation / Compatibility / Memory / Essence Trait gates;
+- authored teaching and independent-application scenes that give assimilation a learning referent;
+- explicit final confirmation that Essence stabilizes an already-assimilated pattern rather than replacing prior evidence.
 
-### Pass standard
-
-The human qualification does not require the player to reproduce implementation formulas. It should pass if they accurately express the causal model approximately as:
-
-> Meaningful interactions changed the relationship; important shared events became evidence; deeper Connection changed ongoing Essence production; practicing and applying Willow's pattern completed assimilation; Essence then stabilized a Trait that had already been relationally earned.
-
-It should fail if their practical model remains approximately:
-
-> I raised the friendship bar, waited for currency, and bought the Trait.
+This is an analytical/cognitive-walkthrough result, not a human-subject result.
 
 ---
 
-## 8. Cross-references
+## 5. Human-comprehension evidence ceiling
 
-- `../RelationshipProgressionRedesign.md`
-- `RelationshipSystemMigrationPlan.md`
-- `../Narrative/ElderWillowVerticalSlice.md`
-- `../Features/RelationshipExperienceSystem.md`
-- `../Features/MemorySystem.md`
-- `../Features/EssenceResonanceModel.md`
+PR #25 does **not** claim:
+
+- that a fresh player definitely notices the explanatory surfaces;
+- that onboarding is empirically intuitive;
+- that terminology is optimal;
+- that human comprehension has been measured.
+
+A future human session can still reveal discoverability, salience, terminology, or mental-model failures that repository inspection cannot establish.
+
+The permitted merge claim is:
+
+> **The causal loop is mechanically traversable through normal UI, and the intended causal model is present and reconstructible from normal player-facing evidence.**
+
+A future human playtest should be treated as product/usability research rather than as evidence already supplied by this PR.
+
+---
+
+## 6. Human-study protocol retained for future research
+
+If a human study is later run, use a participant who:
+
+- has not read the relationship-system design/specification;
+- has not been told the Affinity/Connection/Memory/Essence/assimilation ontology in advance;
+- has not watched another person complete this Willow slice.
+
+Give only this instruction:
+
+> Start a new game and play through Elder Willow's available content. Explore the interface however you naturally would. Please say what you think is happening when something seems important or confusing.
+
+Do not explain the model during play.
+
+Afterward ask, without coaching:
+
+1. What made your relationship with Willow deepen?
+2. What is the difference between Affinity and Connection?
+3. What did `The Seed Preserved` Memory mean or do?
+4. Why did passive Essence generation change?
+5. Why wasn't `WillowsWisdom` available to permanently Resonate at the beginning?
+6. What did teaching and independent application contribute?
+7. What role did Essence play in final Resonance?
+8. Did the game ever contradict the explanation you had formed?
+9. If a rival disliked you but became deeply important, what would you expect Affinity and Connection to do?
+
+The future study should judge the participant's causal model, not exact vocabulary.
+
+---
+
+## 7. M5 conclusion
+
+### Workspace-qualified
+
+- **Routed mechanical playability:** PASS.
+- **Player-facing causal legibility:** PASS.
+- **Human-subject comprehension:** not claimed / deferred.
+
+This boundary is intentional. Weakening the claim makes the evidence honest while allowing engineering to proceed without pretending the workspace can manufacture an independent human participant.
