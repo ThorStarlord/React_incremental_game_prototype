@@ -78,7 +78,8 @@
         {
           "traitId": "WillowsWisdom",
           "compatibilityDelta": 5,
-          "note": "First meaningful exposure to Willow's slow-pattern cognition."
+          "assimilationDelta": 10,
+          "note": "First meaningful exposure begins low-rate assimilation of Willow's slow-pattern cognition."
         }
       ],
       "memoryCandidate": false,
@@ -199,8 +200,8 @@
       "traitEffects": [
         {
           "traitId": "WillowsWisdom",
-          "assimilationDelta": 45,
-          "note": "Primary authored tether/practice segment for the first vertical slice."
+          "assimilationDelta": 55,
+          "note": "Primary authored bounded tether/practice segment for the first vertical slice."
         }
       ],
       "memoryCandidate": false,
@@ -229,7 +230,7 @@
           "traitId": "WillowsWisdom",
           "compatibilityDelta": 20,
           "assimilationDelta": 35,
-          "note": "Independent application supplies the core proof that the pattern is becoming the protagonist's own."
+          "note": "Independent application supplies the final authored assimilation proof that the pattern is becoming the protagonist's own."
         }
       ],
       "memoryCandidate": true,
@@ -288,6 +289,60 @@
       "bondContribution": "Mentor / Student — established",
       "traitRelevance": ["WillowsWisdom"],
       "persistence": "stable"
+    }
+  },
+  "progression": {
+    "npc_elder_willow": {
+      "npcId": "npc_elder_willow",
+      "connectionAuthority": "relationships",
+      "startingProfile": {
+        "dimensions": {
+          "affinity": 0,
+          "trust": 5,
+          "understanding": 0,
+          "sharedMeaning": 0,
+          "reliance": 0,
+          "vulnerability": 0,
+          "reciprocity": 0
+        },
+        "connectionLevel": 0,
+        "connectionProgress": 0,
+        "tetherState": "present"
+      },
+      "qualificationRules": [
+        {
+          "level": 1,
+          "minimumProgress": 10,
+          "minimumExperienceCount": 2,
+          "requiredExperienceIds": ["willow_exp_first_lesson"],
+          "anyOfExperienceIds": [
+            "willow_exp_first_question_admit",
+            "willow_exp_first_question_deflect",
+            "willow_exp_first_question_challenge"
+          ],
+          "minimumDimensions": {
+            "understanding": 8
+          }
+        },
+        {
+          "level": 2,
+          "minimumProgress": 60,
+          "minimumExperienceCount": 6,
+          "requiredExperienceIds": [
+            "willow_exp_three_nights_teaching",
+            "willow_exp_independent_application"
+          ],
+          "requiredMemoryTags": ["Application"],
+          "minimumDimensions": {
+            "understanding": 35,
+            "sharedMeaning": 20
+          }
+        }
+      ],
+      "essence": {
+        "enabled": true,
+        "startingTetherState": "present"
+      }
     }
   }
 }
