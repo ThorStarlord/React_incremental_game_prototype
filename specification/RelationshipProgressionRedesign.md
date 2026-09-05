@@ -1,7 +1,7 @@
 # Relationship Progression Redesign
 
 **Status:** Target design approved; staged runtime migration in progress  
-**Runtime status:** M4 Willow authority cutover implemented; other NPCs remain legacy-authoritative  
+**Runtime status:** M4 Willow authority cutover implemented; M6 Lyra adversarial universality proof implemented; other production NPCs remain legacy-authoritative  
 **Purpose:** Provide one authority/index for the relationship, Essence, Memory, and Trait Resonance redesign while migration is in progress.
 
 ## Why this document exists
@@ -27,13 +27,28 @@ When an older feature spec conflicts with current code, the runtime wins as the 
 Authority is now **per NPC** rather than globally legacy or globally new.
 
 - `RelationshipProgressionDefinition.connectionAuthority` declares whether an NPC uses legacy Connection progression or the Relationships domain.
-- **Elder Willow:** `BondProfile.connectionLevel` is authoritative.
-- **Other NPCs:** existing Affinity/`connectionDepth` behavior remains authoritative until separately migrated.
+- **Elder Willow:** `BondProfile.connectionLevel` is authoritative in playable runtime.
+- **Lyra:** the Relationships domain is authoritative inside the M6 adversarial runtime proof, but Lyra is not yet integrated as a complete player-facing NPC/content slice.
+- **Other production NPCs:** existing Affinity/`connectionDepth` behavior remains authoritative until separately migrated.
 - Willow's legacy `NPC.connectionDepth` remains only as a compatibility projection for consumers that have not migrated yet.
 - Willow's authored Affinity is projected to the NPC field because existing dialogue/service UI still reads it, but Affinity can no longer level Willow Connection.
 - `shadowMode` is retained as a broad migration marker meaning some NPCs are still legacy-authoritative; it no longer means every relationship record is side-effect-free.
 
 Temporary compatibility projections must remain clearly marked and removable.
+
+## Relationship content registration
+
+Authored relationship definitions are now discovered through:
+
+```text
+/data/relationships/index.json
+-> one or more RelationshipDefinitionBundle files
+-> generic merge/registration
+```
+
+The runtime loader does not enumerate Willow or Lyra in TypeScript. Adding another authored relationship bundle should normally be a content-registration change rather than a new NPC-specific branch in generic relationship mechanics.
+
+The loader temporarily accepts the older single-bundle response shape for migration/test compatibility.
 
 ## Current implemented loop for Willow
 
@@ -49,7 +64,22 @@ Authored narrative choice
 -> permanent Willow's Wisdom
 ```
 
-For unmigrated NPCs, the legacy relationship and Trait gates remain in place.
+For unmigrated production NPCs, the legacy relationship and Trait gates remain in place.
+
+## Current Lyra falsification path
+
+```text
+Strategic defeat
+-> coercion reflected
+-> reluctant co-training
+-> ideological friction
+-> mutual calibration
+-> consequential harmonic cooperation
+-> contested landmark Memory
+-> evidence-qualified Connection II
+```
+
+This path deliberately tests whether deep Connection can emerge while immediate liking remains negative.
 
 ## Non-negotiable invariants
 
@@ -65,6 +95,7 @@ For unmigrated NPCs, the legacy relationship and Trait gates remain in place.
 10. Reciprocal/authentic relationships may later unlock qualitatively different outcomes rather than receiving a simplistic universal bonus.
 11. A migrated NPC must not be double-counted through both legacy and Bond-derived Essence contribution paths.
 12. Irreversible resource/permanence changes must not occur before required authored relationship evidence validates successfully.
+13. A new relationship archetype is not considered generalized if it requires an NPC-id conditional inside generic relationship mechanics.
 
 # M3 — Shadow Runtime — Complete
 
@@ -113,7 +144,7 @@ Requires, at minimum:
 
 The runtime records the concrete Experience/Memory ids that qualified each level. Repeated positive Affinity cannot qualify Willow Connection.
 
-## Adversarial progression proof
+## Adversarial progression proof inside Willow
 
 `Willow Disagrees` remains intentionally capable of:
 
@@ -125,11 +156,11 @@ Shared Meaning ↑
 Connection Progress ↑
 ```
 
-This is the first runtime proof that Connection is not a renamed affection meter.
+This was the first runtime proof that Connection is not a renamed affection meter; M6 extends that proof to a relationship whose overall Affinity remains negative.
 
 ## Bond-derived Essence
 
-Willow is now the first NPC using:
+Willow is now the first production NPC using:
 
 ```text
 Connection Base Rate
@@ -243,6 +274,91 @@ The relationship debug panel exposes:
 - `WillowsWisdom` assimilation and relevant Memories;
 - idempotent authored-event injection for qualification.
 
+# M6 — Lyra Adversarial Universality Proof — Implemented
+
+M6 is intentionally a **falsification test of the generic relationship model**, not a second full campaign slice.
+
+Lyra's existing narrative role is an ideological and battlefield adversary who becomes a dialectic counterpart through containment, resistance, forced cooperation, mutual calibration, and consequential shared action. The proof encodes that arc as authored relationship evidence without adding Lyra-specific logic to reducers, selectors, qualification, Memory formation, or Essence calculation.
+
+## Authored proof bundle
+
+`public/data/relationships/lyra.json` defines six one-time Experiences:
+
+1. `Strategic Defeat, Not Submission`;
+2. `Coercion Reflected`;
+3. `Reluctant Co-Training`;
+4. `Ideological Friction`;
+5. `Mutual Calibration`;
+6. `Enemies in Phase`.
+
+The final Experience forms the contested landmark Memory `Enemies in Phase`.
+
+The sequence is deliberately mixed rather than monotonically positive: several beats reduce Affinity and/or Trust while increasing Understanding, Shared Meaning, Reliance, reciprocity, and Connection Progress.
+
+## Generic Connection qualification
+
+Lyra uses the same data-driven `ConnectionQualificationRule` mechanism as Willow.
+
+### Connection I
+
+Requires:
+
+- at least 18 Connection Progress;
+- two Experiences;
+- both initial adversarial assessment Experiences;
+- at least 18 Understanding.
+
+### Connection II
+
+Requires:
+
+- at least 70 Connection Progress;
+- six Experiences;
+- reluctant co-training;
+- the defining proto-bond Experience;
+- a Memory tagged `AdversarialBond`;
+- at least 55 Understanding;
+- at least 40 Shared Meaning.
+
+No relationship reducer or selector contains a special Lyra branch. The generic authoring loader also contains no Lyra identifier; Lyra enters through the relationship-content manifest.
+
+## Expected/qualified adversarial state
+
+The authored sequence produces:
+
+```text
+Connection Level: 2
+Connection Progress: 83
+Affinity: -35
+Understanding: 64
+Shared Meaning: 46
+Stability: contested
+Landmark Memory: Enemies in Phase
+```
+
+This is the key M6 result: **deep, evidence-qualified Connection coexists with negative Affinity and unresolved ideological conflict.**
+
+The result falsifies the concern that the new model is merely an affection meter with extra fields, at least for this authored adversarial case.
+
+## Essence scope boundary
+
+Lyra's M6 config deliberately sets relationship-derived Essence to disabled.
+
+That is intentional. M6 asks whether the relationship ontology and qualification machinery generalize to an adversarial bond. It does not conflate that question with a second economy cutover or a Lyra Trait migration.
+
+## Debug visibility
+
+The development Debug page includes a Lyra universality panel that replays the six authored Experiences through the same authored-experience thunk used by the relationship runtime and shows:
+
+- current authority registration;
+- Connection level and qualification evidence;
+- Affinity;
+- Stability;
+- Connection Progress;
+- Understanding and Shared Meaning;
+- Experience/Memory counts;
+- the intentionally disabled Lyra Essence contribution.
+
 # Save compatibility
 
 M3 saves may contain a Relationships slice but lack M4 fields such as:
@@ -256,6 +372,8 @@ Reducers and selectors lazily normalize those additive fields. Existing Experien
 
 Full pre-Relationships legacy save migration — including conservative mapping from historical `connectionDepth` with explicit legacy-derived provenance — remains Phase I work.
 
+The relationship-content manifest does not fabricate Lyra history for existing saves; authored Experiences are still recorded only when their events occur or when deliberately injected by development tooling/tests.
+
 # Automated qualification
 
 The Build Validation workflow now includes:
@@ -263,11 +381,12 @@ The Build Validation workflow now includes:
 ```text
 npm ci
 npx tsc --noEmit
-relationship-focused Jest tests
+RelationshipRuntime.test.ts
+RelationshipLyraUniversality.test.ts
 npm run build
 ```
 
-The relationship test suite covers:
+The Willow/M4 suite covers:
 
 - unique Experience idempotency and explicit repeatable occurrences;
 - dimension clamping;
@@ -282,16 +401,29 @@ The relationship test suite covers:
 - full evidence permitting one permanent Resonance and one Essence deduction;
 - M3-style save-state lazy upgrade without fabricated Memories.
 
-Exact-head qualification status should be taken from the latest PR workflow run; older M3 green runs do not qualify M4 code.
+The Lyra/M6 suite additionally covers:
+
+- manifest-driven multi-bundle authoring;
+- registration of Lyra through content rather than hardcoded loader entries;
+- six adversarial authored Experiences;
+- a contested landmark Memory;
+- generic Connection I/II qualification;
+- final negative Affinity with Connection II;
+- high Understanding and Shared Meaning despite conflict;
+- contested stability;
+- Lyra Essence remaining disabled during the ontology proof.
+
+Exact-head qualification status must be taken from the latest PR Build Validation run. A green run on an older commit does not qualify a later documentation or code candidate.
 
 # Still legacy / deferred
 
-M4 does **not** migrate the whole game.
+The relationship redesign is **not** a whole-game migration yet.
 
 Still deferred:
 
-- all non-Willow NPC Connection authority;
-- Lyra adversarial universality proof;
+- production Connection authority for NPCs other than Willow;
+- full player-facing Lyra NPC/dialogue/quest integration beyond the M6 runtime/debug proof;
+- Lyra relationship-derived Essence or Trait migration;
 - broad campaign content migration;
 - full Trait discovery redesign;
 - full pre-Relationships save migration;
@@ -302,18 +434,24 @@ Still deferred:
 - advanced distance/tether simulation;
 - authenticity/endgame mechanics.
 
+## M5 qualification note
+
+The Willow gameplay surfaces required for the authored causal sequence are implemented, but M5's stronger wording — that a fresh player can complete the entire causal loop **and explain it** — has not been separately qualified by an end-to-end human/UX run. Do not silently treat runtime/unit qualification as proof of player comprehension.
+
 ## Next engineering milestone
 
-After exact-head M4 qualification, the highest-value next step is **Lyra as the adversarial universality test** before broad NPC migration.
-
-The question is no longer whether the Willow happy-path can work. The next falsification target is whether the same generic Experience/Memory/Connection/Essence machinery can represent:
+With the Lyra adversarial universality test implemented, the core model now has two materially different proofs:
 
 ```text
-low or volatile Affinity
-+ ideological conflict
-+ strong mutual understanding
-+ consequential shared events
--> high Connection
+Willow: mentor/student progression with positive and corrective beats
+Lyra: adversarial/dialectic progression with negative overall Affinity
 ```
 
-without `if (npcId === 'lyra')` exceptions in generic relationship mechanics.
+The highest-value next step is **not broad NPC conversion immediately**. First close the remaining M5 evidence gap with one fresh-player end-to-end Willow run, recording whether the player can actually answer:
+
+- why Connection deepened;
+- why passive Essence changed;
+- why `WillowsWisdom` was locked or unlocked;
+- what role the landmark Memories and assimilation evidence played.
+
+If that UX qualification passes, broad NPC migration can begin from the manifest/data-driven pattern rather than by adding new generic-system exceptions.
