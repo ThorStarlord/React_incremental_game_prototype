@@ -15,7 +15,7 @@ import { selectPlayer } from '../../Player/state/PlayerSelectors';
 import { COPY_SYSTEM, ESSENCE_GENERATION } from '../../../constants/gameConstants';
 import { selectAllCopies } from '../../Copy/state/CopySelectors';
 import { calculateCopyEssenceGeneration } from '../../Copy/utils/copyUtils';
-// Removed unused types
+import { selectAllRelationshipEssenceContributions } from '../../Relationships/state/RelationshipSelectors';
 
 /**
  * Async thunk for processing essence generation over time
@@ -46,30 +46,47 @@ export const processPassiveGenerationThunk: AsyncThunk<{ generated: number; newT
 );
 
 /**
- * Async thunk for updating essence generation rate based on NPC connections and traits.
+ * Update the passive Essence rate from explicit sources.
+ *
+ * M4 adds the first relationship-derived source. Only NPCs whose relationship
+ * progression config is explicitly cut over contribute through the new model,
+ * so there is no double-counting with unmigrated NPCs.
  */
 export const updateEssenceGenerationRateThunk = createAsyncThunk(
   'essence/updateGenerationRate',
   async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
-  const allTraits = state.traits.traits;
-  const copies = selectAllCopies(state);
+    const allTraits = state.traits.traits;
+    const copies = selectAllCopies(state);
 
-    // 1. Start with the base generation rate
+    // 1. Preserve the prototype's global baseline.
     let totalRate = ESSENCE_GENERATION.BASE_RATE_PER_SECOND;
 
-    // 2. Add contribution from qualifying Copies (maturity >= threshold)
+    // 2. Add explicitly migrated relationship-derived NPC contributions.
+    const relationshipContributions = selectAllRelationshipEssenceContributions(state);
+    const relationshipRate = relationshipContributions.reduce(
+      (total, contribution) => total + contribution.effectiveRate,
+      0
+    );
+    totalRate += relationshipRate;
+
+    // 3. Preserve qualifying Copy contributions.
+    let copyRate = 0;
     for (const copy of copies) {
       if (copy.maturity >= COPY_SYSTEM.MATURITY_THRESHOLD) {
-        totalRate += calculateCopyEssenceGeneration(copy, allTraits);
+        copyRate += calculateCopyEssenceGeneration(copy, allTraits);
       }
     }
+    totalRate += copyRate;
 
-    // 3. Dispatch the update action
+    // 4. Dispatch the authoritative passive rate.
     dispatch(updateGenerationRate(totalRate));
 
     return {
       newRate: totalRate,
+      relationshipRate,
+      copyRate,
+      relationshipContributions,
     };
   }
 );
@@ -182,11 +199,13 @@ export const increaseResonanceLevelThunk = createAsyncThunk<
       throw new Error('Maximum resonance level reached');
     }
 
-    dispatch(spendEssence({
-      amount: essenceCost,
-      source: 'resonance_level_increase',
-      description: `Increased resonance level to ${currentResonanceLevel + 1}`
-    }));
+    if (essenceCost > 0) {
+      dispatch(spendEssence({
+        amount: essenceCost,
+        source: 'resonance_level_increase',
+        description: `Increased resonance level to ${currentResonanceLevel + 1}`
+      }));
+    }
     
     dispatch(setResonanceLevel(currentResonanceLevel + 1));
   }
