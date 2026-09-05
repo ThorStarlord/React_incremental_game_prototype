@@ -10,6 +10,7 @@ const questSlice = createSlice({
   name: 'quest',
   initialState,
   reducers: {
+    resetQuestState: () => initialState,
     addQuest: (state, action: PayloadAction<Quest>) => {
       const quest = action.payload;
       state.quests[quest.id] = quest;
@@ -116,6 +117,7 @@ const questSlice = createSlice({
 });
 
 export const {
+  resetQuestState,
   addQuest,
   startQuest,
   updateQuestStatus,
