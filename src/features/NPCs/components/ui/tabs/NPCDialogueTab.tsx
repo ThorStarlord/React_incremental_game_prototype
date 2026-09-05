@@ -23,7 +23,8 @@ interface NPCDialogueTabProps {
   npcId: string;
 }
 
-type Choice = { id: string; title: string; responseKeys: string[] };
+type DialogueResponse = { id: string; label: string };
+type Choice = { id: string; title: string; responses: DialogueResponse[] };
 
 /**
  * NPCDialogueTab - Handles dialogue interactions with NPCs
@@ -46,7 +47,10 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         return {
           id: node.id,
           title: node.title || node.text || node.id,
-          responseKeys: Object.keys(responses),
+          responses: Object.entries(responses).map(([id, label]) => ({
+            id,
+            label: String(label),
+          })),
         } as Choice;
       })
       .filter(Boolean) as Choice[];
@@ -137,19 +141,33 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2" gutterBottom>Conversation Topics</Typography>
           <Grid container spacing={1}>
-      {availableDialogueChoices.map((choice: Choice) => (
-              <Grid item key={choice.id}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => {
-        const keys = choice.responseKeys.length > 0 ? choice.responseKeys : [''];
-        const randomResponse = keys[Math.floor(Math.random() * keys.length)];
-                    handleDialogueChoice(choice, randomResponse);
-                  }}
-                >
+            {availableDialogueChoices.map((choice: Choice) => (
+              <Grid item xs={12} key={choice.id}>
+                <Typography variant="body2" sx={{ mb: 0.75 }}>
                   {choice.title}
-                </Button>
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {choice.responses.length > 0 ? (
+                    choice.responses.map(response => (
+                      <Button
+                        key={`${choice.id}-${response.id}`}
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleDialogueChoice(choice, response.id)}
+                      >
+                        {response.label}
+                      </Button>
+                    ))
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleDialogueChoice(choice, '')}
+                    >
+                      Continue
+                    </Button>
+                  )}
+                </Box>
               </Grid>
             ))}
           </Grid>
