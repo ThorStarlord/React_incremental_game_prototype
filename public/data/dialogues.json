@@ -144,28 +144,113 @@
   "elara_greeting": {
     "id": "elara_greeting",
     "npcId": "npc_scholar_elara",
-    "title": "A Keen Mind",
-    "text": "Ah, an inquisitive traveler. Perhaps you can assist with a missing tome?",
+    "title": "A Useful Objection",
+    "text": "Elara summarizes the accepted chronology of the Ashen Concordance with practiced confidence. One citation in her argument seems to assume the very date it is supposed to prove.",
     "responses": {
-      "offer": "Tell me about the tome.",
-      "later": "Maybe later."
+      "challenge": "That citation is circular. What happens to the chronology if its date is wrong?",
+      "assist": "You are the scholar. Tell me what conclusion you need verified.",
+      "later": "I am not ready to dig through citations."
     },
-    "effects": [],
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_model_challenged", "responseId": "challenge" }
+    ],
     "next": {
-      "offer": "elara_offer_tome",
+      "challenge": null,
+      "assist": null,
       "later": null
+    }
+  },
+  "elara_contradictory_footnote": {
+    "id": "elara_contradictory_footnote",
+    "npcId": "npc_scholar_elara",
+    "title": "The Contradictory Footnote",
+    "text": "Elara returns with a marginal note from a secondary copy. If authentic, it places the Concordance's author in two cities on the same day. 'The easy answer is a copying error,' she says. 'The useful answer is whichever survives checking.'",
+    "requiredExperienceIds": ["elara_exp_model_challenged"],
+    "responses": {
+      "follow": "Then we treat the contradiction as evidence until we can kill it.",
+      "dismiss": "A single footnote is too thin to threaten the accepted chronology."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_contradictory_footnote", "responseId": "follow" }
+    ],
+    "next": {
+      "follow": null,
+      "dismiss": null
     }
   },
   "elara_offer_tome": {
     "id": "elara_offer_tome",
     "npcId": "npc_scholar_elara",
-    "text": "A rare volume has gone missing. I suspect the slums. Will you retrieve it?",
+    "title": "A Model Put at Risk",
+    "text": "Elara produces the recovered source volume. 'This is the copy my published chronology relied on. Take it apart. If the footnote wins, my paper loses.'",
+    "requiredExperienceIds": ["elara_exp_contradictory_footnote"],
     "responses": {
-      "accept": "I'll find your book.",
-      "decline": "Not now."
+      "accept": "Give me the source. We follow what it supports, not what either of us prefers.",
+      "decline": "Not yet. I do not want responsibility for overturning your work."
     },
-    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_elara_lost_tome", "responseId": "accept" } ],
-    "next": { "accept": null, "decline": null }
+    "effects": [
+      { "type": "UNLOCK_QUEST", "questId": "quest_elara_lost_tome", "responseId": "accept" },
+      { "type": "GIVE_ITEM", "itemId": "item_elara_contradictory_tome", "amount": 1, "responseId": "accept" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_tome_committed", "responseId": "accept" }
+    ],
+    "next": {
+      "accept": null,
+      "decline": null
+    }
+  },
+  "elara_revision_mutual": {
+    "id": "elara_revision_mutual",
+    "npcId": "npc_scholar_elara",
+    "title": "Revision Is Mutual",
+    "text": "After the archive result, you present a cleaner replacement chronology. Elara reads it twice and circles one assumption. 'You enjoyed being the correction,' she says. 'Now let the correction happen to you.'",
+    "anyOfExperienceIds": ["elara_exp_follow_evidence", "elara_exp_protect_consensus"],
+    "responses": {
+      "revise": "Show me the counterexample. If my model fails, it fails.",
+      "defend": "You are trying too hard to make the symmetry elegant."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_revision_mutual", "responseId": "revise" }
+    ],
+    "next": {
+      "revise": null,
+      "defend": null
+    }
+  },
+  "elara_theory_neither_owned": {
+    "id": "elara_theory_neither_owned",
+    "npcId": "npc_scholar_elara",
+    "title": "A Theory Neither Owned",
+    "text": "Neither your replacement nor Elara's original survives the full archive. Between you, a third model emerges: uglier, narrower, and supported by every surviving source.",
+    "requiredExperienceIds": ["elara_exp_revision_mutual"],
+    "responses": {
+      "build": "Good. A model neither of us owns is harder for either of us to protect from evidence.",
+      "pause": "I need distance before we rewrite this again."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_theory_neither_owned", "responseId": "build" }
+    ],
+    "next": {
+      "build": null,
+      "pause": null
+    }
+  },
+  "elara_independent_verification": {
+    "id": "elara_independent_verification",
+    "npcId": "npc_scholar_elara",
+    "title": "The Result Held Without Her",
+    "text": "On an unrelated archive problem, you abandoned your first elegant explanation when a shipping ledger contradicted it. Elara has never seen the material. You hand her only your evidence and method; she reproduces the result.",
+    "requiredExperienceIds": ["elara_exp_theory_neither_owned"],
+    "responses": {
+      "report": "You were not there to correct me. The contradiction did it.",
+      "withhold": "The result is enough. The method is mine."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_independent_verification", "responseId": "report" }
+    ],
+    "next": {
+      "report": null,
+      "withhold": null
+    }
   },
   "valerius_greeting": {
     "id": "valerius_greeting",
