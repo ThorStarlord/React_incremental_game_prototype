@@ -3,11 +3,11 @@
     "id": "elder_willow_greeting",
     "npcId": "npc_elder_willow",
     "title": "A Gentle Rustle",
-    "text": "Welcome, child. The forest remembers your footsteps.",
+    "text": "You do not ask what the forest knows. You ask which part of knowing can be used.",
     "responses": {
-      "respect": "I come seeking wisdom.",
-      "casual": "Hey there, big tree!",
-      "inquire_lore": "Can you share some lore?"
+      "respect": "Knowledge that cannot alter action is decoration.",
+      "casual": "You assume too much from one question.",
+      "inquire_lore": "Then tell me what I failed to ask."
     },
     "effects": [
       {
@@ -28,7 +28,7 @@
   "elder_willow_wisdom": {
     "id": "elder_willow_wisdom",
     "npcId": "npc_elder_willow",
-    "text": "Wisdom grows like rings—in time and patience.",
+    "text": "Look there: two groves, green alike. One will be dead by winter. The difference began below the soil seasons ago. Immediate appearances are poor evidence for slow systems.",
     "effects": [
       { "type": "AFFINITY_DELTA", "value": 2 },
       { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_first_lesson" }
