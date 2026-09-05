@@ -87,8 +87,26 @@ export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', 
 
 export const startQuestThunk = createAsyncThunk(
   'quest/startQuest',
-  async (questId: string, { dispatch }) => {
+  async (questId: string, { dispatch, getState }) => {
     dispatch(startQuest(questId));
+
+    // A GATHER objective must reflect items already held when the quest starts.
+    // This closes a general prototype gap and lets authored dialogue hand over a
+    // tutorial resource before the player formally accepts the quest.
+    const state = getState() as RootState;
+    const quest = state.quest.quests[questId];
+    if (quest?.status === 'IN_PROGRESS') {
+      for (const objective of quest.objectives) {
+        if (objective.type !== 'GATHER') continue;
+        const currentQuantity = state.inventory.items[objective.target] ?? 0;
+        dispatch(updateObjectiveProgress({
+          questId,
+          objectiveId: objective.objectiveId,
+          progress: currentQuantity,
+        }));
+      }
+    }
+
     return questId;
   }
 );
