@@ -17,9 +17,19 @@ export interface Trait {
   essenceCost?: number;    // Acquisition cost for Resonance
   permanenceCost?: number; // Cost to make permanent (deprecated)
   source?: string;         // Acquisition source (NPC ID, quest, etc.)
+  sourceNpc?: string;      // Explicit NPC provenance for relationship-mediated Traits
   tier?: number;           // Optional trait tier
   iconPath?: string;       // Optional icon path
   level?: number;          // Optional trait level
+
+  // Relationship-mediated Resonance metadata. Optional so simple Traits remain simple.
+  minimumConnectionLevel?: number;
+  resonanceTags?: string[];
+  requiredMemoryTags?: string[];
+  assimilationDifficulty?: number;
+  assimilationThreshold?: number;
+  minimumCompatibility?: number;
+  resonanceExperienceId?: string;
 }
 
 /**
