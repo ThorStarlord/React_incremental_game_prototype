@@ -3,6 +3,7 @@ import type { RootState } from '../../../app/store';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { updateGenerationRate } from '../../Essence/state/EssenceSlice';
 import { calculateEssenceGenerationRate } from '../../Essence/utils/essenceRate';
+import { discoverTrait } from '../../Traits/state/TraitsSlice';
 import {
   formRelationshipMemory,
   initializeBondProfile,
@@ -19,6 +20,7 @@ import type {
   RelationshipDefinitionBundle,
   RelationshipExperience,
   RelationshipMemory,
+  RelationshipTraitEffect,
 } from './RelationshipTypes';
 
 const AUTHORING_MANIFEST_URL = '/data/relationships/index.json';
@@ -95,6 +97,37 @@ const refreshEssenceRate = (dispatch: any, getState: () => unknown) => {
   const calculation = calculateEssenceGenerationRate(getState() as RootState);
   dispatch(updateGenerationRate(calculation.newRate));
   return calculation;
+};
+
+/**
+ * Authored relationship evidence can reveal a Trait pattern without making that
+ * Trait permanent. Replaying an already-recorded Experience silently repairs a
+ * missing discovery flag, which keeps additive save migration conservative.
+ */
+const applyTraitDiscoveryEffects = (
+  traitEffects: RelationshipTraitEffect[] | undefined,
+  dispatch: any,
+  getState: () => unknown,
+  notify: boolean
+) => {
+  for (const effect of traitEffects ?? []) {
+    if (!effect.discover) continue;
+
+    const state = getState() as RootState;
+    if (state.traits.discoveredTraits.includes(effect.traitId)) continue;
+
+    dispatch(discoverTrait({ traitId: effect.traitId }));
+
+    if (notify) {
+      const traitName = state.traits.traits[effect.traitId]?.name ?? effect.traitId;
+      dispatch(
+        addNotification({
+          type: 'success',
+          message: `Trait pattern discovered: ${traitName}.`,
+        })
+      );
+    }
+  }
 };
 
 export const initializeRelationshipRuntimeThunk = createAsyncThunk<
@@ -232,6 +265,10 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
       );
 
       if (alreadyApplied) {
+        // Repair additive save drift: an older save may contain the authored
+        // Experience but predate explicit Trait discovery state.
+        applyTraitDiscoveryEffects(definition.traitEffects, dispatch, getState, false);
+
         if (definition.memoryDefinitionId && existingExperience) {
           const memoryDefinition = definitions.memories[definition.memoryDefinitionId];
           const memoryExists = relationships?.memoriesById?.[definition.memoryDefinitionId];
@@ -265,6 +302,7 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
       };
 
       dispatch(recordRelationshipExperience(experience));
+      applyTraitDiscoveryEffects(experience.traitEffects, dispatch, getState, true);
 
       // Existing dialogue/service consumers still read NPC affinity. Project the
       // authored migrated-NPC Affinity there without invoking legacy rollover.
