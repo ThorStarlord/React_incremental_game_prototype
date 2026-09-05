@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import { addNotification } from '../../../shared/state/NotificationSlice';
-import { updateEssenceGenerationRateThunk } from '../../Essence/state/EssenceThunks';
+import { updateGenerationRate } from '../../Essence/state/EssenceSlice';
+import { calculateEssenceGenerationRate } from '../../Essence/utils/essenceRate';
 import {
   formRelationshipMemory,
   initializeBondProfile,
@@ -52,13 +53,24 @@ const loadRelationshipDefinitions = async (): Promise<RelationshipDefinitionBund
   return definitionBundlePromise;
 };
 
+/**
+ * Recalculate passive Essence without importing the Essence thunk module.
+ * EssenceThunks itself depends on Relationship selectors, so importing that thunk
+ * here would create a runtime TDZ cycle under Jest/CRA module evaluation.
+ */
+const refreshEssenceRate = (dispatch: any, getState: () => unknown) => {
+  const calculation = calculateEssenceGenerationRate(getState() as RootState);
+  dispatch(updateGenerationRate(calculation.newRate));
+  return calculation;
+};
+
 export const initializeRelationshipRuntimeThunk = createAsyncThunk<
   { registeredNpcIds: string[] },
   { seedProfiles?: boolean } | undefined,
   { rejectValue: string }
 >(
   'relationships/initializeRuntime',
-  async (options, { dispatch, rejectWithValue }) => {
+  async (options, { dispatch, getState, rejectWithValue }) => {
     try {
       const definitions = await loadRelationshipDefinitions();
       const progression = definitions.progression ?? {};
@@ -80,7 +92,7 @@ export const initializeRelationshipRuntimeThunk = createAsyncThunk<
         }
       }
 
-      await dispatch(updateEssenceGenerationRateThunk());
+      refreshEssenceRate(dispatch, getState);
       return { registeredNpcIds: Object.keys(progression) };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -132,6 +144,8 @@ export const evaluateConnectionQualificationThunk = createAsyncThunk<
           })
         );
 
+        // BondProfile is authoritative for migrated NPCs. Keep the legacy field as
+        // a compatibility projection until old consumers have migrated.
         dispatch({
           type: 'npcs/updateNpcConnectionDepth',
           payload: { npcId, newDepth: rule.level },
@@ -148,7 +162,7 @@ export const evaluateConnectionQualificationThunk = createAsyncThunk<
       }
 
       if (currentLevel !== previousLevel) {
-        await dispatch(updateEssenceGenerationRateThunk());
+        refreshEssenceRate(dispatch, getState);
       }
 
       return { npcId, previousLevel, newLevel: currentLevel };
@@ -201,7 +215,7 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
         await dispatch(
           evaluateConnectionQualificationThunk({ npcId: definition.primaryTargetId })
         );
-        await dispatch(updateEssenceGenerationRateThunk());
+        refreshEssenceRate(dispatch, getState);
 
         return {
           experienceId: definition.id,
@@ -219,6 +233,8 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
 
       dispatch(recordRelationshipExperience(experience));
 
+      // Existing dialogue/service consumers still read NPC affinity. Project the
+      // authored migrated-NPC Affinity there without invoking legacy rollover.
       const config = selectRelationshipProgressionDefinition(
         getState() as RootState,
         experience.primaryTargetId
@@ -268,7 +284,9 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
       await dispatch(
         evaluateConnectionQualificationThunk({ npcId: experience.primaryTargetId })
       );
-      await dispatch(updateEssenceGenerationRateThunk());
+      // Relationship Experiences alter future passive production; they do not
+      // directly mint current Essence.
+      refreshEssenceRate(dispatch, getState);
 
       return { experienceId: experience.id, recorded: true, memoryId };
     } catch (error) {
