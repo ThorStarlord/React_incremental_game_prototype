@@ -68,7 +68,7 @@ const willowWisdom = {
   effects: { learningSpeed: 0.15 },
   essenceCost: 40,
   sourceNpc: WILLOW_ID,
-  discoveryMode: 'authored',
+  discoveryMode: 'authored' as const,
   minimumConnectionLevel: 2,
   requiredMemoryTags: ['Application'],
   assimilationThreshold: 100,
