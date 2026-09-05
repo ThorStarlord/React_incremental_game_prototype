@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { updateEssenceGenerationRateThunk } from '../../Essence';
 import {
   formRelationshipMemory,
   recordRelationshipExperience,
@@ -112,10 +111,9 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
         memoryId = memory.id;
       }
 
-      // During shadow mode the existing Essence formula still reads legacy connectionDepth.
-      // Recalculate anyway so this hook remains correct when Essence inputs cut over later.
-      await dispatch(updateEssenceGenerationRateThunk());
-
+      // Shadow mode is evidence-only. Recording an Experience must not alter
+      // authoritative NPC Connection, Essence, Traits, quests, or inventory.
+      // Those integrations belong to their explicit migration/cutover phases.
       return { experienceId: experience.id, recorded: true, memoryId };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
