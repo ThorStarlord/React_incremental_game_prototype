@@ -1,74 +1,126 @@
-Implementation Status: ✅ SPEC UPDATED (JSON schema, gates, effects, deterministic response UI, and relationship-shadow integration aligned to code)
-
 # Dialogue System Specification
 
-Branching conversation system that drives relationships, quest flow, service access, and authored Relationship Experience evidence.
+**Implementation Status:** ✅ Data-driven dialogue + deterministic responses + M4 relationship evidence gates
 
-## 1. Overview
-- Purpose: Present narrative content and explicit player choices that mutate game state (affinity, quests, inventory, services) and can record durable Relationship Experiences.
-- Core Loop: Interact with NPC → Load dialogue node → Render node text and explicit responses → Apply effects → Transition → Exit.
-- Migration note: legacy Affinity effects remain authoritative for current gameplay while `RELATIONSHIP_EXPERIENCE` records additive shadow evidence for the Relationship Progression Redesign.
+The Dialogue system presents explicit player choices, applies authored effects, unlocks quests/services/items, and can record durable Relationship Experiences.
 
-## 2. Data Model (JSON)
-- File: `/public/data/dialogues.json` (prototype).
-- Runtime nodes use the following shape:
+## 1. Runtime shape
+
+Dialogue nodes are loaded from:
+
+`/public/data/dialogues.json`
+
+A current node may contain:
 
 ```json
 {
-  "id": "elder_willow_greeting",
+  "id": "willow_three_nights_teaching",
   "npcId": "npc_elder_willow",
-  "title": "A Gentle Rustle",
+  "title": "Three Nights of Teaching",
   "text": "...",
+  "requiredExperienceIds": ["willow_exp_willow_disagrees"],
   "responses": {
-    "admit": "...",
-    "deflect": "...",
-    "challenge": "..."
+    "begin": "Begin.",
+    "later": "Not yet."
   },
   "effects": [
     {
       "type": "RELATIONSHIP_EXPERIENCE",
-      "experienceIdByResponse": {
-        "admit": "willow_exp_first_question_admit",
-        "deflect": "willow_exp_first_question_deflect",
-        "challenge": "willow_exp_first_question_challenge"
-      }
+      "experienceId": "willow_exp_three_nights_teaching",
+      "responseId": "begin"
     }
   ],
   "next": {
-    "admit": "elder_willow_wisdom",
-    "deflect": null,
-    "challenge": "elder_willow_lore"
+    "begin": null,
+    "later": null
   }
 }
 ```
 
-Relationship Experience definitions are not embedded in the dialogue file. They live in dedicated relationship-authoring bundles such as:
+Relationship Experience definitions themselves live in dedicated bundles such as:
 
-```text
-/public/data/relationships/elder-willow.json
+`/public/data/relationships/elder-willow.json`
+
+Dialogue routing therefore stays separate from durable relationship semantics.
+
+## 2. Deterministic player response
+
+The prototype previously selected a response randomly after a dialogue topic click.
+
+That behavior is incompatible with durable relationship evidence because the recorded consequence could differ from the player's actual choice.
+
+The current UI renders each authored response as an explicit button and dispatches the exact response id selected by the player.
+
+## 3. Evidence gates
+
+M4 supports two relationship-evidence gates on dialogue topics.
+
+### All required Experiences
+
+```json
+"requiredExperienceIds": ["experience_a", "experience_b"]
 ```
 
-This keeps dialogue routing separate from durable relationship semantics.
+Every listed Experience must exist.
 
-### 2.1 Conditions (evaluated before showing a choice)
-- Examples/current conventions:
-  - `HAS_TRAIT { traitId }`
-  - `AFFINITY_AT_LEAST { value }`
-  - `HAS_ITEM { itemId, quantity }`
-  - `QUEST_STATE { questId, state: 'notStarted'|'active'|'completed' }`
-  - `CONNECTION_DEPTH_AT_LEAST { npcId, level }`
+### At least one alternative Experience
 
-Not every listed condition has a full generic runtime interpreter yet. Existing node-level `minAffinity` / `minConnectionDepth` fields remain the current lightweight gate mechanism.
+```json
+"anyOfExperienceIds": ["choice_a", "choice_b"]
+```
 
-### 2.2 Effects (applied on choice select)
-- `AFFINITY_DELTA { value }` — updates the legacy NPC Affinity path.
-- `UNLOCK_QUEST { questId }` — adds a quest to NPC availability and notifies the player.
-- `GIVE_ITEM { itemId, amount }` — grants items to Inventory.
-- `OPEN_SERVICE { serviceId }` — informs the player that the relevant service/tab is available.
-- `RELATIONSHIP_EXPERIENCE { experienceId }` — records one authored Relationship Experience by stable ID.
-- `RELATIONSHIP_EXPERIENCE { experienceIdByResponse }` — maps each explicit response to a mutually exclusive authored Experience variant.
+At least one listed Experience must exist.
 
-Example:
+The UI hides topics whose evidence gate is not satisfied, and the interaction thunk checks the same rule defensively so a caller cannot bypass the presentation layer.
+
+These are evidence gates, not Affinity thresholds.
+
+## 4. Effects
+
+Current effect types include:
+
+### `AFFINITY_DELTA`
+
+```json
+{ "type": "AFFINITY_DELTA", "value": 2 }
+```
+
+Applies the legacy short-horizon NPC relationship delta.
+
+For Relationship-authoritative Willow content, authored Affinity is normally carried inside the Relationship Experience itself so the same causal event drives both the Bond Profile and compatibility projection.
+
+### `UNLOCK_QUEST`
+
+```json
+{ "type": "UNLOCK_QUEST", "questId": "quest_id" }
+```
+
+Adds the quest to the current NPC's available quests.
+
+### `GIVE_ITEM`
+
+```json
+{ "type": "GIVE_ITEM", "itemId": "item_id", "amount": 1 }
+```
+
+Adds an item through Inventory state.
+
+### `OPEN_SERVICE`
+
+Signals that a service is available through the appropriate NPC surface.
+
+### `RELATIONSHIP_EXPERIENCE`
+
+Fixed event:
+
+```json
+{
+  "type": "RELATIONSHIP_EXPERIENCE",
+  "experienceId": "willow_exp_first_lesson"
+}
+```
+
+Response-mapped event:
 
 ```json
 {
@@ -81,96 +133,99 @@ Example:
 }
 ```
 
-The authored Experience runtime enforces stable unique keys, so replaying a one-time beat cannot stack its relationship deltas.
+The effect records the durable authored Experience through the Relationships domain. The Relationship thunk owns idempotency, Memory formation, qualification, and M4 rate recalculation.
 
-Notes:
-- Additional planned legacy types such as ADVANCE_QUEST, TAKE_ITEM, and DISCOVER_TRAITS remain deferred.
-- Relationship Experience effects are intentionally narrow: they reference authored definitions rather than embedding relationship deltas into dialogue JSON.
+## 5. Response-scoped effects
 
-## 3. Runtime & State
-- Dialogue runtime itself remains transient UI state; there is no dedicated Dialogue slice.
-- `/data/dialogues.json` is loaded during NPC initialization into `npcs.dialogueNodes`.
-- Legacy effects are dispatched through existing domain thunks/actions.
-- `RELATIONSHIP_EXPERIENCE` dispatches `recordAuthoredRelationshipExperienceThunk` in the Relationships feature.
-- Relationship events are stored in the normalized `relationships` Redux slice, not duplicated into the NPC dialogue history.
-- During M3 shadow mode, the two paths intentionally coexist:
+Any effect may declare:
 
-```text
-Dialogue choice
-├─ legacy effect(s) → current Affinity / current gameplay
-└─ RELATIONSHIP_EXPERIENCE → shadow Experience / Memory / Bond Profile evidence
+```json
+"responseId": "accept"
 ```
 
-This coexistence is temporary and allows side-by-side validation before Connection authority changes.
+A response-scoped effect fires only when that exact response was selected.
 
-### 3.1 Next-node relationship evidence
+This fixes a general prototype bug where an effect attached to a node could execute even when the player selected the node's decline/later response.
 
-The existing dialogue runtime can resolve the next node immediately after a response. During shadow migration, it may process `RELATIONSHIP_EXPERIENCE` effects found on that resolved next node so that a visible teaching response can create its authored evidence.
+The Willow Seed offer uses this so only `accept`:
 
-It intentionally does **not** automatically execute the next node's unrelated legacy effects. This preserves pre-migration gameplay behavior while allowing relationship evidence to mirror what the player actually saw.
+- unlocks the Ancient Seed quest;
+- supplies the tutorial Sunstone;
+- records `A Seed of Potential`.
 
-## 4. UI/UX
-- Panel embedded in the NPC view with:
-  - current node/topic text;
-  - one explicit button per authored response;
-  - recent conversation history;
-  - free-text fallback for prototype experimentation.
-- Response selection is deterministic. The UI must never randomly choose a response on the player's behalf because Relationship Experience evidence depends on what the player actually selected.
-- Accessibility: responses are normal keyboard-focusable buttons; semantic labels remain visible rather than hidden behind a random topic action.
+Declining does none of those things.
 
-### 4.1 Elder Willow first proof
+The same convention is used by other acceptance dialogue where appropriate.
 
-The first onboarding dialogue now exposes three explicit reactions to Willow accurately identifying the protagonist's instrumental search for knowledge. Each response maps to a different `WE-01 — She Saw Through the Question` Experience variant.
+## 6. Lightweight continuation behavior
 
-This is the first runtime proof that dialogue can preserve **why** an interaction mattered instead of reducing every outcome to one Affinity delta.
+The current dialogue runtime is not a full conversation-state machine.
 
-## 5. Integration
-- NPC System:
-  - continues to own legacy `affinity`, `connectionDepth`, services, and dialogue history during shadow mode;
-  - provides NPC identity/context to Relationship Experience authoring.
-- Relationships System:
-  - records durable Experiences;
-  - applies multidimensional deltas;
-  - enforces idempotency;
-  - forms explicitly authored landmark Memories;
-  - derives the shadow Bond Profile.
-- Quest System: unlocks/advances quests; later Willow quest decisions will emit authored Relationship Experiences at resolution.
-- Inventory/Trading: GIVE/TAKE_ITEM and shop-opening behavior remains separate.
-- Trait System: discovery still occurs through existing NPC interaction behavior; Trait assimilation/Memory gating is a later migration phase.
-- Essence System: current generation still reads legacy `connectionDepth`; relationship-derived generation is not cut over in M3.
+When a selected response points to a `next` node, the runtime displays that next node's text inline. For compatibility with that presentation behavior, **relationship-only** effects on the displayed continuation may be recorded immediately because that narrative content was actually shown.
 
-## 6. Error Handling
-- Missing `next` node ends the conversation gracefully.
-- Unknown legacy effects remain safely ignored by the existing loop.
-- An unknown authored Relationship Experience is rejected by the Relationships thunk rather than inventing state.
-- Relationship definition fetch failures are retryable; a failed fetch does not permanently poison the definition cache.
-- Stable unique keys prevent duplicate application of one-time authored beats.
-- Defensive gating: insufficient affinity blocks legacy gated choices and can show a hint.
+Resource/quest effects on a continuation are not auto-committed; they require an explicit later interaction.
 
-## 7. Migration Boundary
+A richer persistent dialogue-state engine remains deferred.
 
-M3 establishes the relationship evidence path without changing current progression authority.
+## 7. Willow M4 sequence
 
-Implemented in M3:
-- explicit deterministic responses;
-- `RELATIONSHIP_EXPERIENCE` dialogue effect;
-- authored Willow Experience definitions;
-- idempotent Experience recording;
-- authored Memory formation;
-- shadow Bond Profile/debug visibility.
+Current evidence-gated topics support:
 
-Not yet authoritative:
-- qualified Connection Level progression;
-- relationship-derived Essence generation;
-- Trait assimilation;
-- Memory/assimilation-gated permanent Resonance;
-- the complete Ancient Seed decision branch.
+```text
+She Saw Through the Question
+-> The First Lesson
+-> A Seed of Potential
+-> Ancient Seed resolution
+-> Willow Disagrees
+-> Three Nights of Teaching
+-> The Lesson Made Yours
+```
 
-Those changes must follow the staged migration in `../Technical/RelationshipSystemMigrationPlan.md` rather than being folded silently into dialogue handling.
+The final WE-08 Resonance beat is emitted by Trait permanent acquisition rather than a dialogue button.
 
-## 8. Roadmap (Deferred)
-- Localized strings with i18n and variable interpolation.
-- Dialogue variables, flags, and script expressions.
-- Re-usable subtrees and includes to reduce duplication.
-- Cinematic sequencing hooks (animations, sound cues).
-- Generic authored conditions over Bond Profile dimensions and Memories after the relationship runtime becomes authoritative.
+This sequence deliberately includes `Willow Disagrees`, where immediate warmth may fall while Understanding and Connection Progress rise.
+
+## 8. Affinity and Connection during migration
+
+For unmigrated NPCs:
+
+```text
+legacy Affinity update
+-> may still roll into legacy connectionDepth
+```
+
+For Elder Willow:
+
+- Bond Profile is the Connection authority;
+- Affinity is disposition only;
+- authored Affinity effects project to the legacy NPC Affinity field for UI/service compatibility;
+- Affinity does not level Willow Connection.
+
+Dialogue must not silently reintroduce Affinity-as-XP for a migrated NPC.
+
+## 9. Error handling
+
+- missing NPC: interaction fails;
+- unmet Affinity gate: interaction fails with feedback;
+- unmet relationship-evidence gate: interaction fails with feedback;
+- unknown authored Relationship Experience: relationship thunk rejects;
+- missing next node: conversation ends gracefully;
+- unknown optional effect types are skipped by the current lightweight loop unless explicitly handled.
+
+## 10. Deferred
+
+- full persistent dialogue-tree cursor/state;
+- generalized condition expression language;
+- localized string system;
+- reusable subtrees/includes;
+- cinematic sequencing;
+- broad campaign conversion to relationship evidence;
+- richer per-response visual consequence previews.
+
+## 11. Invariants
+
+1. The response shown/selected by the player determines the response-scoped consequence.
+2. Future relationship topics cannot bypass their Experience prerequisites.
+3. Dialogue routing data does not duplicate the full Relationship Experience definition.
+4. A declined response cannot accidentally fire an accept-only effect.
+5. Migrated Willow dialogue cannot deepen Connection merely by accumulating Affinity.
