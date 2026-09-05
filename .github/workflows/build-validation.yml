@@ -28,7 +28,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Relationship runtime tests
-        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts
         env:
           CI: true
 
