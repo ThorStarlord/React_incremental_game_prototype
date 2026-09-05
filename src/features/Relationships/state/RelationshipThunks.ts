@@ -31,7 +31,13 @@ const loadRelationshipDefinitions = async (): Promise<RelationshipDefinitionBund
         }
         return (await response.json()) as RelationshipDefinitionBundle;
       })
-    ).then(mergeBundles);
+    )
+      .then(mergeBundles)
+      .catch(error => {
+        // Allow a later interaction to retry after a transient asset-load failure.
+        definitionBundlePromise = null;
+        throw error;
+      });
   }
 
   return definitionBundlePromise;
@@ -52,14 +58,27 @@ export const recordAuthoredRelationshipExperienceThunk = createAsyncThunk<
         return rejectWithValue(`Unknown authored relationship experience: ${experienceId}`);
       }
 
-      const relationships = (getState() as RootState & {
-        relationships?: RootState['relationships'];
-      }).relationships;
-
-      if (
-        relationships?.experiencesById[definition.id] ||
+      const relationships = (getState() as Partial<RootState>).relationships;
+      const existingExperience = relationships?.experiencesById[definition.id];
+      const alreadyApplied = Boolean(
+        existingExperience ||
         (definition.uniqueKey && relationships?.appliedUniqueKeys[definition.uniqueKey])
-      ) {
+      );
+
+      if (alreadyApplied) {
+        // If a prior version recorded the Experience but failed before forming its
+        // authored Memory, repair the projection without applying event deltas again.
+        if (definition.memoryDefinitionId && existingExperience) {
+          const memoryDefinition = definitions.memories[definition.memoryDefinitionId];
+          const memoryExists = relationships?.memoriesById[definition.memoryDefinitionId];
+          if (memoryDefinition && !memoryExists) {
+            dispatch(formRelationshipMemory({
+              ...memoryDefinition,
+              timestamp: existingExperience.timestamp,
+            }));
+          }
+        }
+
         return {
           experienceId: definition.id,
           recorded: false,
