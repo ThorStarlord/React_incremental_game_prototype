@@ -47,8 +47,31 @@ export const selectBondProfiles = (state: RootState) =>
 export const selectBondProfileByNpcId = (
   state: RootState,
   npcId: string
-): BondProfile =>
-  selectRelationshipState(state).bondProfilesByNpc[npcId] ?? createDefaultBondProfile(npcId);
+): BondProfile => {
+  const existing = selectRelationshipState(state).bondProfilesByNpc[npcId];
+  const defaults = createDefaultBondProfile(npcId);
+  if (!existing) return defaults;
+
+  return {
+    ...defaults,
+    ...existing,
+    dimensions: {
+      ...defaults.dimensions,
+      ...(existing.dimensions ?? {}),
+      custom: {
+        ...defaults.dimensions.custom,
+        ...(existing.dimensions?.custom ?? {}),
+      },
+    },
+    connectionQualificationEvidence:
+      existing.connectionQualificationEvidence ?? {},
+    bondArchetypes: existing.bondArchetypes ?? [],
+    activeMemoryIds: existing.activeMemoryIds ?? [],
+    unresolvedTensions: existing.unresolvedTensions ?? [],
+    recentExperienceIds: existing.recentExperienceIds ?? [],
+    tetherState: existing.tetherState ?? defaults.tetherState,
+  };
+};
 
 export const selectRelationshipProgressionDefinition = (state: RootState, npcId: string) =>
   selectRelationshipState(state).progressionByNpc[npcId];
@@ -111,10 +134,8 @@ export const selectTraitAssimilationState = (
   traitId: string
 ): TraitAssimilationState => {
   const relationships = selectRelationshipState(state);
-  return (
-    relationships.traitAssimilationByKey[traitAssimilationKey(sourceNpcId, traitId)] ??
-    createDefaultTraitAssimilationState(sourceNpcId, traitId)
-  );
+  const existing = relationships.traitAssimilationByKey[traitAssimilationKey(sourceNpcId, traitId)];
+  return existing ?? createDefaultTraitAssimilationState(sourceNpcId, traitId);
 };
 
 export interface ConnectionQualificationCheck {
