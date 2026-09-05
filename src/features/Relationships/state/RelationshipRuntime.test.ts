@@ -265,7 +265,7 @@ const recordFullWillowPath = async (store: ReturnType<typeof makeStore>) => {
   }
 };
 
-beforeAll(() => {
+beforeEach(() => {
   global.fetch = jest.fn(async () => ({
     ok: true,
     json: async () => relationshipBundle,
