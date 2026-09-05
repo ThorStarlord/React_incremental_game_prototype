@@ -1,7 +1,7 @@
 # Relationship Progression Redesign
 
 **Status:** Target design approved; staged runtime migration in progress  
-**Runtime status:** M4 Willow authority cutover implemented; M6 Lyra adversarial universality proof implemented; other production NPCs remain legacy-authoritative  
+**Runtime status:** M4 Willow authority cutover implemented; M5 routed mechanical + workspace causal-legibility qualification implemented; M6 Lyra adversarial universality proof implemented; other production NPCs remain legacy-authoritative  
 **Purpose:** Provide one authority/index for the relationship, Essence, Memory, and Trait Resonance redesign while migration is in progress.
 
 ## Why this document exists
@@ -21,6 +21,8 @@ When an older feature spec conflicts with current code, the runtime wins as the 
 - [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — relationship-derived passive Essence generation and Trait assimilation/Resonance.
 - [`Narrative/ElderWillowVerticalSlice.md`](Narrative/ElderWillowVerticalSlice.md) — first authored proof of the complete loop.
 - [`Technical/RelationshipSystemMigrationPlan.md`](Technical/RelationshipSystemMigrationPlan.md) — staged runtime migration from the existing model.
+- [`Technical/FreshPlayerWillowQualification.md`](Technical/FreshPlayerWillowQualification.md) — routed mechanical qualification and original human-comprehension evidence boundary.
+- [`Technical/WorkspaceCognitiveWalkthrough.md`](Technical/WorkspaceCognitiveWalkthrough.md) — workspace-based player-facing causal-legibility qualification after narrowing the M5 claim.
 
 ## Authority during migration
 
@@ -274,6 +276,59 @@ The relationship debug panel exposes:
 - `WillowsWisdom` assimilation and relevant Memories;
 - idempotent authored-event injection for qualification.
 
+# M5 — Routed Mechanical and Workspace Causal-Legibility Qualification — Implemented
+
+M5 is now split into two claims that can actually be supported from the workspace.
+
+## Routed mechanical qualification
+
+`RelationshipFreshGame.test.tsx` proves that the normal `/game/npcs/:npcId` player path can complete the preserve-branch Willow loop from fresh state without Debug injection:
+
+```text
+New Game
+-> Willow at Connection 0
+-> Dialogue
+-> Connection I
+-> Ancient Seed offer / quest
+-> preserve / awaken decision
+-> The Seed Preserved Memory
+-> disagreement
+-> teaching
+-> independent application
+-> Connection II / 100% assimilation
+-> player-facing relationship explanation
+-> passive Essence accumulation
+-> Trait gate
+-> final Resonance
+-> permanent Willow's Wisdom
+```
+
+The routed qualification exposed and fixed several player-path defects, including route-level NPC reinitialization, missing routed Dialogue/Relationship surfaces, legacy coarse tab gates, stale New Game state, and invalid MUI Tabs composition.
+
+## Workspace causal-legibility qualification
+
+`Technical/WorkspaceCognitiveWalkthrough.md` evaluates only normal player-facing evidence and excludes Debug/specification prose as evidence.
+
+It qualifies the narrower claim that the intended causal model is **present and reconstructible from the game itself**:
+
+- Affinity is explicitly distinguished from Connection;
+- Connection progress explicitly states that progress alone is insufficient and names qualifying Experience/Memory evidence;
+- Memories are explicitly described as defining experiences usable as evidence rather than loot;
+- passive Essence is explicitly described as an ongoing consequence of the current bond rather than a scene drop;
+- `WillowsWisdom` visibly requires Connection, assimilation, compatibility, Memory evidence, and Essence;
+- teaching and independent application give assimilation a visible learning/internalization referent;
+- final Resonance explicitly describes Essence as the stabilization cost for an already-assimilated pattern.
+
+### Evidence ceiling
+
+M5 does **not** claim that an unaided human participant has empirically demonstrated comprehension. A real player may still skip explanatory surfaces, ignore text, or misunderstand terminology.
+
+The merge-scope claim is therefore:
+
+> **The Willow causal model is mechanically traversable and player-facing causal evidence is sufficient for the intended model to be reconstructible.**
+
+Human usability/comprehension research remains valuable but is deferred from PR #25's merge claim rather than silently treated as passed.
+
 # M6 — Lyra Adversarial Universality Proof — Implemented
 
 M6 is intentionally a **falsification test of the generic relationship model**, not a second full campaign slice.
@@ -376,13 +431,14 @@ The relationship-content manifest does not fabricate Lyra history for existing s
 
 # Automated qualification
 
-The Build Validation workflow now includes:
+The Build Validation workflow includes:
 
 ```text
 npm ci
 npx tsc --noEmit
 RelationshipRuntime.test.ts
 RelationshipLyraUniversality.test.ts
+RelationshipFreshGame.test.tsx
 npm run build
 ```
 
@@ -413,6 +469,8 @@ The Lyra/M6 suite additionally covers:
 - contested stability;
 - Lyra Essence remaining disabled during the ontology proof.
 
+The routed M5 suite covers the complete normal-player Willow preserve branch through permanent `WillowsWisdom` Resonance without Debug injection.
+
 Exact-head qualification status must be taken from the latest PR Build Validation run. A green run on an older commit does not qualify a later documentation or code candidate.
 
 # Still legacy / deferred
@@ -427,6 +485,7 @@ Still deferred:
 - broad campaign content migration;
 - full Trait discovery redesign;
 - full pre-Relationships save migration;
+- human usability/comprehension research beyond the workspace causal-legibility audit;
 - procedural/LLM Memories;
 - autonomous NPC social simulation;
 - Copy-system redesign;
@@ -434,24 +493,21 @@ Still deferred:
 - advanced distance/tether simulation;
 - authenticity/endgame mechanics.
 
-## M5 qualification note
-
-The Willow gameplay surfaces required for the authored causal sequence are implemented, but M5's stronger wording — that a fresh player can complete the entire causal loop **and explain it** — has not been separately qualified by an end-to-end human/UX run. Do not silently treat runtime/unit qualification as proof of player comprehension.
-
 ## Next engineering milestone
 
-With the Lyra adversarial universality test implemented, the core model now has two materially different proofs:
+The core model now has three complementary forms of evidence:
 
 ```text
-Willow: mentor/student progression with positive and corrective beats
-Lyra: adversarial/dialectic progression with negative overall Affinity
+Willow runtime: complete mentor/student relationship-to-power mechanism
+Willow player path: routed mechanical completion + player-facing causal legibility
+Lyra runtime: adversarial/dialectic generalization with negative Affinity
 ```
 
-The highest-value next step is **not broad NPC conversion immediately**. First close the remaining M5 evidence gap with one fresh-player end-to-end Willow run, recording whether the player can actually answer:
+Human playtesting remains useful future product research, but it is no longer required to support PR #25's narrowed merge claim.
 
-- why Connection deepened;
-- why passive Essence changed;
-- why `WillowsWisdom` was locked or unlocked;
-- what role the landmark Memories and assimilation evidence played.
+The next engineering decision can therefore move beyond Willow qualification. The highest-value candidates are:
 
-If that UX qualification passes, broad NPC migration can begin from the manifest/data-driven pattern rather than by adding new generic-system exceptions.
+1. migrate one additional production NPC through the manifest/data-driven pattern as a real content expansion; or
+2. address the known Trait-discovery and legacy-save migration debt before broader relationship rollout.
+
+Do not broaden both simultaneously; preserve the same one-question-at-a-time evidence discipline used for Willow and Lyra.
