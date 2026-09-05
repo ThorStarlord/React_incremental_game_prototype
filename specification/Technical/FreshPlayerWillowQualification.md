@@ -4,7 +4,7 @@
 **Scope:** M5 Elder Willow relationship vertical slice  
 **Purpose:** Record what has actually been proven about the fresh-player Willow experience without treating automated or analytical evaluation as evidence of human understanding.
 
-> **Scope update:** The original stronger M5 wording required a fresh human participant to complete the slice and explain the causal model. PR #25 now intentionally makes a narrower claim that can be qualified from the workspace: the loop is mechanically traversable through normal player UI and the intended causal model is present and reconstructible from player-facing evidence. See [`WorkspaceCognitiveWalkthrough.md`](WorkspaceCognitiveWalkthrough.md). A real human comprehension study remains useful future product research but is not a merge prerequisite for this PR.
+> **Scope update:** The original stronger M5 wording required a fresh human participant to complete the slice and explain the causal model. PR #25 now intentionally makes a narrower claim that can be qualified from the workspace: the loop is mechanically traversable through normal player UI and the intended causal model is present and reconstructible from player-facing evidence. See [`WorkspaceCognitiveWalkthrough.md`](WorkspaceCognitiveWalkthrough.md). A real human comprehension study remains useful future product research but is not a merge prerequisite for this PR. Issue #26 retains the blind-human protocol as optional future research.
 
 ---
 
