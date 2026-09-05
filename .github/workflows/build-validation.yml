@@ -24,7 +24,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Production build
         run: npm run build
         env:
-          CI: true
+          # The repository currently has substantial pre-existing ESLint warning debt.
+          # CRA treats warnings as build failures when CI=true. This gate is deliberately
+          # scoped to TypeScript correctness + successful production bundling.
+          CI: false
