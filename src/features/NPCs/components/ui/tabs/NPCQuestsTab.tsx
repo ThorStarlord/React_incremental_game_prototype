@@ -12,7 +12,8 @@ import {
   Divider,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  Stack,
 } from '@mui/material';
 import {
   Assignment as QuestIcon,
@@ -20,14 +21,17 @@ import {
   RadioButtonUnchecked as IncompleteIcon,
   Star as RewardIcon,
   Info as InfoIcon,
-  ExpandMore as ExpandMoreIcon
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
-import type { NPC } from '../../../state/NPCTypes';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import { selectNPCById } from '../../../state/NPCSelectors';
 import { selectQuestById } from '../../../../Quest/state/QuestSelectors';
-import { startQuestThunk, turnInQuestThunk } from '../../../../Quest/state/QuestThunks';
-import { Quest, QuestObjective, QuestStatus } from '../../../../Quest/state/QuestTypes';
+import {
+  resolveQuestOutcomeThunk,
+  startQuestThunk,
+  turnInQuestThunk,
+} from '../../../../Quest/state/QuestThunks';
+import type { Quest, QuestObjective, QuestStatus } from '../../../../Quest/state/QuestTypes';
 
 interface NPCQuestsTabProps {
   npcId: string;
@@ -59,6 +63,10 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
     dispatch(startQuestThunk(questId));
   };
 
+  const handleResolveQuest = (questId: string, resolutionId: string) => {
+    dispatch(resolveQuestOutcomeThunk({ questId, resolutionId }));
+  };
+
   const handleTurnInQuest = (questId: string) => {
     dispatch(turnInQuestThunk(questId));
   };
@@ -80,7 +88,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const formatQuestStatusLabel = (status: QuestStatus): string => {
     switch (status) {
       case 'READY_TO_COMPLETE':
-        return 'Ready to Turn In';
+        return 'Ready to Resolve';
       case 'COMPLETED':
         return 'Completed';
       case 'IN_PROGRESS':
@@ -99,16 +107,16 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
           <QuestIcon color="primary" />
           Quests from {npc?.name}
         </Typography>
-        
+
         <Alert severity="info" sx={{ mb: 2 }}>
           <Typography variant="body2">
-            Complete quests to earn rewards and strengthen your relationship with {npc?.name}.
+            Important outcomes can change relationship history and future progression without becoming one-time relationship loot.
           </Typography>
         </Alert>
       </Box>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-  {availableQuests.map((quest: Quest) => (
+        {availableQuests.map((quest: Quest) => (
           <Accordion key={quest.id} sx={{ '&:before': { display: 'none' }, border: '1px solid', borderColor: 'divider' }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -146,7 +154,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                             variant="body2"
                             sx={{
                               textDecoration: objective.isComplete ? 'line-through' : 'none',
-                              color: objective.isComplete ? 'text.secondary' : 'text.primary'
+                              color: objective.isComplete ? 'text.secondary' : 'text.primary',
                             }}
                           >
                             {formatObjectiveText(objective)}
@@ -158,27 +166,69 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                 </List>
               </Box>
 
+              {quest.status === 'READY_TO_COMPLETE' &&
+                quest.resolutionRequired &&
+                !quest.selectedResolutionId &&
+                (quest.resolutionOptions?.length ?? 0) > 0 && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" gutterBottom>
+                      Decision:
+                    </Typography>
+                    <Stack spacing={1}>
+                      {quest.resolutionOptions?.map(option => (
+                        <Box key={option.id} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 1.25 }}>
+                          <Typography variant="body2" fontWeight={600}>
+                            {option.label}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                            {option.description}
+                          </Typography>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => handleResolveQuest(quest.id, option.id)}
+                          >
+                            Choose {option.label}
+                          </Button>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
+
+              {quest.selectedResolutionId && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  Decision locked: {quest.resolutionOptions?.find(option => option.id === quest.selectedResolutionId)?.label ?? quest.selectedResolutionId}
+                </Alert>
+              )}
+
               <Divider sx={{ my: 2 }} />
 
               <Box sx={{ mb: 2 }}>
                 <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <RewardIcon fontSize="small" />
-                  Rewards:
+                  Turn-in Rewards:
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {quest.rewards.map((reward: any, index: number) => (
-                    <Chip 
-                      key={index}
-                      label={`${reward.value} ${reward.type}`}
-                      size="small"
-                      variant="outlined"
-                      color="primary"
-                    />
-                  ))}
+                  {quest.rewards.length > 0 ? (
+                    quest.rewards.map((reward, index) => (
+                      <Chip
+                        key={index}
+                        label={`${reward.value} ${reward.type}`}
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                      />
+                    ))
+                  ) : (
+                    <Typography variant="caption" color="text.secondary">
+                      No automatic turn-in reward. Authored resolution consequences are shown above.
+                    </Typography>
+                  )}
                 </Box>
               </Box>
 
-              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt:2 }}>
+              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
                 {quest.status === 'NOT_STARTED' && (
                   <Button
                     variant="contained"
@@ -188,15 +238,16 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                   </Button>
                 )}
 
-                {quest.status === 'READY_TO_COMPLETE' && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleTurnInQuest(quest.id)}
-                  >
-                    Turn In Quest
-                  </Button>
-                )}
+                {quest.status === 'READY_TO_COMPLETE' &&
+                  (!quest.resolutionRequired || Boolean(quest.selectedResolutionId)) && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleTurnInQuest(quest.id)}
+                    >
+                      Turn In Quest
+                    </Button>
+                  )}
                 {quest.status === 'COMPLETED' && (
                   <Chip
                     icon={<CompleteIcon />}
@@ -215,7 +266,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
         <Alert severity="info" sx={{ mt: 2 }}>
           <Typography variant="body2">
             <InfoIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
-            No quests available at the moment. Check back later or improve your relationship!
+            No quests available at the moment. Check back later or deepen the relationship.
           </Typography>
         </Alert>
       )}
