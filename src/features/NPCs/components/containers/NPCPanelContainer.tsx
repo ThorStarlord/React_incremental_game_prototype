@@ -15,7 +15,6 @@ import {
   Tabs,
   Tab,
   CircularProgress,
-  Tooltip,
 } from '@mui/material';
 import { CreateCopyModal } from '../../../Copy/components/ui/CreateCopyModal';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
@@ -143,28 +142,32 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
         </Box>
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
+          {/* MUI Tabs expects Tab components as direct children. Wrapping a Tab in
+              Tooltip/span causes Tabs to clone the wrapper, leaks Tab props onto the
+              span, and prevents tab selection from changing. Use native title text
+              for the legacy lock hint while keeping the required child structure. */}
           <Tabs value={currentTab} onChange={handleTabChange} aria-label="npc details tabs" variant="scrollable" scrollButtons="auto">
             <Tab label="Overview" id="npc-tab-0" />
             <Tab label="Dialogue" id="npc-tab-1" />
             <Tab label="Relationship" id="npc-tab-2" />
-            <Tooltip
-              title={questsLocked ? 'Requires Affinity 20' : ''}
-              disableHoverListener={!questsLocked}
-            >
-              <span><Tab disabled={questsLocked} label="Quests" id="npc-tab-3" /></span>
-            </Tooltip>
-            <Tooltip
-              title={traitsLocked ? 'Requires Connection Depth 1' : ''}
-              disableHoverListener={!traitsLocked}
-            >
-              <span><Tab disabled={traitsLocked} label="Traits" id="npc-tab-4" /></span>
-            </Tooltip>
-            <Tooltip
-              title={tradeLocked ? 'Requires Affinity 40' : ''}
-              disableHoverListener={!tradeLocked}
-            >
-              <span><Tab disabled={tradeLocked} label="Trade" id="npc-tab-5" /></span>
-            </Tooltip>
+            <Tab
+              disabled={questsLocked}
+              label="Quests"
+              id="npc-tab-3"
+              title={questsLocked ? 'Requires Affinity 20' : undefined}
+            />
+            <Tab
+              disabled={traitsLocked}
+              label="Traits"
+              id="npc-tab-4"
+              title={traitsLocked ? 'Requires Connection Depth 1' : undefined}
+            />
+            <Tab
+              disabled={tradeLocked}
+              label="Trade"
+              id="npc-tab-5"
+              title={tradeLocked ? 'Requires Affinity 40' : undefined}
+            />
           </Tabs>
         </Box>
 
