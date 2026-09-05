@@ -33,11 +33,6 @@ const createInitialState = (): RelationshipState => ({
 
 export const initialRelationshipState: RelationshipState = createInitialState();
 
-/**
- * `meta/replaceState` can hydrate an M3 save object that predates M4 fields.
- * Reducers repair the missing additive collections lazily instead of requiring
- * destructive save migration.
- */
 const ensureM4Collections = (state: RelationshipState) => {
   if (!state.progressionByNpc) state.progressionByNpc = {};
   if (!state.traitAssimilationByKey) state.traitAssimilationByKey = {};
@@ -52,9 +47,7 @@ const ensureBondProfile = (state: RelationshipState, npcId: string): BondProfile
   const defaults = createDefaultBondProfile(npcId);
 
   if (!profile.dimensions.custom) profile.dimensions.custom = {};
-  if (!profile.connectionQualificationEvidence) {
-    profile.connectionQualificationEvidence = {};
-  }
+  if (!profile.connectionQualificationEvidence) profile.connectionQualificationEvidence = {};
   if (!profile.bondArchetypes) profile.bondArchetypes = [];
   if (!profile.activeMemoryIds) profile.activeMemoryIds = [];
   if (!profile.unresolvedTensions) profile.unresolvedTensions = [];
@@ -66,7 +59,6 @@ const ensureBondProfile = (state: RelationshipState, npcId: string): BondProfile
 
 const deriveStability = (profile: BondProfile): RelationshipStability => {
   const { affinity, trust, sharedMeaning, reciprocity } = profile.dimensions;
-
   if (trust <= 5 && affinity <= -60) return 'ruptured';
   if (affinity <= -35 || trust <= 15) return 'contested';
   if (affinity < 0 || trust < 30) return 'strained';
@@ -95,7 +87,6 @@ const applyDimensionDelta = (
     profile.dimensions.affinity = clamp(profile.dimensions.affinity + delta, -100, 100);
     return;
   }
-
   profile.dimensions[key] = clamp(profile.dimensions[key] + delta, 0, 100);
 };
 
@@ -141,9 +132,7 @@ const relationshipSlice = createSlice({
       npcExperienceIds.push(experience.id);
       state.experienceIdsByNpc[experience.primaryTargetId] = npcExperienceIds;
 
-      if (experience.uniqueKey) {
-        state.appliedUniqueKeys[experience.uniqueKey] = true;
-      }
+      if (experience.uniqueKey) state.appliedUniqueKeys[experience.uniqueKey] = true;
 
       const profile = ensureBondProfile(state, experience.primaryTargetId);
 
@@ -217,13 +206,8 @@ const relationshipSlice = createSlice({
       state.memoryIdsByNpc[memory.primaryTargetId] = npcMemoryIds;
 
       const profile = ensureBondProfile(state, memory.primaryTargetId);
-      if (!profile.activeMemoryIds.includes(memory.id)) {
-        profile.activeMemoryIds.push(memory.id);
-      }
-      if (
-        memory.bondContribution &&
-        !profile.bondArchetypes.includes(memory.bondContribution)
-      ) {
+      if (!profile.activeMemoryIds.includes(memory.id)) profile.activeMemoryIds.push(memory.id);
+      if (memory.bondContribution && !profile.bondArchetypes.includes(memory.bondContribution)) {
         profile.bondArchetypes.push(memory.bondContribution);
       }
 
@@ -252,9 +236,9 @@ const relationshipSlice = createSlice({
       const normalizedLevel = clamp(Math.floor(level), 0, 10);
       if (normalizedLevel <= profile.connectionLevel) return;
       profile.connectionLevel = normalizedLevel;
-      profile.connectionQualificationEvidence[String(normalizedLevel)] = [
-        ...new Set(evidenceIds),
-      ];
+      profile.connectionQualificationEvidence[String(normalizedLevel)] = Array.from(
+        new Set(evidenceIds)
+      );
       recalculateDerivedProfile(profile);
     },
 
