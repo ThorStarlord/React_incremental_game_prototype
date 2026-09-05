@@ -5,7 +5,10 @@
       "uniqueKey": "willow:we01:first-question",
       "title": "She Saw Through the Question",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elder_willow_greeting",
       "significance": "meaningful",
@@ -17,7 +20,11 @@
         "vulnerability": 1
       },
       "connectionProgressDelta": 7,
-      "resonanceTags": ["Truth", "Instrumentalism", "Wisdom"],
+      "resonanceTags": [
+        "Truth",
+        "Instrumentalism",
+        "Wisdom"
+      ],
       "memoryCandidate": false,
       "interpretation": "Willow accurately names the protagonist's instrumental search for useful knowledge, and the protagonist answers candidly."
     },
@@ -26,7 +33,10 @@
       "uniqueKey": "willow:we01:first-question",
       "title": "She Saw Through the Question",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elder_willow_greeting",
       "significance": "meaningful",
@@ -35,7 +45,9 @@
         "understanding": 2
       },
       "connectionProgressDelta": 3,
-      "resonanceTags": ["Guardedness"],
+      "resonanceTags": [
+        "Guardedness"
+      ],
       "memoryCandidate": false,
       "interpretation": "The protagonist resists Willow's reading but still reveals enough for Willow to refine her model."
     },
@@ -44,7 +56,10 @@
       "uniqueKey": "willow:we01:first-question",
       "title": "She Saw Through the Question",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elder_willow_greeting",
       "significance": "meaningful",
@@ -54,7 +69,11 @@
         "sharedMeaning": 2
       },
       "connectionProgressDelta": 7,
-      "resonanceTags": ["Curiosity", "Challenge", "Wisdom"],
+      "resonanceTags": [
+        "Curiosity",
+        "Challenge",
+        "Wisdom"
+      ],
       "memoryCandidate": false,
       "interpretation": "The protagonist turns Willow's observation into a serious intellectual challenge."
     },
@@ -63,7 +82,10 @@
       "uniqueKey": "willow:we02:first-lesson",
       "title": "The First Lesson",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elder_willow_wisdom",
       "significance": "meaningful",
@@ -73,13 +95,18 @@
         "sharedMeaning": 3
       },
       "connectionProgressDelta": 8,
-      "resonanceTags": ["Wisdom", "PatternRecognition", "Patience"],
+      "resonanceTags": [
+        "Wisdom",
+        "PatternRecognition",
+        "Patience"
+      ],
       "traitEffects": [
         {
           "traitId": "WillowsWisdom",
           "compatibilityDelta": 5,
           "assimilationDelta": 10,
-          "note": "First meaningful exposure begins low-rate assimilation of Willow's slow-pattern cognition."
+          "note": "First meaningful exposure begins low-rate assimilation of Willow's slow-pattern cognition.",
+          "discover": true
         }
       ],
       "memoryCandidate": false,
@@ -90,7 +117,10 @@
       "uniqueKey": "willow:we03:seed-offered",
       "title": "A Seed of Potential",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "quest",
       "sourceId": "quest_willow_ancient_seed",
       "significance": "meaningful",
@@ -99,7 +129,11 @@
         "sharedMeaning": 1
       },
       "connectionProgressDelta": 4,
-      "resonanceTags": ["Wisdom", "Potential", "Choice"],
+      "resonanceTags": [
+        "Wisdom",
+        "Potential",
+        "Choice"
+      ],
       "memoryCandidate": false,
       "interpretation": "Willow presents a delayed-value problem without prescribing the answer."
     },
@@ -108,7 +142,10 @@
       "uniqueKey": "willow:we04:sunstone-decision",
       "title": "The Sunstone Decision",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "quest",
       "sourceId": "quest_willow_ancient_seed",
       "significance": "major",
@@ -121,7 +158,13 @@
         "reciprocity": 3
       },
       "connectionProgressDelta": 22,
-      "resonanceTags": ["Wisdom", "Patience", "Stewardship", "CostlyChoice", "Application"],
+      "resonanceTags": [
+        "Wisdom",
+        "Patience",
+        "Stewardship",
+        "CostlyChoice",
+        "Application"
+      ],
       "traitEffects": [
         {
           "traitId": "WillowsWisdom",
@@ -138,7 +181,10 @@
       "uniqueKey": "willow:we04:sunstone-decision",
       "title": "The Sunstone Decision",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "quest",
       "sourceId": "quest_willow_ancient_seed",
       "significance": "major",
@@ -149,7 +195,10 @@
         "sharedMeaning": 2
       },
       "connectionProgressDelta": 7,
-      "resonanceTags": ["Instrumentalism", "ImmediateUtility"],
+      "resonanceTags": [
+        "Instrumentalism",
+        "ImmediateUtility"
+      ],
       "traitEffects": [
         {
           "traitId": "WillowsWisdom",
@@ -165,7 +214,10 @@
       "uniqueKey": "willow:we05:disagreement",
       "title": "Willow Disagrees",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "dialogue",
       "sourceId": "willow_disagreement",
       "significance": "meaningful",
@@ -176,7 +228,11 @@
         "sharedMeaning": 5
       },
       "connectionProgressDelta": 10,
-      "resonanceTags": ["Contradiction", "Wisdom", "IdeologicalFriction"],
+      "resonanceTags": [
+        "Contradiction",
+        "Wisdom",
+        "IdeologicalFriction"
+      ],
       "memoryCandidate": false,
       "interpretation": "Conflict lowers immediate warmth while deepening the protagonist's model of Willow's actual principle."
     },
@@ -185,7 +241,10 @@
       "uniqueKey": "willow:we06:three-nights",
       "title": "Three Nights of Teaching",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "other",
       "sourceId": "willow_tether_teaching",
       "significance": "meaningful",
@@ -196,7 +255,12 @@
         "reciprocity": 2
       },
       "connectionProgressDelta": 12,
-      "resonanceTags": ["Teaching", "Practice", "Wisdom", "Tether"],
+      "resonanceTags": [
+        "Teaching",
+        "Practice",
+        "Wisdom",
+        "Tether"
+      ],
       "traitEffects": [
         {
           "traitId": "WillowsWisdom",
@@ -212,7 +276,10 @@
       "uniqueKey": "willow:we07:independent-application",
       "title": "The Lesson Made Yours",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "quest",
       "sourceId": "willow_independent_application",
       "significance": "defining",
@@ -224,7 +291,12 @@
         "reciprocity": 4
       },
       "connectionProgressDelta": 20,
-      "resonanceTags": ["Wisdom", "Application", "Transformation", "IndependentUnderstanding"],
+      "resonanceTags": [
+        "Wisdom",
+        "Application",
+        "Transformation",
+        "IndependentUnderstanding"
+      ],
       "traitEffects": [
         {
           "traitId": "WillowsWisdom",
@@ -242,7 +314,10 @@
       "uniqueKey": "willow:we08:wisdom-resonance",
       "title": "Resonance: Willow's Wisdom",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "sourceType": "system",
       "sourceId": "WillowsWisdom",
       "significance": "defining",
@@ -250,7 +325,11 @@
         "sharedMeaning": 4
       },
       "connectionProgressDelta": 0,
-      "resonanceTags": ["Wisdom", "Resonance", "Transformation"],
+      "resonanceTags": [
+        "Wisdom",
+        "Resonance",
+        "Transformation"
+      ],
       "memoryCandidate": false,
       "interpretation": "Essence stabilizes a cognitive pattern already earned through exposure, practice, and application."
     }
@@ -261,16 +340,27 @@
       "originExperienceId": "willow_exp_sunstone_decision_preserve",
       "title": "The Seed Preserved",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "memoryType": "shared",
       "significance": "major",
       "playerVisible": true,
       "summary": "You gave up an immediate advantage to protect something whose value was still only potential.",
       "protagonistView": "A delayed system can be more valuable than an immediate extraction.",
       "targetView": "The student acted on the lesson instead of merely agreeing with it.",
-      "resonanceTags": ["Wisdom", "Patience", "Stewardship", "CostlyChoice", "Application"],
+      "resonanceTags": [
+        "Wisdom",
+        "Patience",
+        "Stewardship",
+        "CostlyChoice",
+        "Application"
+      ],
       "bondContribution": "Mentor / Student — emerging",
-      "traitRelevance": ["WillowsWisdom"],
+      "traitRelevance": [
+        "WillowsWisdom"
+      ],
       "persistence": "stable"
     },
     "willow_memory_lesson_made_yours": {
@@ -278,16 +368,27 @@
       "originExperienceId": "willow_exp_independent_application",
       "title": "The Lesson Made Yours",
       "primaryTargetId": "npc_elder_willow",
-      "participantIds": ["player", "npc_elder_willow"],
+      "participantIds": [
+        "player",
+        "npc_elder_willow"
+      ],
       "memoryType": "shared",
       "significance": "defining",
       "playerVisible": true,
       "summary": "You recognized Willow's pattern where Willow was not present to point it out.",
       "protagonistView": "The method had become useful enough to become automatic.",
       "targetView": "The student no longer needed the teacher to see.",
-      "resonanceTags": ["Wisdom", "Understanding", "Application", "Transformation", "IndependentUnderstanding"],
+      "resonanceTags": [
+        "Wisdom",
+        "Understanding",
+        "Application",
+        "Transformation",
+        "IndependentUnderstanding"
+      ],
       "bondContribution": "Mentor / Student — established",
-      "traitRelevance": ["WillowsWisdom"],
+      "traitRelevance": [
+        "WillowsWisdom"
+      ],
       "persistence": "stable"
     }
   },
@@ -314,7 +415,9 @@
           "level": 1,
           "minimumProgress": 10,
           "minimumExperienceCount": 2,
-          "requiredExperienceIds": ["willow_exp_first_lesson"],
+          "requiredExperienceIds": [
+            "willow_exp_first_lesson"
+          ],
           "anyOfExperienceIds": [
             "willow_exp_first_question_admit",
             "willow_exp_first_question_deflect",
@@ -332,7 +435,9 @@
             "willow_exp_three_nights_teaching",
             "willow_exp_independent_application"
           ],
-          "requiredMemoryTags": ["Application"],
+          "requiredMemoryTags": [
+            "Application"
+          ],
           "minimumDimensions": {
             "understanding": 35,
             "sharedMeaning": 20

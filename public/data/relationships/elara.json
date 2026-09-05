@@ -5,7 +5,10 @@
       "uniqueKey": "elara:ec01:model-challenged",
       "title": "A Useful Objection",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elara_greeting",
       "significance": "meaningful",
@@ -17,7 +20,11 @@
         "reciprocity": 2
       },
       "connectionProgressDelta": 8,
-      "resonanceTags": ["Inquiry", "Evidence", "Challenge"],
+      "resonanceTags": [
+        "Inquiry",
+        "Evidence",
+        "Challenge"
+      ],
       "traitEffects": [
         {
           "traitId": "ScholarlyInsight",
@@ -34,7 +41,10 @@
       "uniqueKey": "elara:ec02:contradictory-footnote",
       "title": "The Contradictory Footnote",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elara_contradictory_footnote",
       "significance": "meaningful",
@@ -45,13 +55,19 @@
         "reciprocity": 3
       },
       "connectionProgressDelta": 10,
-      "resonanceTags": ["Inquiry", "Evidence", "Anomaly", "Collaboration"],
+      "resonanceTags": [
+        "Inquiry",
+        "Evidence",
+        "Anomaly",
+        "Collaboration"
+      ],
       "traitEffects": [
         {
           "traitId": "ScholarlyInsight",
           "compatibilityDelta": 5,
           "assimilationDelta": 10,
-          "note": "Contradictory evidence becomes a shared problem rather than an inconvenience to remove."
+          "note": "Contradictory evidence becomes a shared problem rather than an inconvenience to remove.",
+          "discover": true
         }
       ],
       "memoryCandidate": false,
@@ -62,7 +78,10 @@
       "uniqueKey": "elara:ec03:tome-committed",
       "title": "A Model Put at Risk",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "quest",
       "sourceId": "quest_elara_lost_tome",
       "significance": "meaningful",
@@ -72,7 +91,11 @@
         "reciprocity": 2
       },
       "connectionProgressDelta": 6,
-      "resonanceTags": ["Inquiry", "Evidence", "Commitment"],
+      "resonanceTags": [
+        "Inquiry",
+        "Evidence",
+        "Commitment"
+      ],
       "memoryCandidate": false,
       "interpretation": "Elara puts one of her own published assumptions at risk by handing over the contradictory source and inviting a real test."
     },
@@ -81,7 +104,10 @@
       "uniqueKey": "elara:ec04:tome-resolution",
       "title": "Evidence Over Ownership",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "quest",
       "sourceId": "quest_elara_lost_tome",
       "significance": "major",
@@ -93,7 +119,12 @@
         "reciprocity": 8
       },
       "connectionProgressDelta": 18,
-      "resonanceTags": ["Evidence", "Revision", "Collaboration", "CostlyCorrection"],
+      "resonanceTags": [
+        "Evidence",
+        "Revision",
+        "Collaboration",
+        "CostlyCorrection"
+      ],
       "traitEffects": [
         {
           "traitId": "ScholarlyInsight",
@@ -111,7 +142,10 @@
       "uniqueKey": "elara:ec04:tome-resolution",
       "title": "Consensus Preserved",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "quest",
       "sourceId": "quest_elara_lost_tome",
       "significance": "major",
@@ -122,7 +156,10 @@
         "sharedMeaning": 1
       },
       "connectionProgressDelta": 5,
-      "resonanceTags": ["Consensus", "Caution"],
+      "resonanceTags": [
+        "Consensus",
+        "Caution"
+      ],
       "traitEffects": [
         {
           "traitId": "ScholarlyInsight",
@@ -138,7 +175,10 @@
       "uniqueKey": "elara:ec05:revision-mutual",
       "title": "Revision Is Mutual",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elara_revision_mutual",
       "significance": "meaningful",
@@ -150,7 +190,12 @@
         "reciprocity": 7
       },
       "connectionProgressDelta": 12,
-      "resonanceTags": ["Evidence", "Revision", "Reciprocity", "IntellectualFriction"],
+      "resonanceTags": [
+        "Evidence",
+        "Revision",
+        "Reciprocity",
+        "IntellectualFriction"
+      ],
       "traitEffects": [
         {
           "traitId": "ScholarlyInsight",
@@ -167,7 +212,10 @@
       "uniqueKey": "elara:ec06:theory-neither-owned",
       "title": "A Theory Neither Owned",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elara_theory_neither_owned",
       "significance": "major",
@@ -179,7 +227,12 @@
         "reciprocity": 10
       },
       "connectionProgressDelta": 15,
-      "resonanceTags": ["Collaboration", "MutualRevision", "Inquiry", "Evidence"],
+      "resonanceTags": [
+        "Collaboration",
+        "MutualRevision",
+        "Inquiry",
+        "Evidence"
+      ],
       "traitEffects": [
         {
           "traitId": "ScholarlyInsight",
@@ -197,7 +250,10 @@
       "uniqueKey": "elara:ec07:independent-verification",
       "title": "The Result Held Without Her",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "dialogue",
       "sourceId": "elara_independent_verification",
       "significance": "defining",
@@ -208,7 +264,12 @@
         "reciprocity": 5
       },
       "connectionProgressDelta": 18,
-      "resonanceTags": ["IndependentVerification", "Evidence", "Revision", "Transformation"],
+      "resonanceTags": [
+        "IndependentVerification",
+        "Evidence",
+        "Revision",
+        "Transformation"
+      ],
       "traitEffects": [
         {
           "traitId": "ScholarlyInsight",
@@ -226,7 +287,10 @@
       "uniqueKey": "elara:ec08:scholarly-insight-resonance",
       "title": "Resonance: Scholarly Insight",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "sourceType": "system",
       "sourceId": "ScholarlyInsight",
       "significance": "defining",
@@ -234,7 +298,12 @@
         "sharedMeaning": 2
       },
       "connectionProgressDelta": 0,
-      "resonanceTags": ["Inquiry", "Evidence", "Revision", "Resonance"],
+      "resonanceTags": [
+        "Inquiry",
+        "Evidence",
+        "Revision",
+        "Resonance"
+      ],
       "memoryCandidate": false,
       "interpretation": "Essence stabilizes an evidence-first revision habit already demonstrated through reciprocal inquiry and independent verification."
     }
@@ -245,16 +314,26 @@
       "originExperienceId": "elara_exp_follow_evidence",
       "title": "The Footnote That Won",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "memoryType": "shared",
       "significance": "major",
       "playerVisible": true,
       "summary": "A minor contradiction overturned a respected conclusion because both of you chose the evidence over ownership of the old model.",
       "protagonistView": "Expertise became more useful when it was allowed to lose an argument.",
       "targetView": "The collaborator cared enough about the work to challenge mine and remain after the correction became costly.",
-      "resonanceTags": ["Evidence", "Revision", "Collaboration", "CostlyCorrection"],
+      "resonanceTags": [
+        "Evidence",
+        "Revision",
+        "Collaboration",
+        "CostlyCorrection"
+      ],
       "bondContribution": "Investigators — reciprocal",
-      "traitRelevance": ["ScholarlyInsight"],
+      "traitRelevance": [
+        "ScholarlyInsight"
+      ],
       "persistence": "stable"
     },
     "elara_memory_theory_neither_owned": {
@@ -262,16 +341,25 @@
       "originExperienceId": "elara_exp_theory_neither_owned",
       "title": "A Theory Neither Owned",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "memoryType": "shared",
       "significance": "major",
       "playerVisible": true,
       "summary": "You built a model together only after evidence broke the versions each of you preferred.",
       "protagonistView": "A collaborator who can overturn my model is more valuable than an assistant who confirms it.",
       "targetView": "The relationship became intellectually reciprocal: correction could move in either direction.",
-      "resonanceTags": ["Collaboration", "MutualRevision", "Reciprocity"],
+      "resonanceTags": [
+        "Collaboration",
+        "MutualRevision",
+        "Reciprocity"
+      ],
       "bondContribution": "Epistemic peers — emerging",
-      "traitRelevance": ["ScholarlyInsight"],
+      "traitRelevance": [
+        "ScholarlyInsight"
+      ],
       "persistence": "stable"
     },
     "elara_memory_result_held_without_her": {
@@ -279,16 +367,25 @@
       "originExperienceId": "elara_exp_independent_verification",
       "title": "The Result Held Without Her",
       "primaryTargetId": "npc_scholar_elara",
-      "participantIds": ["player", "npc_scholar_elara"],
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
       "memoryType": "shared",
       "significance": "defining",
       "playerVisible": true,
       "summary": "You reproduced the method on a problem Elara had never seen, then brought back a result she could independently verify.",
       "protagonistView": "The method no longer depended on Elara's presence or authority.",
       "targetView": "The collaborator had become a peer capable of producing falsifiable work independently.",
-      "resonanceTags": ["IndependentVerification", "Evidence", "Transformation"],
+      "resonanceTags": [
+        "IndependentVerification",
+        "Evidence",
+        "Transformation"
+      ],
       "bondContribution": "Epistemic peers — established",
-      "traitRelevance": ["ScholarlyInsight"],
+      "traitRelevance": [
+        "ScholarlyInsight"
+      ],
       "persistence": "stable"
     }
   },
@@ -332,7 +429,9 @@
             "elara_exp_theory_neither_owned",
             "elara_exp_independent_verification"
           ],
-          "requiredMemoryTags": ["IndependentVerification"],
+          "requiredMemoryTags": [
+            "IndependentVerification"
+          ],
           "minimumDimensions": {
             "understanding": 45,
             "sharedMeaning": 35,
