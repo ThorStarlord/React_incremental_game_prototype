@@ -12,6 +12,8 @@ import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from 
 import { TRADING } from '../../../constants/gameConstants';
 import { getItemDef } from '../../../shared/data/itemCatalog';
 import { addItem } from '../../Inventory/state/InventorySlice';
+import { initializeBondProfile, resetRelationships } from '../../Relationships/state/RelationshipSlice';
+import { recordAuthoredRelationshipExperienceThunk } from '../../Relationships/state/RelationshipThunks';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -86,6 +88,25 @@ export const newGameSeedNPCsThunk = createAsyncThunk(
           completedDialogues: [],
         }
       } as Record<string, NPC>;
+
+      // Shadow relationship state is additive during M3. Legacy NPC affinity/depth
+      // remains authoritative until the explicit Connection cutover phase.
+      dispatch(resetRelationships());
+      dispatch(initializeBondProfile({
+        npcId: 'npc_elder_willow',
+        dimensions: {
+          affinity: 0,
+          trust: 5,
+          understanding: 0,
+          sharedMeaning: 0,
+          reliance: 0,
+          vulnerability: 0,
+          reciprocity: 0,
+        },
+        connectionLevel: 0,
+        connectionProgress: 0,
+      }));
+
       dispatch(setNPCs(seeded));
       await dispatch(updateEssenceGenerationRateThunk());
       return Object.keys(seeded);
@@ -98,6 +119,8 @@ export const newGameSeedNPCsThunk = createAsyncThunk(
 
 /**
  * REWRITTEN THUNK: Handles relationship updates with "level up" logic for connection depth.
+ *
+ * MIGRATION NOTE: this remains the legacy authoritative path during relationship shadow mode.
  */
 export const updateNPCRelationshipThunk = createAsyncThunk(
   'npcs/updateRelationship',
@@ -217,16 +240,42 @@ export const processNPCInteractionThunk = createAsyncThunk<
           } else if (eff.type === 'OPEN_SERVICE') {
             // Inform user to check Services tab
             dispatch(addNotification({ type: 'info', message: 'A service is now available.' }));
+          } else if (eff.type === 'RELATIONSHIP_EXPERIENCE') {
+            const experienceId = eff.experienceId || (
+              selectedResponse ? eff.experienceIdByResponse?.[selectedResponse] : undefined
+            );
+            if (experienceId) {
+              await dispatch(recordAuthoredRelationshipExperienceThunk({
+                experienceId,
+                timestamp: now,
+              }));
+            }
           }
         }
 
         // Determine next node
         const nextId = selectedResponse && node.next ? node.next[selectedResponse] : undefined;
         if (nextId) {
-          // Fire-and-forget next node text as an additional response line for feedback
+          // Fire-and-forget next node text as an additional response line for feedback.
           const nextNode = (nodes as any)[nextId];
           if (nextNode && nextNode.text) {
             npcText = nextNode.text;
+          }
+
+          // Shadow-mode compatibility: relationship-only effects on the resolved next
+          // node may record evidence without activating any additional legacy effects.
+          const nextEffects = Array.isArray(nextNode?.effects) ? nextNode.effects : [];
+          for (const eff of nextEffects) {
+            if (eff.type !== 'RELATIONSHIP_EXPERIENCE') continue;
+            const experienceId = eff.experienceId || (
+              selectedResponse ? eff.experienceIdByResponse?.[selectedResponse] : undefined
+            );
+            if (experienceId) {
+              await dispatch(recordAuthoredRelationshipExperienceThunk({
+                experienceId,
+                timestamp: now + 1,
+              }));
+            }
           }
         }
       } else if (playerMessage) {
