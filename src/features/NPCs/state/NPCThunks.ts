@@ -36,12 +36,9 @@ export const initializeNPCsThunk = createAsyncThunk<
       }
       const data: Record<string, NPC> = await response.json();
 
-      // Register relationship migration/config definitions for loaded games without
-      // fabricating profiles or historical evidence.
       await dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: false }));
       dispatch(updateEssenceGenerationRateThunk());
 
-      // Load dialogue nodes (best-effort)
       try {
         const dres = await fetch('/data/dialogues.json');
         if (dres.ok) {
@@ -58,19 +55,13 @@ export const initializeNPCsThunk = createAsyncThunk<
   }
 );
 
-/**
- * Thunk for discovering an NPC
- */
 export const discoverNPCThunk = createAsyncThunk(
   'npcs/discoverNPC',
-  async (npcId: string) => {
-    return npcId;
-  }
+  async (npcId: string) => npcId
 );
 
 /**
- * NEW GAME THUNK: Seeds the world with only the Elder Willow NPC in a stripped-down state for onboarding.
- * Fetches the full NPC dataset, extracts npc_elder_willow, normalizes starting values, and dispatches setNPCs.
+ * NEW GAME THUNK: Seeds Willow-only onboarding and the authored M4 relationship config.
  */
 export const newGameSeedNPCsThunk = createAsyncThunk(
   'npcs/newGameSeed',
@@ -92,13 +83,13 @@ export const newGameSeedNPCsThunk = createAsyncThunk(
           discoveredAt: Date.now(),
           availableQuests: [],
           completedQuests: [],
-          availableDialogues: elder.availableDialogues?.slice(0,1) || [],
+          // All authored Willow topics can exist in the NPC definition; the UI and
+          // runtime gates reveal/allow them only when their Experience prerequisites hold.
+          availableDialogues: elder.availableDialogues || [],
           completedDialogues: [],
         }
       } as Record<string, NPC>;
 
-      // M4 is Willow-first: reset durable relationship evidence, seed the authored
-      // Willow profile/config, and leave every unmigrated NPC on legacy authority.
       dispatch(resetRelationships());
       dispatch(setNPCs(seeded));
       await dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: true }));
@@ -113,10 +104,7 @@ export const newGameSeedNPCsThunk = createAsyncThunk(
 
 /**
  * Handles short-horizon NPC Affinity updates.
- *
- * For legacy NPCs, Affinity >= 100 still rolls into connectionDepth. For NPCs
- * explicitly migrated in relationship authoring data (Willow in M4), Affinity
- * is clamped as disposition only and can never level Connection by itself.
+ * Migrated NPCs never roll Affinity into Connection; legacy NPCs still do.
  */
 export const updateNPCRelationshipThunk = createAsyncThunk(
   'npcs/updateRelationship',
@@ -136,11 +124,10 @@ export const updateNPCRelationshipThunk = createAsyncThunk(
     let connectionDepthIncrease = 0;
 
     if (usesRelationshipAuthority) {
-      newAffinity = Math.max(0, Math.min(100, newAffinity));
+      newAffinity = Math.max(-100, Math.min(100, newAffinity));
     } else if (newAffinity >= 100) {
       connectionDepthIncrease = Math.floor(newAffinity / 100);
       newAffinity = newAffinity % 100;
-
       dispatch(increaseConnectionDepth({ npcId, amount: connectionDepthIncrease }));
       dispatch(addNotification({
         type: 'success',
@@ -148,6 +135,8 @@ export const updateNPCRelationshipThunk = createAsyncThunk(
       }));
     }
 
+    // setAffinity is a legacy 0..100 reducer. Migrated authored Affinity normally
+    // projects through updateNpcAffinity; free-text/legacy deltas remain bounded here.
     dispatch(setAffinity({ npcId, value: newAffinity }));
 
     const logEntry: RelationshipChangeEntry = {
@@ -163,14 +152,10 @@ export const updateNPCRelationshipThunk = createAsyncThunk(
     dispatch(addRelationshipChangeEntry(logEntry));
 
     await dispatch(updateEssenceGenerationRateThunk());
-
     return { ...payload, connectionDepthIncrease };
   }
 );
 
-/**
- * Thunk for updating an NPC's connection depth directly (for debug).
- */
 export const updateNPCConnectionDepthThunk = createAsyncThunk(
   'npcs/updateConnectionDepth',
   async (payload: { npcId: string; newDepth: number }, { dispatch }) => {
@@ -180,9 +165,6 @@ export const updateNPCConnectionDepthThunk = createAsyncThunk(
   }
 );
 
-/**
- * NEW THUNK: Debug action to unlock all of an NPC's shared trait slots.
- */
 export const debugUnlockAllSharedSlots = createAsyncThunk(
   'npcs/debugUnlockSlots',
   async (npcId: string, { dispatch }) => {
@@ -191,9 +173,6 @@ export const debugUnlockAllSharedSlots = createAsyncThunk(
   }
 );
 
-/**
- * Placeholder thunk for processing NPC interaction
- */
 export const processNPCInteractionThunk = createAsyncThunk<
   InteractionResult,
   { npcId: string; interactionType: string; context?: any },
@@ -212,7 +191,6 @@ export const processNPCInteractionThunk = createAsyncThunk<
       const choiceId = context?.choiceId as string | undefined;
       const selectedResponse = context?.selectedResponse as string | undefined;
       const playerMessage = context?.playerMessage as string | undefined;
-
       const nodes = (getState() as RootState).npcs.dialogueNodes || {};
       let relDelta = 0;
       let npcText = '';
@@ -223,9 +201,41 @@ export const processNPCInteractionThunk = createAsyncThunk<
           dispatch(addNotification({ type: 'info', message: 'They are not ready to discuss that yet.' }));
           return { success: false, message: 'Dialogue gate not met.' } as InteractionResult;
         }
+
+        const currentRelationships = (getState() as RootState).relationships;
+        const recordedExperiences = currentRelationships?.experiencesById ?? {};
+        const requiredExperienceIds = Array.isArray(node.requiredExperienceIds)
+          ? node.requiredExperienceIds as string[]
+          : [];
+        const missingRequired = requiredExperienceIds.find(id => !recordedExperiences[id]);
+        if (missingRequired) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'This conversation has not become meaningful yet.',
+          }));
+          return { success: false, message: `Missing relationship evidence: ${missingRequired}` } as InteractionResult;
+        }
+
+        const anyOfExperienceIds = Array.isArray(node.anyOfExperienceIds)
+          ? node.anyOfExperienceIds as string[]
+          : [];
+        if (
+          anyOfExperienceIds.length > 0 &&
+          !anyOfExperienceIds.some(id => Boolean(recordedExperiences[id]))
+        ) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'This conversation depends on an earlier decision.',
+          }));
+          return { success: false, message: 'Missing alternative relationship evidence.' } as InteractionResult;
+        }
+
         npcText = node.text || node.title || '';
         const effects = Array.isArray(node.effects) ? node.effects : [];
         for (const eff of effects) {
+          // A response-scoped effect must only fire for that actual response.
+          if (eff.responseId && eff.responseId !== selectedResponse) continue;
+
           if (eff.type === 'AFFINITY_DELTA') {
             relDelta += Number(eff.value) || 0;
           } else if (eff.type === 'UNLOCK_QUEST') {
@@ -258,11 +268,13 @@ export const processNPCInteractionThunk = createAsyncThunk<
             npcText = nextNode.text;
           }
 
-          // A resolved continuation may contribute authored relationship evidence.
-          // Other continuation effects remain opt-in through an explicit later click.
+          // The existing lightweight dialogue runtime displays the next node inline.
+          // Relationship-only continuation effects therefore record the evidence that
+          // was actually displayed; resource/quest effects still require an explicit click.
           const nextEffects = Array.isArray(nextNode?.effects) ? nextNode.effects : [];
           for (const eff of nextEffects) {
             if (eff.type !== 'RELATIONSHIP_EXPERIENCE') continue;
+            if (eff.responseId && eff.responseId !== selectedResponse) continue;
             const experienceId = eff.experienceId || (
               selectedResponse ? eff.experienceIdByResponse?.[selectedResponse] : undefined
             );
@@ -298,9 +310,6 @@ export const processNPCInteractionThunk = createAsyncThunk<
   }
 );
 
-/**
- * Thunk: Shop restock processing. Call periodically (e.g., from game loop tick handler) to refresh NPC stocks.
- */
 export const processNpcShopRestockThunk = createAsyncThunk(
   'npcs/processShopRestock',
   async (_, { getState, dispatch }) => {
@@ -308,8 +317,7 @@ export const processNpcShopRestockThunk = createAsyncThunk(
     const now = Date.now();
     const npcs = Object.values(state.npcs.npcs);
     for (const npc of npcs) {
-      if (!npc) continue;
-      if (!npc.shopStock) continue;
+      if (!npc || !npc.shopStock) continue;
       const last = npc.lastRestockAt || 0;
       if (now - last < TRADING.REFRESH_INTERVAL_MS) continue;
 
@@ -340,9 +348,6 @@ export const processNpcShopRestockThunk = createAsyncThunk(
   }
 );
 
-/**
- * Placeholder thunk for sharing trait with NPC
- */
 export const shareTraitWithNPCThunk = createAsyncThunk(
   'npcs/shareTrait',
   async (
@@ -391,9 +396,6 @@ export const shareTraitWithNPCThunk = createAsyncThunk(
   }
 );
 
-/**
- * Thunk: Purchase an NPC service
- */
 export const purchaseNPCServiceThunk = createAsyncThunk(
   'npcs/purchaseService',
   async (
@@ -428,20 +430,13 @@ export const purchaseNPCServiceThunk = createAsyncThunk(
     const base = typeof service.currentPrice === 'number' ? service.currentPrice : (service.basePrice || 0);
     const discountPct = Math.min(Math.floor((npc.affinity || 0) / 5), 20);
     let price = Math.max(0, Math.floor(base * (1 - discountPct / 100)));
+    if (price <= 0) price = 0;
 
-    if (price <= 0) {
-      price = 0;
-    }
-
-    const playerGold = state.player.gold;
-    if (price > playerGold) {
+    if (price > state.player.gold) {
       dispatch(addNotification({ type: 'warning', message: 'Not enough gold.' }));
       return payload;
     }
-
-    if (price > 0) {
-      dispatch(spendGold(price));
-    }
+    if (price > 0) dispatch(spendGold(price));
 
     if (/combat_trainer|trainer_/i.test(serviceId)) {
       dispatch(addAvailableAttributePoints(1));
