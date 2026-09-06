@@ -1,6 +1,6 @@
 # Elara Collaborative Relationship Migration
 
-**Status:** M7 implemented; exact-head requalification pending after this documentation commit  
+**Status:** M7 implemented and exact-head qualified; Build Validation #98 passed  
 **Scope:** Scholar Elara production relationship migration stacked on PR #25  
 **Purpose:** Prove that the relationship framework can express a third materially different relational logic primarily through authored data and existing generic mechanics.
 
@@ -351,9 +351,9 @@ The test was not weakened.
 
 This makes independent replication the strongest evidence that the protagonist has actually internalized the pattern, which is narratively and mechanically preferable to treating one earlier publication decision as permanently decisive.
 
-### Code/content candidate result
+### Exact-head result
 
-Build Validation run **#97** on code/content head `7a5f3bd9965fcc4f51ed83a4320167b6d189debf` passed:
+Build Validation run **#98** on exact head `652d1f3518b510633791f78041603c309c9f32ee` passed:
 
 - `npm ci`;
 - `npx tsc --noEmit`;
@@ -363,7 +363,7 @@ Build Validation run **#97** on code/content head `7a5f3bd9965fcc4f51ed83a432016
 - Elara/M7 collaboration suite;
 - production build.
 
-Because this document creates a later commit, the final exact-head qualification must be taken from the Build Validation run triggered after this documentation commit.
+This record reflects the qualified M7 candidate; any later review-fix commit must receive a new exact-head Build Validation run before merge.
 
 ---
 
