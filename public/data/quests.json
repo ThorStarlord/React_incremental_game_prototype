@@ -123,14 +123,26 @@
   "quest_silas_retrieve_item": {
     "id": "quest_silas_retrieve_item",
     "title": "A Shady Delivery",
-    "description": "Silas needs a package retrieved from a drop point in the sewers. He warns it's best not to ask what's inside.",
+    "description": "Silas wants a sealed package returned without converting curiosity into leverage. A runner has already brought it as far as the Rusty Mug; your choice is what to do with the access you were given.",
     "giver": "npc_rogue_silas",
     "type": "SIDE",
     "objectives": [
-      { "objectiveId": "1", "description": "Retrieve the package", "type": "GATHER", "target": "item_shady_package", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+      { "objectiveId": "1", "description": "Return the sealed package to Silas", "type": "GATHER", "target": "item_shady_package", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
     ],
     "prerequisites": [],
     "rewards": [{ "type": "GOLD", "value": 100 }],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "return_unopened",
+        "label": "Return It Unopened",
+        "description": "Give the package back without turning access into information Silas did not agree to sell.",
+        "relationshipExperienceId": "silas_exp_package_unopened",
+        "consumeItems": [{ "itemId": "item_shady_package", "quantity": 1 }],
+        "rewards": [],
+        "logMessage": "You return the package unopened. Silas now knows your restraint can be relied on without pretending that either of you has become harmless."
+      }
+    ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
