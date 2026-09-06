@@ -1,6 +1,6 @@
 # Trait Discovery Contract
 
-**Status:** M8 implemented; exact-head requalification pending after documentation reconciliation  
+**Status:** M8 implemented and exact-head qualified; Build Validation #104 passed  
 **Scope:** Trait catalogue loading, authored discovery, New Game reset, relationship evidence integration, and player-facing information boundaries  
 **Purpose:** Make `Discover -> Equip/Attune -> Assimilate -> Resonate` a real progression lifecycle rather than a nominal gate that catalogue loading satisfied automatically.
 
@@ -342,9 +342,9 @@ The production-data-backed Elara M7 suite now additionally proves:
 - The Contradictory Footnote does;
 - the rest of the collaborative path can then assimilate and permanently Resonate it.
 
-### Code candidate result
+### Exact-head result
 
-Build Validation **#102** on code candidate `ce1553763d1f13afc267bb83f5203e50c7babbfc` passed:
+Build Validation **#104** on exact head `2ccdb9f64981c53903fa31a8da22774eb8a06645` passed:
 
 - `npm ci`;
 - `npx tsc --noEmit`;
@@ -357,7 +357,7 @@ Build Validation **#102** on code candidate `ce1553763d1f13afc267bb83f5203e50c7b
 
 The first M8 red run was a TypeScript-only test-fixture literal-widening issue (`'authored'` inferred as `string`); the runtime model was unchanged. The fixture was corrected to preserve the literal type and then requalified.
 
-Because this document and feature-spec reconciliation create later commits, final exact-head qualification must be taken from the Build Validation run after those documentation changes.
+This record reflects the qualified M8 candidate; any later review-fix commit must receive a new exact-head Build Validation run before merge.
 
 ---
 
