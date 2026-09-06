@@ -27,6 +27,7 @@ const manifest = readJson('public/data/relationships/index.json');
 const willowBundle = readJson('public/data/relationships/elder-willow.json');
 const lyraBundle = readJson('public/data/relationships/lyra.json');
 const elaraBundle = readJson('public/data/relationships/elara.json');
+const gronkBundle = readJson('public/data/relationships/gronk.json');
 const npcs = readJson('public/data/npcs.json');
 const traits = readJson('public/data/traits.json');
 
@@ -34,6 +35,7 @@ const bundleByUrl: Record<string, any> = {
   '/data/relationships/elder-willow.json': willowBundle,
   '/data/relationships/lyra.json': lyraBundle,
   '/data/relationships/elara.json': elaraBundle,
+  '/data/relationships/gronk.json': gronkBundle,
 };
 
 const makeStore = () => configureStore({ reducer: rootReducer });
