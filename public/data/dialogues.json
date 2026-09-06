@@ -252,6 +252,114 @@
       "withhold": null
     }
   },
+  "lyra_strategic_defeat": {
+    "id": "lyra_strategic_defeat",
+    "npcId": "npc_lyra",
+    "title": "Strategic Defeat, Not Submission",
+    "text": "Lyra has you tactically contained and expects the advantage to end the argument. You concede the position, not the premise. Her expression hardens when she realizes defeat has made you more precise rather than compliant.",
+    "responses": {
+      "hold_ground": "You won the position. You did not prove the principle behind it.",
+      "yield": "Fine. You have the advantage."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_strategic_defeat", "responseId": "hold_ground" }
+    ],
+    "next": {
+      "hold_ground": null,
+      "yield": null
+    }
+  },
+  "lyra_coercion_reflected": {
+    "id": "lyra_coercion_reflected",
+    "npcId": "npc_lyra",
+    "title": "Coercion Reflected",
+    "text": "Lyra uses harmonic pressure to force a clean choice. You recognize the constraint she is trying to impose and mirror its structure back at her, making brute pressure less informative than understanding your response.",
+    "requiredExperienceIds": ["lyra_exp_strategic_defeat"],
+    "responses": {
+      "reflect": "If your model of me were right, you would not need the pressure. Adjust the model.",
+      "retreat": "Not today."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_coercion_reflected", "responseId": "reflect" }
+    ],
+    "next": {
+      "reflect": null,
+      "retreat": null
+    }
+  },
+  "lyra_offer_cotraining": {
+    "id": "lyra_offer_cotraining",
+    "npcId": "npc_lyra",
+    "title": "A Problem Neither Side Can Solo",
+    "text": "A Chrono Crypt lock is oscillating across two incompatible harmonic frames. Lyra can stabilize one side and you can model the other, but neither of you can hold both. 'Temporary coordination,' she says. 'Do not mistake necessity for trust.'",
+    "requiredExperienceIds": ["lyra_exp_coercion_reflected"],
+    "responses": {
+      "accept": "Good. We coordinate exactly as long as the problem requires.",
+      "refuse": "Find someone else to synchronize with."
+    },
+    "effects": [
+      { "type": "UNLOCK_QUEST", "questId": "quest_lyra_chrono_crypt_calibration", "responseId": "accept" },
+      { "type": "GIVE_ITEM", "itemId": "item_lyra_harmonic_key", "amount": 1, "responseId": "accept" }
+    ],
+    "next": {
+      "accept": null,
+      "refuse": null
+    }
+  },
+  "lyra_ideological_friction": {
+    "id": "lyra_ideological_friction",
+    "npcId": "npc_lyra",
+    "title": "Ideological Friction",
+    "text": "After the crypt exercise, Lyra rejects your conclusion that effective coordination weakens the case for rigid command. You reject her claim that discipline justifies hierarchy. Neither argument survives in caricature anymore.",
+    "requiredExperienceIds": ["lyra_exp_reluctant_cotraining"],
+    "responses": {
+      "argue": "I understand your principle better now. I still think it produces the wrong world.",
+      "avoid": "We solved the lock. Leave the politics out of it."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_ideological_friction", "responseId": "argue" }
+    ],
+    "next": {
+      "argue": null,
+      "avoid": null
+    }
+  },
+  "lyra_mutual_calibration": {
+    "id": "lyra_mutual_calibration",
+    "npcId": "npc_lyra",
+    "title": "Mutual Calibration",
+    "text": "Lyra changes her opening line before you can exploit it. You had already changed your counter because you expected her to notice. For the first time, the confrontation begins from the model each of you has built of the other rather than from a rehearsed tactic.",
+    "requiredExperienceIds": ["lyra_exp_ideological_friction"],
+    "responses": {
+      "calibrate": "You changed because you knew what I would see. I did the same.",
+      "deny": "Coincidence. Do not romanticize adaptation."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_mutual_calibration", "responseId": "calibrate" }
+    ],
+    "next": {
+      "calibrate": null,
+      "deny": null
+    }
+  },
+  "lyra_enemies_in_phase": {
+    "id": "lyra_enemies_in_phase",
+    "npcId": "npc_lyra",
+    "title": "Enemies in Phase",
+    "text": "The Chrono Crypt destabilizes again, this time too quickly for explicit coordination. You and Lyra move on predictions built from every prior confrontation. The lock collapses into phase. When the danger passes, neither of you offers reconciliation.",
+    "requiredExperienceIds": ["lyra_exp_mutual_calibration"],
+    "responses": {
+      "solve": "We still disagree. But neither of us can pretend the other is simple anymore.",
+      "break_phase": "That coordination was an accident. It means nothing."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_proto_bond", "responseId": "solve" }
+    ],
+    "next": {
+      "solve": null,
+      "break_phase": null
+    }
+  },
   "valerius_greeting": {
     "id": "valerius_greeting",
     "npcId": "npc_captain_valerius",
