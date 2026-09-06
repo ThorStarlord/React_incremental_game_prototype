@@ -1,0 +1,130 @@
+{
+  "experiences": {
+    "valerius_exp_objective_before_obedience": {
+      "id": "valerius_exp_objective_before_obedience",
+      "uniqueKey": "valerius:m12:01:objective-before-obedience",
+      "title": "Objective Before Obedience",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_report",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 5,
+        "understanding": 6,
+        "sharedMeaning": 3,
+        "reliance": 1,
+        "reciprocity": 1
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["Institutional", "Discipline", "MissionIntent"],
+      "memoryCandidate": false,
+      "interpretation": "You treat Valerius's order as a mission with constraints rather than a demand for deference. He notices that you are trying to understand command intent, not merely perform obedience."
+    },
+    "valerius_exp_report_without_theatre": {
+      "id": "valerius_exp_report_without_theatre",
+      "uniqueKey": "valerius:m12:02:report-without-theatre",
+      "title": "The Report Without Theatre",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "sourceType": "quest",
+      "sourceId": "quest_valerius_patrol_duty",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 9,
+        "understanding": 6,
+        "sharedMeaning": 7,
+        "reliance": 9,
+        "vulnerability": 1,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 17,
+      "resonanceTags": ["Institutional", "Reliability", "AfterAction", "Duty"],
+      "memoryCandidate": false,
+      "interpretation": "You report the patrol as it actually happened, including a weakness in the Watch deployment. Valerius gains evidence that your reliability includes unwelcome information rather than only compliant performance."
+    },
+    "valerius_exp_order_questioned": {
+      "id": "valerius_exp_order_questioned",
+      "uniqueKey": "valerius:m12:03:order-questioned",
+      "title": "The Order He Let You Question",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_city_issues",
+      "significance": "defining",
+      "relationshipEffects": {
+        "affinity": -1,
+        "trust": 14,
+        "understanding": 12,
+        "sharedMeaning": 12,
+        "reliance": 12,
+        "vulnerability": 5,
+        "reciprocity": 9
+      },
+      "connectionProgressDelta": 28,
+      "resonanceTags": ["InstitutionalTrust", "DisciplinedDissent", "DelegatedJudgment", "Duty"],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "valerius_memory_order_questioned",
+      "interpretation": "You challenge an order by showing how it endangers the mission the order was meant to serve. Valerius changes the deployment without treating disciplined dissent as disloyalty."
+    }
+  },
+  "memories": {
+    "valerius_memory_order_questioned": {
+      "id": "valerius_memory_order_questioned",
+      "originExperienceId": "valerius_exp_order_questioned",
+      "title": "The Order He Let You Question",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "You challenged an order by naming the objective it endangered, and Valerius changed the deployment instead of demanding ceremonial obedience.",
+      "protagonistView": "Valerius values discipline enough to revise an order when the mission demands it. His authority is more useful when it can survive a precise objection.",
+      "targetView": "The player can question command without confusing dissent with defiance. That makes independent judgment something I can delegate rather than suppress.",
+      "resonanceTags": ["InstitutionalTrust", "DisciplinedDissent", "DelegatedJudgment", "Duty"],
+      "bondContribution": "Trusted Field Counsel — emerging",
+      "persistence": "stable"
+    }
+  },
+  "progression": {
+    "npc_captain_valerius": {
+      "npcId": "npc_captain_valerius",
+      "connectionAuthority": "relationships",
+      "qualificationRules": [
+        {
+          "level": 1,
+          "minimumProgress": 25,
+          "minimumExperienceCount": 2,
+          "requiredExperienceIds": [
+            "valerius_exp_objective_before_obedience",
+            "valerius_exp_report_without_theatre"
+          ],
+          "minimumDimensions": {
+            "trust": 12,
+            "understanding": 10,
+            "reliance": 8
+          }
+        },
+        {
+          "level": 2,
+          "minimumProgress": 50,
+          "minimumExperienceCount": 3,
+          "requiredExperienceIds": ["valerius_exp_order_questioned"],
+          "requiredMemoryTags": ["DisciplinedDissent"],
+          "minimumDimensions": {
+            "trust": 25,
+            "understanding": 22,
+            "reliance": 18,
+            "reciprocity": 12
+          }
+        }
+      ],
+      "essence": {
+        "enabled": true,
+        "startingTetherState": "present"
+      }
+    }
+  }
+}
