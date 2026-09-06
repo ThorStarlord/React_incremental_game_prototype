@@ -234,7 +234,7 @@ export const createDefaultBondProfile = (
     reliance: seed?.dimensions?.reliance ?? 0,
     vulnerability: seed?.dimensions?.vulnerability ?? 0,
     reciprocity: seed?.dimensions?.reciprocity ?? 0,
-    custom: seed?.dimensions?.custom ?? {},
+    custom: { ...(seed?.dimensions?.custom ?? {}) },
   },
   connectionLevel: seed?.connectionLevel ?? 0,
   connectionProgress: seed?.connectionProgress ?? 0,
