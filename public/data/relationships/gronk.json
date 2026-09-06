@@ -1,0 +1,150 @@
+{
+  "experiences": {
+    "gronk_exp_steel_not_flattery": {
+      "id": "gronk_exp_steel_not_flattery",
+      "uniqueKey": "gronk:m12:01:steel-not-flattery",
+      "title": "Steel Does Not Care About Flattery",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_greeting",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 6,
+        "understanding": 6,
+        "sharedMeaning": 4
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["Professional", "CraftJudgment", "Competence"],
+      "memoryCandidate": false,
+      "interpretation": "Gronk responds more strongly to a specific reading of the work than to praise, establishing competence as the useful social signal between you."
+    },
+    "gronk_exp_measure_twice": {
+      "id": "gronk_exp_measure_twice",
+      "uniqueKey": "gronk:m12:02:measure-twice",
+      "title": "Measure Twice",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_craft_request",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": 2,
+        "trust": 8,
+        "understanding": 7,
+        "sharedMeaning": 5,
+        "reliance": 5,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 12,
+      "resonanceTags": ["Professional", "Specification", "Reliance"],
+      "memoryCandidate": false,
+      "interpretation": "You identify the constraint Gronk actually needs solved instead of ordering a prettier object, giving him reason to rely on your judgment about the work."
+    },
+    "gronk_exp_quality_over_finish": {
+      "id": "gronk_exp_quality_over_finish",
+      "uniqueKey": "gronk:m12:03:quality-over-finish",
+      "title": "Quality Over Finish",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_rumors",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -2,
+        "trust": 7,
+        "understanding": 7,
+        "sharedMeaning": 8,
+        "reliance": 4,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 14,
+      "resonanceTags": ["Professional", "Disagreement", "Standards"],
+      "memoryCandidate": false,
+      "interpretation": "You accept Gronk's refusal to trade structural quality for a client's vanity, even though it costs the immediate sale and a little warmth."
+    },
+    "gronk_exp_blade_that_held": {
+      "id": "gronk_exp_blade_that_held",
+      "uniqueKey": "gronk:m12:04:blade-that-held",
+      "title": "The Blade That Held",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_blade_held",
+      "significance": "defining",
+      "relationshipEffects": {
+        "affinity": 3,
+        "trust": 12,
+        "understanding": 6,
+        "sharedMeaning": 8,
+        "reliance": 10,
+        "vulnerability": 2,
+        "reciprocity": 7
+      },
+      "connectionProgressDelta": 20,
+      "resonanceTags": ["ProfessionalReliance", "CraftJudgment", "ProvenWork"],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "gronk_memory_blade_that_held",
+      "interpretation": "A weapon built from jointly defended constraints survives the test that mattered, turning professional respect into durable reliance on one another's judgment."
+    }
+  },
+  "memories": {
+    "gronk_memory_blade_that_held": {
+      "id": "gronk_memory_blade_that_held",
+      "originExperienceId": "gronk_exp_blade_that_held",
+      "title": "The Blade That Held",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk"],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "A blade built around constraints you and Gronk defended together held under the stress that would have broken the prettier design.",
+      "protagonistView": "Gronk's standards are useful because he will refuse my bad request instead of flattering it.",
+      "targetView": "The customer understands enough of the work that I can trust the judgment, not just the coin.",
+      "resonanceTags": ["ProfessionalReliance", "CraftJudgment", "ProvenWork"],
+      "bondContribution": "Trusted Craft Counterparts — emerging",
+      "persistence": "stable"
+    }
+  },
+  "progression": {
+    "npc_blacksmith_gronk": {
+      "npcId": "npc_blacksmith_gronk",
+      "connectionAuthority": "relationships",
+      "qualificationRules": [
+        {
+          "level": 1,
+          "minimumProgress": 20,
+          "minimumExperienceCount": 2,
+          "requiredExperienceIds": [
+            "gronk_exp_steel_not_flattery",
+            "gronk_exp_measure_twice"
+          ],
+          "minimumDimensions": {
+            "trust": 12,
+            "understanding": 12
+          }
+        },
+        {
+          "level": 2,
+          "minimumProgress": 50,
+          "minimumExperienceCount": 4,
+          "requiredExperienceIds": [
+            "gronk_exp_quality_over_finish",
+            "gronk_exp_blade_that_held"
+          ],
+          "requiredMemoryTags": ["ProfessionalReliance"],
+          "minimumDimensions": {
+            "trust": 28,
+            "reliance": 15,
+            "reciprocity": 10
+          }
+        }
+      ],
+      "essence": {
+        "enabled": true,
+        "startingTetherState": "present"
+      }
+    }
+  }
+}

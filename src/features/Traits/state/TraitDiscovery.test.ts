@@ -19,15 +19,12 @@ const readJson = (relativePath: string): any =>
 
 const manifest = readJson('public/data/relationships/index.json');
 const willowBundle = readJson('public/data/relationships/elder-willow.json');
-const lyraBundle = readJson('public/data/relationships/lyra.json');
 const elaraBundle = readJson('public/data/relationships/elara.json');
 const productionTraits = readJson('public/data/traits.json');
 
-const bundleByUrl: Record<string, any> = {
-  '/data/relationships/elder-willow.json': willowBundle,
-  '/data/relationships/lyra.json': lyraBundle,
-  '/data/relationships/elara.json': elaraBundle,
-};
+const bundleByUrl: Record<string, any> = Object.fromEntries(
+  manifest.bundles.map((url: string) => [url, readJson(`public${url}`)])
+);
 
 const LEGACY_ID = 'LegacyKnownTrait';
 const AUTHORED_ID = 'AuthoredHiddenTrait';
