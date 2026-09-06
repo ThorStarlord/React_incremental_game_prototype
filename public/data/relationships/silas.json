@@ -90,6 +90,49 @@
       "memoryCandidate": true,
       "memoryDefinitionId": "silas_memory_secret_neither_sold",
       "interpretation": "Both of you receive a profitable opportunity to sell the other's vulnerability and independently decline it. The bond remains dangerous, but the danger has acquired reciprocal limits."
+    },
+    "silas_exp_watch_leak_shared": {
+      "id": "silas_exp_watch_leak_shared",
+      "uniqueKey": "silas:m13:01:watch-leak-shared",
+      "title": "A Tip He Did Not Sell",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "dialogue",
+      "sourceId": "silas_watch_leak_tip",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 4,
+        "understanding": 3,
+        "sharedMeaning": 4,
+        "reliance": 3,
+        "vulnerability": 2,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["MutualLeverage", "Restraint", "Information", "CrossFactionRisk"],
+      "memoryCandidate": false,
+      "interpretation": "Silas gives you a Watch deployment leak he could have sold because the earlier secret neither of you sold established that some leverage is more valuable when it remains reciprocal."
+    },
+    "silas_exp_watch_leak_traced": {
+      "id": "silas_exp_watch_leak_traced",
+      "uniqueKey": "silas:m13:02:watch-leak-traced",
+      "title": "The Pattern Behind the Patrols",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "quest",
+      "sourceId": "quest_m13_trace_merchant_leak",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 5,
+        "sharedMeaning": 4,
+        "reliance": 4,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 9,
+      "resonanceTags": ["Information", "Reliance", "OperationalTrust", "CrossFactionRisk"],
+      "memoryCandidate": false,
+      "interpretation": "You verify that the leaked patrol timings form a real operational pattern rather than broker theatre. Silas now has evidence that information entrusted through your relationship can survive contact with action."
     }
   },
   "memories": {
