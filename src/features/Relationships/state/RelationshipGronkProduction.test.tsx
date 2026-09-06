@@ -64,6 +64,9 @@ const clickResponse = (label: string) => {
   fireEvent.click(screen.getByRole('button', { name: label }));
 };
 
+const gronkDialogueCount = (store: ReturnType<typeof makeStore>) =>
+  store.getState().npcs.dialogueHistory.filter(entry => entry.npcId === GRONK_ID).length;
+
 const originalFetch = global.fetch;
 
 beforeEach(() => {
@@ -146,18 +149,24 @@ describe('M12 Gronk professional relationship baseline migration', () => {
       expect(
         store.getState().relationships.experiencesById.gronk_exp_steel_not_flattery
       ).toBeDefined();
+      expect(gronkDialogueCount(store)).toBe(1);
     });
 
     clickResponse(
       'The shock is twisting the bracket at the mount. Reinforce the load path, not the whole plate.'
     );
     await waitFor(() => {
-      const profile = selectBondProfileByNpcId(store.getState(), GRONK_ID);
-      expect(profile.connectionLevel).toBe(1);
-      expect(profile.connectionProgress).toBe(22);
-      expect(profile.dimensions.trust).toBe(14);
-      expect(profile.dimensions.understanding).toBe(13);
+      expect(
+        store.getState().relationships.experiencesById.gronk_exp_measure_twice
+      ).toBeDefined();
+      expect(gronkDialogueCount(store)).toBe(2);
     });
+
+    const connectionI = selectBondProfileByNpcId(store.getState(), GRONK_ID);
+    expect(connectionI.connectionLevel).toBe(1);
+    expect(connectionI.connectionProgress).toBe(22);
+    expect(connectionI.dimensions.trust).toBe(14);
+    expect(connectionI.dimensions.understanding).toBe(13);
 
     const checkpointId = createSave(store.getState(), 'Gronk Connection I');
     expect(checkpointId).toBeTruthy();
@@ -178,6 +187,7 @@ describe('M12 Gronk professional relationship baseline migration', () => {
       expect(
         store.getState().relationships.experiencesById.gronk_exp_quality_over_finish
       ).toBeDefined();
+      expect(gronkDialogueCount(store)).toBe(3);
     });
 
     clickResponse(
@@ -187,6 +197,7 @@ describe('M12 Gronk professional relationship baseline migration', () => {
       expect(
         store.getState().relationships.experiencesById.gronk_exp_blade_that_held
       ).toBeDefined();
+      expect(gronkDialogueCount(store)).toBe(4);
     });
 
     const profile = selectBondProfileByNpcId(store.getState(), GRONK_ID);
