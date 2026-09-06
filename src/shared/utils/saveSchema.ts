@@ -86,15 +86,21 @@ export const detectSaveSchemaVersion = (payload: unknown): number => {
     return LEGACY_SAVE_SCHEMA_VERSION;
   }
 
-  const schemaVersion = Number(payload.schemaVersion);
-  if (!Number.isInteger(schemaVersion) || schemaVersion < 0) {
+  // Schema identity is part of the persistent contract. Do not coerce strings,
+  // null, booleans, or other malformed values into a numeric version because
+  // doing so can route corrupt payloads through the wrong migration path.
+  if (
+    typeof payload.schemaVersion !== 'number' ||
+    !Number.isInteger(payload.schemaVersion) ||
+    payload.schemaVersion < 0
+  ) {
     throw new SaveMigrationError(
       `Invalid save schema version: ${String(payload.schemaVersion)}`,
       'INVALID_SAVE'
     );
   }
 
-  return schemaVersion;
+  return payload.schemaVersion;
 };
 
 const normalizeLegacyPayload = (payload: unknown): VersionedSaveEnvelope => {
