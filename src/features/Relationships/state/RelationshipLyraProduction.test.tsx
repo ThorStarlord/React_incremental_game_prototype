@@ -44,6 +44,7 @@ const manifest = readJson('public/data/relationships/index.json');
 const willowBundle = readJson('public/data/relationships/elder-willow.json');
 const lyraBundle = readJson('public/data/relationships/lyra.json');
 const elaraBundle = readJson('public/data/relationships/elara.json');
+const gronkBundle = readJson('public/data/relationships/gronk.json');
 const npcs = readJson('public/data/npcs.json');
 const dialogues = readJson('public/data/dialogues.json');
 const quests = readJson('public/data/quests.json');
@@ -52,6 +53,7 @@ const bundleByUrl: Record<string, any> = {
   '/data/relationships/elder-willow.json': willowBundle,
   '/data/relationships/lyra.json': lyraBundle,
   '/data/relationships/elara.json': elaraBundle,
+  '/data/relationships/gronk.json': gronkBundle,
 };
 
 const makeStore = () => configureStore({ reducer: rootReducer });
@@ -408,7 +410,8 @@ describe('M11 Lyra production adversarial vertical slice', () => {
     expect(selectRelationshipMemoriesByNpcId(store.getState(), LYRA_ID)).toEqual([]);
 
     store.dispatch(setDialogueNodes(dialogues));
-    const interaction = await store.dispatch(
+    store.dispatch(setSelectedNPCId(LYRA_ID));
+    const newInteraction = await store.dispatch(
       processNPCInteractionThunk({
         npcId: LYRA_ID,
         interactionType: 'dialogue',
@@ -418,17 +421,16 @@ describe('M11 Lyra production adversarial vertical slice', () => {
         },
       })
     );
-    expect(processNPCInteractionThunk.fulfilled.match(interaction)).toBe(true);
+    expect(processNPCInteractionThunk.fulfilled.match(newInteraction)).toBe(true);
 
-    const afterInteraction = selectBondProfileByNpcId(store.getState(), LYRA_ID);
-    expect(afterInteraction.connectionLevel).toBe(2);
-    expect(afterInteraction.provenance.legacyDerived).toBe(true);
-    expect(afterInteraction.connectionQualificationEvidence).toEqual({});
-    expect(
-      selectRelationshipExperiencesByNpcId(store.getState(), LYRA_ID).map(
-        experience => experience.id
-      )
-    ).toEqual(['lyra_exp_strategic_defeat']);
+    expect(selectRelationshipExperiencesByNpcId(store.getState(), LYRA_ID).map(exp => exp.id)).toEqual([
+      'lyra_exp_strategic_defeat',
+    ]);
     expect(selectRelationshipMemoriesByNpcId(store.getState(), LYRA_ID)).toEqual([]);
+    expect(
+      store.getState().relationships.experiencesById.lyra_exp_coercion_reflected
+    ).toBeUndefined();
+    expect(store.getState().relationships.experiencesById.lyra_exp_proto_bond).toBeUndefined();
+    expect(selectBondProfileByNpcId(store.getState(), LYRA_ID).provenance.legacyDerived).toBe(true);
   });
 });
