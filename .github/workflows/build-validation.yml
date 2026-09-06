@@ -31,7 +31,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Relationship, Trait discovery, save migration, and authoring scalability tests
-        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts RelationshipLyraProduction.test.tsx RelationshipGronkProduction.test.tsx TraitDiscovery.test.ts RelationshipLegacySaveMigration.test.ts saveSchema.test.ts saveUtils.test.ts
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts RelationshipLyraProduction.test.tsx RelationshipGronkProduction.test.tsx RelationshipSilasProduction.test.tsx TraitDiscovery.test.ts RelationshipLegacySaveMigration.test.ts saveSchema.test.ts saveUtils.test.ts
         env:
           CI: true
 
