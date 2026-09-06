@@ -1,6 +1,7 @@
 {
   "bundles": [
     "/data/relationships/elder-willow.json",
-    "/data/relationships/lyra.json"
+    "/data/relationships/lyra.json",
+    "/data/relationships/elara.json"
   ]
 }

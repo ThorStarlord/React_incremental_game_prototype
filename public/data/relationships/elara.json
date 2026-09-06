@@ -1,0 +1,349 @@
+{
+  "experiences": {
+    "elara_exp_model_challenged": {
+      "id": "elara_exp_model_challenged",
+      "uniqueKey": "elara:ec01:model-challenged",
+      "title": "A Useful Objection",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "dialogue",
+      "sourceId": "elara_greeting",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 2,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["Inquiry", "Evidence", "Challenge"],
+      "traitEffects": [
+        {
+          "traitId": "ScholarlyInsight",
+          "compatibilityDelta": 5,
+          "assimilationDelta": 10,
+          "note": "The protagonist treats a scholar's claim as a model to test rather than an authority to obey."
+        }
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Instead of simply accepting Elara's expertise, the protagonist identifies an assumption worth testing, and Elara takes the objection seriously."
+    },
+    "elara_exp_contradictory_footnote": {
+      "id": "elara_exp_contradictory_footnote",
+      "uniqueKey": "elara:ec02:contradictory-footnote",
+      "title": "The Contradictory Footnote",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "dialogue",
+      "sourceId": "elara_contradictory_footnote",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 7,
+        "sharedMeaning": 5,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["Inquiry", "Evidence", "Anomaly", "Collaboration"],
+      "traitEffects": [
+        {
+          "traitId": "ScholarlyInsight",
+          "compatibilityDelta": 5,
+          "assimilationDelta": 10,
+          "note": "Contradictory evidence becomes a shared problem rather than an inconvenience to remove."
+        }
+      ],
+      "memoryCandidate": false,
+      "interpretation": "A marginal note contradicts the accepted chronology. Elara and the protagonist agree that the contradiction deserves investigation rather than dismissal."
+    },
+    "elara_exp_tome_committed": {
+      "id": "elara_exp_tome_committed",
+      "uniqueKey": "elara:ec03:tome-committed",
+      "title": "A Model Put at Risk",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "quest",
+      "sourceId": "quest_elara_lost_tome",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "understanding": 3,
+        "sharedMeaning": 3,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": ["Inquiry", "Evidence", "Commitment"],
+      "memoryCandidate": false,
+      "interpretation": "Elara puts one of her own published assumptions at risk by handing over the contradictory source and inviting a real test."
+    },
+    "elara_exp_follow_evidence": {
+      "id": "elara_exp_follow_evidence",
+      "uniqueKey": "elara:ec04:tome-resolution",
+      "title": "Evidence Over Ownership",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "quest",
+      "sourceId": "quest_elara_lost_tome",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -1,
+        "trust": 6,
+        "understanding": 10,
+        "sharedMeaning": 12,
+        "reciprocity": 8
+      },
+      "connectionProgressDelta": 18,
+      "resonanceTags": ["Evidence", "Revision", "Collaboration", "CostlyCorrection"],
+      "traitEffects": [
+        {
+          "traitId": "ScholarlyInsight",
+          "compatibilityDelta": 10,
+          "assimilationDelta": 20,
+          "note": "Both participants accept that a useful model must survive evidence, even when correction costs status or pride."
+        }
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "elara_memory_footnote_won",
+      "interpretation": "The evidence overturns Elara's published chronology. She accepts the correction because the work matters more than ownership of the old conclusion."
+    },
+    "elara_exp_protect_consensus": {
+      "id": "elara_exp_protect_consensus",
+      "uniqueKey": "elara:ec04:tome-resolution",
+      "title": "Consensus Preserved",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "quest",
+      "sourceId": "quest_elara_lost_tome",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 2,
+        "trust": -1,
+        "understanding": 3,
+        "sharedMeaning": 1
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": ["Consensus", "Caution"],
+      "traitEffects": [
+        {
+          "traitId": "ScholarlyInsight",
+          "compatibilityDelta": 1,
+          "note": "The protagonist understands the anomaly but chooses institutional safety over revision."
+        }
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The contradiction is documented but not allowed to overturn the accepted model. Elara appreciates the caution but learns little about the protagonist as a research peer."
+    },
+    "elara_exp_revision_mutual": {
+      "id": "elara_exp_revision_mutual",
+      "uniqueKey": "elara:ec05:revision-mutual",
+      "title": "Revision Is Mutual",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "dialogue",
+      "sourceId": "elara_revision_mutual",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -2,
+        "trust": 4,
+        "understanding": 8,
+        "sharedMeaning": 6,
+        "reciprocity": 7
+      },
+      "connectionProgressDelta": 12,
+      "resonanceTags": ["Evidence", "Revision", "Reciprocity", "IntellectualFriction"],
+      "traitEffects": [
+        {
+          "traitId": "ScholarlyInsight",
+          "compatibilityDelta": 5,
+          "assimilationDelta": 15,
+          "note": "Elara now breaks the protagonist's preferred revision, proving that reciprocal inquiry applies to both sides."
+        }
+      ],
+      "memoryCandidate": false,
+      "interpretation": "After correcting Elara, the protagonist becomes attached to the replacement theory. Elara finds the counterexample that forces the protagonist to revise in turn."
+    },
+    "elara_exp_theory_neither_owned": {
+      "id": "elara_exp_theory_neither_owned",
+      "uniqueKey": "elara:ec06:theory-neither-owned",
+      "title": "A Theory Neither Owned",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "dialogue",
+      "sourceId": "elara_theory_neither_owned",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 6,
+        "understanding": 10,
+        "sharedMeaning": 10,
+        "reliance": 4,
+        "reciprocity": 10
+      },
+      "connectionProgressDelta": 15,
+      "resonanceTags": ["Collaboration", "MutualRevision", "Inquiry", "Evidence"],
+      "traitEffects": [
+        {
+          "traitId": "ScholarlyInsight",
+          "compatibilityDelta": 5,
+          "assimilationDelta": 25,
+          "note": "The working model is now genuinely co-produced; neither participant can treat the other as a passive assistant."
+        }
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "elara_memory_theory_neither_owned",
+      "interpretation": "Elara and the protagonist build a third model from the failures of both earlier positions. The result belongs to the evidence more than to either author."
+    },
+    "elara_exp_independent_verification": {
+      "id": "elara_exp_independent_verification",
+      "uniqueKey": "elara:ec07:independent-verification",
+      "title": "The Result Held Without Her",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "dialogue",
+      "sourceId": "elara_independent_verification",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 5,
+        "understanding": 10,
+        "sharedMeaning": 8,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 18,
+      "resonanceTags": ["IndependentVerification", "Evidence", "Revision", "Transformation"],
+      "traitEffects": [
+        {
+          "traitId": "ScholarlyInsight",
+          "compatibilityDelta": 10,
+          "assimilationDelta": 40,
+          "note": "Independent verification is the decisive proof that evidence-first model revision has become the protagonist's own cognitive habit, even after an earlier cautious choice."
+        }
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "elara_memory_result_held_without_her",
+      "interpretation": "Working alone on a separate archive problem, the protagonist follows contradiction instead of defending the first plausible model, then returns with a result Elara can independently reproduce."
+    },
+    "elara_exp_resonance_scholarly_insight": {
+      "id": "elara_exp_resonance_scholarly_insight",
+      "uniqueKey": "elara:ec08:scholarly-insight-resonance",
+      "title": "Resonance: Scholarly Insight",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "system",
+      "sourceId": "ScholarlyInsight",
+      "significance": "defining",
+      "relationshipEffects": {
+        "sharedMeaning": 2
+      },
+      "connectionProgressDelta": 0,
+      "resonanceTags": ["Inquiry", "Evidence", "Revision", "Resonance"],
+      "memoryCandidate": false,
+      "interpretation": "Essence stabilizes an evidence-first revision habit already demonstrated through reciprocal inquiry and independent verification."
+    }
+  },
+  "memories": {
+    "elara_memory_footnote_won": {
+      "id": "elara_memory_footnote_won",
+      "originExperienceId": "elara_exp_follow_evidence",
+      "title": "The Footnote That Won",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "memoryType": "shared",
+      "significance": "major",
+      "playerVisible": true,
+      "summary": "A minor contradiction overturned a respected conclusion because both of you chose the evidence over ownership of the old model.",
+      "protagonistView": "Expertise became more useful when it was allowed to lose an argument.",
+      "targetView": "The collaborator cared enough about the work to challenge mine and remain after the correction became costly.",
+      "resonanceTags": ["Evidence", "Revision", "Collaboration", "CostlyCorrection"],
+      "bondContribution": "Investigators — reciprocal",
+      "traitRelevance": ["ScholarlyInsight"],
+      "persistence": "stable"
+    },
+    "elara_memory_theory_neither_owned": {
+      "id": "elara_memory_theory_neither_owned",
+      "originExperienceId": "elara_exp_theory_neither_owned",
+      "title": "A Theory Neither Owned",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "memoryType": "shared",
+      "significance": "major",
+      "playerVisible": true,
+      "summary": "You built a model together only after evidence broke the versions each of you preferred.",
+      "protagonistView": "A collaborator who can overturn my model is more valuable than an assistant who confirms it.",
+      "targetView": "The relationship became intellectually reciprocal: correction could move in either direction.",
+      "resonanceTags": ["Collaboration", "MutualRevision", "Reciprocity"],
+      "bondContribution": "Epistemic peers — emerging",
+      "traitRelevance": ["ScholarlyInsight"],
+      "persistence": "stable"
+    },
+    "elara_memory_result_held_without_her": {
+      "id": "elara_memory_result_held_without_her",
+      "originExperienceId": "elara_exp_independent_verification",
+      "title": "The Result Held Without Her",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "You reproduced the method on a problem Elara had never seen, then brought back a result she could independently verify.",
+      "protagonistView": "The method no longer depended on Elara's presence or authority.",
+      "targetView": "The collaborator had become a peer capable of producing falsifiable work independently.",
+      "resonanceTags": ["IndependentVerification", "Evidence", "Transformation"],
+      "bondContribution": "Epistemic peers — established",
+      "traitRelevance": ["ScholarlyInsight"],
+      "persistence": "stable"
+    }
+  },
+  "progression": {
+    "npc_scholar_elara": {
+      "npcId": "npc_scholar_elara",
+      "connectionAuthority": "relationships",
+      "startingProfile": {
+        "dimensions": {
+          "affinity": 5,
+          "trust": 4,
+          "understanding": 2,
+          "sharedMeaning": 0,
+          "reliance": 0,
+          "vulnerability": 0,
+          "reciprocity": 0
+        },
+        "connectionLevel": 0,
+        "connectionProgress": 0,
+        "tetherState": "present"
+      },
+      "qualificationRules": [
+        {
+          "level": 1,
+          "minimumProgress": 18,
+          "minimumExperienceCount": 2,
+          "requiredExperienceIds": [
+            "elara_exp_model_challenged",
+            "elara_exp_contradictory_footnote"
+          ],
+          "minimumDimensions": {
+            "understanding": 12,
+            "reciprocity": 5
+          }
+        },
+        {
+          "level": 2,
+          "minimumProgress": 70,
+          "minimumExperienceCount": 7,
+          "requiredExperienceIds": [
+            "elara_exp_theory_neither_owned",
+            "elara_exp_independent_verification"
+          ],
+          "requiredMemoryTags": ["IndependentVerification"],
+          "minimumDimensions": {
+            "understanding": 45,
+            "sharedMeaning": 35,
+            "reciprocity": 25
+          }
+        }
+      ],
+      "essence": {
+        "enabled": true,
+        "startingTetherState": "present"
+      }
+    }
+  }
+}

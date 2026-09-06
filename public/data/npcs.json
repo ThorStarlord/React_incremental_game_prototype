@@ -46,7 +46,7 @@
   "npc_scholar_elara": {
     "id": "npc_scholar_elara",
     "name": "Scholar Elara",
-    "description": "A dedicated researcher found in the Grand Library, always eager to share knowledge for a price or a favor.",
+    "description": "A dedicated researcher in the Grand Library who values evidence enough to let a serious collaborator overturn her own conclusions.",
     "category": "Knowledge",
     "location": "Grand Library - Archives",
     "avatar": "avatars/npcs/scholar_elara_avatar.png",
@@ -56,7 +56,14 @@
     "affinity": 5,
     "connectionDepth": 2,
     "loyalty": 10,
-    "availableDialogues": ["scholar_elara_intro", "scholar_elara_research_task", "scholar_elara_trait_teach"],
+    "availableDialogues": [
+      "elara_greeting",
+      "elara_contradictory_footnote",
+      "elara_offer_tome",
+      "elara_revision_mutual",
+      "elara_theory_neither_owned",
+      "elara_independent_verification"
+    ],
     "completedDialogues": [],
     "availableQuests": ["quest_elara_lost_tome", "quest_elara_chain_1"],
     "completedQuests": [],
