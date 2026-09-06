@@ -149,7 +149,7 @@
   "quest_valerius_patrol_duty": {
     "id": "quest_valerius_patrol_duty",
     "title": "Patrol the City Streets",
-    "description": "Captain Valerius needs a capable individual to patrol the merchant district and ensure the peace is kept.",
+    "description": "Captain Valerius wants the merchant district patrolled and, more importantly, an accurate report of what the Watch is failing to see rather than a performance of visible order.",
     "giver": "npc_captain_valerius",
     "type": "REPEATABLE",
     "objectives": [
@@ -157,6 +157,17 @@
     ],
     "prerequisites": [],
     "rewards": [{ "type": "REPUTATION", "value": 10, "faction": "City Watch" }],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "report_plainly",
+        "label": "Give the Plain Report",
+        "description": "Report the district as it was, including the weakness in the Watch deployment, rather than polishing the patrol into a ceremonial success.",
+        "relationshipExperienceId": "valerius_exp_report_without_theatre",
+        "rewards": [],
+        "logMessage": "You report the patrol without polishing away the Watch's blind spot. Valerius treats the unwelcome detail as evidence that your reliability is useful rather than merely obedient."
+      }
+    ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
