@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SavedGame } from '../../../hooks/useSavedGames';
 import { DialogState } from './useDialogManager';
-import { loadSavedGame } from '../../../shared/utils/saveUtils';
+import { loadSavedGameWithMigration } from '../../../shared/utils/saveUtils';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { replaceState, RootState } from '../../../app/store';
+import { replaceState } from '../../../app/store';
 import { resetPlayerState } from '../../../features/Player/state/PlayerSlice';
 import { setHasSeenIntro } from '../../../features/Meta/state/MetaSlice';
 import { newGameSeedNPCsThunk, setSelectedNPCId } from '../../../features/NPCs';
@@ -64,15 +64,24 @@ export function useGameActions({
   const handleLoadGame = useCallback(async (saveId: string) => {
     console.log('Attempting to load game:', saveId);
     try {
-      const loadedState = await loadSavedGame(saveId);
-      if (loadedState) {
-        dispatch(replaceState(loadedState as RootState));
+      // Persistent representation migration happens before Redux replacement.
+      // A future/invalid schema fails here rather than masquerading as a
+      // successful load with partially repaired runtime state.
+      const loaded = await loadSavedGameWithMigration(saveId);
+      if (loaded) {
+        dispatch(replaceState(loaded.state));
 
-        // Relationship migration is intentionally post-load and additive. Raw
-        // legacy `connectionDepth` may seed a compatibility Bond Profile, but the
-        // migration does not fabricate Experiences, Memories, semantic dimensions,
-        // or Connection qualification evidence. A failed authoring fetch must not
-        // make the underlying save unloadable.
+        if (loaded.migration.appliedMigrations.length > 0) {
+          console.info(
+            `Save schema migrated v${loaded.migration.sourceVersion} -> v${loaded.migration.targetVersion}:`,
+            loaded.migration.appliedMigrations.join(', ')
+          );
+        }
+
+        // Runtime reconciliation is intentionally separate from serialized save
+        // migration. Relationship authoring is current content, and M9's bounded
+        // legacy-depth compatibility mapping depends on those live definitions.
+        // It must not fabricate persistent historical evidence.
         try {
           const migrationResult = await dispatch(
             initializeRelationshipRuntimeThunk({ migrateLegacyProfiles: true })
@@ -85,7 +94,7 @@ export function useGameActions({
           }
         } catch (migrationError) {
           console.error(
-            'Game loaded, but relationship save migration could not complete:',
+            'Game loaded, but relationship runtime reconciliation could not complete:',
             migrationError
           );
         }
@@ -97,8 +106,7 @@ export function useGameActions({
         console.error('Failed to load game data.');
       }
     } catch (error) {
-      console.error('Error loading game:', error);
-      console.error('An error occurred while loading the game.');
+      console.error('Error loading or migrating game:', error);
     }
   }, [navigate, closeDialog, dispatch]);
 

@@ -1,19 +1,22 @@
 /**
  * @file saveUtils.ts
- * @description Utilities for saving and loading game data
- * 
- * This module provides functions for managing save game data:
- * - Loading saved games
- * - Creating new saves
- * - Deleting saved games
- * - Importing/exporting save files
+ * @description Canonical save storage/import/export helpers.
+ *
+ * Persistent representation migration is owned by saveSchema.ts. Runtime
+ * reconciliation (content registration, derived-rate refresh, etc.) happens
+ * after migrated state is installed in Redux.
  */
 
 import type { RootState } from '../../app/store';
+import {
+  CURRENT_SAVE_SCHEMA_VERSION,
+  createCurrentSaveEnvelope,
+  migrateSavePayload,
+  type CurrentSaveEnvelope,
+  type SaveMigrationResult,
+} from './saveSchema';
 
-/**
- * Interface for saved game metadata
- */
+/** Metadata used by the Main Menu. `version` remains the game/content version. */
 export interface SavedGame {
   id: string;
   name: string;
@@ -22,12 +25,66 @@ export interface SavedGame {
   screenshot?: string;
   playtime?: number;
   version?: string;
+  schemaVersion?: number;
+}
+
+export interface LoadedSavedGame {
+  state: RootState;
+  envelope: CurrentSaveEnvelope;
+  migration: SaveMigrationResult;
+}
+
+export interface ImportedSaveResult {
+  saveId: string;
+  migration: SaveMigrationResult;
 }
 
 /**
- * Get all saved games from localStorage
- * @returns Array of saved game metadata
+ * Convert a JavaScript string to the binary-byte string expected by btoa.
+ * encodeURIComponent gives us deterministic UTF-8 bytes without relying on
+ * TextEncoder, which is not present in every supported CRA/Jest environment.
  */
+const utf8ToBinary = (value: string): string => {
+  const encoded = encodeURIComponent(value);
+  let binary = '';
+
+  for (let index = 0; index < encoded.length; index += 1) {
+    if (encoded[index] === '%') {
+      binary += String.fromCharCode(parseInt(encoded.slice(index + 1, index + 3), 16));
+      index += 2;
+    } else {
+      binary += encoded[index];
+    }
+  }
+
+  return binary;
+};
+
+/** Convert an atob binary-byte string back into a JavaScript UTF-8 string. */
+const binaryToUtf8 = (binary: string): string => {
+  let encoded = '';
+
+  for (let index = 0; index < binary.length; index += 1) {
+    encoded += `%${binary.charCodeAt(index).toString(16).padStart(2, '0')}`;
+  }
+
+  return decodeURIComponent(encoded);
+};
+
+/**
+ * Encode arbitrary JSON save payloads as base64 without assuming ASCII-only
+ * content. This keeps authored/player Unicode text intact across copy/paste.
+ */
+export const encodeSavePayloadToBase64 = (payload: unknown): string =>
+  btoa(utf8ToBinary(JSON.stringify(payload)));
+
+/** Decode a UTF-8 save-code payload. Surrounding copy/paste whitespace is ignored. */
+export const decodeSavePayloadFromBase64 = (encoded: string): unknown => {
+  const json = binaryToUtf8(atob(encoded.trim()));
+  return JSON.parse(json) as unknown;
+};
+
+/** Get all saved-game metadata from localStorage. */
 export const getSavedGames = (): SavedGame[] => {
   try {
     const savedGamesString = localStorage.getItem('saved_games');
@@ -39,38 +96,52 @@ export const getSavedGames = (): SavedGame[] => {
 };
 
 /**
- * Load a specific saved game by ID
- * @param saveId The ID of the save to load
- * @returns The loaded game state (RootState) or null if loading failed
+ * Strict load boundary. The stored payload is decoded and migrated to the
+ * current persistent schema before any Redux state replacement occurs.
+ *
+ * Migration errors intentionally propagate so callers that care about
+ * compatibility diagnostics can distinguish unsupported/corrupt saves.
+ */
+export const loadSavedGameWithMigration = async (
+  saveId: string
+): Promise<LoadedSavedGame | null> => {
+  const savedGameString = localStorage.getItem(`game_save_${saveId}`);
+  if (!savedGameString) return null;
+
+  const payload = JSON.parse(savedGameString) as unknown;
+  const migration = migrateSavePayload(payload);
+
+  return {
+    state: migration.envelope.state,
+    envelope: migration.envelope,
+    migration,
+  };
+};
+
+/**
+ * Compatibility wrapper for older callers that only consume RootState.
+ * New load surfaces should prefer loadSavedGameWithMigration so migration
+ * diagnostics remain observable.
  */
 export const loadSavedGame = async (saveId: string): Promise<RootState | null> => {
   try {
-    const savedGameString = localStorage.getItem(`game_save_${saveId}`);
-    if (!savedGameString) return null;
-
-    const saveData = JSON.parse(savedGameString);
-    return saveData.state as RootState;
+    const loaded = await loadSavedGameWithMigration(saveId);
+    return loaded?.state ?? null;
   } catch (error) {
     console.error('Failed to load saved game:', error);
     return null;
   }
 };
 
-/**
- * Delete a specific saved game
- * @param saveId The ID of the save to delete
- * @returns True if deletion was successful
- */
+/** Delete a save and its metadata entry. */
 export const deleteSavedGame = (saveId: string): boolean => {
   try {
-    // Remove the save data
     localStorage.removeItem(`game_save_${saveId}`);
-    
-    // Update the saved games list
+
     const savedGames = getSavedGames();
     const updatedSavedGames = savedGames.filter(save => save.id !== saveId);
     localStorage.setItem('saved_games', JSON.stringify(updatedSavedGames));
-    
+
     return true;
   } catch (error) {
     console.error('Failed to delete saved game:', error);
@@ -78,54 +149,51 @@ export const deleteSavedGame = (saveId: string): boolean => {
   }
 };
 
-/**
- * Create a new save from the current game state (RootState)
- * @param gameState The current game state (RootState)
- * @param saveName Optional name for the save
- * @param screenshot Optional screenshot data URL
- * @returns The ID of the new save or null if saving failed
- */
+const persistCurrentSaveEnvelope = (
+  envelope: CurrentSaveEnvelope,
+  saveName: string | undefined,
+  screenshot: string | undefined,
+  now: number
+): string => {
+  const saveId = `save_${now}`;
+  const defaultPlayerName = 'Player';
+  const defaultPlayerLevel = 1;
+  const playtime = envelope.state.player.totalPlaytime || 0;
+  const persistedEnvelope: CurrentSaveEnvelope = {
+    ...envelope,
+    timestamp: now,
+  };
+
+  const saveInfo: SavedGame = {
+    id: saveId,
+    name: saveName || `${defaultPlayerName} - Save ${new Date(now).toLocaleTimeString()}`,
+    timestamp: now,
+    playerLevel: defaultPlayerLevel,
+    playtime,
+    screenshot,
+    version: persistedEnvelope.gameVersion,
+    schemaVersion: persistedEnvelope.schemaVersion,
+  };
+
+  localStorage.setItem(`game_save_${saveId}`, JSON.stringify(persistedEnvelope));
+
+  const savedGames = getSavedGames();
+  savedGames.push(saveInfo);
+  localStorage.setItem('saved_games', JSON.stringify(savedGames));
+
+  return saveId;
+};
+
+/** Create a current-schema save from active RootState. */
 export const createSave = (
-  gameState: RootState, 
-  saveName?: string, 
+  gameState: RootState,
+  saveName?: string,
   screenshot?: string
 ): string | null => {
   try {
-    const saveId = `save_${Date.now()}`;
-    // PlayerState does not have .name or .level
-    // const playerName = gameState.player.name || 'Unnamed Hero'; 
-    // const playerLevel = gameState.player.level || 1;
-    const defaultPlayerName = 'Player'; // Generic name
-    const defaultPlayerLevel = 1; // Default level
-
-    const playtime = gameState.player.totalPlaytime || 0; // Corrected casing
-    
-    // Create save metadata
-    const saveInfo: SavedGame = {
-      id: saveId,
-      name: saveName || `${defaultPlayerName} - Save ${new Date().toLocaleTimeString()}`, // Use generic name
-      timestamp: Date.now(),
-      playerLevel: defaultPlayerLevel, // Use default level
-      playtime,
-      screenshot,
-      version: gameState.meta?.gameVersion || '1.0.0'
-    };
-    
-    // Store the actual save data
-    const saveData = {
-      version: gameState.meta?.gameVersion || '1.0.0',
-      timestamp: Date.now(),
-      state: gameState
-    };
-    
-    localStorage.setItem(`game_save_${saveId}`, JSON.stringify(saveData));
-    
-    // Update the saved games list
-    const savedGames = getSavedGames();
-    savedGames.push(saveInfo);
-    localStorage.setItem('saved_games', JSON.stringify(savedGames));
-    
-    return saveId;
+    const now = Date.now();
+    const envelope = createCurrentSaveEnvelope(gameState, now);
+    return persistCurrentSaveEnvelope(envelope, saveName, screenshot, now);
   } catch (error) {
     console.error('Failed to create save:', error);
     return null;
@@ -133,26 +201,50 @@ export const createSave = (
 };
 
 /**
- * Export a save to a downloadable file
- * @param saveId The ID of the save to export
- * @returns True if the export was successful
+ * Import any supported historical/current payload through the same migration
+ * authority used by local loads, then persist that migrated envelope as a
+ * current-schema save. Envelope-level historical metadata such as gameVersion is
+ * preserved even when the embedded RootState did not carry the same field.
  */
+export const createSaveFromPayload = (
+  payload: unknown,
+  saveName?: string,
+  screenshot?: string
+): ImportedSaveResult | null => {
+  try {
+    const migration = migrateSavePayload(payload);
+    const now = Date.now();
+    const saveId = persistCurrentSaveEnvelope(
+      migration.envelope,
+      saveName,
+      screenshot,
+      now
+    );
+    return { saveId, migration };
+  } catch (error) {
+    console.error('Failed to import save payload:', error);
+    return null;
+  }
+};
+
+/** Export the canonical current-schema envelope as a file. */
 export const exportSaveToFile = async (saveId: string): Promise<boolean> => {
   try {
-    const stateToExport = await loadSavedGame(saveId);
-    if (!stateToExport) return false;
-    
-    const saveBlob = new Blob([JSON.stringify(stateToExport)], { type: 'application/json' });
+    const loaded = await loadSavedGameWithMigration(saveId);
+    if (!loaded) return false;
+
+    const saveBlob = new Blob([JSON.stringify(loaded.envelope)], {
+      type: 'application/json',
+    });
     const url = URL.createObjectURL(saveBlob);
-    
-    // Create download link
+
     const link = document.createElement('a');
     link.href = url;
     link.download = `incremental-rpg-save-${saveId}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     URL.revokeObjectURL(url);
     return true;
   } catch (error) {
@@ -162,34 +254,36 @@ export const exportSaveToFile = async (saveId: string): Promise<boolean> => {
 };
 
 /**
- * Import a save from a file
- * @param file The file containing the save data
- * @returns The imported game state (RootState) or null if import failed
+ * Read an imported file and migrate it through the canonical schema pipeline.
+ * This returns current RootState for compatibility; callers that persist imports
+ * should use createSaveFromPayload so metadata is also current-versioned.
  */
-export const importSaveFromFile = async (file: File): Promise<RootState | null> => {
-  return new Promise((resolve, reject) => {
+export const importSaveFromFile = async (file: File): Promise<RootState | null> =>
+  new Promise(resolve => {
     const reader = new FileReader();
-    
-    reader.onload = (event) => {
+
+    reader.onload = event => {
       try {
         if (!event.target?.result) {
           resolve(null);
           return;
         }
-        
-        const saveData = JSON.parse(event.target.result as string);
-        resolve(saveData as RootState);
+
+        const payload = JSON.parse(event.target.result as string) as unknown;
+        const migration = migrateSavePayload(payload);
+        resolve(migration.envelope.state);
       } catch (error) {
-        console.error('Failed to parse save file:', error);
+        console.error('Failed to parse or migrate save file:', error);
         resolve(null);
       }
     };
-    
+
     reader.onerror = () => {
       console.error('Failed to read save file');
       resolve(null);
     };
-    
+
     reader.readAsText(file);
   });
-};
+
+export { CURRENT_SAVE_SCHEMA_VERSION };

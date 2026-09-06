@@ -17,6 +17,7 @@ export interface SavedGame {
   playtime: number;
   playerLevel?: number;
   version?: string;
+  schemaVersion?: number;
   screenshot?: string;
   data?: {
     characterLevel?: number;

@@ -1,7 +1,7 @@
 # Legacy Relationship Save Migration
 
-**Status:** M9 implemented; exact-head requalification pending after this documentation commit  
-**Scope:** Pre-Relationship saves, legacy `connectionDepth`, Bond Profile provenance, load-time migration, passive Essence compatibility, and Main Menu save metadata consistency  
+**Status:** M9 implemented and qualified; M10 now owns persistent save-schema migration while these Relationship provenance semantics remain authoritative  
+**Scope:** Pre-Relationship saves, legacy `connectionDepth`, Bond Profile provenance, load-time runtime reconciliation, passive Essence compatibility, and Main Menu save metadata consistency  
 **Purpose:** Preserve legitimate progress from historical saves without inventing modern Experience/Memory evidence that those saves never recorded.
 
 ---
@@ -47,13 +47,13 @@ The migration must not convert missing history into invented certainty.
 
 Legacy `connectionDepth` may preserve a compatibility Connection baseline. It is not evidence that any specific modern Experience, Memory, semantic dimension, Connection qualification, or Trait-assimilation event occurred.
 
-Therefore migration may preserve:
+Therefore Relationship reconciliation may preserve:
 
 - legacy Affinity;
 - a bounded compatibility Connection level;
 - the original legacy depth as provenance.
 
-Migration must not fabricate:
+It must not fabricate:
 
 - Experiences;
 - Memories;
@@ -71,9 +71,9 @@ Migration must not fabricate:
 
 ---
 
-## 3. Migration authority
+## 3. Relationship migration authority
 
-Migration applies only to NPCs whose current relationship progression declares:
+Relationship reconciliation applies only to NPCs whose current relationship progression declares:
 
 ```text
 connectionAuthority = relationships
@@ -83,13 +83,13 @@ The runtime loads the current relationship authoring manifest and evaluates only
 
 This prevents M9 from globally rewriting legacy NPCs that have not yet moved to the modern Relationship system.
 
-If an NPC already has a modern `BondProfile`, migration does not overwrite it.
+If an NPC already has a modern `BondProfile`, reconciliation does not overwrite it.
 
 That is the principal idempotency boundary:
 
 ```text
 modern Bond Profile exists -> preserve it exactly
-modern Bond Profile absent -> legacy compatibility migration may seed one
+modern Bond Profile absent -> legacy compatibility reconciliation may seed one
 ```
 
 ---
@@ -125,7 +125,7 @@ The original value remains available in provenance even when the playable compat
 
 ## 5. Bond Profile provenance
 
-`BondProfile` now contains explicit provenance:
+`BondProfile` contains explicit provenance:
 
 ```typescript
 interface BondProfileProvenance {
@@ -134,7 +134,7 @@ interface BondProfileProvenance {
 }
 ```
 
-A raw legacy migration produces, conceptually:
+A raw legacy Relationship reconciliation produces, conceptually:
 
 ```typescript
 {
@@ -162,7 +162,7 @@ No fake event ids are inserted to justify the preserved level.
 
 ### Older modern saves
 
-Some saves can contain an actual Relationship `BondProfile` from M3-M8 but predate the new provenance field.
+Some saves can contain an actual Relationship `BondProfile` from M3-M8 but predate the provenance field.
 
 Selectors/default normalization treat those profiles as:
 
@@ -170,17 +170,18 @@ Selectors/default normalization treat those profiles as:
 provenance: { legacyDerived: false }
 ```
 
-They are modern state with an older schema, not raw legacy state, and must not be relabeled as historical-depth migrations.
+They are modern Relationship state with an older representation, not raw legacy-depth state, and must not be relabeled as historical-depth migrations.
 
 ---
 
-## 6. Load-time sequence
+## 6. Load-time sequence after M10
 
-The Main Menu load path now performs:
+M10 introduced an explicit persistent save-schema layer. The normal Main Menu path is now:
 
 ```text
-loadSavedGame(saveId)
--> replaceState(savedState)
+read serialized save
+-> detect/migrate persistent save schema to CURRENT_SAVE_SCHEMA_VERSION
+-> replaceState(migratedState)
 -> initializeRelationshipRuntimeThunk({ migrateLegacyProfiles: true })
 -> register current progression definitions
 -> seed only missing legacy-derived Bond Profiles
@@ -188,22 +189,35 @@ loadSavedGame(saveId)
 -> continue into the game
 ```
 
-Migration is deliberately **post-load**. The saved state must become the active Redux state before the migration can inspect its historical NPC fields.
+This supersedes M9's original description in which Relationship migration was the first migration concept at the load boundary.
 
-### Failure boundary
+The phases are now deliberately separate:
 
-A relationship-authoring fetch failure does not invalidate the underlying save.
+### Persistent schema migration — M10
 
-The load path catches migration failure separately:
+Transforms the saved representation before Redux state installation.
+
+### Relationship runtime reconciliation — M9
+
+Interprets migrated state against **current authored Relationship definitions** after installation.
+
+The Relationship step remains post-load because its bounded Connection mapping depends on today's authored Connection ceiling.
+
+### Failure boundaries
+
+An unsupported or invalid persistent schema fails before `replaceState`.
+
+A relationship-authoring fetch/reconciliation failure occurs later and does not retroactively turn a successfully decoded current-schema save into corrupted bytes.
+
+The runtime logs that additive reconciliation failure separately.
+
+See:
 
 ```text
-save loaded successfully
-+ relationship migration failed
--> log migration failure
--> keep the loaded save playable
+specification/Technical/SaveSchemaMigrationSystem.md
 ```
 
-This avoids converting a temporary content-loading problem into save loss.
+for the canonical persistent migration contract.
 
 ---
 
@@ -211,7 +225,7 @@ This avoids converting a temporary content-loading problem into save loss.
 
 A preserved Connection baseline may continue to generate passive Essence because that progress represented real historical gameplay.
 
-However, migration seeds no positive semantic dimensions. As a result:
+However, reconciliation seeds no positive semantic dimensions. As a result:
 
 - Resonance Quality begins in the weak band;
 - Stability may remain conservative because Trust is unknown/neutral;
@@ -221,7 +235,7 @@ This is intentional.
 
 The migration preserves **progress continuity**, not a fictional claim that the old save possessed the same semantic bond quality as a fully authored modern route.
 
-Migration recalculates the **generation rate** only. It does not mint current Essence balance.
+Runtime reconciliation recalculates the **generation rate** only. It does not mint current Essence balance.
 
 ---
 
@@ -277,7 +291,7 @@ M9's load-path audit found a separate but directly blocking consistency defect.
 
 The live Main Menu previously used two incompatible save protocols:
 
-### Main Menu listing/deletion hook
+### Old Main Menu listing/deletion hook
 
 ```text
 scan localStorage keys beginning with savegame_
@@ -290,9 +304,7 @@ metadata: saved_games
 state:    game_save_${saveId}
 ```
 
-`createSave`, `loadSavedGame`, export, and import already used the canonical `saveUtils` protocol.
-
-The Main Menu hook now also consumes:
+The Main Menu hook was reconciled to consume:
 
 ```text
 getSavedGames()
@@ -301,15 +313,13 @@ deleteSavedGame(saveId)
 
 from `saveUtils`.
 
-This removes the split-brain where a save could be correctly created by the canonical utility but remain invisible to Continue/Load because the menu scanned a different key family.
-
-M9 does not otherwise redesign the save system.
+M10 builds on that single storage authority and adds explicit `schemaVersion` to newly created save metadata and envelopes.
 
 ---
 
 ## 11. Implementation surfaces
 
-Primary M9 runtime changes:
+Primary M9 runtime surfaces:
 
 ```text
 src/features/Relationships/state/RelationshipTypes.ts
@@ -320,14 +330,22 @@ src/pages/MainMenu/hooks/useGameActions.ts
 src/hooks/useSavedGames.ts
 ```
 
-Qualification:
+M9 qualification:
 
 ```text
 src/features/Relationships/state/RelationshipLegacySaveMigration.test.ts
 .github/workflows/build-validation.yml
 ```
 
-The migration reuses the existing generic relationship manifest and progression definitions. It contains no Willow/Elara-specific migration branch in the generic runtime.
+M10 subsequently adds the persistent migration authority in:
+
+```text
+src/shared/utils/saveSchema.ts
+src/shared/utils/saveUtils.ts
+specification/Technical/SaveSchemaMigrationSystem.md
+```
+
+The Relationship reconciliation still reuses the generic relationship manifest and progression definitions. It contains no Willow/Elara-specific branch in generic migration logic.
 
 ---
 
@@ -337,7 +355,7 @@ The migration reuses the existing generic relationship manifest and progression 
 
 The suite proves:
 
-1. a pre-Relationship save can have no `relationships` slice at all and still migrate;
+1. a pre-Relationship save can have no `relationships` slice at all and still reconcile;
 2. legacy Affinity is preserved;
 3. excessive legacy depth is capped to the target NPC's current authored Connection ceiling;
 4. the original legacy depth remains in provenance;
@@ -347,34 +365,16 @@ The suite proves:
 8. no Experiences are fabricated;
 9. no Memories are fabricated;
 10. no Trait assimilation or compatibility is fabricated;
-11. migration is idempotent;
+11. reconciliation is idempotent;
 12. an existing modern Bond Profile is not overwritten;
 13. an old modern profile missing the provenance field normalizes as non-legacy;
 14. a migrated Connection can retain a weak passive Essence contribution;
 15. migration does not mint current Essence;
 16. migrated Connection cannot bypass Willow's modern Memory/assimilation Trait gates.
 
-### First code qualification
+M9 received exact-head qualification before integration, and the integrated M4-M9 mainline was later requalified as a single tree by Build Validation #114 before M10 began.
 
-Build Validation **#105** qualified code candidate:
-
-```text
-d3e43ac63d6b12cfc7b577294e182951766d4508
-```
-
-Passed:
-
-- `npm ci`;
-- `npx tsc --noEmit`;
-- M4 Relationship runtime regression suite;
-- M5 routed fresh-player Willow suite;
-- M6 Lyra universality suite;
-- M7 production Elara collaboration suite;
-- M8 Trait discovery suite;
-- M9 legacy-save migration suite;
-- production `npm run build`.
-
-A final exact-head run is required after this documentation commit before PR #29 becomes review-ready.
+M10 retains `RelationshipLegacySaveMigration.test.ts` in its Build Validation gate, so save-envelope versioning cannot silently regress the M9 provenance contract.
 
 ---
 
@@ -385,43 +385,41 @@ M9 does **not** claim that:
 - historical saves can reconstruct the real scenes that produced old depth;
 - legacy Connection automatically satisfies modern Memory or Trait-learning evidence;
 - every non-relationship-authoritative NPC has been migrated;
-- the entire save system has been redesigned or versioned;
-- remote/cloud persistence exists;
-- future schema migrations no longer need explicit provenance;
 - a legacy-derived Bond is semantically equivalent to a modern authored Bond of the same level.
 
-Those would exceed the evidence available in a historical scalar save.
+M9 itself also did not establish a generalized save-schema system. M10 now supplies that architecture, but it does not retroactively create missing Relationship history.
 
 ---
 
 ## 14. Invariants for future migration work
 
-Future save migrations should preserve these rules:
+Future persistent migrations and runtime reconciliations must preserve these rules:
 
 1. **Never manufacture causal evidence to make a schema look complete.**
 2. **Preserve known historical facts separately from inferred/default state.**
 3. **Make inference provenance explicit when it affects gameplay or explanation.**
 4. **Do not overwrite a newer authoritative representation with an older compatibility source.**
 5. **A migration may preserve entitlement/progress without claiming semantic history it cannot know.**
-6. **Loading a save and successfully migrating optional additive systems are separate failure domains.**
+6. **Persistent schema conversion and current-runtime reconciliation are separate phases.**
 7. **Player-facing explanations must distinguish preserved legacy state from newly earned modern evidence.**
+8. **Use the M10 migration registry for representation changes; do not add another ad hoc serialized-state repair path.**
 
 ---
 
 ## 15. Relationship to the original migration plan
 
-This document implements **Phase I — Save migration** of `RelationshipSystemMigrationPlan.md`.
+This document implements the Relationship-specific semantics originally described as **Phase I — Save migration** of `RelationshipSystemMigrationPlan.md`.
 
-The original plan's required semantics remain authoritative:
+The required domain semantics remain authoritative:
 
 - preserve Affinity;
 - map old `connectionDepth` conservatively;
 - initialize unknown dimensions neutrally;
 - do not fabricate Experiences or Memories;
-- mark migrated profiles as legacy-derived;
+- mark legacy-derived profiles explicitly;
 - record new authored Experiences from migration onward.
 
-M9 turns that design rule into executable load-time behavior with explicit provenance and automated qualification.
+M10 refines the architecture around those semantics by giving the serialized save itself a formal schema identity and migration chain.
 
 ---
 
@@ -429,8 +427,12 @@ M9 turns that design rule into executable load-time behavior with explicit prove
 
 M9 succeeds when an old player can continue with recognizable relationship progress while the new system remains honest about what it knows.
 
-The migration must be able to say:
+The Relationship reconciliation must be able to say:
 
 > "You had meaningful progress with this NPC before the new evidence model existed. I preserved that progress, but I will not pretend to know which modern Experiences or Memories caused it."
 
-That is the intended contract.
+M10 adds the preceding representational statement:
+
+> "I also know which save schema these bytes used and which explicit forward transformations made them current before Relationship reconciliation began."
+
+Those two claims are complementary, not interchangeable.
