@@ -1,0 +1,154 @@
+{
+  "experiences": {
+    "silas_exp_price_of_truth": {
+      "id": "silas_exp_price_of_truth",
+      "uniqueKey": "silas:m12:01:price-of-truth",
+      "title": "The Price of Useful Truth",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "dialogue",
+      "sourceId": "silas_approach",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -4,
+        "trust": 2,
+        "understanding": 7,
+        "sharedMeaning": 2,
+        "vulnerability": 4
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["Instrumental", "Information", "MutualAssessment"],
+      "memoryCandidate": false,
+      "interpretation": "You accept that Silas prices information according to leverage rather than warmth, and he notices that you prefer a dangerous truth to reassuring theatre."
+    },
+    "silas_exp_package_unopened": {
+      "id": "silas_exp_package_unopened",
+      "uniqueKey": "silas:m12:02:package-unopened",
+      "title": "The Package Returned Unopened",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "quest",
+      "sourceId": "quest_silas_retrieve_item",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 8,
+        "understanding": 5,
+        "sharedMeaning": 5,
+        "reliance": 7,
+        "vulnerability": 5,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 14,
+      "resonanceTags": ["Instrumental", "Restraint", "Reliance", "Secrecy"],
+      "memoryCandidate": false,
+      "interpretation": "You return a package you could have opened. Silas does not mistake restraint for innocence, but he can now price your discretion as a real capability."
+    },
+    "silas_exp_leverage_named": {
+      "id": "silas_exp_leverage_named",
+      "uniqueKey": "silas:m12:03:leverage-named",
+      "title": "Leverage Named",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "dialogue",
+      "sourceId": "silas_trait_hint",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -3,
+        "trust": 3,
+        "understanding": 9,
+        "sharedMeaning": 5,
+        "reliance": 5,
+        "vulnerability": 8,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 14,
+      "resonanceTags": ["Instrumental", "MutualLeverage", "Vulnerability"],
+      "memoryCandidate": false,
+      "interpretation": "Silas stops pretending the asymmetry is one-sided. Each of you now understands at least one fact the other would rather keep expensive."
+    },
+    "silas_exp_secret_neither_sold": {
+      "id": "silas_exp_secret_neither_sold",
+      "uniqueKey": "silas:m12:04:secret-neither-sold",
+      "title": "The Secret Neither Sold",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "dialogue",
+      "sourceId": "silas_secret_neither_sold",
+      "significance": "defining",
+      "relationshipEffects": {
+        "affinity": 2,
+        "trust": 7,
+        "understanding": 8,
+        "sharedMeaning": 8,
+        "reliance": 8,
+        "vulnerability": 10,
+        "reciprocity": 7
+      },
+      "connectionProgressDelta": 20,
+      "resonanceTags": ["MutualLeverage", "Restraint", "Secrecy", "InstrumentalBond"],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "silas_memory_secret_neither_sold",
+      "interpretation": "Both of you receive a profitable opportunity to sell the other's vulnerability and independently decline it. The bond remains dangerous, but the danger has acquired reciprocal limits."
+    }
+  },
+  "memories": {
+    "silas_memory_secret_neither_sold": {
+      "id": "silas_memory_secret_neither_sold",
+      "originExperienceId": "silas_exp_secret_neither_sold",
+      "title": "The Secret Neither Sold",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "Each of you possessed a secret that would have paid well in the wrong hands. Neither sold.",
+      "protagonistView": "Silas is not safe. What matters is that he knows exactly how unsafe I am to him as well, and there are bargains neither of us needs spoken twice.",
+      "targetView": "The player can hold leverage without immediately cashing it out. That makes the leverage more useful, not less dangerous.",
+      "resonanceTags": ["MutualLeverage", "Restraint", "Secrecy", "InstrumentalBond"],
+      "bondContribution": "Dangerous Confidants — emerging",
+      "persistence": "contested"
+    }
+  },
+  "progression": {
+    "npc_rogue_silas": {
+      "npcId": "npc_rogue_silas",
+      "connectionAuthority": "relationships",
+      "qualificationRules": [
+        {
+          "level": 1,
+          "minimumProgress": 20,
+          "minimumExperienceCount": 2,
+          "requiredExperienceIds": [
+            "silas_exp_price_of_truth",
+            "silas_exp_package_unopened"
+          ],
+          "minimumDimensions": {
+            "understanding": 10,
+            "vulnerability": 8
+          }
+        },
+        {
+          "level": 2,
+          "minimumProgress": 50,
+          "minimumExperienceCount": 4,
+          "requiredExperienceIds": [
+            "silas_exp_leverage_named",
+            "silas_exp_secret_neither_sold"
+          ],
+          "requiredMemoryTags": ["MutualLeverage"],
+          "minimumDimensions": {
+            "understanding": 25,
+            "reliance": 18,
+            "vulnerability": 20,
+            "reciprocity": 15
+          }
+        }
+      ],
+      "essence": {
+        "enabled": true,
+        "startingTetherState": "present"
+      }
+    }
+  }
+}
