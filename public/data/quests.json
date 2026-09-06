@@ -85,6 +85,41 @@
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
+  "quest_lyra_chrono_crypt_calibration": {
+    "id": "quest_lyra_chrono_crypt_calibration",
+    "title": "Reluctant Co-Training",
+    "description": "A Chrono Crypt harmonic lock requires two incompatible frames to be held at once. Coordinate with Lyra long enough to solve the problem without pretending necessity has become friendship.",
+    "giver": "npc_lyra",
+    "type": "SIDE",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Bring Lyra's harmonic key into phase with the Chrono Crypt lock",
+        "type": "GATHER",
+        "target": "item_lyra_harmonic_key",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "coordinate_without_conceding",
+        "label": "Coordinate Without Conceding",
+        "description": "Solve the lock by relying on Lyra's timing while preserving the disagreement that made the cooperation necessary rather than sentimental.",
+        "relationshipExperienceId": "lyra_exp_reluctant_cotraining",
+        "consumeItems": [{ "itemId": "item_lyra_harmonic_key", "quantity": 1 }],
+        "rewards": [],
+        "logMessage": "You and Lyra solve the lock through disciplined coordination. The success creates real reliance without friendship or ideological surrender."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
   "quest_silas_retrieve_item": {
     "id": "quest_silas_retrieve_item",
     "title": "A Shady Delivery",

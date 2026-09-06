@@ -6,8 +6,8 @@
       "title": "Strategic Defeat, Not Submission",
       "primaryTargetId": "npc_lyra",
       "participantIds": ["player", "npc_lyra"],
-      "sourceType": "other",
-      "sourceId": "lyra_capture",
+      "sourceType": "dialogue",
+      "sourceId": "lyra_strategic_defeat",
       "significance": "meaningful",
       "relationshipEffects": {
         "affinity": -18,
@@ -19,7 +19,7 @@
       "connectionProgressDelta": 10,
       "resonanceTags": ["Adversarial", "Capture", "MutualAssessment"],
       "memoryCandidate": false,
-      "interpretation": "Lyra loses the tactical contest without conceding the ideological one; each leaves with a sharper model of the other."
+      "interpretation": "Lyra wins the tactical position without securing submission; each leaves with a sharper model of the other."
     },
     "lyra_exp_coercion_reflected": {
       "id": "lyra_exp_coercion_reflected",
@@ -27,8 +27,8 @@
       "title": "Coercion Reflected",
       "primaryTargetId": "npc_lyra",
       "participantIds": ["player", "npc_lyra"],
-      "sourceType": "other",
-      "sourceId": "lyra_resistance",
+      "sourceType": "dialogue",
+      "sourceId": "lyra_coercion_reflected",
       "significance": "meaningful",
       "relationshipEffects": {
         "affinity": -12,
@@ -40,7 +40,7 @@
       "connectionProgressDelta": 10,
       "resonanceTags": ["Adversarial", "Resistance", "HarmonicResonance"],
       "memoryCandidate": false,
-      "interpretation": "Lyra's harmonic discipline reflects coercive pressure and forces the protagonist to understand rather than overwrite her."
+      "interpretation": "Lyra's harmonic pressure is answered by understanding its structure rather than surrendering to it, deepening mutual assessment while warmth falls."
     },
     "lyra_exp_reluctant_cotraining": {
       "id": "lyra_exp_reluctant_cotraining",
@@ -48,8 +48,8 @@
       "title": "Reluctant Co-Training",
       "primaryTargetId": "npc_lyra",
       "participantIds": ["player", "npc_lyra"],
-      "sourceType": "other",
-      "sourceId": "chrono_crypt_cooperation",
+      "sourceType": "quest",
+      "sourceId": "quest_lyra_chrono_crypt_calibration",
       "significance": "major",
       "relationshipEffects": {
         "affinity": 4,
@@ -62,7 +62,7 @@
       "connectionProgressDelta": 15,
       "resonanceTags": ["Adversarial", "Cooperation", "Reliance", "ChronoCrypt"],
       "memoryCandidate": false,
-      "interpretation": "The crypt makes cooperation instrumentally necessary; repeated successful coordination creates reliance without friendship."
+      "interpretation": "The crypt makes cooperation instrumentally necessary; successful coordination creates real reliance without friendship."
     },
     "lyra_exp_ideological_friction": {
       "id": "lyra_exp_ideological_friction",
@@ -71,7 +71,7 @@
       "primaryTargetId": "npc_lyra",
       "participantIds": ["player", "npc_lyra"],
       "sourceType": "dialogue",
-      "sourceId": "lyra_dialectic",
+      "sourceId": "lyra_ideological_friction",
       "significance": "meaningful",
       "relationshipEffects": {
         "affinity": -10,
@@ -82,7 +82,7 @@
       "connectionProgressDelta": 12,
       "resonanceTags": ["Adversarial", "IdeologicalFriction", "Dialectic"],
       "memoryCandidate": false,
-      "interpretation": "Open disagreement makes them like each other less in the moment while exposing the actual structure of their incompatible values."
+      "interpretation": "Open disagreement makes them like each other less while exposing the actual structure of their incompatible values."
     },
     "lyra_exp_mutual_calibration": {
       "id": "lyra_exp_mutual_calibration",
@@ -91,7 +91,7 @@
       "primaryTargetId": "npc_lyra",
       "participantIds": ["player", "npc_lyra"],
       "sourceType": "dialogue",
-      "sourceId": "lyra_dialectic",
+      "sourceId": "lyra_mutual_calibration",
       "significance": "meaningful",
       "relationshipEffects": {
         "trust": 7,
@@ -110,8 +110,8 @@
       "title": "Enemies in Phase",
       "primaryTargetId": "npc_lyra",
       "participantIds": ["player", "npc_lyra"],
-      "sourceType": "other",
-      "sourceId": "chrono_crypt_harmonic_lock",
+      "sourceType": "dialogue",
+      "sourceId": "lyra_enemies_in_phase",
       "significance": "defining",
       "relationshipEffects": {
         "affinity": 1,
@@ -126,7 +126,7 @@
       "resonanceTags": ["AdversarialBond", "MutualCalibration", "HarmonicResonance", "ChronoCrypt"],
       "memoryCandidate": true,
       "memoryDefinitionId": "lyra_memory_enemies_in_phase",
-      "interpretation": "They solve a harmonic problem that neither can solve alone, producing a consequential bond while ideological hostility remains unresolved."
+      "interpretation": "They solve a harmonic problem through models built across prior confrontations, producing a consequential bond while ideological hostility remains unresolved."
     }
   },
   "memories": {
@@ -170,17 +170,20 @@
           "minimumExperienceCount": 6,
           "requiredExperienceIds": [
             "lyra_exp_reluctant_cotraining",
+            "lyra_exp_mutual_calibration",
             "lyra_exp_proto_bond"
           ],
           "requiredMemoryTags": ["AdversarialBond"],
           "minimumDimensions": {
             "understanding": 55,
-            "sharedMeaning": 40
+            "sharedMeaning": 40,
+            "reciprocity": 15
           }
         }
       ],
       "essence": {
-        "enabled": false
+        "enabled": true,
+        "startingTetherState": "present"
       }
     }
   }
