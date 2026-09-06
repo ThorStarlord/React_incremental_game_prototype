@@ -40,28 +40,47 @@ export interface ImportedSaveResult {
 }
 
 /**
+ * Convert a JavaScript string to the binary-byte string expected by btoa.
+ * encodeURIComponent gives us deterministic UTF-8 bytes without relying on
+ * TextEncoder, which is not present in every supported CRA/Jest environment.
+ */
+const utf8ToBinary = (value: string): string => {
+  const encoded = encodeURIComponent(value);
+  let binary = '';
+
+  for (let index = 0; index < encoded.length; index += 1) {
+    if (encoded[index] === '%') {
+      binary += String.fromCharCode(parseInt(encoded.slice(index + 1, index + 3), 16));
+      index += 2;
+    } else {
+      binary += encoded[index];
+    }
+  }
+
+  return binary;
+};
+
+/** Convert an atob binary-byte string back into a JavaScript UTF-8 string. */
+const binaryToUtf8 = (binary: string): string => {
+  let encoded = '';
+
+  for (let index = 0; index < binary.length; index += 1) {
+    encoded += `%${binary.charCodeAt(index).toString(16).padStart(2, '0')}`;
+  }
+
+  return decodeURIComponent(encoded);
+};
+
+/**
  * Encode arbitrary JSON save payloads as base64 without assuming ASCII-only
  * content. This keeps authored/player Unicode text intact across copy/paste.
  */
-export const encodeSavePayloadToBase64 = (payload: unknown): string => {
-  const bytes = new TextEncoder().encode(JSON.stringify(payload));
-  let binary = '';
-  const chunkSize = 0x8000;
-
-  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-    binary += String.fromCharCode(
-      ...Array.from(bytes.subarray(offset, offset + chunkSize))
-    );
-  }
-
-  return btoa(binary);
-};
+export const encodeSavePayloadToBase64 = (payload: unknown): string =>
+  btoa(utf8ToBinary(JSON.stringify(payload)));
 
 /** Decode a UTF-8 save-code payload. Surrounding copy/paste whitespace is ignored. */
 export const decodeSavePayloadFromBase64 = (encoded: string): unknown => {
-  const binary = atob(encoded.trim());
-  const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
-  const json = new TextDecoder().decode(bytes);
+  const json = binaryToUtf8(atob(encoded.trim()));
   return JSON.parse(json) as unknown;
 };
 
