@@ -1,8 +1,8 @@
 # Relationship Progression Redesign
 
-**Status:** Target design approved; staged runtime migration in progress  
-**Runtime status:** M4 Willow authority cutover implemented; M5 routed mechanical + workspace causal-legibility qualification implemented; M6 Lyra adversarial universality proof implemented; other production NPCs remain legacy-authoritative  
-**Purpose:** Provide one authority/index for the relationship, Essence, Memory, and Trait Resonance redesign while migration is in progress.
+**Status:** Target design approved; staged production migration in progress  
+**Runtime status:** M4–M10 integrated on `main`; M11 Lyra player-facing production rollout implemented on its candidate branch; Willow, Elara, and Lyra use Relationship authority while remaining production NPCs are still legacy-authoritative  
+**Purpose:** Provide one authority/index for the relationship, Essence, Memory, Trait Resonance, and persistence redesign while production migration continues.
 
 ## Why this document exists
 
@@ -23,6 +23,11 @@ When an older feature spec conflicts with current code, the runtime wins as the 
 - [`Technical/RelationshipSystemMigrationPlan.md`](Technical/RelationshipSystemMigrationPlan.md) — staged runtime migration from the existing model.
 - [`Technical/FreshPlayerWillowQualification.md`](Technical/FreshPlayerWillowQualification.md) — routed mechanical qualification and original human-comprehension evidence boundary.
 - [`Technical/WorkspaceCognitiveWalkthrough.md`](Technical/WorkspaceCognitiveWalkthrough.md) — workspace-based player-facing causal-legibility qualification after narrowing the M5 claim.
+- [`Technical/ElaraRelationshipMigration.md`](Technical/ElaraRelationshipMigration.md) — M7 collaborative/inquiry archetype migration.
+- [`Technical/TraitDiscoveryContract.md`](Technical/TraitDiscoveryContract.md) — M8 authored Trait-discovery lifecycle.
+- [`Technical/LegacyRelationshipSaveMigration.md`](Technical/LegacyRelationshipSaveMigration.md) — M9 provenance-preserving legacy Relationship reconciliation.
+- [`Technical/SaveSchemaMigrationSystem.md`](Technical/SaveSchemaMigrationSystem.md) — M10 explicit persistent save-schema identity and forward migration.
+- [`Technical/LyraProductionRelationshipVerticalSlice.md`](Technical/LyraProductionRelationshipVerticalSlice.md) — M11 player-facing adversarial production rollout and persistence proof.
 
 ## Authority during migration
 
@@ -30,10 +35,11 @@ Authority is now **per NPC** rather than globally legacy or globally new.
 
 - `RelationshipProgressionDefinition.connectionAuthority` declares whether an NPC uses legacy Connection progression or the Relationships domain.
 - **Elder Willow:** `BondProfile.connectionLevel` is authoritative in playable runtime.
-- **Lyra:** the Relationships domain is authoritative inside the M6 adversarial runtime proof, but Lyra is not yet integrated as a complete player-facing NPC/content slice.
+- **Scholar Elara:** the Relationships domain is authoritative for her collaborative/inquiry production content and `ScholarlyInsight` progression.
+- **Lyra:** the Relationships domain is authoritative for the M6 ontology proof and, under M11, for her normal player-facing Dialogue/Quest/Relationship production route.
 - **Other production NPCs:** existing Affinity/`connectionDepth` behavior remains authoritative until separately migrated.
-- Willow's legacy `NPC.connectionDepth` remains only as a compatibility projection for consumers that have not migrated yet.
-- Willow's authored Affinity is projected to the NPC field because existing dialogue/service UI still reads it, but Affinity can no longer level Willow Connection.
+- Migrated NPCs may retain legacy `NPC.connectionDepth` only as a compatibility projection for consumers that have not migrated yet.
+- Authored Affinity is projected to the NPC field where existing dialogue/service UI still reads it, but Affinity cannot itself level migrated Connection.
 - `shadowMode` is retained as a broad migration marker meaning some NPCs are still legacy-authoritative; it no longer means every relationship record is side-effect-free.
 
 Temporary compatibility projections must remain clearly marked and removable.
@@ -48,7 +54,7 @@ Authored relationship definitions are now discovered through:
 -> generic merge/registration
 ```
 
-The runtime loader does not enumerate Willow or Lyra in TypeScript. Adding another authored relationship bundle should normally be a content-registration change rather than a new NPC-specific branch in generic relationship mechanics.
+The runtime loader does not enumerate Willow, Elara, or Lyra in TypeScript. Adding another authored relationship bundle should normally be a content-registration change rather than a new NPC-specific branch in generic relationship mechanics.
 
 The loader temporarily accepts the older single-bundle response shape for migration/test compatibility.
 
@@ -68,20 +74,22 @@ Authored narrative choice
 
 For unmigrated production NPCs, the legacy relationship and Trait gates remain in place.
 
-## Current Lyra falsification path
+## Current Lyra production path
 
 ```text
 Strategic defeat
 -> coercion reflected
--> reluctant co-training
+-> Connection I
+-> reluctant co-training through a normal Quest resolution
 -> ideological friction
 -> mutual calibration
 -> consequential harmonic cooperation
 -> contested landmark Memory
 -> evidence-qualified Connection II
+-> contested-bond passive Essence
 ```
 
-This path deliberately tests whether deep Connection can emerge while immediate liking remains negative.
+This path deliberately demonstrates that deep Connection and ongoing relationship-derived Essence can emerge while immediate liking remains negative. M11 moves the M6 ontology proof onto ordinary player-facing production surfaces without adding Lyra-specific generic mechanics.
 
 ## Non-negotiable invariants
 
@@ -98,6 +106,7 @@ This path deliberately tests whether deep Connection can emerge while immediate 
 11. A migrated NPC must not be double-counted through both legacy and Bond-derived Essence contribution paths.
 12. Irreversible resource/permanence changes must not occur before required authored relationship evidence validates successfully.
 13. A new relationship archetype is not considered generalized if it requires an NPC-id conditional inside generic relationship mechanics.
+14. Save migration may preserve known progress but must not manufacture unavailable Experience, Memory, or Trait-learning history.
 
 # M3 — Shadow Runtime — Complete
 
@@ -173,7 +182,7 @@ Connection Base Rate
 
 The global base Essence rate and qualifying Copy contribution remain intact.
 
-Only relationship configs explicitly marked `essence.enabled` participate in the new NPC source, preventing Willow from being double-counted with unmigrated NPC behavior.
+Only relationship configs explicitly marked `essence.enabled` participate in the new NPC source, preventing migrated NPCs from being double-counted with unmigrated NPC behavior.
 
 The debug panel exposes the exact Willow contribution and the factors that produced it.
 
@@ -252,13 +261,13 @@ The permanent-acquisition thunk validates in this order:
 
 This means sufficient Essence alone can no longer purchase `WillowsWisdom`.
 
-### Current discovery limitation
+### Trait discovery status
 
-The prototype's existing Trait initialization broadly marks Traits discovered, so M4 enforces the discovery predicate but does **not** yet prove a narratively earned Trait-discovery flow. That remains a separate cleanup rather than being silently redefined here.
+M4 originally inherited a prototype behavior where Trait catalog loading broadly implied discovery. **M8 resolved that limitation.** Relationship-mediated Traits can now use authored discovery: `WillowsWisdom` is revealed by `The First Lesson`, and `ScholarlyInsight` by Elara's contradictory-footnote evidence. Catalog loading is no longer equivalent to discovery for authored Traits.
 
 ## Player/debug visibility
 
-The NPC Trait panel now explains the Willow gate with:
+The NPC Trait panel explains relationship-mediated gates with:
 
 - Connection current/required;
 - assimilation current/required;
@@ -272,9 +281,9 @@ The relationship debug panel exposes:
 - legacy compatibility projection;
 - Connection qualification evidence;
 - Resonance Quality / Stability / Tether;
-- exact Willow Essence contribution;
-- `WillowsWisdom` assimilation and relevant Memories;
-- idempotent authored-event injection for qualification.
+- exact Relationship Essence contribution;
+- Trait assimilation and relevant Memories;
+- idempotent authored-event injection for development qualification.
 
 # M5 — Routed Mechanical and Workspace Causal-Legibility Qualification — Implemented
 
@@ -365,7 +374,7 @@ Requires:
 
 ### Connection II
 
-Requires:
+M6 originally required:
 
 - at least 70 Connection Progress;
 - six Experiences;
@@ -374,6 +383,8 @@ Requires:
 - a Memory tagged `AdversarialBond`;
 - at least 55 Understanding;
 - at least 40 Shared Meaning.
+
+M11 productionizes the same arc and strengthens the Connection II evidence contract by also requiring `Mutual Calibration` and minimum Reciprocity.
 
 No relationship reducer or selector contains a special Lyra branch. The generic authoring loader also contains no Lyra identifier; Lyra enters through the relationship-content manifest.
 
@@ -385,49 +396,137 @@ The authored sequence produces:
 Connection Level: 2
 Connection Progress: 83
 Affinity: -35
+Trust: 19
 Understanding: 64
 Shared Meaning: 46
+Reliance: 16
+Vulnerability: 13
+Reciprocity: 18
 Stability: contested
 Landmark Memory: Enemies in Phase
 ```
 
-This is the key M6 result: **deep, evidence-qualified Connection coexists with negative Affinity and unresolved ideological conflict.**
+This remains the key M6/M11 result: **deep, evidence-qualified Connection coexists with negative Affinity and unresolved ideological conflict.**
 
-The result falsifies the concern that the new model is merely an affection meter with extra fields, at least for this authored adversarial case.
+## Essence scope boundary: M6 historical scope vs M11 production scope
 
-## Essence scope boundary
+M6 deliberately set relationship-derived Lyra Essence to disabled so the ontology proof would not also become an economy cutover.
 
-Lyra's M6 config deliberately sets relationship-derived Essence to disabled.
+M11 changes that production scope deliberately: Lyra's Relationship config now enables Essence and uses the same generic Connection × Resonance Quality × Tether × Stability calculation as other migrated relationships. At the qualified M11 final state, contested Stability reduces the contribution to `0.065/sec` while Affinity remains `-35`.
 
-That is intentional. M6 asks whether the relationship ontology and qualification machinery generalize to an adversarial bond. It does not conflate that question with a second economy cutover or a Lyra Trait migration.
+This is not a Lyra-specific formula. It demonstrates that meaningful hostile entanglement can be metaphysically productive without being affectionate.
 
-## Debug visibility
+## Debug and production visibility
 
-The development Debug page includes a Lyra universality panel that replays the six authored Experiences through the same authored-experience thunk used by the relationship runtime and shows:
+The development Debug page retains the Lyra universality panel as an isolated M6 diagnostic surface.
 
-- current authority registration;
-- Connection level and qualification evidence;
-- Affinity;
-- Stability;
-- Connection Progress;
-- Understanding and Shared Meaning;
-- Experience/Memory counts;
-- the intentionally disabled Lyra Essence contribution.
+M11 additionally routes the same six-beat semantics through normal production NPC/Dialogue/Quest/Relationship UI, including player-visible Connection evidence, contested Stability, `Enemies in Phase`, and passive Essence.
+
+# M7 — Elara Collaborative Relationship Migration — Implemented
+
+Elara provides the third relationship archetype: reciprocal intellectual collaboration rather than mentorship or adversarial conflict.
+
+Her production content is manifest-driven and reaches Connection II through challenge, contradictory evidence, reciprocal revision, a theory neither participant owns, and independent verification. `ScholarlyInsight` is relationship-mediated and uses the generic Trait discovery/assimilation/Resonance machinery rather than an Elara-specific engine branch.
+
+M7 establishes that a third relationship archetype can be expressed primarily as production authoring/configuration on the same generic model.
+
+# M8 — Authored Trait Discovery — Implemented
+
+M8 separates Trait definition loading from Trait discovery.
+
+- legacy/simple Traits may remain initially known for compatibility;
+- relationship-mediated Traits may declare authored discovery;
+- Relationship Experiences can reveal a Trait pattern;
+- replay can repair an older save that contains the Experience but lacks the newer discovery flag;
+- New Game resets authored discoveries without erasing Trait definitions;
+- undiscovered authored Traits do not leak identity/cost/Memory/assimilation details through the normal NPC Trait UI.
+
+Discovery, assimilation, and Resonance are therefore distinct lifecycle stages.
+
+# M9 — Legacy Relationship Save Reconciliation — Implemented
+
+M9 preserves old `connectionDepth` conservatively for Relationship-authoritative NPCs without inventing modern causal history.
+
+A legacy-derived Bond may preserve:
+
+- bounded Connection level;
+- legacy Affinity;
+- explicit provenance.
+
+It does not fabricate:
+
+- Experiences;
+- Memories;
+- qualification evidence;
+- semantic dimensions such as Understanding or Reciprocity;
+- Trait discovery/assimilation evidence.
+
+Existing modern Bond Profiles are never overwritten by the compatibility migration.
+
+# M10 — Save Schema Versioning & Migration — Implemented
+
+M10 makes persistent representation evolution explicit.
+
+- missing historical `schemaVersion` is the one distinguishable legacy representation, v0;
+- current save schema is v1;
+- migrations run as explicit adjacent ordered transitions;
+- local loads and imports use the same persistent migration authority;
+- future/invalid schema identities fail safely;
+- persistent migration runs before Redux state installation;
+- content-dependent Relationship reconciliation remains a separate post-install runtime phase.
+
+This makes M9 and M10 complementary rather than overlapping: M10 transforms saved representations; M9 interprets legacy relationship progress against current authored content without fabricating history.
+
+# M11 — Lyra Production Relationship Rollout — Implemented Candidate
+
+M11 moves Lyra from M6 ontology proof to ordinary production gameplay.
+
+The production route uses:
+
+- a real `npc_lyra` definition in the production catalog;
+- six normal player-facing Dialogue beats;
+- a real `Reluctant Co-Training` Quest resolution;
+- Connection I and II through generic evidence qualification;
+- a player-visible contested `Enemies in Phase` Memory;
+- generic contested-bond passive Essence;
+- mid-arc save/load continuity;
+- final save-code import/export continuity;
+- historical Lyra save coexistence without fabricated modern evidence.
+
+The deterministic final state remains:
+
+```text
+Connection 2
+Connection Progress 83
+Affinity -35
+Trust 19
+Understanding 64
+Shared Meaning 46
+Reliance 16
+Vulnerability 13
+Reciprocity 18
+Stability contested
+Memory: Enemies in Phase
+Passive Essence: 0.065/sec
+```
+
+See [`Technical/LyraProductionRelationshipVerticalSlice.md`](Technical/LyraProductionRelationshipVerticalSlice.md) for the full contract and evidence ceiling.
 
 # Save compatibility
 
-M3 saves may contain a Relationships slice but lack M4 fields such as:
+Save compatibility now has two explicit layers.
 
-- progression definitions;
-- Trait assimilation state;
-- Connection qualification evidence;
-- tether state.
+## Persistent representation — M10
 
-Reducers and selectors lazily normalize those additive fields. Existing Experience and Memory history is preserved; missing Memories are not fabricated.
+Historical/current save payloads are identified by schema version and migrated deterministically to the current persistent envelope before Redux installation.
 
-Full pre-Relationships legacy save migration — including conservative mapping from historical `connectionDepth` with explicit legacy-derived provenance — remains Phase I work.
+## Relationship interpretation — M9
 
-The relationship-content manifest does not fabricate Lyra history for existing saves; authored Experiences are still recorded only when their events occur or when deliberately injected by development tooling/tests.
+After current state is installed, current relationship definitions may conservatively reconcile legacy `connectionDepth` into a bounded, provenance-marked Relationship baseline.
+
+The system preserves known progress without fabricating missing Experience/Memory history. New authored Experiences accumulate normally afterward.
+
+Reducers/selectors still defensively normalize additive optional fields from older modern Relationship saves where appropriate.
 
 # Automated qualification
 
@@ -439,6 +538,12 @@ npx tsc --noEmit
 RelationshipRuntime.test.ts
 RelationshipLyraUniversality.test.ts
 RelationshipFreshGame.test.tsx
+RelationshipElaraCollaboration.test.ts
+RelationshipLyraProduction.test.tsx
+TraitDiscovery.test.ts
+RelationshipLegacySaveMigration.test.ts
+saveSchema.test.ts
+saveUtils.test.ts
 npm run build
 ```
 
@@ -466,10 +571,19 @@ The Lyra/M6 suite additionally covers:
 - generic Connection I/II qualification;
 - final negative Affinity with Connection II;
 - high Understanding and Shared Meaning despite conflict;
-- contested stability;
-- Lyra Essence remaining disabled during the ontology proof.
+- contested Stability.
 
 The routed M5 suite covers the complete normal-player Willow preserve branch through permanent `WillowsWisdom` Resonance without Debug injection.
+
+The M7 suite covers collaborative Elara progression, authored Trait discovery, reciprocal evidence, recovery from the cautious branch, and permanent `ScholarlyInsight`.
+
+The M8 suite covers definition-vs-discovery lifecycle semantics, New Game reset, reload preservation, and additive save repair.
+
+The M9 suite covers bounded legacy Connection preservation, provenance, idempotency, modern-profile protection, weak migrated Essence, and failure to bypass modern Trait evidence.
+
+The M10 suites cover schema identity, v0 interpretation, ordered migration, future-version rejection, local/import parity, UTF-8 save-code transport, and imported metadata preservation.
+
+The M11 suite covers production Lyra data wiring, normal routed Dialogue/Quest progression, negative Affinity at Connection II, contested Memory/Essence, save/load, import/export, legacy coexistence, and absence of `npc_lyra` branches from generic runtime files.
 
 Exact-head qualification status must be taken from the latest PR Build Validation run. A green run on an older commit does not qualify a later documentation or code candidate.
 
@@ -479,35 +593,31 @@ The relationship redesign is **not** a whole-game migration yet.
 
 Still deferred:
 
-- production Connection authority for NPCs other than Willow;
-- full player-facing Lyra NPC/dialogue/quest integration beyond the M6 runtime/debug proof;
-- Lyra relationship-derived Essence or Trait migration;
-- broad campaign content migration;
-- full Trait discovery redesign;
-- full pre-Relationships save migration;
-- human usability/comprehension research beyond the workspace causal-legibility audit;
+- production Relationship authority/content migration for the rest of the legacy cast beyond Willow, Elara, and Lyra;
+- broad campaign content migration and discovery/onboarding integration for the expanded cast;
+- a Lyra relationship-mediated Trait, unless a later milestone identifies a distinct learning hypothesis worth testing;
+- human usability/comprehension research beyond workspace causal-legibility audits;
 - procedural/LLM Memories;
 - autonomous NPC social simulation;
 - Copy-system redesign;
 - multiple Essence currencies;
 - advanced distance/tether simulation;
-- authenticity/endgame mechanics.
+- authenticity/endgame mechanics;
+- global relationship/Essence balance across a production-sized cast.
 
 ## Next engineering milestone
 
-The core model now has three complementary forms of evidence:
+The core model now has complementary forms of evidence:
 
 ```text
-Willow runtime: complete mentor/student relationship-to-power mechanism
-Willow player path: routed mechanical completion + player-facing causal legibility
-Lyra runtime: adversarial/dialectic generalization with negative Affinity
+Willow: complete mentor/student relationship-to-power mechanism + routed player proof
+Elara: collaborative/inquiry production archetype + authored Trait lifecycle
+Lyra: adversarial/dialectic production archetype with negative Affinity + contested Essence
+M9/M10: historical compatibility + explicit persistent-state evolution
 ```
 
-Human playtesting remains useful future product research, but it is no longer required to support PR #25's narrowed merge claim.
+The next high-value question is no longer whether one more archetype can be represented. It is whether **production authoring scales across the broader cast without repeated engine work**.
 
-The next engineering decision can therefore move beyond Willow qualification. The highest-value candidates are:
+The natural next milestone is therefore a bounded relationship content-migration wave that measures authoring throughput, data duplication, validation failures, and TypeScript changes per migrated NPC. If each new NPC can be implemented mostly as authored data, the framework has moved from demonstrated generality to scalable production capability.
 
-1. migrate one additional production NPC through the manifest/data-driven pattern as a real content expansion; or
-2. address the known Trait-discovery and legacy-save migration debt before broader relationship rollout.
-
-Do not broaden both simultaneously; preserve the same one-question-at-a-time evidence discipline used for Willow and Lyra.
+Human playtesting remains useful future product research and should remain separate from mechanical qualification unless explicitly brought back into scope.
