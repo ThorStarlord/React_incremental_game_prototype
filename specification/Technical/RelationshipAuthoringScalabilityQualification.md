@@ -95,8 +95,9 @@ Counting convention: “existing dialogues reused” counts canonical M12 route 
 | New save schema | 0 | 0 | 0 |
 | Candidate-invalidating semantic fixes | 0 | 0 | 0 |
 | CI failures attributable to relationship semantics | 0 | 0 | 0 |
+| Candidate-invalidating route/test fixes | 2 | 0 | 0 |
 | Baseline missing advertised dialogue IDs | 2 | 3 | 3 |
-| Route-only defects after authoring | 0 | 0 | 0 |
+| Route/test defects observed during case qualification | 2 corrected | 0 | 0 |
 | Persistence defects | 0 | 0 | 0 |
 
 A separate shared qualification-fixture intervention occurred during Case B and is recorded in Section 16 rather than charged as an NPC-specific runtime or authoring concept.
@@ -187,7 +188,14 @@ M12 is complete when all three ordered cases have been attempted under this froz
 
 Gronk established the control case through ordinary production dialogue. Four authored Experiences move from craft-specific judgment to durable professional reliance, culminating in the stable Memory **The Blade That Held** and Connection II.
 
-The production route required content reconciliation and a new relationship bundle, but no generic Relationship, Essence, Trait, save, quest-runtime, or UI behavior changed for Gronk. The routed production qualification remained green in the later accumulated M12 gates.
+The production route required content reconciliation and a new relationship bundle, but no generic Relationship, Essence, Trait, save, quest-runtime, or UI behavior changed for Gronk.
+
+The first routed candidate `8cbd51d3f3372725be40b237c382609f8486ec24` failed Build Validation #133 after all older suites and TypeScript had passed. Investigation found two case-level route/test defects rather than a Relationship-model failure:
+
+1. the defining **The Blade That Held** node was nested under a lightweight dialogue continuation path that displays next-node text but does not expose its response buttons, so the response-scoped defining Experience was unreachable;
+2. the test read Connection immediately after the Experience reducer fired instead of waiting for the asynchronous dialogue/qualification interaction to finish.
+
+The defining node was exposed as an explicit evidence-gated production topic and the test was corrected to wait for completed dialogue history. Corrected candidate `e39f67e51c53ef4c1c0da181b8d483e5025fb271` passed Build Validation #135, and the routed Gronk qualification remained green in later accumulated M12 gates.
 
 Observed final relationship state in qualification:
 
@@ -327,7 +335,7 @@ The decisive evidence is not merely that all three NPCs can be made to work. It 
 
 The counter-hypothesis was not supported. No repeated semantic representation gap appeared, no NPC-specific engine logic accumulated, and the confirmation case did not require another abstraction after Silas.
 
-The repeated friction that did appear was real but narrower: qualification fixtures had duplicated knowledge of the relationship bundle catalog. That defect was observable, satisfied the Rule of Two, was repaired once through the production manifest, and requalified without changing domain or runtime behavior. It is therefore insufficient to downgrade the result to PASS-B.
+The repeated friction that did appear was real but narrower: qualification fixtures had duplicated knowledge of the relationship bundle catalog. That defect was observable, satisfied the Rule of Two, was repaired once through the production manifest, and requalified without changing domain or runtime behavior. Gronk also exposed two local route/test defects, both corrected without domain or generic-runtime changes. This evidence is insufficient to downgrade the result to PASS-B.
 
 ## 20. What M12 does and does not justify next
 
