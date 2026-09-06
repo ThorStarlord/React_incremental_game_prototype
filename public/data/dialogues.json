@@ -512,5 +512,58 @@
     },
     "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_valerius_patrol_duty", "responseId": "accept" } ],
     "next": { "accept": null, "decline": null }
+  },
+  "valerius_report": {
+    "id": "valerius_report",
+    "npcId": "npc_captain_valerius",
+    "title": "Objective Before Obedience",
+    "text": "Valerius puts a patrol map on the table. 'Most volunteers ask where to stand. Tell me what you think the patrol is for before I tell you the route.'",
+    "responses": {
+      "state_objective": "Keep trade moving and civilians safe. The route is a constraint, not the objective.",
+      "ask_orders": "You're the captain. Give me the route and I'll follow it exactly."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_objective_before_obedience", "responseId": "state_objective" }
+    ],
+    "next": {
+      "state_objective": null,
+      "ask_orders": null
+    }
+  },
+  "valerius_training_offer": {
+    "id": "valerius_training_offer",
+    "npcId": "npc_captain_valerius",
+    "title": "Patrol the City Streets",
+    "text": "Valerius marks the merchant district. 'Walk the route once. I do not need a performance. I need to know what the Watch is failing to see.'",
+    "requiredExperienceIds": ["valerius_exp_objective_before_obedience"],
+    "responses": {
+      "accept": "Give me the route. I'll report what the district actually needs, not what makes the Watch look clean.",
+      "decline": "Not today."
+    },
+    "effects": [
+      { "type": "UNLOCK_QUEST", "questId": "quest_valerius_patrol_duty", "responseId": "accept" }
+    ],
+    "next": {
+      "accept": null,
+      "decline": null
+    }
+  },
+  "valerius_city_issues": {
+    "id": "valerius_city_issues",
+    "npcId": "npc_captain_valerius",
+    "title": "The Order He Let You Question",
+    "text": "After your report, Valerius orders every patrol fixed at the market gates. The formation will look disciplined, but the alley your report identified will go uncovered. He watches you read the deployment before dismissing the room.",
+    "requiredExperienceIds": ["valerius_exp_report_without_theatre"],
+    "responses": {
+      "question_order": "That order protects the appearance of control and abandons the objective. Keep the gate post, but free one patrol to cover the alley.",
+      "defer": "You're the captain. I'll follow the deployment."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_order_questioned", "responseId": "question_order" }
+    ],
+    "next": {
+      "question_order": null,
+      "defer": null
+    }
   }
 }
