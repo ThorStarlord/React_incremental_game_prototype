@@ -7,6 +7,7 @@ import { updateLastSaved, updateGameMetadata } from './MetaSlice';
 import {
   createSave,
   createSaveFromPayload,
+  decodeSavePayloadFromBase64,
   loadSavedGameWithMigration,
 } from '../../../shared/utils/saveUtils';
 
@@ -100,7 +101,7 @@ export const importGameThunk = createAsyncThunk<
       let payload: unknown;
 
       try {
-        payload = JSON.parse(atob(saveCode)) as unknown;
+        payload = decodeSavePayloadFromBase64(saveCode);
       } catch (error) {
         console.error('Failed to parse import code:', error);
         return rejectWithValue('Invalid import code format. Please check your code and try again.');
