@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import {
+  Alert,
   Box,
   Card,
   CardContent,
@@ -89,9 +90,19 @@ const MigratedRelationshipSummary: React.FC<MigratedRelationshipSummaryProps> = 
       ? 'Meaningful Connection'
       : 'Unformed Connection';
 
+  const legacyDepth = profile.provenance?.legacyConnectionDepth;
+  const legacyDerived = Boolean(profile.provenance?.legacyDerived);
+
   return (
     <Box sx={{ p: 2 }}>
       <Stack spacing={2}>
+        {legacyDerived && (
+          <Alert severity="info">
+            This save preserved Connection {profile.connectionLevel} from the legacy relationship system
+            {typeof legacyDepth === 'number' ? ` (legacy depth ${legacyDepth})` : ''}. The migration did not invent Experiences, Memories, or qualification evidence. New authored interactions will build that history from here.
+          </Alert>
+        )}
+
         <Card>
           <CardContent>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>

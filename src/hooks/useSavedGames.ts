@@ -1,12 +1,35 @@
 import { useState, useEffect, useCallback } from 'react';
+import {
+  deleteSavedGame,
+  getSavedGames,
+  type SavedGame as SaveMetadata,
+} from '../shared/utils/saveUtils';
 
+/**
+ * Main-menu view model for canonical saveUtils metadata.
+ * `data.characterLevel` is retained only as a compatibility shape for the
+ * existing LoadGameDialog; new code should prefer playerLevel directly.
+ */
 export interface SavedGame {
   id: string;
   name: string;
   timestamp: number;
   playtime: number;
-  data: any; // The actual game state data
+  playerLevel?: number;
+  version?: string;
+  screenshot?: string;
+  data?: {
+    characterLevel?: number;
+  };
 }
+
+const toMenuSave = (save: SaveMetadata): SavedGame => ({
+  ...save,
+  playtime: save.playtime ?? 0,
+  data: {
+    characterLevel: save.playerLevel,
+  },
+});
 
 export function useSavedGames() {
   const [savedGames, setSavedGames] = useState<SavedGame[]>([]);
@@ -15,27 +38,9 @@ export function useSavedGames() {
   const loadSavedGames = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Get saved games from localStorage
-      const games: SavedGame[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('savegame_')) {
-          try {
-            const saveData = JSON.parse(localStorage.getItem(key) || '');
-            if (saveData) {
-              games.push({
-                id: key.replace('savegame_', ''),
-                ...saveData
-              });
-            }
-          } catch (e) {
-            console.error('Error parsing saved game:', e);
-          }
-        }
-      }
-      
-      // Sort by timestamp (newest first)
-      games.sort((a, b) => b.timestamp - a.timestamp);
+      const games = getSavedGames()
+        .map(toMenuSave)
+        .sort((a, b) => b.timestamp - a.timestamp);
       setSavedGames(games);
     } catch (error) {
       console.error('Error loading saved games:', error);
@@ -51,9 +56,11 @@ export function useSavedGames() {
   const deleteSave = useCallback(async (id: string) => {
     setIsLoading(true);
     try {
-      localStorage.removeItem(`savegame_${id}`);
-      setSavedGames(prevGames => prevGames.filter(game => game.id !== id));
-      return true;
+      const success = deleteSavedGame(id);
+      if (success) {
+        setSavedGames(prevGames => prevGames.filter(game => game.id !== id));
+      }
+      return success;
     } catch (error) {
       console.error('Error deleting save:', error);
       return false;
@@ -62,7 +69,6 @@ export function useSavedGames() {
     }
   }, []);
 
-  // Load saved games on initial mount
   useEffect(() => {
     loadSavedGames();
   }, [loadSavedGames]);
@@ -72,6 +78,6 @@ export function useSavedGames() {
     isLoading,
     loadSavedGames,
     findMostRecentSave,
-    deleteSave
+    deleteSave,
   };
 }

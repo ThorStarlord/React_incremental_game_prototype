@@ -7,6 +7,7 @@ import { discoverTrait } from '../../Traits/state/TraitsSlice';
 import {
   formRelationshipMemory,
   initializeBondProfile,
+  migrateLegacyBondProfile,
   recordConnectionQualification,
   recordRelationshipExperience,
   registerRelationshipProgressionDefinitions,
@@ -20,6 +21,7 @@ import type {
   RelationshipDefinitionBundle,
   RelationshipExperience,
   RelationshipMemory,
+  RelationshipProgressionDefinition,
   RelationshipTraitEffect,
 } from './RelationshipTypes';
 
@@ -130,9 +132,13 @@ const applyTraitDiscoveryEffects = (
   }
 };
 
+const getAuthoredConnectionCeiling = (
+  config: RelationshipProgressionDefinition
+): number => Math.max(0, ...(config.qualificationRules ?? []).map(rule => rule.level));
+
 export const initializeRelationshipRuntimeThunk = createAsyncThunk<
-  { registeredNpcIds: string[] },
-  { seedProfiles?: boolean } | undefined,
+  { registeredNpcIds: string[]; migratedNpcIds: string[] },
+  { seedProfiles?: boolean; migrateLegacyProfiles?: boolean } | undefined,
   { rejectValue: string }
 >(
   'relationships/initializeRuntime',
@@ -158,8 +164,47 @@ export const initializeRelationshipRuntimeThunk = createAsyncThunk<
         }
       }
 
+      const migratedNpcIds: string[] = [];
+      if (options?.migrateLegacyProfiles) {
+        for (const config of Object.values(progression)) {
+          if (config.connectionAuthority !== 'relationships') continue;
+
+          const state = getState() as RootState;
+          if (state.relationships?.bondProfilesByNpc?.[config.npcId]) continue;
+
+          const npc = state.npcs?.npcs?.[config.npcId];
+          if (!npc) continue;
+
+          const legacyDepth = Number.isFinite(Number(npc.connectionDepth))
+            ? Math.max(0, Number(npc.connectionDepth))
+            : 0;
+          const ceiling = getAuthoredConnectionCeiling(config);
+          const mappedConnectionLevel = Math.min(
+            Math.floor(legacyDepth),
+            ceiling
+          );
+
+          dispatch(
+            migrateLegacyBondProfile({
+              npcId: config.npcId,
+              affinity: Number.isFinite(Number(npc.affinity)) ? Number(npc.affinity) : 0,
+              legacyConnectionDepth: legacyDepth,
+              mappedConnectionLevel,
+              tetherState:
+                config.essence?.startingTetherState ??
+                config.startingProfile?.tetherState ??
+                'present',
+            })
+          );
+          migratedNpcIds.push(config.npcId);
+        }
+      }
+
       refreshEssenceRate(dispatch, getState);
-      return { registeredNpcIds: Object.keys(progression) };
+      return {
+        registeredNpcIds: Object.keys(progression),
+        migratedNpcIds,
+      };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return rejectWithValue(message);

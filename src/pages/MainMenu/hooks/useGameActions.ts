@@ -14,6 +14,7 @@ import { resetQuestState } from '../../../features/Quest/state/QuestSlice';
 import { initializeQuestsThunk } from '../../../features/Quest/state/QuestThunks';
 import { removeCopy } from '../../../features/Copy/state/CopySlice';
 import { resetTraitsState } from '../../../features/Traits/state/TraitsSlice';
+import { initializeRelationshipRuntimeThunk } from '../../../features/Relationships/state/RelationshipThunks';
 
 interface GameActionsProps {
   mostRecentSave: SavedGame | null;
@@ -66,6 +67,29 @@ export function useGameActions({
       const loadedState = await loadSavedGame(saveId);
       if (loadedState) {
         dispatch(replaceState(loadedState as RootState));
+
+        // Relationship migration is intentionally post-load and additive. Raw
+        // legacy `connectionDepth` may seed a compatibility Bond Profile, but the
+        // migration does not fabricate Experiences, Memories, semantic dimensions,
+        // or Connection qualification evidence. A failed authoring fetch must not
+        // make the underlying save unloadable.
+        try {
+          const migrationResult = await dispatch(
+            initializeRelationshipRuntimeThunk({ migrateLegacyProfiles: true })
+          ).unwrap();
+          if (migrationResult.migratedNpcIds.length > 0) {
+            console.info(
+              'Migrated legacy relationship profiles:',
+              migrationResult.migratedNpcIds.join(', ')
+            );
+          }
+        } catch (migrationError) {
+          console.error(
+            'Game loaded, but relationship save migration could not complete:',
+            migrationError
+          );
+        }
+
         closeDialog('loadDialog');
         navigate('/game');
         console.log('Game loaded successfully!');
@@ -121,7 +145,7 @@ export function useGameActions({
   const handleDeleteConfirm = useCallback(async (saveId: string, saveName: string) => {
     const success = await deleteSave(saveId);
     if (success) {
-      console.log(`Deleted "${saveName}"`);
+      console.log(`Deleted \"${saveName}\"`);
     } else {
       console.error('Failed to delete save.');
     }
