@@ -39,6 +39,32 @@ export interface ImportedSaveResult {
   migration: SaveMigrationResult;
 }
 
+/**
+ * Encode arbitrary JSON save payloads as base64 without assuming ASCII-only
+ * content. This keeps authored/player Unicode text intact across copy/paste.
+ */
+export const encodeSavePayloadToBase64 = (payload: unknown): string => {
+  const bytes = new TextEncoder().encode(JSON.stringify(payload));
+  let binary = '';
+  const chunkSize = 0x8000;
+
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(
+      ...Array.from(bytes.subarray(offset, offset + chunkSize))
+    );
+  }
+
+  return btoa(binary);
+};
+
+/** Decode a UTF-8 save-code payload. Surrounding copy/paste whitespace is ignored. */
+export const decodeSavePayloadFromBase64 = (encoded: string): unknown => {
+  const binary = atob(encoded.trim());
+  const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+  const json = new TextDecoder().decode(bytes);
+  return JSON.parse(json) as unknown;
+};
+
 /** Get all saved-game metadata from localStorage. */
 export const getSavedGames = (): SavedGame[] => {
   try {
@@ -104,6 +130,41 @@ export const deleteSavedGame = (saveId: string): boolean => {
   }
 };
 
+const persistCurrentSaveEnvelope = (
+  envelope: CurrentSaveEnvelope,
+  saveName: string | undefined,
+  screenshot: string | undefined,
+  now: number
+): string => {
+  const saveId = `save_${now}`;
+  const defaultPlayerName = 'Player';
+  const defaultPlayerLevel = 1;
+  const playtime = envelope.state.player.totalPlaytime || 0;
+  const persistedEnvelope: CurrentSaveEnvelope = {
+    ...envelope,
+    timestamp: now,
+  };
+
+  const saveInfo: SavedGame = {
+    id: saveId,
+    name: saveName || `${defaultPlayerName} - Save ${new Date(now).toLocaleTimeString()}`,
+    timestamp: now,
+    playerLevel: defaultPlayerLevel,
+    playtime,
+    screenshot,
+    version: persistedEnvelope.gameVersion,
+    schemaVersion: persistedEnvelope.schemaVersion,
+  };
+
+  localStorage.setItem(`game_save_${saveId}`, JSON.stringify(persistedEnvelope));
+
+  const savedGames = getSavedGames();
+  savedGames.push(saveInfo);
+  localStorage.setItem('saved_games', JSON.stringify(savedGames));
+
+  return saveId;
+};
+
 /** Create a current-schema save from active RootState. */
 export const createSave = (
   gameState: RootState,
@@ -112,30 +173,8 @@ export const createSave = (
 ): string | null => {
   try {
     const now = Date.now();
-    const saveId = `save_${now}`;
-    const defaultPlayerName = 'Player';
-    const defaultPlayerLevel = 1;
-    const playtime = gameState.player.totalPlaytime || 0;
     const envelope = createCurrentSaveEnvelope(gameState, now);
-
-    const saveInfo: SavedGame = {
-      id: saveId,
-      name: saveName || `${defaultPlayerName} - Save ${new Date(now).toLocaleTimeString()}`,
-      timestamp: now,
-      playerLevel: defaultPlayerLevel,
-      playtime,
-      screenshot,
-      version: envelope.gameVersion,
-      schemaVersion: envelope.schemaVersion,
-    };
-
-    localStorage.setItem(`game_save_${saveId}`, JSON.stringify(envelope));
-
-    const savedGames = getSavedGames();
-    savedGames.push(saveInfo);
-    localStorage.setItem('saved_games', JSON.stringify(savedGames));
-
-    return saveId;
+    return persistCurrentSaveEnvelope(envelope, saveName, screenshot, now);
   } catch (error) {
     console.error('Failed to create save:', error);
     return null;
@@ -144,7 +183,9 @@ export const createSave = (
 
 /**
  * Import any supported historical/current payload through the same migration
- * authority used by local loads, then persist it as a current-schema save.
+ * authority used by local loads, then persist that migrated envelope as a
+ * current-schema save. Envelope-level historical metadata such as gameVersion is
+ * preserved even when the embedded RootState did not carry the same field.
  */
 export const createSaveFromPayload = (
   payload: unknown,
@@ -153,8 +194,14 @@ export const createSaveFromPayload = (
 ): ImportedSaveResult | null => {
   try {
     const migration = migrateSavePayload(payload);
-    const saveId = createSave(migration.envelope.state, saveName, screenshot);
-    return saveId ? { saveId, migration } : null;
+    const now = Date.now();
+    const saveId = persistCurrentSaveEnvelope(
+      migration.envelope,
+      saveName,
+      screenshot,
+      now
+    );
+    return { saveId, migration };
   } catch (error) {
     console.error('Failed to import save payload:', error);
     return null;
