@@ -67,6 +67,22 @@ describe('M10 save schema migration pipeline', () => {
     expect(result.envelope.timestamp).toBe(0);
   });
 
+  test.each([
+    ['null', null],
+    ['numeric string', '1'],
+    ['boolean', true],
+    ['fractional number', 1.5],
+    ['negative number', -1],
+  ])('malformed schemaVersion (%s) is rejected instead of coerced', (_, schemaVersion) => {
+    const payload = {
+      ...createCurrentSaveEnvelope(makeState(), 1),
+      schemaVersion,
+    };
+
+    expect(() => detectSaveSchemaVersion(payload)).toThrow(SaveMigrationError);
+    expect(() => migrateSavePayload(payload)).toThrow(/Invalid save schema version/i);
+  });
+
   test('future schema versions are rejected rather than downgraded implicitly', () => {
     const future = {
       ...createCurrentSaveEnvelope(makeState(), 1),
