@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
 import {
   createSaveFromPayload,
+  decodeSavePayloadFromBase64,
+  encodeSavePayloadToBase64,
   loadSavedGameWithMigration,
 } from '../shared/utils/saveUtils';
 
@@ -18,9 +20,9 @@ export function useGameImportExport() {
       }
 
       // Export the canonical envelope rather than a raw RootState so schema
-      // identity survives transport. Historical raw-state codes remain accepted
-      // on import by the v0 compatibility decoder.
-      const encodedData = btoa(JSON.stringify(loaded.envelope));
+      // identity survives transport. UTF-8 encoding keeps non-ASCII authored or
+      // player text safe across base64 copy/paste.
+      const encodedData = encodeSavePayloadToBase64(loaded.envelope);
       setExportCode(encodedData);
       return true;
     } catch (error) {
@@ -39,8 +41,7 @@ export function useGameImportExport() {
         throw new Error('No import code provided');
       }
 
-      const decodedString = atob(importCode.trim());
-      const payload = JSON.parse(decodedString) as unknown;
+      const payload = decodeSavePayloadFromBase64(importCode);
       const saveName = `Imported Save - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
       const imported = createSaveFromPayload(payload, saveName);
 
