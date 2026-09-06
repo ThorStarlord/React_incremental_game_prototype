@@ -67,8 +67,10 @@ const recordPath = async (
   }
 };
 
+const originalFetch = global.fetch;
+
 beforeEach(() => {
-  global.fetch = jest.fn(async (input: any) => {
+  global.fetch = jest.fn(async (input: unknown) => {
     const url = String(input);
     if (url === '/data/relationships/index.json') {
       return { ok: true, json: async () => manifest } as any;
@@ -77,10 +79,11 @@ beforeEach(() => {
       return { ok: true, json: async () => bundleByUrl[url] } as any;
     }
     return { ok: false, statusText: `Unexpected test URL: ${url}` } as any;
-  }) as jest.Mock;
+  }) as unknown as typeof fetch;
 });
 
 afterAll(() => {
+  global.fetch = originalFetch;
   jest.restoreAllMocks();
 });
 
