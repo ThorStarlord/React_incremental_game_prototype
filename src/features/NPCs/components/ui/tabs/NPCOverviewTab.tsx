@@ -32,7 +32,11 @@ import {
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import { selectEquippedTraits } from '../../../../Player/state/PlayerSelectors';
-import { selectTraits, selectTraitLoading } from '../../../../Traits/state/TraitsSelectors';
+import {
+  selectTraits,
+  selectTraitLoading,
+  selectDiscoveredTraits,
+} from '../../../../Traits/state/TraitsSelectors';
 import { fetchTraitsThunk } from '../../../../Traits/state/TraitThunks';
 import { equipTrait } from '../../../../Player/state/PlayerSlice';
 import { updateNPCRelationshipThunk } from '../../../state/NPCThunks';
@@ -54,6 +58,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
 
   const allTraits = useAppSelector(selectTraits);
   const traitsLoading = useAppSelector(selectTraitLoading);
+  const discoveredTraitIds = useAppSelector(selectDiscoveredTraits);
   const playerEquippedTraits = useAppSelector(selectEquippedTraits);
   const usesRelationshipAuthority = useAppSelector(state =>
     selectUsesRelationshipConnectionAuthority(state, npc.id)
@@ -72,13 +77,16 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
     if (!npc?.innateTraits) return [];
     return npc.innateTraits
       .map((traitId: string) => allTraits[traitId])
-      .filter(Boolean) as Trait[];
-  }, [npc?.innateTraits, allTraits]);
+      .filter((trait): trait is Trait => Boolean(trait) && discoveredTraitIds.includes(trait.id));
+  }, [npc?.innateTraits, allTraits, discoveredTraitIds]);
 
   const handleEquipNPCTrait = useCallback((traitId: string) => {
+    // The Overview never exposes an undiscovered Trait, preserving the lifecycle
+    // Discover -> Equip/Attune -> Assimilate -> Resonate.
+    if (!discoveredTraitIds.includes(traitId)) return;
     dispatch(equipTrait({ traitId, slotIndex: -1 }));
     dispatch(recalculateStatsThunk());
-  }, [dispatch]);
+  }, [dispatch, discoveredTraitIds]);
 
   if (traitsLoading && Object.keys(allTraits).length === 0) {
     return (
@@ -190,12 +198,12 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
                   <StarIcon sx={{ mr: 1, color: 'primary.main' }} />
-                  NPC's Innate Traits ({npcInnateTraitsDisplay.length})
+                  NPC's Discovered Trait Patterns ({npcInnateTraitsDisplay.length})
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  These are traits this NPC naturally possesses. You can temporarily equip them to your character.
+                  These are Trait patterns you have already recognized in this NPC. Discovered patterns can be temporarily equipped before they are permanently Resonated.
                 </Typography>
                 <Grid container spacing={2}>
                   {npcInnateTraitsDisplay.map((trait: Trait) => (

@@ -68,6 +68,8 @@ export interface RelationshipDimensions {
 
 export interface RelationshipTraitEffect {
   traitId: string;
+  /** Reveal this Trait pattern to the player when the authored Experience occurs. */
+  discover?: boolean;
   compatibilityDelta?: number;
   assimilationDelta?: number;
   note?: string;
@@ -190,34 +192,29 @@ export interface InitializeBondProfilePayload {
   tetherState?: RelationshipTetherState;
 }
 
-/**
- * Authoring-only extension loaded from public relationship data.
- * `memoryDefinitionId` is deliberately not stored on the Experience ledger entry.
- */
-export interface AuthoredRelationshipExperienceDefinition
+export interface RelationshipExperienceDefinition
   extends Omit<RelationshipExperience, 'timestamp'> {
   memoryDefinitionId?: string;
 }
 
-/** Authoring-only Memory definition. Runtime supplies the timestamp. */
-export interface AuthoredRelationshipMemoryDefinition
+export interface RelationshipMemoryDefinition
   extends Omit<RelationshipMemory, 'timestamp'> {}
 
 export interface RelationshipDefinitionBundle {
-  experiences: Record<string, AuthoredRelationshipExperienceDefinition>;
-  memories: Record<string, AuthoredRelationshipMemoryDefinition>;
+  experiences: Record<string, RelationshipExperienceDefinition>;
+  memories: Record<string, RelationshipMemoryDefinition>;
   progression?: Record<string, RelationshipProgressionDefinition>;
 }
 
-export const traitAssimilationKey = (sourceNpcId: string, traitId: string) =>
-  `${sourceNpcId}::${traitId}`;
+export const traitAssimilationKey = (npcId: string, traitId: string) =>
+  `${npcId}::${traitId}`;
 
 export const createDefaultTraitAssimilationState = (
-  sourceNpcId: string,
+  npcId: string,
   traitId: string
 ): TraitAssimilationState => ({
   traitId,
-  sourceNpcId,
+  sourceNpcId: npcId,
   progress: 0,
   compatibility: 0,
   lastUpdatedAt: 0,
@@ -226,21 +223,21 @@ export const createDefaultTraitAssimilationState = (
 
 export const createDefaultBondProfile = (
   npcId: string,
-  overrides?: InitializeBondProfilePayload
+  seed?: Omit<InitializeBondProfilePayload, 'npcId'>
 ): BondProfile => ({
   npcId,
   dimensions: {
-    affinity: overrides?.dimensions?.affinity ?? 0,
-    trust: overrides?.dimensions?.trust ?? 0,
-    understanding: overrides?.dimensions?.understanding ?? 0,
-    sharedMeaning: overrides?.dimensions?.sharedMeaning ?? 0,
-    reliance: overrides?.dimensions?.reliance ?? 0,
-    vulnerability: overrides?.dimensions?.vulnerability ?? 0,
-    reciprocity: overrides?.dimensions?.reciprocity ?? 0,
-    custom: { ...(overrides?.dimensions?.custom ?? {}) },
+    affinity: seed?.dimensions?.affinity ?? 0,
+    trust: seed?.dimensions?.trust ?? 0,
+    understanding: seed?.dimensions?.understanding ?? 0,
+    sharedMeaning: seed?.dimensions?.sharedMeaning ?? 0,
+    reliance: seed?.dimensions?.reliance ?? 0,
+    vulnerability: seed?.dimensions?.vulnerability ?? 0,
+    reciprocity: seed?.dimensions?.reciprocity ?? 0,
+    custom: { ...(seed?.dimensions?.custom ?? {}) },
   },
-  connectionLevel: overrides?.connectionLevel ?? 0,
-  connectionProgress: overrides?.connectionProgress ?? 0,
+  connectionLevel: seed?.connectionLevel ?? 0,
+  connectionProgress: seed?.connectionProgress ?? 0,
   connectionQualificationEvidence: {},
   bondArchetypes: [],
   activeMemoryIds: [],
@@ -248,5 +245,5 @@ export const createDefaultBondProfile = (
   recentExperienceIds: [],
   resonanceQuality: 0,
   stability: 'stable',
-  tetherState: overrides?.tetherState ?? 'present',
+  tetherState: seed?.tetherState ?? 'present',
 });

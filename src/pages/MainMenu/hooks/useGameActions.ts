@@ -13,6 +13,7 @@ import { resetInventory } from '../../../features/Inventory/state/InventorySlice
 import { resetQuestState } from '../../../features/Quest/state/QuestSlice';
 import { initializeQuestsThunk } from '../../../features/Quest/state/QuestThunks';
 import { removeCopy } from '../../../features/Copy/state/CopySlice';
+import { resetTraitsState } from '../../../features/Traits/state/TraitsSlice';
 
 interface GameActionsProps {
   mostRecentSave: SavedGame | null;
@@ -47,6 +48,7 @@ export function useGameActions({
     dispatch(resetEssence());
     dispatch(resetInventory());
     dispatch(resetQuestState());
+    dispatch(resetTraitsState());
     dispatch(setSelectedNPCId(null));
     copyIds.forEach(copyId => dispatch(removeCopy({ copyId })));
     dispatch(setHasSeenIntro(false));

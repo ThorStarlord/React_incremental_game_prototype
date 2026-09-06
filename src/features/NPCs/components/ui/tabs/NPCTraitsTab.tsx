@@ -99,9 +99,10 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   }, [playerEquippedTraits, currentNPC?.sharedTraitSlots]);
 
   const handleOpenResonateDialog = useCallback((trait: Trait) => {
+    if (!playerDiscoveredTraitIds.includes(trait.id)) return;
     setSelectedTraitForDialog(trait);
     setResonateDialogOpen(true);
-  }, []);
+  }, [playerDiscoveredTraitIds]);
 
   const handleConfirmResonance = useCallback(async () => {
     if (selectedTraitForDialog) {
@@ -145,12 +146,35 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
               Traits for Resonance
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Relationship-mediated Traits must be understood and assimilated before Essence can make them permanent.
+              Relationship-mediated patterns must first be discovered, then understood and assimilated before Essence can make them permanent.
             </Typography>
             <List dense>
               {availableTraitsForResonance.length > 0 ? availableTraitsForResonance.map(trait => {
-                const canAfford = (trait.essenceCost || 0) <= currentEssence;
                 const discovered = playerDiscoveredTraitIds.includes(trait.id);
+
+                // Discovery is a real information boundary. Before the player has
+                // recognized the pattern, do not leak its identity, cost, Memory
+                // requirements, or assimilation state through the Resonance UI.
+                if (!discovered) {
+                  return (
+                    <ListItem
+                      key={trait.id}
+                      divider
+                      secondaryAction={
+                        <Button size="small" variant="outlined" disabled>
+                          Undiscovered
+                        </Button>
+                      }
+                    >
+                      <ListItemText
+                        primary="Undiscovered Pattern"
+                        secondary="Meaningful relationship evidence may reveal a Trait pattern here."
+                      />
+                    </ListItem>
+                  );
+                }
+
+                const canAfford = (trait.essenceCost || 0) <= currentEssence;
                 const sourceNpcId = trait.sourceNpc || trait.source;
                 const isRelationshipMediated =
                   usesRelationshipAuthority && sourceNpcId === npcId;
@@ -177,14 +201,12 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
 
                 const canResonate =
                   canAfford &&
-                  discovered &&
                   connectionOk &&
                   assimilationOk &&
                   compatibilityOk &&
                   memoryOk;
 
                 const blockers = [
-                  !discovered ? 'Trait not discovered' : null,
                   !connectionOk ? `Connection ${requiredConnection} required` : null,
                   !assimilationOk ? `Assimilation ${Math.floor(assimilation?.progress ?? 0)}% / ${requiredAssimilation}%` : null,
                   !compatibilityOk ? `Compatibility ${Math.floor(assimilation?.compatibility ?? 0)} / ${requiredCompatibility}` : null,

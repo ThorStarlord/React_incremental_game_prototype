@@ -3,6 +3,8 @@
  * @description Type definitions for the Traits system
  */
 
+export type TraitDiscoveryMode = 'initial' | 'authored';
+
 /**
  * Core trait interface
  */
@@ -21,6 +23,13 @@ export interface Trait {
   tier?: number;           // Optional trait tier
   iconPath?: string;       // Optional icon path
   level?: number;          // Optional trait level
+
+  /**
+   * Discovery controls whether loading the Trait catalogue should make this
+   * pattern player-known immediately. Omitted defaults to `initial` for legacy
+   * compatibility. `authored` Traits must be revealed by an authored event.
+   */
+  discoveryMode?: TraitDiscoveryMode;
 
   // Relationship-mediated Resonance metadata. Optional so simple Traits remain simple.
   minimumConnectionLevel?: number;
@@ -67,7 +76,7 @@ export interface TraitPreset {
   id: string;              // Unique identifier for this preset
   name: string;            // Name of this preset
   traits: string[];        // Array of trait IDs in this preset
-  description?: string;    // Optional description
+  description?: string;
   created: number;         // Created timestamp
 }
 

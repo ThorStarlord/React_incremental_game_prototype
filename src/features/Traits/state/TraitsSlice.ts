@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { 
-  TraitsState, 
+import type {
+  Trait,
+  TraitsState,
   DiscoverTraitPayload,
   SaveTraitPresetPayload,
   LoadTraitPresetPayload,
-  DeleteTraitPresetPayload 
+  DeleteTraitPresetPayload,
 } from './TraitsTypes';
 
 const initialState: TraitsState = {
@@ -15,18 +16,36 @@ const initialState: TraitsState = {
   error: null,
 };
 
+/**
+ * Legacy/simple Traits remain initially known unless they explicitly opt into
+ * authored discovery. This keeps the prototype backward-compatible while making
+ * relationship-mediated discovery a real gameplay gate.
+ */
+export const getInitiallyDiscoveredTraitIds = (
+  traits: Record<string, Trait>
+): string[] => Object.values(traits)
+  .filter(trait => (trait.discoveryMode ?? 'initial') === 'initial')
+  .map(trait => trait.id);
+
 const traitsSlice = createSlice({
   name: 'traits',
   initialState,
   reducers: {
-    loadTraits: (state, action: PayloadAction<Record<string, any>>) => {
-      state.traits = action.payload;
+    loadTraits: (state, action: PayloadAction<Record<string, Trait>>) => {
+      const incoming = action.payload;
+      const previouslyDiscovered = state.discoveredTraits.filter(id => Boolean(incoming[id]));
+      const initiallyDiscovered = getInitiallyDiscoveredTraitIds(incoming);
+
+      state.traits = incoming;
       state.loading = false;
       state.error = null;
-      
-      if (state.discoveredTraits.length === 0) {
-        state.discoveredTraits = Object.keys(action.payload);
-      }
+
+      // Loading definitions is not the same thing as discovering every Trait.
+      // Preserve discoveries already earned in this save, while adding only the
+      // Traits whose definitions say they are initially player-known.
+      state.discoveredTraits = Array.from(
+        new Set([...initiallyDiscovered, ...previouslyDiscovered])
+      );
     },
 
     discoverTrait: (state, action: PayloadAction<DiscoverTraitPayload>) => {
@@ -37,20 +56,19 @@ const traitsSlice = createSlice({
     },
 
     saveTraitPreset: (state, action: PayloadAction<SaveTraitPresetPayload>) => {
-      const { preset } = action.payload; // Correctly destructure the preset object
+      const { preset } = action.payload;
       const existingIndex = state.presets.findIndex(p => p.id === preset.id);
-      
+
       if (existingIndex >= 0) {
         state.presets[existingIndex] = preset;
       } else {
-        // Also check for name collision to prevent duplicates
         state.presets = state.presets.filter(p => p.name !== preset.name);
         state.presets.push(preset);
       }
     },
 
     loadTraitPreset: (state, action: PayloadAction<LoadTraitPresetPayload>) => {
-      // Logic is handled by thunks/components, this action is a hook for middleware if needed
+      // Logic is handled by thunks/components, this action is a hook for middleware if needed.
     },
 
     deleteTraitPreset: (state, action: PayloadAction<DeleteTraitPresetPayload>) => {
@@ -71,10 +89,7 @@ const traitsSlice = createSlice({
       const traits = state.traits;
       Object.assign(state, initialState);
       state.traits = traits;
-      
-      if (Object.keys(traits).length > 0) {
-        state.discoveredTraits = Object.keys(traits);
-      }
+      state.discoveredTraits = getInitiallyDiscoveredTraitIds(traits);
     },
   },
 });
