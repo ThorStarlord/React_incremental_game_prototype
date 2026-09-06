@@ -72,6 +72,8 @@ v1 = explicit M10 SaveEnvelope
 
 Missing `schemaVersion` means **legacy v0**.
 
+A present `schemaVersion` is strict schema identity. It must be a non-negative integer number. Values such as `null`, `"1"`, booleans, negative numbers, or fractional numbers are malformed and fail as `INVALID_SAVE`; they are never coerced into a migration version.
+
 M10 does not infer multiple unrecorded historical versions from surrounding gameplay state.
 
 That would manufacture representational certainty the saved bytes do not contain.
@@ -102,7 +104,7 @@ Both are v0 because neither carries explicit schema identity.
 
 For a raw historical `RootState`, the old export format did not contain an envelope timestamp. M10 normalizes that unknown timestamp to the deterministic sentinel `0` during v0 decoding rather than inventing a wall-clock time.
 
-When an imported historical state is persisted as a new save slot, normal save creation gives that new slot its real current save timestamp.
+When an imported historical state is persisted as a new save slot, the new slot receives its real current save timestamp while the migrated envelope retains authoritative historical metadata such as `gameVersion`.
 
 ---
 
@@ -223,6 +225,17 @@ FUTURE_SCHEMA
 MISSING_MIGRATION
 INVALID_MIGRATION_RESULT
 ```
+
+### Invalid schema identity
+
+If `schemaVersion` is present but is not a non-negative integer number:
+
+```text
+schemaVersion: null | "1" | true | -1 | 1.5
+-> INVALID_SAVE
+```
+
+The decoder does not use JavaScript numeric coercion to reinterpret malformed identity as a valid migration source.
 
 ### Future schema
 
@@ -402,6 +415,8 @@ M10 removes the previous split between local save representation and import/expo
 
 New export codes/files emit the current canonical envelope, including `schemaVersion`.
 
+Copy/paste save codes encode the JSON envelope as UTF-8 bytes before base64 conversion, so non-ASCII authored or player text is preserved. Surrounding copy/paste whitespace is ignored during decode.
+
 ### Historical import
 
 Old exported raw `RootState` remains accepted as v0.
@@ -412,7 +427,9 @@ A current envelope is recognized as current and receives no semantic migration.
 
 ### Persistence after import
 
-Imported supported payloads pass through `migrateSavePayload(...)` and are then persisted using normal current-schema `createSave(...)` behavior.
+Imported supported payloads pass through `migrateSavePayload(...)`. The resulting **migrated current envelope** is then persisted as the new save slot rather than reconstructing a second envelope from `RootState`.
+
+This preserves authoritative envelope-level metadata, including a historical wrapper's `gameVersion`, even when the embedded state does not carry that value.
 
 There is no separate import-only migration chain.
 
@@ -461,25 +478,28 @@ The dedicated tests prove:
 1. newly created envelopes identify the current schema;
 2. current saves require no migration;
 3. missing `schemaVersion` means legacy v0;
-4. historical stored wrappers migrate v0 -> v1;
-5. historical raw RootState exports migrate v0 -> v1;
-6. future schemas are rejected;
-7. multiple registered transitions execute in deterministic ascending order;
-8. missing transitions fail at the exact boundary;
-9. migrations cannot skip a required version;
-10. migration does not mutate the source historical object;
-11. a migrated current envelope is idempotent on a second pass.
+4. malformed present schema identities are rejected rather than coerced;
+5. historical stored wrappers migrate v0 -> v1;
+6. historical raw RootState exports migrate v0 -> v1;
+7. future schemas are rejected;
+8. multiple registered transitions execute in deterministic ascending order;
+9. missing transitions fail at the exact boundary;
+10. migrations cannot skip a required version;
+11. migration does not mutate the source historical object;
+12. a migrated current envelope is idempotent on a second pass.
 
 ### Storage/import coverage
 
 The save-utils tests prove:
 
 1. `createSave` stores current schema identity in both envelope and metadata;
-2. a locally stored historical save uses the canonical migration pipeline;
-3. an imported historical raw state uses that same pipeline;
-4. a migrated import is re-persisted as current schema;
-5. a current imported envelope is not migrated twice;
-6. a future local schema fails at the strict load boundary.
+2. UTF-8 save-code transport round-trips non-ASCII text and ignores surrounding copy/paste whitespace;
+3. a locally stored historical save uses the canonical migration pipeline;
+4. an imported historical raw state uses that same pipeline;
+5. a migrated import is re-persisted as current schema;
+6. imported wrapper-level `gameVersion` survives re-persistence even when embedded state lacks it;
+7. a current imported envelope is not migrated twice;
+8. a future local schema fails at the strict load boundary.
 
 ### Existing regressions retained
 
@@ -495,9 +515,11 @@ Build Validation continues to run:
 - TypeScript;
 - production build.
 
-Build Validation **#115** passed on the first M10 code candidate before this documentation/metadata reconciliation.
+Build Validation **#115** passed on the first M10 code candidate before documentation/metadata reconciliation.
 
-Because this document and subsequent review fixes change the PR head, only a later exact-final-head run qualifies the final candidate; that final run is recorded on PR #31 rather than encoded as a mutable status claim here.
+A late review identified stricter schema-identity, Unicode transport, and imported-envelope metadata edge cases. Build Validation **#125** passed the hardened code candidate before this final documentation reconciliation.
+
+Because this documentation commit changes the PR head, only a later exact-final-head run qualifies the final candidate; that final run is recorded on PR #31 rather than encoded as a mutable status claim here.
 
 ---
 
