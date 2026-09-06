@@ -2,6 +2,8 @@ import { rootReducer, type RootState } from '../../app/store';
 import {
   createSave,
   createSaveFromPayload,
+  decodeSavePayloadFromBase64,
+  encodeSavePayloadToBase64,
   getSavedGames,
   loadSavedGameWithMigration,
 } from './saveUtils';
@@ -38,6 +40,18 @@ describe('M10 canonical save protocols', () => {
     expect(metadata[0].id).toBe(saveId);
   });
 
+  test('save-code base64 transport round-trips Unicode and ignores surrounding whitespace', () => {
+    const payload = {
+      message: 'Willow — memória 日本語 🌱',
+      nested: { label: 'Elara: revisão de hipótese' },
+    };
+
+    const encoded = encodeSavePayloadToBase64(payload);
+    const decoded = decodeSavePayloadFromBase64(`  ${encoded}\n`);
+
+    expect(decoded).toEqual(payload);
+  });
+
   test('local historical saves pass through the schema migration pipeline', async () => {
     const state = makeState();
     localStorage.setItem(
@@ -70,6 +84,26 @@ describe('M10 canonical save protocols', () => {
 
     const metadata = getSavedGames().find(save => save.id === imported!.saveId);
     expect(metadata?.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+  });
+
+  test('import preserves legacy wrapper gameVersion when embedded state does not carry it', () => {
+    jest.spyOn(Date, 'now').mockReturnValue(2500);
+    const state = JSON.parse(JSON.stringify(makeState())) as RootState;
+    delete (state.meta as any).gameVersion;
+
+    const imported = createSaveFromPayload(
+      { version: '0.9.0', timestamp: 123, state },
+      'Imported Wrapper Version'
+    );
+
+    expect(imported).not.toBeNull();
+    expect(imported!.migration.envelope.gameVersion).toBe('0.9.0');
+
+    const stored = JSON.parse(localStorage.getItem(`game_save_${imported!.saveId}`) || '{}');
+    expect(stored.gameVersion).toBe('0.9.0');
+
+    const metadata = getSavedGames().find(save => save.id === imported!.saveId);
+    expect(metadata?.version).toBe('0.9.0');
   });
 
   test('imported current envelopes do not receive a second semantic migration', () => {
