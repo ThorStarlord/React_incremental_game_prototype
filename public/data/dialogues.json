@@ -177,7 +177,7 @@
       { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_quality_over_finish", "responseId": "back_quality" }
     ],
     "next": {
-      "back_quality": "gronk_blade_held",
+      "back_quality": null,
       "please_client": null
     }
   },
@@ -416,6 +416,78 @@
     "next": {
       "solve": null,
       "break_phase": null
+    }
+  },
+  "silas_approach": {
+    "id": "silas_approach",
+    "npcId": "npc_rogue_silas",
+    "title": "The Price of Useful Truth",
+    "text": "Silas offers three answers to the same question: the cheap answer, the comforting answer, and the one that could get someone killed. 'You can afford exactly one of them,' he says.",
+    "responses": {
+      "dangerous_truth": "Give me the answer whose consequences make it expensive.",
+      "comfort": "Start with the version that does not create new enemies."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_price_of_truth", "responseId": "dangerous_truth" }
+    ],
+    "next": {
+      "dangerous_truth": null,
+      "comfort": null
+    }
+  },
+  "silas_shady_deal": {
+    "id": "silas_shady_deal",
+    "npcId": "npc_rogue_silas",
+    "title": "A Shady Delivery",
+    "text": "Silas names a sewer drop containing a sealed package. A runner has already brought it as far as the Rusty Mug; the remaining question is whether you can return it without converting curiosity into leverage.",
+    "requiredExperienceIds": ["silas_exp_price_of_truth"],
+    "responses": {
+      "accept": "Give me the package. If you wanted it opened, you would have said so.",
+      "decline": "Find someone who enjoys being tested."
+    },
+    "effects": [
+      { "type": "UNLOCK_QUEST", "questId": "quest_silas_retrieve_item", "responseId": "accept" },
+      { "type": "GIVE_ITEM", "itemId": "item_shady_package", "amount": 1, "responseId": "accept" }
+    ],
+    "next": {
+      "accept": null,
+      "decline": null
+    }
+  },
+  "silas_trait_hint": {
+    "id": "silas_trait_hint",
+    "npcId": "npc_rogue_silas",
+    "title": "Leverage Named",
+    "text": "After the package returns, Silas names a detail about you that he should not know. You answer with one about him. Neither threat is spoken as a threat because neither needs explanation.",
+    "requiredExperienceIds": ["silas_exp_package_unopened"],
+    "responses": {
+      "name_it": "Good. Now neither of us can pretend the leverage only runs one way.",
+      "threaten": "Use that information and I will use mine first."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_leverage_named", "responseId": "name_it" }
+    ],
+    "next": {
+      "name_it": null,
+      "threaten": null
+    }
+  },
+  "silas_secret_neither_sold": {
+    "id": "silas_secret_neither_sold",
+    "npcId": "npc_rogue_silas",
+    "title": "The Secret Neither Sold",
+    "text": "Two separate buyers approach you and Silas with the same proposition: sell the other's vulnerability. The offers are profitable. Days later, you meet and discover that neither buyer received an answer.",
+    "requiredExperienceIds": ["silas_exp_leverage_named"],
+    "responses": {
+      "acknowledge": "We are still dangerous to each other. Apparently that is not the same thing as being for sale.",
+      "deny": "Do not mistake one missed transaction for trust."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_secret_neither_sold", "responseId": "acknowledge" }
+    ],
+    "next": {
+      "acknowledge": null,
+      "deny": null
     }
   },
   "valerius_greeting": {
