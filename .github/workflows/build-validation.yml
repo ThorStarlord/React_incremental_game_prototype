@@ -6,6 +6,7 @@ on:
       - main
       - feature/relationship-memory-vertical-slice
       - feature/elara-collaborative-relationship
+      - feature/trait-discovery-contract
 
 permissions:
   contents: read
@@ -29,8 +30,8 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
-      - name: Relationship and Trait discovery tests
-        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts TraitDiscovery.test.ts
+      - name: Relationship, Trait discovery, and save migration tests
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts TraitDiscovery.test.ts RelationshipLegacySaveMigration.test.ts
         env:
           CI: true
 
