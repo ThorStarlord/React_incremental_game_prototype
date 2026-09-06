@@ -138,7 +138,7 @@
     "affinity": 0,
     "connectionDepth": 1,
     "loyalty": 5,
-    "availableDialogues": ["gronk_greeting", "gronk_craft_request", "gronk_rumors"],
+    "availableDialogues": ["gronk_greeting", "gronk_craft_request", "gronk_rumors", "gronk_blade_held"],
     "completedDialogues": [],
     "availableQuests": [],
     "completedQuests": [],
