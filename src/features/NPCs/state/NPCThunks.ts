@@ -12,6 +12,12 @@ import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from 
 import { TRADING } from '../../../constants/gameConstants';
 import { getItemDef } from '../../../shared/data/itemCatalog';
 import { addItem } from '../../Inventory/state/InventorySlice';
+import { resetRelationships } from '../../Relationships/state/RelationshipSlice';
+import {
+  initializeRelationshipRuntimeThunk,
+  recordAuthoredRelationshipExperienceThunk,
+} from '../../Relationships/state/RelationshipThunks';
+import { selectUsesRelationshipConnectionAuthority } from '../../Relationships/state/RelationshipSelectors';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -29,9 +35,10 @@ export const initializeNPCsThunk = createAsyncThunk<
         throw new Error('Failed to fetch NPC data');
       }
       const data: Record<string, NPC> = await response.json();
-      
+
+      await dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: false }));
       dispatch(updateEssenceGenerationRateThunk());
-      // Load dialogue nodes (best-effort)
+
       try {
         const dres = await fetch('/data/dialogues.json');
         if (dres.ok) {
@@ -39,7 +46,7 @@ export const initializeNPCsThunk = createAsyncThunk<
           dispatch(setDialogueNodes(nodes));
         }
       } catch {}
-      
+
       return data;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -48,19 +55,13 @@ export const initializeNPCsThunk = createAsyncThunk<
   }
 );
 
-/**
- * Thunk for discovering an NPC
- */
 export const discoverNPCThunk = createAsyncThunk(
   'npcs/discoverNPC',
-  async (npcId: string) => {
-    return npcId;
-  }
+  async (npcId: string) => npcId
 );
 
 /**
- * NEW GAME THUNK: Seeds the world with only the Elder Willow NPC in a stripped-down state for onboarding.
- * Fetches the full NPC dataset, extracts npc_elder_willow, normalizes starting values, and dispatches setNPCs.
+ * NEW GAME THUNK: Seeds Willow-only onboarding and the authored M4 relationship config.
  */
 export const newGameSeedNPCsThunk = createAsyncThunk(
   'npcs/newGameSeed',
@@ -71,7 +72,7 @@ export const newGameSeedNPCsThunk = createAsyncThunk(
       const data: Record<string, NPC> = await res.json();
       const elder = data['npc_elder_willow'];
       if (!elder) throw new Error('Elder Willow NPC definition missing');
-      // Override starting relationship values for onboarding clarity
+
       const seeded: Record<string, NPC> = {
         npc_elder_willow: {
           ...elder,
@@ -82,11 +83,16 @@ export const newGameSeedNPCsThunk = createAsyncThunk(
           discoveredAt: Date.now(),
           availableQuests: [],
           completedQuests: [],
-          availableDialogues: elder.availableDialogues?.slice(0,1) || [],
+          // All authored Willow topics can exist in the NPC definition; the UI and
+          // runtime gates reveal/allow them only when their Experience prerequisites hold.
+          availableDialogues: elder.availableDialogues || [],
           completedDialogues: [],
         }
       } as Record<string, NPC>;
+
+      dispatch(resetRelationships());
       dispatch(setNPCs(seeded));
+      await dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: true }));
       await dispatch(updateEssenceGenerationRateThunk());
       return Object.keys(seeded);
     } catch (e) {
@@ -97,7 +103,8 @@ export const newGameSeedNPCsThunk = createAsyncThunk(
 );
 
 /**
- * REWRITTEN THUNK: Handles relationship updates with "level up" logic for connection depth.
+ * Handles short-horizon NPC Affinity updates.
+ * Migrated NPCs never roll Affinity into Connection; legacy NPCs still do.
  */
 export const updateNPCRelationshipThunk = createAsyncThunk(
   'npcs/updateRelationship',
@@ -107,45 +114,48 @@ export const updateNPCRelationshipThunk = createAsyncThunk(
     const npc = state.npcs.npcs[npcId];
 
     if (!npc) {
-        console.error(`NPC not found for relationship update: ${npcId}`);
-        return;
+      console.error(`NPC not found for relationship update: ${npcId}`);
+      return;
     }
 
+    const usesRelationshipAuthority = selectUsesRelationshipConnectionAuthority(state, npcId);
     const oldValue = npc.affinity;
     let newAffinity = oldValue + change;
     let connectionDepthIncrease = 0;
 
-    if (newAffinity >= 100) {
-        connectionDepthIncrease = Math.floor(newAffinity / 100);
-        newAffinity = newAffinity % 100;
-
-  dispatch(increaseConnectionDepth({ npcId, amount: connectionDepthIncrease }));
-  dispatch(addNotification({ type: 'success', message: `Your bond with ${npc.name} has deepened. Essence now flows more strongly. (Depth ${(npc.connectionDepth || 0) + connectionDepthIncrease})` }));
+    if (usesRelationshipAuthority) {
+      newAffinity = Math.max(-100, Math.min(100, newAffinity));
+    } else if (newAffinity >= 100) {
+      connectionDepthIncrease = Math.floor(newAffinity / 100);
+      newAffinity = newAffinity % 100;
+      dispatch(increaseConnectionDepth({ npcId, amount: connectionDepthIncrease }));
+      dispatch(addNotification({
+        type: 'success',
+        message: `Your bond with ${npc.name} has deepened. (Depth ${(npc.connectionDepth || 0) + connectionDepthIncrease})`,
+      }));
     }
-    
+
+    // setAffinity is a legacy 0..100 reducer. Migrated authored Affinity normally
+    // projects through updateNpcAffinity; free-text/legacy deltas remain bounded here.
     dispatch(setAffinity({ npcId, value: newAffinity }));
 
     const logEntry: RelationshipChangeEntry = {
-        id: `${npcId}-${Date.now()}`,
-        npcId,
-        timestamp: Date.now(),
-        oldValue,
-        newAffinity,
-        reason: connectionDepthIncrease > 0 
-            ? `${reason} & Connection Level Up! (+${connectionDepthIncrease})` 
-            : reason,
+      id: `${npcId}-${Date.now()}`,
+      npcId,
+      timestamp: Date.now(),
+      oldValue,
+      newAffinity,
+      reason: connectionDepthIncrease > 0
+        ? `${reason} & Connection Level Up! (+${connectionDepthIncrease})`
+        : reason,
     };
     dispatch(addRelationshipChangeEntry(logEntry));
-    
+
     await dispatch(updateEssenceGenerationRateThunk());
-    
     return { ...payload, connectionDepthIncrease };
   }
 );
 
-/**
- * Thunk for updating an NPC's connection depth directly (for debug).
- */
 export const updateNPCConnectionDepthThunk = createAsyncThunk(
   'npcs/updateConnectionDepth',
   async (payload: { npcId: string; newDepth: number }, { dispatch }) => {
@@ -155,20 +165,14 @@ export const updateNPCConnectionDepthThunk = createAsyncThunk(
   }
 );
 
-/**
- * NEW THUNK: Debug action to unlock all of an NPC's shared trait slots.
- */
 export const debugUnlockAllSharedSlots = createAsyncThunk(
-    'npcs/debugUnlockSlots',
-    async (npcId: string, { dispatch }) => {
-        dispatch(debugUnlockAllSharedSlotsAction(npcId));
-        return { npcId };
-    }
+  'npcs/debugUnlockSlots',
+  async (npcId: string, { dispatch }) => {
+    dispatch(debugUnlockAllSharedSlotsAction(npcId));
+    return { npcId };
+  }
 );
 
-/**
- * Placeholder thunk for processing NPC interaction
- */
 export const processNPCInteractionThunk = createAsyncThunk<
   InteractionResult,
   { npcId: string; interactionType: string; context?: any },
@@ -187,26 +191,54 @@ export const processNPCInteractionThunk = createAsyncThunk<
       const choiceId = context?.choiceId as string | undefined;
       const selectedResponse = context?.selectedResponse as string | undefined;
       const playerMessage = context?.playerMessage as string | undefined;
-
-      // Data-driven node support
       const nodes = (getState() as RootState).npcs.dialogueNodes || {};
       let relDelta = 0;
       let npcText = '';
       const node = choiceId ? (nodes as any)[choiceId] : undefined;
 
-  if (node) {
-        // Gate checks
+      if (node) {
         if (typeof node.minAffinity === 'number' && (npc.affinity || 0) < node.minAffinity) {
           dispatch(addNotification({ type: 'info', message: 'They are not ready to discuss that yet.' }));
           return { success: false, message: 'Dialogue gate not met.' } as InteractionResult;
         }
+
+        const currentRelationships = (getState() as RootState).relationships;
+        const recordedExperiences = currentRelationships?.experiencesById ?? {};
+        const requiredExperienceIds = Array.isArray(node.requiredExperienceIds)
+          ? node.requiredExperienceIds as string[]
+          : [];
+        const missingRequired = requiredExperienceIds.find(id => !recordedExperiences[id]);
+        if (missingRequired) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'This conversation has not become meaningful yet.',
+          }));
+          return { success: false, message: `Missing relationship evidence: ${missingRequired}` } as InteractionResult;
+        }
+
+        const anyOfExperienceIds = Array.isArray(node.anyOfExperienceIds)
+          ? node.anyOfExperienceIds as string[]
+          : [];
+        if (
+          anyOfExperienceIds.length > 0 &&
+          !anyOfExperienceIds.some(id => Boolean(recordedExperiences[id]))
+        ) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'This conversation depends on an earlier decision.',
+          }));
+          return { success: false, message: 'Missing alternative relationship evidence.' } as InteractionResult;
+        }
+
         npcText = node.text || node.title || '';
         const effects = Array.isArray(node.effects) ? node.effects : [];
         for (const eff of effects) {
+          // A response-scoped effect must only fire for that actual response.
+          if (eff.responseId && eff.responseId !== selectedResponse) continue;
+
           if (eff.type === 'AFFINITY_DELTA') {
             relDelta += Number(eff.value) || 0;
           } else if (eff.type === 'UNLOCK_QUEST') {
-            // Mark quest as available from this NPC (quest giver assumed to be current NPC)
             if (eff.questId) {
               dispatch(addAvailableQuestToNPC({ npcId: npc.id, questId: eff.questId }));
               dispatch(addNotification({ type: 'success', message: `Quest available: ${eff.questId}` }));
@@ -215,22 +247,46 @@ export const processNPCInteractionThunk = createAsyncThunk<
             const qty = eff.amount || 1;
             dispatch(addItem({ itemId: eff.itemId, quantity: qty }));
           } else if (eff.type === 'OPEN_SERVICE') {
-            // Inform user to check Services tab
             dispatch(addNotification({ type: 'info', message: 'A service is now available.' }));
+          } else if (eff.type === 'RELATIONSHIP_EXPERIENCE') {
+            const experienceId = eff.experienceId || (
+              selectedResponse ? eff.experienceIdByResponse?.[selectedResponse] : undefined
+            );
+            if (experienceId) {
+              await dispatch(recordAuthoredRelationshipExperienceThunk({
+                experienceId,
+                timestamp: now,
+              }));
+            }
           }
         }
 
-        // Determine next node
         const nextId = selectedResponse && node.next ? node.next[selectedResponse] : undefined;
         if (nextId) {
-          // Fire-and-forget next node text as an additional response line for feedback
           const nextNode = (nodes as any)[nextId];
           if (nextNode && nextNode.text) {
             npcText = nextNode.text;
           }
+
+          // The existing lightweight dialogue runtime displays the next node inline.
+          // Relationship-only continuation effects therefore record the evidence that
+          // was actually displayed; resource/quest effects still require an explicit click.
+          const nextEffects = Array.isArray(nextNode?.effects) ? nextNode.effects : [];
+          for (const eff of nextEffects) {
+            if (eff.type !== 'RELATIONSHIP_EXPERIENCE') continue;
+            if (eff.responseId && eff.responseId !== selectedResponse) continue;
+            const experienceId = eff.experienceId || (
+              selectedResponse ? eff.experienceIdByResponse?.[selectedResponse] : undefined
+            );
+            if (experienceId) {
+              await dispatch(recordAuthoredRelationshipExperienceThunk({
+                experienceId,
+                timestamp: now + 1,
+              }));
+            }
+          }
         }
       } else if (playerMessage) {
-        // Fallback heuristic for free text
         const text = (playerMessage || '').toLowerCase();
         if (text.includes('thanks') || text.includes('hello') || text.includes('help')) relDelta = 1;
         npcText = relDelta > 0 ? 'They seem pleased.' : 'They acknowledge you.';
@@ -254,9 +310,6 @@ export const processNPCInteractionThunk = createAsyncThunk<
   }
 );
 
-/**
- * Thunk: Shop restock processing. Call periodically (e.g., from game loop tick handler) to refresh NPC stocks.
- */
 export const processNpcShopRestockThunk = createAsyncThunk(
   'npcs/processShopRestock',
   async (_, { getState, dispatch }) => {
@@ -264,12 +317,10 @@ export const processNpcShopRestockThunk = createAsyncThunk(
     const now = Date.now();
     const npcs = Object.values(state.npcs.npcs);
     for (const npc of npcs) {
-      if (!npc) continue;
-      if (!npc.shopStock) continue;
+      if (!npc || !npc.shopStock) continue;
       const last = npc.lastRestockAt || 0;
       if (now - last < TRADING.REFRESH_INTERVAL_MS) continue;
 
-      // Try to increment a few random items that this NPC already deals with
       const itemIds = Object.keys(npc.shopStock);
       if (itemIds.length > 0) {
         const picks = [...itemIds].sort(() => Math.random() - 0.5).slice(0, TRADING.MAX_ITEMS_PER_REFRESH);
@@ -280,7 +331,6 @@ export const processNpcShopRestockThunk = createAsyncThunk(
         }
       }
 
-      // Affinity-gated: introduce new items from NPC inventory list
       const aff = npc.affinity || 0;
       if (aff >= TRADING.AFFINITY_TO_UNLOCK_NEW_ITEMS) {
         const invList = Array.isArray(npc.inventory?.items) ? (npc.inventory!.items as any[]) : [];
@@ -298,9 +348,6 @@ export const processNpcShopRestockThunk = createAsyncThunk(
   }
 );
 
-/**
- * Placeholder thunk for sharing trait with NPC
- */
 export const shareTraitWithNPCThunk = createAsyncThunk(
   'npcs/shareTrait',
   async (
@@ -325,14 +372,12 @@ export const shareTraitWithNPCThunk = createAsyncThunk(
       return payload;
     }
 
-    // Unshare if empty traitId provided
     if (!traitId) {
-  dispatch(setNPCSharedTraitInSlot({ npcId, slotIndex, traitId: null }));
-  dispatch(addNotification({ type: 'info', message: `Removed shared trait from ${npc.name}'s slot ${slot.index + 1}.` }));
+      dispatch(setNPCSharedTraitInSlot({ npcId, slotIndex, traitId: null }));
+      dispatch(addNotification({ type: 'info', message: `Removed shared trait from ${npc.name}'s slot ${slot.index + 1}.` }));
       return payload;
     }
 
-    // Validate: player must have trait equipped or permanent
     const playerPermanent = new Set(state.player.permanentTraits);
     const equippedTraitIds = new Set(
       state.player.traitSlots
@@ -345,28 +390,19 @@ export const shareTraitWithNPCThunk = createAsyncThunk(
       return payload;
     }
 
-    // Apply: de-duplicate across slots and set into target slot
-  dispatch(setNPCSharedTraitInSlot({ npcId, slotIndex, traitId }));
-  dispatch(addNotification({ type: 'success', message: `Shared trait to ${npc.name} (slot ${slot.index + 1}).` }));
+    dispatch(setNPCSharedTraitInSlot({ npcId, slotIndex, traitId }));
+    dispatch(addNotification({ type: 'success', message: `Shared trait to ${npc.name} (slot ${slot.index + 1}).` }));
     return payload;
   }
 );
 
-/**
- * Thunk: Purchase an NPC service
- * - Validates NPC and service existence
- * - Calculates price (uses priceOverride from UI, otherwise currentPrice/basePrice with relationship discount)
- * - Ensures sufficient player gold, deducts on success
- * - Applies a minimal side-effect based on service kind (trainer/info/teacher)
- * - Emits user notifications
- */
 export const purchaseNPCServiceThunk = createAsyncThunk(
   'npcs/purchaseService',
   async (
     payload: { npcId: string; serviceId: string; priceOverride?: number },
     { getState, dispatch }
   ) => {
-    const { npcId, serviceId, priceOverride } = payload;
+    const { npcId, serviceId } = payload;
     const state = getState() as RootState;
     const npc = state.npcs.npcs[npcId];
     if (!npc) {
@@ -380,40 +416,28 @@ export const purchaseNPCServiceThunk = createAsyncThunk(
       return payload;
     }
 
-    // Gating by minimum affinity if specified
     if (typeof service.minAffinity === 'number' && (npc.affinity || 0) < service.minAffinity) {
       dispatch(addNotification({ type: 'warning', message: `Requires affinity ${service.minAffinity} to use ${service.name}.` }));
       return payload;
     }
 
-    // Special zero-cost routing services (e.g., merchant links) just inform the user
     const isRoutingService = /merchant_/i.test(serviceId) || /quest_giver_/i.test(serviceId) || /radiant_quest_provider/i.test(serviceId);
     if (isRoutingService && (service.basePrice || 0) === 0) {
       dispatch(addNotification({ type: 'info', message: `${service.name}: check the relevant tab to proceed.` }));
       return payload;
     }
 
-    // Calculate final price with affinity-based discount
     const base = typeof service.currentPrice === 'number' ? service.currentPrice : (service.basePrice || 0);
     const discountPct = Math.min(Math.floor((npc.affinity || 0) / 5), 20);
     let price = Math.max(0, Math.floor(base * (1 - discountPct / 100)));
+    if (price <= 0) price = 0;
 
-    if (price <= 0) {
-      // Free service
-      price = 0;
-    }
-
-    const playerGold = state.player.gold;
-    if (price > playerGold) {
+    if (price > state.player.gold) {
       dispatch(addNotification({ type: 'warning', message: 'Not enough gold.' }));
       return payload;
     }
+    if (price > 0) dispatch(spendGold(price));
 
-    if (price > 0) {
-      dispatch(spendGold(price));
-    }
-
-    // Minimal service-specific side effects
     if (/combat_trainer|trainer_/i.test(serviceId)) {
       dispatch(addAvailableAttributePoints(1));
       dispatch(addNotification({ type: 'success', message: `${service.name} completed: +1 Attribute Point.` }));

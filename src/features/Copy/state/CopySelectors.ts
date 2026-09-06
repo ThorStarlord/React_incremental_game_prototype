@@ -4,7 +4,7 @@
  */
 
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../../../app/store';
+import type { RootState } from '../../../app/store';
 import { CopiesState, Copy } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import { isQualifyingForEssenceBonus } from '../utils/copyUtils';
@@ -39,7 +39,7 @@ export const selectCopiesLoading = createSelector(
     (copiesState) => copiesState.isLoading
 );
 
-/** Select last error string for Copy operations (or null). */
+/** Select last error string for async Copy operations (or null). */
 export const selectCopiesError = createSelector(
     [selectCopiesState],
     (copiesState) => copiesState.error

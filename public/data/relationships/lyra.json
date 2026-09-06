@@ -1,0 +1,187 @@
+{
+  "experiences": {
+    "lyra_exp_strategic_defeat": {
+      "id": "lyra_exp_strategic_defeat",
+      "uniqueKey": "lyra:lu01:strategic-defeat",
+      "title": "Strategic Defeat, Not Submission",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": ["player", "npc_lyra"],
+      "sourceType": "other",
+      "sourceId": "lyra_capture",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -18,
+        "trust": -8,
+        "understanding": 10,
+        "sharedMeaning": 2,
+        "vulnerability": 3
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["Adversarial", "Capture", "MutualAssessment"],
+      "memoryCandidate": false,
+      "interpretation": "Lyra loses the tactical contest without conceding the ideological one; each leaves with a sharper model of the other."
+    },
+    "lyra_exp_coercion_reflected": {
+      "id": "lyra_exp_coercion_reflected",
+      "uniqueKey": "lyra:lu02:coercion-reflected",
+      "title": "Coercion Reflected",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": ["player", "npc_lyra"],
+      "sourceType": "other",
+      "sourceId": "lyra_resistance",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -12,
+        "trust": -4,
+        "understanding": 10,
+        "sharedMeaning": 3,
+        "vulnerability": 2
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["Adversarial", "Resistance", "HarmonicResonance"],
+      "memoryCandidate": false,
+      "interpretation": "Lyra's harmonic discipline reflects coercive pressure and forces the protagonist to understand rather than overwrite her."
+    },
+    "lyra_exp_reluctant_cotraining": {
+      "id": "lyra_exp_reluctant_cotraining",
+      "uniqueKey": "lyra:lu03:reluctant-cotraining",
+      "title": "Reluctant Co-Training",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": ["player", "npc_lyra"],
+      "sourceType": "other",
+      "sourceId": "chrono_crypt_cooperation",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 4,
+        "trust": 8,
+        "understanding": 12,
+        "sharedMeaning": 10,
+        "reliance": 8,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 15,
+      "resonanceTags": ["Adversarial", "Cooperation", "Reliance", "ChronoCrypt"],
+      "memoryCandidate": false,
+      "interpretation": "The crypt makes cooperation instrumentally necessary; repeated successful coordination creates reliance without friendship."
+    },
+    "lyra_exp_ideological_friction": {
+      "id": "lyra_exp_ideological_friction",
+      "uniqueKey": "lyra:lu04:ideological-friction",
+      "title": "Ideological Friction",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": ["player", "npc_lyra"],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_dialectic",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -10,
+        "trust": -2,
+        "understanding": 12,
+        "sharedMeaning": 9
+      },
+      "connectionProgressDelta": 12,
+      "resonanceTags": ["Adversarial", "IdeologicalFriction", "Dialectic"],
+      "memoryCandidate": false,
+      "interpretation": "Open disagreement makes them like each other less in the moment while exposing the actual structure of their incompatible values."
+    },
+    "lyra_exp_mutual_calibration": {
+      "id": "lyra_exp_mutual_calibration",
+      "uniqueKey": "lyra:lu05:mutual-calibration",
+      "title": "Mutual Calibration",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": ["player", "npc_lyra"],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_dialectic",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 7,
+        "understanding": 12,
+        "sharedMeaning": 10,
+        "reciprocity": 7
+      },
+      "connectionProgressDelta": 16,
+      "resonanceTags": ["Adversarial", "MutualCalibration", "Dialectic"],
+      "memoryCandidate": false,
+      "interpretation": "Neither accepts the other's worldview, but each can now predict the other's reasoning without caricature."
+    },
+    "lyra_exp_proto_bond": {
+      "id": "lyra_exp_proto_bond",
+      "uniqueKey": "lyra:lu06:proto-bond",
+      "title": "Enemies in Phase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": ["player", "npc_lyra"],
+      "sourceType": "other",
+      "sourceId": "chrono_crypt_harmonic_lock",
+      "significance": "defining",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 6,
+        "understanding": 8,
+        "sharedMeaning": 12,
+        "reliance": 8,
+        "vulnerability": 8,
+        "reciprocity": 8
+      },
+      "connectionProgressDelta": 20,
+      "resonanceTags": ["AdversarialBond", "MutualCalibration", "HarmonicResonance", "ChronoCrypt"],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_enemies_in_phase",
+      "interpretation": "They solve a harmonic problem that neither can solve alone, producing a consequential bond while ideological hostility remains unresolved."
+    }
+  },
+  "memories": {
+    "lyra_memory_enemies_in_phase": {
+      "id": "lyra_memory_enemies_in_phase",
+      "originExperienceId": "lyra_exp_proto_bond",
+      "title": "Enemies in Phase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": ["player", "npc_lyra"],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "You and Lyra aligned long enough to solve what neither of you could solve alone, without resolving why you oppose each other.",
+      "protagonistView": "Her principles are constraints I can model, not noise I can erase.",
+      "targetView": "The threat understands me more clearly now, which makes cooperation possible and trust more dangerous.",
+      "resonanceTags": ["AdversarialBond", "MutualCalibration", "HarmonicResonance", "IdeologicalFriction"],
+      "bondContribution": "Dialectic Counterparts — emerging",
+      "persistence": "contested"
+    }
+  },
+  "progression": {
+    "npc_lyra": {
+      "npcId": "npc_lyra",
+      "connectionAuthority": "relationships",
+      "qualificationRules": [
+        {
+          "level": 1,
+          "minimumProgress": 18,
+          "minimumExperienceCount": 2,
+          "requiredExperienceIds": [
+            "lyra_exp_strategic_defeat",
+            "lyra_exp_coercion_reflected"
+          ],
+          "minimumDimensions": {
+            "understanding": 18
+          }
+        },
+        {
+          "level": 2,
+          "minimumProgress": 70,
+          "minimumExperienceCount": 6,
+          "requiredExperienceIds": [
+            "lyra_exp_reluctant_cotraining",
+            "lyra_exp_proto_bond"
+          ],
+          "requiredMemoryTags": ["AdversarialBond"],
+          "minimumDimensions": {
+            "understanding": 55,
+            "sharedMeaning": 40
+          }
+        }
+      ],
+      "essence": {
+        "enabled": false
+      }
+    }
+  }
+}

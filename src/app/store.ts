@@ -9,8 +9,9 @@ import essenceReducer from '../features/Essence/state/EssenceSlice';
 import settingsReducer from '../features/Settings/state/SettingsSlice';
 import metaReducer from '../features/Meta/state/MetaSlice';
 import npcsReducer from '../features/NPCs/state/NPCSlice';
-import copyReducer from '../features/Copy/state/CopySlice'; // Corrected import path
+import copyReducer from '../features/Copy/state/CopySlice';
 import questReducer from '../features/Quest/state/QuestSlice';
+import relationshipReducer from '../features/Relationships/state/RelationshipSlice';
 import notificationsReducer from '../shared/state/NotificationSlice';
 import { inventoryReducer } from '../features/Inventory/state/InventorySlice';
 import { copyListeners } from '../features/Copy/state/CopyListeners';
@@ -26,8 +27,9 @@ const combinedReducer = combineReducers({
   settings: settingsReducer,
   meta: metaReducer,
   npcs: npcsReducer,
-  copy: copyReducer, // Corrected reducer name
+  copy: copyReducer,
   quest: questReducer,
+  relationships: relationshipReducer,
   notifications: notificationsReducer,
   inventory: inventoryReducer,
 });

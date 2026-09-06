@@ -179,6 +179,24 @@ export interface DialogueEntry {
   relationshipChange?: number;
 }
 
+type DialogueEffectScope = {
+  /** Optional response id restricting this effect to the response actually selected. */
+  responseId?: string;
+};
+
+export type DialogueEffect =
+  | (DialogueEffectScope & { type: 'AFFINITY_DELTA'; value: number })
+  | (DialogueEffectScope & { type: 'UNLOCK_QUEST'; questId: string })
+  | (DialogueEffectScope & { type: 'GIVE_ITEM'; itemId: string; amount?: number })
+  | (DialogueEffectScope & { type: 'OPEN_SERVICE'; serviceId: string })
+  | (DialogueEffectScope & {
+      type: 'RELATIONSHIP_EXPERIENCE';
+      /** Fixed authored Experience for this effect. */
+      experienceId?: string;
+      /** Optional response-specific Experience mapping for a branching dialogue node. */
+      experienceIdByResponse?: Record<string, string>;
+    });
+
 /**
  * Data-driven dialogue node definition (authoring format)
  */
@@ -190,12 +208,7 @@ export interface DialogueNode {
   /** Response options keyed by response id -> label */
   responses?: Record<string, string>;
   /** Effects executed when this node is selected/answered */
-  effects?: Array<
-    | { type: 'AFFINITY_DELTA'; value: number }
-    | { type: 'UNLOCK_QUEST'; questId: string }
-    | { type: 'GIVE_ITEM'; itemId: string; amount?: number }
-    | { type: 'OPEN_SERVICE'; serviceId: string }
-  >;
+  effects?: DialogueEffect[];
   /** Next node mapping by response id; if missing, conversation ends */
   next?: Record<string, string | null>;
   /** Optional gating */
@@ -224,7 +237,7 @@ export interface NPCState {
   discoveredNPCs: string[];
   currentInteraction: NPCInteraction | null;
   dialogueHistory: DialogueEntry[];
-  relationshipHistory: RelationshipChangeEntry[]; // FIXED: This property was missing/mismatched.
+  relationshipHistory: RelationshipChangeEntry[];
   loading: boolean;
   error: string | null;
   selectedNPCId: string | null;

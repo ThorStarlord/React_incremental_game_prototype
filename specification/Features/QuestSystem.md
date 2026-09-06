@@ -1,109 +1,188 @@
 # Quest System Specification
 
-Implementation Status: ✅ EXPANDED FOUNDATION (slice + selectors + thunks + QuestLog UI + puzzle modal + radiant quests + timers)
+**Implementation Status:** ✅ Expanded foundation + authored resolution choices  
+**Relationship migration:** ✅ Ancient Seed uses M4 resolution semantics.
 
-Implementation Notes:
-- Feature directory: `src/features/Quest/` (singular)
-- Redux slice key: `quest` (singular, camelCase)
+Feature directory: `src/features/Quest/`  
+Redux slice key: `quest`
 
-This document outlines the design for the quest system, including types, structure, progression, and rewards.
+## 1. Purpose
 
-## 1. Overview
+The Quest system provides structured goals, narrative progression, objective tracking, decisions, and rewards.
 
-*   **Purpose:** Provide goals, narrative progression, challenges, and rewards for the player. Guide player activity and world exploration.
-*   **Core Loop:** Discovery -> Acceptance -> Progress Tracking -> Completion -> Rewards.
+Current general loop:
 
-### Current Implementation (Expanded Foundation)
-- Redux slice with reducers for quest lifecycle: add/start/complete/fail, objective progress, objective field patching, and elapsed-time tracking with fail-on-timeout.
-- Selectors targeting `state.quest` for active quests and lookups.
-- Thunks:
-    - `initializeQuestsThunk` loads quests from `/data/quests.json`.
-    - `startQuestThunk`, `turnInQuestThunk` (rewards: Essence, Gold, Reputation, Items; NPC unlock chaining).
-    - `deliverQuestItemThunk` integrates with Inventory for DELIVER objectives.
-    - `solveQuestPuzzleThunk` handles PUZZLE objectives via outcomes → rewards (Gold), effects (adds StatusEffect), notifications, and marks completion.
-    - `generateRadiantQuestThunk` creates repeatable delivery quests targeting random NPCs.
-    - `processQuestTimersThunk` advances timers per tick and triggers fail with notification.
-- UI:
-    - Quest Log list.
-    - `QuestPuzzleModal` for interactive branching/sequence-based puzzle input.
+```text
+Discover / unlock
+-> Accept
+-> Track objectives
+-> READY_TO_COMPLETE
+-> optional authored Resolution
+-> Turn in / complete
+-> ordinary quest rewards
+```
 
-Deferred (Planned next phases):
-- Full acceptance/turn-in UX flows and NPC hand-in rules (auto-complete vs. return-to-giver).
-- Richer reward types in puzzle outcomes (Essence, Items, Reputation) and broader branching graphs.
-- Map markers and richer objective types; quest graph authoring tools.
+## 2. Current runtime foundation
 
-## 2. Quest Types
+Implemented:
 
-*   **Main Story Quests:** Drive the central narrative. Often linear or branching chains.
-*   **Side Quests:** Optional quests offering rewards, lore, or relationship changes. Found through exploration or NPC interaction.
-*   **Repeatable Quests:** Simple tasks that can be completed multiple times for smaller rewards (e.g., resource gathering, bounty hunting).
-*   **Dynamic/Radiant Quests:** (Future) Procedurally generated quests based on game state (e.g., defend location, retrieve item from random dungeon).
-*   **Tutorial Quests:** Guide new players through core mechanics.
+- quest initialization from `/data/quests.json`;
+- add/start/complete/fail lifecycle;
+- objective progress and field patching;
+- GATHER, DELIVER, KILL, REACH_LOCATION and puzzle-related objective support;
+- timed quest processing;
+- ordinary rewards: Gold, Essence, Items, Reputation;
+- NPC quest availability;
+- return-to-giver turn-in checks;
+- repeatable/radiant quest foundation;
+- authored pre-turn-in resolution choices.
 
-## 3. Quest Structure
+## 3. Quest states
 
-*   **Quest Object:** Data structure containing:
-    *   `id`: Unique identifier.
-    *   `title`: Display name.
-    *   `description`: Narrative text explaining the quest.
-    *   `giver`: NPC or source ID.
-    *   `type`: (Main, Side, Repeatable, etc.).
-    *   `objectives`: Array of tasks to complete.
-        *   `objectiveId`: Unique ID within the quest.
-        *   `description`: Text describing the task (e.g., "Collect 10 Wood", "Defeat Bandit Leader", "Talk to Merchant").
-        *   `type`: (Gather, Kill, Talk, ReachLocation, UseItem, etc.).
-        *   `target`: ID or type of target (e.g., 'wood', 'bandit_leader_01', 'npc_merchant').
-        *   `requiredCount`: Number needed for gather/kill objectives.
-        *   `currentCount`: Player's progress.
-        *   `isHidden`: (Optional) Objective not revealed initially.
-    *   `prerequisites`: Conditions to start the quest (e.g., level, previous quest, relationship).
-    *   `rewards`: Items, XP, Gold, Essence, Reputation changes, Traits granted.
-    *   `status`: (NotStarted, Accepted, InProgress, ReadyToComplete, Completed, Failed).
-    *   `isAutoComplete`: Does the quest complete automatically when objectives are met, or require returning to the giver?
+```typescript
+type QuestStatus =
+  | 'NOT_STARTED'
+  | 'IN_PROGRESS'
+  | 'READY_TO_COMPLETE'
+  | 'COMPLETED'
+  | 'FAILED';
+```
 
-## 4. Quest Progression & Tracking
+When all objectives complete, an in-progress quest becomes `READY_TO_COMPLETE`.
 
-*   **Discovery:** How players find quests (NPC dialogue, item interaction, entering areas).
-*   **Acceptance:** Player choice to accept or decline.
-*   **Tracking:**
-    *   Quest Log UI: Displays active quests, objectives, descriptions, rewards.
-    *   Map Markers: (Optional) Indicate quest locations or objectives.
-    *   Objective Updates: Game systems notify the Quest System when progress is made (e.g., item gathered, enemy killed).
-*   **Completion:** Turning in the quest to the giver or automatic completion.
-*   **Failure Conditions:** Time limits (rare), essential NPC death, specific player actions.
+## 4. Authored resolution choices
 
-Implementation (current): Foundation supports adding/tracking/completing quests and rendering in a basic Quest Log.
+A quest may declare:
 
-## 5. Rewards
+```typescript
+resolutionRequired?: boolean;
+resolutionOptions?: QuestResolutionOption[];
+selectedResolutionId?: string;
+```
 
-*   **Experience Points (XP):** For player leveling.
-*   **Currency (Gold):** Standard monetary reward.
-*   **Essence:** Core metaphysical resource.
-*   **Items:** Equipment, consumables, crafting materials.
-*   **Reputation:** Changes with NPCs or factions.
-*   **Traits:** Specific traits granted upon completion.
-*   **Unlocked Content:** New areas, features, dialogue, or quests.
+Each option may contain:
 
-## 6. UI/UX Considerations
+```typescript
+interface QuestResolutionOption {
+  id: string;
+  label: string;
+  description: string;
+  relationshipExperienceId?: string;
+  consumeItems?: Array<{ itemId: string; quantity: number }>;
+  rewards?: QuestReward[];
+  logMessage?: string;
+}
+```
 
-*   Quest Log interface (filterable, sortable).
-*   Clear indication of new/available quests (e.g., NPC markers).
-*   Notifications for quest acceptance, progress updates, completion.
-*   Dialogue interface for quest interactions.
-*   Map integration for quest locations.
+This is intentionally generic. The Quest system does not contain an `if Ancient Seed` branch.
 
-## 7. Integration with Other Systems
+### Resolution transaction order
 
-*   **NPC System:** Quest givers, dialogue, relationship prerequisites/rewards.
-*   **Combat System:** Kill objectives.
-*   **Inventory/Item System:** Gather objectives, item rewards.
-*   **Trait System:** Trait rewards, trait prerequisites.
-*   **Essence System:** Essence rewards.
-*   **Player System:** Level prerequisites.
+`resolveQuestOutcomeThunk` validates and commits in this order:
 
-## 8. Balancing Notes
+1. quest exists;
+2. objectives are complete;
+3. no mutually exclusive resolution was already selected;
+4. resolution id is valid;
+5. required items exist;
+6. referenced Relationship Experience validates/records;
+7. items are consumed;
+8. independently justified option rewards are applied;
+9. resolution id is locked;
+10. player feedback is emitted.
 
-*   Reward scaling based on quest difficulty and type.
-*   Pacing of main story quests vs. side content availability.
-*   Clarity of objectives and descriptions.
-*   Avoid overly grindy repeatable quests unless intended for specific resource loops.
+This order prevents bad relationship-authoring data from consuming an item or paying a reward before the narrative consequence is durably recordable.
+
+A selected resolution cannot later be replaced by another option.
+
+## 5. Relationship consequences vs. rewards
+
+A relationship consequence and a consumable reward are different concepts.
+
+```text
+Relationship Experience = durable causal/evidentiary history
+Quest/resource reward = immediate inventory/currency consequence
+```
+
+A quest resolution may have both, but one must not be disguised as the other.
+
+For relationship milestones, the normal progression consequence is a future change in Bond/Connection/Essence-rate inputs rather than a one-time relationship Essence drop.
+
+## 6. Ancient Seed — first resolution proof
+
+`quest_willow_ancient_seed` now requires an explicit decision after the Sunstone objective is complete.
+
+### Awaken / preserve the Seed
+
+- consumes one `item_sunstone`;
+- records `willow_exp_sunstone_decision_preserve`;
+- forms `The Seed Preserved` Memory through relationship authoring;
+- grants no immediate relationship Essence payout.
+
+### Extract / consume the Sunstone
+
+- consumes one `item_sunstone`;
+- records `willow_exp_sunstone_decision_consume`;
+- grants a small immediate Essence reward from the **Sunstone's extracted resource value**, not from the relationship event.
+
+This preserves the rule that meaningful relationship Experiences normally change future progression rather than acting as loot drops.
+
+## 7. Tutorial Sunstone compression
+
+The current prototype does not yet provide robust world exploration/item acquisition for `item_sunstone`.
+
+For the Willow vertical slice, accepting the authored Seed challenge grants the tutorial Sunstone through dialogue. This is deliberate vertical-slice compression so the relationship decision is playable without pretending the missing exploration layer exists.
+
+The Quest system also reconciles GATHER objectives against inventory at quest start. If the required item is already held, objective progress reflects it immediately.
+
+This is a general fix, not a Willow-only special case.
+
+## 8. Turn-in behavior
+
+`turnInQuestThunk`:
+
+- requires `READY_TO_COMPLETE`;
+- refuses turn-in when `resolutionRequired` is true but no resolution is selected;
+- enforces return-to-giver for non-auto-complete quests;
+- applies ordinary top-level quest rewards;
+- completes the quest;
+- exposes prerequisite-linked follow-up quests where applicable.
+
+The NPC Quest tab only shows the turn-in action for a resolution-required quest after the authored choice has been locked.
+
+## 9. Puzzle support
+
+Puzzle objectives may provide outcomes with:
+
+- Gold;
+- Essence;
+- Items;
+- Status Effects;
+- log messages.
+
+Puzzle consequences remain independent from M4 relationship resolution unless explicitly connected by authored data later.
+
+## 10. Radiant/repeatable foundation
+
+The existing radiant quest thunk can generate repeatable delivery work against available NPCs.
+
+M4 does not redesign procedural quest generation or make procedural quests automatically produce deep relationship evidence.
+
+## 11. Invariants
+
+1. Objectives must complete before resolution/turn-in.
+2. A required authored resolution is mutually exclusive and locks once chosen.
+3. Missing relationship-authoring data must fail before item consumption/reward application.
+4. Relationship Experiences are not interchangeable with quest rewards.
+5. GATHER objectives consider items already held when the quest starts.
+6. Completion rewards are applied once through the normal quest lifecycle.
+
+## 12. Deferred
+
+- production exploration/map delivery for Sunstone acquisition;
+- richer branching quest graphs;
+- map markers;
+- general quest authoring tools;
+- broad relationship consequences for every quest;
+- procedural generation of deep Relationship Experiences;
+- richer campaign-scale acceptance/hand-in presentation.

@@ -2,14 +2,44 @@
   "quest_willow_ancient_seed": {
     "id": "quest_willow_ancient_seed",
     "title": "The Ancient Seed",
-    "description": "Elder Willow speaks of a dormant seed with immense potential. Find a sunstone to awaken it.",
+    "description": "Elder Willow entrusts you with a dormant seed and a scarce Sunstone. Once you obtain the stone, decide whether to spend its power on the uncertain long-horizon value of awakening the Seed or extract its immediate Essence instead.",
     "giver": "npc_elder_willow",
     "type": "SIDE",
     "objectives": [
-      { "objectiveId": "1", "description": "Find a Sunstone", "type": "GATHER", "target": "item_sunstone", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+      {
+        "objectiveId": "1",
+        "description": "Find a Sunstone",
+        "type": "GATHER",
+        "target": "item_sunstone",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
     ],
     "prerequisites": [],
-    "rewards": [{ "type": "ESSENCE", "value": 100 }],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "preserve_seed",
+        "label": "Awaken the Seed",
+        "description": "Commit the Sunstone to a value that is still mostly potential. There is no immediate Essence payout.",
+        "relationshipExperienceId": "willow_exp_sunstone_decision_preserve",
+        "consumeItems": [{ "itemId": "item_sunstone", "quantity": 1 }],
+        "rewards": [],
+        "logMessage": "You commit the Sunstone to the Ancient Seed. Its value remains future-facing, but Willow recognizes that you acted on the pattern rather than merely agreeing with it."
+      },
+      {
+        "id": "consume_sunstone",
+        "label": "Extract the Sunstone",
+        "description": "Prefer immediate utility and consume the Sunstone's independent metaphysical charge for Essence.",
+        "relationshipExperienceId": "willow_exp_sunstone_decision_consume",
+        "consumeItems": [{ "itemId": "item_sunstone", "quantity": 1 }],
+        "rewards": [{ "type": "ESSENCE", "value": 50 }],
+        "logMessage": "You consume the Sunstone for immediate power. Willow understands the logic, but the choice is weak evidence that her pattern has become yours."
+      }
+    ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -62,11 +92,12 @@
     "giver": "npc_scholar_elara",
     "type": "SIDE",
     "objectives": [
-      { "objectiveId": "1", "description": "Travel to the Whispering Woods", "type": "REACH_LOCATION", "target": "location_whispering_woods", "requiredCount": 1, "currentCount": 0, "isComplete": false }
+      { "objectiveId": "1", "description": "Travel to the Whispering Woods", "type": "REACH_LOCATION", "target": "location_whispering_woods", "requiredCount": 1, "currentCount": 0, "isComplete": false, "isHidden": false }
     ],
     "prerequisites": [],
     "rewards": [{ "type": "GOLD", "value": 20 }],
-    "status": "NOT_STARTED"
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   },
   "quest_elara_chain_2": {
     "id": "quest_elara_chain_2",
@@ -75,11 +106,12 @@
     "giver": "npc_scholar_elara",
     "type": "SIDE",
     "objectives": [
-      { "objectiveId": "1", "description": "Defeat the Arcane Rat", "type": "KILL", "target": "mob_arcane_rat", "requiredCount": 1, "currentCount": 0, "isComplete": false }
+      { "objectiveId": "1", "description": "Defeat the Arcane Rat", "type": "KILL", "target": "mob_arcane_rat", "requiredCount": 1, "currentCount": 0, "isComplete": false, "isHidden": false }
     ],
-    "prerequisites": { "quests": ["quest_elara_chain_1"] },
+    "prerequisites": [{ "type": "QUEST_COMPLETED", "value": "quest_elara_chain_1" }],
     "rewards": [{ "type": "ITEM", "value": "item_rare_book_page", "amount": 1 }],
-    "status": "NOT_STARTED"
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   },
   "quest_willow_disarm_traps": {
     "id": "quest_willow_disarm_traps",
@@ -94,7 +126,10 @@
         "description": "Disarm the magically trapped chest.",
         "type": "INTERACT_PUZZLE",
         "target": "chest_ancient_oak",
-        "requiredCount": 1, "currentCount": 0, "isComplete": false,
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isComplete": false,
+        "isHidden": false,
         "puzzleData": {
           "type": "sequence",
           "prompt": "Enter the sequence of runes: Sun, Moon, Star",
@@ -117,6 +152,8 @@
         ]
       }
     ],
-    "rewards": []
+    "prerequisites": [],
+    "rewards": [],
+    "isAutoComplete": false
   }
 }

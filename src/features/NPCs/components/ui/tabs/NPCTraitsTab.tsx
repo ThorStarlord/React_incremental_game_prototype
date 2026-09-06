@@ -21,6 +21,7 @@ import {
   Tooltip,
   Paper,
   ListItemButton,
+  Stack,
 } from '@mui/material';
 import {
   Share as ShareIcon,
@@ -29,10 +30,9 @@ import {
   AutoAwesome as ResonateIcon,
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
-// Corrected: Import from the feature's public API
 import {
   selectNPCById,
-  shareTraitWithNPCThunk
+  shareTraitWithNPCThunk,
 } from '../../../';
 import {
   selectPermanentTraits,
@@ -43,6 +43,12 @@ import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors
 import { acquireTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks';
 import { TRAIT_RESONANCE } from '../../../../../constants/gameConstants';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
+import {
+  selectBondProfileByNpcId,
+  selectRelationshipMemoriesByNpcId,
+  selectTraitAssimilationState,
+  selectUsesRelationshipConnectionAuthority,
+} from '../../../../Relationships/state/RelationshipSelectors';
 import TraitSlotItem from '../../../../Traits/components/ui/TraitSlotItem';
 import LockedSlotCard from '../../../../Traits/components/ui/LockedSlotCard';
 
@@ -54,22 +60,35 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
   const currentNPC = useAppSelector(state => selectNPCById(state, npcId));
   const allTraits = useAppSelector(selectTraits);
-  // const playerDiscoveredTraitIds = useAppSelector(selectDiscoveredTraits); // not used in this tab
+  const playerDiscoveredTraitIds = useAppSelector(selectDiscoveredTraits);
   const playerPermanentTraitIds = useAppSelector(selectPermanentTraits);
   const playerEquippedTraits = useAppSelector(selectEquippedTraits);
   const currentEssence = useAppSelector(selectCurrentEssence);
+  const usesRelationshipAuthority = useAppSelector(state =>
+    selectUsesRelationshipConnectionAuthority(state, npcId)
+  );
+  const bondProfile = useAppSelector(state => selectBondProfileByNpcId(state, npcId));
+  const relationshipMemories = useAppSelector(state =>
+    selectRelationshipMemoriesByNpcId(state, npcId)
+  );
+  const relationshipTraitStates = useAppSelector(state => {
+    const result: Record<string, ReturnType<typeof selectTraitAssimilationState>> = {};
+    for (const traitId of currentNPC?.availableTraits ?? []) {
+      result[traitId] = selectTraitAssimilationState(state, npcId, traitId);
+    }
+    return result;
+  });
 
   const [resonateDialogOpen, setResonateDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedTraitForDialog, setSelectedTraitForDialog] = useState<Trait | null>(null);
   const [targetSlotForShare, setTargetSlotForShare] = useState<number | null>(null);
 
-  // Memoize lists for performance
   const availableTraitsForResonance = useMemo(() => {
     if (!currentNPC?.availableTraits || !allTraits) return [];
     return currentNPC.availableTraits
       .map(traitId => allTraits[traitId])
-      .filter((trait): trait is Trait => 
+      .filter((trait): trait is Trait =>
         !!trait && !playerPermanentTraitIds.includes(trait.id)
       );
   }, [currentNPC?.availableTraits, allTraits, playerPermanentTraitIds]);
@@ -79,7 +98,6 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     return playerEquippedTraits.filter(t => !npcSharedIds.includes(t.id));
   }, [playerEquippedTraits, currentNPC?.sharedTraitSlots]);
 
-  // Handlers
   const handleOpenResonateDialog = useCallback((trait: Trait) => {
     setSelectedTraitForDialog(trait);
     setResonateDialogOpen(true);
@@ -89,13 +107,13 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
     if (selectedTraitForDialog) {
       await dispatch(acquireTraitWithEssenceThunk({
         traitId: selectedTraitForDialog.id,
-        essenceCost: selectedTraitForDialog.essenceCost || 0
+        essenceCost: selectedTraitForDialog.essenceCost || 0,
       }));
     }
     setResonateDialogOpen(false);
     setSelectedTraitForDialog(null);
   }, [dispatch, selectedTraitForDialog]);
-  
+
   const handleShareClick = useCallback((slotIndex: number) => {
     setTargetSlotForShare(slotIndex);
     setShareDialogOpen(true);
@@ -110,7 +128,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   }, [dispatch, npcId, targetSlotForShare]);
 
   const handleUnshare = useCallback(async (slotIndex: number) => {
-     await dispatch(shareTraitWithNPCThunk({ npcId, traitId: '', slotIndex }));
+    await dispatch(shareTraitWithNPCThunk({ npcId, traitId: '', slotIndex }));
   }, [dispatch, npcId]);
 
   if (!currentNPC) {
@@ -120,7 +138,6 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
   return (
     <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
       <Grid container spacing={4}>
-        {/* Traits for Resonance Section */}
         <Grid item xs={12} md={6}>
           <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -128,55 +145,133 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
               Traits for Resonance
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Spend Essence to permanently learn these traits from {currentNPC.name}. Permanent traits are always active and do not require a slot.
+              Relationship-mediated Traits must be understood and assimilated before Essence can make them permanent.
             </Typography>
             <List dense>
               {availableTraitsForResonance.length > 0 ? availableTraitsForResonance.map(trait => {
                 const canAfford = (trait.essenceCost || 0) <= currentEssence;
-                const requiresNpcDepth = !!((trait as any).sourceNpc || (trait as any).source);
-                const depthOk = !requiresNpcDepth || (currentNPC.connectionDepth ?? 0) >= TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
+                const discovered = playerDiscoveredTraitIds.includes(trait.id);
+                const sourceNpcId = trait.sourceNpc || trait.source;
+                const isRelationshipMediated =
+                  usesRelationshipAuthority && sourceNpcId === npcId;
+
+                const requiredConnection =
+                  trait.minimumConnectionLevel ?? TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
+                const connectionOk = isRelationshipMediated
+                  ? bondProfile.connectionLevel >= requiredConnection
+                  : !sourceNpcId || (currentNPC.connectionDepth ?? 0) >= TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
+
+                const assimilation = relationshipTraitStates[trait.id];
+                const requiredAssimilation = trait.assimilationThreshold ?? 100;
+                const assimilationOk = !isRelationshipMediated ||
+                  (assimilation?.progress ?? 0) >= requiredAssimilation;
+                const requiredCompatibility = trait.minimumCompatibility ?? 0;
+                const compatibilityOk = !isRelationshipMediated ||
+                  (assimilation?.compatibility ?? 0) >= requiredCompatibility;
+                const missingMemoryTags = isRelationshipMediated
+                  ? (trait.requiredMemoryTags ?? []).filter(tag =>
+                      !relationshipMemories.some(memory => memory.resonanceTags.includes(tag))
+                    )
+                  : [];
+                const memoryOk = missingMemoryTags.length === 0;
+
+                const canResonate =
+                  canAfford &&
+                  discovered &&
+                  connectionOk &&
+                  assimilationOk &&
+                  compatibilityOk &&
+                  memoryOk;
+
+                const blockers = [
+                  !discovered ? 'Trait not discovered' : null,
+                  !connectionOk ? `Connection ${requiredConnection} required` : null,
+                  !assimilationOk ? `Assimilation ${Math.floor(assimilation?.progress ?? 0)}% / ${requiredAssimilation}%` : null,
+                  !compatibilityOk ? `Compatibility ${Math.floor(assimilation?.compatibility ?? 0)} / ${requiredCompatibility}` : null,
+                  !memoryOk ? `Missing Memory evidence: ${missingMemoryTags.join(', ')}` : null,
+                  !canAfford ? `Requires ${trait.essenceCost || 0} Essence` : null,
+                ].filter(Boolean) as string[];
+
                 return (
-                  <ListItem key={trait.id} divider secondaryAction={
-                    <Tooltip title={!canAfford ? `Requires ${trait.essenceCost} Essence` : (!depthOk ? `Requires connection depth ${TRAIT_RESONANCE.MIN_CONNECTION_DEPTH}` : '')}>
-                      <span>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => handleOpenResonateDialog(trait)}
-                          disabled={!canAfford || !depthOk}
-                        >
-                          Resonate
-                        </Button>
-                      </span>
-                    </Tooltip>
-                  }>
-                    <ListItemText 
-                      primary={trait.name} 
+                  <ListItem
+                    key={trait.id}
+                    divider
+                    secondaryAction={
+                      <Tooltip title={canResonate ? 'Ready to Resonate' : blockers.join(' · ')}>
+                        <span>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => handleOpenResonateDialog(trait)}
+                            disabled={!canResonate}
+                          >
+                            Resonate
+                          </Button>
+                        </span>
+                      </Tooltip>
+                    }
+                  >
+                    <ListItemText
+                      primary={trait.name}
                       secondary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                          <Typography variant="caption" color="text.secondary">{`${trait.essenceCost || 0} Essence`}</Typography>
-                          {requiresNpcDepth && !depthOk && (
+                        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap sx={{ mt: 0.5, pr: 2 }}>
+                          <Chip size="small" label={`${trait.essenceCost || 0} Essence`} variant="outlined" />
+                          {isRelationshipMediated ? (
+                            <>
+                              <Chip
+                                size="small"
+                                color={connectionOk ? 'success' : 'default'}
+                                icon={connectionOk ? undefined : <LockIcon fontSize="small" />}
+                                label={`Connection ${bondProfile.connectionLevel}/${requiredConnection}`}
+                                variant="outlined"
+                              />
+                              <Chip
+                                size="small"
+                                color={assimilationOk ? 'success' : 'default'}
+                                label={`Assimilation ${Math.floor(assimilation?.progress ?? 0)}%/${requiredAssimilation}%`}
+                                variant="outlined"
+                              />
+                              <Chip
+                                size="small"
+                                color={compatibilityOk ? 'success' : 'default'}
+                                label={`Compatibility ${Math.floor(assimilation?.compatibility ?? 0)}/${requiredCompatibility}`}
+                                variant="outlined"
+                              />
+                              {(trait.requiredMemoryTags ?? []).map(tag => {
+                                const satisfied = !missingMemoryTags.includes(tag);
+                                return (
+                                  <Chip
+                                    key={tag}
+                                    size="small"
+                                    color={satisfied ? 'success' : 'default'}
+                                    label={`Memory: ${tag}`}
+                                    variant="outlined"
+                                  />
+                                );
+                              })}
+                            </>
+                          ) : sourceNpcId && !connectionOk ? (
                             <Chip
                               size="small"
                               icon={<LockIcon fontSize="small" />}
                               label={`Requires depth ${TRAIT_RESONANCE.MIN_CONNECTION_DEPTH} (you: ${currentNPC.connectionDepth ?? 0})`}
                               variant="outlined"
-                              color="default"
                             />
-                          )}
-                        </Box>
+                          ) : null}
+                        </Stack>
                       }
                     />
                   </ListItem>
                 );
               }) : (
-                <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>You have resonated with all of {currentNPC.name}'s available traits.</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
+                  You have resonated with all of {currentNPC.name}'s available traits.
+                </Typography>
               )}
             </List>
           </Paper>
         </Grid>
 
-        {/* Shared Trait Slots Section */}
         <Grid item xs={12} md={6}>
           <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -191,16 +286,16 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                 <Grid item xs={12} sm={6} key={slot.id}>
                   {slot.isUnlocked ? (
                     slot.traitId ? (
-                      <TraitSlotItem 
-                        traitId={slot.traitId} 
-                        trait={allTraits[slot.traitId]} 
+                      <TraitSlotItem
+                        traitId={slot.traitId}
+                        trait={allTraits[slot.traitId]}
                         onRemove={() => handleUnshare(slot.index)}
-                        onMakePermanent={() => {}} // Not applicable here
-                        essence={0} // Not applicable here
+                        onMakePermanent={() => {}}
+                        essence={0}
                       />
                     ) : (
                       <Button fullWidth sx={{ minHeight: 120, borderStyle: 'dashed' }} onClick={() => handleShareClick(slot.index)}>
-                          <AddIcon /> Empty Slot
+                        <AddIcon /> Empty Slot
                       </Button>
                     )
                   ) : (
@@ -209,24 +304,25 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                 </Grid>
               ))}
               {(!currentNPC.sharedTraitSlots || currentNPC.sharedTraitSlots.length === 0) && (
-                 <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>{currentNPC.name} has no slots for shared traits.</Typography>
-                 </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
+                    {currentNPC.name} has no slots for shared traits.
+                  </Typography>
+                </Grid>
               )}
             </Grid>
           </Paper>
         </Grid>
       </Grid>
-      
-      {/* DIALOGS */}
+
       <Dialog open={resonateDialogOpen} onClose={() => setResonateDialogOpen(false)}>
         <DialogTitle>Confirm Trait Resonance</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to spend {selectedTraitForDialog?.essenceCost || 0} Essence to permanently acquire the trait "{selectedTraitForDialog?.name}"?
+            Spend {selectedTraitForDialog?.essenceCost || 0} Essence to stabilize the already-assimilated pattern "{selectedTraitForDialog?.name}" as a permanent Trait?
           </Typography>
-           <Typography variant="caption" color="text.secondary" sx={{mt: 1, display: 'block'}}>
-            This action cannot be undone. The trait will become a permanent part of your character.
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+            Essence is the final stabilization cost; it does not replace the relationship, Memory, and assimilation evidence shown in the Trait card.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -234,22 +330,22 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
           <Button onClick={handleConfirmResonance} variant="contained" color="primary">Confirm & Resonate</Button>
         </DialogActions>
       </Dialog>
-      
+
       <Dialog open={shareDialogOpen} onClose={() => setShareDialogOpen(false)}>
         <DialogTitle>Share a Trait</DialogTitle>
         <DialogContent>
-           <Typography sx={{mb: 2}}>Select a trait to share with {currentNPC.name}.</Typography>
-           <List>
+          <Typography sx={{ mb: 2 }}>Select a trait to share with {currentNPC.name}.</Typography>
+          <List>
             {shareablePlayerTraits.length > 0 ? shareablePlayerTraits.map(trait => (
               <ListItem key={trait.id} disablePadding>
                 <ListItemButton onClick={() => handleConfirmShare(trait.id)}>
-                   <ListItemText primary={trait.name} secondary={trait.description} />
+                  <ListItemText primary={trait.name} secondary={trait.description} />
                 </ListItemButton>
               </ListItem>
             )) : (
               <Typography color="text.secondary">No available traits to share.</Typography>
             )}
-           </List>
+          </List>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShareDialogOpen(false)}>Cancel</Button>
