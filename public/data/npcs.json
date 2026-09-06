@@ -176,7 +176,13 @@
     "affinity": -5,
     "connectionDepth": 3,
     "loyalty": 0,
-    "availableDialogues": ["silas_approach", "silas_shady_deal", "silas_trait_hint", "silas_secret_neither_sold"],
+    "availableDialogues": [
+      "silas_approach",
+      "silas_shady_deal",
+      "silas_trait_hint",
+      "silas_secret_neither_sold",
+      "silas_watch_leak_tip"
+    ],
     "completedDialogues": [],
     "availableQuests": ["quest_silas_retrieve_item"],
     "completedQuests": [],
@@ -208,7 +214,13 @@
     "affinity": 10,
     "connectionDepth": 4,
     "loyalty": 20,
-    "availableDialogues": ["valerius_report", "valerius_training_offer", "valerius_city_issues"],
+    "availableDialogues": [
+      "valerius_report",
+      "valerius_training_offer",
+      "valerius_city_issues",
+      "valerius_leak_rumor",
+      "valerius_delegated_leak_response"
+    ],
     "completedDialogues": [],
     "availableQuests": ["quest_valerius_patrol_duty"],
     "completedQuests": [],
