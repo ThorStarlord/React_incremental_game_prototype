@@ -141,7 +141,7 @@
     "giver": "npc_captain_valerius",
     "type": "REPEATABLE",
     "objectives": [
-      { "objectiveId": "1", "description": "Patrol the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isComplete": false, "isHidden": false }
+      { "objectiveId": "1", "description": "Patrol the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
     ],
     "prerequisites": [],
     "rewards": [{ "type": "REPUTATION", "value": 10, "faction": "City Watch" }],
