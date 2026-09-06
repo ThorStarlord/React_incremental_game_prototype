@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
-// Import necessary functions from saveUtils, remove GameState import
-import { loadSavedGame, createSave } from '../shared/utils/saveUtils';
-// Import RootState from the store
-import { RootState } from '../app/store';
+import {
+  createSaveFromPayload,
+  loadSavedGameWithMigration,
+} from '../shared/utils/saveUtils';
 
 export function useGameImportExport() {
   const [exportCode, setExportCode] = useState<string>('');
@@ -12,22 +12,20 @@ export function useGameImportExport() {
   const exportSave = useCallback(async (saveId: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Load the actual game state using the saveId
-      const gameState = await loadSavedGame(saveId);
-      if (!gameState) {
+      const loaded = await loadSavedGameWithMigration(saveId);
+      if (!loaded) {
         throw new Error('Save data not found or failed to load');
       }
 
-      // Stringify the loaded game state
-      const stateString = JSON.stringify(gameState);
-
-      // Base64 encode the stringified state
-      const encodedData = btoa(stateString);
+      // Export the canonical envelope rather than a raw RootState so schema
+      // identity survives transport. Historical raw-state codes remain accepted
+      // on import by the v0 compatibility decoder.
+      const encodedData = btoa(JSON.stringify(loaded.envelope));
       setExportCode(encodedData);
       return true;
     } catch (error) {
       console.error('Error exporting save:', error);
-      setExportCode(''); // Clear export code on error
+      setExportCode('');
       return false;
     } finally {
       setIsLoading(false);
@@ -41,36 +39,31 @@ export function useGameImportExport() {
         throw new Error('No import code provided');
       }
 
-      // Decode the import code (base64)
       const decodedString = atob(importCode.trim());
-      // Parse the decoded string into a RootState object
-      const importedGameState = JSON.parse(decodedString) as RootState; // Use RootState here
-
-      // Basic validation (check for essential parts of the state)
-      if (!importedGameState || !importedGameState.player || !importedGameState.meta) {
-        throw new Error('Invalid save data format after decoding');
-      }
-
-      // Use createSave to add the imported state as a new save slot
-      // Use a generic name or derive one if possible
+      const payload = JSON.parse(decodedString) as unknown;
       const saveName = `Imported Save - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-      const newSaveId = createSave(importedGameState, saveName); // createSave now expects RootState
+      const imported = createSaveFromPayload(payload, saveName);
 
-      if (newSaveId) {
-        setImportCode(''); // Clear import code on success
-        return true; // Indicate success
-      } else {
-        throw new Error('Failed to save the imported game state.');
+      if (!imported) {
+        throw new Error('Failed to migrate or persist imported save data.');
       }
 
+      if (imported.migration.appliedMigrations.length > 0) {
+        console.info(
+          `Imported save migrated v${imported.migration.sourceVersion} -> v${imported.migration.targetVersion}:`,
+          imported.migration.appliedMigrations.join(', ')
+        );
+      }
+
+      setImportCode('');
+      return true;
     } catch (error) {
       console.error('Error importing save:', error);
-      // Optionally provide more specific feedback based on the error
-      return false; // Indicate failure
+      return false;
     } finally {
       setIsLoading(false);
     }
-  }, [importCode]); // Dependency: importCode
+  }, [importCode]);
 
   return {
     exportCode,
