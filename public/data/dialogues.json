@@ -123,16 +123,20 @@
   "gronk_greeting": {
     "id": "gronk_greeting",
     "npcId": "npc_blacksmith_gronk",
-    "text": "Need steel? I got steel.",
+    "title": "Steel Does Not Care About Flattery",
+    "text": "Gronk lays a newly finished sword across the counter. 'If you're going to praise it, buy it. If you're going to inspect it, say something useful.'",
     "responses": {
-      "ask_trade": "Show me what you've got.",
-      "compliment": "Your craft is unmatched.",
-      "banter": "Bet you can't bend a spoon."
+      "inspect": "The edge is clean, but the forward balance says you built this for a committed cut, not a duelist's recovery.",
+      "flatter": "Your craft is unmatched.",
+      "trade": "Show me what you've got."
     },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_steel_not_flattery", "responseId": "inspect" }
+    ],
     "next": {
-      "ask_trade": null,
-      "compliment": "gronk_smile",
-      "banter": null
+      "inspect": null,
+      "flatter": "gronk_smile",
+      "trade": null
     }
   },
   "gronk_smile": {
@@ -140,6 +144,60 @@
     "npcId": "npc_blacksmith_gronk",
     "text": "Hmph. You got taste.",
     "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
+  },
+  "gronk_craft_request": {
+    "id": "gronk_craft_request",
+    "npcId": "npc_blacksmith_gronk",
+    "title": "Measure Twice",
+    "text": "Gronk shows you a cracked caravan guard. The merchant wants the replacement twice as thick. 'That'll make it heavier, not stronger where it failed. What are you actually asking the steel to survive?'",
+    "requiredExperienceIds": ["gronk_exp_steel_not_flattery"],
+    "responses": {
+      "specify": "The shock is twisting the bracket at the mount. Reinforce the load path, not the whole plate.",
+      "order": "The merchant is paying. Make it twice as thick."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_measure_twice", "responseId": "specify" }
+    ],
+    "next": {
+      "specify": null,
+      "order": null
+    }
+  },
+  "gronk_rumors": {
+    "id": "gronk_rumors",
+    "npcId": "npc_blacksmith_gronk",
+    "title": "Quality Over Finish",
+    "text": "A wealthy client wants the guard polished thinner so it looks elegant on display. Gronk refuses and loses the sale. 'Pretty metal that fails is a lie with a shine on it.'",
+    "requiredExperienceIds": ["gronk_exp_measure_twice"],
+    "responses": {
+      "back_quality": "Then lose the sale. If the constraint matters, the finish serves it—not the other way around.",
+      "please_client": "A customer who pays gets to choose what matters."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_quality_over_finish", "responseId": "back_quality" }
+    ],
+    "next": {
+      "back_quality": "gronk_blade_held",
+      "please_client": null
+    }
+  },
+  "gronk_blade_held": {
+    "id": "gronk_blade_held",
+    "npcId": "npc_blacksmith_gronk",
+    "title": "The Blade That Held",
+    "text": "Weeks later, the same caravan returns after an ambush. The revised guard is scarred but intact. Gronk puts it on the counter between you. 'That's the part I care about. It held where the pretty version would've folded.'",
+    "requiredExperienceIds": ["gronk_exp_quality_over_finish"],
+    "responses": {
+      "recognize": "Your steel held. Our constraint was right. Keep refusing me when I ask for the wrong thing.",
+      "claim": "Good. My specification saved it."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_blade_that_held", "responseId": "recognize" }
+    ],
+    "next": {
+      "recognize": null,
+      "claim": null
+    }
   },
   "elara_greeting": {
     "id": "elara_greeting",
