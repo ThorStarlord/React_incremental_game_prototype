@@ -1,6 +1,6 @@
 # M11 — Lyra Production Relationship Vertical Slice
 
-**Status:** Implemented; final exact-head qualification pending documentation/review closeout  
+**Status:** Implemented; exact final-head qualification is tracked in PR #32  
 **Scope:** Productionize Lyra's adversarial Relationship arc through ordinary player-facing NPC, Dialogue, Quest, Relationship, Essence, and persistence surfaces.  
 **Baseline:** `main` at `c2e558f3d1ea2fbd35e488bd3aa4c2f5307cbe4a` (qualified M10 mainline).
 
@@ -427,7 +427,7 @@ No rivalry subclass or `if Lyra` engine branch was required.
 
 ## 15. Automated qualification
 
-The Build Validation gate now includes:
+The Build Validation gate includes:
 
 - M4 Relationship runtime;
 - M5 routed Willow;
@@ -439,15 +439,21 @@ The Build Validation gate now includes:
 - M11 Lyra production route;
 - production build.
 
-### First implementation candidate
+### Qualified development candidates
 
-Candidate:
+The first implementation/data/test candidate:
 
 `6c6fc139d6ef2eb4e99b8037db3b5ca3b3f3667b`
 
-Build Validation **#127**: **PASS**
+passed Build Validation **#127**.
 
-This run qualified the implementation/data/test candidate before this documentation record was added. A final exact-head qualification is still required after documentation/review closeout.
+The documentation-reconciled candidate:
+
+`6b300846e9db9e7de8e782bed77fa22482845c61`
+
+passed Build Validation **#131**.
+
+Because the final documentation-status cleanup creates a later commit, the authoritative final exact-head Build Validation result belongs in PR #32 rather than being copied here and immediately made stale by documentation maintenance.
 
 ## 16. Evidence ceiling
 
