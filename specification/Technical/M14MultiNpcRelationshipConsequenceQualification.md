@@ -1,6 +1,6 @@
 # M14 — Multi-NPC Relationship Consequence Qualification
 
-**Status:** preregistered before implementation  
+**Status:** results recorded; PASS subject only to exact-final-head requalification  
 **Baseline:** post-M13 `main` at `7a22b5c34de7e4e2e24497a0aff48ceb0bd90430`  
 **Baseline tree:** `fc3f840fa0d7e4face0e6f206190d2ff64350f5c`
 
@@ -22,15 +22,13 @@ M14 reuses three already-qualified production relationships:
 - **Captain Valerius** — institutional trust, disciplined dissent, delegated judgment.
 - **Blacksmith Gronk** — professional reliability, constraint-sensitive craft judgment, proven work.
 
-The main shared event may require prior evidence from all three routes. Existing M12/M13 evidence is historical setup and must not be reimplemented as M14-specific state.
+The main shared event requires historical evidence from all three routes. Existing M12/M13 evidence is historical setup and is not reimplemented as M14-specific state.
 
-## Reconnaissance finding
+## Preregistered reconnaissance finding
 
-`QuestResolutionOption` currently exposes a singular `relationshipExperienceId`. This is a potential pressure point for a one-event-to-many-relationships story.
+`QuestResolutionOption` exposes a singular `relationshipExperienceId`. This was identified before implementation as a potential pressure point for a one-event-to-many-relationships story.
 
-However, ordinary Dialogue already supports an array of effects and `processNPCInteractionThunk` records every authored `RELATIONSHIP_EXPERIENCE` effect in that array. Therefore a single authored response may already fan out into several independent Relationship Experiences targeting different NPCs.
-
-M14 must test that existing contract before changing the quest schema or introducing a new story bridge.
+However, ordinary Dialogue already supports an array of effects and `processNPCInteractionThunk` records every authored `RELATIONSHIP_EXPERIENCE` effect in that array. M14 therefore tested whether a single authored response could fan out into several independent Relationship Experiences targeting different NPCs before changing the quest schema or introducing a new story bridge.
 
 ## Probe A — The Cost of Closing the Leak
 
@@ -40,81 +38,176 @@ After the M13 Merchant District Leak is broken, Valerius, Silas, and Gronk disag
 - Silas values preserving an embedded information source rather than burning the whole network.
 - Gronk values keeping trade and repair routes structurally functional instead of winning a clean-looking crackdown that damages the district.
 
-A single player choice in the shared aftermath must emit three Relationship Experiences — one for each NPC — through the existing Dialogue effect array.
+One ordinary player choice in `valerius_m14_aftermath_council` emits three independently authored Relationship Experiences through the existing Dialogue effect array.
 
-Planned policy choices:
+Implemented policy choices:
 
 1. **Public crackdown** — strongest institutional signal; burns Silas's channel and imposes material trade cost.
 2. **Protect the source** — preserves Silas's intelligence channel; weakens visible institutional closure and leaves practical risk.
 3. **Quiet reroute** — changes routes and constraints to starve the leak while preserving trade and some intelligence value.
 
-The resulting dimension vectors must not all be positive or identical. At least one route must demonstrate a relationally costly choice in which Understanding can rise while Trust/Affinity/Reliance fall.
+### Conflicting interpretation result
 
-Each policy choice should unlock a different authored follow-up quest or consequence without requiring a new quest runtime.
+The consequences are not a shared positive/negative score.
+
+The public crackdown is the clearest stress case:
+
+- **Valerius:** Trust `+6`, Understanding `+2`, Shared Meaning `+5`, Reliance `+4`.
+- **Silas:** Affinity `-3`, Trust `-7`, **Understanding `+5`**, Shared Meaning `-4`, Reliance `-5`, Vulnerability `+2`, Reciprocity `-3`.
+- **Gronk:** Affinity `-3`, Trust `-4`, **Understanding `+4`**, Shared Meaning `-5`, Reliance `-3`, Reciprocity `-2`.
+
+Silas and Gronk therefore understand the player's reasoning more clearly while trusting or relying on that choice less. This directly demonstrates that shared-event conflict remains multidimensional rather than collapsing to a single approval score.
+
+The quiet-reroute decision emits a different three-NPC interpretation and unlocks ordinary follow-up quest `quest_m14_quiet_reroute`.
+
+## Gameplay consequence — Reroute the Load
+
+`quest_m14_quiet_reroute` deliberately retains the existing singular quest contract:
+
+- giver: Valerius;
+- objective: ordinary `REACH_LOCATION` for `location_merchant_district`;
+- one normal resolution option;
+- one singular `relationshipExperienceId`: `gronk_exp_quiet_reroute_proven`.
+
+The quest proves the selected shared policy under real gameplay traffic. Its completion makes the second shared event available through ordinary persisted Relationship evidence.
+
+This is important to the architecture result: M14 did not widen the quest schema merely because the story involved several relationships. Multi-NPC interpretation remained at the shared decision boundary where the existing Dialogue effect list already models it cleanly.
 
 ## Probe B — The Repair Ledger
 
-A second, independently authored shared event must exercise the same fan-out capability from a different NPC anchor after the first policy consequence.
+`gronk_m14_repair_ledger` is a second independently authored shared event anchored on Gronk rather than Valerius.
 
-Gronk and Valerius disagree about whether post-operation repairs should optimize visible speed or the load-bearing constraints that actually failed. One response must emit distinct Gronk and Valerius Experiences through the same existing Dialogue effect mechanism.
+After `gronk_exp_quiet_reroute_proven`, the player chooses between:
 
-Probe B exists to prevent a one-off success in Probe A from being mistaken for general evidence. Generic story/Relationship infrastructure may change only if both probes expose the same concrete limitation.
+- repairing the actual load path even if reopening takes longer; or
+- restoring visible order first and deferring the deeper structural repair.
 
-## Rule of Two for generic bridge changes
+Each response emits two distinct Relationship Experiences from one ordinary player decision:
 
-Do not add generic multi-relationship quest/story infrastructure because one authored event is inconvenient.
+- one Gronk interpretation;
+- one Valerius interpretation.
 
-A generic bridge change is justified only if the same missing capability blocks both Probe A and Probe B independently.
+For `build_for_load`:
 
-Examples of changes that would require Rule-of-Two evidence:
+- Gronk gains Affinity `+1`, Trust `+5`, Understanding `+3`, Shared Meaning `+5`, Reliance `+4`, Reciprocity `+3`;
+- Valerius loses Affinity `-1` while gaining Trust `+2`, Understanding `+4`, Shared Meaning `+1`, Reliance `+1`, Reciprocity `+2`.
 
-- `relationshipExperienceIds` on quest resolution;
-- a new multi-NPC narrative-effect type;
-- a new generic story-state layer solely to fan out Relationship consequences;
-- a new dialogue condition language.
+For `restore_visible_order`, Valerius reacts positively while Gronk gains Understanding `+4` but loses Trust `-5`, Shared Meaning `-5`, and Reliance `-4`.
 
-If existing Dialogue effects cleanly support both probes, no generic bridge change is warranted.
+Probe B therefore reproduces the fan-out capability independently and preserves divergent relational interpretation.
 
-## Falsification / stop conditions
+## Rule-of-Two result
 
-Stop and record the failure rather than patch around it if M14 requires any of the following solely to work:
+**No generic bridge intervention is warranted.**
 
-- `if (npcId === ...)` logic in generic Relationship, NPC, Quest, save, or game-event runtime;
-- `silasTrustsPlayer`, `valeriusWillDelegate`, `gronkSupportsPlan`, or equivalent shadow social flags;
-- a new persistent Relationship dimension such as Authority, Duty, Trade, Secrecy, Leverage, or Craft Alignment;
-- duplicating one world decision as several fake independent player decisions merely to produce per-NPC consequences;
-- direct Experience injection as the principal production route for the new M14 beats;
-- a new save schema solely for M14;
-- a generic bridge abstraction supported by only one probe.
+Both independently authored probes succeeded using the pre-existing Dialogue effect array:
+
+- Probe A: one response -> three NPC-targeted Relationship Experiences.
+- Probe B: one response -> two NPC-targeted Relationship Experiences.
+
+The suspected singular quest field did not block either probe. `QuestResolutionOption.relationshipExperienceId` remains singular, and no plural `relationshipExperienceIds` contract was added.
+
+M14 therefore records a negative abstraction result: the evidence does **not** justify a new multi-NPC narrative effect type, quest schema, generic social-state layer, or dialogue condition language.
+
+## Persistence result
+
+The qualified quiet-reroute path saves after the three-NPC council decision and before the later gameplay consequence.
+
+After load:
+
+- all three council Experiences remain present;
+- `quest_m14_quiet_reroute` remains available on Valerius;
+- the resumed game accepts the quest through the normal Quest UI;
+- ordinary location movement marks it ready;
+- normal quest resolution records `gronk_exp_quiet_reroute_proven`;
+- that persisted Experience exposes Probe B on Gronk;
+- Probe B then records separate Gronk and Valerius consequences through ordinary Dialogue.
+
+The shared-event relational consequences therefore survive a causal save/load boundary and continue controlling later story availability.
+
+## Architecture audit
+
+M14 story behavior changes only authored data/content, qualification documentation/tests, and CI gate wiring.
+
+No generic behavioral change was made to:
+
+- Relationship slice/selectors/thunks;
+- NPC interaction runtime;
+- Quest runtime or Quest types;
+- game-event listeners;
+- Essence or Trait behavior;
+- save schema.
+
+No M14-specific identifier appears in the audited generic Relationship/NPC/Quest/game-event/save runtime files.
+
+M14 adds no:
+
+- NPC-ID generic runtime branch;
+- shadow social boolean such as `silasTrustsPlayer`, `valeriusWillDelegate`, or `gronkSupportsPlan`;
+- persistent Relationship dimension;
+- Connection tier;
+- multi-relationship quest field;
+- narrative effect type;
+- save schema.
+
+## Behavioral qualification
+
+First complete behavioral candidate:
+
+`cd355e8d8f91fbc799dad8ba8e37b48c6badf315`
+
+Candidate tree:
+
+`0acdf8c1d821038d445ee47e2a3801ef2f7f29fc`
+
+Build Validation #160 (`34070717106`): **PASS**
+
+- dependency installation: PASS;
+- TypeScript: PASS;
+- accumulated M4–M13 Relationship / Trait / save qualification: PASS;
+- dedicated M14 multi-NPC consequence suite: PASS;
+- production build: PASS.
+
+No implementation repair cycle was required after the first complete M14 behavioral candidate entered CI.
 
 ## Acceptance criteria
 
-M14 PASS requires all of the following:
+M14 evidence now satisfies:
 
-- [ ] exact post-M13 baseline frozen before implementation;
-- [ ] one bounded shared narrative problem authored;
-- [ ] Silas, Valerius, and Gronk all participate in Probe A;
-- [ ] at least two prior Relationship histories gate or materially shape the shared event;
-- [ ] one ordinary player decision emits distinct Relationship Experiences for at least three NPCs;
-- [ ] those consequences are not all identical or uniformly positive;
-- [ ] at least one NPC gains Understanding while losing at least one of Trust, Affinity, or Reliance;
-- [ ] the decision unlocks a materially different later story/gameplay consequence;
-- [ ] Probe B independently emits distinct Relationship Experiences for at least two NPCs from one ordinary player response;
-- [ ] no generic bridge change occurs unless the Rule of Two is satisfied;
-- [ ] no NPC-specific generic runtime branch is added;
-- [ ] no new Relationship dimension or Connection tier is added;
-- [ ] no shadow social-state boolean is added;
-- [ ] save/load preserves the shared-event Relationship consequences and their later availability;
-- [ ] principal production proof uses ordinary NPC Dialogue, Quest/location, quest resolution, and Relationship persistence paths;
-- [ ] accumulated M4–M13 qualification remains green;
-- [ ] dedicated M14 production qualification passes;
-- [ ] production build passes;
-- [ ] exact final PR head is qualified;
-- [ ] results and evidence ceiling are recorded here before merge.
+- [x] exact post-M13 baseline frozen before implementation;
+- [x] one bounded shared narrative problem authored;
+- [x] Silas, Valerius, and Gronk all participate in Probe A;
+- [x] at least two prior Relationship histories gate or materially shape the shared event;
+- [x] one ordinary player decision emits distinct Relationship Experiences for at least three NPCs;
+- [x] those consequences are not all identical or uniformly positive;
+- [x] at least one NPC gains Understanding while losing at least one of Trust, Affinity, or Reliance;
+- [x] the decision unlocks a materially different later story/gameplay consequence;
+- [x] Probe B independently emits distinct Relationship Experiences for at least two NPCs from one ordinary player response;
+- [x] no generic bridge change occurs unless the Rule of Two is satisfied;
+- [x] no NPC-specific generic runtime branch is added;
+- [x] no new Relationship dimension or Connection tier is added;
+- [x] no shadow social-state boolean is added;
+- [x] save/load preserves the shared-event Relationship consequences and their later availability;
+- [x] principal production proof uses ordinary NPC Dialogue, Quest/location, quest resolution, and Relationship persistence paths;
+- [x] accumulated M4–M13 qualification remains green;
+- [x] dedicated M14 production qualification passes;
+- [x] production build passes;
+- [ ] exact final PR head is qualified after this results record;
+- [x] results and evidence ceiling are recorded here before merge.
+
+The remaining unchecked item is intentionally external to this self-referential results commit: changing this document changes the PR head. The documentation-complete SHA must receive its own exact-head Build Validation before merge; that run is merge evidence and should be recorded in PR metadata rather than causing an infinite documentation/requalification loop.
+
+## Verdict
+
+**PASS, contingent only on exact-final-head requalification of this documentation-complete candidate.**
+
+The bounded M14 hypothesis survived without a generic bridge intervention:
+
+> One shared production decision can be interpreted differently by several existing relationships, including conflicting multidimensional consequences, and those consequences can persist into later gameplay and another shared decision using the existing generic contracts.
 
 ## Evidence ceiling
 
-Even a PASS does not establish:
+This PASS does not establish:
 
 - a true multi-speaker conversation UI;
 - arbitrary N-NPC social simulation;
@@ -125,10 +218,10 @@ Even a PASS does not establish:
 - human enjoyment, pacing, emotional quality, or comprehensibility;
 - economy/balance quality.
 
-The maximum M14 claim is:
+The maximum M14 claim remains:
 
 > A bounded shared production event can be interpreted differently by multiple existing relationships, can produce conflicting per-NPC Relationship consequences from one ordinary player decision, and can carry those consequences into later story/gameplay using existing generic contracts.
 
 ## Merge boundary
 
-Open a dedicated M14 PR after implementation begins. Keep it draft until exact-head Build Validation passes and this document records the actual results. Per owner instruction, ignore the repository Gemini workflow as a merge authority.
+PR #35 must remain draft until the documentation-complete exact head passes Build Validation. Per owner instruction, ignore the repository Gemini workflow as a merge authority. If the exact-final-head gate passes and the PR remains mergeable, M14 is accepted and may merge without a generic bridge change.
