@@ -1,8 +1,8 @@
 # Game Design Document
 ## React Incremental RPG Prototype
 
-**Status:** Living product document — reconciled after M14  
-**Canonical authority note:** Read `Technical/PostM14ProductReconciliation.md` before extending legacy relationship mechanics.
+**Status:** Living product document — reconciled after M16  
+**Canonical authority note:** Read `Technical/PostM14ProductReconciliation.md` for domain/migration authority and `Technical/PostM16TraitGameplayReconciliation.md` before extending Trait-to-gameplay semantics.
 
 ---
 
@@ -20,6 +20,8 @@ The distinctive progression promise is:
 
 This replaces the older product assumption that Affinity is relationship XP and that reaching a numeric Affinity threshold automatically increases `connectionDepth`.
 
+M16 now qualifies an additional payoff: a permanent Trait learned through Relationship-mediated progression can materially expand the solution space of ordinary gameplay.
+
 ---
 
 ## Game Concept
@@ -36,6 +38,7 @@ Players should feel that:
 - different relationships have genuinely different meanings;
 - conflict can deepen a relationship without becoming affection;
 - capabilities learned through others feel earned rather than purchased from a menu;
+- learned capabilities create new ways to perceive and act rather than only larger numbers;
 - passive/incremental growth is downstream of the player's social and strategic history;
 - one decision can help one relationship while harming another;
 - routine work can eventually be delegated without automating irreversible story choices.
@@ -44,11 +47,12 @@ Players should feel that:
 
 1. **Evidence-based Relationship progression** — Experiences, Memories, Bond dimensions, and qualified Connection rather than one universal relationship XP bar.
 2. **Relationship-mediated Trait learning** — discovery, temporary attunement, assimilation, Memory evidence, and permanent Resonance for migrated Traits.
-3. **Relationship-derived Essence** — ongoing passive power generated from meaningful relational significance rather than relationship milestones acting as loot drops.
-4. **Narrative causal memory** — persisted Relationship evidence can unlock or alter later story consequences.
-5. **Multi-NPC social consequence** — one shared event can be interpreted differently by several characters.
-6. **Copy network** — growth, loyalty, Trait sharing, roles, and future routine-task automation extend the incremental layer.
-7. **Character customization** — permanent and slotted Traits support different gameplay solutions and future builds.
+3. **Trait-driven gameplay capability** — permanent learned Traits can expose materially different gameplay solutions while baseline progression remains viable.
+4. **Relationship-derived Essence** — ongoing passive power generated from meaningful relational significance rather than relationship milestones acting as loot drops.
+5. **Narrative causal memory** — persisted Relationship evidence can unlock or alter later story consequences across substantial causal distance.
+6. **Multi-NPC social consequence** — one shared event can be interpreted differently by several characters.
+7. **Copy network** — growth, loyalty, Trait sharing, roles, and future routine-task automation extend the incremental layer.
+8. **Character customization** — permanent and slotted Traits support different gameplay solutions and future builds.
 
 ---
 
@@ -73,7 +77,7 @@ Discover person / problem
 1. Interact with an NPC, quest, location, or active problem.
 2. Make a meaningful decision or perform an action.
 3. Receive gameplay consequences and, where relationally meaningful, Relationship evidence.
-4. Observe changes to Connection, Bond dimensions, Essence rate, Trait progress, quest availability, or story access.
+4. Observe changes to Connection, Bond dimensions, Essence rate, Trait progress, quest availability, story access, or capability options.
 5. Choose the next action, Trait loadout, destination, or investment.
 
 ### Mid-session loop
@@ -90,7 +94,7 @@ Discover person / problem
 
 1. Build a diverse Relationship network.
 2. Accumulate Memories and long-horizon callbacks.
-3. Develop specialized Trait combinations.
+3. Develop specialized permanent capabilities and, later, coherent Trait combinations.
 4. Build an increasingly capable Copy network.
 5. Expand into travel, combat, factions, and durable world consequences.
 6. Revisit old choices when later story situations consume historical evidence.
@@ -170,7 +174,7 @@ World-derived Tether and campaign-wide economy balancing remain future work.
 
 ### Trait System
 
-Traits represent capabilities, patterns, and passive bonuses.
+Traits are internalized capabilities or patterns: durable changes in what the protagonist can perceive, understand, attempt, perform, or passively sustain.
 
 The migrated relationship-mediated lifecycle is:
 
@@ -184,15 +188,29 @@ Discover
 -> Resonate permanently
 ```
 
-Willow's Wisdom and Scholarly Insight already exercise this model in production qualification.
+Willow's Wisdom and Scholarly Insight exercise this model in production qualification.
 
-Legacy/simple Traits may still use compatibility behavior until deliberately migrated.
+M16 additionally qualifies permanent Trait ownership as a gameplay capability boundary through a bounded generic quest-resolution gate:
 
-The next major product payoff is not to reimplement assimilation; it is to make Relationship-derived Traits materially change gameplay solutions.
+```text
+Relationship -> qualifies learning
+Trait        -> owns durable capability
+Gameplay     -> determines local applicability
+Player       -> chooses whether to use it
+Relationship -> interprets the result
+```
+
+A Trait should usually expand meaningful solution space rather than become an automatic best answer. Capability availability must not automatically make irreversible player decisions.
+
+Passive modifiers remain valid, but important Relationship-derived Traits should ideally have a coherent capability identity beyond an interchangeable percentage bonus.
+
+Temporary/equipped Trait gameplay authority beyond existing effects remains deliberately unqualified.
+
+See `Technical/PostM16TraitGameplayReconciliation.md`.
 
 ### Quest and Narrative System
 
-Quests own objectives, lifecycle, rewards, and authored resolution choices.
+Quests own objectives, lifecycle, rewards, authored resolution choices, and local applicability requirements such as M16's permanent-Trait gate.
 
 Relationship state owns the relational meaning of those events.
 
@@ -205,7 +223,7 @@ Story event
 -> later dialogue / quest availability or consequence
 ```
 
-M13 qualified this causal loop. M14 qualified a shared decision producing distinct consequences across multiple NPC Relationships.
+M13 qualified this causal loop. M14 qualified a shared decision producing distinct consequences across multiple NPC Relationships. M15 qualified old and newer Relationship evidence composing across intervening content and save/load. M16 qualified a learned permanent Trait changing a later gameplay solution and producing different Relationship evidence.
 
 ### Copy System
 
@@ -221,7 +239,7 @@ Copies should not silently make irreversible narrative decisions for the player.
 
 Combat currently has a lightweight event-bus scaffold, not a complete encounter game.
 
-Future combat should be introduced as a narrow vertical slice whose primary product question is whether Relationship-derived Traits create meaningful tactical differences.
+The next combat vertical slice should test whether an existing Relationship-derived permanent Trait creates a meaningful tactical option without becoming an automatic best action, pure passive bonus, or prerequisite for victory.
 
 ### Exploration and World
 
@@ -245,13 +263,14 @@ Canonical narrative reference lives in `Narrative/`:
 - power vs. surrender;
 - control, vulnerability, and consequence;
 - understanding without necessarily agreeing;
-- relationships as persistent causes rather than disposable dialogue rewards.
+- relationships as persistent causes rather than disposable dialogue rewards;
+- learning from people as durable character transformation, even when relationships later change.
 
 The Relationship model must support mentorship, alliance, rivalry, ideological opposition, mutual leverage, institutional trust, and other archetypes without requiring a new engine per NPC.
 
 ---
 
-## Current Product Maturity After M14
+## Current Product Maturity After M16
 
 ### Strong / empirically qualified
 
@@ -260,14 +279,17 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 - multiple distinct production Relationship archetypes;
 - adversarial Connection with low/negative Affinity;
 - Relationship-derived Essence for registered bundles;
-- authored Trait discovery and assimilation for Willow/Elara;
+- authored Trait discovery, assimilation, and permanent Resonance for Willow/Elara;
 - save/load persistence and migration;
 - Relationship evidence causing later story consequences;
-- one shared story event producing conflicting consequences for multiple NPCs.
+- one shared story event producing conflicting consequences for multiple NPCs;
+- long-horizon Relationship callbacks composing old and newer evidence across save/load;
+- permanent Relationship-derived Traits changing bounded gameplay solution space;
+- UI + authoritative thunk enforcement of permanent-Trait quest requirements.
 
 ### Functional foundation but incomplete product loop
 
-- Quest system;
+- Quest system beyond bounded authored slices;
 - Trait catalogue/loadout beyond migrated examples;
 - Essence economy/presentation;
 - Copy management and task/deployment depth;
@@ -276,8 +298,6 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 
 ### Major future product gaps
 
-- long-horizon callbacks across substantial intervening content;
-- Trait-driven gameplay payoff;
 - real combat encounter loop;
 - player-facing exploration/travel;
 - world-derived Tether;
@@ -286,36 +306,35 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 - NPC knowledge propagation;
 - distinct faction reputation;
 - reusable world-state consequences;
+- temporary/equipped Trait gameplay semantics if later warranted;
 - one complete chapter-level vertical slice and human playability review.
 
 ---
 
 ## Near-Term Roadmap
 
-### Immediate next milestone — M15
+### Immediate next code-bearing milestone — M17 candidate
 
-**Long-Horizon Relationship Callback Qualification**
+**Narrow Combat Vertical Slice**
 
-Test whether old Relationship evidence remains causally relevant after unrelated intervening content, additional Relationship changes, and save/load.
+If preregistered from the post-M16 reconciled baseline, test:
 
-### After M15
+> Can an existing Relationship-derived permanent Trait create a meaningful tactical option in one bounded combat encounter without becoming an automatic best action, pure passive stat bonus, or prerequisite for victory?
 
-Move directly toward **Trait-driven gameplay**. The repository already implements relationship-mediated Trait assimilation for Willow and Elara, so a future milestone should prove that such a learned capability materially changes how a real gameplay problem is solved rather than rebuilding assimilation as if it were absent.
+M17 must preserve the Checkpoint A capability/decision boundary and avoid a generalized ability system unless repeated production evidence warrants it.
 
-Subsequent candidate areas:
+### Subsequent candidate areas
 
-1. Trait-driven gameplay;
-2. narrow combat vertical slice;
-3. exploration/travel;
-4. world-derived Tether;
-5. Copy task automation;
-6. offline progress;
-7. social knowledge propagation;
-8. faction reputation;
-9. world-state consequences;
-10. first complete chapter vertical slice.
+1. exploration/travel;
+2. world-derived Tether;
+3. Copy task automation;
+4. offline progress;
+5. social knowledge propagation;
+6. faction reputation;
+7. world-state consequences;
+8. first complete chapter vertical slice + human playability review.
 
-Milestone numbering after M15 should be frozen during preregistration based on repository evidence at that time.
+Milestone numbering remains provisional until each experiment is preregistered against the actual repository state.
 
 ---
 
@@ -332,18 +351,19 @@ I formed a consequential relationship
 -> that reaction changed my future progression
 ```
 
-Technical correctness remains necessary, but later vertical slices must also test player comprehension, pacing, and whether incremental automation reinforces rather than distracts from the narrative RPG.
+Technical correctness remains necessary, but later vertical slices must also test player comprehension, pacing, whether Trait-enabled choices remain genuine choices, and whether incremental automation reinforces rather than distracts from the narrative RPG.
 
 ---
 
 ## Canonical References
 
-1. `Technical/PostM14ProductReconciliation.md`
-2. `Features/RelationshipExperienceSystem.md`
-3. `Features/EssenceResonanceModel.md`
-4. `Features/TraitSystem.md`
-5. `Features/QuestSystem.md`
-6. `Features/CopySystem.md`
-7. milestone-specific qualification documents under `Technical/`
+1. `Technical/PostM14ProductReconciliation.md` — broad domain/migration authority
+2. `Technical/PostM16TraitGameplayReconciliation.md` — Trait-to-gameplay doctrine after M16
+3. `Features/RelationshipExperienceSystem.md`
+4. `Features/EssenceResonanceModel.md`
+5. `Features/TraitSystem.md`
+6. `Features/QuestSystem.md`
+7. `Features/CopySystem.md`
+8. milestone-specific qualification documents under `Technical/`
 
 When older documentation conflicts with this authority chain, treat the conflict as migration/documentation debt rather than reviving the legacy model.
