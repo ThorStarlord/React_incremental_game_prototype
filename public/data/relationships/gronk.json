@@ -87,6 +87,136 @@
       "memoryCandidate": true,
       "memoryDefinitionId": "gronk_memory_blade_that_held",
       "interpretation": "A weapon built from jointly defended constraints survives the test that mattered, turning professional respect into durable reliance on one another's judgment."
+    },
+    "gronk_exp_aftermath_public_crackdown": {
+      "id": "gronk_exp_aftermath_public_crackdown",
+      "uniqueKey": "gronk:m14:01:aftermath-public-crackdown",
+      "title": "A Clean Map, a Damaged Route",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk", "npc_rogue_silas", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -3,
+        "trust": -4,
+        "understanding": 4,
+        "sharedMeaning": -5,
+        "reliance": -3,
+        "reciprocity": -2
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": ["SharedDecision", "TradeCost", "ConstraintConflict"],
+      "memoryCandidate": false,
+      "interpretation": "Gronk understands why a visible crackdown appeals to the Watch, but he sees you accepting avoidable structural damage to trade routes for a cleaner institutional picture."
+    },
+    "gronk_exp_aftermath_protect_source": {
+      "id": "gronk_exp_aftermath_protect_source",
+      "uniqueKey": "gronk:m14:02:aftermath-protect-source",
+      "title": "A Network Left Under Load",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk", "npc_rogue_silas", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "affinity": -1,
+        "trust": -2,
+        "understanding": 3,
+        "sharedMeaning": -2,
+        "reliance": -1
+      },
+      "connectionProgressDelta": 4,
+      "resonanceTags": ["SharedDecision", "OperationalRisk", "ConstraintConflict"],
+      "memoryCandidate": false,
+      "interpretation": "Gronk can follow the logic of preserving Silas's source, but he dislikes leaving merchants and repair crews carrying a load that the information strategy does not itself remove."
+    },
+    "gronk_exp_aftermath_quiet_reroute": {
+      "id": "gronk_exp_aftermath_quiet_reroute",
+      "uniqueKey": "gronk:m14:03:aftermath-quiet-reroute",
+      "title": "Move the Load, Not the Problem",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk", "npc_rogue_silas", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 7,
+        "understanding": 5,
+        "sharedMeaning": 6,
+        "reliance": 6,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["SharedDecision", "ConstraintRouting", "ProfessionalReliance"],
+      "memoryCandidate": false,
+      "interpretation": "You treat the district like a load path: change the routes that make the leak useful instead of breaking everything connected to them. Gronk recognizes his own constraint logic in a civic decision."
+    },
+    "gronk_exp_quiet_reroute_proven": {
+      "id": "gronk_exp_quiet_reroute_proven",
+      "uniqueKey": "gronk:m14:04:quiet-reroute-proven",
+      "title": "The Route Held Under Load",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk", "npc_captain_valerius"],
+      "sourceType": "quest",
+      "sourceId": "quest_m14_quiet_reroute",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 4,
+        "understanding": 3,
+        "sharedMeaning": 4,
+        "reliance": 5,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 7,
+      "resonanceTags": ["ConstraintRouting", "ProvenWork", "SharedDecision"],
+      "memoryCandidate": false,
+      "interpretation": "The rerouted caravan and patrol flow survives real traffic while the leaked timing loses value. The shared policy has now been tested against the kind of load Gronk respects."
+    },
+    "gronk_exp_repair_for_load": {
+      "id": "gronk_exp_repair_for_load",
+      "uniqueKey": "gronk:m14:05:repair-for-load",
+      "title": "Repair the Load Path",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_m14_repair_ledger",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 5,
+        "understanding": 3,
+        "sharedMeaning": 5,
+        "reliance": 4,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["SharedDecision", "CraftJudgment", "ConstraintIntegrity"],
+      "memoryCandidate": false,
+      "interpretation": "You refuse a cosmetic repair schedule and fund the work that actually carries the district's load, reinforcing Gronk's belief that you will defend constraints after the politics become inconvenient."
+    },
+    "gronk_exp_repair_for_show": {
+      "id": "gronk_exp_repair_for_show",
+      "uniqueKey": "gronk:m14:06:repair-for-show",
+      "title": "Repair the Appearance",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_m14_repair_ledger",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -2,
+        "trust": -5,
+        "understanding": 4,
+        "sharedMeaning": -5,
+        "reliance": -4,
+        "reciprocity": -2
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": ["SharedDecision", "AppearanceOverConstraint", "ProfessionalConflict"],
+      "memoryCandidate": false,
+      "interpretation": "Gronk understands the political need to reopen visibly and quickly, which is exactly why the choice costs trust: you know the load-bearing repair is better and choose appearance anyway."
     }
   },
   "memories": {
