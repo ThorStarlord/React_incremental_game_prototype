@@ -1,0 +1,86 @@
+{
+  "experiences": {
+    "willow_exp_grove_saved_by_cutting": {
+      "id": "willow_exp_grove_saved_by_cutting",
+      "uniqueKey": "willow:m16:withering-grove-resolution",
+      "title": "What Could Still Be Saved",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "quest",
+      "sourceId": "quest_m16_withering_grove",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 1,
+        "understanding": 2,
+        "sharedMeaning": 1,
+        "reciprocity": 1
+      },
+      "connectionProgressDelta": 2,
+      "resonanceTags": ["Stewardship", "Cost", "Pragmatism"],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist removes the visibly corrupted roots and preserves the grove at a real cost. Willow accepts decisive stewardship without pretending that the lost growth was irrelevant."
+    },
+    "willow_exp_wisdom_used_in_world": {
+      "id": "willow_exp_wisdom_used_in_world",
+      "uniqueKey": "willow:m16:withering-grove-resolution",
+      "title": "The Pattern Used Without Her",
+      "primaryTargetId": "npc_elder_willow",
+      "participantIds": ["player", "npc_elder_willow"],
+      "sourceType": "quest",
+      "sourceId": "quest_m16_withering_grove",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 5,
+        "sharedMeaning": 6,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": ["Wisdom", "Application", "Stewardship", "IndependentUnderstanding"],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist uses Willow's slow-pattern cognition on an external problem Willow did not solve for them, identifying the visible rot as a symptom and restoring the underlying flow."
+    },
+    "elara_exp_inventory_plausible_model": {
+      "id": "elara_exp_inventory_plausible_model",
+      "uniqueKey": "elara:m16:impossible-inventory-resolution",
+      "title": "The Plausible Inventory",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "quest",
+      "sourceId": "quest_m16_impossible_inventory",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 1,
+        "understanding": 2,
+        "sharedMeaning": 1,
+        "reciprocity": 1
+      },
+      "connectionProgressDelta": 2,
+      "resonanceTags": ["Inquiry", "Caution", "Plausibility"],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist accepts the inventory's most plausible linear explanation while preserving the contradictory entries for later review. Elara accepts the conservative inference."
+    },
+    "elara_exp_insight_reopens_inventory": {
+      "id": "elara_exp_insight_reopens_inventory",
+      "uniqueKey": "elara:m16:impossible-inventory-resolution",
+      "title": "The Model Reopened",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": ["player", "npc_scholar_elara"],
+      "sourceType": "quest",
+      "sourceId": "quest_m16_impossible_inventory",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 5,
+        "sharedMeaning": 5,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": ["Inquiry", "Evidence", "Revision", "IndependentVerification"],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist notices that two individually plausible records cannot both be true and reopens the explanatory model rather than defending the first coherent account."
+    }
+  },
+  "memories": {},
+  "progression": {}
+}
