@@ -620,5 +620,59 @@
       "accept": null,
       "defer": null
     }
+  },
+  "valerius_m14_aftermath_council": {
+    "id": "valerius_m14_aftermath_council",
+    "npcId": "npc_captain_valerius",
+    "title": "The Cost of Closing the Leak",
+    "text": "The leak is broken, but the room does not agree on what closure means. Valerius wants the compromised routes purged visibly. Silas warns that a full sweep burns the source who exposed the buyers. Gronk lays a caravan ledger beside the patrol map and points out which repair and trade routes collapse if the district is sealed for appearance's sake. All three wait for the decision you were trusted to make.",
+    "requiredExperienceIds": [
+      "valerius_exp_merchant_leak_broken",
+      "silas_exp_watch_leak_traced",
+      "gronk_exp_blade_that_held"
+    ],
+    "responses": {
+      "public_crackdown": "Close the compromised routes publicly. Arrest what we can see and accept the trade shock. The district needs visible control more than an elegant intelligence channel.",
+      "protect_source": "Preserve Silas's embedded source. Remove only the exposed nodes and keep the network alive long enough to keep learning from it.",
+      "quiet_reroute": "Do not burn the source or freeze the district. Reroute caravans and patrols until the leaked timing stops buying anyone an advantage."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_aftermath_public_crackdown", "responseId": "public_crackdown" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_aftermath_public_crackdown", "responseId": "public_crackdown" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_aftermath_public_crackdown", "responseId": "public_crackdown" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_aftermath_protect_source", "responseId": "protect_source" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_aftermath_protect_source", "responseId": "protect_source" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_aftermath_protect_source", "responseId": "protect_source" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_aftermath_quiet_reroute", "responseId": "quiet_reroute" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_aftermath_quiet_reroute", "responseId": "quiet_reroute" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_aftermath_quiet_reroute", "responseId": "quiet_reroute" },
+      { "type": "UNLOCK_QUEST", "questId": "quest_m14_quiet_reroute", "responseId": "quiet_reroute" }
+    ],
+    "next": {
+      "public_crackdown": null,
+      "protect_source": null,
+      "quiet_reroute": null
+    }
+  },
+  "gronk_m14_repair_ledger": {
+    "id": "gronk_m14_repair_ledger",
+    "npcId": "npc_blacksmith_gronk",
+    "title": "The Repair Ledger",
+    "text": "The quiet reroute works, but the district now needs permanent repairs. Valerius can reopen every visible lane by week's end if Gronk plates the damaged mounts and leaves the deeper load path for later. Gronk refuses to call that a repair. 'You already proved you can move the load instead of hiding it. Decide whether that was a principle or a trick.'",
+    "requiredExperienceIds": ["gronk_exp_quiet_reroute_proven"],
+    "responses": {
+      "build_for_load": "Repair the load path first. If reopening takes longer, the Watch can explain why. I will not turn a known structural failure into a public-relations schedule.",
+      "restore_visible_order": "Plate the visible failures and reopen on schedule. The district needs confidence now; the deeper rebuild can follow."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_repair_for_load", "responseId": "build_for_load" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_repair_for_load", "responseId": "build_for_load" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_repair_for_show", "responseId": "restore_visible_order" },
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_repair_for_show", "responseId": "restore_visible_order" }
+    ],
+    "next": {
+      "build_for_load": null,
+      "restore_visible_order": null
+    }
   }
 }
