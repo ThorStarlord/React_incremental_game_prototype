@@ -187,7 +187,10 @@
       "silas_shady_deal",
       "silas_trait_hint",
       "silas_secret_neither_sold",
-      "silas_watch_leak_tip"
+      "silas_watch_leak_tip",
+      "silas_m15_brokers_price",
+      "silas_m15_debt_still_counts",
+      "silas_m15_debt_not_renewed"
     ],
     "completedDialogues": [],
     "availableQuests": ["quest_silas_retrieve_item"],
@@ -226,7 +229,8 @@
       "valerius_city_issues",
       "valerius_leak_rumor",
       "valerius_delegated_leak_response",
-      "valerius_m14_aftermath_council"
+      "valerius_m14_aftermath_council",
+      "valerius_m15_forged_ledger_inquiry"
     ],
     "completedDialogues": [],
     "availableQuests": ["quest_valerius_patrol_duty"],
