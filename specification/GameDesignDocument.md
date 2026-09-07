@@ -1,8 +1,8 @@
 # Game Design Document
 ## React Incremental RPG Prototype
 
-**Status:** Living product document — reconciled after M16  
-**Canonical authority note:** Read `Technical/PostM14ProductReconciliation.md` for domain/migration authority and `Technical/PostM16TraitGameplayReconciliation.md` before extending Trait-to-gameplay semantics.
+**Status:** Living product document — reconciled after M17  
+**Canonical authority note:** Read `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority, `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine, and `Technical/PostM17ProductReconciliation.md` for current post-M17 product/status alignment. The planned execution sequence through M25 lives in `Technical/PostM17MilestoneRoadmap.md`.
 
 ---
 
@@ -20,7 +20,7 @@ The distinctive progression promise is:
 
 This replaces the older product assumption that Affinity is relationship XP and that reaching a numeric Affinity threshold automatically increases `connectionDepth`.
 
-M16 now qualifies an additional payoff: a permanent Trait learned through Relationship-mediated progression can materially expand the solution space of ordinary gameplay.
+M16 qualified a permanent Trait learned through Relationship-mediated progression materially expanding the solution space of ordinary quest gameplay. M17 now extends that proof into one bounded deterministic combat encounter: permanent `WillowsWisdom` can expose an optional tactical route while an ordinary no-Trait victory remains viable.
 
 ---
 
@@ -96,7 +96,7 @@ Discover person / problem
 2. Accumulate Memories and long-horizon callbacks.
 3. Develop specialized permanent capabilities and, later, coherent Trait combinations.
 4. Build an increasingly capable Copy network.
-5. Expand into travel, combat, factions, and durable world consequences.
+5. Expand the bounded active-play slices into travel, broader combat, factions, and durable world consequences.
 6. Revisit old choices when later story situations consume historical evidence.
 
 ---
@@ -190,14 +190,14 @@ Discover
 
 Willow's Wisdom and Scholarly Insight exercise this model in production qualification.
 
-M16 additionally qualifies permanent Trait ownership as a gameplay capability boundary through a bounded generic quest-resolution gate:
+M16 qualified permanent Trait ownership as a gameplay capability boundary through a bounded generic quest-resolution gate. M17 independently consumed the same permanent-Trait authority in Combat, justifying a shared pure permanent-Trait requirement predicate while preserving the same ownership chain:
 
 ```text
 Relationship -> qualifies learning
 Trait        -> owns durable capability
 Gameplay     -> determines local applicability
 Player       -> chooses whether to use it
-Relationship -> interprets the result
+Relationship -> interprets the result when relationally meaningful
 ```
 
 A Trait should usually expand meaningful solution space rather than become an automatic best answer. Capability availability must not automatically make irreversible player decisions.
@@ -206,7 +206,7 @@ Passive modifiers remain valid, but important Relationship-derived Traits should
 
 Temporary/equipped Trait gameplay authority beyond existing effects remains deliberately unqualified.
 
-See `Technical/PostM16TraitGameplayReconciliation.md`.
+See `Technical/PostM16TraitGameplayReconciliation.md` and `Technical/M17NarrowCombatVerticalSliceResult.md`.
 
 ### Quest and Narrative System
 
@@ -237,15 +237,29 @@ Copies should not silently make irreversible narrative decisions for the player.
 
 ### Combat
 
-Combat currently has a lightweight event-bus scaffold, not a complete encounter game.
+Combat now includes a **bounded qualified vertical slice**, not merely the original event-bus scaffold.
 
-The next combat vertical slice should test whether an existing Relationship-derived permanent Trait creates a meaningful tactical option without becoming an automatic best action, pure passive bonus, or prerequisite for victory.
+M17 qualified one deterministic player-facing `Telluric Echo Fragment` encounter with:
+
+- ordinary `Strike` and `Guard` actions;
+- victory and defeat terminal states;
+- an optional `WillowsWisdom` tactical sequence (`Trace the Cycle` -> `Disrupt the Feedback`);
+- a viable no-Trait control route;
+- runtime rejection of missing-Trait, wrong-phase, and post-terminal bypass attempts before mutation;
+- ordinary `targetKilled` integration with an existing Quest `KILL` objective;
+- transient Combat-owned encounter state rather than a new persistent Combat reducer/save schema.
+
+This does **not** make Combat a complete encounter system. Persistent/mid-combat state, broad Player combat-stat authority, equipment integration, status effects, multi-enemy/party combat, generalized abilities, campaign-scale balance/progression, and human fun/pacing remain unqualified.
+
+See `Features/CombatSystem_MVP.md` and `Technical/M17NarrowCombatVerticalSliceResult.md`.
 
 ### Exploration and World
 
-The prototype has location and quest-event support but not yet a complete travel/world layer.
+The prototype has canonical player location and location-sensitive quest-event support but not yet a complete player-facing travel/world layer.
 
-Future exploration should make location, travel time, resource acquisition, encounters, NPC presence, and Tether mechanically meaningful without turning the Relationship system into world-state storage.
+The next code-bearing milestone is planned as M18, a bounded exploration/travel qualification focused on a small authored location graph, authoritative route validation, player-facing movement, persistence, and reuse of existing `REACH_LOCATION` Quest handling.
+
+Future exploration may later make travel time, resource acquisition, encounters, NPC presence, and Tether mechanically meaningful, but M18 should not assume all of those semantics before evidence warrants them.
 
 ---
 
@@ -270,7 +284,7 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 
 ---
 
-## Current Product Maturity After M16
+## Current Product Maturity After M17
 
 ### Strong / empirically qualified
 
@@ -284,28 +298,32 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 - Relationship evidence causing later story consequences;
 - one shared story event producing conflicting consequences for multiple NPCs;
 - long-horizon Relationship callbacks composing old and newer evidence across save/load;
-- permanent Relationship-derived Traits changing bounded gameplay solution space;
-- UI + authoritative thunk enforcement of permanent-Trait quest requirements.
+- permanent Relationship-derived Traits changing bounded quest solution space;
+- UI + authoritative thunk enforcement of permanent-Trait quest requirements;
+- one bounded deterministic Combat encounter with a viable no-Trait route and an optional permanent-Trait tactical route;
+- Combat victory feeding an existing Quest `KILL` objective through the ordinary event bridge;
+- shared permanent-Trait capability-requirement semantics reused by Quest and Combat without a generalized ability DSL.
 
 ### Functional foundation but incomplete product loop
 
 - Quest system beyond bounded authored slices;
 - Trait catalogue/loadout beyond migrated examples;
 - Essence economy/presentation;
-- Copy management and task/deployment depth;
+- Combat beyond the bounded M17 encounter;
+- Copy management and production task/deployment depth;
 - inventory/equipment integration;
 - relationship-facing UI polish.
 
 ### Major future product gaps
 
-- real combat encounter loop;
 - player-facing exploration/travel;
 - world-derived Tether;
+- broader combat architecture only where later evidence warrants it;
 - production Copy task automation;
 - offline progress;
 - NPC knowledge propagation;
 - distinct faction reputation;
-- reusable world-state consequences;
+- reusable objective world-state consequences;
 - temporary/equipped Trait gameplay semantics if later warranted;
 - one complete chapter-level vertical slice and human playability review.
 
@@ -313,28 +331,31 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 
 ## Near-Term Roadmap
 
-### Immediate next code-bearing milestone — M17 candidate
+The planned post-M17 execution program is defined in `Technical/PostM17MilestoneRoadmap.md`. Individual milestone semantics remain provisional until each milestone is preregistered against the actual then-current repository state.
 
-**Narrow Combat Vertical Slice**
+### Immediate next code-bearing candidate — M18
 
-If preregistered from the post-M16 reconciled baseline, test:
+**Narrow Exploration / Travel Vertical Slice**
 
-> Can an existing Relationship-derived permanent Trait create a meaningful tactical option in one bounded combat encounter without becoming an automatic best action, pure passive stat bonus, or prerequisite for victory?
+Planned question:
 
-M17 must preserve the Checkpoint A capability/decision boundary and avoid a generalized ability system unless repeated production evidence warrants it.
+> Can the player intentionally traverse a small authored world graph through a player-facing travel interface, with canonical player location producing ordinary gameplay consequences, without duplicate location flags or a generalized world simulation?
 
-### Subsequent candidate areas
+### Planned subsequent sequence
 
-1. exploration/travel;
-2. world-derived Tether;
-3. Copy task automation;
-4. offline progress;
-5. social knowledge propagation;
-6. faction reputation;
-7. world-state consequences;
-8. first complete chapter vertical slice + human playability review.
+1. M18 — exploration/travel;
+2. M19 — world-derived Tether;
+3. Checkpoint B — active RPG loop;
+4. M20 — Copy task automation qualification;
+5. M21 — offline progress;
+6. Checkpoint C — incremental integration;
+7. M22 — social knowledge propagation;
+8. M23 — faction reputation;
+9. M24 — objective world-state consequences;
+10. M25 — complete chapter vertical slice;
+11. human integrated playability review.
 
-Milestone numbering remains provisional until each experiment is preregistered against the actual repository state.
+Do not treat the numbering alone as authority to implement the next milestone if the previous checkpoint exposes a prerequisite defect or product weakness.
 
 ---
 
@@ -359,11 +380,13 @@ Technical correctness remains necessary, but later vertical slices must also tes
 
 1. `Technical/PostM14ProductReconciliation.md` — broad domain/migration authority
 2. `Technical/PostM16TraitGameplayReconciliation.md` — Trait-to-gameplay doctrine after M16
-3. `Features/RelationshipExperienceSystem.md`
-4. `Features/EssenceResonanceModel.md`
-5. `Features/TraitSystem.md`
-6. `Features/QuestSystem.md`
-7. `Features/CopySystem.md`
-8. milestone-specific qualification documents under `Technical/`
+3. `Technical/PostM17ProductReconciliation.md` — product/status reconciliation after M17
+4. `Technical/PostM17MilestoneRoadmap.md` — planned execution program from M18 through M25
+5. `Features/RelationshipExperienceSystem.md`
+6. `Features/EssenceResonanceModel.md`
+7. `Features/TraitSystem.md`
+8. `Features/QuestSystem.md`
+9. `Features/CombatSystem_MVP.md`
+10. milestone-specific qualification documents under `Technical/`
 
 When older documentation conflicts with this authority chain, treat the conflict as migration/documentation debt rather than reviving the legacy model.
