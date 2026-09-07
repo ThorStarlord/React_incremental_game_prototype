@@ -246,6 +246,55 @@
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
+  "quest_m15_verify_forged_ledger": {
+    "id": "quest_m15_verify_forged_ledger",
+    "title": "Verify the Ledger",
+    "description": "Valerius refuses to treat the broker ledger as either proven guilt or convenient fiction. Trace its transaction trail through the merchant district and identify where real Watch facts were stitched to a false sale.",
+    "giver": "npc_captain_valerius",
+    "type": "SIDE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Trace the forged ledger's public transaction trail through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prove_public_forgery",
+        "label": "Prove the Public Chain Was Forged",
+        "description": "Show where authentic patrol facts were joined to a transaction that never occurred. This clears the default accusation without exposing a live broker channel.",
+        "rewards": [],
+        "logMessage": "The public chain breaks at the payment record: real Watch facts surround a sale that never happened. The accusation no longer survives ordinary verification."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_m15_follow_hidden_chain": {
+    "id": "quest_m15_follow_hidden_chain",
+    "title": "Follow the Hidden Chain",
+    "description": "Silas risks a live broker mark because old restraint still carries weight. Follow the hidden chain through the merchant district without converting the access itself into another burned source.",
+    "giver": "npc_rogue_silas",
+    "type": "SIDE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Follow Silas's live broker mark through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "verify_hidden_chain",
+        "label": "Verify the Hidden Chain Without Burning It",
+        "description": "Confirm which broker constructed the forgery while preserving the live route Silas chose to risk.",
+        "relationshipExperienceId": "silas_exp_hidden_chain_verified",
+        "rewards": [],
+        "logMessage": "The hidden route identifies the broker who assembled the forgery. You return with verification rather than a list of burned names, turning the old callback into new operational evidence."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
   "quest_elara_chain_1": {
     "id": "quest_elara_chain_1",
     "title": "A Scholar's Journey: The First Step",

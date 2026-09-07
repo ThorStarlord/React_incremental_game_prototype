@@ -201,6 +201,74 @@
       "resonanceTags": ["SharedDecision", "PreservedLeverage", "AdaptiveRouting"],
       "memoryCandidate": false,
       "interpretation": "You do not expose Silas's source and you do not leave the leak useful. By changing the route pattern instead, you preserve some leverage while reducing the damage it can buy."
+    },
+    "silas_exp_old_silence_repaid": {
+      "id": "silas_exp_old_silence_repaid",
+      "uniqueKey": "silas:m15:01:old-silence-repaid",
+      "title": "A Debt He Still Counts",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "dialogue",
+      "sourceId": "silas_m15_debt_still_counts",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 2,
+        "trust": 6,
+        "understanding": 4,
+        "sharedMeaning": 7,
+        "reliance": 4,
+        "vulnerability": 3,
+        "reciprocity": 6
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["LongHorizon", "ReciprocalRestraint", "ReinforcedHistory", "BrokerChainRisk"],
+      "memoryCandidate": false,
+      "interpretation": "Silas treats the old secret neither of you sold as still creditworthy because later conduct reinforced the same restraint. He risks a live broker chain rather than merely explaining how the forgery market works."
+    },
+    "silas_exp_old_silence_reinterpreted": {
+      "id": "silas_exp_old_silence_reinterpreted",
+      "uniqueKey": "silas:m15:02:old-silence-reinterpreted",
+      "title": "A Debt Remembered, Not Renewed",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "dialogue",
+      "sourceId": "silas_m15_debt_not_renewed",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": -1,
+        "understanding": 6,
+        "sharedMeaning": 4,
+        "reliance": -2,
+        "vulnerability": 1,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": ["LongHorizon", "ContestedMemory", "UnderstoodConflict", "LimitedReciprocity"],
+      "memoryCandidate": false,
+      "interpretation": "Silas still counts the old refusal to sell his secret as a real historical fact. He also counts the later source you burned. He will verify the old restraint, but he will not expose another live channel as though the later breach never happened."
+    },
+    "silas_exp_hidden_chain_verified": {
+      "id": "silas_exp_hidden_chain_verified",
+      "uniqueKey": "silas:m15:03:hidden-chain-verified",
+      "title": "The Chain He Risked Again",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "quest",
+      "sourceId": "quest_m15_follow_hidden_chain",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 1,
+        "trust": 3,
+        "understanding": 3,
+        "sharedMeaning": 4,
+        "reliance": 4,
+        "vulnerability": 2,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": ["LongHorizon", "BrokerChainRisk", "Reliance", "Reciprocity"],
+      "memoryCandidate": false,
+      "interpretation": "The live broker chain Silas risked because the older restraint still carried weight survives verification. The callback becomes new operational evidence rather than nostalgia alone."
     }
   },
   "memories": {
