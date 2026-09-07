@@ -490,6 +490,25 @@
       "deny": null
     }
   },
+  "silas_watch_leak_tip": {
+    "id": "silas_watch_leak_tip",
+    "npcId": "npc_rogue_silas",
+    "title": "A Tip He Did Not Sell",
+    "text": "Silas slides a folded set of City Watch patrol timings across the table. 'Someone is buying tomorrow's gaps today. I could sell you the buyer. Instead I'm giving you the pattern. Consider that a very expensive distinction.'",
+    "requiredExperienceIds": ["silas_exp_secret_neither_sold"],
+    "responses": {
+      "take_tip": "You could have sold this. Instead you're giving me the route. I'll find out whether the pattern is real.",
+      "leave_it": "Keep it. I do not want to owe you for unsold information."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_watch_leak_shared", "responseId": "take_tip" },
+      { "type": "UNLOCK_QUEST", "questId": "quest_m13_trace_merchant_leak", "responseId": "take_tip" }
+    ],
+    "next": {
+      "take_tip": null,
+      "leave_it": null
+    }
+  },
   "valerius_greeting": {
     "id": "valerius_greeting",
     "npcId": "npc_captain_valerius",
@@ -563,6 +582,42 @@
     ],
     "next": {
       "question_order": null,
+      "defer": null
+    }
+  },
+  "valerius_leak_rumor": {
+    "id": "valerius_leak_rumor",
+    "npcId": "npc_captain_valerius",
+    "title": "A Pattern, Not Yet a Command",
+    "text": "You put Silas's verified timing pattern on Valerius's desk. He reads it once. 'Useful. But information from a broker is not a field order. The Watch will verify it through its own chain before I hand anyone discretionary command.'",
+    "requiredExperienceIds": ["silas_exp_watch_leak_traced"],
+    "responses": {
+      "submit": "Here is the pattern. Verify it through your own chain."
+    },
+    "effects": [],
+    "next": {
+      "submit": null
+    }
+  },
+  "valerius_delegated_leak_response": {
+    "id": "valerius_delegated_leak_response",
+    "npcId": "npc_captain_valerius",
+    "title": "Command Without a Leash",
+    "text": "Valerius lays Silas's timing pattern beside the deployment map you once forced him to revise. 'You were right about the alley before I was. I will give you the objective and constraints. I will not give you a script. Break the leak without turning the district into a spectacle.'",
+    "requiredExperienceIds": [
+      "silas_exp_watch_leak_traced",
+      "valerius_exp_order_questioned"
+    ],
+    "responses": {
+      "accept": "Give me the objective and the constraint. I'll choose the path.",
+      "defer": "Not this time. Keep the response inside the Watch."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_merchant_leak_delegated", "responseId": "accept" },
+      { "type": "UNLOCK_QUEST", "questId": "quest_m13_break_merchant_leak", "responseId": "accept" }
+    ],
+    "next": {
+      "accept": null,
       "defer": null
     }
   }

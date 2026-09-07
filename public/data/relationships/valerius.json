@@ -68,6 +68,50 @@
       "memoryCandidate": true,
       "memoryDefinitionId": "valerius_memory_order_questioned",
       "interpretation": "You challenge an order by showing how it endangers the mission the order was meant to serve. Valerius changes the deployment without treating disciplined dissent as disloyalty."
+    },
+    "valerius_exp_merchant_leak_delegated": {
+      "id": "valerius_exp_merchant_leak_delegated",
+      "uniqueKey": "valerius:m13:01:merchant-leak-delegated",
+      "title": "Command Without a Leash",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_delegated_leak_response",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 4,
+        "understanding": 3,
+        "sharedMeaning": 4,
+        "reliance": 5,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["InstitutionalTrust", "DelegatedJudgment", "CrossFactionIntelligence"],
+      "memoryCandidate": false,
+      "interpretation": "Valerius chooses to give you mission intent and constraints rather than a scripted route because earlier disciplined dissent proved that your independent judgment can remain aligned with the objective."
+    },
+    "valerius_exp_merchant_leak_broken": {
+      "id": "valerius_exp_merchant_leak_broken",
+      "uniqueKey": "valerius:m13:02:merchant-leak-broken",
+      "title": "The Patrol He Let You Rewrite",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "sourceType": "quest",
+      "sourceId": "quest_m13_break_merchant_leak",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 6,
+        "understanding": 4,
+        "sharedMeaning": 5,
+        "reliance": 6,
+        "vulnerability": 2,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 12,
+      "resonanceTags": ["DelegatedJudgment", "DisciplinedDissent", "OperationalTrust", "CrossFactionIntelligence"],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "valerius_memory_merchant_leak_broken",
+      "interpretation": "You use Silas's intelligence to rewrite the patrol response within Valerius's stated objective, break the leak's operational value, and return with a result produced by delegated judgment rather than close supervision."
     }
   },
   "memories": {
@@ -85,6 +129,22 @@
       "targetView": "The player can question command without confusing dissent with defiance. That makes independent judgment something I can delegate rather than suppress.",
       "resonanceTags": ["InstitutionalTrust", "DisciplinedDissent", "DelegatedJudgment", "Duty"],
       "bondContribution": "Trusted Field Counsel — emerging",
+      "persistence": "stable"
+    },
+    "valerius_memory_merchant_leak_broken": {
+      "id": "valerius_memory_merchant_leak_broken",
+      "originExperienceId": "valerius_exp_merchant_leak_broken",
+      "title": "The Patrol He Let You Rewrite",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "Valerius gave you intent rather than a script, and the patrol you rewrote broke the merchant-district leak without sacrificing the mission.",
+      "protagonistView": "Valerius trusted me with judgment instead of compliance. The result matters because his authority survived becoming less direct.",
+      "targetView": "The player can carry command intent through incomplete information and return with an outcome I would have accepted even if I had not chosen the route myself.",
+      "resonanceTags": ["DelegatedJudgment", "DisciplinedDissent", "OperationalTrust", "CrossFactionIntelligence"],
+      "bondContribution": "Trusted Field Counsel — delegated",
       "persistence": "stable"
     }
   },

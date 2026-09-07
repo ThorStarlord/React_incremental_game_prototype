@@ -171,6 +171,56 @@
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
+  "quest_m13_trace_merchant_leak": {
+    "id": "quest_m13_trace_merchant_leak",
+    "title": "The Merchant District Leak",
+    "description": "Silas gives you patrol timings he chose not to sell. Walk the merchant district and determine whether the pattern is a real operational leak or merely broker theatre.",
+    "giver": "npc_rogue_silas",
+    "type": "SIDE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Trace the leaked patrol pattern through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "confirm_pattern",
+        "label": "Confirm the Pattern",
+        "description": "Treat the repeated timing gap as a real operational leak and carry the evidence forward rather than selling it back into the information market.",
+        "relationshipExperienceId": "silas_exp_watch_leak_traced",
+        "rewards": [],
+        "logMessage": "The patrol gap repeats exactly where Silas's timing said it would. The leak is real, and the information is now actionable rather than merely valuable."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_m13_break_merchant_leak": {
+    "id": "quest_m13_break_merchant_leak",
+    "title": "Break the Pattern",
+    "description": "Valerius gives you the objective and constraints instead of prescribing a route. Re-enter the merchant district, rewrite the patrol response around the leak, and break the pattern without turning the streets into a theatrical crackdown.",
+    "giver": "npc_captain_valerius",
+    "type": "SIDE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Return to the merchant district and execute the delegated response", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [{ "type": "REPUTATION", "value": 15, "faction": "City Watch" }],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "adaptive_intercept",
+        "label": "Use the Adaptive Intercept",
+        "description": "Change the patrol timing and alley coverage around the leak while preserving Valerius's mission constraints instead of following a prewritten route.",
+        "relationshipExperienceId": "valerius_exp_merchant_leak_broken",
+        "rewards": [],
+        "logMessage": "The leak's buyers arrive to find the old pattern gone. Valerius receives the result of judgment he delegated rather than obedience he supervised."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
   "quest_elara_chain_1": {
     "id": "quest_elara_chain_1",
     "title": "A Scholar's Journey: The First Step",
