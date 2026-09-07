@@ -43,10 +43,15 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
 
   const availableDialogueChoices: Choice[] = useMemo(() => {
     if (!npc?.availableDialogues) return [];
+    const completedDialogues = Array.isArray(npc.completedDialogues) ? npc.completedDialogues : [];
     return npc.availableDialogues
       .map((dialogueId: string) => {
         const node: any = (dialogueNodes as any)[dialogueId];
         if (!node) return null;
+
+        if (node.repeatable === false && completedDialogues.includes(node.id)) {
+          return null;
+        }
 
         const requiredExperienceIds = Array.isArray(node.requiredExperienceIds)
           ? node.requiredExperienceIds as string[]
@@ -76,7 +81,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         } as Choice;
       })
       .filter(Boolean) as Choice[];
-  }, [npc?.availableDialogues, dialogueNodes, recordedExperiences]);
+  }, [npc?.availableDialogues, npc?.completedDialogues, dialogueNodes, recordedExperiences]);
 
   if (!npc) {
     return (

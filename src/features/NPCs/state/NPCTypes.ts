@@ -211,6 +211,15 @@ export interface DialogueNode {
   effects?: DialogueEffect[];
   /** Next node mapping by response id; if missing, conversation ends */
   next?: Record<string, string | null>;
+  /** All listed Relationship Experiences must already exist. */
+  requiredExperienceIds?: string[];
+  /** At least one listed Relationship Experience must already exist. */
+  anyOfExperienceIds?: string[];
+  /**
+   * Opt-in one-shot semantics. Undefined/true preserves legacy repeatable behavior.
+   * A successful valid response records this node id in NPC.completedDialogues.
+   */
+  repeatable?: boolean;
   /** Optional gating */
   minAffinity?: number;
   minConnectionDepth?: number;

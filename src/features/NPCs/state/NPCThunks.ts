@@ -6,7 +6,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from '../../Player/state/PlayerSlice';
 import { TRADING } from '../../../constants/gameConstants';
@@ -197,6 +197,27 @@ export const processNPCInteractionThunk = createAsyncThunk<
       const node = choiceId ? (nodes as any)[choiceId] : undefined;
 
       if (node) {
+        const isNonRepeatable = node.repeatable === false;
+        const completedDialogues = Array.isArray(npc.completedDialogues) ? npc.completedDialogues : [];
+        if (isNonRepeatable && completedDialogues.includes(node.id)) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'That decision has already been made.',
+          }));
+          return { success: false, message: 'Dialogue already completed.' } as InteractionResult;
+        }
+
+        const authoredResponses = node.responses && typeof node.responses === 'object'
+          ? Object.keys(node.responses)
+          : [];
+        if (
+          isNonRepeatable &&
+          authoredResponses.length > 0 &&
+          (!selectedResponse || !Object.prototype.hasOwnProperty.call(node.responses, selectedResponse))
+        ) {
+          return { success: false, message: 'A valid response is required for this one-time decision.' } as InteractionResult;
+        }
+
         if (typeof node.minAffinity === 'number' && (npc.affinity || 0) < node.minAffinity) {
           dispatch(addNotification({ type: 'info', message: 'They are not ready to discuss that yet.' }));
           return { success: false, message: 'Dialogue gate not met.' } as InteractionResult;
@@ -285,6 +306,10 @@ export const processNPCInteractionThunk = createAsyncThunk<
               }));
             }
           }
+        }
+
+        if (isNonRepeatable) {
+          dispatch(markDialogueCompleted({ npcId, dialogueId: node.id }));
         }
       } else if (playerMessage) {
         const text = (playerMessage || '').toLowerCase();

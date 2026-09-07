@@ -116,6 +116,16 @@ const npcSlice = createSlice({
     addDialogueEntry: (state, action: PayloadAction<DialogueEntry>) => {
       state.dialogueHistory.push(action.payload);
     },
+    /** Record completion of an explicitly non-repeatable authored dialogue topic. */
+    markDialogueCompleted: (state, action: PayloadAction<{ npcId: string; dialogueId: string }>) => {
+      const { npcId, dialogueId } = action.payload;
+      const npc = state.npcs[npcId];
+      if (!npc) return;
+      if (!Array.isArray(npc.completedDialogues)) npc.completedDialogues = [];
+      if (!npc.completedDialogues.includes(dialogueId)) {
+        npc.completedDialogues.push(dialogueId);
+      }
+    },
     clearError: (state) => {
       state.error = null;
     },
@@ -275,6 +285,7 @@ export const {
   startInteraction,
   endInteraction,
   addDialogueEntry,
+  markDialogueCompleted,
   clearError,
   setDialogueNodes,
   updateNpcConnectionDepth,
