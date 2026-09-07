@@ -1,10 +1,11 @@
 # Trait System Specification
 
-**Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented  
+**Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Trait quest capability qualified in M16  
 **Relationship migration:** ✅ Willow and Elara use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
-**Discovery contract:** [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md)
+**Discovery contract:** [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md)  
+**Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)
 
-Traits provide passive modifications to player capabilities and support discovery, temporary equipping, permanent Resonance, NPC sharing, and Copy-related integration.
+Traits represent internalized capabilities or patterns that can change what the protagonist can perceive, understand, attempt, perform, or passively sustain. Numerical/passive modifiers remain legitimate Trait effects, but they are not the complete product definition of a Trait.
 
 ## 1. Trait lifecycle
 
@@ -57,12 +58,62 @@ Temporary equipping:
 
 - costs no Essence;
 - is reversible;
-- can provide Trait effects while slotted;
+- can provide existing Trait effects while slotted;
 - may participate in NPC/Copy sharing where existing rules allow it.
 
 Permanent Traits do not require an active slot.
 
 Undiscovered authored patterns cannot be equipped from the NPC Overview.
+
+M16 does **not** qualify temporary/equipped Traits as equivalent to permanent learned capability for authored gameplay gates. Whether temporary attunement grants full, partial, unstable, or only passive capability access remains a future production question.
+
+### 1.3 Gameplay capability authority
+
+M16 qualifies the following authority chain for Relationship-derived permanent Traits:
+
+```text
+Relationship history -> explains / qualifies how the capability was learned
+Trait state           -> owns whether the durable capability now exists
+Gameplay system       -> decides whether that capability is applicable here
+Player                 -> decides whether to use the available capability
+Relationship          -> later interprets what the player actually did
+```
+
+A strong Relationship, Memory, Affinity value, Connection level, or legacy `connectionDepth` must not substitute for permanent Trait ownership when gameplay is asking whether the protagonist has learned the capability.
+
+M16 production examples:
+
+- permanent `WillowsWisdom` enables the optional **Restore the Underlying Flow** resolution in **The Withering Grove**;
+- permanent `ScholarlyInsight` enables the optional **Reopen the Model Around the Contradiction** resolution in **The Impossible Inventory**;
+- both problems retain an ordinary valid route without the Trait;
+- invalid direct invocation of a permanent-Trait-only resolution is rejected below the UI.
+
+Current qualified quest consumption uses `QuestResolutionOption.requiredPermanentTraitIds`.
+
+The design invariant is:
+
+```text
+capability != decision
+```
+
+A Trait may reveal or authorize an action without automatically choosing it for the player.
+
+### 1.4 Capability identity
+
+Important Relationship-derived Traits should ideally express a coherent capability identity beyond an interchangeable percentage bonus.
+
+Useful authoring concepts include perceptual, interpretive, procedural, tactical, social, physical, productive, and passive capabilities. These are design categories, not a required runtime enum.
+
+Authoring test:
+
+```text
+Because the protagonist internalized [TRAIT],
+they can now ____________________________________.
+```
+
+Significant uses of the same Trait should be defensible from the same underlying learned pattern rather than behaving as unrelated content keys.
+
+Trait-enabled options should usually expand meaningful solution space rather than become a guaranteed "best" answer. See `PostM16TraitGameplayReconciliation.md` for the full doctrine and evidence/design boundary.
 
 ## 2. Resonance authority
 
@@ -203,6 +254,12 @@ see the pattern
 
 Having 40 Essence without this evidence is insufficient.
 
+### 5.3 Qualified gameplay identity
+
+M16 uses Willow's Wisdom as a bounded interpretive/systemic capability: the player can recognize that visible grove corruption is a symptom of an underlying slow Essence-flow imbalance and may choose a restoration route.
+
+This does not imply that every future Willow's Wisdom use is automatically correct or superior. Future uses should remain coherent with the underlying slow-pattern/systemic-causation identity.
+
 ## 6. Scholarly Insight
 
 `ScholarlyInsight` is the second production relationship-mediated Trait and declares:
@@ -224,6 +281,8 @@ Its semantic pattern is evidence-first model revision:
 The first challenge to Elara does not discover this Trait. The Contradictory Footnote does, because that is where Elara actually demonstrates the defining pattern.
 
 Later reciprocal correction and independent verification complete assimilation.
+
+M16 then reused that same semantic identity in **The Impossible Inventory**, where permanent `ScholarlyInsight` allows the protagonist to reopen a model around mutually incompatible records rather than accept the first plausible reconstruction.
 
 ## 7. Transaction order
 
@@ -259,6 +318,8 @@ If an older relationship save already contains the authored discovery Experience
 New Game explicitly resets Trait progression while retaining the loaded catalogue.
 
 `resetTraitsState` recomputes discovery from only `initial` Traits, so authored relationship patterns must be recognized again in the new run.
+
+Permanent Trait ownership is part of saved player progression. M16 qualified permanent `WillowsWisdom` surviving save/load before its gameplay capability was consumed.
 
 ## 9. NPC Trait UI
 
@@ -300,6 +361,8 @@ The Resonate button is enabled only when every applicable gate passes.
 
 Legacy NPC Traits continue to show the older `connectionDepth` requirement.
 
+Gameplay-option presentation is owned by the consuming gameplay system. M16 qualifies hidden unavailable permanent-Trait quest resolutions; visible-but-unavailable presentation remains a future design/UI choice.
+
 ## 10. NPC innate Trait equipping
 
 The temporary innate-Trait flow remains conceptually separate from permanent Resonance:
@@ -308,6 +371,8 @@ The temporary innate-Trait flow remains conceptually separate from permanent Res
 - only discovered patterns are player-visible/equippable;
 - the player temporarily equips a usable instance into a player Trait slot;
 - no permanent acquisition occurs merely from equipping.
+
+Temporary equipping must not be silently treated as equivalent to permanent authored gameplay mastery without dedicated evidence.
 
 ## 11. Trait sharing
 
@@ -333,12 +398,20 @@ M8 does not redesign Copy Trait inheritance.
 11. A failed gate spends no Essence and adds no permanent Trait.
 12. A successful permanent acquisition spends its Essence cost exactly once.
 13. Missing authored final-event data must fail before currency/permanence reducers commit.
+14. Relationship history qualifies learning; permanent Trait state owns the currently qualified durable gameplay capability.
+15. Capability availability does not automatically make the player's decision.
+16. Relationship deterioration does not normally erase an already permanent internalized Trait.
+17. Trait-enabled actions are interpreted by their consequences; Trait use does not automatically produce positive Relationship reward.
 
 ## 13. Known limitations / deferred work
 
 - Most legacy/simple Traits still default to initially known; they have not been given authored discovery content.
 - Relationship Experiences are only one possible future discovery source; quests, exploration, combat, research, or items may reveal other Traits.
 - Historical pre-Relationships saves do not reconstruct perfect discovery provenance; M8 only performs conservative additive repair from existing authored evidence.
-- advanced Trait combinations, synergies, and broad Copy redesign remain out of scope.
+- Temporary/equipped Trait gameplay authority beyond existing effects is not qualified by M16.
+- Advanced Trait combinations, synergies, and broad Copy redesign remain out of scope.
+- M16 qualifies a bounded permanent-Trait quest-resolution gate, not a general stat/skill/ability condition system.
 
 For the full M8 migration rationale and qualification evidence, see [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md).
+
+For the post-M16 gameplay doctrine and evidence/design boundary, see [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md).
