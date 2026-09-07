@@ -345,5 +345,17 @@
     ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
+  },
+  "quest_m17_telluric_echo": {
+    "id": "quest_m17_telluric_echo",
+    "title": "The Echo Beneath the Grove",
+    "description": "A Telluric Echo Fragment has condensed near the recovering grove. Destroy the hostile manifestation. Willow's teaching may reveal how its repeating Essence feedback sustains it, but conventional force remains a valid answer.",
+    "giver": "npc_elder_willow",
+    "type": "SIDE",
+    "objectives": [{ "objectiveId": "1", "description": "Defeat the Telluric Echo Fragment", "type": "KILL", "target": "enemy_m17_telluric_echo_fragment", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
+    "prerequisites": [{ "type": "QUEST_COMPLETED", "value": "quest_m16_withering_grove" }],
+    "rewards": [],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   }
 }
