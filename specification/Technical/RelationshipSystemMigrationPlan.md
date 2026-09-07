@@ -1,690 +1,148 @@
-# Relationship System Migration Plan
+# Relationship System Migration Plan — Historical Record
 
-**Status:** Implementation plan  
-**Target branch:** `feature/relationship-memory-vertical-slice`  
-**Scope:** Migrate the current Affinity -> Connection Depth -> Essence -> Trait Resonance pipeline to the Experience -> Memory -> Bond Profile architecture without rewriting unrelated systems.
+**Status:** Historical implementation plan; core migration substantially executed and qualified through M14  
+**Original target branch:** `feature/relationship-memory-vertical-slice`  
+**Current authority:** [`PostM14ProductReconciliation.md`](PostM14ProductReconciliation.md)
 
-## 1. Current-state summary
+## 1. Historical purpose
 
-The runtime currently uses a simple but functional relationship pipeline:
+This document originally planned the migration from the prototype relationship pipeline:
 
 ```text
 Dialogue / quest effects
 -> Affinity changes
--> Affinity >= 100
--> connectionDepth +1, Affinity remainder retained
--> Essence generation-rate recalculation
--> Trait Resonance gate uses minimum connectionDepth + Essence balance
+-> Affinity threshold
+-> legacy connectionDepth increase
+-> Essence recalculation
+-> Trait Resonance using connectionDepth + Essence
 ```
 
-The relevant implementation is spread across:
-
-- `src/features/NPCs/state/NPCThunks.ts`
-- `src/features/NPCs/state/NPCSlice.ts`
-- `src/features/NPCs/state/NPCTypes.ts`
-- `src/features/Essence/`
-- `src/features/Traits/state/TraitThunks.ts`
-- `src/constants/gameConstants.ts`
-- `public/data/dialogues.json`
-- `public/data/quests.json`
-- `public/data/traits.json`
-
-The migration should preserve working gameplay while progressively moving authority to the new relationship model.
-
----
-
-## 2. Target architecture
+toward:
 
 ```text
-Narrative action
--> relationshipExperienceRecorded
--> Experience ledger
--> relationship dimensions updated
--> connection qualification evaluated
--> optional Memory formed
--> Bond Profile recalculated
--> Essence contribution recalculated
--> Trait assimilation / Resonance gates recalculated
+Narrative / gameplay action
+-> Relationship Experience
+-> durable Experience ledger
+-> Bond dimensions
+-> Connection qualification
+-> optional Memory
+-> Relationship-derived Essence
+-> Trait discovery / assimilation / Resonance evidence
 ```
 
-The runtime does not need to become a fully event-sourced architecture. However, Experience records should remain durable evidence and derived state should avoid duplicating contradictory truth.
-
----
-
-## 3. Migration principles
-
-1. **Do not break the playable onboarding path while migrating.**
-2. **Do not rewrite unrelated systems.** Combat, Copy tasks, inventory, trading, and broader quest infrastructure remain out of scope.
-3. **Prefer additive state first, replacement second.** Introduce relationship state alongside existing `affinity` / `connectionDepth`, then cut over once validated.
-4. **Use Elder Willow as the only required content proof before generalization.**
-5. **Use Lyra as the first universality test after Willow.**
-6. **Keep save data serializable.**
-7. **Every new state transition must be explainable in debug tooling.**
-8. **Separate migration compatibility from target semantics.** Temporary shims must be clearly marked and removable.
-
----
-
-# 4. Phase A — Add domain types and state without changing behavior
-
-## A1. Create relationship feature/domain
-
-Recommended location:
-
-```text
-src/features/Relationships/
-  state/
-    RelationshipTypes.ts
-    RelationshipSlice.ts
-    RelationshipSelectors.ts
-    RelationshipThunks.ts
-    RelationshipListeners.ts
-  index.ts
-```
-
-Do not put new event history directly into the NPC slice unless implementation proves that a separate feature creates unnecessary complexity.
-
-## A2. Add types
-
-Minimum initial types:
-
-```typescript
-type RelationshipDimensionKey =
-  | 'affinity'
-  | 'trust'
-  | 'understanding'
-  | 'sharedMeaning'
-  | 'reliance'
-  | 'vulnerability'
-  | 'reciprocity';
-
-interface RelationshipExperience {
-  id: string;
-  uniqueKey?: string;
-  title: string;
-  timestamp: number;
-  primaryTargetId: string;
-  participantIds: string[];
-  sourceType: 'dialogue' | 'quest' | 'combat' | 'exploration' | 'system' | 'other';
-  sourceId?: string;
-  significance: 'minor' | 'meaningful' | 'major' | 'defining';
-  relationshipEffects: Partial<Record<RelationshipDimensionKey, number>>;
-  customEffects?: Record<string, number>;
-  connectionProgressDelta?: number;
-  resonanceTags: string[];
-  memoryCandidate: boolean;
-  interpretation?: string;
-  consequences?: string[];
-}
-
-interface RelationshipMemory {
-  id: string;
-  originExperienceId: string;
-  title: string;
-  timestamp: number;
-  primaryTargetId: string;
-  participantIds: string[];
-  memoryType: 'shared' | 'target' | 'protagonist' | 'asymmetric';
-  significance: 'meaningful' | 'major' | 'defining';
-  playerVisible: boolean;
-  summary: string;
-  resonanceTags: string[];
-  bondContribution?: string;
-  traitRelevance?: string[];
-  persistence: 'stable' | 'contested' | 'reinterpretable';
-  currentInterpretation?: string;
-}
-
-interface BondProfile {
-  npcId: string;
-  dimensions: {
-    affinity: number;
-    trust: number;
-    understanding: number;
-    sharedMeaning: number;
-    reliance: number;
-    vulnerability: number;
-    reciprocity: number;
-    custom: Record<string, number>;
-  };
-  connectionLevel: number;
-  connectionProgress: number;
-  bondArchetypes: string[];
-  activeMemoryIds: string[];
-  unresolvedTensions: string[];
-  recentExperienceIds: string[];
-  resonanceQuality: number;
-  stability: 'ruptured' | 'contested' | 'strained' | 'stable' | 'reinforced';
-}
-```
+The second architecture is now substantially implemented. The first pipeline remains only where explicitly retained for legacy compatibility.
 
-The exact TypeScript shape may evolve; semantic fields are more important than naming.
+Do **not** read the old migration sequence as the current product roadmap.
 
-## A3. Add RelationshipState
+## 2. What was implemented
 
-Recommended normalized structure:
+The staged migration produced:
 
-```typescript
-interface RelationshipState {
-  experiencesById: Record<string, RelationshipExperience>;
-  experienceIdsByNpc: Record<string, string[]>;
-  memoriesById: Record<string, RelationshipMemory>;
-  memoryIdsByNpc: Record<string, string[]>;
-  bondProfilesByNpc: Record<string, BondProfile>;
-  appliedUniqueKeys: Record<string, true>;
-}
-```
+- a dedicated `Relationships` feature/domain;
+- Relationship Experience types, authoring, idempotency, and persistence;
+- Memories tied to originating Experiences;
+- Bond Profiles and universal dimensions;
+- evidence-qualified Connection progression;
+- per-NPC `connectionAuthority`;
+- data-driven relationship bundles discovered from `/data/relationships/index.json`;
+- Relationship-derived Essence contributions;
+- authored Trait discovery and relationship-mediated assimilation/Resonance for migrated Traits;
+- save reconciliation and explicit schema migration;
+- player-facing production relationship routes;
+- generic story gates based on Relationship evidence;
+- bounded multi-NPC shared consequence fan-out.
 
-## A4. Register reducer in `src/app/store.ts`
+## 3. Qualification history
 
-No existing behavior changes in Phase A.
+### M4-M10
 
-### Phase A acceptance
+Established the core migration, Willow/Elara production slices, Trait discovery/assimilation evidence, and save migration/reconciliation.
 
-- app compiles;
-- save serialization includes the new slice;
-- old gameplay behaves identically;
-- selectors can return an empty/default Bond Profile for Willow.
+### M11
 
----
+Qualified Lyra as an adversarial Relationship using the same generic ontology.
 
-# 5. Phase B — Record Experiences in shadow mode
+### M12
 
-## B1. Introduce `recordRelationshipExperience`
+Qualified Gronk, Silas, and Valerius and showed that repeated production authoring did not require repeated engine changes.
 
-Create a single authoritative action/thunk for authored relationship events.
+### M13
 
-It must:
+Qualified persisted Relationship evidence as a cause of later story/gameplay consequences.
 
-1. enforce idempotency for `uniqueKey`;
-2. append the Experience;
-3. apply dimension deltas;
-4. update Connection Progress;
-5. recalculate derived Bond data;
-6. optionally request Memory qualification;
-7. trigger Essence-rate recalculation when relationship-derived inputs change.
+### M14
 
-## B2. Keep old Affinity logic temporarily
+Qualified one shared story decision producing distinct/conflicting Relationship consequences across multiple NPCs, plus an independent second fan-out probe.
 
-During shadow mode, important Willow dialogue can still dispatch existing `AFFINITY_DELTA` behavior while also recording new Experiences.
+## 4. Current production authority
 
-The temporary compatibility rule should be explicit:
+The relationship authoring manifest currently registers:
 
-```text
-old Affinity change = legacy gameplay
-new Experience = shadow evidence
-```
+- Elder Willow;
+- Lyra;
+- Elara;
+- Gronk;
+- Silas;
+- Valerius.
 
-Do not derive the new Bond Profile by rereading old RelationshipChangeEntry history; authored Experiences should be explicit.
+For those Relationship-authority NPCs:
 
-## B3. Add new dialogue effect
+- Bond/Connection semantics live in the Relationship domain;
+- Affinity is not Connection XP;
+- important relational history is represented by Experiences/Memories;
+- legacy `NPC.connectionDepth` may remain only as compatibility for unmigrated consumers.
 
-Recommended data effect:
+## 5. Legacy compatibility that remains
 
-```json
-{
-  "type": "RELATIONSHIP_EXPERIENCE",
-  "experienceId": "willow_exp_first_question_admit"
-}
-```
+Migration was intentionally incremental, so several old surfaces may still exist:
 
-The actual Experience definitions may live in a dedicated data file rather than embedding large payloads in dialogue JSON.
+- `NPC.affinity` and `NPC.connectionDepth` fields;
+- old UI/debug components exposing those fields;
+- unmigrated Trait Resonance gates;
+- Copy parent/creation/inheritance calculations using legacy NPC fields;
+- save migration code for old data;
+- older data/content that has not yet moved to Relationship authority.
 
-Suggested location:
+These are not evidence that the old pipeline remains the target design.
 
-```text
-public/data/relationships/elder-willow.json
-```
+## 6. Current remaining gaps
 
-### Phase B acceptance
+The Relationship migration itself is no longer the main product bottleneck.
 
-- Willow dialogue creates Experience records;
-- duplicate authored choices do not double-apply unique Experiences;
-- existing Affinity flow still works;
-- debug output can show old and new states side-by-side.
+Higher-value remaining work includes:
 
----
+- long-horizon Relationship callbacks;
+- Trait-driven gameplay payoff;
+- combat vertical slice;
+- exploration/travel;
+- world-derived Tether;
+- Copy task automation;
+- offline progress;
+- social knowledge propagation;
+- faction reputation;
+- explicit world-state consequences;
+- a complete chapter vertical slice.
 
-# 6. Phase C — Add Memory formation
+## 7. Current migration rules
 
-## C1. Explicit authored Memories first
+When touching a remaining legacy consumer:
 
-For the first vertical slice, avoid building a generic automatic Memory-ranking algorithm.
+1. identify which domain should own the concept;
+2. do not remove compatibility fields without save/runtime evidence;
+3. do not add new legacy dependencies merely because they already exist nearby;
+4. use Relationship Connection/Experience/Memory when deep relational meaning is required;
+5. preserve generic runtime contracts before introducing NPC-specific exceptions;
+6. add focused qualification and preserve accumulated regression gates.
 
-Experience definitions should be able to declare:
+## 8. Canonical reading order
 
-```text
-memoryCandidate: true
-memoryDefinitionId: willow_memory_seed_preserved
-```
+Use:
 
-The runtime validates qualification and creates the Memory when conditions are met.
+1. `PostM14ProductReconciliation.md`;
+2. `../GameDesignDocument.md`;
+3. `../Features/RelationshipExperienceSystem.md`;
+4. `../Features/EssenceResonanceModel.md`;
+5. relevant current feature spec;
+6. milestone-specific qualification evidence.
 
-## C2. First two required Memories
-
-- `willow_memory_seed_preserved`
-- `willow_memory_lesson_made_yours`
-
-`Beneath the Old Tree` remains optional.
-
-## C3. Add Memory selectors
-
-Required selectors:
-
-- visible Memories by NPC;
-- Memory by id;
-- Memories matching a resonance tag;
-- Trait-relevant Memories.
-
-### Phase C acceptance
-
-- every Memory references an existing Experience;
-- replay/reload does not duplicate Memories;
-- Memories survive later negative relationship changes;
-- player-visible and hidden Memories can coexist.
-
----
-
-# 7. Phase D — Cut Connection progression over from Affinity XP
-
-This is the first intentional gameplay behavior change.
-
-## D1. Stop automatic Connection level-up in `updateNPCRelationshipThunk`
-
-Remove or gate the behavior:
-
-```text
-affinity >= 100 -> connectionDepth +1
-```
-
-Affinity remains clamped to its valid range and remains useful for short-term disposition/service gating.
-
-## D2. Move Connection into Bond Profile authority
-
-During migration, options are:
-
-### Preferred
-
-`BondProfile.connectionLevel` becomes authoritative and NPC `connectionDepth` becomes a compatibility projection until consumers migrate.
-
-### Transitional
-
-Keep `connectionDepth` on NPC but allow only the Relationship feature to update it after qualification.
-
-The preferred long-term model is the first option.
-
-## D3. Add qualification selector/thunk
-
-A Connection level-up requires:
-
-- progress threshold;
-- qualifying Experience/Memory evidence;
-- state coherence;
-- optional content-specific condition.
-
-For Willow v1, authored qualification rules are acceptable. Do not hardcode `if npcId === 'npc_elder_willow'` inside generic reducers; put Willow conditions in data/configuration.
-
-### Phase D acceptance
-
-- repeated positive dialogue cannot level Connection by itself;
-- WE-05 can reduce Affinity while increasing Connection-related progress;
-- Willow reaches the required Connection level through the authored slice;
-- other NPCs retain safe legacy/default behavior until their content migrates.
-
----
-
-# 8. Phase E — Migrate Essence generation
-
-## E1. Preserve global base generation
-
-Keep the current `ESSENCE_GENERATION.BASE_RATE_PER_SECOND` initially.
-
-## E2. Replace NPC contribution calculation
-
-Current:
-
-```text
-connectionDepth * NPC_CONTRIBUTION_MULTIPLIER
-```
-
-Target:
-
-```text
-Connection Base Rate
-* Resonance Quality
-* Tether Modifier
-* Stability Modifier
-```
-
-During first implementation, Willow may be the only NPC using the new calculation. Legacy NPCs can use the old contribution behind a compatibility selector.
-
-## E3. Remove relationship-harvest reward from Ancient Seed
-
-Change `quest_willow_ancient_seed` so the relationship milestone no longer directly awards `ESSENCE 100`.
-
-Possible replacement rewards:
-
-- non-Essence item;
-- quest completion with no direct material reward;
-- unlock of the next Willow interaction;
-- a small unrelated resource if pacing requires it.
-
-The relationship value should come from the Experience/Memory and resulting future rate.
-
-## E4. Add explanation selector
-
-The UI/debug layer should be able to show something like:
-
-```text
-Willow contribution: 0.13/sec
-Reasons:
-- Connection II base: 0.10
-- Resonance Quality: Strong
-- Tether: Present
-- Stability: Stable
-```
-
-### Phase E acceptance
-
-- a Willow landmark changes future rate, not current balance;
-- `generateEssenceThunk` continues to accrue over time normally;
-- no double-counting between legacy and new Willow contribution;
-- save/load preserves effective rate inputs.
-
----
-
-# 9. Phase F — Add Trait assimilation and new Resonance gates
-
-## F1. Extend Trait source metadata
-
-For `WillowsWisdom`, add target metadata such as:
-
-```json
-{
-  "sourceNpc": "npc_elder_willow",
-  "minimumConnectionLevel": 2,
-  "resonanceTags": ["Wisdom", "Patience", "PatternRecognition", "Application"],
-  "requiredMemoryTags": ["Application"],
-  "assimilationDifficulty": 1.0
-}
-```
-
-Preserve `essenceCost: 40` initially.
-
-## F2. Add Trait assimilation state
-
-Recommended state by `(traitId, sourceNpcId)`:
-
-```typescript
-interface TraitAssimilationState {
-  traitId: string;
-  sourceNpcId: string;
-  progress: number;
-  lastUpdatedAt: number;
-  qualifyingMemoryIds: string[];
-  compatibility: number;
-}
-```
-
-## F3. Advance assimilation through tether time
-
-The game loop or bounded interaction sessions can advance assimilation only when the player is in a valid tether state with the source.
-
-Avoid making raw real-time proximity the only mechanism until world-location state is robust. For Willow v1, authored teaching sessions can provide bounded tether intervals.
-
-## F4. Update `acquireTraitWithEssenceThunk`
-
-Target validation order:
-
-1. Trait discovered;
-2. source NPC resolved;
-3. qualified Connection level met;
-4. assimilation complete;
-5. required Memory/evidence met;
-6. Trait prerequisites met;
-7. sufficient Essence;
-8. spend Essence;
-9. make Trait permanent.
-
-Errors should explain the first unmet requirement clearly.
-
-### Phase F acceptance
-
-- `WillowsWisdom` cannot be Resonated immediately after viewing Willow;
-- sufficient Essence alone is not enough;
-- `The Lesson Made Yours` or equivalent Application evidence matters;
-- final Resonance still spends 40 Essence;
-- temporary Trait equipping remains functional.
-
----
-
-# 10. Phase G — Player-facing UI
-
-Minimum required surfaces:
-
-## G1. Relationship summary
-
-On Willow's NPC view:
-
-- Connection Level;
-- qualitative Bond interpretation;
-- key dimensions;
-- Essence contribution;
-- recent/defining Memories.
-
-Do not expose every internal formula by default.
-
-## G2. Memory list
-
-Show only player-visible landmark Memories.
-
-## G3. Resonance panel
-
-Show `WillowsWisdom` with:
-
-- discovery status;
-- Connection requirement;
-- assimilation progress;
-- evidence requirement;
-- Essence cost;
-- clear reason when locked.
-
-## G4. Rare Memory notification
-
-When `The Seed Preserved` forms, surface a high-salience but non-spammy notification.
-
-### Phase G acceptance
-
-A player can answer:
-
-- Why did my Connection with Willow deepen?
-- Why is Willow generating more Essence?
-- Why can/can't I Resonate Willow's Wisdom?
-
-without opening debug tools.
-
----
-
-# 11. Phase H — Debug and validation tooling
-
-Add a relationship debug surface before broad content expansion.
-
-Minimum fields:
-
-```text
-NPC
-Experience history
-Memory history
-Dimension state
-Connection progress + qualification evidence
-Bond archetypes
-Resonance Quality calculation
-Essence contribution calculation
-Trait assimilation state
-Resonance gate state
-```
-
-Each calculated value should have an explanation path.
-
----
-
-# 12. Phase I — Save migration
-
-Existing saves may contain only:
-
-```text
-affinity
-connectionDepth
-```
-
-Migration rule:
-
-- preserve existing Affinity;
-- map old `connectionDepth` conservatively to compatibility Connection Level;
-- initialize unknown dimensions to neutral/default values;
-- do not fabricate historical Experiences or Memories;
-- mark migrated profiles as legacy-derived if needed for debugging;
-- begin recording new Experiences from migration onward.
-
-Do not invent `The Seed Preserved` or other Memories merely because an old save had high Connection Depth.
-
----
-
-# 13. Automated test requirements
-
-The current prototype has little automated coverage, but this migration introduces enough state coupling that tests are warranted.
-
-Required minimum tests:
-
-### Experience
-
-- stable unique event applies once;
-- repeatable event can be explicitly repeated;
-- dimension deltas clamp correctly.
-
-### Memory
-
-- Memory cannot reference missing Experience;
-- Memory forms once;
-- Memory persists after Trust/Affinity loss.
-
-### Connection
-
-- Affinity threshold alone does not level Connection;
-- qualifying Experience + progress can level Connection;
-- adversarial event can lower Affinity while increasing Connection progress.
-
-### Essence
-
-- Relationship Experience does not directly alter Essence balance;
-- Bond change alters passive rate;
-- Willow new rate is not double-counted with legacy contribution.
-
-### Trait Resonance
-
-- insufficient assimilation blocks Resonance;
-- missing Memory evidence blocks Resonance;
-- sufficient evidence + Connection + Essence permits Resonance;
-- Essence is deducted exactly once;
-- permanent Trait is added exactly once.
-
-### Save/load
-
-- Experiences, Memories, Bond Profile, and assimilation survive serialization;
-- legacy save migration produces valid state without fake history.
-
----
-
-# 14. Scope exclusions for this migration
-
-Do not implement yet:
-
-- procedural/LLM-generated Memories;
-- autonomous NPC social-network simulation;
-- multiple Essence currencies;
-- full dynamic relationship AI;
-- Copy redesign;
-- broad campaign rewrite;
-- dozens of custom relationship dimensions;
-- automatic universal Memory scoring;
-- advanced remote-bond distance curves;
-- post-Lyra authenticity endgame mechanics.
-
-These remain downstream until the Willow + Lyra proofs validate the core model.
-
----
-
-# 15. Milestones
-
-## M1 — Relationship ontology
-
-**Deliverables:**
-
-- `RelationshipExperienceSystem.md`
-- `MemorySystem.md`
-- `EssenceResonanceModel.md`
-
-**Exit:** terms, invariants, schemas, and boundaries are coherent.
-
-## M2 — Willow authored proof
-
-**Deliverable:**
-
-- `ElderWillowVerticalSlice.md`
-
-**Exit:** 6–10 Experiences, 2–4 Memory candidates, clear Trait Resonance path, branch tolerance.
-
-## M3 — Runtime foundation
-
-**Exit:** Experiences, Memories, Bond Profile exist in Redux and shadow current gameplay.
-
-## M4 — Essence + Resonance cutover
-
-**Exit:** Willow uses relationship-derived passive generation and assimilation-based Trait Resonance.
-
-## M5 — Playable Willow slice
-
-**Exit:** new player can complete the entire causal loop and explain it.
-
-## M6 — Lyra generalization
-
-**Exit:** adversarial high-Connection/low-Affinity relationship works without generic-system exceptions.
-
----
-
-# 16. Definition of done for the Willow slice
-
-A fresh player can:
-
-1. start New Game;
-2. meet Willow at Connection 0;
-3. discover `WillowsWisdom`;
-4. generate meaningful Relationship Experiences;
-5. form `The Seed Preserved` Memory (on the relevant branch);
-6. deepen qualified Connection without Affinity grinding;
-7. observe Willow's passive Essence contribution strengthen;
-8. spend sustained tether time assimilating the Trait;
-9. create Application evidence through `The Lesson Made Yours`;
-10. Resonate `WillowsWisdom` permanently for Essence;
-11. inspect enough UI evidence to understand why every transition occurred.
-
-The slice fails if its practical player summary is still:
-
-> "I filled the relationship bar and bought the Trait."
-
-The target player summary is:
-
-> "I learned how Willow thinks, demonstrated that understanding, and our relationship became both a stronger source of Essence and the reason her Trait could become part of me."
-
----
-
-# 17. Cross-references
-
-- `../Features/RelationshipExperienceSystem.md`
-- `../Features/MemorySystem.md`
-- `../Features/EssenceResonanceModel.md`
-- `../Narrative/ElderWillowVerticalSlice.md`
-- `../Features/NPCSystem.md`
-- `../Features/EssenceSystem.md`
-- `../Features/TraitSystem.md`
-- `DataModel.md`
-- `StateManagement.md`
+This historical migration plan is useful for understanding why compatibility layers exist, but it no longer describes the repository's current state or next roadmap.

@@ -1,101 +1,86 @@
 # Essence and Resonance Model
 
-**Design Status:** Canonical target design; runtime implementation pending  
-**Scope:** Relationship-derived Essence generation and Trait assimilation/Resonance  
-**Replaces when implemented:** direct `connectionDepth * NPC_CONTRIBUTION_MULTIPLIER` as the complete relationship contribution and `connectionDepth + Essence` as the complete Trait Resonance gate
+**Design status:** Canonical model; substantial runtime implementation exists after M14  
+**Scope:** Relationship-derived Essence generation and relationship-mediated Trait discovery / assimilation / permanent Resonance  
+**Current gap:** broad gameplay exploitation, world-derived Tether, wider Trait migration, and economy balancing
 
 ## 1. Purpose
 
 This document defines how relationship history becomes power without turning meaningful scenes into loot drops.
 
-The system has two separate responsibilities:
+It has two connected responsibilities:
 
-1. **Essence generation:** a continuously accumulating resource produced by meaningful relational connection;
-2. **Trait Resonance:** a transformation process through which the protagonist assimilates and permanently integrates patterns learned through another character.
+1. **Essence generation** — continuously accumulating metaphysical resource produced by meaningful relational significance;
+2. **Trait Resonance** — permanent integration of a capability pattern after it has been discovered and sufficiently internalized.
 
-The central rule is:
+Canonical rule:
 
-> Relationship events change the conditions under which Essence is generated and Traits are assimilated. They do not directly harvest Essence as event rewards.
-
----
+> Relationship events change the conditions under which Essence is generated and Traits can be assimilated. They do not normally mint Essence merely for occurring.
 
 ## 2. Essence ontology
 
-Essence represents the usable metaphysical potential produced by persistent relational significance.
+Essence represents usable metaphysical potential produced by persistent relational significance and other explicitly justified game sources.
 
-Essence is not synonymous with affection, friendship, romance, moral goodness, or consent.
+Essence is not synonymous with:
 
-Meaningful rivalry, dependency, ideological conflict, mentorship, loyalty, fear, admiration, love, betrayal, and shared survival can all contribute to a powerful bond if the relationship has become durable and identity-relevant.
+- affection;
+- friendship;
+- romance;
+- moral goodness;
+- consent;
+- obedience.
 
-This allows the protagonist's early instrumental worldview to function mechanically while preserving room for later discovery that reciprocal bonds can support qualitatively different forms of Resonance.
-
----
+Rivalry, dependency, ideological conflict, mentorship, loyalty, betrayal, mutual leverage, professional reliance, love, or shared survival may all support a powerful bond when the relationship is durable and significant.
 
 ## 3. Rate, not harvest
 
-### 3.1 Canonical rule
-
-Relationship Experiences and Memories do not award discrete Essence merely for occurring.
-
-Incorrect target design:
+Incorrect relationship design:
 
 ```text
-The Seed Preserved
-+420 Essence
+Defining relationship event
+-> +420 Essence
 ```
 
-Correct target design:
+Canonical relationship design:
 
 ```text
-The Seed Preserved
+Defining relationship event
+-> Experience / Memory
 -> Bond Profile changes
--> Resonance Quality changes
--> Willow's ongoing Essence contribution changes
+-> Connection / quality / stability changes
+-> future passive Essence contribution changes
 ```
 
-The visible Essence balance later reflects time spent generating at the new rate.
+Other systems may still award one-time Essence when they provide an independently justified metaphysical/resource source.
 
-### 3.2 Exception boundary
+## 4. Current Relationship Essence formula
 
-Other game systems may still award Essence if there is an independently justified source, but relationship milestones themselves must not be designed as Essence harvest events.
-
-The current `quest_willow_ancient_seed` reward of `100 Essence` is therefore considered a migration target. It should eventually be replaced by a relationship consequence or another non-harvest reward unless the story establishes an independent Essence source.
-
----
-
-## 4. Target Essence contribution formula
-
-For v1 planning and implementation, use:
+For a Relationship-authority source with Essence enabled:
 
 ```text
 NPC Essence Rate
 = Connection Base Rate
-× Resonance Quality
-× Tether Modifier
-× Stability Modifier
+x Resonance Quality
+x Tether Modifier
+x Stability Modifier
 ```
 
-Total passive generation remains:
+Total passive generation:
 
 ```text
-Total Essence Rate
-= Global Base Rate
-+ Sum(NPC Essence Rate)
+Global Base Rate
++ sum(Relationship NPC Essence Rates)
 + Copy contributions
-+ other explicitly authored sources
++ other explicit sources
 ```
 
-This preserves the existing incremental-game economy while making relationship quality matter.
-
----
+This model is implemented in the current Relationship/Essence integration for registered authoring bundles. It is not merely a future replacement for the old `connectionDepth` model.
 
 ## 5. Connection Base Rate
 
-Connection Level provides the basic production potential of a relationship.
+Working values:
 
-Initial balancing values are intentionally provisional:
-
-| Connection Level | Working Base Rate / sec |
+| Connection | Base / sec |
 |---:|---:|
 | 0 | 0.00 |
 | 1 | 0.05 |
@@ -109,308 +94,294 @@ Initial balancing values are intentionally provisional:
 | 9 | 1.55 |
 | 10 | 2.10 |
 
-These values are balancing defaults, not narrative truth. The semantic meaning of Connection Levels is defined in `RelationshipExperienceSystem.md`.
-
----
+These values are balance defaults. The semantic definition of Connection lives in `RelationshipExperienceSystem.md`.
 
 ## 6. Resonance Quality
 
-Resonance Quality represents how strongly the relationship's accumulated history supports meaningful metaphysical coupling.
+Resonance Quality represents how strongly accumulated Relationship history supports meaningful metaphysical coupling.
 
-It is derived from the Bond Profile and Memory evidence rather than stored as an arbitrary author-entered reward.
+The current projection can use:
 
-### 6.1 Initial dimensions
+- Trust;
+- Understanding;
+- Shared Meaning;
+- Reciprocity;
+- landmark Memory evidence.
 
-A simple first-pass derived score may use:
+Affinity is intentionally not the dominant input.
 
-- Understanding
-- Shared Meaning
-- Trust
-- Reciprocity
-- relevant custom dimensions
-- Memory resonance tags
-
-Affinity is intentionally a weak or optional input. Current liking should not dominate deep resonance.
-
-Reliance may contribute strongly to instrumental Bonds but should not be treated as equivalent to mutual understanding.
-
-### 6.2 Working implementation bands
+Working bands:
 
 | Quality | Multiplier | Meaning |
 |---|---:|---|
-| Weak | 0.60× | connection exists but has little coherent shared meaning |
-| Stable | 1.00× | ordinary established bond |
-| Strong | 1.25× | substantial understanding/shared history |
-| Deep | 1.50× | relationship meaning strongly reinforces the connection |
-| Exceptional | 2.00× | rare identity-level or metaphysical resonance |
+| Weak | 0.60x | Connection exists but shared meaning is limited/incoherent |
+| Stable | 1.00x | Established ordinary bond |
+| Strong | 1.25x | Substantial understanding/shared history |
+| Deep | 1.50x | Relationship meaning strongly reinforces the bond |
+| Exceptional | 2.00x | Rare identity-level/metaphysical resonance |
 
-The UI may expose the qualitative band and effective rate without exposing every formula term.
+This quality band is a projection for Essence; it does not replace the multidimensional Bond Profile.
 
----
+## 7. Tether
 
-## 7. Tether Modifier
+Tether represents current relational presence/contact intensity.
 
-Tether models active relational proximity/contact.
+| State | Multiplier |
+|---|---:|
+| Absent | 0.20x |
+| Remote | 0.40x |
+| Nearby | 0.75x |
+| Present | 1.00x |
+| Engaged | 1.25x |
+| Deeply Engaged | 1.50x |
 
-The initial target is:
+### Current implementation boundary
 
-| State | Multiplier | Description |
-|---|---:|---|
-| Absent | 0.20× | no current interaction; only residual established bond flow |
-| Remote | 0.40× | meaningful remote awareness/contact |
-| Nearby | 0.75× | same area/environment |
-| Present | 1.00× | ordinary shared presence |
-| Engaged | 1.25× | active conversation/cooperation/shared task |
-| Deeply Engaged | 1.50× | unusually intense shared attention or resonance activity |
+The states/formula exist and Relationship bundles may declare a starting Tether state. Current production use is bounded/static/authored rather than a complete world-derived presence model.
 
-### 7.1 Distance progression principle
+A later exploration/Tether milestone should derive Tether from facts such as:
 
-Early relationships should depend heavily on proximity. Deeper Connections may reduce the effective penalty of distance.
+- player/NPC location;
+- active conversation;
+- shared quest/task;
+- travel/co-presence;
+- remote contact.
 
-The exact distance curve is deferred until the basic vertical slice works.
+Do not pretend the current starting state is a complete proximity simulation.
 
----
+## 8. Stability
 
-## 8. Stability Modifier
+Stability represents whether the current Bond state is coherent enough to sustain its expected flow.
 
-Stability represents whether the current Bond Profile is coherent enough to sustain its expected flow.
+| State | Multiplier |
+|---|---:|
+| Ruptured | 0.25x |
+| Contested | 0.65x |
+| Strained | 0.85x |
+| Stable | 1.00x |
+| Reinforced | 1.10x |
 
-| State | Multiplier | Meaning |
-|---|---:|---|
-| Ruptured | 0.25× | bond remains historically significant but currently destabilized |
-| Contested | 0.65× | serious contradiction, betrayal, or unresolved tension |
-| Strained | 0.85× | active friction without structural rupture |
-| Stable | 1.00× | coherent current relationship |
-| Reinforced | 1.10× | recently affirmed by meaningful Experience or Memory |
+Stability is not a morality score.
 
-Stability should respond to relationship events; it is not a morality score.
+## 9. Trait lifecycle
 
----
-
-## 9. Trait lifecycle target
-
-The existing Discover -> Equip -> Resonate lifecycle remains valid, but Resonance gains an assimilation stage.
-
-Target lifecycle:
+For relationship-mediated Traits, the runtime already supports the conceptual lifecycle:
 
 ```text
 Discover
-  -> Equip / Attune temporarily
-  -> Accumulate relevant Experiences
-  -> Form qualifying Memories
-  -> Assimilate through sustained tether/contact
-  -> Meet Resonance qualification
-  -> Spend Essence
-  -> Permanent Trait integration
+-> temporarily Equip / Attune
+-> accumulate assimilation + compatibility evidence
+-> form qualifying Memory evidence
+-> meet Relationship Connection requirement
+-> satisfy prerequisites
+-> spend Essence
+-> record authored final Resonance Experience
+-> permanent Trait integration
 ```
 
-Temporary equipping remains mechanically useful because it allows the protagonist to experience a pattern before permanently integrating it.
+The earlier design framing that assimilation was wholly future work is obsolete.
 
----
+## 10. Relationship-mediated Trait metadata
 
-## 10. Trait semantic profile
-
-Traits sourced from NPCs should eventually support metadata such as:
+Current Trait definitions may declare optional metadata such as:
 
 ```text
-resonanceTags: [Wisdom, Patience, PatternRecognition]
-sourceNpc: npc_elder_willow
-minimumConnectionLevel: 2
-requiredMemoryTags: [Application]
-assimilationDifficulty: 1.0
+discoveryMode
+sourceNpc
+minimumConnectionLevel
+resonanceTags
+requiredMemoryTags
+assimilationDifficulty
+assimilationThreshold
+minimumCompatibility
+resonanceExperienceId
 ```
 
-Not every Trait needs all fields. The model should allow simple Traits to remain simple.
-
----
+The fields remain optional so legacy/simple Traits do not require unnecessary complexity.
 
 ## 11. Assimilation
 
-Assimilation is progress toward genuinely internalizing a Trait pattern.
+Assimilation represents progress toward reproducing/internalizing a Trait pattern.
 
-A planning formula is:
+Current migrated slices use authored Relationship Experience effects to advance assimilation and compatibility.
+
+A future richer time/proximity model may use a formula resembling:
 
 ```text
-Assimilation per hour
-= Trait Baseline
-× Connection Multiplier
-× Compatibility Multiplier
-× Tether Modifier
-× Memory Evidence Modifier
+Assimilation rate
+= Trait baseline
+x Connection modifier
+x compatibility
+x Tether
+x Memory evidence
 ```
 
-### 11.1 Trait Baseline
+But this more continuous formula is **not required to claim that assimilation exists today**.
 
-Represents inherent difficulty or complexity.
-
-### 11.2 Connection Multiplier
-
-Higher qualified Connection makes sustained attunement more effective.
-
-### 11.3 Compatibility Multiplier
-
-Derived from alignment between Trait `resonanceTags` and the relationship's accumulated Experience/Memory tags.
-
-### 11.4 Tether Modifier
-
-Requires actual contact/proximity in early and mid progression. A high-intensity Experience can improve future assimilation conditions but does not substitute for all tether time.
-
-### 11.5 Memory Evidence Modifier
-
-Qualifying Memories provide evidence that the protagonist has done more than merely observe the Trait.
-
----
+The current bounded authored approach is already production-qualified for Willow/Elara.
 
 ## 12. Resonance qualification
 
-A sourced Trait may become permanently Resonatable when all authored requirements are met.
+A migrated sourced Trait may require:
 
-Canonical categories of requirement:
+1. **Discovery** — the protagonist recognizes the pattern;
+2. **Connection** — sufficient qualified Relationship Connection;
+3. **Assimilation** — sufficient learning progress;
+4. **Compatibility** — sufficient pattern fit;
+5. **Evidence** — required Memory/resonance tags;
+6. **Prerequisites** — any Trait-specific dependencies;
+7. **Essence** — enough spendable resource;
+8. **Final authored event** — where configured, a valid final Resonance Experience.
 
-1. **Discovery:** the protagonist knows the Trait exists;
-2. **Connection:** minimum qualified Connection Level;
-3. **Assimilation:** sufficient assimilation progress;
-4. **Evidence:** required Memory or resonance-tag evidence;
-5. **Essence:** sufficient spendable Essence;
-6. **Prerequisites:** any explicit Trait prerequisites.
+The UI should explain these gates at an appropriate abstraction level.
 
-The precise requirements should be visible to the player at an appropriate level of abstraction.
+## 13. Willow's Wisdom — implemented reference
 
----
+`WillowsWisdom` is a production relationship-mediated Trait.
 
-## 13. Willow's Wisdom target profile
-
-Initial authored target:
-
-```text
-Trait: Willow's Wisdom
-Source: npc_elder_willow
-Essence Cost: 40
-Minimum Connection Level: 2
-Assimilation Threshold: 100%
-Resonance Tags:
-  Wisdom
-  Patience
-  Stewardship
-  Understanding
-  Application
-
-Required Evidence:
-  at least one Memory tagged Application
-
-Strong Supporting Memories:
-  The Seed Preserved
-  The Lesson Made Yours
-```
-
-`The Lesson Made Yours` is the cleanest evidence because it proves independent use of Willow's underlying pattern rather than passive agreement.
-
-The current `essenceCost: 40` may be retained for the first implementation to reduce balancing churn.
-
----
-
-## 14. Instrumental vs reciprocal Bonds
-
-Both can generate substantial Essence.
-
-The distinction should initially appear through the Bond Profile rather than a hidden moral modifier.
-
-Example instrumental profile:
+Current canonical path includes:
 
 ```text
-Trust: 65
-Understanding: 70
-Shared Meaning: 55
-Reliance: 90
-Vulnerability: 20
-Reciprocity: 15
+The First Lesson
+-> discovery + initial assimilation
+
+Three Nights of Teaching
+-> sustained practice
+
+The Lesson Made Yours
+-> independent application / qualifying evidence
+
+qualified Connection + assimilation + compatibility + Memory + Essence
+-> final Resonance
+-> permanent Willow's Wisdom
 ```
 
-Example reciprocal profile:
+This is not a future-only target; it is an implemented/qualified reference slice.
+
+## 14. Scholarly Insight — second implemented reference
+
+`ScholarlyInsight` provides a second relationship-mediated Trait proof through Elara.
+
+Its semantic pattern is evidence-first model revision rather than passive agreement.
+
+The presence of two production examples means the next highest-value unknown is no longer simply “can assimilation exist?”
+
+The stronger product question is:
+
+> Does a Relationship-derived Trait materially change how the player solves a gameplay problem?
+
+## 15. Instrumental vs. reciprocal Bonds
+
+Both instrumental and reciprocal Relationships may generate substantial Essence.
+
+Differences should emerge from actual Bond dimensions/evidence rather than a hidden universal authenticity multiplier.
+
+Example instrumental pattern:
 
 ```text
-Trust: 80
-Understanding: 85
-Shared Meaning: 85
-Reliance: 55
-Vulnerability: 70
-Reciprocity: 80
+high Reliance
+high Understanding
+moderate Trust
+low Reciprocity
+low voluntary Vulnerability
 ```
 
-Both may generate strong Essence. Later high-order mechanics may require qualities such as Reciprocity or mutual Vulnerability and therefore become unavailable to purely extractive Bonds.
-
-This is the target mechanism behind the existing narrative claim that authentic bonds have qualitatively different signatures.
-
----
-
-## 15. Player-facing explanations
-
-The UI should answer `why?` without requiring the player to inspect formulas.
-
-Example:
+Example reciprocal pattern:
 
 ```text
-Elder Willow
-Connection II — Familiar
-Essence Resonance: Strong
-Contribution: 0.13 / sec
-
-Why:
-+ Strong mutual understanding
-+ The Seed Preserved remains a defining shared memory
-+ Currently in active conversation
+high Understanding
+high Shared Meaning
+high Trust
+high Reciprocity
+high voluntary Vulnerability
 ```
 
-Trait example:
+Later capabilities may require specific qualities where thematically/mechanically appropriate.
+
+## 16. Player-facing explanation
+
+The player should be able to answer:
+
+### Why is this Relationship producing this Essence rate?
+
+Useful explanation:
 
 ```text
-Willow's Wisdom
-Assimilation: 72%
-
-Ready:
-[x] Trait discovered
-[x] Connection II
-[x] Relevant shared memory
-[ ] Assimilation complete
-[x] 40 Essence available
+Connection base
+Resonance Quality
+Tether
+Stability
+Effective contribution
 ```
 
----
+### Why can/can't this Trait be Resonated?
 
-## 16. Invariants
+Useful explanation:
+
+```text
+[x] discovered
+[x] Connection requirement
+[x] Memory evidence
+[ ] assimilation complete
+[x] compatibility
+[x] Essence available
+```
+
+## 17. Current implementation status
+
+| Capability | Status |
+|---|---|
+| Relationship-derived Essence formula | Implemented for enabled Relationship bundles |
+| Bond-derived quality/stability inputs | Implemented/qualified in Relationship runtime |
+| Tether states/modifier | Implemented as bounded/static/authored input |
+| World-derived Tether | Not implemented |
+| Authored Trait discovery | Implemented for Willow/Elara |
+| Trait assimilation/compatibility | Implemented for Willow/Elara |
+| Memory-based Resonance evidence | Implemented for Willow/Elara |
+| Permanent Essence spend after qualification | Implemented |
+| Broad migration of all Traits | Not implemented |
+| Trait-driven gameplay payoff | Major remaining gap |
+| Offline assimilation/progression | Not implemented |
+
+## 18. Invariants
 
 1. Relationship Experiences do not directly mint Essence as their default reward.
 2. Connection Level alone does not fully determine Essence output.
 3. Current Affinity alone does not determine Resonance Quality.
-4. High-intensity events cannot bypass all required assimilation time.
-5. Trait Resonance is not merely a currency purchase.
-6. Memory evidence must correspond to authored narrative events.
-7. Manipulative Bonds remain mechanically viable.
-8. Reciprocal Bonds may later unlock qualitatively different outcomes rather than receiving a universal flat bonus.
-9. The player should be able to understand why a Trait is or is not Resonatable.
-10. Balancing constants may change without changing the ontology.
+4. Trait Resonance is not merely a currency purchase for migrated Traits.
+5. Discovery does not imply mastery.
+6. Memory evidence must correspond to authored history.
+7. Manipulative/instrumental Bonds remain mechanically viable.
+8. Reciprocal Bonds may unlock qualitatively different outcomes only when explicit mechanics require those qualities.
+9. The player should understand why a Trait is or is not ready for permanent Resonance.
+10. Balance constants may change without changing the ontology.
+11. Current authored/static Tether must not be overstated as world simulation.
+12. Legacy `connectionDepth` gates may remain for unmigrated Traits but are compatibility behavior, not the new design rule.
 
----
+## 19. Migration / roadmap notes
 
-## 17. Migration notes
+The following older claims are obsolete:
 
-Current runtime behavior remains valid until explicitly migrated:
+- that Relationship-derived Essence is wholly unimplemented;
+- that Trait assimilation is wholly unimplemented;
+- that all NPC Essence is a live `connectionDepth x multiplier` formula;
+- that all Trait Resonance is only `connectionDepth + Essence`.
 
-- Essence currently uses `BASE_RATE + sum(connectionDepth * NPC_CONTRIBUTION_MULTIPLIER)`;
-- Trait Resonance currently checks Essence and minimum `connectionDepth`;
-- some quests currently award one-time Essence.
+Current remaining migration/product work is instead:
 
-These are implementation facts, not the target design defined here.
+- broader Trait migration;
+- Trait-driven gameplay use;
+- world-derived Tether;
+- offline progression;
+- economy balancing and explainability;
+- Copy/world integration.
 
-See `../Technical/RelationshipSystemMigrationPlan.md` for sequencing.
+## 20. Cross-references
 
----
-
-## 18. Cross-references
-
+- `../Technical/PostM14ProductReconciliation.md`
 - `RelationshipExperienceSystem.md`
 - `MemorySystem.md`
 - `TraitSystem.md`
 - `EssenceSystem.md`
-- `../Narrative/ElderWillowVerticalSlice.md`
-- `../Technical/RelationshipSystemMigrationPlan.md`
+- `QuestSystem.md`
+- milestone qualification documents under `../Technical/`

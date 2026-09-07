@@ -1,179 +1,226 @@
-# React Incremental RPG Prototype - Technical Specification
+# React Incremental RPG Prototype — Technical Specification
 
-This specification documents the design, architecture, and implementation details for the React Incremental RPG Prototype. The game is built using modern React development practices with Redux Toolkit state management, Material-UI components, and TypeScript for type safety.
+This specification documents the design, architecture, implementation status, and empirical qualification history of the React Incremental RPG Prototype.
 
-## 📋 Project Overview
+The project uses React, TypeScript, Redux Toolkit, Material UI, listener middleware, data-driven content, save migration, and focused behavioral qualification.
 
-The React Incremental RPG Prototype is an incremental/idle game featuring emotional connections, trait acquisition, and character progression. Players establish relationships with NPCs, acquire traits, and create copies while managing essence as the core resource.
+## Product authority after M14
 
-### 🎯 Core Game Loop
-1. **Establish Emotional Connections** with NPCs through interaction
-2. **Generate Essence** passively based on connection depth
-3. **Acquire Traits** from NPCs using Essence
-4. **Enhance Character** through trait permanence and attribute progression
-5. **Create Copies** through seduction mechanics for extended influence
+Read [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) before extending relationship, Trait, Essence, Copy, narrative, or world progression.
 
-## 🏗️ Architecture Overview
+The canonical product rule is no longer:
 
-### Technology Stack
-- **Frontend Framework**: React 18+ with TypeScript
-- **State Management**: Redux Toolkit (slices, thunks, selectors, listener middleware)
-- **UI Framework**: Material-UI (MUI) with custom theming
-- **Styling**: CSS Modules + Material-UI sx prop system
-- **Routing**: React Router v6 with centralized `AppRouter` and `GameLayout` delegation for `/game/*`
-- **Build Tool**: Create React App with TypeScript template
-
-### Design Patterns
-- **Feature-Sliced Design**: Modular architecture by feature domain
-- **Container/Component Pattern**: Separation of logic and presentation
-- **Redux Toolkit**: Modern Redux with createSlice and createAsyncThunk
-- **Custom Hooks**: Reusable logic extraction and state management
-
-## 📁 Specification Structure
-
-### Requirements Documentation
-- **[Functional Requirements](Requirements/FunctionalRequirements.md)** - What the system should do
-- **[Non-Functional Requirements](Requirements/NonFunctionalRequirements.md)** - How the system should perform
-
-### Technical Documentation
-- **[Architecture Overview](Technical/ArchitectureOverview.md)** - System architecture and technology decisions
-- **[State Management](Technical/StateManagement.md)** - Redux patterns and state organization
-- **[Data Model](Technical/DataModel.md)** - Core data structures and relationships
-
-### UI/UX Documentation
-- **[User Flows](UI_UX/UserFlows.md)** - User interaction patterns and navigation flows
-- **[Layout Design](UI_UX/LayoutDesign.md)** - Interface structure and responsive design
-- **[Component Specification](UI_UX/ComponentSpecification.md)** - UI component library and design system
-
-### Feature Specifications
-- **[Game Design Document](GameDesignDocument.md)** - High-level game design and mechanics
-- **[Player System](Features/PlayerSystem.md)** - Character stats, attributes, and progression ✅ **COMPLETE**
-- **[Trait System](Features/TraitSystem.md)** - Trait acquisition, management, and effects ✅ **COMPLETE** (includes resonance gating by intimacy via `TRAIT_RESONANCE.MIN_CONNECTION_DEPTH`)
-- **[NPC System](Features/NPCSystem.md)** - Non-player character interactions and relationships ✅ **COMPLETE**
-- **[Essence System](Features/EssenceSystem.md)** - Core resource generation and consumption ✅ **COMPLETE**
-- **[GameLoop System](Features/GameLoopSystem.md)** - Time management and game progression ✅ **COMPLETE**
-- **[Settings System](Features/SettingsSystem.md)** - Game configuration and preferences ✅ **COMPLETE**
-- **[Save/Load System](Features/SaveLoadSystem.md)** - Game state persistence and import/export ✅ **COMPLETE**
-- **[Quest System](Features/QuestSystem.md)** - Objective and narrative progression � **EXPANDED FOUNDATION**
-	- Status: ✅ Expanded foundation (slice, selectors, thunks, timers, puzzle modal, basic QuestLog UI)
-- **[Copy System](Features/CopySystem.md)** - Character duplication and management ✅ BASIC UI/STATE + TRAIT SHARING AUTO‑SYNC
-
-### Narrative Documentation (NEW)
-- **[Synopsis](Narrative/Synopsis.md)** – Macro plot beats & act structure
-- **[Characters](Narrative/Characters.md)** – Bios, arcs, mechanical hooks
-- **[World Lore](Narrative/WorldLore.md)** – Cosmology, factions, relic taxonomy, ethical axes
-These documents ground mechanical systems (Essence, Traits, Copies, Quests) in consistent narrative context and should be updated when story-driven mechanics evolve.
-
-## ⚠️ Project Constraints (Prototype Phase)
-
-- Automated tests are intentionally out of scope for this prototype. See Non-Functional Requirements → NFR-QA: Testing Policy (NFR-QA-001).
-
-## ✅ Implementation Status
-
-### Completed Systems
-- **✅ Player System**: Full character management with stats, attributes, traits, and progression tracking
-- **✅ Trait System**: Complete trait acquisition, equipment, permanence, and codex management
-- **✅ NPC System**: Comprehensive relationship management with tabbed interaction interface
-- **✅ Essence System**: Resource generation, consumption, and statistics tracking
-- **✅ GameLoop System**: Time-based progression with speed controls and auto-save
-- **✅ Settings System**: Configuration management with immediate persistence
-- **✅ Save/Load System**: Game state persistence with import/export functionality
-
-### User Interface Achievements
-- **✅ Navigation System**: Complete VerticalNavBar with responsive design
-- **✅ Page Shell Architecture**: Unified MainContentArea with routing
-- **✅ Component Library**: Reusable UI components with accessibility compliance
-- **✅ Responsive Design**: Mobile-first approach with Material-UI Grid system
-- **✅ Accessibility**: WCAG 2.1 AA compliance throughout interface
-
-### State Management Excellence
-- **✅ Redux Architecture**: Feature-sliced Redux with TypeScript integration
-- **✅ Async Operations**: Comprehensive thunk implementation for complex operations
-- **✅ Memoized Selectors**: Performance-optimized state access patterns
-- **✅ Type Safety**: Complete TypeScript integration with strict mode
-
-## 🎨 Design System
-
-### Material-UI Integration
-- **Color System**: Semantic colors for different UI states and meanings
-- **Typography**: Consistent text hierarchy using MUI Typography variants
-- **Spacing**: MUI spacing system for consistent layouts
-- **Icons**: Semantic iconography throughout interface
-- **Responsive Grid**: Breakpoint-based responsive design
-
-### Accessibility Standards
-- **Keyboard Navigation**: Full keyboard support for all interactions
-- **Screen Reader Support**: Comprehensive ARIA labeling and semantic HTML
-- **High Contrast**: Support for high contrast themes and color independence
-- **Touch Targets**: Minimum 44px touch targets for mobile accessibility
-
-## 🔄 Development Workflow
-
-### Code Quality Standards
-- **TypeScript**: Strict mode with comprehensive type definitions
-- **ESLint/Prettier**: Automated code formatting and style enforcement
-- **Component Testing**: React Testing Library for component behavior testing
-- **Performance**: React.memo, useCallback, and useMemo optimization patterns
-
-### Feature Development Process
-1. **Specification**: Document requirements and design in specification folder
-2. **State Design**: Define Redux slice, types, and selectors
-3. **Component Architecture**: Create container and UI components
-4. **Integration**: Connect components to state and implement interactions
-5. **Testing**: (Prototype note) Automated tests deferred; rely on manual QA checklist and runtime validation
-6. **Documentation**: Update specification with implementation status
-
-## 🚀 Getting Started
-
-### Development Setup
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-
-# Run tests
-npm test
-
-# Build for production
-npm run build
+```text
+Affinity reaches threshold
+-> connectionDepth increases
 ```
 
-### Project Structure
+For Relationship-authority content the current model is:
+
+```text
+Story / gameplay event
+-> Relationship Experience
+-> Bond-dimension changes
+-> optional Memory
+-> Connection Progress + semantic qualification
+-> Bond Profile
+-> Essence / Trait / story consequences
 ```
+
+Legacy `affinity` and `connectionDepth` fields remain valid compatibility surfaces where deliberately retained, but they are not the product model for new Relationship-authority content.
+
+## Core game loop
+
+```text
+Discover person / problem
+-> participate in meaningful event
+-> create Relationship evidence
+-> change Bond / Connection
+-> change passive Essence and Trait-learning conditions
+-> learn / equip / Resonate capability
+-> use capability in gameplay
+-> create story / world consequence
+-> other characters interpret the result
+-> create new Relationship evidence
+-> eventually automate routine work through Copies
+```
+
+## Architecture overview
+
+### Technology stack
+
+- **Frontend:** React 18+ with TypeScript
+- **State:** Redux Toolkit slices, thunks, selectors, listener middleware
+- **UI:** Material UI
+- **Routing:** React Router v6
+- **Build:** Create React App toolchain
+- **Persistence:** versioned save/load with migration and import/export
+- **Qualification:** TypeScript, focused behavioral tests, accumulated milestone gates, production build
+
+### Design patterns
+
+- feature-sliced organization;
+- container/presentation separation where useful;
+- data-driven authored content;
+- generic runtime contracts before NPC-specific exceptions;
+- exact-head qualification for milestone PRs;
+- explicit evidence ceilings on experimental claims.
+
+## Specification structure
+
+### Product / reconciliation
+
+- [`GameDesignDocument.md`](GameDesignDocument.md) — current product vision and gameplay loop
+- [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) — current authority map, migration status, and roadmap correction
+
+### Core feature specifications
+
+- [`Features/RelationshipExperienceSystem.md`](Features/RelationshipExperienceSystem.md) — Relationship Experiences, Memories, Bond dimensions, Connection
+- [`Features/MemorySystem.md`](Features/MemorySystem.md) — landmark relational evidence
+- [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — relationship-to-power ontology
+- [`Features/EssenceSystem.md`](Features/EssenceSystem.md) — current passive Essence runtime
+- [`Features/TraitSystem.md`](Features/TraitSystem.md) — discovery, equip, assimilation, Resonance
+- [`Features/NPCSystem.md`](Features/NPCSystem.md) — NPC identity/services/dialogue/quest integration and legacy compatibility boundary
+- [`Features/QuestSystem.md`](Features/QuestSystem.md) — quest lifecycle and authored resolution choices
+- [`Features/CopySystem.md`](Features/CopySystem.md) — Copy growth, loyalty, Trait sharing, roles/tasks
+- [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) — real-time progression and autosave
+- [`Features/CombatSystem_MVP.md`](Features/CombatSystem_MVP.md) — current combat event-bus scaffold
+
+### Technical documentation
+
+- [`Technical/ArchitectureOverview.md`](Technical/ArchitectureOverview.md)
+- [`Technical/StateManagement.md`](Technical/StateManagement.md)
+- [`Technical/DataModel.md`](Technical/DataModel.md)
+- Relationship migration/qualification records under `Technical/`
+
+### UI / UX
+
+- [`UI_UX/UserFlows.md`](UI_UX/UserFlows.md)
+- [`UI_UX/LayoutDesign.md`](UI_UX/LayoutDesign.md)
+- [`UI_UX/ComponentSpecification.md`](UI_UX/ComponentSpecification.md)
+
+### Narrative
+
+- [`Narrative/Synopsis.md`](Narrative/Synopsis.md) — macro plot and act structure
+- [`Narrative/Characters.md`](Narrative/Characters.md) — character bios and arcs
+- [`Narrative/WorldLore.md`](Narrative/WorldLore.md) — factions, cosmology, relics, setting hooks
+
+## Current implementation status after M14
+
+| Area | Status | Notes |
+|---|---|---|
+| Player | Strong foundation | stats/loadout/progression infrastructure exists |
+| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated M4-M14 evidence |
+| Relationship Connection authority | Qualified for registered bundles | legacy NPC compatibility remains |
+| Essence | Functional + Relationship-derived contributions | world-derived Tether and broad economy work remain |
+| Traits | Core + relationship-mediated discovery/assimilation | Willow/Elara qualified; broader gameplay payoff needed |
+| Quest | Expanded foundation | richer graphs/maps/authoring/campaign presentation deferred |
+| Narrative integration | Bounded qualified slices | M13 causal loop; M14 multi-NPC shared consequence |
+| Copy | Substantial partial implementation | growth/loyalty/Traits/roles exist; production automation depth remains |
+| GameLoop | Implemented | offline progress deferred |
+| Save/load | Implemented + migration qualification | accumulated Relationship/Trait/save tests active |
+| Combat | Scaffold only | event bus; no real encounter loop yet |
+| Exploration | Partial | no complete player-facing travel/world layer yet |
+| Faction / world state | Partial concepts | dedicated authority still future work |
+
+## Qualification history
+
+The Relationship redesign is no longer a purely planned architecture.
+
+Key milestones:
+
+- **M4-M10:** core Relationship migration, Memories, Trait evidence, save migration/reconciliation;
+- **M11:** Lyra adversarial universality;
+- **M12:** production authoring scalability across Gronk/Silas/Valerius;
+- **M13:** persisted Relationship evidence causes later story;
+- **M14:** one shared decision creates distinct/conflicting consequences across multiple NPC relationships.
+
+Milestone qualification is documented under `Technical/` and exercised in Build Validation.
+
+## Testing policy
+
+The old prototype rule that automated tests were intentionally out of scope is obsolete.
+
+Current milestone work should preserve:
+
+1. TypeScript correctness;
+2. focused behavioral tests for the changed capability;
+3. accumulated Relationship/Trait/save migration qualification;
+4. production build;
+5. exact-head PR qualification before merge when operating under the milestone workflow.
+
+Do not remove prior gates merely because a new milestone focuses on another subsystem.
+
+## Near-term development direction
+
+The immediate next code-bearing milestone is **M15 — Long-Horizon Relationship Callback Qualification**.
+
+The post-M14 audit also corrected a draft-roadmap assumption: relationship-mediated Trait assimilation is already implemented for Willow and Elara. After M15, the highest-value payoff is therefore to prove that a Relationship-derived Trait materially changes gameplay, then build outward into combat, exploration, Tether, Copy automation, offline progress, social knowledge, factions, world state, and finally a complete chapter vertical slice.
+
+## Development workflow
+
+For milestone work:
+
+```text
+verify current main
+-> freeze baseline SHA/tree
+-> create dedicated branch
+-> preregister question / acceptance / falsification
+-> recon existing capability
+-> implement smallest production proof
+-> add focused qualification
+-> run accumulated CI + production build
+-> record results + evidence ceiling
+-> requalify documentation-complete head
+-> merge exact qualified SHA
+-> verify main
+-> stop at milestone boundary
+```
+
+## Repository structure
+
+```text
 src/
-├── app/                 # Redux store configuration
-├── features/           # Feature-sliced modules
-│   ├── Player/        # Player character management
-│   ├── Traits/        # Trait system implementation
-│   ├── NPCs/          # NPC interaction system
-│   ├── Essence/       # Resource management
-│   ├── GameLoop/      # Time and progression
-│   └── Settings/      # Configuration management
-├── shared/            # Reusable utilities and components
-├── pages/             # Top-level page components
-├── routes/            # Routing configuration
-└── layout/            # Global layout components
+├── app/
+├── features/
+│   ├── Relationships/
+│   ├── Player/
+│   ├── Traits/
+│   ├── NPCs/
+│   ├── Quest/
+│   ├── Essence/
+│   ├── Copy/
+│   ├── Combat/
+│   ├── GameLoop/
+│   └── Settings/
+├── shared/
+├── pages/
+├── routes/
+└── layout/
+
+public/data/
+├── relationships/
+├── dialogues.json
+├── quests.json
+└── npcs.json
+
+specification/
+├── Features/
+├── Narrative/
+├── Technical/
+└── UI_UX/
 ```
 
-## 📝 Contributing
+## Canonical conflict rule
 
-When contributing to this project:
+When an older specification conflicts with the post-M14 authority chain, do not silently revive the old behavior as design truth.
 
-1. **Follow Specifications**: Reference relevant specification documents
-2. **Maintain Architecture**: Adhere to Feature-Sliced Design principles
-3. **Type Safety**: Ensure comprehensive TypeScript coverage
-4. **Accessibility**: Maintain WCAG 2.1 AA compliance
-5. **Performance**: Apply optimization patterns consistently
-6. **Documentation**: Update specifications with implementation changes
+Use this reading order:
 
-## 🔗 Related Documentation
+1. `Technical/PostM14ProductReconciliation.md`;
+2. `GameDesignDocument.md`;
+3. `Features/RelationshipExperienceSystem.md` / `EssenceResonanceModel.md`;
+4. the relevant current feature spec;
+5. milestone-specific qualification evidence.
 
-- **[React Best Practices](../docs/ReactBestPractices.md)** - Development guidelines and patterns
-- **[Testing Strategy](../docs/TestingStrategy.md)** - Testing approaches and standards
-- **[Deployment Guide](../docs/DeploymentGuide.md)** - Production deployment procedures
-
----
-
-This specification provides comprehensive documentation for the React Incremental RPG Prototype, covering all aspects from high-level design to implementation details. The modular specification structure supports iterative development while maintaining consistency and quality standards.
+If the runtime still uses a legacy rule, document it as compatibility/migration debt and migrate it deliberately rather than pretending it is the modern product model.

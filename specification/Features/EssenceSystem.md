@@ -1,58 +1,66 @@
 # Essence System Specification
 
-**Implementation Status:** ✅ State + passive generation + M4 Willow relationship contribution  
-**Migration status:** Willow uses the new Bond-derived NPC source; unmigrated NPCs do not currently contribute through a legacy `connectionDepth` formula.
+**Status:** Implemented state/passive generation with Relationship-derived sources and Copy contributions; reconciled after M14  
+**Canonical model:** See `EssenceResonanceModel.md` and `../Technical/PostM14ProductReconciliation.md`.
 
 Essence is the game's core metaphysical resource representing accumulated capacity for influence, growth, and permanent Trait Resonance.
 
 ## 1. Current authoritative runtime
 
-The current passive generation rate is calculated in `src/features/Essence/state/EssenceThunks.ts#updateEssenceGenerationRateThunk` as:
+The passive generation pipeline combines:
 
 ```text
-Total Rate
+Total Essence Rate
 = global base rate
-+ Σ(explicitly migrated Relationship contributions)
++ sum(enabled Relationship-derived NPC contributions)
 + qualifying Copy contributions
++ other explicitly implemented sources
 ```
 
-This is the authoritative description of current code.
-
-### Important historical drift
-
-Older revisions of this document described:
+The old product description:
 
 ```text
-BASE_RATE + Σ(connectionDepth × NPC_CONTRIBUTION_MULTIPLIER)
+sum(all NPC connectionDepth x multiplier)
 ```
 
-as implemented runtime behavior. That formula was no longer present when the relationship migration began. `NPC_CONTRIBUTION_MULTIPLIER` still exists as a legacy constant, but the pre-M4 generation thunk calculated only base + qualifying Copies.
+is not the modern Relationship authority and must not be reintroduced as the generic source model.
 
-M4 therefore **introduces** the first current relationship-derived NPC contribution through Elder Willow rather than replacing a live legacy NPC source.
+Legacy constants/fields may remain for compatibility, but migrated Relationship bundles provide their own explicit contribution contract.
 
 ## 2. Global base generation
 
-`ESSENCE_GENERATION.BASE_RATE_PER_SECOND` remains active.
+`ESSENCE_GENERATION.BASE_RATE_PER_SECOND` provides a non-zero prototype floor independent of Relationships.
 
-The base provides a non-zero prototype floor independent of relationships. It is intentionally preserved during migration so relationship-system validation does not simultaneously rebalance the entire early economy.
+The base rate remains useful while the wider economy is still being balanced.
 
 ## 3. Relationship-derived generation
 
-Only NPCs whose `RelationshipProgressionDefinition` explicitly enables relationship Essence participate in this source.
+A Relationship bundle may enable Essence in its `RelationshipProgressionDefinition`.
 
-Elder Willow is the first migrated NPC.
+The post-M14 authoring manifest includes:
+
+- Elder Willow;
+- Lyra;
+- Elara;
+- Gronk;
+- Silas;
+- Valerius.
+
+These production Relationships use `connectionAuthority = relationships`, and their authoring can enable Relationship-derived Essence without depending on legacy NPC `connectionDepth` as the semantic source.
 
 ### Formula
 
 ```text
 NPC Essence Rate
 = Connection Base Rate
-× Resonance Quality Multiplier
-× Tether Modifier
-× Stability Modifier
+x Resonance Quality Multiplier
+x Tether Modifier
+x Stability Modifier
 ```
 
 ### Connection Base Rate
+
+Working values:
 
 | Connection | Base / sec |
 |---:|---:|
@@ -68,9 +76,11 @@ NPC Essence Rate
 | 9 | 1.55 |
 | 10 | 2.10 |
 
+These are balance constants, not the semantic definition of Connection.
+
 ### Resonance Quality
 
-The current M4 implementation derives a simple, explainable quality score from:
+The implemented projection uses Bond information including:
 
 - Trust;
 - Understanding;
@@ -78,145 +88,173 @@ The current M4 implementation derives a simple, explainable quality score from:
 - Reciprocity;
 - landmark Memory evidence.
 
-The score maps to bands:
+Working bands:
 
 | Quality | Multiplier |
 |---|---:|
-| Weak | 0.60× |
-| Stable | 1.00× |
-| Strong | 1.25× |
-| Deep | 1.50× |
-| Exceptional | 2.00× |
+| Weak | 0.60x |
+| Stable | 1.00x |
+| Strong | 1.25x |
+| Deep | 1.50x |
+| Exceptional | 2.00x |
 
-This is deliberately an initial transparent projection, not a claim that all future relationship quality should reduce to one scalar.
+Low Affinity does not imply zero Resonance Quality.
 
 ### Tether
 
+The model supports:
+
 | Tether | Multiplier |
 |---|---:|
-| Absent | 0.20× |
-| Remote | 0.40× |
-| Nearby | 0.75× |
-| Present | 1.00× |
-| Engaged | 1.25× |
-| Deeply Engaged | 1.50× |
+| Absent | 0.20x |
+| Remote | 0.40x |
+| Nearby | 0.75x |
+| Present | 1.00x |
+| Engaged | 1.25x |
+| Deeply Engaged | 1.50x |
 
-For the Willow vertical slice, authored teaching sessions provide bounded tether/assimilation evidence. Robust world-location tether simulation remains deferred.
+Current production use is still bounded/static/authored rather than a full world-derived presence simulation. Relationship bundles can declare a starting Tether state, and authored teaching/engagement can provide bounded evidence.
+
+A future world/travel milestone should derive Tether from location/presence/activity instead of treating these current defaults as the final simulation.
 
 ### Stability
 
+Working states:
+
 | Stability | Multiplier |
 |---|---:|
-| Ruptured | 0.25× |
-| Contested | 0.65× |
-| Strained | 0.85× |
-| Stable | 1.00× |
-| Reinforced | 1.10× |
+| Ruptured | 0.25x |
+| Contested | 0.65x |
+| Strained | 0.85x |
+| Stable | 1.00x |
+| Reinforced | 1.10x |
 
-A hostile or strained relationship may therefore remain Essence-productive if it is consequential and resonant; low Affinity is not equivalent to zero Connection.
+Stability is relational coherence, not morality.
 
-## 4. Copy contribution
+## 4. Rate, not harvest
 
-Qualifying Copies continue to add their existing contribution through `calculateCopyEssenceGeneration`.
+Relationship Experiences and Memories normally change the conditions under which Essence is generated.
 
-M4 does not redesign Copy progression or its Essence semantics.
+Correct relationship pattern:
+
+```text
+meaningful event
+-> Relationship Experience
+-> Bond / Connection / quality change
+-> future Essence rate changes
+```
+
+Not:
+
+```text
+meaningful relationship event
+-> arbitrary one-time Essence loot
+```
+
+A non-relationship game system may still award one-time Essence when independently justified by its own resource/event semantics.
 
 ## 5. Passive accrual
 
-`processPassiveGenerationThunk` accrues:
+Passive generation uses elapsed game time while the GameLoop is running and not paused:
 
 ```text
-generated = generationRate × elapsedTime
+generated = generationRate x elapsedTime
 ```
 
-while the game loop is running and not paused.
+Offline progression remains a future capability; normal online passive accrual does not imply offline simulation is already solved.
 
-Relationship Experiences themselves do **not** normally grant a one-time Essence payout. Instead, qualifying relationship changes alter the future passive rate.
+## 6. Copy contribution
 
-## 6. One-time Essence sources
+Qualifying Copies continue to contribute through the Copy/Essence integration.
 
-One-time Essence may still exist when independently justified by a non-relationship resource or event.
+Copy contributions are independent from Relationship-derived NPC contributions.
 
-Example in the Willow vertical slice:
-
-- preserving/awakening the Ancient Seed forms relationship evidence and gives no immediate relationship Essence;
-- consuming the Sunstone may grant a small immediate Essence amount because the **Sunstone itself** is being extracted as a metaphysical resource.
-
-This distinction prevents relationship milestones from becoming disguised loot drops.
+Do not reinterpret Copy maturity/loyalty as Relationship Bond dimensions without a dedicated redesign.
 
 ## 7. Trait Resonance sink
 
-Permanent Trait Resonance remains an important Essence sink.
+Essence remains a primary cost for permanent Trait Resonance.
 
-For unmigrated NPC-sourced Traits, the existing legacy gate remains:
+### Relationship-mediated Traits
 
-```text
-minimum source NPC connectionDepth
-+ enough Essence
--> permanent Trait
-```
-
-For relationship-migrated Traits such as `WillowsWisdom`, Essence is only the final stabilization cost after relational evidence has already been earned:
+For migrated Traits such as Willow's Wisdom and Scholarly Insight:
 
 ```text
 Trait discovered
-+ qualified Connection
-+ complete assimilation
-+ compatibility
++ qualified Relationship Connection
++ assimilation threshold
++ compatibility threshold
 + required Memory evidence
 + prerequisites
 + enough Essence
--> authored Resonance beat
++ authored final Resonance Experience
 -> spend Essence
 -> permanent Trait
 ```
 
-`WillowsWisdom` currently costs 40 Essence.
+Essence is the final stabilization cost; it cannot substitute for missing evidence.
 
-## 8. Recalculation triggers
+### Legacy Traits
 
-The passive rate is recalculated when inputs that can affect it change, including:
+Unmigrated Traits may still use compatibility `connectionDepth` gates.
 
-- relationship runtime initialization;
+That path exists to preserve current behavior, not to define new product design.
+
+## 8. Recalculation inputs
+
+The generation rate can change when relevant inputs change, including:
+
+- Relationship runtime initialization;
 - qualified Connection changes;
-- authored Relationship Experiences that alter Bond quality/stability;
-- relevant existing Copy changes;
-- legacy callers that already request rate recalculation.
+- Relationship Experiences affecting Bond quality/stability;
+- Relationship bundle/Tether inputs;
+- Copy maturity/loyalty qualification;
+- other explicit existing rate sources.
 
-Only enabled Relationship definitions produce an NPC rate, preventing double-counting during staged migration.
+Each source should be counted once through its own domain contract.
 
-## 9. Explainability / debug
+## 9. Explainability
 
-`RelationshipDebugPanel` exposes Willow's contribution as:
+Player/debug presentation should answer **why is this rate what it is?**
+
+Useful per-Relationship explanation includes:
 
 ```text
-effective Willow rate
 Connection base
-Resonance Quality band + multiplier
-Tether multiplier
-Stability multiplier
+Resonance Quality band
+Tether state/modifier
+Stability state/modifier
+Effective contribution
 ```
 
-This is the qualification surface for answering **why** the relationship changes passive production.
-
-The general `EssencePage` still reflects the prototype's older UI architecture and is not yet a complete per-source economy inspector.
+The general Essence UI is still an incomplete per-source economy inspector and can be improved later without changing the ontology.
 
 ## 10. Current limitations
 
-Not yet implemented as part of this migration:
-
-- broad relationship-derived Essence contributions for every NPC;
-- full offline progression;
-- advanced distance/tether curves;
-- generalized Trait/achievement multipliers across every source;
-- production-quality per-source history charts;
-- campaign-wide economy rebalance.
+- no full offline progression;
+- no world-derived Tether simulation;
+- no campaign-wide economy rebalance;
+- limited per-source history/analytics presentation;
+- many legacy/simple Traits still retain compatibility Resonance behavior;
+- no claim that current balance constants are final.
 
 ## 11. Invariants
 
-1. A relationship Experience does not normally change current Essence balance directly.
-2. Relationship milestones may change future passive rate.
-3. A migrated NPC is counted exactly once in relationship-derived generation.
-4. Unmigrated NPC `connectionDepth` is not silently treated as new Bond evidence.
-5. Copy contributions remain independent unless the Copy system is explicitly redesigned later.
-6. Essence cannot substitute for missing relational/assimilation evidence on migrated Trait Resonance.
+1. A Relationship Experience does not normally mint Essence directly.
+2. Relationship state may change future passive rate.
+3. Connection Level alone does not fully determine output.
+4. Current Affinity alone does not determine Resonance Quality.
+5. A migrated Relationship source is counted exactly once.
+6. Legacy NPC `connectionDepth` is not silently converted into Relationship evidence.
+7. Copy contributions remain an independent source.
+8. Essence cannot substitute for missing discovery/assimilation/Memory evidence on migrated Trait Resonance.
+9. World-derived Tether is still future work; current authored/static Tether must not be overstated as a full presence simulation.
+
+## 12. Cross-references
+
+- `../Technical/PostM14ProductReconciliation.md`
+- `RelationshipExperienceSystem.md`
+- `EssenceResonanceModel.md`
+- `TraitSystem.md`
+- `CopySystem.md`
+- `GameLoopSystem.md`

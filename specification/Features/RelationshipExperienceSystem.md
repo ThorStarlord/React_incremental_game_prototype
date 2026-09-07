@@ -1,277 +1,224 @@
 # Relationship Experience System
 
-**Design Status:** Canonical target design; runtime implementation pending  
+**Design status:** Canonical and substantially implemented / empirically qualified through M14  
 **Scope:** Universal relationship progression architecture  
-**Supersedes when implemented:** Affinity-as-XP progression where `affinity >= 100` automatically increments `connectionDepth`
+**Supersedes for Relationship-authority NPCs:** Affinity-as-XP progression where `affinity >= 100` automatically increments legacy `connectionDepth`
 
 ## 1. Purpose
 
-The Relationship Experience System is the translation layer between narrative interactions and persistent progression.
+The Relationship Experience System is the translation layer between narrative/gameplay events and persistent relational progression.
 
-The core design problem is not merely tracking whether an NPC likes the player. The game must be able to answer four separate questions:
+It answers four distinct questions:
 
 1. **What happened between these characters?** — Relationship Experience
-2. **Which events became defining moments?** — Memory
+2. **Which events became defining landmarks?** — Memory
 3. **What does the relationship mean now?** — Bond Profile
-4. **What does that relationship enable?** — Essence generation, dialogue/quest access, Trait assimilation, Resonance, and later Copy mechanics
+4. **What does that relationship enable?** — Connection, Essence, Trait learning, dialogue/quest access, later narrative consequence, and future systems
 
-The canonical causal chain is:
+Canonical causal chain:
 
 ```text
-Narrative interaction
-  -> Relationship Experience
-  -> relationship-dimension changes
-  -> Connection Progress
-  -> Bond Profile recalculation
-  -> optional Memory formation
-  -> Essence-rate recalculation
-  -> Trait assimilation / Resonance consequences
+Story / gameplay interaction
+-> Relationship Experience
+-> relationship-dimension changes
+-> Connection Progress
+-> Bond Profile recalculation
+-> optional Memory formation
+-> Essence / Trait / story consequences
 ```
 
-A dialogue choice, quest completion, rescue, argument, betrayal, lesson, shared discovery, or sacrifice can all become Relationship Experiences. Merely clicking dialogue or spending time near an NPC does not automatically qualify.
+A dialogue choice, quest completion, rescue, argument, betrayal, lesson, shared discovery, tactical decision, or sacrifice may become a Relationship Experience when it has durable relational meaning.
 
----
+Routine contact is not automatically deep relationship progress.
 
 ## 2. Canonical vocabulary
 
-### 2.1 Interaction
+### Interaction
 
-Any player/NPC contact handled by the game: dialogue, quest activity, trade, gift, challenge, shared travel, combat cooperation, etc.
+Any player/NPC contact handled by the game: dialogue, quest activity, trade, gift, challenge, travel, combat cooperation, shared work, etc.
 
-An Interaction is transient by default. It becomes a Relationship Experience only when it creates a durable relational consequence.
+An Interaction is transient by default.
 
-### 2.2 Relationship Experience
+### Relationship Experience
 
-A persistent event record representing an interaction that changed how one or both participants understand, value, rely on, or relate to the other.
+A persistent event record representing an interaction that changed how participants understand, value, trust, rely on, oppose, expose themselves to, or otherwise relate to one another.
 
-Experiences are the authoritative event evidence for relationship progression.
+Experiences are authoritative event evidence for Relationship progression.
 
-### 2.3 Memory
+### Memory
 
-A landmark Relationship Experience that becomes part of how the relationship is interpreted.
+A landmark Relationship Experience that remains durable evidence of how the Relationship became what it is.
 
-Every Memory references an originating Relationship Experience. Most Relationship Experiences do not become Memories.
+Every Memory references an originating Experience. Most Experiences do not become Memories.
 
 See `MemorySystem.md`.
 
-### 2.4 Bond Profile
+### Bond Profile
 
-The current derived state of a relationship. It summarizes the accumulated consequences of Experiences and Memories.
+The current interpreted state of the Relationship.
 
-A Bond Profile is not a second event log. It answers: **what is this relationship now?**
+It summarizes accumulated Experience/Memory consequences rather than acting as a second independent history.
 
-### 2.5 Affinity
+### Affinity
 
-The NPC's current positive or negative disposition toward the player.
+Current positive or negative disposition.
 
-Affinity remains useful for short-horizon reactions, prices, service access, dialogue tone, and temporary conflict. It is **not** the experience bar for Connection Level.
+Affinity can affect short-term reactions, prices, services, tone, or conflict.
 
-A relationship can therefore legitimately have:
+**Affinity is not Connection XP.**
+
+A valid Relationship can have, for example:
 
 ```text
 Affinity: -25
 Connection Level: 4
 ```
 
-This can represent rivalry, betrayal, ideological conflict, grief, or another deeply significant but currently hostile relationship.
+when rivalry, betrayal, ideology, dependency, grief, or another deeply significant relationship remains identity-relevant.
 
-### 2.6 Connection Progress
+### Connection Progress
 
-A readiness measure toward the next Connection Level. It represents accumulated relational significance, not simple approval.
+Readiness toward the next Connection level based on accumulated relational significance.
 
-Connection Progress can be increased by positive or adversarial Experiences when those Experiences deepen understanding, shared history, dependence, vulnerability, ideological recognition, or another meaningful dimension.
+Positive and adversarial Experiences may both contribute when they deepen meaningful history, understanding, reliance, vulnerability, reciprocity, ideological recognition, or another qualified dimension.
 
-### 2.7 Connection Level
+### Connection Level
 
-A qualified measure of how deeply the relationship has become part of the participants' lives and identities.
+An evidence-qualified measure of how deeply the Relationship has become consequential to the participants.
 
-Connection Level is not permitted to increase solely because Affinity reached a threshold.
+Connection cannot increase solely because Affinity reaches a threshold.
 
-### 2.8 Resonance
+### Resonance
 
-The process through which a stable pattern embodied by another character becomes integrated into the protagonist.
+The process by which a stable pattern embodied by another character can become integrated into the protagonist.
 
-Trait Resonance is therefore a relationship-mediated transformation rather than a simple currency purchase.
+Relationship evidence can therefore become character transformation, not merely access or currency.
 
----
-
-## 3. Universal relationship dimensions
-
-The initial universal Bond Profile uses seven dimensions.
+## 3. Universal Bond dimensions
 
 | Dimension | Range | Meaning |
 |---|---:|---|
-| Affinity | -100..100 | Current emotional disposition toward the other character |
-| Trust | 0..100 | Confidence in the other character's reliability, competence, or intentions |
-| Understanding | 0..100 | Accuracy and depth of mutual comprehension |
-| Shared Meaning | 0..100 | Degree to which shared experiences have become significant to identity or worldview |
+| Affinity | -100..100 | Current emotional disposition |
+| Trust | 0..100 | Confidence in reliability, competence, or intentions |
+| Understanding | 0..100 | Accuracy/depth of comprehension |
+| Shared Meaning | 0..100 | Degree shared history has become identity/worldview-relevant |
 | Reliance | 0..100 | Practical or emotional dependence |
-| Vulnerability | 0..100 | Degree of meaningful exposure, disclosure, or entrusted risk |
-| Reciprocity | 0..100 | Degree to which investment and influence run both ways rather than remaining extractive |
+| Vulnerability | 0..100 | Meaningful exposure, disclosure, entrusted risk |
+| Reciprocity | 0..100 | Degree investment/influence runs both ways |
 
-These dimensions are intentionally not collapsed into one universal `relationshipPercent`.
+These dimensions are intentionally not collapsed into one `relationshipPercent`.
 
-NPCs and arcs may define additional custom dimensions such as `RivalRecognition`, `IdeologicalAlignment`, `Duty`, or `Fear`. Custom dimensions must not silently replace the universal ones.
+Custom dimensions may exist where an arc genuinely requires them, but they must not silently replace the universal dimensions.
 
-### 3.1 No universal Authenticity meter in v1
+## 4. Experience contract
 
-Authenticity is represented by event history and the pattern of dimensions rather than a scalar `authenticity = 72`.
-
-For example, a relationship built through manufactured dependency may have high Reliance and moderate Trust but low Reciprocity and Vulnerability. A reciprocal mentorship may have high Understanding, Shared Meaning, Trust, and Reciprocity.
-
-This distinction is important to the game's existing theme of instrumental connection versus authentic bond.
-
----
-
-## 4. Relationship Experience schema
+Authored Experiences currently support concepts equivalent to:
 
 ```text
-EXPERIENCE_ID:       [stable unique id]
-Title:               [short event label]
-Timestamp:           [game/simulation time]
-Primary Target:      [NPC id]
-Participants:        [all relevant character ids]
-Source Type:         [dialogue / quest / combat / exploration / system / other]
-Source ID:           [dialogue node, quest id, encounter id, etc.]
-Unique Key:          [optional idempotency key]
-
-Significance:        [Minor / Meaningful / Major / Defining]
-
-Relationship Effects:
-  Affinity:          [signed delta]
-  Trust:             [signed delta]
-  Understanding:     [signed delta]
-  Shared Meaning:    [signed delta]
-  Reliance:          [signed delta]
-  Vulnerability:     [signed delta]
-  Reciprocity:       [signed delta]
-
-Custom Effects:      [optional named dimension deltas]
-Connection Progress: [signed or zero]
-Resonance Tags:      [semantic tags such as Wisdom, Rivalry, Sacrifice, Truth]
-Trait Effects:       [optional compatibility/assimilation consequences]
-Memory Candidate:    [yes / no]
-Interpretation:      [short narrative meaning; may differ by participant]
-Consequences:        [dialogue, quest, behavior, Essence, Trait, unlock notes]
-Notes:               [authoring/debug context]
+id
+uniqueKey
+primaryTargetId
+participantIds
+sourceType
+sourceId
+significance
+relationshipEffects
+customEffects
+connectionProgressDelta
+resonanceTags
+traitEffects
+memoryCandidate
+interpretation
 ```
 
-### 4.1 Significance is not a reward table
+The runtime/types remain the schema authority for exact field names.
 
-`Minor / Meaningful / Major / Defining` describes narrative/system importance. It does not automatically map to a fixed Connection or Essence reward.
+### Significance is not a loot tier
 
-A rescue, confession, ideological breakthrough, betrayal, and refusal can all be Major Experiences while changing different dimensions.
+`minor / meaningful / major / defining` communicates narrative/system importance. It does not automatically map to fixed Essence or Connection rewards.
 
-### 4.2 Experiences are idempotent when authored as unique beats
+### Idempotency
 
-A one-time authored Experience must have a stable unique key or otherwise be protected from accidental duplicate application.
+One-time authored Experiences must be protected from accidental duplicate application by stable identity/unique-key behavior.
 
-Repeatable interactions may create repeatable Experiences only when explicitly designed to do so, and repeated identical actions should have diminishing or zero relationship significance unless new context changes their meaning.
+Repeatable interactions create repeatable relationship evidence only when explicitly authored to do so.
 
----
+## 5. Bond Profile
 
-## 5. Bond Profile schema
+The Bond Profile contains current Relationship meaning such as:
 
 ```text
-BondProfile:
-  sourceCharacterId
-  targetCharacterId
-
-  dimensions:
-    affinity
-    trust
-    understanding
-    sharedMeaning
-    reliance
-    vulnerability
-    reciprocity
-    customDimensions{}
-
-  connectionLevel
-  connectionProgress
-
-  bondArchetypes[]
-  activeMemoryIds[]
-  unresolvedTensions[]
-  recentExperienceIds[]
-
-  resonanceProfile:
-    tags{}
-    quality
-    stability
-
-  essenceContribution:
-    baseRate
-    effectiveRate
-    explanation[]
+dimensions
+connectionLevel
+connectionProgress
+bondArchetypes
+activeMemoryIds
+unresolved tensions / stability information
+recent Experience references
+resonance information
+essence contribution information
 ```
 
-The Bond Profile should be derived or recalculated from authoritative relationship state wherever practical. It must not become an independent source of truth that can silently disagree with the Experience ledger.
-
----
+Where practical, derived fields should be recalculable from authoritative Relationship state and definitions rather than becoming independent mutable truth.
 
 ## 6. Connection qualification
 
-### 6.1 Target semantic levels
+Working semantic levels remain:
 
-| Level | Working meaning | Qualification concept |
-|---:|---|---|
-| 0 | Unknown / Unformed | No meaningful bond yet |
-| 1 | Recognized | Persistent awareness and at least one meaningful interaction |
-| 2 | Familiar | Repeated meaningful contact; the other person is no longer interchangeable |
-| 3 | Significant | Shared history measurably affects choices or expectations |
-| 4 | Trusted / Established | A stable relational pattern exists even when Affinity fluctuates |
-| 5 | Deep Bond | The relationship can override short-term convenience or prior assumptions |
-| 6 | Interdependent | Meaningful mutual reliance or reciprocal transformation |
-| 7 | Identity-Relevant | The relationship is part of self-conception or worldview |
-| 8 | Profoundly Entangled | Decisions and futures are persistently co-shaped |
-| 9 | Metaphysical Bond | Connection has durable supernatural/systemic consequences beyond ordinary proximity |
-| 10 | Unity | Exceptional end-state; reserved for rare relationships |
+| Level | Working meaning |
+|---:|---|
+| 0 | Unknown / Unformed |
+| 1 | Recognized |
+| 2 | Familiar |
+| 3 | Significant |
+| 4 | Trusted / Established |
+| 5 | Deep Bond |
+| 6 | Interdependent |
+| 7 | Identity-Relevant |
+| 8 | Profoundly Entangled |
+| 9 | Metaphysical Bond |
+| 10 | Unity / exceptional end-state |
 
-Names are working labels; the semantic distinction is canonical.
+Names are working presentation labels; semantic qualification is the important rule.
 
-### 6.2 Level-up rule
+A Connection increase requires the configured combination of:
 
-A Connection Level increase requires all of the following:
+1. sufficient `connectionProgress`;
+2. qualifying Experience evidence since the prior level;
+3. a Bond Profile coherent with the target level;
+4. any explicitly authored arc-specific rule.
 
-1. `connectionProgress` reaches the configured threshold;
-2. at least one qualifying Experience since the previous level demonstrates the next level's meaning;
-3. the current Bond Profile is coherent with the target level;
-4. any arc-specific gate is satisfied.
+Affinity alone cannot satisfy Connection qualification.
 
-Affinity alone can never satisfy these requirements.
+## 7. Negative and adversarial progression
 
-### 6.3 Negative and adversarial progression
+Negative Experience can reduce Affinity or Trust while increasing Understanding, Shared Meaning, custom rival recognition, or Connection Progress.
 
-A negative Experience may reduce Affinity or Trust while increasing Understanding, Shared Meaning, Rival Recognition, or Connection Progress.
+This is intentional and production-qualified.
 
-This is intentional. The system must be capable of modeling Lyra-style adversarial connection without pretending that conflict is affection.
+M11 demonstrated Lyra as an adversarial/dialectical Relationship whose Affinity remained strongly negative while Connection, Understanding, and Shared Meaning increased.
 
----
+M14 further demonstrated that one public crackdown could make Silas and Gronk understand the player's reasoning more while trusting/relying on the player less.
 
-## 7. Memory qualification
+## 8. Memory qualification
 
-An Experience becomes a Memory when at least one of these is true:
+An Experience may become a Memory when it:
 
-- it changes the interpretation of the relationship;
-- it crosses or qualifies a Connection threshold;
-- it establishes, transforms, contests, or retires a Bond archetype;
-- it creates durable Trait/Resonance evidence;
-- it represents a costly or revealing choice;
-- it is explicitly authored as a landmark beat;
-- later content needs to reference the event as evidence of why the relationship changed.
+- changes interpretation of the Relationship;
+- qualifies/crosses a Connection threshold;
+- establishes, transforms, contests, or retires a Bond archetype;
+- provides durable Trait/Resonance evidence;
+- represents costly/revealing choice;
+- is explicitly authored as a landmark;
+- is later required as evidence explaining why the Relationship changed.
 
-Memory formation is deliberately rarer than Experience creation.
+Memory formation should remain rarer than Experience creation.
 
-See `MemorySystem.md` for the player-facing and persistence rules.
+## 9. Bond archetypes
 
----
+Archetypes summarize meaning; they do not replace dimensions.
 
-## 8. Bond archetypes
-
-Bond archetypes summarize meaning; they do not replace dimensions.
-
-Examples:
+Examples include:
 
 - Mentor / Student
 - Rival
@@ -282,95 +229,160 @@ Examples:
 - Instrumental Asset
 - Reciprocal Partner
 - Ideological Counterpart
+- Institutional Trust
+- Professional Respect
 
-An archetype can emerge from several Experiences and Memories rather than from one arbitrary assignment.
+A Relationship may support multiple simultaneous archetypes.
 
-For example:
+## 10. Manipulation and reciprocity
+
+Manipulative Relationships are mechanically real.
+
+They may create Connection, Essence, access, reliance, and Trait compatibility. The game must not encode a universal hidden morality penalty that makes instrumental strategy nonviable by fiat.
+
+Different histories instead create different Bond profiles.
+
+For example, an instrumental bond may show high Reliance and Understanding with low Reciprocity/Vulnerability; a reciprocal mentorship may show high Understanding, Shared Meaning, Trust, Reciprocity, and voluntary Vulnerability.
+
+Later mechanics may distinguish these histories when specific qualities are actually relevant.
+
+## 11. Production authority and migration
+
+`RelationshipProgressionDefinition.connectionAuthority` determines whether an NPC uses Relationship-domain Connection authority or legacy compatibility behavior.
+
+The current relationship authoring manifest registers production bundles for:
+
+- Elder Willow;
+- Lyra;
+- Elara;
+- Gronk;
+- Silas;
+- Valerius.
+
+For those Relationship-authority NPCs, new content must use Relationship Experience/Bond semantics rather than extending `affinity >= threshold -> connectionDepth` as a progression rule.
+
+Legacy fields may remain in NPC state, saves, Traits, Copy mechanics, or UI until deliberately migrated.
+
+## 12. Story integration
+
+### Dialogue
+
+Dialogue choices may emit authored Relationship Experiences.
+
+Dialogue can also require existing Relationship Experience ids for later availability.
+
+### Quest
+
+Quest outcomes may record Relationship Experiences while quest objectives/rewards remain Quest-owned.
+
+### Later story consequence
+
+M13 qualified:
 
 ```text
-The Seed Preserved
-+ Three Nights of Teaching
-+ The Lesson Made Yours
--> Mentor / Student (established)
+Story event
+-> Relationship evidence
+-> save/load
+-> later story gate
+-> new story/gameplay consequence
+-> new Relationship evidence
 ```
 
-An NPC may support more than one simultaneous archetype.
+### Shared social consequence
 
----
+M14 qualified:
 
-## 9. Manipulation and reciprocity
+```text
+one shared player decision
+-> several independent Relationship Experiences
+-> different consequences for multiple NPCs
+```
 
-Manipulative relationships are mechanically real.
+The existing dialogue `effects` array was sufficient for this fan-out; no new social-state engine was required.
 
-They may generate Connection Progress, Essence, useful access, and Trait compatibility. The protagonist's initial instrumental worldview must be viable rather than obviously invalid from the first hour.
+## 13. Essence integration
 
-However, different histories create different Bond Profiles.
+Relationship-authority bundles may enable Relationship-derived Essence.
 
-Instrumental strategies tend to produce patterns such as high Reliance, managed Affinity, controlled Trust, low Reciprocity, or low voluntary Vulnerability. Reciprocal strategies can produce qualities that asymmetric control alone cannot guarantee.
+The effective contribution follows the current Essence/Resonance model:
 
-Later systems may make these histories qualitatively different by unlocking different Resonance outcomes. This should not be implemented as a universal flat penalty to manipulation.
+```text
+Connection Base Rate
+x Resonance Quality
+x Tether
+x Stability
+```
 
----
+Relationship Experiences normally change future generation conditions rather than minting one-time Essence directly.
 
-## 10. Relationship invariants
+See `EssenceSystem.md` and `EssenceResonanceModel.md`.
 
-1. **Affinity is not Connection XP.**
-2. **Connection is not synonymous with affection.**
-3. **Every Memory references an Experience.**
-4. **Not every Experience becomes a Memory.**
-5. **Repeated low-information actions cannot grind deep Connection by themselves.**
-6. **Negative events can deepen Connection while damaging positive dimensions.**
-7. **Historical Memories are not deleted merely because current Affinity or Trust falls.**
-8. **Essence generation is derived from relationship state; a relationship event does not directly harvest Essence.**
-9. **Trait Resonance requires relationship evidence in addition to an Essence balance.**
-10. **NPC-specific narrative rules should use generic mechanics before introducing hard-coded character exceptions.**
+## 14. Trait integration
 
----
+Relationship Experiences and Memories can provide:
 
-## 11. Integration boundaries
+- authored Trait discovery;
+- assimilation progress;
+- compatibility evidence;
+- required Memory tags;
+- final authored Resonance evidence.
 
-### Dialogue System
+Willow's Wisdom and Scholarly Insight already use relationship-mediated discovery/assimilation/Resonance.
 
-Dialogue choices may emit Relationship Experiences. Dialogue handlers should eventually stop directly treating `AFFINITY_DELTA` as the complete relationship consequence for important beats.
+See `TraitSystem.md`.
 
-### Quest System
+## 15. Copy integration boundary
 
-Quest outcomes may emit Relationship Experiences. Quest rewards should not substitute for relationship meaning.
+Copies are a separate domain.
 
-### Essence System
+Copy mechanics may consume Relationship facts when explicitly migrated, but Copy state must not become a second Relationship ledger.
 
-The Bond Profile supplies relationship-derived inputs to passive Essence generation. See `EssenceResonanceModel.md`.
+Current Copy parent/creation calculations still contain legacy compatibility assumptions in places. Those should be migrated only with dedicated evidence, tests, and save-safety analysis.
 
-### Trait System
+## 16. Relationship invariants
 
-Experiences and Memories provide semantic evidence and compatibility modifiers for Trait assimilation. See `EssenceResonanceModel.md`.
+1. Affinity is not Connection XP.
+2. Connection is not synonymous with affection.
+3. Every Memory references an Experience.
+4. Not every Experience becomes a Memory.
+5. Repeated low-information actions cannot grind deep Connection by themselves.
+6. Negative events can deepen Connection while damaging positive dimensions.
+7. Historical Memories are not deleted merely because current Affinity or Trust falls.
+8. Relationship Experiences normally change Essence conditions rather than directly harvesting Essence.
+9. Migrated Trait Resonance requires relationship/assimilation evidence in addition to Essence.
+10. NPC-specific narrative rules should use generic mechanics before hard-coded character exceptions.
+11. Relationship state must not become a general-purpose world-state database.
+12. Legacy compatibility fields may remain, but new Relationship-authority content must not extend them as canon.
 
-### Copy System
+## 17. Empirical qualification history
 
-Copy integration is explicitly deferred until the core relationship model is proven with Elder Willow and Lyra.
+The architecture has moved beyond the original Willow/Lyra proof proposal.
 
----
+- **M4-M10:** Relationship migration, Memories, Trait evidence, persistence/save migration.
+- **M11:** Lyra adversarial universality.
+- **M12:** Gronk/Silas/Valerius production authoring scalability.
+- **M13:** Relationship evidence causes later narrative after persistence.
+- **M14:** shared event produces distinct/conflicting multi-NPC consequences.
 
-## 12. First validation sequence
+These milestones define the current evidence ceiling. They do not prove arbitrary campaign-scale social simulation or human narrative quality.
 
-The architecture is not considered validated merely because the schemas are implementable.
+## 18. Next unknown
 
-It must first pass two narrative tests:
+The next highest-value Relationship question is **temporal depth**, not another Relationship dimension:
 
-1. **Elder Willow — mentorship/friendly proof:** the player can understand why Willow's Wisdom became Resonatable.
-2. **Lyra — adversarial proof:** a low or volatile Affinity relationship can still develop high Connection and strong Resonance through conflict, recognition, and shared meaning.
+> Can old Relationship evidence remain causally relevant after unrelated intervening content, additional Relationship change, and save/load?
 
-If Lyra requires character-specific bypass code, the universal model is incomplete.
+That is the proposed M15 long-horizon callback qualification.
 
----
+After that, the product should increasingly test Relationship-derived capabilities in actual gameplay rather than continuing to add ontology for its own sake.
 
-## 13. Cross-references
+## 19. Cross-references
 
-- `MemorySystem.md` — landmark relationship memories
-- `EssenceResonanceModel.md` — relationship-derived Essence and Trait assimilation
-- `../Narrative/ElderWillowVerticalSlice.md` — first authored proof
-- `NPCSystem.md` — currently implemented Affinity/Connection model to be migrated
-- `DialogueSystem.md` — current dialogue effect architecture
-- `TraitSystem.md` — currently implemented Discover -> Equip -> Resonate lifecycle
-- `EssenceSystem.md` — currently implemented passive Essence generation
-- `../Technical/RelationshipSystemMigrationPlan.md` — staged implementation plan
+- `../Technical/PostM14ProductReconciliation.md`
+- `MemorySystem.md`
+- `EssenceResonanceModel.md`
+- `EssenceSystem.md`
+- `TraitSystem.md`
+- `QuestSystem.md`
+- `../Technical/RelationshipSystemMigrationPlan.md` — historical migration plan; consult current reconciliation before treating old sequencing as active roadmap
+- milestone-specific qualification documents under `../Technical/`
