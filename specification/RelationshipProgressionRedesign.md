@@ -1,10 +1,10 @@
 # Relationship Progression Redesign
 
-**Status:** Implemented core redesign; production-qualified through M14  
-**Current authority:** `Technical/PostM14ProductReconciliation.md` + `Features/RelationshipExperienceSystem.md`  
+**Status:** Implemented core redesign; production-qualified through M16  
+**Current authority:** `Technical/PostM14ProductReconciliation.md` + `Technical/PostM16TraitGameplayReconciliation.md` + `Features/RelationshipExperienceSystem.md`  
 **Purpose:** Provide a compact index to the redesign history and current production authority.
 
-## 1. Current state after M14
+## 1. Current state after M16
 
 The Relationship redesign is no longer a target-only migration package.
 
@@ -17,6 +17,8 @@ Story / gameplay event
 -> optional Memory
 -> evidence-qualified Connection
 -> Bond-derived Essence / Trait / story consequences
+-> learned permanent Trait may alter later gameplay
+-> later consequence becomes new Relationship evidence
 ```
 
 The relationship authoring manifest currently registers production bundles for:
@@ -36,15 +38,17 @@ Legacy `NPC.connectionDepth` and other old fields may remain as compatibility pr
 
 Read in this order:
 
-1. [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) — post-M14 product authority, domain boundaries, migration status, roadmap correction;
-2. [`GameDesignDocument.md`](GameDesignDocument.md) — current product loop and direction;
-3. [`Features/RelationshipExperienceSystem.md`](Features/RelationshipExperienceSystem.md) — Relationship ontology and invariants;
-4. [`Features/MemorySystem.md`](Features/MemorySystem.md) — landmark Memory model;
-5. [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — Relationship-derived Essence + Trait assimilation/Resonance;
-6. [`Features/TraitSystem.md`](Features/TraitSystem.md) — current Trait runtime contract;
-7. milestone-specific qualification documents under `Technical/`.
+1. [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) — broad domain authority, migration status, and compatibility boundaries;
+2. [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md) — post-M16 Trait-to-gameplay doctrine and evidence/design boundary;
+3. [`GameDesignDocument.md`](GameDesignDocument.md) — current product loop and direction;
+4. [`Features/RelationshipExperienceSystem.md`](Features/RelationshipExperienceSystem.md) — Relationship ontology and invariants;
+5. [`Features/MemorySystem.md`](Features/MemorySystem.md) — landmark Memory model;
+6. [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — Relationship-derived Essence + Trait assimilation/Resonance;
+7. [`Features/TraitSystem.md`](Features/TraitSystem.md) — current Trait lifecycle and capability authority;
+8. [`Features/QuestSystem.md`](Features/QuestSystem.md) — current qualified permanent-Trait gameplay consumption surface;
+9. milestone-specific qualification documents under `Technical/`.
 
-`Technical/RelationshipSystemMigrationPlan.md` is now a historical implementation record, not the active roadmap.
+`Technical/RelationshipSystemMigrationPlan.md` is a historical implementation record, not the active roadmap.
 
 ## 3. Authority model
 
@@ -56,7 +60,8 @@ For Relationship-authority NPCs:
 - authored Experience/Memory evidence qualifies progression;
 - Affinity may still project into NPC state for service/UI compatibility;
 - legacy `NPC.connectionDepth` may remain for unmigrated consumers but cannot level the migrated Relationship;
-- important story consequences should use generic Relationship evidence instead of shadow social flags.
+- important story consequences should use generic Relationship evidence instead of shadow social flags;
+- Relationship evidence may qualify Trait learning, but permanent Trait state owns the durable learned capability once Resonance completes.
 
 ## 4. Relationship content registration
 
@@ -119,11 +124,32 @@ A second independent probe reproduced multi-NPC fan-out.
 
 The Rule-of-Two result was **no new generic bridge**: the existing dialogue effect array was already sufficient.
 
+### M15 — long-horizon callback
+
+Qualified old Relationship evidence remaining causally relevant after intervening content, later reinforcing or contradictory Relationship evidence, unrelated NPC activity, and save/load.
+
+The result established that old and newer evidence can jointly determine later story availability without deleting historical Memory or adding duplicate story flags.
+
+### M16 — Trait-driven gameplay
+
+Qualified the first bounded gameplay payoff from Relationship-mediated learning:
+
+```text
+Relationship evidence
+-> permanent Trait
+-> alternate gameplay capability
+-> player choice
+-> different consequence
+-> new Relationship evidence
+```
+
+`WillowsWisdom` and `ScholarlyInsight` independently required the same missing quest semantic, justifying exactly one bounded generic contract: `QuestResolutionOption.requiredPermanentTraitIds`.
+
+M16 also qualified that a strong Relationship without the permanent Trait is insufficient for the Trait-only gameplay route.
+
 ## 6. Current Trait/Essence reality
 
-The redesign package originally described Trait assimilation as future work. That statement is now obsolete.
-
-Willow's Wisdom and Scholarly Insight already use:
+Willow's Wisdom and Scholarly Insight use:
 
 ```text
 Authored discovery
@@ -135,6 +161,8 @@ Authored discovery
 + authored final Resonance Experience
 -> permanent Trait
 ```
+
+M16 further demonstrates that permanent Trait state can be consumed by ordinary gameplay as capability authority.
 
 Likewise, Relationship-derived Essence is implemented for enabled Relationship bundles through the Bond-based formula rather than a live global `connectionDepth x multiplier` rule.
 
@@ -156,28 +184,38 @@ Migration rule:
 
 > isolate and migrate a legacy consumer deliberately when its owning milestone provides evidence and tests; do not extend the legacy rule into new Relationship-authority content.
 
-## 8. Next unknown
+## 8. Current design checkpoint and next unknown
 
-The next Relationship-specific scientific question is not another archetype or dimension.
+The immediate post-M16 task is not another Relationship dimension. It is the documentation-only Trait Gameplay Design Reconciliation in `Technical/PostM16TraitGameplayReconciliation.md`.
 
-### Proposed M15 — Long-Horizon Relationship Callback Qualification
+That checkpoint establishes, among other things:
 
-> Can old Relationship evidence remain causally relevant after unrelated intervening content, additional Relationship changes, and save/load?
+- Relationship qualifies learning; Trait owns learned capability;
+- capability does not make the player's decision;
+- Trait-enabled should not mean objectively best;
+- permanent Traits represent internalized character change;
+- temporary/equipped Trait gameplay semantics remain deferred.
 
-After M15, the project should move toward **Trait-driven gameplay payoff** because Trait assimilation already exists.
+The next candidate code-bearing question is a narrow combat vertical slice:
+
+> Can an existing Relationship-derived permanent Trait create a meaningful tactical option without becoming an automatic best action, pure passive stat bonus, or prerequisite for victory?
+
+Milestone numbering remains provisional until that experiment is preregistered against the actual repository state.
 
 ## 9. Evidence ceiling
 
-M4-M14 do not prove:
+M4-M16 do not prove:
 
 - arbitrary whole-campaign branching;
 - autonomous social simulation;
 - global NPC knowledge propagation;
 - player enjoyment or pacing;
 - complete faction/world-state architecture;
-- complete combat/exploration/Copy automation loops.
+- complete combat/exploration/Copy automation loops;
+- temporary Trait gameplay semantics;
+- broad Trait/build balance.
 
-They do prove that the Relationship domain is sufficiently expressive and generic to support multiple production archetypes, persistent narrative causality, and bounded multi-NPC shared consequences.
+They do prove that the Relationship domain is sufficiently expressive and generic to support multiple production archetypes, persistent narrative causality, bounded multi-NPC shared consequences, long-horizon callbacks, and a bounded Relationship-derived permanent Trait changing later gameplay.
 
 ## 10. Historical references
 
@@ -192,5 +230,7 @@ Detailed historical migration evidence remains in Git history and milestone docu
 - `Technical/LyraProductionRelationshipVerticalSlice.md`
 - `Technical/NarrativeRelationshipIntegrationQualification.md`
 - `Technical/M14MultiNpcRelationshipConsequenceQualification.md`
+- `Technical/M15LongHorizonRelationshipCallbackQualification.md`
+- `Technical/M16TraitDrivenGameplayQualification.md`
 
-Future agents should use those as empirical history while treating the post-M14 reconciliation as current product authority.
+Future agents should use those as empirical history while treating the post-M14 and post-M16 reconciliations as current authority for their respective scopes.

@@ -1,6 +1,6 @@
 # Relationship Experience System
 
-**Design status:** Canonical and substantially implemented / empirically qualified through M14  
+**Design status:** Canonical and substantially implemented / empirically qualified through M16  
 **Scope:** Universal relationship progression architecture  
 **Supersedes for Relationship-authority NPCs:** Affinity-as-XP progression where `affinity >= 100` automatically increments legacy `connectionDepth`
 
@@ -200,6 +200,8 @@ M11 demonstrated Lyra as an adversarial/dialectical Relationship whose Affinity 
 
 M14 further demonstrated that one public crackdown could make Silas and Gronk understand the player's reasoning more while trusting/relying on the player less.
 
+M15 further demonstrated that later contradictory evidence can coexist with an earlier positive landmark Memory rather than deleting or rewriting it.
+
 ## 8. Memory qualification
 
 An Experience may become a Memory when it:
@@ -213,6 +215,8 @@ An Experience may become a Memory when it:
 - is later required as evidence explaining why the Relationship changed.
 
 Memory formation should remain rarer than Experience creation.
+
+M15 qualifies that a landmark Memory may remain true and causally relevant even when later Experience changes current Trust, Reliance, or interpretation.
 
 ## 9. Bond archetypes
 
@@ -275,6 +279,8 @@ Dialogue can also require existing Relationship Experience ids for later availab
 
 Quest outcomes may record Relationship Experiences while quest objectives/rewards remain Quest-owned.
 
+Quest-owned gameplay requirements such as M16's `requiredPermanentTraitIds` must consume the authoritative capability state from the Trait domain rather than querying Relationship state as a substitute.
+
 ### Later story consequence
 
 M13 qualified:
@@ -299,6 +305,34 @@ one shared player decision
 ```
 
 The existing dialogue `effects` array was sufficient for this fan-out; no new social-state engine was required.
+
+### Long-horizon callback
+
+M15 qualified:
+
+```text
+old Relationship evidence
++ later reinforcing or contradictory evidence
++ unrelated intervening NPC content
++ save/load
+-> later callback availability/consequence
+```
+
+Old evidence remains durable; newer evidence can reinterpret its present meaning without erasing history.
+
+### Trait-driven gameplay consequence
+
+M16 qualified:
+
+```text
+Relationship evidence
+-> permanent Trait
+-> alternate quest action
+-> different outcome
+-> new Relationship Experience
+```
+
+The Relationship domain explains/qualifies learning and interprets the consequence. The Trait domain owns the durable learned capability; the Quest domain owns local applicability and resolution.
 
 ## 13. Essence integration
 
@@ -327,9 +361,21 @@ Relationship Experiences and Memories can provide:
 - required Memory tags;
 - final authored Resonance evidence.
 
-Willow's Wisdom and Scholarly Insight already use relationship-mediated discovery/assimilation/Resonance.
+Willow's Wisdom and Scholarly Insight use relationship-mediated discovery/assimilation/Resonance.
 
-See `TraitSystem.md`.
+M16 further qualifies the ownership boundary after learning:
+
+```text
+Relationship history -> acquisition provenance / learning qualification
+Trait state           -> durable learned capability
+Gameplay              -> local applicability
+Player                 -> decision
+Relationship          -> interpretation of the result
+```
+
+A strong Relationship is not itself a gameplay-capability flag.
+
+See `TraitSystem.md` and `../Technical/PostM16TraitGameplayReconciliation.md`.
 
 ## 15. Copy integration boundary
 
@@ -353,6 +399,8 @@ Current Copy parent/creation calculations still contain legacy compatibility ass
 10. NPC-specific narrative rules should use generic mechanics before hard-coded character exceptions.
 11. Relationship state must not become a general-purpose world-state database.
 12. Legacy compatibility fields may remain, but new Relationship-authority content must not extend them as canon.
+13. Relationship evidence may qualify learning, but must not substitute for permanent Trait ownership when gameplay asks whether the capability exists.
+14. Trait use does not automatically produce positive Relationship reward; the actual consequence is interpreted relationally.
 
 ## 17. Empirical qualification history
 
@@ -363,22 +411,23 @@ The architecture has moved beyond the original Willow/Lyra proof proposal.
 - **M12:** Gronk/Silas/Valerius production authoring scalability.
 - **M13:** Relationship evidence causes later narrative after persistence.
 - **M14:** shared event produces distinct/conflicting multi-NPC consequences.
+- **M15:** old and newer Relationship evidence compose across intervening content and save/load.
+- **M16:** Relationship-mediated permanent Traits alter bounded gameplay solution space and produce different Relationship consequences.
 
-These milestones define the current evidence ceiling. They do not prove arbitrary campaign-scale social simulation or human narrative quality.
+These milestones define the current evidence ceiling. They do not prove arbitrary campaign-scale social simulation, combat quality, broad build balance, or human narrative quality.
 
-## 18. Next unknown
+## 18. Current next unknown
 
-The next highest-value Relationship question is **temporal depth**, not another Relationship dimension:
+The highest-value immediate task is no longer another Relationship ontology question.
 
-> Can old Relationship evidence remain causally relevant after unrelated intervening content, additional Relationship change, and save/load?
+The post-M16 design checkpoint defines how learned Traits should behave as gameplay capabilities before combat is expanded. See `../Technical/PostM16TraitGameplayReconciliation.md`.
 
-That is the proposed M15 long-horizon callback qualification.
-
-After that, the product should increasingly test Relationship-derived capabilities in actual gameplay rather than continuing to add ontology for its own sake.
+The next candidate code-bearing question is a narrow combat vertical slice asking whether an existing Relationship-derived permanent Trait can create a meaningful tactical option without becoming an automatic best action, pure passive stat bonus, or prerequisite for victory.
 
 ## 19. Cross-references
 
 - `../Technical/PostM14ProductReconciliation.md`
+- `../Technical/PostM16TraitGameplayReconciliation.md`
 - `MemorySystem.md`
 - `EssenceResonanceModel.md`
 - `EssenceSystem.md`
