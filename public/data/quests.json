@@ -221,6 +221,31 @@
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
+  "quest_m14_quiet_reroute": {
+    "id": "quest_m14_quiet_reroute",
+    "title": "Reroute the Load",
+    "description": "Carry out the council's quiet-reroute policy: change caravan and patrol timing until the compromised schedule stops buying an advantage without freezing trade or exposing Silas's source.",
+    "giver": "npc_captain_valerius",
+    "type": "SIDE",
+    "objectives": [
+      { "objectiveId": "1", "description": "Test the quiet reroute under real merchant-district traffic", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prove_reroute",
+        "label": "Prove the Reroute Under Load",
+        "description": "Hold the new route long enough to show that trade can continue while the leaked timing loses its operational value.",
+        "relationshipExperienceId": "gronk_exp_quiet_reroute_proven",
+        "rewards": [],
+        "logMessage": "The rerouted caravans keep moving and the old patrol gap stops paying. Gronk's constraint logic survives contact with the district rather than only the council table."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
   "quest_elara_chain_1": {
     "id": "quest_elara_chain_1",
     "title": "A Scholar's Journey: The First Step",

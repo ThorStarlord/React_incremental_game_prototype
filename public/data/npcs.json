@@ -138,7 +138,13 @@
     "affinity": 0,
     "connectionDepth": 1,
     "loyalty": 5,
-    "availableDialogues": ["gronk_greeting", "gronk_craft_request", "gronk_rumors", "gronk_blade_held"],
+    "availableDialogues": [
+      "gronk_greeting",
+      "gronk_craft_request",
+      "gronk_rumors",
+      "gronk_blade_held",
+      "gronk_m14_repair_ledger"
+    ],
     "completedDialogues": [],
     "availableQuests": [],
     "completedQuests": [],
@@ -219,7 +225,8 @@
       "valerius_training_offer",
       "valerius_city_issues",
       "valerius_leak_rumor",
-      "valerius_delegated_leak_response"
+      "valerius_delegated_leak_response",
+      "valerius_m14_aftermath_council"
     ],
     "completedDialogues": [],
     "availableQuests": ["quest_valerius_patrol_duty"],

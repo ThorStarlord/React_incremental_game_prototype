@@ -112,6 +112,115 @@
       "memoryCandidate": true,
       "memoryDefinitionId": "valerius_memory_merchant_leak_broken",
       "interpretation": "You use Silas's intelligence to rewrite the patrol response within Valerius's stated objective, break the leak's operational value, and return with a result produced by delegated judgment rather than close supervision."
+    },
+    "valerius_exp_aftermath_public_crackdown": {
+      "id": "valerius_exp_aftermath_public_crackdown",
+      "uniqueKey": "valerius:m14:01:aftermath-public-crackdown",
+      "title": "Closure Everyone Can See",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius", "npc_rogue_silas", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 2,
+        "trust": 6,
+        "understanding": 2,
+        "sharedMeaning": 5,
+        "reliance": 4,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["SharedDecision", "InstitutionalClosure", "PublicControl"],
+      "memoryCandidate": false,
+      "interpretation": "You choose a visible purge of the compromised routes. Valerius sees a decision that restores institutional control cleanly, even though others in the room price the collateral cost differently."
+    },
+    "valerius_exp_aftermath_protect_source": {
+      "id": "valerius_exp_aftermath_protect_source",
+      "uniqueKey": "valerius:m14:02:aftermath-protect-source",
+      "title": "An Open Risk Kept Deliberately",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius", "npc_rogue_silas", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -2,
+        "trust": -4,
+        "understanding": 4,
+        "sharedMeaning": -3,
+        "reliance": -2,
+        "reciprocity": -1
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": ["SharedDecision", "InstitutionalRisk", "UnderstoodConflict"],
+      "memoryCandidate": false,
+      "interpretation": "Valerius understands the intelligence value of preserving Silas's source but sees you deliberately leave an institutional vulnerability alive. The reasoning becomes clearer while trust in the choice falls."
+    },
+    "valerius_exp_aftermath_quiet_reroute": {
+      "id": "valerius_exp_aftermath_quiet_reroute",
+      "uniqueKey": "valerius:m14:03:aftermath-quiet-reroute",
+      "title": "Control Without the Spectacle",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius", "npc_rogue_silas", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 5,
+        "sharedMeaning": 2,
+        "reliance": 3,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["SharedDecision", "DelegatedJudgment", "AdaptiveControl"],
+      "memoryCandidate": false,
+      "interpretation": "You preserve the objective while declining the clean public gesture: alter the routes until the leak stops buying advantage. Valerius recognizes the same mission-over-script reasoning that first made delegation possible."
+    },
+    "valerius_exp_repair_for_load": {
+      "id": "valerius_exp_repair_for_load",
+      "uniqueKey": "valerius:m14:04:repair-for-load",
+      "title": "The Repair That Takes Longer",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_m14_repair_ledger",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -1,
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 1,
+        "reliance": 1,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": ["SharedDecision", "MissionOverAppearance", "InstitutionalPatience"],
+      "memoryCandidate": false,
+      "interpretation": "The slower repair is politically inconvenient, but Valerius recognizes that you are applying the same objective-over-appearance discipline he previously rewarded. Warmth drops slightly while understanding and trust in judgment increase."
+    },
+    "valerius_exp_repair_for_show": {
+      "id": "valerius_exp_repair_for_show",
+      "uniqueKey": "valerius:m14:05:repair-for-show",
+      "title": "Visible Order Restored First",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_m14_repair_ledger",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 2,
+        "trust": 4,
+        "understanding": 2,
+        "sharedMeaning": 4,
+        "reliance": 3,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["SharedDecision", "VisibleOrder", "InstitutionalClosure"],
+      "memoryCandidate": false,
+      "interpretation": "You prioritize reopening the district on a schedule the Watch can defend publicly. Valerius values the restored order even though Gronk sees the same decision as knowingly under-repairing the real load path."
     }
   },
   "memories": {
