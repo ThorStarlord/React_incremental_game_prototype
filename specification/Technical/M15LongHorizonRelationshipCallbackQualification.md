@@ -1,6 +1,6 @@
 # M15 — Long-Horizon Relationship Callback Qualification
 
-**Status:** preregistered v2; production implementation not yet started  
+**Status:** results recorded; PASS subject only to exact-final-head requalification  
 **Baseline:** corrected post-M14 `main` at `76569543fa12e318e61db0aed8f7355048cb3dc0`  
 **Baseline tree:** `91805bb69d89536142e63dbb3d44cf7fd1d104a1`  
 **Branch:** `feature/m15-long-horizon-relationship-callbacks-v2`
@@ -15,7 +15,7 @@ That first M15 attempt stopped and preserved its result rather than working arou
 
 The defect was repaired separately in PR #37 through a qualified generic `repeatable: false` Dialogue contract using existing `NPC.completedDialogues` persistence. The exact repair head `7b21378fe54495793b46f5fe0746e4e7d0aa6078` passed Build Validation #164 and merged as `76569543fa12e318e61db0aed8f7355048cb3dc0` with identical integrated tree `91805bb69d89536142e63dbb3d44cf7fd1d104a1`.
 
-M15 v2 therefore restarts from corrected `main`. The stopped v1 branch remains historical failure evidence and is not rewritten.
+M15 v2 then restarted from corrected `main`. The stopped v1 branch remains historical failure evidence and was not rewritten.
 
 ## 2. Question
 
@@ -38,49 +38,26 @@ old Relationship landmark
 M13 qualified bounded Story -> Relationship -> later Story causality.
 M14 qualified shared social breadth.
 The M14 exclusivity repair restored the assumption that a one-shot policy decision has one historical outcome.
-M15 now tests temporal composition.
+M15 tests temporal composition.
 
-## 3. Primary hypothesis
+## 3. Preregistered hypothesis
 
-The existing generic contracts are sufficient:
+The experiment froze the expectation that the existing generic contracts would be sufficient:
 
 - durable Relationship Experiences and Memories retain old history;
-- M14 policy Experiences are now mutually exclusive when produced through ordinary one-shot production dialogue;
-- Dialogue `requiredExperienceIds` and `anyOfExperienceIds` can consume positive historical evidence;
-- Dialogue `repeatable: false` can mark new landmark/callback topics as one-shot without a new story-state domain;
-- ordinary Dialogue effects can record new Relationship evidence and unlock quests;
-- ordinary Quest/location/resolution contracts can carry history-conditioned access into gameplay;
+- M14 policy Experiences are mutually exclusive through ordinary one-shot production dialogue;
+- Dialogue `requiredExperienceIds` and `anyOfExperienceIds` consume positive historical evidence;
+- Dialogue `repeatable: false` marks one-shot callback topics without a new story-state domain;
+- ordinary Dialogue effects record new Relationship evidence and unlock quests;
+- ordinary Quest/location/resolution contracts carry history-conditioned access into gameplay;
 - existing save/load preserves all causal layers;
 - no negative-condition DSL, shadow boolean, new Relationship dimension, new Connection tier, or NPC-specific generic branch is necessary.
 
-## 4. Counter-hypotheses / stop conditions
+The preregistration also required a stop if M15 needed shadow state such as `silasRemembersSecret`, an NPC-ID generic branch, Memory deletion/rewrite, Affinity/legacy `connectionDepth` as historical proxies, a new save schema, or a generalized boolean condition language derived from this single case.
 
-Stop and preserve the finding if M15 requires:
+None of those stop conditions occurred in v2.
 
-- `silasRemembersSecret`, `silasWillTestify`, `silasTrustRestored`, `oldDebtActive`, `ledgerRouteUnlocked`, or equivalent persistent shadow state;
-- `if (npcId === 'npc_rogue_silas')` or any M15-specific branch in generic runtime;
-- deletion, invalidation, or rewriting of `silas_memory_secret_neither_sold` to represent later contradiction;
-- Affinity or legacy `connectionDepth` as a proxy for landmark history;
-- a new Relationship dimension or Connection tier solely for M15;
-- a save-schema change solely for M15;
-- generalized `NOT` / excluded-Experience / boolean condition syntax from this one authoring case;
-- direct Relationship Experience injection as the principal route for new M15 behavior;
-- UI-only gating that the interaction thunk does not also enforce;
-- evidence that the repaired M14 council can still accumulate a second policy outcome through the qualified production UI/thunk path.
-
-A clean FAIL is evidence and must not be normalized away.
-
-## 5. Re-run prerequisite gate
-
-Before relying on M14 policy histories in the principal M15 tests, the dedicated M15 qualification must confirm the corrected production contract:
-
-- `valerius_m14_aftermath_council.repeatable === false`;
-- after one valid council response is processed, a direct attempt to process a different response is rejected;
-- no second policy Experience is recorded.
-
-This is a verification of the merged prerequisite repair, not a new M15 abstraction.
-
-## 6. Historical evidence under test
+## 4. Historical evidence under test
 
 ### Old landmark
 
@@ -90,51 +67,44 @@ Silas M12:
 - Memory: `silas_memory_secret_neither_sold`
 - title: **The Secret Neither Sold**
 
-This is the old landmark whose later causal relevance M15 tests.
-
 ### Reinforcing M14 evidence
 
-One of:
+The authored reinforced callback accepts either:
 
 - `silas_exp_aftermath_protect_source` — **The Source You Left Alive**;
 - `silas_exp_aftermath_quiet_reroute` — **The Pattern You Made Worth Less**.
+
+The dedicated principal reinforced test uses the quiet-reroute history.
 
 ### Contradictory M14 evidence
 
 - `silas_exp_aftermath_public_crackdown` — **The Source You Burned**.
 
-The contradiction is semantic rather than historical deletion: the old Memory remains true while later Trust/Reliance damage also remains true.
+The contradiction remains historical evidence. It does not delete or invalidate **The Secret Neither Sold**.
 
-## 7. Production story slice — A Debt That Survived the Fire
+## 5. Implemented production slice — A Debt That Survived the Fire
 
-Much later, Captain Valerius receives a forged broker ledger that appears to prove the player sold Watch information.
+Captain Valerius receives a forged broker ledger that appears to prove the player sold Watch information.
 
-The accusation is credible enough that Valerius cannot dismiss it. His already-qualified history of delegated judgment allows an investigation rather than immediate condemnation.
+The accusation is credible enough that Valerius cannot dismiss it. Existing delegated-judgment history instead lets him treat the document as evidence that must be tested before it becomes a verdict.
 
-The crisis is deliberately independent of Silas history: old Silas history changes what assistance becomes available, not whether the crisis can occur.
+The crisis is independent of Silas history: Silas history changes what additional assistance becomes available, not whether the accusation/investigation can occur.
 
-## 8. Valerius late inquiry
+### Valerius late inquiry
 
-Planned topic:
+Production topic:
 
 `valerius_m15_forged_ledger_inquiry`
 
-Planned gate:
+Properties:
 
-`requiredExperienceIds: ["valerius_exp_merchant_leak_broken"]`
+- `repeatable: false`;
+- gate: `valerius_exp_merchant_leak_broken`;
+- response: `investigate`;
+- records `valerius_exp_forged_ledger_inquiry`;
+- unlocks default quest `quest_m15_verify_forged_ledger`.
 
-The topic is a one-shot authored event (`repeatable: false`).
-
-Planned response:
-
-`investigate`
-
-Planned effects:
-
-- record `valerius_exp_forged_ledger_inquiry`;
-- unlock `quest_m15_verify_forged_ledger`.
-
-Frozen Relationship vector for `valerius_exp_forged_ledger_inquiry`:
+`valerius_exp_forged_ledger_inquiry` uses the preregistered vector:
 
 - Trust `+2`
 - Understanding `+4`
@@ -143,70 +113,36 @@ Frozen Relationship vector for `valerius_exp_forged_ledger_inquiry`:
 - Reciprocity `+2`
 - Connection Progress `+6`
 
-Interpretation target:
+### Control fallback
 
-> Valerius treats contradictory evidence as grounds for disciplined inquiry rather than immediate judgment because prior delegated judgment proved that appearances deserve verification when the stakes are high.
+Production topic:
 
-## 9. Three history routes
+`silas_m15_brokers_price` — **A Broker's Price**
 
-### Route A — Control
+Gate:
 
-The control reaches the Valerius inquiry but deliberately lacks:
+`valerius_exp_forged_ledger_inquiry`
 
-`silas_exp_secret_neither_sold`
+It explains the forgery method but does not unlock privileged live-broker access.
 
-Expected Silas state after save/load:
+### Reinforced callback
 
-- fallback topic available;
-- reinforced callback unavailable;
-- contradicted callback unavailable;
-- direct thunk attempt to invoke either privileged callback rejected by Relationship evidence gates;
-- hidden-chain quest unavailable.
+Production topic:
 
-Planned fallback topic:
+`silas_m15_debt_still_counts` — **A Debt He Still Counts**
 
-`silas_m15_brokers_price`
+Properties:
 
-It may explain how forged ledgers circulate but grants no privileged broker-chain access.
+- `repeatable: false`;
+- requires `valerius_exp_forged_ledger_inquiry`;
+- requires `silas_exp_secret_neither_sold`;
+- requires at least one of `silas_exp_aftermath_protect_source` / `silas_exp_aftermath_quiet_reroute`.
 
-### Route B — Reinforced history
-
-Required evidence:
-
-```text
-valerius_exp_forged_ledger_inquiry
-+ silas_exp_secret_neither_sold
-+ one of:
-    silas_exp_aftermath_protect_source
-    silas_exp_aftermath_quiet_reroute
-```
-
-Planned topic:
-
-`silas_m15_debt_still_counts`
-
-Planned gate:
-
-```json
-{
-  "requiredExperienceIds": [
-    "valerius_exp_forged_ledger_inquiry",
-    "silas_exp_secret_neither_sold"
-  ],
-  "anyOfExperienceIds": [
-    "silas_exp_aftermath_protect_source",
-    "silas_exp_aftermath_quiet_reroute"
-  ]
-}
-```
-
-The topic is one-shot (`repeatable: false`).
-
-Planned response `risk_chain` records:
+Response `risk_chain` records:
 
 `silas_exp_old_silence_repaid`
 
-Frozen vector:
+with the preregistered vector:
 
 - Affinity `+2`
 - Trust `+6`
@@ -217,35 +153,28 @@ Frozen vector:
 - Reciprocity `+6`
 - Connection Progress `+8`
 
-The response unlocks:
+It also unlocks:
 
 `quest_m15_follow_hidden_chain`
 
-Meaning target:
+### Contradicted callback
 
-> Silas treats the old mutual restraint as still creditworthy because later conduct reinforced it. He risks access to a broker chain rather than merely selling generic information.
+Production topic:
 
-### Route C — Contradicted history
+`silas_m15_debt_not_renewed` — **A Debt Remembered, Not Renewed**
 
-Required evidence:
+Properties:
 
-```text
-valerius_exp_forged_ledger_inquiry
-+ silas_exp_secret_neither_sold
-+ silas_exp_aftermath_public_crackdown
-```
+- `repeatable: false`;
+- requires `valerius_exp_forged_ledger_inquiry`;
+- requires `silas_exp_secret_neither_sold`;
+- requires `silas_exp_aftermath_public_crackdown`.
 
-Planned topic:
-
-`silas_m15_debt_not_renewed`
-
-The topic is one-shot (`repeatable: false`).
-
-Planned response `confirm_limit` records:
+Response `confirm_limit` records:
 
 `silas_exp_old_silence_reinterpreted`
 
-Frozen vector:
+with the preregistered vector:
 
 - Trust `-1`
 - Understanding `+6`
@@ -255,13 +184,9 @@ Frozen vector:
 - Reciprocity `+2`
 - Connection Progress `+5`
 
-It does **not** unlock `quest_m15_follow_hidden_chain`.
+It does **not** unlock the hidden-chain quest.
 
-Meaning target:
-
-> Silas remembers that the player once refused to sell his secret and treats that historical fact as still true. He also remembers that the player later burned a source exposed under expectations of restraint. He will confirm the old fact or explain the forgery, but he will not expose another channel.
-
-Core invariant:
+The resulting invariant is:
 
 ```text
 old Memory survives
@@ -269,87 +194,32 @@ old Memory survives
 != same future access
 ```
 
-## 10. Memory-history invariant
+## 6. Gameplay consequence
 
-M15 must not delete, invalidate, or overwrite:
-
-`silas_memory_secret_neither_sold`
-
-when `silas_exp_aftermath_public_crackdown` exists.
-
-Both facts remain durable:
-
-```text
-The Secret Neither Sold
-AND
-The Source You Burned
-```
-
-The callback expresses current interpretation of both facts rather than mutating historical truth.
-
-No new M15 Memory is required for this proof.
-
-## 11. Unrelated intervening content
-
-The principal reinforced and contradicted paths must perform at least one ordinary production Relationship interaction with another NPC after historical Silas/M14 setup and before the late Silas callback.
-
-Preferred content:
-
-- Elder Willow `elder_willow_greeting` / **She Saw Through the Question**;
-- response `respect`, producing `willow_exp_first_question_admit` and the existing displayed continuation evidence.
-
-This Willow evidence is not a Silas callback prerequisite. It exists solely to prove that another relationship can accumulate in the same save while old Silas history remains causally available.
-
-## 12. Save/load boundary
-
-Primary save occurs after:
-
-- old Silas landmark exists where applicable;
-- reinforcing or contradictory M14 evidence exists where applicable;
-- unrelated Willow production evidence has been created;
-- `valerius_exp_forged_ledger_inquiry` has been created and default quest unlocked;
-
-but before the Silas M15 callback is selected.
-
-Use existing:
-
-`createSave -> loadSavedGameWithMigration -> replaceState`
-
-After load, verify every historical layer before invoking Silas.
-
-No M15 save schema is permitted absent an independently discovered persistence defect.
-
-## 13. Gameplay consequence
-
-### Default investigation
-
-Quest:
+### Default route
 
 `quest_m15_verify_forged_ledger`
 
 - giver: Valerius;
-- use existing Quest contracts;
-- preferred objective: ordinary `REACH_LOCATION` at an existing production location;
+- ordinary `REACH_LOCATION` objective;
+- target: `location_merchant_district`;
 - one ordinary resolution option;
-- available regardless of special Silas history because Valerius inquiry unlocks it.
+- no privileged Silas Relationship Experience.
 
-The default route provides a valid investigation but no hidden broker-chain access.
+The default route remains available independent of the old Silas landmark because it is unlocked by Valerius's inquiry.
 
-### Reinforced alternate investigation
-
-Quest:
+### Reinforced privileged route
 
 `quest_m15_follow_hidden_chain`
 
 - giver: Silas;
-- unlocked only by `silas_m15_debt_still_counts` response `risk_chain`;
-- use existing Quest/location/resolution contracts.
+- unlocked only by the reinforced callback;
+- ordinary `REACH_LOCATION` objective;
+- target: `location_merchant_district`;
+- one normal resolution option;
+- resolution records `silas_exp_hidden_chain_verified`.
 
-Resolution records:
-
-`silas_exp_hidden_chain_verified`
-
-Frozen vector:
+`silas_exp_hidden_chain_verified` uses the preregistered vector:
 
 - Affinity `+1`
 - Trust `+3`
@@ -360,172 +230,308 @@ Frozen vector:
 - Reciprocity `+3`
 - Connection Progress `+6`
 
-The contradicted route must not receive this quest or Experience.
+The contradicted history does not receive this quest.
 
-## 14. Condition-language policy
+## 7. Unrelated intervening Relationship content
 
-M15 must first use only existing positive evidence gates:
+The principal control, reinforced, and contradicted tests perform ordinary Elder Willow production dialogue before the late Silas callback.
+
+They use:
+
+`elder_willow_greeting` / **She Saw Through the Question**
+
+with response `respect`, producing `willow_exp_first_question_admit` through the normal NPC Dialogue UI.
+
+This Willow Experience is not a Silas prerequisite. It exists only to prove that unrelated Relationship history can accumulate in the same persisted game state while old Silas history remains causally available.
+
+## 8. Save/load result
+
+Each principal history reaches the late Valerius inquiry through ordinary production UI and then saves before the Silas callback.
+
+The qualified persistence route uses:
+
+```text
+createSave
+-> loadSavedGameWithMigration
+-> replaceState
+```
+
+After load, the tests verify the required historical layers before invoking Silas.
+
+### Reinforced state after load
+
+Present simultaneously:
+
+- `silas_memory_secret_neither_sold`;
+- `silas_exp_aftermath_quiet_reroute`;
+- `willow_exp_first_question_admit`;
+- `valerius_exp_forged_ledger_inquiry`.
+
+### Contradicted state after load
+
+Present simultaneously:
+
+- `silas_memory_secret_neither_sold`;
+- `silas_exp_aftermath_public_crackdown`;
+- `willow_exp_first_question_admit`;
+- `valerius_exp_forged_ledger_inquiry`.
+
+No save-schema change was required.
+
+## 9. Repaired M14 prerequisite result
+
+The dedicated M15 architecture test re-runs the repaired M14 decision boundary before relying on M14 outcomes as historical discriminators.
+
+It verifies:
+
+1. `valerius_m14_aftermath_council.repeatable === false`;
+2. a valid `public_crackdown` response succeeds;
+3. a later direct `quiet_reroute` attempt on the same node returns `Dialogue already completed.`;
+4. `silas_exp_aftermath_quiet_reroute` remains absent.
+
+**Prerequisite gate: PASS.**
+
+The prerequisite defect that stopped M15 v1 therefore remains repaired on the corrected baseline used by M15 v2.
+
+## 10. Control-history result
+
+The control history includes required Valerius history but omits `silas_exp_secret_neither_sold`.
+
+After unrelated Willow interaction, late Valerius inquiry, and save/load:
+
+- **A Broker's Price** is available;
+- **A Debt He Still Counts** is unavailable;
+- **A Debt Remembered, Not Renewed** is unavailable;
+- direct thunk invocation of the reinforced callback is rejected for missing Relationship evidence;
+- `quest_m15_follow_hidden_chain` is not available;
+- `quest_m15_verify_forged_ledger` remains available on Valerius.
+
+**Control result: PASS.**
+
+The late crisis alone is insufficient to manufacture the old relational callback.
+
+## 11. Reinforced-history result
+
+Historical setup contains:
+
+- the old Silas M12 landmark and Memory;
+- qualified later Silas/Valerius history;
+- `silas_exp_aftermath_quiet_reroute` as reinforcing M14 evidence.
+
+After unrelated Willow interaction, late Valerius inquiry, and save/load:
+
+- the old Silas Memory persists;
+- quiet-reroute evidence persists;
+- Willow evidence persists;
+- Valerius inquiry evidence persists;
+- fallback topic remains available;
+- **A Debt He Still Counts** becomes available;
+- the contradicted callback remains unavailable.
+
+Selecting the reinforced callback through ordinary Silas Dialogue UI:
+
+- records `silas_exp_old_silence_repaid`;
+- unlocks `quest_m15_follow_hidden_chain`;
+- leaves the old Silas Memory present.
+
+The test then accepts **Follow the Hidden Chain** through the ordinary Quest UI, moves through ordinary player location state to the Merchant District, resolves the quest through the normal resolution UI, and records:
+
+`silas_exp_hidden_chain_verified`
+
+The old Memory remains present afterward.
+
+**Reinforced result: PASS.**
+
+The old relationship history therefore produces materially different later gameplay access rather than merely alternate flavor text.
+
+## 12. Contradicted-history result
+
+Historical setup contains:
+
+- the old Silas M12 landmark and Memory;
+- qualified later Silas/Valerius history;
+- `silas_exp_aftermath_public_crackdown` as contradictory M14 evidence.
+
+After unrelated Willow interaction, late Valerius inquiry, and save/load:
+
+- the old Silas Memory persists;
+- the public-crackdown Experience persists;
+- Willow evidence persists;
+- fallback remains available;
+- **A Debt Remembered, Not Renewed** becomes available;
+- **A Debt He Still Counts** remains unavailable.
+
+Selecting the contradicted callback through ordinary Silas Dialogue UI records:
+
+`silas_exp_old_silence_reinterpreted`
+
+The test verifies the authored current-state change relative to the pre-callback profile:
+
+- Trust `-1`;
+- Understanding `+6`;
+- Shared Meaning `+4`;
+- Reliance `-2`.
+
+The hidden-chain quest remains unavailable, while Valerius's default investigation remains available.
+
+Both the old Silas Memory and the later public-crackdown Experience remain present after the callback.
+
+**Contradicted result: PASS.**
+
+The system therefore does not require historical erasure or automatic reconciliation into a single approval score. The player can have once demonstrated restraint and later violated a related expectation; both facts remain causally meaningful.
+
+## 13. Condition-language / architecture result
+
+M15 succeeded using only existing positive evidence contracts:
 
 - `requiredExperienceIds`;
-- `anyOfExperienceIds`.
+- `anyOfExperienceIds`;
+- `repeatable: false` inherited from the separately qualified M14 correctness repair.
 
-Do not add from this one authoring case:
+No M15 change was made to generic runtime behavior.
+
+The candidate adds no:
 
 - `excludedExperienceIds`;
 - `forbiddenMemoryIds`;
-- generic `NOT`;
-- boolean condition AST/DSL;
-- arbitrary expression language.
+- generic `NOT` or condition AST/DSL;
+- shadow story/Relationship boolean;
+- NPC-ID generic branch;
+- new Relationship dimension;
+- new Connection tier;
+- new save schema;
+- new quest condition language.
 
-Fallback and special positive-evidence topics may coexist. The special callback represents additional history-conditioned opportunity rather than requiring the fallback to disappear.
+The dedicated architecture audit verifies representative generic Relationship, NPC, Quest, game-event, and save files contain no M15 identifiers.
 
-### Rule of Two
+This is another **negative abstraction result**: the evidence does not justify a generalized historical-condition language for this bounded use case.
 
-A generic negative/advanced condition capability is justified only if two independently authored production situations naturally require the same missing semantic capability.
+## 14. Implementation scope
 
-## 15. Expected implementation scope
+Compared with corrected baseline `76569543fa12e318e61db0aed8f7355048cb3dc0`, the first complete behavioral candidate changed exactly eight intended files:
 
-Expected production changes:
-
+- `.github/workflows/build-validation.yml`;
 - `public/data/dialogues.json`;
 - `public/data/npcs.json`;
 - `public/data/quests.json`;
 - `public/data/relationships/silas.json`;
 - `public/data/relationships/valerius.json`;
-- `src/features/Relationships/state/RelationshipM15LongHorizonCallback.test.tsx`;
-- `.github/workflows/build-validation.yml`;
-- this qualification document's later results section.
+- `specification/Technical/M15LongHorizonRelationshipCallbackQualification.md`;
+- `src/features/Relationships/state/RelationshipM15LongHorizonCallback.test.tsx`.
 
-Expected generic-runtime behavioral changes: **none**.
+No generic runtime behavioral file differed from the corrected baseline.
 
-If implementation evidence requires more, record the reason before changing generic runtime.
+## 15. First complete behavioral candidate
 
-## 16. Principal dedicated qualification
+Candidate SHA:
 
-Create:
+`7f3baf5cba5fba1d37d5abc8684351a3f5fd52f6`
 
-`src/features/Relationships/state/RelationshipM15LongHorizonCallback.test.tsx`
+Candidate tree:
 
-At minimum:
+`7e59d578110fe7f393bccadd8fed19e13a40ffa5`
 
-### Test A — production authoring / architecture / repaired prerequisite
+Compared with corrected baseline:
 
-Verify:
+- 8 commits ahead;
+- exactly 8 intended changed files;
+- no generic runtime behavior changes.
 
-- merged M14 council remains `repeatable: false`;
-- one M14 council response blocks a later different response;
-- exact M15 evidence gates and quest wiring;
-- no generalized negative-condition field/DSL added;
-- no M15 identifier appears in generic Relationship/NPC/Quest/game-event/save runtime;
-- no new Relationship dimension, Connection tier, or save schema is introduced.
+Build Validation #165 (`34107453093`), job `101695632462`: **PASS**
 
-### Test B — control history
+- dependency installation: PASS;
+- TypeScript: PASS;
+- accumulated M4-M14 Relationship / Trait discovery / save migration / narrative qualification: PASS;
+- M14 dialogue-exclusivity regression: PASS;
+- dedicated M15 long-horizon callback qualification: PASS;
+- production build: PASS.
 
-- initialize production runtime;
-- create required Valerius history but omit `silas_exp_secret_neither_sold`;
-- perform unrelated Willow production Relationship content;
-- trigger Valerius inquiry through ordinary production UI;
-- save/load before Silas callback;
-- verify fallback available;
-- verify reinforced/contradicted callbacks unavailable;
-- directly invoke privileged callback thunk and expect evidence-gate rejection;
-- verify hidden-chain quest unavailable.
+No implementation repair cycle was required after the first complete M15 v2 behavioral candidate entered CI.
 
-### Test C — reinforced history
-
-- use independently qualified M12-M14 evidence as historical setup;
-- old Silas landmark present;
-- one reinforcing M14 policy Experience present;
-- perform unrelated Willow production content;
-- trigger Valerius inquiry through ordinary production UI;
-- save/load;
-- verify old Silas Memory, reinforcing evidence, Willow evidence, and Valerius inquiry all persist;
-- select reinforced callback through ordinary Silas Dialogue UI;
-- verify `silas_exp_old_silence_repaid`;
-- verify hidden-chain quest unlock;
-- complete hidden-chain quest through ordinary Quest/location/resolution UI;
-- verify `silas_exp_hidden_chain_verified`;
-- verify old Silas Memory remains present.
-
-### Test D — contradicted history
-
-- old Silas landmark present;
-- `silas_exp_aftermath_public_crackdown` present;
-- perform unrelated Willow content;
-- trigger Valerius inquiry;
-- save/load;
-- verify old Memory + contradictory Experience both survive;
-- select contradicted callback through ordinary Silas Dialogue UI;
-- verify `silas_exp_old_silence_reinterpreted`;
-- verify hidden-chain quest is not unlocked;
-- verify Trust is not falsely restored while Understanding/Shared Meaning change as authored;
-- verify old Memory remains present.
-
-Historical M12-M14 evidence may be seeded directly only because those routes were independently qualified earlier. Every new M15 Experience and quest consequence must be exercised through ordinary production paths.
-
-## 17. Acceptance criteria
+## 16. Acceptance criteria
 
 - [x] corrected exact baseline frozen;
 - [x] fresh v2 branch created from corrected `main`;
 - [x] v1 STOP evidence preserved rather than rewritten;
 - [x] v2 preregistration committed before production behavior changes;
-- [ ] repaired M14 policy-exclusivity prerequisite reverified;
-- [ ] one old Silas landmark reused;
-- [ ] reinforcing later history exercised;
-- [ ] contradictory later history exercised;
-- [ ] control history lacks old landmark;
-- [ ] unrelated NPC Relationship evidence occurs between historical setup and callback;
-- [ ] additional Relationship state changes before callback;
-- [ ] save/load occurs before callback;
-- [ ] old Silas Memory survives save/load;
-- [ ] old Silas Memory survives later contradictory evidence;
-- [ ] contradictory M14 evidence remains present;
-- [ ] callback interpretation composes old + recent evidence;
-- [ ] control history cannot invoke privileged callback through UI or direct thunk;
-- [ ] reinforced history receives materially different later gameplay access;
-- [ ] contradicted history does not receive the same privileged access;
-- [ ] new M15 callbacks produce new Relationship evidence;
-- [ ] no shadow story/Relationship boolean;
-- [ ] no NPC-ID generic runtime branch;
-- [ ] no new Relationship dimension or Connection tier;
-- [ ] no new save schema solely for M15;
-- [ ] no generalized condition language from this one case;
-- [ ] accumulated M4-M14 + exclusivity qualification remains green;
-- [ ] dedicated M15 qualification passes;
-- [ ] TypeScript passes;
-- [ ] production build passes;
-- [ ] first complete behavioral candidate SHA/tree recorded;
-- [ ] actual results/evidence ceiling recorded before merge;
+- [x] repaired M14 policy-exclusivity prerequisite reverified;
+- [x] one old Silas landmark reused;
+- [x] reinforcing later history exercised;
+- [x] contradictory later history exercised;
+- [x] control history lacks old landmark;
+- [x] unrelated NPC Relationship evidence occurs between historical setup and callback;
+- [x] additional Relationship state changes before callback;
+- [x] save/load occurs before callback;
+- [x] old Silas Memory survives save/load;
+- [x] old Silas Memory survives later contradictory evidence;
+- [x] contradictory M14 evidence remains present;
+- [x] callback interpretation composes old + recent evidence;
+- [x] control history cannot invoke privileged callback through UI or direct thunk;
+- [x] reinforced history receives materially different later gameplay access;
+- [x] contradicted history does not receive the same privileged access;
+- [x] new M15 callbacks produce new Relationship evidence;
+- [x] no shadow story/Relationship boolean;
+- [x] no NPC-ID generic runtime branch;
+- [x] no new Relationship dimension or Connection tier;
+- [x] no new save schema solely for M15;
+- [x] no generalized condition language from this one case;
+- [x] accumulated M4-M14 + exclusivity qualification remains green;
+- [x] dedicated M15 qualification passes;
+- [x] TypeScript passes;
+- [x] production build passes;
+- [x] first complete behavioral candidate SHA/tree recorded;
+- [x] actual results/evidence ceiling recorded before merge;
 - [ ] documentation-complete exact final head passes Build Validation;
 - [ ] merge uses exact qualified head with expected-head guard.
 
+The two remaining unchecked items are intentionally external to this results commit: this document update changes the PR head, so the documentation-complete candidate must receive its own exact-head Build Validation before merge.
+
+## 17. Verdict
+
+**PASS, contingent only on exact-final-head requalification of this documentation-complete candidate.**
+
+The bounded M15 hypothesis survived without a new generic narrative-history abstraction:
+
+> Old Relationship evidence remains causally relevant after later reinforcing or contradictory Relationship history, unrelated NPC Relationship activity, and save/load. Old and newer evidence can jointly determine later story availability and materially different gameplay access while both historical facts remain durable.
+
+The strongest conceptual result is:
+
+> **The past is not replaced by the present. The present changes what the past means now.**
+
+M13 showed that Relationship state can cause later story.
+M14 showed that one event can mean different things to several relationships.
+M15 now shows that a relationship can accumulate history whose earlier and later evidence remain jointly causal.
+
 ## 18. Evidence ceiling
 
-Even a PASS establishes only:
-
-> A bounded production relationship history can remain causally relevant across intervening events, additional reinforcing or contradictory relationship evidence, unrelated NPC activity, and save/load; old and newer evidence can jointly determine later story availability without a duplicate story flag or NPC-specific generic runtime branch.
-
-M15 does not establish:
+M15 does **not** establish:
 
 - whole-campaign continuity;
-- automatic Memory aging/decay;
+- automatic Memory aging, decay, or reinterpretation algorithms;
 - arbitrary historical reasoning;
 - NPC belief simulation;
 - emergent/procedural storytelling;
+- a generalized temporal query language;
 - human satisfaction, pacing, emotional quality, or comprehensibility;
 - campaign-scale branching scalability.
 
-"Long horizon" means causal distance in authored game history, not a claim about real-world play duration.
+"Long horizon" here means substantial causal distance in authored game history, including intervening relationship events and a persistence boundary. It is not a claim about real-world play duration.
+
+The maximum qualified claim remains:
+
+> A bounded production relationship history can remain causally relevant across intervening events, additional reinforcing or contradictory relationship evidence, unrelated NPC activity, and save/load; old and newer evidence can jointly determine later story availability and differentiated gameplay consequence without duplicate story flags or NPC-specific generic runtime branches.
 
 ## 19. Merge boundary
 
-Open the eventual PR as draft. Merge only after:
+PR #38 must remain draft until the documentation-complete exact head passes Build Validation.
 
-1. first complete behavioral candidate passes Build Validation;
-2. actual results are recorded here;
-3. documentation-complete final head passes Build Validation again;
-4. PR remains mergeable and still points to that exact final SHA.
+If that final gate passes:
 
-Merge with an expected-head guard.
+1. record the exact final SHA/tree and run in PR metadata;
+2. mark the PR ready;
+3. verify the head has not moved and the PR is mergeable;
+4. merge only with an expected-head SHA guard;
+5. verify `main`, integrated tree, and merge parents;
+6. separately check whether GitHub created a post-merge Build Validation before claiming one.
 
 Per owner instruction, Gemini is not merge authority.
