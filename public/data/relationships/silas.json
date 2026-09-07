@@ -133,6 +133,74 @@
       "resonanceTags": ["Information", "Reliance", "OperationalTrust", "CrossFactionRisk"],
       "memoryCandidate": false,
       "interpretation": "You verify that the leaked patrol timings form a real operational pattern rather than broker theatre. Silas now has evidence that information entrusted through your relationship can survive contact with action."
+    },
+    "silas_exp_aftermath_public_crackdown": {
+      "id": "silas_exp_aftermath_public_crackdown",
+      "uniqueKey": "silas:m14:01:aftermath-public-crackdown",
+      "title": "The Source You Burned",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas", "npc_captain_valerius", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -3,
+        "trust": -7,
+        "understanding": 5,
+        "sharedMeaning": -4,
+        "reliance": -5,
+        "vulnerability": 2,
+        "reciprocity": -3
+      },
+      "connectionProgressDelta": 7,
+      "resonanceTags": ["SharedDecision", "BurnedLeverage", "UnderstoodConflict"],
+      "memoryCandidate": false,
+      "interpretation": "Silas understands exactly why a public purge satisfies the Watch. That clarity makes the loss sharper: you burn an information source he exposed because he trusted your restraint, and understanding rises while trust and reliance fall."
+    },
+    "silas_exp_aftermath_protect_source": {
+      "id": "silas_exp_aftermath_protect_source",
+      "uniqueKey": "silas:m14:02:aftermath-protect-source",
+      "title": "The Source You Left Alive",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas", "npc_captain_valerius", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": 2,
+        "trust": 6,
+        "understanding": 4,
+        "sharedMeaning": 5,
+        "reliance": 5,
+        "vulnerability": 3,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 10,
+      "resonanceTags": ["SharedDecision", "PreservedLeverage", "OperationalTrust"],
+      "memoryCandidate": false,
+      "interpretation": "You preserve the embedded source even though doing so weakens the visible closure Valerius wants. Silas reads that as proof that information can remain useful after it crosses into your decisions."
+    },
+    "silas_exp_aftermath_quiet_reroute": {
+      "id": "silas_exp_aftermath_quiet_reroute",
+      "uniqueKey": "silas:m14:03:aftermath-quiet-reroute",
+      "title": "The Pattern You Made Worth Less",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas", "npc_captain_valerius", "npc_blacksmith_gronk"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m14_aftermath_council",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 2,
+        "reliance": 3,
+        "vulnerability": 1,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["SharedDecision", "PreservedLeverage", "AdaptiveRouting"],
+      "memoryCandidate": false,
+      "interpretation": "You do not expose Silas's source and you do not leave the leak useful. By changing the route pattern instead, you preserve some leverage while reducing the damage it can buy."
     }
   },
   "memories": {
