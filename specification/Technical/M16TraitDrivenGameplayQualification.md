@@ -1,6 +1,6 @@
 # M16 — Trait-Driven Gameplay Qualification
 
-**Status:** preregistered; production implementation not yet started  
+**Status:** behavioral candidate qualified; documentation-complete head pending requalification  
 **Baseline:** post-M15 `main` at `337231772cfb1f0cd63ae7378a38219227499134`  
 **Baseline tree:** `c56bda0b0dc678a2bb1ef3f905283f9945c66896`  
 **Branch:** `feature/m16-trait-driven-gameplay`
@@ -95,11 +95,11 @@ A player with permanent `WillowsWisdom` after ordinary save/load must have both 
 
 ## 6. Relationship consequences
 
-Planned ordinary-resolution Experience:
+Ordinary-resolution Experience:
 
 `willow_exp_grove_saved_by_cutting`
 
-Frozen target vector:
+Frozen vector:
 
 - Trust `+1`
 - Understanding `+2`
@@ -107,13 +107,13 @@ Frozen target vector:
 - Reciprocity `+1`
 - Connection Progress `+2`
 
-Interpretation target: Willow accepts that the player acted decisively and preserved what could be preserved, without pretending the destructive cost was invisible.
+Interpretation: Willow accepts that the player acted decisively and preserved what could be preserved, without pretending the destructive cost was invisible.
 
-Planned Wisdom-resolution Experience:
+Wisdom-resolution Experience:
 
 `willow_exp_wisdom_used_in_world`
 
-Frozen target vector:
+Frozen vector:
 
 - Trust `+2`
 - Understanding `+5`
@@ -121,62 +121,86 @@ Frozen target vector:
 - Reciprocity `+3`
 - Connection Progress `+5`
 
-Interpretation target: the player independently used Willow's way of perceiving slow systems on a problem Willow did not solve for them.
+Interpretation: the player independently used Willow's way of perceiving slow systems on a problem Willow did not solve for them.
 
-No new M16 Memory is required for qualification. A Memory may be added only if the authored event is independently judged landmark-worthy; Trait use must not automatically create Memories.
+No M16 Memory is created. Trait use does not automatically create Memories.
 
 ## 7. Reconnaissance / Rule of Two
 
-Before implementation, inspect whether existing generic gameplay authoring already supports Trait-conditioned choices/resolutions.
+Reconnaissance found that existing quest-resolution authoring had no Trait condition:
 
-M16 must not preemptively add:
+- `QuestResolutionOption` had no Trait requirement;
+- `resolveQuestOutcomeThunk` validated readiness, option identity, item costs, Relationship effects, rewards, and resolution locking but did not inspect player Traits;
+- `NPCQuestsTab` rendered authored resolution options without Trait filtering;
+- permanent learned capabilities were already authoritative in `player.permanentTraits`.
 
-- `requiredTraitIds`;
-- `forbiddenTraitIds`;
+Probe A, **The Withering Grove**, therefore exposed a real missing semantic capability. Per the preregistered Rule of Two, no generic extension was added from that one case.
+
+A second independent production probe using permanent `ScholarlyInsight` — **The Impossible Inventory** — required the same missing semantic. The reconnaissance result was frozen before behavioral implementation in `M16TraitDrivenGameplayReconAmendment.md` at commit `2e5cf0711229db5df8f5f5078a7e13abf52a9d1e`.
+
+Two independent production cases therefore justified exactly one bounded generic contract:
+
+```ts
+requiredPermanentTraitIds?: string[];
+```
+
+Semantics:
+
+- omitted/empty preserves existing behavior;
+- all listed Trait IDs must exist in `state.player.permanentTraits`;
+- the authoritative thunk rejects an unmet option before Relationship evidence, item consumption, rewards, or resolution lock;
+- the NPC Quest UI uses the same generic availability helper;
+- temporary/equipped-Trait semantics remain deliberately deferred.
+
+M16 does not add:
+
+- negative Trait conditions;
+- any-of Trait conditions;
 - generalized ability requirements;
 - stat/skill check DSL;
 - arbitrary boolean expression syntax.
 
-If existing contracts are sufficient, reuse them.
-
-If Probe A (Withering Grove) exposes a missing generic semantic capability, a generic extension is not justified from that single inconvenience alone.
-
-A second independent production probe using `ScholarlyInsight` may be added only if necessary to test whether the same authoring gap repeats. A bounded generic Trait-condition contract is warranted only if two independent production cases need the same missing capability.
-
 ## 8. Persistence boundary
 
-The principal qualified path must include ordinary save/load after `WillowsWisdom` is permanent and before the M16 Trait-enabled resolution is consumed.
+The principal qualified path includes ordinary save/load after `WillowsWisdom` is permanent and after the M16 quest is ready, but before the Trait-enabled resolution is consumed.
 
-After load verify:
+After load the qualification verifies:
 
 - permanent `WillowsWisdom` still exists;
-- M16 gameplay state remains valid;
-- Trait-enabled resolution availability is preserved.
+- the quest remains `READY_TO_COMPLETE`;
+- both the ordinary and Trait-enabled resolutions are available;
+- the Trait-enabled resolution can be chosen normally.
 
-No M16 save-schema change is permitted absent an independently discovered persistence defect.
+No M16 save-schema change was required.
 
 ## 9. Runtime enforcement
 
 UI hiding alone is insufficient.
 
-A direct attempt to process the Wisdom-only resolution without permanent `WillowsWisdom` must be rejected below the presentation layer.
+The authoritative runtime gate is generic and checks only `QuestResolutionOption.requiredPermanentTraitIds` against `state.player.permanentTraits`.
 
-The authoritative runtime gate must be generic with respect to Trait identity; no generic runtime branch may check `npc_elder_willow`, `WillowsWisdom`, or any M16-specific ID as a special case.
+A direct attempt to process a Trait-only resolution without its permanent Trait is rejected before any Relationship consequence or resolution lock occurs.
 
-## 10. Expected implementation scope
+No generic runtime branch checks `npc_elder_willow`, `npc_scholar_elara`, `WillowsWisdom`, `ScholarlyInsight`, or an M16 quest ID as a special case.
 
-Expected changes are limited to the smallest necessary production and qualification surface, likely among:
+## 10. Actual implementation scope
 
-- `public/data/quests.json`;
-- `public/data/dialogues.json` if needed for introduction/turn-in;
-- `public/data/npcs.json` if an existing NPC topic list must reference new content;
-- `public/data/relationships/elder-willow.json`;
-- the existing Quest or Dialogue authoring/runtime contract if a generic Trait gate is empirically justified;
-- one dedicated M16 behavioral qualification test;
-- `.github/workflows/build-validation.yml`;
-- this document's later result section.
+M16 changed the following bounded surfaces:
 
-Expected Relationship runtime behavioral changes: **none**.
+- `public/data/quests.json` — authored the two production probes;
+- `public/data/relationships/m16-gameplay.json` — four probe consequences;
+- `public/data/relationships/index.json` — registered the M16 bundle;
+- `src/features/Quest/state/QuestTypes.ts` — optional `requiredPermanentTraitIds` field;
+- `src/features/Quest/state/QuestResolutionAvailability.ts` — shared pure gate helper;
+- `src/features/Quest/state/QuestThunks.ts` — authoritative rejection;
+- `src/features/NPCs/components/ui/tabs/NPCQuestsTab.tsx` — matching option visibility;
+- `src/features/Quest/state/QuestM16TraitDrivenGameplay.test.tsx` — dedicated qualification;
+- `.github/workflows/build-validation.yml` — accumulated M16 gate;
+- the M16 preregistration and reconnaissance documents.
+
+No Relationship runtime behavioral file or save-schema file changed.
+
+`public/data/quests.json` was formatting-normalized while the two probes were added, making its textual diff larger than the semantic change. The accumulated behavioral suite and production build were therefore retained as the authority for compatibility rather than treating line-count size as evidence of behavioral scope.
 
 ## 11. Explicit non-goals
 
@@ -200,103 +224,200 @@ M16 does not build:
 
 ## 12. Stop / falsification conditions
 
-Stop and preserve the finding if M16 requires:
+M16 did not require:
 
 - `willowWisdomUsed`, `willowCanSolveGrove`, `groveWisdomRouteUnlocked`, `playerLearnedWillowMethod`, or equivalent duplicate persistent booleans;
-- a generic runtime branch keyed on `npc_elder_willow`, `WillowsWisdom`, or an M16 ID;
+- a generic runtime branch keyed on Willow, Elara, either Trait, or an M16 ID;
 - direct Willow Relationship inspection as gameplay capability authority;
 - legacy Affinity or `connectionDepth` as the gameplay gate;
 - UI-only gating with a bypassable runtime action;
 - re-earning the permanent Trait after save/load;
-- two visually different resolutions with mechanically/relationally identical consequence;
-- a generalized ability/condition framework introduced from only one production case;
+- mechanically/relationally identical alternate resolutions;
+- a generalized ability/condition framework;
 - a save-schema change solely for M16.
 
-A clean FAIL is evidence and must not be normalized away.
+No preregistered stop condition fired after implementation began.
 
-## 13. Dedicated qualification
+## 13. Dedicated qualification result
 
-Create one dedicated M16 test in the feature that owns the authoritative resolution gate after reconnaissance.
+`src/features/Quest/state/QuestM16TraitDrivenGameplay.test.tsx` passes five cases.
 
-At minimum it must prove:
+### Test A — production authoring / architecture / Rule of Two
 
-### Test A — production authoring / architecture
+Proves:
 
-- existing relationship-mediated Willow Trait acquisition remains intact;
-- M16 uses Trait state as gameplay capability authority;
-- no duplicate Willow story flag;
-- no legacy Relationship proxy;
-- no M16-specific generic runtime branch;
-- any generic Trait-gate extension is justified by the recorded Rule-of-Two evidence.
+- Willow and Elara probes use the same generic permanent-Trait gate;
+- ordinary routes have no Trait requirement;
+- Willow requires `WillowsWisdom` and Elara requires `ScholarlyInsight`;
+- all-of semantics work generically;
+- the M16 Relationship bundle is manifest-registered;
+- all four authored consequences exist;
+- M16 adds no Memory;
+- no negative/any-of/expression-language Trait condition appears;
+- audited generic runtime files contain no M16 quest IDs, NPC IDs, or Trait IDs as special cases.
 
-### Test B — no-Trait control
+### Test B — no-Trait Willow control
 
-- ordinary route available;
-- Wisdom route unavailable;
-- direct bypass rejected;
-- ordinary route completes;
-- `willow_exp_grove_saved_by_cutting` recorded;
-- Wisdom consequence absent.
+Proves:
 
-### Test C — qualified permanent-Trait route
+- **Remove the Corrupted Roots** remains available;
+- **Restore the Underlying Flow** is hidden;
+- direct thunk invocation of the Wisdom route is rejected and does not lock a resolution or create the special Experience;
+- the ordinary route completes through production UI and records `willow_exp_grove_saved_by_cutting`;
+- the Wisdom Experience remains absent.
 
-- permanent `WillowsWisdom` established through qualified state/production path;
-- save/load before M16 resolution;
-- ordinary and Wisdom routes available after load;
-- Wisdom route completes through ordinary production UI/runtime;
-- `willow_exp_wisdom_used_in_world` recorded;
-- ordinary-only consequence absent;
-- permanent Trait remains owned.
+### Test C — permanent Willow Trait + save/load
 
-### Test D — strong Relationship, no permanent Trait
+Proves:
 
-- Willow Relationship may be highly qualified;
-- `WillowsWisdom` is not permanent;
-- Wisdom route remains unavailable;
-- direct bypass rejected.
+- independently qualified permanent Trait ownership survives save/load;
+- the ready quest survives save/load;
+- both ordinary and Wisdom routes are visible after load;
+- choosing **Restore the Underlying Flow** through production UI records `willow_exp_wisdom_used_in_world`;
+- the ordinary-only consequence is absent;
+- permanent `WillowsWisdom` remains owned.
 
-Historical Willow evidence may be seeded only where independently qualified by earlier tests. New M16 Experiences/resolutions must be exercised through ordinary production paths.
+### Test D — strong Willow Relationship without permanent Trait
+
+Seeds previously qualified Willow Relationship evidence through independent application and the landmark `willow_memory_lesson_made_yours`, while deliberately withholding permanent `WillowsWisdom`.
+
+The Wisdom route remains hidden and direct invocation remains rejected.
+
+This qualifies the authority boundary:
+
+```text
+Relationship evidence != learned gameplay capability
+permanent Trait state  == learned gameplay capability authority
+```
+
+### Test E — independent Scholarly Insight corroboration
+
+Without permanent `ScholarlyInsight`, the ordinary **Accept the Most Plausible Inventory** route remains available while **Reopen the Model Around the Contradiction** is hidden and direct invocation is rejected.
+
+With permanent `ScholarlyInsight`, the same generic gate exposes the alternate route, which completes through production UI and records `elara_exp_insight_reopens_inventory` rather than the ordinary Elara consequence.
 
 ## 14. Acceptance criteria
 
 - [x] exact post-M15 baseline SHA/tree frozen;
 - [x] fresh M16 branch created from exact baseline;
 - [x] preregistration committed before behavior changes;
-- [ ] existing Trait-consumption/gameplay contracts reconnoitered;
-- [ ] existing Willow assimilation reused rather than rebuilt;
-- [ ] one ordinary gameplay problem authored;
-- [ ] problem completable without Trait;
-- [ ] permanent `WillowsWisdom` creates a materially different optional solution;
-- [ ] Relationship state is not gameplay capability authority;
-- [ ] strong Relationship without permanent Trait does not grant capability;
-- [ ] direct invalid bypass rejected below UI;
-- [ ] permanent Trait and route survive save/load;
-- [ ] ordinary route records ordinary Relationship consequence;
-- [ ] Trait route records different Relationship consequence;
-- [ ] no shadow boolean;
-- [ ] no NPC-specific generic branch;
-- [ ] no generalized ability/condition DSL from one case;
-- [ ] no new Relationship dimension or Connection tier;
-- [ ] no save-schema change unless an independent defect is discovered;
-- [ ] accumulated M4-M15 qualification remains green;
-- [ ] dedicated M16 qualification passes;
-- [ ] TypeScript passes;
-- [ ] production build passes;
-- [ ] first complete behavioral candidate SHA/tree recorded;
-- [ ] result + architecture finding + evidence ceiling recorded;
+- [x] existing Trait-consumption/gameplay contracts reconnoitered;
+- [x] existing Willow assimilation reused rather than rebuilt;
+- [x] one ordinary gameplay problem authored;
+- [x] problem completable without Trait;
+- [x] permanent `WillowsWisdom` creates a materially different optional solution;
+- [x] Relationship state is not gameplay capability authority;
+- [x] strong Relationship without permanent Trait does not grant capability;
+- [x] direct invalid bypass rejected below UI;
+- [x] permanent Trait and route survive save/load;
+- [x] ordinary route records ordinary Relationship consequence;
+- [x] Trait route records different Relationship consequence;
+- [x] no shadow boolean;
+- [x] no NPC-specific generic branch;
+- [x] no generalized ability/condition DSL from one case;
+- [x] no new Relationship dimension or Connection tier;
+- [x] no save-schema change;
+- [x] accumulated M4-M15 qualification remains green;
+- [x] dedicated M16 qualification passes;
+- [x] TypeScript passes;
+- [x] production build passes;
+- [x] first complete behavioral candidate SHA/tree recorded;
+- [x] result + architecture finding + evidence ceiling recorded;
 - [ ] documentation-complete final head requalified;
 - [ ] exact qualified head merged with expected-head guard;
 - [ ] integrated `main` SHA/tree verified;
 - [ ] post-merge CI claimed only if it actually exists.
 
-## 15. Evidence ceiling
+## 15. First complete behavioral candidate
 
-Even on PASS, the maximum claim is:
+Candidate:
 
-> An existing Relationship-derived permanent Trait can materially alter the solution space of a bounded production gameplay problem and produce a distinct later Relationship consequence through generic gameplay contracts.
+- SHA `93840cc7312c1359e216f961abd3e7c8785560a0`
+- tree `2887395b34678ece059338881b101746a88f7b28`
+- compared with M15 baseline: 11 commits / 11 intended changed files
 
-M16 does not qualify full build diversity, a complete ability/skill system, balanced Trait usefulness, combat viability, generalized RPG skill checks, campaign-scale Trait relevance, puzzle quality, or human enjoyment.
+Build Validation #167:
 
-## 16. Merge authority
+- run `34113734869`
+- job `101715611695`
+- exact head `93840cc7312c1359e216f961abd3e7c8785560a0`
+- dependency installation: **PASS**
+- TypeScript: **PASS**
+- accumulated M4-M16 behavioral qualification: **PASS**
+- production build: **PASS**
+- overall verdict: **PASS**
+
+No implementation repair cycle occurred after the first complete behavioral candidate entered CI.
+
+## 16. Architecture finding
+
+M16 produced a bounded positive abstraction result.
+
+The existing architecture was sufficient for Relationship provenance, permanent Trait ownership, quest consequences, Relationship consequence recording, location objectives, and persistence. The only repeated missing semantic was a way for an authored quest resolution to require an already-permanent learned capability.
+
+The Rule-of-Two demonstrated this independently with:
+
+```text
+WillowsWisdom
+-> The Withering Grove alternate restoration
+
+ScholarlyInsight
+-> The Impossible Inventory alternate model revision
+```
+
+Therefore the warranted abstraction is only:
+
+```ts
+requiredPermanentTraitIds?: string[];
+```
+
+The result does **not** warrant a generalized ability system, skill-check DSL, temporary-Trait capability semantics, negative Trait conditions, or arbitrary predicate language.
+
+A second important boundary is now qualified:
+
+```text
+Relationship owns why/how the protagonist learned from someone.
+Trait owns the durable learned capability.
+Quest/gameplay consumes the Trait capability.
+Relationship interprets the consequence afterward.
+```
+
+## 17. Qualified claim
+
+> An existing Relationship-derived permanent Trait can materially alter the solution space of a bounded production gameplay problem and produce a distinct later Relationship consequence through a generic permanent-Trait quest-resolution gate. Strong Relationship evidence without the permanent Trait remains insufficient for the gameplay capability, and invalid Trait-only resolutions are rejected below the UI.
+
+Conceptually:
+
+```text
+Relationship
+-> learning
+-> permanent capability
+-> different action
+-> different consequence
+-> Relationship
+```
+
+## 18. Evidence ceiling
+
+M16 does **not** qualify:
+
+- a complete ability or skill system;
+- broad build diversity;
+- balanced Trait usefulness;
+- temporary/equipped-Trait gameplay semantics;
+- generalized RPG skill checks;
+- stat checks or probability systems;
+- combat viability;
+- exploration-system maturity;
+- campaign-scale Trait relevance;
+- puzzle quality;
+- human enjoyment, pacing, or perceived meaningfulness;
+- that every Trait should produce bespoke alternate quest resolutions.
+
+The strongest supported claim is bounded to two production quest-resolution probes using two already-qualified permanent Relationship-derived Traits through one generic positive permanent-Trait gate.
+
+## 19. Merge authority
 
 Build Validation on the exact candidate SHA is merge authority. Gemini is not merge authority.
+
+The documentation-complete head produced by this results record must receive its own exact-head Build Validation before merge.
