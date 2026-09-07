@@ -509,6 +509,66 @@
       "leave_it": null
     }
   },
+  "silas_m15_brokers_price": {
+    "id": "silas_m15_brokers_price",
+    "npcId": "npc_rogue_silas",
+    "title": "A Broker's Price",
+    "text": "Silas reads the copied ledger without touching it. 'Forgery this good is not about handwriting. It is about buying the right true facts and connecting them with one false transaction. You can prove that without me giving you anyone who is still alive in the market.'",
+    "requiredExperienceIds": ["valerius_exp_forged_ledger_inquiry"],
+    "responses": {
+      "take_method": "Then give me the method. I will prove the chain the slow way."
+    },
+    "effects": [],
+    "next": {
+      "take_method": null
+    }
+  },
+  "silas_m15_debt_still_counts": {
+    "id": "silas_m15_debt_still_counts",
+    "npcId": "npc_rogue_silas",
+    "title": "A Debt He Still Counts",
+    "text": "Silas folds the ledger shut. 'You did not sell mine when selling it would have paid. Later, when the leak became useful, you still found a way not to burn the channel just to make the map look clean. I keep accounts too.' He writes one live broker mark on the back of the page.",
+    "repeatable": false,
+    "requiredExperienceIds": [
+      "valerius_exp_forged_ledger_inquiry",
+      "silas_exp_secret_neither_sold"
+    ],
+    "anyOfExperienceIds": [
+      "silas_exp_aftermath_protect_source",
+      "silas_exp_aftermath_quiet_reroute"
+    ],
+    "responses": {
+      "risk_chain": "You are risking a live chain. I will verify it without spending it carelessly."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_old_silence_repaid", "responseId": "risk_chain" },
+      { "type": "UNLOCK_QUEST", "questId": "quest_m15_follow_hidden_chain", "responseId": "risk_chain" }
+    ],
+    "next": {
+      "risk_chain": null
+    }
+  },
+  "silas_m15_debt_not_renewed": {
+    "id": "silas_m15_debt_not_renewed",
+    "npcId": "npc_rogue_silas",
+    "title": "A Debt Remembered, Not Renewed",
+    "text": "Silas studies the ledger, then you. 'You did not sell my secret. That is still true. You burned a source I exposed later. That is also true. I will tell Valerius the first fact and how this forgery was built. I will not give you another living name.'",
+    "repeatable": false,
+    "requiredExperienceIds": [
+      "valerius_exp_forged_ledger_inquiry",
+      "silas_exp_secret_neither_sold",
+      "silas_exp_aftermath_public_crackdown"
+    ],
+    "responses": {
+      "confirm_limit": "Fair. Confirm what is true. Keep the live names."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_old_silence_reinterpreted", "responseId": "confirm_limit" }
+    ],
+    "next": {
+      "confirm_limit": null
+    }
+  },
   "valerius_greeting": {
     "id": "valerius_greeting",
     "npcId": "npc_captain_valerius",
@@ -653,6 +713,24 @@
       "public_crackdown": null,
       "protect_source": null,
       "quiet_reroute": null
+    }
+  },
+  "valerius_m15_forged_ledger_inquiry": {
+    "id": "valerius_m15_forged_ledger_inquiry",
+    "npcId": "npc_captain_valerius",
+    "title": "The Ledger That Should Not Exist",
+    "text": "Valerius places a broker ledger beside the patrol map you once rewrote. The dates, payments, and Watch routes fit too well: on paper, you sold operational information after he trusted you with discretion. 'I will not call evidence false because I dislike its conclusion,' he says. 'And I will not call an accusation a verdict before we test its chain.'",
+    "repeatable": false,
+    "requiredExperienceIds": ["valerius_exp_merchant_leak_broken"],
+    "responses": {
+      "investigate": "Treat the ledger as evidence, not verdict. Give me the chain and I will test where the true facts become a false transaction."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_forged_ledger_inquiry", "responseId": "investigate" },
+      { "type": "UNLOCK_QUEST", "questId": "quest_m15_verify_forged_ledger", "responseId": "investigate" }
+    ],
+    "next": {
+      "investigate": null
     }
   },
   "gronk_m14_repair_ledger": {
