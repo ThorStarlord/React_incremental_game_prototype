@@ -221,6 +221,27 @@
       "resonanceTags": ["SharedDecision", "VisibleOrder", "InstitutionalClosure"],
       "memoryCandidate": false,
       "interpretation": "You prioritize reopening the district on a schedule the Watch can defend publicly. Valerius values the restored order even though Gronk sees the same decision as knowingly under-repairing the real load path."
+    },
+    "valerius_exp_forged_ledger_inquiry": {
+      "id": "valerius_exp_forged_ledger_inquiry",
+      "uniqueKey": "valerius:m15:01:forged-ledger-inquiry",
+      "title": "The Ledger He Did Not Treat as a Verdict",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m15_forged_ledger_inquiry",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 2,
+        "reliance": 2,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": ["LongHorizon", "DelegatedJudgment", "EvidenceBeforeVerdict", "InstitutionalTrust"],
+      "memoryCandidate": false,
+      "interpretation": "A ledger appears to implicate you in selling Watch information. Valerius does not dismiss the evidence, but prior delegated judgment gives him reason to investigate before converting an accusation into a verdict."
     }
   },
   "memories": {
