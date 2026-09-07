@@ -626,6 +626,7 @@
     "npcId": "npc_captain_valerius",
     "title": "The Cost of Closing the Leak",
     "text": "The leak is broken, but the room does not agree on what closure means. Valerius wants the compromised routes purged visibly. Silas warns that a full sweep burns the source who exposed the buyers. Gronk lays a caravan ledger beside the patrol map and points out which repair and trade routes collapse if the district is sealed for appearance's sake. All three wait for the decision you were trusted to make.",
+    "repeatable": false,
     "requiredExperienceIds": [
       "valerius_exp_merchant_leak_broken",
       "silas_exp_watch_leak_traced",
@@ -659,6 +660,7 @@
     "npcId": "npc_blacksmith_gronk",
     "title": "The Repair Ledger",
     "text": "The quiet reroute works, but the district now needs permanent repairs. Valerius can reopen every visible lane by week's end if Gronk plates the damaged mounts and leaves the deeper load path for later. Gronk refuses to call that a repair. 'You already proved you can move the load instead of hiding it. Decide whether that was a principle or a trick.'",
+    "repeatable": false,
     "requiredExperienceIds": ["gronk_exp_quiet_reroute_proven"],
     "responses": {
       "build_for_load": "Repair the load path first. If reopening takes longer, the Watch can explain why. I will not turn a known structural failure into a public-relations schedule.",
