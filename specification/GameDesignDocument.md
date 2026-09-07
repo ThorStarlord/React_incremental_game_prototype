@@ -1,259 +1,349 @@
 # Game Design Document
 ## React Incremental RPG Prototype
 
-**Version:** 1.0  
-**Date:** Current  
-**Status:** Living Document  
+**Status:** Living product document — reconciled after M14  
+**Canonical authority note:** Read `Technical/PostM14ProductReconciliation.md` before extending legacy relationship mechanics.
 
 ---
 
-## 🎯 Executive Summary
+## Executive Summary
 
-The React Incremental RPG Prototype is an experimental incremental game that explores emotional connection mechanics as the core progression driver. Unlike traditional incremental games focused on numerical growth, this prototype emphasizes building meaningful relationships with NPCs to unlock character abilities and create allied entities.
+The React Incremental RPG Prototype is an experimental incremental RPG where **relationship history becomes power, access, automation, and narrative causality**.
 
-### Core Innovation
-The game replaces traditional "clicking for numbers" with "connecting for growth," where players invest time and emotional intelligence to build relationships that yield both mechanical benefits and narrative depth.
+The game does not treat relationships as a single approval meter. Meaningful dialogue, quests, conflict, shared risk, teaching, betrayal, cooperation, and sacrifice can become durable Relationship Experiences. Landmark Experiences can form Memories; accumulated evidence shapes a Bond Profile and qualified Connection; that state can alter passive Essence generation, Trait-learning conditions, later story availability, and eventually broader world consequences.
 
-## 🌟 Game Concept
+### Core innovation
 
-### Vision Statement
-Create an incremental RPG where emotional intelligence and relationship building drive progression, allowing players to acquire abilities through understanding and connecting with diverse characters rather than grinding resources.
+The distinctive progression promise is:
 
-### Target Experience
-Players should feel like they're building a network of meaningful relationships while gradually becoming more capable through the wisdom and abilities gained from these connections.
+> The protagonist becomes more capable because relationships change what they understand, what they can internalize, what resources they generate, and what later situations become possible.
 
-### Unique Selling Points
-1. **Emotional Connection Mechanics** - Relationships as primary progression currency
-2. **Trait Acquisition System** - Learn abilities from NPCs through understanding
-3. **Copy Creation** - Transform deep connections into allied entities
-4. **Essence Economy** - Metaphysical resource generated from emotional bonds
-5. **Character Customization** - Build unique character combinations through relationship choices
+This replaces the older product assumption that Affinity is relationship XP and that reaching a numeric Affinity threshold automatically increases `connectionDepth`.
 
-## 🎮 Core Gameplay Loop
+---
 
-### Primary Loop (5-10 minutes)
-1. **Discover NPCs** - Encounter new characters with unique traits and personalities
-\n+## 📖 Narrative Documentation
-Detailed story, character bios, and world lore have been externalized into the new `specification/Narrative/` folder:
-- `Narrative/Synopsis.md` – Act structure & macro beats
-- `Narrative/Characters.md` – Key character bios & progression flags
-- `Narrative/WorldLore.md` – Cosmology, factions, relic taxonomy, systemic hooks
-These documents serve as the canonical narrative reference for quest design, dialogue authoring, trait sourcing rationale, and future feature gating.
-2. **Build Relationships** - Engage in dialogue and activities to deepen connections
-3. **Generate Essence** - Passive resource generation from active emotional connections
-4. **Acquire Traits** - Spend Essence to learn abilities from connected NPCs
-5. **Customize Character** - Equip and manage acquired traits for desired build
+## Game Concept
 
-### Secondary Loop (30-60 minutes)
-1. **Deepen Existing Connections** - Strengthen relationships for better Essence generation
-2. **Make Traits Permanent** - Invest significant Essence to free up trait slots
-3. **Create Copies** - Transform deepest connections into allied entities
-4. **Manage Copy Network** - Direct and develop allied entities for various tasks
-5. **Explore New Areas** - Unlock regions with unique NPCs and opportunities
+### Vision statement
 
-### Meta Loop (Multiple Sessions)
-1. **Character Mastery** - Develop specialized character builds through trait combinations
-2. **Relationship Portfolio** - Build diverse network of connections for varied benefits
-3. **Copy Empire** - Manage multiple allied entities with specialized roles
-4. **Narrative Discovery** - Uncover deeper stories through long-term NPC relationships
-5. **System Mastery** - Optimize Essence generation and trait acquisition strategies
+Create an incremental RPG where building consequential relationships is a primary source of progression, allowing the player to learn capabilities, generate metaphysical resources, unlock new solutions, and create a network of delegated agents while the story remembers how those relationships were formed.
 
-## 🧠 Core Mechanics
+### Target experience
 
-### Emotional Connection System
-**Concept**: The foundation of all progression, representing the depth of understanding and bond between player and NPCs. This connection is crucial for unlocking interactions and generating Essence.
+Players should feel that:
 
-**Implementation**:
-- **Affinity**: Represents the player's current standing or favorability with an NPC. It's a dynamic, often fluctuating value (0-99). Increases through positive interactions, decreases through negative actions. Primarily impacts gameplay services (unlocks trading, quests, dialogue options; affects shop prices).
-- **Intimacy (Connection Depth)**: Represents the depth of the metaphysical or emotional bond. It's a "level up" mechanic (0-10+ integer levels). Increases by 1 each time Affinity reaches 100 (Affinity then resets to 0). Primarily drives metaphysical and core progression (Essence Generation, Trait Resonance).
-- **Essence Generation**: Passive resource production directly linked to the sum of `connectionDepth` levels from all connected NPCs.
-- **Unlock Gates**: Deeper connections (both Affinity and Intimacy) unlock new interaction options and content (e.g., tabs in the NPC panel).
+- characters remember important history;
+- different relationships have genuinely different meanings;
+- conflict can deepen a relationship without becoming affection;
+- capabilities learned through others feel earned rather than purchased from a menu;
+- passive/incremental growth is downstream of the player's social and strategic history;
+- one decision can help one relationship while harming another;
+- routine work can eventually be delegated without automating irreversible story choices.
 
-**Player Actions**:
-- Engage in meaningful dialogue choices that resonate with NPC personalities
-- Complete personal quests or favors that matter to the NPC
-- Share beneficial traits to demonstrate care and investment
-- Spend time in activities the NPC enjoys or values
+### Unique selling points
+
+1. **Evidence-based Relationship progression** — Experiences, Memories, Bond dimensions, and qualified Connection rather than one universal relationship XP bar.
+2. **Relationship-mediated Trait learning** — discovery, temporary attunement, assimilation, Memory evidence, and permanent Resonance for migrated Traits.
+3. **Relationship-derived Essence** — ongoing passive power generated from meaningful relational significance rather than relationship milestones acting as loot drops.
+4. **Narrative causal memory** — persisted Relationship evidence can unlock or alter later story consequences.
+5. **Multi-NPC social consequence** — one shared event can be interpreted differently by several characters.
+6. **Copy network** — growth, loyalty, Trait sharing, roles, and future routine-task automation extend the incremental layer.
+7. **Character customization** — permanent and slotted Traits support different gameplay solutions and future builds.
+
+---
+
+## Canonical Gameplay Loop
+
+```text
+Discover person / problem
+-> participate in meaningful event
+-> record Relationship Experience
+-> form/alter Bond Profile and possibly Memory
+-> qualify Connection and change ongoing Essence / Trait-learning conditions
+-> discover / assimilate / Resonate capability
+-> use capability in gameplay
+-> create story / world consequence
+-> NPCs interpret the consequence
+-> create new Relationship evidence
+-> eventually delegate routine work through Copies
+```
+
+### Short-session loop
+
+1. Interact with an NPC, quest, location, or active problem.
+2. Make a meaningful decision or perform an action.
+3. Receive gameplay consequences and, where relationally meaningful, Relationship evidence.
+4. Observe changes to Connection, Bond dimensions, Essence rate, Trait progress, quest availability, or story access.
+5. Choose the next action, Trait loadout, destination, or investment.
+
+### Mid-session loop
+
+1. Deepen or complicate several Relationships.
+2. Complete quests and authored resolution choices.
+3. Accumulate passive Essence.
+4. Discover and assimilate useful Traits.
+5. Spend Essence to stabilize qualified Traits permanently.
+6. Use learned capabilities to solve later problems differently.
+7. Develop Copies for routine/automated work as that system matures.
+
+### Multi-session loop
+
+1. Build a diverse Relationship network.
+2. Accumulate Memories and long-horizon callbacks.
+3. Develop specialized Trait combinations.
+4. Build an increasingly capable Copy network.
+5. Expand into travel, combat, factions, and durable world consequences.
+6. Revisit old choices when later story situations consume historical evidence.
+
+---
+
+## Core Mechanics
+
+### Relationship System
+
+The canonical Relationship model is defined in `Features/RelationshipExperienceSystem.md`.
+
+#### Relationship Experience
+
+A persistent record of an event that changed how participants understand, value, trust, rely on, oppose, or otherwise relate to one another.
+
+#### Memory
+
+A landmark Experience that remains durable evidence of how the relationship became what it is.
+
+#### Bond Profile
+
+The interpreted current relationship state. Universal dimensions include:
+
+- Affinity;
+- Trust;
+- Understanding;
+- Shared Meaning;
+- Reliance;
+- Vulnerability;
+- Reciprocity.
+
+Custom dimensions may exist when genuinely necessary, but should not replace the universal model.
+
+#### Affinity
+
+Affinity is current positive or negative disposition. It can still affect service access, pricing, dialogue tone, and short-term reactions.
+
+**Affinity is not Connection XP.**
+
+A hostile or rival relationship may have low Affinity while still having high Connection, Understanding, Shared Meaning, or metaphysical significance.
+
+#### Connection
+
+Connection represents evidence-qualified relational significance. Progress toward the next Connection level requires authored relationship evidence and semantic qualification, not merely accumulation of positive points.
+
+Registered Relationship-authority NPCs currently include Elder Willow, Lyra, Elara, Gronk, Silas, and Valerius.
+
+Legacy `connectionDepth` fields remain compatibility surfaces for unmigrated systems and saves; they are not the product rule for new Relationship-authority content.
 
 ### Essence System
-**Concept**: Metaphysical currency representing emotional energy and potential for growth. Essence is the primary resource for advanced actions and progression.
 
-**Generation**:
-- **Passive Income** - Continuous generation directly from the `connectionDepth` of all active emotional connections.
-- **Connection Depth Influence** - Higher `connectionDepth` with NPCs leads to increased passive Essence generation.
-- **NPC Uniqueness** - More complex or powerful NPCs provide higher base generation rates for their connections.
-- **Manual Actions** - Limited direct generation through focused actions (e.g., clicking a button).
-- **Trait Multipliers** - Certain player traits can increase the overall Essence generation rate.
+Essence is the primary metaphysical resource used for advanced progression and permanent Trait Resonance.
 
-**Consumption**:
-- **Trait Acquisition (Resonance)** - Primary Essence sink for learning new abilities from NPCs. This is the "Resonance" action.
-- **Trait Permanence** - Major investment to make traits always active without slot usage.
-- **Copy Acceleration** - Speed up entity creation and development.
-- **Emotional Influence** - Direct manipulation of NPC emotional states - *Planned for future implementation.*
+Relationship events normally change **future generation conditions**, not the current balance directly.
 
-**Consumption**:
-- **Trait Acquisition** - Primary Essence sink for learning new abilities
-- **Trait Permanence** - Major investment to make traits always active
-- **Copy Acceleration** - Speed up entity creation and development
-- **Emotional Influence** - Direct manipulation of NPC emotional states
+For Relationship-authority sources with Essence enabled:
+
+```text
+NPC Essence Rate
+= Connection Base Rate
+x Resonance Quality
+x Tether
+x Stability
+```
+
+Total passive generation combines:
+
+```text
+Global base rate
++ Relationship-derived NPC contributions
++ qualifying Copy contributions
++ other explicitly justified sources
+```
+
+World-derived Tether and campaign-wide economy balancing remain future work.
 
 ### Trait System
-**Concept**: Abilities, characteristics, and passive bonuses that define character capabilities. Traits are acquired from NPCs and equipped to enhance the player.
 
-**Acquisition Methods**:
-- **Discovery**: The player becomes aware of a trait, typically by interacting with an NPC. Discovered traits can be equipped into active slots.
-- **Equipping**: A temporary, strategic choice to place a discovered trait into a limited active slot to gain its benefits. This is free.
-- **Resonance (Permanent Acquisition)**: The primary method for permanently mastering a trait. This is an **action** where the player spends **Essence** to make a *discovered* trait a permanent, innate ability that no longer requires a slot. This action is gated by the **Intimacy (`connectionDepth`) level** with the source NPC.
-- **Quest Rewards**: Direct grants from significant achievements, which could grant either discovered or permanent traits.
+Traits represent capabilities, patterns, and passive bonuses.
 
-**Management**:
-- **Limited Slots** - Players start with few trait slots, unlock more through progression
-- **Permanent Traits** - Expensive option to make traits always active without slot usage
-- **Trait Categories** - Combat, Social, Physical, Mental traits with different applications
-- **Synergy Systems** - Future combinations and interactions between traits
+The migrated relationship-mediated lifecycle is:
 
-### NPC Interaction System
-**Concept**: Rich interaction framework supporting diverse relationship types and progression paths.
+```text
+Discover
+-> temporarily Equip / Attune
+-> accumulate assimilation + compatibility evidence
+-> form required Memory evidence
+-> meet qualified Connection requirement
+-> spend Essence
+-> Resonate permanently
+```
 
-**Relationship Progression**:
-- **Discovery Phase** - Initial NPC encounter and basic information gathering
-- **Acquaintance Level** - Basic dialogue and simple trait observation
-- **Friend Level** - Deeper conversations, quest access, trait acquisition options
-- **Close Bond** - Advanced interactions, trait sharing, emotional influence
-- **Deep Connection** - Copy creation potential, permanent trait options, unique content
+Willow's Wisdom and Scholarly Insight already exercise this model in production qualification.
 
-**Interaction Types**:
-- **Dialogue Systems** - Branching conversations with personality-aware responses
-- **Activity Participation** - Join NPCs in activities they enjoy or need help with
-- **Gift Systems** - Share resources, traits, or assistance meaningful to the NPC
-- **Conflict Resolution** - Help NPCs overcome personal challenges or problems
+Legacy/simple Traits may still use compatibility behavior until deliberately migrated.
 
-### Copy Creation System
-**Concept**: Transform deep emotional connections into allied entities that assist the player. Copies inherit aspects of the player and their "parent" NPC.
+The next major product payoff is not to reimplement assimilation; it is to make Relationship-derived Traits materially change gameplay solutions.
 
-**Creation Process**:
-*   **Seduction Outcome**: This high-level interaction is only possible once a very high **Intimacy (`connectionDepth`) level** is achieved with an NPC. Affinity is a secondary factor, or may not be required at all.
-- **Growth Options** - Choose between time-intensive natural growth or Essence-accelerated development.
-- **Trait Inheritance** - A new Copy inherits a snapshot of traits the player had actively shared with the parent NPC at the moment of creation.
-- **Loyalty System** - Ongoing relationship maintenance is required for reliable Copy behavior.
+### Quest and Narrative System
 
-**Inheritance**:
-- **Emotional Resonance (Player Ability):** Copies inherit the player's core "Emotional Resonance" ability. This is a planned player characteristic that allows Copies to potentially form connections and interact with the Trait system (perhaps in a limited way initially). Its specific mechanics are currently undefined and planned for future implementation with the Copy system. **Note: This is distinct from the sidelined "Soul Resonance" concept found in `soulResonanceUtils.ts`.**
-- **Shared Traits:** Copies inherit *snapshots* of any traits the player had actively shared with the *target parent* via Trait Slots *at the moment of creation*. These become the Copy's initial base traits. They do *not* automatically update if the player later changes the traits shared with the parent.
-- **Player Traits:** Copies do not inherit traits the player has permanently active or equipped for themselves by default, to differentiate them from the player.
+Quests own objectives, lifecycle, rewards, and authored resolution choices.
 
-**Copy Management**:
-- **Task Assignment** - Direct Copies to perform specific activities or goals.
-- **Trait Sharing** - Grant additional abilities to Copies for specialized roles via dedicated Copy Trait Slots.
-- **Loyalty Maintenance** - Ongoing investment required to prevent Copy independence or rebellion.
-- **Capability Limits** - Maximum number of active Copies based on player progression.
+Relationship state owns the relational meaning of those events.
 
-## 🎨 Aesthetic & Narrative Direction
+The bridge is intentionally generic:
 
-### Visual Style
-- **Clean Interface Design** - Material-UI components with consistent theming
-- **Relationship Visualization** - Clear progress indicators and connection strength displays
-- **Character Representation** - Avatar systems with personality expression
-- **Responsive Design** - Seamless experience across desktop, tablet, and mobile devices
+```text
+Story event
+-> Relationship Experience / Memory
+-> persisted Relationship evidence
+-> later dialogue / quest availability or consequence
+```
 
-### Narrative Themes
-- **Emotional Intelligence** - Understanding others as a form of power and growth
-- **Connection vs. Isolation** - Benefits of building relationships vs. self-reliance
-- **Personal Growth** - Learning from others while maintaining individual identity
-- **Responsibility** - Managing relationships and created entities with care
-- **Diversity of Perspective** - Value in connecting with different types of people
+M13 qualified this causal loop. M14 qualified a shared decision producing distinct consequences across multiple NPC Relationships.
 
-### Tone
-- **Optimistic** - Focus on positive relationship building and mutual benefit
-- **Thoughtful** - Encourage reflection on relationship dynamics and emotional intelligence
-- **Empowering** - Players feel capable of growth through understanding others
-- **Inclusive** - NPCs represent diverse backgrounds, personalities, and perspectives
+### Copy System
 
-## 🚀 Progression Systems
+Copies are delegated entities with growth, loyalty, roles, Trait inheritance/sharing, and passive Essence interactions.
 
-### Character Development
-- **Attribute Growth** - Strength, Charisma, Intelligence affect various game systems
-- **Skill Advancement** - Specialized abilities improve through use and training
-- **Trait Mastery** - Growing expertise with equipped traits through consistent use
-- **Equipment Progression** - Items that enhance character capabilities and appearance
+Current implementation is substantial but incomplete. Copy relationship prerequisites and some parent-NPC calculations still contain legacy compatibility assumptions and must be migrated deliberately rather than treated as new canon.
 
-### Relationship Portfolio
-- **Connection Diversity** - Benefits from building relationships with different NPC types
-- **Depth vs. Breadth** - Balance between many shallow connections vs. few deep bonds
-- **Network Effects** - NPCs who know each other provide synergistic benefits
-- **Relationship Maintenance** - Ongoing attention required to maintain connection strength
+The intended future Copy role is **routine automation**: gathering, scouting, crafting support, patrols, research, and other repeatable work.
 
-### Copy Network Development
-- **Specialization** - Develop Copies for specific roles (combat, social, resource gathering)
-- **Coordination** - Manage multiple Copies working together on complex tasks
-- **Evolution** - Copies grow and change based on their experiences and assignments
-- **Independence** - Advanced Copies develop their own goals and relationships
+Copies should not silently make irreversible narrative decisions for the player.
 
-### Essence Economy Mastery
-- **Generation Optimization** - Maximize Essence income through strategic relationship building
-- **Efficient Spending** - Learn optimal investment patterns for trait acquisition and permanence
-- **Market Dynamics** - Understand relative value of different traits and abilities
-- **Resource Planning** - Long-term strategy for major Essence investments
+### Combat
 
-## 🎯 Success Metrics
+Combat currently has a lightweight event-bus scaffold, not a complete encounter game.
 
-### Player Engagement
-- **Session Length** - Average time spent per play session
-- **Return Rate** - Percentage of players returning after first session
-- **Progression Satisfaction** - Player feedback on growth feeling meaningful
-- **Relationship Investment** - Time and effort players spend on individual NPCs
+Future combat should be introduced as a narrow vertical slice whose primary product question is whether Relationship-derived Traits create meaningful tactical differences.
 
-### Mechanical Balance
-- **Essence Generation Rates** - Ensure progression feels rewarding but not trivial
-- **Trait Acquisition Costs** - Balance between accessibility and meaningful investment
-- **Copy Creation Frequency** - Rate that feels special but achievable
-- **Relationship Progression Speed** - Pacing that maintains engagement without frustration
+### Exploration and World
 
-### Technical Performance
-- **Load Times** - Responsive application startup and navigation
-- **State Management** - Clean Redux patterns with efficient updates
-- **Cross-Platform Compatibility** - Consistent experience across devices
-- **Accessibility Compliance** - WCAG 2.1 AA standards throughout application
+The prototype has location and quest-event support but not yet a complete travel/world layer.
 
-## 🔮 Future Vision
-
-### Planned Expansions
-- **Quest System** - Narrative-driven objectives that deepen NPC relationships
-- **World Exploration** - Multiple locations with unique NPCs and opportunities
-- **Advanced Copy Mechanics** - Complex task systems and Copy-to-Copy relationships
-- **Trait Combinations** - Synergy systems for combining compatible traits
-- **Multiplayer Elements** - Shared world where players can interact and compare progress
-
-### Long-term Goals
-- **Educational Value** - Teach emotional intelligence and relationship skills
-- **Therapeutic Applications** - Explore game's potential for social skill development
-- **Community Building** - Foster player community around relationship-building themes
-- **Research Platform** - Gather insights about human relationship preferences and patterns
-- **Commercial Viability** - Develop sustainable monetization that aligns with game values
-
-## 📋 Implementation Roadmap
-
-### Phase 1: Core Foundation ✅ **COMPLETE**
-- ✅ Redux Toolkit state management architecture
-- ✅ Feature-Sliced Design organization
-- ✅ Basic Player, Trait, Essence, and NPC systems
-- ✅ Responsive navigation and layout system
-- ✅ Save/load functionality with import/export
-
-### Phase 2: Enhanced Interactions ✅ **COMPLETE**
-- ✅ Advanced NPC dialogue systems (Basic implementation complete)
-- ✅ Trait acquisition and permanence mechanics (Essence cost for acquisition and permanence implemented)
-- ✅ Enhanced Essence generation from relationships (Passive generation now based on NPC connection depth)
-- 📋 Copy creation system implementation (Basic UI and state management implemented)
-- 📋 Quest system foundation (Planned)
-
-### Phase 3: Polish & Expansion 📋 **PLANNED**
-- 📋 Advanced Copy management and task systems
-- 📋 Multiple locations and world exploration
-- 📋 Trait combination and synergy systems
-- 📋 Enhanced narrative content and character development
-- 📋 Performance optimization and mobile experience refinement
+Future exploration should make location, travel time, resource acquisition, encounters, NPC presence, and Tether mechanically meaningful without turning the Relationship system into world-state storage.
 
 ---
 
-This Game Design Document serves as the guiding vision for the React Incremental RPG Prototype, establishing the core concept while remaining flexible enough to evolve based on implementation discoveries and player feedback.
+## Narrative Direction
+
+Canonical narrative reference lives in `Narrative/`:
+
+- `Narrative/Synopsis.md` — macro plot and act structure;
+- `Narrative/Characters.md` — character bios, arcs, and hooks;
+- `Narrative/WorldLore.md` — factions, cosmology, relics, systemic setting.
+
+### Core themes
+
+- instrumental connection vs. reciprocal transformation;
+- power vs. surrender;
+- control, vulnerability, and consequence;
+- understanding without necessarily agreeing;
+- relationships as persistent causes rather than disposable dialogue rewards.
+
+The Relationship model must support mentorship, alliance, rivalry, ideological opposition, mutual leverage, institutional trust, and other archetypes without requiring a new engine per NPC.
+
+---
+
+## Current Product Maturity After M14
+
+### Strong / empirically qualified
+
+- Relationship Experiences and Memories;
+- Bond dimensions and evidence-qualified Connection;
+- multiple distinct production Relationship archetypes;
+- adversarial Connection with low/negative Affinity;
+- Relationship-derived Essence for registered bundles;
+- authored Trait discovery and assimilation for Willow/Elara;
+- save/load persistence and migration;
+- Relationship evidence causing later story consequences;
+- one shared story event producing conflicting consequences for multiple NPCs.
+
+### Functional foundation but incomplete product loop
+
+- Quest system;
+- Trait catalogue/loadout beyond migrated examples;
+- Essence economy/presentation;
+- Copy management and task/deployment depth;
+- inventory/equipment integration;
+- relationship-facing UI polish.
+
+### Major future product gaps
+
+- long-horizon callbacks across substantial intervening content;
+- Trait-driven gameplay payoff;
+- real combat encounter loop;
+- player-facing exploration/travel;
+- world-derived Tether;
+- production Copy task automation;
+- offline progress;
+- NPC knowledge propagation;
+- distinct faction reputation;
+- reusable world-state consequences;
+- one complete chapter-level vertical slice and human playability review.
+
+---
+
+## Near-Term Roadmap
+
+### Immediate next milestone — M15
+
+**Long-Horizon Relationship Callback Qualification**
+
+Test whether old Relationship evidence remains causally relevant after unrelated intervening content, additional Relationship changes, and save/load.
+
+### After M15
+
+Move directly toward **Trait-driven gameplay**. The repository already implements relationship-mediated Trait assimilation for Willow and Elara, so a future milestone should prove that such a learned capability materially changes how a real gameplay problem is solved rather than rebuilding assimilation as if it were absent.
+
+Subsequent candidate areas:
+
+1. Trait-driven gameplay;
+2. narrow combat vertical slice;
+3. exploration/travel;
+4. world-derived Tether;
+5. Copy task automation;
+6. offline progress;
+7. social knowledge propagation;
+8. faction reputation;
+9. world-state consequences;
+10. first complete chapter vertical slice.
+
+Milestone numbering after M15 should be frozen during preregistration based on repository evidence at that time.
+
+---
+
+## Success Criteria
+
+The project succeeds as a game when players can understand and feel this causal chain:
+
+```text
+I formed a consequential relationship
+-> I learned something real from that character
+-> it became part of my build
+-> I used it to solve a problem differently
+-> the world and other characters reacted
+-> that reaction changed my future progression
+```
+
+Technical correctness remains necessary, but later vertical slices must also test player comprehension, pacing, and whether incremental automation reinforces rather than distracts from the narrative RPG.
+
+---
+
+## Canonical References
+
+1. `Technical/PostM14ProductReconciliation.md`
+2. `Features/RelationshipExperienceSystem.md`
+3. `Features/EssenceResonanceModel.md`
+4. `Features/TraitSystem.md`
+5. `Features/QuestSystem.md`
+6. `Features/CopySystem.md`
+7. milestone-specific qualification documents under `Technical/`
+
+When older documentation conflicts with this authority chain, treat the conflict as migration/documentation debt rather than reviving the legacy model.
