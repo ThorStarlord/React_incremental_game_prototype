@@ -30,8 +30,8 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
-      - name: Relationship, Trait discovery, save migration, authoring scalability, narrative integration, M14 exclusivity, and M15 callback tests
-        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts RelationshipLyraProduction.test.tsx RelationshipGronkProduction.test.tsx RelationshipSilasProduction.test.tsx RelationshipValeriusProduction.test.tsx RelationshipM12MultiNpcProduction.test.ts RelationshipM13NarrativeIntegration.test.tsx RelationshipM14MultiNpcConsequence.test.tsx RelationshipM14DialogueExclusivity.test.tsx RelationshipM15LongHorizonCallback.test.tsx TraitDiscovery.test.ts RelationshipLegacySaveMigration.test.ts saveSchema.test.ts saveUtils.test.ts
+      - name: Relationship, Trait discovery, save migration, narrative integration, M14 exclusivity, M15 callbacks, and M16 Trait-gameplay tests
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts RelationshipLyraProduction.test.tsx RelationshipGronkProduction.test.tsx RelationshipSilasProduction.test.tsx RelationshipValeriusProduction.test.tsx RelationshipM12MultiNpcProduction.test.ts RelationshipM13NarrativeIntegration.test.tsx RelationshipM14MultiNpcConsequence.test.tsx RelationshipM14DialogueExclusivity.test.tsx RelationshipM15LongHorizonCallback.test.tsx QuestM16TraitDrivenGameplay.test.tsx TraitDiscovery.test.ts RelationshipLegacySaveMigration.test.ts saveSchema.test.ts saveUtils.test.ts
         env:
           CI: true
 

@@ -10,6 +10,7 @@ import {
   setQuestResolution,
 } from './QuestSlice';
 import type { Quest, QuestReward } from './QuestTypes';
+import { getMissingPermanentTraitIdsForResolution } from './QuestResolutionAvailability';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold, addStatusEffect } from '../../Player/state/PlayerSlice';
 import { addAvailableQuestToNPC } from '../../NPCs/state/NPCSlice';
@@ -208,6 +209,16 @@ export const resolveQuestOutcomeThunk = createAsyncThunk<
 
       const option = quest.resolutionOptions?.find(candidate => candidate.id === resolutionId);
       if (!option) throw new Error(`Unknown quest resolution: ${resolutionId}`);
+
+      const missingPermanentTraitIds = getMissingPermanentTraitIdsForResolution(
+        option,
+        state.player.permanentTraits
+      );
+      if (missingPermanentTraitIds.length > 0) {
+        throw new Error(
+          `Resolution requires permanent Trait${missingPermanentTraitIds.length === 1 ? '' : 's'}: ${missingPermanentTraitIds.join(', ')}.`
+        );
+      }
 
       for (const cost of option.consumeItems ?? []) {
         const available = state.inventory.items[cost.itemId] ?? 0;

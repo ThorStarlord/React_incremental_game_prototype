@@ -31,6 +31,7 @@ import {
   startQuestThunk,
   turnInQuestThunk,
 } from '../../../../Quest/state/QuestThunks';
+import { canUseQuestResolution } from '../../../../Quest/state/QuestResolutionAvailability';
 import type { Quest, QuestObjective, QuestStatus } from '../../../../Quest/state/QuestTypes';
 
 interface NPCQuestsTabProps {
@@ -51,12 +52,16 @@ const formatObjectiveText = (objective: QuestObjective) => {
 
 const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const dispatch = useAppDispatch();
-  const { npc, availableQuests } = useAppSelector((state) => {
+  const { npc, availableQuests, permanentTraitIds } = useAppSelector((state) => {
     const n = selectNPCById(state, npcId);
     const quests: Quest[] = (n?.availableQuests ?? [])
       .map((questId: string) => selectQuestById(state, questId))
       .filter((quest: Quest | undefined): quest is Quest => quest !== undefined);
-    return { npc: n, availableQuests: quests };
+    return {
+      npc: n,
+      availableQuests: quests,
+      permanentTraitIds: state.player.permanentTraits,
+    };
   });
 
   const handleAcceptQuest = (questId: string) => {
@@ -116,7 +121,12 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
       </Box>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {availableQuests.map((quest: Quest) => (
+        {availableQuests.map((quest: Quest) => {
+          const availableResolutionOptions = quest.resolutionOptions?.filter(option =>
+            canUseQuestResolution(option, permanentTraitIds)
+          );
+
+          return (
           <Accordion key={quest.id} sx={{ '&:before': { display: 'none' }, border: '1px solid', borderColor: 'divider' }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -169,13 +179,13 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
               {quest.status === 'READY_TO_COMPLETE' &&
                 quest.resolutionRequired &&
                 !quest.selectedResolutionId &&
-                (quest.resolutionOptions?.length ?? 0) > 0 && (
+                (availableResolutionOptions?.length ?? 0) > 0 && (
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" gutterBottom>
                       Decision:
                     </Typography>
                     <Stack spacing={1}>
-                      {quest.resolutionOptions?.map(option => (
+                      {availableResolutionOptions?.map(option => (
                         <Box key={option.id} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 1.25 }}>
                           <Typography variant="body2" fontWeight={600}>
                             {option.label}
@@ -259,7 +269,8 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
               </Box>
             </AccordionDetails>
           </Accordion>
-        ))}
+          );
+        })}
       </Box>
 
       {availableQuests.length === 0 && (

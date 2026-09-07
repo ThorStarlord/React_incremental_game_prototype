@@ -30,6 +30,12 @@ export interface QuestResolutionOption {
   label: string;
   description: string;
   relationshipExperienceId?: string;
+  /**
+   * Optional capability gate for choices that require permanently assimilated Traits.
+   * All listed Traits must exist in player.permanentTraits. Temporary/equipped Trait
+   * semantics are deliberately not implied by this field.
+   */
+  requiredPermanentTraitIds?: string[];
   consumeItems?: QuestResolutionItemCost[];
   rewards?: QuestReward[];
   logMessage?: string;

@@ -5,18 +5,7 @@
     "description": "Elder Willow entrusts you with a dormant seed and a scarce Sunstone. Once you obtain the stone, decide whether to spend its power on the uncertain long-horizon value of awakening the Seed or extract its immediate Essence instead.",
     "giver": "npc_elder_willow",
     "type": "SIDE",
-    "objectives": [
-      {
-        "objectiveId": "1",
-        "description": "Find a Sunstone",
-        "type": "GATHER",
-        "target": "item_sunstone",
-        "requiredCount": 1,
-        "currentCount": 0,
-        "isHidden": false,
-        "isComplete": false
-      }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Find a Sunstone", "type": "GATHER", "target": "item_sunstone", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [],
     "resolutionRequired": true,
@@ -49,18 +38,7 @@
     "description": "Elara gives you the recovered source volume behind her published chronology. Compare it against the contradictory marginal note and decide whether the evidence is strong enough to overturn the accepted model.",
     "giver": "npc_scholar_elara",
     "type": "SIDE",
-    "objectives": [
-      {
-        "objectiveId": "1",
-        "description": "Examine the recovered source against the contradictory footnote",
-        "type": "GATHER",
-        "target": "item_elara_contradictory_tome",
-        "requiredCount": 1,
-        "currentCount": 0,
-        "isHidden": false,
-        "isComplete": false
-      }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Examine the recovered source against the contradictory footnote", "type": "GATHER", "target": "item_elara_contradictory_tome", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [{ "type": "GOLD", "value": 50 }],
     "resolutionRequired": true,
@@ -91,32 +69,19 @@
     "description": "A Chrono Crypt harmonic lock requires two incompatible frames to be held at once. Coordinate with Lyra long enough to solve the problem without pretending necessity has become friendship.",
     "giver": "npc_lyra",
     "type": "SIDE",
-    "objectives": [
-      {
-        "objectiveId": "1",
-        "description": "Bring Lyra's harmonic key into phase with the Chrono Crypt lock",
-        "type": "GATHER",
-        "target": "item_lyra_harmonic_key",
-        "requiredCount": 1,
-        "currentCount": 0,
-        "isHidden": false,
-        "isComplete": false
-      }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Bring Lyra's harmonic key into phase with the Chrono Crypt lock", "type": "GATHER", "target": "item_lyra_harmonic_key", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [],
     "resolutionRequired": true,
-    "resolutionOptions": [
-      {
-        "id": "coordinate_without_conceding",
-        "label": "Coordinate Without Conceding",
-        "description": "Solve the lock by relying on Lyra's timing while preserving the disagreement that made the cooperation necessary rather than sentimental.",
-        "relationshipExperienceId": "lyra_exp_reluctant_cotraining",
-        "consumeItems": [{ "itemId": "item_lyra_harmonic_key", "quantity": 1 }],
-        "rewards": [],
-        "logMessage": "You and Lyra solve the lock through disciplined coordination. The success creates real reliance without friendship or ideological surrender."
-      }
-    ],
+    "resolutionOptions": [{
+      "id": "coordinate_without_conceding",
+      "label": "Coordinate Without Conceding",
+      "description": "Solve the lock by relying on Lyra's timing while preserving the disagreement that made the cooperation necessary rather than sentimental.",
+      "relationshipExperienceId": "lyra_exp_reluctant_cotraining",
+      "consumeItems": [{ "itemId": "item_lyra_harmonic_key", "quantity": 1 }],
+      "rewards": [],
+      "logMessage": "You and Lyra solve the lock through disciplined coordination. The success creates real reliance without friendship or ideological surrender."
+    }],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -126,23 +91,19 @@
     "description": "Silas wants a sealed package returned without converting curiosity into leverage. A runner has already brought it as far as the Rusty Mug; your choice is what to do with the access you were given.",
     "giver": "npc_rogue_silas",
     "type": "SIDE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Return the sealed package to Silas", "type": "GATHER", "target": "item_shady_package", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Return the sealed package to Silas", "type": "GATHER", "target": "item_shady_package", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [{ "type": "GOLD", "value": 100 }],
     "resolutionRequired": true,
-    "resolutionOptions": [
-      {
-        "id": "return_unopened",
-        "label": "Return It Unopened",
-        "description": "Give the package back without turning access into information Silas did not agree to sell.",
-        "relationshipExperienceId": "silas_exp_package_unopened",
-        "consumeItems": [{ "itemId": "item_shady_package", "quantity": 1 }],
-        "rewards": [],
-        "logMessage": "You return the package unopened. Silas now knows your restraint can be relied on without pretending that either of you has become harmless."
-      }
-    ],
+    "resolutionOptions": [{
+      "id": "return_unopened",
+      "label": "Return It Unopened",
+      "description": "Give the package back without turning access into information Silas did not agree to sell.",
+      "relationshipExperienceId": "silas_exp_package_unopened",
+      "consumeItems": [{ "itemId": "item_shady_package", "quantity": 1 }],
+      "rewards": [],
+      "logMessage": "You return the package unopened. Silas now knows your restraint can be relied on without pretending that either of you has become harmless."
+    }],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -152,22 +113,18 @@
     "description": "Captain Valerius wants the merchant district patrolled and, more importantly, an accurate report of what the Watch is failing to see rather than a performance of visible order.",
     "giver": "npc_captain_valerius",
     "type": "REPEATABLE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Patrol the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Patrol the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [{ "type": "REPUTATION", "value": 10, "faction": "City Watch" }],
     "resolutionRequired": true,
-    "resolutionOptions": [
-      {
-        "id": "report_plainly",
-        "label": "Give the Plain Report",
-        "description": "Report the district as it was, including the weakness in the Watch deployment, rather than polishing the patrol into a ceremonial success.",
-        "relationshipExperienceId": "valerius_exp_report_without_theatre",
-        "rewards": [],
-        "logMessage": "You report the patrol without polishing away the Watch's blind spot. Valerius treats the unwelcome detail as evidence that your reliability is useful rather than merely obedient."
-      }
-    ],
+    "resolutionOptions": [{
+      "id": "report_plainly",
+      "label": "Give the Plain Report",
+      "description": "Report the district as it was, including the weakness in the Watch deployment, rather than polishing the patrol into a ceremonial success.",
+      "relationshipExperienceId": "valerius_exp_report_without_theatre",
+      "rewards": [],
+      "logMessage": "You report the patrol without polishing away the Watch's blind spot. Valerius treats the unwelcome detail as evidence that your reliability is useful rather than merely obedient."
+    }],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -177,22 +134,18 @@
     "description": "Silas gives you patrol timings he chose not to sell. Walk the merchant district and determine whether the pattern is a real operational leak or merely broker theatre.",
     "giver": "npc_rogue_silas",
     "type": "SIDE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Trace the leaked patrol pattern through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Trace the leaked patrol pattern through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [],
     "resolutionRequired": true,
-    "resolutionOptions": [
-      {
-        "id": "confirm_pattern",
-        "label": "Confirm the Pattern",
-        "description": "Treat the repeated timing gap as a real operational leak and carry the evidence forward rather than selling it back into the information market.",
-        "relationshipExperienceId": "silas_exp_watch_leak_traced",
-        "rewards": [],
-        "logMessage": "The patrol gap repeats exactly where Silas's timing said it would. The leak is real, and the information is now actionable rather than merely valuable."
-      }
-    ],
+    "resolutionOptions": [{
+      "id": "confirm_pattern",
+      "label": "Confirm the Pattern",
+      "description": "Treat the repeated timing gap as a real operational leak and carry the evidence forward rather than selling it back into the information market.",
+      "relationshipExperienceId": "silas_exp_watch_leak_traced",
+      "rewards": [],
+      "logMessage": "The patrol gap repeats exactly where Silas's timing said it would. The leak is real, and the information is now actionable rather than merely valuable."
+    }],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -202,22 +155,18 @@
     "description": "Valerius gives you the objective and constraints instead of prescribing a route. Re-enter the merchant district, rewrite the patrol response around the leak, and break the pattern without turning the streets into a theatrical crackdown.",
     "giver": "npc_captain_valerius",
     "type": "SIDE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Return to the merchant district and execute the delegated response", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Return to the merchant district and execute the delegated response", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [{ "type": "REPUTATION", "value": 15, "faction": "City Watch" }],
     "resolutionRequired": true,
-    "resolutionOptions": [
-      {
-        "id": "adaptive_intercept",
-        "label": "Use the Adaptive Intercept",
-        "description": "Change the patrol timing and alley coverage around the leak while preserving Valerius's mission constraints instead of following a prewritten route.",
-        "relationshipExperienceId": "valerius_exp_merchant_leak_broken",
-        "rewards": [],
-        "logMessage": "The leak's buyers arrive to find the old pattern gone. Valerius receives the result of judgment he delegated rather than obedience he supervised."
-      }
-    ],
+    "resolutionOptions": [{
+      "id": "adaptive_intercept",
+      "label": "Use the Adaptive Intercept",
+      "description": "Change the patrol timing and alley coverage around the leak while preserving Valerius's mission constraints instead of following a prewritten route.",
+      "relationshipExperienceId": "valerius_exp_merchant_leak_broken",
+      "rewards": [],
+      "logMessage": "The leak's buyers arrive to find the old pattern gone. Valerius receives the result of judgment he delegated rather than obedience he supervised."
+    }],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -227,22 +176,18 @@
     "description": "Carry out the council's quiet-reroute policy: change caravan and patrol timing until the compromised schedule stops buying an advantage without freezing trade or exposing Silas's source.",
     "giver": "npc_captain_valerius",
     "type": "SIDE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Test the quiet reroute under real merchant-district traffic", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Test the quiet reroute under real merchant-district traffic", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [],
     "resolutionRequired": true,
-    "resolutionOptions": [
-      {
-        "id": "prove_reroute",
-        "label": "Prove the Reroute Under Load",
-        "description": "Hold the new route long enough to show that trade can continue while the leaked timing loses its operational value.",
-        "relationshipExperienceId": "gronk_exp_quiet_reroute_proven",
-        "rewards": [],
-        "logMessage": "The rerouted caravans keep moving and the old patrol gap stops paying. Gronk's constraint logic survives contact with the district rather than only the council table."
-      }
-    ],
+    "resolutionOptions": [{
+      "id": "prove_reroute",
+      "label": "Prove the Reroute Under Load",
+      "description": "Hold the new route long enough to show that trade can continue while the leaked timing loses its operational value.",
+      "relationshipExperienceId": "gronk_exp_quiet_reroute_proven",
+      "rewards": [],
+      "logMessage": "The rerouted caravans keep moving and the old patrol gap stops paying. Gronk's constraint logic survives contact with the district rather than only the council table."
+    }],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -252,21 +197,17 @@
     "description": "Valerius refuses to treat the broker ledger as either proven guilt or convenient fiction. Trace its transaction trail through the merchant district and identify where real Watch facts were stitched to a false sale.",
     "giver": "npc_captain_valerius",
     "type": "SIDE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Trace the forged ledger's public transaction trail through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Trace the forged ledger's public transaction trail through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [],
     "resolutionRequired": true,
-    "resolutionOptions": [
-      {
-        "id": "prove_public_forgery",
-        "label": "Prove the Public Chain Was Forged",
-        "description": "Show where authentic patrol facts were joined to a transaction that never occurred. This clears the default accusation without exposing a live broker channel.",
-        "rewards": [],
-        "logMessage": "The public chain breaks at the payment record: real Watch facts surround a sale that never happened. The accusation no longer survives ordinary verification."
-      }
-    ],
+    "resolutionOptions": [{
+      "id": "prove_public_forgery",
+      "label": "Prove the Public Chain Was Forged",
+      "description": "Show where authentic patrol facts were joined to a transaction that never occurred. This clears the default accusation without exposing a live broker channel.",
+      "rewards": [],
+      "logMessage": "The public chain breaks at the payment record: real Watch facts surround a sale that never happened. The accusation no longer survives ordinary verification."
+    }],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -276,22 +217,18 @@
     "description": "Silas risks a live broker mark because old restraint still carries weight. Follow the hidden chain through the merchant district without converting the access itself into another burned source.",
     "giver": "npc_rogue_silas",
     "type": "SIDE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Follow Silas's live broker mark through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Follow Silas's live broker mark through the merchant district", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
     "prerequisites": [],
     "rewards": [],
     "resolutionRequired": true,
-    "resolutionOptions": [
-      {
-        "id": "verify_hidden_chain",
-        "label": "Verify the Hidden Chain Without Burning It",
-        "description": "Confirm which broker constructed the forgery while preserving the live route Silas chose to risk.",
-        "relationshipExperienceId": "silas_exp_hidden_chain_verified",
-        "rewards": [],
-        "logMessage": "The hidden route identifies the broker who assembled the forgery. You return with verification rather than a list of burned names, turning the old callback into new operational evidence."
-      }
-    ],
+    "resolutionOptions": [{
+      "id": "verify_hidden_chain",
+      "label": "Verify the Hidden Chain Without Burning It",
+      "description": "Confirm which broker constructed the forgery while preserving the live route Silas chose to risk.",
+      "relationshipExperienceId": "silas_exp_hidden_chain_verified",
+      "rewards": [],
+      "logMessage": "The hidden route identifies the broker who assembled the forgery. You return with verification rather than a list of burned names, turning the old callback into new operational evidence."
+    }],
     "status": "NOT_STARTED",
     "isAutoComplete": false
   },
@@ -301,9 +238,7 @@
     "description": "Scholar Elara wants to test your observation skills. Travel to the Whispering Woods.",
     "giver": "npc_scholar_elara",
     "type": "SIDE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Travel to the Whispering Woods", "type": "REACH_LOCATION", "target": "location_whispering_woods", "requiredCount": 1, "currentCount": 0, "isComplete": false, "isHidden": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Travel to the Whispering Woods", "type": "REACH_LOCATION", "target": "location_whispering_woods", "requiredCount": 1, "currentCount": 0, "isComplete": false, "isHidden": false }],
     "prerequisites": [],
     "rewards": [{ "type": "GOLD", "value": 20 }],
     "status": "NOT_STARTED",
@@ -315,9 +250,7 @@
     "description": "A rare book was damaged by an Arcane Rat. Elara needs you to deal with it.",
     "giver": "npc_scholar_elara",
     "type": "SIDE",
-    "objectives": [
-      { "objectiveId": "1", "description": "Defeat the Arcane Rat", "type": "KILL", "target": "mob_arcane_rat", "requiredCount": 1, "currentCount": 0, "isComplete": false, "isHidden": false }
-    ],
+    "objectives": [{ "objectiveId": "1", "description": "Defeat the Arcane Rat", "type": "KILL", "target": "mob_arcane_rat", "requiredCount": 1, "currentCount": 0, "isComplete": false, "isHidden": false }],
     "prerequisites": [{ "type": "QUEST_COMPLETED", "value": "quest_elara_chain_1" }],
     "rewards": [{ "type": "ITEM", "value": "item_rare_book_page", "amount": 1 }],
     "status": "NOT_STARTED",
@@ -330,40 +263,87 @@
     "giver": "npc_elder_willow",
     "type": "SIDE",
     "status": "NOT_STARTED",
-    "objectives": [
-      {
-        "objectiveId": "1",
-        "description": "Disarm the magically trapped chest.",
-        "type": "INTERACT_PUZZLE",
-        "target": "chest_ancient_oak",
-        "requiredCount": 1,
-        "currentCount": 0,
-        "isComplete": false,
-        "isHidden": false,
-        "puzzleData": {
-          "type": "sequence",
-          "prompt": "Enter the sequence of runes: Sun, Moon, Star",
-          "options": ["Sun", "Moon", "Star", "Leaf"],
-          "solution": "Sun,Moon,Star"
-        },
-        "outcomes": [
-          {
-            "solution": "Sun,Moon,Star",
-            "rewards": [{ "type": "GOLD", "value": 150 }],
-            "effects": [],
-            "logMessage": "You carefully disarmed the trap!"
-          },
-          {
-            "solution": "force",
-            "rewards": [{ "type": "GOLD", "value": 50 }],
-            "effects": [{ "type": "STATUS_EFFECT", "value": "cursed_hands_debuff" }],
-            "logMessage": "You forced the chest open, triggering a minor curse!"
-          }
-        ]
-      }
-    ],
+    "objectives": [{
+      "objectiveId": "1",
+      "description": "Disarm the magically trapped chest.",
+      "type": "INTERACT_PUZZLE",
+      "target": "chest_ancient_oak",
+      "requiredCount": 1,
+      "currentCount": 0,
+      "isComplete": false,
+      "isHidden": false,
+      "puzzleData": { "type": "sequence", "prompt": "Enter the sequence of runes: Sun, Moon, Star", "options": ["Sun", "Moon", "Star", "Leaf"], "solution": "Sun,Moon,Star" },
+      "outcomes": [
+        { "solution": "Sun,Moon,Star", "rewards": [{ "type": "GOLD", "value": 150 }], "effects": [], "logMessage": "You carefully disarmed the trap!" },
+        { "solution": "force", "rewards": [{ "type": "GOLD", "value": 50 }], "effects": [{ "type": "STATUS_EFFECT", "value": "cursed_hands_debuff" }], "logMessage": "You forced the chest open, triggering a minor curse!" }
+      ]
+    }],
     "prerequisites": [],
     "rewards": [],
+    "isAutoComplete": false
+  },
+  "quest_m16_withering_grove": {
+    "id": "quest_m16_withering_grove",
+    "title": "The Withering Grove",
+    "description": "A stand of old growth in the Whispering Woods is failing. The visible roots are blackened enough to justify cutting them away, but the pattern may be slower and deeper than the damage on the surface.",
+    "giver": "npc_elder_willow",
+    "type": "SIDE",
+    "objectives": [{ "objectiveId": "1", "description": "Inspect the failing grove in the Whispering Woods", "type": "REACH_LOCATION", "target": "location_whispering_woods", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
+    "prerequisites": [{ "type": "QUEST_COMPLETED", "value": "quest_willow_ancient_seed" }],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "remove_corrupted_roots",
+        "label": "Remove the Corrupted Roots",
+        "description": "Cut away the visibly failing roots before the rot can spread. The grove survives, but part of the old growth is sacrificed.",
+        "relationshipExperienceId": "willow_exp_grove_saved_by_cutting",
+        "rewards": [],
+        "logMessage": "You remove the corrupted root mass. The grove stabilizes around the loss: a valid intervention, but an irreversible one."
+      },
+      {
+        "id": "restore_underlying_flow",
+        "label": "Restore the Underlying Flow",
+        "description": "Use Willow's slow-pattern method to trace the visible rot back to the Essence-flow imbalance beneath it, then rebalance the flow instead of cutting the symptom away.",
+        "relationshipExperienceId": "willow_exp_wisdom_used_in_world",
+        "requiredPermanentTraitIds": ["WillowsWisdom"],
+        "rewards": [],
+        "logMessage": "The blackened roots stop advancing once the deeper flow is corrected. What looked like rot was a symptom; the grove survives without the sacrifice the surface evidence suggested."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_m16_impossible_inventory": {
+    "id": "quest_m16_impossible_inventory",
+    "title": "The Impossible Inventory",
+    "description": "Two merchant-district provenance records are each plausible in isolation, yet together they imply the same recovered object occupied two places at once. Decide whether to preserve the most likely linear account or reopen the model around the contradiction.",
+    "giver": "npc_scholar_elara",
+    "type": "SIDE",
+    "objectives": [{ "objectiveId": "1", "description": "Compare the archive inventory against the merchant-district provenance trail", "type": "REACH_LOCATION", "target": "location_merchant_district", "requiredCount": 1, "currentCount": 0, "isHidden": false, "isComplete": false }],
+    "prerequisites": [{ "type": "QUEST_COMPLETED", "value": "quest_elara_lost_tome" }],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "accept_plausible_inventory",
+        "label": "Accept the Most Plausible Inventory",
+        "description": "Keep the contradiction on file but retain the linear account that best fits the majority of the evidence.",
+        "relationshipExperienceId": "elara_exp_inventory_plausible_model",
+        "rewards": [],
+        "logMessage": "You preserve the most plausible inventory model and flag the contradiction for later review. The investigation closes conservatively rather than pretending certainty."
+      },
+      {
+        "id": "reopen_inventory_model",
+        "label": "Reopen the Model Around the Contradiction",
+        "description": "Apply Scholarly Insight: two individually plausible records cannot both be true, so revise the explanatory model instead of defending the first coherent chronology.",
+        "relationshipExperienceId": "elara_exp_insight_reopens_inventory",
+        "requiredPermanentTraitIds": ["ScholarlyInsight"],
+        "rewards": [],
+        "logMessage": "You stop treating the contradiction as noise and rebuild the provenance model around it. The apparently coherent inventory resolves into two conflated objects rather than one impossible history."
+      }
+    ],
+    "status": "NOT_STARTED",
     "isAutoComplete": false
   }
 }
