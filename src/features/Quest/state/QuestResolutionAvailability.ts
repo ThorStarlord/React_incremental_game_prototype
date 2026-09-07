@@ -1,14 +1,15 @@
 import type { QuestResolutionOption } from './QuestTypes';
+import {
+  getMissingPermanentTraitIds,
+  hasRequiredPermanentTraits,
+} from '../../Traits/state/TraitCapabilityRequirements';
 
 export const getMissingPermanentTraitIdsForResolution = (
   option: Pick<QuestResolutionOption, 'requiredPermanentTraitIds'>,
   permanentTraitIds: readonly string[]
-): string[] => {
-  const owned = new Set(permanentTraitIds);
-  return (option.requiredPermanentTraitIds ?? []).filter(traitId => !owned.has(traitId));
-};
+): string[] => getMissingPermanentTraitIds(option.requiredPermanentTraitIds, permanentTraitIds);
 
 export const canUseQuestResolution = (
   option: Pick<QuestResolutionOption, 'requiredPermanentTraitIds'>,
   permanentTraitIds: readonly string[]
-): boolean => getMissingPermanentTraitIdsForResolution(option, permanentTraitIds).length === 0;
+): boolean => hasRequiredPermanentTraits(option.requiredPermanentTraitIds, permanentTraitIds);
