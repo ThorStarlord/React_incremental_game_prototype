@@ -4,7 +4,7 @@ This specification documents the design, architecture, implementation status, an
 
 The project uses React, TypeScript, Redux Toolkit, Material UI, listener middleware, data-driven content, versioned save/load, and focused behavioral qualification.
 
-## Product authority through M24 Objective World State PASS
+## Product authority through M25 Complete Chapter Vertical Slice PASS
 
 Read milestone records as an authority chain rather than assuming older design prose describes the current runtime.
 
@@ -18,29 +18,17 @@ The most relevant current records are:
 - [`Technical/CheckpointBActiveRpgLoopResult.md`](Technical/CheckpointBActiveRpgLoopResult.md) — historical first `CHECKPOINT_B_WEAK` verdict;
 - [`Technical/ActiveRpgLoopIntegrationRepairResult.md`](Technical/ActiveRpgLoopIntegrationRepairResult.md) — qualified repair of the observed active-loop gaps;
 - [`Technical/CheckpointBActiveRpgLoopRerunResult.md`](Technical/CheckpointBActiveRpgLoopRerunResult.md) — fresh `CHECKPOINT_B_PASS` that authorized M20;
-- [`Technical/M20ProductionCopyTaskAutomation.md`](Technical/M20ProductionCopyTaskAutomation.md) — preregistered M20 contract;
-- [`Technical/M20ProductionCopyTaskAutomationReconAmendment.md`](Technical/M20ProductionCopyTaskAutomationReconAmendment.md) — frozen M20 implementation semantics;
 - [`Technical/M20ProductionCopyTaskAutomationResult.md`](Technical/M20ProductionCopyTaskAutomationResult.md) — qualified routine Copy automation;
-- [`Technical/M21BoundedOfflineProgress.md`](Technical/M21BoundedOfflineProgress.md) — preregistered M21 contract;
-- [`Technical/M21BoundedOfflineProgressReconAmendment.md`](Technical/M21BoundedOfflineProgressReconAmendment.md) — frozen time/cap/allowlist semantics;
 - [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md) — qualified bounded offline settlement;
-- [`Technical/CheckpointCIncrementalIntegration.md`](Technical/CheckpointCIncrementalIntegration.md) — preregistered post-M21 integration checkpoint;
 - [`Technical/CheckpointCIncrementalIntegrationResult.md`](Technical/CheckpointCIncrementalIntegrationResult.md) — historical first `CHECKPOINT_C_WEAK` verdict;
-- [`Technical/IncrementalIntegrationRepair.md`](Technical/IncrementalIntegrationRepair.md) — preregistered bounded repair;
-- [`Technical/IncrementalIntegrationRepairReconAmendment.md`](Technical/IncrementalIntegrationRepairReconAmendment.md) — frozen repair implementation decisions;
-- [`Technical/IncrementalIntegrationRepairResult.md`](Technical/IncrementalIntegrationRepairResult.md) — qualified repair result and evidence ceiling;
-- [`Technical/CheckpointCIncrementalIntegrationRerun.md`](Technical/CheckpointCIncrementalIntegrationRerun.md) — fresh rerun preregistration against repaired main;
-- [`Technical/CheckpointCIncrementalIntegrationRerunResult.md`](Technical/CheckpointCIncrementalIntegrationRerunResult.md) — fresh `CHECKPOINT_C_PASS` and bounded evidence ceiling;
-- [`Technical/M22SocialKnowledgePropagation.md`](Technical/M22SocialKnowledgePropagation.md) — preregistered M22 scientific/authority contract;
-- [`Technical/M22SocialKnowledgePropagationReconAmendment.md`](Technical/M22SocialKnowledgePropagationReconAmendment.md) — frozen objective-event, witness, report, persistence, and consumer semantics;
+- [`Technical/IncrementalIntegrationRepairResult.md`](Technical/IncrementalIntegrationRepairResult.md) — qualified earned-routine + visible-return repair;
+- [`Technical/CheckpointCIncrementalIntegrationRerunResult.md`](Technical/CheckpointCIncrementalIntegrationRerunResult.md) — fresh `CHECKPOINT_C_PASS`;
 - [`Technical/M22SocialKnowledgePropagationResult.md`](Technical/M22SocialKnowledgePropagationResult.md) + [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md) — bounded `M22_PASS` authority;
-- [`Technical/M23FactionReputation.md`](Technical/M23FactionReputation.md) — preregistered M23 institutional-vs-personal authority contract;
-- [`Technical/M23FactionReputationReconAmendment.md`](Technical/M23FactionReputationReconAmendment.md) — frozen faction identities, quest routing, Rule-of-Two, consumer, persistence, and no-spillover semantics;
 - [`Technical/M23FactionReputationResult.md`](Technical/M23FactionReputationResult.md) + [`Features/FactionSystem.md`](Features/FactionSystem.md) — bounded `M23_PASS` authority;
-- [`Technical/M24ObjectiveWorldState.md`](Technical/M24ObjectiveWorldState.md) — preregistered objective-world authority contract;
-- [`Technical/M24ObjectiveWorldStateReconAmendment.md`](Technical/M24ObjectiveWorldStateReconAmendment.md) — frozen Merchant District fields, mutation/consumer paths, persistence, and no-simulation semantics;
 - [`Technical/M24ObjectiveWorldStateResult.md`](Technical/M24ObjectiveWorldStateResult.md) + [`Features/WorldStateSystem.md`](Features/WorldStateSystem.md) — bounded `M24_PASS` authority;
-- [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — planned sequence through M25, subject to actual milestone preregistration/results.
+- [`Technical/M25CompleteChapterVerticalSliceResult.md`](Technical/M25CompleteChapterVerticalSliceResult.md) — complete chapter composition authority;
+- [`Technical/PostM25ProductDirection.md`](Technical/PostM25ProductDirection.md) — post-M25 product hypotheses and current human-review boundary;
+- [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — historical execution program that culminated in M25.
 
 Current milestone status is:
 
@@ -51,14 +39,19 @@ Fresh Checkpoint C rerun: PASS
 M22 Social Knowledge Propagation: PASS — bounded
 M23 Faction Reputation: PASS — bounded
 M24 Objective World State: PASS — bounded
-M25 Complete Chapter Vertical Slice: AUTHORIZED NEXT only after qualified M24 merge
+M25 Complete Chapter Vertical Slice: PASS
+Automated post-M17 implementation program: COMPLETE
+Human Integrated Playability / Product Review: NEXT
+M26: NOT AUTHORIZED
 ```
 
 M22's PASS remains intentionally narrow: one existing objective Forge-practice event, one direct witness, one explicit report path, and one real downstream Knowledge consumer.
 
-M23's PASS is also bounded: two institutions, explicit institutional mutations, two institutional consumers, persistence, and demonstrated independence from personal Relationship and Knowledge.
+M23's PASS is bounded: two institutions, explicit institutional mutations, two institutional consumers, persistence, and demonstrated independence from personal Relationship and Knowledge.
 
 M24's PASS is bounded to one existing region, two typed objective conditions, two explicit player-caused mutations, two cross-NPC consumers, persistence/reset/legacy neutrality, and demonstrated independence from Relationship, Knowledge, and Faction. It does not claim generalized world simulation.
+
+M25's PASS composes the already-qualified Relationship, Trait, Combat, Exploration, Knowledge, Faction, World-State, Copy, persistence, and bounded Offline authorities into two strategically distinct Merchant District chapter routes without a chapter engine, chapter-local shadow state, generalized condition DSL, or new save schema. It does not qualify human comprehension, pacing, fun, final balance, retention, campaign scalability, or generalized chapter authoring.
 
 ---
 
@@ -85,7 +78,7 @@ Affinity threshold
 
 Legacy `affinity` and `connectionDepth` remain compatibility surfaces where deliberately retained, but they are not the product model for new Relationship-authority content.
 
-M23 proves personal Relationship is not institutional standing; M24 further proves neither social axis is objective regional World State.
+M23 proves personal Relationship is not institutional standing; M24 proves neither social axis is objective regional World State; M25 proves those independent authorities can still compose causally in one chapter.
 
 ---
 
@@ -102,6 +95,8 @@ Relationship -> interprets the result when relationally meaningful
 ```
 
 The Incremental Integration Repair later reuses successful active Trait Resonance as one **routine-familiarity learning source**. That does not change Trait capability authority; it records that the player has personally experienced the Resonance process strongly enough to delegate the bounded `resonance_calibration` routine.
+
+M25 composes permanent Trait capability into a complete chapter route while preserving player choice and independent downstream authorities.
 
 ---
 
@@ -127,16 +122,11 @@ The first Checkpoint B evaluation found three bypasses:
 2. anchored NPC in-person interaction could ignore canonical co-presence;
 3. legal travel did not immediately surface Tether/Essence opportunity cost.
 
-The bounded repair qualified encounter location, anchored Willow/Gronk co-presence, and immediate post-travel spatial feedback. A fresh rerun then produced:
-
-```text
-CHECKPOINT_B_PASS
-M20 authorized
-```
+The bounded repair qualified encounter location, anchored Willow/Gronk co-presence, and immediate post-travel spatial feedback. A fresh rerun then produced `CHECKPOINT_B_PASS`.
 
 The Incremental Integration Repair adds one more bounded active use of Exploration: **Forge Assistance practice exists only in City Center** and establishes player familiarity with that routine. M22 reuses that already-qualified event plus Gronk's existing City Center anchor as its direct-witness proof.
 
-M24 reuses the existing M18 Merchant District identifier as the only qualified World State region. It does not create a parallel location system.
+M24 reuses the existing M18 Merchant District identifier as the only qualified World State region. M25 composes legal travel repeatedly through both chapter routes without creating a parallel location system.
 
 ---
 
@@ -180,9 +170,7 @@ role = researcher | agent
 
 M20 qualified authored IDs, below-UI legality, deterministic role duration modifiers, busy rejection, task-specific rewards, exact-once completion, mid-task save/load continuity, canonical Forge location resolution, and unchanged Relationship/Quest narrative state during routine completion.
 
-### Repair-added familiarity authority
-
-Checkpoint C correctly observed that M20 did not yet prove the first half of its doctrine. The repair adds player-owned persisted familiarity for exactly the two M20 task IDs.
+Checkpoint C later added player-owned persisted familiarity for exactly the two M20 task IDs:
 
 ```text
 Forge Assistance familiarity
@@ -192,11 +180,9 @@ Resonance Calibration familiarity
 <- successful active Trait Resonance
 ```
 
-`startCopyProductionTaskThunk` requires familiarity **below the UI**, in addition to the existing per-Copy requirements.
+`startCopyProductionTaskThunk` requires familiarity below the UI, in addition to the existing per-Copy requirements.
 
-The Copy panel keeps unfamiliar routines visible and explains the active action required to learn them.
-
-See [`Features/CopySystem.md`](Features/CopySystem.md) and [`Technical/IncrementalIntegrationRepairResult.md`](Technical/IncrementalIntegrationRepairResult.md).
+M25 demonstrates the composed active-to-automation chain inside both complete chapter routes: personal Forge practice -> familiarity -> deliberate Copy assignment -> save/load -> bounded offline completion.
 
 ---
 
@@ -230,9 +216,9 @@ saved essence.generationRate snapshot x bounded elapsed
 -> existing M20 Copy task progress/completion
 ```
 
-M21 continues to qualify missing/future/equal timestamps, the eight-hour cap, paused/stopped saves, passive Essence snapshot accrual, partial Copy progress, exact-once Copy completion, discarded excess elapsed time, no task restart/chaining, replay protection, and unchanged narrative authority.
+M21 does **not** process Quest timers, Relationship evidence, dialogue, Combat, travel, Copy general growth/loyalty decay, Trait choices, Knowledge, Faction Reputation, World State, or generalized GameLoop ticks offline.
 
-M21 still does **not** process Quest timers, Relationship evidence, dialogue, Combat, travel, Copy general growth/loyalty decay, Trait choices, status effects, regeneration, Knowledge, Faction Reputation, World State, or generalized GameLoop ticks offline.
+M25 proves bounded offline settlement can occur late in a complete chapter without auto-resolving the chapter's meaningful player-owned decisions.
 
 ---
 
@@ -259,53 +245,13 @@ feature / M21 dispatches addNotification
 
 The composed repair proof renders a `While you were away` message after bounded offline Copy completion.
 
-See [`Features/NotificationSystem.md`](Features/NotificationSystem.md).
-
----
-
-## Checkpoint C history, repair, and fresh rerun
-
-The first post-M21 evaluation produced:
-
-```text
-CHECKPOINT_C_WEAK
-bounded incremental-integration repair required
-M22 not authorized
-```
-
-It found two blocking seams: no demonstrated learned-routine prerequisite before automation, and no demonstrated mounted renderer for offline return summaries.
-
-The repair qualified both:
-
-```text
-active Forge practice / successful Trait Resonance
--> persisted player familiarity
--> below-UI Copy delegation prerequisite
-```
-
-and:
-
-```text
-M21 shared return summary
--> mounted GlobalNotificationHost
--> visible player feedback
-```
-
-The fresh rerun then produced:
-
-```text
-CHECKPOINT_C_PASS
-```
-
-The PASS remains bounded and does not claim final economy balance, repeatable manual Forge gameplay, final notification UX, human pacing/fun, or generalized automation.
-
 ---
 
 ## M22 social Knowledge authority
 
 M22 establishes the first bounded first-class Knowledge domain.
 
-Canonical separation now reads:
+Canonical separation is:
 
 ```text
 OBJECTIVE SOURCE   -> whether an event/fact is true
@@ -315,9 +261,7 @@ RELATIONSHIP       -> what shared history means between people
 FACTION REPUTATION -> how an institution regards the player
 ```
 
-The first qualified Knowledge fact references the existing Player-owned City Center Forge-practice event.
-
-Direct witness:
+Qualified direct witness:
 
 ```text
 successful City Center Forge practice
@@ -327,44 +271,23 @@ canonical Gronk co-presence
 -> Valerius remains ignorant
 ```
 
-Explicit report:
+Qualified explicit report:
 
 ```text
 Player has objectively practiced Forge Assistance
 +
 Valerius still ignorant
 -> valerius_m22_forge_report
--> KNOWLEDGE_FACT
 -> Valerius knows
 ```
 
-Downstream consumer:
-
-```text
-Valerius ignorant
--> valerius_m22_forge_logistics unavailable/rejected
-
-Valerius informed
--> available/accepted
-```
-
-M24 preserves M22's boundary by explicitly proving Forge/Knowledge activity leaves the new `worldState` root unchanged.
-
-See [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md) and [`Technical/M22SocialKnowledgePropagationResult.md`](Technical/M22SocialKnowledgePropagationResult.md).
+M25 composes this divergence and explicit transfer inside both complete chapter routes.
 
 ---
 
 ## M23 Faction Reputation authority
 
-M23 establishes first-class institutional standing:
-
-```ts
-FactionState {
-  reputationByFactionId: Record<string, number>
-}
-```
-
-It corrects historical faction-tagged Quest `REPUTATION` routing so the named institution changes rather than the quest giver's personal Affinity.
+M23 establishes first-class institutional standing.
 
 City Watch divergence:
 
@@ -375,34 +298,23 @@ valerius_exp_order_questioned
 -> City Watch -10
 ```
 
-With the same Relationship evidence, City Watch -10 blocks institutional clearance while City Watch 0 permits it.
-
 Merchants Guild divergence:
 
 ```text
 gronk_m23_guild_audit
 -> Merchants Guild +12
 -> Gronk Relationship unchanged
--> Guild priority available
 ```
-
-At Merchants Guild +12, Relationship-only `gronk_blade_held` still requires its personal evidence.
 
 The dormant reputation bands and ally/rival spillover machinery remain unused/unqualified.
 
-See [`Features/FactionSystem.md`](Features/FactionSystem.md) and [`Technical/M23FactionReputationResult.md`](Technical/M23FactionReputationResult.md).
+M25 uses the two institutions as materially different route consequences rather than cosmetic counters.
 
 ---
 
 ## M24 Objective World State authority
 
 M24 establishes the first bounded first-class persistent regional World State domain.
-
-Root:
-
-```text
-worldState
-```
 
 Qualified region:
 
@@ -417,81 +329,47 @@ watchPresence: normal | heavy
 tradeFlow:     normal | strong
 ```
 
-Missing root/region/field reads through neutral defaults:
+The public-order path can explicitly produce `watchPresence = heavy`; the trade-recovery path can explicitly produce `tradeFlow = strong`. Cross-NPC content consumes those objective conditions independently from Relationship, Knowledge, and Faction.
+
+M24 does not qualify generalized world simulation, and M25 does not widen that claim.
+
+---
+
+## M25 complete chapter composition authority
+
+M25 qualifies two strategically distinct production routes:
 
 ```text
-watchPresence = normal
-tradeFlow = normal
+Route A — Public Order / Institutional Friction
+Route B — Quiet Network / Trade Recovery
 ```
 
-### Patrol-density mutation and consumer
+Both routes begin from the same class of controlled pre-chapter history and compose existing Relationship, Trait, Exploration, Combat, Knowledge, Faction, World-State, Copy, persistence, and Offline authorities through ordinary production surfaces.
+
+The routes differ materially in:
+
+- shared M14 decision;
+- multi-NPC Relationship interpretation;
+- Quest work;
+- long-horizon Silas callback;
+- Combat tactic selected;
+- affected institution;
+- Faction standing;
+- objective Merchant District condition;
+- downstream World-State consumer;
+- final NPC / conclusion.
+
+The routes deliberately converge on Forge familiarity, Knowledge transfer, Copy delegation, persistence, and offline settlement because those are shared capabilities rather than route identity.
+
+M25 adds no chapter reducer, generalized ChapterEngine, new save root, generalized condition DSL, dynamic content discovery framework, or one giant chapter-completion flag.
+
+Its central architectural result is:
 
 ```text
-valerius_exp_m23_public_override
--> valerius_m24_redeploy_patrols
--> explicit player decision
--> Merchant District watchPresence = heavy
+shared systems
+!=
+shared outcome
 ```
-
-The action adds no automatic Relationship, Faction, or Knowledge mutation.
-
-Later:
-
-```text
-watchPresence normal
--> silas_m24_patrol_pressure unavailable/rejected
-
-watchPresence heavy
--> Silas topic available/accepted
-```
-
-with Silas social state held constant.
-
-### Freight-throughput mutation and consumer
-
-```text
-Merchants Guild >= 10
--> gronk_m24_release_verified_freight available
-```
-
-At that same Guild standing, before the explicit action:
-
-```text
-tradeFlow = normal
-```
-
-After the player releases verified contract freight:
-
-```text
-tradeFlow = strong
-Merchants Guild standing unchanged
-Gronk Relationship unchanged
-Knowledge unchanged
-```
-
-Later:
-
-```text
-tradeFlow normal
--> valerius_m24_freight_corridor unavailable/rejected
-
-tradeFlow strong
--> Valerius topic available/accepted
-```
-
-### Gate and persistence authority
-
-M24 adds exact-value `requiredWorldState` dialogue requirements and a typed `WORLD_STATE_SET` effect. UI and `processNPCInteractionThunk` use the same fail-closed requirement helper; malformed requirements reject.
-
-World State persists through normal RootState save/load, missing legacy-like state is neutral, and new-game Player reset clears it.
-
-M24 adds no offline World State progression.
-
-### Evidence ceiling
-
-M24 does not qualify additional regions/fields, generalized world fact registries, arbitrary condition DSLs, city/economy/population/ecology simulation, territory control, patrol AI, World-State-gated Trade or Combat, automatic social interpretation, offline world progression, M25 chapter composition, or human pacing/fun.
-
-See [`Features/WorldStateSystem.md`](Features/WorldStateSystem.md) and [`Technical/M24ObjectiveWorldStateResult.md`](Technical/M24ObjectiveWorldStateResult.md).
 
 ---
 
@@ -508,7 +386,6 @@ Discover person / problem
 -> learn / equip / Resonate capability
 -> travel to an authored location when required
 -> current presence may change effective Tether / Essence intensity
--> encounters and anchored in-person interactions consume canonical presence where qualified
 -> use capability in gameplay
 -> create story / objective event consequence
 -> only legitimate witnesses know selected objective facts where Knowledge is authored
@@ -556,7 +433,8 @@ The incremental layer compresses understood repetition rather than replacing act
 - positive allowlists for bounded automation/offline execution;
 - player-owned routine familiarity distinct from per-Copy capability;
 - exact-head qualification for milestone PRs;
-- explicit evidence ceilings on experimental claims.
+- explicit evidence ceilings on experimental claims;
+- Rule-of-Two pressure before generalized abstraction.
 
 ---
 
@@ -568,45 +446,27 @@ The incremental layer compresses understood repetition rather than replacing act
 - [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md)
 - [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md)
 - [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md)
-- [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md)
-- milestone qualification/reconciliation records under [`Technical/`](Technical/), including M18-M24 and Checkpoints B/C.
+- [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — historical execution program through M25
+- [`Technical/PostM25ProductDirection.md`](Technical/PostM25ProductDirection.md) — current hypotheses and human-review boundary
+- milestone qualification/reconciliation records under [`Technical/`](Technical/), including M18-M25 and Checkpoints B/C.
 
 ### Core feature specifications
 
-- [`Features/RelationshipExperienceSystem.md`](Features/RelationshipExperienceSystem.md) — Relationship Experiences, Memories, Bond dimensions, Connection
-- [`Features/MemorySystem.md`](Features/MemorySystem.md) — landmark relational evidence
-- [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md) — per-NPC awareness of objective facts; M22 bounded authority
-- [`Features/FactionSystem.md`](Features/FactionSystem.md) — independent institutional standing; M23 bounded authority
-- [`Features/WorldStateSystem.md`](Features/WorldStateSystem.md) — persistent objective regional conditions; M24 bounded authority
-- [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — Relationship-to-power ontology including spatial Tether
-- [`Features/EssenceSystem.md`](Features/EssenceSystem.md) — passive Essence runtime and bounded M21 offline snapshot accrual
-- [`Features/TraitSystem.md`](Features/TraitSystem.md) — discovery, assimilation, Resonance, permanent gameplay capability
-- [`Features/NPCSystem.md`](Features/NPCSystem.md) — NPC identity/services/dialogue/quest + cross-domain gate integration
-- [`Features/QuestSystem.md`](Features/QuestSystem.md) — quest lifecycle, authored resolutions, faction-tagged reputation routing
-- [`Features/CopySystem.md`](Features/CopySystem.md) — Copy progression, M20 tasks, familiarity prerequisite, M21 continuation
-- [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) — live fixed timestep + bounded M21 settlement + visible-return path
-- [`Features/NotificationSystem.md`](Features/NotificationSystem.md) — shared queue + qualified renderer
-- [`Features/CombatSystem_MVP.md`](Features/CombatSystem_MVP.md) — M17 encounter and location launch authority
-- [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md) — M18 travel, M19 spatial facts, active presence integration
-
-### Technical documentation
-
-- [`Technical/ArchitectureOverview.md`](Technical/ArchitectureOverview.md)
-- [`Technical/StateManagement.md`](Technical/StateManagement.md)
-- [`Technical/DataModel.md`](Technical/DataModel.md)
-- milestone qualification/reconciliation records under `Technical/`
-
-### UI / UX
-
-- [`UI_UX/UserFlows.md`](UI_UX/UserFlows.md)
-- [`UI_UX/LayoutDesign.md`](UI_UX/LayoutDesign.md)
-- [`UI_UX/ComponentSpecification.md`](UI_UX/ComponentSpecification.md)
-
-### Narrative
-
-- [`Narrative/Synopsis.md`](Narrative/Synopsis.md)
-- [`Narrative/Characters.md`](Narrative/Characters.md)
-- [`Narrative/WorldLore.md`](Narrative/WorldLore.md)
+- [`Features/RelationshipExperienceSystem.md`](Features/RelationshipExperienceSystem.md)
+- [`Features/MemorySystem.md`](Features/MemorySystem.md)
+- [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md)
+- [`Features/FactionSystem.md`](Features/FactionSystem.md)
+- [`Features/WorldStateSystem.md`](Features/WorldStateSystem.md)
+- [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md)
+- [`Features/EssenceSystem.md`](Features/EssenceSystem.md)
+- [`Features/TraitSystem.md`](Features/TraitSystem.md)
+- [`Features/NPCSystem.md`](Features/NPCSystem.md)
+- [`Features/QuestSystem.md`](Features/QuestSystem.md)
+- [`Features/CopySystem.md`](Features/CopySystem.md)
+- [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md)
+- [`Features/NotificationSystem.md`](Features/NotificationSystem.md)
+- [`Features/CombatSystem_MVP.md`](Features/CombatSystem_MVP.md)
+- [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md)
 
 ---
 
@@ -615,27 +475,29 @@ The incremental layer compresses understood repetition rather than replacing act
 | Area | Status | Notes |
 |---|---|---|
 | Player | Strong foundation + bounded routine familiarity | canonical location + persisted familiarity for two M20 routines |
-| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated regression evidence preserved through M24 |
+| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated regression evidence preserved through M25 |
 | Relationship Connection authority | Qualified for registered bundles | legacy compatibility remains |
 | Knowledge | **M22 PASS — bounded** | one fact; witness + report + downstream consumer; no auto propagation |
 | Faction Reputation | **M23 PASS — bounded** | City Watch + Merchants Guild; independent from Relationship/Knowledge/World State |
-| Objective World State | **M24 PASS — bounded** | Merchant District `watchPresence` + `tradeFlow`; two explicit mutations + two cross-NPC consumers; no simulation |
+| Objective World State | **M24 PASS — bounded** | Merchant District `watchPresence` + `tradeFlow`; explicit mutations + consumers; no simulation |
 | Essence | Functional + Relationship-derived + spatial Tether + bounded offline snapshot accrual | M21 max 8h; not event-time simulation |
-| Traits | Core + relationship-mediated discovery/assimilation + gameplay capability | active Resonance also teaches calibration familiarity; no offline Trait choices |
-| Quest | Expanded foundation + corrected faction Reputation routing | World State is not inferred from quest completion |
-| Narrative integration | Bounded qualified slices | M13-M15 + M22 Knowledge + M23 Faction + M24 World State consumers |
+| Traits | Core + relationship-mediated discovery/assimilation + gameplay capability | no generalized buildcraft claim |
+| Quest | Expanded foundation + integrated chapter usage | no generalized chapter scripting authority |
+| Narrative integration | **M25 complete chapter composition PASS** | two strategically distinct routes using canonical authorities |
 | Copy | **M20 PASS + familiarity repair PASS + M21 continuation** | two tasks only; no autonomous selection |
 | GameLoop | **M21 PASS** | canonical timestamp, 8h cap, two-consumer allowlist, replay guard |
 | Shared notifications | **Repair PASS** | mounted production host; M21 summary visibly rendered |
-| Save/load | Implemented + migration qualification | Knowledge/Faction/WorldState/familiarity/task state persist; schema remains v1 |
-| Combat | Bounded qualified vertical slice + presence gate | no M24 World-State-gated Combat claim |
-| Exploration | Bounded qualified travel/presence + Forge learning surface | Merchant District identity reused by M24; no generalized simulation |
+| Save/load | Implemented + migration qualification | integrated M25 state survives ordinary persistence boundaries |
+| Combat | Bounded qualified vertical slice + presence gate | one encounter; no generalized Combat completeness |
+| Exploration | Bounded qualified travel/presence | four-location graph; no generalized simulation |
 | Spatial Tether | Bounded qualified projection | Willow/Gronk anchors; no offline spatial replay |
-| NPC active presence | Bounded qualified integration | dialogue now supports Relationship/Knowledge/Faction/World-State gates |
+| NPC active presence | Bounded qualified integration | in-person actions consume canonical co-presence where anchored |
 | Active RPG integration | **Checkpoint B PASS** | first WEAK -> repair PASS -> fresh PASS |
-| Offline progress | **M21 PASS — bounded** | passive Essence + already-running M20 task only; social/World State excluded |
+| Offline progress | **M21 PASS — bounded** | passive Essence + already-running M20 task only |
 | Incremental integration | **Checkpoint C PASS — bounded** | first WEAK -> repair PASS -> fresh rerun PASS |
-| Complete chapter | Future next candidate | M25 only after M24 qualified merge |
+| Complete chapter | **M25 PASS** | two strategically distinct Merchant District routes; no chapter engine |
+| Human integrated playability | **NEXT / unqualified** | comprehension, pacing, emotional impact, fun, retention remain open |
+| M26+ | **NOT AUTHORIZED** | post-M25 direction awaits human/product review |
 
 ---
 
@@ -657,15 +519,16 @@ Key milestones:
 - **M19:** player + NPC anchors derive bounded spatial Tether without rewriting Bond history;
 - **Checkpoint B first evaluation:** `CHECKPOINT_B_WEAK`;
 - **Active RPG Loop Integration Repair:** PASS;
-- **Checkpoint B fresh rerun:** `CHECKPOINT_B_PASS`; M20 authorized;
+- **Checkpoint B fresh rerun:** `CHECKPOINT_B_PASS`;
 - **M20:** PASS — two authored routine Copy tasks, deterministic live progress, exact-once rewards, save/load continuity, narrative authority preserved;
 - **M21:** PASS — bounded save-envelope offline settlement for passive Essence + already-running M20 task;
 - **Checkpoint C first evaluation:** `CHECKPOINT_C_WEAK`;
 - **Incremental Integration Repair:** PASS — earned-routine bridge + shared visible return path;
 - **Checkpoint C fresh rerun:** `CHECKPOINT_C_PASS`;
 - **M22:** `M22_PASS` — objective event can produce divergent per-NPC knowledge, explicit reporting transfers the fact, later content consumes Knowledge independently;
-- **M23:** `M23_PASS` — City Watch and Merchants Guild use first-class institutional standing independent from personal Relationship/Knowledge; legacy faction reward routing normalized;
-- **M24:** `M24_PASS` — Merchant District persists two typed objective conditions; explicit patrol/freight actions mutate them; later Silas/Valerius content consumes them independently from Relationship/Knowledge/Faction; persistence/reset/legacy neutrality and no-offline progression qualified.
+- **M23:** `M23_PASS` — City Watch and Merchants Guild use first-class institutional standing independent from personal Relationship/Knowledge;
+- **M24:** `M24_PASS` — Merchant District persists two typed objective conditions with explicit mutations and cross-NPC consumers;
+- **M25:** `M25_PASS` — two complete strategically distinct Merchant District routes compose Relationship, Trait, Combat, Exploration, Knowledge, Faction, World State, Copy, persistence, and bounded Offline authorities without a chapter engine or chapter-local shadow state.
 
 Milestone records live under `Technical/`; executable gates live in Build Validation.
 
@@ -686,30 +549,39 @@ Do not remove prior gates merely because a later milestone focuses on another su
 
 Build Validation + preregistered criteria are milestone merge authority. Repository Gemini review is diagnostic only.
 
-The workflow now includes additive **M24 objective world state**, **M23 faction reputation**, and **M22 social knowledge propagation** gates while preserving Checkpoint C repair, M21, M20, active-loop repair, modified historical, accumulated M4-M19, TypeScript, and production-build gates.
+The exact M25 final candidate passed M25, M24, M23, M22, Checkpoint C repair, M21, M20, active-loop repair, modified historical qualification, accumulated M4-M19 qualification, TypeScript, and production build.
+
+This documentation-only post-M25 reconciliation does not create a new behavioral milestone or inherit authority to claim new gameplay behavior.
 
 ---
 
 ## Near-term development direction
 
-After the exact documentation-complete M24 PASS candidate is requalified and merged, the next authorized candidate is:
+The automated post-M17 implementation program has completed at `M25_PASS`.
+
+The only currently authorized next activity is:
 
 ```text
-M25 — Complete Chapter Vertical Slice
+Human Integrated Playability / Product Review
 ```
 
-M25 is **not implemented or preregistered by M24**.
+The review should test the complete integrated experience rather than another isolated subsystem. It should evaluate discoverability, state and causal legibility, distinction between Relationship/Knowledge/Faction/World State, strategic agency, narrative/emotional coherence, incremental fit, pacing, and desire to continue.
 
-It must begin from the then-current merged M24 baseline and prove that already-qualified systems compose into a coherent playable chapter rather than merely coexist as isolated mechanics.
+`Technical/PostM25ProductDirection.md` records candidate hypotheses including:
 
-The governing separation entering M25 is:
+- causal-legibility UX;
+- a second heterogeneous complete chapter before a ChapterEngine;
+- content-authoring intelligence / validators;
+- deeper Relationship-derived Trait capability/buildcraft;
+- selected World-State affordances;
+- strategic institutional access from Faction Reputation;
+- information-control gameplay from Knowledge;
+- deeper earned Copy delegation;
+- bounded Combat breadth;
+- selective time/presence opportunity cost;
+- technical stewardship.
 
-```text
-WORLD STATE        -> what objectively exists now
-KNOWLEDGE          -> who knows which facts
-RELATIONSHIP       -> what shared history means between people
-FACTION REPUTATION -> how an institution regards the player
-```
+These are **not** authorized milestones.
 
 Current sequence:
 
@@ -722,15 +594,18 @@ M20 Copy Task Automation: PASS
 -> M22 Social Knowledge Propagation: PASS
 -> M23 Faction Reputation: PASS
 -> M24 Objective World State: PASS
--> M25 Complete Chapter Vertical Slice: AUTHORIZED NEXT after qualified M24 merge
--> Human integrated playability / product review
+-> M25 Complete Chapter Vertical Slice: PASS
+-> automated post-M17 implementation program: COMPLETE
+-> Human Integrated Playability / Product Review: NEXT
+-> Post-M25 Product Direction Decision
+-> M26+: NOT AUTHORIZED until then
 ```
 
 ---
 
 ## Development workflow
 
-For code-bearing milestones:
+For any future code-bearing milestone that is explicitly authorized after the post-M25 review:
 
 ```text
 verify current main
@@ -784,6 +659,7 @@ src/
 public/data/
 ├── relationships/
 ├── m24-world-state-content.json
+├── m25-chapter-content.json
 ├── dialogues.json
 ├── quests.json
 └── npcs.json
@@ -801,7 +677,7 @@ specification/
 
 When an older specification conflicts with current qualified authority, do not silently revive old behavior as design truth.
 
-Use this reading order for the current post-M24 product:
+Use this reading order for the current post-M25 product:
 
 1. `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority;
 2. `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine;
@@ -819,9 +695,11 @@ Use this reading order for the current post-M24 product:
 14. `Technical/M22SocialKnowledgePropagationResult.md` + `Features/KnowledgeSystem.md` for bounded social-Knowledge authority;
 15. `Technical/M23FactionReputationResult.md` + `Features/FactionSystem.md` + `Features/QuestSystem.md` for bounded institutional-standing authority;
 16. `Technical/M24ObjectiveWorldStateResult.md` + `Features/WorldStateSystem.md` + `Features/NPCSystem.md` for bounded objective-regional-state authority;
-17. milestone preregistration/recon records for exact experiment contracts;
-18. `Technical/PostM17MilestoneRoadmap.md` for future planned sequencing;
-19. `GameDesignDocument.md` and older feature prose where not superseded.
+17. `Technical/M25CompleteChapterVerticalSliceResult.md` for complete chapter composition authority;
+18. `Technical/PostM25ProductDirection.md` for current post-M25 hypotheses and the human-review boundary;
+19. milestone preregistration/recon records for exact historical experiment contracts;
+20. `Technical/PostM17MilestoneRoadmap.md` as the historical roadmap that culminated in M25;
+21. `GameDesignDocument.md` and older feature prose where not superseded.
 
 If runtime still uses a legacy rule, document it as compatibility/migration debt and migrate it deliberately rather than pretending it is modern product authority.
 
@@ -830,3 +708,5 @@ If historical content uses Relationship evidence to stand in for cross-NPC aware
 If older code treats faction-tagged `REPUTATION` as giver-NPC Affinity or dormant ally/rival constants as active authority, M23 supersedes that interpretation.
 
 If older prose uses Relationship, Knowledge, Faction, NPC flags, or Quest completion as shorthand for persistent regional conditions, M24's World State authority supersedes that interpretation within its bounded evidence ceiling.
+
+If older prose describes M25 as future or merely authorized, `M25CompleteChapterVerticalSliceResult.md` supersedes that status. Post-M25 ideas remain hypotheses until separately authorized and qualified.
