@@ -1,4 +1,9 @@
 import type { RootState } from '../../../app/store';
+import {
+  areLocationsDirectlyConnected,
+  resolveCanonicalLocationId,
+} from '../../Exploration/LocationDefinitions';
+import { getNpcWorldLocationId } from '../../NPCs/state/NPCWorldLocationDefinitions';
 import type {
   BondProfile,
   ConnectionQualificationRule,
@@ -233,12 +238,56 @@ const qualityBand = (quality: number) => {
   return { label: 'Weak', multiplier: 0.6 };
 };
 
+export type RelationshipTetherSource = 'authored' | 'spatial';
+
+export interface EffectiveRelationshipTether {
+  tetherState: RelationshipTetherState;
+  source: RelationshipTetherSource;
+  playerLocationId?: string;
+  npcLocationId?: string;
+}
+
+/**
+ * M19 spatial presence is a current-world projection, not Relationship history.
+ * When either side lacks a canonical M18 location, preserve the authored/static
+ * BondProfile tether rather than guessing a world position.
+ */
+export const selectEffectiveRelationshipTether = (
+  state: RootState,
+  npcId: string
+): EffectiveRelationshipTether => {
+  const profile = selectBondProfileByNpcId(state, npcId);
+  const authoredFallback: EffectiveRelationshipTether = {
+    tetherState: profile.tetherState,
+    source: 'authored',
+  };
+
+  const npcAnchor = getNpcWorldLocationId(npcId);
+  if (!npcAnchor) return authoredFallback;
+
+  const playerLocationId = resolveCanonicalLocationId(state.player.location);
+  const npcLocationId = resolveCanonicalLocationId(npcAnchor);
+  if (!playerLocationId || !npcLocationId) return authoredFallback;
+
+  if (playerLocationId === npcLocationId) {
+    return { tetherState: 'present', source: 'spatial', playerLocationId, npcLocationId };
+  }
+
+  if (areLocationsDirectlyConnected(playerLocationId, npcLocationId)) {
+    return { tetherState: 'nearby', source: 'spatial', playerLocationId, npcLocationId };
+  }
+
+  return { tetherState: 'remote', source: 'spatial', playerLocationId, npcLocationId };
+};
+
 export interface RelationshipEssenceContribution {
   npcId: string;
   enabled: boolean;
   baseRate: number;
   qualityBand: string;
   qualityMultiplier: number;
+  tetherState: RelationshipTetherState;
+  tetherSource: RelationshipTetherSource;
   tetherMultiplier: number;
   stabilityMultiplier: number;
   effectiveRate: number;
@@ -251,12 +300,13 @@ export const selectRelationshipEssenceContributionByNpcId = (
 ): RelationshipEssenceContribution => {
   const config = selectRelationshipProgressionDefinition(state, npcId);
   const profile = selectBondProfileByNpcId(state, npcId);
+  const effectiveTether = selectEffectiveRelationshipTether(state, npcId);
   const enabled = Boolean(
     config?.connectionAuthority === 'relationships' && config.essence?.enabled
   );
   const baseRate = CONNECTION_BASE_RATES[Math.max(0, Math.min(10, profile.connectionLevel))] ?? 0;
   const quality = qualityBand(profile.resonanceQuality);
-  const tetherMultiplier = TETHER_MULTIPLIERS[profile.tetherState] ?? 1;
+  const tetherMultiplier = TETHER_MULTIPLIERS[effectiveTether.tetherState] ?? 1;
   const stabilityMultiplier = STABILITY_MULTIPLIERS[profile.stability] ?? 1;
   const effectiveRate = enabled
     ? baseRate * quality.multiplier * tetherMultiplier * stabilityMultiplier
@@ -268,6 +318,8 @@ export const selectRelationshipEssenceContributionByNpcId = (
     baseRate,
     qualityBand: quality.label,
     qualityMultiplier: quality.multiplier,
+    tetherState: effectiveTether.tetherState,
+    tetherSource: effectiveTether.source,
     tetherMultiplier,
     stabilityMultiplier,
     effectiveRate,
@@ -275,7 +327,7 @@ export const selectRelationshipEssenceContributionByNpcId = (
       ? [
           `Connection L${profile.connectionLevel} base: ${baseRate.toFixed(2)}/sec`,
           `Resonance Quality ${quality.label}: ${quality.multiplier.toFixed(2)}x`,
-          `Tether ${profile.tetherState}: ${tetherMultiplier.toFixed(2)}x`,
+          `Tether ${effectiveTether.tetherState} (${effectiveTether.source}): ${tetherMultiplier.toFixed(2)}x`,
           `Stability ${profile.stability}: ${stabilityMultiplier.toFixed(2)}x`,
         ]
       : ['Relationship-derived Essence is not enabled for this NPC.'],
