@@ -37,6 +37,15 @@ const STREAM_START_TIMEOUT_MS = 60_000;
 const STREAM_END_TIMEOUT_MS = 10 * 60_000;
 const SETTLE_DELAY_MS = 5_000;
 
+// Anti-detection: random delay helpers
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomDelay(min, max) {
+  return randomInt(min, max);
+}
+
 let stopRequested = false;
 let started = false;
 let _startResolve = null;
@@ -159,11 +168,27 @@ async function waitForLogin(page, timeoutMs = 10 * 60_000) {
 
 async function sendPrompt(page, text) {
   const composer = await findFirstVisible(page, COMPOSER_SELECTORS, 120_000);
+  
+  // Anti-detection: random pause before interacting
+  await page.waitForTimeout(randomDelay(500, 1500));
+  
   await composer.click();
-  // ProseMirror editor (#prompt-textarea) is a contenteditable div — keyboard.type is most reliable.
+  
+  // Anti-detection: pause after click before typing
+  await page.waitForTimeout(randomDelay(200, 600));
+  
+  // Clear existing content
   await page.keyboard.press("ControlOrMeta+A");
   await page.keyboard.press("Backspace");
-  await page.keyboard.type(text, { delay: 10 });
+  
+  // Anti-detection: pause before typing
+  await page.waitForTimeout(randomDelay(100, 400));
+  
+  // Type with randomized delay between keystrokes (more human-like)
+  await page.keyboard.type(text, { delay: randomDelay(15, 35) });
+
+  // Anti-detection: pause before sending
+  await page.waitForTimeout(randomDelay(300, 800));
 
   // Prefer clicking Send; fall back to Enter.
   for (const sel of SEND_SELECTORS) {
@@ -230,10 +255,41 @@ async function waitForAnswer(page) {
 
   const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
     headless: false,
-    viewport: { width: 1280, height: 900 },
-    args: ["--disable-blink-features=AutomationControlled"],
+    viewport: { width: randomInt(1200, 1600), height: randomInt(800, 1000) },
+    args: [
+      "--disable-blink-features=AutomationControlled",
+      "--disable-web-security",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--window-position=0,0",
+      "--disable-features=IsolateOrigins,site-per-process"
+    ],
   });
   const page = context.pages()[0] || (await context.newPage());
+
+  // Anti-detection: inject scripts to override navigator properties
+  await page.addInitScript(() => {
+    // Override navigator.webdriver
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => false
+    });
+    
+    // Mock plugins
+    Object.defineProperty(navigator, 'plugins', {
+      get: () => [1, 2, 3, 4, 5]
+    });
+    
+    // Mock languages
+    Object.defineProperty(navigator, 'languages', {
+      get: () => ['en-US', 'en']
+    });
+    
+    // Mock chrome property
+    window.chrome = { runtime: {} };
+    
+    // Remove automation flags
+    delete navigator.__proto__.webdriver;
+  });
 
   console.log(`[open] ${CHATGPT_URL}`);
   await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
