@@ -12,6 +12,7 @@ import {
   getCopyProductionTaskDefinition,
 } from './CopyTaskDefinitions';
 import { updateCopy } from './state/CopySlice';
+import type { Copy } from './state/CopyTypes';
 import {
   processCopyTasksThunk,
   startCopyProductionTaskThunk,
@@ -24,7 +25,7 @@ type TestStore = ReturnType<typeof makeStore>;
 
 const prepareCopy = (
   store: TestStore,
-  updates: Parameters<typeof updateCopy>[0]['payload']['updates']
+  updates: Partial<Copy>
 ) => {
   store.dispatch(updateCopy({ copyId: 'copy-001', updates }));
 };
