@@ -40,6 +40,7 @@ import {
 import { fetchTraitsThunk } from '../../../../Traits/state/TraitThunks';
 import { equipTrait } from '../../../../Player/state/PlayerSlice';
 import { updateNPCRelationshipThunk } from '../../../state/NPCThunks';
+import { isAnchoredNpcPhysicallyPresent } from '../../../state/NPCWorldLocationDefinitions';
 import { recalculateStatsThunk } from '../../../../Player/state/PlayerThunks';
 import type { NPC } from '../../../state/NPCTypes';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
@@ -60,10 +61,13 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
   const traitsLoading = useAppSelector(selectTraitLoading);
   const discoveredTraitIds = useAppSelector(selectDiscoveredTraits);
   const playerEquippedTraits = useAppSelector(selectEquippedTraits);
+  const playerLocation = useAppSelector(state => state.player.location);
   const usesRelationshipAuthority = useAppSelector(state =>
     selectUsesRelationshipConnectionAuthority(state, npc.id)
   );
   const bondProfile = useAppSelector(state => selectBondProfileByNpcId(state, npc.id));
+  const anchoredPresence = isAnchoredNpcPhysicallyPresent(npc.id, playerLocation);
+  const activeInteractionBlocked = anchoredPresence === false;
 
   useEffect(() => {
     if (Object.keys(allTraits).length === 0 && !traitsLoading) {
@@ -81,12 +85,13 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
   }, [npc?.innateTraits, allTraits, discoveredTraitIds]);
 
   const handleEquipNPCTrait = useCallback((traitId: string) => {
+    if (activeInteractionBlocked) return;
     // The Overview never exposes an undiscovered Trait, preserving the lifecycle
     // Discover -> Equip/Attune -> Assimilate -> Resonate.
     if (!discoveredTraitIds.includes(traitId)) return;
     dispatch(equipTrait({ traitId, slotIndex: -1 }));
     dispatch(recalculateStatsThunk());
-  }, [dispatch, discoveredTraitIds]);
+  }, [dispatch, discoveredTraitIds, activeInteractionBlocked]);
 
   if (traitsLoading && Object.keys(allTraits).length === 0) {
     return (
@@ -100,7 +105,11 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 3 }}>
-        {usesRelationshipAuthority ? (
+        {activeInteractionBlocked ? (
+          <Alert severity="info">
+            This profile is available remotely. Active interaction with {npc.name} requires physical presence.
+          </Alert>
+        ) : usesRelationshipAuthority ? (
           <Alert severity="info">
             Deep Connection is earned through meaningful Experiences, choices, and landmark Memories. Affinity reflects current disposition, but filling Affinity does not level this bond. Use Dialogue and Quests to create relationship history.
           </Alert>
@@ -108,9 +117,9 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
           <Button
             variant="contained"
             color="secondary"
-            disabled={cooldown}
+            disabled={cooldown || activeInteractionBlocked}
             onClick={() => {
-              if (cooldown) return;
+              if (cooldown || activeInteractionBlocked) return;
               setCooldown(true);
               dispatch(updateNPCRelationshipThunk({ npcId: npc.id, change: 10, reason: 'Interaction' }));
               setTimeout(() => setCooldown(false), 1200);
@@ -128,34 +137,42 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
               <Typography variant="h6" gutterBottom>Available Interactions</Typography>
               <List dense>
                 <ListItem>
-                  <ListItemIcon><DialogueIcon color="primary" /></ListItemIcon>
+                  <ListItemIcon>
+                    {activeInteractionBlocked ? <LockedIcon color="disabled" /> : <DialogueIcon color="primary" />}
+                  </ListItemIcon>
                   <ListItemText
                     primary="Dialogue"
-                    secondary={usesRelationshipAuthority
-                      ? 'Available now. Meaningful responses can become Relationship Experiences.'
-                      : isAffinityUnlocked(1) ? 'Have conversations' : 'Requires Affinity: 1'}
+                    secondary={activeInteractionBlocked
+                      ? 'Requires physical presence'
+                      : usesRelationshipAuthority
+                        ? 'Available now. Meaningful responses can become Relationship Experiences.'
+                        : isAffinityUnlocked(1) ? 'Have conversations' : 'Requires Affinity: 1'}
                   />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
-                    {isAffinityUnlocked(2) ? <TradeIcon color="primary" /> : <LockedIcon color="disabled" />}
+                    {!activeInteractionBlocked && isAffinityUnlocked(2) ? <TradeIcon color="primary" /> : <LockedIcon color="disabled" />}
                   </ListItemIcon>
                   <ListItemText
                     primary="Trading"
-                    secondary={isAffinityUnlocked(2) ? 'Buy and sell items' : 'Requires Affinity: 2'}
+                    secondary={activeInteractionBlocked
+                      ? 'Requires physical presence'
+                      : isAffinityUnlocked(2) ? 'Buy and sell items' : 'Requires Affinity: 2'}
                   />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
-                    {usesRelationshipAuthority || isAffinityUnlocked(3)
+                    {!activeInteractionBlocked && (usesRelationshipAuthority || isAffinityUnlocked(3))
                       ? <QuestIcon color="primary" />
                       : <LockedIcon color="disabled" />}
                   </ListItemIcon>
                   <ListItemText
                     primary="Quests"
-                    secondary={usesRelationshipAuthority
-                      ? 'Quest opportunities appear when your shared history makes them relevant.'
-                      : isAffinityUnlocked(3) ? 'Accept and complete quests' : 'Requires Affinity: 3'}
+                    secondary={activeInteractionBlocked
+                      ? 'Requires physical presence'
+                      : usesRelationshipAuthority
+                        ? 'Quest opportunities appear when your shared history makes them relevant.'
+                        : isAffinityUnlocked(3) ? 'Accept and complete quests' : 'Requires Affinity: 3'}
                   />
                 </ListItem>
               </List>
@@ -221,9 +238,12 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                             size="small"
                             fullWidth
                             onClick={() => handleEquipNPCTrait(trait.id)}
-                            disabled={playerEquippedTraits.length >= 6 || playerEquippedTraits.some(t => t.id === trait.id)}
+                            disabled={activeInteractionBlocked || playerEquippedTraits.length >= 6 || playerEquippedTraits.some(t => t.id === trait.id)}
+                            title={activeInteractionBlocked ? 'Requires physical presence' : undefined}
                           >
-                            {playerEquippedTraits.some(t => t.id === trait.id) ? 'Already Equipped' : 'Equip Trait'}
+                            {activeInteractionBlocked
+                              ? 'Requires Presence'
+                              : playerEquippedTraits.some(t => t.id === trait.id) ? 'Already Equipped' : 'Equip Trait'}
                           </Button>
                         </CardContent>
                       </Card>
