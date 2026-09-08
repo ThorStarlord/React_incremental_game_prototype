@@ -1,8 +1,8 @@
-Implementation Status: ⚠️ PARTIAL — shared Redux queue implemented; production toast renderer not currently demonstrated
+Implementation Status: ✅ BOUNDED SHARED QUEUE + PRODUCTION RENDERER QUALIFIED
 
 # Notification System Specification
 
-Global, lightweight feedback state for actions and events.
+Global, lightweight feedback state and production presentation for actions and events.
 
 ## 1. Current authoritative runtime
 
@@ -30,72 +30,120 @@ GameNotification {
 }
 ```
 
-Several feature thunks/listeners dispatch `addNotification`, including NPC trade, Quest, Trait, Copy, Relationship, and M21 offline-settlement feedback.
+Feature thunks/listeners dispatch `addNotification`, including NPC trade, Quest, Trait, Copy, Relationship, active Forge familiarity feedback, and M21 offline-settlement feedback.
 
-## 2. Checkpoint C presentation finding
-
-Checkpoint C repository inspection did **not** find a production component consuming `selectNotifications` / `state.notifications.items` and rendering the shared queue into the mounted application layout.
-
-`useMenuNotifications` is a separate local React-state hook. It is not a renderer for the shared Redux queue.
-
-Therefore the current proven loop is:
+The Checkpoint-C Incremental Integration Repair adds the missing presentation bridge:
 
 ```text
 feature dispatches addNotification
 -> shared Redux queue stores GameNotification
+-> GlobalNotificationHost consumes selectNotifications
+-> MUI Snackbar + Alert renders the current shared message
+-> player can dismiss
+-> removeNotification removes that queue entry
 ```
 
-The stronger intended loop is **not yet qualified**:
+`GlobalNotificationHost` is mounted once in `GameLayout`.
+
+See:
+
+- `../Technical/CheckpointCIncrementalIntegrationResult.md` — historical first `CHECKPOINT_C_WEAK` finding;
+- `../Technical/IncrementalIntegrationRepair.md` — preregistered repair contract;
+- `../Technical/IncrementalIntegrationRepairReconAmendment.md` — frozen renderer decision;
+- `../Technical/IncrementalIntegrationRepairResult.md` — qualified repair result.
+
+## 2. Historical Checkpoint C finding and repair
+
+The first Checkpoint C evaluation found that the shared Redux queue existed but the production component tree did not demonstrate a consumer of `selectNotifications` / `state.notifications.items`.
+
+`useMenuNotifications` was and remains a separate local React-state hook. It is not the shared Redux renderer.
+
+Historical pre-repair state:
+
+```text
+feature dispatches addNotification
+-> shared Redux queue stores GameNotification
+-> no qualified mounted shared renderer
+```
+
+Qualified repaired state:
 
 ```text
 feature dispatches notification
 -> shared queue
--> mounted toast / notification surface
--> player sees message
--> lifecycle/dismissal
+-> mounted GlobalNotificationHost
+-> player-visible Alert
+-> shared dismissal/removal
 ```
 
-This gap is especially material for M21 because the bounded `While you were away` summary is dispatched into the shared queue after offline settlement but is not yet proven player-visible.
+The repair does not merge the local menu-notification hook into this authority and does not create an M21-specific duplicate store.
 
-See `../Technical/CheckpointCIncrementalIntegrationResult.md`.
+## 3. Production renderer
 
-## 3. Intended UI/UX
+`src/shared/components/ui/GlobalNotificationHost.tsx` is the bounded production renderer.
 
-A bounded repair should render the existing shared queue in a production player-facing surface rather than creating another notification authority solely for M21.
+Current qualified behavior:
 
-Desired behavior:
+- consumes `selectNotifications`;
+- renders the most recent queued shared notification so a newly generated return summary is immediately legible;
+- maps `GameNotification.type` to Material UI Alert severity;
+- uses `Snackbar` + `Alert`;
+- provides Alert close/dismiss behavior;
+- removes the rendered entry through `removeNotification`;
+- mounts once in `GameLayout`.
 
-- toast/stack presentation for queued notifications;
-- severity mapped from `GameNotification.type`;
-- dismissal through `removeNotification`;
-- optional timeout behavior consistent with `GameNotification.timeout`;
-- accessible `role="status"` / `role="alert"` semantics as appropriate;
-- no duplication of notification state into another global store.
+When `GameNotification.timeout` is absent, the current host uses a bounded five-second display default. A supplied timeout is honored by the host.
 
-A Notification Center/history panel is optional and remains outside the current repair requirement.
+The repair qualifies a single shared player-visible host and queue lifecycle. It does not qualify a rich notification center or long-term notification-history product.
 
-## 4. Integration
+## 4. M21 return-feedback integration
 
-Current notification producers include ordinary feature feedback from:
+M21 already constructs a bounded summary after a positive offline settlement:
+
+```text
+While you were away: ...
+```
+
+The repair now qualifies the complete presentation path:
+
+```text
+settleOfflineProgressThunk
+-> addNotification
+-> notifications.items
+-> GlobalNotificationHost
+-> player-visible Alert
+```
+
+The composed repair test specifically proves a saved running Forge Assistance task completing through M21 and the resulting `While you were away` summary being visibly rendered.
+
+This closes the presentation seam identified by the first Checkpoint C evaluation. A fresh Checkpoint C rerun is still required to decide the overall product verdict.
+
+## 5. Integration
+
+Current shared notification producers include ordinary feature feedback from:
 
 - Trait actions;
 - Copy actions;
 - Quest updates;
 - NPC/trading actions;
 - Relationship actions;
+- active City Center Forge familiarity;
 - M21 offline settlement.
 
-Checkpoint C does not claim that all producer messages require identical presentation policy. It establishes only that the shared queue currently lacks demonstrated production rendering and that M21 return feedback therefore needs a bounded presentation bridge.
+The existence of one shared production renderer does not imply that every producer must eventually use identical timeout, stacking, history, or interruption policy. Those broader UX decisions remain outside the bounded repair evidence.
 
-## 5. Non-goals
+## 6. Evidence ceiling / non-goals
 
-The Checkpoint-C repair does not require:
+The qualified repair does not establish:
 
-- per-feature channels;
-- notification analytics/history persistence;
+- a notification center/history panel;
+- durable notification history across sessions as a product requirement;
+- per-feature channels or mute settings;
 - rich inline actions;
 - deep links;
-- generalized messaging/event-bus redesign;
-- a second M21-specific notification store.
+- notification analytics;
+- multi-toast stacking policy at scale;
+- final timeout/accessibility/user-comprehension tuning;
+- a generalized event-bus redesign.
 
-Those remain optional future enhancements after the basic shared queue is player-visible.
+It qualifies the smaller requirement needed by Checkpoint C: the existing shared queue now has a mounted production presentation and dismissal path, including visible M21 return feedback.
