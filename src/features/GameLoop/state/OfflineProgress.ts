@@ -134,14 +134,16 @@ export const settleOfflineProgressThunk = createAsyncThunk<
       return { ...baseSummary, skipReason: 'game_paused', elapsedMs: 0 };
     }
 
-    const beforeTasks = Object.values(restoredState.copy.copies)
-      .filter(copy => copy.activeTask?.status === 'running' && Boolean(copy.activeTask.productionTaskId))
-      .map(copy => ({
+    const beforeTasks = Object.values(restoredState.copy.copies).flatMap(copy => {
+      const task = copy.activeTask;
+      if (!task || task.status !== 'running' || !task.productionTaskId) return [];
+      return [{
         copyId: copy.id,
         copyName: copy.name,
-        productionTaskId: copy.activeTask!.productionTaskId!,
-        durationSeconds: copy.activeTask!.durationSeconds,
-      }));
+        productionTaskId: task.productionTaskId,
+        durationSeconds: task.durationSeconds,
+      }];
+    });
 
     // Frozen M21 order: snapshot passive Essence first, then M20 Copy task settlement.
     const essenceResult = await dispatch(processPassiveGenerationThunk(window.elapsedMs)).unwrap();
@@ -155,11 +157,20 @@ export const settleOfflineProgressThunk = createAsyncThunk<
       if (!definition) continue;
 
       const afterTask = settledState.copy.copies[before.copyId]?.activeTask;
-      const completed = !afterTask;
-      const progressSeconds = completed
-        ? before.durationSeconds
-        : Math.min(afterTask.progressSeconds, afterTask.durationSeconds);
-      const durationSeconds = completed ? before.durationSeconds : afterTask.durationSeconds;
+      let completed: boolean;
+      let progressSeconds: number;
+      let durationSeconds: number;
+
+      if (!afterTask) {
+        completed = true;
+        progressSeconds = before.durationSeconds;
+        durationSeconds = before.durationSeconds;
+      } else {
+        completed = false;
+        progressSeconds = Math.min(afterTask.progressSeconds, afterTask.durationSeconds);
+        durationSeconds = afterTask.durationSeconds;
+      }
+
       const progressPercent = durationSeconds > 0
         ? Math.min(100, Math.floor((progressSeconds / durationSeconds) * 100))
         : 100;
