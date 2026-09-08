@@ -9,6 +9,7 @@ import {
 import { spendEssence } from '../../Essence/state/EssenceSlice';
 import {
   addPermanentTrait,
+  markRoutineFamiliarity,
   unequipTrait,
 } from '../../Player/state/PlayerSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
@@ -185,6 +186,11 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
 
       dispatch(discoverTrait({ traitId }));
       dispatch(addPermanentTrait(traitId));
+      dispatch(markRoutineFamiliarity({
+        routineId: 'resonance_calibration',
+        source: 'trait_resonance',
+        learnedAt: Date.now(),
+      }));
 
       // Once permanent, the Trait no longer needs to occupy a temporary attunement slot.
       for (const slot of state.player.traitSlots) {
