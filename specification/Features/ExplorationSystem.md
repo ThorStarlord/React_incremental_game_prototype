@@ -1,7 +1,7 @@
 # Exploration / Travel System
 
-**Status:** Bounded production vertical slice qualified in M18  
-**Current authority:** `Technical/M18ExplorationTravelQualification.md` + `Technical/M18ExplorationTravelReconAmendment.md` + `Technical/M18ExplorationTravelResult.md`
+**Status:** Bounded production travel vertical slice qualified in M18; M19 now consumes its world facts for spatial Tether  
+**Current authority:** `Technical/M18ExplorationTravelQualification.md` + `Technical/M18ExplorationTravelReconAmendment.md` + `Technical/M18ExplorationTravelResult.md` + `Technical/M19WorldDerivedTetherResult.md`
 
 ## 1. Purpose
 
@@ -9,7 +9,7 @@ Exploration owns **authored spatial topology and legal player travel between dir
 
 It does not own the player's live current location. `Player.location` remains the canonical current-location authority.
 
-The M18 boundary is:
+The qualified boundary is:
 
 ```text
 Exploration definitions
@@ -21,7 +21,12 @@ Player
 
 Quest / Story
 -> reacts to location changes
+
+Relationship / Essence (M19)
+-> may consume objective location/adjacency facts to derive current spatial Tether
 ```
+
+Exploration does not itself own Relationship meaning or Essence calculation.
 
 ## 2. Qualified M18 graph
 
@@ -68,11 +73,11 @@ There is no direct City Center <-> Whispering Woods route.
 }
 ```
 
-The contract is intentionally small. M18 does not add travel time, coordinates, resources, encounters, NPC schedules, region simulation, or world-state predicates.
+The contract is intentionally small. M18/M19 do not add travel time, coordinates, resources, encounters, NPC schedules, region simulation, or world-state predicates.
 
 ### Current-location authority
 
-Fresh Player state now starts at:
+Fresh Player state starts at:
 
 ```text
 location_city_center
@@ -131,30 +136,67 @@ player chooses legal travel
 
 The production proof reuses existing `quest_elara_chain_1`, whose objective targets `location_whispering_woods`.
 
-## 6. Persistence
+## 6. M19 spatial Tether consumption
+
+M19 independently reuses the same objective world facts for a second domain without moving authority into Exploration.
+
+Bounded NPC-domain anchors are:
+
+```text
+Willow -> location_whispering_woods
+Gronk  -> location_city_center
+```
+
+Relationship selectors combine:
+
+```text
+Player.location
++
+NPC canonical anchor
++
+Exploration direct adjacency
+-> effective spatial Tether
+```
+
+For the qualified bounded graph:
+
+```text
+same location       -> present
+direct neighbor     -> nearby
+other known location -> remote
+```
+
+This is a consumer of Exploration facts, not a new Exploration responsibility. Travel does not write Relationship state. Unanchored NPCs continue to use authored/static Relationship Tether.
+
+The existing `setLocation` listener also refreshes the cached passive Essence rate after a location change so the live rate reflects the newly derived spatial Tether.
+
+## 7. Persistence
 
 Exploration adds no persistent reducer state and no save-schema version.
 
-Because `Player.location` is already part of RootState, ordinary save/load preserves the current location. M18 qualifies saving at `location_city_gate`, restoring that location, and then continuing legal travel to `location_whispering_woods`.
+Because `Player.location` is already part of RootState, ordinary save/load preserves the current location. M18 qualified saving at `location_city_gate`, restoring that location, and then continuing legal travel to `location_whispering_woods`.
 
-The legacy `"City Center"` compatibility alias is handled at route-resolution time rather than by a new save migration.
+M19 further qualifies that the same restored `Player.location` reconstructs Willow/Gronk's effective spatial Tether and Relationship-derived Essence contributions without persisting separate proximity flags.
 
-## 7. Authority boundaries
+The legacy `"City Center"` compatibility alias remains handled at route/projection resolution time rather than by a new save migration.
 
-M18 preserves these rules:
+## 8. Authority boundaries
+
+The current rules are:
 
 - **Exploration:** authored topology / direct adjacency;
 - **Player:** current player location;
-- **NPC:** NPC location where applicable; not migrated in M18;
-- **Copy:** Copy location where applicable; not migrated in M18;
+- **NPC:** bounded canonical NPC world anchors where qualified; descriptive NPC location remains separate;
+- **Copy:** Copy location where applicable; not migrated by M18/M19;
 - **Quest / Story:** consequences of location facts;
-- **Relationship:** relational meaning, not objective spatial truth.
+- **Relationship:** historical relational meaning plus authored/static Tether fallback;
+- **Essence:** consumes the effective Tether projection in its existing formula.
 
-Do not introduce shadow booleans such as `playerAtGrove`, `willowNearby`, or `silasInMarket` as substitute location authority.
+Do not introduce shadow booleans such as `playerAtGrove`, `willowNearby`, or `silasInMarket` as substitute location/presence authority.
 
-## 8. Explicitly unqualified
+## 9. Explicitly unqualified
 
-M18 does not qualify:
+M18/M19 do not qualify:
 
 - open-world exploration;
 - coordinate movement;
@@ -164,15 +206,22 @@ M18 does not qualify:
 - random encounters in transit;
 - resource gathering by location;
 - procedural maps;
-- NPC schedules;
+- NPC schedules or autonomous NPC movement;
+- dynamic NPC positions;
 - Copy travel;
 - offline travel;
-- world-derived Relationship Tether;
-- campaign-scale navigation;
+- continuous-distance Tether;
+- spatially derived `Absent`;
+- activity-derived `Engaged` / `Deeply Engaged`;
+- campaign-scale navigation/presence simulation;
 - human travel pacing or enjoyment.
 
-## 9. Next boundary — M19
+## 10. Next boundary — Checkpoint B
 
-The next planned milestone may use the objective spatial facts M18 established to ask whether world presence can derive Relationship Tether without changing historical Relationship state.
+M18 established objective player-facing travel. M19 proved those world facts can modulate current Relationship-derived Essence through bounded spatial Tether without changing historical Bond state.
 
-M18 itself does not derive Tether.
+The next step is **Checkpoint B — Active RPG Loop**.
+
+Checkpoint B should evaluate whether Relationship, Trait, Quest, Combat, Travel, Presence/Tether, and Essence now function as one coherent active-play loop and whether adding Copy automation would enhance that loop rather than mask weaknesses in it.
+
+Do not start M20 solely because M19 passed.
