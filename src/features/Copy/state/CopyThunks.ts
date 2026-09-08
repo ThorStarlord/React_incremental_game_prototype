@@ -127,7 +127,7 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
     for (const copy of Object.values(copies)) {
       if (copy.loyalty > COPY_SYSTEM.LOYALTY_MIN) {
-        const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
+        const newLoyalty = applyLoyaltyDecay(copy.loyalty, baseGrowthOrZero(copy.growthType, decayThisTick));
         if (newLoyalty !== copy.loyalty) {
           batched.push({ copyId: copy.id, updates: { loyalty: newLoyalty } });
         }
@@ -140,6 +140,9 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     }
   }
 );
+
+/** Keep decay semantics explicit while preserving the historical rate for all growth types. */
+const baseGrowthOrZero = (_growthType: CopyGrowthType, value: number): number => value;
 
 /**
  * Increase a Copy's loyalty by spending Essence.
@@ -285,7 +288,7 @@ export const startCopyTimedTaskThunk = createAsyncThunk(
   }
 );
 
-/** Start one authored M20 production task after validating Copy requirements below the UI. */
+/** Start one authored M20 production task after validating player familiarity and Copy requirements below the UI. */
 export const startCopyProductionTaskThunk = createAsyncThunk(
   'copy/startProductionTask',
   async (
@@ -306,7 +309,11 @@ export const startCopyProductionTaskThunk = createAsyncThunk(
       return rejectWithValue('Task already running');
     }
 
-    const eligibility = evaluateCopyProductionTaskEligibility(copy, definition);
+    const eligibility = evaluateCopyProductionTaskEligibility(
+      copy,
+      definition,
+      Boolean(state.player.routineFamiliarity?.[definition.id])
+    );
     if (!eligibility.eligible) {
       const message = eligibility.reasons.join(' ');
       dispatch(addNotification({ type: 'warning', message }));
