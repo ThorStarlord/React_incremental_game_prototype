@@ -22,6 +22,12 @@ import { learnNpcFact } from '../../Knowledge/state/KnowledgeSlice';
 import { selectNpcKnowsFact } from '../../Knowledge/state/KnowledgeSelectors';
 import { adjustFactionReputation } from '../../Factions/state/FactionSlice';
 import { selectFactionReputation } from '../../Factions/state/FactionSelectors';
+import { setWorldStateCondition } from '../../WorldState/state/WorldStateSlice';
+import {
+  doesWorldStateRequirementPass,
+  selectWorldStateRegions,
+} from '../../WorldState/state/WorldStateSelectors';
+import type { WorldStateMutation } from '../../WorldState/state/WorldStateTypes';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -43,13 +49,51 @@ export const initializeNPCsThunk = createAsyncThunk<
       await dispatch(initializeRelationshipRuntimeThunk({ seedProfiles: false }));
       dispatch(updateEssenceGenerationRateThunk());
 
+      let dialogueNodes: Record<string, any> | undefined;
       try {
         const dres = await fetch('/data/dialogues.json');
         if (dres.ok) {
-          const nodes = await dres.json();
-          dispatch(setDialogueNodes(nodes));
+          dialogueNodes = await dres.json();
         }
       } catch {}
+
+      // M24 uses one bounded content extension rather than rewriting the large
+      // historical NPC/dialogue fixtures. If the extension is unavailable, older
+      // content still initializes normally; the dedicated M24 qualification proves
+      // the production bundle itself exists and is merged when present.
+      try {
+        const m24res = await fetch('/data/m24-world-state-content.json');
+        if (m24res.ok) {
+          const extension = await m24res.json();
+          const extensionDialogues = extension?.dialogues && typeof extension.dialogues === 'object'
+            ? extension.dialogues as Record<string, any>
+            : {};
+          const npcDialogueIds = extension?.npcDialogueIds && typeof extension.npcDialogueIds === 'object'
+            ? extension.npcDialogueIds as Record<string, unknown>
+            : {};
+
+          for (const [npcId, rawDialogueIds] of Object.entries(npcDialogueIds)) {
+            const npc = data[npcId];
+            if (!npc || !Array.isArray(rawDialogueIds)) continue;
+            const dialogueIds = rawDialogueIds.filter(
+              (id): id is string => typeof id === 'string' && id.length > 0
+            );
+            npc.availableDialogues = Array.from(new Set([
+              ...(npc.availableDialogues ?? []),
+              ...dialogueIds,
+            ]));
+          }
+
+          dialogueNodes = {
+            ...(dialogueNodes ?? {}),
+            ...extensionDialogues,
+          };
+        }
+      } catch {}
+
+      if (dialogueNodes) {
+        dispatch(setDialogueNodes(dialogueNodes));
+      }
 
       return data;
     } catch (error) {
@@ -318,6 +362,30 @@ export const processNPCInteractionThunk = createAsyncThunk<
           } as InteractionResult;
         }
 
+        const requiredWorldState = Array.isArray(node.requiredWorldState)
+          ? node.requiredWorldState
+          : [];
+        const worldStateRegions = selectWorldStateRegions(currentState);
+        const unmetWorldStateRequirement = requiredWorldState.find(
+          requirement => !doesWorldStateRequirementPass(worldStateRegions, requirement)
+        );
+        if (unmetWorldStateRequirement) {
+          const regionId = typeof unmetWorldStateRequirement?.regionId === 'string'
+            ? unmetWorldStateRequirement.regionId
+            : 'unknown-region';
+          const field = typeof unmetWorldStateRequirement?.field === 'string'
+            ? unmetWorldStateRequirement.field
+            : 'unknown-field';
+          dispatch(addNotification({
+            type: 'info',
+            message: 'The objective conditions in the world do not support that yet.',
+          }));
+          return {
+            success: false,
+            message: `World state gate not met: ${regionId}.${field}`,
+          } as InteractionResult;
+        }
+
         npcText = node.text || node.title || '';
         const effects = Array.isArray(node.effects) ? node.effects : [];
         for (const eff of effects) {
@@ -347,6 +415,12 @@ export const processNPCInteractionThunk = createAsyncThunk<
                 amount: Number(eff.value) || 0,
               }));
             }
+          } else if (eff.type === 'WORLD_STATE_SET') {
+            dispatch(setWorldStateCondition({
+              regionId: eff.regionId,
+              field: eff.field,
+              value: eff.value,
+            } as WorldStateMutation));
           } else if (eff.type === 'RELATIONSHIP_EXPERIENCE') {
             const experienceId = eff.experienceId || (
               selectedResponse ? eff.experienceIdByResponse?.[selectedResponse] : undefined
