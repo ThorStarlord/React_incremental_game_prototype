@@ -28,6 +28,12 @@ export interface CombatEncounterDefinition {
   targetId: string;
   name: string;
   description: string;
+  /**
+   * Optional authored canonical M18 location required for the player-facing
+   * encounter launcher. This is deliberately one bounded spatial fact, not a
+   * generalized encounter-condition language.
+   */
+  requiredLocationId?: string;
   playerMaxHealth: number;
   enemyMaxHealth: number;
   strikeDamage: number;
