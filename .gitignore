@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# playwright persistent profile for scripts/chatgpt-loop.js (contains session cookies)
+.chatgpt-profile/
