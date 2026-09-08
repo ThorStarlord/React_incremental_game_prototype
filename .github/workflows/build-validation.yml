@@ -30,6 +30,12 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: M24 objective world state qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand M24ObjectiveWorldState.test.tsx
+        env:
+          CI: true
+
       - name: M23 faction reputation qualification
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand M23FactionReputation.test.tsx
