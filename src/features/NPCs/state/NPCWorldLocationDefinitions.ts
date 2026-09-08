@@ -1,6 +1,7 @@
 import {
   CITY_CENTER_LOCATION_ID,
   WHISPERING_WOODS_LOCATION_ID,
+  resolveCanonicalLocationId,
 } from '../../Exploration/LocationDefinitions';
 
 /**
@@ -17,3 +18,21 @@ export const NPC_WORLD_LOCATION_IDS: Readonly<Record<string, string>> = {
 
 export const getNpcWorldLocationId = (npcId: string): string | undefined =>
   NPC_WORLD_LOCATION_IDS[npcId];
+
+/**
+ * Returns undefined for NPCs without a qualified canonical world anchor so
+ * legacy/unmigrated presence semantics can remain unchanged.
+ */
+export const isPlayerAtNpcWorldLocation = (
+  npcId: string,
+  playerLocationValue: string
+): boolean | undefined => {
+  const npcLocationId = getNpcWorldLocationId(npcId);
+  if (!npcLocationId) return undefined;
+
+  const playerLocationId = resolveCanonicalLocationId(playerLocationValue);
+  const canonicalNpcLocationId = resolveCanonicalLocationId(npcLocationId);
+  if (!playerLocationId || !canonicalNpcLocationId) return false;
+
+  return playerLocationId === canonicalNpcLocationId;
+};
