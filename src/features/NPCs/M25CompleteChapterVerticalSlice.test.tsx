@@ -317,8 +317,8 @@ describe('M25 complete chapter vertical slice qualification', () => {
     expect(fetchedUrls).toContain('/data/m25-chapter-content.json');
     expect(store.getState().npcs.dialogueNodes[PATROL_MUTATION_ID]).toBeDefined();
     expect(store.getState().npcs.dialogueNodes[PUBLIC_CONCLUSION_ID]).toBeDefined();
-    expect(store.getState().npcs.npcs[VALERIUS_ID]!.availableDialogues).toContain(PUBLIC_CONCLUSION_ID);
-    expect(store.getState().npcs.npcs[GRONK_ID]!.availableDialogues).toContain(QUIET_CONCLUSION_ID);
+    expect(store.getState().npcs.npcs[VALERIUS_ID]!.availableDialogues ?? []).toContain(PUBLIC_CONCLUSION_ID);
+    expect(store.getState().npcs.npcs[GRONK_ID]!.availableDialogues ?? []).toContain(QUIET_CONCLUSION_ID);
 
     const npcThunkSource = fs.readFileSync(
       path.join(process.cwd(), 'src/features/NPCs/state/NPCThunks.ts'),
