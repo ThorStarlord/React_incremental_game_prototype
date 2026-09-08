@@ -13,6 +13,9 @@ export type CopyGrowthType = 'normal' | 'accelerated';
 /** A lightweight classification for Copy behavior. */
 export type CopyRole = 'infiltrator' | 'researcher' | 'guardian' | 'agent' | 'none';
 
+/** Authored M20 production tasks that may be delegated to a Copy. */
+export type CopyProductionTaskId = 'forge_assistance' | 'resonance_calibration';
+
 /**
  * States a task can be in during its lifecycle.
  */
@@ -21,10 +24,12 @@ export type CopyTaskStatus = 'idle' | 'running' | 'completed' | 'failed';
 /** Minimal set of task types for MVP. */
 export type CopyTaskType = 'timed' | 'gather_info' | 'train';
 
-/** A single in‑progress or completed task for a Copy. */
+/** A single in-progress or completed task for a Copy. */
 export interface CopyTask {
   id: string;
   type: CopyTaskType;
+  /** Authored production task identity. Absent only on legacy task state. */
+  productionTaskId?: CopyProductionTaskId;
   /** Seconds required to finish. */
   durationSeconds: number;
   /** Seconds progressed so far. */

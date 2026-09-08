@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   Box,
   Dialog,
@@ -23,9 +23,14 @@ import {
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { RootState } from '../../../../app/store';
 import { selectCopyById, selectCopyEffectiveTraitsWithSource, selectCopyEligibleShareTraitIds, selectCopySharePreferences, selectCopyShareEligibilityContext, selectCopyUnlockedEmptySlotCount, selectCopyHasRunningTask } from '../../state/CopySelectors';
-import { assignCopyRoleThunk, startCopyTimedTaskThunk, setCopySharePreferenceThunk, applySharePreferencesForCopyThunk } from '../../state/CopyThunks';
+import { assignCopyRoleThunk, startCopyProductionTaskThunk, setCopySharePreferenceThunk, applySharePreferencesForCopyThunk } from '../../state/CopyThunks';
 import { selectTraits } from '../../../Traits/state/TraitsSelectors';
 import type { CopyRole } from '../../state/CopyTypes';
+import {
+  COPY_PRODUCTION_TASKS,
+  evaluateCopyProductionTaskEligibility,
+  getCopyProductionTaskDefinition,
+} from '../../CopyTaskDefinitions';
 
 interface CopyDetailPanelProps {
   copyId: string;
@@ -51,7 +56,6 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const eligibility = useAppSelector((s: RootState) => selectCopyShareEligibilityContext(s, copyId));
   const emptySlotCount = useAppSelector((s: RootState) => selectCopyUnlockedEmptySlotCount(s, copyId));
   const allTraits = useAppSelector(selectTraits);
-  const [taskSeconds, setTaskSeconds] = useState<number>(60);
   const hasRunningTask = useAppSelector((s: RootState) => selectCopyHasRunningTask(s, copyId));
 
   const title = useMemo(() => (copy ? `${copy.name}` : 'Copy Details'), [copy]);
@@ -61,12 +65,10 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
     dispatch(assignCopyRoleThunk({ copyId: copy.id, role }));
   };
 
-  const startTask = () => {
-    if (!copy) return;
-    dispatch(startCopyTimedTaskThunk({ copyId: copy.id, durationSeconds: taskSeconds }));
-  };
-
   const active = copy?.activeTask;
+  const activeDefinition = active?.productionTaskId
+    ? getCopyProductionTaskDefinition(active.productionTaskId)
+    : undefined;
   const emptySlots = emptySlotCount;
   const anyPrefEnabled = Object.values(sharePrefs).some(Boolean);
   const enableAll = () => {
@@ -129,22 +131,69 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                   ))}
                 </Select>
               </FormControl>
-
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
-                <Typography variant="body2" color="text.secondary">Start timed task:</Typography>
-                <Stack direction="row" spacing={1}>
-                  {[30, 60, 120].map(s => (
-                    <Button key={s} size="small" variant={taskSeconds === s ? 'contained' : 'outlined'} onClick={() => setTaskSeconds(s)}>{s}s</Button>
-                  ))}
-                </Stack>
-                <Button size="small" variant="contained" onClick={startTask} disabled={hasRunningTask}>Start</Button>
-              </Stack>
+              <Box>
+                <Typography variant="caption" color="text.secondary">Current Copy location</Typography>
+                <Typography variant="body2">{copy.location}</Typography>
+              </Box>
             </Stack>
+
+            <Box>
+              <Typography variant="overline" color="text.secondary">Production Delegation</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Delegate repeatable execution only. Narrative and irreversible decisions remain under player authority.
+              </Typography>
+              <Stack spacing={1}>
+                {COPY_PRODUCTION_TASKS.map(task => {
+                  const taskEligibility = evaluateCopyProductionTaskEligibility(copy, task);
+                  const rewardParts: string[] = [];
+                  if ((task.reward.gold ?? 0) > 0) rewardParts.push(`${task.reward.gold} Gold`);
+                  if ((task.reward.essence ?? 0) > 0) rewardParts.push(`${task.reward.essence} Essence`);
+                  const disabled = hasRunningTask || !taskEligibility.eligible;
+                  return (
+                    <Box
+                      key={task.id}
+                      sx={{
+                        border: 1,
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        p: 1.5,
+                      }}
+                    >
+                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="space-between">
+                        <Box>
+                          <Typography variant="subtitle2">{task.name}</Typography>
+                          <Typography variant="body2" color="text.secondary">{task.description}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Base duration: {task.baseDurationSeconds}s • Reward: {rewardParts.join(' + ')}
+                          </Typography>
+                          {!taskEligibility.eligible && (
+                            <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 0.5 }}>
+                              {taskEligibility.reasons.join(' ')}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          disabled={disabled}
+                          onClick={() => dispatch(startCopyProductionTaskThunk({ copyId: copy.id, taskId: task.id }))}
+                          sx={{ alignSelf: { xs: 'stretch', sm: 'center' }, minWidth: 100 }}
+                        >
+                          Assign
+                        </Button>
+                      </Stack>
+                    </Box>
+                  );
+                })}
+              </Stack>
+            </Box>
 
             {active && (
               <Box>
                 <Typography variant="caption" color="text.secondary">Active Task</Typography>
-                <Typography variant="body2">{active.type} • {Math.floor(active.progressSeconds)}/{active.durationSeconds}s</Typography>
+                <Typography variant="body2">
+                  {activeDefinition?.name ?? 'Legacy task'} • {Math.floor(active.progressSeconds)}/{active.durationSeconds}s
+                </Typography>
                 <LinearProgress variant="determinate" value={(active.progressSeconds / active.durationSeconds) * 100} sx={{ mt: 0.5 }} />
               </Box>
             )}

@@ -30,6 +30,12 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: M20 Copy production automation qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand CopyM20ProductionTaskAutomation.test.tsx
+        env:
+          CI: true
+
       - name: Active-loop repair qualification
         timeout-minutes: 5
         run: npm test -- --watchAll=false --runInBand ActiveRpgLoopIntegrationRepair.test.tsx

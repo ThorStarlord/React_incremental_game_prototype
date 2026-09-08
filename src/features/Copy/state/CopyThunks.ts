@@ -15,6 +15,10 @@ import { addNotification } from '../../../shared/state/NotificationSlice';
 import { generateCopyId, generateCopyName } from '../utils/copyUtils';
 import { gainGold } from '../../Player/state/PlayerSlice';
 import { selectCopyHasRunningTask } from './CopySelectors';
+import {
+  evaluateCopyProductionTaskEligibility,
+  getCopyProductionTaskDefinition,
+} from '../CopyTaskDefinitions';
 
 // Default starting stats for a new Copy
 const defaultCopyStats: PlayerStats = {
@@ -94,16 +98,16 @@ export const processCopyGrowthThunk = createAsyncThunk(
     const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
     for (const copy of Object.values(copies)) {
       if (copy.maturity < COPY_SYSTEM.MATURITY_MAX) {
-  const newMaturity = applyGrowth(copy.maturity, baseGrowth, copy.growthType === 'accelerated');
+        const newMaturity = applyGrowth(copy.maturity, baseGrowth, copy.growthType === 'accelerated');
         if (newMaturity !== copy.maturity) {
           batched.push({ copyId: copy.id, updates: { maturity: newMaturity } });
         }
       }
     }
-  if (batched.length) {
+    if (batched.length) {
       dispatch(updateMultipleCopies(batched));
-  // After maturity changes, ensure any eligible slots unlock
-  for (const b of batched) dispatch(unlockCopySlotsIfEligible({ copyId: b.copyId }));
+      // After maturity changes, ensure any eligible slots unlock
+      for (const b of batched) dispatch(unlockCopySlotsIfEligible({ copyId: b.copyId }));
     }
   }
 );
@@ -123,16 +127,16 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
     for (const copy of Object.values(copies)) {
       if (copy.loyalty > COPY_SYSTEM.LOYALTY_MIN) {
-  const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
+        const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
         if (newLoyalty !== copy.loyalty) {
           batched.push({ copyId: copy.id, updates: { loyalty: newLoyalty } });
         }
       }
     }
-  if (batched.length) {
+    if (batched.length) {
       dispatch(updateMultipleCopies(batched));
-  // After loyalty changes, ensure any eligible slots unlock
-  for (const b of batched) dispatch(unlockCopySlotsIfEligible({ copyId: b.copyId }));
+      // After loyalty changes, ensure any eligible slots unlock
+      for (const b of batched) dispatch(unlockCopySlotsIfEligible({ copyId: b.copyId }));
     }
   }
 );
@@ -173,11 +177,11 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
       return rejectWithValue(message);
     }
 
-  dispatch(spendEssence({ amount: essenceCost, source: 'bolster_loyalty' }));
+    dispatch(spendEssence({ amount: essenceCost, source: 'bolster_loyalty' }));
     const newLoyalty = Math.min(100, copy.loyalty + loyaltyGain);
     dispatch(updateCopy({ copyId, updates: { loyalty: newLoyalty } }));
-  dispatch(unlockCopySlotsIfEligible({ copyId }));
-  if (!suppressNotify) dispatch(addNotification({ type: 'success', message: 'Loyalty bolstered.' }));
+    dispatch(unlockCopySlotsIfEligible({ copyId }));
+    if (!suppressNotify) dispatch(addNotification({ type: 'success', message: 'Loyalty bolstered.' }));
 
     return { success: true };
   }
@@ -227,7 +231,7 @@ export const createCopyThunk = createAsyncThunk(
 
     // --- Create the Copy Object ---
     const newCopy: Copy = {
-  id: generateCopyId(),
+      id: generateCopyId(),
       name: generateCopyName(npc.name),
       createdAt: Date.now(),
       parentNPCId: npc.id,
@@ -238,11 +242,14 @@ export const createCopyThunk = createAsyncThunk(
       // Inherit a capped snapshot of traits informed by NPC connectionDepth
       inheritedTraits: computeInheritedTraits(npc),
       traitSlots: undefined,
+      sharePreferences: {},
+      role: 'none',
+      activeTask: null,
       location: npc.location, // Starts at the parent's location
     };
 
     // --- Dispatch the action & notify ---
-  dispatch(addCopy(newCopy));
+    dispatch(addCopy(newCopy));
     dispatch(unlockCopySlotsIfEligible({ copyId: newCopy.id }));
     dispatch(addNotification({ type: 'success', message: `Created ${newCopy.name}.` }));
 
@@ -262,30 +269,69 @@ export const assignCopyRoleThunk = createAsyncThunk(
   }
 );
 
-/** Start an MVP timed task on a Copy. */
+/**
+ * Legacy arbitrary-duration task entrypoint.
+ * M20 production automation is allowlisted through startCopyProductionTaskThunk.
+ */
 export const startCopyTimedTaskThunk = createAsyncThunk(
   'copy/startTimedTask',
-  async ({ copyId, durationSeconds, type = 'timed' as const }: { copyId: string; durationSeconds: number; type?: 'timed' }, { getState, dispatch, rejectWithValue }) => {
+  async (
+    _payload: { copyId: string; durationSeconds: number; type?: 'timed' },
+    { dispatch, rejectWithValue }
+  ) => {
+    const message = 'Generic timed tasks are not production assignments. Choose an authored production task.';
+    dispatch(addNotification({ type: 'warning', message }));
+    return rejectWithValue(message);
+  }
+);
+
+/** Start one authored M20 production task after validating Copy requirements below the UI. */
+export const startCopyProductionTaskThunk = createAsyncThunk(
+  'copy/startProductionTask',
+  async (
+    { copyId, taskId }: { copyId: string; taskId: string },
+    { getState, dispatch, rejectWithValue }
+  ) => {
+    const definition = getCopyProductionTaskDefinition(taskId);
+    if (!definition) {
+      return rejectWithValue('Unknown production task.');
+    }
+
     const state = getState() as RootState;
     const copy = state.copy.copies[copyId];
     if (!copy) return rejectWithValue('Copy not found');
-  if (selectCopyHasRunningTask(getState() as RootState, copyId)) {
+
+    if (selectCopyHasRunningTask(state, copyId)) {
       dispatch(addNotification({ type: 'warning', message: 'A task is already running for this Copy.' }));
       return rejectWithValue('Task already running');
     }
+
+    const eligibility = evaluateCopyProductionTaskEligibility(copy, definition);
+    if (!eligibility.eligible) {
+      const message = eligibility.reasons.join(' ');
+      dispatch(addNotification({ type: 'warning', message }));
+      return rejectWithValue(message);
+    }
+
     const multiplier = getTaskDurationMultiplier(copy.role);
-    const adjustedDuration = Math.max(1, Math.round(durationSeconds * multiplier));
+    const adjustedDuration = Math.max(
+      1,
+      Math.round(definition.baseDurationSeconds * multiplier)
+    );
+    const now = Date.now();
     const task: CopyTask = {
-      id: `task_${Date.now()}`,
-      type,
+      id: `task_${definition.id}_${now}`,
+      type: 'timed',
+      productionTaskId: definition.id,
       durationSeconds: adjustedDuration,
       progressSeconds: 0,
       status: 'running',
-      startedAt: Date.now(),
+      startedAt: now,
     };
+
     dispatch(startCopyTask({ copyId, task }));
-    dispatch(addNotification({ type: 'info', message: 'Task started.' }));
-    return { success: true };
+    dispatch(addNotification({ type: 'info', message: `${definition.name} started.` }));
+    return { success: true, taskId: definition.id, durationSeconds: adjustedDuration };
   }
 );
 
@@ -301,7 +347,22 @@ export const processCopyTasksThunk = createAsyncThunk(
         dispatch(progressCopyTask({ copyId: copy.id, deltaSeconds: seconds }));
         const updated = (getState() as RootState).copy.copies[copy.id].activeTask;
         if (updated && updated.status === 'completed') {
-          // Role-based completion bonus
+          const definition = updated.productionTaskId
+            ? getCopyProductionTaskDefinition(updated.productionTaskId)
+            : undefined;
+
+          // Legacy/unknown task state may finish its timer, but it cannot bypass
+          // the authored M20 production catalog to produce economy rewards.
+          if (!definition) {
+            dispatch(addNotification({
+              type: 'warning',
+              message: `${copy.name} completed an unauthored task; no production reward was applied.`,
+            }));
+            dispatch(clearCopyActiveTask({ copyId: copy.id }));
+            continue;
+          }
+
+          // Role-based completion bonus remains Copy-owned progression flavor.
           const bonus = getCompletionBonusTextAndUpdates(copy);
           if (bonus.updates) {
             dispatch(updateCopy({ copyId: copy.id, updates: bonus.updates }));
@@ -309,11 +370,27 @@ export const processCopyTasksThunk = createAsyncThunk(
               dispatch(unlockCopySlotsIfEligible({ copyId: copy.id }));
             }
           }
-          const suffix = bonus.text ? ` (${bonus.text})` : '';
-          dispatch(addNotification({ type: 'success', message: `${copy.name} completed a task${suffix}.` }));
-          // Rewards on completion (use constants)
-          dispatch(gainGold(COPY_SYSTEM.TASK_REWARDS.GOLD));
-          dispatch(gainEssence({ amount: COPY_SYSTEM.TASK_REWARDS.ESSENCE, source: 'copy_task' }));
+
+          if ((definition.reward.gold ?? 0) > 0) {
+            dispatch(gainGold(definition.reward.gold ?? 0));
+          }
+          if ((definition.reward.essence ?? 0) > 0) {
+            dispatch(gainEssence({
+              amount: definition.reward.essence ?? 0,
+              source: `copy_task_${definition.id}`,
+            }));
+          }
+
+          const rewardParts: string[] = [];
+          if ((definition.reward.gold ?? 0) > 0) rewardParts.push(`+${definition.reward.gold} Gold`);
+          if ((definition.reward.essence ?? 0) > 0) rewardParts.push(`+${definition.reward.essence} Essence`);
+          if (bonus.text) rewardParts.push(bonus.text);
+          const suffix = rewardParts.length > 0 ? ` (${rewardParts.join(', ')})` : '';
+
+          dispatch(addNotification({
+            type: 'success',
+            message: `${copy.name} completed ${definition.name}${suffix}.`,
+          }));
           dispatch(clearCopyActiveTask({ copyId: copy.id }));
         }
       }
@@ -377,8 +454,8 @@ export const applySharePreferencesForCopyThunk = createAsyncThunk<
       );
       if (shareTraitWithCopyThunk.fulfilled.match(result)) applied += 1;
     }
-  if (!suppressNotify && applied > 0) dispatch(addNotification({ type: 'success', message: `Applied ${applied} share preference(s).` }));
-  return { applied };
+    if (!suppressNotify && applied > 0) dispatch(addNotification({ type: 'success', message: `Applied ${applied} share preference(s).` }));
+    return { applied };
   }
 );
 
@@ -436,11 +513,11 @@ export const shareTraitWithCopyThunk = createAsyncThunk<
       .map(s => s.traitId)
       .filter((id): id is string => !!id);
     const isPermanent = state.player.permanentTraits.includes(traitId);
-  if (isPermanent) return reject('Permanent traits are not shareable');
-  if (!equippedIds.includes(traitId)) return reject('Trait must be equipped to share');
+    if (isPermanent) return reject('Permanent traits are not shareable');
+    if (!equippedIds.includes(traitId)) return reject('Trait must be equipped to share');
 
     dispatch(shareTraitToCopy({ copyId, slotIndex, traitId }));
-    // Lightweight role effect: researchers integrate traits slightly better → tiny maturity gain
+    // Lightweight role effect: researchers integrate traits slightly better -> tiny maturity gain
     const role = copy.role ?? 'none';
     if (role === 'researcher') {
       const newMaturity = Math.min(COPY_SYSTEM.MATURITY_MAX, (copy.maturity ?? 0) + 0.5);

@@ -1,280 +1,467 @@
-Implementation Status: ✅ **BASIC STATE/UI + TRAIT SHARING AUTO‑SYNC IMPLEMENTED (Phase 1–7 + Phase 10–11)**
-
-> Current Build Summary (Aug 2025):
-> * Slice + thunks for growth, decay, creation, loyalty bolster, promotion (accelerated growth) implemented.
-> * Constants centralized in `COPY_SYSTEM` within `gameConstants.ts`.
-> * UI list (basic) + actions wired (bolster loyalty, promote) – advanced segmented UI planned.
-> * Notification system added (`notifications` slice) replacing console logs for success/failure feedback.
-> * JSDoc added for thunks, selectors, utilities.
-> * Essence integration (bonus per qualifying Copy) present via selectors (qualifying = maturity ≥ threshold & loyalty > threshold).
-> * ✅ Copy–Trait integration: Copies have trait slots with maturity/loyalty unlocks, can receive shared traits from the Player (while equipped), and auto‑sync unshares on player unequip/replace/permanence.
-
 # Copy System Specification
 
-This document details the mechanics for creating, managing, and utilizing "Copies" – entities created by the player through a unique process, inheriting aspects of the player and potentially a target.
+**Implementation Status:** ✅ **CORE STATE/UI + TRAIT SHARING AUTO-SYNC + BOUNDED M20 PRODUCTION AUTOMATION IMPLEMENTED**
 
-**Implementation Note:** The feature slice for this system is located at `src/features/Copy/` (singular), and its state is managed under the `copy` key in the Redux store.
+> Current qualified build summary:
+> - Slice + thunks for growth, decay, creation, loyalty bolster, accelerated growth, role assignment, and task progress are implemented.
+> - Copy Trait slots, sharing preferences, and automatic unshare on player unequip/replace/permanence are implemented.
+> - Mature/loyal Copies contribute to passive Essence through the existing Copy/Essence selectors.
+> - M20 qualifies two authored repeatable production tasks through the existing `activeTask` lifecycle: **Forge Assistance** and **Resonance Calibration**.
+> - Production task assignment validates authored requirements below the UI, progresses through the live GameLoop, survives ordinary save/load, and applies bounded rewards once.
+> - Meaningful irreversible narrative decisions remain player-owned; M20 does not qualify autonomous-agent gameplay or offline progress.
+
+**Implementation location:** `src/features/Copy/` (singular), stored under the Redux `copy` key.
+
+For empirical authority, read:
+
+- `../Technical/M20ProductionCopyTaskAutomation.md` — preregistered M20 contract;
+- `../Technical/M20ProductionCopyTaskAutomationReconAmendment.md` — frozen recon/probe decisions;
+- `../Technical/M20ProductionCopyTaskAutomationResult.md` — qualified M20 result and evidence ceiling.
+
+---
 
 ## 1. Overview
 
-*   **Concept:** Copies are extensions of the player's will and essence, created through a specific interaction outcome ("Seduction"). They serve various purposes, from infiltration to specialized tasks, and grow over time.
-*   **Core Loop:** Target -> Seduction Interaction -> Creation -> Growth (Normal/Accelerated) -> Management/Deployment -> Loyalty Maintenance.
+**Concept:** Copies are extensions of the player's will and Essence, created through the Copy-creation interaction and later managed as distinct entities with maturity, loyalty, role, Traits, location data, and one active task at a time.
 
-## 2. Creation Method: Seduction Outcome
+The current broad lifecycle is:
 
-## 3. Traits on Copies (Inherited + Shared) ✅ IMPLEMENTED
+```text
+Target
+-> Copy creation
+-> growth / loyalty management
+-> role + Trait configuration
+-> player chooses a routine authored task
+-> Copy performs live deterministic progress
+-> bounded ordinary reward
+-> Copy becomes available again
+```
 
-Copies gain traits from two sources:
-### 3.1 Slot Unlocks and Limits
-- Slots unlock by maturity/loyalty thresholds per `COPY_SYSTEM.TRAIT_SLOT_UNLOCKS`.
-- Initial unlocked slots = `COPY_SYSTEM.INITIAL_TRAIT_SLOTS`; max = `COPY_SYSTEM.MAX_TRAIT_SLOTS`.
-- Unlocks are one-way in MVP; once unlocked they remain available.
+M20 adds an important product boundary:
 
-### 3.2 Share Preconditions & Auto‑sync
-- Shareable only if the trait is equipped on the player and is not permanent.
-- De-duplicated: a Copy can’t receive the same trait twice (including inherited snapshot).
-- Auto‑unshare via listener middleware when the player unequips/replaces a trait or makes it permanent.
+```text
+routine execution -> may be delegated to a Copy
+irreversible / meaningful narrative decision -> remains player authority
+```
 
-### 3.3 Essence Bonus Qualification
-- Qualifying Copy = maturity ≥ `MATURITY_THRESHOLD` AND loyalty > `LOYALTY_THRESHOLD`.
-- Each qualifying Copy adds a flat `ESSENCE_GENERATION_BONUS` to passive Essence.
-
-- Inherited Traits (read‑only): On creation, a Copy snapshots any traits that the parent NPC was receiving from the Player at that moment. These are immutable on the Copy and always count toward its effective trait list.
-- Shared Traits (player‑controlled): Each Copy has a set of trait slots. Unlocked slots can receive one of the Player’s currently equipped, non‑permanent traits. Shared traits remain active on the Copy while the Player keeps that trait equipped and non‑permanent.
-
-### 3.1 Slot Unlock Rules
-- Configuration lives in `COPY_SYSTEM.TRAIT_SLOT_UNLOCKS` with per‑slot requirements (maturity or loyalty thresholds). Initial locked/unlocked count is defined by `INITIAL_TRAIT_SLOTS` and capped by `MAX_TRAIT_SLOTS`.
-- Unlocks are one‑way in this prototype: once a slot unlocks, it stays unlocked even if metrics later decline.
-
-### 3.2 Share Validation
-- Trait must be equipped on the Player.
-- Trait must not be permanent on the Player (permanent traits are not shareable).
-- The Copy must not already have the trait (inherited or in another slot). Duplicate shares are blocked.
-
-### 3.3 Auto‑Unshare Invariants (Listener Middleware) ✅ IMPLEMENTED
-Cross‑slice listener middleware enforces these invariants automatically:
-- Player unequips a trait → it is unshared from all Copy slots that had it.
-- Player replaces a trait in a slot → the replaced (old) trait is unshared from all Copies.
-- Player resonates a trait (makes it permanent) → that trait is unshared from all Copies and cannot be shared again.
-
-Notifications are emitted to provide user feedback on auto‑unshare events.
-
-### 3.4 Migration Safety & Save/Load
-- Older saves may lack `copy.traitSlots`. On load/import or any share/unshare sweep, the system initializes missing slots using the current `COPY_SYSTEM` configuration.
-- A minimal post‑load pass ensures all Copies have `traitSlots` before UI renders share options.
-
-### 3.5 UI Behavior (Phase 1)
-- Locked slots show a tooltip with the unlock requirement (e.g., “maturity ≥ 80”).
-- Share list shows only player‑equipped, non‑permanent traits.
-- Traits already present on the Copy (inherited/shared) render the Share button disabled with a tooltip explaining the reason.
-
-*   **Trigger:** Successfully completing a "Seduction" interaction path with a suitable target (likely an NPC, potentially other entities based on game design). This is a high-level social/interaction challenge outcome, not necessarily literal seduction.
-*   **Result:** Instead of typical relationship gains, a successful Seduction outcome results in the creation of a nascent Copy.
-*   **Essence Cost:** The initial creation might have a base Essence cost, or the cost might be front-loaded into the Seduction interaction itself. (TBD - Initial cost or interaction cost?)
-*   **Target Influence:** The target NPC involved in the Seduction might have their relationship significantly altered, potentially becoming highly loyal, confused, or even hostile depending on their personality and the context. The Copy is linked to this "parent" target in some way (flavor, potential unique interactions).
-
-## 3. Growth Options
-
-| Mode | Mechanic | Current Constant(s) | Notes |
-|------|----------|---------------------|-------|
-| Normal | Base per‑second maturity increase | `GROWTH_RATE_PER_SECOND = 0.1` | Applied every game loop tick (delta‑time scaled). |
-| Accelerated | Normal * multiplier | `ACCELERATED_GROWTH_MULTIPLIER = 2` | Set via promotion action (one‑time essence spend). |
-
-**Normal Growth**  
-* Scales with real time via game loop delta; no essence upkeep.  
-* Suited for background progression; cheaper but slower.
-
-**Accelerated Growth**  
-* Activated by spending Essence (`PROMOTE_ACCELERATED_COST = 150`).  
-* Doubles effective maturity gain rate (current multiplier = 2).  
-* Strategic for rushing a Copy to maturity threshold.
-
-## 4. Inheritance
-
-*   **Base Abilities:** Copies automatically inherit the player's core "Emotional Resonance" ability.
-    *   **Emotional Resonance (Player Ability):** This is a planned player characteristic that allows Copies to potentially form connections and interact with the Trait system (perhaps in a limited way initially). Its specific mechanics are currently undefined and planned for future implementation with the Copy system. **Note: This is distinct from the sidelined "Soul Resonance" concept found in `soulResonanceUtils.ts`.**
-*   **Shared Traits:** Copies inherit *snapshots* of any traits the player had actively shared with the *target parent* via Trait Slots *at the moment of creation*.
-    *   These inherited traits become the Copy's initial base traits.
-    *   They do *not* automatically update if the player later changes the traits shared with the parent.
-*   **Player Traits:** Do Copies inherit traits the player has permanently active or equipped for themselves? (TBD - Probably not by default, to differentiate them from the player).
-
-## 5. Stats, Abilities, and Progression
-
-*   **Independent Stats:** Copies possess their own set of stats (Health, Mana, Attributes) and a Power Level, distinct from the player and the parent target.
-    *   Initial stats might be influenced by the player's stats, the parent target's stats, and the growth method (Normal vs. Accelerated).
-*   **Trait Gain:** Can Copies acquire new traits independently?
-    *   *Option 1:* Yes, through their own interactions or tasks, potentially consuming their own generated Essence (if they generate any).
-    *   *Option 2:* No, they can only gain traits shared with them by the player via dedicated Copy Trait Slots (see below).
-    *   *Decision:* Option 2 seems more aligned with the "extension of the player" theme initially. Player shares traits to customize Copies.
-*   **Skill Progression:** Can Copies learn/improve skills? (TBD - If a skill system exists, how do Copies interact with it?).
-
-## 6. Control, Management, and Limits
-
-*   **Interface:** A dedicated UI panel/screen is needed to view, manage, and potentially issue commands to Copies. (Link to `UI_UX/UserFlows.md`, `UI_UX/LayoutDesign.md`).
-    *   Displays Copy status, location, current task, loyalty, stats, inherited/shared traits.
-*   **Commands:** What level of control does the player have?
-    *   Assigning tasks (e.g., gather resources, scout area, assist in combat, influence target).
-    *   Setting general behavior (passive, defensive, aggressive).
-    *   Moving to specific locations.
-*   **Limit:** Is there a maximum number of active Copies the player can maintain simultaneously?
-    *   *Decision:* Yes, likely limited by a player stat (e.g., Charisma, Intelligence) or a specific upgrade/trait related to control or Essence capacity. Start with a low limit (e.g., 1-3) that can be increased.
-*   **Trait Slots for Copies:** Does the player grant trait slots *to* Copies similar to NPCs?
-    *   *Decision:* Yes, this seems the primary way to customize and empower Copies. The number of slots a Copy can receive could scale with its age, loyalty, or player upgrades.
-
-## 7. Loyalty
-
-*   **Concept:** A measure of the Copy's alignment with the player's goals and resistance to external influence or deviation. Crucial for reliable function.
-*   **Maintenance:**
-    *   **Trait Sharing:** Planned – not yet implemented. (Hooks into Trait system later.)
-    *   **Task Completion:** Planned – tasks presently stored as `currentTask` only.
-    *   **Player Interaction:** Planned future enhancement.
-    *   **Essence Investment:** Promotion + bolster actions.
-    *   **Bolster Action (Implemented):** Spend Essence to raise loyalty: cost `BOLSTER_LOYALTY_COST = 25`, gain `BOLSTER_LOYALTY_GAIN = 10` (clamped at 100).
-*   **Decay/Loss:**
-    *   Neglect (lack of tasks or interaction).
-    *   Failure on critical tasks.
-    *   Removing beneficial shared traits.
-    *   Exposure to strong opposing influences.
-    *   (Potential) A natural slow decay over time if not maintained.
-*   **Consequences of Low Loyalty:**
-    *   Reduced task efficiency.
-    *   Ignoring commands.
-    *   Potential to act independently or even turn against the player.
-    *   Increased vulnerability to being "poached" or influenced by rivals.
-
-## 8. UI/UX Considerations
-
-*   Clear indication of Copy creation possibility during Seduction interactions.
-*   Management screen listing all Copies, their status, and key info.
-*   Interface for assigning tasks and managing shared traits for each Copy.
-*   Visual representation of Copies in the game world (if applicable) or on maps.
-*   Notifications for Copy creation, promotion, bolster success/failure (implemented through notifications slice). Low loyalty warnings: TODO (selector + threshold trigger to dispatch notification when crossing below X%).
-
-## 9. Balancing Notes
-
-*   Cost of Seduction interaction vs. Copy benefits.
-*   Essence cost of Accelerated Growth vs. time saved.
-*   Impact of inherited traits vs. traits shared later.
-*   Scaling of Copy stats/power relative to player and enemies.
-*   Loyalty gain/loss rates need careful tuning. Current passive decay: `DECAY_RATE_PER_SECOND = 0.05` (evaluated each tick, delta scaled). Bolster provides discrete recovery.
-*   The limit on the number of Copies needs to be balanced against their utility.
+The Copy system is therefore intended to remove routine execution burden, not to make the game choose story meaning for the player.
 
 ---
 
-## 10. Implemented Constants (COPY_SYSTEM)
+## 2. Creation
 
-| Constant | Value | Purpose |
-|----------|-------|---------|
-| `GROWTH_RATE_PER_SECOND` | 0.1 | Base maturity gain per second. |
-| `ACCELERATED_GROWTH_MULTIPLIER` | 2 | Multiplies base growth when accelerated. |
-| `DECAY_RATE_PER_SECOND` | 0.05 | Base loyalty decay per second. |
-| `BOLSTER_LOYALTY_COST` | 25 | Essence cost to bolster loyalty. |
-| `BOLSTER_LOYALTY_GAIN` | 10 | Loyalty restored per bolster action. |
-| `ESSENCE_GENERATION_BONUS` | 0.2 | Flat essence/sec per qualifying Copy. |
-| `MATURITY_THRESHOLD` | 100 | Maturity threshold for bonus qualification. |
-| `LOYALTY_THRESHOLD` | 50 | Loyalty must be strictly greater than this for bonus. |
-| `MATURITY_MIN/MAX` | 0 / 100 | Clamp boundaries for maturity. |
-| `LOYALTY_MIN/MAX` | 0 / 100 | Clamp boundaries for loyalty. |
-| `PROMOTE_ACCELERATED_COST` | 150 | Essence cost to enable accelerated growth. |
+The current creation path is implemented through `createCopyThunk`.
 
-Qualification rule for essence bonus: maturity ≥ `MATURITY_THRESHOLD` AND loyalty > `LOYALTY_THRESHOLD`.
+- The target NPC must exist.
+- Creation spends the current Essence cost derived from connection depth, plus the accelerated-growth surcharge when selected.
+- The existing Charisma-based success roll determines success.
+- A successful Copy receives independent stats, maturity, loyalty, inherited Traits, role/task state, and the target NPC's current descriptive location value.
+- Trait slots are initialized/reconciled through the existing Copy slot machinery.
 
-## 11. Current Implementation Summary
+M20 does not redesign Copy creation.
+
+### Location note
+
+Copy creation still inherits `npc.location`, and older/demo Copy state can therefore contain human-readable location strings.
+
+M20 does **not** create Copy movement or a second world model. Where an authored task needs location, it reuses M18 `resolveCanonicalLocationId(...)` against the existing Exploration location authority. The qualified Forge probe accepts legacy `"City Center"` because M18 explicitly resolves it to `location_city_center`.
+
+A value that cannot be resolved into the authored M18 graph is simply ineligible for a canonical-location-gated task; M20 does not silently invent a location for that Copy.
+
+---
+
+## 3. Traits on Copies
+
+Copies gain Traits from two current sources.
+
+### 3.1 Inherited Traits
+
+At creation, the Copy snapshots a bounded set of Traits informed by its parent NPC. These are read-only on the Copy.
+
+### 3.2 Shared Traits
+
+The player may share currently equipped, non-permanent Traits into unlocked Copy Trait slots.
+
+Rules:
+
+- the Trait must be equipped on the player;
+- permanent player Traits are not shareable;
+- inherited/shared duplicates are rejected;
+- an unlocked empty slot is required;
+- preferences may be stored and applied to available slots.
+
+### 3.3 Slot unlocks
+
+Configuration lives in `COPY_SYSTEM.TRAIT_SLOT_UNLOCKS`.
+
+- `MAX_TRAIT_SLOTS = 4`;
+- initial/unlock behavior remains one-way in this prototype;
+- maturity/loyalty changes trigger unlock reconciliation where applicable.
+
+### 3.4 Auto-unshare invariants
+
+Listener middleware automatically removes a shared Trait from Copies when the player:
+
+- unequips it;
+- replaces it in the relevant player slot;
+- makes it permanent through Resonance.
+
+This keeps Copy sharing subordinate to current Player Trait authority.
+
+### 3.5 Save/load
+
+Older saves may lack current Copy Trait-slot fields. Existing post-load/listener reconciliation initializes missing slot structure without requiring M20-specific persistence.
+
+---
+
+## 4. Growth
+
+| Mode | Mechanic | Current tuning |
+|---|---|---|
+| Normal | Base maturity growth per live GameLoop delta | `GROWTH_RATE_PER_SECOND = 0.1` |
+| Accelerated | Normal growth multiplied | `ACCELERATED_GROWTH_MULTIPLIER = 2` |
+
+Accelerated growth can be selected/activated through the current Essence-spending paths. M20 does not change growth authority.
+
+Copies also experience current passive loyalty decay through `processCopyLoyaltyDecayThunk(deltaTime)`.
+
+---
+
+## 5. Essence contribution
+
+A Copy may contribute to passive Essence through the existing Copy qualification model.
+
+Current broad qualification remains based on maturity and loyalty thresholds, with `COPY_SYSTEM.ESSENCE_GENERATION_BONUS` and related selectors/thunks supplying the existing passive contribution behavior.
+
+This passive contribution is distinct from the **one-shot M20 Resonance Calibration reward**. A completed Resonance Calibration explicitly grants its authored task reward through the Essence reducer; it does not alter the passive-generation formula.
+
+---
+
+## 6. Roles
+
+Current roles:
+
+```text
+none
+infiltrator
+researcher
+guardian
+agent
+```
+
+Role assignment is player-controlled through `assignCopyRoleThunk` and the Copy detail UI.
+
+### 6.1 Duration modifiers
+
+Existing role modifiers are reused by M20 production tasks:
+
+- infiltrator: `0.90x` duration;
+- researcher: `0.95x` duration;
+- guardian: `1.05x` duration;
+- agent: `1.00x` duration;
+- none: `1.00x` duration.
+
+M20 qualifies the modifier through two concrete cases:
+
+```text
+Forge Assistance + guardian
+60s base * 1.05 -> 63s
+
+Resonance Calibration + researcher
+90s base * 0.95 -> 86s rounded
+```
+
+### 6.2 Existing completion bonuses
+
+Role completion flavor remains Copy-owned progression:
+
+- infiltrator: +2 loyalty;
+- researcher: +1 maturity;
+- guardian: +1 loyalty;
+- agent: +1 loyalty and +0.5 maturity;
+- none: no role bonus.
+
+These bonuses are separate from the authored production task's ordinary Gold/Essence reward.
+
+---
+
+## 7. M20 Production Task Automation
+
+### 7.1 Task authority
+
+The production catalog lives in `CopyTaskDefinitions.ts`.
+
+M20 intentionally uses a **positive allowlist** rather than a generalized task/effect scripting engine.
+
+The bounded definition shape is:
+
+```ts
+CopyProductionTaskDefinition {
+  id
+  name
+  description
+  baseDurationSeconds
+  minimumMaturity?
+  minimumLoyalty?
+  allowedRoles?
+  requiredLocationId?
+  reward: {
+    gold?
+    essence?
+  }
+}
+```
+
+No arbitrary callback, Redux-action array, behavior tree, AI planner, or narrative decision payload is part of the task definition.
+
+### 7.2 Qualified task: Forge Assistance
+
+```text
+id: forge_assistance
+base duration: 60s
+minimum maturity: 50
+allowed roles: guardian | agent
+required location: location_city_center
+reward: +15 Gold
+```
+
+The location requirement uses M18 canonical location resolution. It does not use a Copy-specific coordinate/presence flag.
+
+### 7.3 Qualified task: Resonance Calibration
+
+```text
+id: resonance_calibration
+base duration: 90s
+minimum maturity: 75
+minimum loyalty: 55
+allowed roles: researcher | agent
+reward: +8 Essence
+```
+
+No location requirement is authored for this task because M20 does not have a qualified general Copy movement/presence system.
+
+### 7.4 Assignment
+
+`startCopyProductionTaskThunk({ copyId, taskId })` is the production assignment authority.
+
+It rejects before mutation when:
+
+- task ID is unknown;
+- Copy is missing;
+- Copy already has a running task;
+- maturity/loyalty requirement is unmet;
+- role requirement is unmet;
+- authored canonical location requirement is unmet.
+
+The UI calls the same production thunk and uses the same eligibility helper for player-facing disabled state/reasons.
+
+The old arbitrary-duration `startCopyTimedTaskThunk(...)` is not a production assignment path and now rejects with guidance to select an authored production task.
+
+### 7.5 Active task state
+
+One Copy may have one current `activeTask`.
+
+The existing task lifecycle stores:
+
+```text
+id
+type
+productionTaskId
+durationSeconds
+progressSeconds
+status
+startedAt
+```
+
+`productionTaskId` is the authored identity needed to resolve M20 requirements/reward semantics after persistence.
+
+### 7.6 Live progression
+
+The main GameLoop already dispatches:
+
+```text
+processCopyTasksThunk(deltaTime)
+```
+
+Running tasks progress deterministically from live `deltaTime`.
+
+M20 does not settle elapsed wall-clock time while the application is closed. That belongs to M21.
+
+### 7.7 Completion
+
+For a valid authored production task:
+
+```text
+progress reaches duration
+-> resolve productionTaskId
+-> apply existing role completion bonus
+-> apply authored Gold/Essence reward
+-> notify player
+-> clear activeTask
+```
+
+For unknown/legacy task state:
+
+```text
+timer completes
+-> no production reward
+-> warning
+-> clear activeTask
+```
+
+This prevents a legacy/arbitrary task record from acquiring M20 economy authority merely by reaching a timer threshold.
+
+### 7.8 Exact-once behavior
+
+After reward application, `activeTask` is cleared. A later task tick therefore has no completed task to replay.
+
+M20 directly qualifies:
+
+- completion reward once;
+- extra live tick does not duplicate it;
+- save/load after completion followed by another tick does not duplicate it.
+
+---
+
+## 8. Persistence
+
+The canonical save system serializes the complete `RootState`. `copy.activeTask` therefore persists through the existing save envelope rather than a Copy-specific save format.
+
+M20 qualifies:
+
+```text
+active task at partial progress
+-> createSave
+-> loadSavedGameWithMigration
+-> replaceState
+-> identity + progress preserved
+-> live progress continues
+-> reward applies once
+```
+
+No M20 save-schema bump was required.
+
+Offline elapsed-time settlement is deliberately not performed here; it is an M21 concern.
+
+---
+
+## 9. Player-facing management
+
+The current Copy detail UI includes:
+
+- maturity and loyalty progress;
+- role assignment;
+- current Copy location label;
+- authored Production Delegation cards;
+- base duration and reward;
+- eligibility reasons;
+- disabled assignment while busy/ineligible;
+- active task name and progress;
+- Trait share preferences;
+- effective Traits.
+
+The M20 UI explicitly states that delegation covers repeatable execution and that narrative/irreversible decisions remain player authority.
+
+---
+
+## 10. Narrative authority boundary
+
+Delegable M20 activities are bounded routine execution.
+
+Examples compatible with the doctrine include gather/repair/craft/patrol/routine research when they are explicitly authored into the production catalog.
+
+The M20 catalog has no representation for:
+
+- choosing a Quest ending;
+- selecting a major dialogue response;
+- defining/reinterpreting a Relationship;
+- betraying or exposing someone;
+- choosing an alliance/faction alignment;
+- making an irreversible political/social decision.
+
+An arbitrary ID such as `choose_quest_ending` is rejected because it is not an authored production task.
+
+M20 tests additionally verify that completing a qualified routine task leaves current Relationship and Quest Redux state unchanged.
+
+---
+
+## 11. Current implementation summary
 
 | Feature | Status | Notes |
-|---------|--------|-------|
-| Slice (CRUD + batch update) | Implemented | Batch reducer `updateMultipleCopies`. |
-| Growth Thunk | Implemented | Uses delta time & accelerated multiplier. |
-| Loyalty Decay Thunk | Implemented | Flat decay; batched updates. |
-| Creation Thunk | Implemented | Charisma-based success chance formula; inherits player trait slot IDs snapshot. |
-| Bolster Loyalty Thunk | Implemented | Essence spend + clamp. |
-| Promotion Thunk | Implemented | Adds accelerated growth state + notification. |
-| Selectors (basic) | Implemented | Advanced segmentation (mature/loyal, etc.) pending merge in later phase. |
-| Essence Bonus Integration | Partial | Bonus constant defined; recalculation logic lives in Essence selectors/thunks (qualifying count). |
-| Notifications | Implemented | Replaces console logs for Copy actions. |
-| UI List Page | Basic | Detailed card & segmentation in roadmap. |
-| Task System | Minimal | `currentTask` string only; task mechanics TBD. |
-| Low Loyalty Alerts | TODO | Needs threshold watcher + notification dispatch. |
-
-## 12. Player-Facing UI Actions (Implemented)
-
-| Action | Trigger | Cost | Effect | Source Code |
-|--------|---------|------|--------|------------|
-| Create Copy | `createCopyThunk` success (Seduction roll) | None (roll only) | Adds new Copy at 0 maturity / 50 loyalty | `CopyThunks.ts` |
-| Bolster Loyalty | User action (UI button) | 25 Essence | +10 loyalty (clamped) | `bolsterCopyLoyaltyThunk` |
-| Promote to Accelerated | User action (UI button) | 150 Essence | Sets `growthType = accelerated` | `promoteCopyToAcceleratedThunk` |
-
-Planned actions: Assign Task (task catalog), Share Trait, Revoke Trait, Recall / Release Copy, Suspend Growth.
-
-## 13. Lifecycle & Game Loop Integration
-
-1. Game loop tick computes `deltaTime` (ms).  
-2. Dispatch order (current):
-    * `processCopyGrowthThunk(deltaTime)` – batches maturity changes.
-    * `processCopyLoyaltyDecayThunk(deltaTime)` – batches loyalty decay.
-3. Essence system periodically recalculates generation rate using selector counting qualifying Copies.  
-4. UI re-renders only on batch reducer invocation (single state change for many Copies).  
-
-Edge Cases Considered:
-* Idle: No maturity update if already at max.
-* Loyalty floor at 0 prevents negative accumulation.
-* Accelerated promotion is idempotent (rejects if already accelerated).
-
-## 14. Notifications & Feedback
-
-Added lightweight `notifications` slice (array queue) with `addNotification` for:  
-* Copy creation success / failure (chance shown on failure).  
-* Promotion success.  
-* Bolster success / rejection reasons (handled via thunk reject values).  
-
-Upcoming: automatic notifications for low loyalty (< configurable threshold), maturity completion, task completion.
-
-## 16. Role Effects (MVP implemented)
-
-Roles provide lightweight flavor and small mechanical modifiers to Copies. The goal is to add personality and subtle differentiation without deep balance dependencies at this stage.
-
-Current behavior (implemented in `CopyThunks.ts`):
-- Task duration multipliers
-    - infiltrator: 0.90× duration (faster timed tasks)
-    - researcher: 0.95× duration
-    - guardian: 1.05× duration (slower, methodical)
-    - agent/none: 1.00× duration
-- Task completion bonuses
-    - infiltrator: +2 loyalty on completion (clamped to 100)
-    - researcher: +1 maturity on completion (respects `MATURITY_MAX`; unlock checks run)
-    - guardian: +1 loyalty on completion
-    - agent: +1 loyalty and +0.5 maturity on completion
-- Sharing synergy
-    - researcher: When a trait is shared to a slot, the Copy gains +0.5 maturity (clamped), then runs slot‑unlock checks.
-
-Notifications:
-- Starting a task shows an info toast.
-- On completion, a single success notification is emitted with any role bonus summarized (e.g., “completed a task (+2 loyalty)”).
-
-Assignment:
-- Role is assigned via `assignCopyRoleThunk` and surfaced in the Copy detail UI. A small success toast confirms changes.
-
-Future directions (considered, not yet implemented):
-- Role‑themed task catalog: infiltrator (intel, disguise), researcher (analysis, training), guardian (patrol, escort), agent (missions).
-- Role XP and rank: completing role‑themed tasks levels up the role to amplify bonuses.
-- Synergies with Player traits: certain player traits enhance role effects (e.g., faster infil tasks when player equips “Shadowed Step”).
-- Risk/reward tasks: daring infil missions with higher loyalty gains but failure risk.
-- Team tasks: multiple Copies with complementary roles executing linked operations for combo bonuses.
-
-## 15. Future / TODO Roadmap
-
-| Area | Planned Work |
-|------|--------------|
-| Advanced Selectors | Segment Copies (growing, mature, low loyalty) and memoized essence bonus recalculation. |
-| Task System | Define task schema, execution loop, reward hooks (loyalty/essence/traits). |
-| Low Loyalty Alerts | Threshold crossing detection + debounce to avoid spam. |
-| Trait Integration | Copy trait slots & sharing UI. |
-| Essence Scaling | Non-linear bonuses / diminishing returns for many Copies. |
-| Save/Load | Ensure backward-compatible migrations when adding new Copy fields. |
-| Testing | Unit tests for thunks (growth/decay/promotion), selector coverage. |
-| Performance | Potential Web Worker for large Copy counts; virtualization in UI. |
-| Security | Validate NPC existence & uniqueness before creation (prevent duplicates). |
+|---|---|---|
+| Copy state CRUD/batch update | Implemented | `updateMultipleCopies` available |
+| Growth | Implemented | live delta-time progression |
+| Loyalty decay | Implemented | live delta-time progression |
+| Creation | Implemented | current Essence cost + Charisma roll |
+| Bolster loyalty | Implemented | Essence spend + clamp |
+| Accelerated growth | Implemented | promotion/creation paths |
+| Roles | Implemented | assignment, duration modifiers, completion flavor bonuses |
+| Trait inheritance/sharing | Implemented | slots, preferences, validation, auto-unshare |
+| Passive Essence contribution | Implemented/partial-balance | existing maturity/loyalty qualification |
+| Production task catalog | **M20 qualified** | Forge Assistance + Resonance Calibration |
+| Production task eligibility | **M20 qualified** | role/maturity/loyalty/canonical-location requirements as authored |
+| Live task progression | **M20 qualified** | existing GameLoop task processor |
+| One-shot task reward | **M20 qualified** | Gold/Essence task-specific effects, replay controls |
+| Mid-task save/load | **M20 qualified** | ordinary RootState persistence |
+| Offline task progress | Not implemented | M21 boundary |
+| Copy travel/autonomous movement | Not implemented | not required by M20 |
+| Strategic/autonomous delegation | Not implemented | outside M20 evidence ceiling |
+| Low-loyalty alerts | TODO | separate product/UI work |
 
 ---
 
-Revision: Updated for Phase 10 documentation (final constants & implemented actions).
+## 12. Current constants
+
+`COPY_SYSTEM` remains the authority for current Copy growth/loyalty/slot tuning, including:
+
+| Constant | Current value |
+|---|---:|
+| `GROWTH_RATE_PER_SECOND` | 0.1 |
+| `ACCELERATED_GROWTH_MULTIPLIER` | 2 |
+| `DECAY_RATE_PER_SECOND` | 0.05 |
+| `BOLSTER_LOYALTY_COST` | 25 |
+| `BOLSTER_LOYALTY_GAIN` | 10 |
+| `ESSENCE_GENERATION_BONUS` | 0.2 |
+| `MATURITY_THRESHOLD` | 100 |
+| `LOYALTY_THRESHOLD` | 50 |
+| `PROMOTE_ACCELERATED_COST` | 150 |
+| `MAX_TRAIT_SLOTS` | 4 |
+
+The older global `COPY_SYSTEM.TASK_REWARDS` constant remains legacy tuning but is **not** M20 production reward authority. M20 production rewards live with their authored definitions in `CopyTaskDefinitions.ts`.
+
+---
+
+## 13. Notifications
+
+The notification system currently reports Copy creation, promotion/bolster/share actions, task assignment failures, production task start, and production task completion.
+
+Completion feedback names the authored task and summarizes its bounded ordinary reward plus any existing role completion bonus.
+
+---
+
+## 14. Evidence ceiling / future work
+
+M20 qualifies **two bounded production activities**, not a general autonomous workforce.
+
+Not qualified by M20:
+
+- offline progression;
+- self-selected/strategic tasks;
+- AI planners or behavior trees;
+- arbitrary task scripting/effect DSLs;
+- task queues/priorities;
+- task failure/risk simulation;
+- team Copy tasks;
+- Copy movement/pathfinding/schedules;
+- generalized Copy world presence;
+- social knowledge propagation;
+- faction reputation;
+- generalized world state;
+- irreversible narrative decision automation;
+- economy balance at scale.
+
+The next planned milestone after an exact-head M20 merge is **M21 — Offline Progress**, using passive Essence plus the now-qualified Copy task progress path as bounded offline-safe consumers.
+
+---
+
+**Revision:** Reconciled to qualified M20 Production Copy Task Automation behavior and evidence ceiling.
