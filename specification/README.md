@@ -4,11 +4,30 @@ This specification documents the design, architecture, implementation status, an
 
 The project uses React, TypeScript, Redux Toolkit, Material UI, listener middleware, data-driven content, save migration, and focused behavioral qualification.
 
-## Product authority through the Active RPG Loop Integration Repair
+## Product authority through M20
 
-Read [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) for broad domain/migration authority, [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md) for Trait-to-gameplay doctrine, [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md) for post-M17 product/status alignment, [`Technical/M18ExplorationTravelResult.md`](Technical/M18ExplorationTravelResult.md) plus [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md) for bounded travel authority, [`Technical/M19WorldDerivedTetherResult.md`](Technical/M19WorldDerivedTetherResult.md) plus [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) for bounded world-derived spatial Tether, [`Technical/CheckpointBActiveRpgLoopResult.md`](Technical/CheckpointBActiveRpgLoopResult.md) for the original `CHECKPOINT_B_WEAK` verdict, and [`Technical/ActiveRpgLoopIntegrationRepairResult.md`](Technical/ActiveRpgLoopIntegrationRepairResult.md) for the qualified bounded repair. The planned execution sequence through M25 lives in [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md).
+Read the milestone records as an authority chain rather than assuming older design prose describes the current runtime.
 
-The canonical Relationship product rule is no longer:
+The most relevant current records are:
+
+- [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) — broad domain/migration authority;
+- [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md) — Trait-to-gameplay doctrine;
+- [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md) — post-M17 product/status alignment;
+- [`Technical/M18ExplorationTravelResult.md`](Technical/M18ExplorationTravelResult.md) + [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md) — bounded travel authority;
+- [`Technical/M19WorldDerivedTetherResult.md`](Technical/M19WorldDerivedTetherResult.md) + [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — bounded world-derived spatial Tether;
+- [`Technical/CheckpointBActiveRpgLoopResult.md`](Technical/CheckpointBActiveRpgLoopResult.md) — historical first `CHECKPOINT_B_WEAK` verdict;
+- [`Technical/ActiveRpgLoopIntegrationRepairResult.md`](Technical/ActiveRpgLoopIntegrationRepairResult.md) — qualified repair of the observed active-loop gaps;
+- [`Technical/CheckpointBActiveRpgLoopRerunResult.md`](Technical/CheckpointBActiveRpgLoopRerunResult.md) — fresh `CHECKPOINT_B_PASS` after the repair;
+- [`Technical/M20ProductionCopyTaskAutomation.md`](Technical/M20ProductionCopyTaskAutomation.md) — preregistered M20 contract;
+- [`Technical/M20ProductionCopyTaskAutomationReconAmendment.md`](Technical/M20ProductionCopyTaskAutomationReconAmendment.md) — frozen M20 production probes/architecture decisions;
+- [`Technical/M20ProductionCopyTaskAutomationResult.md`](Technical/M20ProductionCopyTaskAutomationResult.md) — qualified M20 automation result and evidence ceiling;
+- [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — planned sequence through M25, subject to actual milestone preregistration/results.
+
+---
+
+## Canonical Relationship model
+
+The product rule is not:
 
 ```text
 Affinity reaches threshold
@@ -29,7 +48,11 @@ Story / gameplay event
 
 Legacy `affinity` and `connectionDepth` fields remain valid compatibility surfaces where deliberately retained, but they are not the product model for new Relationship-authority content.
 
-For learned gameplay capability, M16 established and M17 independently exercised the qualified boundary:
+---
+
+## Trait-to-gameplay authority
+
+M16 established and M17 independently exercised:
 
 ```text
 Relationship -> qualifies learning
@@ -39,21 +62,35 @@ Player       -> chooses whether to use it
 Relationship -> interprets the result when relationally meaningful
 ```
 
-M18/M19 establish the spatial authority:
+This preserves Relationship provenance without making Relationship state a hidden gameplay permission system.
+
+---
+
+## Spatial authority
+
+M18/M19 plus the Active RPG Loop Integration Repair establish:
 
 ```text
-Exploration -> owns authored topology / direct adjacency
-Player      -> owns canonical current player location
-NPC         -> owns bounded canonical world anchors where qualified
-Relationship-> owns historical Bond + authored/static Tether fallback
-Selector    -> derives current effective spatial Tether
+Exploration -> authored topology / direct adjacency
+Player      -> canonical current player location
+NPC         -> bounded canonical world anchors where qualified
+Relationship-> historical Bond + authored/static Tether fallback
+Selector    -> current effective spatial Tether projection
 Essence     -> consumes effective Tether
 Quest/Story -> reacts independently to location facts
+Combat      -> may consume canonical encounter location requirements
+NPC UI      -> anchored in-person actions consume canonical co-presence
 ```
 
-Checkpoint B found that these authorities were substantially compatible but still bypassable at active-play boundaries: the M17 encounter could surface without consuming `Player.location`, anchored NPC in-person interaction could be opened globally, and travel did not immediately explain Tether opportunity cost. That evaluation remains historically valid as `CHECKPOINT_B_WEAK`.
+The first Checkpoint B evaluation found three active-play bypasses:
 
-The subsequent **Active RPG Loop Integration Repair is now independently qualified**. It adds only the bounded missing bridges:
+1. Telluric Echo combat could ignore location;
+2. anchored NPC in-person interaction could ignore canonical co-presence;
+3. legal travel did not immediately surface the Tether/Essence opportunity cost.
+
+That historical verdict remains correctly recorded as `CHECKPOINT_B_WEAK`.
+
+The bounded repair then qualified:
 
 ```text
 canonical world presence -> Telluric Echo encounter availability
@@ -61,15 +98,78 @@ canonical world presence -> anchored Willow/Gronk in-person interaction availabi
 successful legal travel  -> immediate bounded Tether consequence feedback
 ```
 
-The repair does **not** itself convert Checkpoint B to PASS. The current authorization state is therefore:
+A fresh evaluation after the repair then produced:
 
 ```text
-repair qualified
--> fresh Checkpoint B re-run required
--> M20 still NOT authorized
+CHECKPOINT_B_PASS
+M20 authorized
 ```
 
+That fresh PASS, not the repair by itself, authorized automation work.
+
+---
+
+## M20 Copy automation authority
+
+M20 is now behaviorally qualified.
+
+The product doctrine is:
+
+```text
+player experiences / understands an activity
+-> activity becomes routine
+-> player may delegate routine execution to a Copy
+-> Copy produces a bounded ordinary consequence
+
+meaningful / irreversible decision
+-> remains player authority
+```
+
+The qualified production probes are:
+
+```text
+Forge Assistance
+60s base
+maturity >= 50
+role = guardian | agent
+canonical Copy presence = location_city_center
+-> +15 Gold
+```
+
+and:
+
+```text
+Resonance Calibration
+90s base
+maturity >= 75
+loyalty >= 55
+role = researcher | agent
+-> +8 Essence
+```
+
+Both reuse the existing `Copy.activeTask` / GameLoop progression substrate through one authored task-definition contract.
+
+M20 also qualifies:
+
+- below-UI task legality;
+- busy-Copy rejection;
+- deterministic role duration modifiers;
+- task-specific ordinary rewards;
+- exact-once completion;
+- mid-task save/load continuation;
+- post-completion replay safety;
+- canonical M18 location resolution for the Forge location requirement;
+- unchanged Relationship and Quest narrative state during qualified routine task completion.
+
+M20 does **not** qualify autonomous agents, Copy travel simulation, generalized task scripting, offline progress, social knowledge, faction reputation, generalized world state, or irreversible narrative-decision automation.
+
+See [`Features/CopySystem.md`](Features/CopySystem.md) for the reconciled current Copy feature contract.
+
+---
+
 ## Core game loop
+
+The currently proven direction is now:
 
 ```text
 Discover person / problem
@@ -80,15 +180,20 @@ Discover person / problem
 -> learn / equip / Resonate capability
 -> travel to an authored location when required
 -> current presence may change effective Tether / Essence intensity
--> in-person encounters/interactions consume canonical presence where qualified
+-> encounters and anchored in-person interactions consume canonical presence where qualified
 -> use capability in gameplay
 -> create story / world consequence
 -> other characters interpret the result
 -> create new Relationship evidence
--> eventually automate routine work through Copies
+-> identify understood routine work
+-> delegate bounded routine execution to a qualified Copy
+-> receive ordinary task result
+-> return player attention to higher-order active decisions
 ```
 
-The loop above remains the target. The bounded repair closes the specific world-presence bypasses that made the first Checkpoint-B evaluation WEAK; a fresh Checkpoint-B evaluation must now decide whether the repaired active loop is coherent enough to authorize automation.
+The incremental/automation layer is intended to support the RPG rather than replace its meaningful decisions.
+
+---
 
 ## Architecture overview
 
@@ -107,47 +212,51 @@ The loop above remains the target. The bounded repair closes the specific world-
 - feature-sliced organization;
 - container/presentation separation where useful;
 - data-driven authored content;
-- generic runtime contracts before NPC-specific exceptions;
+- generic runtime contracts before content-specific exceptions;
+- explicit domain authority rather than duplicated cross-system flags;
 - exact-head qualification for milestone PRs;
 - explicit evidence ceilings on experimental claims.
+
+---
 
 ## Specification structure
 
 ### Product / reconciliation
 
-- [`GameDesignDocument.md`](GameDesignDocument.md) — product vision and gameplay loop; later empirical checkpoint/result documents override stale near-term status where necessary
-- [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) — broad domain authority, migration status, and compatibility boundaries
-- [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md) — current Trait-gameplay doctrine and evidence/design boundary
-- [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md) — product/status alignment after qualified M17 combat
-- [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — planned execution program from M18 through M25
-- [`Technical/M18ExplorationTravelResult.md`](Technical/M18ExplorationTravelResult.md) — M18 empirical travel result and evidence ceiling
-- [`Technical/M19WorldDerivedTetherResult.md`](Technical/M19WorldDerivedTetherResult.md) — M19 empirical spatial-Tether result and evidence ceiling
-- [`Technical/CheckpointBActiveRpgLoop.md`](Technical/CheckpointBActiveRpgLoop.md) — frozen first Checkpoint-B evaluation contract
-- [`Technical/CheckpointBActiveRpgLoopResult.md`](Technical/CheckpointBActiveRpgLoopResult.md) — first Checkpoint-B `WEAK` verdict and observed integration gaps
-- [`Technical/ActiveRpgLoopIntegrationRepairQualification.md`](Technical/ActiveRpgLoopIntegrationRepairQualification.md) — frozen repair scientific contract
-- [`Technical/ActiveRpgLoopIntegrationRepairReconAmendment.md`](Technical/ActiveRpgLoopIntegrationRepairReconAmendment.md) — frozen bounded repair architecture decisions
-- [`Technical/ActiveRpgLoopIntegrationRepairResult.md`](Technical/ActiveRpgLoopIntegrationRepairResult.md) — qualified repair result, diagnostic history, and current authorization boundary
+- [`GameDesignDocument.md`](GameDesignDocument.md) — product vision and gameplay loop; later empirical records override stale near-term status where necessary
+- [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md)
+- [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md)
+- [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md)
+- [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md)
+- [`Technical/M18ExplorationTravelResult.md`](Technical/M18ExplorationTravelResult.md)
+- [`Technical/M19WorldDerivedTetherResult.md`](Technical/M19WorldDerivedTetherResult.md)
+- [`Technical/CheckpointBActiveRpgLoopResult.md`](Technical/CheckpointBActiveRpgLoopResult.md)
+- [`Technical/ActiveRpgLoopIntegrationRepairResult.md`](Technical/ActiveRpgLoopIntegrationRepairResult.md)
+- [`Technical/CheckpointBActiveRpgLoopRerunResult.md`](Technical/CheckpointBActiveRpgLoopRerunResult.md)
+- [`Technical/M20ProductionCopyTaskAutomation.md`](Technical/M20ProductionCopyTaskAutomation.md)
+- [`Technical/M20ProductionCopyTaskAutomationReconAmendment.md`](Technical/M20ProductionCopyTaskAutomationReconAmendment.md)
+- [`Technical/M20ProductionCopyTaskAutomationResult.md`](Technical/M20ProductionCopyTaskAutomationResult.md)
 
 ### Core feature specifications
 
 - [`Features/RelationshipExperienceSystem.md`](Features/RelationshipExperienceSystem.md) — Relationship Experiences, Memories, Bond dimensions, Connection
 - [`Features/MemorySystem.md`](Features/MemorySystem.md) — landmark relational evidence
-- [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — relationship-to-power ontology including bounded M19 spatial Tether
-- [`Features/EssenceSystem.md`](Features/EssenceSystem.md) — current passive Essence runtime and recalculation boundaries
-- [`Features/TraitSystem.md`](Features/TraitSystem.md) — discovery, equip, assimilation, Resonance, and qualified permanent gameplay capability
-- [`Features/NPCSystem.md`](Features/NPCSystem.md) — NPC identity/services/dialogue/quest integration and legacy compatibility boundary
-- [`Features/QuestSystem.md`](Features/QuestSystem.md) — quest lifecycle, authored resolution choices, and permanent-Trait resolution gates
-- [`Features/CopySystem.md`](Features/CopySystem.md) — Copy growth, loyalty, Trait sharing, roles/tasks
-- [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) — real-time progression and autosave
+- [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — Relationship-to-power ontology including bounded spatial Tether
+- [`Features/EssenceSystem.md`](Features/EssenceSystem.md) — passive Essence runtime and recalculation boundaries
+- [`Features/TraitSystem.md`](Features/TraitSystem.md) — discovery, equip, assimilation, Resonance, permanent gameplay capability
+- [`Features/NPCSystem.md`](Features/NPCSystem.md) — NPC identity/services/dialogue/quest integration and compatibility boundaries
+- [`Features/QuestSystem.md`](Features/QuestSystem.md) — quest lifecycle, authored resolution choices, permanent-Trait resolution gates
+- [`Features/CopySystem.md`](Features/CopySystem.md) — Copy growth, loyalty, Traits, roles, qualified M20 routine production tasks
+- [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) — live real-time progression; offline progression remains future work
 - [`Features/CombatSystem_MVP.md`](Features/CombatSystem_MVP.md) — M17 deterministic encounter plus bounded canonical-location launch authority
-- [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md) — M18 travel, M19 spatial Tether inputs, and bounded active-play presence integration
+- [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md) — M18 travel, M19 spatial Tether inputs, bounded active-play presence integration
 
 ### Technical documentation
 
 - [`Technical/ArchitectureOverview.md`](Technical/ArchitectureOverview.md)
 - [`Technical/StateManagement.md`](Technical/StateManagement.md)
 - [`Technical/DataModel.md`](Technical/DataModel.md)
-- Relationship/Trait/gameplay migration and qualification records under `Technical/`
+- milestone qualification/reconciliation records under `Technical/`
 
 ### UI / UX
 
@@ -157,34 +266,39 @@ The loop above remains the target. The bounded repair closes the specific world-
 
 ### Narrative
 
-- [`Narrative/Synopsis.md`](Narrative/Synopsis.md) — macro plot and act structure
-- [`Narrative/Characters.md`](Narrative/Characters.md) — character bios and arcs
-- [`Narrative/WorldLore.md`](Narrative/WorldLore.md) — factions, cosmology, relics, setting hooks
+- [`Narrative/Synopsis.md`](Narrative/Synopsis.md)
+- [`Narrative/Characters.md`](Narrative/Characters.md)
+- [`Narrative/WorldLore.md`](Narrative/WorldLore.md)
 
-## Current implementation status after the Active RPG Loop Integration Repair
+---
+
+## Current implementation status through M20
 
 | Area | Status | Notes |
 |---|---|---|
-| Player | Strong foundation | stats/loadout/progression infrastructure exists; canonical fresh location is `location_city_center` |
-| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated M4-M19 evidence |
-| Relationship Connection authority | Qualified for registered bundles | legacy NPC compatibility remains |
-| Essence | Functional + Relationship-derived contributions + bounded spatial Tether | Willow/Gronk spatial `Remote`/`Nearby`/`Present` qualified; authored fallback and broad economy work remain |
-| Traits | Core + relationship-mediated discovery/assimilation + bounded gameplay capability | Willow/Elara qualified; temporary gameplay semantics deferred |
-| Quest | Expanded foundation | permanent-Trait resolution gate qualified; ordinary `REACH_LOCATION` consumes M18 travel through existing listener |
-| Narrative integration | Bounded qualified slices | M13 causal loop; M14 multi-NPC; M15 long-horizon callbacks |
-| Copy | Substantial partial implementation | growth/loyalty/Traits/roles/tasks substrate exists; production automation depth remains; **M20 still blocked pending fresh Checkpoint B** |
-| GameLoop | Implemented | offline progress deferred |
-| Save/load | Implemented + migration qualification | M18 location and M19 derived spatial Tether reconstruct without new proximity persistence |
-| Combat | Bounded qualified vertical slice + bounded presence gate | M17 encounter works; repair requires canonical Whispering Woods presence before entry |
-| Exploration | Bounded qualified vertical slice + bounded cross-domain integration | four authored locations, legal direct travel, Quest integration, M19 Tether inputs, immediate post-travel Tether feedback |
-| Spatial Tether | Bounded qualified projection | Willow/Gronk anchored; unanchored Relationships retain authored/static fallback; broader presence semantics deferred |
-| NPC active presence | Bounded qualified integration | anchored Willow/Gronk require co-presence for in-person detailed actions; remote Overview/Relationship inspection remains available; unanchored NPCs retain legacy behavior |
-| Active RPG integration | Repair qualified; checkpoint decision pending | original Checkpoint B = WEAK; bounded observed gaps repaired; fresh Checkpoint B rerun required |
-| Faction / world state | Partial concepts | dedicated authority still future work |
+| Player | Strong foundation | stats/loadout/progression; canonical fresh location `location_city_center` |
+| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated M4-M20 regression evidence preserves prior behavior |
+| Relationship Connection authority | Qualified for registered bundles | legacy compatibility remains |
+| Essence | Functional + Relationship-derived contributions + bounded spatial Tether | also receives qualified one-shot M20 Resonance Calibration reward |
+| Traits | Core + relationship-mediated discovery/assimilation + bounded gameplay capability | Willow/Elara proof slices |
+| Quest | Expanded foundation | Trait resolution gate + ordinary M18 location listener; M20 routine completion leaves Quest authority unchanged |
+| Narrative integration | Bounded qualified slices | M13/M14/M15 plus active-loop closure controls |
+| Copy | **Bounded production automation qualified** | growth/loyalty/Traits/roles + two authored M20 routine tasks; offline/strategic autonomy not qualified |
+| GameLoop | Live progression implemented | includes Copy task ticks; offline settlement deferred to M21 |
+| Save/load | Implemented + migration qualification | M20 active task identity/progress survives ordinary save/load |
+| Combat | Bounded qualified vertical slice + presence gate | Telluric Echo requires canonical Whispering Woods presence |
+| Exploration | Bounded qualified vertical slice + cross-domain integration | four authored locations, legal direct travel, Quest/Tether/presence integration |
+| Spatial Tether | Bounded qualified projection | Willow/Gronk anchors; authored fallback for unanchored Relationships |
+| NPC active presence | Bounded qualified integration | anchored in-person actions require co-presence; remote inspection remains distinct |
+| Active RPG integration | **Checkpoint B PASS** | first evaluation WEAK -> repair PASS -> fresh rerun PASS |
+| Offline progress | Future | M21 next candidate |
+| Social knowledge | Future | M22 |
+| Faction reputation | Future | M23 |
+| Objective world state | Future | M24 |
+
+---
 
 ## Qualification history
-
-The Relationship/Trait/gameplay progression architecture is no longer a purely planned design.
 
 Key milestones:
 
@@ -192,91 +306,96 @@ Key milestones:
 - **M11:** Lyra adversarial universality;
 - **M12:** production authoring scalability across Gronk/Silas/Valerius;
 - **M13:** persisted Relationship evidence causes later story;
-- **M14:** one shared decision creates distinct/conflicting consequences across multiple NPC relationships;
-- **M15:** old and newer Relationship evidence compose across unrelated intervening content and save/load;
-- **M16:** Relationship-derived permanent Traits materially change bounded quest gameplay solution space through a generic permanent-Trait resolution gate;
-- **Checkpoint A:** post-M16 doctrine reconciled Relationship provenance, Trait capability authority, player decision authority, and anti-golden-option design rules;
-- **M17:** one bounded deterministic Combat encounter demonstrates an optional permanent-`WillowsWisdom` tactical route while ordinary no-Trait victory remains viable, and legitimate victory advances an existing Quest `KILL` objective through the ordinary event bridge;
-- **P17.5:** product/status canon reconciled after M17 without runtime change;
-- **M18:** one bounded four-location graph supports player-facing legal travel, below-UI direct-route enforcement, save/load continuation, and existing `REACH_LOCATION` Quest consequences through the ordinary `setLocation` listener;
-- **M19:** objective player location relative to two independently anchored Relationship-authority NPCs derives bounded spatial Tether and changes current Relationship-derived Essence intensity without rewriting historical Bond state; unanchored Relationships retain authored/static Tether and save/load reconstructs the spatial projection without proximity flags;
-- **Checkpoint B (first evaluation):** **WEAK** — Relationship/Trait/Quest/Travel/Tether/Essence composition was substantial, but Combat and anchored-NPC active interaction could bypass canonical world presence and spatial consequence feedback was fragmented;
-- **Active RPG Loop Integration Repair:** **PASS** — the existing Telluric Echo consumes canonical encounter location, anchored Willow/Gronk in-person actions consume co-presence while remote Relationship inspection remains available, and legal travel immediately reports bounded Tether opportunity cost without rewriting Bond history or adding a generalized world/presence engine. A fresh Checkpoint-B re-run remains required before M20.
+- **M14:** one shared decision creates distinct/conflicting consequences across multiple Relationships;
+- **M15:** old/new Relationship evidence composes across intervening content and save/load;
+- **M16:** Relationship-derived permanent Traits materially change bounded Quest solution space;
+- **Checkpoint A:** Trait-to-gameplay authority reconciled;
+- **M17:** bounded deterministic Combat with an optional permanent-`WillowsWisdom` tactical route and ordinary Quest `KILL` integration;
+- **P17.5:** post-M17 product/status reconciliation;
+- **M18:** bounded authored travel graph, below-UI route legality, save/load, ordinary `REACH_LOCATION` consequence;
+- **M19:** bounded spatial Tether derived from player location + two NPC anchors without rewriting Bond history;
+- **Checkpoint B first evaluation:** `CHECKPOINT_B_WEAK` — three active world-presence/legibility gaps found;
+- **Active RPG Loop Integration Repair:** PASS — bounded repair of encounter location, anchored NPC co-presence, and post-travel spatial feedback;
+- **Checkpoint B fresh rerun:** `CHECKPOINT_B_PASS` — repaired active RPG loop qualified; M20 authorized;
+- **M20:** PASS — two authored routine Copy tasks use one production contract with below-UI requirements, deterministic live progress, exact-once ordinary rewards, save/load continuity, and preserved narrative authority.
 
-Milestone qualification is documented under `Technical/` and exercised in Build Validation.
+Milestone records live under `Technical/` and the executable gates live in Build Validation.
+
+---
 
 ## Testing policy
-
-The old prototype rule that automated tests were intentionally out of scope is obsolete.
 
 Current milestone work should preserve:
 
 1. TypeScript correctness;
-2. focused behavioral tests for the changed capability;
-3. accumulated Relationship/Trait/save/narrative/combat/exploration/Tether qualification;
+2. focused behavioral qualification for the changed capability;
+3. earlier milestone/regression evidence relevant to shared runtime;
 4. production build;
-5. exact-head PR qualification before merge when operating under the milestone workflow.
+5. exact-head PR qualification before merge;
+6. explicit separation between diagnostic/review signals and merge authority.
 
-The active-loop repair also demonstrated why qualification should remain decomposable and bounded: an opaque combined Jest step was split into dedicated repair, modified historical, and otherwise unchanged accumulated groups with explicit timeouts. This preserved all evidence while making failures diagnosable.
+Do not remove prior gates merely because a later milestone focuses on another subsystem.
 
-Do not remove prior gates merely because a new milestone focuses on another subsystem.
+Build Validation + preregistered criteria are milestone merge authority. Repository Gemini review is not merge authority.
+
+---
 
 ## Near-term development direction
 
-The bounded **Active RPG Loop Integration Repair is qualified**.
-
-The immediate next task is now a **fresh Checkpoint B — Active RPG Loop evaluation** against the merged repair.
-
-The fresh checkpoint should reassess the original coherence dimensions, especially:
+After an exact-head M20 qualification and merge, the next candidate is:
 
 ```text
-Relationship -> Trait provenance
-Trait -> Quest / Combat capability identity
-Travel -> meaningful destination choice
-Travel -> immediate spatial/Tether consequence legibility
-canonical presence -> encounter availability
-canonical presence -> anchored NPC in-person interaction
-Gameplay consequence -> Relationship closure
+M21 — Offline Progress
 ```
 
-Important boundaries remain:
+M21 should test whether explicitly offline-safe systems can advance deterministically across save/load using bounded elapsed real time.
 
-- the repair PASS is not itself a Checkpoint-B PASS;
-- remote inspection of known Relationship information remains distinct from active in-person interaction;
-- do not introduce coordinates, NPC schedules, autonomous movement, travel time, pathfinding, a generalized encounter-condition DSL, or a world-state engine merely to make the checkpoint look complete;
-- preserve M18 legal-travel authority and M19 derived-not-stored Tether;
-- preserve all accumulated qualification.
-
-Only a fresh:
+The initial qualified consumers should be:
 
 ```text
-CHECKPOINT_B_PASS
-M20 authorized
+passive Essence
++
+M20 Copy task progress
 ```
 
-authorizes Copy Task Automation.
-
-The remaining planned sequence is therefore:
+The safety rule remains an allowlist:
 
 ```text
-Checkpoint B first evaluation: WEAK
--> bounded Active RPG Loop Integration Repair: PASS
--> fresh Checkpoint B re-run
--> if PASS: M20 Copy Task Automation
+offline-safe routine progression -> may settle elapsed time
+narrative / irreversible decision -> must not silently resolve offline
+```
+
+Important M21 boundaries:
+
+- no offline dialogue choice;
+- no offline Relationship-defining decision;
+- no offline Quest ending;
+- no generalized background world simulation;
+- no arbitrary offline Combat;
+- explicit timestamp, clamping, clock-skew, rounding, and exact-once settlement rules must be preregistered before implementation.
+
+M21 is **not implemented by M20**.
+
+The remaining planned sequence is:
+
+```text
+M20 Copy Task Automation: PASS
 -> M21 Offline Progress
--> Checkpoint C
+-> Checkpoint C — Incremental Integration
 -> M22 Social Knowledge Propagation
 -> M23 Faction Reputation
 -> M24 Objective World State
 -> M25 Complete Chapter Vertical Slice
--> Human integrated playability review
+-> Human integrated playability / product review
 ```
 
-See `Technical/PostM17MilestoneRoadmap.md` for the original working experiment program, `Technical/CheckpointBActiveRpgLoopResult.md` for the first evaluation, and `Technical/ActiveRpgLoopIntegrationRepairResult.md` for the current repair evidence. Individual future milestone semantics remain provisional until each experiment is preregistered against the actual then-current repository state.
+Individual future milestone semantics remain provisional until preregistered against the actual then-current repository state.
+
+---
 
 ## Development workflow
 
-For milestone work:
+For code-bearing milestones:
 
 ```text
 verify current main
@@ -284,17 +403,23 @@ verify current main
 -> create dedicated branch
 -> preregister question / acceptance / falsification
 -> recon existing capability
+-> freeze recon amendments when findings change implementation semantics
 -> implement smallest production proof
 -> add focused qualification
 -> run accumulated CI + production build
--> record results + evidence ceiling
--> requalify documentation-complete head
+-> freeze first complete behavioral SHA/tree
+-> record result + evidence ceiling
+-> reconcile canon
+-> requalify documentation-complete exact head
 -> merge exact qualified SHA
--> verify main
+-> verify integrated tree
+-> claim post-merge CI only when an actual merge-commit run exists
 -> stop at milestone boundary
 ```
 
-For documentation-only reconciliation checkpoints, preserve the same exact-head merge discipline but do not invent runtime tests or behavior changes when the task is canon alignment.
+For documentation-only checkpoints, preserve the same exact-head discipline without inventing runtime changes.
+
+---
 
 ## Repository structure
 
@@ -331,23 +456,25 @@ specification/
 └── UI_UX/
 ```
 
+---
+
 ## Canonical conflict rule
 
-When an older specification conflicts with the current authority chain, do not silently revive old behavior as design truth.
+When an older specification conflicts with current qualified authority, do not silently revive old behavior as design truth.
 
-Use this reading order:
+Use this reading order for the current M20-era product:
 
 1. `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority;
 2. `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine;
-3. `Technical/PostM17ProductReconciliation.md` for post-M17 product/status alignment;
+3. `Technical/PostM17ProductReconciliation.md` for post-M17 alignment;
 4. `Technical/M18ExplorationTravelResult.md` + `Features/ExplorationSystem.md` for qualified player-travel authority;
-5. `Technical/M19WorldDerivedTetherResult.md` + `Features/EssenceResonanceModel.md` for qualified bounded spatial-Tether authority;
-6. `Technical/CheckpointBActiveRpgLoopResult.md` for the first active-RPG integration verdict and the exact gaps it observed;
-7. `Technical/ActiveRpgLoopIntegrationRepairResult.md` for the qualified repair of those gaps and the current requirement to re-run Checkpoint B;
-8. `Technical/PostM17MilestoneRoadmap.md` for the planned future execution program subject to checkpoint overrides;
-9. `GameDesignDocument.md`;
-10. `Features/RelationshipExperienceSystem.md` / `EssenceResonanceModel.md`;
-11. the relevant current feature spec;
-12. milestone-specific qualification evidence.
+5. `Technical/M19WorldDerivedTetherResult.md` + `Features/EssenceResonanceModel.md` for bounded spatial-Tether authority;
+6. `Technical/CheckpointBActiveRpgLoopResult.md` for the historical first active-RPG verdict;
+7. `Technical/ActiveRpgLoopIntegrationRepairResult.md` for the repair evidence;
+8. `Technical/CheckpointBActiveRpgLoopRerunResult.md` for the fresh PASS that authorized M20;
+9. `Technical/M20ProductionCopyTaskAutomationResult.md` + `Features/CopySystem.md` for qualified Copy production automation authority;
+10. milestone preregistration/recon records for the exact experiment contract;
+11. `Technical/PostM17MilestoneRoadmap.md` for future planned sequencing;
+12. `GameDesignDocument.md` and other older feature prose where not superseded.
 
-If the runtime still uses a legacy rule, document it as compatibility/migration debt and migrate it deliberately rather than pretending it is the modern product model.
+If runtime still uses a legacy rule, document it as compatibility/migration debt and migrate it deliberately rather than pretending it is the modern product model.
