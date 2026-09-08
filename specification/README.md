@@ -4,9 +4,9 @@ This specification documents the design, architecture, implementation status, an
 
 The project uses React, TypeScript, Redux Toolkit, Material UI, listener middleware, data-driven content, save migration, and focused behavioral qualification.
 
-## Product authority after M17
+## Product authority through M18
 
-Read [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) for broad domain/migration authority, [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md) for Trait-to-gameplay doctrine, and [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md) for current post-M17 product/status alignment. The planned execution sequence through M25 lives in [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md).
+Read [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) for broad domain/migration authority, [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md) for Trait-to-gameplay doctrine, [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md) for post-M17 product/status alignment, and [`Technical/M18ExplorationTravelResult.md`](Technical/M18ExplorationTravelResult.md) plus [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md) for the qualified bounded travel layer. The planned execution sequence through M25 lives in [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md).
 
 The canonical Relationship product rule is no longer:
 
@@ -39,6 +39,14 @@ Player       -> chooses whether to use it
 Relationship -> interprets the result when relationally meaningful
 ```
 
+M18 adds a separate spatial boundary:
+
+```text
+Exploration -> owns authored topology / direct adjacency
+Player      -> owns canonical current player location
+Quest/Story -> reacts to location facts
+```
+
 ## Core game loop
 
 ```text
@@ -48,6 +56,7 @@ Discover person / problem
 -> change Bond / Connection
 -> change passive Essence and Trait-learning conditions
 -> learn / equip / Resonate capability
+-> travel to an authored location when required
 -> use capability in gameplay
 -> create story / world consequence
 -> other characters interpret the result
@@ -83,8 +92,9 @@ Discover person / problem
 - [`GameDesignDocument.md`](GameDesignDocument.md) — current product vision and gameplay loop
 - [`Technical/PostM14ProductReconciliation.md`](Technical/PostM14ProductReconciliation.md) — broad domain authority, migration status, and compatibility boundaries
 - [`Technical/PostM16TraitGameplayReconciliation.md`](Technical/PostM16TraitGameplayReconciliation.md) — current Trait-gameplay doctrine and evidence/design boundary
-- [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md) — current product/status alignment after qualified M17 combat
+- [`Technical/PostM17ProductReconciliation.md`](Technical/PostM17ProductReconciliation.md) — product/status alignment after qualified M17 combat
 - [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — planned execution program from M18 through M25
+- [`Technical/M18ExplorationTravelResult.md`](Technical/M18ExplorationTravelResult.md) — M18 empirical result and evidence ceiling
 
 ### Core feature specifications
 
@@ -98,13 +108,14 @@ Discover person / problem
 - [`Features/CopySystem.md`](Features/CopySystem.md) — Copy growth, loyalty, Trait sharing, roles/tasks
 - [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) — real-time progression and autosave
 - [`Features/CombatSystem_MVP.md`](Features/CombatSystem_MVP.md) — event bus plus the bounded qualified M17 deterministic encounter vertical slice
+- [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md) — bounded M18 authored topology, direct travel authority, and Player-location boundary
 
 ### Technical documentation
 
 - [`Technical/ArchitectureOverview.md`](Technical/ArchitectureOverview.md)
 - [`Technical/StateManagement.md`](Technical/StateManagement.md)
 - [`Technical/DataModel.md`](Technical/DataModel.md)
-- Relationship/Trait migration and qualification records under `Technical/`
+- Relationship/Trait/gameplay migration and qualification records under `Technical/`
 
 ### UI / UX
 
@@ -115,25 +126,25 @@ Discover person / problem
 ### Narrative
 
 - [`Narrative/Synopsis.md`](Narrative/Synopsis.md) — macro plot and act structure
-- [`Narrative/Characters.md`](Narrative/Characters.md) — character bios and arcs
+- [`Narrative/Characters.md`](Narrative/Characters.md) — character bios, arcs, and hooks
 - [`Narrative/WorldLore.md`](Narrative/WorldLore.md) — factions, cosmology, relics, setting hooks
 
-## Current implementation status after M17
+## Current implementation status after M18
 
 | Area | Status | Notes |
 |---|---|---|
-| Player | Strong foundation | stats/loadout/progression infrastructure exists |
-| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated M4-M17 evidence |
+| Player | Strong foundation | stats/loadout/progression infrastructure exists; canonical fresh location is `location_city_center` |
+| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated M4-M18 evidence |
 | Relationship Connection authority | Qualified for registered bundles | legacy NPC compatibility remains |
 | Essence | Functional + Relationship-derived contributions | world-derived Tether and broad economy work remain |
 | Traits | Core + relationship-mediated discovery/assimilation + bounded gameplay capability | Willow/Elara qualified; temporary gameplay semantics deferred |
-| Quest | Expanded foundation | permanent-Trait resolution gate qualified; richer graphs/maps/campaign presentation deferred |
+| Quest | Expanded foundation | permanent-Trait resolution gate qualified; ordinary `REACH_LOCATION` consumes M18 travel through existing listener |
 | Narrative integration | Bounded qualified slices | M13 causal loop; M14 multi-NPC; M15 long-horizon callbacks |
 | Copy | Substantial partial implementation | growth/loyalty/Traits/roles/tasks substrate exists; production automation depth remains |
 | GameLoop | Implemented | offline progress deferred |
-| Save/load | Implemented + migration qualification | accumulated Relationship/Trait/save tests active |
+| Save/load | Implemented + migration qualification | M18 confirms canonical Player location survives ordinary save/load without a schema bump |
 | Combat | Bounded qualified vertical slice | event bus + one deterministic player-facing encounter; broader combat remains incomplete |
-| Exploration | Partial | canonical location exists; no complete player-facing travel/world layer yet |
+| Exploration | Bounded qualified vertical slice | four authored locations, direct-adjacency UI/runtime enforcement, existing Quest integration; broader travel/world semantics remain future work |
 | Faction / world state | Partial concepts | dedicated authority still future work |
 
 ## Qualification history
@@ -150,7 +161,9 @@ Key milestones:
 - **M15:** old and newer Relationship evidence compose across unrelated intervening content and save/load;
 - **M16:** Relationship-derived permanent Traits materially change bounded quest gameplay solution space through a generic permanent-Trait resolution gate;
 - **Checkpoint A:** post-M16 doctrine reconciled Relationship provenance, Trait capability authority, player decision authority, and anti-golden-option design rules;
-- **M17:** one bounded deterministic Combat encounter demonstrates an optional permanent-`WillowsWisdom` tactical route while ordinary no-Trait victory remains viable, and legitimate victory advances an existing Quest `KILL` objective through the ordinary event bridge.
+- **M17:** one bounded deterministic Combat encounter demonstrates an optional permanent-`WillowsWisdom` tactical route while ordinary no-Trait victory remains viable, and legitimate victory advances an existing Quest `KILL` objective through the ordinary event bridge;
+- **P17.5:** product/status canon reconciled after M17 without runtime change;
+- **M18:** one bounded four-location graph supports player-facing legal travel, below-UI direct-route enforcement, save/load continuation, and existing `REACH_LOCATION` Quest consequences through the ordinary `setLocation` listener.
 
 Milestone qualification is documented under `Technical/` and exercised in Build Validation.
 
@@ -162,7 +175,7 @@ Current milestone work should preserve:
 
 1. TypeScript correctness;
 2. focused behavioral tests for the changed capability;
-3. accumulated Relationship/Trait/save/narrative/combat qualification;
+3. accumulated Relationship/Trait/save/narrative/combat/exploration qualification;
 4. production build;
 5. exact-head PR qualification before merge when operating under the milestone workflow.
 
@@ -170,17 +183,16 @@ Do not remove prior gates merely because a new milestone focuses on another subs
 
 ## Near-term development direction
 
-The immediate next code-bearing candidate is **M18 — Narrow Exploration / Travel Vertical Slice**.
+The immediate next code-bearing candidate is **M19 — World-Derived Relationship Tether**.
 
-The planned question is:
+M18 now establishes objective player-facing spatial facts through canonical Player location and authored direct adjacency. The next planned question is whether those world-presence facts can alter the **current intensity** of Relationship-derived Essence through Tether without rewriting historical Relationship state such as Connection, Memories, or Bond dimensions.
 
-> Can the player intentionally traverse a small authored world graph through a player-facing travel interface, with canonical player location producing ordinary gameplay consequences, without duplicate location flags or a generalized world simulation?
+M19 must be separately preregistered against the actual post-M18 `main` before behavior changes.
 
-The planned post-M17 sequence is:
+The remaining planned sequence is:
 
 ```text
-M18 Exploration / Travel
--> M19 World-Derived Tether
+M19 World-Derived Tether
 -> Checkpoint B
 -> M20 Copy Task Automation
 -> M21 Offline Progress
@@ -230,6 +242,7 @@ src/
 │   ├── Essence/
 │   ├── Copy/
 │   ├── Combat/
+│   ├── Exploration/
 │   ├── GameLoop/
 │   └── Settings/
 ├── shared/
@@ -258,11 +271,12 @@ Use this reading order:
 
 1. `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority;
 2. `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine;
-3. `Technical/PostM17ProductReconciliation.md` for current product/status alignment after M17;
-4. `Technical/PostM17MilestoneRoadmap.md` for the planned execution program;
-5. `GameDesignDocument.md`;
-6. `Features/RelationshipExperienceSystem.md` / `EssenceResonanceModel.md`;
-7. the relevant current feature spec;
-8. milestone-specific qualification evidence.
+3. `Technical/PostM17ProductReconciliation.md` for post-M17 product/status alignment;
+4. `Technical/M18ExplorationTravelResult.md` + `Features/ExplorationSystem.md` for qualified player-travel authority;
+5. `Technical/PostM17MilestoneRoadmap.md` for the planned future execution program;
+6. `GameDesignDocument.md`;
+7. `Features/RelationshipExperienceSystem.md` / `EssenceResonanceModel.md`;
+8. the relevant current feature spec;
+9. milestone-specific qualification evidence.
 
 If the runtime still uses a legacy rule, document it as compatibility/migration debt and migrate it deliberately rather than pretending it is the modern product model.
