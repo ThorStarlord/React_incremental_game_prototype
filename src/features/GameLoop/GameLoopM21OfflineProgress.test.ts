@@ -65,8 +65,8 @@ describe('M21 bounded offline progress qualification', () => {
   });
 
   test.each([
-    ['paused', (store: TestStore) => store.dispatch(pauseGame()), 'game_paused'],
-    ['stopped', (store: TestStore) => store.dispatch(stopGame()), 'game_not_running'],
+    ['paused', (store: TestStore): void => { store.dispatch(pauseGame()); }, 'game_paused'],
+    ['stopped', (store: TestStore): void => { store.dispatch(stopGame()); }, 'game_not_running'],
   ] as const)('saved %s game receives no offline Essence or Copy progress', async (_label, changeLoopState, reason) => {
     const store = makeStore();
     store.dispatch(updateGenerationRate(2));
@@ -140,7 +140,8 @@ describe('M21 bounded offline progress qualification', () => {
     expect(store.getState().relationships).toEqual(relationshipsBefore);
     expect(store.getState().quest).toEqual(questBefore);
     expect(store.getState().player.location).toBe(locationBefore);
-    expect(store.getState().notifications.notifications.at(-1)?.message).toContain('While you were away: +40 Essence');
+    const notifications = store.getState().notifications.items;
+    expect(notifications[notifications.length - 1]?.message).toContain('While you were away: +40 Essence');
 
     const essenceAfterFirstSettlement = store.getState().essence.currentEssence;
     const progressAfterFirstSettlement = store.getState().copy.copies['copy-001'].activeTask?.progressSeconds;
