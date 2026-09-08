@@ -1,40 +1,101 @@
-Implementation Status: ✅ IMPLEMENTED (slice + toasts) — extendable
+Implementation Status: ⚠️ PARTIAL — shared Redux queue implemented; production toast renderer not currently demonstrated
 
 # Notification System Specification
 
-Global, lightweight feedback mechanism for actions and events.
+Global, lightweight feedback state for actions and events.
 
-## 1. Overview
-- Purpose: Provide consistent, non-blocking user feedback with severity and optional actions.
-- Core Loop: Feature dispatches notification → UI displays → Auto-dismiss/manual clear.
+## 1. Current authoritative runtime
 
-## 2. Data Model & Slice
-- Slice key: `notifications`
-- Notification shape:
-	- id: string
-	- message: string
-	- severity: 'success' | 'error' | 'info' | 'warning'
-	- timeoutMs?: number (default from constants)
-	- action?: { label: string; onClickType: string; payload?: any } (dispatched action type)
-	- context?: string (e.g., 'trading', 'traits') for filtering/logging
-- Reducers/actions:
-	- enqueueNotification(payload)
-	- dismissNotification(id)
-	- clearAll()
+The implemented shared notification substrate is `src/shared/state/NotificationSlice.ts`.
 
-## 3. UI/UX
-- Toast stack (top-right by default), max N visible, with auto-dismiss and hover pause.
-- Notification Center panel (optional) to review recent messages.
-- Accessible: role="status"/"alert" based on severity; focus management for critical errors.
+It provides:
+
+```text
+notifications.items
+addNotification
+removeNotification
+clearNotifications
+selectNotifications
+```
+
+Current notification shape:
+
+```ts
+GameNotification {
+  id: string
+  message: string
+  type: 'success' | 'error' | 'info' | 'warning'
+  timestamp: number
+  timeout?: number
+}
+```
+
+Several feature thunks/listeners dispatch `addNotification`, including NPC trade, Quest, Trait, Copy, Relationship, and M21 offline-settlement feedback.
+
+## 2. Checkpoint C presentation finding
+
+Checkpoint C repository inspection did **not** find a production component consuming `selectNotifications` / `state.notifications.items` and rendering the shared queue into the mounted application layout.
+
+`useMenuNotifications` is a separate local React-state hook. It is not a renderer for the shared Redux queue.
+
+Therefore the current proven loop is:
+
+```text
+feature dispatches addNotification
+-> shared Redux queue stores GameNotification
+```
+
+The stronger intended loop is **not yet qualified**:
+
+```text
+feature dispatches notification
+-> shared queue
+-> mounted toast / notification surface
+-> player sees message
+-> lifecycle/dismissal
+```
+
+This gap is especially material for M21 because the bounded `While you were away` summary is dispatched into the shared queue after offline settlement but is not yet proven player-visible.
+
+See `../Technical/CheckpointCIncrementalIntegrationResult.md`.
+
+## 3. Intended UI/UX
+
+A bounded repair should render the existing shared queue in a production player-facing surface rather than creating another notification authority solely for M21.
+
+Desired behavior:
+
+- toast/stack presentation for queued notifications;
+- severity mapped from `GameNotification.type`;
+- dismissal through `removeNotification`;
+- optional timeout behavior consistent with `GameNotification.timeout`;
+- accessible `role="status"` / `role="alert"` semantics as appropriate;
+- no duplication of notification state into another global store.
+
+A Notification Center/history panel is optional and remains outside the current repair requirement.
 
 ## 4. Integration
-- Trait equip/resonate, Copy actions, Quest updates, Save/Load results, Trading transactions.
-- Listener middleware can intercept domain events and enqueue standardized messages.
 
-## 5. Constants
-- `NOTIFICATIONS` in `gameConstants.ts`:
-	- DEFAULT_TIMEOUT_MS, MAX_VISIBLE_TOASTS, ERROR_PERSIST_MS.
+Current notification producers include ordinary feature feedback from:
 
-## 6. Roadmap (Deferred)
-- Per-feature channels and mute toggles (from Settings).
-- Rich notifications with inline buttons and deep links (e.g., "Open Quest Log").
+- Trait actions;
+- Copy actions;
+- Quest updates;
+- NPC/trading actions;
+- Relationship actions;
+- M21 offline settlement.
+
+Checkpoint C does not claim that all producer messages require identical presentation policy. It establishes only that the shared queue currently lacks demonstrated production rendering and that M21 return feedback therefore needs a bounded presentation bridge.
+
+## 5. Non-goals
+
+The Checkpoint-C repair does not require:
+
+- per-feature channels;
+- notification analytics/history persistence;
+- rich inline actions;
+- deep links;
+- generalized messaging/event-bus redesign;
+- a second M21-specific notification store.
+
+Those remain optional future enhancements after the basic shared queue is player-visible.
