@@ -120,7 +120,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         const requiredWorldState = Array.isArray(node.requiredWorldState)
           ? node.requiredWorldState
           : [];
-        if (requiredWorldState.some(requirement =>
+        if (requiredWorldState.some((requirement: unknown) =>
           !doesWorldStateRequirementPass(worldStateRegions, requirement)
         )) {
           return null;
