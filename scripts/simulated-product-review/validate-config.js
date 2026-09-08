@@ -70,7 +70,7 @@ function main() {
   }
   requireText(protocol, "Human comprehension        NOT CLAIMED", protocolPath);
   requireText(protocol, "Human product validation remains deferred", protocolPath);
-  requireText(protocol, "do not request or preserve private chain-of-thought", protocolPath);
+  requireText(protocol, "Do not request or preserve private chain-of-thought", protocolPath);
 
   const resultPath = "specification/Technical/SimulatedIntegratedProductReviewResultTemplate.md";
   const result = read(resultPath);
