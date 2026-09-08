@@ -230,7 +230,9 @@
       "valerius_leak_rumor",
       "valerius_delegated_leak_response",
       "valerius_m14_aftermath_council",
-      "valerius_m15_forged_ledger_inquiry"
+      "valerius_m15_forged_ledger_inquiry",
+      "valerius_m22_forge_report",
+      "valerius_m22_forge_logistics"
     ],
     "completedDialogues": [],
     "availableQuests": ["quest_valerius_patrol_duty"],
