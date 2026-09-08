@@ -11,6 +11,7 @@ const initialState: GameLoopState = {
   gameSpeed: 1.0,
   autoSaveInterval: 30000, // 30 seconds
   lastAutoSave: 0,
+  lastOfflineSettlementSourceTimestamp: null,
 };
 
 export const gameLoopSlice = createSlice({
@@ -54,6 +55,9 @@ export const gameLoopSlice = createSlice({
     updateAutoSave: (state, action: PayloadAction<number>) => {
       state.lastAutoSave = action.payload;
     },
+    markOfflineSettlementSource: (state, action: PayloadAction<number>) => {
+      state.lastOfflineSettlementSourceTimestamp = action.payload;
+    },
   },
 });
 
@@ -66,6 +70,7 @@ export const {
   setGameSpeed,
   setTickRate,
   updateAutoSave,
+  markOfflineSettlementSource,
 } = gameLoopSlice.actions;
 
 export default gameLoopSlice.reducer;
