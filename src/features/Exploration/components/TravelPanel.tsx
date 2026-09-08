@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Alert, Box, Button, Paper, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
+  CITY_CENTER_LOCATION_ID,
   getConnectedLocationDefinitions,
   getLocationDefinition,
   resolveCanonicalLocationId,
 } from '../LocationDefinitions';
-import { travelToLocationThunk } from '../TravelThunks';
+import { practiceForgeAssistanceThunk, travelToLocationThunk } from '../TravelThunks';
 import { NPC_WORLD_LOCATION_IDS } from '../../NPCs/state/NPCWorldLocationDefinitions';
 import { deriveSpatialRelationshipTether } from '../../Relationships/state/RelationshipSelectors';
 
@@ -23,6 +24,7 @@ const formatTether = (value: string) =>
 const TravelPanel: React.FC = () => {
   const dispatch = useAppDispatch();
   const locationValue = useAppSelector(state => state.player.location);
+  const forgeFamiliar = useAppSelector(state => Boolean(state.player.routineFamiliarity?.forge_assistance));
   const npcs = useAppSelector(state => state.npcs.npcs);
   const [error, setError] = useState<string | null>(null);
   const [spatialFeedback, setSpatialFeedback] = useState<SpatialTetherFeedback[]>([]);
@@ -64,6 +66,18 @@ const TravelPanel: React.FC = () => {
     setSpatialFeedback(pendingSpatialFeedback);
   };
 
+  const handleForgePractice = async () => {
+    setError(null);
+    const result = await dispatch(practiceForgeAssistanceThunk());
+    if (practiceForgeAssistanceThunk.rejected.match(result)) {
+      setError(
+        typeof result.payload === 'string'
+          ? result.payload
+          : result.error.message || 'Forge practice failed.'
+      );
+    }
+  };
+
   return (
     <Paper sx={{ p: 2, mb: 2 }}>
       <Typography variant="h6" gutterBottom>
@@ -78,6 +92,23 @@ const TravelPanel: React.FC = () => {
           <Typography variant="body2" sx={{ mb: 2 }}>
             {currentLocation.description}
           </Typography>
+
+          {currentLocation.id === CITY_CENTER_LOCATION_ID && (
+            <Box sx={{ mb: 2, p: 1.5, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2">City Forge</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Practice the workshop support routine yourself once to understand it before delegating it to a Copy.
+              </Typography>
+              <Button
+                variant="contained"
+                size="small"
+                disabled={forgeFamiliar}
+                onClick={handleForgePractice}
+              >
+                {forgeFamiliar ? 'Forge Assistance Learned' : 'Practice Forge Assistance (+5 Gold)'}
+              </Button>
+            </Box>
+          )}
 
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             {destinations.map(destination => (
