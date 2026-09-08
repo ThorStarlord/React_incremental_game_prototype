@@ -1,8 +1,8 @@
 # Essence and Resonance Model
 
-**Design status:** Canonical model; substantial runtime implementation exists after M14  
+**Design status:** Canonical model; substantial runtime implementation qualified through M19  
 **Scope:** Relationship-derived Essence generation and relationship-mediated Trait discovery / assimilation / permanent Resonance  
-**Current gap:** broad gameplay exploitation, world-derived Tether, wider Trait migration, and economy balancing
+**Current gap:** broader spatial/activity Tether coverage, wider Trait migration, offline progression, and economy balancing
 
 ## 1. Purpose
 
@@ -124,7 +124,7 @@ This quality band is a projection for Essence; it does not replace the multidime
 
 ## 7. Tether
 
-Tether represents current relational presence/contact intensity.
+Tether represents **current relational presence/contact intensity**, not historical Relationship significance.
 
 | State | Multiplier |
 |---|---:|
@@ -135,19 +135,41 @@ Tether represents current relational presence/contact intensity.
 | Engaged | 1.25x |
 | Deeply Engaged | 1.50x |
 
-### Current implementation boundary
+### Qualified M19 spatial boundary
 
-The states/formula exist and Relationship bundles may declare a starting Tether state. Current production use is bounded/static/authored rather than a complete world-derived presence model.
+M19 qualifies a bounded world-derived spatial projection for two independently anchored production Relationship-authority NPCs:
 
-A later exploration/Tether milestone should derive Tether from facts such as:
+```text
+npc_elder_willow     -> location_whispering_woods
+npc_blacksmith_gronk -> location_city_center
+```
 
-- player/NPC location;
-- active conversation;
-- shared quest/task;
-- travel/co-presence;
-- remote contact.
+Using M18 canonical player location and direct adjacency:
 
-Do not pretend the current starting state is a complete proximity simulation.
+```text
+same canonical location           -> Present
+directly adjacent location        -> Nearby
+other distinct canonical location -> Remote
+```
+
+This projection is **derived at selector time**. Travel does not rewrite `BondProfile.tetherState`, Connection, Bond dimensions, Memories, Stability, or Resonance Quality.
+
+The stored `BondProfile.tetherState` remains an authored/static fallback when no qualified canonical NPC world anchor exists. M19 therefore preserves existing unanchored Relationship behavior rather than globally reinterpreting every Tether as proximity.
+
+### Explicitly still unqualified
+
+M19 does not derive:
+
+- `Absent` from spatial topology;
+- `Engaged` or `Deeply Engaged` from conversation/activity;
+- continuous distance;
+- NPC schedules or moving NPC positions;
+- Copy presence;
+- travel-time/offline presence.
+
+Future milestones may add those semantics only when separately warranted.
+
+See `../Technical/M19WorldDerivedTetherQualification.md`, `../Technical/M19WorldDerivedTetherReconAmendment.md`, `../Technical/M19WorldDerivedTetherReconCorrection.md`, and `../Technical/M19WorldDerivedTetherResult.md`.
 
 ## 8. Stability
 
@@ -216,7 +238,7 @@ x Tether
 x Memory evidence
 ```
 
-But this more continuous formula is **not required to claim that assimilation exists today**.
+But this more continuous formula is **not required to claim that assimilation exists today** and was not introduced by M19.
 
 The current bounded authored approach is already production-qualified for Willow/Elara.
 
@@ -264,11 +286,7 @@ This is not a future-only target; it is an implemented/qualified reference slice
 
 Its semantic pattern is evidence-first model revision rather than passive agreement.
 
-The presence of two production examples means the next highest-value unknown is no longer simply “can assimilation exist?”
-
-The stronger product question is:
-
-> Does a Relationship-derived Trait materially change how the player solves a gameplay problem?
+M16 qualified permanent Relationship-derived Traits changing quest solution space, and M17 independently qualified a permanent Trait changing bounded tactical combat. Trait-driven gameplay payoff is therefore no longer a wholly future gap.
 
 ## 15. Instrumental vs. reciprocal Bonds
 
@@ -309,10 +327,12 @@ Useful explanation:
 ```text
 Connection base
 Resonance Quality
-Tether
+Effective Tether + source (spatial or authored)
 Stability
 Effective contribution
 ```
+
+M19 exposes whether effective Tether came from the bounded spatial projection or the authored/static fallback so the displayed explanation matches the actual calculation.
 
 ### Why can/can't this Trait be Resonated?
 
@@ -333,14 +353,16 @@ Useful explanation:
 |---|---|
 | Relationship-derived Essence formula | Implemented for enabled Relationship bundles |
 | Bond-derived quality/stability inputs | Implemented/qualified in Relationship runtime |
-| Tether states/modifier | Implemented as bounded/static/authored input |
-| World-derived Tether | Not implemented |
+| Tether states/modifier | Implemented |
+| Authored/static Tether fallback | Implemented and preserved |
+| World-derived spatial Tether | Bounded M19 qualification for Willow/Gronk: Remote/Nearby/Present |
+| Activity-derived Engaged/Deeply Engaged | Not implemented as a general derivation |
 | Authored Trait discovery | Implemented for Willow/Elara |
 | Trait assimilation/compatibility | Implemented for Willow/Elara |
 | Memory-based Resonance evidence | Implemented for Willow/Elara |
 | Permanent Essence spend after qualification | Implemented |
+| Trait-driven gameplay payoff | Qualified in bounded Quest and Combat slices (M16/M17) |
 | Broad migration of all Traits | Not implemented |
-| Trait-driven gameplay payoff | Major remaining gap |
 | Offline assimilation/progression | Not implemented |
 
 ## 18. Invariants
@@ -355,8 +377,10 @@ Useful explanation:
 8. Reciprocal Bonds may unlock qualitatively different outcomes only when explicit mechanics require those qualities.
 9. The player should understand why a Trait is or is not ready for permanent Resonance.
 10. Balance constants may change without changing the ontology.
-11. Current authored/static Tether must not be overstated as world simulation.
-12. Legacy `connectionDepth` gates may remain for unmigrated Traits but are compatibility behavior, not the new design rule.
+11. Current world-derived spatial Tether is a bounded projection, not a full presence simulation.
+12. Moving through the world must not itself rewrite historical Relationship significance.
+13. Unanchored Relationships retain authored/static Tether until a world-presence authority is explicitly qualified for them.
+14. Legacy `connectionDepth` gates may remain for unmigrated Traits but are compatibility behavior, not the new design rule.
 
 ## 19. Migration / roadmap notes
 
@@ -365,13 +389,15 @@ The following older claims are obsolete:
 - that Relationship-derived Essence is wholly unimplemented;
 - that Trait assimilation is wholly unimplemented;
 - that all NPC Essence is a live `connectionDepth x multiplier` formula;
-- that all Trait Resonance is only `connectionDepth + Essence`.
+- that all Trait Resonance is only `connectionDepth + Essence`;
+- that world-derived Tether is wholly unimplemented;
+- that Trait-driven gameplay payoff is wholly unimplemented.
 
-Current remaining migration/product work is instead:
+Current remaining migration/product work includes:
 
 - broader Trait migration;
-- Trait-driven gameplay use;
-- world-derived Tether;
+- broader NPC world anchoring only where needed;
+- activity/context-derived higher Tether states if later warranted;
 - offline progression;
 - economy balancing and explainability;
 - Copy/world integration.
@@ -379,9 +405,11 @@ Current remaining migration/product work is instead:
 ## 20. Cross-references
 
 - `../Technical/PostM14ProductReconciliation.md`
+- `../Technical/PostM16TraitGameplayReconciliation.md`
+- `../Technical/M19WorldDerivedTetherResult.md`
 - `RelationshipExperienceSystem.md`
 - `MemorySystem.md`
 - `TraitSystem.md`
 - `EssenceSystem.md`
 - `QuestSystem.md`
-- milestone qualification documents under `../Technical/`
+- `ExplorationSystem.md`
