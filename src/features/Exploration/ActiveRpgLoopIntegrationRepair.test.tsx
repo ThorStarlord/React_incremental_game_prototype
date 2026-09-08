@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { rootReducer } from '../../app/store';
 import { gameEventListeners } from '../../app/listeners/GameEventListeners';
@@ -42,6 +42,7 @@ const manifest = readJson('public/data/relationships/index.json');
 const npcs = readJson('public/data/npcs.json');
 const dialogues = readJson('public/data/dialogues.json');
 const quests = readJson('public/data/quests.json');
+const traits = readJson('public/data/traits.json');
 const bundleByUrl: Record<string, any> = Object.fromEntries(
   manifest.bundles.map((url: string) => [url, readJson(`public${url}`)])
 );
@@ -100,6 +101,9 @@ beforeEach(() => {
     if (url === '/data/quests.json') {
       return { ok: true, json: async () => quests } as any;
     }
+    if (url === '/data/traits.json') {
+      return { ok: true, json: async () => traits } as any;
+    }
     if (url === '/data/relationships/index.json') {
       return { ok: true, json: async () => manifest } as any;
     }
@@ -140,7 +144,9 @@ describe('Checkpoint B bounded active-loop integration repair', () => {
     expect(screen.queryByRole('button', { name: 'Begin Encounter' })).not.toBeInTheDocument();
     expect(store.getState().quest.quests[M17_QUEST_ID].objectives[0].currentCount).toBe(0);
 
-    store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
+    act(() => {
+      store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
+    });
 
     expect(
       await screen.findByRole('button', { name: 'Begin Encounter' })
@@ -176,7 +182,9 @@ describe('Checkpoint B bounded active-loop integration repair', () => {
     expect(await screen.findByTestId(`npc-presence-gate-${WILLOW_ID}`)).toBeInTheDocument();
     expect(screen.queryByText('Conversation with Elder Willow')).not.toBeInTheDocument();
 
-    store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
+    act(() => {
+      store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
+    });
     expect(await screen.findByText('Conversation with Elder Willow')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Create Copy' })).toBeEnabled();
 
