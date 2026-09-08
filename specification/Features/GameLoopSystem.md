@@ -1,14 +1,16 @@
 # GameLoop System Specification
 
-**Implementation Status:** ✅ **LIVE FIXED-TIMESTEP LOOP + BOUNDED M21 OFFLINE SETTLEMENT QUALIFIED**
+**Implementation Status:** ✅ **LIVE FIXED-TIMESTEP LOOP + BOUNDED M21 OFFLINE SETTLEMENT + VISIBLE RETURN PRESENTATION QUALIFIED**
 
-The GameLoop system owns live timing/control and now also owns the bounded orchestration boundary for M21 offline-safe catch-up.
+The GameLoop system owns live timing/control and the bounded orchestration boundary for M21 offline-safe catch-up. The Checkpoint-C Incremental Integration Repair does not broaden that allowlist; it closes the presentation seam by making the existing M21 summary visible through the shared production notification host.
 
 For empirical authority, read:
 
 - `../Technical/M21BoundedOfflineProgress.md` — preregistered M21 contract;
 - `../Technical/M21BoundedOfflineProgressReconAmendment.md` — frozen time/cap/allowlist decisions;
-- `../Technical/M21BoundedOfflineProgressResult.md` — qualified result and evidence ceiling.
+- `../Technical/M21BoundedOfflineProgressResult.md` — qualified M21 result/evidence ceiling;
+- `../Technical/CheckpointCIncrementalIntegrationResult.md` — historical first Checkpoint-C finding;
+- `../Technical/IncrementalIntegrationRepairResult.md` — qualified visible-return repair.
 
 ---
 
@@ -51,7 +53,7 @@ Current defaults include:
 
 The hook resets its frame baseline from `performance.now()` when it starts. Wall-clock absence is therefore not silently converted into one giant live-frame delta.
 
-`App.tsx` owns the ordinary online consumer sequence. It currently includes systems such as passive Essence, Copy growth/loyalty/tasks, player regeneration/status processing, and Quest timers.
+`App.tsx` owns the ordinary online consumer sequence. It includes systems such as passive Essence, Copy growth/loyalty/tasks, player regeneration/status processing, and Quest timers.
 
 That online list is **not** the offline allowlist.
 
@@ -80,7 +82,7 @@ GameLoopState {
 
 `lastOfflineSettlementSourceTimestamp` is optional/backward-compatible.
 
-It is **not** a source of elapsed time. It records which canonical save-envelope timestamp has already been settled into the currently restored state so an accidental repeated settlement cannot duplicate progression.
+It is **not** elapsed-time authority. It records which canonical save-envelope timestamp has already been settled into the restored state so an accidental repeat cannot duplicate progression.
 
 Canonical elapsed time remains:
 
@@ -124,7 +126,7 @@ No second persistent `lastSaveTime` clock was added.
 
 Older standalone helpers still present in `GameLoopThunks.ts` that reference separate `gameState` / `lastSaveTime` local-storage values are legacy/non-authoritative for M21. The canonical Main Menu load path uses `loadSavedGameWithMigration`.
 
-No save-schema version bump was required for M21.
+No save-schema version bump was required for M21 or for the later optional player routine-familiarity repair.
 
 ---
 
@@ -173,13 +175,13 @@ saved passive generation-rate snapshot
 -> processCopyTasksThunk(elapsedMs)
 ```
 
-### Why this is snapshot settlement
+The Checkpoint-C repair does not add routine familiarity as an offline consumer. Familiarity must already have been earned through active play before the task could have been assigned.
 
-If a Copy task completion could change a later derived Essence rate, M21 does not divide the offline interval around that event and recalculate rate subperiods.
+### Snapshot semantics
 
-That would be a wider temporal simulation engine.
+If a Copy task completion could change a later derived Essence rate, M21 does not segment the interval around that event and recalculate subperiods.
 
-Qualified semantics are therefore:
+Qualified semantics remain:
 
 ```text
 persisted Essence generationRate x bounded elapsed
@@ -192,13 +194,7 @@ persisted Essence generationRate x bounded elapsed
 
 M21 reuses M20's existing task authority.
 
-An already-running task may:
-
-```text
-advance partially
-```
-
-or:
+An already-running task may advance partially or reach one completion:
 
 ```text
 reach completion
@@ -211,10 +207,13 @@ Excess offline time after completion is discarded for that Copy.
 
 M21 does not:
 
+- teach an unfamiliar routine;
 - select another task;
 - queue tasks;
 - repeat the completed task;
 - make strategic/autonomous assignments.
+
+The later Checkpoint-C repair adds familiarity at **assignment time**, not inside offline settlement.
 
 ---
 
@@ -230,13 +229,11 @@ A repeated call against the same restored save timestamp is skipped.
 
 A later ordinary save creates a new canonical envelope timestamp, so a genuinely later load can settle a new interval normally.
 
-This gives exact-once settlement identity without creating a competing clock authority.
-
 ---
 
 ## 10. Player-facing return summary
 
-A positive M21 settlement emits an informational notification beginning:
+A positive M21 settlement emits an informational shared notification beginning:
 
 ```text
 While you were away:
@@ -248,7 +245,26 @@ It may summarize:
 - Copy task percentage;
 - Copy task completion.
 
-The summary is presentation only. Actual resource/task state remains owned by the existing Essence and Copy contracts.
+The summary remains presentation only; resource/task truth stays with Essence and Copy authorities.
+
+### 10.1 Historical presentation gap
+
+The first Checkpoint C evaluation found that the summary was correctly dispatched into `NotificationSlice` but the mounted production component tree did not demonstrate a renderer for the shared queue.
+
+### 10.2 Qualified repaired presentation
+
+The Incremental Integration Repair adds `GlobalNotificationHost`, mounted once in `GameLayout`:
+
+```text
+M21 settleOfflineProgressThunk
+-> addNotification("While you were away: ...")
+-> NotificationSlice.notifications.items
+-> GlobalNotificationHost
+-> MUI Alert visible to player
+-> removeNotification on dismissal
+```
+
+The combined repair qualification proves this with a running Forge Assistance task that is saved, loaded, completed during a 60-second offline interval, rewarded exactly once, and then summarized visibly.
 
 ---
 
@@ -261,6 +277,7 @@ M21 does not invoke offline:
 - dialogue decisions;
 - Combat actions;
 - player travel/location changes;
+- player routine-learning actions;
 - Copy general maturity growth;
 - Copy loyalty decay;
 - Trait discovery/Resonance decisions;
@@ -268,7 +285,7 @@ M21 does not invoke offline:
 - player vitality regeneration;
 - generalized GameLoop `tick` replay.
 
-This allowlist boundary is intentional. The implementation prefers *not processing unsafe domains* over inventing a pending-decision or background-world simulator.
+This positive allowlist is intentional.
 
 ---
 
@@ -295,29 +312,48 @@ Dedicated M21 qualification proves:
 - excess time does not restart/queue work;
 - duplicate settlement of the same save timestamp is blocked;
 - a later save timestamp can legitimately produce another interval;
-- Relationship and Quest state remain unchanged in the qualified positive probe;
+- Relationship and Quest state remain unchanged in the positive probe;
 - Player location remains unchanged;
 - unsafe broad GameLoop consumers are absent from offline orchestration;
-- save schema remains v1;
-- M20 and accumulated earlier qualification remain green.
+- save schema remains v1.
 
-See `../Technical/M21BoundedOfflineProgressResult.md` for exact CI/SHA evidence.
+The later Incremental Integration Repair qualification additionally proves:
+
+- missing/legacy-like routine familiarity remains missing across positive offline time;
+- already-earned familiarity survives ordinary save/load;
+- a familiar running Forge task may complete through the unchanged M21 authority;
+- the M21 summary is rendered through the mounted shared notification host;
+- replay of the same saved timestamp still does not duplicate the reward.
+
+Build Validation #213 passed the repair gate, M21, M20, active-loop, historical M4-M19, TypeScript and production build on the first complete behavioral repair candidate.
 
 ---
 
-## 14. Evidence ceiling / future work
+## 14. Evidence ceiling / next boundary
 
-Not qualified by M21:
+Not qualified by M21 or the bounded presentation repair:
 
 - trusted server time;
-- device-clock tamper resistance or anti-cheat;
+- device-clock tamper resistance / anti-cheat;
 - final eight-hour balance;
 - event-time segmented offline simulation;
-- offline Copy growth/loyalty decay beyond existing task-owned completion bonuses;
+- offline Copy growth/loyalty decay beyond task-owned completion bonuses;
+- offline routine learning;
 - offline Quest/Relationship/dialogue/Combat/travel;
 - automatic task chains;
 - generalized offline economy/world simulation;
 - background simulation merely because a browser tab is unfocused;
+- final notification UX/timeout policy at scale;
 - human pacing/enjoyment.
 
-The next planned evaluation is **Checkpoint C — Incremental Integration**, which asks whether M20/M21 automation supports the active RPG rather than becoming a detached idle layer.
+The current sequence is:
+
+```text
+M21 PASS
+-> first Checkpoint C: WEAK
+-> Incremental Integration Repair: PASS
+-> fresh Checkpoint C rerun required
+-> only a fresh CHECKPOINT_C_PASS may authorize M22
+```
+
+The repair result is evidence for the rerun, not a substitute for it.
