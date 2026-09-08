@@ -179,7 +179,13 @@ describe('Checkpoint B bounded active-loop integration repair', () => {
     expect(await screen.findByText('Connection with Elder Willow')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Dialogue' }));
-    expect(await screen.findByTestId(`npc-presence-gate-${WILLOW_ID}`)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /Elder Willow is at Whispering Woods\. You can review Overview and Relationship remotely/
+        )
+      ).toBeInTheDocument();
+    });
     expect(screen.queryByText('Conversation with Elder Willow')).not.toBeInTheDocument();
 
     act(() => {
@@ -219,14 +225,13 @@ describe('Checkpoint B bounded active-loop integration repair', () => {
 
     await waitFor(() => {
       expect(store.getState().player.location).toBe(CITY_GATE_LOCATION_ID);
+      expect(screen.getByText('Presence changed')).toBeInTheDocument();
+      expect(screen.getByText(/Elder Willow.*Tether: Remote.*Nearby/)).toBeInTheDocument();
+      expect(screen.getByText(/Blacksmith Gronk.*Tether: Present.*Nearby/)).toBeInTheDocument();
+      expect(
+        screen.getByText('Movement changed current presence/Tether, not Relationship history.')
+      ).toBeInTheDocument();
     });
-
-    const feedback = await screen.findByTestId('travel-spatial-feedback');
-    expect(feedback).toHaveTextContent('Elder Willow — Tether: Remote → Nearby');
-    expect(feedback).toHaveTextContent('Blacksmith Gronk — Tether: Present → Nearby');
-    expect(feedback).toHaveTextContent(
-      'Movement changed current presence/Tether, not Relationship history.'
-    );
 
     expect(selectBondProfileByNpcId(store.getState(), WILLOW_ID)).toEqual(willowBefore);
     expect(selectBondProfileByNpcId(store.getState(), GRONK_ID)).toEqual(gronkBefore);
