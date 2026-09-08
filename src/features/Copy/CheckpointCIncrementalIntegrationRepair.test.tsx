@@ -219,10 +219,9 @@ describe('Checkpoint C incremental integration repair qualification', () => {
       </Provider>
     );
 
-    expect(screen.getByTestId('global-notification')).toHaveTextContent('Repair notification visible');
-    const closeButton = screen.getByTestId('global-notification').querySelector('button');
-    expect(closeButton).not.toBeNull();
-    fireEvent.click(closeButton!);
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveTextContent('Repair notification visible');
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => {
       expect(store.getState().notifications.items).toHaveLength(0);
     });
@@ -296,8 +295,9 @@ describe('Checkpoint C incremental integration repair qualification', () => {
         <GlobalNotificationHost />
       </Provider>
     );
-    expect(screen.getByTestId('global-notification')).toHaveTextContent('While you were away:');
-    expect(screen.getByTestId('global-notification')).toHaveTextContent('completed Forge Assistance');
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveTextContent('While you were away:');
+    expect(alert).toHaveTextContent('completed Forge Assistance');
 
     const goldAfterSettlement = resumedStore.getState().player.gold;
     const replay = await resumedStore.dispatch(
