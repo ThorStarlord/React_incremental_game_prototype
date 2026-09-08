@@ -1,0 +1,109 @@
+{
+  "dialogues": {
+    "valerius_m24_redeploy_patrols": {
+      "id": "valerius_m24_redeploy_patrols",
+      "npcId": "npc_captain_valerius",
+      "title": "Patrols Where the Threat Actually Is",
+      "text": "The obsolete checkpoint is gone, but the freight streets are still exposed. Valerius spreads a district map across the table. 'If we move the same bodies instead of restoring the same post, we can cover the caravans without pretending yesterday's order is still correct.'",
+      "repeatable": false,
+      "requiredExperienceIds": ["valerius_exp_m23_public_override"],
+      "responses": {
+        "redeploy": "Redeploy the mobile teams through the Merchant District freight corridors. Do not rebuild the obsolete checkpoint."
+      },
+      "effects": [
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "watchPresence",
+          "value": "heavy",
+          "responseId": "redeploy"
+        }
+      ],
+      "next": {
+        "redeploy": null
+      }
+    },
+    "silas_m24_patrol_pressure": {
+      "id": "silas_m24_patrol_pressure",
+      "npcId": "npc_rogue_silas",
+      "title": "Too Many Uniforms for the Old Route",
+      "text": "Silas folds a familiar route sketch into quarters. 'The old alleys still exist. The problem is that every useful exit now opens under a Watch patrol. Geography did not change. The operational world did.'",
+      "repeatable": false,
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "watchPresence",
+          "equals": "heavy"
+        }
+      ],
+      "responses": {
+        "acknowledge": "Then the old route is objectively worse now, whether or not anyone likes why."
+      },
+      "effects": [],
+      "next": {
+        "acknowledge": null
+      }
+    },
+    "gronk_m24_release_verified_freight": {
+      "id": "gronk_m24_release_verified_freight",
+      "npcId": "npc_blacksmith_gronk",
+      "title": "Move the Contracts, Not Just the Numbers",
+      "text": "The Guild audit is accepted, but verified manifests are still stacked beside the gate clerk instead of moving freight. Gronk taps the paperwork. 'Good numbers that never leave the desk are just cleaner clutter.'",
+      "repeatable": false,
+      "requiredFactionReputation": [
+        {
+          "factionId": "Merchants Guild",
+          "min": 10
+        }
+      ],
+      "responses": {
+        "release": "Route the reconciled manifests to the gate clerks and release the stalled contract caravans."
+      },
+      "effects": [
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "tradeFlow",
+          "value": "strong",
+          "responseId": "release"
+        }
+      ],
+      "next": {
+        "release": null
+      }
+    },
+    "valerius_m24_freight_corridor": {
+      "id": "valerius_m24_freight_corridor",
+      "npcId": "npc_captain_valerius",
+      "title": "Supplies Are Moving Again",
+      "text": "Valerius points to the district intake board. The backlog columns have collapsed and supply carts are arriving on schedule again. 'Whatever the Guild thinks of you and whatever I think of you, this corridor is moving. That fact changes what I can deploy elsewhere.'",
+      "repeatable": false,
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "tradeFlow",
+          "equals": "strong"
+        }
+      ],
+      "responses": {
+        "acknowledge": "Then use the capacity that actually exists now, not the shortage we had yesterday."
+      },
+      "effects": [],
+      "next": {
+        "acknowledge": null
+      }
+    }
+  },
+  "npcDialogueIds": {
+    "npc_captain_valerius": [
+      "valerius_m24_redeploy_patrols",
+      "valerius_m24_freight_corridor"
+    ],
+    "npc_rogue_silas": [
+      "silas_m24_patrol_pressure"
+    ],
+    "npc_blacksmith_gronk": [
+      "gronk_m24_release_verified_freight"
+    ]
+  }
+}
