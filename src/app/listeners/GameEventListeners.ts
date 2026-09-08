@@ -5,6 +5,8 @@ import { setLocation } from '../../features/Player/state/PlayerSlice';
 import { updateNpcLocation } from '../../features/NPCs/state/NPCSlice';
 import { targetKilled } from '../../features/Combat/CombatSlice';
 import { failQuest, updateObjectiveProgress, patchObjectiveFields } from '../../features/Quest/state/QuestSlice';
+import { updateGenerationRate } from '../../features/Essence/state/EssenceSlice';
+import { calculateEssenceGenerationRate } from '../../features/Essence/utils/essenceRate';
 
 export const gameEventListeners = createListenerMiddleware();
 
@@ -60,7 +62,7 @@ gameEventListeners.startListening({
   },
 });
 
-// Listener for location changes (REACH_LOCATION and ESCORT objectives)
+// Listener for location changes (REACH_LOCATION / ESCORT objectives and world-derived Essence context)
 gameEventListeners.startListening({
   actionCreator: setLocation,
   effect: async (action: ReturnType<typeof setLocation>, listenerApi) => {
@@ -102,6 +104,13 @@ gameEventListeners.startListening({
         }
       }
     }
+
+    // M19: location is an objective world fact consumed by the existing pure
+    // Essence-rate calculation. Refresh the cached passive rate after any
+    // legitimate setLocation event without mutating Relationship history.
+    const updatedState = listenerApi.getState() as RootState;
+    const essenceCalculation = calculateEssenceGenerationRate(updatedState);
+    listenerApi.dispatch(updateGenerationRate(essenceCalculation.newRate));
   },
 });
 

@@ -1,8 +1,8 @@
 # Game Design Document
 ## React Incremental RPG Prototype
 
-**Status:** Living product document — current through M18  
-**Canonical authority note:** Read `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority, `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine, `Technical/PostM17ProductReconciliation.md` for post-M17 product/status alignment, and `Technical/M18ExplorationTravelResult.md` / `Features/ExplorationSystem.md` for the qualified bounded travel layer. The planned execution sequence through M25 lives in `Technical/PostM17MilestoneRoadmap.md`.
+**Status:** Living product document — current through M19  
+**Canonical authority note:** Read `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority, `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine, `Technical/PostM17ProductReconciliation.md` for post-M17 product/status alignment, `Technical/M18ExplorationTravelResult.md` / `Features/ExplorationSystem.md` for the qualified bounded travel layer, and `Technical/M19WorldDerivedTetherResult.md` / `Features/EssenceResonanceModel.md` for the qualified bounded spatial-Tether layer. The planned execution sequence through M25 lives in `Technical/PostM17MilestoneRoadmap.md`.
 
 ---
 
@@ -20,7 +20,7 @@ The distinctive progression promise is:
 
 This replaces the older product assumption that Affinity is relationship XP and that reaching a numeric Affinity threshold automatically increases `connectionDepth`.
 
-M16 qualified a permanent Trait learned through Relationship-mediated progression materially expanding the solution space of ordinary quest gameplay. M17 extended that proof into one bounded deterministic combat encounter: permanent `WillowsWisdom` can expose an optional tactical route while an ordinary no-Trait victory remains viable. M18 now gives those active-play slices a bounded spatial layer: the player can traverse an authored four-location graph through a player-facing travel interface, with route legality enforced below UI and existing `REACH_LOCATION` Quest consequences consuming canonical Player location changes.
+M16 qualified a permanent Trait learned through Relationship-mediated progression materially expanding the solution space of ordinary quest gameplay. M17 extended that proof into one bounded deterministic combat encounter: permanent `WillowsWisdom` can expose an optional tactical route while an ordinary no-Trait victory remains viable. M18 gave those active-play slices a bounded spatial layer through authored player-facing travel. M19 now qualifies objective spatial presence affecting the **current intensity** of Relationship-derived Essence through Tether while historical Relationship state remains unchanged.
 
 ---
 
@@ -40,6 +40,8 @@ Players should feel that:
 - capabilities learned through others feel earned rather than purchased from a menu;
 - learned capabilities create new ways to perceive and act rather than only larger numbers;
 - where the protagonist goes is an objective gameplay fact rather than a hidden story flag;
+- being physically present with one important person can increase current Resonance without pretending the historical Relationship itself became deeper;
+- choosing where to spend time can create opportunity cost across multiple Relationships;
 - passive/incremental growth is downstream of the player's social and strategic history;
 - one decision can help one relationship while harming another;
 - routine work can eventually be delegated without automating irreversible story choices.
@@ -52,9 +54,10 @@ Players should feel that:
 4. **Relationship-derived Essence** — ongoing passive power generated from meaningful relational significance rather than relationship milestones acting as loot drops.
 5. **Narrative causal memory** — persisted Relationship evidence can unlock or alter later story consequences across substantial causal distance.
 6. **Multi-NPC social consequence** — one shared event can be interpreted differently by several characters.
-7. **Bounded authored travel** — canonical Player location can now be changed through a legal player-facing route graph and consumed by existing gameplay consequences.
-8. **Copy network** — growth, loyalty, Trait sharing, roles, and future routine-task automation extend the incremental layer.
-9. **Character customization** — permanent and slotted Traits support different gameplay solutions and future builds.
+7. **Bounded authored travel** — canonical Player location can be changed through a legal player-facing route graph and consumed by existing gameplay consequences.
+8. **World-derived spatial Tether** — for qualified anchored NPCs, objective proximity can modulate current Relationship-derived Essence without rewriting the Bond's history.
+9. **Copy network** — growth, loyalty, Trait sharing, roles, and future routine-task automation extend the incremental layer.
+10. **Character customization** — permanent and slotted Traits support different gameplay solutions and future builds.
 
 ---
 
@@ -68,6 +71,7 @@ Discover person / problem
 -> qualify Connection and change ongoing Essence / Trait-learning conditions
 -> discover / assimilate / Resonate capability
 -> travel to an authored location when the problem requires it
+-> current world presence may alter effective Tether / Essence intensity
 -> use capability in gameplay
 -> create story / world consequence
 -> NPCs interpret the consequence
@@ -80,20 +84,22 @@ Discover person / problem
 1. Interact with an NPC, quest, location, or active problem.
 2. Choose a meaningful action, destination, or response.
 3. Travel through legal authored connections when the problem is elsewhere.
-4. Receive gameplay consequences and, where relationally meaningful, Relationship evidence.
-5. Observe changes to Connection, Bond dimensions, Essence rate, Trait progress, quest availability, story access, location, or capability options.
-6. Choose the next action, Trait loadout, destination, or investment.
+4. Observe current spatial presence affecting qualified Relationship-derived Essence where applicable.
+5. Receive gameplay consequences and, where relationally meaningful, Relationship evidence.
+6. Observe changes to Connection, Bond dimensions, Essence rate, Trait progress, quest availability, story access, location, or capability options.
+7. Choose the next action, Trait loadout, destination, or investment.
 
 ### Mid-session loop
 
 1. Deepen or complicate several Relationships.
 2. Complete quests and authored resolution choices.
 3. Move between bounded authored locations as objectives require.
-4. Accumulate passive Essence.
-5. Discover and assimilate useful Traits.
-6. Spend Essence to stabilize qualified Traits permanently.
-7. Use learned capabilities to solve later problems differently.
-8. Develop Copies for routine/automated work as that system matures.
+4. Choose spatial presence knowing that being near one qualified Relationship may mean being more remote from another.
+5. Accumulate passive Essence.
+6. Discover and assimilate useful Traits.
+7. Spend Essence to stabilize qualified Traits permanently.
+8. Use learned capabilities to solve later problems differently.
+9. Develop Copies for routine/automated work as that system matures.
 
 ### Multi-session loop
 
@@ -101,7 +107,7 @@ Discover person / problem
 2. Accumulate Memories and long-horizon callbacks.
 3. Develop specialized permanent capabilities and, later, coherent Trait combinations.
 4. Build an increasingly capable Copy network.
-5. Expand the bounded active-play slices into richer travel, broader combat, factions, and durable world consequences.
+5. Expand the bounded active-play slices into richer travel/presence, broader combat, factions, and durable world consequences only where evidence warrants it.
 6. Revisit old choices when later story situations consume historical evidence.
 
 ---
@@ -175,7 +181,15 @@ Global base rate
 + other explicitly justified sources
 ```
 
-World-derived Tether and campaign-wide economy balancing remain future work.
+M19 qualifies a bounded world-derived spatial Tether projection for Elder Willow and Gronk using M18 canonical player location and direct adjacency:
+
+```text
+same location        -> Present
+direct neighbor      -> Nearby
+other known location -> Remote
+```
+
+This projection changes **effective current Tether**, not historical Relationship state. The stored `BondProfile.tetherState` remains the authored/static fallback for unanchored Relationships. Activity-derived `Engaged` / `Deeply Engaged`, spatial `Absent`, moving NPCs, and campaign-scale presence simulation remain future questions.
 
 ### Trait System
 
@@ -289,13 +303,15 @@ Whispering Woods
 
 `travelToLocationThunk` is the player-facing route authority. It resolves the current/destination locations, validates one authored direct edge, rejects an illegal jump before mutation, and only then dispatches the existing `Player.setLocation` event. `TravelPanel` renders only legal direct destinations, but the runtime thunk independently enforces route legality below UI.
 
-Fresh Player state now uses canonical `location_city_center`. The historical `"City Center"` Player value is supported through a narrow compatibility alias and canonicalizes on the next legal travel. M18 does not migrate Copy/NPC location strings.
+Fresh Player state uses canonical `location_city_center`. The historical `"City Center"` Player value is supported through a narrow compatibility alias and canonicalizes on the next legal travel.
 
 M18 adds no Exploration reducer, no second `currentLocation`, no new Travel-to-Quest bridge, and no save-schema version. Existing save/load already persists `Player.location`; the qualification demonstrates saving at City Gate and continuing legally to Whispering Woods after load. Existing `REACH_LOCATION` listener behavior consumes the final `setLocation` event.
 
-M18 does **not** qualify open-world navigation, coordinates, pathfinding beyond direct adjacency, travel duration, random encounters, NPC schedules, Copy travel, offline travel, or world-derived Tether.
+M19 then independently consumes these same objective facts. The NPC domain supplies bounded canonical anchors for Willow and Gronk; Relationship selectors derive effective `Remote` / `Nearby` / `Present` Tether from Player location plus Exploration adjacency; Essence consumes that projection in the existing formula. The `setLocation` listener refreshes the cached passive Essence rate after movement without writing Relationship history.
 
-See `Features/ExplorationSystem.md` and `Technical/M18ExplorationTravelResult.md`.
+This remains bounded. M18/M19 do **not** qualify open-world navigation, coordinates, generalized pathfinding, travel duration, random encounters, NPC schedules/movement, Copy travel, offline travel, spatial `Absent`, activity-derived higher Tether states, or campaign-scale presence simulation.
+
+See `Features/ExplorationSystem.md`, `Technical/M18ExplorationTravelResult.md`, and `Technical/M19WorldDerivedTetherResult.md`.
 
 ---
 
@@ -320,7 +336,7 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 
 ---
 
-## Current Product Maturity After M18
+## Current Product Maturity After M19
 
 ### Strong / empirically qualified
 
@@ -342,23 +358,29 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 - one bounded four-location authored travel graph with player-facing legal movement;
 - runtime rejection of illegal direct travel before Player or Quest mutation;
 - save/load continuation of canonical Player location;
-- player-facing travel feeding an existing Quest `REACH_LOCATION` consequence through the ordinary `setLocation` listener.
+- player-facing travel feeding an existing Quest `REACH_LOCATION` consequence through the ordinary `setLocation` listener;
+- bounded world-derived spatial Tether for Willow/Gronk using `Remote` / `Nearby` / `Present`;
+- spatial presence changing current Relationship-derived Essence intensity while historical Bond state remains unchanged;
+- authored/static Tether fallback for unanchored Relationships;
+- spatial Tether/Essence reconstruction across save/load without duplicate proximity persistence.
 
 ### Functional foundation but incomplete product loop
 
 - Quest system beyond bounded authored slices;
 - Trait catalogue/loadout beyond migrated examples;
-- Essence economy/presentation;
+- Essence economy/presentation and balance;
 - Combat beyond the bounded M17 encounter;
 - Exploration beyond the bounded M18 direct-adjacency graph;
+- Tether beyond the bounded M19 spatial anchors/states;
 - Copy management and production task/deployment depth;
 - inventory/equipment integration;
 - relationship-facing UI polish.
 
 ### Major future product gaps
 
-- world-derived Tether from objective presence;
-- richer exploration only where evidence warrants it, including possible travel time / NPC presence semantics;
+- activity/context-derived higher Tether states if later warranted;
+- broader NPC world anchoring only where real content requires it;
+- richer exploration only where evidence warrants it, including possible travel-time/NPC-presence semantics;
 - broader combat architecture only where later evidence warrants it;
 - production Copy task automation;
 - offline progress;
@@ -374,28 +396,31 @@ The Relationship model must support mentorship, alliance, rivalry, ideological o
 
 The planned post-M17 execution program is defined in `Technical/PostM17MilestoneRoadmap.md`. Individual milestone semantics remain provisional until each milestone is preregistered against the actual then-current repository state.
 
-### Immediate next code-bearing candidate — M19
+### Immediate next boundary — Checkpoint B
 
-**World-Derived Relationship Tether**
+**Active RPG Loop Evaluation**
 
-The next planned question is whether objective world presence established by M18 can alter current Relationship-derived Essence intensity through Tether without rewriting Connection, Memories, or Bond dimensions.
+M18 and M19 now complete the planned active-play sequence through player travel and bounded spatial presence/Tether. The next step is not automatically another code-bearing milestone.
 
-M19 must be separately preregistered from the actual post-M18 baseline before behavior changes. M18 itself does not derive Tether.
+Checkpoint B asks:
 
-### Planned subsequent sequence
+> Do Relationship, Trait, Combat, Travel, Presence/Tether, Quest, and Essence now feel like one coherent active RPG loop rather than separate technical features?
 
-1. M19 — world-derived Tether;
-2. Checkpoint B — active RPG loop;
-3. M20 — Copy task automation qualification;
-4. M21 — offline progress;
-5. Checkpoint C — incremental integration;
-6. M22 — social knowledge propagation;
-7. M23 — faction reputation;
-8. M24 — objective world-state consequences;
-9. M25 — complete chapter vertical slice;
-10. human integrated playability review.
+It should evaluate spatial agency, capability identity, combat context, presence, opportunity cost, Essence legibility, system legibility, and whether automation would enhance rather than hide weaknesses in the active loop.
 
-Do not treat the numbering alone as authority to implement the next milestone if the previous checkpoint exposes a prerequisite defect or product weakness.
+### Planned subsequent sequence if Checkpoint B passes
+
+1. Checkpoint B — active RPG loop;
+2. M20 — Copy task automation qualification;
+3. M21 — offline progress;
+4. Checkpoint C — incremental integration;
+5. M22 — social knowledge propagation;
+6. M23 — faction reputation;
+7. M24 — objective world-state consequences;
+8. M25 — complete chapter vertical slice;
+9. human integrated playability review.
+
+Do not start M20 solely because M19 passed. A WEAK/FAIL Checkpoint B should improve or reconsider the active RPG loop first.
 
 ---
 
@@ -408,12 +433,13 @@ I formed a consequential relationship
 -> I learned something real from that character
 -> it became part of my build
 -> I traveled to where a consequential problem existed
+-> my current presence changed the immediate expression of relevant Relationships
 -> I used the capability to solve the problem differently
 -> the world and other characters reacted
 -> that reaction changed my future progression
 ```
 
-Technical correctness remains necessary, but later vertical slices must also test player comprehension, pacing, whether Trait-enabled choices remain genuine choices, whether spatial decisions are meaningful, and whether incremental automation reinforces rather than distracts from the narrative RPG.
+Technical correctness remains necessary, but later vertical slices must also test player comprehension, pacing, whether Trait-enabled choices remain genuine choices, whether spatial/presence decisions are meaningful, and whether incremental automation reinforces rather than distracts from the narrative RPG.
 
 ---
 
@@ -424,12 +450,14 @@ Technical correctness remains necessary, but later vertical slices must also tes
 3. `Technical/PostM17ProductReconciliation.md` — product/status reconciliation after M17
 4. `Technical/PostM17MilestoneRoadmap.md` — planned execution program from M18 through M25
 5. `Technical/M18ExplorationTravelResult.md` — M18 empirical travel result and evidence ceiling
-6. `Features/RelationshipExperienceSystem.md`
-7. `Features/EssenceResonanceModel.md`
-8. `Features/TraitSystem.md`
-9. `Features/QuestSystem.md`
-10. `Features/CombatSystem_MVP.md`
-11. `Features/ExplorationSystem.md`
-12. milestone-specific qualification documents under `Technical/`
+6. `Technical/M19WorldDerivedTetherResult.md` — M19 empirical spatial-Tether result and evidence ceiling
+7. `Features/RelationshipExperienceSystem.md`
+8. `Features/EssenceResonanceModel.md`
+9. `Features/EssenceSystem.md`
+10. `Features/TraitSystem.md`
+11. `Features/QuestSystem.md`
+12. `Features/CombatSystem_MVP.md`
+13. `Features/ExplorationSystem.md`
+14. milestone-specific qualification documents under `Technical/`
 
 When older documentation conflicts with this authority chain, treat the conflict as migration/documentation debt rather than reviving the legacy model.

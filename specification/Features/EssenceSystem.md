@@ -1,7 +1,7 @@
 # Essence System Specification
 
-**Status:** Implemented state/passive generation with Relationship-derived sources and Copy contributions; reconciled after M14  
-**Canonical model:** See `EssenceResonanceModel.md` and `../Technical/PostM14ProductReconciliation.md`.
+**Status:** Implemented passive generation with Relationship-derived sources, bounded world-derived spatial Tether, and Copy contributions; qualified through M19  
+**Canonical model:** See `EssenceResonanceModel.md`, `../Technical/PostM14ProductReconciliation.md`, and `../Technical/M19WorldDerivedTetherResult.md`.
 
 Essence is the game's core metaphysical resource representing accumulated capacity for influence, growth, and permanent Trait Resonance.
 
@@ -37,7 +37,7 @@ The base rate remains useful while the wider economy is still being balanced.
 
 A Relationship bundle may enable Essence in its `RelationshipProgressionDefinition`.
 
-The post-M14 authoring manifest includes:
+The registered authoring manifest includes:
 
 - Elder Willow;
 - Lyra;
@@ -113,9 +113,26 @@ The model supports:
 | Engaged | 1.25x |
 | Deeply Engaged | 1.50x |
 
-Current production use is still bounded/static/authored rather than a full world-derived presence simulation. Relationship bundles can declare a starting Tether state, and authored teaching/engagement can provide bounded evidence.
+M19 qualifies a bounded world-derived **spatial** projection for two independently anchored Relationship-authority NPCs:
 
-A future world/travel milestone should derive Tether from location/presence/activity instead of treating these current defaults as the final simulation.
+```text
+npc_elder_willow     -> location_whispering_woods
+npc_blacksmith_gronk -> location_city_center
+```
+
+Using the M18 canonical player-location graph:
+
+```text
+same canonical location           -> Present
+directly adjacent location        -> Nearby
+other distinct canonical location -> Remote
+```
+
+This is a current-world projection rather than Relationship history. Travel does not rewrite Connection, Bond dimensions, Memories, Stability, Resonance Quality, or the stored authored Tether fallback.
+
+For Relationship-authority NPCs without an M19 canonical anchor, the existing stored `BondProfile.tetherState` remains authoritative as the authored/static fallback. M19 therefore does not globally reinterpret all Tether as physical proximity.
+
+M19 does not derive `Absent`, `Engaged`, or `Deeply Engaged` from space, and it does not qualify NPC schedules, moving NPC positions, continuous distance, Copy presence, or activity-derived presence.
 
 ### Stability
 
@@ -202,14 +219,17 @@ That path exists to preserve current behavior, not to define new product design.
 
 ## 8. Recalculation inputs
 
-The generation rate can change when relevant inputs change, including:
+The cached passive generation rate changes when relevant inputs change, including:
 
 - Relationship runtime initialization;
 - qualified Connection changes;
 - Relationship Experiences affecting Bond quality/stability;
-- Relationship bundle/Tether inputs;
+- authored/static Relationship Tether inputs;
+- M19 player-location changes that alter effective spatial Tether;
 - Copy maturity/loyalty qualification;
 - other explicit existing rate sources.
+
+M19 reuses the existing `setLocation` event boundary: after location-sensitive Quest/escort processing, the listener recalculates the existing pure Essence-rate function and refreshes `essence.generationRate`. It does not dispatch a Relationship Tether mutation.
 
 Each source should be counted once through its own domain contract.
 
@@ -222,17 +242,22 @@ Useful per-Relationship explanation includes:
 ```text
 Connection base
 Resonance Quality band
-Tether state/modifier
+Effective Tether state + source (spatial or authored)
 Stability state/modifier
 Effective contribution
 ```
+
+M19 exposes the effective Tether state and whether it came from the bounded spatial projection or authored/static fallback, so presentation and calculation use the same state.
 
 The general Essence UI is still an incomplete per-source economy inspector and can be improved later without changing the ontology.
 
 ## 10. Current limitations
 
 - no full offline progression;
-- no world-derived Tether simulation;
+- world-derived spatial Tether is bounded to the M19 qualified anchors/states rather than a full presence simulation;
+- no spatially derived `Absent` state;
+- no general activity-derived `Engaged` / `Deeply Engaged` semantics;
+- no NPC schedules or moving NPC world positions;
 - no campaign-wide economy rebalance;
 - limited per-source history/analytics presentation;
 - many legacy/simple Traits still retain compatibility Resonance behavior;
@@ -248,13 +273,18 @@ The general Essence UI is still an incomplete per-source economy inspector and c
 6. Legacy NPC `connectionDepth` is not silently converted into Relationship evidence.
 7. Copy contributions remain an independent source.
 8. Essence cannot substitute for missing discovery/assimilation/Memory evidence on migrated Trait Resonance.
-9. World-derived Tether is still future work; current authored/static Tether must not be overstated as a full presence simulation.
+9. Objective movement may alter effective spatial Tether and current Essence intensity without rewriting historical Relationship significance.
+10. Unanchored Relationship sources retain authored/static Tether until a world-presence authority is explicitly qualified for them.
+11. M19's spatial Tether is a bounded projection, not a complete proximity/presence simulation.
 
 ## 12. Cross-references
 
 - `../Technical/PostM14ProductReconciliation.md`
+- `../Technical/M19WorldDerivedTetherQualification.md`
+- `../Technical/M19WorldDerivedTetherResult.md`
 - `RelationshipExperienceSystem.md`
 - `EssenceResonanceModel.md`
 - `TraitSystem.md`
 - `CopySystem.md`
 - `GameLoopSystem.md`
+- `ExplorationSystem.md`
