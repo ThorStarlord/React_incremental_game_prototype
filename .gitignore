@@ -24,3 +24,6 @@ yarn-error.log*
 
 # playwright persistent profile for scripts/chatgpt-loop.js (contains session cookies)
 .chatgpt-profile/
+
+# synthetic-review observation output (freeze selected records explicitly in specification/)
+.simulated-review-output/

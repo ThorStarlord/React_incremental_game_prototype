@@ -27,6 +27,38 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Synthetic review contract qualification
+        run: npm run simulated-review:validate
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Synthetic review UI-only smoke qualification
+        timeout-minutes: 6
+        run: |
+          HOST=127.0.0.1 PORT=3000 BROWSER=none npm start > /tmp/simulated-review-app.log 2>&1 &
+          app_pid=$!
+          trap 'kill "$app_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000 >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo "Synthetic review app server failed to become ready"
+            cat /tmp/simulated-review-app.log
+            exit 1
+          fi
+
+          npm run simulated-review:smoke
+        env:
+          CI: true
+
       - name: Type check
         run: npx tsc --noEmit
 
