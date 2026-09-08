@@ -1,7 +1,7 @@
 # Essence System Specification
 
-**Status:** Implemented passive generation with Relationship-derived sources, bounded world-derived spatial Tether, and Copy contributions; qualified through M19  
-**Canonical model:** See `EssenceResonanceModel.md`, `../Technical/PostM14ProductReconciliation.md`, and `../Technical/M19WorldDerivedTetherResult.md`.
+**Status:** Implemented passive generation with Relationship-derived sources, bounded world-derived spatial Tether, Copy contributions, and bounded M21 offline snapshot accrual  
+**Canonical model:** See `EssenceResonanceModel.md`, `../Technical/PostM14ProductReconciliation.md`, `../Technical/M19WorldDerivedTetherResult.md`, and `../Technical/M21BoundedOfflineProgressResult.md`.
 
 Essence is the game's core metaphysical resource representing accumulated capacity for influence, growth, and permanent Trait Resonance.
 
@@ -172,13 +172,42 @@ A non-relationship game system may still award one-time Essence when independent
 
 ## 5. Passive accrual
 
+### Online
+
 Passive generation uses elapsed game time while the GameLoop is running and not paused:
 
 ```text
 generated = generationRate x elapsedTime
 ```
 
-Offline progression remains a future capability; normal online passive accrual does not imply offline simulation is already solved.
+The online authority is `processPassiveGenerationThunk(deltaTime)`.
+
+### M21 bounded offline accrual
+
+M21 qualifies one explicit snapshot settlement using the same passive-generation authority.
+
+```text
+canonical saved envelope timestamp
++
+resume timestamp
+-> bounded elapsed interval (max 8h)
+-> persisted generationRate snapshot x elapsed
+-> gain Essence
+```
+
+M21 settlement occurs only when the restored save says the GameLoop was running and not paused.
+
+The offline orchestrator then processes the second allowed consumer—already-running M20 Copy tasks—but it does not replay the full GameLoop.
+
+Important limitation:
+
+```text
+saved generationRate snapshot
+```
+
+is used for the entire bounded interval. M21 does not simulate event-time changes to Relationship/Tether/Copy-derived rates during absence.
+
+Therefore M21 qualifies deterministic bounded snapshot accrual, not a general offline temporal economy simulator.
 
 ## 6. Copy contribution
 
@@ -187,6 +216,10 @@ Qualifying Copies continue to contribute through the Copy/Essence integration.
 Copy contributions are independent from Relationship-derived NPC contributions.
 
 Do not reinterpret Copy maturity/loyalty as Relationship Bond dimensions without a dedicated redesign.
+
+M20 also qualifies `Resonance Calibration` as a one-shot authored Copy production reward of +8 Essence. That ordinary task reward is separate from passive generation-rate calculation.
+
+During M21 offline settlement, an already-running M20 task may complete through its existing task authority. M21 does not automatically start another task.
 
 ## 7. Trait Resonance sink
 
@@ -217,9 +250,11 @@ Unmigrated Traits may still use compatibility `connectionDepth` gates.
 
 That path exists to preserve current behavior, not to define new product design.
 
+M21 does not make Trait discovery, assimilation, or Resonance decisions offline.
+
 ## 8. Recalculation inputs
 
-The cached passive generation rate changes when relevant inputs change, including:
+The cached passive generation rate changes online when relevant inputs change, including:
 
 - Relationship runtime initialization;
 - qualified Connection changes;
@@ -232,6 +267,8 @@ The cached passive generation rate changes when relevant inputs change, includin
 M19 reuses the existing `setLocation` event boundary: after location-sensitive Quest/escort processing, the listener recalculates the existing pure Essence-rate function and refreshes `essence.generationRate`. It does not dispatch a Relationship Tether mutation.
 
 Each source should be counted once through its own domain contract.
+
+M21 intentionally consumes the **persisted cached rate** at save time rather than running these recalculation triggers offline.
 
 ## 9. Explainability
 
@@ -249,11 +286,16 @@ Effective contribution
 
 M19 exposes the effective Tether state and whether it came from the bounded spatial projection or authored/static fallback, so presentation and calculation use the same state.
 
+M21 adds a bounded return summary beginning `While you were away:` for offline-safe settlement. That summary reports ordinary accrued output/task progress; it does not reinterpret why the saved generation rate had its value.
+
 The general Essence UI is still an incomplete per-source economy inspector and can be improved later without changing the ontology.
 
 ## 10. Current limitations
 
-- no full offline progression;
+- M21 offline progression is bounded to snapshot passive Essence + already-running M20 Copy tasks, not full offline simulation;
+- maximum qualified offline interval is an 8-hour prototype cap, not final balance;
+- no anti-cheat/server-authoritative time or device-clock tamper protection;
+- no event-time rate segmentation/recalculation during the offline interval;
 - world-derived spatial Tether is bounded to the M19 qualified anchors/states rather than a full presence simulation;
 - no spatially derived `Absent` state;
 - no general activity-derived `Engaged` / `Deeply Engaged` semantics;
@@ -276,12 +318,17 @@ The general Essence UI is still an incomplete per-source economy inspector and c
 9. Objective movement may alter effective spatial Tether and current Essence intensity without rewriting historical Relationship significance.
 10. Unanchored Relationship sources retain authored/static Tether until a world-presence authority is explicitly qualified for them.
 11. M19's spatial Tether is a bounded projection, not a complete proximity/presence simulation.
+12. M21 offline Essence uses the persisted generation-rate snapshot and a bounded canonical save-envelope interval; it does not replay Relationship/world causes offline.
+13. M21 cannot silently resolve narrative, Relationship, Quest, Combat, travel, or Trait choices merely because time elapsed.
 
 ## 12. Cross-references
 
 - `../Technical/PostM14ProductReconciliation.md`
 - `../Technical/M19WorldDerivedTetherQualification.md`
 - `../Technical/M19WorldDerivedTetherResult.md`
+- `../Technical/M21BoundedOfflineProgress.md`
+- `../Technical/M21BoundedOfflineProgressReconAmendment.md`
+- `../Technical/M21BoundedOfflineProgressResult.md`
 - `RelationshipExperienceSystem.md`
 - `EssenceResonanceModel.md`
 - `TraitSystem.md`

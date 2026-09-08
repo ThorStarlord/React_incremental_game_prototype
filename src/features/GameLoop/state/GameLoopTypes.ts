@@ -15,6 +15,8 @@ export interface GameLoopState {
   gameSpeed: number; // Speed multiplier (0.1x to 5.0x)
   autoSaveInterval: number; // Auto-save frequency in milliseconds
   lastAutoSave: number; // Last auto-save timestamp
+  /** Replay token for the save-envelope timestamp already settled offline. Not a clock authority. */
+  lastOfflineSettlementSourceTimestamp?: number | null;
 }
 
 /**

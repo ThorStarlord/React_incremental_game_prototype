@@ -30,6 +30,12 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: M21 bounded offline progress qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopM21OfflineProgress.test.ts
+        env:
+          CI: true
+
       - name: M20 Copy production automation qualification
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand CopyM20ProductionTaskAutomation.test.tsx

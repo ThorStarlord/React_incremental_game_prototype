@@ -15,6 +15,7 @@ import { initializeQuestsThunk } from '../../../features/Quest/state/QuestThunks
 import { removeCopy } from '../../../features/Copy/state/CopySlice';
 import { resetTraitsState } from '../../../features/Traits/state/TraitsSlice';
 import { initializeRelationshipRuntimeThunk } from '../../../features/Relationships/state/RelationshipThunks';
+import { settleOfflineProgressThunk } from '../../../features/GameLoop/state/OfflineProgress';
 
 interface GameActionsProps {
   mostRecentSave: SavedGame | null;
@@ -70,6 +71,20 @@ export function useGameActions({
       const loaded = await loadSavedGameWithMigration(saveId);
       if (loaded) {
         dispatch(replaceState(loaded.state));
+
+        // M21 settles exactly the explicit offline-safe allowlist from the
+        // canonical save-envelope timestamp. This occurs after state replacement
+        // and before ordinary runtime reconciliation; it does not replay App.tsx's
+        // full GameLoop consumer chain.
+        const offlineResult = await dispatch(
+          settleOfflineProgressThunk({
+            savedTimestamp: loaded.envelope.timestamp,
+            resumeTimestamp: Date.now(),
+          })
+        ).unwrap();
+        if (offlineResult.skipReason) {
+          console.info('Offline progress settlement skipped:', offlineResult.skipReason);
+        }
 
         if (loaded.migration.appliedMigrations.length > 0) {
           console.info(

@@ -1,73 +1,323 @@
 # GameLoop System Specification
 
-This document details the design and mechanics of the GameLoop system, which provides the foundational timing and state management for all game progression mechanics.
+**Implementation Status:** ✅ **LIVE FIXED-TIMESTEP LOOP + BOUNDED M21 OFFLINE SETTLEMENT QUALIFIED**
 
-**Implementation Status**: ✅ **FULLY IMPLEMENTED** - Complete game loop system with fixed timestep architecture, state management, and UI controls.
+The GameLoop system owns live timing/control and now also owns the bounded orchestration boundary for M21 offline-safe catch-up.
 
-## 1. Overview
+For empirical authority, read:
 
-*   **Purpose:** Provides consistent time-based progression for all game systems. Manages game state (running/paused), speed control, and automatic saving functionality.
-*   **Core Loop:** Auto-Initialize -> Tick Processing -> State Updates -> Auto-save -> Continue/Pause/Stop.
-*   **Auto-Start:** The game loop now starts automatically as soon as the main `GameLayout` component is mounted, ensuring that time-based mechanics like resource generation are always active when the player is in the game view.
+- `../Technical/M21BoundedOfflineProgress.md` — preregistered M21 contract;
+- `../Technical/M21BoundedOfflineProgressReconAmendment.md` — frozen time/cap/allowlist decisions;
+- `../Technical/M21BoundedOfflineProgressResult.md` — qualified result and evidence ceiling.
 
-## 2. Core Architecture ✅ IMPLEMENTED
+---
 
-*   **Fixed Timestep:** Uses a fixed timestep approach with accumulator pattern to ensure consistent game logic regardless of frame rate.
-*   **RequestAnimationFrame:** Leverages browser's `requestAnimationFrame` for smooth 60fps rendering while maintaining independent game logic timing.
-*   **Tick Rate:** Configurable tick rate (default 10 TPS - 100ms per tick) for game logic updates.
-*   **Performance Optimization:** Memoized callbacks and selectors prevent unnecessary re-renders.
+## 1. Purpose
 
-## 3. Game State Management ✅ IMPLEMENTED
+The GameLoop has two deliberately different timing modes.
 
-*   **Game States:**
-    *   `isRunning`: Boolean indicating if the game loop is active. **Defaults to `true` on load.**
-    *   `isPaused`: Boolean indicating if the game is temporarily paused.
-    *   `currentTick`: Current tick number since game start.
-    *   `totalGameTime`: Total elapsed game time in milliseconds.
-*   **Speed Control:**
-    *   `gameSpeed`: Multiplier ranging from 0.1x to 5.0x.
-    *   Real-time speed adjustment during gameplay.
-    *   Speed disabled when game is not running.
+### Live progression
 
-## 4. Auto-save System ✅ IMPLEMENTED
+```text
+requestAnimationFrame
+-> fixed timestep accumulator
+-> ordinary online GameLoop consumers
+```
 
-*   **Configuration:**
-    *   `autoSaveInterval`: Time in seconds between auto-saves (default 30).
-    *   `lastAutoSave`: Timestamp of last auto-save operation.
-*   **Triggers:** Automatic saving based on elapsed game time.
-*   **Integration:** Hooks into existing save/load system via Redux thunks.
+### M21 offline settlement
 
-## 5. Integration Points ✅ IMPLEMENTED
+```text
+canonical save-envelope timestamp
++
+resume wall-clock timestamp
+-> bounded elapsed interval
+-> explicit offline-safe allowlist only
+```
 
-*   **Tick Callbacks:** Other systems can register for tick-based updates via `useGameLoop` hook in `App.tsx`.
-*   **Timing Data:** Provides `deltaTime` and timing information for time-based calculations.
-*   **State Synchronization:** All time-dependent systems sync with GameLoop state.
+M21 does **not** replay the live loop for the entire time the application was closed.
 
-## 6. UI Components ✅ IMPLEMENTED
+---
 
-*   **GameControlPanel:** Main interface for game loop control.
-    *   **Pause/Resume Button:** Allows the user to pause and resume the game loop. The "Start Game" button is no longer the primary way to initiate the loop.
-    *   Game speed slider with real-time feedback.
-    *   Current game time display in human-readable format.
-    *   Tick counter for debugging and advanced users.
+## 2. Live fixed-timestep architecture
 
-## 7. Performance Considerations ✅ IMPLEMENTED
+`useGameLoop` uses `requestAnimationFrame` with an accumulator and a fixed timestep derived from `tickRate`.
 
-*   **Memory Management:** Proper cleanup of animation frames and event listeners.
-*   **Efficient Updates:** Minimal state updates to prevent unnecessary re-renders.
-*   **Browser Optimization:** Uses `requestAnimationFrame` for optimal browser performance.
+Current defaults include:
 
-## 8. Technical Implementation ✅ COMPLETE
+- `isRunning = true`;
+- `tickRate = 10` ticks/second;
+- `gameSpeed = 1.0`;
+- `autoSaveInterval = 30000` ms.
 
-*   **Location:** `src/features/GameLoop/`
-*   **State Management:** Redux Toolkit slice with typed selectors and actions. The `initialState` for `isRunning` is now `true`.
-*   **Custom Hook:** `useGameLoop` is initialized in `App.tsx` to provide a single, centralized game tick for all subsystems.
-*   **Initialization:** The `startGame` action is dispatched automatically from a `useEffect` hook in the main `GameLayout.tsx` component.
-*   **UI Components:** Material-UI based control panel with responsive design.
+The hook resets its frame baseline from `performance.now()` when it starts. Wall-clock absence is therefore not silently converted into one giant live-frame delta.
 
-## 9. Future Enhancements
+`App.tsx` owns the ordinary online consumer sequence. It currently includes systems such as passive Essence, Copy growth/loyalty/tasks, player regeneration/status processing, and Quest timers.
 
-*   **Offline Progress:** Calculate progression during offline time.
-*   **Speed Presets:** Quick-select common speed multipliers.
-*   **Advanced Controls:** Fine-grained control over specific system tick rates.
-*   **Performance Monitoring:** Real-time performance metrics and optimization.
+That online list is **not** the offline allowlist.
+
+---
+
+## 3. GameLoop state
+
+Current state includes:
+
+```ts
+GameLoopState {
+  isRunning
+  isPaused
+  currentTick
+  tickRate
+  lastUpdateTime
+  totalGameTime
+  gameSpeed
+  autoSaveInterval
+  lastAutoSave
+  lastOfflineSettlementSourceTimestamp?
+}
+```
+
+### Replay marker
+
+`lastOfflineSettlementSourceTimestamp` is optional/backward-compatible.
+
+It is **not** a source of elapsed time. It records which canonical save-envelope timestamp has already been settled into the currently restored state so an accidental repeated settlement cannot duplicate progression.
+
+Canonical elapsed time remains:
+
+```text
+loaded CurrentSaveEnvelope.timestamp
+-> compared with resume Date.now()
+```
+
+---
+
+## 4. Live controls
+
+The live loop supports:
+
+- start;
+- pause;
+- resume;
+- stop;
+- configurable tick rate;
+- game-speed multiplier;
+- tick/total-game-time tracking.
+
+A saved state that is stopped or paused receives **no M21 offline settlement**. Offline progression does not override persisted player loop control.
+
+---
+
+## 5. Canonical persistence/time authority
+
+M21 uses the versioned save envelope owned by `shared/utils/saveSchema.ts` and `saveUtils.ts`.
+
+```ts
+CurrentSaveEnvelope {
+  schemaVersion
+  gameVersion
+  timestamp
+  state
+}
+```
+
+No second persistent `lastSaveTime` clock was added.
+
+Older standalone helpers still present in `GameLoopThunks.ts` that reference separate `gameState` / `lastSaveTime` local-storage values are legacy/non-authoritative for M21. The canonical Main Menu load path uses `loadSavedGameWithMigration`.
+
+No save-schema version bump was required for M21.
+
+---
+
+## 6. M21 bounded offline window
+
+The qualified prototype cap is:
+
+```text
+MAX_OFFLINE_PROGRESS_MS
+= 28,800,000 ms
+= 8 hours
+```
+
+Window calculation:
+
+```text
+rawElapsed = resumeTimestamp - savedTimestamp
+```
+
+Then:
+
+- missing/legacy-zero/non-finite saved timestamp -> zero settlement;
+- future/equal timestamp -> zero settlement;
+- stopped save -> zero settlement;
+- paused save -> zero settlement;
+- positive interval -> clamp to at most eight hours.
+
+The cap is a bounded prototype safety/evidence choice, not a final economy balance claim or anti-cheat guarantee.
+
+---
+
+## 7. Explicit offline allowlist
+
+M21 qualifies exactly two consumers:
+
+```text
+1. passive Essence
+2. already-running M20 Copy production tasks
+```
+
+Settlement order is frozen as:
+
+```text
+saved passive generation-rate snapshot
+-> processPassiveGenerationThunk(elapsedMs)
+-> processCopyTasksThunk(elapsedMs)
+```
+
+### Why this is snapshot settlement
+
+If a Copy task completion could change a later derived Essence rate, M21 does not divide the offline interval around that event and recalculate rate subperiods.
+
+That would be a wider temporal simulation engine.
+
+Qualified semantics are therefore:
+
+```text
+persisted Essence generationRate x bounded elapsed
+-> then Copy task progress/completion
+```
+
+---
+
+## 8. Copy task offline behavior
+
+M21 reuses M20's existing task authority.
+
+An already-running task may:
+
+```text
+advance partially
+```
+
+or:
+
+```text
+reach completion
+-> apply authored M20 reward exactly once
+-> apply existing task-owned role completion bonus where applicable
+-> clear activeTask
+```
+
+Excess offline time after completion is discarded for that Copy.
+
+M21 does not:
+
+- select another task;
+- queue tasks;
+- repeat the completed task;
+- make strategic/autonomous assignments.
+
+---
+
+## 9. Replay safety
+
+After one positive settlement:
+
+```text
+markOfflineSettlementSource(savedTimestamp)
+```
+
+A repeated call against the same restored save timestamp is skipped.
+
+A later ordinary save creates a new canonical envelope timestamp, so a genuinely later load can settle a new interval normally.
+
+This gives exact-once settlement identity without creating a competing clock authority.
+
+---
+
+## 10. Player-facing return summary
+
+A positive M21 settlement emits an informational notification beginning:
+
+```text
+While you were away:
+```
+
+It may summarize:
+
+- bounded Essence gain;
+- Copy task percentage;
+- Copy task completion.
+
+The summary is presentation only. Actual resource/task state remains owned by the existing Essence and Copy contracts.
+
+---
+
+## 11. Explicitly online-only / not processed by M21
+
+M21 does not invoke offline:
+
+- Quest timer processing;
+- Relationship mutation/evidence/Memory creation;
+- dialogue decisions;
+- Combat actions;
+- player travel/location changes;
+- Copy general maturity growth;
+- Copy loyalty decay;
+- Trait discovery/Resonance decisions;
+- player status-effect processing;
+- player vitality regeneration;
+- generalized GameLoop `tick` replay.
+
+This allowlist boundary is intentional. The implementation prefers *not processing unsafe domains* over inventing a pending-decision or background-world simulator.
+
+---
+
+## 12. Auto-save
+
+The application has a settings-driven autosave system and canonical versioned save/load helpers.
+
+M21's time authority comes from the timestamp in the canonical persisted save envelope. The offline module does not create its own storage channel.
+
+Legacy GameLoop-local save helper code is not the current product persistence authority and should not be expanded as if it were.
+
+---
+
+## 13. Qualification
+
+Dedicated M21 qualification proves:
+
+- missing/future/equal timestamp produces no progress;
+- interval clamps exactly to eight hours;
+- paused/stopped saves do not settle;
+- passive Essence settles through existing authority;
+- an M20 task can advance partially offline;
+- an M20 task can complete offline with authored reward exactly once;
+- excess time does not restart/queue work;
+- duplicate settlement of the same save timestamp is blocked;
+- a later save timestamp can legitimately produce another interval;
+- Relationship and Quest state remain unchanged in the qualified positive probe;
+- Player location remains unchanged;
+- unsafe broad GameLoop consumers are absent from offline orchestration;
+- save schema remains v1;
+- M20 and accumulated earlier qualification remain green.
+
+See `../Technical/M21BoundedOfflineProgressResult.md` for exact CI/SHA evidence.
+
+---
+
+## 14. Evidence ceiling / future work
+
+Not qualified by M21:
+
+- trusted server time;
+- device-clock tamper resistance or anti-cheat;
+- final eight-hour balance;
+- event-time segmented offline simulation;
+- offline Copy growth/loyalty decay beyond existing task-owned completion bonuses;
+- offline Quest/Relationship/dialogue/Combat/travel;
+- automatic task chains;
+- generalized offline economy/world simulation;
+- background simulation merely because a browser tab is unfocused;
+- human pacing/enjoyment.
+
+The next planned evaluation is **Checkpoint C — Incremental Integration**, which asks whether M20/M21 automation supports the active RPG rather than becoming a detached idle layer.
