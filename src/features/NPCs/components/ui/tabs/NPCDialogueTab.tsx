@@ -27,9 +27,9 @@ type Choice = { id: string; title: string; responses: DialogueResponse[] };
 
 /**
  * NPCDialogueTab - Handles dialogue interactions with NPCs.
- * Authored topics can declare Relationship, active-experience, and per-NPC
- * Knowledge prerequisites so future beats do not spoil themselves or become
- * clickable out of causal order.
+ * Authored topics can declare Relationship, active-experience, per-NPC
+ * Knowledge, and bounded institutional prerequisites so future beats do not
+ * spoil themselves or become clickable out of causal order.
  */
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
@@ -46,6 +46,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   );
   const knownFactIds = useAppSelector(
     state => state.knowledge?.factIdsByNpcId?.[npcId] ?? []
+  );
+  const factionReputationByFactionId = useAppSelector(
+    state => state.factions?.reputationByFactionId ?? {}
   );
 
   const availableDialogueChoices: Choice[] = useMemo(() => {
@@ -98,6 +101,18 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           return null;
         }
 
+        const requiredFactionReputation = Array.isArray(node.requiredFactionReputation)
+          ? node.requiredFactionReputation as Array<{ factionId: string; min?: number; max?: number }>
+          : [];
+        if (requiredFactionReputation.some(requirement => {
+          const value = factionReputationByFactionId[requirement.factionId] ?? 0;
+          if (typeof requirement.min === 'number' && value < requirement.min) return true;
+          if (typeof requirement.max === 'number' && value > requirement.max) return true;
+          return false;
+        })) {
+          return null;
+        }
+
         const responses = node.responses || {};
         return {
           id: node.id,
@@ -116,6 +131,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
     recordedExperiences,
     routineFamiliarity,
     knownFactIds,
+    factionReputationByFactionId,
   ]);
 
   if (!npc) {

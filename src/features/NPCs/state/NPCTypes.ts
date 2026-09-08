@@ -193,12 +193,23 @@ export type DialogueEffect =
   | (DialogueEffectScope & { type: 'OPEN_SERVICE'; serviceId: string })
   | (DialogueEffectScope & { type: 'KNOWLEDGE_FACT'; factId: string })
   | (DialogueEffectScope & {
+      type: 'FACTION_REPUTATION';
+      factionId: string;
+      value: number;
+    })
+  | (DialogueEffectScope & {
       type: 'RELATIONSHIP_EXPERIENCE';
       /** Fixed authored Experience for this effect. */
       experienceId?: string;
       /** Optional response-specific Experience mapping for a branching dialogue node. */
       experienceIdByResponse?: Record<string, string>;
     });
+
+export interface FactionReputationRequirement {
+  factionId: string;
+  min?: number;
+  max?: number;
+}
 
 /**
  * Data-driven dialogue node definition (authoring format)
@@ -224,6 +235,8 @@ export interface DialogueNode {
   requiredKnowledgeFactIds?: string[];
   /** The current dialogue NPC must know none of the listed facts. */
   forbiddenKnowledgeFactIds?: string[];
+  /** Institutional standing requirements; all listed bounds must pass. */
+  requiredFactionReputation?: FactionReputationRequirement[];
   /**
    * Opt-in one-shot semantics. Undefined/true preserves legacy repeatable behavior.
    * A successful valid response records this node id in NPC.completedDialogues.

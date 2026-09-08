@@ -1,7 +1,7 @@
 # Knowledge System Specification
 
-**Status:** M22 bounded production authority qualified behaviorally; documentation-complete exact-head qualification pending  
-**Scope:** per-NPC awareness of objective facts; not objective truth, Relationship meaning, faction standing, or generalized epistemic simulation
+**Status:** M22 bounded production authority qualified and merged; M23 preserves Knowledge as a distinct authority  
+**Scope:** per-NPC awareness of objective facts; not objective truth, Relationship meaning, Faction standing, or generalized epistemic simulation
 
 ## 1. Purpose
 
@@ -21,9 +21,9 @@ Gronk knows it happened
 Valerius does not know it happened
 ```
 
-without forcing that distinction into Relationship state or ad-hoc story booleans.
+without forcing that distinction into Relationship state, Faction standing, or ad-hoc story booleans.
 
-The core authority separation is:
+The core authority separation after M23 is:
 
 ```text
 WORLD / source domain -> what objectively happened or exists
@@ -156,7 +156,7 @@ Thus direct witnessing and explicit reporting share the same canonical knowledge
 
 ## 5. Dialogue integration
 
-The generic dialogue contract now supports:
+The generic dialogue contract supports:
 
 ```ts
 requiredRoutineFamiliarityIds?: RoutineFamiliarityId[];
@@ -173,8 +173,6 @@ and the effect:
 }
 ```
 
-### Availability authority
-
 The same gates are checked in:
 
 ```text
@@ -183,41 +181,19 @@ NPCDialogueTab
 processNPCInteractionThunk
 ```
 
-This prevents presentation-only enforcement.
+so direct thunk dispatch cannot bypass an authored Knowledge prerequisite.
 
-A direct thunk dispatch cannot bypass an authored knowledge prerequisite.
-
-### M22 report topic
+M22 production examples remain:
 
 ```text
 valerius_m22_forge_report
-```
+-> explicit Knowledge acquisition
 
-requires:
-
-```text
-Player routine familiarity: forge_assistance
-```
-
-and forbids:
-
-```text
-Valerius already knows fact_m22_player_practiced_forge_assistance
-```
-
-### M22 downstream consumer
-
-```text
 valerius_m22_forge_logistics
+-> downstream Knowledge consumer
 ```
 
-requires:
-
-```text
-Valerius knows fact_m22_player_practiced_forge_assistance
-```
-
-It is the first qualified production example of later content reading Knowledge authority directly.
+M23 adds Faction dialogue gates/effects alongside these, but does not change Knowledge semantics.
 
 ---
 
@@ -241,7 +217,7 @@ Authored report content may additionally use one-shot dialogue/completion rules 
 
 ## 7. Persistence
 
-Knowledge is ordinary campaign state inside the persisted Redux RootState.
+Knowledge is ordinary campaign state inside persisted Redux RootState.
 
 M22 keeps:
 
@@ -249,9 +225,7 @@ M22 keeps:
 CURRENT_SAVE_SCHEMA_VERSION = 1
 ```
 
-because the existing save envelope can carry the new root without an incompatible representation change.
-
-### Legacy-like state
+because the existing save envelope can carry the root without an incompatible representation change.
 
 A current-schema save lacking the `knowledge` root is interpreted as:
 
@@ -259,15 +233,9 @@ A current-schema save lacking the `knowledge` root is interpreted as:
 no recorded Knowledge facts
 ```
 
-Selectors are tolerant of the missing root.
+Selectors tolerate the missing root. No startup migration or Relationship/Faction reconciliation infers facts.
 
-No startup migration or Relationship reconciliation infers facts.
-
-### Offline progress
-
-M21 offline settlement does not consume or mutate Knowledge.
-
-Elapsed time alone cannot teach an NPC a fact.
+M21 offline settlement does not consume or mutate Knowledge. Elapsed time alone cannot teach an NPC a fact.
 
 ---
 
@@ -290,7 +258,7 @@ new campaign
 
 Knowledge is not Relationship state.
 
-M22 qualifies all of the following:
+M22 qualifies:
 
 ```text
 Gronk learns fact
@@ -303,31 +271,14 @@ Valerius consumes known fact in later dialogue
 -> no automatic Relationship change
 ```
 
-A future authored event may legitimately create both:
+A future authored event may legitimately create both Knowledge and Relationship consequences, but they must remain independently authored and authoritative.
 
-```text
-Knowledge consequence
-+
-Relationship Experience
-```
-
-when the story supports both.
-
-If so, they must remain independently authored and independently authoritative.
-
-Never use:
+Never use generic rules such as:
 
 ```text
 high Trust -> magically knows fact
-```
-
-or:
-
-```text
 learned fact -> automatic Trust increase
 ```
-
-as generic rules.
 
 ---
 
@@ -350,23 +301,39 @@ M24 remains responsible for proving persistent objective regional World State.
 
 ---
 
-## 11. Faction boundary
+## 11. Faction boundary after M23
 
 Knowledge does not represent institutional regard.
 
-M22 adds no faction-standing authority.
+M23 now provides the first-class Faction authority that M22 intentionally deferred.
 
-The model must be able to support future combinations such as:
+The product can represent combinations such as:
 
 ```text
 Valerius knows the player worked the forge: YES
-Valerius Trust: +60
-City Watch Standing: -20
+Valerius personal Trust: high
+City Watch Standing: negative
 ```
 
-without forcing any value to derive from the others.
+without deriving any value from the others.
 
-M23 remains responsible for first-class Faction Reputation.
+M23's focused probes explicitly verify:
+
+```text
+Faction Reputation changes
+-> Knowledge state unchanged
+```
+
+and add no generic bridge such as:
+
+```text
+Valerius knows favorable fact
+-> City Watch Reputation +X
+```
+
+If a future authored event legitimately has both Knowledge and institutional consequences, they must be separate explicit effects.
+
+See `FactionSystem.md` and `../Technical/M23FactionReputationResult.md`.
 
 ---
 
@@ -389,19 +356,7 @@ knows / does not know
 
 Adding persistent provenance now would be speculative.
 
-If future production content needs different behavior for:
-
-```text
-Valerius saw it himself
-```
-
-versus:
-
-```text
-Valerius was told
-```
-
-that requirement should be separately preregistered and qualified before extending the schema.
+If future production content needs different behavior for firsthand witnessing versus reported information, that requirement should be separately preregistered and qualified before extending the schema.
 
 ---
 
@@ -423,10 +378,10 @@ Current status:
 ```text
 historical M13/M14/M15 awareness normalization
 = explicit migration/design debt
-= outside M22 qualified scope
+= outside M22/M23 qualified scope
 ```
 
-Do not treat those old gates as proof that Knowledge is unnecessary, and do not silently reinterpret them as canonical M22 fact state.
+Do not silently reinterpret those old gates as canonical Knowledge state.
 
 ---
 
@@ -437,13 +392,15 @@ Do not treat those old gates as proof that Knowledge is unnecessary, and do not 
 3. Relationship dimensions do not imply Knowledge.
 4. Knowledge acquisition does not automatically mutate Relationship state.
 5. Knowledge does not represent Faction standing.
-6. Knowledge does not represent objective regional World State.
-7. The same NPC/fact pair is stored at most once.
-8. Missing legacy Knowledge state means no recorded facts, not inferred facts.
-9. Offline elapsed time does not create Knowledge.
-10. New-game reset clears Knowledge.
-11. Generic dialogue knowledge gates must be enforced below UI as well as in presentation.
-12. M22 does not introduce automatic propagation between NPCs.
+6. Faction standing does not automatically mutate Knowledge.
+7. Knowledge does not represent objective regional World State.
+8. The same NPC/fact pair is stored at most once.
+9. Missing legacy Knowledge state means no recorded facts, not inferred facts.
+10. Offline elapsed time does not create Knowledge.
+11. New-game reset clears Knowledge.
+12. Generic dialogue Knowledge gates are enforced below UI as well as in presentation.
+13. M22 does not introduce automatic propagation between NPCs.
+14. M23 does not reinterpret Knowledge as institutional consensus.
 
 ---
 
@@ -465,16 +422,17 @@ The current Knowledge system does not provide:
 - recursive knowledge;
 - player Knowledge as a separate modeled domain;
 - generalized fact catalogs;
-- faction reputation;
+- institutional Knowledge/consensus;
+- automatic Knowledge-to-Faction conversion;
 - objective world-state simulation.
 
-These are not missing implementation details required to complete M22. They are intentionally outside its evidence ceiling.
+Faction Reputation itself is now a separate M23-qualified domain rather than a Knowledge non-goal to be implemented here.
 
 ---
 
 ## 16. Qualified production path
 
-The currently qualified path is:
+The M22-qualified path remains:
 
 ```text
 City Center Forge practice
@@ -487,28 +445,34 @@ City Center Forge practice
 -> Valerius knowledge-gated logistics dialogue
 ```
 
+M23 independently proves that later institutional standing can diverge from both that Knowledge and personal Relationship state.
+
 See:
 
 - `../Technical/M22SocialKnowledgePropagation.md`
 - `../Technical/M22SocialKnowledgePropagationReconAmendment.md`
 - `../Technical/M22SocialKnowledgePropagationResult.md`
+- `FactionSystem.md`
+- `../Technical/M23FactionReputationResult.md`
 
 ---
 
 ## 17. Next domain boundary
 
-A qualified merged M22 PASS enables the next candidate:
+After qualified M23 merge, the next candidate is:
 
 ```text
-M23 — Faction Reputation
+M24 — Objective World State
 ```
 
-M23 must preserve:
+M24 must preserve:
 
 ```text
-Personal Relationship
+Objective World condition
 !=
 NPC Knowledge
+!=
+Personal Relationship
 !=
 Institutional Standing
 ```

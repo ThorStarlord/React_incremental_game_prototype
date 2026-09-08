@@ -1,7 +1,8 @@
 # Quest System Specification
 
-**Implementation Status:** ✅ Expanded foundation + authored resolution choices + permanent-Trait resolution gates  
-**Relationship migration:** ✅ Ancient Seed uses M4 resolution semantics; M16 qualifies Trait-driven authored resolutions.
+**Implementation Status:** ✅ Expanded foundation + authored resolution choices + permanent-Trait resolution gates + M23 faction-tagged reputation routing  
+**Relationship migration:** ✅ Ancient Seed uses M4 resolution semantics; M16 qualifies Trait-driven authored resolutions.  
+**Faction integration:** ✅ M23 qualifies faction-tagged `REPUTATION` rewards as institutional standing rather than giver-NPC Affinity.
 
 Feature directory: `src/features/Quest/`  
 Redux slice key: `quest`
@@ -31,7 +32,7 @@ Implemented:
 - objective progress and field patching;
 - GATHER, DELIVER, KILL, REACH_LOCATION and puzzle-related objective support;
 - timed quest processing;
-- ordinary rewards: Gold, Essence, Items, Reputation;
+- ordinary rewards: Gold, Essence, Items, and faction-tagged Reputation;
 - NPC quest availability;
 - return-to-giver turn-in checks;
 - repeatable/radiant quest foundation;
@@ -123,16 +124,56 @@ A selected resolution cannot later be replaced by another option.
 
 ## 5. Relationship consequences vs. rewards
 
-A relationship consequence and a consumable reward are different concepts.
+A relationship consequence and a consumable or institutional reward are different concepts.
 
 ```text
-Relationship Experience = durable causal/evidentiary history
+Relationship Experience = durable causal/evidentiary personal history
 Quest/resource reward = immediate inventory/currency consequence
+Faction Reputation reward = explicit institutional-standing consequence
 ```
 
-A quest resolution may have both, but one must not be disguised as the other.
+A quest resolution may have several of these, but one must not be disguised as another.
 
-For relationship milestones, the normal progression consequence is a future change in Bond/Connection/Essence-rate inputs rather than a one-time relationship Essence drop.
+For relationship milestones, the normal progression consequence is a future change in Bond/Connection/Essence-rate inputs rather than a one-time relationship Essence drop or an implicit faction score.
+
+### 5.1 M23 faction-tagged reputation authority
+
+The authoring model already supported:
+
+```typescript
+{
+  type: 'REPUTATION',
+  value: number,
+  faction?: string,
+}
+```
+
+Before M23, runtime behavior ignored the `faction` field and changed the quest giver's personal NPC relationship/Affinity. That was an authority conflation.
+
+M23 qualifies the corrected rule:
+
+```text
+REPUTATION + non-empty faction
+-> Faction authority
+-> named institution changes
+-> giver NPC personal Relationship does not implicitly change
+```
+
+Production control:
+
+```text
+quest_valerius_patrol_duty
+-> +10 City Watch
+-> Valerius Affinity unchanged by that REPUTATION reward
+-> Relationship state unchanged by that REPUTATION reward
+-> Knowledge unchanged
+```
+
+The separately authored Relationship consequences of a quest remain Relationship-owned.
+
+No production factionless `REPUTATION` reward was found during M23 recon. A factionless value therefore must not silently fall back to personal Relationship semantics.
+
+See `FactionSystem.md` and `../Technical/M23FactionReputationResult.md`.
 
 ## 6. Ancient Seed — first resolution proof
 
@@ -215,9 +256,11 @@ This is a general fix, not a Willow-only special case.
 - requires `READY_TO_COMPLETE`;
 - refuses turn-in when `resolutionRequired` is true but no resolution is selected;
 - enforces return-to-giver for non-auto-complete quests;
-- applies ordinary top-level quest rewards;
+- applies ordinary top-level quest rewards through their domain authorities;
 - completes the quest;
 - exposes prerequisite-linked follow-up quests where applicable.
+
+For faction-tagged `REPUTATION`, the named Faction is the reward authority. The quest giver is not implicitly the reputation target.
 
 The NPC Quest tab only shows the turn-in action for a resolution-required quest after the authored choice has been locked.
 
@@ -235,9 +278,11 @@ Puzzle consequences remain independent from M4/M16 relationship/Trait resolution
 
 ## 11. Radiant/repeatable foundation
 
-The existing radiant quest thunk can generate repeatable delivery work against available NPCs.
+The existing radiant quest thunk can generate repeatable delivery work against available NPCs and currently authors an `Adventurer's Guild` faction-tagged reputation reward.
 
-Procedural quest generation is not automatically authorized to produce deep Relationship Experiences or permanent-Trait capability gates without explicit authoring.
+M23's generic routing means that reward now targets the named institution rather than the giver NPC. The radiant path itself is not part of the M23 Rule-of-Two production claim.
+
+Procedural quest generation is not automatically authorized to produce deep Relationship Experiences, permanent-Trait capability gates, or broader faction simulation without explicit authoring.
 
 ## 12. Invariants
 
@@ -250,6 +295,9 @@ Procedural quest generation is not automatically authorized to produce deep Rela
 7. Missing required permanent Traits reject the resolution below the UI before consequence/reward/lock.
 8. Relationship state does not substitute for permanent Trait ownership when the resolution requires a learned capability.
 9. Capability availability does not automatically make the player's decision.
+10. Faction-tagged `REPUTATION` rewards update Faction authority, not giver-NPC Affinity.
+11. Faction Reputation does not automatically imply a Relationship or Knowledge consequence.
+12. Objective M24 World State must not be smuggled through a reputation reward.
 
 ## 13. Deferred
 
@@ -262,4 +310,7 @@ Procedural quest generation is not automatically authorized to produce deep Rela
 - richer campaign-scale acceptance/hand-in presentation;
 - temporary/equipped-Trait resolution semantics;
 - OR/NOT Trait requirements;
-- generalized stat/skill/ability condition language.
+- generalized stat/skill/ability condition language;
+- reputation tiers/bands;
+- faction diplomacy or ally/rival spillover;
+- objective regional World State (M24).

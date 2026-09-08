@@ -1,0 +1,28 @@
+{
+  "experiences": {
+    "valerius_exp_m23_public_override": {
+      "id": "valerius_exp_m23_public_override",
+      "uniqueKey": "valerius:m23:01:public-override",
+      "title": "The Order You Broke in Public",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": ["player", "npc_captain_valerius"],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_m23_public_override",
+      "significance": "major",
+      "relationshipEffects": {
+        "affinity": -1,
+        "trust": 6,
+        "understanding": 5,
+        "sharedMeaning": 3,
+        "reliance": 5,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": ["DisciplinedDissent", "PublicOverride", "MissionOverCeremony"],
+      "memoryCandidate": false,
+      "interpretation": "You override a Watch checkpoint in public because the posted order would sacrifice the mission objective. Valerius dislikes the visible breach but recognizes the same disciplined judgment he previously chose to trust, so personal reliance deepens even while the institution has reason to resent the precedent."
+    }
+  },
+  "memories": {},
+  "progression": {}
+}

@@ -143,7 +143,9 @@
       "gronk_craft_request",
       "gronk_rumors",
       "gronk_blade_held",
-      "gronk_m14_repair_ledger"
+      "gronk_m14_repair_ledger",
+      "gronk_m23_guild_audit",
+      "gronk_m23_guild_priority"
     ],
     "completedDialogues": [],
     "availableQuests": [],
@@ -232,7 +234,9 @@
       "valerius_m14_aftermath_council",
       "valerius_m15_forged_ledger_inquiry",
       "valerius_m22_forge_report",
-      "valerius_m22_forge_logistics"
+      "valerius_m22_forge_logistics",
+      "valerius_m23_public_override",
+      "valerius_m23_watch_clearance"
     ],
     "completedDialogues": [],
     "availableQuests": ["quest_valerius_patrol_duty"],

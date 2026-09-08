@@ -14,7 +14,7 @@ import { getMissingPermanentTraitIdsForResolution } from './QuestResolutionAvail
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold, addStatusEffect } from '../../Player/state/PlayerSlice';
 import { addAvailableQuestToNPC } from '../../NPCs/state/NPCSlice';
-import { updateNPCRelationshipThunk } from '../../NPCs/state/NPCThunks';
+import { adjustFactionReputation } from '../../Factions/state/FactionSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { addItem, removeItem } from '../../Inventory/state/InventorySlice';
 import { recordAuthoredRelationshipExperienceThunk } from '../../Relationships/state/RelationshipThunks';
@@ -46,14 +46,12 @@ const applyQuestRewards = async (
         break;
       }
       case 'REPUTATION': {
-        dispatch(
-          updateNPCRelationshipThunk({
-            npcId: quest.giver,
-            change: Number(reward.value) || 0,
-            reason: 'Quest Reward',
-          })
-        );
-        rewardSummaries.push(`+${reward.value} Reputation with ${quest.giver}`);
+        const factionId = typeof reward.faction === 'string' ? reward.faction.trim() : '';
+        const amount = Number(reward.value) || 0;
+        if (factionId) {
+          dispatch(adjustFactionReputation({ factionId, amount }));
+          rewardSummaries.push(`${amount >= 0 ? '+' : ''}${amount} Reputation with ${factionId}`);
+        }
         break;
       }
       case 'ITEM': {

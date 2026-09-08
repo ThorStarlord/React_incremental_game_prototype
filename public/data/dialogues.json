@@ -199,6 +199,39 @@
       "claim": null
     }
   },
+  "gronk_m23_guild_audit": {
+    "id": "gronk_m23_guild_audit",
+    "npcId": "npc_blacksmith_gronk",
+    "title": "Weights That Match the Ledger",
+    "text": "The Merchants Guild asks you to verify a disputed weights-and-receipts audit across three stalls. Gronk shrugs at the paperwork. 'Not my friendship test. But if the Guild is going to settle contracts by those numbers, make sure the numbers are real.'",
+    "repeatable": false,
+    "responses": {
+      "verify": "I checked the weights against the receipts. The disputed entries reconcile; the Guild can clear the contracts on evidence rather than favors."
+    },
+    "effects": [
+      { "type": "FACTION_REPUTATION", "factionId": "Merchants Guild", "value": 12, "responseId": "verify" }
+    ],
+    "next": {
+      "verify": null
+    }
+  },
+  "gronk_m23_guild_priority": {
+    "id": "gronk_m23_guild_priority",
+    "npcId": "npc_blacksmith_gronk",
+    "title": "A Guild Queue, Not a Favor",
+    "text": "The Merchants Guild has moved your next contract into its verified-priority queue. Gronk taps the stamped order. 'That's their decision, not mine. You made their audit reliable enough that they'll risk institutional priority on your paperwork.'",
+    "repeatable": false,
+    "requiredFactionReputation": [
+      { "factionId": "Merchants Guild", "min": 10 }
+    ],
+    "responses": {
+      "acknowledge": "Then keep the distinction clear: Guild priority is institutional standing, not personal credit with you."
+    },
+    "effects": [],
+    "next": {
+      "acknowledge": null
+    }
+  },
   "elara_greeting": {
     "id": "elara_greeting",
     "npcId": "npc_scholar_elara",
@@ -764,6 +797,42 @@
     "effects": [],
     "next": {
       "answer": null
+    }
+  },
+  "valerius_m23_public_override": {
+    "id": "valerius_m23_public_override",
+    "npcId": "npc_captain_valerius",
+    "title": "The Order You Broke in Public",
+    "text": "A Watch checkpoint begins detaining every caravan on an order written for yesterday's threat pattern. You override the post in front of witnesses and reopen the lane that keeps civilians supplied. Later, Valerius closes the office door. 'The Watch hates a public precedent it did not authorize. I hate an order that survives after its objective has changed. Those are not the same judgment.'",
+    "repeatable": false,
+    "requiredExperienceIds": ["valerius_exp_order_questioned"],
+    "responses": {
+      "own_override": "I broke the visible order because following it would have broken the mission. You can trust that judgment personally without asking the Watch to like the precedent."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_m23_public_override", "responseId": "own_override" },
+      { "type": "FACTION_REPUTATION", "factionId": "City Watch", "value": -10, "responseId": "own_override" }
+    ],
+    "next": {
+      "own_override": null
+    }
+  },
+  "valerius_m23_watch_clearance": {
+    "id": "valerius_m23_watch_clearance",
+    "npcId": "npc_captain_valerius",
+    "title": "Clearance the Captain Cannot Give Alone",
+    "text": "Valerius has already made his personal judgment about the checkpoint override. The remaining question belongs to the institution: whether the Watch will place its seal on your access to restricted patrol records. This time his trust is not enough by itself.",
+    "repeatable": false,
+    "requiredExperienceIds": ["valerius_exp_m23_public_override"],
+    "requiredFactionReputation": [
+      { "factionId": "City Watch", "min": 0 }
+    ],
+    "responses": {
+      "accept_clearance": "Then record the distinction: your trust opened the conversation; the Watch's standing authorizes the seal."
+    },
+    "effects": [],
+    "next": {
+      "accept_clearance": null
     }
   },
   "gronk_m14_repair_ledger": {
