@@ -1,139 +1,127 @@
 # Copy System Specification
 
-**Implementation Status:** ✅ **CORE STATE/UI + TRAIT SHARING AUTO-SYNC + BOUNDED M20 PRODUCTION AUTOMATION IMPLEMENTED**
+**Implementation Status:** ✅ **CORE COPY RUNTIME + TRAIT SHARING + BOUNDED M20 AUTOMATION + M21 OFFLINE CONTINUATION + CHECKPOINT-C FAMILIARITY REPAIR QUALIFIED**
 
 > Current qualified build summary:
-> - Slice + thunks for growth, decay, creation, loyalty bolster, accelerated growth, role assignment, and task progress are implemented.
-> - Copy Trait slots, sharing preferences, and automatic unshare on player unequip/replace/permanence are implemented.
-> - Mature/loyal Copies contribute to passive Essence through the existing Copy/Essence selectors.
-> - M20 qualifies two authored repeatable production tasks through the existing `activeTask` lifecycle: **Forge Assistance** and **Resonance Calibration**.
-> - Production task assignment validates authored requirements below the UI, progresses through the live GameLoop, survives ordinary save/load, and applies bounded rewards once.
-> - Meaningful irreversible narrative decisions remain player-owned; M20 does not qualify autonomous-agent gameplay or offline progress.
+> - Copy state/thunks cover creation, growth, loyalty decay/bolster, accelerated growth, role assignment, Trait inheritance/sharing, and one active task per Copy.
+> - M20 qualifies exactly two authored routine production tasks: **Forge Assistance** and **Resonance Calibration**.
+> - The Checkpoint-C Incremental Integration Repair adds player-owned routine familiarity as a prerequisite to delegating those tasks.
+> - Forge familiarity is earned by a one-time active City Center Forge Assistance practice; Resonance Calibration familiarity is earned only by a successful active Trait Resonance.
+> - Familiarity is enforced below the UI by `startCopyProductionTaskThunk`; Copy maturity/loyalty/role/location requirements remain independent.
+> - M21 may advance or complete an already-running authored Copy task during bounded offline settlement, but never selects or chains a new task.
+> - Meaningful/irreversible narrative decisions remain player-owned.
 
-**Implementation location:** `src/features/Copy/` (singular), stored under the Redux `copy` key.
+**Implementation location:** `src/features/Copy/` (singular), stored under Redux key `copy`.
 
-For empirical authority, read:
+For current empirical authority, read:
 
-- `../Technical/M20ProductionCopyTaskAutomation.md` — preregistered M20 contract;
-- `../Technical/M20ProductionCopyTaskAutomationReconAmendment.md` — frozen recon/probe decisions;
-- `../Technical/M20ProductionCopyTaskAutomationResult.md` — qualified M20 result and evidence ceiling.
+- `../Technical/M20ProductionCopyTaskAutomation.md`
+- `../Technical/M20ProductionCopyTaskAutomationReconAmendment.md`
+- `../Technical/M20ProductionCopyTaskAutomationResult.md`
+- `../Technical/M21BoundedOfflineProgressResult.md`
+- `../Technical/CheckpointCIncrementalIntegrationResult.md` — historical first `CHECKPOINT_C_WEAK`;
+- `../Technical/IncrementalIntegrationRepair.md`
+- `../Technical/IncrementalIntegrationRepairReconAmendment.md`
+- `../Technical/IncrementalIntegrationRepairResult.md` — qualified repair.
+
+A repair PASS does not itself make Checkpoint C PASS. A fresh checkpoint rerun remains required before M22.
 
 ---
 
-## 1. Overview
+## 1. Product role
 
-**Concept:** Copies are extensions of the player's will and Essence, created through the Copy-creation interaction and later managed as distinct entities with maturity, loyalty, role, Traits, location data, and one active task at a time.
+Copies are extensions of the player's will and Essence, created from NPC-derived source material and later managed as distinct entities with maturity, loyalty, role, Traits, descriptive/canonicalizable location data, and at most one active task.
 
-The current broad lifecycle is:
-
-```text
-Target
--> Copy creation
--> growth / loyalty management
--> role + Trait configuration
--> player chooses a routine authored task
--> Copy performs live deterministic progress
--> bounded ordinary reward
--> Copy becomes available again
-```
-
-M20 adds an important product boundary:
+The repaired product doctrine is:
 
 ```text
-routine execution -> may be delegated to a Copy
-irreversible / meaningful narrative decision -> remains player authority
+player actively experiences / understands an activity
+-> activity becomes a familiar routine
+-> player may deliberately delegate that routine
+-> a qualified Copy executes it
+-> ordinary consequence returns to the existing RPG economy
 ```
 
-The Copy system is therefore intended to remove routine execution burden, not to make the game choose story meaning for the player.
+while:
+
+```text
+meaningful / irreversible narrative or world decision
+-> remains player authority
+```
+
+The Copy system is therefore a compression layer for already-understood routine execution, not an autonomous story-playing agent.
 
 ---
 
 ## 2. Creation
 
-The current creation path is implemented through `createCopyThunk`.
+The current creation path uses `createCopyThunk`.
 
-- The target NPC must exist.
-- Creation spends the current Essence cost derived from connection depth, plus the accelerated-growth surcharge when selected.
-- The existing Charisma-based success roll determines success.
-- A successful Copy receives independent stats, maturity, loyalty, inherited Traits, role/task state, and the target NPC's current descriptive location value.
-- Trait slots are initialized/reconciled through the existing Copy slot machinery.
+- target NPC must exist;
+- creation spends the current Essence cost derived from connection depth plus accelerated-growth surcharge where selected;
+- the existing Charisma-based success roll determines success;
+- a successful Copy receives independent stats, maturity, loyalty, inherited Traits, role/task state, and the target NPC's current descriptive location value;
+- Trait-slot structure is initialized/reconciled through the existing Copy machinery.
 
-M20 does not redesign Copy creation.
+The Checkpoint-C repair does not redesign Copy creation.
 
-### Location note
+### 2.1 Location note
 
-Copy creation still inherits `npc.location`, and older/demo Copy state can therefore contain human-readable location strings.
+Copy creation still inherits `npc.location`, so older/demo state can contain human-readable values.
 
-M20 does **not** create Copy movement or a second world model. Where an authored task needs location, it reuses M18 `resolveCanonicalLocationId(...)` against the existing Exploration location authority. The qualified Forge probe accepts legacy `"City Center"` because M18 explicitly resolves it to `location_city_center`.
+Where an authored production task needs location, M20 reuses M18 `resolveCanonicalLocationId(...)`. Forge Assistance therefore accepts legacy `"City Center"` because it resolves to `location_city_center`.
 
-A value that cannot be resolved into the authored M18 graph is simply ineligible for a canonical-location-gated task; M20 does not silently invent a location for that Copy.
+The system still does **not** qualify Copy travel/pathfinding or a generalized Copy-presence simulation.
 
 ---
 
 ## 3. Traits on Copies
 
-Copies gain Traits from two current sources.
-
 ### 3.1 Inherited Traits
 
-At creation, the Copy snapshots a bounded set of Traits informed by its parent NPC. These are read-only on the Copy.
+At creation, a Copy snapshots a bounded inherited set informed by its parent NPC.
 
 ### 3.2 Shared Traits
 
 The player may share currently equipped, non-permanent Traits into unlocked Copy Trait slots.
 
-Rules:
+Rules include:
 
-- the Trait must be equipped on the player;
+- source Trait must be equipped by the player;
 - permanent player Traits are not shareable;
 - inherited/shared duplicates are rejected;
 - an unlocked empty slot is required;
-- preferences may be stored and applied to available slots.
+- player preferences may be stored and applied to available slots.
 
-### 3.3 Slot unlocks
+### 3.3 Auto-unshare
 
-Configuration lives in `COPY_SYSTEM.TRAIT_SLOT_UNLOCKS`.
+Listener middleware removes a shared Trait when the player unequips/replaces it or makes it permanent through Resonance.
 
-- `MAX_TRAIT_SLOTS = 4`;
-- initial/unlock behavior remains one-way in this prototype;
-- maturity/loyalty changes trigger unlock reconciliation where applicable.
-
-### 3.4 Auto-unshare invariants
-
-Listener middleware automatically removes a shared Trait from Copies when the player:
-
-- unequips it;
-- replaces it in the relevant player slot;
-- makes it permanent through Resonance.
-
-This keeps Copy sharing subordinate to current Player Trait authority.
-
-### 3.5 Save/load
-
-Older saves may lack current Copy Trait-slot fields. Existing post-load/listener reconciliation initializes missing slot structure without requiring M20-specific persistence.
+This keeps Copy sharing subordinate to Player Trait authority.
 
 ---
 
-## 4. Growth
+## 4. Growth and loyalty
 
-| Mode | Mechanic | Current tuning |
-|---|---|---|
-| Normal | Base maturity growth per live GameLoop delta | `GROWTH_RATE_PER_SECOND = 0.1` |
-| Accelerated | Normal growth multiplied | `ACCELERATED_GROWTH_MULTIPLIER = 2` |
+| Mode/mechanic | Current behavior |
+|---|---|
+| Normal maturity growth | live GameLoop delta-time |
+| Accelerated maturity growth | normal growth × current accelerated multiplier |
+| Loyalty decay | live GameLoop delta-time |
+| Loyalty bolster | player spends Essence |
+| Accelerated promotion | player spends Essence |
 
-Accelerated growth can be selected/activated through the current Essence-spending paths. M20 does not change growth authority.
+The repair does not alter the historical growth or loyalty-decay formulas.
 
-Copies also experience current passive loyalty decay through `processCopyLoyaltyDecayThunk(deltaTime)`.
+M21 does not process general Copy growth or loyalty decay offline; only an already-running M20 production task is on the offline allowlist.
 
 ---
 
-## 5. Essence contribution
+## 5. Passive Essence contribution
 
-A Copy may contribute to passive Essence through the existing Copy qualification model.
+Mature/loyal Copies may contribute to passive Essence through the pre-existing Copy/Essence qualification model.
 
-Current broad qualification remains based on maturity and loyalty thresholds, with `COPY_SYSTEM.ESSENCE_GENERATION_BONUS` and related selectors/thunks supplying the existing passive contribution behavior.
-
-This passive contribution is distinct from the **one-shot M20 Resonance Calibration reward**. A completed Resonance Calibration explicitly grants its authored task reward through the Essence reducer; it does not alter the passive-generation formula.
+This is distinct from the **one-shot M20 Resonance Calibration reward**. Completing that task grants its authored +8 Essence reward; it does not redefine the passive contribution formula.
 
 ---
 
@@ -149,31 +137,31 @@ guardian
 agent
 ```
 
-Role assignment is player-controlled through `assignCopyRoleThunk` and the Copy detail UI.
+Role assignment is player-controlled.
 
 ### 6.1 Duration modifiers
 
-Existing role modifiers are reused by M20 production tasks:
+M20 reuses existing role duration modifiers:
 
-- infiltrator: `0.90x` duration;
-- researcher: `0.95x` duration;
-- guardian: `1.05x` duration;
-- agent: `1.00x` duration;
-- none: `1.00x` duration.
+- infiltrator: `0.90x`;
+- researcher: `0.95x`;
+- guardian: `1.05x`;
+- agent: `1.00x`;
+- none: `1.00x`.
 
-M20 qualifies the modifier through two concrete cases:
+Qualified examples:
 
 ```text
 Forge Assistance + guardian
-60s base * 1.05 -> 63s
+60s * 1.05 -> 63s
 
 Resonance Calibration + researcher
-90s base * 0.95 -> 86s rounded
+90s * 0.95 -> 86s rounded
 ```
 
-### 6.2 Existing completion bonuses
+### 6.2 Completion bonuses
 
-Role completion flavor remains Copy-owned progression:
+Existing role completion flavor remains separate from authored production rewards:
 
 - infiltrator: +2 loyalty;
 - researcher: +1 maturity;
@@ -181,25 +169,101 @@ Role completion flavor remains Copy-owned progression:
 - agent: +1 loyalty and +0.5 maturity;
 - none: no role bonus.
 
-These bonuses are separate from the authored production task's ordinary Gold/Essence reward.
+---
+
+## 7. Player-owned routine familiarity
+
+The Checkpoint-C repair introduces an optional player-owned familiarity map for exactly the two current production routines:
+
+```text
+PlayerState.routineFamiliarity
+  forge_assistance?
+  resonance_calibration?
+```
+
+Each record stores:
+
+```text
+source
+learnedAt
+```
+
+The current bounded sources are:
+
+```text
+forge_assistance
+-> city_center_forge_assistance
+
+resonance_calibration
+-> trait_resonance
+```
+
+This state answers:
+
+```text
+Has the player personally established enough understanding to delegate this routine?
+```
+
+It does **not** answer:
+
+```text
+Can this particular Copy perform it?
+```
+
+Those authorities compose rather than replace one another.
+
+### 7.1 Forge familiarity
+
+Forge Assistance familiarity is earned by the player through one explicit active City Center interaction exposed on the Exploration `TravelPanel`:
+
+```text
+player at location_city_center
+-> Practice Forge Assistance
+-> +5 Gold once
+-> forge_assistance familiarity
+```
+
+The thunk rejects outside City Center and rejects after familiarity already exists. Travel to City Center alone is insufficient evidence.
+
+The +5 Gold amount is a bounded proof value; no final economy-balance claim is made.
+
+### 7.2 Resonance Calibration familiarity
+
+Calibration familiarity is recorded only after a successful active `acquireTraitWithEssenceThunk` has passed the existing Trait Resonance gates and committed permanent acquisition:
+
+```text
+successful Trait Resonance
+-> resonance_calibration familiarity
+```
+
+Failed or merely attempted Resonance does not teach the routine.
+
+### 7.3 Persistence
+
+The familiarity map lives in Player state and therefore persists through the existing full-RootState save envelope.
+
+The field is optional for backward compatibility. If an older/current-schema save lacks it:
+
+```text
+absence -> unfamiliar
+```
+
+Offline time itself does not create familiarity.
 
 ---
 
-## 7. M20 Production Task Automation
+## 8. M20 production task catalog
 
-### 7.1 Task authority
+The catalog lives in `CopyTaskDefinitions.ts` and remains a positive allowlist, not a generalized effect/task scripting engine.
 
-The production catalog lives in `CopyTaskDefinitions.ts`.
-
-M20 intentionally uses a **positive allowlist** rather than a generalized task/effect scripting engine.
-
-The bounded definition shape is:
+The bounded definition includes:
 
 ```ts
 CopyProductionTaskDefinition {
   id
   name
   description
+  familiarityHint
   baseDurationSeconds
   minimumMaturity?
   minimumLoyalty?
@@ -212,56 +276,63 @@ CopyProductionTaskDefinition {
 }
 ```
 
-No arbitrary callback, Redux-action array, behavior tree, AI planner, or narrative decision payload is part of the task definition.
+No arbitrary Redux-action array, callback, behavior tree, planner, narrative-decision payload, or general task DSL is qualified.
 
-### 7.2 Qualified task: Forge Assistance
+### 8.1 Forge Assistance
 
 ```text
 id: forge_assistance
 base duration: 60s
+player familiarity: required
 minimum maturity: 50
 allowed roles: guardian | agent
-required location: location_city_center
+required Copy location: location_city_center
 reward: +15 Gold
 ```
 
-The location requirement uses M18 canonical location resolution. It does not use a Copy-specific coordinate/presence flag.
-
-### 7.3 Qualified task: Resonance Calibration
+### 8.2 Resonance Calibration
 
 ```text
 id: resonance_calibration
 base duration: 90s
+player familiarity: required
 minimum maturity: 75
 minimum loyalty: 55
 allowed roles: researcher | agent
 reward: +8 Essence
 ```
 
-No location requirement is authored for this task because M20 does not have a qualified general Copy movement/presence system.
+No Copy location requirement is authored for Calibration because generalized Copy movement/presence remains unqualified.
 
-### 7.4 Assignment
+---
 
-`startCopyProductionTaskThunk({ copyId, taskId })` is the production assignment authority.
+## 9. Assignment authority
 
-It rejects before mutation when:
+`startCopyProductionTaskThunk({ copyId, taskId })` remains the production assignment authority.
+
+It rejects before task mutation when:
 
 - task ID is unknown;
 - Copy is missing;
 - Copy already has a running task;
+- player familiarity for the authored routine is absent;
 - maturity/loyalty requirement is unmet;
 - role requirement is unmet;
-- authored canonical location requirement is unmet.
+- authored canonical Copy-location requirement is unmet.
 
-The UI calls the same production thunk and uses the same eligibility helper for player-facing disabled state/reasons.
+The Copy UI consumes the same familiarity state and the same task-eligibility helper.
 
-The old arbitrary-duration `startCopyTimedTaskThunk(...)` is not a production assignment path and now rejects with guidance to select an authored production task.
+The UI keeps unfamiliar tasks visible and explains how the player must learn them, rather than silently hiding them.
 
-### 7.5 Active task state
+The legacy arbitrary-duration `startCopyTimedTaskThunk(...)` is not a production assignment path and rejects with guidance to choose an authored task.
 
-One Copy may have one current `activeTask`.
+---
 
-The existing task lifecycle stores:
+## 10. Active task lifecycle
+
+One Copy may have one active task.
+
+Persisted task identity includes:
 
 ```text
 id
@@ -273,21 +344,11 @@ status
 startedAt
 ```
 
-`productionTaskId` is the authored identity needed to resolve M20 requirements/reward semantics after persistence.
-
-### 7.6 Live progression
-
-The main GameLoop already dispatches:
+Live GameLoop processing calls:
 
 ```text
 processCopyTasksThunk(deltaTime)
 ```
-
-Running tasks progress deterministically from live `deltaTime`.
-
-M20 does not settle elapsed wall-clock time while the application is closed. That belongs to M21.
-
-### 7.7 Completion
 
 For a valid authored production task:
 
@@ -296,123 +357,130 @@ progress reaches duration
 -> resolve productionTaskId
 -> apply existing role completion bonus
 -> apply authored Gold/Essence reward
--> notify player
+-> shared notification
 -> clear activeTask
 ```
 
-For unknown/legacy task state:
+Unknown/legacy task state may finish its timer but receives no M20 production reward.
 
-```text
-timer completes
--> no production reward
--> warning
--> clear activeTask
-```
-
-This prevents a legacy/arbitrary task record from acquiring M20 economy authority merely by reaching a timer threshold.
-
-### 7.8 Exact-once behavior
-
-After reward application, `activeTask` is cleared. A later task tick therefore has no completed task to replay.
-
-M20 directly qualifies:
-
-- completion reward once;
-- extra live tick does not duplicate it;
-- save/load after completion followed by another tick does not duplicate it.
+Clearing `activeTask` after completion supplies the existing exact-once replay control.
 
 ---
 
-## 8. Persistence
+## 11. Save/load and M21 offline continuation
 
-The canonical save system serializes the complete `RootState`. `copy.activeTask` therefore persists through the existing save envelope rather than a Copy-specific save format.
+The canonical save system serializes the complete RootState, including:
 
-M20 qualifies:
+- `player.routineFamiliarity` when present;
+- `copy.activeTask` and `productionTaskId`.
+
+M20 qualifies live mid-task save/load continuation.
+
+M21 later qualifies bounded offline settlement for an **already-running** M20 task:
 
 ```text
-active task at partial progress
--> createSave
--> loadSavedGameWithMigration
--> replaceState
--> identity + progress preserved
--> live progress continues
--> reward applies once
+saved running task
++
+bounded elapsed time
+-> task progress or one completion
 ```
 
-No M20 save-schema bump was required.
+M21 never:
 
-Offline elapsed-time settlement is deliberately not performed here; it is an M21 concern.
+- assigns a task;
+- chooses between tasks;
+- queues another task;
+- repeats excess elapsed time into a second task;
+- learns unfamiliar routines;
+- processes general Copy growth/loyalty decay offline.
+
+The repaired combined qualification proves:
+
+```text
+active Forge learning
+-> deliberate Forge assignment
+-> save with running task
+-> load
+-> 60s M21 settlement
+-> Forge completes
+-> +15 Gold once
+-> task clears
+-> visible While you were away summary
+```
+
+Relationship, Quest and canonical player-location state remain unchanged across that offline settlement probe.
 
 ---
 
-## 9. Player-facing management
+## 12. Player-facing management
 
-The current Copy detail UI includes:
+The Copy detail UI includes:
 
-- maturity and loyalty progress;
+- maturity/loyalty progress;
 - role assignment;
 - current Copy location label;
 - authored Production Delegation cards;
-- base duration and reward;
-- eligibility reasons;
+- routine familiarity status;
+- active-learning instruction when unfamiliar;
+- Copy-specific eligibility reasons;
+- base duration/reward;
 - disabled assignment while busy/ineligible;
-- active task name and progress;
-- Trait share preferences;
+- active task/progress;
+- Trait sharing preferences;
 - effective Traits.
 
-The M20 UI explicitly states that delegation covers repeatable execution and that narrative/irreversible decisions remain player authority.
+Current delegation copy states the boundary directly: the player must experience a routine before delegating repeatable execution, while narrative/irreversible decisions remain player authority.
 
 ---
 
-## 10. Narrative authority boundary
+## 13. Narrative authority boundary
 
-Delegable M20 activities are bounded routine execution.
+The production catalog has no representation for choosing:
 
-Examples compatible with the doctrine include gather/repair/craft/patrol/routine research when they are explicitly authored into the production catalog.
+- Quest endings;
+- major dialogue responses;
+- Relationship interpretation/redefinition;
+- betrayal/exposure decisions;
+- alliance/faction alignment;
+- irreversible political/social decisions.
 
-The M20 catalog has no representation for:
+An arbitrary ID such as `choose_quest_ending` remains rejected because it is not an authored production task.
 
-- choosing a Quest ending;
-- selecting a major dialogue response;
-- defining/reinterpreting a Relationship;
-- betraying or exposing someone;
-- choosing an alliance/faction alignment;
-- making an irreversible political/social decision.
-
-An arbitrary ID such as `choose_quest_ending` is rejected because it is not an authored production task.
-
-M20 tests additionally verify that completing a qualified routine task leaves current Relationship and Quest Redux state unchanged.
+M20 tests preserve Relationship and Quest state across qualified task completion. M21 and the Checkpoint-C repair preserve narrative/world decision authority across offline settlement.
 
 ---
 
-## 11. Current implementation summary
+## 14. Current implementation summary
 
 | Feature | Status | Notes |
 |---|---|---|
-| Copy state CRUD/batch update | Implemented | `updateMultipleCopies` available |
-| Growth | Implemented | live delta-time progression |
-| Loyalty decay | Implemented | live delta-time progression |
-| Creation | Implemented | current Essence cost + Charisma roll |
+| Copy CRUD/batch update | Implemented | existing Redux authority |
+| Growth | Implemented | live delta-time |
+| Loyalty decay | Implemented | live delta-time; historical formula preserved |
+| Creation | Implemented | Essence cost + current Charisma roll |
 | Bolster loyalty | Implemented | Essence spend + clamp |
-| Accelerated growth | Implemented | promotion/creation paths |
-| Roles | Implemented | assignment, duration modifiers, completion flavor bonuses |
-| Trait inheritance/sharing | Implemented | slots, preferences, validation, auto-unshare |
-| Passive Essence contribution | Implemented/partial-balance | existing maturity/loyalty qualification |
-| Production task catalog | **M20 qualified** | Forge Assistance + Resonance Calibration |
-| Production task eligibility | **M20 qualified** | role/maturity/loyalty/canonical-location requirements as authored |
-| Live task progression | **M20 qualified** | existing GameLoop task processor |
-| One-shot task reward | **M20 qualified** | Gold/Essence task-specific effects, replay controls |
-| Mid-task save/load | **M20 qualified** | ordinary RootState persistence |
-| Offline task progress | Not implemented | M21 boundary |
-| Copy travel/autonomous movement | Not implemented | not required by M20 |
-| Strategic/autonomous delegation | Not implemented | outside M20 evidence ceiling |
-| Low-loyalty alerts | TODO | separate product/UI work |
+| Accelerated growth | Implemented | creation/promotion paths |
+| Roles | Implemented | duration + completion flavor |
+| Trait inheritance/sharing | Implemented | slots/preferences/auto-unshare |
+| Passive Essence contribution | Implemented/partial-balance | existing threshold model |
+| Production catalog | **M20 PASS** | exactly two authored tasks |
+| Routine familiarity prerequisite | **Repair PASS** | player-owned Rule-of-Two |
+| Forge active learning | **Repair PASS** | City Center, +5 Gold once |
+| Calibration active learning | **Repair PASS** | successful Trait Resonance |
+| Below-UI familiarity enforcement | **Repair PASS** | assignment thunk authority |
+| Live task progression/reward | **M20 PASS** | deterministic, exact-once |
+| Mid-task save/load | **M20 PASS** | RootState persistence |
+| Bounded offline task continuation | **M21 PASS** | already-running task only |
+| Visible offline return summary | **Repair PASS** | shared notification host |
+| Copy travel/autonomous movement | Not qualified | outside current boundary |
+| Autonomous/strategic delegation | Not qualified | outside current boundary |
+| Social knowledge | Future | M22 remains unauthorized pending fresh Checkpoint C PASS |
 
 ---
 
-## 12. Current constants
+## 15. Current constants
 
-`COPY_SYSTEM` remains the authority for current Copy growth/loyalty/slot tuning, including:
+`COPY_SYSTEM` remains the authority for current growth/loyalty/slot tuning, including:
 
 | Constant | Current value |
 |---|---:|
@@ -427,41 +495,38 @@ M20 tests additionally verify that completing a qualified routine task leaves cu
 | `PROMOTE_ACCELERATED_COST` | 150 |
 | `MAX_TRAIT_SLOTS` | 4 |
 
-The older global `COPY_SYSTEM.TASK_REWARDS` constant remains legacy tuning but is **not** M20 production reward authority. M20 production rewards live with their authored definitions in `CopyTaskDefinitions.ts`.
+The older global `COPY_SYSTEM.TASK_REWARDS` value remains legacy tuning; authored M20 production rewards live in `CopyTaskDefinitions.ts`.
 
 ---
 
-## 13. Notifications
+## 16. Evidence ceiling / next boundary
 
-The notification system currently reports Copy creation, promotion/bolster/share actions, task assignment failures, production task start, and production task completion.
+The current Copy/automation evidence does **not** qualify:
 
-Completion feedback names the authored task and summarizes its bounded ordinary reward plus any existing role completion bonus.
-
----
-
-## 14. Evidence ceiling / future work
-
-M20 qualifies **two bounded production activities**, not a general autonomous workforce.
-
-Not qualified by M20:
-
-- offline progression;
-- self-selected/strategic tasks;
-- AI planners or behavior trees;
-- arbitrary task scripting/effect DSLs;
-- task queues/priorities;
+- generalized routine-learning/activity discovery;
+- additional production task IDs beyond the current two;
+- generalized crafting/manual production systems;
+- autonomous task choice/planning;
+- task queues/priorities/chaining;
 - task failure/risk simulation;
 - team Copy tasks;
-- Copy movement/pathfinding/schedules;
-- generalized Copy world presence;
+- Copy travel/pathfinding/schedules;
+- generalized Copy presence;
+- new offline consumers;
+- offline narrative progression;
 - social knowledge propagation;
 - faction reputation;
 - generalized world state;
-- irreversible narrative decision automation;
-- economy balance at scale.
+- economy balance or human enjoyment at scale.
 
-The next planned milestone after an exact-head M20 merge is **M21 — Offline Progress**, using passive Essence plus the now-qualified Copy task progress path as bounded offline-safe consumers.
+The required next sequence is:
 
----
+```text
+Checkpoint C first evaluation: WEAK
+-> Incremental Integration Repair: PASS
+-> merge repair
+-> fresh Checkpoint C rerun
+-> only CHECKPOINT_C_PASS may authorize M22
+```
 
-**Revision:** Reconciled to qualified M20 Production Copy Task Automation behavior and evidence ceiling.
+**Revision:** Reconciled through the qualified Checkpoint-C Incremental Integration Repair; M22 remains unauthorized pending a fresh checkpoint PASS.

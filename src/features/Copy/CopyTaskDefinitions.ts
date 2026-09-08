@@ -14,6 +14,7 @@ export interface CopyProductionTaskDefinition {
   id: CopyProductionTaskId;
   name: string;
   description: string;
+  familiarityHint: string;
   baseDurationSeconds: number;
   minimumMaturity?: number;
   minimumLoyalty?: number;
@@ -33,6 +34,7 @@ export const COPY_PRODUCTION_TASKS: readonly CopyProductionTaskDefinition[] = [
     name: 'Forge Assistance',
     description:
       'Handle repeatable workshop support and equipment upkeep in the City Center.',
+    familiarityHint: 'Practice Forge Assistance yourself in the City Center first.',
     baseDurationSeconds: 60,
     minimumMaturity: 50,
     allowedRoles: ['guardian', 'agent'],
@@ -44,6 +46,7 @@ export const COPY_PRODUCTION_TASKS: readonly CopyProductionTaskDefinition[] = [
     name: 'Resonance Calibration',
     description:
       'Run a controlled repeatable Essence calibration routine and return the stabilized yield.',
+    familiarityHint: 'Successfully Resonate a Trait yourself before delegating calibration.',
     baseDurationSeconds: 90,
     minimumMaturity: 75,
     minimumLoyalty: 55,
@@ -59,9 +62,14 @@ export const getCopyProductionTaskDefinition = (
 
 export const evaluateCopyProductionTaskEligibility = (
   copy: Copy,
-  task: CopyProductionTaskDefinition
+  task: CopyProductionTaskDefinition,
+  isFamiliar: boolean
 ): CopyProductionTaskEligibility => {
   const reasons: string[] = [];
+
+  if (!isFamiliar) {
+    reasons.push(task.familiarityHint);
+  }
 
   if (
     task.minimumMaturity !== undefined &&

@@ -3,7 +3,15 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PlayerState, PlayerAttributes, TraitSlot, StatusEffect, PlayerBaseStats } from './PlayerTypes';
+import {
+  PlayerState,
+  PlayerAttributes,
+  TraitSlot,
+  StatusEffect,
+  PlayerBaseStats,
+  RoutineFamiliarityId,
+  RoutineFamiliarityRecord,
+} from './PlayerTypes';
 import { MAX_TRAIT_SLOTS, INITIAL_TRAIT_SLOTS } from '../../../constants/playerConstants';
 
 /**
@@ -69,6 +77,7 @@ const initialState: PlayerState = {
   statusEffects: [],
   permanentTraits: [],
   traitSlots: createInitialTraitSlots(),
+  routineFamiliarity: {},
   totalPlaytime: 0,
   isAlive: true,
   location: 'location_city_center',
@@ -179,6 +188,22 @@ const playerSlice = createSlice({
       const amount = Math.max(0, action.payload);
       state.gold = Math.max(0, state.gold - amount);
     },
+    markRoutineFamiliarity: (
+      state,
+      action: PayloadAction<{
+        routineId: RoutineFamiliarityId;
+        source: RoutineFamiliarityRecord['source'];
+        learnedAt: number;
+      }>
+    ) => {
+      state.routineFamiliarity ??= {};
+      if (!state.routineFamiliarity[action.payload.routineId]) {
+        state.routineFamiliarity[action.payload.routineId] = {
+          source: action.payload.source,
+          learnedAt: action.payload.learnedAt,
+        };
+      }
+    },
   },
 });
 
@@ -204,6 +229,7 @@ export const {
   setLocation,
   gainGold,
   spendGold,
+  markRoutineFamiliarity,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

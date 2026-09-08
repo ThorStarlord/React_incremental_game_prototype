@@ -7,6 +7,7 @@ import { updateCopy } from '../Copy/state/CopySlice';
 import type { Copy } from '../Copy/state/CopyTypes';
 import { startCopyProductionTaskThunk } from '../Copy/state/CopyThunks';
 import { CITY_CENTER_LOCATION_ID } from '../Exploration/LocationDefinitions';
+import { markRoutineFamiliarity } from '../Player/state/PlayerSlice';
 import { pauseGame, stopGame } from './state/GameLoopSlice';
 import {
   MAX_OFFLINE_PROGRESS_MS,
@@ -20,6 +21,14 @@ type TestStore = ReturnType<typeof makeStore>;
 
 const prepareCopy = (store: TestStore, updates: Partial<Copy>) => {
   store.dispatch(updateCopy({ copyId: 'copy-001', updates }));
+};
+
+const learnForge = (store: TestStore) => {
+  store.dispatch(markRoutineFamiliarity({
+    routineId: 'forge_assistance',
+    source: 'city_center_forge_assistance',
+    learnedAt: 1,
+  }));
 };
 
 beforeEach(() => {
@@ -70,6 +79,7 @@ describe('M21 bounded offline progress qualification', () => {
   ] as const)('saved %s game receives no offline Essence or Copy progress', async (_label, changeLoopState, reason) => {
     const store = makeStore();
     store.dispatch(updateGenerationRate(2));
+    learnForge(store);
     prepareCopy(store, {
       role: 'agent',
       maturity: 90,
@@ -97,6 +107,7 @@ describe('M21 bounded offline progress qualification', () => {
   test('one positive interval settles passive Essence and partial M20 task progress while narrative/location authority stays frozen', async () => {
     const store = makeStore();
     store.dispatch(updateGenerationRate(2));
+    learnForge(store);
     prepareCopy(store, {
       role: 'agent',
       maturity: 90,
@@ -158,6 +169,7 @@ describe('M21 bounded offline progress qualification', () => {
   test('offline Copy completion applies the authored Forge reward exactly once and discards excess elapsed time', async () => {
     const store = makeStore();
     store.dispatch(updateGenerationRate(0));
+    learnForge(store);
     prepareCopy(store, {
       role: 'agent',
       maturity: 90,

@@ -3,7 +3,7 @@
  * @description Type definitions for the Copy system.
  */
 
-import { PlayerStats } from '../../Player/state/PlayerTypes';
+import { PlayerStats, RoutineFamiliarityId } from '../../Player/state/PlayerTypes';
 
 /**
  * Defines the growth method for a Copy.
@@ -14,7 +14,7 @@ export type CopyGrowthType = 'normal' | 'accelerated';
 export type CopyRole = 'infiltrator' | 'researcher' | 'guardian' | 'agent' | 'none';
 
 /** Authored M20 production tasks that may be delegated to a Copy. */
-export type CopyProductionTaskId = 'forge_assistance' | 'resonance_calibration';
+export type CopyProductionTaskId = RoutineFamiliarityId;
 
 /**
  * States a task can be in during its lifecycle.

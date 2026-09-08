@@ -7,6 +7,7 @@ import { VerticalNavBar } from './VerticalNavBar/VerticalNavBar';
 import { MainContentArea } from './MainContentArea';
 import { Outlet } from 'react-router-dom';
 import IntroNarration from '../../shared/components/ui/IntroNarration';
+import GlobalNotificationHost from '../../shared/components/ui/GlobalNotificationHost';
 import { useAppSelector } from '../../app/hooks';
 import { selectHasSeenIntro } from '../../features/Meta/state/MetaSlice';
 import { useNpcShopRestock } from '../../features/NPCs/hooks/useNpcShopRestock';
@@ -86,6 +87,7 @@ export const GameLayout: React.FC = React.memo(() => {
           {!hasSeenIntro && <IntroNarration />}
         </MainContentArea>
       </Box>
+      <GlobalNotificationHost />
     </Box>
   );
 });

@@ -3,7 +3,7 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import type { PlayerState, PlayerStats } from './PlayerTypes'; // Import PlayerStats
+import type { PlayerState, PlayerStats, RoutineFamiliarityId } from './PlayerTypes'; // Import PlayerStats
 import { selectTraits } from '../../Traits/state/TraitsSelectors';
 
 // Base player state selector
@@ -18,6 +18,16 @@ export const selectGold = createSelector(
     [selectPlayer],
     (player) => player.gold
 );
+
+export const selectRoutineFamiliarity = createSelector(
+  [selectPlayer],
+  (player) => player.routineFamiliarity ?? {}
+);
+
+export const selectIsRoutineFamiliar = (
+  state: RootState,
+  routineId: RoutineFamiliarityId
+): boolean => Boolean(state.player.routineFamiliarity?.[routineId]);
 
 // NEW: Selector for the final, calculated stats object
 export const selectFinalStats = createSelector(

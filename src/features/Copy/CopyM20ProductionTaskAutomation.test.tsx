@@ -5,6 +5,8 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { rootReducer, replaceState } from '../../app/store';
 import { createSave, loadSavedGameWithMigration } from '../../shared/utils/saveUtils';
 import { CITY_CENTER_LOCATION_ID } from '../Exploration/LocationDefinitions';
+import { markRoutineFamiliarity } from '../Player/state/PlayerSlice';
+import type { RoutineFamiliarityId } from '../Player/state/PlayerTypes';
 import CopyDetailPanel from './components/ui/CopyDetailPanel';
 import {
   COPY_PRODUCTION_TASKS,
@@ -28,6 +30,16 @@ const prepareCopy = (
   updates: Partial<Copy>
 ) => {
   store.dispatch(updateCopy({ copyId: 'copy-001', updates }));
+};
+
+const learnRoutine = (store: TestStore, routineId: RoutineFamiliarityId) => {
+  store.dispatch(markRoutineFamiliarity({
+    routineId,
+    source: routineId === 'forge_assistance'
+      ? 'city_center_forge_assistance'
+      : 'trait_resonance',
+    learnedAt: 1,
+  }));
 };
 
 const saveAndRestore = async (
@@ -71,6 +83,7 @@ describe('M20 production Copy task automation qualification', () => {
 
   test('Forge Assistance accepts legacy City Center through canonical M18 location resolution and pays Gold exactly once', async () => {
     const store = makeStore();
+    learnRoutine(store, 'forge_assistance');
     prepareCopy(store, {
       role: 'guardian',
       maturity: 75,
@@ -81,7 +94,7 @@ describe('M20 production Copy task automation qualification', () => {
 
     const forge = getCopyProductionTaskDefinition('forge_assistance')!;
     expect(forge.requiredLocationId).toBe(CITY_CENTER_LOCATION_ID);
-    expect(evaluateCopyProductionTaskEligibility(store.getState().copy.copies['copy-001'], forge)).toEqual({
+    expect(evaluateCopyProductionTaskEligibility(store.getState().copy.copies['copy-001'], forge, true)).toEqual({
       eligible: true,
       reasons: [],
     });
@@ -109,6 +122,7 @@ describe('M20 production Copy task automation qualification', () => {
 
   test('Resonance Calibration uses the same generic lifecycle, researcher duration modifier, and Essence authority', async () => {
     const store = makeStore();
+    learnRoutine(store, 'resonance_calibration');
     prepareCopy(store, {
       role: 'researcher',
       maturity: 75,
@@ -135,6 +149,7 @@ describe('M20 production Copy task automation qualification', () => {
 
   test('unmet role/location requirements and busy assignment reject before task mutation', async () => {
     const wrongRoleStore = makeStore();
+    learnRoutine(wrongRoleStore, 'forge_assistance');
     prepareCopy(wrongRoleStore, {
       role: 'none',
       maturity: 75,
@@ -150,6 +165,7 @@ describe('M20 production Copy task automation qualification', () => {
     expect(wrongRoleStore.getState().copy.copies['copy-001'].activeTask).toBeNull();
 
     const wrongLocationStore = makeStore();
+    learnRoutine(wrongLocationStore, 'forge_assistance');
     prepareCopy(wrongLocationStore, {
       role: 'guardian',
       maturity: 75,
@@ -165,6 +181,8 @@ describe('M20 production Copy task automation qualification', () => {
     expect(wrongLocationStore.getState().copy.copies['copy-001'].activeTask).toBeNull();
 
     const busyStore = makeStore();
+    learnRoutine(busyStore, 'forge_assistance');
+    learnRoutine(busyStore, 'resonance_calibration');
     prepareCopy(busyStore, {
       role: 'agent',
       maturity: 90,
@@ -212,6 +230,7 @@ describe('M20 production Copy task automation qualification', () => {
 
   test('mid-task save/load preserves authored identity and progress; completion after restore pays once with no replay', async () => {
     const store = makeStore();
+    learnRoutine(store, 'forge_assistance');
     prepareCopy(store, {
       role: 'agent',
       maturity: 90,
@@ -256,6 +275,7 @@ describe('M20 production Copy task automation qualification', () => {
 
   test('routine task completion leaves Relationship and Quest narrative authority unchanged', async () => {
     const store = makeStore();
+    learnRoutine(store, 'resonance_calibration');
     prepareCopy(store, {
       role: 'researcher',
       maturity: 80,
@@ -277,6 +297,7 @@ describe('M20 production Copy task automation qualification', () => {
 
   test('player-facing Copy UI exposes authored routine jobs and removes arbitrary timer controls', async () => {
     const store = makeStore();
+    learnRoutine(store, 'forge_assistance');
     prepareCopy(store, {
       role: 'guardian',
       maturity: 75,

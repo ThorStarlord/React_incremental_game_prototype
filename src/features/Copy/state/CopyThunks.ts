@@ -285,7 +285,7 @@ export const startCopyTimedTaskThunk = createAsyncThunk(
   }
 );
 
-/** Start one authored M20 production task after validating Copy requirements below the UI. */
+/** Start one authored M20 production task after validating player familiarity and Copy requirements below the UI. */
 export const startCopyProductionTaskThunk = createAsyncThunk(
   'copy/startProductionTask',
   async (
@@ -306,7 +306,11 @@ export const startCopyProductionTaskThunk = createAsyncThunk(
       return rejectWithValue('Task already running');
     }
 
-    const eligibility = evaluateCopyProductionTaskEligibility(copy, definition);
+    const eligibility = evaluateCopyProductionTaskEligibility(
+      copy,
+      definition,
+      Boolean(state.player.routineFamiliarity?.[definition.id])
+    );
     if (!eligibility.eligible) {
       const message = eligibility.reasons.join(' ');
       dispatch(addNotification({ type: 'warning', message }));

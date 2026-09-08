@@ -20,6 +20,18 @@ export interface PlayerBaseStats {
 // PlayerStats now represents the FINAL, calculated stats
 export type PlayerStats = PlayerBaseStats;
 
+/** Bounded routines whose manual experience may unlock later Copy delegation. */
+export type RoutineFamiliarityId = 'forge_assistance' | 'resonance_calibration';
+
+export type RoutineFamiliaritySource =
+  | 'city_center_forge_assistance'
+  | 'trait_resonance';
+
+export interface RoutineFamiliarityRecord {
+  source: RoutineFamiliaritySource;
+  learnedAt: number;
+}
+
 /**
  * Player attributes interface
  */
@@ -75,6 +87,13 @@ export interface PlayerState {
   statusEffects: StatusEffect[];
   permanentTraits: string[];
   traitSlots: TraitSlot[];
+
+  /**
+   * Player-owned knowledge that a bounded routine has been personally learned.
+   * Optional for backward-compatible current-schema saves created before the
+   * Checkpoint C repair; absence safely means unfamiliar.
+   */
+  routineFamiliarity?: Partial<Record<RoutineFamiliarityId, RoutineFamiliarityRecord>>;
   
   totalPlaytime: number;
   isAlive: boolean;

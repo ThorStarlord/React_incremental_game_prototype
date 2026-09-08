@@ -57,6 +57,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const emptySlotCount = useAppSelector((s: RootState) => selectCopyUnlockedEmptySlotCount(s, copyId));
   const allTraits = useAppSelector(selectTraits);
   const hasRunningTask = useAppSelector((s: RootState) => selectCopyHasRunningTask(s, copyId));
+  const routineFamiliarity = useAppSelector((s: RootState) => s.player.routineFamiliarity ?? {});
 
   const title = useMemo(() => (copy ? `${copy.name}` : 'Copy Details'), [copy]);
 
@@ -140,11 +141,12 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
             <Box>
               <Typography variant="overline" color="text.secondary">Production Delegation</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                Delegate repeatable execution only. Narrative and irreversible decisions remain under player authority.
+                Experience a routine yourself before delegating repeatable execution. Narrative and irreversible decisions remain under player authority.
               </Typography>
               <Stack spacing={1}>
                 {COPY_PRODUCTION_TASKS.map(task => {
-                  const taskEligibility = evaluateCopyProductionTaskEligibility(copy, task);
+                  const isFamiliar = Boolean(routineFamiliarity[task.id]);
+                  const taskEligibility = evaluateCopyProductionTaskEligibility(copy, task, isFamiliar);
                   const rewardParts: string[] = [];
                   if ((task.reward.gold ?? 0) > 0) rewardParts.push(`${task.reward.gold} Gold`);
                   if ((task.reward.essence ?? 0) > 0) rewardParts.push(`${task.reward.essence} Essence`);
@@ -166,9 +168,17 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                           <Typography variant="caption" color="text.secondary">
                             Base duration: {task.baseDurationSeconds}s • Reward: {rewardParts.join(' + ')}
                           </Typography>
-                          {!taskEligibility.eligible && (
+                          <Typography
+                            variant="caption"
+                            color={isFamiliar ? 'success.main' : 'warning.main'}
+                            display="block"
+                            sx={{ mt: 0.5 }}
+                          >
+                            {isFamiliar ? 'Routine understood.' : `Locked: ${task.familiarityHint}`}
+                          </Typography>
+                          {taskEligibility.reasons.filter(reason => reason !== task.familiarityHint).length > 0 && (
                             <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 0.5 }}>
-                              {taskEligibility.reasons.join(' ')}
+                              {taskEligibility.reasons.filter(reason => reason !== task.familiarityHint).join(' ')}
                             </Typography>
                           )}
                         </Box>
