@@ -8,9 +8,10 @@ import { rootReducer, replaceState } from '../../app/store';
 import { gameEventListeners } from '../../app/listeners/GameEventListeners';
 import { initializeQuestsThunk, startQuestThunk } from '../Quest/state/QuestThunks';
 import { initializeNPCsThunk } from '../NPCs/state/NPCThunks';
-import { addPermanentTrait } from '../Player/state/PlayerSlice';
+import { addPermanentTrait, setLocation } from '../Player/state/PlayerSlice';
 import { recordAuthoredRelationshipExperienceThunk } from '../Relationships/state/RelationshipThunks';
 import { createSave, loadSavedGameWithMigration } from '../../shared/utils/saveUtils';
+import { WHISPERING_WOODS_LOCATION_ID } from '../Exploration/LocationDefinitions';
 import ActiveQuestCombatPanel from './components/ActiveQuestCombatPanel';
 import CombatEncounterPanel from './components/CombatEncounterPanel';
 import {
@@ -50,6 +51,7 @@ const initializeProductionRuntime = async (store: ReturnType<typeof makeStore>) 
 };
 
 const startM17Quest = async (store: ReturnType<typeof makeStore>) => {
+  store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
   await store.dispatch(startQuestThunk(M17_QUEST_ID)).unwrap();
   expect(store.getState().quest.quests[M17_QUEST_ID].status).toBe('IN_PROGRESS');
 };
@@ -161,6 +163,7 @@ describe('M17 narrow Trait-sensitive combat vertical slice', () => {
     ]);
 
     expect(TELLURIC_ECHO_ENCOUNTER.targetId).toBe(M17_TARGET_ID);
+    expect(TELLURIC_ECHO_ENCOUNTER.requiredLocationId).toBe(WHISPERING_WOODS_LOCATION_ID);
     expect(TELLURIC_ECHO_ENCOUNTER.feedbackPattern?.requiredPermanentTraitIds).toEqual([
       WISDOM_ID,
     ]);
@@ -299,6 +302,7 @@ describe('M17 narrow Trait-sensitive combat vertical slice', () => {
     const resumedStore = await saveAndRestore(store, 61000);
     expect(resumedStore.getState().player.permanentTraits).toContain(WISDOM_ID);
     expect(resumedStore.getState().quest.quests[M17_QUEST_ID].status).toBe('IN_PROGRESS');
+    expect(resumedStore.getState().player.location).toBe(WHISPERING_WOODS_LOCATION_ID);
 
     renderActiveCombat(resumedStore);
     fireEvent.click(await screen.findByRole('button', { name: 'Begin Encounter' }));
