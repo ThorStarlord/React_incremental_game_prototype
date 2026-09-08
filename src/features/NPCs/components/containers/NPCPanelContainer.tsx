@@ -3,11 +3,13 @@
  * @description Routed NPC detail container.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
+import { isAnchoredNpcPhysicallyPresent } from '../../state/NPCWorldLocationDefinitions';
 import {
+  Alert,
   Box,
   Paper,
   Typography,
@@ -61,12 +63,27 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   const npc = useAppSelector(state => (npcId ? selectNPCById(state, npcId) : undefined));
   const isLoading = useAppSelector(selectNPCLoading);
   const error = useAppSelector(selectNPCError);
+  const playerLocation = useAppSelector(state => state.player.location);
   const usesRelationshipAuthority = useAppSelector(state =>
     npcId ? selectUsesRelationshipConnectionAuthority(state, npcId) : false
   );
 
   const [currentTab, setCurrentTab] = useState(0);
   const [isCreateCopyModalOpen, setCreateCopyModalOpen] = useState(false);
+
+  const anchoredPresence = npcId
+    ? isAnchoredNpcPhysicallyPresent(npcId, playerLocation)
+    : undefined;
+  const activeInteractionBlocked = anchoredPresence === false;
+
+  useEffect(() => {
+    if (activeInteractionBlocked && [1, 3, 4, 5].includes(currentTab)) {
+      setCurrentTab(0);
+    }
+    if (activeInteractionBlocked) {
+      setCreateCopyModalOpen(false);
+    }
+  }, [activeInteractionBlocked, currentTab]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -123,9 +140,9 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   // Migrated relationships use content-level evidence gates inside Dialogue,
   // Quests, Traits, and Relationship. Those surfaces must remain visible from
   // Connection 0 so a fresh player can discover what changes the bond.
-  const questsLocked = !usesRelationshipAuthority && npc.affinity < 20;
-  const traitsLocked = !usesRelationshipAuthority && npc.connectionDepth < 1;
-  const tradeLocked = npc.affinity < 40;
+  const questsLocked = activeInteractionBlocked || (!usesRelationshipAuthority && npc.affinity < 20);
+  const traitsLocked = activeInteractionBlocked || (!usesRelationshipAuthority && npc.connectionDepth < 1);
+  const tradeLocked = activeInteractionBlocked || npc.affinity < 40;
 
   return (
     <>
@@ -135,11 +152,19 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
           <Button
             variant="contained"
             color="secondary"
+            disabled={activeInteractionBlocked}
+            title={activeInteractionBlocked ? 'Requires physical presence' : undefined}
             onClick={() => setCreateCopyModalOpen(true)}
           >
             Create Copy
           </Button>
         </Box>
+
+        {activeInteractionBlocked && (
+          <Alert severity="info" sx={{ mt: 2 }}>
+            {npc.name} is not physically present here. You can review profile and Relationship history remotely, but in-person actions require traveling to their location.
+          </Alert>
+        )}
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
           {/* MUI Tabs expects Tab components as direct children. Wrapping a Tab in
@@ -148,25 +173,30 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
               for the legacy lock hint while keeping the required child structure. */}
           <Tabs value={currentTab} onChange={handleTabChange} aria-label="npc details tabs" variant="scrollable" scrollButtons="auto">
             <Tab label="Overview" id="npc-tab-0" />
-            <Tab label="Dialogue" id="npc-tab-1" />
+            <Tab
+              disabled={activeInteractionBlocked}
+              label="Dialogue"
+              id="npc-tab-1"
+              title={activeInteractionBlocked ? 'Requires physical presence' : undefined}
+            />
             <Tab label="Relationship" id="npc-tab-2" />
             <Tab
               disabled={questsLocked}
               label="Quests"
               id="npc-tab-3"
-              title={questsLocked ? 'Requires Affinity 20' : undefined}
+              title={activeInteractionBlocked ? 'Requires physical presence' : questsLocked ? 'Requires Affinity 20' : undefined}
             />
             <Tab
               disabled={traitsLocked}
               label="Traits"
               id="npc-tab-4"
-              title={traitsLocked ? 'Requires Connection Depth 1' : undefined}
+              title={activeInteractionBlocked ? 'Requires physical presence' : traitsLocked ? 'Requires Connection Depth 1' : undefined}
             />
             <Tab
               disabled={tradeLocked}
               label="Trade"
               id="npc-tab-5"
-              title={tradeLocked ? 'Requires Affinity 40' : undefined}
+              title={activeInteractionBlocked ? 'Requires physical presence' : tradeLocked ? 'Requires Affinity 40' : undefined}
             />
           </Tabs>
         </Box>
