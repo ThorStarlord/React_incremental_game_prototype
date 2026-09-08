@@ -57,14 +57,21 @@ export const initializeNPCsThunk = createAsyncThunk<
         }
       } catch {}
 
-      // M24 uses one bounded content extension rather than rewriting the large
-      // historical NPC/dialogue fixtures. If the extension is unavailable, older
-      // content still initializes normally; the dedicated M24 qualification proves
-      // the production bundle itself exists and is merged when present.
-      try {
-        const m24res = await fetch('/data/m24-world-state-content.json');
-        if (m24res.ok) {
-          const extension = await m24res.json();
+      // M24 and M25 each use one bounded content extension rather than rewriting
+      // the large historical NPC/dialogue fixtures. This fixed list is intentionally
+      // not dynamic discovery: two independently authored bundles now justify one
+      // shared merge path while preserving the same optional-extension behavior.
+      const contentExtensionUrls = [
+        '/data/m24-world-state-content.json',
+        '/data/m25-chapter-content.json',
+      ] as const;
+
+      for (const extensionUrl of contentExtensionUrls) {
+        try {
+          const extensionResponse = await fetch(extensionUrl);
+          if (!extensionResponse.ok) continue;
+
+          const extension = await extensionResponse.json();
           const extensionDialogues = extension?.dialogues && typeof extension.dialogues === 'object'
             ? extension.dialogues as Record<string, any>
             : {};
@@ -88,8 +95,8 @@ export const initializeNPCsThunk = createAsyncThunk<
             ...(dialogueNodes ?? {}),
             ...extensionDialogues,
           };
-        }
-      } catch {}
+        } catch {}
+      }
 
       if (dialogueNodes) {
         dispatch(setDialogueNodes(dialogueNodes));

@@ -1,0 +1,88 @@
+{
+  "dialogues": {
+    "valerius_m25_public_order_conclusion": {
+      "id": "valerius_m25_public_order_conclusion",
+      "npcId": "npc_captain_valerius",
+      "title": "The District Holds, But Not Quietly",
+      "text": "Valerius looks over the latest patrol board, then at you. 'The Watch still dislikes the precedent you set. I still think the decision was correct. The freight streets are under pressure, but they are no longer pretending the old order was intact. We paid for control in legitimacy, and we know exactly where the bill came from.'",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "valerius_exp_aftermath_public_crackdown",
+        "silas_exp_old_silence_reinterpreted",
+        "valerius_exp_m23_public_override"
+      ],
+      "requiredRoutineFamiliarityIds": [
+        "forge_assistance"
+      ],
+      "requiredKnowledgeFactIds": [
+        "fact_m22_player_practiced_forge_assistance"
+      ],
+      "requiredFactionReputation": [
+        {
+          "factionId": "City Watch",
+          "max": -1
+        }
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "watchPresence",
+          "equals": "heavy"
+        }
+      ],
+      "responses": {
+        "close": "Then we leave the district in a state we understand, not one we can pretend is clean."
+      },
+      "effects": [],
+      "next": {
+        "close": null
+      }
+    },
+    "gronk_m25_quiet_network_conclusion": {
+      "id": "gronk_m25_quiet_network_conclusion",
+      "npcId": "npc_blacksmith_gronk",
+      "title": "The Load Moves Because the Route Held",
+      "text": "Gronk watches another contract caravan roll through on a manifest that finally matches the freight. 'You did not win by making everyone agree. You changed the route until the facts held under load. The Guild likes the numbers. Valerius likes that carts are moving. Silas likes that you did not spend people just to look decisive. That is enough agreement for one district.'",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "gronk_exp_aftermath_quiet_reroute",
+        "gronk_exp_quiet_reroute_proven",
+        "silas_exp_old_silence_repaid"
+      ],
+      "requiredRoutineFamiliarityIds": [
+        "forge_assistance"
+      ],
+      "requiredKnowledgeFactIds": [
+        "fact_m22_player_practiced_forge_assistance"
+      ],
+      "requiredFactionReputation": [
+        {
+          "factionId": "Merchants Guild",
+          "min": 10
+        }
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "tradeFlow",
+          "equals": "strong"
+        }
+      ],
+      "responses": {
+        "close": "Then the district keeps the route that works and the people who made it work remain people, not abstractions."
+      },
+      "effects": [],
+      "next": {
+        "close": null
+      }
+    }
+  },
+  "npcDialogueIds": {
+    "npc_captain_valerius": [
+      "valerius_m25_public_order_conclusion"
+    ],
+    "npc_blacksmith_gronk": [
+      "gronk_m25_quiet_network_conclusion"
+    ]
+  }
+}
