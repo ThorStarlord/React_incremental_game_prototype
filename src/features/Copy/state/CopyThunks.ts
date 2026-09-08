@@ -127,7 +127,7 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     const batched: Array<{ copyId: string; updates: Partial<Copy> }> = [];
     for (const copy of Object.values(copies)) {
       if (copy.loyalty > COPY_SYSTEM.LOYALTY_MIN) {
-        const newLoyalty = applyLoyaltyDecay(copy.loyalty, baseGrowthOrZero(copy.growthType, decayThisTick));
+        const newLoyalty = applyLoyaltyDecay(copy.loyalty, decayThisTick);
         if (newLoyalty !== copy.loyalty) {
           batched.push({ copyId: copy.id, updates: { loyalty: newLoyalty } });
         }
@@ -140,9 +140,6 @@ export const processCopyLoyaltyDecayThunk = createAsyncThunk(
     }
   }
 );
-
-/** Keep decay semantics explicit while preserving the historical rate for all growth types. */
-const baseGrowthOrZero = (_growthType: CopyGrowthType, value: number): number => value;
 
 /**
  * Increase a Copy's loyalty by spending Essence.
