@@ -733,6 +733,39 @@
       "investigate": null
     }
   },
+  "valerius_m22_forge_report": {
+    "id": "valerius_m22_forge_report",
+    "npcId": "npc_captain_valerius",
+    "title": "A Workshop Fact, Not a Reputation Claim",
+    "text": "You give Valerius the plain version: you spent a shift at Gronk's forge learning the support routine before delegating it. He does not praise the effort; he records the operational fact. 'Good. Then when you speak about repair throughput, I know which part comes from firsthand work rather than confidence.'",
+    "repeatable": false,
+    "requiredRoutineFamiliarityIds": ["forge_assistance"],
+    "forbiddenKnowledgeFactIds": ["fact_m22_player_practiced_forge_assistance"],
+    "responses": {
+      "report": "Record the fact. I worked the routine myself before I delegated it."
+    },
+    "effects": [
+      { "type": "KNOWLEDGE_FACT", "factId": "fact_m22_player_practiced_forge_assistance", "responseId": "report" }
+    ],
+    "next": {
+      "report": null
+    }
+  },
+  "valerius_m22_forge_logistics": {
+    "id": "valerius_m22_forge_logistics",
+    "npcId": "npc_captain_valerius",
+    "title": "What the Watch Can Now Ask",
+    "text": "Because Valerius knows you actually worked Gronk's support line, he stops treating your repair estimates as second-hand advocacy. He marks two damaged patrol mounts on the map. 'I am not asking whether Gronk likes the schedule or whether I trust your judgment. I am asking what the forge can physically sustain.'",
+    "repeatable": false,
+    "requiredKnowledgeFactIds": ["fact_m22_player_practiced_forge_assistance"],
+    "responses": {
+      "answer": "Then use the fact, not my reputation: one support line can carry this load without pretending the deeper repair is already done."
+    },
+    "effects": [],
+    "next": {
+      "answer": null
+    }
+  },
   "gronk_m14_repair_ledger": {
     "id": "gronk_m14_repair_ledger",
     "npcId": "npc_blacksmith_gronk",

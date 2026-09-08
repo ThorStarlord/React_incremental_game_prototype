@@ -18,6 +18,8 @@ import {
   recordAuthoredRelationshipExperienceThunk,
 } from '../../Relationships/state/RelationshipThunks';
 import { selectUsesRelationshipConnectionAuthority } from '../../Relationships/state/RelationshipSelectors';
+import { learnNpcFact } from '../../Knowledge/state/KnowledgeSlice';
+import { selectNpcKnowsFact } from '../../Knowledge/state/KnowledgeSelectors';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -223,8 +225,8 @@ export const processNPCInteractionThunk = createAsyncThunk<
           return { success: false, message: 'Dialogue gate not met.' } as InteractionResult;
         }
 
-        const currentRelationships = (getState() as RootState).relationships;
-        const recordedExperiences = currentRelationships?.experiencesById ?? {};
+        const currentState = getState() as RootState;
+        const recordedExperiences = currentState.relationships?.experiencesById ?? {};
         const requiredExperienceIds = Array.isArray(node.requiredExperienceIds)
           ? node.requiredExperienceIds as string[]
           : [];
@@ -251,6 +253,48 @@ export const processNPCInteractionThunk = createAsyncThunk<
           return { success: false, message: 'Missing alternative relationship evidence.' } as InteractionResult;
         }
 
+        const requiredRoutineFamiliarityIds = Array.isArray(node.requiredRoutineFamiliarityIds)
+          ? node.requiredRoutineFamiliarityIds as string[]
+          : [];
+        const missingRoutine = requiredRoutineFamiliarityIds.find(
+          id => !currentState.player.routineFamiliarity?.[id as keyof typeof currentState.player.routineFamiliarity]
+        );
+        if (missingRoutine) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'You have not personally experienced what this report depends on yet.',
+          }));
+          return { success: false, message: `Missing routine familiarity: ${missingRoutine}` } as InteractionResult;
+        }
+
+        const requiredKnowledgeFactIds = Array.isArray(node.requiredKnowledgeFactIds)
+          ? node.requiredKnowledgeFactIds as string[]
+          : [];
+        const missingKnowledge = requiredKnowledgeFactIds.find(
+          factId => !selectNpcKnowsFact(currentState, npcId, factId)
+        );
+        if (missingKnowledge) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'They do not know what this conversation depends on yet.',
+          }));
+          return { success: false, message: `Missing NPC knowledge: ${missingKnowledge}` } as InteractionResult;
+        }
+
+        const forbiddenKnowledgeFactIds = Array.isArray(node.forbiddenKnowledgeFactIds)
+          ? node.forbiddenKnowledgeFactIds as string[]
+          : [];
+        const alreadyKnown = forbiddenKnowledgeFactIds.find(
+          factId => selectNpcKnowsFact(currentState, npcId, factId)
+        );
+        if (alreadyKnown) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'They already know that fact.',
+          }));
+          return { success: false, message: `NPC already knows fact: ${alreadyKnown}` } as InteractionResult;
+        }
+
         npcText = node.text || node.title || '';
         const effects = Array.isArray(node.effects) ? node.effects : [];
         for (const eff of effects) {
@@ -269,6 +313,10 @@ export const processNPCInteractionThunk = createAsyncThunk<
             dispatch(addItem({ itemId: eff.itemId, quantity: qty }));
           } else if (eff.type === 'OPEN_SERVICE') {
             dispatch(addNotification({ type: 'info', message: 'A service is now available.' }));
+          } else if (eff.type === 'KNOWLEDGE_FACT') {
+            if (eff.factId) {
+              dispatch(learnNpcFact({ npcId: npc.id, factId: eff.factId }));
+            }
           } else if (eff.type === 'RELATIONSHIP_EXPERIENCE') {
             const experienceId = eff.experienceId || (
               selectedResponse ? eff.experienceIdByResponse?.[selectedResponse] : undefined

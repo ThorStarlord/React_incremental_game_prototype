@@ -12,10 +12,12 @@ import npcsReducer from '../features/NPCs/state/NPCSlice';
 import copyReducer from '../features/Copy/state/CopySlice';
 import questReducer from '../features/Quest/state/QuestSlice';
 import relationshipReducer from '../features/Relationships/state/RelationshipSlice';
+import knowledgeReducer from '../features/Knowledge/state/KnowledgeSlice';
 import notificationsReducer from '../shared/state/NotificationSlice';
 import { inventoryReducer } from '../features/Inventory/state/InventorySlice';
 import { copyListeners } from '../features/Copy/state/CopyListeners';
 import { npcListeners } from '../features/NPCs/state/NPCListeners';
+import { knowledgeListeners } from '../features/Knowledge/state/KnowledgeListeners';
 import { gameEventListeners } from './listeners/GameEventListeners';
 
 // Combine all feature reducers
@@ -30,6 +32,7 @@ const combinedReducer = combineReducers({
   copy: copyReducer,
   quest: questReducer,
   relationships: relationshipReducer,
+  knowledge: knowledgeReducer,
   notifications: notificationsReducer,
   inventory: inventoryReducer,
 });
@@ -65,7 +68,12 @@ export const store = configureStore({
         ignoredActions: ['meta/replaceState'],
         ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
       },
-    }).prepend(npcListeners.middleware, copyListeners.middleware, gameEventListeners.middleware),
+    }).prepend(
+      knowledgeListeners.middleware,
+      npcListeners.middleware,
+      copyListeners.middleware,
+      gameEventListeners.middleware
+    ),
   devTools: process.env.NODE_ENV !== 'production',
 });
 

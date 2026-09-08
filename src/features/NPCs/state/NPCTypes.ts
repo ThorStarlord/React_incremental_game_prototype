@@ -3,6 +3,8 @@
  * @description TypeScript interfaces and types for the NPC system
  */
 
+import type { RoutineFamiliarityId } from '../../Player/state/PlayerTypes';
+
 /**
  * Type definitions for the NPCs system
  */
@@ -189,6 +191,7 @@ export type DialogueEffect =
   | (DialogueEffectScope & { type: 'UNLOCK_QUEST'; questId: string })
   | (DialogueEffectScope & { type: 'GIVE_ITEM'; itemId: string; amount?: number })
   | (DialogueEffectScope & { type: 'OPEN_SERVICE'; serviceId: string })
+  | (DialogueEffectScope & { type: 'KNOWLEDGE_FACT'; factId: string })
   | (DialogueEffectScope & {
       type: 'RELATIONSHIP_EXPERIENCE';
       /** Fixed authored Experience for this effect. */
@@ -215,6 +218,12 @@ export interface DialogueNode {
   requiredExperienceIds?: string[];
   /** At least one listed Relationship Experience must already exist. */
   anyOfExperienceIds?: string[];
+  /** All listed objective Player routine-familiarity records must exist. */
+  requiredRoutineFamiliarityIds?: RoutineFamiliarityId[];
+  /** The current dialogue NPC must know all listed facts. */
+  requiredKnowledgeFactIds?: string[];
+  /** The current dialogue NPC must know none of the listed facts. */
+  forbiddenKnowledgeFactIds?: string[];
   /**
    * Opt-in one-shot semantics. Undefined/true preserves legacy repeatable behavior.
    * A successful valid response records this node id in NPC.completedDialogues.
