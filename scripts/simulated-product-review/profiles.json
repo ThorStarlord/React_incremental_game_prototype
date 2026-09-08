@@ -1,0 +1,42 @@
+{
+  "protocolVersion": 1,
+  "minimumPanelSize": 6,
+  "profiles": [
+    {
+      "id": "goal-focused",
+      "name": "Goal-Focused",
+      "packet": "specification/Technical/SimulatedProductReviewParticipants/ParticipantA-GoalFocused.md",
+      "risk": "Does the game communicate enough without proactive system-panel study?"
+    },
+    {
+      "id": "explorer",
+      "name": "Explorer",
+      "packet": "specification/Technical/SimulatedProductReviewParticipants/ParticipantB-Explorer.md",
+      "risk": "Is deeper causal information discoverable through ordinary exploration?"
+    },
+    {
+      "id": "rpg-veteran",
+      "name": "RPG Veteran",
+      "packet": "specification/Technical/SimulatedProductReviewParticipants/ParticipantC-RpgVeteran.md",
+      "risk": "Does the relationship model distinguish itself from conventional RPG progression expectations?"
+    },
+    {
+      "id": "incremental",
+      "name": "Incremental / Automation Player",
+      "packet": "specification/Technical/SimulatedProductReviewParticipants/ParticipantD-Incremental.md",
+      "risk": "Does delegation visibly follow player-understood routine mastery?"
+    },
+    {
+      "id": "narrative",
+      "name": "Narrative-First",
+      "packet": "specification/Technical/SimulatedProductReviewParticipants/ParticipantE-Narrative.md",
+      "risk": "Can narrative context communicate causal structure without systems-first play?"
+    },
+    {
+      "id": "skeptical",
+      "name": "Skeptical Model-Builder",
+      "packet": "specification/Technical/SimulatedProductReviewParticipants/ParticipantF-Skeptical.md",
+      "risk": "Does visible evidence correct plausible but wrong causal models?"
+    }
+  ]
+}
