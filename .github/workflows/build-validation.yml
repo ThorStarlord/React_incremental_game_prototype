@@ -30,6 +30,12 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: Checkpoint C incremental integration repair qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand CheckpointCIncrementalIntegrationRepair.test.tsx
+        env:
+          CI: true
+
       - name: M21 bounded offline progress qualification
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopM21OfflineProgress.test.ts
