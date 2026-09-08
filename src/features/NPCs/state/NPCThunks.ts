@@ -20,6 +20,8 @@ import {
 import { selectUsesRelationshipConnectionAuthority } from '../../Relationships/state/RelationshipSelectors';
 import { learnNpcFact } from '../../Knowledge/state/KnowledgeSlice';
 import { selectNpcKnowsFact } from '../../Knowledge/state/KnowledgeSelectors';
+import { adjustFactionReputation } from '../../Factions/state/FactionSlice';
+import { selectFactionReputation } from '../../Factions/state/FactionSelectors';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -295,6 +297,27 @@ export const processNPCInteractionThunk = createAsyncThunk<
           return { success: false, message: `NPC already knows fact: ${alreadyKnown}` } as InteractionResult;
         }
 
+        const requiredFactionReputation = Array.isArray(node.requiredFactionReputation)
+          ? node.requiredFactionReputation as Array<{ factionId: string; min?: number; max?: number }>
+          : [];
+        const unmetFactionRequirement = requiredFactionReputation.find(requirement => {
+          if (!requirement?.factionId) return true;
+          const reputation = selectFactionReputation(currentState, requirement.factionId);
+          if (typeof requirement.min === 'number' && reputation < requirement.min) return true;
+          if (typeof requirement.max === 'number' && reputation > requirement.max) return true;
+          return false;
+        });
+        if (unmetFactionRequirement) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'The institution is not prepared to offer that yet.',
+          }));
+          return {
+            success: false,
+            message: `Faction reputation gate not met: ${unmetFactionRequirement.factionId}`,
+          } as InteractionResult;
+        }
+
         npcText = node.text || node.title || '';
         const effects = Array.isArray(node.effects) ? node.effects : [];
         for (const eff of effects) {
@@ -316,6 +339,13 @@ export const processNPCInteractionThunk = createAsyncThunk<
           } else if (eff.type === 'KNOWLEDGE_FACT') {
             if (eff.factId) {
               dispatch(learnNpcFact({ npcId: npc.id, factId: eff.factId }));
+            }
+          } else if (eff.type === 'FACTION_REPUTATION') {
+            if (eff.factionId) {
+              dispatch(adjustFactionReputation({
+                factionId: eff.factionId,
+                amount: Number(eff.value) || 0,
+              }));
             }
           } else if (eff.type === 'RELATIONSHIP_EXPERIENCE') {
             const experienceId = eff.experienceId || (
