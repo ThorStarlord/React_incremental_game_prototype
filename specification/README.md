@@ -4,7 +4,7 @@ This specification documents the design, architecture, implementation status, an
 
 The project uses React, TypeScript, Redux Toolkit, Material UI, listener middleware, data-driven content, save migration, and focused behavioral qualification.
 
-## Product authority through M20
+## Product authority through M21
 
 Read the milestone records as an authority chain rather than assuming older design prose describes the current runtime.
 
@@ -21,6 +21,9 @@ The most relevant current records are:
 - [`Technical/M20ProductionCopyTaskAutomation.md`](Technical/M20ProductionCopyTaskAutomation.md) — preregistered M20 contract;
 - [`Technical/M20ProductionCopyTaskAutomationReconAmendment.md`](Technical/M20ProductionCopyTaskAutomationReconAmendment.md) — frozen M20 production probes/architecture decisions;
 - [`Technical/M20ProductionCopyTaskAutomationResult.md`](Technical/M20ProductionCopyTaskAutomationResult.md) — qualified M20 automation result and evidence ceiling;
+- [`Technical/M21BoundedOfflineProgress.md`](Technical/M21BoundedOfflineProgress.md) — preregistered M21 offline-settlement contract;
+- [`Technical/M21BoundedOfflineProgressReconAmendment.md`](Technical/M21BoundedOfflineProgressReconAmendment.md) — frozen timestamp/cap/allowlist semantics;
+- [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md) — qualified bounded offline-progress result and evidence ceiling;
 - [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — planned sequence through M25, subject to actual milestone preregistration/results.
 
 ---
@@ -111,7 +114,7 @@ That fresh PASS, not the repair by itself, authorized automation work.
 
 ## M20 Copy automation authority
 
-M20 is now behaviorally qualified.
+M20 is behaviorally qualified.
 
 The product doctrine is:
 
@@ -161,9 +164,67 @@ M20 also qualifies:
 - canonical M18 location resolution for the Forge location requirement;
 - unchanged Relationship and Quest narrative state during qualified routine task completion.
 
-M20 does **not** qualify autonomous agents, Copy travel simulation, generalized task scripting, offline progress, social knowledge, faction reputation, generalized world state, or irreversible narrative-decision automation.
+M20 itself did not qualify offline progress; that later boundary is owned by M21.
 
-See [`Features/CopySystem.md`](Features/CopySystem.md) for the reconciled current Copy feature contract.
+M20 still does **not** qualify autonomous agents, Copy travel simulation, generalized task scripting, social knowledge, faction reputation, generalized world state, or irreversible narrative-decision automation.
+
+See [`Features/CopySystem.md`](Features/CopySystem.md) for the reconciled Copy feature contract.
+
+---
+
+## M21 offline-progress authority
+
+M21 is behaviorally qualified as a **bounded snapshot settlement**, not as full background simulation.
+
+Canonical timing is:
+
+```text
+loaded versioned save-envelope timestamp
++
+resume Date.now()
+-> clamp elapsed interval to at most 8 hours
+```
+
+Settlement occurs only when the restored save says the GameLoop was running and not paused.
+
+The explicit offline allowlist is exactly:
+
+```text
+1. persisted passive Essence generation
+2. already-running M20 Copy production task progress/completion
+```
+
+Settlement order is:
+
+```text
+saved essence.generationRate snapshot x bounded elapsed
+-> passive Essence
+-> existing M20 Copy task progress/completion
+```
+
+M21 reuses the existing `processPassiveGenerationThunk` and `processCopyTasksThunk` authorities instead of replaying `App.tsx`'s entire live GameLoop.
+
+It qualifies:
+
+- zero settlement for missing/legacy-zero/future/equal timestamps;
+- an eight-hour maximum offline interval;
+- zero settlement for saved paused/stopped GameLoop state;
+- deterministic passive Essence snapshot accrual;
+- partial M20 task progress offline;
+- M20 task completion with authored reward exactly once;
+- excess elapsed time discarded after that task completes;
+- no automatic task restart/queue/selection;
+- replay protection for the same restored save-envelope timestamp;
+- a later ordinary save timestamp becoming a legitimate new settlement identity;
+- player-facing `While you were away` summary feedback;
+- unchanged Relationship/Quest/player-location authority in the positive qualification probe;
+- unchanged save-schema version.
+
+M21 explicitly does **not** process Quest timers, Relationship evidence, dialogue, Combat, travel, Copy general growth/loyalty decay, Trait choices, status effects, regeneration, or generalized GameLoop ticks offline.
+
+The current evidence ceiling also excludes anti-cheat/server time, device-clock tamper resistance, event-time segmented rate recalculation, generalized offline economy/world simulation, and final balance of the eight-hour cap.
+
+See [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) and [`Features/EssenceSystem.md`](Features/EssenceSystem.md) for the reconciled feature contracts.
 
 ---
 
@@ -187,7 +248,7 @@ Discover person / problem
 -> create new Relationship evidence
 -> identify understood routine work
 -> delegate bounded routine execution to a qualified Copy
--> receive ordinary task result
+-> ordinary routine progression may continue through bounded offline-safe settlement
 -> return player attention to higher-order active decisions
 ```
 
@@ -214,6 +275,7 @@ The incremental/automation layer is intended to support the RPG rather than repl
 - data-driven authored content;
 - generic runtime contracts before content-specific exceptions;
 - explicit domain authority rather than duplicated cross-system flags;
+- positive allowlists for bounded automation/offline execution;
 - exact-head qualification for milestone PRs;
 - explicit evidence ceilings on experimental claims.
 
@@ -236,18 +298,21 @@ The incremental/automation layer is intended to support the RPG rather than repl
 - [`Technical/M20ProductionCopyTaskAutomation.md`](Technical/M20ProductionCopyTaskAutomation.md)
 - [`Technical/M20ProductionCopyTaskAutomationReconAmendment.md`](Technical/M20ProductionCopyTaskAutomationReconAmendment.md)
 - [`Technical/M20ProductionCopyTaskAutomationResult.md`](Technical/M20ProductionCopyTaskAutomationResult.md)
+- [`Technical/M21BoundedOfflineProgress.md`](Technical/M21BoundedOfflineProgress.md)
+- [`Technical/M21BoundedOfflineProgressReconAmendment.md`](Technical/M21BoundedOfflineProgressReconAmendment.md)
+- [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md)
 
 ### Core feature specifications
 
 - [`Features/RelationshipExperienceSystem.md`](Features/RelationshipExperienceSystem.md) — Relationship Experiences, Memories, Bond dimensions, Connection
 - [`Features/MemorySystem.md`](Features/MemorySystem.md) — landmark relational evidence
 - [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — Relationship-to-power ontology including bounded spatial Tether
-- [`Features/EssenceSystem.md`](Features/EssenceSystem.md) — passive Essence runtime and recalculation boundaries
+- [`Features/EssenceSystem.md`](Features/EssenceSystem.md) — passive Essence runtime, recalculation boundaries, bounded M21 offline snapshot accrual
 - [`Features/TraitSystem.md`](Features/TraitSystem.md) — discovery, equip, assimilation, Resonance, permanent gameplay capability
 - [`Features/NPCSystem.md`](Features/NPCSystem.md) — NPC identity/services/dialogue/quest integration and compatibility boundaries
 - [`Features/QuestSystem.md`](Features/QuestSystem.md) — quest lifecycle, authored resolution choices, permanent-Trait resolution gates
 - [`Features/CopySystem.md`](Features/CopySystem.md) — Copy growth, loyalty, Traits, roles, qualified M20 routine production tasks
-- [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) — live real-time progression; offline progression remains future work
+- [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) — live fixed-timestep progression + bounded M21 offline settlement orchestration
 - [`Features/CombatSystem_MVP.md`](Features/CombatSystem_MVP.md) — M17 deterministic encounter plus bounded canonical-location launch authority
 - [`Features/ExplorationSystem.md`](Features/ExplorationSystem.md) — M18 travel, M19 spatial Tether inputs, bounded active-play presence integration
 
@@ -272,27 +337,28 @@ The incremental/automation layer is intended to support the RPG rather than repl
 
 ---
 
-## Current implementation status through M20
+## Current implementation status through M21
 
 | Area | Status | Notes |
 |---|---|---|
 | Player | Strong foundation | stats/loadout/progression; canonical fresh location `location_city_center` |
-| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated M4-M20 regression evidence preserves prior behavior |
+| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated regression evidence preserved through M21 |
 | Relationship Connection authority | Qualified for registered bundles | legacy compatibility remains |
-| Essence | Functional + Relationship-derived contributions + bounded spatial Tether | also receives qualified one-shot M20 Resonance Calibration reward |
-| Traits | Core + relationship-mediated discovery/assimilation + bounded gameplay capability | Willow/Elara proof slices |
-| Quest | Expanded foundation | Trait resolution gate + ordinary M18 location listener; M20 routine completion leaves Quest authority unchanged |
-| Narrative integration | Bounded qualified slices | M13/M14/M15 plus active-loop closure controls |
-| Copy | **Bounded production automation qualified** | growth/loyalty/Traits/roles + two authored M20 routine tasks; offline/strategic autonomy not qualified |
-| GameLoop | Live progression implemented | includes Copy task ticks; offline settlement deferred to M21 |
-| Save/load | Implemented + migration qualification | M20 active task identity/progress survives ordinary save/load |
-| Combat | Bounded qualified vertical slice + presence gate | Telluric Echo requires canonical Whispering Woods presence |
-| Exploration | Bounded qualified vertical slice + cross-domain integration | four authored locations, legal direct travel, Quest/Tether/presence integration |
-| Spatial Tether | Bounded qualified projection | Willow/Gronk anchors; authored fallback for unanchored Relationships |
+| Essence | Functional + Relationship-derived contributions + bounded spatial Tether + bounded offline snapshot accrual | M21 settles persisted rate for max 8h; not event-time simulation |
+| Traits | Core + relationship-mediated discovery/assimilation + bounded gameplay capability | Willow/Elara proof slices; no offline Trait choices |
+| Quest | Expanded foundation | Trait resolution gate + ordinary M18 location listener; M20/M21 preserve Quest decision authority |
+| Narrative integration | Bounded qualified slices | M13/M14/M15 plus active-loop closure controls; M21 does not replay narrative offline |
+| Copy | **Bounded production automation + offline task continuation qualified** | two M20 authored tasks; M21 may advance/complete an already-running task, never auto-assign another |
+| GameLoop | **Live progression + bounded offline settlement qualified** | canonical save timestamp, 8h cap, two-consumer allowlist, replay guard |
+| Save/load | Implemented + migration qualification | versioned timestamp is M21 wall-clock authority; no schema bump |
+| Combat | Bounded qualified vertical slice + presence gate | Telluric Echo requires canonical Whispering Woods presence; no offline Combat |
+| Exploration | Bounded qualified vertical slice + cross-domain integration | four authored locations, legal direct travel, Quest/Tether/presence integration; no offline travel |
+| Spatial Tether | Bounded qualified projection | Willow/Gronk anchors; authored fallback for unanchored Relationships; no offline spatial replay |
 | NPC active presence | Bounded qualified integration | anchored in-person actions require co-presence; remote inspection remains distinct |
 | Active RPG integration | **Checkpoint B PASS** | first evaluation WEAK -> repair PASS -> fresh rerun PASS |
-| Offline progress | Future | M21 next candidate |
-| Social knowledge | Future | M22 |
+| Offline progress | **M21 PASS — bounded** | passive Essence + already-running M20 task only; 8h cap; exact-once restored-save identity |
+| Incremental integration | Pending evaluation | Checkpoint C is next; must judge whether M20/M21 support rather than displace active play |
+| Social knowledge | Future | M22, not authorized until Checkpoint C outcome permits progression |
 | Faction reputation | Future | M23 |
 | Objective world state | Future | M24 |
 
@@ -317,9 +383,10 @@ Key milestones:
 - **Checkpoint B first evaluation:** `CHECKPOINT_B_WEAK` — three active world-presence/legibility gaps found;
 - **Active RPG Loop Integration Repair:** PASS — bounded repair of encounter location, anchored NPC co-presence, and post-travel spatial feedback;
 - **Checkpoint B fresh rerun:** `CHECKPOINT_B_PASS` — repaired active RPG loop qualified; M20 authorized;
-- **M20:** PASS — two authored routine Copy tasks use one production contract with below-UI requirements, deterministic live progress, exact-once ordinary rewards, save/load continuity, and preserved narrative authority.
+- **M20:** PASS — two authored routine Copy tasks use one production contract with below-UI requirements, deterministic live progress, exact-once ordinary rewards, save/load continuity, and preserved narrative authority;
+- **M21:** PASS — canonical save-envelope elapsed time settles an explicit two-consumer offline allowlist (passive Essence + already-running M20 task) once within an eight-hour cap while active/narrative domains remain untouched.
 
-Milestone records live under `Technical/` and the executable gates live in Build Validation.
+Milestone records live under `Technical/` and executable gates live in Build Validation.
 
 ---
 
@@ -342,47 +409,50 @@ Build Validation + preregistered criteria are milestone merge authority. Reposit
 
 ## Near-term development direction
 
-After an exact-head M20 qualification and merge, the next candidate is:
+After exact-head M21 qualification and merge, the next required step is:
 
 ```text
-M21 — Offline Progress
+Checkpoint C — Incremental Integration
 ```
 
-M21 should test whether explicitly offline-safe systems can advance deterministically across save/load using bounded elapsed real time.
-
-The initial qualified consumers should be:
+Checkpoint C must evaluate the product effect of the combined automation layer:
 
 ```text
-passive Essence
+M20 routine Copy delegation
 +
-M20 Copy task progress
+M21 bounded offline-safe settlement
 ```
 
-The safety rule remains an allowlist:
+The question is not merely whether those mechanisms execute correctly—they now do within their evidence ceilings. The checkpoint must ask whether they **support the active RPG** by removing understood routine repetition while preserving meaningful player attention and agency.
+
+Evaluate whether automation/offline progression:
+
+- reduces repetition without making manual active play irrelevant;
+- preserves meaningful decisions;
+- makes Relationships/capabilities/Copies more useful rather than bypassing them;
+- produces legible ordinary resource flow;
+- frees the player for higher-order problems;
+- avoids rewarding absence more strongly than participation.
+
+The preferred doctrine remains:
 
 ```text
-offline-safe routine progression -> may settle elapsed time
-narrative / irreversible decision -> must not silently resolve offline
+player experiences / understands activity
+-> routine portion may be automated
+-> meaningful decision remains active/player-driven
 ```
 
-Important M21 boundaries:
+Checkpoint C has **not** been started by M21.
 
-- no offline dialogue choice;
-- no offline Relationship-defining decision;
-- no offline Quest ending;
-- no generalized background world simulation;
-- no arbitrary offline Combat;
-- explicit timestamp, clamping, clock-skew, rounding, and exact-once settlement rules must be preregistered before implementation.
-
-M21 is **not implemented by M20**.
+M22 Social Knowledge Propagation is **not yet authorized** merely because M21 passed. The checkpoint result must decide whether the incremental layer is coherent enough to proceed.
 
 The remaining planned sequence is:
 
 ```text
 M20 Copy Task Automation: PASS
--> M21 Offline Progress
+-> M21 Bounded Offline Progress: PASS
 -> Checkpoint C — Incremental Integration
--> M22 Social Knowledge Propagation
+-> if checkpoint permits: M22 Social Knowledge Propagation
 -> M23 Faction Reputation
 -> M24 Objective World State
 -> M25 Complete Chapter Vertical Slice
@@ -462,7 +532,7 @@ specification/
 
 When an older specification conflicts with current qualified authority, do not silently revive old behavior as design truth.
 
-Use this reading order for the current M20-era product:
+Use this reading order for the current M21-era product:
 
 1. `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority;
 2. `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine;
@@ -472,9 +542,10 @@ Use this reading order for the current M20-era product:
 6. `Technical/CheckpointBActiveRpgLoopResult.md` for the historical first active-RPG verdict;
 7. `Technical/ActiveRpgLoopIntegrationRepairResult.md` for the repair evidence;
 8. `Technical/CheckpointBActiveRpgLoopRerunResult.md` for the fresh PASS that authorized M20;
-9. `Technical/M20ProductionCopyTaskAutomationResult.md` + `Features/CopySystem.md` for qualified Copy production automation authority;
-10. milestone preregistration/recon records for the exact experiment contract;
-11. `Technical/PostM17MilestoneRoadmap.md` for future planned sequencing;
-12. `GameDesignDocument.md` and other older feature prose where not superseded.
+9. `Technical/M20ProductionCopyTaskAutomationResult.md` + `Features/CopySystem.md` for qualified routine Copy automation authority;
+10. `Technical/M21BoundedOfflineProgressResult.md` + `Features/GameLoopSystem.md` + `Features/EssenceSystem.md` for bounded offline-settlement authority;
+11. milestone preregistration/recon records for the exact experiment contract;
+12. `Technical/PostM17MilestoneRoadmap.md` for future planned sequencing;
+13. `GameDesignDocument.md` and other older feature prose where not superseded.
 
 If runtime still uses a legacy rule, document it as compatibility/migration debt and migrate it deliberately rather than pretending it is the modern product model.
