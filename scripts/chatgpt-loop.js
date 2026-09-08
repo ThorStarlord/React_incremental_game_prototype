@@ -1,24 +1,10 @@
 /**
- * ChatGPT "plan -> proceed" looper (Playwright + Node).
- *
- * Flow:
- *  1. Opens chatgpt.com in a persistent Chromium profile (so you log in once manually).
- *  2. Sends INITIAL_PROMPT once, waits for the answer to finish streaming.
- *  3. Sends FOLLOWUP_PROMPT ("proceed") in a loop, waiting after each one.
- *  4. Loop ends when you press ENTER in this terminal (after current answer finishes).
- *
- * Setup:
- *   npm i -D playwright
- *   npx playwright install chromium
- *
- * Run:
- *   node scripts/chatgpt-loop.js
- *
- * Notes:
- *  - Keep the browser headed (headless:false) so login / Cloudflare / 2FA can be
- *    solved manually. Do NOT try to bypass CAPTCHAs programmatically.
- *  - UI automation of chatgpt.com is brittle (selectors change) and may violate
- *    OpenAI's Terms for automated access. For durable use prefer the API.
+ * Multi-Repo ChatGPT Looper (Playwright + Node)
+ * 
+ * Features:
+ * - Creates a dedicated browser tab for each repo (No sidebar navigation needed!).
+ * - Saves each chat's direct URL (https://chatgpt.com/c/<uuid>) for bookmarking.
+ * - Loops through all repos sequentially when you press ENTER.
  */
 
 const path = require("path");
@@ -28,11 +14,61 @@ const { chromium } = require("playwright");
 const CHATGPT_URL = "https://chatgpt.com/";
 const USER_DATA_DIR = path.join(__dirname, "..", ".chatgpt-profile");
 
-const INITIAL_PROMPT =
-  "@github I am building React incremental repository, what are the next steps? please create a detailed plan.";
-const FOLLOWUP_PROMPT = "proceed";
+// 1. CONFIGURE YOUR REPOSITORIES HERE
+const REPOSITORIES = [
+  {
+    id: "incremental",
+    name: "ThorStarlord/React_incremental_game_prototype",
+    type: "React / TypeScript incremental game prototype"
+  },
+  {
+    id: "chess",
+    name: "ThorStarlord/Chess-mentor-engine",
+    type: "Chess mentor engine and analysis tool"
+  }
+];
 
-// How long to wait for streaming to start / finish.
+// 2. PROMPT TEMPLATES
+function buildInitialPrompt(repo) {
+  return `
+@github Analyze repository "${repo.name}". It is a ${repo.type}.
+
+PHASE 1: BRAINSTORM & AUDIT
+- Review repository architecture, code quality, and missing core systems.
+- Identify top opportunities for high-impact improvement.
+
+PHASE 2: 3-FEATURE EXECUTION QUEUE
+Distill your analysis into the TOP 3 most impactful, distinct features or refactors.
+Format strictly as this Markdown checklist:
+### Feature Queue
+- [ ] Feature 1: [Short Name] - [Brief explanation and files affected]
+- [ ] Feature 2: [Short Name] - [Brief explanation and files affected]
+- [ ] Feature 3: [Short Name] - [Brief explanation and files affected]
+
+CRITICAL RULES:
+1. DO NOT write code, create branches, or open PRs yet.
+2. Confirm you are ready. Stop and wait for my next signal to start Feature 1.
+`.trim();
+}
+
+const FOLLOWUP_PROMPT = `
+ACTION: Implement the NEXT pending [ ] feature from our Feature Queue.
+
+WORKFLOW:
+1. SYNC: Fetch/pull 'main' to build on the latest codebase.
+2. BRANCH: Create branch "feature/<short-name>".
+3. IMPLEMENT: Apply code changes for THIS FEATURE ONLY.
+4. VERIFY: Ensure no broken imports or syntax/type errors.
+5. COMMIT & PUSH: Commit with a descriptive message and push.
+6. PULL REQUEST: Open a PR into 'main'.
+7. MERGE:
+   - If your tool permits merging, merge immediately.
+   - Otherwise, state: "PR open, requires manual merge".
+8. STATUS: Output the updated Feature Queue with [x] for completed and [ ] for pending.
+9. STOP: Halt execution here. Do NOT start the next feature.
+`.trim();
+
+// Timeouts
 const STREAM_START_TIMEOUT_MS = 60_000;
 const STREAM_END_TIMEOUT_MS = 10 * 60_000;
 const SETTLE_DELAY_MS = 5_000;
@@ -43,47 +79,45 @@ let started = false;
 let _startResolve = null;
 let readlineInterface = null;
 let browserContext = null;
+
 const startPromise = new Promise((resolve) => {
   _startResolve = resolve;
 });
 
 function watchEnterKey() {
-  console.log("\n>>> Log in in the browser, then press ENTER here to START. Next ENTER stops. <<<\n");
+  console.log("\n========================================================");
+  console.log(">>> Log in, then press ENTER to START the initial prompts.");
+  console.log(">>> Subsequent ENTER presses will trigger the follow-up loop.");
+  console.log("========================================================\n");
+  
   readlineInterface = readline.createInterface({ input: process.stdin, output: process.stdout });
   readlineInterface.on("line", () => {
     if (!started) {
       started = true;
-      console.log("\n[start] ENTER pressed — starting prompt loop. Next ENTER will stop.\n");
+      console.log("\n[start] Starting initial prompt initialization...\n");
       if (_startResolve) _startResolve();
     } else {
       stopRequested = true;
-      console.log("\n[stop] ENTER pressed — finishing current answer, then exiting loop…\n");
+      console.log("\n[stop] Exit requested — will stop after completing the current turn.\n");
     }
   });
-}
-
-async function waitForUserStart() {
-  if (started) return;
-  console.log("[ready] Browser open. Log in to ChatGPT, then press ENTER in this terminal to start.");
-  await startPromise;
-  if (stopRequested) throw new Error("Stop requested");
 }
 
 const COMPOSER_SELECTORS = [
   "#prompt-textarea",
   '[data-testid="prompt-textarea"]',
   'div[contenteditable="true"]',
-  "textarea",
+  "textarea"
 ];
 
 const SEND_SELECTORS = [
   'button[data-testid="send-button"]',
-  'button[aria-label*="Send"]',
+  'button[aria-label*="Send"]'
 ];
 
 const STOP_SELECTORS = [
   'button[data-testid="stop-button"]',
-  'button[aria-label*="Stop"]',
+  'button[aria-label*="Stop"]'
 ];
 
 async function findFirstVisible(page, selectors, timeout = 30_000) {
@@ -101,76 +135,35 @@ async function findFirstVisible(page, selectors, timeout = 30_000) {
     }
     await page.waitForTimeout(1000);
   }
-  throw new Error(`Composer/input not found. Tried: ${selectors.join(", ")}. Last error: ${lastError}`);
+  throw new Error(`Element not found. Tried: ${selectors.join(", ")}. Last error: ${lastError}`);
 }
 
-async function waitForLogin(page, timeoutMs = 10 * 60_000) {
-  console.log("[login] If not logged in, log in manually in the opened browser. Waiting for login…");
+async function waitForLogin(page, timeoutMs = LOGIN_TIMEOUT_MS) {
+  console.log("[login] Checking login status...");
   const deadline = Date.now() + timeoutMs;
-  let announced = false;
   while (Date.now() < deadline) {
-    if (stopRequested) throw new Error("Stop requested");
     try {
-      const url = page.url();
-      const onAuthPage = /auth|login/i.test(url);
-
-      // Logged-out indicators (landing page shows Log in / Sign up).
-      let loggedOutVisible = false;
-      for (const sel of ['a[href*="auth/login"]', 'button:has-text("Log in")', 'button:has-text("Sign up")']) {
-        try {
-          const loc = page.locator(sel).first();
-          if ((await loc.count()) > 0 && (await loc.isVisible())) {
-            loggedOutVisible = true;
-            break;
-          }
-        } catch {
-          // ignore per-selector errors
-        }
-      }
-
-      // Logged-in indicator: composer box visible.
-      let composerVisible = false;
       for (const sel of COMPOSER_SELECTORS) {
-        try {
-          const loc = page.locator(sel).first();
-          if ((await loc.count()) > 0 && (await loc.isVisible())) {
-            composerVisible = true;
-            break;
-          }
-        } catch {
-          // ignore
+        const loc = page.locator(sel).first();
+        if ((await loc.count()) > 0 && (await loc.isVisible())) {
+          console.log("[login] Logged in successfully.");
+          return;
         }
       }
-
-      if (composerVisible && !onAuthPage && !loggedOutVisible) {
-        console.log("[login] Logged in — continuing.");
-        return;
-      }
-
-      if (!announced) {
-        console.log("[login] Not logged in yet — complete login in the browser, then the script continues automatically.");
-        announced = true;
-      }
-    } catch (e) {
-      if (String(e && e.message).includes("Stop requested")) throw e;
-      // ignore transient errors, keep waiting
-    }
+    } catch {}
     await page.waitForTimeout(2000);
   }
-  throw new Error("Login timeout (10 min). Log in manually and re-run.");
+  throw new Error("Login timeout. Log in manually and restart.");
 }
 
 async function sendPrompt(page, text) {
-  if (!text || !text.trim()) throw new Error("Cannot send an empty prompt.");
-
-  const composer = await findFirstVisible(page, COMPOSER_SELECTORS, 120_000);
+  if (!text || !text.trim()) throw new Error("Prompt is empty");
+  const composer = await findFirstVisible(page, COMPOSER_SELECTORS, 60_000);
   await composer.click();
-  // ProseMirror editor (#prompt-textarea) is a contenteditable div — keyboard.type is most reliable.
   await page.keyboard.press("ControlOrMeta+A");
   await page.keyboard.press("Backspace");
-  await page.keyboard.type(text, { delay: 10 });
+  await page.keyboard.type(text, { delay: 5 });
 
-  // Prefer clicking Send; fall back to Enter.
   for (const sel of SEND_SELECTORS) {
     try {
       const btn = page.locator(sel).first();
@@ -178,39 +171,29 @@ async function sendPrompt(page, text) {
         await btn.click();
         return;
       }
-    } catch {
-      // try next selector / fallback below
-    }
+    } catch {}
   }
   await page.keyboard.press("Enter");
 }
 
 async function waitForAnswer(page) {
-  // 1. Wait for streaming to start (Stop button appears).
   let sawStreaming = false;
   for (const sel of STOP_SELECTORS) {
     try {
       await page.locator(sel).first().waitFor({ state: "visible", timeout: STREAM_START_TIMEOUT_MS });
       sawStreaming = true;
       break;
-    } catch {
-      // try next selector
-    }
+    } catch {}
   }
 
   if (!sawStreaming) {
-    throw new Error(
-      "Could not detect answer streaming. Refusing to send another prompt while the page state is unknown."
-    );
+    console.log("[wait] No streaming indicator detected. Waiting fallback (20s)...");
+    await page.waitForTimeout(20_000);
+    return;
   }
 
-  // 2. Wait for streaming to finish (Stop button detaches).
-  console.log("[wait] Answer streaming… waiting for it to finish.");
   const start = Date.now();
   while (Date.now() - start < STREAM_END_TIMEOUT_MS) {
-    if (stopRequested) {
-      // Still wait a bit so we don't cut mid-sentence, but check often.
-    }
     let anyVisible = false;
     for (const sel of STOP_SELECTORS) {
       try {
@@ -219,15 +202,12 @@ async function waitForAnswer(page) {
           anyVisible = true;
           break;
         }
-      } catch {
-        // ignore
-      }
+      } catch {}
     }
     if (!anyVisible) break;
     await page.waitForTimeout(2000);
   }
   await page.waitForTimeout(SETTLE_DELAY_MS);
-  console.log("[wait] Answer looks done.");
 }
 
 (async () => {
@@ -235,49 +215,80 @@ async function waitForAnswer(page) {
 
   browserContext = await chromium.launchPersistentContext(USER_DATA_DIR, {
     headless: false,
-    viewport: { width: 1280, height: 900 },
+    viewport: { width: 1280, height: 900 }
   });
-  const page = browserContext.pages()[0] || (await browserContext.newPage());
 
-  console.log(`[open] ${CHATGPT_URL}`);
-  await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
+  const firstPage = browserContext.pages()[0] || (await browserContext.newPage());
+  await firstPage.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
+  await waitForLogin(firstPage);
+
+  console.log("[ready] Logged in. Press ENTER in this terminal to initialize all repo chats.");
+  await startPromise;
+
+  // Dictionary mapping repo.id -> { page, directUrl }
+  const sessions = {};
 
   try {
-    await waitForLogin(page, LOGIN_TIMEOUT_MS);
-    await waitForUserStart();
-    // Initial prompt (sent once)
-    await sendPrompt(page, INITIAL_PROMPT);
-    console.log(`[sent] initial prompt (${INITIAL_PROMPT.length} chars)`);
-    await waitForAnswer(page);
+    // -------------------------------------------------------------
+    // STEP 1: INITIALIZE REPO SESSIONS (ONE TAB PER REPO)
+    // -------------------------------------------------------------
+    for (let i = 0; i < REPOSITORIES.length; i++) {
+      const repo = REPOSITORIES[i];
+      console.log(`\n--- [Init] Setting up Tab for: ${repo.name} ---`);
+      
+      // Use the existing first page for the first repo; open new tabs for the rest
+      const page = (i === 0) ? firstPage : await browserContext.newPage();
+      await page.bringToFront();
+      
+      if (i > 0) {
+        await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
+      }
 
-    // Follow-up loop
-    let i = 1;
-    while (!stopRequested) {
-      console.log(`\n[loop ${i}] Sending: "${FOLLOWUP_PROMPT}" (press ENTER to stop after this answer)`);
-      await sendPrompt(page, FOLLOWUP_PROMPT);
-      console.log(`[sent] follow-up #${i}`);
+      const prompt = buildInitialPrompt(repo);
+      await sendPrompt(page, prompt);
+      console.log(`[sent] Initial prompt sent to ${repo.id}`);
+      
       await waitForAnswer(page);
-      i += 1;
+      
+      // Store the direct URL (e.g., https://chatgpt.com/c/670...)
+      const chatUrl = page.url();
+      console.log(`[saved] ${repo.id} chat URL: ${chatUrl}`);
+      sessions[repo.id] = { page, chatUrl, name: repo.name };
     }
-  } catch (e) {
-    if (String(e && e.message).includes("Stop requested")) {
-      console.log("[stop] Requested during input wait.");
-    } else {
-      console.error("[error]", e);
-      console.error(
-        "\nTip: ChatGPT's DOM changes often. Inspect the composer / send / stop buttons " +
-          "in DevTools and update COMPOSER_SELECTORS / SEND_SELECTORS / STOP_SELECTORS at the top of this file."
-      );
+
+    console.log("\n>>> All repositories initialized! <<<");
+    console.log("Press ENTER at any time to send the follow-up step to each repo in turn.\n");
+
+    // -------------------------------------------------------------
+    // STEP 2: MULTI-REPO FOLLOW-UP LOOP
+    // -------------------------------------------------------------
+    let cycle = 1;
+    while (!stopRequested) {
+      console.log(`\n================== [CYCLE ${cycle}] ==================`);
+      for (const repo of REPOSITORIES) {
+        if (stopRequested) break;
+
+        const session = sessions[repo.id];
+        console.log(`\n[loop] Switching to tab: ${session.name}`);
+        await session.page.bringToFront();
+
+        console.log(`[loop] Sending FOLLOWUP_PROMPT...`);
+        await sendPrompt(session.page, FOLLOWUP_PROMPT);
+        await waitForAnswer(session.page);
+        console.log(`[done] Completed iteration for ${session.name}`);
+      }
+
+      cycle++;
+      if (!stopRequested) {
+        console.log("\nCycle complete. Press ENTER to stop or keep running next loop...");
+      }
     }
+  } catch (err) {
+    console.error("[error]", err);
   } finally {
-    console.log("[done] Closing browser. Profile kept in .chatgpt-profile/ so login persists.");
+    console.log("\n[exit] Closing browser session.");
     readlineInterface?.close();
     await browserContext?.close();
+    process.exit(0);
   }
 })();
-
-process.on("SIGINT", () => {
-  console.log("\n[stop] Ctrl+C — exiting after current step…");
-  stopRequested = true;
-  if (!started && _startResolve) _startResolve();
-});
