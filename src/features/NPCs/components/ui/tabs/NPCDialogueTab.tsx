@@ -27,8 +27,9 @@ type Choice = { id: string; title: string; responses: DialogueResponse[] };
 
 /**
  * NPCDialogueTab - Handles dialogue interactions with NPCs.
- * Authored relationship topics can declare Experience prerequisites so future
- * beats do not spoil themselves or become clickable out of causal order.
+ * Authored topics can declare Relationship, active-experience, and per-NPC
+ * Knowledge prerequisites so future beats do not spoil themselves or become
+ * clickable out of causal order.
  */
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
@@ -39,6 +40,12 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dialogueNodes = useAppSelector(state => state.npcs.dialogueNodes || {});
   const recordedExperiences = useAppSelector(
     state => state.relationships?.experiencesById ?? {}
+  );
+  const routineFamiliarity = useAppSelector(
+    state => state.player.routineFamiliarity ?? {}
+  );
+  const knownFactIds = useAppSelector(
+    state => state.knowledge?.factIdsByNpcId?.[npcId] ?? []
   );
 
   const availableDialogueChoices: Choice[] = useMemo(() => {
@@ -70,6 +77,27 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           return null;
         }
 
+        const requiredRoutineFamiliarityIds = Array.isArray(node.requiredRoutineFamiliarityIds)
+          ? node.requiredRoutineFamiliarityIds as string[]
+          : [];
+        if (requiredRoutineFamiliarityIds.some(id => !routineFamiliarity[id as keyof typeof routineFamiliarity])) {
+          return null;
+        }
+
+        const requiredKnowledgeFactIds = Array.isArray(node.requiredKnowledgeFactIds)
+          ? node.requiredKnowledgeFactIds as string[]
+          : [];
+        if (requiredKnowledgeFactIds.some(id => !knownFactIds.includes(id))) {
+          return null;
+        }
+
+        const forbiddenKnowledgeFactIds = Array.isArray(node.forbiddenKnowledgeFactIds)
+          ? node.forbiddenKnowledgeFactIds as string[]
+          : [];
+        if (forbiddenKnowledgeFactIds.some(id => knownFactIds.includes(id))) {
+          return null;
+        }
+
         const responses = node.responses || {};
         return {
           id: node.id,
@@ -81,7 +109,14 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         } as Choice;
       })
       .filter(Boolean) as Choice[];
-  }, [npc?.availableDialogues, npc?.completedDialogues, dialogueNodes, recordedExperiences]);
+  }, [
+    npc?.availableDialogues,
+    npc?.completedDialogues,
+    dialogueNodes,
+    recordedExperiences,
+    routineFamiliarity,
+    knownFactIds,
+  ]);
 
   if (!npc) {
     return (
