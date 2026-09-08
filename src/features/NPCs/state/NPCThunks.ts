@@ -367,7 +367,7 @@ export const processNPCInteractionThunk = createAsyncThunk<
           : [];
         const worldStateRegions = selectWorldStateRegions(currentState);
         const unmetWorldStateRequirement = requiredWorldState.find(
-          requirement => !doesWorldStateRequirementPass(worldStateRegions, requirement)
+          (requirement: any) => !doesWorldStateRequirementPass(worldStateRegions, requirement)
         );
         if (unmetWorldStateRequirement) {
           const regionId = typeof unmetWorldStateRequirement?.regionId === 'string'
