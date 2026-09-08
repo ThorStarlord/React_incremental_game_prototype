@@ -1,6 +1,6 @@
 # Faction System Specification
 
-**Status:** Bounded first-class authority qualified by M23  
+**Status:** Bounded first-class authority qualified by M23; M24 preserves Faction as distinct from Objective World State  
 **Milestone authority:** `M23FactionReputationResult.md`  
 **Redux root:** `factions`
 
@@ -19,18 +19,18 @@ How does this institution regard the player?
 It does not answer:
 
 ```text
-What happened?                        -> objective source / future World State where appropriate
-Who knows what happened?              -> Knowledge
-What does one person's history mean?  -> Relationship
+What objectively exists now?          -> World State
+Who knows what happened?               -> Knowledge
+What does one person's history mean?   -> Relationship
 ```
 
-The canonical separation after M23 is:
+The canonical separation after M24 is:
 
 ```text
-WORLD        -> objective conditions/events
-KNOWLEDGE    -> per-NPC awareness
-RELATIONSHIP -> personal shared-history meaning
-FACTION      -> institutional standing
+WORLD STATE        -> objective regional conditions
+KNOWLEDGE          -> per-NPC awareness
+RELATIONSHIP       -> personal shared-history meaning
+FACTION REPUTATION -> institutional standing
 ```
 
 ---
@@ -79,7 +79,7 @@ The canonical query is:
 selectFactionReputation(state, factionId)
 ```
 
-The selector treats a missing `factions` root or missing faction key as neutral rather than deriving standing from another social domain.
+The selector treats a missing `factions` root or missing faction key as neutral rather than deriving standing from another social or world domain.
 
 Faction state is persisted as ordinary RootState.
 
@@ -306,7 +306,7 @@ Knowledge can become an authored prerequisite to a future institutional reaction
 
 ## 11. Quest integration
 
-Faction-tagged quest reputation now means institutional standing.
+Faction-tagged quest reputation means institutional standing.
 
 Existing qualified control:
 
@@ -361,11 +361,11 @@ A legacy-like state lacking `factions` is interpreted as neutral standing.
 
 Recon found that machinery dormant.
 
-M23 deliberately does **not** activate it.
+M23 deliberately does **not** activate it, and M24 does not revive it.
 
 It must not be treated as canonical Faction authority merely because it exists in the repository.
 
-In particular, M23 does not qualify:
+In particular, current authority does not qualify:
 
 ```text
 City Watch change -> allied faction change
@@ -376,28 +376,75 @@ or any reputation-level labels.
 
 ---
 
-## 14. World-State boundary
+## 14. Objective World State boundary after M24
 
-Faction standing is a social/institutional assessment, not objective regional state.
+Faction standing is a social/institutional assessment; World State is an objective regional condition.
 
-For example:
-
-```text
-City Watch reputation = -10
-```
-
-does not itself mean:
+M24 now qualifies a separate `worldState` root with exactly two Merchant District conditions:
 
 ```text
-more guards deployed
-merchant district locked down
-crime increased
-patrol density changed
+watchPresence: normal | heavy
+tradeFlow: normal | strong
 ```
 
-Those are objective world conditions and remain M24 territory.
+The distinction is directly exercised by M24.
 
-M23 adds no generalized World State root or simulation.
+### Institutional standing is not freight throughput
+
+M24's freight mutation requires:
+
+```text
+Merchants Guild >= 10
+```
+
+but at that same standing the campaign can still have:
+
+```text
+tradeFlow = normal
+```
+
+until the player explicitly releases the verified contract caravans.
+
+Only that separate action produces:
+
+```text
+tradeFlow = strong
+```
+
+while Merchants Guild standing remains unchanged.
+
+Therefore:
+
+```text
+institutional permission / regard
+!=
+objective world condition
+```
+
+### Institutional opinion is not patrol density
+
+Likewise:
+
+```text
+City Watch reputation
+```
+
+does not itself determine:
+
+```text
+location_merchant_district.watchPresence
+```
+
+M24's qualified patrol-density mutation is an explicit player-authored operational action downstream of prior history, not a score-to-world automatic mapping.
+
+M24 tests also preserve the historical M23 invariant:
+
+```text
+Faction mutation
+-> World State remains neutral/unmutated
+```
+
+See `WorldStateSystem.md` and `../Technical/M24ObjectiveWorldStateResult.md`.
 
 ---
 
@@ -405,15 +452,17 @@ M23 adds no generalized World State root or simulation.
 
 1. Faction standing is independent from personal NPC Relationship state.
 2. Faction standing is independent from per-NPC Knowledge.
-3. Missing faction state is neutral, not inferred.
-4. Faction-tagged `REPUTATION` quest rewards update the named faction, not the quest giver's personal Affinity.
-5. `FACTION_REPUTATION` dialogue effects are explicit institutional consequences.
-6. Institutional dialogue gates are enforced below the UI.
-7. Relationship evidence may coexist with a faction effect but does not mirror automatically.
-8. Faction standing does not satisfy Relationship-only gates.
-9. Relationship state does not satisfy faction-only gates.
-10. Dormant ally/rival spillover is not canonical runtime authority.
-11. Faction reputation does not imply objective M24 World State.
+3. Faction standing is independent from objective World State.
+4. Missing faction state is neutral, not inferred.
+5. Faction-tagged `REPUTATION` quest rewards update the named faction, not the quest giver's personal Affinity.
+6. `FACTION_REPUTATION` dialogue effects are explicit institutional consequences.
+7. Institutional dialogue gates are enforced below the UI.
+8. Relationship evidence may coexist with a faction effect but does not mirror automatically.
+9. Faction standing does not satisfy Relationship-only gates.
+10. Relationship state does not satisfy faction-only gates.
+11. Dormant ally/rival spillover is not canonical runtime authority.
+12. Faction Reputation does not automatically mutate M24 World State.
+13. World State mutation does not automatically mutate Faction Reputation.
 
 ---
 
@@ -444,11 +493,23 @@ without gronk_exp_quality_over_finish
 -> gronk_blade_held still unavailable
 ```
 
+### M24 cross-domain control
+
+```text
+Merchants Guild +12
+-> explicit freight release is available
+-> before action tradeFlow still normal
+-> after explicit action tradeFlow strong
+-> Merchants Guild remains +12
+```
+
+This M24 control preserves Faction authority rather than expanding it.
+
 ---
 
 ## 17. Evidence ceiling
 
-M23 does not qualify:
+Faction authority still does not qualify:
 
 - generalized faction registry semantics;
 - reputation labels/tiers/bands;
@@ -461,9 +522,11 @@ M23 does not qualify:
 - institutional Knowledge or consensus;
 - territory control;
 - patrol simulation;
-- objective regional World State;
+- automatic Faction-to-World-State conversion;
 - M25 complete chapter integration;
 - human pacing, comprehension, or fun.
+
+Objective World State itself is now separately M24-qualified within its own narrow evidence ceiling rather than a Faction feature.
 
 ---
 
@@ -472,10 +535,12 @@ M23 does not qualify:
 - `../Technical/M23FactionReputation.md`
 - `../Technical/M23FactionReputationReconAmendment.md`
 - `../Technical/M23FactionReputationResult.md`
+- `WorldStateSystem.md`
+- `../Technical/M24ObjectiveWorldStateResult.md`
 - `NPCSystem.md`
 - `QuestSystem.md`
 - `KnowledgeSystem.md`
 - `RelationshipExperienceSystem.md`
 - `../Technical/PostM17MilestoneRoadmap.md`
 
-When older code/docs treat `REPUTATION` as a personal NPC Affinity reward or imply faction spillover from dormant constants, M23's qualified authority supersedes that interpretation.
+When older code/docs treat `REPUTATION` as a personal NPC Affinity reward, imply faction spillover from dormant constants, or use Faction standing as shorthand for objective regional conditions, the qualified M23/M24 authority separation supersedes that interpretation.

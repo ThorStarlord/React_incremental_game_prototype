@@ -14,6 +14,7 @@ import questReducer from '../features/Quest/state/QuestSlice';
 import relationshipReducer from '../features/Relationships/state/RelationshipSlice';
 import knowledgeReducer from '../features/Knowledge/state/KnowledgeSlice';
 import factionReducer from '../features/Factions/state/FactionSlice';
+import worldStateReducer from '../features/WorldState/state/WorldStateSlice';
 import notificationsReducer from '../shared/state/NotificationSlice';
 import { inventoryReducer } from '../features/Inventory/state/InventorySlice';
 import { copyListeners } from '../features/Copy/state/CopyListeners';
@@ -35,6 +36,7 @@ const combinedReducer = combineReducers({
   relationships: relationshipReducer,
   knowledge: knowledgeReducer,
   factions: factionReducer,
+  worldState: worldStateReducer,
   notifications: notificationsReducer,
   inventory: inventoryReducer,
 });

@@ -17,6 +17,7 @@ import {
   processNPCInteractionThunk,
 } from '../../../';
 import type { DialogueEntry } from '../../../state/NPCTypes';
+import { doesWorldStateRequirementPass } from '../../../../WorldState/state/WorldStateSelectors';
 
 interface NPCDialogueTabProps {
   npcId: string;
@@ -28,8 +29,8 @@ type Choice = { id: string; title: string; responses: DialogueResponse[] };
 /**
  * NPCDialogueTab - Handles dialogue interactions with NPCs.
  * Authored topics can declare Relationship, active-experience, per-NPC
- * Knowledge, and bounded institutional prerequisites so future beats do not
- * spoil themselves or become clickable out of causal order.
+ * Knowledge, bounded institutional, and bounded objective-world prerequisites
+ * so future beats do not spoil themselves or become clickable out of causal order.
  */
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
@@ -49,6 +50,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   );
   const factionReputationByFactionId = useAppSelector(
     state => state.factions?.reputationByFactionId ?? {}
+  );
+  const worldStateRegions = useAppSelector(
+    state => state.worldState?.regions ?? {}
   );
 
   const availableDialogueChoices: Choice[] = useMemo(() => {
@@ -113,6 +117,15 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           return null;
         }
 
+        const requiredWorldState = Array.isArray(node.requiredWorldState)
+          ? node.requiredWorldState
+          : [];
+        if (requiredWorldState.some((requirement: unknown) =>
+          !doesWorldStateRequirementPass(worldStateRegions, requirement)
+        )) {
+          return null;
+        }
+
         const responses = node.responses || {};
         return {
           id: node.id,
@@ -132,6 +145,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
     routineFamiliarity,
     knownFactIds,
     factionReputationByFactionId,
+    worldStateRegions,
   ]);
 
   if (!npc) {

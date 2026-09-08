@@ -1,7 +1,7 @@
 # NPC System Specification
 
-**Status:** Implemented NPC interaction foundation; Relationship semantics reconciled after M14; bounded Knowledge dialogue integration qualified by M22; bounded Faction dialogue integration qualified by M23  
-**Authority:** For migrated relationships, `Relationships` owns Connection/Experience/Memory semantics. `Knowledge` owns per-NPC awareness of objective facts. `Factions` owns institutional standing. NPC state retains identity, services, inventory, authored faction membership metadata, dialogue/quest availability, and legacy compatibility fields.
+**Status:** Implemented NPC interaction foundation; Relationship semantics reconciled after M14; bounded Knowledge/Faction/World-State dialogue integration qualified by M22/M23/M24  
+**Authority:** `Relationships` owns personal Connection/Experience/Memory semantics. `Knowledge` owns per-NPC awareness. `Factions` owns institutional standing. `WorldState` owns bounded objective regional conditions. NPC state retains identity, services, inventory, authored membership metadata, dialogue/quest availability, and legacy compatibility fields.
 
 ## 1. Purpose
 
@@ -14,17 +14,13 @@ The NPC system represents the game's inhabitants and provides the player-facing 
 - Trait sourcing / sharing surfaces;
 - inventory and authored faction membership metadata;
 - interaction routing;
-- presentation/consumption of authored Relationship, Knowledge, and Faction prerequisites.
+- presentation/consumption of authored Relationship, Knowledge, Faction, and bounded World State prerequisites.
 
 The NPC system does **not** own the modern meaning of a relationship for NPCs whose `RelationshipProgressionDefinition.connectionAuthority` is `relationships`.
 
-That authority belongs to `Features/RelationshipExperienceSystem.md` and the `Relationships` runtime.
-
-NPC data also does not own canonical per-NPC fact awareness or institutional standing. Those authorities belong to `Features/KnowledgeSystem.md` and `Features/FactionSystem.md`; the NPC dialogue runtime provides generic acquisition/consumption integration.
+NPC data likewise does not own canonical per-NPC fact awareness, institutional standing, or regional World State. Those authorities belong to `RelationshipExperienceSystem.md`, `KnowledgeSystem.md`, `FactionSystem.md`, and `WorldStateSystem.md`. The NPC dialogue runtime provides generic integration between authored content and those domains.
 
 ## 2. Relationship authority
-
-### 2.1 Canonical model for migrated NPCs
 
 For Relationship-authority NPCs:
 
@@ -40,33 +36,9 @@ Dialogue / quest / gameplay event
 
 Current registered production Relationship bundles include Elder Willow, Lyra, Elara, Gronk, Silas, and Valerius, plus bounded cross-system milestone bundles.
 
-These characters must not be authored as though Affinity were an XP bar whose threshold automatically grants Connection.
+Affinity remains a short-horizon NPC signal for disposition, legacy service rules, dialogue tone, and compatibility. **Affinity is not Connection XP, Faction Reputation, Knowledge, or World State.**
 
-### 2.2 Affinity
-
-Affinity remains useful as a short-horizon NPC signal:
-
-- positive/negative current disposition;
-- service pricing or access where existing rules use it;
-- dialogue tone;
-- temporary conflict;
-- legacy compatibility.
-
-**Affinity is not Connection XP and is not Faction Reputation.**
-
-A production relationship may legitimately have low/negative Affinity while high Connection, Understanding, Shared Meaning, or Reliance reflects deep rivalry, conflict, obligation, betrayal, or another durable bond.
-
-### 2.3 Connection
-
-For Relationship-authority NPCs, Connection is read from the Relationship Bond Profile and is qualified by authored evidence.
-
-A Connection increase requires the configured progress/evidence rules. It must not occur solely because `npc.affinity` reaches a threshold.
-
-### 2.4 Legacy `connectionDepth`
-
-`NPC.connectionDepth` remains in the data model and some runtime/UI paths for compatibility with unmigrated NPCs, old saves, legacy Trait gates, Copy calculations that have not yet migrated, debugging, and older UI surfaces.
-
-It is a compatibility field, not product-level authority for new Relationship content.
+`NPC.connectionDepth` remains a legacy compatibility field; it is not modern Relationship authority.
 
 ## 3. NPC-owned state
 
@@ -95,16 +67,11 @@ legacy affinity / connectionDepth / loyalty compatibility fields
 
 The precise TypeScript shape is defined by runtime types rather than duplicated here as an independent schema authority.
 
-The `faction` string on an NPC is bounded authored **membership/identity metadata**. M23 reuses existing values such as:
+The `faction` string on an NPC is authored **membership/identity metadata**. Institutional standing lives in the separate `factions` root.
 
-```text
-Captain Valerius -> City Watch
-Blacksmith Gronk -> Merchants Guild
-```
+Per-NPC awareness lives in `knowledge`.
 
-but institutional standing is not stored on the NPC object. It lives in the separate `factions` Redux root.
-
-Likewise, per-NPC Knowledge lives in the separate `knowledge` root.
+Objective regional conditions live in `worldState`, not inside NPC objects.
 
 ## 4. Dialogue integration
 
@@ -117,14 +84,20 @@ Important current effects include:
 - `GIVE_ITEM` — grants an item where independently justified;
 - `KNOWLEDGE_FACT` — records that the current dialogue NPC knows one canonical fact reference;
 - `FACTION_REPUTATION` — explicitly changes one named institution's standing;
+- `WORLD_STATE_SET` — explicitly changes one of the two M24-qualified objective regional conditions;
 - service/opening effects supported by the existing dialogue runtime;
 - legacy `AFFINITY_DELTA` for compatibility/simple interactions.
 
 ### 4.1 Relationship evidence gates
 
-Dialogue may declare `requiredExperienceIds` and `anyOfExperienceIds`.
+Dialogue may declare:
 
-Availability is enforced in production UI and checked by the interaction thunk, so Relationship evidence can cause later narrative availability without shadow booleans.
+```ts
+requiredExperienceIds?: string[];
+anyOfExperienceIds?: string[];
+```
+
+Availability is enforced in production UI and checked by `processNPCInteractionThunk`.
 
 M13 qualified the Story -> Relationship -> later Story loop.
 
@@ -160,149 +133,208 @@ requiredFactionReputation?: Array<{
 }>;
 ```
 
-All listed institutional bounds must pass.
+All listed institutional bounds must pass in both presentation and the authoritative interaction thunk.
 
-The same gate is enforced in both presentation and `processNPCInteractionThunk`, so direct thunk dispatch cannot bypass institutional requirements.
-
-Qualified examples:
+Qualified examples include:
 
 ```text
 valerius_m23_watch_clearance
-requires:
-  valerius_exp_m23_public_override
-  City Watch >= 0
+-> Relationship evidence + City Watch >= 0
 ```
 
 and:
 
 ```text
 gronk_m23_guild_priority
-requires:
-  Merchants Guild >= 10
+-> Merchants Guild >= 10
 ```
 
-### 4.4 Authorities do not imply each other
+### 4.4 Objective World State gates after M24
 
-A dialogue effect must be interpreted according to its domain:
+M24 adds exactly one bounded prerequisite family:
+
+```ts
+requiredWorldState?: WorldStateRequirement[];
+```
+
+The qualified requirement union supports exact equality for:
+
+```text
+watchPresence: normal | heavy
+tradeFlow: normal | strong
+```
+
+The same fail-closed helper is used by:
+
+```text
+NPCDialogueTab
++
+processNPCInteractionThunk
+```
+
+A direct thunk dispatch therefore cannot bypass an objective-world prerequisite, and malformed requirements are rejected rather than treated as permissive.
+
+M24's qualified consumers are:
+
+```text
+silas_m24_patrol_pressure
+requires Merchant District watchPresence == heavy
+```
+
+and:
+
+```text
+valerius_m24_freight_corridor
+requires Merchant District tradeFlow == strong
+```
+
+### 4.5 Authorities do not imply each other
+
+A dialogue effect must be interpreted according to its owning domain:
 
 ```text
 RELATIONSHIP_EXPERIENCE -> personal shared-history meaning
 KNOWLEDGE_FACT          -> current NPC awareness
 FACTION_REPUTATION      -> institutional standing
+WORLD_STATE_SET         -> objective regional condition
 ```
 
 None is generic shorthand for the others.
 
-If one player decision legitimately creates several consequences, author them separately.
+M23's Valerius public-override decision proves one response can have independent personal + institutional consequences.
 
-M23's Valerius public-override decision is the canonical bounded example:
+M24 then proves a social prerequisite can enable an **explicit later operational action** without becoming the objective condition itself:
 
 ```text
-one response
--> positive/mixed Valerius Relationship Experience
--> City Watch -10
--> Knowledge unchanged
+Merchants Guild >= 10
+-> player may explicitly release verified freight
+-> tradeFlow changes to strong
+-> Guild standing remains unchanged
 ```
 
-### 4.5 Multi-NPC Relationship consequences
+### 4.6 Multi-NPC and cross-NPC consequences
 
-One ordinary dialogue response may contain several `RELATIONSHIP_EXPERIENCE` effects targeted at different NPCs.
+One ordinary dialogue response may contain several `RELATIONSHIP_EXPERIENCE` effects targeted at different NPCs; M14 qualified that behavior.
 
-M14 qualified this behavior in two independent probes. A shared story decision can therefore create distinct, even conflicting, personal interpretations without requiring a generic social-state engine.
+M22 does not turn `KNOWLEDGE_FACT` into broadcasting.
 
-M22 does not turn `KNOWLEDGE_FACT` into broadcasting, and M23 does not turn `FACTION_REPUTATION` into ally/rival spillover.
+M23 does not turn `FACTION_REPUTATION` into ally/rival spillover.
 
-## 5. Quest integration
+M24 does not turn `WORLD_STATE_SET` into automatic social interpretation. Its two downstream consumers are cross-NPC precisely because World State persists independently from the NPC who participated in the mutation scene.
+
+## 5. M24 bounded content extension
+
+M24 production nodes live in:
+
+```text
+public/data/m24-world-state-content.json
+```
+
+`initializeNPCsThunk` loads the existing `npcs.json` / `dialogues.json`, then merges this bounded extension when present:
+
+```text
+extension.dialogues
++
+extension.npcDialogueIds
+```
+
+The generic runtime does **not** branch on Valerius, Gronk, or Silas IDs to implement M24 semantics.
+
+This bounded extension avoids rewriting the large historical fixtures while keeping the production nodes data-driven.
+
+Its four qualified nodes are:
+
+```text
+valerius_m24_redeploy_patrols
+silas_m24_patrol_pressure
+gronk_m24_release_verified_freight
+valerius_m24_freight_corridor
+```
+
+## 6. Quest integration
 
 NPCs expose available quests through the existing Quest system.
 
 The Quest system owns acceptance, objectives, progress, authored resolution choices, turn-in, and reward routing.
 
-The Relationship system owns relational interpretation when an authored Experience is recorded.
+Relationship owns relational interpretation when an authored Experience is recorded.
 
-The Knowledge system owns per-NPC awareness where explicitly represented.
+Knowledge owns per-NPC awareness where explicitly represented.
 
-The Faction system owns institution-level standing for faction-tagged Reputation rewards.
+Faction owns institution-level standing for faction-tagged Reputation rewards.
 
-M23 corrects the old behavior where a quest reward authored as `REPUTATION` for `City Watch` changed the giver NPC's personal Affinity. See `QuestSystem.md` and `FactionSystem.md`.
+World State owns persistent objective regional conditions when a separately authored event mutates them.
 
-Do not duplicate durable Relationship meaning, Knowledge, or Faction standing as arbitrary NPC quest flags.
+M24 does not infer World State from quest completion flags.
 
-## 6. Services and trading
+## 7. Services and trading
 
 NPC services may include training, information, Trait teaching, crafting, trading, or routing to other feature surfaces.
 
-Existing service/trade behavior may continue using Affinity-based compatibility rules such as minimum Affinity, pricing discounts, and item availability thresholds.
+Existing service/trade behavior may continue using legacy Affinity-based compatibility rules.
 
-These are short-horizon NPC/service mechanics. They do not imply that Affinity controls Relationship Connection, Knowledge, or institutional Faction standing.
+M24 intentionally does **not** qualify World-State-gated trade transactions because the current `NPCTradeTab` purchase/sell path lacks a separate below-UI transaction authority suitable for this milestone without an unrelated refactor.
 
-When a future service genuinely needs another authority, query that domain explicitly rather than inflating Affinity into a universal social score.
+Do not interpret that deferral as evidence that World State may never affect trade. A future milestone may add such consumption with its own correctness boundary.
 
-## 7. Trait integration
+## 8. Trait integration
 
-NPCs may expose:
+NPCs may expose `availableTraits`, `innateTraits`, and `sharedTraitSlots`.
 
-- `availableTraits` — Traits that can become permanently Resonated where qualified;
-- `innateTraits` — patterns the player may temporarily equip/attune when discovered;
-- `sharedTraitSlots` — Traits shared from the player to the NPC where existing slot rules permit.
-
-For Relationship-authority sources, permanent Resonance may require qualified Relationship Connection, assimilation/compatibility thresholds, Memory evidence, Trait prerequisites, enough Essence, and an authored final Resonance Experience.
+For Relationship-authority sources, permanent Resonance may require qualified Relationship Connection, assimilation/compatibility thresholds, Memory evidence, prerequisites, enough Essence, and an authored final Resonance Experience.
 
 Willow's Wisdom and Scholarly Insight exercise this model.
 
 Unmigrated NPC-sourced Traits may still use legacy `connectionDepth` gating for compatibility; that is not the target design for new Traits.
 
-## 8. Presentation
+## 9. Presentation
 
 The NPC UI should increasingly present Relationship-authority state through the Bond Profile and use authored gates for causal availability.
 
-Some older list/debug components still expose raw `affinity` / `connectionDepth`; those surfaces are migration debt and must not be used as evidence that the legacy model remains canonical.
+Some older list/debug components still expose raw `affinity` / `connectionDepth`; those surfaces are migration debt.
 
-M22 added Knowledge-sensitive dialogue availability but no generalized Knowledge inspector.
+M22 adds Knowledge-sensitive dialogue availability without a generalized Knowledge inspector.
 
-M23 adds Faction-sensitive dialogue availability but no generalized reputation dashboard. Player-facing institutional presentation beyond dialogue consequences remains future UX work.
+M23 adds Faction-sensitive dialogue availability without a generalized reputation dashboard.
 
-## 9. Faction authority after M23
+M24 adds World-State-sensitive dialogue availability without a generalized regional-state dashboard.
 
-Faction metadata is no longer merely a future placeholder: M23 qualifies first-class institutional standing for two production institutions.
+Those absent dashboards are UX/product questions, not reasons to collapse authorities into NPC state.
 
-Canonical distinction:
+## 10. Faction and World-State composition
 
-```text
-Valerius personal Relationship
-!=
-City Watch Reputation
-```
-
-and:
+M23 qualifies:
 
 ```text
-Gronk personal Relationship
-!=
-Merchants Guild Reputation
+Valerius Relationship != City Watch Reputation
+Gronk Relationship    != Merchants Guild Reputation
 ```
 
-The runtime supports states such as:
+M24 extends the composition boundary:
 
 ```text
-Valerius personally deepens trust in the player's judgment
-while
-City Watch standing falls because the player broke a public order
+Faction Reputation != Objective World State
 ```
 
-and:
+Qualified example:
 
 ```text
-Merchants Guild standing rises from a verified audit
-while
-Gronk Relationship remains unchanged
+Merchants Guild +12
++
+tradeFlow normal
 ```
 
-Do not derive faction scores by averaging personal NPC Relationships, known facts, or member Affinity.
+can persist until the player explicitly chooses to release verified freight, after which:
 
-The dormant legacy ally/rival spillover constants remain unqualified prototype residue.
+```text
+Merchants Guild +12
++
+tradeFlow strong
+```
 
-## 10. State-management boundary
+Likewise, City Watch standing does not define Merchant District patrol density.
+
+## 11. State-management boundary
 
 ### NPC slice / thunks
 
@@ -310,11 +342,15 @@ Own NPC-specific operational state and interaction routing, including generic en
 
 ### Knowledge slice / selectors/listeners
 
-Own per-NPC fact-awareness records and bounded qualified acquisition/query semantics.
+Own per-NPC fact-awareness records and bounded acquisition/query semantics.
 
 ### Faction slice / selectors
 
 Own persisted institutional standing and institutional-standing queries.
+
+### World State slice / selectors
+
+Own persisted bounded objective regional conditions and exact-value World State requirements.
 
 ### Relationship slice / thunks
 
@@ -328,54 +364,56 @@ Own quest lifecycle/objectives and route faction-tagged Reputation rewards to Fa
 
 Consume qualified state through their own contracts.
 
-This separation prevents NPC state from becoming a second Relationship, Knowledge, or Faction engine.
+This separation prevents NPC state from becoming a second Relationship, Knowledge, Faction, or World State engine.
 
-## 11. Invariants
+## 12. Invariants
 
 1. For migrated NPCs, Affinity is not Connection XP.
-2. For migrated NPCs, `connectionDepth` is not Relationship authority.
-3. Important relationship beats should use authored Relationship Experiences rather than only `AFFINITY_DELTA`.
-4. Relationship Memories live in the Relationship domain, not NPC flags.
-5. Story availability may query generic Relationship evidence.
-6. Story availability may query Knowledge when the relevant question is whether this NPC knows a fact.
-7. Story availability may query Faction when the relevant question is institutional standing.
-8. High Relationship does not imply an NPC knows a fact they never acquired.
-9. High Relationship does not imply high Faction standing.
-10. High Faction standing does not satisfy Relationship-only evidence gates.
-11. `KNOWLEDGE_FACT` does not automatically mutate Relationship or Faction state.
-12. `FACTION_REPUTATION` does not automatically mutate Relationship or Knowledge state.
-13. NPC-specific narrative behavior must not require NPC-ID branches in generic runtime unless repeated evidence proves a missing generic capability.
-14. Service Affinity rules do not define deeper Relationship, Knowledge, or Faction authority.
-15. Legacy fields may remain until migration is safe; do not extend them casually.
+2. `connectionDepth` is legacy compatibility, not Relationship authority.
+3. Important relationship beats use authored Relationship Experiences.
+4. Relationship Memories live in Relationship, not NPC flags.
+5. Story availability may query Relationship evidence.
+6. Story availability may query Knowledge when the question is NPC awareness.
+7. Story availability may query Faction when the question is institutional standing.
+8. Story availability may query World State when the question is an objective regional condition.
+9. High Relationship does not imply Knowledge, high Faction standing, or a World State value.
+10. High Faction standing does not satisfy Relationship-only or World-State-only gates.
+11. `KNOWLEDGE_FACT` does not automatically mutate Relationship, Faction, or World State.
+12. `FACTION_REPUTATION` does not automatically mutate Relationship, Knowledge, or World State.
+13. `WORLD_STATE_SET` does not automatically mutate Relationship, Knowledge, or Faction.
+14. World-sensitive dialogue gates are enforced below UI.
+15. Malformed World State requirements fail closed.
+16. NPC-specific narrative behavior should not require NPC-ID branches in generic runtime without repeated evidence.
+17. Legacy fields may remain until migration is safe; do not extend them casually.
 
-## 12. Current gaps
+## 13. Current gaps
 
 - several UI/debug surfaces still expose the legacy two-number Relationship model;
 - unmigrated NPCs and Traits may still use compatibility `connectionDepth` rules;
-- Copy creation/inheritance still contains legacy parent-NPC assumptions that need separate migration evidence;
-- NPC schedules and world-derived presence are not yet a production world system;
-- broader player-facing Relationship and Knowledge presentation remains future work;
-- broader player-facing Faction/reputation presentation is not yet qualified;
+- Copy creation/inheritance still contains legacy parent-NPC assumptions requiring separate migration evidence;
+- NPC schedules are not a production world simulation;
+- broader player-facing Relationship, Knowledge, Faction, and World State presentation remains future work;
 - reputation tiers/bands and ally/rival spillover are not qualified;
 - historical M13/M14/M15 cross-NPC awareness-shaped gates remain explicit Knowledge migration/design debt;
-- objective regional World State remains M24.
+- M24 does not qualify World-State-gated Trade or Combat;
+- M25 complete-chapter composition remains future work until M24 merges.
 
-## 13. Canonical references
+## 14. Canonical references
 
 - `../Technical/PostM14ProductReconciliation.md`
 - `RelationshipExperienceSystem.md`
 - `MemorySystem.md`
 - `KnowledgeSystem.md`
 - `FactionSystem.md`
+- `WorldStateSystem.md`
 - `EssenceResonanceModel.md`
 - `TraitSystem.md`
 - `QuestSystem.md`
 - `../Technical/M22SocialKnowledgePropagationResult.md`
-- `../Technical/M23FactionReputation.md`
-- `../Technical/M23FactionReputationReconAmendment.md`
 - `../Technical/M23FactionReputationResult.md`
+- `../Technical/M24ObjectiveWorldState.md`
+- `../Technical/M24ObjectiveWorldStateReconAmendment.md`
+- `../Technical/M24ObjectiveWorldStateResult.md`
 - milestone qualification documents under `../Technical/`
 
-When older NPC documentation or code comments describe `affinity >= 100 -> connectionDepth + 1`, treat that as legacy behavior to migrate or isolate, not the design rule for Relationship-authority content.
-
-When older code treats faction-tagged `REPUTATION` as personal giver-NPC Affinity or suggests automatic ally/rival spillover, M23's qualified Faction authority supersedes that interpretation.
+When older NPC documentation treats Affinity thresholds as modern Connection, faction-tagged Reputation as giver-NPC Affinity, automatic ally/rival spillover as canonical, or social state as shorthand for objective regional conditions, the qualified M14-M24 authority chain supersedes those interpretations.

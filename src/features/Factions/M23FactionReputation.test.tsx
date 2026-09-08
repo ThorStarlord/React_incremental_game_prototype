@@ -281,7 +281,7 @@ describe('M23 faction reputation qualification', () => {
     expect(store.getState().quest.quests[PATROL_QUEST_ID].status).toBe('COMPLETED');
   });
 
-  test('M23 runtime does not activate dormant faction spillover or M24 world-state authority', () => {
+  test('M23 runtime does not activate dormant faction spillover or mutate M24 world state', () => {
     for (const sourceFile of [
       'src/features/Factions/state/FactionSlice.ts',
       'src/features/Factions/state/FactionSelectors.ts',
@@ -293,7 +293,9 @@ describe('M23 faction reputation qualification', () => {
     }
 
     const store = makeStore();
-    expect((store.getState() as any).worldState).toBeUndefined();
+    expect(store.getState().worldState.regions).toEqual({});
+    store.dispatch(adjustFactionReputation({ factionId: CITY_WATCH, amount: 10 }));
+    expect(store.getState().worldState.regions).toEqual({});
     expect((store.getState() as any).factionDiplomacy).toBeUndefined();
   });
 });

@@ -4,6 +4,10 @@
  */
 
 import type { RoutineFamiliarityId } from '../../Player/state/PlayerTypes';
+import type {
+  WorldStateMutation,
+  WorldStateRequirement,
+} from '../../WorldState/state/WorldStateTypes';
 
 /**
  * Type definitions for the NPCs system
@@ -197,6 +201,7 @@ export type DialogueEffect =
       factionId: string;
       value: number;
     })
+  | (DialogueEffectScope & ({ type: 'WORLD_STATE_SET' } & WorldStateMutation))
   | (DialogueEffectScope & {
       type: 'RELATIONSHIP_EXPERIENCE';
       /** Fixed authored Experience for this effect. */
@@ -237,6 +242,8 @@ export interface DialogueNode {
   forbiddenKnowledgeFactIds?: string[];
   /** Institutional standing requirements; all listed bounds must pass. */
   requiredFactionReputation?: FactionReputationRequirement[];
+  /** Objective regional conditions; all exact-value requirements must pass. */
+  requiredWorldState?: WorldStateRequirement[];
   /**
    * Opt-in one-shot semantics. Undefined/true preserves legacy repeatable behavior.
    * A successful valid response records this node id in NPC.completedDialogues.

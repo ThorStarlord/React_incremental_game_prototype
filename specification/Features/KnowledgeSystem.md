@@ -1,6 +1,6 @@
 # Knowledge System Specification
 
-**Status:** M22 bounded production authority qualified and merged; M23 preserves Knowledge as a distinct authority  
+**Status:** M22 bounded production authority qualified and merged; M23/M24 preserve Knowledge as a distinct authority  
 **Scope:** per-NPC awareness of objective facts; not objective truth, Relationship meaning, Faction standing, or generalized epistemic simulation
 
 ## 1. Purpose
@@ -21,15 +21,16 @@ Gronk knows it happened
 Valerius does not know it happened
 ```
 
-without forcing that distinction into Relationship state, Faction standing, or ad-hoc story booleans.
+without forcing that distinction into Relationship state, Faction standing, World State, or ad-hoc story booleans.
 
-The core authority separation after M23 is:
+The core authority separation after M24 is:
 
 ```text
-WORLD / source domain -> what objectively happened or exists
-KNOWLEDGE             -> which NPC knows that fact
-RELATIONSHIP          -> what shared history means between people
-FACTION               -> how an institution regards the player
+WORLD STATE        -> what objectively exists now
+OBJECTIVE SOURCE   -> other domains may own objective events/facts
+KNOWLEDGE          -> which NPC knows that fact
+RELATIONSHIP       -> what shared history means between people
+FACTION REPUTATION -> how an institution regards the player
 ```
 
 Knowledge must not silently absorb the responsibilities reserved for the other domains.
@@ -68,6 +69,8 @@ fact is objectively true
 !=
 NPC knows fact
 ```
+
+M24 adds a separate World State authority for persistent regional conditions; it does not move this existing Player-owned objective event into World State.
 
 ---
 
@@ -193,7 +196,7 @@ valerius_m22_forge_logistics
 -> downstream Knowledge consumer
 ```
 
-M23 adds Faction dialogue gates/effects alongside these, but does not change Knowledge semantics.
+M23 adds Faction gates/effects and M24 adds World State gates/effects alongside these. Neither changes Knowledge semantics.
 
 ---
 
@@ -233,7 +236,7 @@ A current-schema save lacking the `knowledge` root is interpreted as:
 no recorded Knowledge facts
 ```
 
-Selectors tolerate the missing root. No startup migration or Relationship/Faction reconciliation infers facts.
+Selectors tolerate the missing root. No startup migration or Relationship/Faction/World-State reconciliation infers facts.
 
 M21 offline settlement does not consume or mutate Knowledge. Elapsed time alone cannot teach an NPC a fact.
 
@@ -282,22 +285,46 @@ learned fact -> automatic Trust increase
 
 ---
 
-## 10. Objective-world boundary
+## 10. Objective World State boundary after M24
 
-Knowledge records awareness, not reality.
+Knowledge records awareness; World State records persistent objective regional conditions.
 
-The first qualified fact references an objective event already owned by Player routine familiarity.
+M24 now qualifies a separate root:
 
-M22 does not introduce:
+```text
+worldState
+```
 
-- a generalized WorldFacts registry;
-- trade-flow state;
-- watch-presence state;
-- infrastructure state;
-- regional simulation;
-- encounter-condition storage.
+with exactly two bounded Merchant District conditions:
 
-M24 remains responsible for proving persistent objective regional World State.
+```text
+watchPresence: normal | heavy
+tradeFlow: normal | strong
+```
+
+M24 proves that explicit World State mutations do not automatically grant Knowledge. Conversely, the historical M22 qualification now explicitly snapshots World State before Forge-practice Knowledge acquisition and verifies that it remains unchanged afterward.
+
+Therefore:
+
+```text
+NPC knows fact
+!=
+objective regional condition changes
+```
+
+and:
+
+```text
+objective regional condition changes
+!=
+NPC automatically knows it changed
+```
+
+A future story may legitimately author Knowledge about a World State condition, but awareness acquisition must remain explicit and independently qualified.
+
+M24 does **not** create a generalized WorldFacts registry, and M22's first objective Forge event remains Player-owned rather than being mechanically migrated into World State.
+
+See `WorldStateSystem.md` and `../Technical/M24ObjectiveWorldStateResult.md`.
 
 ---
 
@@ -305,7 +332,7 @@ M24 remains responsible for proving persistent objective regional World State.
 
 Knowledge does not represent institutional regard.
 
-M23 now provides the first-class Faction authority that M22 intentionally deferred.
+M23 provides first-class Faction authority.
 
 The product can represent combinations such as:
 
@@ -313,11 +340,12 @@ The product can represent combinations such as:
 Valerius knows the player worked the forge: YES
 Valerius personal Trust: high
 City Watch Standing: negative
+Merchant District watchPresence: independently normal or heavy
 ```
 
 without deriving any value from the others.
 
-M23's focused probes explicitly verify:
+M23's focused probes verify:
 
 ```text
 Faction Reputation changes
@@ -378,7 +406,7 @@ Current status:
 ```text
 historical M13/M14/M15 awareness normalization
 = explicit migration/design debt
-= outside M22/M23 qualified scope
+= outside M22-M24 qualified scope
 ```
 
 Do not silently reinterpret those old gates as canonical Knowledge state.
@@ -393,14 +421,17 @@ Do not silently reinterpret those old gates as canonical Knowledge state.
 4. Knowledge acquisition does not automatically mutate Relationship state.
 5. Knowledge does not represent Faction standing.
 6. Faction standing does not automatically mutate Knowledge.
-7. Knowledge does not represent objective regional World State.
-8. The same NPC/fact pair is stored at most once.
-9. Missing legacy Knowledge state means no recorded facts, not inferred facts.
-10. Offline elapsed time does not create Knowledge.
-11. New-game reset clears Knowledge.
-12. Generic dialogue Knowledge gates are enforced below UI as well as in presentation.
-13. M22 does not introduce automatic propagation between NPCs.
-14. M23 does not reinterpret Knowledge as institutional consensus.
+7. Knowledge does not represent objective World State.
+8. Knowledge acquisition does not mutate M24 World State automatically.
+9. World State mutation does not grant Knowledge automatically.
+10. The same NPC/fact pair is stored at most once.
+11. Missing legacy Knowledge state means no recorded facts, not inferred facts.
+12. Offline elapsed time does not create Knowledge.
+13. New-game reset clears Knowledge.
+14. Generic dialogue Knowledge gates are enforced below UI as well as in presentation.
+15. M22 does not introduce automatic propagation between NPCs.
+16. M23 does not reinterpret Knowledge as institutional consensus.
+17. M24 does not reinterpret Knowledge as objective regional state.
 
 ---
 
@@ -424,9 +455,10 @@ The current Knowledge system does not provide:
 - generalized fact catalogs;
 - institutional Knowledge/consensus;
 - automatic Knowledge-to-Faction conversion;
-- objective world-state simulation.
+- automatic Knowledge-to-World-State conversion;
+- objective world simulation.
 
-Faction Reputation itself is now a separate M23-qualified domain rather than a Knowledge non-goal to be implemented here.
+Faction Reputation and Objective World State are separate M23/M24-qualified domains rather than Knowledge features to be implemented here.
 
 ---
 
@@ -445,7 +477,9 @@ City Center Forge practice
 -> Valerius knowledge-gated logistics dialogue
 ```
 
-M23 independently proves that later institutional standing can diverge from both that Knowledge and personal Relationship state.
+M23 independently proves institutional standing can diverge from Knowledge and Relationship.
+
+M24 independently proves objective regional conditions can diverge from all three social authorities.
 
 See:
 
@@ -454,18 +488,20 @@ See:
 - `../Technical/M22SocialKnowledgePropagationResult.md`
 - `FactionSystem.md`
 - `../Technical/M23FactionReputationResult.md`
+- `WorldStateSystem.md`
+- `../Technical/M24ObjectiveWorldStateResult.md`
 
 ---
 
-## 17. Next domain boundary
+## 17. Next boundary
 
-After qualified M23 merge, the next candidate is:
+After the documentation-complete M24 PASS is requalified and merged, the next candidate is:
 
 ```text
-M24 — Objective World State
+M25 — Complete Chapter Vertical Slice
 ```
 
-M24 must preserve:
+M25 must compose the already-distinct authorities rather than collapsing them:
 
 ```text
 Objective World condition
@@ -477,4 +513,4 @@ Personal Relationship
 Institutional Standing
 ```
 
-and must receive its own preregistration/recon before implementation.
+M24 itself does not authorize chapter-scale implementation before merge.
