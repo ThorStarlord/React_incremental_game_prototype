@@ -254,7 +254,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
               </FormGroup>
               <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>
                 <Button size="small" onClick={enableAll} disabled={eligibleShareIds.length === 0}>Enable all eligible</Button>
-                <Button size="small" onClick={disableAll} disabled={!anyPrefEnabled}>Disable all eligible</Button>
+                <Button size="small" onClick={disableAll} disabled={!anyPrefEnabled}>Disable all</Button>
                 <Button size="small" variant="contained" onClick={() => dispatch(applySharePreferencesForCopyThunk({ copyId, suppressNotify: false }))} disabled={!anyPrefEnabled || emptySlots === 0}>
                   Apply Now
                 </Button>
