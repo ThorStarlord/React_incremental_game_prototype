@@ -248,6 +248,33 @@ export interface EffectiveRelationshipTether {
 }
 
 /**
+ * Pure M19 spatial projection for a qualified anchored NPC at an arbitrary
+ * Player location. Undefined means no qualified spatial projection is available
+ * and callers should preserve their authored/static fallback semantics.
+ */
+export const deriveSpatialRelationshipTether = (
+  npcId: string,
+  playerLocationValue: string
+): EffectiveRelationshipTether | undefined => {
+  const npcAnchor = getNpcWorldLocationId(npcId);
+  if (!npcAnchor) return undefined;
+
+  const playerLocationId = resolveCanonicalLocationId(playerLocationValue);
+  const npcLocationId = resolveCanonicalLocationId(npcAnchor);
+  if (!playerLocationId || !npcLocationId) return undefined;
+
+  if (playerLocationId === npcLocationId) {
+    return { tetherState: 'present', source: 'spatial', playerLocationId, npcLocationId };
+  }
+
+  if (areLocationsDirectlyConnected(playerLocationId, npcLocationId)) {
+    return { tetherState: 'nearby', source: 'spatial', playerLocationId, npcLocationId };
+  }
+
+  return { tetherState: 'remote', source: 'spatial', playerLocationId, npcLocationId };
+};
+
+/**
  * M19 spatial presence is a current-world projection, not Relationship history.
  * When either side lacks a canonical M18 location, preserve the authored/static
  * BondProfile tether rather than guessing a world position.
@@ -262,22 +289,7 @@ export const selectEffectiveRelationshipTether = (
     source: 'authored',
   };
 
-  const npcAnchor = getNpcWorldLocationId(npcId);
-  if (!npcAnchor) return authoredFallback;
-
-  const playerLocationId = resolveCanonicalLocationId(state.player.location);
-  const npcLocationId = resolveCanonicalLocationId(npcAnchor);
-  if (!playerLocationId || !npcLocationId) return authoredFallback;
-
-  if (playerLocationId === npcLocationId) {
-    return { tetherState: 'present', source: 'spatial', playerLocationId, npcLocationId };
-  }
-
-  if (areLocationsDirectlyConnected(playerLocationId, npcLocationId)) {
-    return { tetherState: 'nearby', source: 'spatial', playerLocationId, npcLocationId };
-  }
-
-  return { tetherState: 'remote', source: 'spatial', playerLocationId, npcLocationId };
+  return deriveSpatialRelationshipTether(npcId, state.player.location) ?? authoredFallback;
 };
 
 export interface RelationshipEssenceContribution {

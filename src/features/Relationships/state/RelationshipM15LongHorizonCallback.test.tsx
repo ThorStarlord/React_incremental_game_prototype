@@ -125,6 +125,9 @@ const clickButton = async (name: string) => {
 
 const performUnrelatedWillowBeat = async (store: ReturnType<typeof makeStore>) => {
   cleanup();
+  // M15's unrelated Willow beat predates player-facing travel; establish the
+  // physical co-presence that this historical interaction fixture assumes.
+  store.dispatch(setLocation('location_whispering_woods'));
   renderNpcRoute(store, WILLOW_ID);
   clickTab('Dialogue');
   await clickButton('Knowledge that cannot alter action is decoration.');

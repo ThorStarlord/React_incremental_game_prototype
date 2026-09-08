@@ -28,6 +28,12 @@ export interface CombatEncounterDefinition {
   targetId: string;
   name: string;
   description: string;
+  /**
+   * Optional canonical world location required to surface this encounter through
+   * the active production bridge. This is deliberately a single bounded world
+   * fact rather than a general encounter-condition language.
+   */
+  requiredLocationId?: string;
   playerMaxHealth: number;
   enemyMaxHealth: number;
   strikeDamage: number;

@@ -7,11 +7,25 @@ import {
   resolveCanonicalLocationId,
 } from '../LocationDefinitions';
 import { travelToLocationThunk } from '../TravelThunks';
+import { NPC_WORLD_LOCATION_IDS } from '../../NPCs/state/NPCWorldLocationDefinitions';
+import { deriveSpatialRelationshipTether } from '../../Relationships/state/RelationshipSelectors';
+
+interface SpatialTetherFeedback {
+  npcId: string;
+  npcName: string;
+  fromTether: string;
+  toTether: string;
+}
+
+const formatTether = (value: string) =>
+  value.charAt(0).toUpperCase() + value.slice(1);
 
 const TravelPanel: React.FC = () => {
   const dispatch = useAppDispatch();
   const locationValue = useAppSelector(state => state.player.location);
+  const npcs = useAppSelector(state => state.npcs.npcs);
   const [error, setError] = useState<string | null>(null);
+  const [spatialFeedback, setSpatialFeedback] = useState<SpatialTetherFeedback[]>([]);
 
   const currentLocationId = resolveCanonicalLocationId(locationValue);
   const currentLocation = currentLocationId
@@ -19,16 +33,35 @@ const TravelPanel: React.FC = () => {
     : undefined;
   const destinations = getConnectedLocationDefinitions(locationValue);
 
+  const buildSpatialFeedback = (destinationId: string): SpatialTetherFeedback[] =>
+    Object.keys(NPC_WORLD_LOCATION_IDS).flatMap(npcId => {
+      const before = deriveSpatialRelationshipTether(npcId, locationValue);
+      const after = deriveSpatialRelationshipTether(npcId, destinationId);
+      if (!before || !after || before.tetherState === after.tetherState) return [];
+
+      return [{
+        npcId,
+        npcName: npcs[npcId]?.name ?? npcId,
+        fromTether: before.tetherState,
+        toTether: after.tetherState,
+      }];
+    });
+
   const handleTravel = async (destinationId: string) => {
     setError(null);
+    const pendingSpatialFeedback = buildSpatialFeedback(destinationId);
     const result = await dispatch(travelToLocationThunk(destinationId));
     if (travelToLocationThunk.rejected.match(result)) {
+      setSpatialFeedback([]);
       setError(
         typeof result.payload === 'string'
           ? result.payload
           : result.error.message || 'Travel failed.'
       );
+      return;
     }
+
+    setSpatialFeedback(pendingSpatialFeedback);
   };
 
   return (
@@ -67,6 +100,22 @@ const TravelPanel: React.FC = () => {
       ) : (
         <Alert severity="warning">
           Current location "{locationValue}" is not part of the authored M18 travel graph.
+        </Alert>
+      )}
+
+      {spatialFeedback.length > 0 && (
+        <Alert severity="info" sx={{ mt: 2 }} data-testid="travel-spatial-feedback">
+          <Typography variant="subtitle2" gutterBottom>
+            Presence changed
+          </Typography>
+          {spatialFeedback.map(change => (
+            <Typography key={change.npcId} variant="body2">
+              {change.npcName} — Tether: {formatTether(change.fromTether)} → {formatTether(change.toTether)}
+            </Typography>
+          ))}
+          <Typography variant="caption" color="text.secondary">
+            Movement changed current presence/Tether, not Relationship history.
+          </Typography>
         </Alert>
       )}
 

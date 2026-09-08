@@ -34,6 +34,7 @@ import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
 import { selectHasSeenIntro } from '../../../Meta/state/MetaSlice';
 import { selectPlayerLocation } from '../../../Player/state/PlayerSelectors';
+import { isPlayerAtNpcWorldLocation } from '../../state/NPCWorldLocationDefinitions';
 import { NPC } from '../../state/NPCTypes';
 import { initializeNPCsThunk } from '../..';
 import { NPCListCard } from '../ui/NPCListCard';
@@ -97,7 +98,10 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList = npcList.filter(npc => npc.affinity >= 60);
         break;
       case 'same_location':
-        npcList = npcList.filter(npc => npc.location === playerLocation);
+        npcList = npcList.filter(npc => {
+          const anchoredPresence = isPlayerAtNpcWorldLocation(npc.id, playerLocation);
+          return anchoredPresence ?? npc.location === playerLocation;
+        });
         break;
       case 'connected':
         npcList = npcList.filter(npc => npc.connectionDepth > 0);

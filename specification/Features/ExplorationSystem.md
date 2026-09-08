@@ -1,7 +1,7 @@
 # Exploration / Travel System
 
-**Status:** Bounded production travel vertical slice qualified in M18; M19 now consumes its world facts for spatial Tether  
-**Current authority:** `Technical/M18ExplorationTravelQualification.md` + `Technical/M18ExplorationTravelReconAmendment.md` + `Technical/M18ExplorationTravelResult.md` + `Technical/M19WorldDerivedTetherResult.md`
+**Status:** Bounded production travel vertical slice qualified in M18; M19 consumes its world facts for spatial Tether; active-loop repair now makes those facts authoritative at bounded encounter/NPC interaction surfaces and reports immediate Tether consequences  
+**Current authority:** `Technical/M18ExplorationTravelQualification.md` + `Technical/M18ExplorationTravelReconAmendment.md` + `Technical/M18ExplorationTravelResult.md` + `Technical/M19WorldDerivedTetherResult.md` + `Technical/ActiveRpgLoopIntegrationRepairResult.md`
 
 ## 1. Purpose
 
@@ -24,9 +24,12 @@ Quest / Story
 
 Relationship / Essence (M19)
 -> may consume objective location/adjacency facts to derive current spatial Tether
+
+Combat / anchored NPC interaction (active-loop repair)
+-> may consume canonical world presence to decide whether a bounded in-person action is available
 ```
 
-Exploration does not itself own Relationship meaning or Essence calculation.
+Exploration does not itself own Relationship meaning, Essence calculation, Combat resolution, or NPC interaction semantics.
 
 ## 2. Qualified M18 graph
 
@@ -73,7 +76,7 @@ There is no direct City Center <-> Whispering Woods route.
 }
 ```
 
-The contract is intentionally small. M18/M19 do not add travel time, coordinates, resources, encounters, NPC schedules, region simulation, or world-state predicates.
+The contract is intentionally small. M18/M19 and the active-loop repair do not add travel time, coordinates, resources, NPC schedules, region simulation, pathfinding, or generalized world-state predicates.
 
 ### Current-location authority
 
@@ -116,9 +119,20 @@ The low-level `setLocation` action remains the existing canonical location mutat
 - a travel button for each legal destination;
 - a warning if the current location cannot be resolved into the bounded graph.
 
-The panel is composed into `GameControlPanel` alongside the existing active-Quest Combat panel.
+The active-loop repair adds bounded **post-success spatial consequence feedback**. For qualified canonically anchored Relationship sources whose effective spatial Tether changes, the panel can report transitions such as:
 
-UI visibility is not the authority boundary. An illegal direct call to the travel thunk is independently rejected before Player or Quest mutation.
+```text
+Elder Willow — Tether: Remote -> Nearby
+Blacksmith Gronk — Tether: Present -> Nearby
+```
+
+and explicitly states that movement changed current presence/Tether rather than historical Relationship state.
+
+The feedback is derived from the same Relationship-owned spatial projection used by M19; Travel does not mutate Relationship history or own the Tether formula. Failed/illegal travel does not publish successful-arrival feedback.
+
+The panel is composed into `GameControlPanel` alongside the active-Quest Combat panel.
+
+UI visibility is not the travel authority boundary. An illegal direct call to the travel thunk is independently rejected before Player or Quest mutation.
 
 ## 5. Quest integration
 
@@ -135,6 +149,8 @@ player chooses legal travel
 ```
 
 The production proof reuses existing `quest_elara_chain_1`, whose objective targets `location_whispering_woods`.
+
+The active-loop repair does not alter this bridge.
 
 ## 6. M19 spatial Tether consumption
 
@@ -161,8 +177,8 @@ Exploration direct adjacency
 For the qualified bounded graph:
 
 ```text
-same location       -> present
-direct neighbor     -> nearby
+same location        -> present
+direct neighbor      -> nearby
 other known location -> remote
 ```
 
@@ -170,7 +186,42 @@ This is a consumer of Exploration facts, not a new Exploration responsibility. T
 
 The existing `setLocation` listener also refreshes the cached passive Essence rate after a location change so the live rate reflects the newly derived spatial Tether.
 
-## 7. Persistence
+For the active-loop repair, the same pure spatial projection can be evaluated for the pre-travel and post-travel player locations to produce truthful immediate feedback without persisting another proximity state.
+
+## 7. Active-play world-presence consumers
+
+Checkpoint B found that spatial facts were real but could still be bypassed by important active-play surfaces. The bounded repair closes that gap for the currently qualified cases without making Exploration the owner of those domains.
+
+### Combat encounter availability
+
+The M17 Telluric Echo encounter is authored at:
+
+```text
+location_whispering_woods
+```
+
+The Combat launch surface consumes canonical `Player.location` and does not expose the encounter away from that location. Combat still owns encounter resolution and Quest still owns the `KILL` objective consequence.
+
+### Anchored NPC in-person interaction
+
+The NPC domain reuses the same canonical anchors qualified by M19.
+
+For anchored Willow and Gronk:
+
+```text
+player at NPC canonical location
+-> in-person NPC surfaces available
+
+player elsewhere
+-> Overview / Relationship information may remain inspectable
+-> in-person Dialogue / Quests / Traits / Trade / Copy creation require travel
+```
+
+Unanchored NPCs preserve legacy availability behavior.
+
+This does not establish remote communication or generalized NPC-presence simulation.
+
+## 8. Persistence
 
 Exploration adds no persistent reducer state and no save-schema version.
 
@@ -178,25 +229,59 @@ Because `Player.location` is already part of RootState, ordinary save/load prese
 
 M19 further qualifies that the same restored `Player.location` reconstructs Willow/Gronk's effective spatial Tether and Relationship-derived Essence contributions without persisting separate proximity flags.
 
+The active-loop repair likewise needs no new persistence: encounter required locations and NPC canonical anchors are static authored definitions, while live player location already persists.
+
 The legacy `"City Center"` compatibility alias remains handled at route/projection resolution time rather than by a new save migration.
 
-## 8. Authority boundaries
+## 9. Authority boundaries
 
 The current rules are:
 
-- **Exploration:** authored topology / direct adjacency;
+- **Exploration:** authored topology / direct adjacency and player-facing legal travel;
 - **Player:** current player location;
-- **NPC:** bounded canonical NPC world anchors where qualified; descriptive NPC location remains separate;
-- **Copy:** Copy location where applicable; not migrated by M18/M19;
+- **NPC:** bounded canonical NPC world anchors where qualified; descriptive NPC location remains separate; anchored in-person interaction consumes co-presence;
+- **Combat:** encounter authoring/resolution and bounded required-location availability where authored;
+- **Copy:** Copy location where applicable; not migrated into a generalized world model by M18/M19/repair;
 - **Quest / Story:** consequences of location facts;
-- **Relationship:** historical relational meaning plus authored/static Tether fallback;
+- **Relationship:** historical relational meaning plus authored/static Tether fallback and pure spatial effective-Tether derivation;
 - **Essence:** consumes the effective Tether projection in its existing formula.
 
 Do not introduce shadow booleans such as `playerAtGrove`, `willowNearby`, or `silasInMarket` as substitute location/presence authority.
 
-## 9. Explicitly unqualified
+## 10. Qualification
 
-M18/M19 do not qualify:
+M18 independently qualifies legal travel, below-UI direct-route enforcement, existing `REACH_LOCATION` Quest integration, persistence, and legacy City Center compatibility.
+
+M19 independently qualifies Willow/Gronk world anchors and derived `Remote`/`Nearby`/`Present` Tether affecting current Relationship-derived Essence without rewriting Bond history.
+
+The active-loop repair adds a cross-system qualification:
+
+```text
+src/features/Exploration/ActiveRpgLoopIntegrationRepair.test.tsx
+```
+
+It proves that:
+
+- the existing M17 encounter consumes its canonical required location at the production launch boundary;
+- Willow and Gronk use one generic anchored-NPC co-presence rule while remote Relationship inspection remains available;
+- legal travel immediately surfaces Willow/Gronk Tether opportunity cost;
+- those travel/presence changes do not mutate historical Bond profiles;
+- no generalized condition/pathfinding/schedule/world-state engine is introduced.
+
+First fully qualified repair behavior candidate:
+
+```text
+SHA  3dc8ce8f2ae70cbc15eba2e80277902c5e8b513a
+tree f7cd974f73989d62557bb57eb7fbb6bba439fc01
+```
+
+Build Validation #194 (`34182041060`, job `101922918366`) passed the dedicated repair suite, modified historical qualification, otherwise unchanged accumulated M4-M19 qualification, TypeScript, dependencies, and production build.
+
+See `../Technical/ActiveRpgLoopIntegrationRepairResult.md` for the full #189-#194 diagnostic history.
+
+## 11. Explicitly unqualified
+
+M18/M19/active-loop repair do not qualify:
 
 - open-world exploration;
 - coordinate movement;
@@ -206,8 +291,11 @@ M18/M19 do not qualify:
 - random encounters in transit;
 - resource gathering by location;
 - procedural maps;
+- generalized encounter/world condition expressions;
+- arbitrary encounter placement rules;
 - NPC schedules or autonomous NPC movement;
 - dynamic NPC positions;
+- remote communication/contact simulation;
 - Copy travel;
 - offline travel;
 - continuous-distance Tether;
@@ -216,12 +304,19 @@ M18/M19 do not qualify:
 - campaign-scale navigation/presence simulation;
 - human travel pacing or enjoyment.
 
-## 10. Next boundary — Checkpoint B
+## 12. Next boundary — fresh Checkpoint B re-run
 
-M18 established objective player-facing travel. M19 proved those world facts can modulate current Relationship-derived Essence through bounded spatial Tether without changing historical Bond state.
+M18 established objective player-facing travel. M19 proved those world facts can modulate current Relationship-derived Essence through bounded spatial Tether. The active-loop repair now makes those same canonical world facts authoritative for the qualified encounter and anchored-NPC in-person surfaces and gives travel immediate spatial-consequence feedback.
 
-The next step is **Checkpoint B — Active RPG Loop**.
+That repair PASS does **not** itself convert the prior `CHECKPOINT_B_WEAK` verdict into PASS.
 
-Checkpoint B should evaluate whether Relationship, Trait, Quest, Combat, Travel, Presence/Tether, and Essence now function as one coherent active-play loop and whether adding Copy automation would enhance that loop rather than mask weaknesses in it.
+The next step is a **fresh Checkpoint B — Active RPG Loop re-run** against the merged repair.
 
-Do not start M20 solely because M19 passed.
+Only:
+
+```text
+CHECKPOINT_B_PASS
+M20 authorized
+```
+
+permits M20 Copy Task Automation.

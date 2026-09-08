@@ -30,8 +30,21 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
-      - name: Relationship, Trait discovery, save migration, narrative integration, M14 exclusivity, M15 callbacks, M16 Trait-gameplay, M17 combat, M18 exploration, and M19 tether tests
-        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipFreshGame.test.tsx RelationshipElaraCollaboration.test.ts RelationshipLyraProduction.test.tsx RelationshipGronkProduction.test.tsx RelationshipSilasProduction.test.tsx RelationshipValeriusProduction.test.tsx RelationshipM12MultiNpcProduction.test.ts RelationshipM13NarrativeIntegration.test.tsx RelationshipM14MultiNpcConsequence.test.tsx RelationshipM14DialogueExclusivity.test.tsx RelationshipM15LongHorizonCallback.test.tsx QuestM16TraitDrivenGameplay.test.tsx CombatM17TraitTacticalVerticalSlice.test.tsx ExplorationM18TravelVerticalSlice.test.tsx RelationshipM19WorldDerivedTether.test.ts TraitDiscovery.test.ts RelationshipLegacySaveMigration.test.ts saveSchema.test.ts saveUtils.test.ts
+      - name: Active-loop repair qualification
+        timeout-minutes: 5
+        run: npm test -- --watchAll=false --runInBand ActiveRpgLoopIntegrationRepair.test.tsx
+        env:
+          CI: true
+
+      - name: Modified historical qualification
+        timeout-minutes: 8
+        run: npm test -- --watchAll=false --runInBand RelationshipFreshGame.test.tsx RelationshipM14MultiNpcConsequence.test.tsx RelationshipM15LongHorizonCallback.test.tsx CombatM17TraitTacticalVerticalSlice.test.tsx
+        env:
+          CI: true
+
+      - name: Accumulated M4-M19 baseline qualification
+        timeout-minutes: 12
+        run: npm test -- --watchAll=false --runInBand RelationshipRuntime.test.ts RelationshipLyraUniversality.test.ts RelationshipElaraCollaboration.test.ts RelationshipLyraProduction.test.tsx RelationshipGronkProduction.test.tsx RelationshipSilasProduction.test.tsx RelationshipValeriusProduction.test.tsx RelationshipM12MultiNpcProduction.test.ts RelationshipM13NarrativeIntegration.test.tsx RelationshipM14DialogueExclusivity.test.tsx QuestM16TraitDrivenGameplay.test.tsx ExplorationM18TravelVerticalSlice.test.tsx RelationshipM19WorldDerivedTether.test.ts TraitDiscovery.test.ts RelationshipLegacySaveMigration.test.ts saveSchema.test.ts saveUtils.test.ts
         env:
           CI: true
 

@@ -1,3 +1,4 @@
+import { WHISPERING_WOODS_LOCATION_ID } from '../Exploration/LocationDefinitions';
 import type { CombatEncounterDefinition } from './CombatTypes';
 
 export const TELLURIC_ECHO_ENCOUNTER: CombatEncounterDefinition = {
@@ -6,6 +7,7 @@ export const TELLURIC_ECHO_ENCOUNTER: CombatEncounterDefinition = {
   name: 'Telluric Echo Fragment',
   description:
     'A telluric manifestation keeps rebuilding itself through a repeating Essence feedback cycle. Conventional pressure can still destroy it, but the pattern may reveal another tactical route.',
+  requiredLocationId: WHISPERING_WOODS_LOCATION_ID,
   playerMaxHealth: 12,
   enemyMaxHealth: 12,
   strikeDamage: 4,

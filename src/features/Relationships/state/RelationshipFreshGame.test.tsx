@@ -433,6 +433,9 @@ describe('M5 fresh Willow routed vertical slice', () => {
 
     await store.dispatch(newGameSeedNPCsThunk()).unwrap();
     store.dispatch(setSelectedNPCId(WILLOW_ID));
+    // This historical relationship qualification predates player-facing travel.
+    // Establish the physical co-presence its routed Willow interactions assume.
+    store.dispatch({ type: 'player/setLocation', payload: 'location_whispering_woods' });
 
     expect(Object.keys(store.getState().npcs.npcs)).toEqual([WILLOW_ID]);
     expect(store.getState().npcs.npcs[WILLOW_ID].affinity).toBe(0);

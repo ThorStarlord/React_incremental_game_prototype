@@ -384,6 +384,9 @@ describe('M14 multi-NPC relationship consequence', () => {
     ).toBeUndefined();
 
     cleanup();
+    // The reroute objective was completed in the Merchant District; return to
+    // Gronk's canonical City Center location before the in-person repair scene.
+    resumedStore.dispatch(setLocation('location_city_center'));
     renderNpcRoute(resumedStore, GRONK_ID);
     clickTab('Dialogue');
 
