@@ -317,8 +317,8 @@ describe('M25 complete chapter vertical slice qualification', () => {
     expect(fetchedUrls).toContain('/data/m25-chapter-content.json');
     expect(store.getState().npcs.dialogueNodes[PATROL_MUTATION_ID]).toBeDefined();
     expect(store.getState().npcs.dialogueNodes[PUBLIC_CONCLUSION_ID]).toBeDefined();
-    expect(store.getState().npcs.npcs[VALERIUS_ID].availableDialogues).toContain(PUBLIC_CONCLUSION_ID);
-    expect(store.getState().npcs.npcs[GRONK_ID].availableDialogues).toContain(QUIET_CONCLUSION_ID);
+    expect(store.getState().npcs.npcs[VALERIUS_ID]!.availableDialogues).toContain(PUBLIC_CONCLUSION_ID);
+    expect(store.getState().npcs.npcs[GRONK_ID]!.availableDialogues).toContain(QUIET_CONCLUSION_ID);
 
     const npcThunkSource = fs.readFileSync(
       path.join(process.cwd(), 'src/features/NPCs/state/NPCThunks.ts'),
@@ -400,14 +400,14 @@ describe('M25 complete chapter vertical slice qualification', () => {
     expect(selectTradeFlow(store.getState(), MERCHANT_DISTRICT_LOCATION_ID)).toBe('normal');
     await interact(store, SILAS_ID, PATROL_CONSUMER_ID, 'acknowledge');
 
-    expect(store.getState().npcs.npcs[VALERIUS_ID].completedDialogues).not.toContain(PUBLIC_CONCLUSION_ID);
+    expect(store.getState().npcs.npcs[VALERIUS_ID]!.completedDialogues).not.toContain(PUBLIC_CONCLUSION_ID);
     const resumed = await saveRestoreAndSettleRoutine(store, 1_000_000);
     expect(selectFactionReputation(resumed.getState(), CITY_WATCH)).toBe(-10);
     expect(selectWatchPresence(resumed.getState(), MERCHANT_DISTRICT_LOCATION_ID)).toBe('heavy');
     expect(resumed.getState().relationships.experiencesById.silas_exp_old_silence_reinterpreted).toBeDefined();
     expect(resumed.getState().player.permanentTraits).toContain(WISDOM_ID);
     expect(selectNpcKnowsFact(resumed.getState(), VALERIUS_ID, FORGE_ASSISTANCE_PRACTICED_FACT_ID)).toBe(true);
-    expect(resumed.getState().npcs.npcs[VALERIUS_ID].completedDialogues).not.toContain(PUBLIC_CONCLUSION_ID);
+    expect(resumed.getState().npcs.npcs[VALERIUS_ID]!.completedDialogues).not.toContain(PUBLIC_CONCLUSION_ID);
 
     const opposite = await resumed.dispatch(processNPCInteractionThunk({
       npcId: GRONK_ID,
@@ -429,7 +429,7 @@ describe('M25 complete chapter vertical slice qualification', () => {
     expect(resumed.getState().factions).toEqual(domainBeforeConclusion.factions);
     expect(resumed.getState().worldState).toEqual(domainBeforeConclusion.worldState);
     expect(resumed.getState().quest).toEqual(domainBeforeConclusion.quest);
-    expect(resumed.getState().npcs.npcs[VALERIUS_ID].completedDialogues).toContain(PUBLIC_CONCLUSION_ID);
+    expect(resumed.getState().npcs.npcs[VALERIUS_ID]!.completedDialogues).toContain(PUBLIC_CONCLUSION_ID);
   });
 
   test('Route B composes quiet rerouting through real travel work, long-horizon reciprocity, Wisdom combat, Guild standing, freight recovery and offline delegation', async () => {
@@ -437,9 +437,9 @@ describe('M25 complete chapter vertical slice qualification', () => {
     await seedChapterEntry(store);
 
     await interact(store, VALERIUS_ID, COUNCIL_ID, 'quiet_reroute');
-    expect(store.getState().relationships.experiencesById.gonk_exp_aftermath_quiet_reroute).toBeDefined();
+    expect(store.getState().relationships.experiencesById.gronk_exp_aftermath_quiet_reroute).toBeDefined();
     expect(store.getState().relationships.experiencesById.silas_exp_aftermath_quiet_reroute).toBeDefined();
-    expect(store.getState().npcs.npcs[VALERIUS_ID].availableQuests).toContain(QUIET_QUEST_ID);
+    expect(store.getState().npcs.npcs[VALERIUS_ID]!.availableQuests).toContain(QUIET_QUEST_ID);
 
     await store.dispatch(startQuestThunk(QUIET_QUEST_ID)).unwrap();
     expect(store.getState().quest.quests[QUIET_QUEST_ID].status).toBe('IN_PROGRESS');
@@ -507,6 +507,6 @@ describe('M25 complete chapter vertical slice qualification', () => {
     expect(resumed.getState().factions).toEqual(domainBeforeConclusion.factions);
     expect(resumed.getState().worldState).toEqual(domainBeforeConclusion.worldState);
     expect(resumed.getState().quest).toEqual(domainBeforeConclusion.quest);
-    expect(resumed.getState().npcs.npcs[GRONK_ID].completedDialogues).toContain(QUIET_CONCLUSION_ID);
+    expect(resumed.getState().npcs.npcs[GRONK_ID]!.completedDialogues).toContain(QUIET_CONCLUSION_ID);
   });
 });
