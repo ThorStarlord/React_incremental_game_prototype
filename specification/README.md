@@ -4,7 +4,7 @@ This specification documents the design, architecture, implementation status, an
 
 The project uses React, TypeScript, Redux Toolkit, Material UI, listener middleware, data-driven content, versioned save/load, and focused behavioral qualification.
 
-## Product authority through the Incremental Integration Repair
+## Product authority through fresh Checkpoint C PASS
 
 Read milestone records as an authority chain rather than assuming older design prose describes the current runtime.
 
@@ -29,16 +29,20 @@ The most relevant current records are:
 - [`Technical/IncrementalIntegrationRepair.md`](Technical/IncrementalIntegrationRepair.md) — preregistered bounded repair;
 - [`Technical/IncrementalIntegrationRepairReconAmendment.md`](Technical/IncrementalIntegrationRepairReconAmendment.md) — frozen repair implementation decisions;
 - [`Technical/IncrementalIntegrationRepairResult.md`](Technical/IncrementalIntegrationRepairResult.md) — qualified repair result and evidence ceiling;
+- [`Technical/CheckpointCIncrementalIntegrationRerun.md`](Technical/CheckpointCIncrementalIntegrationRerun.md) — fresh rerun preregistration against repaired main;
+- [`Technical/CheckpointCIncrementalIntegrationRerunResult.md`](Technical/CheckpointCIncrementalIntegrationRerunResult.md) — fresh `CHECKPOINT_C_PASS` and bounded evidence ceiling;
 - [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — planned sequence through M25, subject to actual milestone preregistration/results.
 
-The repair PASS does **not** rewrite the historical first Checkpoint C result. Current status is:
+The historical first Checkpoint C result and repair remain preserved. Current status is:
 
 ```text
 Checkpoint C first evaluation: WEAK
 Incremental Integration Repair: PASS
-Fresh Checkpoint C rerun: REQUIRED NEXT
-M22: NOT AUTHORIZED
+Fresh Checkpoint C rerun: PASS
+M22: AUTHORIZED AS NEXT CANDIDATE
 ```
+
+M22 behavior is not yet implemented or qualified; it must begin from the merged Checkpoint C rerun baseline with its own preregistration and recon.
 
 ---
 
@@ -262,7 +266,7 @@ See [`Features/NotificationSystem.md`](Features/NotificationSystem.md).
 
 ---
 
-## Checkpoint C history and repair result
+## Checkpoint C history, repair, and fresh rerun
 
 ### First evaluation
 
@@ -288,7 +292,7 @@ The architecture itself remained healthy: assignment was deliberate, narrative a
 
 ### Bounded repair
 
-The Incremental Integration Repair now qualifies both seams:
+The Incremental Integration Repair qualifies both seams:
 
 ```text
 active Forge practice / successful Trait Resonance
@@ -322,7 +326,21 @@ active City Center Forge practice
 
 Relationship, Quest, and canonical player-location state remain unchanged across the offline portion of that probe.
 
-**This repair PASS is evidence for a fresh Checkpoint C rerun. It is not a substitute for that rerun.**
+### Fresh rerun
+
+The separate fresh Checkpoint C rerun re-applied the original seven integration dimensions and ten anti-idle falsifiers rather than allowing the repair to grade itself.
+
+It produced:
+
+```text
+CHECKPOINT_C_PASS
+```
+
+The bounded reason is that both historical seams are now present in production and no new structural contradiction was found: routine delegation is downstream of active familiarity; Copy capability requirements remain independent; offline progression remains the same two-consumer allowlist with an 8-hour cap and no task chaining; Gold/Essence remain existing currencies; and return feedback is player-visible.
+
+The fresh PASS does **not** qualify final economy balance, repeatable manual Forge gameplay, final notification UX, human pacing/fun, generalized automation, or any M22+ behavior.
+
+M22 Social Knowledge Propagation is therefore the next authorized candidate after the rerun merge.
 
 ---
 
@@ -408,6 +426,8 @@ The incremental/automation layer is intended to compress understood repetition, 
 - [`Technical/IncrementalIntegrationRepair.md`](Technical/IncrementalIntegrationRepair.md)
 - [`Technical/IncrementalIntegrationRepairReconAmendment.md`](Technical/IncrementalIntegrationRepairReconAmendment.md)
 - [`Technical/IncrementalIntegrationRepairResult.md`](Technical/IncrementalIntegrationRepairResult.md)
+- [`Technical/CheckpointCIncrementalIntegrationRerun.md`](Technical/CheckpointCIncrementalIntegrationRerun.md)
+- [`Technical/CheckpointCIncrementalIntegrationRerunResult.md`](Technical/CheckpointCIncrementalIntegrationRerunResult.md)
 
 ### Core feature specifications
 
@@ -466,8 +486,8 @@ The incremental/automation layer is intended to compress understood repetition, 
 | NPC active presence | Bounded qualified integration | anchored in-person actions require co-presence |
 | Active RPG integration | **Checkpoint B PASS** | first WEAK -> repair PASS -> fresh PASS |
 | Offline progress | **M21 PASS — bounded** | passive Essence + already-running M20 task only |
-| Incremental integration | **First Checkpoint C WEAK; Repair PASS; rerun pending** | both observed seams repaired; fresh evaluation still required |
-| Social knowledge | **Blocked** | M22 requires fresh `CHECKPOINT_C_PASS` |
+| Incremental integration | **Checkpoint C PASS — bounded** | first WEAK -> repair PASS -> fresh rerun PASS; final balance/human UX remain unqualified |
+| Social knowledge | **Authorized next candidate** | M22 behavior not yet implemented; preregistration/recon required |
 | Faction reputation | Future | M23 |
 | Objective world state | Future | M24 |
 
@@ -495,7 +515,8 @@ Key milestones:
 - **M20:** PASS — two authored routine Copy tasks, deterministic live progress, exact-once ordinary rewards, save/load continuity, narrative authority preserved;
 - **M21:** PASS — bounded save-envelope offline settlement for passive Essence + an already-running M20 task;
 - **Checkpoint C first evaluation:** `CHECKPOINT_C_WEAK` — missing earned-routine bridge + missing mounted shared return renderer; M22 blocked;
-- **Incremental Integration Repair:** **PASS** — player-owned Rule-of-Two familiarity + below-UI enforcement + active Forge/Resonance sources + shared production notification host + composed active->automation->offline->visible-return proof.
+- **Incremental Integration Repair:** **PASS** — player-owned Rule-of-Two familiarity + below-UI enforcement + active Forge/Resonance sources + shared production notification host + composed active->automation->offline->visible-return proof;
+- **Checkpoint C fresh rerun:** **`CHECKPOINT_C_PASS`** — repaired composition satisfies the bounded integration rubric; M22 becomes the next authorized candidate after the rerun merge.
 
 Milestone records live under `Technical/`; executable gates live in Build Validation.
 
@@ -522,46 +543,39 @@ The current workflow includes an additive **Checkpoint C incremental integration
 
 ## Near-term development direction
 
-The repair is qualified, but the next authorized boundary is **not M22**.
-
-The required next step is:
+Fresh Checkpoint C now passes. The next authorized candidate is:
 
 ```text
-Fresh Checkpoint C — Incremental Integration rerun
+M22 — Social Knowledge Propagation
 ```
 
-It must independently re-evaluate the now-repaired composition:
+M22 must not inherit provisional roadmap assumptions as implementation truth. Start from the merged Checkpoint C rerun baseline and perform fresh recon before freezing the exact knowledge model and production probes.
+
+The governing M22 boundary is expected to preserve:
 
 ```text
-active RPG loop
-+
-earned routine familiarity
-+
-M20 Copy delegation
-+
-M21 bounded offline continuation
-+
-visible shared return feedback
+WORLD        -> what objectively happened?
+KNOWLEDGE    -> who knows it happened?
+RELATIONSHIP -> what shared history means between specific people
+FACTION      -> how an institution regards the player
 ```
 
-The rerun should ask whether the repaired layer now actually supports active RPG play by compressing already-understood repetition while keeping meaningful decisions active/player-owned.
+but exact M22 semantics remain provisional until preregistered against the then-current repository.
 
-Required sequence:
+Current sequence:
 
 ```text
 M20 Copy Task Automation: PASS
 -> M21 Bounded Offline Progress: PASS
 -> Checkpoint C first evaluation: WEAK
 -> Incremental Integration Repair: PASS
--> fresh Checkpoint C rerun
--> only if CHECKPOINT_C_PASS: M22 Social Knowledge Propagation
+-> fresh Checkpoint C rerun: PASS
+-> M22 Social Knowledge Propagation: AUTHORIZED NEXT
 -> M23 Faction Reputation
 -> M24 Objective World State
 -> M25 Complete Chapter Vertical Slice
 -> Human integrated playability / product review
 ```
-
-A repair PASS is necessary evidence for the rerun. It cannot self-authorize the milestone that it was created to repair.
 
 Individual future milestone semantics remain provisional until preregistered against the then-current repository.
 
@@ -636,7 +650,7 @@ specification/
 
 When an older specification conflicts with current qualified authority, do not silently revive old behavior as design truth.
 
-Use this reading order for the current repair-era product:
+Use this reading order for the current post-Checkpoint-C product:
 
 1. `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority;
 2. `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine;
@@ -650,8 +664,9 @@ Use this reading order for the current repair-era product:
 10. `Technical/M21BoundedOfflineProgressResult.md` for original bounded offline-settlement authority;
 11. `Technical/CheckpointCIncrementalIntegrationResult.md` for the historical first incremental-integration verdict;
 12. `Technical/IncrementalIntegrationRepairResult.md` + `Features/CopySystem.md` + `Features/GameLoopSystem.md` + `Features/NotificationSystem.md` for the qualified repair authority;
-13. milestone preregistration/recon records for exact experiment contracts;
-14. `Technical/PostM17MilestoneRoadmap.md` for future planned sequencing;
-15. `GameDesignDocument.md` and older feature prose where not superseded.
+13. `Technical/CheckpointCIncrementalIntegrationRerunResult.md` for the fresh PASS that authorizes M22 as the next candidate;
+14. milestone preregistration/recon records for exact experiment contracts;
+15. `Technical/PostM17MilestoneRoadmap.md` for future planned sequencing;
+16. `GameDesignDocument.md` and older feature prose where not superseded.
 
 If runtime still uses a legacy rule, document it as compatibility/migration debt and migrate it deliberately rather than pretending it is the modern product model.
