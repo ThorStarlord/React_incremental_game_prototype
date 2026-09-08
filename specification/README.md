@@ -4,7 +4,7 @@ This specification documents the design, architecture, implementation status, an
 
 The project uses React, TypeScript, Redux Toolkit, Material UI, listener middleware, data-driven content, versioned save/load, and focused behavioral qualification.
 
-## Product authority through fresh Checkpoint C PASS
+## Product authority through M22 Social Knowledge PASS
 
 Read milestone records as an authority chain rather than assuming older design prose describes the current runtime.
 
@@ -31,18 +31,22 @@ The most relevant current records are:
 - [`Technical/IncrementalIntegrationRepairResult.md`](Technical/IncrementalIntegrationRepairResult.md) — qualified repair result and evidence ceiling;
 - [`Technical/CheckpointCIncrementalIntegrationRerun.md`](Technical/CheckpointCIncrementalIntegrationRerun.md) — fresh rerun preregistration against repaired main;
 - [`Technical/CheckpointCIncrementalIntegrationRerunResult.md`](Technical/CheckpointCIncrementalIntegrationRerunResult.md) — fresh `CHECKPOINT_C_PASS` and bounded evidence ceiling;
+- [`Technical/M22SocialKnowledgePropagation.md`](Technical/M22SocialKnowledgePropagation.md) — preregistered M22 scientific/authority contract;
+- [`Technical/M22SocialKnowledgePropagationReconAmendment.md`](Technical/M22SocialKnowledgePropagationReconAmendment.md) — frozen objective-event, witness, report, persistence, and consumer semantics;
+- [`Technical/M22SocialKnowledgePropagationResult.md`](Technical/M22SocialKnowledgePropagationResult.md) + [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md) — bounded `M22_PASS` authority;
 - [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — planned sequence through M25, subject to actual milestone preregistration/results.
 
-The historical first Checkpoint C result and repair remain preserved. Current status is:
+Current milestone status is:
 
 ```text
 Checkpoint C first evaluation: WEAK
 Incremental Integration Repair: PASS
 Fresh Checkpoint C rerun: PASS
-M22: AUTHORIZED AS NEXT CANDIDATE
+M22 Social Knowledge Propagation: PASS — bounded
+M23 Faction Reputation: AUTHORIZED NEXT after qualified M22 merge
 ```
 
-M22 behavior is not yet implemented or qualified; it must begin from the merged Checkpoint C rerun baseline with its own preregistration and recon.
+M22's PASS is intentionally narrow: one existing objective Forge-practice event, one direct witness, one explicit report path, and one real downstream Knowledge consumer. It does not claim generalized social epistemics.
 
 ---
 
@@ -116,7 +120,7 @@ CHECKPOINT_B_PASS
 M20 authorized
 ```
 
-The current Incremental Integration Repair adds one more bounded active use of Exploration: **Forge Assistance practice exists only in City Center** and establishes player familiarity with that routine. It does not create generalized crafting or location-resource simulation.
+The Incremental Integration Repair adds one more bounded active use of Exploration: **Forge Assistance practice exists only in City Center** and establishes player familiarity with that routine. M22 then reuses that already-qualified event plus Gronk's existing City Center anchor as its direct-witness proof. Neither milestone creates generalized crafting or location-resource simulation.
 
 ---
 
@@ -162,7 +166,7 @@ M20 originally qualified their task-execution contract: authored IDs, below-UI l
 
 ### Repair-added familiarity authority
 
-Checkpoint C correctly observed that M20 did not yet prove the first half of its doctrine. The repair now adds player-owned persisted familiarity for exactly the two M20 task IDs.
+Checkpoint C correctly observed that M20 did not yet prove the first half of its doctrine. The repair adds player-owned persisted familiarity for exactly the two M20 task IDs.
 
 ```text
 Forge Assistance familiarity
@@ -172,7 +176,7 @@ Resonance Calibration familiarity
 <- successful active Trait Resonance
 ```
 
-`startCopyProductionTaskThunk` now requires familiarity **below the UI**, in addition to the existing per-Copy requirements.
+`startCopyProductionTaskThunk` requires familiarity **below the UI**, in addition to the existing per-Copy requirements.
 
 The Copy panel keeps unfamiliar routines visible and explains the active action required to learn them.
 
@@ -227,7 +231,7 @@ M21 continues to qualify:
 - unchanged Relationship/Quest/player-location authority in its positive probe;
 - unchanged save-schema version.
 
-M21 still does **not** process Quest timers, Relationship evidence, dialogue, Combat, travel, Copy general growth/loyalty decay, Trait choices, status effects, regeneration, or generalized GameLoop ticks offline.
+M21 still does **not** process Quest timers, Relationship evidence, dialogue, Combat, travel, Copy general growth/loyalty decay, Trait choices, status effects, regeneration, Knowledge, or generalized GameLoop ticks offline.
 
 ---
 
@@ -241,7 +245,7 @@ M21 settlement
 -> no demonstrated mounted shared renderer
 ```
 
-The repair now qualifies:
+The repair qualifies:
 
 ```text
 feature / M21 dispatches addNotification
@@ -336,11 +340,92 @@ It produced:
 CHECKPOINT_C_PASS
 ```
 
-The bounded reason is that both historical seams are now present in production and no new structural contradiction was found: routine delegation is downstream of active familiarity; Copy capability requirements remain independent; offline progression remains the same two-consumer allowlist with an 8-hour cap and no task chaining; Gold/Essence remain existing currencies; and return feedback is player-visible.
+The bounded reason is that both historical seams are present in production and no new structural contradiction was found: routine delegation is downstream of active familiarity; Copy capability requirements remain independent; offline progression remains the same two-consumer allowlist with an 8-hour cap and no task chaining; Gold/Essence remain existing currencies; and return feedback is player-visible.
 
-The fresh PASS does **not** qualify final economy balance, repeatable manual Forge gameplay, final notification UX, human pacing/fun, generalized automation, or any M22+ behavior.
+The fresh PASS does **not** qualify final economy balance, repeatable manual Forge gameplay, final notification UX, human pacing/fun, generalized automation, or any M22+ behavior by itself.
 
-M22 Social Knowledge Propagation is therefore the next authorized candidate after the rerun merge.
+---
+
+## M22 social Knowledge authority
+
+M22 establishes the first bounded first-class Knowledge domain.
+
+Canonical separation:
+
+```text
+OBJECTIVE SOURCE -> whether an event/fact is true
+KNOWLEDGE        -> which NPC knows that fact
+RELATIONSHIP     -> what shared history means between people
+FACTION          -> how an institution regards the player
+```
+
+### Qualified objective event
+
+The existing qualified City Center Forge-practice record remains objective authority:
+
+```text
+Player.routineFamiliarity.forge_assistance
+source = city_center_forge_assistance
+```
+
+M22's stable awareness reference is:
+
+```text
+fact_m22_player_practiced_forge_assistance
+```
+
+Knowledge does not become a second source of truth.
+
+### Direct witness path
+
+```text
+successful City Center Forge practice
++
+canonical Gronk co-presence
+-> Gronk knows Forge-practice fact
+-> Valerius remains ignorant
+```
+
+The event becoming true does not broadcast knowledge globally.
+
+### Explicit report path
+
+```text
+Player has objectively practiced Forge Assistance
++
+Valerius still ignorant
+-> valerius_m22_forge_report
+-> KNOWLEDGE_FACT effect for Valerius
+-> Valerius knows
+```
+
+### Downstream Knowledge consumer
+
+```text
+Valerius ignorant
+-> valerius_m22_forge_logistics unavailable/rejected
+
+Valerius informed
+-> valerius_m22_forge_logistics available/accepted
+```
+
+The consumer reads canonical Knowledge, not Relationship evidence or quest completion as a substitute.
+
+### Persistence and reset
+
+```text
+Gronk knows / Valerius ignorant
+-> save/load
+-> divergence preserved
+```
+
+Current-schema legacy-like state lacking `knowledge` means no recorded facts; M21 offline settlement does not invent awareness. New-game Player reset clears Knowledge.
+
+### Evidence ceiling
+
+M22 qualifies one fact, one direct witness path, one explicit report path, one downstream consumer, persistence, idempotence, and domain separation. It does **not** qualify rumor graphs, automatic gossip, misinformation, confidence, forgetting, epistemic inference, player Knowledge, historical M13 awareness migration, faction standing, or objective regional World State.
+
+See [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md) and [`Technical/M22SocialKnowledgePropagationResult.md`](Technical/M22SocialKnowledgePropagationResult.md).
 
 ---
 
@@ -351,7 +436,7 @@ The currently qualified direction is now:
 ```text
 Discover person / problem
 -> participate in meaningful event
--> create Relationship evidence
+-> create Relationship evidence where relationally meaningful
 -> change Bond / Connection
 -> change passive Essence and Trait-learning conditions
 -> learn / equip / Resonate capability
@@ -359,9 +444,11 @@ Discover person / problem
 -> current presence may change effective Tether / Essence intensity
 -> encounters and anchored in-person interactions consume canonical presence where qualified
 -> use capability in gameplay
--> create story / world consequence
--> other characters interpret the result
--> create new Relationship evidence
+-> create story / objective event consequence
+-> only legitimate witnesses know selected objective facts where Knowledge is authored
+-> explicit later communication may inform another NPC where authored
+-> different NPCs can therefore interpret different information sets
+-> create new Relationship evidence when relationally meaningful
 -> personally experience bounded routine work
 -> persist routine familiarity
 -> delegate that understood routine to a qualified Copy
@@ -371,7 +458,7 @@ Discover person / problem
 -> return player attention to higher-order active decisions
 ```
 
-The incremental/automation layer is intended to compress understood repetition, not replace active meaning-making.
+The incremental/automation layer is intended to compress understood repetition, not replace active meaning-making. The Knowledge layer is intended to represent bounded awareness, not to become an automatic social simulation.
 
 ---
 
@@ -394,6 +481,8 @@ The incremental/automation layer is intended to compress understood repetition, 
 - data-driven authored content;
 - generic runtime contracts before content-specific exceptions;
 - explicit domain authority rather than duplicated cross-system flags;
+- objective truth separate from per-NPC Knowledge;
+- Knowledge separate from Relationship meaning and future Faction standing;
 - positive allowlists for bounded automation/offline execution;
 - player-owned routine familiarity distinct from per-Copy capability;
 - exact-head qualification for milestone PRs;
@@ -428,15 +517,19 @@ The incremental/automation layer is intended to compress understood repetition, 
 - [`Technical/IncrementalIntegrationRepairResult.md`](Technical/IncrementalIntegrationRepairResult.md)
 - [`Technical/CheckpointCIncrementalIntegrationRerun.md`](Technical/CheckpointCIncrementalIntegrationRerun.md)
 - [`Technical/CheckpointCIncrementalIntegrationRerunResult.md`](Technical/CheckpointCIncrementalIntegrationRerunResult.md)
+- [`Technical/M22SocialKnowledgePropagation.md`](Technical/M22SocialKnowledgePropagation.md)
+- [`Technical/M22SocialKnowledgePropagationReconAmendment.md`](Technical/M22SocialKnowledgePropagationReconAmendment.md)
+- [`Technical/M22SocialKnowledgePropagationResult.md`](Technical/M22SocialKnowledgePropagationResult.md)
 
 ### Core feature specifications
 
 - [`Features/RelationshipExperienceSystem.md`](Features/RelationshipExperienceSystem.md) — Relationship Experiences, Memories, Bond dimensions, Connection
 - [`Features/MemorySystem.md`](Features/MemorySystem.md) — landmark relational evidence
+- [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md) — per-NPC awareness of objective facts; M22 bounded authority
 - [`Features/EssenceResonanceModel.md`](Features/EssenceResonanceModel.md) — Relationship-to-power ontology including spatial Tether
 - [`Features/EssenceSystem.md`](Features/EssenceSystem.md) — passive Essence runtime and bounded M21 offline snapshot accrual
 - [`Features/TraitSystem.md`](Features/TraitSystem.md) — discovery, assimilation, Resonance, permanent gameplay capability
-- [`Features/NPCSystem.md`](Features/NPCSystem.md) — NPC identity/services/dialogue/quest integration
+- [`Features/NPCSystem.md`](Features/NPCSystem.md) — NPC identity/services/dialogue/quest/Knowledge integration
 - [`Features/QuestSystem.md`](Features/QuestSystem.md) — quest lifecycle and authored resolution choices
 - [`Features/CopySystem.md`](Features/CopySystem.md) — Copy progression, Traits, roles, M20 tasks, repair familiarity prerequisite, M21 continuation
 - [`Features/GameLoopSystem.md`](Features/GameLoopSystem.md) — live fixed timestep + bounded M21 settlement + repaired visible-return path
@@ -470,25 +563,26 @@ The incremental/automation layer is intended to compress understood repetition, 
 | Area | Status | Notes |
 |---|---|---|
 | Player | Strong foundation + bounded routine familiarity | canonical location + optional persisted familiarity for the two current M20 routines |
-| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated regression evidence preserved through repair |
+| Relationship Experiences / Memories / Bond | Qualified production runtime | accumulated regression evidence preserved through M22 |
 | Relationship Connection authority | Qualified for registered bundles | legacy compatibility remains |
+| Knowledge | **M22 PASS — bounded** | one fact; Gronk direct witness; Valerius explicit report; one Valerius downstream consumer; no auto propagation |
 | Essence | Functional + Relationship-derived + spatial Tether + bounded offline snapshot accrual | M21 max 8h; not event-time simulation |
-| Traits | Core + relationship-mediated discovery/assimilation + gameplay capability | successful active Resonance now also teaches calibration familiarity; no offline Trait choices |
+| Traits | Core + relationship-mediated discovery/assimilation + gameplay capability | successful active Resonance also teaches calibration familiarity; no offline Trait choices |
 | Quest | Expanded foundation | permanent-Trait resolution gates; offline repair preserves Quest authority |
-| Narrative integration | Bounded qualified slices | M13-M15 plus later controls; no offline narrative replay |
+| Narrative integration | Bounded qualified slices | M13-M15 plus M22 Knowledge consumer; historical pre-M22 awareness migration remains debt |
 | Copy | **M20 PASS + familiarity repair PASS + M21 continuation** | two tasks only; unfamiliar assignment rejected below UI; no autonomous selection |
 | GameLoop | **M21 PASS** | canonical timestamp, 8h cap, two-consumer allowlist, replay guard |
 | Shared notifications | **Repair PASS** | `GlobalNotificationHost` mounted in `GameLayout`; M21 summary visibly rendered |
-| Save/load | Implemented + migration qualification | familiarity/task state persist through full RootState; schema remains v1 |
+| Save/load | Implemented + migration qualification | Knowledge/familiarity/task state persist through full RootState; schema remains v1 |
 | Combat | Bounded qualified vertical slice + presence gate | Telluric Echo requires Whispering Woods; no offline Combat |
-| Exploration | Bounded qualified travel/presence + Forge learning surface | City Center active Forge practice is one bounded repair interaction; no generalized crafting |
+| Exploration | Bounded qualified travel/presence + Forge learning surface | City Center Forge practice also supplies M22 objective event; no generalized crafting |
 | Spatial Tether | Bounded qualified projection | Willow/Gronk anchors; no offline spatial replay |
-| NPC active presence | Bounded qualified integration | anchored in-person actions require co-presence |
+| NPC active presence | Bounded qualified integration | Gronk co-presence also participates in M22 witness acquisition |
 | Active RPG integration | **Checkpoint B PASS** | first WEAK -> repair PASS -> fresh PASS |
-| Offline progress | **M21 PASS — bounded** | passive Essence + already-running M20 task only |
+| Offline progress | **M21 PASS — bounded** | passive Essence + already-running M20 task only; Knowledge excluded |
 | Incremental integration | **Checkpoint C PASS — bounded** | first WEAK -> repair PASS -> fresh rerun PASS; final balance/human UX remain unqualified |
-| Social knowledge | **Authorized next candidate** | M22 behavior not yet implemented; preregistration/recon required |
-| Faction reputation | Future | M23 |
+| Social knowledge | **M22 PASS — bounded** | objective truth can diverge from per-NPC awareness and later content consumes Knowledge |
+| Faction reputation | **Authorized next candidate** | M23 requires separate preregistration/recon; not implemented by M22 |
 | Objective world state | Future | M24 |
 
 ---
@@ -516,7 +610,8 @@ Key milestones:
 - **M21:** PASS — bounded save-envelope offline settlement for passive Essence + an already-running M20 task;
 - **Checkpoint C first evaluation:** `CHECKPOINT_C_WEAK` — missing earned-routine bridge + missing mounted shared return renderer; M22 blocked;
 - **Incremental Integration Repair:** **PASS** — player-owned Rule-of-Two familiarity + below-UI enforcement + active Forge/Resonance sources + shared production notification host + composed active->automation->offline->visible-return proof;
-- **Checkpoint C fresh rerun:** **`CHECKPOINT_C_PASS`** — repaired composition satisfies the bounded integration rubric; M22 becomes the next authorized candidate after the rerun merge.
+- **Checkpoint C fresh rerun:** **`CHECKPOINT_C_PASS`** — repaired composition satisfies the bounded integration rubric; M22 authorized;
+- **M22:** **`M22_PASS`** — one objective Forge event produces divergent Gronk/Valerius knowledge; explicit reporting transfers the fact; later Valerius content reads canonical Knowledge independently of Relationship/Faction/World-State authority.
 
 Milestone records live under `Technical/`; executable gates live in Build Validation.
 
@@ -537,30 +632,42 @@ Do not remove prior gates merely because a later milestone focuses on another su
 
 Build Validation + preregistered criteria are milestone merge authority. Repository Gemini review is not merge authority.
 
-The current workflow includes an additive **Checkpoint C incremental integration repair qualification** gate while preserving M21, M20, active-loop repair, modified historical, accumulated M4-M19, TypeScript, and production-build gates.
+The current workflow includes an additive **M22 social knowledge propagation qualification** gate while preserving Checkpoint C repair, M21, M20, active-loop repair, modified historical, accumulated M4-M19, TypeScript, and production-build gates.
 
 ---
 
 ## Near-term development direction
 
-Fresh Checkpoint C now passes. The next authorized candidate is:
+After a qualified merged M22 PASS, the next authorized candidate is:
 
 ```text
-M22 — Social Knowledge Propagation
+M23 — Faction Reputation
 ```
 
-M22 must not inherit provisional roadmap assumptions as implementation truth. Start from the merged Checkpoint C rerun baseline and perform fresh recon before freezing the exact knowledge model and production probes.
+M23 must not infer its implementation from the provisional roadmap alone. It must begin from the merged M22 baseline and perform fresh preregistration/recon.
 
-The governing M22 boundary is expected to preserve:
+The governing separation is expected to preserve:
 
 ```text
-WORLD        -> what objectively happened?
-KNOWLEDGE    -> who knows it happened?
+WORLD        -> what objectively exists/happened
+KNOWLEDGE    -> who knows which facts
 RELATIONSHIP -> what shared history means between specific people
 FACTION      -> how an institution regards the player
 ```
 
-but exact M22 semantics remain provisional until preregistered against the then-current repository.
+The key provisional M23 invariant is:
+
+```text
+Valerius Relationship != City Watch Standing
+```
+
+and M22 strengthens it to:
+
+```text
+Valerius Knowledge != Valerius Relationship != City Watch Standing
+```
+
+Exact M23 semantics remain provisional until preregistered against the then-current repository.
 
 Current sequence:
 
@@ -570,8 +677,8 @@ M20 Copy Task Automation: PASS
 -> Checkpoint C first evaluation: WEAK
 -> Incremental Integration Repair: PASS
 -> fresh Checkpoint C rerun: PASS
--> M22 Social Knowledge Propagation: AUTHORIZED NEXT
--> M23 Faction Reputation
+-> M22 Social Knowledge Propagation: PASS
+-> M23 Faction Reputation: AUTHORIZED NEXT after qualified M22 merge
 -> M24 Objective World State
 -> M25 Complete Chapter Vertical Slice
 -> Human integrated playability / product review
@@ -616,6 +723,7 @@ src/
 ├── app/
 ├── features/
 │   ├── Relationships/
+│   ├── Knowledge/
 │   ├── Player/
 │   ├── Traits/
 │   ├── NPCs/
@@ -650,7 +758,7 @@ specification/
 
 When an older specification conflicts with current qualified authority, do not silently revive old behavior as design truth.
 
-Use this reading order for the current post-Checkpoint-C product:
+Use this reading order for the current post-M22 product:
 
 1. `Technical/PostM14ProductReconciliation.md` for broad domain/migration authority;
 2. `Technical/PostM16TraitGameplayReconciliation.md` for Trait-to-gameplay doctrine;
@@ -664,9 +772,12 @@ Use this reading order for the current post-Checkpoint-C product:
 10. `Technical/M21BoundedOfflineProgressResult.md` for original bounded offline-settlement authority;
 11. `Technical/CheckpointCIncrementalIntegrationResult.md` for the historical first incremental-integration verdict;
 12. `Technical/IncrementalIntegrationRepairResult.md` + `Features/CopySystem.md` + `Features/GameLoopSystem.md` + `Features/NotificationSystem.md` for the qualified repair authority;
-13. `Technical/CheckpointCIncrementalIntegrationRerunResult.md` for the fresh PASS that authorizes M22 as the next candidate;
-14. milestone preregistration/recon records for exact experiment contracts;
-15. `Technical/PostM17MilestoneRoadmap.md` for future planned sequencing;
-16. `GameDesignDocument.md` and older feature prose where not superseded.
+13. `Technical/CheckpointCIncrementalIntegrationRerunResult.md` for the fresh PASS that authorized M22;
+14. `Technical/M22SocialKnowledgePropagationResult.md` + `Features/KnowledgeSystem.md` + `Features/NPCSystem.md` for bounded social-Knowledge authority;
+15. milestone preregistration/recon records for exact experiment contracts;
+16. `Technical/PostM17MilestoneRoadmap.md` for future planned sequencing;
+17. `GameDesignDocument.md` and older feature prose where not superseded.
 
 If runtime still uses a legacy rule, document it as compatibility/migration debt and migrate it deliberately rather than pretending it is the modern product model.
+
+If historical content uses Relationship evidence to stand in for cross-NPC awareness, treat it as pre-M22 authoring/migration debt unless a dedicated migration explicitly separates objective truth, Knowledge, and retained Relationship meaning.
