@@ -36,18 +36,21 @@ const FOLLOWUP_PROMPT = "proceed";
 const STREAM_START_TIMEOUT_MS = 60_000;
 const STREAM_END_TIMEOUT_MS = 10 * 60_000;
 const SETTLE_DELAY_MS = 5_000;
+const LOGIN_TIMEOUT_MS = 10 * 60_000;
 
 let stopRequested = false;
 let started = false;
 let _startResolve = null;
+let readlineInterface = null;
+let browserContext = null;
 const startPromise = new Promise((resolve) => {
   _startResolve = resolve;
 });
 
 function watchEnterKey() {
   console.log("\n>>> Log in in the browser, then press ENTER here to START. Next ENTER stops. <<<\n");
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  rl.on("line", () => {
+  readlineInterface = readline.createInterface({ input: process.stdin, output: process.stdout });
+  readlineInterface.on("line", () => {
     if (!started) {
       started = true;
       console.log("\n[start] ENTER pressed — starting prompt loop. Next ENTER will stop.\n");
@@ -158,6 +161,8 @@ async function waitForLogin(page, timeoutMs = 10 * 60_000) {
 }
 
 async function sendPrompt(page, text) {
+  if (!text || !text.trim()) throw new Error("Cannot send an empty prompt.");
+
   const composer = await findFirstVisible(page, COMPOSER_SELECTORS, 120_000);
   await composer.click();
   // ProseMirror editor (#prompt-textarea) is a contenteditable div — keyboard.type is most reliable.
@@ -194,9 +199,9 @@ async function waitForAnswer(page) {
   }
 
   if (!sawStreaming) {
-    console.log("[wait] No Stop button seen — page may have changed. Waiting 30s fallback…");
-    await page.waitForTimeout(30_000);
-    return;
+    throw new Error(
+      "Could not detect answer streaming. Refusing to send another prompt while the page state is unknown."
+    );
   }
 
   // 2. Wait for streaming to finish (Stop button detaches).
@@ -228,17 +233,17 @@ async function waitForAnswer(page) {
 (async () => {
   watchEnterKey();
 
-  const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
+  browserContext = await chromium.launchPersistentContext(USER_DATA_DIR, {
     headless: false,
     viewport: { width: 1280, height: 900 },
-    args: ["--disable-blink-features=AutomationControlled"],
   });
-  const page = context.pages()[0] || (await context.newPage());
+  const page = browserContext.pages()[0] || (await browserContext.newPage());
 
   console.log(`[open] ${CHATGPT_URL}`);
   await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
 
   try {
+    await waitForLogin(page, LOGIN_TIMEOUT_MS);
     await waitForUserStart();
     // Initial prompt (sent once)
     await sendPrompt(page, INITIAL_PROMPT);
@@ -266,8 +271,8 @@ async function waitForAnswer(page) {
     }
   } finally {
     console.log("[done] Closing browser. Profile kept in .chatgpt-profile/ so login persists.");
-    await context.close();
-    process.exit(0);
+    readlineInterface?.close();
+    await browserContext?.close();
   }
 })();
 
