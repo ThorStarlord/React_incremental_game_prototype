@@ -69,6 +69,7 @@ describe('M22 social knowledge propagation qualification', () => {
 
     store.dispatch(setLocation(CITY_CENTER_LOCATION_ID));
     const relationshipsBefore = JSON.parse(JSON.stringify(store.getState().relationships));
+    const worldStateBefore = JSON.parse(JSON.stringify(store.getState().worldState));
     const practiced = await store.dispatch(practiceForgeAssistanceThunk());
     expect(practiceForgeAssistanceThunk.fulfilled.match(practiced)).toBe(true);
 
@@ -84,7 +85,7 @@ describe('M22 social knowledge propagation qualification', () => {
       .toEqual([FORGE_ASSISTANCE_PRACTICED_FACT_ID]);
 
     expect((store.getState() as any).faction).toBeUndefined();
-    expect((store.getState() as any).worldState).toBeUndefined();
+    expect(store.getState().worldState).toEqual(worldStateBefore);
   });
 
   test('knowledge divergence persists while legacy-like missing knowledge stays empty through offline time', async () => {
