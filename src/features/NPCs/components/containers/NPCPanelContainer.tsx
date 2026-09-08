@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
 import {
+  Alert,
   Box,
   Paper,
   Typography,
@@ -25,6 +26,11 @@ import NPCQuestsTab from '../ui/tabs/NPCQuestsTab';
 import NPCTraitsTab from '../ui/tabs/NPCTraitsTab';
 import MigratedRelationshipSummary from '../../../Relationships/components/MigratedRelationshipSummary';
 import { selectUsesRelationshipConnectionAuthority } from '../../../Relationships/state/RelationshipSelectors';
+import {
+  getNpcWorldLocationId,
+  isPlayerAtNpcWorldLocation,
+} from '../../state/NPCWorldLocationDefinitions';
+import { getLocationDefinition } from '../../../Exploration/LocationDefinitions';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -61,6 +67,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   const npc = useAppSelector(state => (npcId ? selectNPCById(state, npcId) : undefined));
   const isLoading = useAppSelector(selectNPCLoading);
   const error = useAppSelector(selectNPCError);
+  const playerLocation = useAppSelector(state => state.player.location);
   const usesRelationshipAuthority = useAppSelector(state =>
     npcId ? selectUsesRelationshipConnectionAuthority(state, npcId) : false
   );
@@ -127,19 +134,44 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   const traitsLocked = !usesRelationshipAuthority && npc.connectionDepth < 1;
   const tradeLocked = npc.affinity < 40;
 
+  const npcWorldLocationId = getNpcWorldLocationId(npc.id);
+  const presenceAtAnchor = isPlayerAtNpcWorldLocation(npc.id, playerLocation);
+  const inPersonBlocked = presenceAtAnchor === false;
+  const npcWorldLocation = npcWorldLocationId
+    ? getLocationDefinition(npcWorldLocationId)
+    : undefined;
+  const requiredLocationLabel = npcWorldLocation?.name ?? npcWorldLocationId ?? npc.location;
+
+  const renderInPersonSurface = (children: React.ReactNode) => {
+    if (!inPersonBlocked) return children;
+    return (
+      <Alert severity="info" data-testid={`npc-presence-gate-${npc.id}`}>
+        {npc.name} is at {requiredLocationLabel}. You can review Overview and Relationship remotely, but travel there for in-person interaction.
+      </Alert>
+    );
+  };
+
   return (
     <>
       <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
           <Typography variant="h5">{npc.name}</Typography>
           <Button
             variant="contained"
             color="secondary"
             onClick={() => setCreateCopyModalOpen(true)}
+            disabled={inPersonBlocked}
+            title={inPersonBlocked ? `Travel to ${requiredLocationLabel} to create a Copy from ${npc.name}.` : undefined}
           >
             Create Copy
           </Button>
         </Box>
+
+        {inPersonBlocked && (
+          <Alert severity="info" sx={{ mt: 2 }}>
+            Current presence: remote from {npc.name}. Travel to {requiredLocationLabel} for Dialogue, Quests, Traits, Trade, or Copy creation. Overview and Relationship history remain available remotely.
+          </Alert>
+        )}
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
           {/* MUI Tabs expects Tab components as direct children. Wrapping a Tab in
@@ -175,7 +207,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
           <NPCOverviewTab npc={npc} />
         </TabPanel>
         <TabPanel value={currentTab} index={1}>
-          <NPCDialogueTab npcId={npc.id} />
+          {renderInPersonSurface(<NPCDialogueTab npcId={npc.id} />)}
         </TabPanel>
         <TabPanel value={currentTab} index={2}>
           {usesRelationshipAuthority ? (
@@ -185,18 +217,18 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
           )}
         </TabPanel>
         <TabPanel value={currentTab} index={3}>
-          <NPCQuestsTab npcId={npc.id} />
+          {renderInPersonSurface(<NPCQuestsTab npcId={npc.id} />)}
         </TabPanel>
         <TabPanel value={currentTab} index={4}>
-          <NPCTraitsTab npcId={npc.id} />
+          {renderInPersonSurface(<NPCTraitsTab npcId={npc.id} />)}
         </TabPanel>
         <TabPanel value={currentTab} index={5}>
-          <NPCTradeTab npcId={npc.id} />
+          {renderInPersonSurface(<NPCTradeTab npcId={npc.id} />)}
         </TabPanel>
       </Box>
 
       <CreateCopyModal
-        open={isCreateCopyModalOpen}
+        open={isCreateCopyModalOpen && !inPersonBlocked}
         onClose={() => setCreateCopyModalOpen(false)}
         npcId={npc.id}
         npcName={npc.name}
