@@ -30,7 +30,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "simulated-review:validate": "node --check scripts/simulated-product-review/ui-observer.js && node --check scripts/simulated-product-review/validate-config.js && node scripts/simulated-product-review/validate-config.js",
+    "simulated-review:validate": "node --check scripts/simulated-product-review/ui-observer.js && node --check scripts/simulated-product-review/action-contract.js && node --check scripts/simulated-product-review/validate-action-contract.js && node --check scripts/simulated-product-review/validate-config.js && node scripts/simulated-product-review/validate-config.js",
+    "simulated-review:action-contract": "node scripts/simulated-product-review/validate-action-contract.js",
     "simulated-review:observe": "node scripts/simulated-product-review/ui-observer.js",
     "simulated-review:smoke": "node scripts/simulated-product-review/ui-observer.js --smoke --headless --url http://127.0.0.1:3000 --out .simulated-review-output/ci-smoke"
   },
