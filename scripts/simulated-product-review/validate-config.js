@@ -72,7 +72,7 @@ function main() {
 
   const amendmentPath = 'specification/Technical/SimulatedIntegratedProductReviewV2Amendment.md';
   const amendment = read(amendmentPath);
-  requireText(amendment, 'observation-bound action IDs', amendmentPath);
+  requireText(amendment, 'Observation-bound action IDs', amendmentPath);
   requireText(amendment, 'fail closed', amendmentPath);
   requireText(amendment, 'Same frozen game candidate', amendmentPath);
   requireText(amendment, 'six-profile', amendmentPath);
