@@ -69,7 +69,7 @@ The synthetic-review tooling exists to collect **Level-2 synthetic product-risk 
 npm run simulated-review:validate
 ```
 
-This validates the UI observer, action contract, configuration, campaign/protocol bindings, and repository-side review invariants.
+This validates the UI observer/action-contract source shape, participant-profile manifests, protocol/configuration bindings, and repository-side review invariants. It does not by itself validate a completed campaign or assign a product verdict.
 
 ### Run negative/rejection action-binding qualification
 
