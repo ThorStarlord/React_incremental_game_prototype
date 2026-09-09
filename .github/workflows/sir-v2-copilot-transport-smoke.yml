@@ -94,7 +94,7 @@ jobs:
           EOF
           )
 
-          SECOND_OUTPUT="$((
+          SECOND_OUTPUT="$(
             cd "$PARTICIPANT_DIR"
             env -i \
               PATH="$PATH" \
@@ -111,7 +111,7 @@ jobs:
                 --no-remote-export \
                 --no-auto-update \
                 --no-experimental
-          ))"
+          )"
           printf '%s\n' "$SECOND_OUTPUT" | tee "${RUNNER_TEMP}/sir-v2-transport-second.txt"
 
           grep -Fx 'CURRENT INTERPRETATION: transport qualification continuation' <<<"$SECOND_OUTPUT"
