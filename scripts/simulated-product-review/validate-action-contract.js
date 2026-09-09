@@ -16,7 +16,8 @@ let result = validateBoundAction(beta.actionId, observation, controls);
 assert.equal(result.ok, true);
 assert.equal(result.controlNumber, 2);
 
-result = validateBoundAction(`${beta.actionId.slice(0, -1)}0`, observation, controls);
+const mutatedActionId = `${beta.actionId.slice(0, -1)}${beta.actionId.endsWith('0') ? '1' : '0'}`;
+result = validateBoundAction(mutatedActionId, observation, controls);
 assert.equal(result.ok, false);
 assert.equal(result.code, 'INVALID_ACTION_ID');
 
