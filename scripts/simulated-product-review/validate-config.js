@@ -74,7 +74,7 @@ function main() {
   const amendment = read(amendmentPath);
   requireText(amendment, 'observation-bound action IDs', amendmentPath);
   requireText(amendment, 'fail closed', amendmentPath);
-  requireText(amendment, 'same frozen game candidate', amendmentPath);
+  requireText(amendment, 'Same frozen game candidate', amendmentPath);
   requireText(amendment, 'six-profile', amendmentPath);
 
   const protocolPath = 'specification/Technical/SimulatedIntegratedProductReview.md';
