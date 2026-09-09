@@ -124,7 +124,10 @@ WORKFLOW:
 // 3. SELECTORS & TIMEOUTS
 // -------------------------------------------------------------
 const STREAM_START_TIMEOUT_MS = 45_000;
-const STREAM_END_TIMEOUT_MS = 12 * 60_000;
+const configuredStreamTimeout = Number(process.env.CHATGPT_STREAM_TIMEOUT_MS);
+const STREAM_END_TIMEOUT_MS = Number.isFinite(configuredStreamTimeout) && configuredStreamTimeout > 0
+  ? configuredStreamTimeout
+  : 30 * 60_000;
 const SETTLE_DELAY_MS = 6_000;
 const COOLDOWN_DELAY_MS = 4_000;
 const LOGIN_TIMEOUT_MS = 10 * 60_000;
@@ -235,6 +238,7 @@ async function waitForLogin(page, timeoutMs = LOGIN_TIMEOUT_MS) {
 }
 
 async function startFreshChat(page) {
+  if (page.isClosed()) throw new Error("Cannot start a chat on a closed page.");
   console.log("[session] Starting fresh chat session (clean context)...");
   let clicked = false;
 
@@ -253,34 +257,96 @@ async function startFreshChat(page) {
     await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
   }
 
-  await findFirstVisible(page, COMPOSER_SELECTORS, 30_000);
+  await clearComposer(page, 30_000);
   await page.waitForTimeout(1500);
 }
 
+async function clearComposer(page, timeoutMs = 30_000) {
+  const composer = await fillComposer(page, "", timeoutMs);
+  await waitForComposerCleared(page, composer);
+}
+
+async function fillComposer(page, text, timeoutMs = 30_000) {
+  const deadline = Date.now() + timeoutMs;
+  let lastError = null;
+
+  while (Date.now() < deadline) {
+    if (page.isClosed()) throw new Error("Cannot fill a composer on a closed page.");
+    try {
+      const composer = await findFirstVisible(page, COMPOSER_SELECTORS, 2_000);
+      await composer.fill(text);
+      return composer;
+    } catch (error) {
+      lastError = error;
+      await page.waitForTimeout(250);
+    }
+  }
+
+  throw new Error(`Could not fill the visible composer. Last error: ${lastError?.message}`);
+}
+
+async function readComposerText(composer) {
+  const tagName = await composer.evaluate(element => element.tagName.toLowerCase());
+  if (tagName === "textarea" || tagName === "input") return composer.inputValue();
+  return (await composer.textContent()) || "";
+}
+
+function normalizePromptText(text) {
+  // ChatGPT's contenteditable composer may collapse line breaks and repeated
+  // whitespace while preserving the actual prompt content.
+  return text.replace(/\r\n/g, "\n").replace(/\s+/g, " ").trim();
+}
+
+async function waitForComposerCleared(page, composer, timeoutMs = 10_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if ((await readComposerText(composer)).trim() === "") return;
+    await page.waitForTimeout(250);
+  }
+  throw new Error("Prompt was not cleared after submission; refusing to continue.");
+}
+
 async function sendPrompt(page, text) {
+  if (page.isClosed()) throw new Error("Cannot send a prompt on a closed page.");
   if (!text || !text.trim()) throw new Error("Cannot send empty prompt.");
   const copyButtonsBefore = await page.locator(COPY_SELECTOR_COMBINED).count();
-  const composer = await findFirstVisible(page, COMPOSER_SELECTORS, 120_000);
-  await composer.click();
-  await page.keyboard.press("ControlOrMeta+A");
-  await page.keyboard.press("Backspace");
-  await page.keyboard.type(text, { delay: 10 });
+  // ChatGPT's contenteditable composer can drop newline separators. Flatten
+  // them explicitly so adjacent words never become concatenated.
+  const promptForComposer = text.replace(/\r\n/g, "\n").replace(/\n/g, " ");
+  const composer = await fillComposer(page, promptForComposer, 120_000);
 
+  const composerText = await readComposerText(composer);
+  if (normalizePromptText(composerText) !== normalizePromptText(promptForComposer)) {
+    throw new Error(
+      `Prompt verification failed: expected ${promptForComposer.length} characters, received ${composerText.length}.`
+    );
+  }
+
+  console.log(`[send] Prompt loaded (${text.length} characters).`);
+
+  let sent = false;
   for (const sel of SEND_SELECTORS) {
     try {
       const button = page.locator(sel).first();
       if ((await button.count()) > 0 && (await button.isVisible()) && (await button.isEnabled())) {
         await button.click();
-        return { copyButtonsBefore };
+        sent = true;
+        break;
       }
     } catch {}
   }
 
-  await page.keyboard.press("Enter");
+  if (!sent) {
+    throw new Error("Send button was not found or was not enabled; prompt was not submitted.");
+  }
+
+  await waitForComposerCleared(page, composer);
   return { copyButtonsBefore };
 }
 
 async function waitForAnswer(page, { copyButtonsBefore = 0 } = {}) {
+  if (page.isClosed()) throw new Error("Cannot wait for an answer on a closed page.");
+
   const countVisible = async selector => {
     const buttons = page.locator(selector);
     const count = await buttons.count();
@@ -390,22 +456,24 @@ async function createRepositoryPages(firstPage) {
   return sessions;
 }
 
-async function runMilestone(repo, page) {
-  await page.bringToFront();
+async function initializeRepository({ repo, page }) {
   await startFreshChat(page);
   const initialPrompt = await sendPrompt(page, buildInitialPrompt(repo));
   console.log(`[sent] Initial audit prompt sent to ${repo.id}.`);
   await waitForAnswer(page, initialPrompt);
+  await page.waitForTimeout(COOLDOWN_DELAY_MS);
+}
 
-  for (let packageNumber = 1; packageNumber <= TOTAL_PACKAGES; packageNumber++) {
-    if (stopRequested) return;
+async function runPackage({ repo, page }, packageNumber) {
+  if (stopRequested) return;
 
-    console.log(`[package ${packageNumber}/${TOTAL_PACKAGES}] ${repo.name}`);
-    const followupPrompt = await sendPrompt(page, FOLLOWUP_PROMPT);
-    await waitForAnswer(page, followupPrompt);
-    await page.waitForTimeout(COOLDOWN_DELAY_MS);
-  }
+  console.log(`[package ${packageNumber}/${TOTAL_PACKAGES}] ${repo.name}`);
+  const followupPrompt = await sendPrompt(page, FOLLOWUP_PROMPT);
+  await waitForAnswer(page, followupPrompt);
+  await page.waitForTimeout(COOLDOWN_DELAY_MS);
+}
 
+async function runHandoff({ repo, page }) {
   if (stopRequested) return;
 
   console.log(`[handoff] ${repo.name}`);
@@ -414,14 +482,46 @@ async function runMilestone(repo, page) {
   console.log(`[complete] Milestone finished for ${repo.name}. Chat URL: ${page.url()}`);
 }
 
+async function runParallelStage(label, sessions, worker) {
+  const activeSessions = sessions.filter(session => !session.failed);
+  console.log(`\n=== ${label} (${activeSessions.length} tabs in parallel) ===`);
+  const results = await Promise.allSettled(activeSessions.map(worker));
+  const failures = [];
+
+  results.forEach((result, index) => {
+    if (result.status === "rejected") {
+      const session = activeSessions[index];
+      session.failed = true;
+      failures.push(`${session.repo.name}: ${result.reason?.message || String(result.reason)}`);
+    }
+  });
+
+  if (failures.length > 0) {
+    console.error(`[stage] ${label} quarantined ${failures.length} tab(s):`);
+    failures.forEach(message => console.error(`  - ${message}`));
+  }
+}
+
 async function runRepositories(firstPage) {
   const sessions = await createRepositoryPages(firstPage);
 
-  for (const { repo, page } of sessions) {
-    if (stopRequested) break;
-    console.log(`\n=== ${repo.name} ===`);
-    await runMilestone(repo, page);
-    await page.waitForTimeout(COOLDOWN_DELAY_MS);
+  await runParallelStage("Initial audits", sessions, async session => {
+    if (session.page.isClosed()) throw new Error(`The browser tab for ${session.repo.name} was closed.`);
+    await initializeRepository(session);
+  });
+
+  for (let packageNumber = 1; packageNumber <= TOTAL_PACKAGES && !stopRequested; packageNumber++) {
+    await runParallelStage(`Package ${packageNumber}`, sessions, session => runPackage(session, packageNumber));
+  }
+
+  if (!stopRequested) {
+    await runParallelStage("Milestone handoffs", sessions, session => runHandoff(session));
+  }
+
+  const failedSessions = sessions.filter(session => session.failed);
+  if (failedSessions.length > 0) {
+    console.error("\n[summary] Some tabs were quarantined and did not receive later prompts:");
+    failedSessions.forEach(session => console.error(`  - ${session.repo.name}`));
   }
 }
 
@@ -436,6 +536,7 @@ async function runRepositories(firstPage) {
   const firstPage = browserContext.pages()[0] || (await browserContext.newPage());
   await firstPage.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
   await waitForLogin(firstPage);
+  await clearComposer(firstPage);
 
   console.log("[ready] Logged in. Press ENTER to start the milestone run.");
   await startPromise;
