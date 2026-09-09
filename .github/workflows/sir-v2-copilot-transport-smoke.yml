@@ -1,0 +1,124 @@
+name: SIR V2 Copilot Participant Transport Qualification
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/sir-v2-copilot-transport-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: none
+  copilot-requests: write
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install GitHub Copilot CLI
+        run: npm install -g @github/copilot@latest
+
+      - name: Record CLI version
+        run: copilot --version
+
+      - name: Qualify locked-down fresh session and continuation
+        shell: bash
+        env:
+          PARTICIPANT_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          PARTICIPANT_DIR="${RUNNER_TEMP}/sir-v2-participant-transport"
+          COPILOT_DIR="${RUNNER_TEMP}/sir-v2-copilot-home"
+          mkdir -p "$PARTICIPANT_DIR" "$COPILOT_DIR"
+          test -z "$(find "$PARTICIPANT_DIR" -mindepth 1 -maxdepth 1 -print -quit)"
+
+          run_participant() {
+            local prompt="$1"
+            (
+              cd "$PARTICIPANT_DIR"
+              env -i \
+                PATH="$PATH" \
+                HOME="$HOME" \
+                GITHUB_TOKEN="$PARTICIPANT_TOKEN" \
+                COPILOT_HOME="$COPILOT_DIR" \
+                copilot -s -p "$prompt" \
+                  --model=gpt-5.4 \
+                  --available-tools='ask_user' \
+                  --no-ask-user \
+                  --disable-builtin-mcps \
+                  --no-custom-instructions \
+                  --no-remote \
+                  --no-remote-export \
+                  --no-auto-update \
+                  --no-experimental
+            )
+          }
+
+          FIRST_PROMPT=$(cat <<'EOF'
+          You are a sterile participant-transport qualification session. You have no repository task and must not inspect files, URLs, tools, or implementation details. Remember the nonce SIRV2-TRANSPORT-9F17.
+
+          Respond with exactly these six lines and nothing else:
+          CURRENT INTERPRETATION: transport qualification
+          CURRENT HYPOTHESIS: nonce SIRV2-TRANSPORT-9F17
+          DECISION: verify session continuity
+          REASON: transport qualification only
+          ACTION: snapshot
+          CONFUSION: none
+          EOF
+          )
+
+          FIRST_OUTPUT="$(run_participant "$FIRST_PROMPT")"
+          printf '%s\n' "$FIRST_OUTPUT" | tee "${RUNNER_TEMP}/sir-v2-transport-first.txt"
+
+          grep -Fx 'CURRENT INTERPRETATION: transport qualification' <<<"$FIRST_OUTPUT"
+          grep -Fx 'CURRENT HYPOTHESIS: nonce SIRV2-TRANSPORT-9F17' <<<"$FIRST_OUTPUT"
+          grep -Fx 'DECISION: verify session continuity' <<<"$FIRST_OUTPUT"
+          grep -Fx 'REASON: transport qualification only' <<<"$FIRST_OUTPUT"
+          grep -Fx 'ACTION: snapshot' <<<"$FIRST_OUTPUT"
+          grep -Fx 'CONFUSION: none' <<<"$FIRST_OUTPUT"
+
+          SECOND_PROMPT=$(cat <<'EOF'
+          Continue the same sterile qualification session. Without reading any external information, prove that you retained the nonce from the previous turn.
+
+          Respond with exactly these six lines and nothing else:
+          CURRENT INTERPRETATION: transport qualification continuation
+          CURRENT HYPOTHESIS: nonce SIRV2-TRANSPORT-9F17
+          DECISION: end transport qualification
+          REASON: continuity verified from prior participant context
+          ACTION: quit
+          CONFUSION: none
+          EOF
+          )
+
+          SECOND_OUTPUT="$((
+            cd "$PARTICIPANT_DIR"
+            env -i \
+              PATH="$PATH" \
+              HOME="$HOME" \
+              GITHUB_TOKEN="$PARTICIPANT_TOKEN" \
+              COPILOT_HOME="$COPILOT_DIR" \
+              copilot --continue -s -p "$SECOND_PROMPT" \
+                --model=gpt-5.4 \
+                --available-tools='ask_user' \
+                --no-ask-user \
+                --disable-builtin-mcps \
+                --no-custom-instructions \
+                --no-remote \
+                --no-remote-export \
+                --no-auto-update \
+                --no-experimental
+          ))"
+          printf '%s\n' "$SECOND_OUTPUT" | tee "${RUNNER_TEMP}/sir-v2-transport-second.txt"
+
+          grep -Fx 'CURRENT INTERPRETATION: transport qualification continuation' <<<"$SECOND_OUTPUT"
+          grep -Fx 'CURRENT HYPOTHESIS: nonce SIRV2-TRANSPORT-9F17' <<<"$SECOND_OUTPUT"
+          grep -Fx 'DECISION: end transport qualification' <<<"$SECOND_OUTPUT"
+          grep -Fx 'REASON: continuity verified from prior participant context' <<<"$SECOND_OUTPUT"
+          grep -Fx 'ACTION: quit' <<<"$SECOND_OUTPUT"
+          grep -Fx 'CONFUSION: none' <<<"$SECOND_OUTPUT"
+
+          echo 'SIR_V2_COPILOT_PARTICIPANT_TRANSPORT_PASS'
