@@ -46,7 +46,7 @@ jobs:
                 GITHUB_TOKEN="$PARTICIPANT_TOKEN" \
                 COPILOT_HOME="$COPILOT_DIR" \
                 copilot -s -p "$prompt" \
-                  --model=gpt-5.4 \
+                  --model=gpt-5-mini \
                   --available-tools='ask_user' \
                   --no-ask-user \
                   --disable-builtin-mcps \
@@ -102,7 +102,7 @@ jobs:
               GITHUB_TOKEN="$PARTICIPANT_TOKEN" \
               COPILOT_HOME="$COPILOT_DIR" \
               copilot --continue -s -p "$SECOND_PROMPT" \
-                --model=gpt-5.4 \
+                --model=gpt-5-mini \
                 --available-tools='ask_user' \
                 --no-ask-user \
                 --disable-builtin-mcps \
