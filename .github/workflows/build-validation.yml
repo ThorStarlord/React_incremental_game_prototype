@@ -30,10 +30,13 @@ jobs:
       - name: Synthetic review contract qualification
         run: npm run simulated-review:validate
 
+      - name: Synthetic review V2 action-binding qualification
+        run: npm run simulated-review:action-contract
+
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Synthetic review UI-only smoke qualification
+      - name: Synthetic review V2 UI-only live smoke qualification
         timeout-minutes: 6
         run: |
           HOST=127.0.0.1 PORT=3000 BROWSER=none npm start > /tmp/simulated-review-app.log 2>&1 &
