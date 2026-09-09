@@ -142,9 +142,10 @@ const SEND_SELECTORS = [
 ];
 
 const STOP_SELECTOR_COMBINED = 'button[data-testid="stop-button"], button[aria-label*="Stop"]';
+const COPY_SELECTOR_COMBINED = 'button[aria-label*="Copy"], [data-testid="copy-turn-action-button"]';
+const REQUIRED_IDLE_MS = 6_000;
 
 const NEW_CHAT_SELECTORS = [
-  'a[href="/"]',
   '[data-testid="new-chat-button"]',
   'button:has-text("New chat")',
   'a:has-text("New chat")'
@@ -258,6 +259,7 @@ async function startFreshChat(page) {
 
 async function sendPrompt(page, text) {
   if (!text || !text.trim()) throw new Error("Cannot send empty prompt.");
+  const copyButtonsBefore = await page.locator(COPY_SELECTOR_COMBINED).count();
   const composer = await findFirstVisible(page, COMPOSER_SELECTORS, 120_000);
   await composer.click();
   await page.keyboard.press("ControlOrMeta+A");
@@ -269,63 +271,158 @@ async function sendPrompt(page, text) {
       const button = page.locator(sel).first();
       if ((await button.count()) > 0 && (await button.isVisible()) && (await button.isEnabled())) {
         await button.click();
-        return;
+        return { copyButtonsBefore };
       }
     } catch {}
   }
 
   await page.keyboard.press("Enter");
+  return { copyButtonsBefore };
 }
 
-async function waitForAnswer(page) {
-  try {
-    await page.locator(STOP_SELECTOR_COMBINED).first().waitFor({
-      state: "visible",
-      timeout: STREAM_START_TIMEOUT_MS
-    });
-  } catch {
+async function waitForAnswer(page, { copyButtonsBefore = 0 } = {}) {
+  const countVisible = async selector => {
+    const buttons = page.locator(selector);
+    const count = await buttons.count();
+    let visible = 0;
+    for (let i = 0; i < count; i++) {
+      if (await buttons.nth(i).isVisible()) visible++;
+    }
+    return visible;
+  };
+
+  const isStopVisible = async () => (await countVisible(STOP_SELECTOR_COMBINED)) > 0;
+
+  const isComposerIdle = async () => {
+    for (const selector of COMPOSER_SELECTORS) {
+      const composers = page.locator(selector);
+      const count = await composers.count();
+      for (let i = 0; i < count; i++) {
+        const composer = composers.nth(i);
+        if (!(await composer.isVisible())) continue;
+        const ariaDisabled = await composer.getAttribute("aria-disabled");
+        const contentEditable = await composer.getAttribute("contenteditable");
+        if (ariaDisabled === "true" || contentEditable === "false") continue;
+        if (await composer.isEnabled()) return true;
+      }
+    }
+    return false;
+  };
+
+  const copyButtonsAfter = async () => page.locator(COPY_SELECTOR_COMBINED).count();
+
+  // A response may begin with reasoning or a tool call before visible text.
+  // Wait until there is evidence that this prompt actually started processing.
+  const startDeadline = Date.now() + STREAM_START_TIMEOUT_MS;
+  let started = false;
+  while (Date.now() < startDeadline) {
+    if (await isStopVisible()) {
+      started = true;
+      break;
+    }
+    if ((await copyButtonsAfter()) > copyButtonsBefore) {
+      started = true;
+      break;
+    }
+    if (!(await isComposerIdle())) {
+      started = true;
+      break;
+    }
+    await page.waitForTimeout(500);
+  }
+
+  if (!started) {
     throw new Error(
-      "Could not detect answer streaming. Refusing to send another prompt while page state is unknown."
+      "Could not confirm that the prompt started processing. Refusing to send another prompt."
     );
   }
 
-  console.log("[wait] Answer streaming...");
+  console.log("[wait] Waiting for the current answer to finish...");
   const deadline = Date.now() + STREAM_END_TIMEOUT_MS;
+  let idleSince = null;
   while (Date.now() < deadline) {
-    try {
-      const stopButton = page.locator(STOP_SELECTOR_COMBINED).first();
-      if (!(await stopButton.isVisible())) break;
-    } catch {
-      break;
+    const stopVisible = await isStopVisible();
+    const composerIdle = await isComposerIdle();
+    const copyAppeared = (await copyButtonsAfter()) > copyButtonsBefore;
+
+    if (!stopVisible && composerIdle) {
+      idleSince ??= Date.now();
+    } else {
+      idleSince = null;
     }
-    await page.waitForTimeout(2000);
+
+    const idleLongEnough = idleSince !== null && Date.now() - idleSince >= REQUIRED_IDLE_MS;
+    const copyEvidenceAvailable = (await countVisible(COPY_SELECTOR_COMBINED)) > 0 || copyButtonsBefore > 0;
+    if (idleLongEnough && (copyAppeared || !copyEvidenceAvailable)) break;
+
+    await page.waitForTimeout(1000);
+  }
+
+  const finalStopVisible = await isStopVisible();
+  const finalComposerIdle = await isComposerIdle();
+  const finalCopyAppeared = (await copyButtonsAfter()) > copyButtonsBefore;
+  const finalCopyEvidenceAvailable = (await countVisible(COPY_SELECTOR_COMBINED)) > 0 || copyButtonsBefore > 0;
+  if (finalStopVisible || !finalComposerIdle || (finalCopyEvidenceAvailable && !finalCopyAppeared)) {
+    throw new Error("Answer did not finish before the streaming timeout.");
   }
 
   await page.waitForTimeout(SETTLE_DELAY_MS);
-  console.log("[wait] Answer complete.");
+  console.log("[wait] Answer complete and verified.");
+}
+
+async function createRepositoryPages(firstPage) {
+  const sessions = [];
+
+  for (let index = 0; index < REPOSITORIES.length; index++) {
+    const repo = REPOSITORIES[index];
+    const page = index === 0 ? firstPage : await browserContext.newPage();
+    await page.bringToFront();
+
+    if (index > 0) {
+      await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
+      await waitForLogin(page);
+    }
+
+    sessions.push({ repo, page });
+    console.log(`[tab ${index + 1}/${REPOSITORIES.length}] Ready for ${repo.name}.`);
+  }
+
+  return sessions;
 }
 
 async function runMilestone(repo, page) {
+  await page.bringToFront();
   await startFreshChat(page);
-  await sendPrompt(page, buildInitialPrompt(repo));
+  const initialPrompt = await sendPrompt(page, buildInitialPrompt(repo));
   console.log(`[sent] Initial audit prompt sent to ${repo.id}.`);
-  await waitForAnswer(page);
+  await waitForAnswer(page, initialPrompt);
 
   for (let packageNumber = 1; packageNumber <= TOTAL_PACKAGES; packageNumber++) {
     if (stopRequested) return;
 
     console.log(`[package ${packageNumber}/${TOTAL_PACKAGES}] ${repo.name}`);
-    await sendPrompt(page, FOLLOWUP_PROMPT);
-    await waitForAnswer(page);
+    const followupPrompt = await sendPrompt(page, FOLLOWUP_PROMPT);
+    await waitForAnswer(page, followupPrompt);
     await page.waitForTimeout(COOLDOWN_DELAY_MS);
   }
 
   if (stopRequested) return;
 
   console.log(`[handoff] ${repo.name}`);
-  await sendPrompt(page, HANDOFF_PROMPT);
-  await waitForAnswer(page);
+  const handoffPrompt = await sendPrompt(page, HANDOFF_PROMPT);
+  await waitForAnswer(page, handoffPrompt);
   console.log(`[complete] Milestone finished for ${repo.name}. Chat URL: ${page.url()}`);
+}
+
+async function runRepositories(firstPage) {
+  const sessions = await createRepositoryPages(firstPage);
+
+  for (const { repo, page } of sessions) {
+    if (stopRequested) break;
+    console.log(`\n=== ${repo.name} ===`);
+    await runMilestone(repo, page);
+    await page.waitForTimeout(COOLDOWN_DELAY_MS);
+  }
 }
 
 (async () => {
@@ -344,19 +441,7 @@ async function runMilestone(repo, page) {
   await startPromise;
 
   try {
-    for (let index = 0; index < REPOSITORIES.length && !stopRequested; index++) {
-      const repo = REPOSITORIES[index];
-      const page = index === 0 ? firstPage : await browserContext.newPage();
-
-      if (index > 0) {
-        await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
-        await waitForLogin(page);
-      }
-
-      console.log(`\n=== [${index + 1}/${REPOSITORIES.length}] ${repo.name} ===`);
-      await runMilestone(repo, page);
-      await page.waitForTimeout(COOLDOWN_DELAY_MS);
-    }
+    await runRepositories(firstPage);
   } catch (error) {
     console.error("[error]", error);
   } finally {
