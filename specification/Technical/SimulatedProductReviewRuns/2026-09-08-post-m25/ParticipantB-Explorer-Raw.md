@@ -1004,3 +1004,10 @@ Evaluator had access before freeze: NO
 
 NONE AT INITIAL FREEZE
 
+### Append-only clerical correction — 2026-09-09
+
+The initial raw-evidence freeze commit referenced by this record is:
+
+```text
+53ad05a3a25c72f5ec8bf44a80ac12cf2070c0e4
+```
