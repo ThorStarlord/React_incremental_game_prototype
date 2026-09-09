@@ -129,3 +129,11 @@ SYNTHETIC_VERDICT_NOT_ASSIGNED
 HUMAN_PRODUCT_VALIDATION_DEFERRED
 M26_NOT_AUTHORIZED
 ```
+
+## Append-only clerical correction — 2026-09-09
+
+The initial EarlyStopRecord freeze commit is:
+
+```text
+1a6a8bbb456b3c85ede8e58c6e6739cc2fed7d00
+```
