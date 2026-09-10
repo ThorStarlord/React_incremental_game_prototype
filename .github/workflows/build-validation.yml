@@ -71,9 +71,27 @@ jobs:
         env:
           CI: true
 
+      - name: Large-frame / background-stall GameLoop preflight
+        timeout-minutes: 5
+        run: npm test -- --watchAll=false --runInBand GameLoopLargeFrameBackgroundStallPreflight.test.tsx
+        env:
+          CI: true
+
+      - name: Mid-session cadence transition qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopMidSessionCadenceTransitionQualification.test.tsx
+        env:
+          CI: true
+
       - name: Cross-progression tick determinism characterization
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
+        env:
+          CI: true
+
+      - name: Long-horizon cross-progression drift qualification
+        timeout-minutes: 8
+        run: npm test -- --watchAll=false --runInBand GameLoopLongHorizonCrossProgressionDrift.test.tsx
         env:
           CI: true
 
@@ -86,6 +104,18 @@ jobs:
       - name: Quest timing integration qualification
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
+        env:
+          CI: true
+
+      - name: Timed Quest precision preflight decision regression
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionPreflight.test.tsx
+        env:
+          CI: true
+
+      - name: Timed Quest precision semantics resolution
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionResolution.test.tsx
         env:
           CI: true
 
