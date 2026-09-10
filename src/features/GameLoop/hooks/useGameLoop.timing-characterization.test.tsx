@@ -133,7 +133,9 @@ describe('useGameLoop deterministic timing', () => {
   test('preserves the fractional accumulator remainder across tick-driven rerenders', () => {
     const store = makeStore();
     const deliveredTicks: number[] = [];
-    mountGameLoop(store, tickData => deliveredTicks.push(tickData.currentTick));
+    mountGameLoop(store, tickData => {
+      deliveredTicks.push(tickData.currentTick);
+    });
 
     act(() => {
       raf.frame(150);
@@ -153,7 +155,9 @@ describe('useGameLoop deterministic timing', () => {
   test('multi-step catch-up delivers monotonic callback tick identities', () => {
     const store = makeStore();
     const deliveredTicks: number[] = [];
-    mountGameLoop(store, tickData => deliveredTicks.push(tickData.currentTick));
+    mountGameLoop(store, tickData => {
+      deliveredTicks.push(tickData.currentTick);
+    });
 
     act(() => {
       raf.frame(250);
