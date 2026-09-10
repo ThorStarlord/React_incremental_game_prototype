@@ -65,6 +65,12 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: GameLoop timing characterization qualification
+        timeout-minutes: 5
+        run: npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
+        env:
+          CI: true
+
       - name: M25 complete chapter vertical slice qualification
         timeout-minutes: 8
         run: npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
