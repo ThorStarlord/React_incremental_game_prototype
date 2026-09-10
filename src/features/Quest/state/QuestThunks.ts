@@ -10,6 +10,7 @@ import {
   setQuestResolution,
 } from './QuestSlice';
 import type { Quest, QuestReward } from './QuestTypes';
+import { hasReachedQuestTimeLimit } from './QuestTimerPrecision';
 import { getMissingPermanentTraitIdsForResolution } from './QuestResolutionAvailability';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold, addStatusEffect } from '../../Player/state/PlayerSlice';
@@ -367,8 +368,7 @@ export const turnInQuestThunk = createAsyncThunk(
       } else {
         dispatch(addNotification({
           message: `Quest Complete: ${quest.title}.`,
-          type: 'success',
-        }));
+          type: 'success' }));
       }
 
       dispatch(completeQuest(questId));
@@ -409,7 +409,9 @@ export const processQuestTimersThunk = createAsyncThunk(
     for (const quest of activeQuests) {
       const before = quest.elapsedSeconds || 0;
       const after = before + elapsedDeltaSeconds;
-      const willFail = quest.timeLimitSeconds !== undefined && before < quest.timeLimitSeconds && after >= quest.timeLimitSeconds;
+      const willFail = quest.timeLimitSeconds !== undefined
+        && before < quest.timeLimitSeconds
+        && hasReachedQuestTimeLimit(after, quest.timeLimitSeconds);
       dispatch(incrementQuestElapsed({ questId: quest.id, deltaSeconds: elapsedDeltaSeconds }));
       if (willFail) {
         dispatch(addNotification({ message: `Quest Failed: ${quest.title}`, type: 'error' }));
