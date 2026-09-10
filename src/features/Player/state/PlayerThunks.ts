@@ -58,26 +58,35 @@ export const processStatusEffectsThunk = createAsyncThunk(
 );
 
 /**
- * Placeholder thunk for regenerating vitals based on final stats
+ * Regenerate health and mana from the documented per-second rates using the
+ * logical GameLoop delta in milliseconds. Invalid/non-positive elapsed input
+ * is a no-op; maxima remain enforced by the existing Player reducers.
  */
-export const regenerateVitalsThunk = createAsyncThunk(
+export const regenerateVitalsThunk = createAsyncThunk<
+  { newHealth: number; newMana: number } | undefined,
+  number,
+  { state: RootState }
+>(
   'player/regenerateVitals',
-  async (_, { getState, dispatch }) => {
-    const state = getState() as RootState;
+  async (deltaTime, { getState, dispatch }) => {
+    const state = getState();
     const { health, maxHealth, mana, maxMana, healthRegen, manaRegen } = state.player.stats;
     const isAlive = state.player.isAlive;
 
-    if (!isAlive) return;
+    if (!isAlive || !Number.isFinite(deltaTime) || deltaTime <= 0) {
+      return undefined;
+    }
 
-    const newHealth = Math.min(maxHealth, health + healthRegen);
-    const newMana = Math.min(maxMana, mana + manaRegen);
+    const elapsedSeconds = deltaTime / 1000;
+    const newHealth = Math.min(maxHealth, health + (healthRegen * elapsedSeconds));
+    const newMana = Math.min(maxMana, mana + (manaRegen * elapsedSeconds));
     
     // Dispatch synchronous updates
     if (newHealth !== health) {
-        dispatch(updateHealth(newHealth));
+      dispatch(updateHealth(newHealth));
     }
     if (newMana !== mana) {
-        dispatch(updateMana(newMana));
+      dispatch(updateMana(newMana));
     }
     
     return { newHealth, newMana };
