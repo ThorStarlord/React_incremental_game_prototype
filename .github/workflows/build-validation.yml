@@ -83,6 +83,12 @@ jobs:
         env:
           CI: true
 
+      - name: Quest timing integration qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
+        env:
+          CI: true
+
       - name: Live/offline progression boundary qualification
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
