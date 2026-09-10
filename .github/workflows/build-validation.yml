@@ -77,6 +77,12 @@ jobs:
         env:
           CI: true
 
+      - name: Live/offline progression boundary qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
+        env:
+          CI: true
+
       - name: M25 complete chapter vertical slice qualification
         timeout-minutes: 8
         run: npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
