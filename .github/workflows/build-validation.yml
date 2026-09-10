@@ -71,6 +71,12 @@ jobs:
         env:
           CI: true
 
+      - name: Large-frame / background-stall GameLoop preflight
+        timeout-minutes: 5
+        run: npm test -- --watchAll=false --runInBand GameLoopLargeFrameBackgroundStallPreflight.test.tsx
+        env:
+          CI: true
+
       - name: Cross-progression tick determinism characterization
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
