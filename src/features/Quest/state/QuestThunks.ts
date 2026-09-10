@@ -395,7 +395,12 @@ export const turnInQuestThunk = createAsyncThunk(
 
 export const processQuestTimersThunk = createAsyncThunk(
   'quest/processQuestTimers',
-  async (deltaTime: number, { dispatch, getState }) => {
+  async (deltaTimeMs: number, { dispatch, getState }) => {
+    if (!Number.isFinite(deltaTimeMs) || deltaTimeMs <= 0) {
+      return;
+    }
+
+    const elapsedDeltaSeconds = deltaTimeMs / 1000;
     const state = getState() as RootState;
     const activeQuests = state.quest.activeQuestIds
       .map(id => state.quest.quests[id])
@@ -403,9 +408,9 @@ export const processQuestTimersThunk = createAsyncThunk(
 
     for (const quest of activeQuests) {
       const before = quest.elapsedSeconds || 0;
-      const after = before + Math.max(0, deltaTime);
+      const after = before + elapsedDeltaSeconds;
       const willFail = quest.timeLimitSeconds !== undefined && before < quest.timeLimitSeconds && after >= quest.timeLimitSeconds;
-      dispatch(incrementQuestElapsed({ questId: quest.id, deltaSeconds: Math.max(0, deltaTime) }));
+      dispatch(incrementQuestElapsed({ questId: quest.id, deltaSeconds: elapsedDeltaSeconds }));
       if (willFail) {
         dispatch(addNotification({ message: `Quest Failed: ${quest.title}`, type: 'error' }));
       }
