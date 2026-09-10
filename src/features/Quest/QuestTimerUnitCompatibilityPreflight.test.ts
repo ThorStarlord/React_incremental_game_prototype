@@ -37,18 +37,26 @@ const seedTimedQuest = (store: TestStore, overrides: Partial<Quest> = {}) => {
 
 const readQuest = (store: TestStore) => store.getState().quest.quests[QUEST_ID];
 
+const failureNotifications = (store: TestStore) =>
+  store.getState().notifications.items.filter(
+    notification => notification.message === 'Quest Failed: Timed Quest unit preflight probe'
+  );
+
 describe('Timed Quest unit and save-compatibility preflight', () => {
-  test('current live timer thunk writes raw millisecond GameLoop deltas into elapsedSeconds', async () => {
+  test.each([
+    [100, 0.1],
+    [250, 0.25],
+  ])('live timer thunk converts %d milliseconds to %d seconds exactly once', async (deltaMs, expectedSeconds) => {
     const store = makeStore();
     seedTimedQuest(store);
 
-    await store.dispatch(processQuestTimersThunk(100));
+    await store.dispatch(processQuestTimersThunk(deltaMs));
 
-    expect(readQuest(store).elapsedSeconds).toBe(100);
+    expect(readQuest(store).elapsedSeconds).toBeCloseTo(expectedSeconds, 8);
     expect(readQuest(store).status).toBe('IN_PROGRESS');
   });
 
-  test('Quest reducer and display helper interpret their public timer fields as seconds', () => {
+  test('Quest reducer and display helper remain seconds-based', () => {
     const store = makeStore();
     seedTimedQuest(store, { timeLimitSeconds: 5 });
 
@@ -59,9 +67,9 @@ describe('Timed Quest unit and save-compatibility preflight', () => {
     expect(getTimeRemaining(undefined, 5, elapsedSeconds)).toBe(4);
   });
 
-  test('current schema-v1 save/load preserves an already millisecond-scaled elapsedSeconds value without normalization', () => {
+  test('current schema-v1 save/load preserves stored timer values and normalized live increments resume from that value', async () => {
     const store = makeStore();
-    seedTimedQuest(store, { elapsedSeconds: 1250, timeLimitSeconds: 5000 });
+    seedTimedQuest(store, { elapsedSeconds: 4.5, timeLimitSeconds: 10 });
 
     const envelope = createCurrentSaveEnvelope(store.getState(), 123456);
     const result = migrateSavePayload(envelope);
@@ -69,11 +77,20 @@ describe('Timed Quest unit and save-compatibility preflight', () => {
     expect(result.sourceVersion).toBe(1);
     expect(result.targetVersion).toBe(1);
     expect(result.appliedMigrations).toEqual([]);
-    expect(result.envelope.state.quest.quests[QUEST_ID].elapsedSeconds).toBe(1250);
-    expect(result.envelope.state.quest.quests[QUEST_ID].timeLimitSeconds).toBe(5000);
+    expect(result.envelope.state.quest.quests[QUEST_ID].elapsedSeconds).toBe(4.5);
+    expect(result.envelope.state.quest.quests[QUEST_ID].timeLimitSeconds).toBe(10);
+
+    const resumedStore = configureStore({
+      reducer: rootReducer,
+      preloadedState: result.envelope.state,
+    });
+    await resumedStore.dispatch(processQuestTimersThunk(500));
+
+    expect(resumedStore.getState().quest.quests[QUEST_ID].elapsedSeconds).toBeCloseTo(5, 8);
+    expect(resumedStore.getState().quest.quests[QUEST_ID].status).toBe('IN_PROGRESS');
   });
 
-  test('legacy v0 wrapping migration also preserves timed-Quest elapsedSeconds without unit conversion', () => {
+  test('legacy v0 wrapping migration preserves timed-Quest elapsedSeconds without unit conversion', () => {
     const store = makeStore();
     seedTimedQuest(store, { elapsedSeconds: 1250, timeLimitSeconds: 5000 });
 
@@ -91,17 +108,45 @@ describe('Timed Quest unit and save-compatibility preflight', () => {
     expect(result.envelope.state.quest.quests[QUEST_ID].timeLimitSeconds).toBe(5000);
   });
 
-  test('zero and negative live timer deltas are currently bounded to no progress', async () => {
+  test('zero, negative, NaN, and infinite live timer deltas are no-ops', async () => {
     const store = makeStore();
     seedTimedQuest(store);
 
-    await store.dispatch(processQuestTimersThunk(0));
-    await store.dispatch(processQuestTimersThunk(-100));
+    for (const invalidDelta of [0, -100, Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      await store.dispatch(processQuestTimersThunk(invalidDelta));
+    }
 
     expect(readQuest(store).elapsedSeconds).toBe(0);
     expect(readQuest(store).status).toBe('IN_PROGRESS');
+    expect(failureNotifications(store)).toHaveLength(0);
   });
 
-  test.todo('non-finite live timer deltas should be rejected rather than contaminating elapsedSeconds');
-  test.todo('one second of GameLoop logical time should advance timed Quest elapsedSeconds by exactly one second');
+  test('one second of GameLoop logical time advances timed Quest elapsedSeconds by exactly one second', async () => {
+    const store = makeStore();
+    seedTimedQuest(store);
+
+    for (let tick = 0; tick < 10; tick += 1) {
+      await store.dispatch(processQuestTimersThunk(100));
+    }
+
+    expect(readQuest(store).elapsedSeconds).toBeCloseTo(1, 8);
+    expect(readQuest(store).status).toBe('IN_PROGRESS');
+  });
+
+  test('exact timeout crossing fails once and emits one failure notification', async () => {
+    const store = makeStore();
+    seedTimedQuest(store, { elapsedSeconds: 0.9, timeLimitSeconds: 1 });
+
+    await store.dispatch(processQuestTimersThunk(100));
+
+    expect(readQuest(store).elapsedSeconds).toBeCloseTo(1, 8);
+    expect(readQuest(store).status).toBe('FAILED');
+    expect(failureNotifications(store)).toHaveLength(1);
+
+    await store.dispatch(processQuestTimersThunk(100));
+
+    expect(readQuest(store).elapsedSeconds).toBeCloseTo(1, 8);
+    expect(readQuest(store).status).toBe('FAILED');
+    expect(failureNotifications(store)).toHaveLength(1);
+  });
 });
