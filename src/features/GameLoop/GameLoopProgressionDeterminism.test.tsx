@@ -120,7 +120,7 @@ const runOnlineProgressionTick = async (store: TestStore, tickData: TickData) =>
   await store.dispatch(processCopyTasksThunk(tickData.deltaTime));
   store.dispatch(processResonanceLevelThunk());
   await store.dispatch(processStatusEffectsThunk());
-  await store.dispatch(regenerateVitalsThunk());
+  await store.dispatch(regenerateVitalsThunk(tickData.deltaTime));
   store.dispatch(recalculateStatsThunk());
   await store.dispatch(processQuestTimersThunk(tickData.deltaTime));
 };
@@ -149,8 +149,7 @@ type ProgressionSnapshot = ReturnType<typeof snapshotProgression>;
 
 const expectEquivalentProgression = (
   actual: ProgressionSnapshot,
-  expected: ProgressionSnapshot,
-  options: { includeVitals?: boolean } = {}
+  expected: ProgressionSnapshot
 ) => {
   expect(actual.totalGameTime).toBeCloseTo(expected.totalGameTime, 8);
   expect(actual.essence).toBeCloseTo(expected.essence, 8);
@@ -158,13 +157,10 @@ const expectEquivalentProgression = (
   expect(actual.copyMaturity).toBeCloseTo(expected.copyMaturity, 8);
   expect(actual.copyLoyalty).toBeCloseTo(expected.copyLoyalty, 8);
   expect(actual.copyTaskProgressSeconds).toBeCloseTo(expected.copyTaskProgressSeconds as number, 8);
+  expect(actual.playerHealth).toBeCloseTo(expected.playerHealth, 8);
+  expect(actual.playerMana).toBeCloseTo(expected.playerMana, 8);
   expect(actual.questElapsedSeconds).toBeCloseTo(expected.questElapsedSeconds, 8);
   expect(actual.questStatus).toBe(expected.questStatus);
-
-  if (options.includeVitals !== false) {
-    expect(actual.playerHealth).toBeCloseTo(expected.playerHealth, 8);
-    expect(actual.playerMana).toBeCloseTo(expected.playerMana, 8);
-  }
 };
 
 const runScenario = async (
@@ -212,7 +208,7 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-describe('Package 1 cross-progression tick determinism characterization', () => {
+describe('Cross-progression tick determinism qualification', () => {
   test('equivalent 1s logical time at 10 Hz is invariant across regular, irregular, and same-frame RAF chunking', async () => {
     const regular = await runScenario(
       [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
@@ -233,7 +229,7 @@ describe('Package 1 cross-progression tick determinism characterization', () => 
     expectEquivalentProgression(catchUp, regular);
   });
 
-  test('20 Hz preserves delta-time progression but exposes invocation-count vitality regeneration', async () => {
+  test('supported 10 Hz and 20 Hz schedules preserve equivalent per-second vitality recovery', async () => {
     const tenHz = await runScenario(
       [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
       10,
@@ -247,14 +243,37 @@ describe('Package 1 cross-progression tick determinism characterization', () => 
 
     expect(tenHz.currentTick).toBe(10);
     expect(twentyHz.currentTick).toBe(20);
-    expectEquivalentProgression(twentyHz, tenHz, { includeVitals: false });
+    expectEquivalentProgression(twentyHz, tenHz);
+    expect(tenHz.playerHealth).toBeCloseTo(51, 8);
+    expect(twentyHz.playerHealth).toBeCloseTo(51, 8);
+    expect(tenHz.playerMana).toBeCloseTo(10.5, 8);
+    expect(twentyHz.playerMana).toBeCloseTo(10.5, 8);
+  });
 
-    // Current production behavior: regen is applied once per tick even though the
-    // Player contract describes healthRegen/manaRegen as per-second values.
-    expect(tenHz.playerHealth).toBeCloseTo(60, 8);
-    expect(twentyHz.playerHealth).toBeCloseTo(70, 8);
-    expect(tenHz.playerMana).toBeCloseTo(15, 8);
-    expect(twentyHz.playerMana).toBeCloseTo(20, 8);
+  test('vital regeneration scales fractional elapsed time, clamps at maxima, and rejects invalid elapsed input as a no-op', async () => {
+    const store = makeStore();
+    store.dispatch(updateHealth(50));
+    store.dispatch(updateMana(10));
+
+    await store.dispatch(regenerateVitalsThunk(250));
+    expect(store.getState().player.stats.health).toBeCloseTo(50.25, 8);
+    expect(store.getState().player.stats.mana).toBeCloseTo(10.125, 8);
+
+    const beforeInvalid = {
+      health: store.getState().player.stats.health,
+      mana: store.getState().player.stats.mana,
+    };
+    await store.dispatch(regenerateVitalsThunk(0));
+    await store.dispatch(regenerateVitalsThunk(-100));
+    await store.dispatch(regenerateVitalsThunk(Number.NaN));
+    expect(store.getState().player.stats.health).toBeCloseTo(beforeInvalid.health, 8);
+    expect(store.getState().player.stats.mana).toBeCloseTo(beforeInvalid.mana, 8);
+
+    store.dispatch(updateHealth(99.5));
+    store.dispatch(updateMana(49.75));
+    await store.dispatch(regenerateVitalsThunk(1000));
+    expect(store.getState().player.stats.health).toBe(100);
+    expect(store.getState().player.stats.mana).toBe(50);
   });
 
   test('paused wall time is rejected from cross-progression and resume starts from an ordinary live tick', async () => {
@@ -331,6 +350,5 @@ describe('Package 1 cross-progression tick determinism characterization', () => 
     expect(catchUp.questStatus).toBe('IN_PROGRESS');
   });
 
-  test.todo('vital regeneration should use logical delta time so supported tick rates produce equivalent recovery');
   test.todo('timed Quest elapsedSeconds should advance in seconds rather than raw milliseconds');
 });
