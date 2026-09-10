@@ -4,7 +4,7 @@ A React/TypeScript incremental RPG prototype combining active relational/strateg
 
 ## Current authority
 
-The automated implementation program through **M25 — Complete Chapter Vertical Slice** remains complete and qualified. The timed-Quest timing milestone is also complete: the GameLoop milliseconds -> Quest seconds boundary was preflighted, repaired, and qualified across scheduler, persistence, pause/resume, timeout, notification, and M21 offline-settlement seams.
+The automated implementation program through **M25 — Complete Chapter Vertical Slice** remains complete and qualified. The timed-Quest timing milestone is also complete: the GameLoop milliseconds -> Quest seconds boundary was preflighted, repaired, and qualified across scheduler, persistence, pause/resume, timeout, notification, and M21 offline-settlement seams. A later bounded precision repair makes timeout comparison insensitive to machine-scale floating-point residue while preserving raw timer accumulation and persistence values.
 
 ```text
 M25 Complete Chapter Vertical Slice: PASS
@@ -16,6 +16,7 @@ Live/Persistence/Offline Progression Boundary Qualification: COMPLETE
 Timed Quest Unit & Save-Compatibility Preflight: COMPLETE
 Seconds-Normalized Timed Quest Repair: COMPLETE
 Quest Timing Integration Qualification: COMPLETE
+Timed Quest Precision Semantics Resolution: COMPLETE
 Human Integrated Playability / Product Review: PENDING
 Product Direction Decision: PENDING
 M26: NOT AUTHORIZED
@@ -131,7 +132,23 @@ This hermetic integration suite composes the real production seams and verifies:
 - M21 offline settlement leaves timed Quest state frozen;
 - resumed live fixed steps alone advance the restored Quest timer and can trigger failure.
 
-Discrete timeout semantics are intentionally characterized rather than modified: repeated decimal fixed-step additions can land just below an authored decimal threshold because of IEEE floating-point representation. The current contract fails on the first fixed step whose computed value satisfies the existing `elapsed >= timeLimitSeconds` predicate. Do not add rounding, epsilon comparison, clamping, or quantization as an incidental change.
+Timed-Quest timeout comparison is intentionally **comparison-only tolerant** of machine-scale floating-point residue. Raw `elapsedSeconds` remains unrounded and may be infinitesimally below an authored limit on the nominal timeout step. The shared comparison helper treats only a small magnitude-relative `Number.EPSILON` tolerance as equality; it does not clamp, quantize, rewrite saves, or create a gameplay-scale grace/penalty window.
+
+### Timed Quest precision semantics resolution
+
+```bash
+CI=true npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionResolution.test.tsx
+```
+
+This suite qualifies the bounded precision repair. It verifies that:
+
+- supported 10 Hz and 20 Hz schedules agree on the `1.0` second timeout boundary;
+- regular, irregular, and same-frame catch-up layouts agree;
+- machine-noise undershoot is accepted but materially early values are rejected;
+- exact and accumulated save histories resolve on the same next nominal fixed step;
+- raw accumulated and persisted timer values are not rounded or rewritten;
+- invalid/non-positive deltas remain no-ops;
+- failure notification remains exact-once and failed timers remain frozen.
 
 ### Live / persistence / offline boundary
 
@@ -172,10 +189,13 @@ Timed Quests remain online-only during offline settlement.
 - [`specification/Technical/TimedQuestUnitAndSaveCompatibilityPreflight.md`](specification/Technical/TimedQuestUnitAndSaveCompatibilityPreflight.md)
 - [`specification/Technical/GameLoopTimedQuestSecondsNormalizationRepair.md`](specification/Technical/GameLoopTimedQuestSecondsNormalizationRepair.md)
 - [`specification/Technical/GameLoopQuestTimingIntegrationQualification.md`](specification/Technical/GameLoopQuestTimingIntegrationQualification.md)
+- [`specification/Technical/GameLoopTimedQuestPrecisionResolution.md`](specification/Technical/GameLoopTimedQuestPrecisionResolution.md)
 - [`src/features/Quest/state/QuestThunks.ts`](src/features/Quest/state/QuestThunks.ts)
+- [`src/features/Quest/state/QuestTimerPrecision.ts`](src/features/Quest/state/QuestTimerPrecision.ts)
 - [`src/features/Quest/QuestTimerUnitCompatibilityPreflight.test.ts`](src/features/Quest/QuestTimerUnitCompatibilityPreflight.test.ts)
 - [`src/features/GameLoop/GameLoopProgressionDeterminism.test.tsx`](src/features/GameLoop/GameLoopProgressionDeterminism.test.tsx)
 - [`src/features/GameLoop/GameLoopQuestTimingIntegrationQualification.test.tsx`](src/features/GameLoop/GameLoopQuestTimingIntegrationQualification.test.tsx)
+- [`src/features/GameLoop/GameLoopTimedQuestPrecisionResolution.test.tsx`](src/features/GameLoop/GameLoopTimedQuestPrecisionResolution.test.tsx)
 - [`.github/workflows/build-validation.yml`](.github/workflows/build-validation.yml)
 
 ## Post-M25 synthetic-review tooling
@@ -233,6 +253,7 @@ CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characteriza
 CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
 CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
 CI=true npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionResolution.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
 CI=true npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
 CI=true npm test -- --watchAll=false --runInBand M24ObjectiveWorldState.test.tsx
@@ -257,6 +278,7 @@ CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characteriza
 CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
 CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
 CI=true npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionResolution.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
 CI=true npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
 CI=true npm test -- --watchAll=false --runInBand M24ObjectiveWorldState.test.tsx
@@ -285,20 +307,17 @@ M25 technical composition PASS
 
 Scheduler, progression, and timed-Quest correctness do not replace this chain. Do **not** infer pacing quality, balance quality, comprehension, fun, retention, or M26 authorization from deterministic execution.
 
-The three-package timed-Quest queue is complete. Before creating a new queue, reconcile the latest `main`, `STATUS.md`, recent commits, and current product authority.
+The original three-package timed-Quest unit-normalization queue is complete. The later timeout-precision question is now resolved by a bounded comparison-only contract; it does not authorize broader timer or product changes.
 
-Two repository-local questions may be worth future bounded preflight **only if reconciliation confirms they are the active bottleneck**:
+One repository-local question may still be worth future bounded preflight **only if reconciliation confirms it is the active bottleneck**:
 
-- whether decimal/fixed-step timeout precision needs a stronger authored contract than the current first-qualifying-step behavior;
 - whether timed-Quest authoring eventually requires explicit persisted timer-unit provenance or a future schema contract.
-
-Neither question is implicitly authorized as a production change by the completed milestone.
 
 Human pacing, fairness, comprehension, enjoyment, retention, and Product Direction remain separate authority gates.
 
 ## External review diagnostic
 
-The separate Gemini AI Code Review workflow currently fails before producing review output because its configured Gemini API key is invalid. This is an `EXTERNAL_AUTHORITY` maintenance issue. Repository Build Validation remains the authoritative hermetic merge gate for this workflow.
+The separate Gemini AI Code Review workflow currently fails before producing review output because its configured Gemini API key is invalid. This is an `EXTERNAL_AUTHORITY` maintenance issue. Repository Build Validation remains the authoritative hermetic correctness gate for the gameplay/timing packages.
 
 Do not inject production credentials or mix Gemini credential repair into gameplay/timing packages.
 
