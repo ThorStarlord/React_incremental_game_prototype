@@ -3,7 +3,8 @@
 **Package:** 3 — Quest Timing Integration Qualification  
 **Zone:** HERMETIC_VALIDATION  
 **Base:** `main` at `379d3612f4c575e7617aa8129e8e1fef333ce97d`  
-**Production mechanics changed by this package:** none
+**Production mechanics changed by this package:** none  
+**Precision semantics note:** the raw `>=` timeout-boundary characterization below was later superseded by the bounded comparison-only repair defined in `GameLoopTimedQuestPrecisionResolution.md`.
 
 ## Purpose
 
@@ -17,7 +18,7 @@ GameLoop fixed-step delta (milliseconds)
 -> Quest elapsedSeconds / timeLimitSeconds (seconds)
 ```
 
-This package does not change that implementation. It qualifies the repaired contract across the production scheduler, persistence, pause/resume, timeout, notification, and bounded offline-progression seams.
+This qualification composes that unit repair across the production scheduler, persistence, pause/resume, timeout, notification, and bounded offline-progression seams. The later precision-resolution package changes only how a timeout boundary is compared; it does not change the unit, accumulation, or persistence contracts qualified here.
 
 ## Authoritative integrated invariant
 
@@ -31,8 +32,8 @@ Therefore:
 - save/load must preserve the stored Quest timer value without reinterpretation;
 - M21 offline settlement must not advance Quest timers or trigger Quest timeout failure;
 - after resume, only new live fixed-step ticks advance the Quest timer;
-- timeout failure occurs on the first fixed step whose accumulated Quest time satisfies the existing `elapsedSeconds >= timeLimitSeconds` contract;
-- decimal floating-point accumulation may leave the nominal boundary infinitesimally below the authored value, so the observed failure value is bounded to no more than one fixed Quest step beyond the authored threshold;
+- timeout failure occurs on the nominal fixed step when accumulated Quest time reaches the authored threshold, allowing only machine-scale representation noise through the shared comparison helper;
+- raw `elapsedSeconds` remains unrounded and may therefore be infinitesimally below the authored limit when timeout is declared;
 - once failure occurs, the Quest is removed from active timer processing, emits exactly one failure notification, and queued catch-up ticks must not continue advancing or duplicate failure.
 
 ## Permanent qualification suite
@@ -48,23 +49,23 @@ The suite compares one second of logical Quest time under:
 - one-frame 10 Hz catch-up;
 - regular 20 Hz delivery.
 
-All scenarios must end with exactly one elapsed Quest second and no failure for a non-expiring probe.
+All scenarios must end with exactly one elapsed Quest second, within normal floating-point assertion tolerance, and no failure for a non-expiring probe.
 
 ### Catch-up timeout semantics
 
 A 1.5 second same-frame catch-up at 10 Hz runs fifteen queued logical ticks against a Quest with a one-second limit.
 
-The required result is:
+The required result after the precision-resolution repair is:
 
 - fifteen GameLoop ticks are recorded;
-- failure occurs on the first 100 ms fixed step whose accumulated seconds satisfy the reducer's existing `>= 1` threshold;
-- because repeated `0.1` additions may represent the nominal `1.0` boundary just below one in binary floating point, the failed `elapsedSeconds` value is required to be within `[1.0, 1.1]` rather than artificially rounded by the test;
+- failure occurs on the nominal tenth 100 ms fixed step when accumulated time is within machine-scale comparison tolerance of `1.0`;
+- the raw stored `elapsedSeconds` remains unrounded and may equal `0.9999999999999999`;
 - status becomes `FAILED`;
 - the Quest leaves `activeQuestIds`;
 - exactly one `Quest Failed` notification exists;
 - later queued ticks do not mutate the failed Quest or emit another failure notification.
 
-This bound records existing discrete fixed-step behavior; it does not authorize an epsilon, rounding, timer-clamping, or precision change in production code.
+The precision repair is comparison-only. It does not round, clamp, quantize, or rewrite the timer value.
 
 ### Pause/resume boundary
 
@@ -85,9 +86,9 @@ createSave
 -> processQuestTimersThunk
 ```
 
-A Quest saved at `0.4 / 0.6` seconds must remain at `0.4` seconds across a 20-second M21 offline settlement. The first resumed 100 ms live tick advances it to `0.5`; the second advances it to `0.6`, fails it exactly once, and later live ticks leave the failed timer frozen.
+A Quest saved at `0.4 / 0.6` seconds must remain at `0.4` seconds across a 20-second M21 offline settlement. The first resumed 100 ms live tick advances it to `0.5`; the second advances it to the nominal `0.6` boundary, fails it exactly once under the comparison contract, and later live ticks leave the failed timer frozen.
 
-This composes the repaired timer with the real save envelope and the real two-consumer offline settlement authority without adding an artificial migration or replay path.
+This composes the timer with the real save envelope and the real two-consumer offline settlement authority without adding an artificial migration or replay path.
 
 ## Relationship to existing authorities
 
@@ -96,10 +97,11 @@ This suite is additive rather than substitutive:
 - `useGameLoop.timing-characterization.test.tsx` remains the fixed-step scheduler characterization authority;
 - `GameLoopProgressionDeterminism.test.tsx` remains the cross-progression frame-layout/tick-rate authority;
 - `QuestTimerUnitCompatibilityPreflight.test.ts` remains the focused timer unit, malformed-delta, persistence-value, and reducer/display authority;
+- `GameLoopTimedQuestPrecisionResolution.test.tsx` is the later timeout-comparison precision authority;
 - `GameLoopLiveOfflineBoundary.test.tsx` remains the broader live/save/offline/resume progression-boundary authority;
 - `GameLoopM21OfflineProgress.test.ts` remains the explicit M21 two-consumer allowlist/rejection authority.
 
-Package 3 adds the missing composed proof that those boundaries agree specifically for timed Quests.
+This package provides the composed timing proof; the precision-resolution package narrows and supersedes only its original raw-comparison boundary behavior.
 
 ## Build Validation authority
 
@@ -116,6 +118,7 @@ Merge qualification still requires the rest of Build Validation, including:
 - TypeScript;
 - scheduler and cross-progression suites;
 - focused Quest timer preflight;
+- timed-Quest precision-resolution qualification when present on the candidate;
 - live/offline and M21 qualification;
 - M20–M25 milestone regressions;
 - historical M4–M19 regressions;
@@ -123,11 +126,11 @@ Merge qualification still requires the rest of Build Validation, including:
 
 ## Scope deliberately unchanged
 
-This package does not change or claim authority over:
+Neither this integration qualification nor the later precision-resolution repair changes or claims authority over:
 
 - GameLoop tick rate or game speed;
 - Quest duration/reward authoring;
-- timer rounding, epsilon, clamping, or numeric precision policy;
+- timer storage, clamping, quantization, or persistence normalization;
 - save-schema version or stored Quest timer migration;
 - M21 offline allowlist;
 - offline Quest progression;
