@@ -31,8 +31,9 @@ Therefore:
 - save/load must preserve the stored Quest timer value without reinterpretation;
 - M21 offline settlement must not advance Quest timers or trigger Quest timeout failure;
 - after resume, only new live fixed-step ticks advance the Quest timer;
-- crossing a timeout boundary must fail the Quest once, remove it from active timer processing, and emit exactly one failure notification;
-- queued catch-up ticks after failure must not duplicate failure or continue advancing the failed Quest.
+- timeout failure occurs on the first fixed step whose accumulated Quest time satisfies the existing `elapsedSeconds >= timeLimitSeconds` contract;
+- decimal floating-point accumulation may leave the nominal boundary infinitesimally below the authored value, so the observed failure value is bounded to no more than one fixed Quest step beyond the authored threshold;
+- once failure occurs, the Quest is removed from active timer processing, emits exactly one failure notification, and queued catch-up ticks must not continue advancing or duplicate failure.
 
 ## Permanent qualification suite
 
@@ -56,11 +57,14 @@ A 1.5 second same-frame catch-up at 10 Hz runs fifteen queued logical ticks agai
 The required result is:
 
 - fifteen GameLoop ticks are recorded;
-- the Quest stops at one elapsed second;
+- failure occurs on the first 100 ms fixed step whose accumulated seconds satisfy the reducer's existing `>= 1` threshold;
+- because repeated `0.1` additions may represent the nominal `1.0` boundary just below one in binary floating point, the failed `elapsedSeconds` value is required to be within `[1.0, 1.1]` rather than artificially rounded by the test;
 - status becomes `FAILED`;
 - the Quest leaves `activeQuestIds`;
 - exactly one `Quest Failed` notification exists;
 - later queued ticks do not mutate the failed Quest or emit another failure notification.
+
+This bound records existing discrete fixed-step behavior; it does not authorize an epsilon, rounding, timer-clamping, or precision change in production code.
 
 ### Pause/resume boundary
 
@@ -123,6 +127,7 @@ This package does not change or claim authority over:
 
 - GameLoop tick rate or game speed;
 - Quest duration/reward authoring;
+- timer rounding, epsilon, clamping, or numeric precision policy;
 - save-schema version or stored Quest timer migration;
 - M21 offline allowlist;
 - offline Quest progression;
