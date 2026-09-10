@@ -1,85 +1,147 @@
-# Milestone Handoff — Post-M25 Review Boundary
+# Milestone Handoff — GameLoop Determinism Hardening
 
-**Handoff date:** 2026-09-09  
-**Branch cut from `main`:** `101251f9cf7bf1c843f9bf0d45b62fc5164b8159`  
+**Handoff date:** 2026-09-10  
+**Branch cut from `main`:** `3446549f91c28a2eb915683b0df8e23ba29e11b3`  
 **Product authority:** `M25 Complete Chapter Vertical Slice = PASS`  
 **Human product validation:** `DEFERRED / UNPROVEN`  
 **M26:** `NOT AUTHORIZED`
 
 ## Purpose
 
-This document is the in-repository handoff for future engineers and future chat sessions after the post-M25 work-package cycle.
+This document is the repository-grounded handoff for future engineers and future chat sessions after the GameLoop determinism work-package cycle.
 
-The important distinction is that the **session/work queue is closed at a valid evidence boundary**, but that does **not** mean three new implementation packages were merged. Repository authority still ends at M25 plus the qualified post-M25 synthetic-review apparatus and campaign freeze. Do not infer M26 authorization from the administrative statement that the milestone session is complete.
+The key distinction is between **engineering scheduler hardening** and **product authority**:
+
+- Packages 1 and 2 of the scheduler-hardening queue were implemented, qualified, and merged.
+- Package 3 — progression determinism and tick-boundary regression coverage — was not implemented in this cycle and remains the next repository-only work package.
+- The scheduler work does not authorize new mechanics, pacing changes, balance changes, progression redesign, or M26.
+- Human comprehension, pacing, enjoyment, retention, and product-direction claims remain unproven.
+
+Do not convert administrative milestone closure into evidence that Package 3 or M26 work already exists.
 
 ## Current repository state
 
-The automated implementation program through M25 is complete. The strongest qualified product chain includes Relationship, Trait, Combat, Exploration, Knowledge, Faction Reputation, Objective World State, Copy automation, persistence, bounded offline settlement, and two strategically distinct Merchant District chapter routes.
+The automated implementation program through M25 remains qualified. The live GameLoop has now also been hardened against three repository-demonstrated scheduler defects:
 
-The governing post-M25 question is now product evidence rather than missing system composition:
+1. fractional fixed-step accumulator remainder loss across Redux-driven rerenders;
+2. duplicate `TickData.currentTick` identities during same-frame catch-up; and
+3. overlapping asynchronous `onTick` processing.
 
-> Can a fresh player understand the causal model, make meaningful route decisions, use delegation appropriately, experience satisfying pacing, and want to continue?
+The live loop still preserves the established boundary that wall-clock absence is **not** replayed by feeding a giant delta through ordinary live ticks. M21 bounded offline settlement remains separate authority.
 
-See:
+Key scheduler references:
 
-- `specification/README.md`
-- `specification/Technical/M25CompleteChapterVerticalSliceResult.md`
-- `specification/Technical/PostM25ProductDirection.md`
-- `specification/Technical/PostM25SyntheticReviewAuthority.md`
-- `specification/Technical/SimulatedIntegratedProductReview.md`
-- `specification/Technical/SimulatedIntegratedProductReviewV2Amendment.md`
+- `specification/Technical/GameLoopTimingCharacterization.md`
+- `specification/Technical/GameLoopDeterministicLiveSchedulerRepair.md`
+- `src/features/GameLoop/hooks/useGameLoop.ts`
+- `src/features/GameLoop/hooks/useGameLoop.timing-characterization.test.tsx`
+- `.github/workflows/build-validation.yml`
 
 ## Work-package outcomes
 
-### Package 1 — Fresh isolated V2 participant evidence
+### Package 1 — GameLoop Timing Characterization & Determinism Gate
 
-**Terminal state:** `VALID PRELAUNCH STOP / EVIDENCE NOT COLLECTED`
+**Terminal state:** `COMPLETE / MERGED`
 
-Delivered/verified before the stop:
+**PR:** #70 — `Test GameLoop timing characterization and determinism boundary`  
+**Merge commit:** `97807e9c0f759a6d8632f9d0d7f92bc10e6a8101`
 
-- the post-SIR-V1 measurement apparatus was repaired and qualified;
-- observation-bound action IDs and stale/mismatched-action rejection were qualified;
-- a fresh six-profile V2 campaign was frozen on `main`;
-- the frozen game candidate and V2 apparatus provenance were re-verified before attempting Participant A;
-- the repository-side Build Validation for the early-stop candidate passed.
+Delivered:
 
-The Package 1 execution attempt could not honestly satisfy the preregistered fresh-context isolation gate. The available controller context already knew the repository, protocol, campaign authority, and isolation rules. Therefore the controller did not impersonate Participant A and did not deliver Observation 001.
+- deterministic fake-`requestAnimationFrame` / controlled-`performance.now()` test harness;
+- exact default 10 Hz fixed-step characterization;
+- approximately 60 Hz RAF chunking and irregular-substep accumulation coverage;
+- pause/resume rejection boundary coverage;
+- game-speed and tick-rate transition coverage;
+- deterministic reproduction of fractional accumulator remainder loss;
+- deterministic reproduction of duplicate same-frame callback tick identities;
+- deterministic reproduction of async `onTick` overlap;
+- explicit CI qualification entrypoint for the timing suite.
 
-As a consequence:
+Package 1 changed no production mechanics or progression values. Its purpose was to establish evidence before repair.
 
-- no Participant A raw record exists;
-- no Participant B-F run was started;
-- no synthetic product verdict was assigned;
-- no game repair or apparatus repair was justified by participant evidence.
+Qualification:
 
-The evidence-only early-stop record is currently represented by PR #68 (`work/v2-panel-a-c-evidence-freeze`). At this handoff snapshot, its Build Validation passed, while the separate Gemini AI Code Review workflow did not pass; therefore it was not merged under the all-checks-green merge rule.
+- exact candidate head: `56273c177e641d4ed386a17c8be189fbe522f416`;
+- Build Validation #267: `PASS`;
+- TypeScript, timing characterization, negative/rejection contract, localhost smoke, M20-M25 qualification, historical regression stack, and production build passed.
 
-### Package 2 — Evidence adjudication / product-direction decision
+### Package 2 — Deterministic Live Tick Scheduler Repair
 
-**Terminal state:** `GATED / NOT EXECUTED`
+**Terminal state:** `COMPLETE / MERGED`
 
-Package 2 depended on valid Package 1 participant evidence. Because Package 1 stopped before Observation 001, there is no scientifically valid V2 participant corpus to adjudicate. No product-direction decision should be synthesized from the failed execution environment.
+**PR:** #71 — `Fix deterministic live GameLoop scheduling`  
+**Merge commit:** `3446549f91c28a2eb915683b0df8e23ba29e11b3`
 
-### Package 3 — Result-driven mechanics / progression work
+Delivered:
 
-**Terminal state:** `NOT AUTHORIZED / NOT EXECUTED`
+- RAF scheduler lifetime decoupled from changing render-captured GameLoop state;
+- fractional accumulator continuity preserved across ordinary Redux tick rerenders;
+- same-frame fixed steps assigned monotonic local tick identities before Redux rerender;
+- `onTick` explicitly supports synchronous or Promise-returning handlers;
+- emitted tick callbacks are serialized in logical order;
+- rejected async handlers are contained and do not deadlock subsequent queued work;
+- pause/resume wall-clock re-anchoring continues to reject paused wall time from live progression;
+- Package 1 defect characterizations promoted into desired regression invariants.
 
-No mechanics, tick-rate, progression, tutorial, balance, or new-system work should be invented merely to keep the queue moving. The repository's explicit authority still requires product evidence and a product-direction decision before a new M26+ roadmap is authorized.
+The repair deliberately did **not** alter:
+
+- the default 10 Hz tick rate;
+- game-speed bounds;
+- progression formulas;
+- reward curves;
+- economy or unlock thresholds;
+- bounded offline-settlement authority;
+- M26 scope.
+
+Qualification:
+
+- first candidate correctly failed TypeScript because two new test callbacks returned `Array.push(...)` values instead of `void`; that test-only typing defect was repaired and the candidate was requalified from a new exact head;
+- final exact candidate head: `84b89ad1703830c6e6a4d81fb37ba0a18079122d`;
+- Build Validation #269: `PASS`;
+- synthetic-review contract: `PASS`;
+- V2 stale/mismatched-action negative/rejection qualification: `PASS`;
+- localhost UI-only smoke: `PASS`;
+- TypeScript: `PASS`;
+- GameLoop deterministic timing suite: `PASS`;
+- M20-M25 qualification stack: `PASS`;
+- active-loop repair qualification: `PASS`;
+- modified historical qualification: `PASS`;
+- accumulated M4-M19 baseline: `PASS`;
+- production build: `PASS`.
+
+### Package 3 — Progression Determinism & Tick-Boundary Regression Harness
+
+**Terminal state:** `CARRIED FORWARD / NOT IMPLEMENTED`
+
+No Package 3 branch, implementation PR, or merge exists at this handoff.
+
+The intended bounded scope remains repository-only / hermetic validation:
+
+- connect the repaired scheduler to existing progression authorities without introducing new progression design;
+- exercise equivalent logical tick streams under different RAF chunking;
+- cover pause/resume boundaries;
+- cover persistence and the live/offline boundary where current contracts require equivalence;
+- verify existing passive/progression flows do not duplicate rewards, advancement, or side effects solely because frame layout differs;
+- preserve existing M20-M25 behavior rather than inventing new balance targets.
+
+Package 3 must **not** become a vehicle for reward tuning, pacing changes, progression restructuring, new unlock rules, or M26 design.
 
 ## Evidence ledger
 
 ### Verified
 
-- M25 Complete Chapter Vertical Slice: `PASS`.
-- Automated post-M17 implementation program: `COMPLETE`.
-- Post-M25 synthetic-review protocol exists and preserves the human-evidence ceiling.
-- V2 measurement apparatus is qualified on repository CI.
-- V2 campaign is frozen with six profiles, fixed execution order, fresh-context isolation, evidence-freeze rules, and evaluator embargo.
-- The failed Participant A launch was correctly treated as an epistemic-isolation stop rather than fabricated participant evidence.
-- Build Validation on the Package 1 early-stop candidate passed.
+- M25 Complete Chapter Vertical Slice remains `PASS`.
+- Package 1 characterization harness is merged and CI-qualified.
+- The three scheduler failure modes identified by Package 1 were reproducible before repair.
+- Package 2 repairs those demonstrated failure modes and is merged.
+- The exact Package 2 candidate passed the deterministic GameLoop regression suite.
+- Existing M20-M25, active-loop, historical, synthetic-review rejection, localhost smoke, TypeScript, and production-build gates passed on the Package 2 candidate.
+- The default 10 Hz cadence and M21 bounded-offline authority were preserved.
 
 ### Still unproven / pending
 
+- Package 3 cross-progression/tick-boundary equivalence coverage;
 - human comprehension;
 - human pacing;
 - emotional impact and enjoyment;
@@ -93,36 +155,46 @@ No mechanics, tick-rate, progression, tutorial, balance, or new-system work shou
 
 ## Open operational artifacts
 
-At the handoff snapshot:
+At this handoff snapshot:
 
-- **PR #66 — `Experiment: collect SIR-V2 participant evidence`** remains an evidence-only draft/open collection surface. It must not become a place for game or protocol repair while the evidence corpus is incomplete.
-- **PR #68 — `Experiment: freeze V2 prelaunch participant-isolation stop`** records the valid Package 1 prelaunch stop. Do not merge it unless the repository's required checks satisfy the active merge policy.
+- **PR #66 — `Experiment: collect SIR-V2 participant evidence`** remains an evidence-only draft/open collection surface from the separate post-M25 product-evidence track.
+- **PR #68 — `Experiment: freeze V2 prelaunch participant-isolation stop`** remains open from that separate evidence track.
 
-Future sessions must re-read current PR state rather than assuming these snapshots are still current.
+These PRs are not part of the GameLoop scheduler repair. Future sessions must re-read their current state rather than relying on this snapshot.
 
 ## Recommended next priorities
 
-1. **Establish a valid evidence source.** Prefer an actual fresh human integrated playability/product review. If continuing the synthetic V2 experiment, use a genuinely isolated participant context that cannot access repository/specification knowledge and satisfies the frozen dispatch checklist before Observation 001.
-2. **Collect raw evidence without repair.** Preserve the frozen game candidate, participant packet, action-binding contract, observation relay, and raw-record boundary. Freeze each participant record before advancing.
-3. **Adjudicate only after valid evidence exists.** Classify discoverability, state legibility, causal explanation, terminology, mechanical contradiction, content/dramatization, pacing, strategic-choice, and system-value failures before proposing fixes.
-4. **Make the Product Direction Decision.** Decide what evidence justifies deepening, simplifying, repairing, or abandoning. Record that decision explicitly.
-5. **Only then authorize M26+.** Convert validated findings into a bounded roadmap for mechanics, progression, pacing, UX, or content. Do not pre-authorize a subsystem because M25 technically passed.
+1. **Implement Package 3 — Progression Determinism & Tick-Boundary Regression Harness.** Start from current `main`, add synthetic/hermetic equivalence scenarios only, and do not change progression design unless a current contract is demonstrably violated and a later repair package is separately authorized.
+2. **Exercise representative existing progression authorities across equivalent logical tick streams.** Prioritize passive generation and selected M20-M25 flows whose outcomes should be independent of RAF chunking.
+3. **Strengthen live/offline boundary rejection coverage.** Ensure bounded offline settlement stays separate from the live fixed-step scheduler and that no future test encourages giant-delta live replay.
+4. **After Package 3, reassess the engineering bottleneck.** If deterministic progression behavior is qualified, stop inventing scheduler work and return to the repository's actual remaining product-evidence boundary.
+5. **Keep human/product claims gated.** Fresh-player evidence and an explicit Product Direction Decision remain prerequisites for pacing, balance, tutorial, retention, or M26 claims.
 
 ## Fast re-entry checklist for the next engineer/session
 
 ```text
 1. Read STATUS.md.
-2. Read specification/README.md.
-3. Read specification/Technical/PostM25ProductDirection.md.
-4. Reconcile latest main + open PRs #66/#68 (or their successors).
-5. Verify whether any valid new human/synthetic evidence exists.
-6. If no valid evidence exists: do not invent M26 implementation scope.
-7. If valid evidence exists: adjudicate first, then authorize the smallest evidence-backed work package.
+2. Confirm latest main and recent PRs/commits.
+3. Read GameLoopTimingCharacterization.md.
+4. Read GameLoopDeterministicLiveSchedulerRepair.md.
+5. Run the focused GameLoop deterministic timing suite.
+6. Treat Package 3 as the next pending repository-only package unless main already contains later work.
+7. Preserve the live-tick vs bounded-offline boundary.
+8. Do not infer player-facing pacing/balance conclusions from scheduler correctness.
 ```
 
 ## Validation / tooling entrypoints
 
-The canonical commands are documented in the root `README.md` and `.github/workflows/build-validation.yml`. The most relevant post-M25 commands are:
+Focused GameLoop qualification:
+
+```bash
+npx tsc --noEmit
+CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
+```
+
+Broader candidate qualification should use `.github/workflows/build-validation.yml`, which includes the synthetic-review contract and negative/rejection checks, localhost smoke, TypeScript, GameLoop timing suite, M20-M25 milestones, active-loop checks, historical regressions, and production build.
+
+Useful local commands:
 
 ```bash
 npm ci
@@ -130,7 +202,8 @@ npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx playwright install --with-deps chromium
 npx tsc --noEmit
-npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
+CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
+CI=true npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
 npm run build
 ```
 
@@ -140,6 +213,9 @@ For the live synthetic-review smoke, start the app on `127.0.0.1:3000` and run:
 npm run simulated-review:smoke
 ```
 
-## Governing stop condition
+## Governing stop conditions
 
-If the only remaining blocker is fresh-player evidence or an explicit product decision, report that boundary clearly and stop. Do not convert absent evidence into implementation authority.
+- Scheduler correctness is not evidence that the game is well paced or fun.
+- Fixed-step live execution is not the authority for arbitrary wall-clock absence.
+- Package 3 is pending until repository evidence shows it was implemented and qualified.
+- M26 remains unauthorized until the separate product-evidence and Product Direction Decision gates are satisfied.
