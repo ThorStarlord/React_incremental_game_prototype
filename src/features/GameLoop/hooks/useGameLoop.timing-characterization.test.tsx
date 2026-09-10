@@ -60,7 +60,7 @@ class RafHarness {
 
 const mountGameLoop = (
   store: ReturnType<typeof makeStore>,
-  onTick?: (tickData: TickData) => void
+  onTick?: (tickData: TickData) => void | Promise<void>
 ) => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <Provider store={store}>{children}</Provider>
@@ -69,7 +69,7 @@ const mountGameLoop = (
   return renderHook(() => useGameLoop({ onTick }), { wrapper });
 };
 
-describe('useGameLoop timing characterization', () => {
+describe('useGameLoop deterministic timing', () => {
   let raf: RafHarness;
 
   beforeEach(() => {
@@ -130,10 +130,10 @@ describe('useGameLoop timing characterization', () => {
     expect(onTick).toHaveBeenCalledTimes(1);
   });
 
-  test('characterizes the current fractional-remainder loss after a tick-triggered rerender', () => {
+  test('preserves the fractional accumulator remainder across tick-driven rerenders', () => {
     const store = makeStore();
-    const onTick = jest.fn();
-    mountGameLoop(store, onTick);
+    const deliveredTicks: number[] = [];
+    mountGameLoop(store, tickData => deliveredTicks.push(tickData.currentTick));
 
     act(() => {
       raf.frame(150);
@@ -145,18 +145,12 @@ describe('useGameLoop timing characterization', () => {
       raf.frame(200);
     });
 
-    // Current-main behavior: the 50 ms remainder from the 150 ms frame is lost
-    // when the Redux tick update recreates/restarts the effect. Package 2 should
-    // preserve the remainder so this scenario reaches tick 2 at t=200 ms.
-    expect(store.getState().gameLoop.currentTick).toBe(1);
-    expect(onTick).toHaveBeenCalledTimes(1);
+    expect(store.getState().gameLoop.currentTick).toBe(2);
+    expect(store.getState().gameLoop.totalGameTime).toBe(200);
+    expect(deliveredTicks).toEqual([1, 2]);
   });
 
-  test.todo(
-    'desired invariant: preserve the fractional accumulator remainder across tick-driven rerenders'
-  );
-
-  test('characterizes duplicate callback tick identity during multi-step catch-up', () => {
+  test('multi-step catch-up delivers monotonic callback tick identities', () => {
     const store = makeStore();
     const deliveredTicks: number[] = [];
     mountGameLoop(store, tickData => deliveredTicks.push(tickData.currentTick));
@@ -166,26 +160,29 @@ describe('useGameLoop timing characterization', () => {
     });
 
     expect(store.getState().gameLoop.currentTick).toBe(2);
-    expect(deliveredTicks).toEqual([1, 1]);
+    expect(store.getState().gameLoop.totalGameTime).toBe(200);
+    expect(deliveredTicks).toEqual([1, 2]);
   });
 
-  test.todo(
-    'desired invariant: multi-step catch-up delivers monotonic callback tick identities [1, 2, ...]'
-  );
-
-  test('characterizes overlapping async onTick work during multi-step catch-up', async () => {
+  test('serializes async onTick work without overlapping logical ticks', async () => {
     const store = makeStore();
     let active = 0;
     let peakConcurrent = 0;
-    let release: (() => void) | undefined;
-    const gate = new Promise<void>(resolve => {
-      release = resolve;
+    let releaseFirst: (() => void) | undefined;
+    const firstGate = new Promise<void>(resolve => {
+      releaseFirst = resolve;
     });
+    const deliveredTicks: number[] = [];
 
-    const onTick = jest.fn(async () => {
+    const onTick = jest.fn(async (tickData: TickData) => {
+      deliveredTicks.push(tickData.currentTick);
       active += 1;
       peakConcurrent = Math.max(peakConcurrent, active);
-      await gate;
+
+      if (tickData.currentTick === 1) {
+        await firstGate;
+      }
+
       active -= 1;
     });
 
@@ -195,18 +192,60 @@ describe('useGameLoop timing characterization', () => {
       raf.frame(250);
     });
 
-    expect(onTick).toHaveBeenCalledTimes(2);
-    expect(peakConcurrent).toBe(2);
+    expect(store.getState().gameLoop.currentTick).toBe(2);
+    expect(onTick).toHaveBeenCalledTimes(1);
+    expect(deliveredTicks).toEqual([1]);
+    expect(peakConcurrent).toBe(1);
 
     await act(async () => {
-      release?.();
+      releaseFirst?.();
+      await Promise.resolve();
+      await Promise.resolve();
       await Promise.resolve();
     });
 
+    expect(onTick).toHaveBeenCalledTimes(2);
+    expect(deliveredTicks).toEqual([1, 2]);
+    expect(peakConcurrent).toBe(1);
     expect(active).toBe(0);
   });
 
-  test.todo('desired invariant: async tick processing has an explicit non-overlap ordering contract');
+  test('rejected async onTick work cannot deadlock the serialized queue', async () => {
+    const store = makeStore();
+    const expectedFailure = new Error('expected hermetic rejection');
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const deliveredTicks: number[] = [];
+
+    const onTick = jest.fn((tickData: TickData) => {
+      deliveredTicks.push(tickData.currentTick);
+      if (tickData.currentTick === 1) {
+        return Promise.reject(expectedFailure);
+      }
+      return undefined;
+    });
+
+    mountGameLoop(store, onTick);
+
+    act(() => {
+      raf.frame(250);
+    });
+
+    expect(onTick).toHaveBeenCalledTimes(1);
+    expect(deliveredTicks).toEqual([1]);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(onTick).toHaveBeenCalledTimes(2);
+    expect(deliveredTicks).toEqual([1, 2]);
+    expect(consoleError).toHaveBeenCalledWith(
+      'GameLoop onTick handler rejected',
+      expectedFailure
+    );
+  });
 
   test('pause rejects live progress and resume does not replay paused wall-clock time', () => {
     const store = makeStore();
