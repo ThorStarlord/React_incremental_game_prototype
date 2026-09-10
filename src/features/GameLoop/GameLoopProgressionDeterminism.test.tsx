@@ -229,7 +229,7 @@ describe('Cross-progression tick determinism qualification', () => {
     expectEquivalentProgression(catchUp, regular);
   });
 
-  test('supported 10 Hz and 20 Hz schedules preserve equivalent per-second vitality recovery', async () => {
+  test('supported 10 Hz and 20 Hz schedules preserve equivalent per-second vitality and Quest timing', async () => {
     const tenHz = await runScenario(
       [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
       10,
@@ -248,6 +248,8 @@ describe('Cross-progression tick determinism qualification', () => {
     expect(twentyHz.playerHealth).toBeCloseTo(51, 8);
     expect(tenHz.playerMana).toBeCloseTo(10.5, 8);
     expect(twentyHz.playerMana).toBeCloseTo(10.5, 8);
+    expect(tenHz.questElapsedSeconds).toBeCloseTo(1, 8);
+    expect(twentyHz.questElapsedSeconds).toBeCloseTo(1, 8);
   });
 
   test('vital regeneration scales fractional elapsed time, clamps at maxima, and rejects invalid elapsed input as a no-op', async () => {
@@ -336,7 +338,7 @@ describe('Cross-progression tick determinism qualification', () => {
     }
   });
 
-  test('timed Quest progression is frame-layout deterministic but currently advances elapsedSeconds with millisecond deltas', async () => {
+  test('timed Quest progression is frame-layout deterministic and advances elapsedSeconds in seconds', async () => {
     const regular = await runScenario(
       [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
       10,
@@ -344,11 +346,9 @@ describe('Cross-progression tick determinism qualification', () => {
     );
     const catchUp = await runScenario([1000], 10, 10);
 
-    expect(regular.questElapsedSeconds).toBe(1000);
-    expect(catchUp.questElapsedSeconds).toBe(1000);
+    expect(regular.questElapsedSeconds).toBeCloseTo(1, 8);
+    expect(catchUp.questElapsedSeconds).toBeCloseTo(1, 8);
     expect(regular.questStatus).toBe('IN_PROGRESS');
     expect(catchUp.questStatus).toBe('IN_PROGRESS');
   });
-
-  test.todo('timed Quest elapsedSeconds should advance in seconds rather than raw milliseconds');
 });
