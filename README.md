@@ -4,7 +4,7 @@ A React/TypeScript incremental RPG prototype combining active relational/strateg
 
 ## Current authority
 
-The automated implementation program through **M25 — Complete Chapter Vertical Slice** remains complete and qualified. The post-scheduler progression-timing milestone is also complete: cross-progression determinism was characterized, Player vitality was normalized to elapsed logical time, and the canonical live/save/offline/resume seam now has permanent hermetic qualification.
+The automated implementation program through **M25 — Complete Chapter Vertical Slice** remains complete and qualified. The timed-Quest timing milestone is also complete: the GameLoop milliseconds -> Quest seconds boundary was preflighted, repaired, and qualified across scheduler, persistence, pause/resume, timeout, notification, and M21 offline-settlement seams.
 
 ```text
 M25 Complete Chapter Vertical Slice: PASS
@@ -13,7 +13,9 @@ Deterministic Live Tick Scheduler Repair: COMPLETE
 Cross-Progression Tick Determinism Characterization: COMPLETE
 Delta-Time-Normalized Vital Regeneration Repair: COMPLETE
 Live/Persistence/Offline Progression Boundary Qualification: COMPLETE
-Timed Quest seconds-vs-milliseconds discrepancy: KNOWN / UNREPAIRED
+Timed Quest Unit & Save-Compatibility Preflight: COMPLETE
+Seconds-Normalized Timed Quest Repair: COMPLETE
+Quest Timing Integration Qualification: COMPLETE
 Human Integrated Playability / Product Review: PENDING
 Product Direction Decision: PENDING
 M26: NOT AUTHORIZED
@@ -72,34 +74,64 @@ The authoritative pull-request gate is `.github/workflows/build-validation.yml`.
 CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
 ```
 
-Covers:
+Covers fixed-step cadence, irregular RAF accumulation, fractional accumulator continuity, same-frame catch-up, serialized async `onTick`, rejected-handler recovery, pause/resume wall-clock rejection, game-speed changes, and tick-rate changes.
 
-- default 10 Hz fixed-step behavior;
-- irregular and approximately 60 Hz RAF accumulation;
-- fractional accumulator remainder continuity;
-- monotonic same-frame catch-up tick identities;
-- serialized Promise-returning `onTick` handling;
-- rejected async-handler recovery;
-- pause/resume wall-clock rejection;
-- game-speed and tick-rate changes.
-
-### Cross-progression determinism and vitality repair
+### Cross-progression determinism
 
 ```bash
 CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
 ```
 
-Covers representative Essence, Copy, Player, and timed-Quest progression under equivalent logical time across:
+Covers representative Essence, Copy, Player, and timed-Quest progression under equivalent logical time across regular/irregular/catch-up delivery, 10 Hz vs 20 Hz schedules, and pause/resume boundaries.
 
-- regular 10 Hz delivery;
-- irregular RAF chunking;
-- same-frame catch-up;
-- 10 Hz vs 20 Hz schedules; and
-- pause/resume boundaries.
+Player vitality is elapsed-logical-time based rather than tick-count based. Timed Quest progression now also asserts the public seconds contract.
 
-The suite also qualifies Player vitality regeneration as elapsed-time based rather than tick-count based. With the package seed, one logical second converges on the same health/mana recovery at 10 Hz and 20 Hz.
+### Timed Quest unit / save-compatibility qualification
 
-The timed-Quest path intentionally retains a known characterization: Quest fields are seconds-named, while `processQuestTimersThunk` currently consumes millisecond `TickData.deltaTime` directly. That mismatch remains unrepaired and must not be silently normalized without a separately scoped change.
+```bash
+CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
+```
+
+This focused suite is the regression authority for the repaired unit boundary. It verifies:
+
+- 100 ms -> 0.1 elapsed Quest seconds;
+- 250 ms -> 0.25 elapsed Quest seconds;
+- non-finite, zero, and negative GameLoop deltas are no-ops;
+- reducer/display semantics remain seconds-based;
+- one logical GameLoop second advances timed Quest state by one second;
+- seeded timeout crossing emits exactly one failure notification;
+- current schema-v1 saves preserve stored Quest timer values exactly;
+- resumed future live increments are normalized without retroactive timer conversion;
+- legacy v0 wrapping migration does not guess-convert Quest timers.
+
+The production boundary is intentionally narrow:
+
+```text
+GameLoop deltaTimeMs
+-> processQuestTimersThunk
+-> positive finite validation
+-> deltaSeconds = deltaTimeMs / 1000
+-> Quest elapsedSeconds / timeLimitSeconds
+```
+
+Do **not** introduce a save migration that divides existing schema-v1 timer values by 1000 unless a new provenance/migration contract is explicitly designed.
+
+### Quest timing integration qualification
+
+```bash
+CI=true npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
+```
+
+This hermetic integration suite composes the real production seams and verifies:
+
+- equivalent one-second timed-Quest progression under regular 10 Hz, irregular 10 Hz, one-frame 10 Hz catch-up, and regular 20 Hz delivery;
+- catch-up timeout failure occurs once, removes the Quest from active timer processing, and later queued ticks do not duplicate failure or advance the failed timer;
+- paused wall-clock time contributes zero Quest time;
+- canonical save/load preserves stored Quest timing;
+- M21 offline settlement leaves timed Quest state frozen;
+- resumed live fixed steps alone advance the restored Quest timer and can trigger failure.
+
+Discrete timeout semantics are intentionally characterized rather than modified: repeated decimal fixed-step additions can land just below an authored decimal threshold because of IEEE floating-point representation. The current contract fails on the first fixed step whose computed value satisfies the existing `elapsed >= timeLimitSeconds` predicate. Do not add rounding, epsilon comparison, clamping, or quantization as an incidental change.
 
 ### Live / persistence / offline boundary
 
@@ -107,7 +139,7 @@ The timed-Quest path intentionally retains a known characterization: Quest field
 CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
 ```
 
-This hermetic seam test exercises production authorities across:
+This seam qualification exercises:
 
 ```text
 useGameLoop
@@ -120,16 +152,7 @@ useGameLoop
 -> resumed useGameLoop
 ```
 
-It verifies:
-
-- canonical save timestamp persistence and restore;
-- bounded M21 offline settlement;
-- offline advancement limited to passive Essence plus already-running M20 Copy production tasks;
-- online-only GameLoop time, Copy maturity/loyalty, Player vitals, and timed Quest state remain frozen during absence;
-- duplicate settlement rejects without duplicate progress;
-- paused and stopped saved states reject offline settlement;
-- offline Copy completion rewards exactly once; and
-- resumed live scheduling emits an ordinary fixed step rather than replaying the wall-clock absence as a giant delta.
+It verifies canonical save timestamp persistence/restore, bounded M21 settlement, duplicate-settlement rejection, paused/stopped save rejection, exact-once offline Copy completion rewards, and ordinary fixed-step resume without giant-delta replay.
 
 ### M21 bounded offline settlement
 
@@ -137,18 +160,22 @@ It verifies:
 CI=true npm test -- --watchAll=false --runInBand GameLoopM21OfflineProgress.test.ts
 ```
 
-The live GameLoop is **not** the authority for replaying arbitrary wall-clock absence. M21 remains a separate, explicit two-consumer offline allowlist. Do not qualify offline progress by feeding a giant absence delta through ordinary live ticks.
+The live GameLoop is **not** the authority for replaying arbitrary wall-clock absence. M21 remains a separate explicit two-consumer offline allowlist:
 
-Key GameLoop/progression references:
+1. passive Essence;
+2. already-running M20 Copy production tasks.
 
-- [`specification/Technical/GameLoopTimingCharacterization.md`](specification/Technical/GameLoopTimingCharacterization.md)
-- [`specification/Technical/GameLoopDeterministicLiveSchedulerRepair.md`](specification/Technical/GameLoopDeterministicLiveSchedulerRepair.md)
-- [`specification/Technical/GameLoopProgressionDeterminismCharacterization.md`](specification/Technical/GameLoopProgressionDeterminismCharacterization.md)
-- [`specification/Technical/GameLoopDeltaTimeVitalRegenerationRepair.md`](specification/Technical/GameLoopDeltaTimeVitalRegenerationRepair.md)
-- [`specification/Technical/GameLoopLiveOfflineProgressionBoundaryQualification.md`](specification/Technical/GameLoopLiveOfflineProgressionBoundaryQualification.md)
-- [`src/features/GameLoop/hooks/useGameLoop.ts`](src/features/GameLoop/hooks/useGameLoop.ts)
+Timed Quests remain online-only during offline settlement.
+
+## Timed Quest technical authority chain
+
+- [`specification/Technical/TimedQuestUnitAndSaveCompatibilityPreflight.md`](specification/Technical/TimedQuestUnitAndSaveCompatibilityPreflight.md)
+- [`specification/Technical/GameLoopTimedQuestSecondsNormalizationRepair.md`](specification/Technical/GameLoopTimedQuestSecondsNormalizationRepair.md)
+- [`specification/Technical/GameLoopQuestTimingIntegrationQualification.md`](specification/Technical/GameLoopQuestTimingIntegrationQualification.md)
+- [`src/features/Quest/state/QuestThunks.ts`](src/features/Quest/state/QuestThunks.ts)
+- [`src/features/Quest/QuestTimerUnitCompatibilityPreflight.test.ts`](src/features/Quest/QuestTimerUnitCompatibilityPreflight.test.ts)
 - [`src/features/GameLoop/GameLoopProgressionDeterminism.test.tsx`](src/features/GameLoop/GameLoopProgressionDeterminism.test.tsx)
-- [`src/features/GameLoop/GameLoopLiveOfflineBoundary.test.tsx`](src/features/GameLoop/GameLoopLiveOfflineBoundary.test.tsx)
+- [`src/features/GameLoop/GameLoopQuestTimingIntegrationQualification.test.tsx`](src/features/GameLoop/GameLoopQuestTimingIntegrationQualification.test.tsx)
 - [`.github/workflows/build-validation.yml`](.github/workflows/build-validation.yml)
 
 ## Post-M25 synthetic-review tooling
@@ -199,71 +226,26 @@ Do not use repository state, Redux inspection, local-storage inspection, debug i
 
 ## Milestone qualification commands
 
-These are focused regression entrypoints used by Build Validation.
-
-### GameLoop — Deterministic live scheduler
+These are the focused regression entrypoints currently used by Build Validation.
 
 ```bash
 CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
-```
-
-### GameLoop — Cross-progression determinism / vitality
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
-```
-
-### GameLoop — Live/save/offline/resume boundary
-
-```bash
+CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
+CI=true npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
-```
-
-### M25 — Complete Chapter Vertical Slice
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
-```
-
-### M24 — Objective World State
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand M24ObjectiveWorldState.test.tsx
-```
-
-### M23 — Faction Reputation
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand M23FactionReputation.test.tsx
-```
-
-### M22 — Social Knowledge Propagation
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand M22SocialKnowledgePropagation.test.tsx
-```
-
-### Checkpoint C — Incremental Integration Repair
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand CheckpointCIncrementalIntegrationRepair.test.tsx
-```
-
-### M21 — Bounded Offline Progress
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand GameLoopM21OfflineProgress.test.ts
-```
-
-### M20 — Copy Production Automation
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand CopyM20ProductionTaskAutomation.test.tsx
 ```
 
 ## CI-parity validation sequence
 
-For a candidate touching GameLoop scheduling, progression timing, persistence/offline boundaries, or the post-M25 review apparatus, run at least:
+For a candidate touching GameLoop scheduling, progression timing, timed Quests, persistence/offline boundaries, or the post-M25 review apparatus, run at least:
 
 ```bash
 npm ci
@@ -273,6 +255,8 @@ npx playwright install --with-deps chromium
 npx tsc --noEmit
 CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
+CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
+CI=true npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
 CI=true npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
 CI=true npm test -- --watchAll=false --runInBand M24ObjectiveWorldState.test.tsx
@@ -284,7 +268,7 @@ CI=true npm test -- --watchAll=false --runInBand CopyM20ProductionTaskAutomation
 npm run build
 ```
 
-The workflow also runs active-loop and historical regression suites; consult `.github/workflows/build-validation.yml` for the complete exact list.
+The workflow also runs the localhost UI smoke, active-loop qualification, modified historical qualification, and accumulated M4-M19 baseline. Consult `.github/workflows/build-validation.yml` for the exact current list.
 
 ## Product / evidence runbook
 
@@ -299,20 +283,24 @@ M25 technical composition PASS
 -> M26+ only if authorized
 ```
 
-Scheduler and progression correctness do not replace this chain. Do **not** infer pacing quality, balance quality, comprehension, fun, retention, or M26 authorization from deterministic execution.
+Scheduler, progression, and timed-Quest correctness do not replace this chain. Do **not** infer pacing quality, balance quality, comprehension, fun, retention, or M26 authorization from deterministic execution.
 
-The previous three-package progression-timing queue is complete. Before creating a new queue, reconcile the latest `main` and current authority. The known timed-Quest seconds-vs-milliseconds mismatch is the leading bounded repository-local candidate for investigation, but it is **not implicitly authorized** by this completed milestone.
+The three-package timed-Quest queue is complete. Before creating a new queue, reconcile the latest `main`, `STATUS.md`, recent commits, and current product authority.
 
-If that repair is later authorized, preserve the existing authored Quest time limits and keep M21 offline authority separate; add regression coverage for equivalent logical time, pause/resume, persistence, and live/offline rejection rather than broadening offline simulation.
+Two repository-local questions may be worth future bounded preflight **only if reconciliation confirms they are the active bottleneck**:
 
-Key references:
+- whether decimal/fixed-step timeout precision needs a stronger authored contract than the current first-qualifying-step behavior;
+- whether timed-Quest authoring eventually requires explicit persisted timer-unit provenance or a future schema contract.
 
-- [`STATUS.md`](STATUS.md) — current engineering/session handoff
-- [`specification/README.md`](specification/README.md) — specification and milestone authority chain
-- [`specification/Technical/PostM25ProductDirection.md`](specification/Technical/PostM25ProductDirection.md) — product boundary and next evidence gate
-- [`specification/Technical/SimulatedIntegratedProductReview.md`](specification/Technical/SimulatedIntegratedProductReview.md) — base synthetic-review protocol
-- [`specification/Technical/SimulatedIntegratedProductReviewV2Amendment.md`](specification/Technical/SimulatedIntegratedProductReviewV2Amendment.md) — V2 action/evidence amendment
-- [`.github/workflows/build-validation.yml`](.github/workflows/build-validation.yml) — exact merge qualification stack
+Neither question is implicitly authorized as a production change by the completed milestone.
+
+Human pacing, fairness, comprehension, enjoyment, retention, and Product Direction remain separate authority gates.
+
+## External review diagnostic
+
+The separate Gemini AI Code Review workflow currently fails before producing review output because its configured Gemini API key is invalid. This is an `EXTERNAL_AUTHORITY` maintenance issue. Repository Build Validation remains the authoritative hermetic merge gate for this workflow.
+
+Do not inject production credentials or mix Gemini credential repair into gameplay/timing packages.
 
 ## Standard npm scripts
 
