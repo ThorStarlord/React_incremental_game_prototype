@@ -45,6 +45,12 @@ jobs:
         env:
           CI: true
 
+      - name: Post-M25 product-depth qualification
+        timeout-minutes: 10
+        run: npm test -- --watchAll=false --runInBand PostM25RuleOfTwoChapterArchitecture.test.ts PostM25ContextualCausalLegibility.test.ts PostM25CrossDomainTraitBuildcraft.test.ts PostM25ThirdHeterogeneousChapterQualification.test.ts PostM25CopyRoutineStrategy.test.ts
+        env:
+          CI: true
+
       - name: Synthetic review contract qualification
         run: npm run simulated-review:validate
 
