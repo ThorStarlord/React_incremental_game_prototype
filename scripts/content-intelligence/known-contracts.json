@@ -1,0 +1,36 @@
+{
+  "routines": {
+    "forge_assistance": {
+      "label": "Forge Assistance",
+      "producer": "active City Center Forge practice"
+    },
+    "resonance_calibration": {
+      "label": "Resonance Calibration",
+      "producer": "successful active Trait Resonance"
+    }
+  },
+  "locations": [
+    "location_city_center",
+    "location_city_gate",
+    "location_merchant_district",
+    "location_whispering_woods"
+  ],
+  "factions": [
+    "City Watch",
+    "Merchants Guild"
+  ],
+  "worldState": {
+    "watchPresence": ["normal", "heavy"],
+    "tradeFlow": ["normal", "strong"]
+  },
+  "advisoryDanglingTargets": [
+    "dialogue:rook_greeting",
+    "dialogue:rook_bounty_explanation"
+  ],
+  "advisoryProvenanceSources": [
+    "dialogue:ScholarlyInsight",
+    "dialogue:willow_tether_teaching",
+    "quest:willow_independent_application",
+    "dialogue:WillowsWisdom"
+  ]
+}
