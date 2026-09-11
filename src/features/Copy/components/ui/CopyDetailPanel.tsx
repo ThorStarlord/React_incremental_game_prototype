@@ -24,13 +24,18 @@ import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { RootState } from '../../../../app/store';
 import { selectCopyById, selectCopyEffectiveTraitsWithSource, selectCopyEligibleShareTraitIds, selectCopySharePreferences, selectCopyShareEligibilityContext, selectCopyUnlockedEmptySlotCount, selectCopyHasRunningTask } from '../../state/CopySelectors';
 import { assignCopyRoleThunk, startCopyProductionTaskThunk, setCopySharePreferenceThunk, applySharePreferencesForCopyThunk } from '../../state/CopyThunks';
+import {
+  setCopyRoutinePriorityThunk,
+  startPreferredCopyProductionTaskThunk,
+} from '../../state/CopyStrategyThunks';
 import { selectTraits } from '../../../Traits/state/TraitsSelectors';
-import type { CopyRole } from '../../state/CopyTypes';
+import type { CopyProductionTaskId, CopyRole } from '../../state/CopyTypes';
 import {
   COPY_PRODUCTION_TASKS,
   evaluateCopyProductionTaskEligibility,
   getCopyProductionTaskDefinition,
 } from '../../CopyTaskDefinitions';
+import { getFirstEligiblePreferredProductionTask } from '../../CopyRoutineStrategy';
 
 interface CopyDetailPanelProps {
   copyId: string;
@@ -70,6 +75,32 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const activeDefinition = active?.productionTaskId
     ? getCopyProductionTaskDefinition(active.productionTaskId)
     : undefined;
+  const routinePriority = copy?.routinePriority ?? [];
+  const firstEligiblePreferredTask = copy
+    ? getFirstEligiblePreferredProductionTask(copy, routineFamiliarity)
+    : undefined;
+  const priorityLabel = routinePriority.length > 0
+    ? routinePriority
+        .map(taskId => getCopyProductionTaskDefinition(taskId)?.name ?? taskId)
+        .join(' → ')
+    : 'No routine priority set.';
+
+  const prioritizeRoutine = (taskId: CopyProductionTaskId) => {
+    if (!copy) return;
+    dispatch(setCopyRoutinePriorityThunk({
+      copyId: copy.id,
+      taskIds: [taskId, ...routinePriority.filter(id => id !== taskId)],
+    }));
+  };
+
+  const removeRoutinePriority = (taskId: CopyProductionTaskId) => {
+    if (!copy) return;
+    dispatch(setCopyRoutinePriorityThunk({
+      copyId: copy.id,
+      taskIds: routinePriority.filter(id => id !== taskId),
+    }));
+  };
+
   const emptySlots = emptySlotCount;
   const anyPrefEnabled = Object.values(sharePrefs).some(Boolean);
   const enableAll = () => {
@@ -143,6 +174,29 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 Experience a routine yourself before delegating repeatable execution. Narrative and irreversible decisions remain under player authority.
               </Typography>
+
+              <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5, mb: 1.5 }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }}>
+                  <Box>
+                    <Typography variant="subtitle2">Routine Priority</Typography>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      {priorityLabel}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Start Preferred chooses only the first currently eligible routine from this player-approved order. It never chains another task automatically.
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    disabled={hasRunningTask || !firstEligiblePreferredTask}
+                    onClick={() => dispatch(startPreferredCopyProductionTaskThunk(copy.id))}
+                  >
+                    Start Preferred
+                  </Button>
+                </Stack>
+              </Box>
+
               <Stack spacing={1}>
                 {COPY_PRODUCTION_TASKS.map(task => {
                   const isFamiliar = Boolean(routineFamiliarity[task.id]);
@@ -151,6 +205,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                   if ((task.reward.gold ?? 0) > 0) rewardParts.push(`${task.reward.gold} Gold`);
                   if ((task.reward.essence ?? 0) > 0) rewardParts.push(`${task.reward.essence} Essence`);
                   const disabled = hasRunningTask || !taskEligibility.eligible;
+                  const priorityIndex = routinePriority.indexOf(task.id);
                   return (
                     <Box
                       key={task.id}
@@ -163,7 +218,12 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                     >
                       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="space-between">
                         <Box>
-                          <Typography variant="subtitle2">{task.name}</Typography>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Typography variant="subtitle2">{task.name}</Typography>
+                            {priorityIndex >= 0 && (
+                              <Chip size="small" label={`Priority ${priorityIndex + 1}`} variant="outlined" />
+                            )}
+                          </Stack>
                           <Typography variant="body2" color="text.secondary">{task.description}</Typography>
                           <Typography variant="caption" color="text.secondary">
                             Base duration: {task.baseDurationSeconds}s • Reward: {rewardParts.join(' + ')}
@@ -182,15 +242,32 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                             </Typography>
                           )}
                         </Box>
-                        <Button
-                          size="small"
-                          variant="contained"
-                          disabled={disabled}
-                          onClick={() => dispatch(startCopyProductionTaskThunk({ copyId: copy.id, taskId: task.id }))}
-                          sx={{ alignSelf: { xs: 'stretch', sm: 'center' }, minWidth: 100 }}
-                        >
-                          Assign
-                        </Button>
+                        <Stack spacing={0.75} sx={{ alignSelf: { xs: 'stretch', sm: 'center' }, minWidth: 130 }}>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            disabled={disabled}
+                            onClick={() => dispatch(startCopyProductionTaskThunk({ copyId: copy.id, taskId: task.id }))}
+                          >
+                            Assign
+                          </Button>
+                          <Button
+                            size="small"
+                            variant="text"
+                            onClick={() => prioritizeRoutine(task.id)}
+                          >
+                            {priorityIndex === 0 ? 'Top Priority' : 'Prioritize'}
+                          </Button>
+                          {priorityIndex >= 0 && (
+                            <Button
+                              size="small"
+                              variant="text"
+                              onClick={() => removeRoutinePriority(task.id)}
+                            >
+                              Remove Priority
+                            </Button>
+                          )}
+                        </Stack>
                       </Stack>
                     </Box>
                   );

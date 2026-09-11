@@ -77,6 +77,11 @@ export interface Copy {
   role?: CopyRole;
   /** Active task (MVP keeps one active at a time). */
   activeTask?: CopyTask | null;
+  /**
+   * Player-authored ordered allowlist for routine delegation. Optional keeps
+   * historical saves valid; only authored CopyProductionTaskIds may persist.
+   */
+  routinePriority?: CopyProductionTaskId[];
   
   // The current task the copy is assigned to (optional)
   currentTask?: string;
