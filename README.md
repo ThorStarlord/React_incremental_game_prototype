@@ -10,7 +10,10 @@ Post-M25 GameLoop Timing Hardening: COMPLETE / INTEGRATED
 Post-M25 Content Intelligence: COMPLETE / INTEGRATED
 Three heterogeneous chapter-scale projections: QUALIFIED / INTEGRATED
 Player Insight + Product-Depth Packages: COMPLETE / INTEGRATED
-Human Integrated Playability / Product Review: DEFERRED / UNPROVEN
+Product Direction Decision Readiness: COMPLETE / INTEGRATED
+Three-Chapter Friction Audit: COMPLETE / CLOSED
+Chapter-Definition Integrity Repair: COMPLETE / INTEGRATED
+Human Integrated Playability / Product Review: OPEN HUMAN AUTHORITY GATE / UNPROVEN
 Product Direction Decision: PENDING
 M26: NOT AUTHORIZED
 ```
@@ -24,6 +27,7 @@ The strongest integrated product pattern is:
 ```text
 meaningful active play
 -> Relationship / Knowledge / Faction / World consequences
+-> understandable causal memory
 -> durable relationship-derived capabilities
 -> higher-order tactical and social decisions
 -> understood routine
@@ -37,12 +41,14 @@ Post-M25 development has added:
 - developer-side content integrity, dependency/reachability analysis, and route tracing;
 - three heterogeneous chapter-scale projections over canonical domain state: **Merchant District Crisis**, **Archive Inquiry**, and **Enemies in Phase**;
 - a bounded Rule-of-Two chapter-requirement helper rather than a generalized `ChapterEngine` or narrative DSL;
+- chapter identity derived from canonical definitions plus `chapter:validate` integrity checking for route/reference errors across the bounded runtime dialogue and Relationship content sources;
 - read-only **Player Insight** surfaces: Causal Journal, Opportunity Map, and Relationship-Derived Build;
 - contextual `Available because` explanations for already-visible dialogue choices without exposing locked future prerequisites;
 - cross-domain semantic Trait use, including `ScholarlyInsight` in investigation and tactical combat while baseline solutions remain viable;
-- player-authored Copy routine priorities over the existing M20 production-task allowlist, with explicit `Start Preferred` delegation and **no automatic task chaining**.
+- player-authored Copy routine priorities over the existing M20 production-task allowlist, with explicit `Start Preferred` delegation and **no automatic task chaining**;
+- a Product Direction Decision Readiness record that compares the demonstrated identities without promoting repository evidence into a final product decision.
 
-The candidate product thesis remains: incremental automation should compress **understood repetition**, not replace discovery, interpretation, tactical choice, social choice, or irreversible player agency.
+The leading synthesis remains a **hypothesis**: incremental automation should compress **understood repetition**, while causal state and relationship-derived capabilities preserve meaningful long-horizon change and irreversible player agency.
 
 ## Documentation map
 
@@ -52,8 +58,9 @@ Do not infer authority from file age, folder depth, or detail. Read in this orde
 2. [`docs/CURRENT.md`](docs/CURRENT.md) — canonical classification: **CURRENT AUTHORITY / REFERENCE / HISTORICAL EVIDENCE / SUPERSEDED**.
 3. [`RUNBOOK.md`](RUNBOOK.md) — setup, validation, CI, diagnostics, exact-head qualification, and integration procedure.
 4. [`specification/README.md`](specification/README.md) — technical/product authority map and domain-specific source chain.
-5. [`specification/Technical/PostM25ImplementationRoadmap.md`](specification/Technical/PostM25ImplementationRoadmap.md) — reconciled accounting of post-M25 hypotheses versus delivered work.
-6. Specific current contract/result documents linked from those indexes.
+5. [`specification/Technical/PostM25ProductDirectionDecisionReadiness.md`](specification/Technical/PostM25ProductDirectionDecisionReadiness.md) — current decision-preparation record; it does not select final Product Direction.
+6. [`specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md`](specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md) — integrated result of the closed three-chapter friction audit repair queue.
+7. Specific current contract/result documents linked from those indexes.
 
 `README.md` is orientation, not final authority for disputed implementation, product, or evidence questions.
 
@@ -109,12 +116,14 @@ The development app is served at `http://localhost:3000` by default.
 
 ```bash
 npm run docs:authority:validate
+npm run content:intelligence:validate
+npm run chapter:validate
 npx tsc --noEmit
 CI=true npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
-Focused post-M25 and subsystem commands are documented in [`RUNBOOK.md`](RUNBOOK.md).
+`chapter:validate` is included by `content:intelligence:validate`; the standalone command is useful for focused diagnosis. Focused post-M25 and subsystem commands are documented in [`RUNBOOK.md`](RUNBOOK.md).
 
 The authoritative pull-request workflow is:
 
@@ -132,10 +141,10 @@ latest main
 -> docs/CURRENT.md
 -> RUNBOOK.md
 -> specification/README.md
--> PostM25ImplementationRoadmap.md when relevant
 -> affected current contract/result documents
+-> issue #109 for human Product Review evidence
 -> fresh bottleneck reconciliation
 -> bounded package with explicit evidence ceiling
 ```
 
-Do not restart completed post-M25 packages from historical queues, and do not infer M26 authorization from technical green tests alone.
+The three-chapter friction audit's R1–R3 queue is closed. Do not restart completed post-M25 packages from historical records, do not fabricate human Product Review evidence, and do not infer M26 authorization from technical green tests alone.
