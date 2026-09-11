@@ -1,16 +1,15 @@
 import React, { useMemo } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Card, 
-  CardContent, 
-  Alert, 
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Alert,
   AlertTitle,
   Chip,
   LinearProgress,
   Stack,
-  Divider,
   Paper,
   List,
   ListItem,
@@ -18,7 +17,7 @@ import {
   ListItemText,
   ListItemSecondaryAction
 } from '@mui/material';
-import { 
+import {
   Person as PersonIcon,
   Star as StarIcon,
   Group as GroupIcon,
@@ -30,9 +29,8 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 
-// App hooks and selectors
 import { useAppSelector } from '../app/hooks';
-import { 
+import {
   selectPlayerHealth,
   selectPlayerMaxHealth,
   selectPlayerMana,
@@ -40,19 +38,15 @@ import {
   selectAvailableAttributePoints,
   selectIsPlayerAlive,
   selectResonanceLevel,
-  selectPermanentTraits // Added import for permanent traits
+  selectPermanentTraits,
+  selectEquippedTraits
 } from '../features/Player/state/PlayerSelectors';
 import { selectEssence } from '../features/Essence/state/EssenceSelectors';
 import { selectGameLoop } from '../features/GameLoop/state/GameLoopSelectors';
-import { selectEquippedTraits } from '../features/Player/state/PlayerSelectors';
 import { selectTraitsState } from '../features/Traits/state/TraitsSelectors';
-
-// Feature components
 import { GameControlPanel } from '../features/GameLoop/components/ui/GameControlPanel';
+import { PlayerInsightPanel } from '../features/Story/components/PlayerInsightPanel';
 
-/**
- * Interface for dashboard stat cards
- */
 interface DashboardStatCard {
   title: string;
   value: string | number;
@@ -62,9 +56,6 @@ interface DashboardStatCard {
   progress?: number;
 }
 
-/**
- * Interface for quick action items
- */
 interface QuickActionItem {
   label: string;
   value: string;
@@ -72,21 +63,9 @@ interface QuickActionItem {
   color?: 'primary' | 'secondary' | 'success' | 'warning' | 'error';
 }
 
-/**
- * DashboardPage component - Main overview page displaying key game information
- * 
- * Features:
- * - Player status overview with vital stats and progression
- * - Resource summaries with generation rates
- * - Game controls with timing information
- * - Quick navigation to other systems
- * - Performance metrics and achievements
- * - Recent activity summary
- */
 export const DashboardPage: React.FC = React.memo(() => {
   const theme = useTheme();
-  
-  // Redux state selection
+
   const health = useAppSelector(selectPlayerHealth);
   const maxHealth = useAppSelector(selectPlayerMaxHealth);
   const mana = useAppSelector(selectPlayerMana);
@@ -98,9 +77,8 @@ export const DashboardPage: React.FC = React.memo(() => {
   const gameLoop = useAppSelector(selectGameLoop);
   const traits = useAppSelector(selectEquippedTraits);
   const traitsState = useAppSelector(selectTraitsState);
-  const permanentTraits = useAppSelector(selectPermanentTraits); // Get permanent traits
+  const permanentTraits = useAppSelector(selectPermanentTraits);
 
-  // Computed dashboard statistics
   const dashboardStats = useMemo((): DashboardStatCard[] => [
     {
       title: 'Current Essence',
@@ -125,7 +103,6 @@ export const DashboardPage: React.FC = React.memo(() => {
     }
   ], [essence, traits, traitsState, permanentTraits]);
 
-  // Quick action items
   const quickActions = useMemo((): QuickActionItem[] => [
     {
       label: 'Health',
@@ -153,25 +130,23 @@ export const DashboardPage: React.FC = React.memo(() => {
     }
   ], [health, maxHealth, mana, maxMana, availableAttributePoints, gameLoop]);
 
-  // Health percentage for progress bar
-  const healthPercentage = useMemo(() => 
-    (health / maxHealth) * 100,
+  const healthPercentage = useMemo(
+    () => (health / maxHealth) * 100,
     [health, maxHealth]
   );
 
-  // Mana percentage for progress bar
-  const manaPercentage = useMemo(() => 
-    (mana / maxMana) * 100,
+  const manaPercentage = useMemo(
+    () => (mana / maxMana) * 100,
     [mana, maxMana]
   );
 
   return (
     <Box sx={{ py: 3 }}>
-      <Typography 
-        variant="h4" 
-        component="h1" 
+      <Typography
+        variant="h4"
+        component="h1"
         gutterBottom
-        sx={{ 
+        sx={{
           mb: 3,
           fontWeight: 600,
           color: theme.palette.primary.main
@@ -179,9 +154,8 @@ export const DashboardPage: React.FC = React.memo(() => {
       >
         Game Dashboard
       </Typography>
-      
+
       <Grid container spacing={3}>
-        {/* Game Controls Section */}
         <Grid item xs={12} lg={6}>
           <Card elevation={2}>
             <CardContent>
@@ -190,8 +164,8 @@ export const DashboardPage: React.FC = React.memo(() => {
                 <Typography variant="h6" component="h2">
                   Game Controls
                 </Typography>
-                <Chip 
-                  label={gameLoop.isRunning ? 'Running' : 'Stopped'} 
+                <Chip
+                  label={gameLoop.isRunning ? 'Running' : 'Stopped'}
                   color={gameLoop.isRunning ? 'success' : 'default'}
                   size="small"
                 />
@@ -201,7 +175,6 @@ export const DashboardPage: React.FC = React.memo(() => {
           </Card>
         </Grid>
 
-        {/* Character Vitals Section */}
         <Grid item xs={12} lg={6}>
           <Card elevation={2}>
             <CardContent>
@@ -210,38 +183,38 @@ export const DashboardPage: React.FC = React.memo(() => {
                 <Typography variant="h6" component="h2">
                   Character Vitals
                 </Typography>
-                <Chip 
-                  label={isAlive ? 'Alive' : 'Dead'} 
+                <Chip
+                  label={isAlive ? 'Alive' : 'Dead'}
                   color={isAlive ? 'success' : 'error'}
                   size="small"
                 />
               </Stack>
-              
+
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    <strong>Resonance Level {resonanceLevel}</strong> 
+                    <strong>Resonance Level {resonanceLevel}</strong>
                   </Typography>
-                  
+
                   <Box sx={{ mb: 1 }}>
                     <Typography variant="caption" color="text.secondary">
                       Health: {health}/{maxHealth} ({healthPercentage.toFixed(0)}%)
                     </Typography>
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={healthPercentage} 
+                    <LinearProgress
+                      variant="determinate"
+                      value={healthPercentage}
                       color={healthPercentage < 30 ? 'error' : healthPercentage < 70 ? 'warning' : 'success'}
                       sx={{ height: 8, borderRadius: 1 }}
                     />
                   </Box>
-                  
+
                   <Box>
                     <Typography variant="caption" color="text.secondary">
                       Mana: {mana}/{maxMana} ({manaPercentage.toFixed(0)}%)
                     </Typography>
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={manaPercentage} 
+                    <LinearProgress
+                      variant="determinate"
+                      value={manaPercentage}
                       color="primary"
                       sx={{ height: 8, borderRadius: 1 }}
                     />
@@ -252,7 +225,6 @@ export const DashboardPage: React.FC = React.memo(() => {
           </Card>
         </Grid>
 
-        {/* Dashboard Statistics */}
         {dashboardStats.map((stat, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card elevation={1} sx={{ height: '100%' }}>
@@ -263,21 +235,21 @@ export const DashboardPage: React.FC = React.memo(() => {
                     {stat.title}
                   </Typography>
                 </Stack>
-                
+
                 <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
                   {stat.value}
                 </Typography>
-                
+
                 {stat.subtitle && (
                   <Typography variant="caption" color="text.secondary">
                     {stat.subtitle}
                   </Typography>
                 )}
-                
+
                 {stat.progress !== undefined && (
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={stat.progress} 
+                  <LinearProgress
+                    variant="determinate"
+                    value={stat.progress}
                     color={stat.color}
                     sx={{ mt: 1, height: 4, borderRadius: 1 }}
                   />
@@ -287,27 +259,26 @@ export const DashboardPage: React.FC = React.memo(() => {
           </Grid>
         ))}
 
-        {/* Resources Overview */}
         <Grid item xs={12} md={6}>
           <Card elevation={2}>
             <CardContent>
               <Typography variant="h6" component="h2" gutterBottom>
                 Resources Overview
               </Typography>
-              
+
               <List dense>
                 {quickActions.map((action, index) => (
                   <ListItem key={index} divider={index < quickActions.length - 1}>
                     <ListItemIcon>
                       <action.icon color={action.color} fontSize="small" />
                     </ListItemIcon>
-                    <ListItemText 
+                    <ListItemText
                       primary={action.label}
                       primaryTypographyProps={{ variant: 'body2' }}
                     />
                     <ListItemSecondaryAction>
-                      <Chip 
-                        label={action.value} 
+                      <Chip
+                        label={action.value}
                         color={action.color}
                         size="small"
                         variant="outlined"
@@ -320,7 +291,6 @@ export const DashboardPage: React.FC = React.memo(() => {
           </Card>
         </Grid>
 
-        {/* Quick Navigation */}
         <Grid item xs={12} md={6}>
           <Card elevation={2}>
             <CardContent>
@@ -330,12 +300,12 @@ export const DashboardPage: React.FC = React.memo(() => {
                   Quick Navigation
                 </Typography>
               </Stack>
-              
+
               <Alert severity="info" sx={{ mb: 2 }}>
                 <AlertTitle>Navigation Guide</AlertTitle>
                 Use the sidebar navigation to access different game systems:
               </Alert>
-              
+
               <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
                 <Grid container spacing={2}>
                   <Grid item xs={6} sm={3}>
@@ -349,7 +319,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                       </Typography>
                     </Stack>
                   </Grid>
-                  
+
                   <Grid item xs={6} sm={3}>
                     <Stack alignItems="center" spacing={1}>
                       <StarIcon color="secondary" fontSize="large" />
@@ -361,7 +331,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                       </Typography>
                     </Stack>
                   </Grid>
-                  
+
                   <Grid item xs={6} sm={3}>
                     <Stack alignItems="center" spacing={1}>
                       <GroupIcon color="warning" fontSize="large" />
@@ -373,7 +343,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                       </Typography>
                     </Stack>
                   </Grid>
-                  
+
                   <Grid item xs={6} sm={3}>
                     <Stack alignItems="center" spacing={1}>
                       <EssenceIcon color="info" fontSize="large" />
@@ -391,14 +361,17 @@ export const DashboardPage: React.FC = React.memo(() => {
           </Card>
         </Grid>
 
-        {/* Game Statistics */}
+        <Grid item xs={12}>
+          <PlayerInsightPanel />
+        </Grid>
+
         <Grid item xs={12}>
           <Card elevation={2}>
             <CardContent>
               <Typography variant="h6" component="h2" gutterBottom>
                 Session Statistics
               </Typography>
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
                   <Stack alignItems="center" spacing={1}>
@@ -410,7 +383,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                     </Typography>
                   </Stack>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={4}>
                   <Stack alignItems="center" spacing={1}>
                     <Typography variant="h4" color="secondary.main" fontWeight={600}>
@@ -421,7 +394,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                     </Typography>
                   </Stack>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={4}>
                   <Stack alignItems="center" spacing={1}>
                     <Typography variant="h4" color="success.main" fontWeight={600}>
@@ -441,14 +414,11 @@ export const DashboardPage: React.FC = React.memo(() => {
   );
 });
 
-/**
- * Format game time from milliseconds to human-readable format
- */
 function formatGameTime(milliseconds: number): string {
   const seconds = Math.floor(milliseconds / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
-  
+
   if (hours > 0) {
     return `${hours}h ${minutes % 60}m`;
   } else if (minutes > 0) {
