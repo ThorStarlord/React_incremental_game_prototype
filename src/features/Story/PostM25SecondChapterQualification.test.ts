@@ -127,11 +127,13 @@ describe('post-M25 second heterogeneous chapter qualification', () => {
     expect(progress.completedRouteId).toBe('evidence_over_ownership');
     expect(progress.routes.find(route => route.id === 'cautious_then_reopened')?.satisfied).toBe(false);
 
-    const memoryIds = selectRelationshipMemoriesByNpcId(store.getState(), ELARA_ID)
-      .map(memory => memory.id);
-    expect(memoryIds).toContain('elara_memory_footnote_won');
-    expect(memoryIds).toContain('elara_memory_theory_neither_owned');
-    expect(memoryIds).toContain('elara_memory_result_held_without_her');
+    const memoryTitles = selectRelationshipMemoriesByNpcId(store.getState(), ELARA_ID)
+      .map(memory => memory.title);
+    expect(memoryTitles).toEqual(expect.arrayContaining([
+      'The Footnote That Won',
+      'A Theory Neither Owned',
+      'The Result Held Without Her',
+    ]));
 
     await acquireInsight(store);
   });
@@ -147,11 +149,14 @@ describe('post-M25 second heterogeneous chapter qualification', () => {
     expect(progress.completedRouteId).toBe('cautious_then_reopened');
     expect(progress.routes.find(route => route.id === 'evidence_over_ownership')?.satisfied).toBe(false);
 
-    const memoryIds = selectRelationshipMemoriesByNpcId(store.getState(), ELARA_ID)
-      .map(memory => memory.id);
-    expect(memoryIds).not.toContain('elara_memory_footnote_won');
-    expect(memoryIds).toContain('elara_memory_theory_neither_owned');
-    expect(memoryIds).toContain('elara_memory_result_held_without_her');
+    const memories = selectRelationshipMemoriesByNpcId(store.getState(), ELARA_ID);
+    const memoryTitles = memories.map(memory => memory.title);
+    expect(memoryTitles).not.toContain('The Footnote That Won');
+    expect(memoryTitles).toEqual(expect.arrayContaining([
+      'A Theory Neither Owned',
+      'The Result Held Without Her',
+    ]));
+    expect(memories.some(memory => memory.resonanceTags.includes('IndependentVerification'))).toBe(true);
 
     await acquireInsight(store);
   });
