@@ -71,9 +71,21 @@ jobs:
         env:
           CI: true
 
+      - name: Async tick backlog policy contract qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopAsyncTickBacklogPolicyContract.test.tsx
+        env:
+          CI: true
+
       - name: Bounded backlog control repair qualification
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopBoundedBacklogControlRepair.test.tsx
+        env:
+          CI: true
+
+      - name: Lifecycle remainder policy qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopSubStepRestartSaveResumePreflight.test.tsx GameLoopLifecycleRemainderPolicy.test.ts
         env:
           CI: true
 
