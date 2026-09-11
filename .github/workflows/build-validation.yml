@@ -71,6 +71,12 @@ jobs:
         env:
           CI: true
 
+      - name: Lifecycle remainder policy qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopSubStepRestartSaveResumePreflight.test.tsx GameLoopLifecycleRemainderPolicy.test.ts
+        env:
+          CI: true
+
       - name: Cross-progression tick determinism characterization
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
