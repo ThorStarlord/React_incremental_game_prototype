@@ -316,6 +316,30 @@ function createPrompt() {
   };
 }
 
+async function waitForControlSetTransition(page, deliveredObservation, timeoutMs = 5000) {
+  const deadline = Date.now() + timeoutMs;
+  let lastValidation = null;
+
+  while (Date.now() < deadline) {
+    const entries = await collectControlEntries(page);
+    lastValidation = validateBoundAction(
+      deliveredObservation.controls[0].actionId,
+      deliveredObservation,
+      entries.map((entry) => entry.metadata)
+    );
+    if (!lastValidation.ok) return { entries, validation: lastValidation };
+    await page.waitForTimeout(100);
+  }
+
+  const entries = await collectControlEntries(page);
+  lastValidation = validateBoundAction(
+    deliveredObservation.controls[0].actionId,
+    deliveredObservation,
+    entries.map((entry) => entry.metadata)
+  );
+  return { entries, validation: lastValidation };
+}
+
 async function runSmoke(page, state) {
   const first = await captureObservation(page, state);
   if (!first.visibleText.length) throw new Error('Smoke failure: no rendered visible text.');
@@ -331,11 +355,19 @@ async function runSmoke(page, state) {
 
   const result = await executeCommand(page, `click ${validAction}`, state);
   if (!result.changed) throw new Error('Smoke failure: valid action did not execute.');
-  await page.waitForTimeout(400);
 
-  const afterEntries = await collectControlEntries(page);
-  const stale = validateBoundAction(validAction, first, afterEntries.map((entry) => entry.metadata));
-  if (stale.ok) throw new Error('Smoke failure: stale action remained valid after UI transition.');
+  // The first control currently launches an async New Game flow. A fixed sleep
+  // makes stale-action qualification depend on CI speed rather than the UI-only
+  // contract. Poll ordinary visible controls until the action binding becomes
+  // stale/mismatched, while preserving the same bounded fail-closed assertion.
+  const transition = await waitForControlSetTransition(page, first);
+  const stale = transition.validation;
+  if (stale.ok) {
+    throw new Error('Smoke failure: valid action produced no observable control-set transition within 5000ms.');
+  }
+  if (stale.code !== 'ACTION_REJECTED_STALE_OR_MISMATCHED') {
+    throw new Error(`Smoke failure: unexpected stale-action rejection code ${stale.code}.`);
+  }
 
   const second = await captureObservation(page, state);
   console.log(`SIMULATED_REVIEW_V2_LIVE_SMOKE_PASS observations=${second.sequence} firstControls=${first.controls.length} staleCode=${stale.code}`);
