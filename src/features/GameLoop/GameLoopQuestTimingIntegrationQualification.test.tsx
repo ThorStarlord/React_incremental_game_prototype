@@ -226,11 +226,11 @@ describe('Package 3 Quest timing integration qualification', () => {
 
     expect(snapshot.currentTick).toBe(15);
     expect(snapshot.totalGameTime).toBeCloseTo(1500, 8);
-    // Repeated decimal fixed steps can undershoot the authored threshold by
-    // floating-point epsilon. Qualify the existing >= contract by requiring
-    // failure on the first crossing step, bounded to one 100 ms step beyond it.
-    expect(snapshot.elapsedSeconds).toBeGreaterThanOrEqual(1);
-    expect(snapshot.elapsedSeconds).toBeLessThanOrEqual(1.1);
+    // The comparison-time precision contract treats machine-noise undershoot
+    // as the authored threshold while preserving the raw accumulated timer.
+    expect(snapshot.elapsedSeconds).toBeLessThanOrEqual(1);
+    expect(1 - snapshot.elapsedSeconds).toBeGreaterThanOrEqual(0);
+    expect(1 - snapshot.elapsedSeconds).toBeLessThanOrEqual(Number.EPSILON);
     expect(snapshot.status).toBe('FAILED');
     expect(snapshot.active).toBe(false);
     expect(snapshot.failureNotifications).toBe(1);
