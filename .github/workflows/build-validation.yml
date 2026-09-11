@@ -76,6 +76,10 @@ jobs:
       - name: Synthetic review V2 action-binding qualification
         run: npm run simulated-review:action-contract
 
+      - name: M26 provisional learn-to-delegate qualification
+        timeout-minutes: 8
+        run: npm run m26:validate
+
       - name: Type check
         id: typecheck
         shell: bash
