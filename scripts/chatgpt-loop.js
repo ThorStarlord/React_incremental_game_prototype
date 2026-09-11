@@ -6,6 +6,7 @@
  *   2. Chess-mentor-engine
  *   3. sensemaking-skills
  *   4. ViralFactory
+ *   5. Auteur
  *
  * Lifecycle per Repository Milestone:
  *   1. Initial Prompt (Audit & 3-Package Queue)
@@ -72,42 +73,60 @@ function buildInitialPrompt(repo) {
 @github Reconcile and audit repository "${repo.name}".
 Objective: ${repo.objective}
 
-PHASE 1: RECONCILIATION & AUDIT
-1. Read the latest 'main' branch, recent commits, and our handoff document ('STATUS.md' or 'HANDOFF.md') to inspect the current state.
-2. Determine the true active bottleneck.
-3. Classify pending work into these zones:
+PHASE 1: RECONCILIATION & VERSION 1.0 GAP ANALYSIS
+1. Read the latest 'main' branch, recent commits, and our handoff document ('STATUS.md' or 'HANDOFF.md') to reconstruct current repository reality.
+2. Evaluate Version 1.0 readiness by answering:
+   "What is missing for this repository to reach Version 1.0 — where its architecture is coherent, the known design debt is resolved, and it is stable enough to be released?"
+   - Identify only gaps genuinely required for Version 1.0 and support them with current repository evidence.
+   - Distinguish true Version 1.0 blockers from optional enhancements, future features, polish, experimentation, and post-V1 opportunities.
+   - Do not infer missing work merely because additional improvement is possible.
+3. Determine the highest-priority remaining Version 1.0 bottleneck.
+4. Classify each remaining Version 1.0 gap into these zones:
    - REPOSITORY_ONLY: pure code, tests, refactors, fixtures, documentation, and local tooling.
    - HERMETIC_VALIDATION: mocks, dry-run integrations, synthetic data/assets, local runners, and failure simulations.
-   - EXTERNAL_AUTHORITY: real credentials, paid services, live external calls, deployments, destructive migrations, subjective approval, or production QA.
+   - EXTERNAL_AUTHORITY: real credentials, paid services, live external calls, deployments, destructive migrations, subjective approval, production QA, or owner-reserved product decisions.
+
+TERMINAL CONDITIONS
+- If no repository-resolvable Version 1.0 gaps remain and Version 1.0 readiness can be determined from repository evidence, do not invent new work and do not output a Work Package Queue.
+  Output this exact standalone line:
+  STATUS: VERSION_1_REPOSITORY_READY
+  Then list any remaining EXTERNAL_AUTHORITY release validation separately and stop.
+- If a required Version 1.0 blocker remains but progress or readiness determination requires unavailable human/external evidence or an owner-reserved decision, do not invent substitute work and do not output a Work Package Queue.
+  Output this exact standalone line followed by the reason:
+  STATUS: AWAITING_HUMAN_EVIDENCE: [reason]
+  Then stop.
 
 PHASE 2: WORK PACKAGE QUEUE (UP TO 3 PACKAGES)
-Propose UP TO 3 bounded work packages that advance the objective.
-If external work is blocked, choose REPOSITORY_ONLY or HERMETIC_VALIDATION work instead. Do not attempt the external action.
-Only output "STATUS: AWAITING_HUMAN_EVIDENCE: [reason]" if no meaningful bounded repository-only or hermetic validation work remains.
+Only reach this phase when repository-resolvable Version 1.0 gaps remain.
+Propose UP TO 3 bounded work packages that close the highest-priority remaining Version 1.0 gaps.
+Do not create packages solely because additional improvements are possible.
+If external work is blocked but repository-only or hermetic work can still close a required Version 1.0 gap, choose that work instead and defer the external action.
 Every package must state what changes locally, how it will be verified without external credentials, and what external step remains deferred, if any.
 
 ### Work Package Queue
-- [ ] Package 1: [Short Title] - [Deliverable & Target Checkpoint]
-- [ ] Package 2: [Short Title] - [Deliverable & Target Checkpoint]
-- [ ] Package 3: [Short Title] - [Deliverable & Target Checkpoint]
+- [ ] Package 1: [Short Title] - [Version 1.0 Gap Closed & Target Checkpoint]
+- [ ] Package 2: [Short Title] - [Version 1.0 Gap Closed & Target Checkpoint]
+- [ ] Package 3: [Short Title] - [Version 1.0 Gap Closed & Target Checkpoint]
 
 CRITICAL: DO NOT write code, create branches, or open PRs yet. Confirm readiness and wait for my signal to start Package 1.
 `.trim();
 }
 
 const FOLLOWUP_PROMPT = `
-ACTION: Implement the NEXT pending [ ] package from our Work Package Queue.
+ACTION: Reconcile and process the NEXT pending [ ] Version 1.0 package from our Work Package Queue.
 
 WORKFLOW:
-1. PULL: Sync with latest 'main'.
-2. BRANCH: Create branch "work/<short-package-name>".
+1. PULL & RECONCILE: Sync with latest 'main' and confirm the NEXT pending package is still required by current repository reality and the Version 1.0 target.
+   - If that package is already satisfied, obsolete, or made unnecessary by earlier work, mark it [x] as RECONCILED_NO_CHANGE.
+   - Do not replace an obsolete package with optional, speculative, or post-V1 work in this turn.
+2. BRANCH: If implementation is still warranted, create branch "work/<short-package-name>".
 3. IMPLEMENT: Apply changes for THIS PACKAGE ONLY. Run native stack checks AND negative/rejection tests.
    - Keep the work REPOSITORY_ONLY or HERMETIC_VALIDATION.
    - Do not use production credentials, call live external services, deploy infrastructure, perform destructive migrations, or make subjective production claims.
 4. QUALIFY & MERGE:
    - Commit and push. Open PR into 'main'.
    - MERGE READINESS: Merge immediately ONLY IF all tests/CI pass on the candidate head. Otherwise leave PR open.
-5. STATUS: Output the updated Feature Queue with [x] for completed and [ ] for pending/blocked.
+5. STATUS: Output the updated Work Package Queue with [x] for completed/reconciled and [ ] for pending/blocked.
 6. STOP: Halt execution here. Do NOT start the next package.
 `.trim();
 
@@ -178,7 +197,13 @@ const SEND_SELECTORS = [
 ];
 
 const STOP_SELECTOR_COMBINED = 'button[data-testid="stop-button"], button[aria-label*="Stop"]';
+const ASSISTANT_MESSAGE_SELECTORS = [
+  '[data-message-author-role="assistant"]'
+];
 const REQUIRED_IDLE_MS = 6_000;
+
+const VERSION_1_READY_STATUS = "STATUS: VERSION_1_REPOSITORY_READY";
+const AWAITING_HUMAN_STATUS_PREFIX = "STATUS: AWAITING_HUMAN_EVIDENCE";
 
 const NEW_CHAT_SELECTORS = [
   '[data-testid="new-chat-button"]',
@@ -374,6 +399,53 @@ async function sendPrompt(page, text) {
   await waitForComposerCleared(page, composer);
 }
 
+function normalizeStatusLine(line) {
+  return line
+    .trim()
+    .replace(/^[-#>*`\s]+/, "")
+    .replace(/[`*_]+/g, "")
+    .trim();
+}
+
+function detectTerminalStatus(answerText) {
+  const lines = String(answerText || "").split(/\r?\n/).map(normalizeStatusLine);
+
+  for (const line of lines) {
+    if (line === VERSION_1_READY_STATUS) return VERSION_1_READY_STATUS;
+    if (line.startsWith(`${AWAITING_HUMAN_STATUS_PREFIX}:`)) return line;
+  }
+
+  return null;
+}
+
+async function readLatestAssistantText(page, timeoutMs = 15_000) {
+  const deadline = Date.now() + timeoutMs;
+  let lastError = null;
+
+  while (Date.now() < deadline) {
+    for (const selector of ASSISTANT_MESSAGE_SELECTORS) {
+      try {
+        const messages = page.locator(selector);
+        const count = await messages.count();
+        if (count === 0) continue;
+
+        for (let i = count - 1; i >= 0; i--) {
+          const message = messages.nth(i);
+          if (!(await message.isVisible())) continue;
+          const text = (await message.innerText()).trim();
+          if (text) return text;
+        }
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    await page.waitForTimeout(250);
+  }
+
+  throw new Error(`Could not read the latest assistant response. Last error: ${lastError?.message || "none"}`);
+}
+
 async function waitForAnswer(page) {
   if (page.isClosed()) throw new Error("Cannot wait for an answer on a closed page.");
 
@@ -457,6 +529,7 @@ async function waitForAnswer(page) {
 
   await page.waitForTimeout(SETTLE_DELAY_MS);
   console.log("[wait] Answer complete and verified.");
+  return readLatestAssistantText(page);
 }
 
 async function createRepositoryPages(firstPage) {
@@ -472,18 +545,26 @@ async function createRepositoryPages(firstPage) {
       await waitForLogin(page);
     }
 
-    sessions.push({ repo, page });
+    sessions.push({ repo, page, failed: false, terminalStatus: null });
     console.log(`[tab ${index + 1}/${REPOSITORIES.length}] Ready for ${repo.name}.`);
   }
 
   return sessions;
 }
 
-async function initializeRepository({ repo, page }) {
+async function initializeRepository(session) {
+  const { repo, page } = session;
   await startFreshChat(page);
   await sendPrompt(page, buildInitialPrompt(repo));
-  console.log(`[sent] Initial audit prompt sent to ${repo.id}.`);
-  await waitForAnswer(page);
+  console.log(`[sent] Initial Version 1.0 audit prompt sent to ${repo.id}.`);
+  const answerText = await waitForAnswer(page);
+
+  const terminalStatus = detectTerminalStatus(answerText);
+  if (terminalStatus) {
+    session.terminalStatus = terminalStatus;
+    console.log(`[terminal] ${repo.name}: ${terminalStatus}`);
+  }
+
   await page.waitForTimeout(COOLDOWN_DELAY_MS);
 }
 
@@ -506,7 +587,7 @@ async function runHandoff({ repo, page }) {
 }
 
 async function runParallelStage(label, sessions, worker) {
-  const activeSessions = sessions.filter(session => !session.failed);
+  const activeSessions = sessions.filter(session => !session.failed && !session.terminalStatus);
   console.log(`\n=== ${label} (${activeSessions.length} tabs in parallel) ===`);
   const results = await Promise.allSettled(activeSessions.map(worker));
   const failures = [];
@@ -549,6 +630,12 @@ async function runMilestoneCycle(sessions, cycleNumber) {
     console.error("\n[summary] Some tabs were quarantined and did not receive later prompts:");
     failedSessions.forEach(session => console.error(`  - ${session.repo.name}`));
   }
+
+  const terminalSessions = sessions.filter(session => session.terminalStatus);
+  if (terminalSessions.length > 0) {
+    console.log("\n[summary] Terminal repositories removed from future milestone stages:");
+    terminalSessions.forEach(session => console.log(`  - ${session.repo.name}: ${session.terminalStatus}`));
+  }
 }
 
 async function runRepositories(firstPage) {
@@ -557,10 +644,20 @@ async function runRepositories(firstPage) {
 
   while (!stopRequested) {
     await runMilestoneCycle(sessions, cycleNumber);
+
+    const remainingSessions = sessions.filter(session => !session.terminalStatus);
+    if (remainingSessions.length === 0) {
+      console.log("\n[complete] Every enabled repository reached a terminal Version 1.0 state. Autonomous loop finished.");
+      break;
+    }
+
     cycleNumber++;
 
     if (!stopRequested) {
-      console.log(`\n[cycle] Cycle complete. Starting the next milestone in ${CYCLE_COOLDOWN_MS / 1000}s.`);
+      console.log(
+        `\n[cycle] Cycle complete. ${remainingSessions.length} repository/repositories still actionable. ` +
+        `Starting the next milestone in ${CYCLE_COOLDOWN_MS / 1000}s.`
+      );
       await firstPage.waitForTimeout(CYCLE_COOLDOWN_MS);
     }
   }
