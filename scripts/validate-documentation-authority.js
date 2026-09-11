@@ -25,6 +25,17 @@ function requireContains(relativePath, needles) {
   }
 }
 
+const completionAuthorityFiles = [
+  'specification/GameCompletionDefinition.md',
+  'specification/Features/FeatureScopeMatrix.md',
+  'specification/Progression/GameProgressionArc.md',
+  'specification/Narrative/CampaignArchitecture.md',
+  'specification/Technical/GameCompletionRoadmap.md',
+  'specification/Technical/AlphaCompletionContract.md',
+  'specification/Technical/BetaCompletionContract.md',
+  'specification/Technical/ReleaseQualificationContract.md',
+];
+
 const requiredAuthorityFiles = [
   'docs/CURRENT.md',
   'docs/README.md',
@@ -32,6 +43,10 @@ const requiredAuthorityFiles = [
   'STATUS.md',
   'RUNBOOK.md',
   'specification/README.md',
+  ...completionAuthorityFiles,
+  'specification/Technical/PostM25ProvisionalGovernanceDecision.md',
+  'specification/Technical/PostM25ProvisionalProductDirectionDecision.md',
+  'specification/Technical/M26ProvisionalProductDepthResult.md',
   'specification/Technical/M25CompleteChapterVerticalSliceResult.md',
   'specification/Technical/PostM25ProductDirection.md',
   'specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md',
@@ -66,6 +81,16 @@ if (exists('docs/CURRENT.md')) {
     'STATUS.md',
     'RUNBOOK.md',
     'specification/README.md',
+    'GameCompletionDefinition.md',
+    'FeatureScopeMatrix.md',
+    'GameProgressionArc.md',
+    'CampaignArchitecture.md',
+    'GameCompletionRoadmap.md',
+    'AlphaCompletionContract.md',
+    'BetaCompletionContract.md',
+    'ReleaseQualificationContract.md',
+    'PostM25ProvisionalProductDirectionDecision.md',
+    'M26ProvisionalProductDepthResult.md',
     'GameLoopAsyncTickBacklogPolicyContract.md',
     'GameLoopLifecycleRemainderPolicy.md',
     'M25CompleteChapterVerticalSliceResult.md',
@@ -76,16 +101,84 @@ if (exists('docs/CURRENT.md')) {
   ]);
 }
 
-for (const entrypoint of ['README.md', 'STATUS.md', 'RUNBOOK.md']) {
-  requireContains(entrypoint, ['docs/CURRENT.md']);
-}
+requireContains('STATUS.md', [
+  'PLAYABLE PRE-ALPHA',
+  'GameCompletionDefinition.md',
+  'FeatureScopeMatrix.md',
+  'GameCompletionRoadmap.md',
+  'M26',
+  'issue #109',
+]);
+
+requireContains('README.md', [
+  'Playable Pre-Alpha',
+  'GameCompletionDefinition.md',
+  'FeatureScopeMatrix.md',
+  'GameCompletionRoadmap.md',
+  'AlphaCompletionContract.md',
+  'BetaCompletionContract.md',
+  'ReleaseQualificationContract.md',
+]);
+
+requireContains('RUNBOOK.md', [
+  'docs/CURRENT.md',
+  'specification/GameCompletionDefinition.md',
+  'specification/Features/FeatureScopeMatrix.md',
+  'specification/Technical/GameCompletionRoadmap.md',
+  'npm run m26:validate',
+  'alpha:validate',
+  'release:validate',
+]);
+
+requireContains('specification/README.md', [
+  'Authority chain',
+  'GameCompletionDefinition.md',
+  'FeatureScopeMatrix.md',
+  'GameProgressionArc.md',
+  'CampaignArchitecture.md',
+  'GameCompletionRoadmap.md',
+  'AlphaCompletionContract.md',
+  'BetaCompletionContract.md',
+  'ReleaseQualificationContract.md',
+  'M26ProvisionalProductDepthResult.md',
+]);
+
+requireContains('specification/GameCompletionDefinition.md', [
+  'PLAYABLE PRE-ALPHA',
+  '1.0 stop condition',
+  'Campaign One',
+  'Telluric Echo',
+]);
+
+requireContains('specification/Features/FeatureScopeMatrix.md', [
+  'CORE_1_0',
+  'DEFER_POST_1_0',
+  'CUT',
+  'Separate Skills',
+  'General Crafting',
+]);
+
+requireContains('specification/Technical/GameCompletionRoadmap.md', [
+  'GC-00',
+  'GC-14',
+  'Alpha qualification',
+  'Release Candidate',
+  'No automatic M-number continuation',
+]);
+
+requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
+  'COMPLETE / INTEGRATED',
+  'Build Validation #340',
+  '7f306f3b6a69a27c250c1986df976cc518119821',
+]);
 
 requireContains('docs/README.md', ['CURRENT.md', 'HISTORICAL']);
-requireContains('specification/README.md', ['authority chain', 'current records']);
-requireContains('package.json', ['"docs:authority:validate"']);
+requireContains('package.json', ['"docs:authority:validate"', '"m26:validate"']);
 requireContains('.github/workflows/build-validation.yml', [
   'Documentation authority qualification',
   'npm run docs:authority:validate',
+  'M26 provisional learn-to-delegate qualification',
+  'npm run m26:validate',
 ]);
 
 if (exists('.github/workflows/gemini-review.yml')) {

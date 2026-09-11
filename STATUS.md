@@ -1,239 +1,162 @@
-# Repository Status — Post-M25 Decision-Readiness Integrated State
+# Repository Status — Playable Pre-Alpha / Campaign One Completion
 
 **Status date:** 2026-09-11  
-**Current integrated implementation baseline:** `5bdf808154a62bdb85c1bee55777f9be35f1395e`  
-**M25 Complete Chapter Vertical Slice:** `PASS`  
-**Post-M25 GameLoop timing hardening:** `COMPLETE / INTEGRATED`  
-**Post-M25 content intelligence:** `COMPLETE / INTEGRATED`  
-**Second heterogeneous chapter:** `QUALIFIED / INTEGRATED`  
-**Player Insight projections:** `COMPLETE / INTEGRATED`  
-**Post-M25 product-depth packages:** `COMPLETE / INTEGRATED`  
-**Product Direction decision-readiness package:** `COMPLETE / INTEGRATED`  
-**Three-chapter friction audit:** `COMPLETE / CLOSED`  
-**Chapter-definition integrity repairs:** `COMPLETE / INTEGRATED`  
-**Human Integrated Playability / Product Review:** `OPEN HUMAN AUTHORITY GATE / UNPROVEN`  
-**Product Direction Decision:** `PENDING`  
-**M26:** `NOT AUTHORIZED`
+**Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
+**Current maturity:** `PLAYABLE PRE-ALPHA`  
+**Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
+**M26:** `COMPLETE / INTEGRATED`  
+**Human Product Review:** issue #109 `OPEN / UNPROVEN`  
+**Active program:** Campaign One / 1.0 Game Completion
 
-## Role of this file
+## Current authority
 
-`STATUS.md` is the current-state authority for the repository. It answers what is integrated, which contracts are binding, what evidence exists, what remains unproven, what work must not be restarted, and what decision should happen next.
+Read in this order:
 
-Read [`docs/CURRENT.md`](docs/CURRENT.md) for documentation classification and supersession, [`RUNBOOK.md`](RUNBOOK.md) for operating and qualification procedure, and [`specification/README.md`](specification/README.md) for the domain authority chain.
+1. [`docs/CURRENT.md`](docs/CURRENT.md)
+2. [`specification/GameCompletionDefinition.md`](specification/GameCompletionDefinition.md)
+3. [`specification/Features/FeatureScopeMatrix.md`](specification/Features/FeatureScopeMatrix.md)
+4. [`specification/Progression/GameProgressionArc.md`](specification/Progression/GameProgressionArc.md)
+5. [`specification/Narrative/CampaignArchitecture.md`](specification/Narrative/CampaignArchitecture.md)
+6. [`specification/Technical/GameCompletionRoadmap.md`](specification/Technical/GameCompletionRoadmap.md)
+7. relevant [`Alpha`](specification/Technical/AlphaCompletionContract.md) / [`Beta`](specification/Technical/BetaCompletionContract.md) / [`Release`](specification/Technical/ReleaseQualificationContract.md) contract
+8. [`RUNBOOK.md`](RUNBOOK.md) and [`specification/README.md`](specification/README.md)
 
-## Current repository state
+`STATUS.md` owns current state. The completion records above own the path to 1.0.
 
-The automated implementation program through M25 is complete. The later GameLoop timing-hardening milestone is complete and integrated. Subsequent post-M25 repository-only evolution has also been integrated without introducing a generalized chapter engine, narrative condition DSL, duplicate chapter state, or autonomous irreversible Copy planning.
+## Big picture
 
-The repository now includes:
+The project has passed proof-of-concept, technical-prototype and bounded vertical-slice stages. It has a runnable game shell, persistent saves/import-export, deterministic time, NPC/dialogue, quests, authored travel, combat, Relationship/Memory progression, Traits/Essence, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progress, three heterogeneous chapter-scale projections, and a qualified complete two-route chapter.
 
-- deterministic fixed-step GameLoop scheduling, serialized async backpressure, lifecycle remainder semantics, long-horizon timing qualification, comparison-only timed-Quest precision handling, and bounded M21 offline authority;
-- developer-side content integrity, dependency/reachability analysis, route tracing, and negative authoring self-tests;
-- three heterogeneous chapter-scale projections over existing domain authorities: **Merchant District Crisis**, **Archive Inquiry**, and **Enemies in Phase**;
-- a bounded shared chapter-requirement evaluator extracted by the Rule of Two, rather than a `ChapterEngine`;
-- chapter identity derived from canonical definitions rather than duplicated manually;
-- generic chapter-definition integrity qualification for unique chapter/route identity, non-empty/non-duplicate requirements, and valid Relationship Experience / completed-dialogue references;
-- a chapter validator whose completed-dialogue catalogue mirrors the bounded runtime source set: base dialogues plus M24/M25 dialogue extensions;
-- read-only **Player Insight** projections: Causal Journal, Opportunity Map, and Relationship-Derived Build;
-- contextual `Available because` explanations for already-visible dialogue topics, with locked content remaining fail-closed rather than becoming a spoiler list;
-- cross-domain semantic use of relationship-derived Traits, including `ScholarlyInsight` in both investigation/Quest and combat contexts while preserving permanent-Trait authority and baseline alternatives;
-- player-authored Copy routine priority over the existing M20 production-task allowlist, with explicit `Start Preferred` delegation through existing M20 eligibility and one-active-task authority; no automatic chaining;
-- a Product Direction Decision Readiness record comparing causal legibility, relationship-derived buildcraft, earned delegation, and heterogeneous composition without prematurely choosing a final product identity.
+It is therefore best described as a **Playable Pre-Alpha**: a real rudimentary game whose complete campaign, content breadth, human validation, polish and release qualification remain unfinished.
 
-## Current technical invariants
+## Product direction
 
-### `SERIAL_BACKPRESSURE_V1`
+Current provisional hierarchy:
 
 ```text
-elapsed live logical time
--> accumulator
--> admit at most one fixed step while an async consumer is unresolved
--> advance scheduler state only for admitted work
--> retain excess logical milliseconds
--> no queued per-tick FIFO
--> no drop / skip / coalescing / concurrent consumers
--> fulfillment or rejection releases admission
+Primary promise      -> relationship-derived capability buildcraft
+Supporting identity  -> causal legibility
+Incremental identity -> earned delegation / mastery compression
+Architecture         -> heterogeneous authored composition
 ```
 
-### `FRESH_LOOP_RESET_V1`
+This may guide bounded reversible development under the provisional governance decision. It does **not** prove fresh-player comprehension, fun, pacing, fairness, retention or preference.
 
-| Boundary | Sub-step remainder | Wall-time replay |
-| --- | --- | --- |
-| continuous live execution | preserve | live time only |
-| pause/resume | preserve | paused interval rejected |
-| stop/start | discard | none |
-| unmount/remount | discard | none |
-| canonical save/load + fresh mount | discard | none |
+## M26 closure
 
-Timed-Quest precision remains comparison-only. Raw and persisted timer values are not rounded or rewritten. M21 remains a bounded offline allowlist; timed Quests remain online-only during offline settlement.
-
-## Post-M25 integration evidence
-
-### PR #101 — Content intelligence and reachability
-
-Integrated developer-side content auditing, causal dependency/reachability tooling, route tracing, and deterministic negative self-tests. No generalized runtime condition language was introduced.
-
-### PR #102 — Second heterogeneous chapter
-
-`Archive Inquiry` demonstrated a second structurally different chapter-scale composition derived from existing Elara Relationship evidence. It introduced no chapter reducer, save root, or `ChapterEngine`.
-
-### PR #103 — Player Insight projections
+PR #114 is integrated:
 
 ```text
-qualified candidate: 8b0c8481dfc067a068b7fc1f52b239deb2c50182
-Build Validation #327: PASS on exact candidate head
-merge commit: bc03919c8eb43244bebdbdc37ef926464d98e0c8
+first candidate: 2dcb1e68619b76dc1a8fe7a5e5df2e963b4df1ea
+Build Validation #339: FAIL — stale historical Checkpoint C UI wording expectation
+
+qualified candidate: 9b9b0380f0a2bb23d89036a8b0b133a7ffe133cf
+Build Validation #340 / run 34624393744: PASS
+merge commit: 7f306f3b6a69a27c250c1986df976cc518119821
 ```
 
-### PR #104 — Post-M25 product depth
+M26 adds read-only provenance for relationship-derived capabilities and mastered routines and distinguishes personal mastery from Copy-specific readiness without adding new canonical state or autonomous authority.
+
+M26 is the final numbered milestone in the previous sequence. **There is no automatic M27.**
+
+## Finished-game target
+
+Campaign One / 1.0 is now explicitly bounded by [`GameCompletionDefinition.md`](specification/GameCompletionDefinition.md):
+
+> A narrative incremental RPG in which consequential relationships teach durable capabilities, remembered history explains why later options exist, and personally understood repetition can be deliberately delegated so the player increasingly focuses on novel strategic and relational decisions.
+
+Campaign One ends on the isolated planet with the Telluric Echo finale and a state-responsive epilogue.
+
+## Campaign spine
 
 ```text
-qualified candidate: a70dec63550774aa6ce81ea8f56722e2c339bd49
-Build Validation #331: PASS on exact candidate head
-merge commit: 4bed51ce21758e2787afdd16f704f6b74b01964c
+Prologue                                      [missing]
+Chapter 1 — Merchant District Crisis          [integrated]
+Chapter 2 — Archive Inquiry                   [integrated]
+Chapter 3 — Enemies in Phase                  [integrated]
+Chapter 4 — Lattice Under Strain              [missing]
+Chapter 5 — The Chrono-Crypt                  [missing]
+Chapter 6 — Network Under Pressure            [missing]
+Chapter 7 — Counterphase                      [missing]
+Finale — The Telluric Echo                    [missing]
+Epilogue — Aftermath / Conditional Reprieve   [missing]
 ```
 
-PR #104 integrated bounded Rule-of-Two chapter requirements, contextual causal dialogue explanations, cross-domain `ScholarlyInsight` buildcraft, the `Enemies in Phase` third heterogeneous chapter, and player-authored Copy routine priority.
+Chapters 8+, interplanetary continuation and New Game+ are outside the 1.0 critical path unless authority is explicitly revised.
 
-### PR #106 — Closed post-M25 implementation roadmap
+## Key 1.0 scope decisions
 
-The former six-package post-M25 queue is a closed implementation record rather than a future backlog. Future sessions must not restart it by inertia.
+[`FeatureScopeMatrix.md`](specification/Features/FeatureScopeMatrix.md) currently establishes:
 
-### PR #107 — Product Direction decision readiness + three-chapter friction audit
+- existing Relationship, Trait/Essence, NPC/Dialogue, Quest, Travel, Combat, Knowledge, Faction, World State, Copy, persistence and bounded offline authorities are `CORE_1_0` at bounded scope;
+- separate generic **Skills** are `CUT` because Traits already own capability progression;
+- generic **Crafting** is `CUT` for Campaign One;
+- general **Inventory/Equipment** is `DEFER_POST_1_0` unless actual campaign evidence promotes it;
+- a duplicate **Saves** system is `CUT`; existing save/load/import-export remains canonical;
+- generic ChapterEngine/DSL, autonomous Copy planning, offline narrative progression and generalized simulations are outside 1.0.
+
+## Completion breadth floor
+
+Before 1.0, the campaign must support at least:
+
+- all six anchor Relationship NPCs receiving meaningful long-horizon use: Elder Willow, Lyra, Elara, Gronk, Silas and Valerius;
+- four durable relationship-derived capability identities across at least three anchors;
+- two capabilities with meaningful cross-domain use;
+- two viable late-game build profiles;
+- three personally mastered routine identities across at least two contexts;
+- a finale that consumes meaningful prior Relationship/capability/Knowledge/Faction/World State;
+- a state-responsive epilogue and persisted campaign-complete state.
+
+## Active Game Completion queue
 
 ```text
-merge commit before PR #108: 75dbd0d2b8de8610a29196324c237c3c6044e299
+[x] GC-00 M26 closure + completion-program authority
+[ ] GC-01 1.0 player-surface scope cleanup
+[ ] GC-02 Prologue / onboarding
+[ ] GC-03 Chapters 1–3 campaign integration
+[ ] GC-04 Buildcraft breadth
+[ ] GC-05 Earned-delegation breadth
+[ ] GC-06 Chapter 4 — Lattice Under Strain
+[ ] GC-07 Chapter 5 — The Chrono-Crypt
+[ ] GC-08 Chapter 6 — Network Under Pressure
+[ ] GC-09 Chapter 7 — Counterphase
+[ ] GC-10 Finale + Epilogue
+[ ] GC-11 Alpha qualification
+[ ] GC-12 Content Alpha completion
+[ ] GC-13 Beta
+[ ] GC-14 Release Candidate / 1.0
 ```
 
-PR #107 created the current Product Direction decision-preparation record and audited all three chapter projections for repeated repository friction. The audit authorized exactly three repairs: derive chapter identity, add generic chapter-definition integrity qualification, and remove the one-off Archive progress selector.
+GC-04/GC-05 may be satisfied within chapter packages where that is the natural content-driven implementation; package numbering must not force redundant feature work.
 
-### PR #108 — Chapter-definition integrity repairs
+## Maturity gates
 
-```text
-first candidate: 5fb3edfc9f70f7ecd9ed8f645a078fdb281402c5
-Build Validation #335: FAIL at newly added chapter integrity validation
-root cause: validator indexed base dialogues but omitted bounded M24/M25 runtime dialogue extensions
+**Alpha:** ordinary fresh save can traverse New Game -> Prologue -> Chapters 1–7 -> Finale -> Epilogue, all required systems exist at required scope, no debug-only progression. Alpha may still be explicitly human-unvalidated.
 
-qualified candidate: 458d1fead28fea3e92c33db5e8baee319d55c3ed
-Build Validation #336: PASS on exact candidate head
-merge commit: 5bdf808154a62bdb85c1bee55777f9be35f1395e
-```
+**Content Alpha:** the complete bounded campaign is fully authored; no required content placeholder remains.
 
-The repair corrected the validator catalogue rather than weakening chapter requirements or rewriting authored content. Build Validation #336 passed documentation authority, content intelligence including `chapter:validate`, heterogeneous chapter qualification, Player Insight, product-depth, TypeScript, live UI-only smoke, the complete timing/progression stack, M20–M25, historical regressions, accumulated M4–M19, and production build.
+**Beta:** feature/content scope locked; genuine human evidence required; focus on comprehension, pacing, balance, reliability, accessibility, presentation and supported desktop browsers.
 
-## Documentation authority
+**Release Candidate / 1.0:** one exact production candidate passes the release contract, full New Game -> Epilogue play, representative divergence, save/recovery/browser qualification and has no release-blocking defects.
 
-The repository uses four explicit classifications:
+## Binding technical invariants
 
-```text
-CURRENT AUTHORITY
-REFERENCE
-HISTORICAL EVIDENCE
-SUPERSEDED
-```
+`SERIAL_BACKPRESSURE_V1`: at most one unresolved admitted fixed step; retain logical milliseconds; no per-tick FIFO, drop, skip, coalescing or concurrent async consumers.
 
-[`docs/CURRENT.md`](docs/CURRENT.md) is the canonical classification index.
+`FRESH_LOOP_RESET_V1`: continuous and pause/resume preserve sub-step remainder while paused wall time is rejected; stop/start, unmount/remount and save/load fresh mount discard remainder.
 
-Important consequences:
+Timed-Quest precision remains comparison-only. M21 offline authority remains bounded and timed Quests remain online-only during offline settlement.
 
-- `README.md` is orientation, not final technical authority;
-- `STATUS.md` owns current repository/milestone truth;
-- `RUNBOOK.md` owns operating and qualification procedure;
-- `specification/README.md` maps domain-specific technical/product authority;
-- `specification/Technical/PostM25ProductDirectionDecisionReadiness.md` owns bounded Product Direction preparation, not the final Product Direction decision;
-- `specification/Technical/PostM25ImplementationRoadmap.md` is a closed program record;
-- `specification/Technical/PostM25ThreeChapterFrictionAudit.md` is a closed audit record whose R1–R3 repairs are integrated;
-- `specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md` is the integrated result authority for that repair;
-- older milestone documents remain evidence and must not silently override current records.
+## Human evidence boundary
 
-## Evidence ceiling — still unproven
+Issue #109 remains open. Automation can prove implementation correctness and deterministic composition, but cannot prove fresh-player comprehension, pacing, fairness, enjoyment, emotional impact, retention or market preference.
 
-Technical integration does **not** establish:
+Under the completion program this is not a blanket pre-Alpha development freeze. It becomes required evidence for Beta and final player-quality claims.
 
-- fresh-player comprehension or discoverability;
-- perceived responsiveness;
-- causal/terminology legibility for humans;
-- whether relationship-derived capabilities feel meaningfully learned from characters;
-- whether Copy delegation feels like earned mastery rather than lost play;
-- pacing quality;
-- fairness or final balance;
-- enjoyment;
-- retention / desire to continue;
-- final Quest duration/reward/economy tuning;
-- generalized campaign scalability;
-- production-device/background behavior outside the qualified envelope;
-- a final Product Direction decision;
-- M26 authorization.
+## Do not restart by inertia
 
-The repository has stronger deterministic evidence about composition and bounded behavior than it has human product evidence. That evidence ceiling is intentional and must remain explicit.
+M4–M26, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
 
-## Completed work that must not be restarted
+## Governing implementation rule
 
-The following queues are closed unless a fresh regression or new bottleneck provides evidence to reopen them:
-
-- M4–M25 automated implementation program;
-- post-M25 GameLoop timing-hardening Packages 1–3;
-- Gemini CI retirement and merge-authority reconciliation;
-- post-M25 content-intelligence package;
-- second heterogeneous chapter qualification;
-- Player Insight projection package;
-- Rule-of-Two requirement extraction;
-- contextual causal dialogue package;
-- cross-domain Trait-buildcraft qualification package;
-- third heterogeneous chapter projection;
-- bounded Copy routine-priority package;
-- post-M25 roadmap reconciliation;
-- Product Direction decision-readiness documentation package;
-- three-chapter friction-audit R1–R3 repair queue;
-- chapter-definition integrity repair package.
-
-Do not restart these from historical queues merely because an older document still contains ideas or pre-integration wording.
-
-## Current unresolved gate and next priorities
-
-The only pre-declared product gate that remains intentionally unresolved is **issue #109 — Human Integrated Playability / Product Review**. It requires genuine fresh human evidence; repository tests and synthetic UI observation must not be relabeled as human validation.
-
-When human review becomes available, use it to discriminate between the candidate product identities documented in `PostM25ProductDirectionDecisionReadiness.md`:
-
-1. causal RPG / causal legibility;
-2. relationship-derived capability buildcraft;
-3. earned delegation / incremental mastery;
-4. heterogeneous content composition as enabling architecture.
-
-After genuine evidence is recorded, create an explicit Product Direction Decision that states the selected primary promise, supporting identities, evidence/counter-evidence, what to deepen, what to hold, what to stop expanding, and whether a new milestone is authorized.
-
-Until then:
-
-- Product Direction remains `PENDING`;
-- M26 remains `NOT AUTHORIZED`;
-- no large new product feature queue should be inferred from technical green tests;
-- if repository-only work continues before human evidence, it must start from a fresh concrete bottleneck rather than this closed queue.
-
-## Fast re-entry checklist
-
-```text
-1. Pull and verify latest main.
-2. Read STATUS.md.
-3. Read docs/CURRENT.md before trusting an older document.
-4. Read RUNBOOK.md for exact-head qualification procedure.
-5. Use specification/README.md to locate domain-specific current authority.
-6. Confirm the post-M25 implementation and chapter-integrity queues are closed.
-7. Check issue #109 for genuine Human Integrated Playability / Product Review evidence.
-8. If no human evidence exists, keep Product Direction PENDING and M26 NOT AUTHORIZED.
-9. Run npm run docs:authority:validate when documentation authority changes.
-10. Require exact-head Build Validation before merge.
-```
-
-## Governing stop conditions
-
-- Do not infer `M26` from technical green tests; it remains **NOT AUTHORIZED**.
-- Do not fabricate or simulate human Product Review evidence.
-- Do not reintroduce the retired Gemini workflow or `GEMINI_API_KEY` as an implicit merge gate.
-- Do not use superseded Checkpoint B/C verdicts as current outcomes.
-- Do not introduce tick dropping, skipping, or coalescing as incidental optimization.
-- Do not persist GameLoop accumulator remainder without a new persistence/schema contract.
-- Do not widen M21 offline authority implicitly.
-- Do not rewrite stored Quest timer values to solve floating-point comparison noise.
-- Do not introduce generalized `ChapterEngine`/narrative DSL or duplicate chapter state without repeated concrete need.
-- Do not let Copy priority become automatic task chaining or irreversible player-decision authority.
-- Do not infer comprehension, pacing, fairness, fun, retention, Product Direction, or M26 authority from deterministic tests.
+> **Every future 1.0 package must close a named completion requirement or a demonstrated blocker to one. Technical possibility alone is not authorization.**

@@ -1,12 +1,13 @@
 # Documentation Authority Index
 
 **Status:** CURRENT AUTHORITY for document classification  
-**Reconciled against integrated implementation baseline:** `5bdf808154a62bdb85c1bee55777f9be35f1395e`  
+**Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
+**Current maturity:** PLAYABLE PRE-ALPHA  
 **Last reconciled:** 2026-09-11
 
 ## Purpose
 
-This file is the canonical documentation-classification index. Do not infer authority from file age, folder depth, detail, or how confident an older document sounds.
+This file is the canonical documentation-classification index. Do not infer authority from file age, folder depth, detail, or historical confidence.
 
 The repository uses four classifications:
 
@@ -19,144 +20,184 @@ SUPERSEDED
 
 ## Required reading order
 
-For a new engineering or coding-agent session, read in this order:
+For a new engineering or coding-agent session:
 
-1. [`STATUS.md`](../STATUS.md) — current repository state, integrated work, evidence ceiling, and next decisions.
+1. [`STATUS.md`](../STATUS.md) — current state, active queue, evidence ceiling.
 2. [`docs/CURRENT.md`](CURRENT.md) — this classification index.
-3. [`RUNBOOK.md`](../RUNBOOK.md) — setup, validation, exact-head CI, diagnostics, and integration procedure.
-4. [`specification/README.md`](../specification/README.md) — technical/product authority map and domain-specific source chain.
-5. The specific current contract/result documents named by those indexes.
-6. Historical or reference material only as needed for provenance.
+3. [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) — the product-level 1.0 definition and stop condition.
+4. [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) — what 1.0 includes, minimizes, defers, or cuts.
+5. [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) and [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) — progression and campaign scope.
+6. [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) — active implementation program.
+7. [`RUNBOOK.md`](../RUNBOOK.md) — operating / qualification procedure.
+8. [`specification/README.md`](../specification/README.md) — domain-specific authority map.
+9. The specific current contract/result records relevant to the active package.
+10. Reference / historical evidence only as needed.
 
 `README.md` is orientation, not final technical or product authority.
 
 ## Conflict-resolution rule
 
-Authority is scope-sensitive rather than simply newest-file-wins:
+Authority is scope-sensitive:
 
 ```text
-current STATUS / docs/CURRENT
--> explicitly current contract or result for the affected scope
--> specification/README authority chain
--> current feature/domain specification
--> repository implementation + executable qualification evidence
--> reference documents
+STATUS / docs/CURRENT
+-> GameCompletionDefinition
+-> FeatureScopeMatrix + ProgressionArc + CampaignArchitecture
+-> GameCompletionRoadmap + relevant maturity contract
+-> current affected domain contract/result
+-> specification/README authority map
+-> executable implementation + qualification evidence
+-> reference
 -> historical evidence
 -> superseded conclusions
 ```
 
-If a conflict still cannot be resolved, perform a bounded reconciliation before changing production behavior.
+If two CURRENT records conflict within the same scope, reconcile the conflict before changing production behavior.
 
 ## Current authority matrix
 
 | Concern | Classification | Current source(s) | Notes |
 | --- | --- | --- | --- |
-| Repository state | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md) | First source for what is complete, pending, unproven, or unauthorized. |
-| Documentation classification | CURRENT AUTHORITY | [`docs/CURRENT.md`](CURRENT.md) | Determines how older repository prose should be interpreted. |
-| Operating / CI procedure | CURRENT AUTHORITY | [`RUNBOOK.md`](../RUNBOOK.md), [`.github/workflows/build-validation.yml`](../.github/workflows/build-validation.yml) | Workflow file is executable CI truth; RUNBOOK explains intended use. |
-| Technical authority map | CURRENT AUTHORITY | [`specification/README.md`](../specification/README.md) | Routes to current domain-specific contracts/results. |
-| M25 complete chapter | CURRENT AUTHORITY | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Bounded complete-chapter composition; does not prove human product quality. |
-| Post-M25 product boundary | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Product hypotheses, human-evidence boundary, anti-expansion controls. `M26` remains **NOT AUTHORIZED** by technical evidence alone. |
-| Product Direction decision readiness | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProductDirectionDecisionReadiness.md`](../specification/Technical/PostM25ProductDirectionDecisionReadiness.md) | Compares demonstrated candidate identities without making the Product Direction Decision. |
-| Post-M25 implementation accounting | CURRENT AUTHORITY | [`specification/Technical/PostM25ImplementationRoadmap.md`](../specification/Technical/PostM25ImplementationRoadmap.md) | Closed program record; the former six-step post-M25 queue is complete and must not be restarted by inertia. |
-| Three-chapter repository friction | HISTORICAL EVIDENCE / CLOSED AUDIT | [`specification/Technical/PostM25ThreeChapterFrictionAudit.md`](../specification/Technical/PostM25ThreeChapterFrictionAudit.md) | Findings remain authoritative provenance; its R1–R3 queue is complete. |
-| Chapter-definition integrity repair | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md`](../specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md) | Integrated R1–R3 result, exact-head qualification, runtime-aligned dialogue catalogue, and anti-expansion boundary. |
+| Repository state | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md) | First source for complete/pending/unproven work. |
+| Documentation classification | CURRENT AUTHORITY | [`docs/CURRENT.md`](CURRENT.md) | This file. |
+| 1.0 completion / stop condition | CURRENT AUTHORITY | [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) | Defines the smallest complete Campaign One / 1.0. |
+| 1.0 feature scope | CURRENT AUTHORITY | [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) | Core/minimal/deferred/cut decisions. |
+| Whole-game progression | CURRENT AUTHORITY | [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) | Personal action -> specialization -> networked mastery -> strategic synthesis. |
+| Campaign One structure | CURRENT AUTHORITY | [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) | Prologue + Ch1–7 + finale + epilogue. |
+| Active implementation program | CURRENT AUTHORITY | [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) | GC-00→GC-14; no automatic M27. |
+| Alpha definition | CURRENT AUTHORITY | [`specification/Technical/AlphaCompletionContract.md`](../specification/Technical/AlphaCompletionContract.md) | Whole structural game playable New Game -> Epilogue. |
+| Beta definition | CURRENT AUTHORITY | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) | Content locked + human product evidence + UX/balance/reliability. |
+| Release / 1.0 qualification | CURRENT AUTHORITY | [`specification/Technical/ReleaseQualificationContract.md`](../specification/Technical/ReleaseQualificationContract.md) | Exact production candidate, browser/full-run/recovery evidence. |
+| Operating / CI procedure | CURRENT AUTHORITY | [`RUNBOOK.md`](../RUNBOOK.md), [`.github/workflows/build-validation.yml`](../.github/workflows/build-validation.yml) | Workflow is executable CI truth; RUNBOOK explains intended use. |
+| Domain authority map | CURRENT AUTHORITY | [`specification/README.md`](../specification/README.md) | Routes to current technical/domain records. |
+| Provisional governance boundary | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProvisionalGovernanceDecision.md`](../specification/Technical/PostM25ProvisionalGovernanceDecision.md) | Allows bounded reversible human-unvalidated product development; does not create human evidence. |
+| Provisional Product Direction | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProvisionalProductDirectionDecision.md`](../specification/Technical/PostM25ProvisionalProductDirectionDecision.md) | Relationship-derived capability buildcraft + causal legibility + earned delegation. |
+| M26 result | CURRENT AUTHORITY, integrated | [`specification/Technical/M26ProvisionalProductDepthResult.md`](../specification/Technical/M26ProvisionalProductDepthResult.md) | Exact-head #340 PASS; M26 closed. |
+| Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
+| M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
+| Post-M25 product evidence boundary | REFERENCE / predecessor authority | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Its anti-expansion/evidence doctrine remains useful; completion scope is now governed above. |
+| Product Direction decision readiness | HISTORICAL EVIDENCE / predecessor | [`specification/Technical/PostM25ProductDirectionDecisionReadiness.md`](../specification/Technical/PostM25ProductDirectionDecisionReadiness.md) | Led to provisional governance/direction decision; no longer active implementation queue. |
+| Closed post-M25 implementation accounting | HISTORICAL EVIDENCE / CLOSED | [`specification/Technical/PostM25ImplementationRoadmap.md`](../specification/Technical/PostM25ImplementationRoadmap.md) | Former program; do not restart. |
+| Three-chapter friction audit | HISTORICAL EVIDENCE / CLOSED | [`specification/Technical/PostM25ThreeChapterFrictionAudit.md`](../specification/Technical/PostM25ThreeChapterFrictionAudit.md) | R1–R3 complete. |
+| Chapter-definition integrity repair | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md`](../specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md) | Derived IDs/reference validation/runtime-aligned dialogue catalog. |
 | Scheduler async backpressure | CURRENT AUTHORITY | [`specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md`](../specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md), [`specification/Technical/GameLoopBoundedBacklogControlRepair.md`](../specification/Technical/GameLoopBoundedBacklogControlRepair.md) | `SERIAL_BACKPRESSURE_V1`. |
 | GameLoop lifecycle remainder | CURRENT AUTHORITY | [`specification/Technical/GameLoopLifecycleRemainderPolicy.md`](../specification/Technical/GameLoopLifecycleRemainderPolicy.md) | `FRESH_LOOP_RESET_V1`. |
-| Timed-Quest precision | CURRENT AUTHORITY | [`specification/Technical/GameLoopTimedQuestPrecisionResolution.md`](../specification/Technical/GameLoopTimedQuestPrecisionResolution.md), [`specification/Technical/GameLoopQuestTimingIntegrationQualification.md`](../specification/Technical/GameLoopQuestTimingIntegrationQualification.md) | Comparison-only precision handling; raw/persisted values remain unchanged. |
-| Offline progression | CURRENT AUTHORITY | [`specification/Technical/M21BoundedOfflineProgressResult.md`](../specification/Technical/M21BoundedOfflineProgressResult.md) | Positive allowlist remains bounded; timed Quests remain online-only. |
+| Timed-Quest precision | CURRENT AUTHORITY | [`specification/Technical/GameLoopTimedQuestPrecisionResolution.md`](../specification/Technical/GameLoopTimedQuestPrecisionResolution.md), [`specification/Technical/GameLoopQuestTimingIntegrationQualification.md`](../specification/Technical/GameLoopQuestTimingIntegrationQualification.md) | Comparison-only precision; persisted values unchanged. |
+| Bounded offline progression | CURRENT AUTHORITY | [`specification/Technical/M21BoundedOfflineProgressResult.md`](../specification/Technical/M21BoundedOfflineProgressResult.md) | Explicit allowlist; timed Quests remain online-only offline. |
 
-## Current post-M25 records
+## Current completion authorities
 
-The following are **CURRENT AUTHORITY** for their bounded scopes:
+The following collectively own the path to 1.0:
 
-- [`specification/Technical/PostM25ProductDirectionDecisionReadiness.md`](../specification/Technical/PostM25ProductDirectionDecisionReadiness.md) — decision-preparation evidence matrix for causal legibility, relationship-derived buildcraft, earned delegation, and heterogeneous composition; no final direction is selected.
-- [`specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md`](../specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md) — integrated chapter identity/reference/API repair; `chapter:validate` is now part of content-intelligence qualification.
-- [`specification/Technical/PostM25ContentIntelligence.md`](../specification/Technical/PostM25ContentIntelligence.md) — developer-side authoring integrity, dependency/reachability intelligence, and route tracing.
-- [`specification/Technical/PostM25SecondChapterQualification.md`](../specification/Technical/PostM25SecondChapterQualification.md) — Archive Inquiry as the qualified second heterogeneous chapter-scale projection without a ChapterEngine.
-- [`specification/Technical/PostM25PlayerInsightProjection.md`](../specification/Technical/PostM25PlayerInsightProjection.md) — Causal Journal, Opportunity Map, Relationship-Derived Build, and read-only Player Insight boundaries.
-- [`specification/Technical/PostM25RuleOfTwoChapterArchitecture.md`](../specification/Technical/PostM25RuleOfTwoChapterArchitecture.md) — bounded requirement extraction justified by repeated chapter projection behavior.
-- [`specification/Technical/PostM25ContextualCausalLegibility.md`](../specification/Technical/PostM25ContextualCausalLegibility.md) — spoiler-safe contextual `Available because` dialogue explanation contract.
-- [`specification/Technical/PostM25CrossDomainTraitBuildcraft.md`](../specification/Technical/PostM25CrossDomainTraitBuildcraft.md) — cross-domain semantic Trait application and capability-ownership boundaries.
-- [`specification/Technical/PostM25ThirdHeterogeneousChapter.md`](../specification/Technical/PostM25ThirdHeterogeneousChapter.md) — `Enemies in Phase` as a third heterogeneous chapter projection over existing Lyra evidence.
-- [`specification/Technical/PostM25CopyRoutineStrategy.md`](../specification/Technical/PostM25CopyRoutineStrategy.md) — player-authored bounded routine priority and explicit preferred-task delegation.
+```text
+GameCompletionDefinition.md
+-> Features/FeatureScopeMatrix.md
+-> Progression/GameProgressionArc.md
+-> Narrative/CampaignArchitecture.md
+-> Technical/GameCompletionRoadmap.md
+-> Technical/AlphaCompletionContract.md
+-> Technical/BetaCompletionContract.md
+-> Technical/ReleaseQualificationContract.md
+```
 
-The post-M25 GameLoop timing/backpressure/lifecycle qualification records remain current for their stated technical scopes. Use [`specification/README.md`](../specification/README.md) for the complete current chain.
+These records are **PROVISIONAL / HUMAN-UNVALIDATED** where they make player-experience assumptions. Their scope decisions are nevertheless current repository authority under the provisional governance decision until revised.
 
-## Closed audit / program records
+## Current technical/domain authorities retained
 
-These records remain important provenance but are **not pending implementation queues**:
+Important current bounded records also include:
 
-- [`specification/Technical/PostM25ImplementationRoadmap.md`](../specification/Technical/PostM25ImplementationRoadmap.md) — closed six-package post-M25 program record.
-- [`specification/Technical/PostM25ThreeChapterFrictionAudit.md`](../specification/Technical/PostM25ThreeChapterFrictionAudit.md) — closed audit; R1–R3 were implemented by PR #108 and are represented by `PostM25ChapterDefinitionIntegrityRepair.md`.
+- `PostM25ContentIntelligence.md` — authoring integrity/reachability/route tracing;
+- `PostM25SecondChapterQualification.md` — Archive Inquiry;
+- `PostM25PlayerInsightProjection.md` — Causal Journal / Opportunity Map / Relationship-Derived Build;
+- `PostM25RuleOfTwoChapterArchitecture.md` — shared requirement evaluator;
+- `PostM25ContextualCausalLegibility.md` — spoiler-safe explanation;
+- `PostM25CrossDomainTraitBuildcraft.md` — semantic cross-domain Trait use;
+- `PostM25ThirdHeterogeneousChapter.md` — Enemies in Phase;
+- `PostM25CopyRoutineStrategy.md` — explicit routine priority / Start Preferred;
+- `M26ProvisionalProductDepthResult.md` — visible capability/mastery/delegation provenance.
 
-## Reference
+Use [`specification/README.md`](../specification/README.md) for the broader domain map.
 
-The following are useful but subordinate to the current authority chain:
+## Current maturity interpretation
 
-- [`README.md`](../README.md) — repository orientation and entry links.
-- [`specification/GameDesignDocument.md`](../specification/GameDesignDocument.md) — broad product/design intent.
-- `specification/Features/`, `specification/Narrative/`, and `specification/UI_UX/` — feature, narrative, and UI/UX context unless explicitly promoted by the technical authority map.
-- [`specification/Technical/ArchitectureOverview.md`](../specification/Technical/ArchitectureOverview.md) — legacy architecture reference only; its manual-only testing/CI statements are superseded.
-- [`docs/analysis/`](analysis/) — architecture/component analyses and provenance.
+Historical documents and package metadata may still contain the word **prototype**. That is not a current maturity verdict.
+
+Current maturity is:
+
+```text
+PLAYABLE PRE-ALPHA
+```
+
+The repository has passed proof-of-concept, systems-prototype and bounded vertical-slice stages. It has not yet passed Alpha because Campaign One is not playable New Game -> Epilogue.
+
+## Explicit 1.0 scope consequences
+
+Current scope decisions include:
+
+- separate generic Skills/skill-tree: `CUT` for 1.0;
+- generic Crafting: `CUT` for Campaign One;
+- general Inventory/Equipment: `DEFER_POST_1_0` unless campaign evidence promotes it;
+- dedicated duplicate Saves system: `CUT`; use existing canonical persistence authority;
+- generic ChapterEngine / narrative DSL: `CUT` absent repeated concrete need;
+- autonomous Copy planning / automatic irreversible decisions: `CUT`;
+- offline narrative/social/world decision execution: `CUT`;
+- interplanetary continuation / AI-war campaign / New Game+: `DEFER_POST_1_0`.
+
+Do not treat old feature specs, placeholder routes, lore hooks, or expansion ideas as authority that silently overrides these decisions.
+
+## Human evidence authority
+
+Issue #109 remains open. Under the completion program it is no longer a total freeze on bounded pre-Alpha development; it becomes required evidence for Beta and final player-quality claims.
+
+Automated tests, synthetic UI observation, code review and repository analysis do **not** establish:
+
+- fresh-player comprehension/discoverability;
+- pacing;
+- fairness/final balance;
+- enjoyment;
+- emotional impact;
+- retention/desire to continue;
+- market preference.
 
 ## Historical evidence
 
-Older milestone reports, checkpoint artifacts, PR handoffs, synthetic-review captures, and analysis files may remain valuable **HISTORICAL EVIDENCE** even after their active decision role ends. Preserve them for auditability; do not silently turn them back into implementation queues.
+Older milestone reports, checkpoint artifacts, PR handoffs, synthetic-review captures and analysis files remain useful provenance. Preserve them; do not turn them back into active queues.
 
-This includes Build Validation #335, whose failure is useful provenance for the chapter-integrity repair: it exposed an incomplete validator dialogue catalogue, not invalid chapter content. Build Validation #336 on exact head `458d1fead28fea3e92c33db5e8baee319d55c3ed` supersedes that candidate as qualification evidence.
+Notable history:
+
+- [`specification/Technical/CheckpointBActiveRpgLoopResult.md`](../specification/Technical/CheckpointBActiveRpgLoopResult.md) — first weak verdict superseded by later repair/rerun PASS.
+- [`specification/Technical/CheckpointCIncrementalIntegrationResult.md`](../specification/Technical/CheckpointCIncrementalIntegrationResult.md) — first weak verdict superseded by repair/rerun PASS; the M26 wording assertion repair did not change its behavioral authority.
+- Build Validation #335 — useful failure provenance for chapter-integrity validator source mismatch; superseded by #336 PASS.
+- Build Validation #339 — useful failure provenance for stale historical Copy-detail wording; superseded by M26 exact candidate #340 PASS.
 
 ## Explicitly superseded conclusions
 
-The following records remain historical evidence, but their identified verdicts or assumptions are **SUPERSEDED**:
+The following must not govern new work:
 
-- [`specification/Technical/CheckpointBActiveRpgLoopResult.md`](../specification/Technical/CheckpointBActiveRpgLoopResult.md) — its first weak verdict is superseded by later repair/rerun PASS evidence.
-- [`specification/Technical/CheckpointCIncrementalIntegrationResult.md`](../specification/Technical/CheckpointCIncrementalIntegrationResult.md) — its first weak verdict is superseded by later repair/rerun PASS evidence.
-- [`specification/Technical/ArchitectureOverview.md`](../specification/Technical/ArchitectureOverview.md) statements that testing is manual-only or that authoritative CI is absent — superseded by current Build Validation, `RUNBOOK.md`, and accumulated qualification history.
-- Candidate-only milestone handoff PR #98 — superseded by the integrated handoff and current `STATUS.md`.
-- Former `.github/workflows/gemini-review.yml`, `gemini.md`, and `GEMINI_API_KEY` dependence — retired; deterministic Build Validation is current merge authority.
-- Any old post-M25 queue that treats timing-hardening Packages 1–3, content intelligence, Archive Inquiry, Player Insight, Rule-of-Two extraction, contextual causality, cross-domain Trait buildcraft, the third chapter, Copy routine priority, Product Direction decision-readiness preparation, or chapter-integrity R1–R3 as pending.
-- The former test assumption that the repository must contain exactly two chapter definitions. Archive Inquiry remains the qualified second chapter, but later heterogeneous chapter projections are valid.
+- `ArchitectureOverview.md` claims that testing is manual-only or authoritative CI is absent;
+- retired `.github/workflows/gemini-review.yml`, `gemini.md`, or `GEMINI_API_KEY` merge dependency;
+- any queue treating M4–M26, post-M25 content intelligence, the three-chapter R1–R3 repair, Player Insight, cross-domain Trait buildcraft, or Copy provenance as pending;
+- any statement that Product Direction is still entirely unselected: it is now **provisionally selected / human-unvalidated**;
+- any statement that M26 remains unauthorized: it has been explicitly authorized, qualified and integrated;
+- any implication that technical green tests authorize M27;
+- any old feature placeholder that implies Skills, Crafting, general Inventory, or a duplicate save system must ship in 1.0.
 
 A `SUPERSEDED` label applies to the identified conclusion/scope, not necessarily every historical fact in the file.
 
-## Current unresolved human authority gate
-
-Issue #109 — **Human Integrated Playability / Product Review** — is intentionally unresolved. Only genuine fresh human evidence can satisfy it. Automated tests, synthetic UI smoke, repository inspection, or an LLM-authored opinion must not be relabeled as human product evidence.
-
-Until that evidence exists:
-
-```text
-Product Direction Decision: PENDING
-M26: NOT AUTHORIZED
-```
-
-## Product-evidence ceiling
-
-Repository qualification does **not** prove:
-
-- fresh-player comprehension or discoverability;
-- perceived responsiveness;
-- causal terminology comprehension;
-- pacing quality;
-- fairness or final balance;
-- enjoyment;
-- retention / desire to continue;
-- generalized campaign scalability;
-- production-device/background behavior outside the qualified envelope;
-- a final Product Direction decision;
-- M26 authorization.
-
-If human validation is unavailable, repository-only or hermetic work may continue only after a fresh reconciliation identifies a legitimate bounded bottleneck. Claims must remain below this evidence ceiling.
-
 ## Maintenance rule
 
-When a change creates, supersedes, or materially reinterprets an authoritative document:
+When work creates, supersedes or materially reinterprets authority:
 
-1. update this index in the same package or milestone handoff;
-2. update `STATUS.md` if repository state/authority changed;
-3. update `RUNBOOK.md` if operating or qualification procedure changed;
-4. keep `README.md` concise and navigational;
-5. preserve historical records rather than silently rewriting them into current-looking documents;
-6. run `npm run docs:authority:validate` before merge;
-7. if `main` moves before merge, reconcile the candidate and re-run Build Validation on the exact new head.
+1. update/create the affected domain/completion contract;
+2. update this index in the same handoff;
+3. update `STATUS.md` when repository state or queue changes;
+4. update `RUNBOOK.md` when commands/procedure changes;
+5. keep `README.md` navigational;
+6. update `specification/README.md` when authority routing changes;
+7. preserve historical evidence instead of deleting useful provenance;
+8. run `npm run docs:authority:validate`;
+9. require exact-head Build Validation before merge.
+
+## Governing rule
+
+> **A future package must close a named 1.0 completion requirement or a demonstrated blocker to one. Technical possibility alone is not authorization.**
