@@ -10,7 +10,11 @@ import {
   initializeRelationshipRuntimeThunk,
   recordAuthoredRelationshipExperienceThunk,
 } from '../Relationships/state/RelationshipThunks';
-import { selectRelationshipMemoriesByNpcId } from '../Relationships/state/RelationshipSelectors';
+import {
+  selectBondProfileByNpcId,
+  selectRelationshipMemoriesByNpcId,
+  selectTraitAssimilationState,
+} from '../Relationships/state/RelationshipSelectors';
 import {
   CHAPTER_DEFINITIONS,
   getChapterDefinition,
@@ -138,7 +142,7 @@ describe('post-M25 second heterogeneous chapter qualification', () => {
     await acquireInsight(store);
   });
 
-  test('Cautious Consensus can reopen later, complete by a distinct history, and converge on the same learned capability', async () => {
+  test('Cautious Consensus reopens later, completes by a distinct history, and reaches the canonical resonance-ready boundary', async () => {
     const store = makeStore();
     await initialize(store);
 
@@ -158,7 +162,13 @@ describe('post-M25 second heterogeneous chapter qualification', () => {
     ]));
     expect(memories.some(memory => memory.resonanceTags.includes('IndependentVerification'))).toBe(true);
 
-    await acquireInsight(store);
+    const profile = selectBondProfileByNpcId(store.getState(), ELARA_ID);
+    const assimilation = selectTraitAssimilationState(store.getState(), ELARA_ID, INSIGHT_ID);
+    expect(profile.connectionLevel).toBeGreaterThanOrEqual(2);
+    expect(store.getState().traits.discoveredTraits).toContain(INSIGHT_ID);
+    expect(assimilation.progress).toBe(100);
+    expect(assimilation.compatibility).toBeGreaterThanOrEqual(25);
+    expect(store.getState().player.permanentTraits).not.toContain(INSIGHT_ID);
   });
 
   test('the two chapter routes preserve different relationship history instead of collapsing to one hidden completion flag', async () => {
