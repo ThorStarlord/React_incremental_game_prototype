@@ -1,51 +1,42 @@
 # Documentation Authority Index
 
 **Status:** CURRENT AUTHORITY for document classification  
-**Reconciled from `main`:** `56fbee2758ba734f1db67f40230a0970d67fd531`  
-**Purpose:** prevent historical or superseded repository prose from being mistaken for current product, architecture, implementation, or CI authority.
+**Reconciled against integrated implementation baseline:** `4bed51ce21758e2787afdd16f704f6b74b01964c`  
+**Last reconciled:** 2026-09-11
 
-This file classifies repository documentation by authority. It does **not** move or delete historical records. Older documents remain valuable evidence, but their age, location, or level of detail does not make them current authority.
+## Purpose
+
+This file is the canonical documentation-classification index. Do not infer authority from file age, folder depth, detail, or how confident an older document sounds.
+
+The repository uses four classifications:
+
+```text
+CURRENT AUTHORITY
+REFERENCE
+HISTORICAL EVIDENCE
+SUPERSEDED
+```
 
 ## Required reading order
 
 For a new engineering or coding-agent session, read in this order:
 
-1. [`STATUS.md`](../STATUS.md) — current repository state, completed work, open authority gates, and next decisions.
-2. [`docs/CURRENT.md`](CURRENT.md) — this classification index; determines how to interpret the rest of the documentation corpus.
-3. [`RUNBOOK.md`](../RUNBOOK.md) — operational commands, CI procedure, exact-head qualification, and integration rules.
+1. [`STATUS.md`](../STATUS.md) — current repository state, integrated work, evidence ceiling, and next decisions.
+2. [`docs/CURRENT.md`](CURRENT.md) — this classification index.
+3. [`RUNBOOK.md`](../RUNBOOK.md) — setup, validation, exact-head CI, diagnostics, and integration procedure.
 4. [`specification/README.md`](../specification/README.md) — technical/product authority map and domain-specific source chain.
-5. The specific current contract/result documents named by those indexes for the concern being changed.
-6. Historical or reference documents only as needed for provenance or context.
+5. The specific current contract/result documents named by those indexes.
+6. Historical or reference material only as needed for provenance.
 
-`README.md` is orientation, not the final authority for a disputed technical or product question.
-
-## Classification vocabulary
-
-### CURRENT AUTHORITY
-
-A document that may be used to determine present repository state, an active contract, an accepted design boundary, or the current decision/evidence ceiling for its stated scope.
-
-### REFERENCE
-
-Useful context, architecture explanation, design intent, or contributor guidance that remains helpful but is subordinate to current reconciliations, accepted contracts, result documents, executable behavior, and tests.
-
-### HISTORICAL EVIDENCE
-
-A durable record of a prior experiment, qualification, milestone, PR, CI run, or decision state. Historical evidence may explain why the current contract exists, but it must not be treated as the current state when later authority supersedes it.
-
-### SUPERSEDED
-
-A document or verdict whose current-decision role has been explicitly replaced. Retain it for provenance; do not use its superseded conclusion to drive new implementation.
+`README.md` is orientation, not final technical or product authority.
 
 ## Conflict-resolution rule
 
-Documentation authority is **scope-sensitive**, not simply newest-file-wins.
-
-When two documents appear to conflict:
+Authority is scope-sensitive rather than simply newest-file-wins:
 
 ```text
-current STATUS / this authority index
--> explicitly ratified current contract or result for the affected scope
+current STATUS / docs/CURRENT
+-> explicitly current contract or result for the affected scope
 -> specification/README authority chain
 -> current feature/domain specification
 -> repository implementation + executable qualification evidence
@@ -54,83 +45,86 @@ current STATUS / this authority index
 -> superseded conclusions
 ```
 
-If the conflict still cannot be resolved, stop treating either prose statement as authoritative and perform a bounded reconciliation before changing production behavior.
-
-A newer implementation does not automatically invalidate a still-current product boundary, and a newer prose file does not automatically override an explicitly accepted technical contract.
+If a conflict still cannot be resolved, perform a bounded reconciliation before changing production behavior.
 
 ## Current authority matrix
 
 | Concern | Classification | Current source(s) | Notes |
 | --- | --- | --- | --- |
-| Repository/milestone state | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md) | First source for what is complete, pending, unproven, or unauthorized. |
-| Documentation classification | CURRENT AUTHORITY | [`docs/CURRENT.md`](CURRENT.md) | Determines how older repository documents should be interpreted. |
-| Operational/CI procedure | CURRENT AUTHORITY | [`RUNBOOK.md`](../RUNBOOK.md), [`.github/workflows/build-validation.yml`](../.github/workflows/build-validation.yml) | Workflow file is executable CI truth; RUNBOOK explains intended use. |
+| Repository state | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md) | First source for what is complete, pending, unproven, or unauthorized. |
+| Documentation classification | CURRENT AUTHORITY | [`docs/CURRENT.md`](CURRENT.md) | Determines how older repository prose should be interpreted. |
+| Operating / CI procedure | CURRENT AUTHORITY | [`RUNBOOK.md`](../RUNBOOK.md), [`.github/workflows/build-validation.yml`](../.github/workflows/build-validation.yml) | Workflow file is executable CI truth; RUNBOOK explains intended use. |
 | Technical authority map | CURRENT AUTHORITY | [`specification/README.md`](../specification/README.md) | Routes to current domain-specific contracts/results. |
-| M25 integrated product capability | CURRENT AUTHORITY | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Bounded complete-chapter composition; does not prove human product quality. |
-| Post-M25 product boundary | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Current hypotheses and evidence boundary. It explicitly does **not** authorize M26. |
+| M25 complete chapter | CURRENT AUTHORITY | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Bounded complete-chapter composition; does not prove human product quality. |
+| Post-M25 product boundary | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Product hypotheses, human-evidence boundary, anti-expansion controls. `M26` remains **NOT AUTHORIZED** by technical evidence alone. |
+| Post-M25 implementation accounting | CURRENT AUTHORITY | [`specification/Technical/PostM25ImplementationRoadmap.md`](../specification/Technical/PostM25ImplementationRoadmap.md) | Reconciles hypotheses with work actually delivered through PR #104. |
 | Scheduler async backpressure | CURRENT AUTHORITY | [`specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md`](../specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md), [`specification/Technical/GameLoopBoundedBacklogControlRepair.md`](../specification/Technical/GameLoopBoundedBacklogControlRepair.md) | `SERIAL_BACKPRESSURE_V1`. |
 | GameLoop lifecycle remainder | CURRENT AUTHORITY | [`specification/Technical/GameLoopLifecycleRemainderPolicy.md`](../specification/Technical/GameLoopLifecycleRemainderPolicy.md) | `FRESH_LOOP_RESET_V1`. |
-| Composed post-M25 timing model | CURRENT AUTHORITY | [`specification/Technical/GameLoopUnifiedTimingHardeningCompositionQualification.md`](../specification/Technical/GameLoopUnifiedTimingHardeningCompositionQualification.md), [`specification/Technical/GameLoopBackpressureCadenceProgressionStressQualification.md`](../specification/Technical/GameLoopBackpressureCadenceProgressionStressQualification.md) | Composition/stress authority; no implicit widening to new background/offline policy. |
-| Timed-Quest unit/precision semantics | CURRENT AUTHORITY | [`specification/Technical/GameLoopTimedQuestPrecisionResolution.md`](../specification/Technical/GameLoopTimedQuestPrecisionResolution.md), [`specification/Technical/GameLoopQuestTimingIntegrationQualification.md`](../specification/Technical/GameLoopQuestTimingIntegrationQualification.md) | Comparison-only precision handling; raw/persisted values remain unchanged. |
+| Timed-Quest precision | CURRENT AUTHORITY | [`specification/Technical/GameLoopTimedQuestPrecisionResolution.md`](../specification/Technical/GameLoopTimedQuestPrecisionResolution.md), [`specification/Technical/GameLoopQuestTimingIntegrationQualification.md`](../specification/Technical/GameLoopQuestTimingIntegrationQualification.md) | Comparison-only precision handling; raw/persisted values remain unchanged. |
 | Offline progression | CURRENT AUTHORITY | [`specification/Technical/M21BoundedOfflineProgressResult.md`](../specification/Technical/M21BoundedOfflineProgressResult.md) | Positive allowlist remains bounded; timed Quests remain online-only. |
-| Repository merge authority | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md), [`RUNBOOK.md`](../RUNBOOK.md), [`.github/workflows/build-validation.yml`](../.github/workflows/build-validation.yml) | Deterministic Build Validation + preregistered acceptance criteria + explicitly declared authoritative gates. AI review is advisory unless deliberately re-authorized. |
 
-## Reference matrix
+## Current post-M25 records
 
-These documents are useful, but they must be read through the current authority chain above.
+The following are **CURRENT AUTHORITY** for their bounded scopes:
 
-| Document/group | Classification | Use |
-| --- | --- | --- |
-| [`README.md`](../README.md) | REFERENCE | Repository orientation, setup, current high-level state, and entry links. |
-| [`specification/GameDesignDocument.md`](../specification/GameDesignDocument.md) | REFERENCE | Broad product/design intent; later reconciliations and bounded result documents may refine it. |
-| [`specification/Features/`](../specification/Features/) | REFERENCE unless specifically promoted by `specification/README.md` | Domain explanations and feature-level intent. |
-| [`specification/Requirements/`](../specification/Requirements/) | REFERENCE unless explicitly ratified by a current authority document | Requirement history and scope context. |
-| [`specification/Narrative/`](../specification/Narrative/) | REFERENCE | Narrative/content context; not repository implementation-status authority. |
-| [`specification/UI_UX/`](../specification/UI_UX/) | REFERENCE | UI/UX design context; human product quality claims still require the appropriate evidence gate. |
-| [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) | REFERENCE | Contributor conventions; subordinate to current code, accepted contracts, and explicit repository governance. |
+- [`specification/Technical/PostM25ContentIntelligence.md`](../specification/Technical/PostM25ContentIntelligence.md) — developer-side authoring integrity, dependency/reachability intelligence, and route tracing.
+- [`specification/Technical/PostM25SecondChapterQualification.md`](../specification/Technical/PostM25SecondChapterQualification.md) — Archive Inquiry as the qualified second heterogeneous chapter-scale projection without a ChapterEngine.
+- [`specification/Technical/PostM25PlayerInsightProjection.md`](../specification/Technical/PostM25PlayerInsightProjection.md) — Causal Journal, Opportunity Map, Relationship-Derived Build, and read-only Player Insight boundaries.
+- [`specification/Technical/PostM25RuleOfTwoChapterArchitecture.md`](../specification/Technical/PostM25RuleOfTwoChapterArchitecture.md) — bounded requirement extraction justified by repeated chapter projection behavior.
+- [`specification/Technical/PostM25ContextualCausalLegibility.md`](../specification/Technical/PostM25ContextualCausalLegibility.md) — spoiler-safe contextual `Available because` dialogue explanation contract.
+- [`specification/Technical/PostM25CrossDomainTraitBuildcraft.md`](../specification/Technical/PostM25CrossDomainTraitBuildcraft.md) — cross-domain semantic Trait application and capability-ownership boundaries.
+- [`specification/Technical/PostM25ThirdHeterogeneousChapter.md`](../specification/Technical/PostM25ThirdHeterogeneousChapter.md) — `Enemies in Phase` as a third heterogeneous chapter projection over existing Lyra evidence.
+- [`specification/Technical/PostM25CopyRoutineStrategy.md`](../specification/Technical/PostM25CopyRoutineStrategy.md) — player-authored bounded routine priority and explicit preferred-task delegation.
 
-## Historical evidence matrix
+The existing post-M25 GameLoop timing/backpressure/lifecycle qualification records remain current for their stated technical scopes. Use [`specification/README.md`](../specification/README.md) for the complete current chain.
 
-| Document/group | Classification | Interpretation |
-| --- | --- | --- |
-| [`docs/analysis/`](analysis/) | HISTORICAL EVIDENCE / REFERENCE | Earlier architecture/component analyses. Useful for provenance; do not treat them as present-state authority without fresh verification. |
-| [`specification/Technical/PostM17MilestoneRoadmap.md`](../specification/Technical/PostM17MilestoneRoadmap.md) | HISTORICAL EVIDENCE | Completed execution program that culminated in M25; it is not the active roadmap for M26. |
-| Preflight, recon, qualification and result records under [`specification/Technical/`](../specification/Technical/) | HISTORICAL EVIDENCE unless listed as CURRENT AUTHORITY above or promoted by `specification/README.md` | Preserve experiment/decision provenance and evidence ceilings. |
-| Closed/merged PR descriptions and GitHub Actions runs | HISTORICAL EVIDENCE | Immutable integration and qualification evidence; not a substitute for current `main` state. |
-| Historical Gemini `API_KEY_INVALID` runs | HISTORICAL EVIDENCE | Explain prior merge blockage only. Gemini CI has been retired and is not a current gate. |
+## Reference
+
+The following are useful but subordinate to the current authority chain:
+
+- [`README.md`](../README.md) — repository orientation and entry links.
+- [`specification/GameDesignDocument.md`](../specification/GameDesignDocument.md) — broad product/design intent.
+- `specification/Features/`, `specification/Narrative/`, and `specification/UI_UX/` — feature, narrative, and UI/UX context unless explicitly promoted by the technical authority map.
+- [`specification/Technical/ArchitectureOverview.md`](../specification/Technical/ArchitectureOverview.md) — legacy architecture reference only; its manual-only testing/CI statements are superseded.
+- [`docs/analysis/`](analysis/) — architecture/component analyses and provenance.
+
+## Historical evidence
+
+Older milestone reports, checkpoint artifacts, PR handoffs, synthetic-review captures, and analysis files may remain valuable **HISTORICAL EVIDENCE** even after their active decision role ends. Preserve them for auditability; do not silently turn them back into implementation queues.
+
+Examples include pre-integration post-M25 timing handoffs, exact-head qualification records for already-merged candidates, earlier synthetic-review observations later repaired or rerun, and historical Gemini `API_KEY_INVALID` failures.
 
 ## Explicitly superseded conclusions
 
-The following records remain valuable history, but their **verdicts** have been replaced:
+The following records remain historical evidence, but their identified verdicts or assumptions are **SUPERSEDED**:
 
-| Document / record | Classification | Superseded by |
-| --- | --- | --- |
-| [`specification/Technical/CheckpointBActiveRpgLoopResult.md`](../specification/Technical/CheckpointBActiveRpgLoopResult.md) — first `CHECKPOINT_B_WEAK` verdict | SUPERSEDED | [`specification/Technical/ActiveRpgLoopIntegrationRepairResult.md`](../specification/Technical/ActiveRpgLoopIntegrationRepairResult.md) + [`specification/Technical/CheckpointBActiveRpgLoopRerunResult.md`](../specification/Technical/CheckpointBActiveRpgLoopRerunResult.md) (`CHECKPOINT_B_PASS`). |
-| [`specification/Technical/CheckpointCIncrementalIntegrationResult.md`](../specification/Technical/CheckpointCIncrementalIntegrationResult.md) — first `CHECKPOINT_C_WEAK` verdict | SUPERSEDED | [`specification/Technical/IncrementalIntegrationRepairResult.md`](../specification/Technical/IncrementalIntegrationRepairResult.md) + [`specification/Technical/CheckpointCIncrementalIntegrationRerunResult.md`](../specification/Technical/CheckpointCIncrementalIntegrationRerunResult.md) (`CHECKPOINT_C_PASS`). |
-| `specification/Technical/ArchitectureOverview.md` statements that automated tests are not required and that validation is manual-only | SUPERSEDED for testing/CI claims | Current Build Validation, `RUNBOOK.md`, `STATUS.md`, and post-M14+ qualification history. Treat the file as legacy architecture reference only until it is separately reconciled. |
-| Candidate-only milestone handoff in PR #98 | SUPERSEDED | Integrated handoff merged by PR #99 and current `STATUS.md`. |
-| Former `.github/workflows/gemini-review.yml` / `gemini.md` | SUPERSEDED / REMOVED | Deterministic Build Validation and current CI-governance policy. |
+- [`specification/Technical/CheckpointBActiveRpgLoopResult.md`](../specification/Technical/CheckpointBActiveRpgLoopResult.md) — its first weak verdict is superseded by the later repair/rerun PASS evidence.
+- [`specification/Technical/CheckpointCIncrementalIntegrationResult.md`](../specification/Technical/CheckpointCIncrementalIntegrationResult.md) — its first weak verdict is superseded by the later repair/rerun PASS evidence.
+- [`specification/Technical/ArchitectureOverview.md`](../specification/Technical/ArchitectureOverview.md) statements that testing is manual-only or that authoritative CI is absent — superseded by current Build Validation, `RUNBOOK.md`, and accumulated qualification history.
+- Candidate-only milestone handoff PR #98 — superseded by the integrated handoff and current `STATUS.md`.
+- Former `.github/workflows/gemini-review.yml`, `gemini.md`, and `GEMINI_API_KEY` dependence — retired; deterministic Build Validation is current merge authority.
+- Any old post-M25 queue that treats timing-hardening Packages 1–3, content intelligence, Archive Inquiry, Player Insight, Rule-of-Two extraction, contextual causality, cross-domain Trait buildcraft, the third chapter, or Copy routine priority as pending.
+- The former test assumption that the repository must contain exactly two chapter definitions. Archive Inquiry remains the qualified second chapter, but later heterogeneous chapter projections are valid.
 
-A `SUPERSEDED` label here applies to the identified conclusion/scope. It does not imply the entire historical record is useless or false.
+A `SUPERSEDED` label applies to the identified conclusion/scope, not necessarily every historical fact in the file.
 
 ## Product-evidence ceiling
 
-No documentation classification may promote repository evidence beyond what the current product authority permits.
-
-At this reconciliation point, repository qualification does **not** prove:
+Repository qualification does **not** prove:
 
 - fresh-player comprehension or discoverability;
 - perceived responsiveness;
+- causal terminology comprehension;
 - pacing quality;
 - fairness or final balance;
 - enjoyment;
 - retention / desire to continue;
-- generalized campaign/chapter scalability;
+- generalized campaign scalability;
 - production-device/background behavior outside the qualified envelope;
 - a final Product Direction decision;
 - M26 authorization.
 
-If human validation is unavailable, repository-only or hermetic work may continue when a fresh reconciliation identifies a legitimate bounded bottleneck, but claims must remain below this evidence ceiling.
+If human validation is unavailable, repository-only or hermetic work may continue only after a fresh reconciliation identifies a legitimate bounded bottleneck. Claims must remain below this evidence ceiling.
 
 ## Maintenance rule
 
@@ -143,14 +137,3 @@ When a change creates, supersedes, or materially reinterprets an authoritative d
 5. preserve historical records rather than silently rewriting them into current-looking documents;
 6. run `npm run docs:authority:validate` before merge;
 7. if `main` moves before merge, reconcile the candidate and re-run Build Validation on the exact new head.
-
-## Non-goals
-
-This authority index does not:
-
-- authorize new gameplay or M26;
-- replace domain-specific specifications;
-- assert that every old document has been semantically audited line-by-line;
-- require moving historical files into archive folders;
-- permit deleting evidence simply because it is superseded;
-- turn documentation into evidence of human product quality.
