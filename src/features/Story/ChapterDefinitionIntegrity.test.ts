@@ -33,8 +33,23 @@ type ReferenceCatalog = {
   completedDialogueIds: ReadonlySet<string>;
 };
 
+const DIALOGUE_CATALOG_PATHS = [
+  'public/data/dialogues.json',
+  'public/data/m24-world-state-content.json',
+  'public/data/m25-chapter-content.json',
+] as const;
+
 const readJson = (relativePath: string): any =>
   JSON.parse(fs.readFileSync(path.join(process.cwd(), relativePath), 'utf8'));
+
+const dialogueNodesFromBundle = (bundle: any): Record<string, unknown> => {
+  if (bundle?.dialogues && typeof bundle.dialogues === 'object') {
+    return bundle.dialogues as Record<string, unknown>;
+  }
+  return bundle && typeof bundle === 'object'
+    ? bundle as Record<string, unknown>
+    : {};
+};
 
 const loadReferenceCatalog = (): ReferenceCatalog => {
   const relationshipDirectory = path.join(process.cwd(), 'public/data/relationships');
@@ -47,9 +62,13 @@ const loadReferenceCatalog = (): ReferenceCatalog => {
     }
   }
 
-  const completedDialogueIds = new Set<string>(
-    Object.keys(readJson('public/data/dialogues.json'))
-  );
+  const completedDialogueIds = new Set<string>();
+  for (const cataloguePath of DIALOGUE_CATALOG_PATHS) {
+    const dialogueNodes = dialogueNodesFromBundle(readJson(cataloguePath));
+    for (const dialogueId of Object.keys(dialogueNodes)) {
+      completedDialogueIds.add(dialogueId);
+    }
+  }
 
   return { experienceIds, completedDialogueIds };
 };
@@ -152,6 +171,18 @@ const validChapter = (): IntegrityChapter => ({
 });
 
 describe('chapter definition integrity', () => {
+  test('loads the same bounded dialogue catalogues used by runtime initialization', () => {
+    const catalog = loadReferenceCatalog();
+
+    expect(catalog.completedDialogueIds).toEqual(
+      expect.objectContaining({
+        has: expect.any(Function),
+      })
+    );
+    expect(catalog.completedDialogueIds.has('valerius_m25_public_order_conclusion')).toBe(true);
+    expect(catalog.completedDialogueIds.has('gronk_m25_quiet_network_conclusion')).toBe(true);
+  });
+
   test('all current chapter requirements resolve to canonical authored content', () => {
     expect(
       collectChapterDefinitionIntegrityIssues(
