@@ -39,11 +39,12 @@ const withExperiences = (experienceIds: string[]): RootState => {
 };
 
 describe('post-M25 second heterogeneous chapter qualification', () => {
-  test('Archive Inquiry is a derived second chapter contract, not a new state authority', () => {
-    expect(CHAPTER_DEFINITIONS.map(chapter => chapter.id)).toEqual([
+  test('Archive Inquiry remains the derived second chapter contract, not a new state authority', () => {
+    expect(CHAPTER_DEFINITIONS.slice(0, 2).map(chapter => chapter.id)).toEqual([
       'merchant_district',
       'archive_inquiry',
     ]);
+    expect(CHAPTER_DEFINITIONS.map(chapter => chapter.id)).toContain('archive_inquiry');
     const archive = getChapterDefinition('archive_inquiry');
     expect(archive.routes.map(route => route.id)).toEqual([
       'evidence_over_ownership',
