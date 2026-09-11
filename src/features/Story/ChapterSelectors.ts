@@ -5,6 +5,10 @@ import {
   type ChapterId,
   type ChapterRouteDefinition,
 } from './ChapterDefinitions';
+import {
+  isChapterRequirementSatisfied,
+  listChapterRouteRequirements,
+} from './ChapterRequirements';
 
 export type ChapterProgressStatus = 'not_started' | 'in_progress' | 'complete';
 
@@ -27,30 +31,21 @@ export interface ChapterProgress {
   routes: ChapterRouteProgress[];
 }
 
-const hasExperience = (state: RootState, experienceId: string): boolean =>
-  Boolean(state.relationships.experiencesById[experienceId]);
-
-const hasCompletedDialogue = (state: RootState, dialogueId: string): boolean =>
-  Object.values(state.npcs.npcs).some(npc =>
-    (npc.completedDialogues ?? []).includes(dialogueId)
-  );
-
 const evaluateRoute = (
   state: RootState,
   route: ChapterRouteDefinition
 ): ChapterRouteProgress => {
-  const checks = [
-    ...(route.requiredExperienceIds ?? []).map(id => hasExperience(state, id)),
-    ...(route.requiredCompletedDialogueIds ?? []).map(id => hasCompletedDialogue(state, id)),
-  ];
-  const satisfiedRequirements = checks.filter(Boolean).length;
+  const requirements = listChapterRouteRequirements(route);
+  const satisfiedRequirements = requirements.filter(requirement =>
+    isChapterRequirementSatisfied(state, requirement)
+  ).length;
   return {
     id: route.id,
     label: route.label,
     summary: route.summary,
-    satisfied: checks.length > 0 && satisfiedRequirements === checks.length,
+    satisfied: requirements.length > 0 && satisfiedRequirements === requirements.length,
     satisfiedRequirements,
-    totalRequirements: checks.length,
+    totalRequirements: requirements.length,
   };
 };
 
