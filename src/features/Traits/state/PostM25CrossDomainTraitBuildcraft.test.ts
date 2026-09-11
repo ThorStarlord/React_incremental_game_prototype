@@ -18,7 +18,7 @@ const quests = readJson('public/data/quests.json');
 describe('post-M25 cross-domain relationship-derived Trait buildcraft', () => {
   test('Scholarly Insight already changes quest solution space and now changes combat solution space', () => {
     const inventoryQuest = quests.quest_m16_impossible_inventory;
-    const scholarlyResolution = inventoryQuest.resolutions.find(
+    const scholarlyResolution = inventoryQuest.resolutionOptions.find(
       (resolution: any) => resolution.id === 'reopen_inventory_model'
     );
 
