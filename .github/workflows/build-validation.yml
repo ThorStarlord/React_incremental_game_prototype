@@ -51,6 +51,9 @@ jobs:
       - name: Synthetic review V2 action-binding qualification
         run: npm run simulated-review:action-contract
 
+      - name: Type check
+        run: npx tsc --noEmit
+
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
@@ -76,12 +79,13 @@ jobs:
             exit 1
           fi
 
-          npm run simulated-review:smoke
+          if ! npm run simulated-review:smoke; then
+            echo "Synthetic review live smoke failed; app log follows"
+            cat /tmp/simulated-review-app.log
+            exit 1
+          fi
         env:
           CI: true
-
-      - name: Type check
-        run: npx tsc --noEmit
 
       - name: GameLoop timing characterization qualification
         timeout-minutes: 5
