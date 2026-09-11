@@ -45,6 +45,12 @@ jobs:
         env:
           CI: true
 
+      - name: Post-M25 Copy portfolio strategy qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand CopyPortfolioStrategyQualification.test.ts
+        env:
+          CI: true
+
       - name: Synthetic review contract qualification
         run: npm run simulated-review:validate
 
