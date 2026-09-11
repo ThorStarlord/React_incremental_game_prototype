@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Documentation authority qualification
+        run: npm run docs:authority:validate
+
       - name: Synthetic review contract qualification
         run: npm run simulated-review:validate
 
