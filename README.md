@@ -4,13 +4,17 @@ A React/TypeScript incremental RPG prototype combining active relational/strateg
 
 ## Current authority
 
-The automated implementation program through **M25 — Complete Chapter Vertical Slice** remains complete and qualified. The timed-Quest timing milestone is also complete: the GameLoop milliseconds -> Quest seconds boundary was preflighted, repaired, and qualified across scheduler, persistence, pause/resume, timeout, notification, and M21 offline-settlement seams. A later bounded precision repair makes timeout comparison insensitive to machine-scale floating-point residue while preserving raw timer accumulation and persistence values.
+The automated implementation program through **M25 — Complete Chapter Vertical Slice** remains complete and qualified. The timed-Quest timing milestone is complete, including seconds normalization and comparison-only floating-point precision handling. The later post-M25 GameLoop timing-hardening milestone is also **complete and integrated**: serialized async backpressure, lifecycle remainder semantics, large-frame/cadence characterization, long-horizon drift, and cross-seam progression stress qualification now coexist on `main`.
 
 ```text
 M25 Complete Chapter Vertical Slice: PASS
 GameLoop Timing Characterization: COMPLETE
 Deterministic Live Tick Scheduler Repair: COMPLETE
+Serial Async Backpressure: COMPLETE / INTEGRATED
+Lifecycle Remainder Semantics: COMPLETE / INTEGRATED
+Backpressure x Cadence Progression Stress: COMPLETE / INTEGRATED
 Cross-Progression Tick Determinism Characterization: COMPLETE
+Long-Horizon Cross-Progression Drift: COMPLETE / INTEGRATED
 Delta-Time-Normalized Vital Regeneration Repair: COMPLETE
 Live/Persistence/Offline Progression Boundary Qualification: COMPLETE
 Timed Quest Unit & Save-Compatibility Preflight: COMPLETE
@@ -22,7 +26,7 @@ Product Direction Decision: PENDING
 M26: NOT AUTHORIZED
 ```
 
-Start with [`STATUS.md`](STATUS.md) for the current milestone handoff and [`specification/README.md`](specification/README.md) for the technical authority chain.
+Start with [`STATUS.md`](STATUS.md) for the current milestone handoff, [`RUNBOOK.md`](RUNBOOK.md) for operational qualification commands, and [`specification/README.md`](specification/README.md) for the technical authority chain.
 
 ## Stack
 
@@ -65,7 +69,7 @@ npm run build
 CI=true npm test -- --watchAll=false --runInBand
 ```
 
-The authoritative pull-request gate is `.github/workflows/build-validation.yml`. When qualifying a candidate for merge, prefer the exact workflow commands rather than assuming one local command reproduces every CI step.
+The authoritative pull-request correctness workflow is `.github/workflows/build-validation.yml`. Merge authority is deterministic Build Validation plus preregistered package/milestone acceptance criteria and any separately declared authoritative gate for the change. Optional AI review is advisory unless an explicit future policy says otherwise.
 
 ## GameLoop and progression qualification
 
@@ -77,15 +81,29 @@ CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characteriza
 
 Covers fixed-step cadence, irregular RAF accumulation, fractional accumulator continuity, same-frame catch-up, serialized async `onTick`, rejected-handler recovery, pause/resume wall-clock rejection, game-speed changes, and tick-rate changes.
 
+### Async backpressure and lifecycle qualification
+
+```bash
+CI=true npm test -- --watchAll=false --runInBand GameLoopAsyncTickBacklogPolicyContract.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopBoundedBacklogControlRepair.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopSubStepRestartSaveResumePreflight.test.tsx GameLoopLifecycleRemainderPolicy.test.ts
+CI=true npm test -- --watchAll=false --runInBand GameLoopBackpressureCadenceProgressionStressQualification.test.tsx
+```
+
+The current scheduler authority is `SERIAL_BACKPRESSURE_V1`: defer logical milliseconds in the accumulator, admit at most one unresolved async consumer tick, and do not drop, skip, coalesce, pre-mint a TickData FIFO, or run consumers concurrently.
+
+The lifecycle authority is `FRESH_LOOP_RESET_V1`: continuous execution and pause/resume preserve sub-step remainder, while stop/start, unmount/remount, and canonical save/load + fresh mount discard it. Paused or offline wall time is not replayed through the live GameLoop.
+
 ### Cross-progression determinism
 
 ```bash
 CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopLongHorizonCrossProgressionDrift.test.tsx
 ```
 
-Covers representative Essence, Copy, Player, and timed-Quest progression under equivalent logical time across regular/irregular/catch-up delivery, 10 Hz vs 20 Hz schedules, and pause/resume boundaries.
+Covers representative Essence, Copy, Player, and timed-Quest progression under equivalent logical time across regular/irregular/catch-up delivery, supported cadence changes, and pause/resume boundaries.
 
-Player vitality is elapsed-logical-time based rather than tick-count based. Timed Quest progression now also asserts the public seconds contract.
+Player vitality is elapsed-logical-time based rather than tick-count based. Timed Quest progression also asserts the public seconds contract.
 
 ### Timed Quest unit / save-compatibility qualification
 
@@ -198,6 +216,8 @@ Timed Quests remain online-only during offline settlement.
 - [`src/features/GameLoop/GameLoopTimedQuestPrecisionResolution.test.tsx`](src/features/GameLoop/GameLoopTimedQuestPrecisionResolution.test.tsx)
 - [`.github/workflows/build-validation.yml`](.github/workflows/build-validation.yml)
 
+For the complete post-M25 timing-hardening authority and operational command set, use [`STATUS.md`](STATUS.md) and [`RUNBOOK.md`](RUNBOOK.md).
+
 ## Post-M25 synthetic-review tooling
 
 The synthetic-review tooling collects **Level-2 synthetic product-risk evidence**. It does not prove human comprehension, enjoyment, pacing, retention, or product-market fit.
@@ -246,13 +266,21 @@ Do not use repository state, Redux inspection, local-storage inspection, debug i
 
 ## Milestone qualification commands
 
-These are the focused regression entrypoints currently used by Build Validation.
+These are representative focused regression entrypoints currently used by Build Validation.
 
 ```bash
 CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopAsyncTickBacklogPolicyContract.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopBoundedBacklogControlRepair.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopSubStepRestartSaveResumePreflight.test.tsx GameLoopLifecycleRemainderPolicy.test.ts
+CI=true npm test -- --watchAll=false --runInBand GameLoopLargeFrameBackgroundStallPreflight.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopMidSessionCadenceTransitionQualification.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopBackpressureCadenceProgressionStressQualification.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopLongHorizonCrossProgressionDrift.test.tsx
 CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
 CI=true npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionPreflight.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionResolution.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
 CI=true npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
@@ -266,31 +294,9 @@ CI=true npm test -- --watchAll=false --runInBand CopyM20ProductionTaskAutomation
 
 ## CI-parity validation sequence
 
-For a candidate touching GameLoop scheduling, progression timing, timed Quests, persistence/offline boundaries, or the post-M25 review apparatus, run at least:
+For a candidate touching GameLoop scheduling, progression timing, timed Quests, persistence/offline boundaries, or the post-M25 review apparatus, follow [`RUNBOOK.md`](RUNBOOK.md) and the exact `.github/workflows/build-validation.yml` command sequence.
 
-```bash
-npm ci
-npm run simulated-review:validate
-npm run simulated-review:action-contract
-npx playwright install --with-deps chromium
-npx tsc --noEmit
-CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
-CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
-CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
-CI=true npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
-CI=true npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionResolution.test.tsx
-CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
-CI=true npm test -- --watchAll=false --runInBand M25CompleteChapterVerticalSlice.test.tsx
-CI=true npm test -- --watchAll=false --runInBand M24ObjectiveWorldState.test.tsx
-CI=true npm test -- --watchAll=false --runInBand M23FactionReputation.test.tsx
-CI=true npm test -- --watchAll=false --runInBand M22SocialKnowledgePropagation.test.tsx
-CI=true npm test -- --watchAll=false --runInBand CheckpointCIncrementalIntegrationRepair.test.tsx
-CI=true npm test -- --watchAll=false --runInBand GameLoopM21OfflineProgress.test.ts
-CI=true npm test -- --watchAll=false --runInBand CopyM20ProductionTaskAutomation.test.tsx
-npm run build
-```
-
-The workflow also runs the localhost UI smoke, active-loop qualification, modified historical qualification, and accumulated M4-M19 baseline. Consult `.github/workflows/build-validation.yml` for the exact current list.
+The workflow runs localhost UI smoke, TypeScript, focused timing/progression qualification, active-loop qualification, modified historical qualification, accumulated M4-M19 baseline, and production build.
 
 ## Product / evidence runbook
 
@@ -307,19 +313,25 @@ M25 technical composition PASS
 
 Scheduler, progression, and timed-Quest correctness do not replace this chain. Do **not** infer pacing quality, balance quality, comprehension, fun, retention, or M26 authorization from deterministic execution.
 
-The original three-package timed-Quest unit-normalization queue is complete. The later timeout-precision question is now resolved by a bounded comparison-only contract; it does not authorize broader timer or product changes.
+The post-M25 timing-hardening queue is complete and integrated. Before creating another repository-local timing queue, reconcile current `main`, current product authority, and the actual active bottleneck.
 
-One repository-local question may still be worth future bounded preflight **only if reconciliation confirms it is the active bottleneck**:
-
-- whether timed-Quest authoring eventually requires explicit persisted timer-unit provenance or a future schema contract.
+Potential future timing questions such as persisted scheduler remainder, Page Visibility/background handoff, or wider cadence envelopes are not implicitly authorized production changes.
 
 Human pacing, fairness, comprehension, enjoyment, retention, and Product Direction remain separate authority gates.
 
-## External review diagnostic
+## CI governance
 
-The separate Gemini AI Code Review workflow currently fails before producing review output because its configured Gemini API key is invalid. This is an `EXTERNAL_AUTHORITY` maintenance issue. Repository Build Validation remains the authoritative hermetic correctness gate for the gameplay/timing packages.
+The former Gemini AI Code Review workflow was retired during PR #97. Its API-key dependency was obsolete relative to the repository's established merge-authority model and had become an accidental blocker after later process wording drifted toward “all configured workflows.”
 
-Do not inject production credentials or mix Gemini credential repair into gameplay/timing packages.
+Current repository authority is:
+
+```text
+Build Validation
++ preregistered package/milestone acceptance criteria
++ any explicitly declared authoritative gate for the change
+```
+
+AI review, when used, is advisory. The repository no longer consumes `GEMINI_API_KEY` in CI. Historical `API_KEY_INVALID` runs remain historical diagnostics only.
 
 ## Standard npm scripts
 
