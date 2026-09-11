@@ -16,21 +16,27 @@ import {
   selectNPCDialogueHistory,
   processNPCInteractionThunk,
 } from '../../../';
-import type { DialogueEntry } from '../../../state/NPCTypes';
-import { doesWorldStateRequirementPass } from '../../../../WorldState/state/WorldStateSelectors';
+import type { DialogueEntry, DialogueNode } from '../../../state/NPCTypes';
+import { evaluateDialogueAvailabilityPresentation } from '../../../state/DialogueAvailabilityPresentation';
 
 interface NPCDialogueTabProps {
   npcId: string;
 }
 
 type DialogueResponse = { id: string; label: string };
-type Choice = { id: string; title: string; responses: DialogueResponse[] };
+type Choice = {
+  id: string;
+  title: string;
+  responses: DialogueResponse[];
+  availabilityReasons: string[];
+};
 
 /**
  * NPCDialogueTab - Handles dialogue interactions with NPCs.
  * Authored topics can declare Relationship, active-experience, per-NPC
- * Knowledge, bounded institutional, and bounded objective-world prerequisites
- * so future beats do not spoil themselves or become clickable out of causal order.
+ * Knowledge, bounded institutional, and bounded objective-world prerequisites.
+ * Already-available topics may surface a concise spoiler-safe explanation of
+ * the canonical evidence that made them available.
  */
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
@@ -58,73 +64,21 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const availableDialogueChoices: Choice[] = useMemo(() => {
     if (!npc?.availableDialogues) return [];
     const completedDialogues = Array.isArray(npc.completedDialogues) ? npc.completedDialogues : [];
+
     return npc.availableDialogues
       .map((dialogueId: string) => {
-        const node: any = (dialogueNodes as any)[dialogueId];
+        const node = (dialogueNodes as Record<string, DialogueNode>)[dialogueId];
         if (!node) return null;
 
-        if (node.repeatable === false && completedDialogues.includes(node.id)) {
-          return null;
-        }
-
-        const requiredExperienceIds = Array.isArray(node.requiredExperienceIds)
-          ? node.requiredExperienceIds as string[]
-          : [];
-        if (requiredExperienceIds.some(id => !recordedExperiences[id])) {
-          return null;
-        }
-
-        const anyOfExperienceIds = Array.isArray(node.anyOfExperienceIds)
-          ? node.anyOfExperienceIds as string[]
-          : [];
-        if (
-          anyOfExperienceIds.length > 0 &&
-          !anyOfExperienceIds.some(id => Boolean(recordedExperiences[id]))
-        ) {
-          return null;
-        }
-
-        const requiredRoutineFamiliarityIds = Array.isArray(node.requiredRoutineFamiliarityIds)
-          ? node.requiredRoutineFamiliarityIds as string[]
-          : [];
-        if (requiredRoutineFamiliarityIds.some(id => !routineFamiliarity[id as keyof typeof routineFamiliarity])) {
-          return null;
-        }
-
-        const requiredKnowledgeFactIds = Array.isArray(node.requiredKnowledgeFactIds)
-          ? node.requiredKnowledgeFactIds as string[]
-          : [];
-        if (requiredKnowledgeFactIds.some(id => !knownFactIds.includes(id))) {
-          return null;
-        }
-
-        const forbiddenKnowledgeFactIds = Array.isArray(node.forbiddenKnowledgeFactIds)
-          ? node.forbiddenKnowledgeFactIds as string[]
-          : [];
-        if (forbiddenKnowledgeFactIds.some(id => knownFactIds.includes(id))) {
-          return null;
-        }
-
-        const requiredFactionReputation = Array.isArray(node.requiredFactionReputation)
-          ? node.requiredFactionReputation as Array<{ factionId: string; min?: number; max?: number }>
-          : [];
-        if (requiredFactionReputation.some(requirement => {
-          const value = factionReputationByFactionId[requirement.factionId] ?? 0;
-          if (typeof requirement.min === 'number' && value < requirement.min) return true;
-          if (typeof requirement.max === 'number' && value > requirement.max) return true;
-          return false;
-        })) {
-          return null;
-        }
-
-        const requiredWorldState = Array.isArray(node.requiredWorldState)
-          ? node.requiredWorldState
-          : [];
-        if (requiredWorldState.some((requirement: unknown) =>
-          !doesWorldStateRequirementPass(worldStateRegions, requirement)
-        )) {
-          return null;
-        }
+        const availability = evaluateDialogueAvailabilityPresentation(node, {
+          completedDialogueIds: completedDialogues,
+          recordedExperiences,
+          routineFamiliarity,
+          knownFactIds,
+          factionReputationByFactionId,
+          worldStateRegions,
+        });
+        if (!availability.available) return null;
 
         const responses = node.responses || {};
         return {
@@ -134,6 +88,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
             id,
             label: String(label),
           })),
+          availabilityReasons: availability.availabilityReasons,
         } as Choice;
       })
       .filter(Boolean) as Choice[];
@@ -234,9 +189,18 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           <Grid container spacing={1}>
             {availableDialogueChoices.map((choice: Choice) => (
               <Grid item xs={12} key={choice.id}>
-                <Typography variant="body2" sx={{ mb: 0.75 }}>
+                <Typography variant="body2" sx={{ mb: 0.5 }}>
                   {choice.title}
                 </Typography>
+                {choice.availabilityReasons.length > 0 && (
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block', mb: 0.75 }}
+                  >
+                    Available because: {choice.availabilityReasons.join(' · ')}
+                  </Typography>
+                )}
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {choice.responses.length > 0 ? (
                     choice.responses.map(response => (
