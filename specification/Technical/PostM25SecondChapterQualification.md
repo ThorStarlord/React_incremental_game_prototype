@@ -54,7 +54,7 @@ A Useful Objection
 -> The Result Held Without Her
 ```
 
-The route preserves the costly-correction memory `elara_memory_footnote_won`.
+The route preserves the costly-correction memory `elara_memory_footnote_won` and the existing Elara qualification proves irreversible acquisition of permanent `ScholarlyInsight` after the canonical resonance gates are satisfied.
 
 ### Route B — Cautious Consensus, Later Reopened
 
@@ -68,22 +68,20 @@ A Useful Objection
 -> The Result Held Without Her
 ```
 
-This route deliberately does not fabricate `elara_memory_footnote_won`. It can still reach reciprocal inquiry and independent verification later.
+This route deliberately does not fabricate `elara_memory_footnote_won`. Existing Elara authority establishes that the route can still reach Connection II, full `ScholarlyInsight` assimilation, sufficient compatibility, and the required `IndependentVerification` Memory evidence.
 
-## Shared capability outcome without shared history
+## Shared capability boundary without shared history
 
-Both routes may eventually satisfy the existing requirements for permanent `ScholarlyInsight`.
-
-That composition demonstrates:
+The two routes preserve materially different Relationship/Memory histories while converging at the same canonical resonance-ready boundary. This package does not invent a second irreversible-acquisition proof where the existing Elara qualification did not already claim one.
 
 ```text
 different relationship history
 + different memory history
--> can converge on one earned cognitive capability
-without erasing the route-specific past
+-> same qualified capability boundary
+-> permanent Trait remains owned by the existing Trait resonance authority
 ```
 
-This is useful evidence for the proposed relationship-derived build direction: a Trait is durable capability authority, while Relationship remains the authority for how that capability was learned.
+This is useful evidence for the proposed relationship-derived build direction: a Trait is durable capability authority, while Relationship remains the authority for how that capability became available.
 
 ## Qualification
 
@@ -93,8 +91,9 @@ This is useful evidence for the proposed relationship-derived build direction: a
 2. no new chapter/story reducer or save authority is introduced;
 3. both Archive Inquiry routes derive from existing Relationship evidence;
 4. the two routes preserve different experience and Memory histories;
-5. both can converge on permanent `ScholarlyInsight` through the already-qualified Trait acquisition path;
-6. partial evidence derives `in_progress` rather than fabricating completion.
+5. the evidence-first route can perform the already-qualified permanent `ScholarlyInsight` acquisition;
+6. the cautious route reaches the canonical resonance-ready boundary without fabricating permanence;
+7. partial evidence derives `in_progress` rather than fabricating completion.
 
 ## Evidence ceiling
 
