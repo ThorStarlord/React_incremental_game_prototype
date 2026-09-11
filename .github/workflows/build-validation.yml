@@ -33,6 +33,12 @@ jobs:
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 
+      - name: Post-M25 second heterogeneous chapter qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand PostM25SecondChapterQualification.test.ts
+        env:
+          CI: true
+
       - name: Synthetic review contract qualification
         run: npm run simulated-review:validate
 
