@@ -1,7 +1,7 @@
 # Documentation Authority Index
 
 **Status:** CURRENT AUTHORITY for document classification  
-**Reconciled against integrated implementation baseline:** `57055416f310e1302aae673074f0d8933b1cbc36` plus the closed post-M25 roadmap record  
+**Reconciled against integrated implementation baseline:** `5bdf808154a62bdb85c1bee55777f9be35f1395e`  
 **Last reconciled:** 2026-09-11
 
 ## Purpose
@@ -59,7 +59,8 @@ If a conflict still cannot be resolved, perform a bounded reconciliation before 
 | Post-M25 product boundary | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Product hypotheses, human-evidence boundary, anti-expansion controls. `M26` remains **NOT AUTHORIZED** by technical evidence alone. |
 | Product Direction decision readiness | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProductDirectionDecisionReadiness.md`](../specification/Technical/PostM25ProductDirectionDecisionReadiness.md) | Compares demonstrated candidate identities without making the Product Direction Decision. |
 | Post-M25 implementation accounting | CURRENT AUTHORITY | [`specification/Technical/PostM25ImplementationRoadmap.md`](../specification/Technical/PostM25ImplementationRoadmap.md) | Closed program record; the former six-step post-M25 queue is complete and must not be restarted by inertia. |
-| Three-chapter repository friction | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ThreeChapterFrictionAudit.md`](../specification/Technical/PostM25ThreeChapterFrictionAudit.md) | Authorizes only the three explicitly identified chapter-integrity/type/API repairs. |
+| Three-chapter repository friction | HISTORICAL EVIDENCE / CLOSED AUDIT | [`specification/Technical/PostM25ThreeChapterFrictionAudit.md`](../specification/Technical/PostM25ThreeChapterFrictionAudit.md) | Findings remain authoritative provenance; its R1–R3 queue is complete. |
+| Chapter-definition integrity repair | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md`](../specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md) | Integrated R1–R3 result, exact-head qualification, runtime-aligned dialogue catalogue, and anti-expansion boundary. |
 | Scheduler async backpressure | CURRENT AUTHORITY | [`specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md`](../specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md), [`specification/Technical/GameLoopBoundedBacklogControlRepair.md`](../specification/Technical/GameLoopBoundedBacklogControlRepair.md) | `SERIAL_BACKPRESSURE_V1`. |
 | GameLoop lifecycle remainder | CURRENT AUTHORITY | [`specification/Technical/GameLoopLifecycleRemainderPolicy.md`](../specification/Technical/GameLoopLifecycleRemainderPolicy.md) | `FRESH_LOOP_RESET_V1`. |
 | Timed-Quest precision | CURRENT AUTHORITY | [`specification/Technical/GameLoopTimedQuestPrecisionResolution.md`](../specification/Technical/GameLoopTimedQuestPrecisionResolution.md), [`specification/Technical/GameLoopQuestTimingIntegrationQualification.md`](../specification/Technical/GameLoopQuestTimingIntegrationQualification.md) | Comparison-only precision handling; raw/persisted values remain unchanged. |
@@ -70,7 +71,7 @@ If a conflict still cannot be resolved, perform a bounded reconciliation before 
 The following are **CURRENT AUTHORITY** for their bounded scopes:
 
 - [`specification/Technical/PostM25ProductDirectionDecisionReadiness.md`](../specification/Technical/PostM25ProductDirectionDecisionReadiness.md) — decision-preparation evidence matrix for causal legibility, relationship-derived buildcraft, earned delegation, and heterogeneous composition; no final direction is selected.
-- [`specification/Technical/PostM25ThreeChapterFrictionAudit.md`](../specification/Technical/PostM25ThreeChapterFrictionAudit.md) — fresh repository-only friction audit across all three chapter projections and the exact bounded repair authorization it produced.
+- [`specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md`](../specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md) — integrated chapter identity/reference/API repair; `chapter:validate` is now part of content-intelligence qualification.
 - [`specification/Technical/PostM25ContentIntelligence.md`](../specification/Technical/PostM25ContentIntelligence.md) — developer-side authoring integrity, dependency/reachability intelligence, and route tracing.
 - [`specification/Technical/PostM25SecondChapterQualification.md`](../specification/Technical/PostM25SecondChapterQualification.md) — Archive Inquiry as the qualified second heterogeneous chapter-scale projection without a ChapterEngine.
 - [`specification/Technical/PostM25PlayerInsightProjection.md`](../specification/Technical/PostM25PlayerInsightProjection.md) — Causal Journal, Opportunity Map, Relationship-Derived Build, and read-only Player Insight boundaries.
@@ -80,7 +81,14 @@ The following are **CURRENT AUTHORITY** for their bounded scopes:
 - [`specification/Technical/PostM25ThirdHeterogeneousChapter.md`](../specification/Technical/PostM25ThirdHeterogeneousChapter.md) — `Enemies in Phase` as a third heterogeneous chapter projection over existing Lyra evidence.
 - [`specification/Technical/PostM25CopyRoutineStrategy.md`](../specification/Technical/PostM25CopyRoutineStrategy.md) — player-authored bounded routine priority and explicit preferred-task delegation.
 
-The existing post-M25 GameLoop timing/backpressure/lifecycle qualification records remain current for their stated technical scopes. Use [`specification/README.md`](../specification/README.md) for the complete current chain.
+The post-M25 GameLoop timing/backpressure/lifecycle qualification records remain current for their stated technical scopes. Use [`specification/README.md`](../specification/README.md) for the complete current chain.
+
+## Closed audit / program records
+
+These records remain important provenance but are **not pending implementation queues**:
+
+- [`specification/Technical/PostM25ImplementationRoadmap.md`](../specification/Technical/PostM25ImplementationRoadmap.md) — closed six-package post-M25 program record.
+- [`specification/Technical/PostM25ThreeChapterFrictionAudit.md`](../specification/Technical/PostM25ThreeChapterFrictionAudit.md) — closed audit; R1–R3 were implemented by PR #108 and are represented by `PostM25ChapterDefinitionIntegrityRepair.md`.
 
 ## Reference
 
@@ -96,21 +104,32 @@ The following are useful but subordinate to the current authority chain:
 
 Older milestone reports, checkpoint artifacts, PR handoffs, synthetic-review captures, and analysis files may remain valuable **HISTORICAL EVIDENCE** even after their active decision role ends. Preserve them for auditability; do not silently turn them back into implementation queues.
 
-Examples include pre-integration post-M25 timing handoffs, exact-head qualification records for already-merged candidates, earlier synthetic-review observations later repaired or rerun, and historical Gemini `API_KEY_INVALID` failures.
+This includes Build Validation #335, whose failure is useful provenance for the chapter-integrity repair: it exposed an incomplete validator dialogue catalogue, not invalid chapter content. Build Validation #336 on exact head `458d1fead28fea3e92c33db5e8baee319d55c3ed` supersedes that candidate as qualification evidence.
 
 ## Explicitly superseded conclusions
 
 The following records remain historical evidence, but their identified verdicts or assumptions are **SUPERSEDED**:
 
-- [`specification/Technical/CheckpointBActiveRpgLoopResult.md`](../specification/Technical/CheckpointBActiveRpgLoopResult.md) — its first weak verdict is superseded by the later repair/rerun PASS evidence.
-- [`specification/Technical/CheckpointCIncrementalIntegrationResult.md`](../specification/Technical/CheckpointCIncrementalIntegrationResult.md) — its first weak verdict is superseded by the later repair/rerun PASS evidence.
+- [`specification/Technical/CheckpointBActiveRpgLoopResult.md`](../specification/Technical/CheckpointBActiveRpgLoopResult.md) — its first weak verdict is superseded by later repair/rerun PASS evidence.
+- [`specification/Technical/CheckpointCIncrementalIntegrationResult.md`](../specification/Technical/CheckpointCIncrementalIntegrationResult.md) — its first weak verdict is superseded by later repair/rerun PASS evidence.
 - [`specification/Technical/ArchitectureOverview.md`](../specification/Technical/ArchitectureOverview.md) statements that testing is manual-only or that authoritative CI is absent — superseded by current Build Validation, `RUNBOOK.md`, and accumulated qualification history.
 - Candidate-only milestone handoff PR #98 — superseded by the integrated handoff and current `STATUS.md`.
 - Former `.github/workflows/gemini-review.yml`, `gemini.md`, and `GEMINI_API_KEY` dependence — retired; deterministic Build Validation is current merge authority.
-- Any old post-M25 queue that treats timing-hardening Packages 1–3, content intelligence, Archive Inquiry, Player Insight, Rule-of-Two extraction, contextual causality, cross-domain Trait buildcraft, the third chapter, or Copy routine priority as pending.
+- Any old post-M25 queue that treats timing-hardening Packages 1–3, content intelligence, Archive Inquiry, Player Insight, Rule-of-Two extraction, contextual causality, cross-domain Trait buildcraft, the third chapter, Copy routine priority, Product Direction decision-readiness preparation, or chapter-integrity R1–R3 as pending.
 - The former test assumption that the repository must contain exactly two chapter definitions. Archive Inquiry remains the qualified second chapter, but later heterogeneous chapter projections are valid.
 
 A `SUPERSEDED` label applies to the identified conclusion/scope, not necessarily every historical fact in the file.
+
+## Current unresolved human authority gate
+
+Issue #109 — **Human Integrated Playability / Product Review** — is intentionally unresolved. Only genuine fresh human evidence can satisfy it. Automated tests, synthetic UI smoke, repository inspection, or an LLM-authored opinion must not be relabeled as human product evidence.
+
+Until that evidence exists:
+
+```text
+Product Direction Decision: PENDING
+M26: NOT AUTHORIZED
+```
 
 ## Product-evidence ceiling
 
