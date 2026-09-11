@@ -1,4 +1,7 @@
-import { doesWorldStateRequirementPass } from '../../WorldState/state/WorldStateSelectors';
+import {
+  doesWorldStateRequirementPass,
+  type WorldStateRegions,
+} from '../../WorldState/state/WorldStateSelectors';
 import type { DialogueNode } from './NPCTypes';
 
 export interface DialogueAvailabilityPresentationContext {
@@ -7,7 +10,7 @@ export interface DialogueAvailabilityPresentationContext {
   routineFamiliarity: Record<string, unknown>;
   knownFactIds: readonly string[];
   factionReputationByFactionId: Record<string, number | undefined>;
-  worldStateRegions: unknown;
+  worldStateRegions: WorldStateRegions;
 }
 
 export interface DialogueAvailabilityPresentation {
