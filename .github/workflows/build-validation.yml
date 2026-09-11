@@ -71,6 +71,12 @@ jobs:
         env:
           CI: true
 
+      - name: Sub-step restart / save-resume remainder preflight
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopSubStepRestartSaveResumePreflight.test.tsx
+        env:
+          CI: true
+
       - name: Cross-progression tick determinism characterization
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
