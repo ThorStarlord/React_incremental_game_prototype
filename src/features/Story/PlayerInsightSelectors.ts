@@ -177,7 +177,7 @@ export const selectRelationshipBuildCapabilities = (
       if (!sourceNpcId) return false;
       return discovered.has(trait.id) || permanent.has(trait.id);
     })
-    .map(trait => {
+    .map((trait): RelationshipBuildCapability => {
       const sourceNpcId = trait.sourceNpc ?? trait.source!;
       const profile = state.relationships.bondProfilesByNpc[sourceNpcId];
       const assimilation =
@@ -200,6 +200,11 @@ export const selectRelationshipBuildCapabilities = (
         assimilationProgress >= assimilationThreshold &&
         compatibility >= minimumCompatibility &&
         missingMemoryTags.length === 0;
+      const status: RelationshipCapabilityStatus = permanent.has(trait.id)
+        ? 'permanent'
+        : resonanceReady
+          ? 'resonance_ready'
+          : 'developing';
 
       return {
         traitId: trait.id,
@@ -207,11 +212,7 @@ export const selectRelationshipBuildCapabilities = (
         description: trait.description,
         sourceNpcId,
         sourceNpcName: npcName(state, sourceNpcId),
-        status: permanent.has(trait.id)
-          ? 'permanent'
-          : resonanceReady
-            ? 'resonance_ready'
-            : 'developing',
+        status,
         connectionLevel,
         requiredConnectionLevel,
         assimilationProgress,
