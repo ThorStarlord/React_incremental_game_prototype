@@ -52,6 +52,8 @@ for (const entrypoint of ['README.md', 'STATUS.md', 'RUNBOOK.md']) {
   requireContains(entrypoint, ['docs/CURRENT.md']);
 }
 
+requireContains('docs/README.md', ['CURRENT.md', 'HISTORICAL']);
+requireContains('specification/README.md', ['authority chain', 'current records']);
 requireContains('package.json', ['"docs:authority:validate"']);
 requireContains('.github/workflows/build-validation.yml', [
   'Documentation authority qualification',
