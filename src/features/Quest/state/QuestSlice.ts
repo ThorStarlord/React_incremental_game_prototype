@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Quest, QuestObjective, QuestState, QuestStatus } from './QuestTypes';
+import { hasReachedQuestTimeLimit } from './QuestTimerPrecision';
 
 const initialState: QuestState = {
   quests: {},
@@ -36,7 +37,7 @@ const questSlice = createSlice({
       if (!quest || quest.status !== 'IN_PROGRESS') return;
       if (typeof quest.timeLimitSeconds !== 'number') return;
       quest.elapsedSeconds = Math.max(0, (quest.elapsedSeconds || 0) + Math.max(0, deltaSeconds));
-      if (quest.elapsedSeconds >= quest.timeLimitSeconds) {
+      if (hasReachedQuestTimeLimit(quest.elapsedSeconds, quest.timeLimitSeconds)) {
         quest.status = 'FAILED';
         state.activeQuestIds = state.activeQuestIds.filter((id) => id !== questId);
       }

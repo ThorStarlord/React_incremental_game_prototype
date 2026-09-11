@@ -9,11 +9,6 @@ interface UseGameLoopOptions {
   onTick?: TickHandler;
 }
 
-interface QueuedTick {
-  tickData: TickData;
-  handler: TickHandler;
-}
-
 const isPromiseLike = (value: unknown): value is PromiseLike<void> =>
   (typeof value === 'object' || typeof value === 'function') &&
   value !== null &&
@@ -35,8 +30,9 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
     tickRate: gameLoop.tickRate,
   });
   const onTickRef = useRef<TickHandler | undefined>(onTick);
-  const tickQueueRef = useRef<QueuedTick[]>([]);
-  const isProcessingTickQueueRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const isTickConsumerActiveRef = useRef(false);
+  const drainDeferredTicksRef = useRef<() => void>(() => undefined);
 
   currentTickRef.current = gameLoop.currentTick;
   schedulingStateRef.current = {
@@ -47,52 +43,82 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
   };
   onTickRef.current = onTick;
 
-  const drainTickQueue = useCallback(() => {
-    if (isProcessingTickQueueRef.current) {
+  const drainDeferredTicks = useCallback(() => {
+    if (!isMountedRef.current || isTickConsumerActiveRef.current) {
       return;
     }
 
-    isProcessingTickQueueRef.current = true;
+    while (isMountedRef.current) {
+      const schedulingState = schedulingStateRef.current;
 
-    const continueDraining = () => {
-      while (tickQueueRef.current.length > 0) {
-        const next = tickQueueRef.current.shift();
-        if (!next) {
-          continue;
-        }
-
-        try {
-          const result = next.handler(next.tickData);
-          if (isPromiseLike(result)) {
-            void Promise.resolve(result).then(
-              () => continueDraining(),
-              (error) => {
-                console.error('GameLoop onTick handler rejected', error);
-                continueDraining();
-              }
-            );
-            return;
-          }
-        } catch (error) {
-          console.error('GameLoop onTick handler threw', error);
-        }
+      if (
+        !schedulingState.isRunning ||
+        schedulingState.isPaused ||
+        isTickConsumerActiveRef.current
+      ) {
+        return;
       }
 
-      isProcessingTickQueueRef.current = false;
-    };
+      const fixedTimeStep = 1000 / schedulingState.tickRate;
+      if (accumulatorRef.current < fixedTimeStep) {
+        return;
+      }
 
-    continueDraining();
-  }, []);
+      // SERIAL_BACKPRESSURE_V1: logical time stays in the accumulator until a
+      // consumer admission slot is available. Only the admitted fixed step is
+      // removed; no TickData objects are queued ahead of an async consumer.
+      accumulatorRef.current -= fixedTimeStep;
 
-  const enqueueTick = useCallback((tickData: TickData) => {
-    const handler = onTickRef.current;
-    if (!handler) {
-      return;
+      const nextTick = currentTickRef.current + 1;
+      currentTickRef.current = nextTick;
+
+      dispatch(tick({
+        deltaTime: fixedTimeStep,
+        timestamp: lastFrameTimeRef.current,
+      }));
+
+      const handler = onTickRef.current;
+      if (!handler) {
+        continue;
+      }
+
+      const tickData: TickData = {
+        deltaTime: fixedTimeStep,
+        currentTick: nextTick,
+        gameSpeed: schedulingState.gameSpeed,
+      };
+
+      // Mark the consumer active before invocation so re-entrant drain attempts
+      // cannot admit a second logical tick during the handler call itself.
+      isTickConsumerActiveRef.current = true;
+
+      try {
+        const result = handler(tickData);
+        if (isPromiseLike(result)) {
+          void Promise.resolve(result).then(
+            () => {
+              isTickConsumerActiveRef.current = false;
+              drainDeferredTicksRef.current();
+            },
+            (error) => {
+              console.error('GameLoop onTick handler rejected', error);
+              isTickConsumerActiveRef.current = false;
+              drainDeferredTicksRef.current();
+            }
+          );
+          return;
+        }
+      } catch (error) {
+        console.error('GameLoop onTick handler threw', error);
+      }
+
+      // Synchronous fulfillment/throw settles immediately and opens the next
+      // admission slot in this same deterministic drain pass.
+      isTickConsumerActiveRef.current = false;
     }
+  }, [dispatch]);
 
-    tickQueueRef.current.push({ tickData, handler });
-    drainTickQueue();
-  }, [drainTickQueue]);
+  drainDeferredTicksRef.current = drainDeferredTicks;
 
   const gameLoopStep = useCallback((timestamp: number) => {
     const schedulingState = schedulingStateRef.current;
@@ -113,26 +139,10 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
     const adjustedDeltaTime = deltaTime * schedulingState.gameSpeed;
     accumulatorRef.current += adjustedDeltaTime;
 
-    const fixedTimeStep = 1000 / schedulingState.tickRate;
-
-    while (accumulatorRef.current >= fixedTimeStep) {
-      const nextTick = currentTickRef.current + 1;
-      currentTickRef.current = nextTick;
-
-      dispatch(tick({ deltaTime: fixedTimeStep, timestamp }));
-
-      enqueueTick({
-        deltaTime: fixedTimeStep,
-        currentTick: nextTick,
-        gameSpeed: schedulingState.gameSpeed,
-      });
-
-      // Autosave timing is handled by the settings-driven autosave system.
-      accumulatorRef.current -= fixedTimeStep;
-    }
+    drainDeferredTicks();
 
     animationFrameRef.current = requestAnimationFrame(gameLoopStep);
-  }, [dispatch, enqueueTick]);
+  }, [drainDeferredTicks]);
 
   useEffect(() => {
     if (!gameLoop.isRunning) {
@@ -156,12 +166,21 @@ export const useGameLoop = (options: UseGameLoopOptions = {}) => {
       // Re-anchor the live wall-clock boundary on both pause and resume so
       // paused wall time is never replayed through the live fixed-step loop.
       lastFrameTimeRef.current = performance.now();
+
+      // A consumer that settled while paused deliberately leaves pre-pause
+      // logical time deferred. Resume re-opens one admission slot without
+      // waiting for another RAF callback.
+      if (!gameLoop.isPaused) {
+        drainDeferredTicks();
+      }
     }
-  }, [gameLoop.isPaused, gameLoop.isRunning]);
+  }, [gameLoop.isPaused, gameLoop.isRunning, drainDeferredTicks]);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     return () => {
-      tickQueueRef.current = [];
+      isMountedRef.current = false;
       onTickRef.current = undefined;
 
       if (animationFrameRef.current !== undefined) {
