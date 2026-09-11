@@ -32,10 +32,12 @@ import { selectTraits } from '../../../Traits/state/TraitsSelectors';
 import type { CopyProductionTaskId, CopyRole } from '../../state/CopyTypes';
 import {
   COPY_PRODUCTION_TASKS,
-  evaluateCopyProductionTaskEligibility,
   getCopyProductionTaskDefinition,
 } from '../../CopyTaskDefinitions';
-import { getFirstEligiblePreferredProductionTask } from '../../CopyRoutineStrategy';
+import {
+  getFirstEligiblePreferredProductionTask,
+  presentCopyProductionTaskReadiness,
+} from '../../CopyRoutineStrategy';
 
 interface CopyDetailPanelProps {
   copyId: string;
@@ -105,7 +107,6 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const anyPrefEnabled = Object.values(sharePrefs).some(Boolean);
   const enableAll = () => {
     if (!copy) return;
-    // enable all currently eligible
     eligibleShareIds.forEach((id) => {
       if (!sharePrefs[id]) {
         dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: true, suppressNotify: true }));
@@ -114,7 +115,6 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   };
   const disableAll = () => {
     if (!copy) return;
-    // disable everything currently enabled
     Object.keys(sharePrefs).forEach((id) => {
       if (sharePrefs[id]) {
         dispatch(setCopySharePreferenceThunk({ copyId, traitId: id, enabled: false, suppressNotify: true }));
@@ -200,11 +200,11 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
               <Stack spacing={1}>
                 {COPY_PRODUCTION_TASKS.map(task => {
                   const isFamiliar = Boolean(routineFamiliarity[task.id]);
-                  const taskEligibility = evaluateCopyProductionTaskEligibility(copy, task, isFamiliar);
+                  const readiness = presentCopyProductionTaskReadiness(copy, task, isFamiliar);
                   const rewardParts: string[] = [];
                   if ((task.reward.gold ?? 0) > 0) rewardParts.push(`${task.reward.gold} Gold`);
                   if ((task.reward.essence ?? 0) > 0) rewardParts.push(`${task.reward.essence} Essence`);
-                  const disabled = hasRunningTask || !taskEligibility.eligible;
+                  const disabled = hasRunningTask || !readiness.eligibility.eligible;
                   const priorityIndex = routinePriority.indexOf(task.id);
                   return (
                     <Box
@@ -218,10 +218,13 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                     >
                       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="space-between">
                         <Box>
-                          <Stack direction="row" spacing={1} alignItems="center">
+                          <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
                             <Typography variant="subtitle2">{task.name}</Typography>
                             {priorityIndex >= 0 && (
                               <Chip size="small" label={`Priority ${priorityIndex + 1}`} variant="outlined" />
+                            )}
+                            {isFamiliar && (
+                              <Chip size="small" label="Mastered by you" color="success" variant="outlined" />
                             )}
                           </Stack>
                           <Typography variant="body2" color="text.secondary">{task.description}</Typography>
@@ -230,15 +233,15 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                           </Typography>
                           <Typography
                             variant="caption"
-                            color={isFamiliar ? 'success.main' : 'warning.main'}
+                            color={readiness.status === 'ready' ? 'success.main' : 'warning.main'}
                             display="block"
                             sx={{ mt: 0.5 }}
                           >
-                            {isFamiliar ? 'Routine understood.' : `Locked: ${task.familiarityHint}`}
+                            {readiness.label}
                           </Typography>
-                          {taskEligibility.reasons.filter(reason => reason !== task.familiarityHint).length > 0 && (
+                          {readiness.status === 'copy_blocked' && readiness.reasons.length > 0 && (
                             <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 0.5 }}>
-                              {taskEligibility.reasons.filter(reason => reason !== task.familiarityHint).join(' ')}
+                              This Copy still needs: {readiness.reasons.join(' ')}
                             </Typography>
                           )}
                         </Box>
@@ -292,7 +295,6 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
               <Typography variant="caption" color="text.secondary">Available slots: {emptySlots}</Typography>
               <FormGroup sx={{ mt: 1 }}>
                 {(copy?.traitSlots ?? []) && Object.keys(allTraits).length > 0 && eligibleShareIds.concat(
-                  // Include prefs that are currently ineligible to show guidance
                   Object.keys(sharePrefs).filter((id) => sharePrefs[id] && !eligibleShareIds.includes(id))
                 ).filter((v, i, a) => a.indexOf(v) === i).map((id) => {
                   const t = allTraits[id];
