@@ -103,3 +103,32 @@ export const evaluateCopyProductionTaskEligibility = (
 
   return { eligible: reasons.length === 0, reasons };
 };
+
+/**
+ * Canonical role-adjusted duration used by both single-Copy and portfolio
+ * assignment paths. Keeping this calculation here prevents two assignment
+ * surfaces from drifting on the same authored task contract.
+ */
+export const getCopyProductionTaskDurationSeconds = (
+  copy: Copy,
+  task: CopyProductionTaskDefinition
+): number => {
+  let multiplier = 1;
+  switch (copy.role ?? 'none') {
+    case 'infiltrator':
+      multiplier = 0.9;
+      break;
+    case 'researcher':
+      multiplier = 0.95;
+      break;
+    case 'guardian':
+      multiplier = 1.05;
+      break;
+    case 'agent':
+    case 'none':
+    default:
+      multiplier = 1;
+      break;
+  }
+  return Math.max(1, Math.round(task.baseDurationSeconds * multiplier));
+};
