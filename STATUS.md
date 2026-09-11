@@ -1,26 +1,33 @@
-# Milestone Handoff — Post-M25 GameLoop Timing Hardening
+# Repository Status — Post-M25 Integrated State
 
-**Handoff date:** 2026-09-11  
-**Integrated `main` at handoff:** `88c1b5114995cd6702936f414823b783de97bb23`  
-**Milestone state:** `COMPLETE / INTEGRATED / CURRENT-MAIN AUTHORITY`  
-**Canonical integration:** PR #97  
-**Reconciled candidate head:** `4c503ccaa63147c53a733ac6aad65262adcbb026`  
-**Build Validation:** #305 — `PASS` on the exact reconciled candidate head  
+**Status date:** 2026-09-11  
+**Baseline `main` before this documentation-authority reconciliation:** `56fbee2758ba734f1db67f40230a0970d67fd531`  
+**Product authority:** `M25 Complete Chapter Vertical Slice = PASS`  
+**Post-M25 timing hardening:** `COMPLETE / INTEGRATED`  
 **Human product validation:** `DEFERRED / UNPROVEN`  
 **Product Direction Decision:** `PENDING`  
 **M26:** `NOT AUTHORIZED`
 
-## Purpose
+## Role of this file
 
-This is the current repository handoff after the post-M25 GameLoop timing-hardening milestone was integrated into `main`.
+`STATUS.md` is the current-state authority for the repository. It answers:
 
-The milestone is no longer a candidate-only body of work. PR #97 was merged after a fresh reconciliation against the then-current `main` and a full Build Validation pass on the exact reconciled candidate head.
+- what is complete and integrated;
+- what contracts are currently binding;
+- what evidence exists;
+- what remains unproven or unauthorized;
+- what work must not be restarted;
+- what decision should happen next.
 
-Do not restart Packages 1–3. Future work must reconcile from current `main` and identify a new product or repository bottleneck.
+For documentation classification and supersession, read [`docs/CURRENT.md`](docs/CURRENT.md). For commands and integration procedure, read [`RUNBOOK.md`](RUNBOOK.md). For domain-specific technical authority, read [`specification/README.md`](specification/README.md).
 
-## What is now authoritative on `main`
+Do not use this file as a substitute for the detailed domain contracts linked by those indexes.
 
-The integrated post-M25 stack establishes one compatible timing model across:
+## Current repository state
+
+The automated implementation program through M25 is complete. The later post-M25 GameLoop timing-hardening work is also integrated on `main`.
+
+The current technical stack includes a compatible model across:
 
 - deterministic fixed-step scheduling;
 - serialized async-consumer backpressure;
@@ -62,54 +69,33 @@ Timed-Quest precision handling remains comparison-only. Raw and persisted `elaps
 
 M21 remains a separate bounded offline authority. Timed Quests remain online-only during offline settlement.
 
-## Completed package lineage
+## Integration evidence
 
-### Package 1 — Backpressure + Lifecycle Composition
+The canonical post-M25 timing-hardening integration is **PR #97**.
 
-- PR #95 — closed as a superseded cumulative predecessor after #97 merged.
-- Candidate head: `b11101273323b3ff242eaf4ccf5f24b4b104c642`.
-- Build Validation #300: `PASS`.
-- Delivered composition of `SERIAL_BACKPRESSURE_V1` and `FRESH_LOOP_RESET_V1`.
+```text
+final reconciled candidate: 4c503ccaa63147c53a733ac6aad65262adcbb026
+Build Validation #305: PASS on exact candidate head
+merge commit: 88c1b5114995cd6702936f414823b783de97bb23
+```
 
-### Package 2 — Unified Timing-Hardening Composition
+The final integrated milestone handoff is **PR #99**.
 
-- PR #96 — closed as a superseded cumulative predecessor after #97 merged.
-- Candidate head: `ed1762fabaa99a4bd266b303f9f188579dd7898f`.
-- Build Validation #301: `PASS`.
-- Composed Package 1 with precision, large-frame, cadence-transition, and long-horizon timing qualification.
+```text
+documentation candidate: fd5c5dc1f3cf1c328c778474891bc41d2e96114e
+Build Validation #306: PASS on exact candidate head
+merge commit: 56fbee2758ba734f1db67f40230a0970d67fd531
+```
 
-### Package 3 / Canonical Cumulative Integration
+PRs #95 and #96 were closed as superseded cumulative predecessors after #97 integrated their work. PR #98 was closed as a superseded pre-integration handoff.
 
-- PR #97 — **MERGED**.
-- Original stress candidate: `87cc91a3410c4dc3e066e5c4c3e58559a180e821`.
-- Original Build Validation #302: `PASS`.
-- CI-governance cleanup head: `365e250979c96e1ee4b8b71139849687053813e4`.
-- Build Validation #304: `PASS` on that head.
-- `main` then moved independently to `64ed7f51df141d9655a4aaa19702cb391d824c6c` (`Refine handoff CI failure governance`).
-- PR #97 explicitly reconciled that concurrent mainline change without dropping it.
-- Final reconciled candidate: `4c503ccaa63147c53a733ac6aad65262adcbb026`.
-- Build Validation #305: `PASS` on that exact head.
-- Merge commit: `88c1b5114995cd6702936f414823b783de97bb23`.
+The detailed lineage remains historical evidence; it is no longer an active work queue.
 
-The Package 3 stress suite qualifies:
+## CI and merge authority
 
-1. cadence changes while a real progression consumer remains blocked, with producer lead bounded to one and final elapsed-time progression matching a reference execution;
-2. successive backlog windows across different fixed-step sizes without lost/coalesced time or non-contiguous tick identities;
-3. async rejection during a cadence transition without retry, deadlock, or concurrent consumers, followed by serial drainage and future live progress.
+The former Gemini AI Code Review workflow and standalone `gemini.md` instructions were retired in PR #97. Repository CI no longer consumes `GEMINI_API_KEY`.
 
-## CI-governance resolution
-
-The repository's old Gemini AI Code Review workflow was retired as obsolete CI configuration.
-
-PR #97 removed:
-
-- `.github/workflows/gemini-review.yml`;
-- `gemini.md`;
-- the repository CI dependency on `GEMINI_API_KEY`.
-
-This was not a weakening of repository correctness gates. Existing repository documentation already defined **Build Validation + preregistered acceptance criteria** as merge authority and Gemini review as diagnostic only. Recent all-configured-workflow wording had accidentally promoted the broken external diagnostic into a merge blocker.
-
-Current rule:
+Current merge authority is:
 
 ```text
 MERGE AUTHORITY
@@ -118,45 +104,33 @@ MERGE AUTHORITY
 + any separately declared human or external gate that is genuinely authoritative for that change
 ```
 
-AI review, when used, is advisory. It is not an implicit merge authority.
+AI review, when used, is advisory unless a future explicit policy deliberately changes its status.
 
-Historical Gemini `API_KEY_INVALID` runs remain historical evidence explaining why PRs #95–#98 were temporarily left open. They are not current repository blockers.
+Historical Gemini `API_KEY_INVALID` runs explain prior blocked PRs but are not current repository blockers.
 
-The GitHub repository secret named `GEMINI_API_KEY`, if it still exists in repository settings, is now unused by repository code and CI. Secret deletion is an account/repository-settings cleanup action and is not required for runtime or CI correctness.
+The documentation-authority reconciliation adds a deterministic `npm run docs:authority:validate` check to prevent the top-level documentation hierarchy and retired Gemini surfaces from silently drifting.
 
-## Superseded handoff
+## Documentation authority
 
-PR #98 documented the pre-integration candidate state and is closed as superseded. Its statement that Gemini was a current external merge blocker is historical, not current authority.
+The repository now uses four explicit classifications:
 
-This handoff supersedes that candidate-only state.
+```text
+CURRENT AUTHORITY
+REFERENCE
+HISTORICAL EVIDENCE
+SUPERSEDED
+```
 
-## Evidence verified on the final reconciled candidate
+[`docs/CURRENT.md`](docs/CURRENT.md) is the canonical classification index.
 
-Build Validation #305 passed the complete configured stack, including:
+Important consequences:
 
-- dependency installation;
-- synthetic-review protocol validation;
-- synthetic-review action-binding rejection checks;
-- localhost Playwright UI-only smoke;
-- TypeScript type checking;
-- GameLoop timing characterization;
-- async backlog policy contract qualification;
-- bounded backlog production-repair qualification;
-- lifecycle remainder qualification;
-- large-frame/background-stall qualification;
-- mid-session cadence-transition qualification;
-- backpressure × cadence × progression stress qualification;
-- cross-progression determinism;
-- long-horizon drift qualification;
-- timed-Quest unit/save compatibility;
-- Quest timing integration;
-- timed-Quest precision preflight regression and resolution;
-- live/offline progression boundary;
-- M21 bounded offline progression;
-- M20–M25 milestone qualification;
-- active-loop and modified historical qualification;
-- accumulated M4–M19 baseline;
-- production build.
+- `README.md` is orientation, not final technical authority;
+- this `STATUS.md` owns current repository/milestone state;
+- `RUNBOOK.md` owns operating and qualification procedure;
+- `specification/README.md` maps domain-specific technical/product authority;
+- older milestone and analysis documents remain preserved as evidence instead of being physically moved or silently rewritten;
+- explicitly superseded verdicts must not be used to drive new implementation.
 
 ## Evidence ceiling — still unproven
 
@@ -165,45 +139,64 @@ Technical integration does **not** establish:
 - fresh-player comprehension or discoverability;
 - perceived responsiveness;
 - pacing quality;
-- fairness or balance;
+- fairness or final balance;
 - enjoyment;
 - retention / desire to continue;
 - final Quest duration/reward/economy tuning;
 - generalized campaign/chapter scalability;
 - production-device/background behavior outside the qualified envelope;
-- Product Direction;
+- a final Product Direction decision;
 - M26 authorization.
 
 These remain separate human/product authority questions.
 
+The current `PostM25ProductDirection.md` document contains hypotheses and the human-review boundary; it does not itself authorize M26.
+
+## Completed work that must not be restarted
+
+The following queues are closed:
+
+- M4–M25 automated implementation program;
+- timed-Quest unit normalization and integration qualification;
+- timed-Quest comparison-only precision repair;
+- post-M25 GameLoop backpressure/lifecycle/timing-hardening Packages 1–3;
+- Gemini CI retirement and merge-authority reconciliation;
+- pre-integration post-M25 handoff represented by PR #98.
+
+A new package must begin from a fresh reconciliation of current `main`, not from an unchecked old queue.
+
 ## Recommended next priorities
 
-1. **Reconcile product direction before opening another GameLoop timing queue.** The timing-hardening queue is complete and integrated.
-2. **Treat human product evidence as a distinct gate when it becomes available.** Repository determinism is not a substitute for comprehension, pacing, fairness, enjoyment, or retention evidence.
-3. **Keep optional future timing questions un-authorized until they become real bottlenecks.** Examples include explicit Page Visibility/background handoff policy, persisted scheduler remainder, or wider cadence envelopes.
-4. **Preserve M21 boundaries.** Do not reinterpret browser suspension or arbitrary wall-clock absence as offline Quest progression.
-5. **Use deterministic CI authority.** Build Validation and explicit acceptance criteria remain the repository merge gate; optional AI review must remain advisory unless a future explicit policy deliberately changes that.
+1. **Reconcile Product Direction before opening another GameLoop timing queue.** The timing-hardening work is complete and integrated.
+2. **Use the documentation authority chain during every new-session recon.** Start with `STATUS.md`, then `docs/CURRENT.md`, `RUNBOOK.md`, and `specification/README.md`.
+3. **Treat human product evidence as a separate gate when available.** Deterministic repository evidence is not a substitute for comprehension, pacing, fairness, enjoyment, or retention evidence.
+4. **If human validation is unavailable, continue only with a newly justified repository-only or hermetic bottleneck.** Keep all experiential claims explicitly unproven.
+5. **Keep optional future timing questions unauthorized until they become real bottlenecks.** Examples include Page Visibility/background handoff policy, persisted scheduler remainder, or wider cadence envelopes.
+6. **Preserve M21 boundaries.** Do not reinterpret browser suspension or arbitrary wall-clock absence as offline Quest progression.
+
+## Fast re-entry checklist
+
+```text
+1. Pull and verify latest main.
+2. Read STATUS.md.
+3. Read docs/CURRENT.md and classify any old document before relying on it.
+4. Read RUNBOOK.md for exact operating/CI procedure.
+5. Use specification/README.md to locate domain-specific current authority.
+6. Confirm old work packages are closed before proposing new work.
+7. Reconcile the real active bottleneck.
+8. State the evidence ceiling for the new package.
+9. Run npm run docs:authority:validate when documentation authority changes.
+10. Require exact-head Build Validation before merge.
+```
 
 ## Governing stop conditions
 
-- Packages 1, 2, and 3 are complete and integrated; do not restart them.
-- Do not reopen the retired Gemini workflow merely to reproduce historical process.
+- Do not restart completed post-M25 timing Packages 1–3.
+- Do not reintroduce the retired Gemini workflow as an implicit merge gate.
+- Do not use `specification/Technical/ArchitectureOverview.md` testing/CI statements as current authority; its manual-only testing claim is superseded.
+- Do not use the first weak Checkpoint B/C verdicts as current outcomes; their later repairs and reruns supersede those verdicts.
 - Do not introduce tick dropping, skipping, or coalescing as incidental optimization.
 - Do not persist GameLoop accumulator remainder without a new persistence/schema contract.
 - Do not widen M21 offline authority implicitly.
 - Do not rewrite stored Quest timer values to solve floating-point comparison noise.
 - Do not infer pacing, fairness, comprehension, fun, retention, Product Direction, or M26 authority from deterministic tests.
-
-## Fast re-entry checklist
-
-```text
-1. Read STATUS.md and RUNBOOK.md.
-2. Verify latest main; this handoff recorded 88c1b5114995cd6702936f414823b783de97bb23.
-3. Treat PR #97 as integrated history, not a pending candidate.
-4. Preserve SERIAL_BACKPRESSURE_V1 and FRESH_LOOP_RESET_V1.
-5. Preserve comparison-only timed-Quest precision behavior.
-6. Preserve M21 as a separate bounded offline authority.
-7. Use Build Validation + explicit acceptance criteria as merge authority.
-8. Reconcile product direction before inventing another timing package.
-9. Do not infer human/product quality from repository qualification.
-```
