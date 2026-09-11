@@ -43,7 +43,7 @@ const ALL_REPOSITORIES = [
     id: "sensemaking",
     name: "ThorStarlord/sensemaking-skills",
     objective: "Advance campaign state persistence, narrative verification, and qualification evidence.",
-    enabled: true
+    enabled: false
   },
   {
     id: "viralfactory",
@@ -75,10 +75,17 @@ Objective: ${repo.objective}
 PHASE 1: RECONCILIATION & AUDIT
 1. Read the latest 'main' branch, recent commits, and our handoff document ('STATUS.md' or 'HANDOFF.md') to inspect the current state.
 2. Determine the true active bottleneck.
-3. If blocked awaiting external human evidence or approval, output "STATUS: AWAITING_HUMAN_EVIDENCE" and STOP.
+3. Classify pending work into these zones:
+   - REPOSITORY_ONLY: pure code, tests, refactors, fixtures, documentation, and local tooling.
+   - HERMETIC_VALIDATION: mocks, dry-run integrations, synthetic data/assets, local runners, and failure simulations.
+   - EXTERNAL_AUTHORITY: real credentials, paid services, live external calls, deployments, destructive migrations, subjective approval, or production QA.
 
 PHASE 2: WORK PACKAGE QUEUE (UP TO 3 PACKAGES)
-Propose UP TO 3 bounded work packages that advance the objective:
+Propose UP TO 3 bounded work packages that advance the objective.
+If external work is blocked, choose REPOSITORY_ONLY or HERMETIC_VALIDATION work instead. Do not attempt the external action.
+Only output "STATUS: AWAITING_HUMAN_EVIDENCE: [reason]" if no meaningful bounded repository-only or hermetic validation work remains.
+Every package must state what changes locally, how it will be verified without external credentials, and what external step remains deferred, if any.
+
 ### Work Package Queue
 - [ ] Package 1: [Short Title] - [Deliverable & Target Checkpoint]
 - [ ] Package 2: [Short Title] - [Deliverable & Target Checkpoint]
@@ -95,6 +102,8 @@ WORKFLOW:
 1. PULL: Sync with latest 'main'.
 2. BRANCH: Create branch "work/<short-package-name>".
 3. IMPLEMENT: Apply changes for THIS PACKAGE ONLY. Run native stack checks AND negative/rejection tests.
+   - Keep the work REPOSITORY_ONLY or HERMETIC_VALIDATION.
+   - Do not use production credentials, call live external services, deploy infrastructure, perform destructive migrations, or make subjective production claims.
 4. QUALIFY & MERGE:
    - Commit and push. Open PR into 'main'.
    - MERGE READINESS: Merge immediately ONLY IF all tests/CI pass on the candidate head. Otherwise leave PR open.
@@ -108,16 +117,39 @@ ACTION: Post-Milestone Runbook & In-Repo Handoff Document.
 All packages for this milestone are complete. Create the handoff documentation for future engineers (and future chat sessions):
 
 WORKFLOW:
-1. SYNC: Pull latest 'main'.
-2. BRANCH: Create branch "docs/milestone-handoff".
-3. HANDOFF DOCUMENTATION:
+1. RECONCILE BASE & INTEGRATION CANDIDATE:
+   - Pull the latest 'main' and inspect the implementation PR created during this session.
+   - Confirm the candidate PR number, branch name, head commit SHA, merge status, and CI checks using GitHub.
+   - If the implementation PR is merged, document the milestone as "INTEGRATED / CURRENT-MAIN AUTHORITY".
+   - If it is unmerged, do not claim that the implementation is on 'main'. Record the candidate as "REPOSITORY-QUALIFIED / AWAITING_INTEGRATION".
+
+2. CI FAILURE TRIAGE:
+   - Inspect the workflow file, failure log, trigger, required-check status, and relationship to the implementation.
+   - Classify each failure as IMPLEMENTATION_FAILURE, RELEVANT_ENVIRONMENT_FAILURE, OBSOLETE_CI_CONFIGURATION, NON_REQUIRED_AUXILIARY_FAILURE, or HUMAN_PRODUCT_DECISION.
+   - Treat implementation failures and relevant environment failures as blocking.
+   - Treat obsolete or non-required CI as non-blocking for product scope, but determine whether branch protection still prevents merging.
+   - Never classify a failure as obsolete solely because it mentions an API key. Verify that the workflow is retired, experimental, unrelated, or otherwise no longer intentional.
+   - If obsolete CI blocks merging, prepare a repository-only cleanup or replacement rather than ignoring the check.
+
+3. SYNC & BRANCH:
+   - If the implementation is merged, pull the latest 'main' and branch from it as "docs/milestone-handoff".
+   - If the implementation is unmerged because of blocking implementation or relevant environment CI, do not create a separate documentation PR.
+
+4. HANDOFF DOCUMENTATION:
    - Update or create 'STATUS.md' (or 'HANDOFF.md') on 'main':
      * Summary of what was delivered across Packages 1, 2, and 3.
      * Evidence verified and any pending human QA / approval gates.
      * The recommended next priorities for the next milestone session.
    - Update 'README.md' or runbooks with CLI commands to run any newly added tools or test suites.
-4. COMMIT & MERGE: Commit, open PR, and merge into 'main' once checks pass.
-5. STOP: Output a final milestone summary and halt.
+
+5. COMMIT & PR:
+   - Commit, push, and open the documentation PR only when the implementation is already merged or when the change is a repository-only cleanup for obsolete CI.
+   - Never merge a documentation PR unless the implementation is confirmed on 'main' and all checks pass on the exact documentation head.
+   - If the implementation is unmerged because of a blocking failure, stop and report:
+     "STATUS: MILESTONE_BLOCKED_ON_IMPLEMENTATION_CI"
+   - If the implementation is unmerged only because of obsolete or non-required CI, continue safe cleanup work but do not claim the implementation is integrated until it reaches 'main'.
+
+6. STOP: Output a concise status summary and halt.
 `.trim();
 
 // -------------------------------------------------------------
@@ -130,6 +162,7 @@ const STREAM_END_TIMEOUT_MS = Number.isFinite(configuredStreamTimeout) && config
   : 30 * 60_000;
 const SETTLE_DELAY_MS = 6_000;
 const COOLDOWN_DELAY_MS = 4_000;
+const CYCLE_COOLDOWN_MS = 15_000;
 const LOGIN_TIMEOUT_MS = 10 * 60_000;
 
 const COMPOSER_SELECTORS = [
@@ -145,7 +178,6 @@ const SEND_SELECTORS = [
 ];
 
 const STOP_SELECTOR_COMBINED = 'button[data-testid="stop-button"], button[aria-label*="Stop"]';
-const COPY_SELECTOR_COMBINED = 'button[aria-label*="Copy"], [data-testid="copy-turn-action-button"]';
 const REQUIRED_IDLE_MS = 6_000;
 
 const NEW_CHAT_SELECTORS = [
@@ -309,7 +341,6 @@ async function waitForComposerCleared(page, composer, timeoutMs = 10_000) {
 async function sendPrompt(page, text) {
   if (page.isClosed()) throw new Error("Cannot send a prompt on a closed page.");
   if (!text || !text.trim()) throw new Error("Cannot send empty prompt.");
-  const copyButtonsBefore = await page.locator(COPY_SELECTOR_COMBINED).count();
   // ChatGPT's contenteditable composer can drop newline separators. Flatten
   // them explicitly so adjacent words never become concatenated.
   const promptForComposer = text.replace(/\r\n/g, "\n").replace(/\n/g, " ");
@@ -341,10 +372,9 @@ async function sendPrompt(page, text) {
   }
 
   await waitForComposerCleared(page, composer);
-  return { copyButtonsBefore };
 }
 
-async function waitForAnswer(page, { copyButtonsBefore = 0 } = {}) {
+async function waitForAnswer(page) {
   if (page.isClosed()) throw new Error("Cannot wait for an answer on a closed page.");
 
   const countVisible = async selector => {
@@ -375,18 +405,12 @@ async function waitForAnswer(page, { copyButtonsBefore = 0 } = {}) {
     return false;
   };
 
-  const copyButtonsAfter = async () => page.locator(COPY_SELECTOR_COMBINED).count();
-
   // A response may begin with reasoning or a tool call before visible text.
   // Wait until there is evidence that this prompt actually started processing.
   const startDeadline = Date.now() + STREAM_START_TIMEOUT_MS;
   let started = false;
   while (Date.now() < startDeadline) {
     if (await isStopVisible()) {
-      started = true;
-      break;
-    }
-    if ((await copyButtonsAfter()) > copyButtonsBefore) {
       started = true;
       break;
     }
@@ -409,7 +433,6 @@ async function waitForAnswer(page, { copyButtonsBefore = 0 } = {}) {
   while (Date.now() < deadline) {
     const stopVisible = await isStopVisible();
     const composerIdle = await isComposerIdle();
-    const copyAppeared = (await copyButtonsAfter()) > copyButtonsBefore;
 
     if (!stopVisible && composerIdle) {
       idleSince ??= Date.now();
@@ -418,17 +441,17 @@ async function waitForAnswer(page, { copyButtonsBefore = 0 } = {}) {
     }
 
     const idleLongEnough = idleSince !== null && Date.now() - idleSince >= REQUIRED_IDLE_MS;
-    const copyEvidenceAvailable = (await countVisible(COPY_SELECTOR_COMBINED)) > 0 || copyButtonsBefore > 0;
-    if (idleLongEnough && (copyAppeared || !copyEvidenceAvailable)) break;
+    // Copy controls are useful diagnostics, but ChatGPT may reuse or omit
+    // them on later turns. Completion is therefore based on the debounced
+    // Stop-absent + idle-composer state instead of requiring a new Copy node.
+    if (idleLongEnough) break;
 
     await page.waitForTimeout(1000);
   }
 
   const finalStopVisible = await isStopVisible();
   const finalComposerIdle = await isComposerIdle();
-  const finalCopyAppeared = (await copyButtonsAfter()) > copyButtonsBefore;
-  const finalCopyEvidenceAvailable = (await countVisible(COPY_SELECTOR_COMBINED)) > 0 || copyButtonsBefore > 0;
-  if (finalStopVisible || !finalComposerIdle || (finalCopyEvidenceAvailable && !finalCopyAppeared)) {
+  if (finalStopVisible || !finalComposerIdle) {
     throw new Error("Answer did not finish before the streaming timeout.");
   }
 
@@ -458,9 +481,9 @@ async function createRepositoryPages(firstPage) {
 
 async function initializeRepository({ repo, page }) {
   await startFreshChat(page);
-  const initialPrompt = await sendPrompt(page, buildInitialPrompt(repo));
+  await sendPrompt(page, buildInitialPrompt(repo));
   console.log(`[sent] Initial audit prompt sent to ${repo.id}.`);
-  await waitForAnswer(page, initialPrompt);
+  await waitForAnswer(page);
   await page.waitForTimeout(COOLDOWN_DELAY_MS);
 }
 
@@ -468,8 +491,8 @@ async function runPackage({ repo, page }, packageNumber) {
   if (stopRequested) return;
 
   console.log(`[package ${packageNumber}/${TOTAL_PACKAGES}] ${repo.name}`);
-  const followupPrompt = await sendPrompt(page, FOLLOWUP_PROMPT);
-  await waitForAnswer(page, followupPrompt);
+  await sendPrompt(page, FOLLOWUP_PROMPT);
+  await waitForAnswer(page);
   await page.waitForTimeout(COOLDOWN_DELAY_MS);
 }
 
@@ -477,8 +500,8 @@ async function runHandoff({ repo, page }) {
   if (stopRequested) return;
 
   console.log(`[handoff] ${repo.name}`);
-  const handoffPrompt = await sendPrompt(page, HANDOFF_PROMPT);
-  await waitForAnswer(page, handoffPrompt);
+  await sendPrompt(page, HANDOFF_PROMPT);
+  await waitForAnswer(page);
   console.log(`[complete] Milestone finished for ${repo.name}. Chat URL: ${page.url()}`);
 }
 
@@ -502,9 +525,12 @@ async function runParallelStage(label, sessions, worker) {
   }
 }
 
-async function runRepositories(firstPage) {
-  const sessions = await createRepositoryPages(firstPage);
+async function runMilestoneCycle(sessions, cycleNumber) {
+  sessions.forEach(session => {
+    session.failed = false;
+  });
 
+  console.log(`\n################## MILESTONE CYCLE ${cycleNumber} ##################`);
   await runParallelStage("Initial audits", sessions, async session => {
     if (session.page.isClosed()) throw new Error(`The browser tab for ${session.repo.name} was closed.`);
     await initializeRepository(session);
@@ -522,6 +548,21 @@ async function runRepositories(firstPage) {
   if (failedSessions.length > 0) {
     console.error("\n[summary] Some tabs were quarantined and did not receive later prompts:");
     failedSessions.forEach(session => console.error(`  - ${session.repo.name}`));
+  }
+}
+
+async function runRepositories(firstPage) {
+  const sessions = await createRepositoryPages(firstPage);
+  let cycleNumber = 1;
+
+  while (!stopRequested) {
+    await runMilestoneCycle(sessions, cycleNumber);
+    cycleNumber++;
+
+    if (!stopRequested) {
+      console.log(`\n[cycle] Cycle complete. Starting the next milestone in ${CYCLE_COOLDOWN_MS / 1000}s.`);
+      await firstPage.waitForTimeout(CYCLE_COOLDOWN_MS);
+    }
   }
 }
 
