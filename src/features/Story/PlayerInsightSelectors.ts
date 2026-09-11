@@ -1,4 +1,9 @@
 import type { RootState } from '../../app/store';
+import { COPY_PRODUCTION_TASKS } from '../Copy/CopyTaskDefinitions';
+import type {
+  RoutineFamiliarityId,
+  RoutineFamiliaritySource,
+} from '../Player/state/PlayerTypes';
 import { CHAPTER_DEFINITIONS } from './ChapterDefinitions';
 import { selectAllChapterProgress } from './ChapterSelectors';
 import {
@@ -45,6 +50,14 @@ export type RelationshipCapabilityStatus =
   | 'resonance_ready'
   | 'permanent';
 
+export interface RelationshipCapabilityEvidence {
+  memoryId: string;
+  title: string;
+  summary: string;
+  causeLabel: string;
+  timestamp: number;
+}
+
 export interface RelationshipBuildCapability {
   traitId: string;
   name: string;
@@ -59,10 +72,31 @@ export interface RelationshipBuildCapability {
   compatibility: number;
   minimumCompatibility: number;
   missingMemoryTags: string[];
+  evidence: RelationshipCapabilityEvidence[];
+}
+
+export interface MasteredRoutineView {
+  taskId: RoutineFamiliarityId;
+  name: string;
+  description: string;
+  source: RoutineFamiliaritySource;
+  sourceLabel: string;
+  learnedAt: number;
 }
 
 const npcName = (state: RootState, npcId: string): string =>
   state.npcs.npcs[npcId]?.name ?? npcId;
+
+const routineSourceLabel = (
+  source: RoutineFamiliaritySource
+): string => {
+  switch (source) {
+    case 'city_center_forge_assistance':
+      return 'Practiced Forge Assistance yourself in the City Center.';
+    case 'trait_resonance':
+      return 'Completed Trait resonance yourself.';
+  }
+};
 
 /**
  * A player-facing causal journal derived only from Memories already marked
@@ -152,6 +186,8 @@ export const selectOpportunityMap = (state: RootState): OpportunityChapterView[]
 /**
  * Relationship-derived build projection. Authored Traits remain hidden until
  * discovery; this selector never makes a Trait discoverable or permanent.
+ * Provenance is restricted to already-player-visible Memories that the
+ * canonical assimilation state recorded as qualifying evidence.
  */
 export const selectRelationshipBuildCapabilities = (
   state: RootState
@@ -179,6 +215,26 @@ export const selectRelationshipBuildCapabilities = (
       const missingMemoryTags = (trait.requiredMemoryTags ?? []).filter(
         tag => !memories.some(memory => memory.resonanceTags.includes(tag))
       );
+      const evidence = (assimilation?.qualifyingMemoryIds ?? [])
+        .flatMap(memoryId => {
+          const memory = state.relationships.memoriesById[memoryId];
+          if (
+            !memory ||
+            !memory.playerVisible ||
+            memory.primaryTargetId !== sourceNpcId
+          ) {
+            return [];
+          }
+          const origin = state.relationships.experiencesById[memory.originExperienceId];
+          return [{
+            memoryId: memory.id,
+            title: memory.title,
+            summary: memory.currentInterpretation ?? memory.summary,
+            causeLabel: origin?.title ?? 'Recorded experience',
+            timestamp: memory.timestamp,
+          }];
+        })
+        .sort((a, b) => b.timestamp - a.timestamp);
       const connectionLevel = profile?.connectionLevel ?? 0;
       const assimilationProgress = assimilation?.progress ?? 0;
       const compatibility = assimilation?.compatibility ?? 0;
@@ -208,6 +264,7 @@ export const selectRelationshipBuildCapabilities = (
         compatibility,
         minimumCompatibility,
         missingMemoryTags,
+        evidence,
       };
     })
     .sort((a, b) => {
@@ -218,4 +275,26 @@ export const selectRelationshipBuildCapabilities = (
       };
       return rank[a.status] - rank[b.status] || a.name.localeCompare(b.name);
     });
+};
+
+/**
+ * Player-owned mastery projection. This does not create familiarity or decide
+ * whether any Copy may execute a routine; it only translates existing recorded
+ * familiarity into a player-facing explanation.
+ */
+export const selectMasteredRoutines = (state: RootState): MasteredRoutineView[] => {
+  const familiarity = state.player.routineFamiliarity ?? {};
+
+  return COPY_PRODUCTION_TASKS.flatMap(task => {
+    const record = familiarity[task.id];
+    if (!record) return [];
+    return [{
+      taskId: task.id,
+      name: task.name,
+      description: task.description,
+      source: record.source,
+      sourceLabel: routineSourceLabel(record.source),
+      learnedAt: record.learnedAt,
+    }];
+  });
 };

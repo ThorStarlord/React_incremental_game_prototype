@@ -2,6 +2,7 @@ import {
   COPY_PRODUCTION_TASKS,
   evaluateCopyProductionTaskEligibility,
   getCopyProductionTaskDefinition,
+  type CopyProductionTaskDefinition,
   type CopyProductionTaskEligibility,
 } from './CopyTaskDefinitions';
 import type { Copy, CopyProductionTaskId } from './state/CopyTypes';
@@ -10,6 +11,18 @@ export interface CopyRoutinePriorityEvaluation {
   taskId: CopyProductionTaskId;
   name: string;
   priority: number;
+  eligibility: CopyProductionTaskEligibility;
+}
+
+export type CopyDelegationReadinessStatus =
+  | 'unmastered'
+  | 'copy_blocked'
+  | 'ready';
+
+export interface CopyDelegationReadinessPresentation {
+  status: CopyDelegationReadinessStatus;
+  label: string;
+  reasons: string[];
   eligibility: CopyProductionTaskEligibility;
 }
 
@@ -35,6 +48,48 @@ export const normalizeCopyRoutinePriority = (
   });
 
   return normalized;
+};
+
+/**
+ * Player-facing readiness projection over the existing M20 eligibility
+ * authority. This helper does not create familiarity, change Copy state, or
+ * start/choose a task.
+ */
+export const presentCopyProductionTaskReadiness = (
+  copy: Copy,
+  task: CopyProductionTaskDefinition,
+  isFamiliar: boolean
+): CopyDelegationReadinessPresentation => {
+  const eligibility = evaluateCopyProductionTaskEligibility(
+    copy,
+    task,
+    isFamiliar
+  );
+
+  if (!isFamiliar) {
+    return {
+      status: 'unmastered',
+      label: `Not mastered yet: ${task.familiarityHint}`,
+      reasons: [task.familiarityHint],
+      eligibility,
+    };
+  }
+
+  if (eligibility.eligible) {
+    return {
+      status: 'ready',
+      label: 'Ready to delegate: mastered by you, and this Copy meets the current requirements.',
+      reasons: [],
+      eligibility,
+    };
+  }
+
+  return {
+    status: 'copy_blocked',
+    label: 'Mastered by you; this Copy is not ready yet.',
+    reasons: eligibility.reasons,
+    eligibility,
+  };
 };
 
 export const evaluateCopyRoutinePriority = (
