@@ -30,6 +30,9 @@ jobs:
       - name: Documentation authority qualification
         run: npm run docs:authority:validate
 
+      - name: Content intelligence qualification
+        run: npm run content:intelligence:validate
+
       - name: Synthetic review contract qualification
         run: npm run simulated-review:validate
 
