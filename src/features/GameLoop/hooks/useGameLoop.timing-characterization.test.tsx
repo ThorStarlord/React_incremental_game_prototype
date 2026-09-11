@@ -168,7 +168,7 @@ describe('useGameLoop deterministic timing', () => {
     expect(deliveredTicks).toEqual([1, 2]);
   });
 
-  test('serializes async onTick work without overlapping logical ticks', async () => {
+  test('serializes async onTick work with one admitted tick of scheduler lead', async () => {
     const store = makeStore();
     let active = 0;
     let peakConcurrent = 0;
@@ -196,7 +196,8 @@ describe('useGameLoop deterministic timing', () => {
       raf.frame(250);
     });
 
-    expect(store.getState().gameLoop.currentTick).toBe(2);
+    expect(store.getState().gameLoop.currentTick).toBe(1);
+    expect(store.getState().gameLoop.totalGameTime).toBe(100);
     expect(onTick).toHaveBeenCalledTimes(1);
     expect(deliveredTicks).toEqual([1]);
     expect(peakConcurrent).toBe(1);
@@ -208,13 +209,15 @@ describe('useGameLoop deterministic timing', () => {
       await Promise.resolve();
     });
 
+    expect(store.getState().gameLoop.currentTick).toBe(2);
+    expect(store.getState().gameLoop.totalGameTime).toBe(200);
     expect(onTick).toHaveBeenCalledTimes(2);
     expect(deliveredTicks).toEqual([1, 2]);
     expect(peakConcurrent).toBe(1);
     expect(active).toBe(0);
   });
 
-  test('rejected async onTick work cannot deadlock the serialized queue', async () => {
+  test('rejected async onTick work cannot deadlock deferred logical ticks', async () => {
     const store = makeStore();
     const expectedFailure = new Error('expected hermetic rejection');
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -234,6 +237,7 @@ describe('useGameLoop deterministic timing', () => {
       raf.frame(250);
     });
 
+    expect(store.getState().gameLoop.currentTick).toBe(1);
     expect(onTick).toHaveBeenCalledTimes(1);
     expect(deliveredTicks).toEqual([1]);
 
@@ -243,6 +247,7 @@ describe('useGameLoop deterministic timing', () => {
       await Promise.resolve();
     });
 
+    expect(store.getState().gameLoop.currentTick).toBe(2);
     expect(onTick).toHaveBeenCalledTimes(2);
     expect(deliveredTicks).toEqual([1, 2]);
     expect(consoleError).toHaveBeenCalledWith(
