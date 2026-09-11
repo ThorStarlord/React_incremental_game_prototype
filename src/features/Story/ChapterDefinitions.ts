@@ -1,8 +1,3 @@
-export type ChapterId =
-  | 'merchant_district'
-  | 'archive_inquiry'
-  | 'adversarial_calibration';
-
 export interface ChapterRouteDefinition {
   id: string;
   label: string;
@@ -11,8 +6,8 @@ export interface ChapterRouteDefinition {
   requiredCompletedDialogueIds?: readonly string[];
 }
 
-export interface ChapterDefinition {
-  id: ChapterId;
+interface ChapterDefinitionShape {
+  id: string;
   title: string;
   centerOfGravity: string;
   description: string;
@@ -40,7 +35,7 @@ const LYRA_ADVERSARIAL_CALIBRATION_ARC = [
  * These definitions project existing domain authority into a chapter-scale view.
  * They are not a chapter state machine, reducer, condition DSL, or save-schema root.
  */
-export const CHAPTER_DEFINITIONS: readonly ChapterDefinition[] = [
+export const CHAPTER_DEFINITIONS = [
   {
     id: 'merchant_district',
     title: 'Merchant District Crisis',
@@ -110,7 +105,17 @@ export const CHAPTER_DEFINITIONS: readonly ChapterDefinition[] = [
       },
     ],
   },
-] as const;
+] as const satisfies readonly ChapterDefinitionShape[];
+
+/**
+ * Chapter identity is derived from the canonical definition list so adding or
+ * removing a definition cannot drift from a separately maintained union.
+ */
+export type ChapterId = (typeof CHAPTER_DEFINITIONS)[number]['id'];
+
+export type ChapterDefinition = Omit<ChapterDefinitionShape, 'id'> & {
+  id: ChapterId;
+};
 
 export const getChapterDefinition = (chapterId: ChapterId): ChapterDefinition => {
   const chapter = CHAPTER_DEFINITIONS.find(candidate => candidate.id === chapterId);
