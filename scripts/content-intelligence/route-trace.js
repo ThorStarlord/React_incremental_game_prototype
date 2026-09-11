@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const path = require('path');
 const { createModel, formatTrace, traceTarget } = require('./content-graph');
+const { applyRepositoryPolicy } = require('./repository-policy');
 
 function parseArgs(argv) {
   const args = { json: false, target: null };
@@ -20,7 +21,7 @@ if (!args.target) {
 }
 
 const root = path.resolve(__dirname, '..', '..');
-const model = createModel(root);
+const model = applyRepositoryPolicy(createModel(root));
 if (model.issues.length > 0) {
   for (const issue of model.issues) console.error(`ERROR ${issue.code}: ${issue.message}`);
   process.exit(1);
