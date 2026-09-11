@@ -163,7 +163,7 @@ requireContains('specification/Technical/GameCompletionRoadmap.md', [
   'GC-14',
   'Alpha qualification',
   'Release Candidate',
-  'There is no automatic M27',
+  'No automatic M-number continuation',
 ]);
 
 requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
