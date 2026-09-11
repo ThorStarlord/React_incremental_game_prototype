@@ -1,123 +1,136 @@
-# React Incremental RPG Prototype — Specification Authority Map
+# React Incremental RPG — Specification Authority Map
 
-This file is the technical/product **authority chain** for the React Incremental RPG Prototype. It routes a reader to current records rather than duplicating every historical milestone narrative.
+This file routes readers to the current product, completion, technical and domain authorities. It does not duplicate every historical milestone narrative.
+
+**Current maturity:** PLAYABLE PRE-ALPHA  
+**Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
+**Human Product Review:** issue #109 OPEN / UNPROVEN
 
 ## Authority chain
 
-Read repository authority in this order:
+Read current authority in this order:
 
 ```text
 STATUS.md
 -> docs/CURRENT.md
--> RUNBOOK.md
--> specification/README.md
--> current domain contract/result records
--> executable implementation + qualification tests
+-> GameCompletionDefinition.md
+-> Features/FeatureScopeMatrix.md
+-> Progression/GameProgressionArc.md + Narrative/CampaignArchitecture.md
+-> Technical/GameCompletionRoadmap.md
+-> relevant Alpha / Beta / Release completion contract
+-> affected current domain contract/result
+-> executable implementation + qualification
 -> reference / historical evidence only as needed
 ```
 
-Authority is scope-sensitive. A later implementation record does not automatically override a still-current product boundary, and older detailed prose does not override current executable contracts.
+Authority is scope-sensitive. Older detailed prose does not override the current 1.0 scope, and a green technical test does not promote a human-quality claim.
 
-## Current repository boundary
+## Current game-completion authorities
 
-```text
-M25 Complete Chapter Vertical Slice: PASS
-Post-M25 GameLoop Timing Hardening: COMPLETE / INTEGRATED
-Post-M25 Content Intelligence: COMPLETE / INTEGRATED
-Archive Inquiry second chapter: QUALIFIED / INTEGRATED
-Player Insight projections: COMPLETE / INTEGRATED
-Post-M25 Product-Depth Packages: COMPLETE / INTEGRATED
-Product Direction Decision Readiness: COMPLETE / INTEGRATED
-Three-Chapter Friction Audit: COMPLETE / CLOSED
-Chapter-Definition Integrity Repair: COMPLETE / INTEGRATED
-Human Integrated Playability / Product Review: OPEN HUMAN AUTHORITY GATE / UNPROVEN
-Product Direction Decision: PENDING
-M26: NOT AUTHORIZED
-```
+### Finished-game definition
 
-Repository qualification proves bounded technical behavior and composition. It does not prove human comprehension, pacing, fairness, enjoyment, retention, final balance, or final Product Direction.
+- [`GameCompletionDefinition.md`](GameCompletionDefinition.md) — **CURRENT AUTHORITY** for what Campaign One / 1.0 is, what counts as complete, and when to stop adding 1.0 scope.
 
-## Current records — product and implementation direction
+The current target is a bounded isolated-planet Campaign One where consequential relationships teach durable capabilities, remembered history explains later possibilities, and understood repetition becomes deliberately delegatable.
 
-- [`Technical/PostM25ProductDirection.md`](Technical/PostM25ProductDirection.md) — candidate product thesis, human-review boundary, promotion conditions, and anti-expansion controls. This remains the product-evidence boundary and does **not** authorize M26.
-- [`Technical/PostM25ProductDirectionDecisionReadiness.md`](Technical/PostM25ProductDirectionDecisionReadiness.md) — compares the demonstrated candidate identities and records the leading synthesis hypothesis without selecting final Product Direction.
-- [`Technical/PostM25ImplementationRoadmap.md`](Technical/PostM25ImplementationRoadmap.md) — closed program record for the former six-package post-M25 sequence; it is not a pending backlog.
-- [`Technical/M25CompleteChapterVerticalSliceResult.md`](Technical/M25CompleteChapterVerticalSliceResult.md) — M25 complete-chapter composition authority.
+### Feature scope
 
-The currently strongest candidate product pattern remains:
+- [`Features/FeatureScopeMatrix.md`](Features/FeatureScopeMatrix.md) — **CURRENT AUTHORITY** for `CORE_1_0`, `SUPPORTING_1_0`, `MINIMAL_1_0`, `DEFER_POST_1_0`, and `CUT` decisions.
+
+Important consequences:
 
 ```text
-meaningful active play
--> independent Relationship / Knowledge / Faction / World consequences
--> understandable causal memory
--> durable relationship-derived capability
--> intentional tactical/social application
--> understood routine
--> deliberate Copy delegation
--> bounded offline continuation where explicitly allowed
--> return attention to novelty and higher-order decisions
+Traits                         -> capability/skill authority for 1.0
+separate generic Skills        -> CUT
+Generic Crafting               -> CUT for Campaign One
+General Inventory/Equipment    -> DEFER_POST_1_0 unless campaign evidence promotes it
+canonical save/load/import     -> CORE_1_0
+duplicate Saves system         -> CUT
+ChapterEngine / narrative DSL  -> CUT absent repeated concrete need
+autonomous Copy decisions      -> CUT
+interplanetary campaign / NG+  -> DEFER_POST_1_0
 ```
 
-This is a **leading synthesis hypothesis**, not the final Product Direction decision.
+### Whole-game progression
 
-## Current records — post-M25 content and chapter architecture
-
-- [`Technical/PostM25ContentIntelligence.md`](Technical/PostM25ContentIntelligence.md) — deterministic authored-content integrity, dependency/reachability intelligence, route tracing, and rejection self-tests.
-- [`Technical/PostM25SecondChapterQualification.md`](Technical/PostM25SecondChapterQualification.md) — **Archive Inquiry**, the qualified second heterogeneous chapter-scale projection over existing Elara authority.
-- [`Technical/PostM25RuleOfTwoChapterArchitecture.md`](Technical/PostM25RuleOfTwoChapterArchitecture.md) — bounded shared requirement evaluator extracted from repeated Merchant District / Archive Inquiry projection behavior.
-- [`Technical/PostM25ThirdHeterogeneousChapter.md`](Technical/PostM25ThirdHeterogeneousChapter.md) — **Enemies in Phase**, a third one-route heterogeneous chapter-scale projection over existing Lyra evidence.
-- [`Technical/PostM25ChapterDefinitionIntegrityRepair.md`](Technical/PostM25ChapterDefinitionIntegrityRepair.md) — integrated three-chapter integrity repair: derived chapter identity, generic reference/uniqueness qualification, and generic chapter-progress API surface.
-- [`Technical/PostM25ThreeChapterFrictionAudit.md`](Technical/PostM25ThreeChapterFrictionAudit.md) — closed audit provenance that justified exactly the now-completed R1–R3 repairs. It is not a future implementation queue.
-
-Current chapter-scale evidence is:
+- [`Progression/GameProgressionArc.md`](Progression/GameProgressionArc.md) — **CURRENT AUTHORITY** for the progression transformation:
 
 ```text
-Merchant District Crisis
--> institutions / trade / public order / world-state consequences
--> two conclusions
-
-Archive Inquiry
--> evidence / model revision / independent verification
--> two distinct relationship histories
-
-Enemies in Phase
--> adversarial learning / calibration / necessary cooperation
--> one route
+Personal Agency
+-> Relationship-Shaped Specialization
+-> Networked Mastery
+-> Strategic Synthesis
 ```
 
-All three are projections over canonical domain authorities. There is still no generalized `ChapterEngine`, chapter reducer, chapter-local save root, dynamic chapter registry, or generalized narrative condition DSL.
+### Campaign structure
 
-### Chapter-definition integrity
-
-The focused qualification command is:
-
-```bash
-npm run chapter:validate
-```
-
-It is also executed at the tail of:
-
-```bash
-npm run content:intelligence:validate
-```
-
-The validator rejects duplicate chapter/route IDs, empty or duplicate requirements, and dangling Experience/completed-dialogue requirements. Its dialogue catalogue deliberately mirrors the bounded runtime initialization source set:
+- [`Narrative/CampaignArchitecture.md`](Narrative/CampaignArchitecture.md) — **CURRENT AUTHORITY** for the bounded Campaign One spine:
 
 ```text
-public/data/dialogues.json
-public/data/m24-world-state-content.json -> dialogues
-public/data/m25-chapter-content.json -> dialogues
+Prologue
+Ch1 Merchant District Crisis      [integrated]
+Ch2 Archive Inquiry               [integrated]
+Ch3 Enemies in Phase              [integrated]
+Ch4 Lattice Under Strain          [to build]
+Ch5 The Chrono-Crypt              [to build]
+Ch6 Network Under Pressure        [to build]
+Ch7 Counterphase                  [to build]
+Finale — The Telluric Echo        [to build]
+Epilogue                          [to build]
 ```
 
-Build Validation #335 exposed the danger of validating only the base dialogue file; the corrected runtime-aligned candidate passed exact-head Build Validation #336 and merged through PR #108.
+The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative reference; `CampaignArchitecture.md` owns bounded 1.0 production scope.
 
-## Current records — player legibility and relationship-derived buildcraft
+### Active implementation roadmap
 
-- [`Technical/PostM25PlayerInsightProjection.md`](Technical/PostM25PlayerInsightProjection.md) — Causal Journal, Opportunity Map, Relationship-Derived Build, spoiler boundaries, and read-only projection authority.
-- [`Technical/PostM25ContextualCausalLegibility.md`](Technical/PostM25ContextualCausalLegibility.md) — contextual `Available because` explanations for already-visible dialogue topics; unavailable topics remain hidden and expose no prerequisite hints.
-- [`Technical/PostM25CrossDomainTraitBuildcraft.md`](Technical/PostM25CrossDomainTraitBuildcraft.md) — relationship-derived Traits retain durable capability identity across more than one gameplay domain while permanent Trait state remains capability authority.
+- [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for GC-00→GC-14 and the dependency path to 1.0.
 
-Trait authority remains:
+There is no automatic M27. Every active package must close a named 1.0 completion requirement or a demonstrated blocker to one.
+
+### Maturity gates
+
+- [`Technical/AlphaCompletionContract.md`](Technical/AlphaCompletionContract.md) — **CURRENT AUTHORITY** for Alpha: whole structural game playable New Game -> Epilogue through normal UI.
+- [`Technical/BetaCompletionContract.md`](Technical/BetaCompletionContract.md) — **CURRENT AUTHORITY** for Content Alpha/Beta: content lock, genuine human evidence, UX/pacing/balance/reliability/accessibility/browser readiness.
+- [`Technical/ReleaseQualificationContract.md`](Technical/ReleaseQualificationContract.md) — **CURRENT AUTHORITY** for exact Release Candidate / 1.0 promotion.
+
+## Provisional Product Direction and governance
+
+- [`Technical/PostM25ProvisionalGovernanceDecision.md`](Technical/PostM25ProvisionalGovernanceDecision.md) — current bounded governance exception permitting reversible human-unvalidated product development while preserving the human-evidence ceiling.
+- [`Technical/PostM25ProvisionalProductDirectionDecision.md`](Technical/PostM25ProvisionalProductDirectionDecision.md) — provisional hierarchy:
+  1. relationship-derived capability buildcraft;
+  2. causal legibility;
+  3. earned delegation / mastery compression;
+  4. heterogeneous authored composition.
+- [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — integrated provenance/readiness result; exact candidate `9b9b0380...`, Build Validation #340 PASS, PR #114 merged as `7f306f3b...`.
+
+The earlier [`Technical/PostM25ProductDirectionDecisionReadiness.md`](Technical/PostM25ProductDirectionDecisionReadiness.md) is predecessor evidence, not the active implementation authority.
+
+## Human evidence authority
+
+Issue #109 — **Human Integrated Playability / Product Review** — remains open and unproven.
+
+Under the game-completion program it is not a blanket freeze on all pre-Alpha work. It is the authority for claims that require fresh human observation and becomes a required input to `BETA_PASS`.
+
+Automation must not claim:
+
+- fresh-player comprehension/discoverability;
+- pacing quality;
+- fairness/final balance;
+- enjoyment/emotional impact;
+- retention/desire to continue;
+- market preference.
+
+## Current relationship / capability chain
+
+### Relationship authority
+
+Relationship progression is based on persistent Experiences, Memories, interpreted Bond state and evidence-qualified Connection rather than one universal relationship XP meter.
+
+Use current Relationship contracts/results under [`Technical/`](Technical/) and feature references under [`Features/`](Features/), especially the current Relationship Experience/Memory authority linked by those records.
+
+### Trait / capability authority
+
+The governing separation remains:
 
 ```text
 Relationship -> qualifies learning / explains provenance
@@ -126,96 +139,15 @@ Gameplay     -> determines local applicability
 Player       -> chooses whether to use it
 ```
 
-The post-M25 buildcraft qualification adds `ScholarlyInsight` as a semantic combat capability in addition to its existing investigation/Quest use. Baseline actions remain viable, so the Trait expands solution space rather than becoming mandatory universal power.
+Current relevant records include:
 
-## Current records — Copy and incremental authority
+- [`Technical/PostM25CrossDomainTraitBuildcraft.md`](Technical/PostM25CrossDomainTraitBuildcraft.md) — semantic cross-domain capability use;
+- [`Technical/PostM25PlayerInsightProjection.md`](Technical/PostM25PlayerInsightProjection.md) — read-only build/provenance projections;
+- [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — player-visible qualifying-Memory provenance.
 
-- [`Technical/M20ProductionCopyTaskAutomationResult.md`](Technical/M20ProductionCopyTaskAutomationResult.md) — qualified bounded Copy production-task execution.
-- [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md) — bounded offline snapshot settlement authority.
-- [`Technical/PostM25CopyRoutineStrategy.md`](Technical/PostM25CopyRoutineStrategy.md) — player-authored ordered routine priority over the existing M20 allowlist, plus explicit `Start Preferred` delegation through existing M20 eligibility and one-active-task authority.
+The 1.0 completion floor is four durable relationship-derived capability identities across at least three anchor relationships, at least two with meaningful cross-domain use, and at least two viable late-game build profiles.
 
-The product doctrine remains:
-
-```text
-player personally understands routine
--> routine familiarity persists
--> player may deliberately delegate approved repetition
--> Copy executes bounded ordinary consequence
-
-novel / meaningful / irreversible decision
--> remains player authority
-```
-
-Post-M25 routine priority does **not** automatically chain tasks and does not authorize autonomous narrative, social, Knowledge, Faction, World State, travel, Quest, or combat decisions.
-
-## Current records — GameLoop timing and progression
-
-The integrated post-M25 timing model remains governed by the current GameLoop records, especially:
-
-- [`Technical/GameLoopAsyncTickBacklogPolicyContract.md`](Technical/GameLoopAsyncTickBacklogPolicyContract.md) — `SERIAL_BACKPRESSURE_V1`.
-- [`Technical/GameLoopBoundedBacklogControlRepair.md`](Technical/GameLoopBoundedBacklogControlRepair.md) — bounded implementation repair preserving the async backlog contract.
-- [`Technical/GameLoopLifecycleRemainderPolicy.md`](Technical/GameLoopLifecycleRemainderPolicy.md) — `FRESH_LOOP_RESET_V1`.
-- [`Technical/GameLoopUnifiedTimingHardeningCompositionQualification.md`](Technical/GameLoopUnifiedTimingHardeningCompositionQualification.md) — integrated timing composition authority.
-- [`Technical/GameLoopBackpressureCadenceProgressionStressQualification.md`](Technical/GameLoopBackpressureCadenceProgressionStressQualification.md) — backpressure/cadence/progression stress qualification.
-- [`Technical/GameLoopTimedQuestPrecisionResolution.md`](Technical/GameLoopTimedQuestPrecisionResolution.md) — comparison-only timed-Quest floating-point precision semantics.
-- [`Technical/GameLoopQuestTimingIntegrationQualification.md`](Technical/GameLoopQuestTimingIntegrationQualification.md) — Quest timing integration evidence.
-
-Key invariants:
-
-```text
-SERIAL_BACKPRESSURE_V1
--> at most one unresolved admitted fixed step
--> logical time retained in accumulator
--> no per-tick FIFO backlog
--> no drop / skip / coalescing / concurrent consumers
-
-FRESH_LOOP_RESET_V1
--> continuous execution preserves sub-step remainder
--> pause/resume preserves remainder but rejects paused wall time
--> stop/start discards remainder
--> unmount/remount discards remainder
--> save/load + fresh mount discards remainder
-```
-
-M21 offline authority remains separate and bounded; timed Quests remain online-only during offline settlement.
-
-## Current records — active RPG domain chain
-
-### Relationship / Memory / Trait
-
-Use the M4-M17 current contracts/results and later reconciliation records under [`Technical/`](Technical/) together with feature documents under [`Features/`](Features/). Relationship evidence and Memories explain social history and learning provenance, while Traits own durable capability identity.
-
-The first weak Checkpoint B verdict in [`Technical/CheckpointBActiveRpgLoopResult.md`](Technical/CheckpointBActiveRpgLoopResult.md) is historical evidence; later repair and rerun PASS records supersede that verdict for current decisions.
-
-### Exploration / spatial authority
-
-- [`Technical/M18ExplorationTravelResult.md`](Technical/M18ExplorationTravelResult.md) — bounded authored travel authority.
-- [`Technical/M19WorldDerivedTetherResult.md`](Technical/M19WorldDerivedTetherResult.md) — bounded world-derived spatial Tether authority.
-
-Player location remains canonical for player presence. NPC anchors and Relationship/Tether projections do not replace canonical spatial authority.
-
-### Knowledge
-
-- [`Technical/M22SocialKnowledgePropagationResult.md`](Technical/M22SocialKnowledgePropagationResult.md)
-- [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md)
-
-Knowledge answers **which NPC knows an objective fact**; it is not Relationship meaning, Faction standing, or objective World State.
-
-### Faction Reputation
-
-- [`Technical/M23FactionReputationResult.md`](Technical/M23FactionReputationResult.md)
-- [`Features/FactionSystem.md`](Features/FactionSystem.md)
-
-Faction Reputation answers **how an institution regards the player** and remains independent from personal Relationship and Knowledge.
-
-### Objective World State
-
-- [`Technical/M24ObjectiveWorldStateResult.md`](Technical/M24ObjectiveWorldStateResult.md)
-- [`Features/WorldStateSystem.md`](Features/WorldStateSystem.md)
-
-World State owns qualified objective regional conditions and remains independent from social interpretation.
-
-## Current system separation
+## Current causal-state separation
 
 ```text
 OBJECTIVE EVENT / SOURCE -> what happened
@@ -228,80 +160,153 @@ COPY                     -> bounded execution of understood routine
 CHAPTER PROJECTION       -> read-only composition of existing authorities
 ```
 
-Do not collapse these into a universal progression or condition system without new evidence.
+Do not collapse these into a universal progression/condition system without a new demonstrated completion blocker.
+
+### Knowledge
+
+- [`Technical/M22SocialKnowledgePropagationResult.md`](Technical/M22SocialKnowledgePropagationResult.md)
+- [`Features/KnowledgeSystem.md`](Features/KnowledgeSystem.md)
+
+### Faction Reputation
+
+- [`Technical/M23FactionReputationResult.md`](Technical/M23FactionReputationResult.md)
+- [`Features/FactionSystem.md`](Features/FactionSystem.md)
+
+### Objective World State
+
+- [`Technical/M24ObjectiveWorldStateResult.md`](Technical/M24ObjectiveWorldStateResult.md)
+- [`Features/WorldStateSystem.md`](Features/WorldStateSystem.md)
+
+## Current Copy / incremental authority
+
+- [`Technical/M20ProductionCopyTaskAutomationResult.md`](Technical/M20ProductionCopyTaskAutomationResult.md) — bounded Copy task execution.
+- [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md) — bounded offline snapshot settlement.
+- [`Technical/PostM25CopyRoutineStrategy.md`](Technical/PostM25CopyRoutineStrategy.md) — player-authored routine priority and explicit `Start Preferred` action.
+- [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — personal mastery provenance vs Copy-specific readiness.
+
+Product doctrine:
+
+```text
+player personally learns routine
+-> familiarity persists
+-> player may deliberately delegate approved repetition
+-> Copy executes bounded ordinary consequence
+
+novel / meaningful / irreversible decision
+-> remains player authority
+```
+
+The 1.0 completion floor is three personally mastered routine identities across at least two learning contexts.
+
+## Current chapter/content architecture
+
+- [`Technical/M25CompleteChapterVerticalSliceResult.md`](Technical/M25CompleteChapterVerticalSliceResult.md) — qualified two-route Merchant District chapter.
+- [`Technical/PostM25SecondChapterQualification.md`](Technical/PostM25SecondChapterQualification.md) — Archive Inquiry.
+- [`Technical/PostM25ThirdHeterogeneousChapter.md`](Technical/PostM25ThirdHeterogeneousChapter.md) — Enemies in Phase.
+- [`Technical/PostM25RuleOfTwoChapterArchitecture.md`](Technical/PostM25RuleOfTwoChapterArchitecture.md) — bounded shared requirement helper.
+- [`Technical/PostM25ChapterDefinitionIntegrityRepair.md`](Technical/PostM25ChapterDefinitionIntegrityRepair.md) — derived ChapterId + generic integrity qualification.
+- [`Technical/PostM25ContentIntelligence.md`](Technical/PostM25ContentIntelligence.md) — content integrity, reachability and route tracing.
+
+There remains no generalized `ChapterEngine`, chapter reducer/save root, or narrative condition DSL.
+
+Focused chapter/content commands:
+
+```bash
+npm run content:intelligence:validate
+npm run chapter:validate
+```
+
+## GameLoop timing authority
+
+Current key records include:
+
+- [`Technical/GameLoopAsyncTickBacklogPolicyContract.md`](Technical/GameLoopAsyncTickBacklogPolicyContract.md) — `SERIAL_BACKPRESSURE_V1`.
+- [`Technical/GameLoopBoundedBacklogControlRepair.md`](Technical/GameLoopBoundedBacklogControlRepair.md).
+- [`Technical/GameLoopLifecycleRemainderPolicy.md`](Technical/GameLoopLifecycleRemainderPolicy.md) — `FRESH_LOOP_RESET_V1`.
+- [`Technical/GameLoopUnifiedTimingHardeningCompositionQualification.md`](Technical/GameLoopUnifiedTimingHardeningCompositionQualification.md).
+- [`Technical/GameLoopTimedQuestPrecisionResolution.md`](Technical/GameLoopTimedQuestPrecisionResolution.md) — comparison-only precision semantics.
+- [`Technical/GameLoopQuestTimingIntegrationQualification.md`](Technical/GameLoopQuestTimingIntegrationQualification.md).
+
+Key invariants:
+
+```text
+SERIAL_BACKPRESSURE_V1
+-> at most one unresolved admitted fixed step
+-> retain excess logical milliseconds
+-> no per-tick FIFO
+-> no drop / skip / coalescing / concurrent consumers
+
+FRESH_LOOP_RESET_V1
+-> continuous execution and pause/resume preserve sub-step remainder
+-> paused wall time rejected
+-> stop/start, unmount/remount, save/load fresh mount discard remainder
+```
+
+M21 offline authority remains separate and bounded; timed Quests remain online-only during offline settlement.
 
 ## Current qualification surfaces
 
-Executable authority is [`.github/workflows/build-validation.yml`](../.github/workflows/build-validation.yml). Operational commands belong in [`../RUNBOOK.md`](../RUNBOOK.md).
-
-The current Build Validation includes, among other gates:
-
-- documentation-authority validation;
-- content-intelligence qualification, including `chapter:validate`;
-- Archive Inquiry second-chapter qualification;
-- Player Insight qualification;
-- post-M25 product-depth qualification covering Rule-of-Two extraction, contextual causal legibility, cross-domain Trait buildcraft, third chapter, and Copy routine strategy;
-- TypeScript checking with failure-only diagnostics;
-- UI-only synthetic smoke;
-- GameLoop timing/backpressure/lifecycle/drift qualification;
-- M20-M25 milestone gates;
-- active-loop and historical regression qualification;
-- production build.
-
-Exact-head green CI is necessary for merge but does not promote claims above the declared evidence ceiling.
-
-## Current unresolved human authority gate
-
-Issue #109 — **Human Integrated Playability / Product Review** — remains open by design. Only genuine fresh human observations can satisfy it. Repository tests, synthetic UI smoke, and LLM analysis cannot be promoted into human product evidence.
-
-That gate should discriminate between:
+Executable CI authority:
 
 ```text
-causal RPG / causal legibility
-relationship-derived capability buildcraft
-earned delegation / incremental mastery
-heterogeneous content composition as enabling architecture
+.github/workflows/build-validation.yml
 ```
 
-A final Product Direction Decision should be written only after genuine evidence exists. Until then, Product Direction is `PENDING` and M26 is `NOT AUTHORIZED`.
+Operational procedure:
 
-## Reference records
+- [`../RUNBOOK.md`](../RUNBOOK.md)
 
-Broad product and design context remains useful in:
+Current important commands include:
+
+```bash
+npm run docs:authority:validate
+npm run content:intelligence:validate
+npm run chapter:validate
+npm run m26:validate
+npm run simulated-review:validate
+npm run simulated-review:action-contract
+npx tsc --noEmit
+npm run build
+```
+
+`alpha:validate` and `release:validate` are **future required commands** defined by the maturity contracts. Do not claim they exist until their owning completion packages implement them.
+
+## Historical / closed program records
+
+The following remain useful provenance but are not active queues:
+
+- [`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) — historical program culminating in M25.
+- [`Technical/PostM25ImplementationRoadmap.md`](Technical/PostM25ImplementationRoadmap.md) — closed post-M25 program.
+- [`Technical/PostM25ThreeChapterFrictionAudit.md`](Technical/PostM25ThreeChapterFrictionAudit.md) — closed R1–R3 audit.
+- first weak Checkpoint B/C verdicts — historical evidence superseded by their repair/rerun PASS records.
+- Build Validation #335 failure — historical evidence for the runtime-aligned chapter-validator repair.
+- Build Validation #339 failure — historical evidence for the M26 stale historical wording assertion; superseded by #340 PASS.
+
+## Reference material
+
+Broad product/lore/design reference remains in:
 
 - [`GameDesignDocument.md`](GameDesignDocument.md)
+- [`Narrative/Synopsis.md`](Narrative/Synopsis.md)
+- [`Narrative/Characters.md`](Narrative/Characters.md)
+- [`Narrative/WorldLore.md`](Narrative/WorldLore.md)
 - [`Features/`](Features/)
-- [`Narrative/`](Narrative/)
 - [`UI_UX/`](UI_UX/)
-- reconciliation and historical milestone records under [`Technical/`](Technical/)
 
-[`Technical/PostM17MilestoneRoadmap.md`](Technical/PostM17MilestoneRoadmap.md) is historical evidence for the completed program through M25, not the active roadmap for M26.
+These files do not silently expand 1.0 scope. `GameCompletionDefinition.md` and `FeatureScopeMatrix.md` own that boundary.
 
-Use [`../docs/CURRENT.md`](../docs/CURRENT.md) before treating older technical records as present-state authority.
+## 1.0 governing rule
 
-## Evidence ceiling and anti-expansion boundary
-
-Repository qualification still does **not** prove:
-
-- fresh-player comprehension or discoverability;
-- causal terminology comprehension;
-- pacing quality;
-- fairness or final balance;
-- emotional coherence;
-- enjoyment;
-- retention / desire to continue;
-- final Product Direction;
-- M26 authorization.
-
-Do not infer permission from the current architecture to build a generalized ChapterEngine, narrative DSL, open-world simulation, NPC schedules, generalized economy, generalized belief/rumor simulation, autonomous irreversible Copy planning, or offline narrative/world simulation.
-
-For new work, follow:
+For any proposed work:
 
 ```text
-real current bottleneck
--> observed concrete friction
--> repeated case where abstraction is relevant
--> smallest justified intervention
--> explicit deterministic qualification
--> preserve evidence ceiling
+identify unsatisfied Game Completion requirement
+-> identify current concrete blocker
+-> use existing authority if sufficient
+-> introduce smallest intervention
+-> qualify positive + negative paths
+-> exact-head Build Validation
+-> update completion status
 ```
+
+> **Technical possibility is not a 1.0 requirement. Finish the bounded Campaign One before expanding the architecture.**
