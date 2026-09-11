@@ -39,6 +39,12 @@ jobs:
         env:
           CI: true
 
+      - name: Post-M25 player insight projection qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand PostM25PlayerInsightsQualification.test.ts
+        env:
+          CI: true
+
       - name: Synthetic review contract qualification
         run: npm run simulated-review:validate
 
