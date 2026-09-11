@@ -4,23 +4,25 @@
  */
 
 /** 
- * Unique identifier for navigation tabs
- * Using string literal types for type safety and autocomplete
+ * Unique identifier for navigation tabs.
+ * Historical/deferred IDs remain in the union so persisted navigation state
+ * and older code references can still be interpreted safely; presence here
+ * does not mean a destination belongs to Campaign One / 1.0.
  */
 export type TabId = 
   | 'dashboard'     // Dashboard overview and analytics
-  | 'character'     // Character management (stats, attributes, equipment)
-  | 'traits'        // Trait system (slots, management, codex)
-  | 'skills'        // Skills management and progression
+  | 'character'     // Character management
+  | 'traits'        // Campaign One capability authority
+  | 'skills'        // Legacy ID; separate generic skill tree is CUT for 1.0
   | 'npcs'          // NPC interactions and relationships
   | 'quests'        // Quest log and management
-  | 'copies'        // Copy management (future implementation)
-  | 'essence'       // Essence management (future)
-  | 'inventory'     // Item and equipment management (future)
+  | 'copies'        // Copy / delegation management
+  | 'essence'       // Essence and Resonance progression
+  | 'inventory'     // Legacy ID; general inventory is DEFER_POST_1_0
   | 'settings'      // Game settings and configuration
-  | 'saves'         // Save management interface
-  | 'crafting'      // Crafting system (recipes, materials, management)
-  | 'save-load'     // Save and load game interface
+  | 'saves'         // Legacy duplicate-save placeholder; CUT for 1.0
+  | 'crafting'      // Legacy ID; generic crafting is CUT for Campaign One
+  | 'save-load'     // Legacy duplicate-save route; main menu owns persistence UX
   | 'debug';        // Development and testing tools
 
 /**
@@ -58,7 +60,7 @@ export interface NavItem {
 
 /**
  * Badge configuration
- * Defines the structure for badge notifications on navigation items
+ * Defines the structure for badge notifications
  */
 export interface BadgeConfig {
   /** Badge content, can be a number or string */

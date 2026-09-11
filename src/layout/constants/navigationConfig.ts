@@ -1,6 +1,9 @@
 /**
- * Navigation configuration and item definitions
- * Centralized configuration for the main navigation system
+ * Navigation configuration and item definitions.
+ *
+ * `NAVIGATION_ITEMS` retains legacy IDs so old layout state and historical
+ * references remain type-safe, but Campaign One only advertises currently
+ * implemented 1.0 surfaces. Cut/deferred legacy IDs stay unavailable.
  */
 
 import {
@@ -20,29 +23,22 @@ import {
   BugReport as DebugIcon,
 } from '@mui/icons-material';
 
-import type { 
-  NavigationConfig, 
-  NavSection, 
-  NavItem, 
-  TabId 
+import type {
+  NavigationConfig,
+  NavSection,
+  NavItem,
+  TabId,
 } from '../types/NavigationTypes';
 
-/**
- * Default navigation configuration
- */
 export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
   defaultTab: 'character',
   maxHistoryLength: 10,
   persistState: true,
   storageKey: 'rpg_navigation_state',
   enableTransitions: true,
-  transitionDuration: 300
+  transitionDuration: 300,
 };
 
-/**
- * Core navigation items definition
- * Defines all available navigation destinations
- */
 export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
   dashboard: {
     id: 'dashboard',
@@ -68,25 +64,29 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     icon: TraitsIcon,
     route: '/game/traits',
     isImplemented: true,
-    tooltip: 'Manage acquired traits and abilities',
+    tooltip: 'Manage relationship-derived capabilities and Traits',
     section: 'character-management',
   },
+
+  // Historical compatibility ID. A separate generic skill tree is CUT for 1.0;
+  // Traits remain the Campaign One capability authority.
   skills: {
     id: 'skills',
     label: 'Skills',
     icon: SkillsIcon,
     route: '/game/skills',
     isImplemented: false,
-    tooltip: 'Manage character skills',
+    tooltip: 'Not part of Campaign One / 1.0',
     section: 'character-management',
   },
+
   npcs: {
     id: 'npcs',
     label: 'NPCs',
     icon: NPCsIcon,
     route: '/game/npcs',
     isImplemented: true,
-    tooltip: 'Interact with non-player characters',
+    tooltip: 'Interact with characters and relationship history',
     section: 'world-interaction',
   },
   quests: {
@@ -103,8 +103,8 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     label: 'Copies',
     icon: CopiesIcon,
     route: '/game/copies',
-    isImplemented: true, // Set to true since the page now exists
-    tooltip: 'Manage created copies',
+    isImplemented: true,
+    tooltip: 'Manage bounded delegated routine work',
     section: 'world-interaction',
   },
   essence: {
@@ -113,25 +113,31 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     icon: EssenceIcon,
     route: '/game/essence',
     isImplemented: true,
-    tooltip: 'Manage essence and related mechanics',
+    tooltip: 'View Essence and Resonance progression',
     section: 'character-management',
   },
+
+  // Deferred post-1.0 unless a concrete Campaign One requirement promotes it.
   inventory: {
     id: 'inventory',
     label: 'Inventory',
     icon: InventoryIcon,
     route: '/game/inventory',
     isImplemented: false,
-    tooltip: 'Manage items and equipment'
+    tooltip: 'Deferred from Campaign One / 1.0',
   },
+
+  // Generic crafting is CUT for Campaign One. Authored forge interactions and
+  // mastered routines do not imply a generic crafting economy.
   crafting: {
     id: 'crafting',
     label: 'Crafting',
     icon: CraftingIcon,
     route: '/game/crafting',
     isImplemented: false,
-    tooltip: 'Craft items and equipment'
+    tooltip: 'Not part of Campaign One / 1.0',
   },
+
   settings: {
     id: 'settings',
     label: 'Settings',
@@ -141,13 +147,16 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     tooltip: 'Configure game settings',
     section: 'systems',
   },
+
+  // Legacy compatibility IDs. Save/load/import/export is owned by the main
+  // menu; Campaign One does not expose a second save-management authority.
   saves: {
     id: 'saves',
     label: 'Manage Saves',
     icon: SavesIcon,
     route: '/game/saves',
     isImplemented: false,
-    tooltip: 'Manage multiple save game slots',
+    tooltip: 'Use the main menu for save management',
     section: 'systems',
   },
   'save-load': {
@@ -155,9 +164,11 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     label: 'Save/Load',
     icon: SaveLoadIcon,
     route: '/game/save-load',
-    isImplemented: true,
-    tooltip: 'Save and load game progress'
+    isImplemented: false,
+    tooltip: 'Use the main menu for save/load/import/export',
+    section: 'systems',
   },
+
   debug: {
     id: 'debug',
     label: 'Debug',
@@ -170,8 +181,8 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
 };
 
 /**
- * Navigation sections for organized display
- * Groups navigation items into logical sections
+ * Primary Campaign One grouping. Only actual 1.0 surfaces belong in these
+ * sections; compatibility IDs above intentionally remain outside them.
  */
 export const NAVIGATION_SECTIONS: NavSection[] = [
   {
@@ -180,39 +191,29 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     items: [
       NAVIGATION_ITEMS.character,
       NAVIGATION_ITEMS.traits,
-      NAVIGATION_ITEMS.skills,
       NAVIGATION_ITEMS.essence,
-      NAVIGATION_ITEMS.inventory
-    ]
+    ],
   },
-  
   {
     id: 'world-interaction',
     title: 'World',
     items: [
       NAVIGATION_ITEMS.npcs,
       NAVIGATION_ITEMS.quests,
-      NAVIGATION_ITEMS.copies
-    ]
+      NAVIGATION_ITEMS.copies,
+    ],
   },
-  
   {
     id: 'systems',
     title: 'Systems',
     items: [
       NAVIGATION_ITEMS.dashboard,
-      NAVIGATION_ITEMS.crafting,
       NAVIGATION_ITEMS.settings,
-      NAVIGATION_ITEMS['save-load'],
-      NAVIGATION_ITEMS.saves,
       NAVIGATION_ITEMS.debug,
-    ]
-  }
+    ],
+  },
 ];
 
-/**
- * Get navigation item by ID with type safety
- */
 export function getNavigationItem(id: TabId): NavItem {
   const item = NAVIGATION_ITEMS[id];
   if (!item) {
@@ -221,31 +222,22 @@ export function getNavigationItem(id: TabId): NavItem {
   return item;
 }
 
-/**
- * Get all implemented navigation items
- */
 export function getImplementedItems(): NavItem[] {
   return Object.values(NAVIGATION_ITEMS).filter(item => item.isImplemented);
 }
 
-/**
- * Get navigation items by section
- */
 export function getItemsBySection(sectionId: string): NavItem[] {
   const section = NAVIGATION_SECTIONS.find(s => s.id === sectionId);
   return section?.items || [];
 }
 
-/**
- * Check if a navigation item is available
- */
 export function isItemAvailable(id: TabId): boolean {
   const item = NAVIGATION_ITEMS[id];
   return !!item?.isImplemented && (!item.requiresCondition || item.requiresCondition());
 }
 
 /**
- * Default navigation items for initial load
- * (This is a fallback and might be deprecated in favor of the full sections)
+ * Fallback player navigation now mirrors availability instead of advertising
+ * unavailable legacy destinations.
  */
-export const DEFAULT_NAV_ITEMS: NavItem[] = Object.values(NAVIGATION_ITEMS);
+export const DEFAULT_NAV_ITEMS: NavItem[] = getImplementedItems();
