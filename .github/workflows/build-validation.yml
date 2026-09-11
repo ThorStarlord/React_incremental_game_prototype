@@ -34,6 +34,10 @@ jobs:
         timeout-minutes: 5
         run: npm run gc01:validate
 
+      - name: GC-02 Prologue / onboarding qualification
+        timeout-minutes: 5
+        run: npm run gc02:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 
