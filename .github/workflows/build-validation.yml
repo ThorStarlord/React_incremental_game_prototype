@@ -30,6 +30,10 @@ jobs:
       - name: Documentation authority qualification
         run: npm run docs:authority:validate
 
+      - name: GC-01 1.0 player-surface scope qualification
+        timeout-minutes: 5
+        run: npm run gc01:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 
