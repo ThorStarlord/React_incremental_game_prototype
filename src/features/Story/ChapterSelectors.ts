@@ -79,6 +79,3 @@ export const selectChapterProgress = (
 
 export const selectAllChapterProgress = (state: RootState): ChapterProgress[] =>
   CHAPTER_DEFINITIONS.map(chapter => evaluateChapter(state, chapter));
-
-export const selectArchiveInquiryChapterProgress = (state: RootState): ChapterProgress =>
-  selectChapterProgress(state, 'archive_inquiry');

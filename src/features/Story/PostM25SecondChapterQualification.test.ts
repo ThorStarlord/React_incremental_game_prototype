@@ -5,7 +5,7 @@ import {
   CHAPTER_DEFINITIONS,
   getChapterDefinition,
 } from './ChapterDefinitions';
-import { selectArchiveInquiryChapterProgress } from './ChapterSelectors';
+import { selectChapterProgress } from './ChapterSelectors';
 
 const readJson = (relativePath: string): any =>
   JSON.parse(fs.readFileSync(path.join(process.cwd(), relativePath), 'utf8'));
@@ -66,7 +66,7 @@ describe('post-M25 second heterogeneous chapter qualification', () => {
 
   test('partial Archive Inquiry evidence derives in_progress without fabricating completion', () => {
     const state = withExperiences(commonOpening);
-    const progress = selectArchiveInquiryChapterProgress(state);
+    const progress = selectChapterProgress(state, 'archive_inquiry');
 
     expect(progress.status).toBe('in_progress');
     expect(progress.completedRouteId).toBeNull();
@@ -79,7 +79,7 @@ describe('post-M25 second heterogeneous chapter qualification', () => {
       'elara_exp_follow_evidence',
       ...commonLateArc,
     ]);
-    const progress = selectArchiveInquiryChapterProgress(state);
+    const progress = selectChapterProgress(state, 'archive_inquiry');
 
     expect(progress.status).toBe('complete');
     expect(progress.completedRouteId).toBe('evidence_over_ownership');
@@ -93,7 +93,7 @@ describe('post-M25 second heterogeneous chapter qualification', () => {
       'elara_exp_protect_consensus',
       ...commonLateArc,
     ]);
-    const progress = selectArchiveInquiryChapterProgress(state);
+    const progress = selectChapterProgress(state, 'archive_inquiry');
 
     expect(progress.status).toBe('complete');
     expect(progress.completedRouteId).toBe('cautious_then_reopened');
