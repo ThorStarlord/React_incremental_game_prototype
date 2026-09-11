@@ -149,7 +149,7 @@ describe('GC-02 Prologue / onboarding vertical path', () => {
     expect(screen.getByText(/Next: Merchant District Crisis/)).toBeInTheDocument();
   });
 
-  test('production wiring keeps the prologue in ordinary UI and New Game out of debug setup', () => {
+  test('production wiring keeps the prologue in ordinary UI and preserves the Willow-only New Game seed', () => {
     const gameLayoutSource = fs.readFileSync(
       path.join(process.cwd(), 'src/layout/components/GameLayout.tsx'),
       'utf8'
@@ -166,5 +166,14 @@ describe('GC-02 Prologue / onboarding vertical path', () => {
     expect(newGameSource).toContain('newGameSeedNPCsThunk');
     expect(newGameSource).toContain("navigate('/game/npcs')");
     expect(newGameSource).not.toContain("navigate('/game/debug')");
+
+    const appSource = fs.readFileSync(path.join(process.cwd(), 'src/App.tsx'), 'utf8');
+    expect(appSource).toContain('dispatch(initializeNPCsThunk())');
+
+    const npcListSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/features/NPCs/components/containers/NPCListView.tsx'),
+      'utf8'
+    );
+    expect(npcListSource).not.toContain('initializeNPCsThunk');
   });
 });
