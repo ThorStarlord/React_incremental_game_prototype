@@ -8,6 +8,7 @@ const {
   findReachabilityProblems,
   traceTarget,
 } = require('./content-graph');
+const { checkStructuralConsistency } = require('./structural-checks');
 
 const knownContracts = {
   routines: {},
@@ -73,6 +74,7 @@ const validRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'content-intelligence-va
 buildValidFixture(validRoot);
 const validModel = createModel(validRoot, { knownContracts });
 assert.deepStrictEqual(validModel.issues, [], `expected valid fixture, got ${JSON.stringify(validModel.issues)}`);
+assert.deepStrictEqual(checkStructuralConsistency(validModel), []);
 assert.deepStrictEqual(findReachabilityProblems(validModel), []);
 const trace = traceTarget(validModel, 'dialogue_gated');
 assert(trace, 'expected gated dialogue trace');
@@ -104,5 +106,27 @@ const brokenModel = createModel(brokenRoot, { knownContracts });
 assert(brokenModel.issues.some(issue => issue.code === 'DANGLING_REFERENCE' && issue.target === 'experience:exp_missing'));
 assert(brokenModel.issues.some(issue => issue.code === 'DUPLICATE_ID' && issue.entity === 'dialogue:dialogue_root'));
 assert(findReachabilityProblems(brokenModel).some(problem => problem.entity === 'dialogue:dialogue_gated'));
+
+const structuralModel = {
+  outgoing: new Map([
+    ['dialogue:contradictory', [
+      { from: 'dialogue:contradictory', to: 'fact:signal', relation: 'requires-fact' },
+      { from: 'dialogue:contradictory', to: 'fact:signal', relation: 'forbids-fact' },
+      { from: 'dialogue:contradictory', to: 'faction:Test Guild', relation: 'requires-faction', min: 10 },
+      { from: 'dialogue:contradictory', to: 'faction:Test Guild', relation: 'requires-faction', max: 5 },
+      { from: 'dialogue:contradictory', to: 'world-condition:location_test.signal=quiet', relation: 'requires-world-state', regionId: 'location_test', field: 'signal', equals: 'quiet' },
+      { from: 'dialogue:contradictory', to: 'world-condition:location_test.signal=clear', relation: 'requires-world-state', regionId: 'location_test', field: 'signal', equals: 'clear' },
+    ]],
+    ['trait:a', [{ from: 'trait:a', to: 'trait:b', relation: 'requires-trait' }]],
+    ['trait:b', [{ from: 'trait:b', to: 'trait:a', relation: 'requires-trait' }]],
+  ]),
+  edges: [],
+};
+structuralModel.edges = [...structuralModel.outgoing.values()].flat();
+const structuralIssues = checkStructuralConsistency(structuralModel);
+assert(structuralIssues.some(issue => issue.code === 'CONTENT_CONTRADICTORY_FACT_REQUIREMENT'));
+assert(structuralIssues.some(issue => issue.code === 'CONTENT_CONTRADICTORY_FACTION_REQUIREMENT'));
+assert(structuralIssues.some(issue => issue.code === 'CONTENT_CONTRADICTORY_WORLD_STATE_REQUIREMENT'));
+assert(structuralIssues.some(issue => issue.code === 'CONTENT_PREREQUISITE_CYCLE'));
 
 console.log('content-intelligence selftest passed');
