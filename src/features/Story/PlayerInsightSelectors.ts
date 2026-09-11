@@ -125,7 +125,7 @@ export const selectOpportunityMap = (state: RootState): OpportunityChapterView[]
     const sharedKeys = routeKeySets.length === 0
       ? new Set<string>()
       : new Set(
-          [...routeKeySets[0]].filter(key => routeKeySets.every(keys => keys.has(key)))
+          Array.from(routeKeySets[0]).filter(key => routeKeySets.every(keys => keys.has(key)))
         );
 
     const visibleRoutes = progress.status === 'not_started'
@@ -133,7 +133,7 @@ export const selectOpportunityMap = (state: RootState): OpportunityChapterView[]
       : progress.routes.filter((routeProgress, index) => {
           if (routeProgress.satisfied) return true;
           const routeKeys = routeKeySets[index] ?? new Set<string>();
-          return [...routeKeys].some(
+          return Array.from(routeKeys).some(
             key => !sharedKeys.has(key) && requirementSatisfied(state, key)
           );
         });
