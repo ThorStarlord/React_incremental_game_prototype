@@ -1,9 +1,11 @@
 import type { RootState } from '../../app/store';
-import {
-  CHAPTER_DEFINITIONS,
-  type ChapterRouteDefinition,
-} from './ChapterDefinitions';
+import { CHAPTER_DEFINITIONS } from './ChapterDefinitions';
 import { selectAllChapterProgress } from './ChapterSelectors';
+import {
+  chapterRequirementKey,
+  isChapterRequirementSatisfied,
+  listChapterRouteRequirements,
+} from './ChapterRequirements';
 
 export interface CausalJournalEntry {
   id: string;
@@ -62,26 +64,6 @@ export interface RelationshipBuildCapability {
 const npcName = (state: RootState, npcId: string): string =>
   state.npcs.npcs[npcId]?.name ?? npcId;
 
-const routeRequirementKeys = (route: ChapterRouteDefinition): string[] => [
-  ...(route.requiredExperienceIds ?? []).map(id => `experience:${id}`),
-  ...(route.requiredCompletedDialogueIds ?? []).map(id => `dialogue:${id}`),
-];
-
-const requirementSatisfied = (state: RootState, key: string): boolean => {
-  const separator = key.indexOf(':');
-  const kind = key.slice(0, separator);
-  const id = key.slice(separator + 1);
-  if (kind === 'experience') {
-    return Boolean(state.relationships.experiencesById[id]);
-  }
-  if (kind === 'dialogue') {
-    return Object.values(state.npcs.npcs).some(npc =>
-      (npc.completedDialogues ?? []).includes(id)
-    );
-  }
-  return false;
-};
-
 /**
  * A player-facing causal journal derived only from Memories already marked
  * playerVisible. It deliberately does not inspect unrecorded authoring data.
@@ -121,7 +103,12 @@ export const selectOpportunityMap = (state: RootState): OpportunityChapterView[]
 
   return CHAPTER_DEFINITIONS.map(chapter => {
     const progress = progressById.get(chapter.id)!;
-    const routeKeySets = chapter.routes.map(route => new Set(routeRequirementKeys(route)));
+    const routeRequirements = chapter.routes.map(route =>
+      listChapterRouteRequirements(route)
+    );
+    const routeKeySets = routeRequirements.map(requirements =>
+      new Set(requirements.map(chapterRequirementKey))
+    );
     const sharedKeys = routeKeySets.length === 0
       ? new Set<string>()
       : new Set(
@@ -132,9 +119,10 @@ export const selectOpportunityMap = (state: RootState): OpportunityChapterView[]
       ? []
       : progress.routes.filter((routeProgress, index) => {
           if (routeProgress.satisfied) return true;
-          const routeKeys = routeKeySets[index] ?? new Set<string>();
-          return Array.from(routeKeys).some(
-            key => !sharedKeys.has(key) && requirementSatisfied(state, key)
+          const requirements = routeRequirements[index] ?? [];
+          return requirements.some(requirement =>
+            !sharedKeys.has(chapterRequirementKey(requirement)) &&
+            isChapterRequirementSatisfied(state, requirement)
           );
         });
 
