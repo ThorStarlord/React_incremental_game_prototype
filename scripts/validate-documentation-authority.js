@@ -25,12 +25,40 @@ function requireContains(relativePath, needles) {
   }
 }
 
-const authorityPath = 'docs/CURRENT.md';
+const requiredAuthorityFiles = [
+  'docs/CURRENT.md',
+  'docs/README.md',
+  'README.md',
+  'STATUS.md',
+  'RUNBOOK.md',
+  'specification/README.md',
+  'specification/Technical/M25CompleteChapterVerticalSliceResult.md',
+  'specification/Technical/PostM25ProductDirection.md',
+  'specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md',
+  'specification/Technical/GameLoopBoundedBacklogControlRepair.md',
+  'specification/Technical/GameLoopLifecycleRemainderPolicy.md',
+  'specification/Technical/GameLoopUnifiedTimingHardeningCompositionQualification.md',
+  'specification/Technical/GameLoopBackpressureCadenceProgressionStressQualification.md',
+  'specification/Technical/GameLoopTimedQuestPrecisionResolution.md',
+  'specification/Technical/GameLoopQuestTimingIntegrationQualification.md',
+  'specification/Technical/M21BoundedOfflineProgressResult.md',
+  'specification/Technical/CheckpointBActiveRpgLoopResult.md',
+  'specification/Technical/ActiveRpgLoopIntegrationRepairResult.md',
+  'specification/Technical/CheckpointBActiveRpgLoopRerunResult.md',
+  'specification/Technical/CheckpointCIncrementalIntegrationResult.md',
+  'specification/Technical/IncrementalIntegrationRepairResult.md',
+  'specification/Technical/CheckpointCIncrementalIntegrationRerunResult.md',
+  '.github/workflows/build-validation.yml',
+];
 
-if (!exists(authorityPath)) {
-  fail(`${authorityPath} is missing`);
-} else {
-  requireContains(authorityPath, [
+for (const requiredFile of requiredAuthorityFiles) {
+  if (!exists(requiredFile)) {
+    fail(`indexed authority file is missing: ${requiredFile}`);
+  }
+}
+
+if (exists('docs/CURRENT.md')) {
+  requireContains('docs/CURRENT.md', [
     'CURRENT AUTHORITY',
     'REFERENCE',
     'HISTORICAL EVIDENCE',
