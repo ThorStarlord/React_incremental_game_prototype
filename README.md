@@ -4,52 +4,62 @@ A React/TypeScript incremental RPG prototype combining active relational/strateg
 
 ## Current state
 
-The automated implementation program through **M25 — Complete Chapter Vertical Slice** is complete and qualified. The later post-M25 GameLoop timing-hardening milestone is also **complete and integrated**: deterministic fixed-step scheduling, serialized async backpressure, lifecycle remainder semantics, cadence/large-frame characterization, long-horizon drift qualification, timed-Quest precision handling, persistence boundaries, and M21 bounded offline authority coexist on `main`.
-
 ```text
 M25 Complete Chapter Vertical Slice: PASS
 Post-M25 GameLoop Timing Hardening: COMPLETE / INTEGRATED
+Post-M25 Content Intelligence: COMPLETE / INTEGRATED
+Three heterogeneous chapter-scale projections: QUALIFIED / INTEGRATED
+Player Insight + Product-Depth Packages: COMPLETE / INTEGRATED
 Human Integrated Playability / Product Review: DEFERRED / UNPROVEN
 Product Direction Decision: PENDING
 M26: NOT AUTHORIZED
 ```
 
-Repository qualification proves bounded technical behavior. It does **not** prove player comprehension, pacing, fairness, enjoyment, retention, final balance, or Product Direction.
+The repository now has strong deterministic evidence that its RPG, relationship, progression, chapter-scale composition, delegation, persistence, offline, and Timing contracts can coexist. It still does **not** prove fresh-player comprehension, pacing, fairness, enjoyment, retention, final balance, or final Product Direction.
 
-## Documentation map
+## What the prototype currently demonstrates
 
-Do not infer authority from file age, folder depth, or detail. The repository contains substantial historical qualification material.
-
-Read in this order:
-
-1. [`STATUS.md`](STATUS.md) — current repository state, completed work, open gates, and next decisions.
-2. [`docs/CURRENT.md`](docs/CURRENT.md) — canonical documentation classification: **CURRENT AUTHORITY / REFERENCE / HISTORICAL EVIDENCE / SUPERSEDED**.
-3. [`RUNBOOK.md`](RUNBOOK.md) — setup, validation, CI, exact-head qualification, and integration procedure.
-4. [`specification/README.md`](specification/README.md) — technical/product authority map and domain-specific source chain.
-5. Specific contract/result documents linked from those indexes.
-
-`README.md` is intentionally an orientation surface. It is not the final authority for disputed implementation, product, or evidence questions.
-
-## Product direction
-
-The strongest currently qualified product pattern is:
+The strongest integrated product pattern is:
 
 ```text
 meaningful active play
--> Relationship / world / capability consequences
+-> Relationship / Knowledge / Faction / World consequences
+-> durable relationship-derived capabilities
+-> higher-order tactical and social decisions
 -> understood routine
 -> deliberate Copy delegation
 -> bounded offline continuation where explicitly allowed
--> return attention to higher-order active decisions
+-> player attention returns to novelty and consequential choice
 ```
 
-The current candidate thesis is that incremental automation should compress **understood repetition**, not replace discovery, interpretation, tactical choice, social choice, or irreversible player agency.
+Post-M25 development has added:
 
-This remains a product-direction hypothesis rather than M26 authorization. See [`specification/Technical/PostM25ProductDirection.md`](specification/Technical/PostM25ProductDirection.md).
+- developer-side content integrity, dependency/reachability analysis, and route tracing;
+- three heterogeneous chapter-scale projections over canonical domain state: **Merchant District Crisis**, **Archive Inquiry**, and **Enemies in Phase**;
+- a bounded Rule-of-Two chapter-requirement helper rather than a generalized `ChapterEngine` or narrative DSL;
+- read-only **Player Insight** surfaces: Causal Journal, Opportunity Map, and Relationship-Derived Build;
+- contextual `Available because` explanations for already-visible dialogue choices without exposing locked future prerequisites;
+- cross-domain semantic Trait use, including `ScholarlyInsight` in investigation and tactical combat while baseline solutions remain viable;
+- player-authored Copy routine priorities over the existing M20 production-task allowlist, with explicit `Start Preferred` delegation and **no automatic task chaining**.
 
-## Current technical invariants
+The candidate product thesis remains: incremental automation should compress **understood repetition**, not replace discovery, interpretation, tactical choice, social choice, or irreversible player agency.
 
-Two important GameLoop contracts are now integrated:
+## Documentation map
+
+Do not infer authority from file age, folder depth, or detail. Read in this order:
+
+1. [`STATUS.md`](STATUS.md) — current repository state, integrated work, evidence ceiling, and next priorities.
+2. [`docs/CURRENT.md`](docs/CURRENT.md) — canonical classification: **CURRENT AUTHORITY / REFERENCE / HISTORICAL EVIDENCE / SUPERSEDED**.
+3. [`RUNBOOK.md`](RUNBOOK.md) — setup, validation, CI, diagnostics, exact-head qualification, and integration procedure.
+4. [`specification/README.md`](specification/README.md) — technical/product authority map and domain-specific source chain.
+5. [`specification/Technical/PostM25ImplementationRoadmap.md`](specification/Technical/PostM25ImplementationRoadmap.md) — reconciled accounting of post-M25 hypotheses versus delivered work.
+6. Specific current contract/result documents linked from those indexes.
+
+`README.md` is orientation, not final authority for disputed implementation, product, or evidence questions.
+
+## Current Timing invariants
+
+Two important GameLoop contracts remain integrated:
 
 **`SERIAL_BACKPRESSURE_V1`**
 
@@ -73,8 +83,6 @@ save/load + fresh mount:   discard remainder
 
 Timed-Quest precision remains comparison-only; raw and persisted timer values are not rounded or rewritten. M21 remains an explicit bounded offline allowlist, and timed Quests remain online-only during offline settlement.
 
-For the complete technical authority chain, use [`specification/README.md`](specification/README.md) and [`docs/CURRENT.md`](docs/CURRENT.md).
-
 ## Stack
 
 - React 18 + Create React App
@@ -86,9 +94,9 @@ For the complete technical authority chain, use [`specification/README.md`](spec
 - Jest / React Testing Library
 - Playwright-based UI-only synthetic review tooling
 
-## Local setup
-
 Node.js 20 is the project runtime used by repository CI.
+
+## Local setup
 
 ```bash
 npm ci
@@ -106,7 +114,7 @@ CI=true npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
-For focused GameLoop, Quest, progression, persistence/offline, synthetic-review, and milestone qualification commands, use [`RUNBOOK.md`](RUNBOOK.md).
+Focused post-M25 and subsystem commands are documented in [`RUNBOOK.md`](RUNBOOK.md).
 
 The authoritative pull-request workflow is:
 
@@ -114,32 +122,9 @@ The authoritative pull-request workflow is:
 .github/workflows/build-validation.yml
 ```
 
-Current merge authority is:
-
-```text
-Build Validation
-+ preregistered package / milestone acceptance criteria
-+ any explicitly declared authoritative gate for the change
-```
-
-AI review is advisory unless a future explicit policy deliberately promotes it. The retired Gemini review workflow and `GEMINI_API_KEY` dependency are not part of current repository CI.
-
-## Repository layout
-
-```text
-src/                    production source and executable qualification tests
-specification/          product, feature, narrative, UI/UX, and technical records
-docs/CURRENT.md         documentation authority/classification index
-docs/analysis/          historical/reference analysis material
-scripts/                repository-local validation and review tooling
-.github/workflows/      authoritative CI workflow(s)
-STATUS.md               current repository/milestone truth
-RUNBOOK.md              operating and qualification procedure
-```
+Current merge authority is deterministic Build Validation plus preregistered package/milestone acceptance criteria and any separately declared authoritative gate for the change. AI review is advisory unless explicitly promoted by future policy. The retired Gemini review workflow and `GEMINI_API_KEY` dependency are not part of current repository CI.
 
 ## Working rule for future changes
-
-Before opening a new milestone or feature package:
 
 ```text
 latest main
@@ -147,9 +132,10 @@ latest main
 -> docs/CURRENT.md
 -> RUNBOOK.md
 -> specification/README.md
+-> PostM25ImplementationRoadmap.md when relevant
 -> affected current contract/result documents
 -> fresh bottleneck reconciliation
 -> bounded package with explicit evidence ceiling
 ```
 
-Do not restart completed Packages 1–3 from the post-M25 timing-hardening milestone, and do not infer M26 from technical green tests alone.
+Do not restart completed post-M25 packages from historical queues, and do not infer M26 authorization from technical green tests alone.
