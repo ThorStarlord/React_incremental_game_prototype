@@ -1,7 +1,7 @@
 # Repository Runbook
 
-**Current product baseline:** M25 complete chapter + integrated post-M25 timing, content-intelligence, Player Insight, and product-depth packages  
-**Integrated implementation baseline before this handoff:** `4bed51ce21758e2787afdd16f704f6b74b01964c`
+**Current product baseline:** M25 complete chapter + integrated post-M25 timing, content-intelligence, Player Insight, product-depth, decision-readiness preparation, and chapter-definition integrity  
+**Integrated implementation baseline before this handoff:** `5bdf808154a62bdb85c1bee55777f9be35f1395e`
 
 This file owns **operational procedure**. Read [`STATUS.md`](STATUS.md) for current repository state and [`docs/CURRENT.md`](docs/CURRENT.md) before interpreting older documentation.
 
@@ -13,8 +13,8 @@ latest main
 -> docs/CURRENT.md
 -> RUNBOOK.md
 -> specification/README.md
--> PostM25ImplementationRoadmap.md when relevant
 -> affected current contract/result documents
+-> issue #109 when Product Direction or human evidence is relevant
 -> fresh bottleneck reconciliation
 ```
 
@@ -96,6 +96,7 @@ A green run is merge authority only for the **exact-head** candidate it qualifie
 npm ci
 npm run docs:authority:validate
 npm run content:intelligence:validate
+npm run chapter:validate
 npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx tsc --noEmit
@@ -103,17 +104,41 @@ CI=true npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
+`chapter:validate` is already included at the tail of `content:intelligence:validate`; running it separately is useful when diagnosing chapter-definition/reference integrity.
+
 Build Validation remains the final executable truth because it also runs the live UI-only smoke and the repository's focused milestone/technical qualifications.
 
 ## Focused post-M25 qualification
 
-### Content intelligence
+### Content intelligence and chapter-definition integrity
 
 ```bash
 npm run content:intelligence:validate
+npm run chapter:validate
 ```
 
-This includes authoring-integrity and reachability checks. Use the route tracer commands documented in the content-intelligence contract when diagnosing authored conclusion paths.
+`content:intelligence:validate` includes the existing authoring-integrity, reachability, route-tracing checks and the focused chapter-definition qualification.
+
+The chapter validator checks current projections for:
+
+- duplicate chapter IDs;
+- duplicate route IDs within a chapter;
+- empty route requirements;
+- duplicate requirements;
+- dangling Relationship Experience requirements;
+- dangling completed-dialogue requirements.
+
+Completed-dialogue validation must mirror the same bounded source set composed by runtime NPC initialization:
+
+```text
+public/data/dialogues.json
+public/data/m24-world-state-content.json -> dialogues
+public/data/m25-chapter-content.json -> dialogues
+```
+
+Do not simplify the validator back to `dialogues.json` alone: Build Validation #335 demonstrated that doing so falsely marks valid M25 conclusion IDs as dangling. The runtime-aligned repair passed exact-head Build Validation #336.
+
+Use the route tracer commands documented in the content-intelligence contract when diagnosing authored conclusion paths.
 
 ### Second heterogeneous chapter
 
@@ -121,7 +146,7 @@ This includes authoring-integrity and reachability checks. Use the route tracer 
 CI=true npm test -- --watchAll=false --runInBand PostM25SecondChapterQualification.test.ts
 ```
 
-Archive Inquiry remains the qualified second chapter; this test no longer asserts that only two chapter definitions may ever exist.
+Archive Inquiry remains the qualified second chapter; this test no longer asserts that only two chapter definitions may ever exist. Use `selectChapterProgress(state, 'archive_inquiry')`; the old Archive-specific selector has been removed.
 
 ### Player Insight
 
@@ -140,13 +165,7 @@ CI=true npm test -- --watchAll=false --runInBand \
   PostM25CopyRoutineStrategy.test.ts
 ```
 
-The package set qualifies:
-
-1. bounded Rule-of-Two chapter requirement extraction;
-2. spoiler-safe contextual dialogue causality;
-3. cross-domain semantic Trait buildcraft;
-4. the `Enemies in Phase` third heterogeneous chapter projection;
-5. player-authored Copy routine priority with explicit `Start Preferred` execution and no automatic chaining.
+The package set qualifies bounded Rule-of-Two chapter requirement extraction, spoiler-safe contextual dialogue causality, cross-domain semantic Trait buildcraft, the `Enemies in Phase` third heterogeneous chapter projection, and player-authored Copy routine priority with explicit `Start Preferred` execution and no automatic chaining.
 
 The workflow preserves a failure-only `product-depth-diagnostics` artifact when this combined gate fails; the gate itself still fails and must not be bypassed.
 
@@ -178,6 +197,8 @@ npm run simulated-review:smoke
 ```
 
 Do not use Redux inspection, local-storage inspection, debug injection, repository state, or source content as a player oracle when collecting synthetic player-facing evidence.
+
+Synthetic observation is **not** human Product Review evidence and must not be used to close issue #109.
 
 ## TypeScript diagnostics
 
@@ -254,6 +275,21 @@ CI=true npm test -- --watchAll=false --runInBand ActiveRpgLoopIntegrationRepair.
 
 For the accumulated M4-M19 and modified-historical command lists, use `.github/workflows/build-validation.yml` as executable authority rather than copying stale command sets from older milestone documents.
 
+## Human Product Review gate
+
+Issue #109 is the explicit unresolved Human Integrated Playability / Product Review authority surface.
+
+Repository automation may prepare the build, record prompts/questions, preserve provenance, and reconcile documentation. It may **not** invent participant observations, score human comprehension, claim enjoyment, or close the gate.
+
+The eventual human review should test the decision-discriminating questions in `specification/Technical/PostM25ProductDirectionDecisionReadiness.md`. Only after genuine evidence is recorded should a Product Direction Decision be authored.
+
+Until then:
+
+```text
+Product Direction Decision: PENDING
+M26: NOT AUTHORIZED
+```
+
 ## Documentation change procedure
 
 When a package creates, supersedes, or materially reinterprets authority:
@@ -285,6 +321,8 @@ Repository and hermetic validation may establish deterministic behavior, composi
 - Do not make timed Quests advance during offline settlement implicitly.
 - Do not persist GameLoop accumulator remainder without a new persistence/schema contract.
 - Do not introduce drop/skip/coalescing as incidental backpressure optimization.
+- Do not weaken `chapter:validate` by ignoring runtime dialogue-extension sources.
 - Do not introduce a generalized `ChapterEngine`, narrative DSL, or duplicate chapter state without repeated concrete need.
 - Do not let Copy routine priority become automatic task chaining or irreversible narrative/social/world authority.
+- Do not fabricate human Product Review evidence.
 - Do not infer pacing, fairness, comprehension, enjoyment, retention, Product Direction, or M26 authority from deterministic execution.

@@ -27,7 +27,10 @@ Post-M25 Content Intelligence: COMPLETE / INTEGRATED
 Archive Inquiry second chapter: QUALIFIED / INTEGRATED
 Player Insight projections: COMPLETE / INTEGRATED
 Post-M25 Product-Depth Packages: COMPLETE / INTEGRATED
-Human Integrated Playability / Product Review: DEFERRED / UNPROVEN
+Product Direction Decision Readiness: COMPLETE / INTEGRATED
+Three-Chapter Friction Audit: COMPLETE / CLOSED
+Chapter-Definition Integrity Repair: COMPLETE / INTEGRATED
+Human Integrated Playability / Product Review: OPEN HUMAN AUTHORITY GATE / UNPROVEN
 Product Direction Decision: PENDING
 M26: NOT AUTHORIZED
 ```
@@ -37,30 +40,36 @@ Repository qualification proves bounded technical behavior and composition. It d
 ## Current records — product and implementation direction
 
 - [`Technical/PostM25ProductDirection.md`](Technical/PostM25ProductDirection.md) — candidate product thesis, human-review boundary, promotion conditions, and anti-expansion controls. This remains the product-evidence boundary and does **not** authorize M26.
-- [`Technical/PostM25ImplementationRoadmap.md`](Technical/PostM25ImplementationRoadmap.md) — reconciles post-M25 hypotheses with work actually delivered through PR #104 so future sessions do not restart completed packages.
+- [`Technical/PostM25ProductDirectionDecisionReadiness.md`](Technical/PostM25ProductDirectionDecisionReadiness.md) — compares the demonstrated candidate identities and records the leading synthesis hypothesis without selecting final Product Direction.
+- [`Technical/PostM25ImplementationRoadmap.md`](Technical/PostM25ImplementationRoadmap.md) — closed program record for the former six-package post-M25 sequence; it is not a pending backlog.
 - [`Technical/M25CompleteChapterVerticalSliceResult.md`](Technical/M25CompleteChapterVerticalSliceResult.md) — M25 complete-chapter composition authority.
 
-The currently strongest candidate product pattern is:
+The currently strongest candidate product pattern remains:
 
 ```text
 meaningful active play
 -> independent Relationship / Knowledge / Faction / World consequences
+-> understandable causal memory
 -> durable relationship-derived capability
--> tactical/social application
+-> intentional tactical/social application
 -> understood routine
 -> deliberate Copy delegation
 -> bounded offline continuation where explicitly allowed
 -> return attention to novelty and higher-order decisions
 ```
 
+This is a **leading synthesis hypothesis**, not the final Product Direction decision.
+
 ## Current records — post-M25 content and chapter architecture
 
 - [`Technical/PostM25ContentIntelligence.md`](Technical/PostM25ContentIntelligence.md) — deterministic authored-content integrity, dependency/reachability intelligence, route tracing, and rejection self-tests.
 - [`Technical/PostM25SecondChapterQualification.md`](Technical/PostM25SecondChapterQualification.md) — **Archive Inquiry**, the qualified second heterogeneous chapter-scale projection over existing Elara authority.
-- [`Technical/PostM25RuleOfTwoChapterArchitecture.md`](Technical/PostM25RuleOfTwoChapterArchitecture.md) — the bounded shared requirement evaluator extracted from repeated Merchant District / Archive Inquiry projection behavior.
+- [`Technical/PostM25RuleOfTwoChapterArchitecture.md`](Technical/PostM25RuleOfTwoChapterArchitecture.md) — bounded shared requirement evaluator extracted from repeated Merchant District / Archive Inquiry projection behavior.
 - [`Technical/PostM25ThirdHeterogeneousChapter.md`](Technical/PostM25ThirdHeterogeneousChapter.md) — **Enemies in Phase**, a third one-route heterogeneous chapter-scale projection over existing Lyra evidence.
+- [`Technical/PostM25ChapterDefinitionIntegrityRepair.md`](Technical/PostM25ChapterDefinitionIntegrityRepair.md) — integrated three-chapter integrity repair: derived chapter identity, generic reference/uniqueness qualification, and generic chapter-progress API surface.
+- [`Technical/PostM25ThreeChapterFrictionAudit.md`](Technical/PostM25ThreeChapterFrictionAudit.md) — closed audit provenance that justified exactly the now-completed R1–R3 repairs. It is not a future implementation queue.
 
-Current chapter-scale evidence is therefore:
+Current chapter-scale evidence is:
 
 ```text
 Merchant District Crisis
@@ -76,7 +85,31 @@ Enemies in Phase
 -> one route
 ```
 
-All three are projections over canonical domain authorities. There is still no generalized `ChapterEngine`, chapter reducer, chapter-local save root, or generalized narrative condition DSL.
+All three are projections over canonical domain authorities. There is still no generalized `ChapterEngine`, chapter reducer, chapter-local save root, dynamic chapter registry, or generalized narrative condition DSL.
+
+### Chapter-definition integrity
+
+The focused qualification command is:
+
+```bash
+npm run chapter:validate
+```
+
+It is also executed at the tail of:
+
+```bash
+npm run content:intelligence:validate
+```
+
+The validator rejects duplicate chapter/route IDs, empty or duplicate requirements, and dangling Experience/completed-dialogue requirements. Its dialogue catalogue deliberately mirrors the bounded runtime initialization source set:
+
+```text
+public/data/dialogues.json
+public/data/m24-world-state-content.json -> dialogues
+public/data/m25-chapter-content.json -> dialogues
+```
+
+Build Validation #335 exposed the danger of validating only the base dialogue file; the corrected runtime-aligned candidate passed exact-head Build Validation #336 and merged through PR #108.
 
 ## Current records — player legibility and relationship-derived buildcraft
 
@@ -150,7 +183,7 @@ M21 offline authority remains separate and bounded; timed Quests remain online-o
 
 ### Relationship / Memory / Trait
 
-Use the M4-M17 current contracts/results and later reconciliation records under [`Technical/`](Technical/) together with feature documents under [`Features/`](Features/). Important current doctrine is that Relationship evidence and Memories explain social history and learning provenance, while Traits own durable capability identity.
+Use the M4-M17 current contracts/results and later reconciliation records under [`Technical/`](Technical/) together with feature documents under [`Features/`](Features/). Relationship evidence and Memories explain social history and learning provenance, while Traits own durable capability identity.
 
 The first weak Checkpoint B verdict in [`Technical/CheckpointBActiveRpgLoopResult.md`](Technical/CheckpointBActiveRpgLoopResult.md) is historical evidence; later repair and rerun PASS records supersede that verdict for current decisions.
 
@@ -204,7 +237,7 @@ Executable authority is [`.github/workflows/build-validation.yml`](../.github/wo
 The current Build Validation includes, among other gates:
 
 - documentation-authority validation;
-- content-intelligence qualification;
+- content-intelligence qualification, including `chapter:validate`;
 - Archive Inquiry second-chapter qualification;
 - Player Insight qualification;
 - post-M25 product-depth qualification covering Rule-of-Two extraction, contextual causal legibility, cross-domain Trait buildcraft, third chapter, and Copy routine strategy;
@@ -216,6 +249,21 @@ The current Build Validation includes, among other gates:
 - production build.
 
 Exact-head green CI is necessary for merge but does not promote claims above the declared evidence ceiling.
+
+## Current unresolved human authority gate
+
+Issue #109 — **Human Integrated Playability / Product Review** — remains open by design. Only genuine fresh human observations can satisfy it. Repository tests, synthetic UI smoke, and LLM analysis cannot be promoted into human product evidence.
+
+That gate should discriminate between:
+
+```text
+causal RPG / causal legibility
+relationship-derived capability buildcraft
+earned delegation / incremental mastery
+heterogeneous content composition as enabling architecture
+```
+
+A final Product Direction Decision should be written only after genuine evidence exists. Until then, Product Direction is `PENDING` and M26 is `NOT AUTHORIZED`.
 
 ## Reference records
 

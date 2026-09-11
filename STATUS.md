@@ -1,14 +1,17 @@
-# Repository Status — Post-M25 Product-Depth Integrated State
+# Repository Status — Post-M25 Decision-Readiness Integrated State
 
 **Status date:** 2026-09-11  
-**Integrated baseline before this documentation handoff:** `4bed51ce21758e2787afdd16f704f6b74b01964c`  
+**Current integrated implementation baseline:** `5bdf808154a62bdb85c1bee55777f9be35f1395e`  
 **M25 Complete Chapter Vertical Slice:** `PASS`  
 **Post-M25 GameLoop timing hardening:** `COMPLETE / INTEGRATED`  
 **Post-M25 content intelligence:** `COMPLETE / INTEGRATED`  
 **Second heterogeneous chapter:** `QUALIFIED / INTEGRATED`  
 **Player Insight projections:** `COMPLETE / INTEGRATED`  
 **Post-M25 product-depth packages:** `COMPLETE / INTEGRATED`  
-**Human Integrated Playability / Product Review:** `DEFERRED / UNPROVEN`  
+**Product Direction decision-readiness package:** `COMPLETE / INTEGRATED`  
+**Three-chapter friction audit:** `COMPLETE / CLOSED`  
+**Chapter-definition integrity repairs:** `COMPLETE / INTEGRATED`  
+**Human Integrated Playability / Product Review:** `OPEN HUMAN AUTHORITY GATE / UNPROVEN`  
 **Product Direction Decision:** `PENDING`  
 **M26:** `NOT AUTHORIZED`
 
@@ -28,10 +31,14 @@ The repository now includes:
 - developer-side content integrity, dependency/reachability analysis, route tracing, and negative authoring self-tests;
 - three heterogeneous chapter-scale projections over existing domain authorities: **Merchant District Crisis**, **Archive Inquiry**, and **Enemies in Phase**;
 - a bounded shared chapter-requirement evaluator extracted by the Rule of Two, rather than a `ChapterEngine`;
+- chapter identity derived from canonical definitions rather than duplicated manually;
+- generic chapter-definition integrity qualification for unique chapter/route identity, non-empty/non-duplicate requirements, and valid Relationship Experience / completed-dialogue references;
+- a chapter validator whose completed-dialogue catalogue mirrors the bounded runtime source set: base dialogues plus M24/M25 dialogue extensions;
 - read-only **Player Insight** projections: Causal Journal, Opportunity Map, and Relationship-Derived Build;
 - contextual `Available because` explanations for already-visible dialogue topics, with locked content remaining fail-closed rather than becoming a spoiler list;
 - cross-domain semantic use of relationship-derived Traits, including `ScholarlyInsight` in both investigation/Quest and combat contexts while preserving permanent-Trait authority and baseline alternatives;
-- player-authored Copy routine priority over the existing M20 production-task allowlist, with explicit `Start Preferred` delegation through existing M20 eligibility and one-active-task authority; no automatic chaining.
+- player-authored Copy routine priority over the existing M20 production-task allowlist, with explicit `Start Preferred` delegation through existing M20 eligibility and one-active-task authority; no automatic chaining;
+- a Product Direction Decision Readiness record comparing causal legibility, relationship-derived buildcraft, earned delegation, and heterogeneous composition without prematurely choosing a final product identity.
 
 ## Current technical invariants
 
@@ -78,8 +85,6 @@ Build Validation #327: PASS on exact candidate head
 merge commit: bc03919c8eb43244bebdbdc37ef926464d98e0c8
 ```
 
-The package added read-only causal/opportunity/build projections while keeping canonical gameplay authorities unchanged. The CI TypeScript gate was also improved so failure diagnostics are preserved as an artifact without weakening the gate.
-
 ### PR #104 — Post-M25 product depth
 
 ```text
@@ -88,15 +93,33 @@ Build Validation #331: PASS on exact candidate head
 merge commit: 4bed51ce21758e2787afdd16f704f6b74b01964c
 ```
 
-PR #104 integrated five bounded packages:
+PR #104 integrated bounded Rule-of-Two chapter requirements, contextual causal dialogue explanations, cross-domain `ScholarlyInsight` buildcraft, the `Enemies in Phase` third heterogeneous chapter, and player-authored Copy routine priority.
 
-1. Rule-of-Two chapter requirement extraction;
-2. contextual causal dialogue explanations;
-3. cross-domain `ScholarlyInsight` buildcraft qualification;
-4. third heterogeneous chapter projection, `Enemies in Phase`;
-5. player-authored bounded Copy routine priority and explicit preferred-task start.
+### PR #106 — Closed post-M25 implementation roadmap
 
-The cumulative candidate passed the new product-depth gate, TypeScript, live UI-only smoke, GameLoop timing/backpressure/lifecycle qualification, M20–M25 qualification, modified historical qualification, accumulated M4–M19 regression coverage, and production build.
+The former six-package post-M25 queue is a closed implementation record rather than a future backlog. Future sessions must not restart it by inertia.
+
+### PR #107 — Product Direction decision readiness + three-chapter friction audit
+
+```text
+merge commit before PR #108: 75dbd0d2b8de8610a29196324c237c3c6044e299
+```
+
+PR #107 created the current Product Direction decision-preparation record and audited all three chapter projections for repeated repository friction. The audit authorized exactly three repairs: derive chapter identity, add generic chapter-definition integrity qualification, and remove the one-off Archive progress selector.
+
+### PR #108 — Chapter-definition integrity repairs
+
+```text
+first candidate: 5fb3edfc9f70f7ecd9ed8f645a078fdb281402c5
+Build Validation #335: FAIL at newly added chapter integrity validation
+root cause: validator indexed base dialogues but omitted bounded M24/M25 runtime dialogue extensions
+
+qualified candidate: 458d1fead28fea3e92c33db5e8baee319d55c3ed
+Build Validation #336: PASS on exact candidate head
+merge commit: 5bdf808154a62bdb85c1bee55777f9be35f1395e
+```
+
+The repair corrected the validator catalogue rather than weakening chapter requirements or rewriting authored content. Build Validation #336 passed documentation authority, content intelligence including `chapter:validate`, heterogeneous chapter qualification, Player Insight, product-depth, TypeScript, live UI-only smoke, the complete timing/progression stack, M20–M25, historical regressions, accumulated M4–M19, and production build.
 
 ## Documentation authority
 
@@ -117,8 +140,11 @@ Important consequences:
 - `STATUS.md` owns current repository/milestone truth;
 - `RUNBOOK.md` owns operating and qualification procedure;
 - `specification/README.md` maps domain-specific technical/product authority;
-- `specification/Technical/PostM25ImplementationRoadmap.md` reconciles repository-only post-M25 implementation hypotheses with work already delivered;
-- older milestone documents remain preserved as evidence and must not silently override current records.
+- `specification/Technical/PostM25ProductDirectionDecisionReadiness.md` owns bounded Product Direction preparation, not the final Product Direction decision;
+- `specification/Technical/PostM25ImplementationRoadmap.md` is a closed program record;
+- `specification/Technical/PostM25ThreeChapterFrictionAudit.md` is a closed audit record whose R1–R3 repairs are integrated;
+- `specification/Technical/PostM25ChapterDefinitionIntegrityRepair.md` is the integrated result authority for that repair;
+- older milestone documents remain evidence and must not silently override current records.
 
 ## Evidence ceiling — still unproven
 
@@ -127,6 +153,8 @@ Technical integration does **not** establish:
 - fresh-player comprehension or discoverability;
 - perceived responsiveness;
 - causal/terminology legibility for humans;
+- whether relationship-derived capabilities feel meaningfully learned from characters;
+- whether Copy delegation feels like earned mastery rather than lost play;
 - pacing quality;
 - fairness or final balance;
 - enjoyment;
@@ -153,18 +181,33 @@ The following queues are closed unless a fresh regression or new bottleneck prov
 - contextual causal dialogue package;
 - cross-domain Trait-buildcraft qualification package;
 - third heterogeneous chapter projection;
-- bounded Copy routine-priority package.
+- bounded Copy routine-priority package;
+- post-M25 roadmap reconciliation;
+- Product Direction decision-readiness documentation package;
+- three-chapter friction-audit R1–R3 repair queue;
+- chapter-definition integrity repair package.
 
-Do not restart these from historical queues merely because an old document still contains unchecked ideas.
+Do not restart these from historical queues merely because an older document still contains ideas or pre-integration wording.
 
-## Recommended next priorities
+## Current unresolved gate and next priorities
 
-1. **Human Integrated Playability / Product Review when human evidence is available.** This remains the highest-value unresolved product gate: can players understand the causal model, experience route consequences as meaningful, use delegation appropriately, and want to continue?
-2. **Product Direction Decision after human evidence.** Decide which emerging identity deserves depth: causal RPG state, relationship-derived capability buildcraft, earned delegation, or another observed strength.
-3. **If human validation remains unavailable, reconcile a fresh repository-only or hermetic bottleneck before coding.** Do not continue the completed post-M25 queue by inertia.
-4. **Use three heterogeneous chapter cases as the abstraction evidence base.** Any additional generic chapter infrastructure must be justified by concrete repeated friction; chapter count alone is insufficient.
-5. **Keep Copy autonomy bounded.** Routine priority is player-authored and explicit; do not infer permission for automatic chaining or irreversible narrative/social/world decisions.
-6. **Keep technical stewardship subordinate to real development risk.** CRA/TypeScript/test modernization is valid when it materially improves correctness or development speed, not as a substitute for product direction.
+The only pre-declared product gate that remains intentionally unresolved is **issue #109 — Human Integrated Playability / Product Review**. It requires genuine fresh human evidence; repository tests and synthetic UI observation must not be relabeled as human validation.
+
+When human review becomes available, use it to discriminate between the candidate product identities documented in `PostM25ProductDirectionDecisionReadiness.md`:
+
+1. causal RPG / causal legibility;
+2. relationship-derived capability buildcraft;
+3. earned delegation / incremental mastery;
+4. heterogeneous content composition as enabling architecture.
+
+After genuine evidence is recorded, create an explicit Product Direction Decision that states the selected primary promise, supporting identities, evidence/counter-evidence, what to deepen, what to hold, what to stop expanding, and whether a new milestone is authorized.
+
+Until then:
+
+- Product Direction remains `PENDING`;
+- M26 remains `NOT AUTHORIZED`;
+- no large new product feature queue should be inferred from technical green tests;
+- if repository-only work continues before human evidence, it must start from a fresh concrete bottleneck rather than this closed queue.
 
 ## Fast re-entry checklist
 
@@ -174,9 +217,9 @@ Do not restart these from historical queues merely because an old document still
 3. Read docs/CURRENT.md before trusting an older document.
 4. Read RUNBOOK.md for exact-head qualification procedure.
 5. Use specification/README.md to locate domain-specific current authority.
-6. Read PostM25ImplementationRoadmap.md for reconciled post-M25 implementation accounting.
-7. Confirm prior packages are closed.
-8. Reconcile the current bottleneck and evidence ceiling.
+6. Confirm the post-M25 implementation and chapter-integrity queues are closed.
+7. Check issue #109 for genuine Human Integrated Playability / Product Review evidence.
+8. If no human evidence exists, keep Product Direction PENDING and M26 NOT AUTHORIZED.
 9. Run npm run docs:authority:validate when documentation authority changes.
 10. Require exact-head Build Validation before merge.
 ```
@@ -184,6 +227,7 @@ Do not restart these from historical queues merely because an old document still
 ## Governing stop conditions
 
 - Do not infer `M26` from technical green tests; it remains **NOT AUTHORIZED**.
+- Do not fabricate or simulate human Product Review evidence.
 - Do not reintroduce the retired Gemini workflow or `GEMINI_API_KEY` as an implicit merge gate.
 - Do not use superseded Checkpoint B/C verdicts as current outcomes.
 - Do not introduce tick dropping, skipping, or coalescing as incidental optimization.
