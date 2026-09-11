@@ -1,272 +1,288 @@
-# Milestone Handoff — Timed Quest Unit Normalization & Integration Qualification
+# Milestone Handoff — Post-M25 Timing Hardening, Backlog, and Lifecycle Remainder
 
 **Handoff date:** 2026-09-10  
-**Implementation milestone tip before this docs handoff:** `d704bc6f1cc45b0414447aff2fe2ba19a14751ad`  
+**Synchronized `main`:** `96a87c78b9ff33fa57bd9d8fb2a89cd4776c6a71`  
+**Milestone package state:** `PACKAGES 1-3 COMPLETE / REPOSITORY-QUALIFIED`  
+**Integration state:** `NOT MERGED TO MAIN — EXTERNAL CI BLOCKED`  
 **Product authority:** `M25 Complete Chapter Vertical Slice = PASS`  
-**Human product validation:** `DEFERRED / UNPROVEN`  
+**Human Integrated Playability / Product Review:** `DEFERRED / UNPROVEN`  
 **Product Direction Decision:** `PENDING`  
 **M26:** `NOT AUTHORIZED`
 
 ## Purpose
 
-This is the repository-grounded handoff for future engineers and future chat sessions after the three-package timed-Quest timing milestone.
+This is the authoritative handoff for the completed three-package post-M25 timing-hardening milestone executed after the timed-Quest seconds-normalization work.
 
-The milestone began from a characterized unit mismatch:
+The milestone closed three bounded repository/hermetic questions:
+
+1. compose the previously independent precision/drift, large-frame/background-stall, and cadence-transition timing work into one unified candidate;
+2. characterize async `onTick` catch-up backlog safety without inventing a production backpressure/capping policy; and
+3. characterize sub-step accumulator remainder behavior across pause/resume, stop/start, unmount/remount, and canonical save/load boundaries.
+
+All three packages are complete at the `REPOSITORY_ONLY` / `HERMETIC_VALIDATION` level. None is merged to `main` because repository Build Validation passed on each exact candidate head while the separate Gemini AI Code Review workflow failed before review with `API_KEY_INVALID`. The standing merge rule required every CI workflow on the exact candidate head to pass.
+
+Package completion is therefore **not** current-main integration.
+
+## Current `main` authority
+
+`main` remains at:
 
 ```text
-GameLoop TickData.deltaTime = milliseconds
-Quest elapsedSeconds/timeLimitSeconds = seconds
-processQuestTimersThunk previously forwarded milliseconds directly
+96a87c78b9ff33fa57bd9d8fb2a89cd4776c6a71
+Merge PR #80: timed Quest milestone handoff
 ```
 
-The milestone closed three bounded questions:
-
-1. where milliseconds become Quest seconds and how persisted timer state constrains a safe repair;
-2. whether the live timed-Quest path can be repaired without rewriting existing saves, authored durations, scheduler cadence, or M21 offline authority; and
-3. whether the repaired contract composes correctly with the real fixed-step GameLoop, catch-up, pause/resume, save/load, timeout notification, and bounded offline-settlement seams.
-
-All three packages are complete and merged. Do **not** carry this three-package queue forward as pending work.
-
-This milestone does **not** establish player-facing pacing, balance, comprehension, enjoyment, retention, production scalability, anti-cheat resistance, Product Direction, or authorization for M26.
-
-## Current repository state
-
-The automated implementation program through M25 remains qualified. The deterministic fixed-step GameLoop, cross-progression timing qualification, elapsed-time-based Player vitality repair, live/save/offline/resume boundary qualification, and timed-Quest seconds repair are now all present together on `main`.
-
-The timed-Quest live contract is now:
+Current merged timing contract remains:
 
 ```text
 GameLoop fixed-step deltaTimeMs
 -> processQuestTimersThunk(deltaTimeMs)
 -> reject non-finite / non-positive input
 -> deltaSeconds = deltaTimeMs / 1000
--> use the same deltaSeconds for timeout prediction and reducer dispatch
 -> Quest elapsedSeconds / timeLimitSeconds remain seconds
 ```
 
-Important persistence boundary:
+Current merged M21 authority remains the separate two-consumer offline allowlist:
 
-- current schema-v1 saves still preserve stored Quest timer values exactly;
-- no v1 -> v2 migration was introduced for this repair;
-- existing schema-v1 timer values have no unit-provenance marker, so blind conversion would risk corrupting legitimate seconds values;
-- only **future live increments** are normalized at the GameLoop -> Quest boundary;
-- M21 remains an explicit two-consumer offline allowlist: passive Essence plus already-running M20 Copy production tasks;
-- timed Quests remain online-only during offline settlement.
+1. passive Essence;
+2. already-running M20 Copy production tasks.
 
-Key references:
+Timed Quests remain online-only during M21 offline settlement.
 
-- `specification/Technical/TimedQuestUnitAndSaveCompatibilityPreflight.md`
-- `specification/Technical/GameLoopTimedQuestSecondsNormalizationRepair.md`
-- `specification/Technical/GameLoopQuestTimingIntegrationQualification.md`
-- `src/features/Quest/state/QuestThunks.ts`
-- `src/features/Quest/QuestTimerUnitCompatibilityPreflight.test.ts`
-- `src/features/GameLoop/GameLoopProgressionDeterminism.test.tsx`
-- `src/features/GameLoop/GameLoopQuestTimingIntegrationQualification.test.tsx`
-- `src/features/GameLoop/GameLoopLiveOfflineBoundary.test.tsx`
-- `.github/workflows/build-validation.yml`
+## Package outcomes
 
-## Work-package outcomes
+### Package 1 — Unified Timing-Hardening Integration Candidate
 
-### Package 1 — Timed-Quest Unit & Save-Compatibility Preflight
+**State:** `COMPLETE / REPOSITORY-QUALIFIED / NOT MERGED`  
+**PR:** #88 — `Integrate unified post-M25 timing hardening candidate`  
+**Branch:** `work/unified-timing-hardening-integration`  
+**Candidate head:** `b5387622e2abac222ccd1249dde6094aa1efeada`  
+**Build Validation:** #292 — `PASS`  
+**Gemini AI Code Review:** #322 — `FAIL / API_KEY_INVALID`
 
-**Terminal state:** `COMPLETE / MERGED`  
-**PR:** #77 — `Preflight timed Quest unit and save compatibility`  
-**Candidate head:** `0e720033a8ed88a1f288ac2c44a7c5caec44ab2f`  
-**Merge commit:** `bad49e7faeef09acf9d16a0e039c8b1f8bd4099c`  
-**Build Validation:** #275 — `PASS`
+Package 1 created one candidate from synchronized `main` and composed the timing work that had previously existed on PRs #85, #86, and #87.
 
-Delivered:
+Delivered on the Package 1 branch:
 
-- executable characterization of the live milliseconds-vs-seconds mismatch;
-- confirmation that reducer, helper, UI, and public Quest field semantics are seconds-based;
-- current schema-v1 and legacy-v0 persistence characterization;
-- malformed/zero/negative delta characterization;
-- a producer/consumer/persistence/offline dependency map;
-- the authorized repair boundary for Package 2;
-- permanent focused CI coverage.
+- bounded timed-Quest comparison-time precision repair without rewriting raw accumulated `elapsedSeconds` or persisted timer values;
+- 60-second long-horizon cross-progression drift qualification;
+- large-frame/background-stall characterization;
+- mid-session cadence-transition qualification;
+- one combined Build Validation workflow proving these timing surfaces together;
+- preserved pause, catch-up, persistence, Quest-unit, live/offline, M20-M25, historical, and production-build gates.
+
+Package 1 did **not** authorize a new background-stall policy, tick-rate policy, offline Quest policy, persistence migration, balance retune, or Product Direction change.
+
+Important integration fact:
+
+```text
+PR #88 supersedes the need to integrate PRs #85/#86/#87 independently.
+Do not treat #85/#86/#87 as a sequential merge stack after #88 exists.
+```
+
+### Package 2 — Async Catch-Up Backlog Safety Preflight
+
+**State:** `COMPLETE / REPOSITORY-QUALIFIED / NOT MERGED`  
+**PR:** #89 — `Preflight async GameLoop catch-up backlog safety`  
+**Branch:** `work/async-catch-up-backlog-safety-preflight`  
+**Candidate head:** `06e4f5930dfafd27f9a509b135af5cfa911da7c1`  
+**Build Validation:** #293 — `PASS`  
+**Gemini AI Code Review:** #323 — `FAIL / API_KEY_INVALID`
 
 Preflight decision:
 
-- normalize exactly once inside `processQuestTimersThunk`;
-- preserve `incrementQuestElapsed`, `elapsedSeconds`, `timeLimitSeconds`, and display semantics as seconds;
-- do not guess-convert existing schema-v1 stored values because no unit-provenance marker exists;
-- do not widen M21 offline authority;
-- do not retune Quest durations/rewards, tick rate, game speed, or product pacing.
-
-Package 1 changed no production mechanics.
-
-### Package 2 — Seconds-Normalized Timed-Quest Repair
-
-**Terminal state:** `COMPLETE / MERGED`  
-**PR:** #78 — `Normalize timed Quest progression to seconds`  
-**Candidate head:** `094184cc60c67fbdc23be2a6e96e9f6babe7a235`  
-**Merge commit:** `379d3612f4c575e7617aa8129e8e1fef333ce97d`  
-**Build Validation:** #276 — `PASS`
-
-Delivered:
-
-- `processQuestTimersThunk` now treats GameLoop input as milliseconds;
-- non-finite and non-positive deltas are rejected as no-ops;
-- positive input is converted exactly once with `deltaSeconds = deltaTimeMs / 1000`;
-- timeout prediction and reducer dispatch use the same normalized seconds value;
-- 100 ms -> 0.1 s and 250 ms -> 0.25 s are enforced;
-- one logical GameLoop second -> one elapsed Quest second is enforced;
-- regular/irregular/catch-up and 10 Hz/20 Hz cross-progression assertions now enforce seconds-based Quest progression;
-- exact seeded threshold crossing and single failure notification are covered;
-- current schema-v1 save/load preserves stored timer values and resumes with normalized future increments.
-
-Package 2 deliberately did **not** change:
-
-- save schema or persisted Quest timer values;
-- authored `timeLimitSeconds` or rewards;
-- GameLoop tick rate or game speed;
-- M21 offline allowlist;
-- offline Quest progression;
-- product pacing/balance claims;
-- Product Direction or M26 authority.
-
-### Package 3 — Quest Timing Integration Qualification
-
-**Terminal state:** `COMPLETE / MERGED`  
-**PR:** #79 — `Qualify integrated timed Quest timing boundaries`  
-**Final candidate head:** `525e8d798d6e633292576d900ce69212ab1f011c`  
-**Merge commit:** `d704bc6f1cc45b0414447aff2fe2ba19a14751ad`  
-**Build Validation:** #279 — `PASS`
-
-Delivered a permanent hermetic suite using the real production seams:
-
 ```text
-useGameLoop
--> processQuestTimersThunk
--> Quest state / failure notification
--> createSave
--> loadSavedGameWithMigration
--> replaceState
--> settleOfflineProgressThunk
--> resumed useGameLoop
+BACKLOG_RISK_CONFIRMED / NO_PRODUCTION_REPAIR_AUTHORIZED
 ```
 
-The suite verifies:
+Verified behavior:
 
-- one logical Quest second is invariant across regular 10 Hz, irregular 10 Hz, same-frame 10 Hz catch-up, and regular 20 Hz delivery;
-- same-frame queued catch-up fails an expiring Quest once, removes it from active timer processing, and later queued ticks neither advance it nor duplicate notification;
-- pause/resume excludes paused wall-clock time and resumes with an ordinary fixed step;
-- canonical save/load preserves the stored Quest timer value;
-- a synthetic 20-second M21 offline settlement leaves timed Quest state frozen;
-- resumed live ticks alone advance the Quest and can cross the timeout;
-- failed Quest timers remain frozen after failure.
+- scheduler tick production can advance while one Promise-returning `onTick` consumer remains unresolved;
+- the scheduler-vs-consumer gap can grow under both regular production and large catch-up bursts;
+- queued `onTick` delivery remains serialized and FIFO;
+- no overlapping async handler execution occurs in the qualified cases;
+- a rejecting queued handler is logged and later queued work continues draining;
+- pause rejects new scheduler intake while already-produced queued work remains drainable;
+- unmount clears queued stale callback work after the active promise settles.
 
-Qualification also exposed an important discrete-timestep detail: repeated decimal `0.1` second additions may land just below an authored decimal threshold because of IEEE floating-point representation. The repository therefore qualifies timeout failure on the **first fixed step whose computed elapsed value satisfies the existing `>= timeLimitSeconds` predicate**, with crossing delay bounded by at most one fixed step. This package did **not** authorize rounding, epsilon comparison, timer clamping, quantization, or other production precision changes.
+Current implementation has no explicit backlog cap, producer backpressure gate, coalescing rule, or tick-dropping policy. This package characterizes that risk only; it does not choose production semantics.
 
-Package 3 changed only test/CI/documentation surfaces; no production mechanics were changed.
+### Package 3 — Sub-Step Restart & Save/Resume Remainder Preflight
+
+**State:** `COMPLETE / REPOSITORY-QUALIFIED / NOT MERGED`  
+**PR:** #90 — `Preflight sub-step restart and save-resume remainder semantics`  
+**Branch:** `work/sub-step-restart-save-resume-preflight`  
+**Candidate head:** `98fc6e82d2cee4108d52693385690de35d52910b`  
+**Build Validation:** #294 — `PASS`  
+**Gemini AI Code Review:** #324 — `FAIL / API_KEY_INVALID`
+
+Preflight decision:
+
+```text
+DETERMINISTIC_REMAINDER_DISCONTINUITY_CONFIRMED / POLICY_REQUIRED / NO_PRODUCTION_REPAIR_AUTHORIZED
+```
+
+Verified behavior:
+
+- sub-step accumulation behaves as expected at representative 10 Hz and 20 Hz cadences;
+- pause/resume preserves the in-memory pre-pause accumulator remainder while rejecting paused wall time;
+- stop/start reconstructs the live loop with zero hook-local remainder;
+- unmount/remount reconstructs the live loop with zero hook-local remainder;
+- canonical `createSave -> loadSavedGameWithMigration -> replaceState -> fresh useGameLoop` preserves persisted Redux progression exactly but has no persisted accumulator remainder field;
+- after a restart, a fresh full fixed step advances representative Essence, Copy task, Player vitality, timed Quest, and GameLoop state normally;
+- each discarded remainder is individually below one fixed step, but repeated reset boundaries can accumulate lost logical time beyond one fixed step across multiple transitions.
+
+This package did not add a persisted accumulator, change the save schema, add a migration, widen offline authority, or redefine scheduler lifecycle semantics.
 
 ## Evidence ledger
 
-### Verified repository / hermetic evidence
+### Repository / hermetic evidence verified
 
-- M25 Complete Chapter Vertical Slice remains `PASS`.
-- Deterministic GameLoop scheduler qualification remains green.
-- Cross-progression regular/irregular/catch-up and 10 Hz/20 Hz timing qualification remains green.
-- Player vitality remains elapsed-logical-time based.
-- Timed Quest live progression now normalizes milliseconds to seconds exactly once.
-- Timed Quest invalid/non-positive deltas are no-ops.
-- Current schema-v1 stored Quest timer values are preserved rather than guessed/migrated.
-- Future live increments after restore use normalized seconds.
-- Quest timeout prediction and reducer progression consume the same normalized delta.
-- Timeout failure emits one failure notification and removes the Quest from active timer processing.
-- Paused wall-clock time does not advance timed Quests.
-- Equivalent logical Quest time is stable across qualified RAF layouts and supported 10 Hz/20 Hz schedules.
-- M21 offline settlement does not advance timed Quest timers or trigger timed-Quest failure.
-- Resumed live scheduling advances Quest time from the restored value with ordinary fixed steps.
-- Package Build Validation results passed on exact candidate heads: #275, #276, and final #279.
-- Final Package 3 Build Validation #279 passed rejection checks, localhost UI smoke, TypeScript, scheduler/cross-progression/timed-Quest/live-offline suites, M20-M25 qualification, active-loop/historical regressions, and production build.
+- Package 1 candidate `b5387622...` passed Build Validation #292.
+- Package 2 candidate `06e4f593...` passed Build Validation #293.
+- Package 3 candidate `98fc6e82...` passed Build Validation #294.
+- Each exact candidate passed repository rejection/action-binding checks, localhost synthetic UI smoke, TypeScript, the relevant focused GameLoop/Quest/progression suites, M20-M25 qualification, active-loop/historical regressions, accumulated M4-M19 baseline, and production build.
+- Package 1 proves precision/drift + large-frame + cadence-transition work together on one candidate tree.
+- Package 2 proves ordered/serialized async callback drain and confirms backlog-growth risk without production-policy changes.
+- Package 3 proves lifecycle-specific accumulator remainder semantics and confirms deterministic restart/save-resume discontinuity without persistence-policy changes.
 
-### Still unproven / pending human or external authority
+### Not yet verified as one integrated `main` state
+
+- PR #88 on `main`.
+- Package 2 replayed/requalified after PR #88 integration.
+- Package 3 replayed/requalified after PR #88 and Package 2 integration.
+- one final combined current-main tree containing all three package results.
+- successful Gemini review on PR #88, #89, or #90.
+
+Package 2 and Package 3 began from the synchronized pre-integration `main`, not from Package 1. Their independent green runs are not evidence that all three package trees compose without replay/requalification.
+
+## External CI blocker
+
+The separate Gemini AI Code Review workflow failed before review output on all three package candidates:
+
+```text
+400 INVALID_ARGUMENT
+reason: API_KEY_INVALID
+message: API key not valid. Please pass a valid API key.
+```
+
+This is `EXTERNAL_AUTHORITY`. Do not expose, fabricate, replace, or bypass credentials from a repository-only gameplay/timing package. If the all-CI merge rule remains in force, the credential/review gate must be resolved separately before any blocked package is merged.
+
+## Pending human / product authority
+
+Still unproven:
 
 - fresh-player comprehension and discoverability;
-- human pacing assessment, including whether timed-Quest durations feel fair or readable;
-- emotional impact and enjoyment;
+- perceived responsiveness under large catch-up or high cadence;
+- whether timed Quests and progression feel fair/readable;
+- pacing and balance quality;
+- enjoyment / emotional impact;
 - retention / desire to continue;
-- final progression, reward, regeneration, Quest-duration, and offline-cap balance;
+- production browser/device performance under sustained catch-up backlog;
+- acceptable lifecycle semantics for losing sub-step remainder across restart/save-resume boundaries;
+- acceptable production policy for async callback backlog;
 - generalized campaign/chapter scalability;
 - trusted server time / anti-cheat authority;
-- a valid completed human product-review evidence cycle where required;
-- explicit post-M25 Product Direction Decision;
+- explicit Product Direction Decision;
 - M26 authorization.
 
-### External diagnostic note
-
-The separate Gemini AI Code Review workflow failed on Packages 1-3 before producing a review because its configured Gemini API key is invalid (`API_KEY_INVALID`). Repository-authoritative Build Validation passed independently on all final package candidates.
-
-Fixing or replacing that credential is an **EXTERNAL_AUTHORITY** concern. It should not be mixed into GameLoop/Quest mechanics work and was intentionally not attempted.
+Human Integrated Playability / Product Review remains `DEFERRED / UNPROVEN`. Product Direction remains `PENDING`. M26 remains `NOT AUTHORIZED`.
 
 ## Recommended next priorities
 
-1. **Start the next session with a fresh repository reconciliation.** This timed-Quest queue is complete; do not infer another package from the old queue without checking the latest `main`, `STATUS.md`, recent commits, and current product authority.
-2. **Decide whether timeout precision semantics deserve a bounded preflight.** Package 3 documented that decimal floating-point accumulation can delay a `>=` threshold by one fixed step. Do not silently add epsilon/rounding/clamping. If exact authored timeout semantics matter, first define the intended contract and persistence/UI implications, then qualify alternatives hermetically.
-3. **Define timed-Quest authoring/persistence readiness before relying on timed Quests as authored product content.** Existing schema-v1 timer values have no unit provenance. If timed Quests become broadly authored or real saved games containing them become important, decide whether a future schema/version/provenance mechanism is required rather than retroactively guessing old values.
-4. **Keep M21 offline authority separate.** Timed Quests remain online-only during offline settlement. Any future offline Quest progression requires an explicit product decision and a separate bounded design/qualification package.
-5. **Return to human product evidence when available.** Deterministic timing does not prove pacing, fairness, comprehension, fun, or retention. Those remain the gates for an explicit Product Direction Decision and any M26 authorization.
-6. **Optionally repair the Gemini credential as a separate external-maintenance task.** Do not let that credential issue redefine repository correctness or merge qualification.
+1. **Fresh reconciliation first.** Read current `main`, this handoff, PRs #88/#89/#90, recent commits, and current product authority.
+2. **Resolve the external CI authority separately if available.** Repair/replace the Gemini credential or explicitly revise merge policy in a dedicated maintenance decision. Do not mix credentials with gameplay/timing work.
+3. **Integrate sequentially once the merge gate is resolvable.** Merge/requalify PR #88 first; then replay Package 2 onto the resulting latest `main`, run full exact-head CI, and merge only if every required check passes; then replay Package 3 onto that resulting `main` and repeat the full gate.
+4. **Do not merge #85/#86/#87 independently after choosing #88.** PR #88 is the unified timing-hardening integration candidate that already composes those earlier timing branches.
+5. **If async backlog becomes the active bottleneck, design policy before repair.** Candidate families include producer backpressure, bounded queue + explicit overflow semantics, proven-safe coalescing, or separating deterministic per-tick state changes from slow async side effects. No option is currently authorized.
+6. **If lifecycle remainder becomes the active bottleneck, choose lifecycle semantics before persistence changes.** Decide whether fresh-loop reset is intended or whether a logical-clock/remainder concept should survive lifecycle boundaries. Any save-schema or migration work requires its own contract.
+7. **Keep large-frame/background behavior as a separate policy seam.** Package 1 characterizes current catch-up behavior but does not authorize a frame clamp, visibility pause, background cutoff, or offline-settlement handoff.
+8. **Return to human product evidence when available.** Deterministic timing correctness cannot establish pacing, comprehension, fun, retention, Product Direction, or M26.
 
-If external human validation is unavailable in the next session, prefer another clearly justified `REPOSITORY_ONLY` or `HERMETIC_VALIDATION` package discovered by reconciliation rather than weakening human/product claims.
+If external credentials and human review remain unavailable, future work may continue with justified `REPOSITORY_ONLY` / `HERMETIC_VALIDATION` packages discovered through reconciliation, but external/human claims must not be weakened merely to continue implementation.
 
 ## Fast re-entry checklist
 
 ```text
-1. Read STATUS.md and verify the current main SHA.
-2. Read the three timed-Quest technical documents.
-3. Confirm Packages 1-3 are complete; do not restart them.
-4. Run the focused GameLoop / Quest / live-offline qualification commands below.
-5. Reconcile before creating a new work-package queue.
-6. Preserve current schema-v1 stored Quest timer values unless a new migration authority is explicitly designed.
-7. Preserve M21 as a separate two-consumer offline allowlist.
-8. Treat fixed-step decimal timeout precision as documented behavior, not implicit permission to add epsilon/rounding.
-9. Do not infer pacing, balance, fun, retention, Product Direction, or M26 authority from deterministic execution.
+1. Read STATUS.md and verify latest main SHA.
+2. Inspect PRs #88, #89, and #90.
+3. Confirm whether API_KEY_INVALID still blocks the all-CI merge rule.
+4. Do not claim branch-only Package 1/2/3 behavior is on main until integrated.
+5. Prefer integration order: #88 -> replay/requalify #89 -> replay/requalify #90.
+6. Do not independently integrate superseded timing branches #85/#86/#87 if #88 is the chosen candidate.
+7. Use exact-head Build Validation after every replay/integration candidate.
+8. Preserve M21 as a separate bounded offline allowlist unless explicitly redesigned.
+9. Preserve schema-v1 Quest timer values unless new provenance/migration authority is designed.
+10. Treat async backlog policy and lifecycle remainder policy as explicit future decisions, not incidental fixes.
+11. Keep human product evidence, Product Direction, and M26 as separate authority gates.
 ```
 
-## Validation / tooling entrypoints
+## Validation / runbook entrypoints
 
-Install and type-check:
+### Current-main baseline
 
 ```bash
 npm ci
+npm run simulated-review:validate
+npm run simulated-review:action-contract
 npx tsc --noEmit
-```
-
-Focused GameLoop / timed-Quest qualification:
-
-```bash
 CI=true npm test -- --watchAll=false --runInBand useGameLoop.timing-characterization.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
 CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
 CI=true npm test -- --watchAll=false --runInBand GameLoopQuestTimingIntegrationQualification.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
 CI=true npm test -- --watchAll=false --runInBand GameLoopM21OfflineProgress.test.ts
-```
-
-Repository rejection / synthetic-review contract checks:
-
-```bash
-npm run simulated-review:validate
-npm run simulated-review:action-contract
-```
-
-Production bundling:
-
-```bash
 npm run build
 ```
 
-The authoritative merge stack is `.github/workflows/build-validation.yml`; use its exact current command sequence when qualifying a future candidate.
+### Package 1 branch — PR #88
+
+```bash
+git fetch origin
+git switch work/unified-timing-hardening-integration
+npm ci
+CI=true npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionPreflight.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopLongHorizonCrossProgressionDrift.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopLargeFrameBackgroundStallPreflight.test.tsx
+CI=true npm test -- --watchAll=false --runInBand GameLoopMidSessionCadenceTransitionQualification.test.tsx
+npm run build
+```
+
+### Package 2 branch — PR #89
+
+```bash
+git fetch origin
+git switch work/async-catch-up-backlog-safety-preflight
+npm ci
+CI=true npm test -- --watchAll=false --runInBand GameLoopAsyncCatchUpBacklogSafetyPreflight.test.tsx
+npm run build
+```
+
+### Package 3 branch — PR #90
+
+```bash
+git fetch origin
+git switch work/sub-step-restart-save-resume-preflight
+npm ci
+CI=true npm test -- --watchAll=false --runInBand GameLoopSubStepRestartSaveResumePreflight.test.tsx
+npm run build
+```
+
+For merge qualification, the authoritative command list is always the exact candidate's `.github/workflows/build-validation.yml`; the focused commands above are re-entry aids, not substitutes for the complete CI gate.
+
+## Repository hygiene note
+
+Several old/no-op refs may still be visible, including `noop-unused` and `work/unified-timing-hardening-integration-2` through `-7`. They point to the unchanged historical `main` baseline and contain none of the Package 1 implementation. Do not treat them as package candidates.
 
 ## Governing stop conditions
 
-- This three-package timed-Quest milestone is complete; do not restart Package 1, 2, or 3.
-- The old `KNOWN / UNREPAIRED` timed-Quest milliseconds-vs-seconds statement is obsolete.
-- Existing persisted Quest timer values must not be guess-converted without new migration/provenance authority.
-- Fixed-step floating-point threshold behavior is characterized, not authorization for an unscoped precision repair.
-- Deterministic execution is not evidence that the game is well paced, balanced, understandable, or fun.
-- Fixed-step live execution is not authority for arbitrary wall-clock absence.
-- M21 offline authority must remain explicit and bounded unless separately changed by product authority.
-- M26 remains unauthorized until separate product-evidence and Product Direction Decision gates are satisfied.
+- The milestone queue is complete; do not restart Packages 1-3 as if unimplemented.
+- None of the three final package candidates is current-main authority until merged.
+- Do not bypass or silently redefine the all-CI merge rule.
+- Do not expose or inject production credentials to repair Gemini from a gameplay/timing task.
+- Do not infer an async backlog repair from characterization alone.
+- Do not persist/replay accumulator remainder without an explicit lifecycle/persistence contract.
+- Do not infer a large-frame catch-up/background policy from characterization alone.
+- Do not widen M21 offline authority without a separate product/technical decision.
+- Deterministic execution is not evidence of pacing, balance, comprehension, enjoyment, retention, or product-market fit.
+- M26 remains unauthorized.
