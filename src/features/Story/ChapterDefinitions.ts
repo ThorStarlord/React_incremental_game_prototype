@@ -16,6 +16,12 @@ export interface ChapterDefinition {
   routes: readonly ChapterRouteDefinition[];
 }
 
+const ARCHIVE_INQUIRY_SHARED_OPENING = [
+  'elara_exp_model_challenged',
+  'elara_exp_contradictory_footnote',
+  'elara_exp_tome_committed',
+] as const;
+
 /**
  * Presentation-only chapter definitions.
  *
@@ -56,6 +62,7 @@ export const CHAPTER_DEFINITIONS: readonly ChapterDefinition[] = [
         label: 'Evidence Over Ownership',
         summary: 'Accept the costly correction early, then continue through reciprocal revision and independent verification.',
         requiredExperienceIds: [
+          ...ARCHIVE_INQUIRY_SHARED_OPENING,
           'elara_exp_follow_evidence',
           'elara_exp_revision_mutual',
           'elara_exp_theory_neither_owned',
@@ -67,6 +74,7 @@ export const CHAPTER_DEFINITIONS: readonly ChapterDefinition[] = [
         label: 'Cautious Consensus, Later Reopened',
         summary: 'Protect the initial consensus, then earn the same method through later reciprocal revision and independent verification.',
         requiredExperienceIds: [
+          ...ARCHIVE_INQUIRY_SHARED_OPENING,
           'elara_exp_protect_consensus',
           'elara_exp_revision_mutual',
           'elara_exp_theory_neither_owned',
