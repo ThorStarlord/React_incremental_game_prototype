@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 const path = require('path');
 const { createModel, findReachabilityProblems } = require('./content-graph');
+const { applyRepositoryPolicy } = require('./repository-policy');
 
 const root = path.resolve(__dirname, '..', '..');
-const model = createModel(root);
+const model = applyRepositoryPolicy(createModel(root));
 const problems = findReachabilityProblems(model);
 
 console.log('Content Reachability Qualification');
