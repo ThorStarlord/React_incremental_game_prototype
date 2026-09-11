@@ -14,8 +14,15 @@ const traits = readJson('public/data/traits.json');
 const ELARA_ID = 'npc_scholar_elara';
 const INSIGHT_ID = 'ScholarlyInsight';
 
-const makeState = (): RootState =>
-  rootReducer(undefined, { type: '@@INIT', payload: undefined } as any);
+/**
+ * Redux Toolkit freezes reducer output in the test/development build. These
+ * selector tests intentionally construct synthetic canonical snapshots, so use
+ * a JSON round-trip to obtain a mutable serializable fixture rather than
+ * mutating the reducer-owned frozen object.
+ */
+const makeState = (): RootState => JSON.parse(JSON.stringify(
+  rootReducer(undefined, { type: '@@INIT', payload: undefined } as any)
+));
 
 const addExperienceIds = (state: RootState, ids: string[]) => {
   const relationships = state.relationships as any;
