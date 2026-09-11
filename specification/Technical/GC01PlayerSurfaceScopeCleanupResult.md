@@ -1,6 +1,6 @@
 # GC-01 — 1.0 Player-Surface Scope Cleanup Result
 
-**Status:** CANDIDATE  
+**Status:** COMPLETE / INTEGRATED  
 **Program:** Campaign One / 1.0 Game Completion  
 **Requirement source:** `GameCompletionRoadmap.md` / `../Features/FeatureScopeMatrix.md`  
 **Human Product Review:** issue #109 remains OPEN / UNPROVEN
@@ -11,7 +11,7 @@ GC-01 closes the first post-transition Alpha requirement:
 
 > Player-facing navigation must not advertise cut/deferred Campaign One systems or a duplicate save authority as if they were required 1.0 work.
 
-## Candidate changes
+## Integrated changes
 
 ### Router
 
@@ -65,7 +65,7 @@ GC-01 therefore removes a false duplicate UI promise rather than creating a seco
 
 ## Focused qualification
 
-Candidate adds:
+GC-01 adds:
 
 ```bash
 npm run gc01:validate
@@ -82,6 +82,18 @@ npm run gc01:validate
 7. Main Menu still exposes the canonical persistence actions.
 
 Build Validation runs the focused GC-01 gate immediately after documentation-authority qualification.
+
+## Qualification and integration evidence
+
+```text
+base main:          135896d4ab6866981761328e849887ee64c43a18
+qualified candidate: caabc1581316dab33f7eeb98dac9b32072ec57df
+Build Validation:   #343 / run 34629859287 / PASS
+PR:                 #117 / merged
+merge commit:       ff829ce6ee4da8a693adfb783fe843775403326d
+```
+
+The exact candidate passed the full repository Build Validation chain before merge, including the GC-01 positive and rejection qualification, existing GameLoop/timing qualification, TypeScript checks, content intelligence, synthetic review contracts, historical regression suites, and production build.
 
 ## Explicit non-goals
 
@@ -100,7 +112,7 @@ Historical feature specifications are preserved as reference/provenance rather t
 
 ## Evidence ceiling
 
-A green GC-01 can prove only that the current player surface no longer advertises the excluded destinations and that current required destinations remain configured.
+A green GC-01 proves only that the current player surface no longer advertises the excluded destinations and that current required destinations remain configured.
 
 It does not prove:
 
@@ -114,4 +126,6 @@ Those remain later human/Beta concerns.
 
 ## Qualification state
 
-This document remains **CANDIDATE** until the exact implementation head passes the full Build Validation chain and is integrated.
+`GC-01 = COMPLETE / INTEGRATED`.
+
+The next completion-program responsibility is GC-02 Prologue / onboarding. This result does not authorize GC-02 implementation inside the GC-01 package.
