@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom'; // Removed BrowserRouter as Router
+import { Routes, Route, Navigate } from 'react-router-dom';
 import MainMenu from '../pages/MainMenu';
 import { GameLayout } from '../layout/components/GameLayout';
 import NPCsPage from '../pages/NPCsPage';
@@ -12,31 +12,30 @@ import EssencePage from '../pages/EssencePage';
 import QuestsPage from '../pages/QuestsPage';
 import SettingsPage from '../pages/SettingsPage';
 import DebugPage from '../pages/DebugPage';
-import { PlaceholderPage } from '../shared/components/PlaceholderPage';
 
 /**
- * Main application router component
- * Handles routing between MainMenu and the game interface
+ * Main application router component.
+ *
+ * Campaign One exposes only implemented 1.0 player surfaces. Historical
+ * placeholder routes for Skills, Inventory, Crafting, and duplicate save
+ * management are intentionally absent; direct legacy URLs fail closed to the
+ * game dashboard rather than advertising deferred/cut systems.
  */
 export const AppRouter: React.FC = () => {
   return (
-    // <Router> removed
     <Routes>
-      {/* Main Menu Route - Standalone */}
+      {/* Main Menu Route - standalone and canonical save/load/import-export surface. */}
       <Route path="/" element={<MainMenu />} />
       <Route path="/menu" element={<MainMenu />} />
-      
-      {/* Game Routes - Use GameLayout for all game-related paths */}
+
+      {/* Game Routes - use GameLayout for all game-related paths. */}
       <Route path="/game" element={<GameLayout />}>
-        {/* Default route for /game -> /game/dashboard */}
         <Route index element={<Navigate to="dashboard" replace />} />
 
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="character" element={<CharacterPage />} />
         <Route path="traits" element={<TraitsPage />} />
-        <Route path="skills" element={<PlaceholderPage title="Skills System" description="Character skill trees and progression system" status="planned" features={['Skill tree visualization', 'Skill point allocation', 'Mastery progression', 'Synergy system']} />} />
-        
-        {/* Nested route for NPCs to handle list and detail views */}
+
         <Route path="npcs" element={<NPCsPage />}>
           <Route path=":npcId" element={<NPCPanelContainer />} />
         </Route>
@@ -44,16 +43,14 @@ export const AppRouter: React.FC = () => {
         <Route path="quests" element={<QuestsPage />} />
         <Route path="copies" element={<CopiesPage />} />
         <Route path="essence" element={<EssencePage />} />
-        <Route path="inventory" element={<PlaceholderPage title="Inventory System" description="Item management and storage interface" status="planned" features={['Item organization', 'Equipment management', 'Storage expansion', 'Item crafting']} />} />
-        <Route path="crafting" element={<PlaceholderPage title="Crafting System" description="Item creation and enhancement interface" status="planned" features={['Recipe management', 'Material collection', 'Quality enhancement', 'Advanced crafting']} />} />
         <Route path="settings" element={<SettingsPage />} />
-        <Route path="saves" element={<PlaceholderPage title="Save Management" description="Game save and load management interface" status="in-progress" features={['Save slot management', 'Import/Export functionality', 'Backup system', 'Cloud sync (future)']} />} />
         <Route path="debug" element={<DebugPage />} />
+
+        {/* Cut/deferred or otherwise unknown legacy game URLs return safely to a real surface. */}
+        <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Route>
-      
-      {/* Default redirect to main menu */}
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-    // </Router> removed
   );
 };
