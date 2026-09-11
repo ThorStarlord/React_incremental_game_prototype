@@ -2,9 +2,12 @@
 const path = require('path');
 const { createModel } = require('./content-graph');
 const { applyRepositoryPolicy } = require('./repository-policy');
+const { checkStructuralConsistency } = require('./structural-checks');
 
 const root = path.resolve(__dirname, '..', '..');
 const model = applyRepositoryPolicy(createModel(root));
+const structuralIssues = checkStructuralConsistency(model);
+model.issues.push(...structuralIssues);
 
 console.log('Content Integrity Audit');
 console.log(`JSON files: ${model.files.length}`);
