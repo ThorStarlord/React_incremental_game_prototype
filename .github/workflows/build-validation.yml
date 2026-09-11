@@ -39,11 +39,39 @@ jobs:
         env:
           CI: true
 
+      - name: Post-M25 player insight projection qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand PostM25PlayerInsightsQualification.test.ts
+        env:
+          CI: true
+
       - name: Synthetic review contract qualification
         run: npm run simulated-review:validate
 
       - name: Synthetic review V2 action-binding qualification
         run: npm run simulated-review:action-contract
+
+      - name: Type check
+        id: typecheck
+        shell: bash
+        run: |
+          set +e
+          npx tsc --noEmit 2>&1 | tee /tmp/tsc-errors.txt
+          typecheck_exit=${PIPESTATUS[0]}
+          echo "exit_code=${typecheck_exit}" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload TypeScript diagnostics on failure
+        if: steps.typecheck.outputs.exit_code != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsc-diagnostics
+          path: /tmp/tsc-errors.txt
+          if-no-files-found: error
+
+      - name: Enforce TypeScript gate
+        if: steps.typecheck.outputs.exit_code != '0'
+        run: exit 1
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
@@ -70,12 +98,13 @@ jobs:
             exit 1
           fi
 
-          npm run simulated-review:smoke
+          if ! npm run simulated-review:smoke; then
+            echo "Synthetic review live smoke failed; app log follows"
+            cat /tmp/simulated-review-app.log
+            exit 1
+          fi
         env:
           CI: true
-
-      - name: Type check
-        run: npx tsc --noEmit
 
       - name: GameLoop timing characterization qualification
         timeout-minutes: 5
