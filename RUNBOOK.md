@@ -1,36 +1,31 @@
-# Repository Runbook — Post-M25 GameLoop Timing Hardening
+# Repository Runbook
 
-**Milestone:** post-M25 timing hardening  
-**Integrated main recorded by this runbook:** `88c1b5114995cd6702936f414823b783de97bb23`  
-**Canonical integration:** PR #97  
-**Final reconciled candidate:** `4c503ccaa63147c53a733ac6aad65262adcbb026`  
-**Build Validation:** #305 — `PASS`
+**Current product baseline:** M25 complete chapter + integrated post-M25 timing hardening  
+**Last integrated milestone handoff before this documentation-authority package:** `56fbee2758ba734f1db67f40230a0970d67fd531`  
+**Canonical timing integration:** PR #97 / Build Validation #305 PASS  
+**Canonical prior handoff:** PR #99 / Build Validation #306 PASS
 
-Read `STATUS.md` first. It is the authority for milestone state, product/human evidence ceilings, and next-session priorities.
+This file owns **operational procedure**. Read [`STATUS.md`](STATUS.md) for current repository state and [`docs/CURRENT.md`](docs/CURRENT.md) before interpreting older documentation.
 
-## CI authority
+## Required re-entry order
 
-The repository has one active PR correctness workflow:
-
-```text
-.github/workflows/build-validation.yml
-```
-
-The former `.github/workflows/gemini-review.yml` and `gemini.md` were retired in PR #97. `GEMINI_API_KEY` is no longer consumed by repository CI.
-
-Current merge rule:
+For every new engineering/coding-agent session:
 
 ```text
-Build Validation
-+ preregistered package / milestone acceptance criteria
-+ any explicitly declared authoritative human/external gate for that change
+latest main
+-> STATUS.md
+-> docs/CURRENT.md
+-> RUNBOOK.md
+-> specification/README.md
+-> affected current contract/result documents
+-> fresh bottleneck reconciliation
 ```
 
-Optional AI review is advisory unless a future explicit policy says otherwise.
+Do not start by searching old milestone files and assuming the first detailed document found is current authority.
 
 ## Environment
 
-Repository CI uses Node.js 20.
+Repository CI uses Node.js 20 for the project runtime.
 
 ```bash
 npm ci
@@ -40,8 +35,6 @@ npm run build
 
 ## Current-main verification
 
-Before starting future work:
-
 ```bash
 git fetch origin
 git switch main
@@ -49,15 +42,75 @@ git pull --ff-only origin main
 git rev-parse HEAD
 ```
 
-This handoff recorded:
+Always compare the result with the most recent `STATUS.md`/PR evidence. If `main` moved, the newer tree is the integration base; old exact-head CI results remain historical evidence and do not automatically prove compatibility with later changes.
 
-```text
-88c1b5114995cd6702936f414823b783de97bb23
+## Documentation authority qualification
+
+Run whenever documentation authority, handoff state, CI governance, or top-level documentation entrypoints change:
+
+```bash
+npm run docs:authority:validate
 ```
 
-If `main` has moved, treat the newer SHA as authority after reconciliation. Do not assume old exact-head evidence proves compatibility with later changes.
+The validator checks that:
 
-## Focused timing qualification
+- `docs/CURRENT.md` exists and contains the four authority classifications;
+- `README.md`, `STATUS.md`, and `RUNBOOK.md` point to the canonical authority index;
+- key current and explicitly superseded technical documents are represented in the index;
+- the npm validation entrypoint remains configured;
+- Build Validation runs the authority validator;
+- retired `.github/workflows/gemini-review.yml` and `gemini.md` are not silently restored.
+
+This is a structural consistency check. It does not replace semantic review of a newly created technical or product authority document.
+
+## CI authority
+
+The authoritative PR correctness workflow is:
+
+```text
+.github/workflows/build-validation.yml
+```
+
+Current merge rule:
+
+```text
+Build Validation
++ preregistered package / milestone acceptance criteria
++ any explicitly declared authoritative human/external gate for that change
+```
+
+Optional AI review is advisory unless a future explicit policy deliberately changes that rule.
+
+The former Gemini review workflow and standalone `gemini.md` were retired in PR #97. `GEMINI_API_KEY` is not consumed by repository CI.
+
+## Synthetic-review / rejection checks
+
+```bash
+npm run simulated-review:validate
+npm run simulated-review:action-contract
+```
+
+For the UI-only smoke:
+
+```bash
+npx playwright install --with-deps chromium
+```
+
+Terminal 1:
+
+```bash
+HOST=127.0.0.1 PORT=3000 BROWSER=none npm start
+```
+
+Terminal 2:
+
+```bash
+npm run simulated-review:smoke
+```
+
+Do not use Redux inspection, local-storage inspection, debug injection, repository state, or source content as a player oracle when collecting synthetic player-facing evidence.
+
+## Focused GameLoop timing qualification
 
 ### Scheduler characterization
 
@@ -107,9 +160,9 @@ CI=true npm test -- --watchAll=false --runInBand GameLoopLargeFrameBackgroundSta
 CI=true npm test -- --watchAll=false --runInBand GameLoopMidSessionCadenceTransitionQualification.test.tsx
 ```
 
-These tests characterize large-frame/background-stall behavior and cadence transitions. They do **not** authorize a max-frame budget, Page Visibility policy, or new offline semantics.
+These characterize large-frame/background-stall behavior and cadence transitions. They do **not** authorize a max-frame budget, Page Visibility policy, wider offline authority, or new cadence defaults.
 
-### Backpressure × cadence × progression stress
+### Backpressure x cadence x progression stress
 
 ```bash
 CI=true npm test -- --watchAll=false --runInBand GameLoopBackpressureCadenceProgressionStressQualification.test.tsx
@@ -130,7 +183,7 @@ CI=true npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.
 CI=true npm test -- --watchAll=false --runInBand GameLoopLongHorizonCrossProgressionDrift.test.tsx
 ```
 
-### Timed Quest qualification
+## Timed-Quest qualification
 
 ```bash
 CI=true npm test -- --watchAll=false --runInBand QuestTimerUnitCompatibilityPreflight.test.ts
@@ -141,7 +194,7 @@ CI=true npm test -- --watchAll=false --runInBand GameLoopTimedQuestPrecisionReso
 
 Timed-Quest precision remains comparison-only. Do not round, clamp, quantize, or rewrite raw/persisted timer values as an incidental repair.
 
-### Live/offline authority
+## Live/offline authority
 
 ```bash
 CI=true npm test -- --watchAll=false --runInBand GameLoopLiveOfflineBoundary.test.tsx
@@ -150,39 +203,13 @@ CI=true npm test -- --watchAll=false --runInBand GameLoopM21OfflineProgress.test
 
 M21 remains a separate bounded offline authority. Timed Quests do not progress during offline settlement.
 
-## Synthetic-review / rejection checks
-
-```bash
-npm run simulated-review:validate
-npm run simulated-review:action-contract
-```
-
-For the UI-only smoke:
-
-```bash
-npx playwright install --with-deps chromium
-```
-
-Terminal 1:
-
-```bash
-HOST=127.0.0.1 PORT=3000 BROWSER=none npm start
-```
-
-Terminal 2:
-
-```bash
-npm run simulated-review:smoke
-```
-
-Do not use Redux inspection, local-storage inspection, debug injection, repository state, or source content as a player oracle when collecting synthetic player-facing evidence.
-
 ## Focused cumulative sequence
 
 For changes near GameLoop scheduling, cadence, progression, Quest timing, persistence, or offline seams:
 
 ```bash
 npm ci
+npm run docs:authority:validate
 npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx tsc --noEmit
@@ -204,40 +231,67 @@ CI=true npm test -- --watchAll=false --runInBand GameLoopM21OfflineProgress.test
 npm run build
 ```
 
-The exact Build Validation workflow additionally runs milestone and historical regression gates. Use `.github/workflows/build-validation.yml` as the authoritative current command set.
+The exact Build Validation workflow additionally runs synthetic UI smoke, M20-M25 milestone checks, active-loop qualification, modified historical checks, accumulated M4-M19 baseline, and production build. Use `.github/workflows/build-validation.yml` as executable truth.
 
-## Historical milestone evidence
+## Documentation change procedure
 
-| Stage | PR / head | Build Validation | Current state |
-| --- | --- | --- | --- |
-| Package 1 | #95 / `b1110127...` | #300 PASS | closed, superseded predecessor |
-| Package 2 | #96 / `ed1762fa...` | #301 PASS | closed, superseded predecessor |
-| Package 3 original stress | #97 / `87cc91a3...` | #302 PASS | cumulative lineage |
-| Gemini-retirement candidate | #97 / `365e2509...` | #304 PASS | superseded by fresh-main reconciliation |
-| Final reconciled candidate | #97 / `4c503cca...` | #305 PASS | merged |
-| Integration | merge `88c1b511...` | exact candidate #305 PASS | current-main authority at handoff |
-| Candidate handoff | #98 / `64ff96f...` | #303 PASS | closed, superseded |
-
-Historical Gemini failures (#330–#333) explain the earlier blocked state but no longer constitute an active CI gate.
-
-## Safe future integration procedure
+When a package creates, supersedes, or materially reinterprets authority:
 
 ```text
-1. Pull latest main.
-2. Read STATUS.md and this RUNBOOK.md.
-3. Identify the bounded package and its explicit authority/evidence ceiling.
-4. Branch from current main.
-5. Run focused local/repository qualification.
-6. Open a PR.
-7. Require Build Validation on the exact candidate head.
-8. If main moves before merge, reconcile/rebase/merge current main into the candidate and rerun Build Validation.
-9. Merge only after current-base exact-head qualification succeeds.
-10. Record actual integration evidence in STATUS.md when closing a milestone.
+1. Update/create the domain-specific contract or result.
+2. Update docs/CURRENT.md classification in the same package.
+3. Update STATUS.md if current repository state or an evidence/authority gate changed.
+4. Update RUNBOOK.md if commands, CI, or operating procedure changed.
+5. Update README.md only when repository orientation or entry links changed.
+6. Preserve old evidence; prefer classification over destructive relocation.
+7. Run npm run docs:authority:validate.
+8. Open PR and require exact-head Build Validation.
+9. If main moves, reconcile and rerun exact-head Build Validation.
+10. Merge only after current-base qualification succeeds.
 ```
+
+Do not create a second handoff PR before the implementation it describes has reached `main` unless the documentation change itself is the bounded implementation package.
+
+## Historical evidence
+
+The post-M25 timing-hardening lineage remains available as historical evidence:
+
+| Stage | PR / head | Build Validation | Disposition |
+| --- | --- | --- | --- |
+| Package 1 | #95 / `b1110127...` | #300 PASS | closed, superseded cumulative predecessor |
+| Package 2 | #96 / `ed1762fa...` | #301 PASS | closed, superseded cumulative predecessor |
+| Package 3 original stress | #97 / `87cc91a3...` | #302 PASS | historical candidate lineage |
+| Gemini-retirement candidate | #97 / `365e2509...` | #304 PASS | superseded by fresh-main reconciliation |
+| Final reconciled candidate | #97 / `4c503cca...` | #305 PASS | merged |
+| Integration | `88c1b511...` | candidate #305 PASS | integrated timing authority |
+| Candidate handoff | #98 / `64ff96f...` | #303 PASS | closed, superseded |
+| Integrated handoff | #99 / `fd5c5dc1...` | #306 PASS | merged as `56fbee27...` |
+
+Use [`docs/CURRENT.md`](docs/CURRENT.md) to distinguish historical evidence from current authority before relying on older technical files.
+
+## Product evidence boundary
+
+Repository and hermetic validation may establish deterministic behavior, composition, rejection paths, persistence behavior, and bounded synthetic risk evidence.
+
+They do not by themselves establish:
+
+- fresh-player comprehension;
+- perceived responsiveness;
+- pacing/fairness;
+- enjoyment;
+- retention;
+- final balance;
+- generalized campaign scalability;
+- Product Direction;
+- M26 authorization.
+
+Do not weaken these claims merely because human validation is temporarily unavailable.
 
 ## Do-not-cross boundaries
 
+- Do not bypass `docs/CURRENT.md` when interpreting old documentation.
 - Do not reintroduce the retired Gemini workflow as an implicit merge gate.
+- Do not use the legacy `ArchitectureOverview.md` manual-only testing statement as current CI authority.
 - Do not widen M21 offline authority without an explicit product/design decision.
 - Do not make timed Quests advance during offline settlement implicitly.
 - Do not persist GameLoop accumulator remainder without a new persistence/schema contract.
