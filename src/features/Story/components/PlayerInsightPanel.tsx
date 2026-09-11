@@ -13,6 +13,7 @@ import {
 import { useAppSelector } from '../../../app/hooks';
 import {
   selectCausalJournalEntries,
+  selectMasteredRoutines,
   selectOpportunityMap,
   selectRelationshipBuildCapabilities,
   type RelationshipCapabilityStatus,
@@ -35,13 +36,15 @@ const capabilityLabel = (status: RelationshipCapabilityStatus): string => {
 /**
  * Read-only projection over canonical gameplay state.
  *
- * This component owns no journal, opportunity, chapter, relationship, or Trait
- * state. It intentionally exposes only evidence the player has already earned.
+ * This component owns no journal, opportunity, chapter, relationship, Trait,
+ * routine-mastery, or Copy state. It intentionally exposes only evidence the
+ * player has already earned.
  */
 export const PlayerInsightPanel: React.FC = React.memo(() => {
   const journal = useAppSelector(state => selectCausalJournalEntries(state, 5));
   const opportunities = useAppSelector(selectOpportunityMap);
   const capabilities = useAppSelector(selectRelationshipBuildCapabilities);
+  const masteredRoutines = useAppSelector(selectMasteredRoutines);
   const visibleOpportunities = opportunities.filter(
     chapter => chapter.status !== 'not_started'
   );
@@ -55,12 +58,12 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               Player Insight
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              A read-only view of consequences, unresolved opportunities, and capabilities already evidenced by your play.
+              A read-only view of consequences, unresolved opportunities, learned capabilities, and repeatable work you have already mastered.
             </Typography>
           </Box>
 
           <Grid container spacing={3}>
-            <Grid item xs={12} lg={4}>
+            <Grid item xs={12} md={6} lg={3}>
               <Stack spacing={1.5}>
                 <Typography variant="subtitle1" fontWeight={600}>
                   Causal Journal
@@ -90,7 +93,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               </Stack>
             </Grid>
 
-            <Grid item xs={12} lg={4}>
+            <Grid item xs={12} md={6} lg={3}>
               <Stack spacing={1.5}>
                 <Typography variant="subtitle1" fontWeight={600}>
                   Opportunity Map
@@ -136,7 +139,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               </Stack>
             </Grid>
 
-            <Grid item xs={12} lg={4}>
+            <Grid item xs={12} md={6} lg={3}>
               <Stack spacing={1.5}>
                 <Typography variant="subtitle1" fontWeight={600}>
                   Relationship-Derived Build
@@ -147,7 +150,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                   </Typography>
                 ) : capabilities.map(capability => (
                   <Box key={capability.traitId}>
-                    <Stack direction="row" spacing={1} alignItems="center">
+                    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
                       <Typography variant="body2" fontWeight={600}>
                         {capability.name}
                       </Typography>
@@ -165,11 +168,66 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                       value={Math.min(100, capability.assimilationProgress)}
                       sx={{ mt: 0.5 }}
                     />
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="text.secondary" display="block">
                       Assimilation {capability.assimilationProgress}/{capability.assimilationThreshold}
-                      {capability.missingMemoryTags.length > 0
-                        ? ` · missing evidence: ${capability.missingMemoryTags.join(', ')}`
-                        : ''}
+                    </Typography>
+                    {capability.evidence.length > 0 ? (
+                      <Stack spacing={0.75} sx={{ mt: 1 }}>
+                        <Typography variant="caption" fontWeight={600}>
+                          Learned through remembered experience
+                        </Typography>
+                        {capability.evidence.map(evidence => (
+                          <Box key={evidence.memoryId} sx={{ pl: 1, borderLeft: 2, borderColor: 'divider' }}>
+                            <Typography variant="caption" fontWeight={600} display="block">
+                              {evidence.title}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" display="block">
+                              From: {evidence.causeLabel}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {evidence.summary}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Stack>
+                    ) : capability.status === 'developing' ? (
+                      <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.75 }}>
+                        Your understanding is still developing through shared experience.
+                      </Typography>
+                    ) : null}
+                  </Box>
+                ))}
+              </Stack>
+            </Grid>
+
+            <Grid item xs={12} md={6} lg={3}>
+              <Stack spacing={1.5}>
+                <Typography variant="subtitle1" fontWeight={600}>
+                  Mastered Routines
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Personally learned repeatable work. A specific Copy may still need the right maturity, role, loyalty, or location before you can delegate it.
+                </Typography>
+                {masteredRoutines.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    No repeatable routine has been personally mastered yet.
+                  </Typography>
+                ) : masteredRoutines.map(routine => (
+                  <Box key={routine.taskId}>
+                    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+                      <Typography variant="body2" fontWeight={600}>
+                        {routine.name}
+                      </Typography>
+                      <Chip label="Mastered by you" size="small" color="success" />
+                    </Stack>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                      {routine.description}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                      {routine.sourceLabel}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Mastery recorded <time dateTime={new Date(routine.learnedAt).toISOString()}>{new Date(routine.learnedAt).toLocaleString()}</time>
                     </Typography>
                   </Box>
                 ))}
@@ -179,7 +237,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
 
           <Divider />
           <Typography variant="caption" color="text.secondary">
-            This view explains recorded state; it does not create chapter completion, reveal undiscovered authored Traits, or make decisions for the player.
+            This view explains recorded state; it does not create chapter completion, reveal undiscovered authored Traits, grant routine mastery, or make delegation decisions for the player.
           </Typography>
         </Stack>
       </CardContent>
