@@ -46,7 +46,7 @@ A typo or content rename can therefore leave a route syntactically valid but imp
 - every required Experience ID exists in relationship content;
 - every required completed-dialogue ID exists in dialogue content.
 
-Expose it as `npm run chapter:validate` and run it in Build Validation after content-intelligence qualification.
+Expose it as `npm run chapter:validate`. Build Validation executes it at the tail of `content:intelligence:validate`, immediately after the JSON content-intelligence checks.
 
 Do not create a generalized condition language or duplicate content graph.
 
