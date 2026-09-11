@@ -1,7 +1,7 @@
 # Repository Runbook — Game Completion Program
 
 **Current maturity:** PLAYABLE PRE-ALPHA  
-**Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
+**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
 **Active program:** Campaign One / 1.0 Game Completion  
 **Human Product Review:** issue #109 OPEN / UNPROVEN
 
@@ -14,6 +14,7 @@ For every new coding-agent / engineering session:
 ```text
 latest main
 -> STATUS.md
+-> HANDOFF.md when present for the latest completed milestone/session
 -> docs/CURRENT.md
 -> specification/GameCompletionDefinition.md
 -> specification/Features/FeatureScopeMatrix.md
@@ -29,6 +30,8 @@ latest main
 Do not start from an old milestone queue. Do not infer M27 from M26. The active question is always:
 
 > Which unsatisfied 1.0 requirement is the current blocker?
+
+GC-01 is integrated. The next unsatisfied completion-program responsibility is GC-02 Prologue / onboarding.
 
 ## Environment
 
@@ -93,21 +96,21 @@ If a requested system is `CUT` or `DEFER_POST_1_0`, do not implement it merely b
 Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 
 ```text
-GC-00  M26 closure + completion-program authority
-GC-01  1.0 player-surface scope cleanup
-GC-02  Prologue / onboarding
-GC-03  Chapters 1–3 campaign integration
-GC-04  Buildcraft breadth
-GC-05  Earned-delegation breadth
-GC-06  Chapter 4 — Lattice Under Strain
-GC-07  Chapter 5 — The Chrono-Crypt
-GC-08  Chapter 6 — Network Under Pressure
-GC-09  Chapter 7 — Counterphase
-GC-10  Finale + Epilogue
-GC-11  Alpha qualification
-GC-12  Content Alpha
-GC-13  Beta
-GC-14  Release Candidate / 1.0
+[x] GC-00  M26 closure + completion-program authority
+[x] GC-01  1.0 player-surface scope cleanup
+[ ] GC-02  Prologue / onboarding
+[ ] GC-03  Chapters 1–3 campaign integration
+[ ] GC-04  Buildcraft breadth
+[ ] GC-05  Earned-delegation breadth
+[ ] GC-06  Chapter 4 — Lattice Under Strain
+[ ] GC-07  Chapter 5 — The Chrono-Crypt
+[ ] GC-08  Chapter 6 — Network Under Pressure
+[ ] GC-09  Chapter 7 — Counterphase
+[ ] GC-10  Finale + Epilogue
+[ ] GC-11  Alpha qualification
+[ ] GC-12  Content Alpha
+[ ] GC-13  Beta
+[ ] GC-14  Release Candidate / 1.0
 ```
 
 The roadmap may merge/split packages where content proves that clearer, but requirement traceability must remain explicit.
@@ -143,6 +146,30 @@ npm run docs:authority:validate
 
 The validator must represent the current game-completion authority chain and continue rejecting silent restoration of retired Gemini review authority.
 
+## GC-01 integrated qualification
+
+GC-01 is integrated on `main`.
+
+Focused command:
+
+```bash
+npm run gc01:validate
+```
+
+Integrated evidence:
+
+```text
+PR:                  #117
+branch:              work/gc01-player-surface-scope-cleanup
+qualified candidate: caabc1581316dab33f7eeb98dac9b32072ec57df
+Build Validation:    #343 / run 34629859287 / PASS
+merge commit:        ff829ce6ee4da8a693adfb783fe843775403326d
+```
+
+The focused qualification includes positive and rejection coverage for cut/deferred/duplicate-save navigation, required current surfaces, fail-closed legacy game routes, and preservation of Main Menu persistence authority.
+
+Do not recreate Skills, generic Crafting, general Inventory, or a duplicate save model as follow-up work unless current 1.0 scope authority is explicitly revised from new campaign evidence.
+
 ## Authoritative CI and exact-head merge rule
 
 Executable authority:
@@ -168,13 +195,14 @@ Build Validation
 + any separately declared authoritative external/human gate for the claimed maturity state
 ```
 
-A green CI run is never permission to claim human comprehension, fun, pacing, fairness or retention.
+A queued check is not a passing check. A green CI run is never permission to claim human comprehension, fun, pacing, fairness or retention.
 
 ## Core local validation
 
 ```bash
 npm ci
 npm run docs:authority:validate
+npm run gc01:validate
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate
@@ -483,6 +511,8 @@ When a package changes current completion/product/technical authority:
 10. Reconcile if main moves.
 11. Merge only green current-base candidate.
 ```
+
+For post-milestone handoffs, use `HANDOFF.md` as a concise re-entry record when a separate handoff materially helps future sessions. `STATUS.md` remains the current-state authority; the handoff must not contradict it.
 
 ## Permanent anti-expansion boundaries for Campaign One
 

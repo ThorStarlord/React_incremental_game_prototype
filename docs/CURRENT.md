@@ -1,7 +1,7 @@
 # Documentation Authority Index
 
 **Status:** CURRENT AUTHORITY for document classification  
-**Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
+**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
 **Current maturity:** PLAYABLE PRE-ALPHA  
 **Last reconciled:** 2026-09-11
 
@@ -73,6 +73,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | Provisional governance boundary | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProvisionalGovernanceDecision.md`](../specification/Technical/PostM25ProvisionalGovernanceDecision.md) | Allows bounded reversible human-unvalidated product development; does not create human evidence. |
 | Provisional Product Direction | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProvisionalProductDirectionDecision.md`](../specification/Technical/PostM25ProvisionalProductDirectionDecision.md) | Relationship-derived capability buildcraft + causal legibility + earned delegation. |
 | M26 result | CURRENT AUTHORITY, integrated | [`specification/Technical/M26ProvisionalProductDepthResult.md`](../specification/Technical/M26ProvisionalProductDepthResult.md) | Exact-head #340 PASS; M26 closed. |
+| GC-01 player-surface cleanup | CURRENT AUTHORITY, integrated | [`specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md`](../specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md) | Exact-head #343 PASS; PR #117 merged; cut/deferred placeholders no longer primary 1.0 surfaces. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
 | Post-M25 product evidence boundary | REFERENCE / predecessor authority | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Its anti-expansion/evidence doctrine remains useful; completion scope is now governed above. |
@@ -114,7 +115,8 @@ Important current bounded records also include:
 - `PostM25CrossDomainTraitBuildcraft.md` — semantic cross-domain Trait use;
 - `PostM25ThirdHeterogeneousChapter.md` — Enemies in Phase;
 - `PostM25CopyRoutineStrategy.md` — explicit routine priority / Start Preferred;
-- `M26ProvisionalProductDepthResult.md` — visible capability/mastery/delegation provenance.
+- `M26ProvisionalProductDepthResult.md` — visible capability/mastery/delegation provenance;
+- `GC01PlayerSurfaceScopeCleanupResult.md` — integrated 1.0 player-surface cleanup and rejection qualification.
 
 Use [`specification/README.md`](../specification/README.md) for the broader domain map.
 
@@ -129,6 +131,8 @@ PLAYABLE PRE-ALPHA
 ```
 
 The repository has passed proof-of-concept, systems-prototype and bounded vertical-slice stages. It has not yet passed Alpha because Campaign One is not playable New Game -> Epilogue.
+
+GC-01 is now complete. The next completion-program responsibility is GC-02 Prologue / onboarding.
 
 ## Explicit 1.0 scope consequences
 
@@ -169,6 +173,7 @@ Notable history:
 - [`specification/Technical/CheckpointCIncrementalIntegrationResult.md`](../specification/Technical/CheckpointCIncrementalIntegrationResult.md) — first weak verdict superseded by repair/rerun PASS; the M26 wording assertion repair did not change its behavioral authority.
 - Build Validation #335 — useful failure provenance for chapter-integrity validator source mismatch; superseded by #336 PASS.
 - Build Validation #339 — useful failure provenance for stale historical Copy-detail wording; superseded by M26 exact candidate #340 PASS.
+- Build Validation #343 — qualified GC-01 player-surface cleanup on exact candidate `caabc1581316dab33f7eeb98dac9b32072ec57df` before PR #117 integration.
 
 ## Explicitly superseded conclusions
 
@@ -176,7 +181,7 @@ The following must not govern new work:
 
 - `ArchitectureOverview.md` claims that testing is manual-only or authoritative CI is absent;
 - retired `.github/workflows/gemini-review.yml`, `gemini.md`, or `GEMINI_API_KEY` merge dependency;
-- any queue treating M4–M26, post-M25 content intelligence, the three-chapter R1–R3 repair, Player Insight, cross-domain Trait buildcraft, or Copy provenance as pending;
+- any queue treating M4–M26, GC-01, post-M25 content intelligence, the three-chapter R1–R3 repair, Player Insight, cross-domain Trait buildcraft, or Copy provenance as pending;
 - any statement that Product Direction is still entirely unselected: it is now **provisionally selected / human-unvalidated**;
 - any statement that M26 remains unauthorized: it has been explicitly authorized, qualified and integrated;
 - any implication that technical green tests authorize M27;

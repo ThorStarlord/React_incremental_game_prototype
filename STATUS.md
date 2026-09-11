@@ -1,10 +1,11 @@
 # Repository Status — Playable Pre-Alpha / Campaign One Completion
 
 **Status date:** 2026-09-11  
-**Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
+**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
 **Current maturity:** `PLAYABLE PRE-ALPHA`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
+**GC-01:** `COMPLETE / INTEGRATED`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Active program:** Campaign One / 1.0 Game Completion
 
@@ -59,6 +60,20 @@ M26 adds read-only provenance for relationship-derived capabilities and mastered
 
 M26 is the final numbered milestone in the previous sequence. **There is no automatic M27.**
 
+## GC-01 closure
+
+PR #117 is integrated:
+
+```text
+qualified candidate: caabc1581316dab33f7eeb98dac9b32072ec57df
+Build Validation #343 / run 34629859287: PASS
+merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
+```
+
+GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
+
+The next unsatisfied completion-program responsibility is GC-02 Prologue / onboarding.
+
 ## Finished-game target
 
 Campaign One / 1.0 is now explicitly bounded by [`GameCompletionDefinition.md`](specification/GameCompletionDefinition.md):
@@ -111,7 +126,7 @@ Before 1.0, the campaign must support at least:
 
 ```text
 [x] GC-00 M26 closure + completion-program authority
-[ ] GC-01 1.0 player-surface scope cleanup
+[x] GC-01 1.0 player-surface scope cleanup
 [ ] GC-02 Prologue / onboarding
 [ ] GC-03 Chapters 1–3 campaign integration
 [ ] GC-04 Buildcraft breadth
@@ -155,7 +170,7 @@ Under the completion program this is not a blanket pre-Alpha development freeze.
 
 ## Do not restart by inertia
 
-M4–M26, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
+M4–M26, GC-01, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
 
 ## Governing implementation rule
 
