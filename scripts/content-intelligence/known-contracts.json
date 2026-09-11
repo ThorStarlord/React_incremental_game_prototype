@@ -11,7 +11,9 @@
   },
   "locations": [
     "location_city_center",
-    "location_merchant_district"
+    "location_city_gate",
+    "location_merchant_district",
+    "location_whispering_woods"
   ],
   "factions": [
     "City Watch",
