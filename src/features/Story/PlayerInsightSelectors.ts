@@ -1,5 +1,8 @@
 import type { RootState } from '../../app/store';
-import { CHAPTER_DEFINITIONS } from './ChapterDefinitions';
+import {
+  CHAPTER_DEFINITIONS,
+  type ChapterRouteDefinition,
+} from './ChapterDefinitions';
 import { selectAllChapterProgress } from './ChapterSelectors';
 
 export interface CausalJournalEntry {
@@ -59,6 +62,26 @@ export interface RelationshipBuildCapability {
 const npcName = (state: RootState, npcId: string): string =>
   state.npcs.npcs[npcId]?.name ?? npcId;
 
+const routeRequirementKeys = (route: ChapterRouteDefinition): string[] => [
+  ...(route.requiredExperienceIds ?? []).map(id => `experience:${id}`),
+  ...(route.requiredCompletedDialogueIds ?? []).map(id => `dialogue:${id}`),
+];
+
+const requirementSatisfied = (state: RootState, key: string): boolean => {
+  const separator = key.indexOf(':');
+  const kind = key.slice(0, separator);
+  const id = key.slice(separator + 1);
+  if (kind === 'experience') {
+    return Boolean(state.relationships.experiencesById[id]);
+  }
+  if (kind === 'dialogue') {
+    return Object.values(state.npcs.npcs).some(npc =>
+      (npc.completedDialogues ?? []).includes(id)
+    );
+  }
+  return false;
+};
+
 /**
  * A player-facing causal journal derived only from Memories already marked
  * playerVisible. It deliberately does not inspect unrecorded authoring data.
@@ -86,9 +109,10 @@ export const selectCausalJournalEntries = (
     });
 
 /**
- * Chapter opportunity projection. Untouched chapters do not reveal authored
- * route names. Once canonical evidence exists, the player may see the route(s)
- * they have actually started and any completed route.
+ * Chapter opportunity projection. Shared opening evidence can reveal that a
+ * chapter is underway, but future branch labels remain hidden until the player
+ * has recorded route-specific evidence. This is a projection, not an unlock
+ * authority or narrative planner.
  */
 export const selectOpportunityMap = (state: RootState): OpportunityChapterView[] => {
   const progressById = new Map(
@@ -97,9 +121,22 @@ export const selectOpportunityMap = (state: RootState): OpportunityChapterView[]
 
   return CHAPTER_DEFINITIONS.map(chapter => {
     const progress = progressById.get(chapter.id)!;
+    const routeKeySets = chapter.routes.map(route => new Set(routeRequirementKeys(route)));
+    const sharedKeys = routeKeySets.length === 0
+      ? new Set<string>()
+      : new Set(
+          [...routeKeySets[0]].filter(key => routeKeySets.every(keys => keys.has(key)))
+        );
+
     const visibleRoutes = progress.status === 'not_started'
       ? []
-      : progress.routes.filter(route => route.satisfiedRequirements > 0 || route.satisfied);
+      : progress.routes.filter((routeProgress, index) => {
+          if (routeProgress.satisfied) return true;
+          const routeKeys = routeKeySets[index] ?? new Set<string>();
+          return [...routeKeys].some(
+            key => !sharedKeys.has(key) && requirementSatisfied(state, key)
+          );
+        });
 
     return {
       id: chapter.id,
