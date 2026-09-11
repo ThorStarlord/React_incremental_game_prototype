@@ -71,6 +71,12 @@ jobs:
         env:
           CI: true
 
+      - name: Async tick backlog policy contract qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand GameLoopAsyncTickBacklogPolicyContract.test.tsx
+        env:
+          CI: true
+
       - name: Cross-progression tick determinism characterization
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand GameLoopProgressionDeterminism.test.tsx
