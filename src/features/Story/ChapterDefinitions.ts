@@ -1,4 +1,7 @@
-export type ChapterId = 'merchant_district' | 'archive_inquiry';
+export type ChapterId =
+  | 'merchant_district'
+  | 'archive_inquiry'
+  | 'adversarial_calibration';
 
 export interface ChapterRouteDefinition {
   id: string;
@@ -20,6 +23,15 @@ const ARCHIVE_INQUIRY_SHARED_OPENING = [
   'elara_exp_model_challenged',
   'elara_exp_contradictory_footnote',
   'elara_exp_tome_committed',
+] as const;
+
+const LYRA_ADVERSARIAL_CALIBRATION_ARC = [
+  'lyra_exp_strategic_defeat',
+  'lyra_exp_coercion_reflected',
+  'lyra_exp_reluctant_cotraining',
+  'lyra_exp_ideological_friction',
+  'lyra_exp_mutual_calibration',
+  'lyra_exp_proto_bond',
 ] as const;
 
 /**
@@ -80,6 +92,21 @@ export const CHAPTER_DEFINITIONS: readonly ChapterDefinition[] = [
           'elara_exp_theory_neither_owned',
           'elara_exp_independent_verification',
         ],
+      },
+    ],
+  },
+  {
+    id: 'adversarial_calibration',
+    title: 'Enemies in Phase',
+    centerOfGravity: 'adversarial learning, calibrated opposition, and necessary cooperation',
+    description:
+      'A third chapter-scale composition derived from Lyra\'s existing arc. Progress comes from learning an opponent accurately enough to cooperate without requiring ideological convergence or affection.',
+    routes: [
+      {
+        id: 'calibrated_opposition',
+        label: 'Calibrated Opposition',
+        summary: 'Move from strategic defeat through reflected coercion and reluctant co-training into mutual calibration without dissolving the underlying disagreement.',
+        requiredExperienceIds: [...LYRA_ADVERSARIAL_CALIBRATION_ARC],
       },
     ],
   },
