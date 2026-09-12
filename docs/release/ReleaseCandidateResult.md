@@ -9,7 +9,7 @@
 | Field | Value |
 | --- | --- |
 | Version | `1.0.0` in package metadata; promotion not approved |
-| Commit SHA | `5116a527dd9c3064c21185d5b486fa56f7d4845c` |
+| Commit SHA | `74765d08d146f1dec8e0ee373c978d8628622205` |
 | Build Validation run | Local clean detached worktree at the candidate SHA; CI run not recorded |
 | Production artifact/deployment | Local `CI=true npm run build` passed; deployment not recorded |
 | Release date | Not assigned |
@@ -26,7 +26,7 @@
 | Full tests | PASS — 61 suites / 278 tests |
 | Production build | PASS — `CI=true npm run build` |
 | Browser qualification | Candidate Chromium PASS; candidate Firefox host execution blocked; CI rerun required |
-| Dependency security review | Candidate policy PASS — 0 high/critical; 3 moderate findings documented for review |
+| Dependency security review | Candidate policy PASS — 0 high/critical; 2 React Router moderate findings documented for review |
 
 ## Release blockers
 
