@@ -1,6 +1,7 @@
 name: Build Validation
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -41,9 +42,18 @@ jobs:
         timeout-minutes: 6
         run: npm run security:release
 
+      - name: Release evidence metadata qualification
+        run: npm run release:evidence:validate
+
       - name: Campaign One Alpha qualification
         timeout-minutes: 12
         run: npm run alpha:validate
+
+      - name: Complete Jest suite qualification
+        timeout-minutes: 15
+        run: npm test -- --watchAll=false --runInBand
+        env:
+          CI: true
 
       - name: Post-M25 second heterogeneous chapter qualification
         timeout-minutes: 6

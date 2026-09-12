@@ -42,6 +42,7 @@ npm run lint:release
 npm run alpha:validate
 npm run release:browser -- --url http://127.0.0.1:3000
 npm run security:release
+npm run release:evidence:validate
 ```
 
 ## Verify current main
@@ -200,6 +201,11 @@ npm run build
 `chapter:validate` already runs at the tail of `content:intelligence:validate`; the standalone command is useful for focused diagnosis.
 
 Build Validation remains final executable authority because it also runs live UI smoke and the accumulated technical/milestone gates.
+
+The workflow is manually dispatchable for exact-candidate qualification. It now
+enforces release-evidence metadata and the complete Jest suite in addition to
+the accumulated milestone gates and Chromium/Firefox smoke matrix. A green CI
+run still does not replace Beta human evidence or a normal-UI whole-game run.
 
 ## M26 integrated qualification
 
