@@ -9,7 +9,7 @@
 | Field | Value |
 | --- | --- |
 | Version | `1.0.0` in package metadata; promotion not approved |
-| Commit SHA | `f27ee04349c4e94a76e773cb7ecee5e9c91d634d` |
+| Commit SHA | `0409696d23e4a9f98aa6c562b8e8562660091525` |
 | Build Validation run | Local clean detached worktree at the candidate SHA; CI run not recorded |
 | Production artifact/deployment | Local `CI=true npm run build` passed; deployment not recorded |
 | Release date | Not assigned |
@@ -25,8 +25,8 @@
 | Alpha qualification | PASS — deterministic production-action gate |
 | TypeScript | PASS — clean-install verification |
 | Release evidence metadata | PASS — candidate SHA and external evidence blockers validated by `npm run release:evidence:validate` |
-| Full tests | PASS — 62 suites / 279 tests |
-| Production build | PASS — `CI=true npm run build`; main bundle 278.28 kB gzip |
+| Full tests | PASS — 63 suites / 280 tests |
+| Production build | PASS — `CI=true npm run build`; main bundle 278.25 kB gzip |
 | Browser qualification | Candidate Chromium smoke PASS; candidate Firefox host execution blocked; CI rerun required |
 | Dependency security review | Candidate policy PASS — 0 high/critical; 2 React Router moderate findings documented for review |
 
