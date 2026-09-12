@@ -20,7 +20,7 @@ import {
   selectBondProfileByNpcId,
   selectRelationshipEssenceContributionByNpcId,
   selectRelationshipExperiencesByNpcId,
-  selectRelationshipMemoriesByNpcId,
+  selectVisibleRelationshipMemoriesByNpcId,
   selectRelationshipProgressionDefinition,
 } from '../state/RelationshipSelectors';
 
@@ -47,7 +47,7 @@ const MigratedRelationshipSummary: React.FC<MigratedRelationshipSummaryProps> = 
     selectRelationshipExperiencesByNpcId(state, npc.id)
   );
   const memories = useAppSelector(state =>
-    selectRelationshipMemoriesByNpcId(state, npc.id).filter(memory => memory.playerVisible)
+    selectVisibleRelationshipMemoriesByNpcId(state, npc.id)
   );
   const progression = useAppSelector(state =>
     selectRelationshipProgressionDefinition(state, npc.id)

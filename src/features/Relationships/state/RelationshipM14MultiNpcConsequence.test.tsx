@@ -98,7 +98,7 @@ const renderNpcRoute = (store: ReturnType<typeof makeStore>, npcId: string) => {
   store.dispatch(setSelectedNPCId(npcId));
   return render(
     <Provider store={store}>
-      <MemoryRouter initialEntries={[`/game/npcs/${npcId}`]}>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={[`/game/npcs/${npcId}`]}>
         <Routes>
           <Route path="/game/npcs/:npcId" element={<NPCPanelContainer />} />
         </Routes>

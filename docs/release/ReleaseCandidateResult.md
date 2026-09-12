@@ -14,6 +14,7 @@
 | Production artifact/deployment | Local `CI=true npm run build` passed; deployment not recorded |
 | Release date | Not assigned |
 | Browser matrix | See `docs/release/BrowserQualification.md` |
+| Known defects | See `docs/release/KnownDefects.md` |
 
 ## Deterministic gates
 

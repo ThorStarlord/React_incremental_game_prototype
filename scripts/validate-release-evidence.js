@@ -15,6 +15,7 @@ const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const recordPath = path.join(root, 'docs/release/ReleaseCandidateResult.md');
 const browserRecordPath = path.join(root, 'docs/release/BrowserQualification.md');
+const defectLedgerPath = path.join(root, 'docs/release/KnownDefects.md');
 
 function fail(message) {
   throw new Error(`release evidence validation failed: ${message}`);
@@ -45,9 +46,11 @@ function commitExists(sha) {
 function main() {
   if (!fs.existsSync(recordPath)) fail('candidate result record is missing');
   if (!fs.existsSync(browserRecordPath)) fail('browser qualification record is missing');
+  if (!fs.existsSync(defectLedgerPath)) fail('known-defect ledger is missing');
 
   const record = fs.readFileSync(recordPath, 'utf8');
   const browserRecord = fs.readFileSync(browserRecordPath, 'utf8');
+  const defectLedger = fs.readFileSync(defectLedgerPath, 'utf8');
   const status = extractRequired(record, 'candidate status', /^\*\*Status:\*\* (.+)$/m);
   const version = extractRequired(record, 'candidate version', /^\| Version \| `([^`]+)`/m);
   const sha = extractRequired(record, 'candidate commit SHA', /^\| Commit SHA \| `([0-9a-f]{40})`/m);
@@ -72,6 +75,9 @@ function main() {
   }
   requireText(browserRecord, 'browser qualification record', 'Human follow-up still required');
   requireText(browserRecord, 'browser qualification record', 'full campaign completion');
+  for (const defect of ['KD-001', 'KD-002', 'KD-003', 'KD-004']) {
+    requireText(defectLedger, 'known-defect ledger', defect);
+  }
 
   console.log(`release evidence metadata is valid for blocked candidate ${sha}`);
 }

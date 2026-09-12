@@ -24,8 +24,7 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
-import { selectNPCById } from '../../../state/NPCSelectors';
-import { selectQuestById } from '../../../../Quest/state/QuestSelectors';
+import { selectNPCAvailableQuestsById, selectNPCById } from '../../../state/NPCSelectors';
 import {
   resolveQuestOutcomeThunk,
   startQuestThunk,
@@ -52,17 +51,11 @@ const formatObjectiveText = (objective: QuestObjective) => {
 
 const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const dispatch = useAppDispatch();
-  const { npc, availableQuests, permanentTraitIds } = useAppSelector((state) => {
-    const n = selectNPCById(state, npcId);
-    const quests: Quest[] = (n?.availableQuests ?? [])
-      .map((questId: string) => selectQuestById(state, questId))
-      .filter((quest: Quest | undefined): quest is Quest => quest !== undefined);
-    return {
-      npc: n,
-      availableQuests: quests,
-      permanentTraitIds: state.player.permanentTraits,
-    };
-  });
+  const npc = useAppSelector(state => selectNPCById(state, npcId));
+  const permanentTraitIds = useAppSelector(state => state.player.permanentTraits);
+  const availableQuests = useAppSelector(state =>
+    selectNPCAvailableQuestsById(state, npcId)
+  );
 
   const handleAcceptQuest = (questId: string) => {
     dispatch(startQuestThunk(questId));

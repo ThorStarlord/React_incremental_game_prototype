@@ -42,7 +42,7 @@ const initializeProductionRuntime = async (store: ReturnType<typeof makeStore>) 
 const renderGronkRoute = (store: ReturnType<typeof makeStore>) =>
   render(
     <Provider store={store}>
-      <MemoryRouter initialEntries={[`/game/npcs/${GRONK_ID}`]}>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={[`/game/npcs/${GRONK_ID}`]}>
         <Routes>
           <Route path="/game/npcs/:npcId" element={<NPCPanelContainer />} />
         </Routes>

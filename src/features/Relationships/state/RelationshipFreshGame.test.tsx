@@ -444,7 +444,7 @@ describe('M5 fresh Willow routed vertical slice', () => {
 
     render(
       <Provider store={store}>
-        <MemoryRouter initialEntries={[`/game/npcs/${WILLOW_ID}`]}>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={[`/game/npcs/${WILLOW_ID}`]}>
           <Routes>
             <Route path="/game/npcs/:npcId" element={<NPCPanelContainer />} />
           </Routes>

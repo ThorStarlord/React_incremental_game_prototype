@@ -61,7 +61,7 @@ const initializeProductionRuntime = async (store: ReturnType<typeof makeStore>) 
 const renderLyraRoute = (store: ReturnType<typeof makeStore>) =>
   render(
     <Provider store={store}>
-      <MemoryRouter initialEntries={[`/game/npcs/${LYRA_ID}`]}>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={[`/game/npcs/${LYRA_ID}`]}>
         <Routes>
           <Route path="/game/npcs/:npcId" element={<NPCPanelContainer />} />
         </Routes>

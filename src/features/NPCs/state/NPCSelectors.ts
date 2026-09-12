@@ -8,6 +8,9 @@ import type { RootState } from '../../../app/store';
 import type { NPCState } from './NPCTypes';
 import type { Trait } from '../../Traits/state/TraitsTypes';
 import { selectTraits } from '../../Traits/state/TraitsSelectors';
+import { selectAllQuests } from '../../Quest/state/QuestSelectors';
+
+const EMPTY_QUESTS = [] as const;
 
 // Base selectors
 export const selectNPCState = (state: RootState): NPCState => state.npcs;
@@ -112,4 +115,14 @@ export const selectNPCsWithSharedTraits = createSelector(
 export const selectActiveConnectionCount = createSelector(
   [selectAllNPCs],
   (npcs) => Object.values(npcs).filter(npc => npc.connectionDepth > 0).length
+);
+
+export const selectNPCAvailableQuestsById = createSelector(
+  [selectNPCById, selectAllQuests],
+  (npc, quests) => {
+    if (!npc?.availableQuests || npc.availableQuests.length === 0) return EMPTY_QUESTS;
+    return npc.availableQuests
+      .map(questId => quests[questId])
+      .filter(quest => quest !== undefined);
+  }
 );

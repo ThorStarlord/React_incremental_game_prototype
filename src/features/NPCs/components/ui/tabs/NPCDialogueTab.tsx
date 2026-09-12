@@ -31,6 +31,10 @@ type Choice = {
   availabilityReasons: string[];
 };
 
+const EMPTY_DIALOGUE_NODES: Record<string, DialogueNode> = {};
+const EMPTY_RECORD = {} as Record<string, never>;
+const EMPTY_IDS: string[] = [];
+
 /**
  * NPCDialogueTab - Handles dialogue interactions with NPCs.
  * Authored topics can declare Relationship, active-experience, per-NPC
@@ -44,21 +48,21 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
 
   const npc = useAppSelector(state => selectNPCById(state, npcId));
   const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npcId));
-  const dialogueNodes = useAppSelector(state => state.npcs.dialogueNodes || {});
+  const dialogueNodes = useAppSelector(state => state.npcs.dialogueNodes ?? EMPTY_DIALOGUE_NODES);
   const recordedExperiences = useAppSelector(
-    state => state.relationships?.experiencesById ?? {}
+    state => state.relationships?.experiencesById ?? EMPTY_RECORD
   );
   const routineFamiliarity = useAppSelector(
-    state => state.player.routineFamiliarity ?? {}
+    state => state.player.routineFamiliarity ?? EMPTY_RECORD
   );
   const knownFactIds = useAppSelector(
-    state => state.knowledge?.factIdsByNpcId?.[npcId] ?? []
+    state => state.knowledge?.factIdsByNpcId?.[npcId] ?? EMPTY_IDS
   );
   const factionReputationByFactionId = useAppSelector(
-    state => state.factions?.reputationByFactionId ?? {}
+    state => state.factions?.reputationByFactionId ?? EMPTY_RECORD
   );
   const worldStateRegions = useAppSelector(
-    state => state.worldState?.regions ?? {}
+    state => state.worldState?.regions ?? EMPTY_RECORD
   );
 
   const availableDialogueChoices: Choice[] = useMemo(() => {

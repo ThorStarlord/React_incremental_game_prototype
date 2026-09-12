@@ -41,8 +41,8 @@ As of this status date:
   histories through production dialogue effects and checks early/mid/pre-finale/
   post-complete save boundaries, import/export and invalid-import rejection;
 - content intelligence reports 0 warnings and 0 errors;
-- `npm run lint:release` fails on production lint errors while keeping legacy
-  warnings visible to normal repository linting;
+- `npm run lint:release` passes; normal repository linting may still show legacy
+  warnings outside the release lint scope;
 - `npm run release:browser` provides Chromium/Firefox fresh-context and keyboard
   smoke evidence;
 - `npm run release:evidence:validate` validates that the checked-in candidate
