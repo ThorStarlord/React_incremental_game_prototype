@@ -45,8 +45,16 @@ As of this status date:
   warnings visible to normal repository linting;
 - `npm run release:browser` provides Chromium/Firefox fresh-context and keyboard
   smoke evidence;
+- `npm run release:evidence:validate` validates that the checked-in candidate
+  record names an existing immutable commit and explicitly records pending
+  external evidence;
 - the worktree is not an immutable release candidate until it is committed and
   rerun under the exact-head release procedure.
+
+The relationship selector seam is now memoized and covered by a focused
+referential-stability regression test. This removes repeated derived-object
+recomputation from unchanged Redux inputs without changing relationship rules
+or introducing a second authority.
 
 ## Product direction
 

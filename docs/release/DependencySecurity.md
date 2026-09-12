@@ -20,11 +20,11 @@
 
 The release command writes `audit.json` and `audit.md` to its output directory.
 The current audit has no high or critical findings after moving build tooling to
-`devDependencies` and updating the safe React Router 6 line. Two moderate
-findings remain: React Router 6 is below the patched React Router 7 line, and
-`yaml` is reachable through the deprecated CRA build toolchain. The root
-`overrides` policy pins that toolchain dependency to the compatible `yaml@1.10.3`
-patch release, leaving only the two React Router advisory entries. The application
+`devDependencies`, updating the safe React Router 6 line, and pinning the
+transitive `yaml` dependency. Two moderate React Router findings remain because
+React Router 6 is below the patched React Router 7 line. The root `overrides`
+policy pins the CRA toolchain to the compatible `yaml@1.10.3` patch release; the
+YAML advisory is therefore no longer present in the current audit. The application
 is client-only, uses static/internal navigation targets, and does not use the
 affected SSR hydration path. The executable policy gate reports `PASS` because
 there are no high or critical findings; the moderate findings remain visible in

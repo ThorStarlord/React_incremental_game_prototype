@@ -135,6 +135,13 @@ boundaries. Alpha remains open because the contract still requires an ordinary
 fresh-UI New Game -> Epilogue run and evidence record; Beta and release evidence
 remain open as well.
 
+The release tooling now includes `npm run release:evidence:validate`, which checks
+that the candidate record is tied to an existing commit and that missing CI,
+Firefox, human, and production-playthrough evidence remains explicitly blocked.
+Relationship selectors are memoized at the feature seam so unchanged Redux
+inputs retain stable derived references; this is a performance and correctness
+hardening change, not a new domain authority.
+
 ## Explicit 1.0 scope consequences
 
 Current scope decisions include:

@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import {
   areLocationsDirectlyConnected,
@@ -26,122 +27,138 @@ import { initialRelationshipState } from './RelationshipSlice';
  * fields introduced by later migration phases. Keep selectors defensive until
  * formal save migration lands.
  */
-export const selectRelationshipState = (state: RootState): RelationshipState => {
-  const raw = (state as RootState & { relationships?: Partial<RelationshipState> }).relationships;
-  if (!raw) return initialRelationshipState;
-  return {
-    ...initialRelationshipState,
-    ...raw,
-    experiencesById: raw.experiencesById ?? {},
-    experienceIdsByNpc: raw.experienceIdsByNpc ?? {},
-    memoriesById: raw.memoriesById ?? {},
-    memoryIdsByNpc: raw.memoryIdsByNpc ?? {},
-    bondProfilesByNpc: raw.bondProfilesByNpc ?? {},
-    appliedUniqueKeys: raw.appliedUniqueKeys ?? {},
-    progressionByNpc: raw.progressionByNpc ?? {},
-    traitAssimilationByKey: raw.traitAssimilationByKey ?? {},
-  };
-};
+const selectRawRelationshipState = (
+  state: RootState
+): Partial<RelationshipState> | undefined =>
+  (state as RootState & { relationships?: Partial<RelationshipState> }).relationships;
 
-export const selectRelationshipShadowMode = (state: RootState) =>
-  selectRelationshipState(state).shadowMode;
+export const selectRelationshipState = createSelector(
+  [selectRawRelationshipState],
+  (raw): RelationshipState => {
+    if (!raw) return initialRelationshipState;
+    return {
+      ...initialRelationshipState,
+      ...raw,
+      experiencesById: raw.experiencesById ?? {},
+      experienceIdsByNpc: raw.experienceIdsByNpc ?? {},
+      memoriesById: raw.memoriesById ?? {},
+      memoryIdsByNpc: raw.memoryIdsByNpc ?? {},
+      bondProfilesByNpc: raw.bondProfilesByNpc ?? {},
+      appliedUniqueKeys: raw.appliedUniqueKeys ?? {},
+      progressionByNpc: raw.progressionByNpc ?? {},
+      traitAssimilationByKey: raw.traitAssimilationByKey ?? {},
+    };
+  }
+);
 
-export const selectBondProfiles = (state: RootState) =>
-  selectRelationshipState(state).bondProfilesByNpc;
+export const selectRelationshipShadowMode = createSelector(
+  [selectRelationshipState],
+  relationships => relationships.shadowMode
+);
 
-export const selectBondProfileByNpcId = (
-  state: RootState,
-  npcId: string
-): BondProfile => {
-  const existing = selectRelationshipState(state).bondProfilesByNpc[npcId];
-  const defaults = createDefaultBondProfile(npcId);
-  if (!existing) return defaults;
+export const selectBondProfiles = createSelector(
+  [selectRelationshipState],
+  relationships => relationships.bondProfilesByNpc
+);
 
-  return {
-    ...defaults,
-    ...existing,
-    dimensions: {
-      ...defaults.dimensions,
-      ...(existing.dimensions ?? {}),
-      custom: {
-        ...defaults.dimensions.custom,
-        ...(existing.dimensions?.custom ?? {}),
+export const selectBondProfileByNpcId = createSelector(
+  [selectRelationshipState, (_state: RootState, npcId: string) => npcId],
+  (relationships, npcId): BondProfile => {
+    const existing = relationships.bondProfilesByNpc[npcId];
+    const defaults = createDefaultBondProfile(npcId);
+    if (!existing) return defaults;
+
+    return {
+      ...defaults,
+      ...existing,
+      dimensions: {
+        ...defaults.dimensions,
+        ...(existing.dimensions ?? {}),
+        custom: {
+          ...defaults.dimensions.custom,
+          ...(existing.dimensions?.custom ?? {}),
+        },
       },
-    },
-    connectionQualificationEvidence:
-      existing.connectionQualificationEvidence ?? {},
-    bondArchetypes: existing.bondArchetypes ?? [],
-    activeMemoryIds: existing.activeMemoryIds ?? [],
-    unresolvedTensions: existing.unresolvedTensions ?? [],
-    recentExperienceIds: existing.recentExperienceIds ?? [],
-    tetherState: existing.tetherState ?? defaults.tetherState,
-  };
-};
+      connectionQualificationEvidence:
+        existing.connectionQualificationEvidence ?? {},
+      bondArchetypes: existing.bondArchetypes ?? [],
+      activeMemoryIds: existing.activeMemoryIds ?? [],
+      unresolvedTensions: existing.unresolvedTensions ?? [],
+      recentExperienceIds: existing.recentExperienceIds ?? [],
+      tetherState: existing.tetherState ?? defaults.tetherState,
+    };
+  }
+);
 
-export const selectRelationshipProgressionDefinition = (state: RootState, npcId: string) =>
-  selectRelationshipState(state).progressionByNpc[npcId];
+export const selectRelationshipProgressionDefinition = createSelector(
+  [selectRelationshipState, (_state: RootState, npcId: string) => npcId],
+  (relationships, npcId) => relationships.progressionByNpc[npcId]
+);
 
 export const selectUsesRelationshipConnectionAuthority = (state: RootState, npcId: string) =>
   selectRelationshipProgressionDefinition(state, npcId)?.connectionAuthority === 'relationships';
 
-export const selectRelationshipExperiencesByNpcId = (state: RootState, npcId: string) => {
-  const relationships = selectRelationshipState(state);
-  return (relationships.experienceIdsByNpc[npcId] ?? [])
-    .map(id => relationships.experiencesById[id])
-    .filter(Boolean);
-};
+export const selectRelationshipExperiencesByNpcId = createSelector(
+  [selectRelationshipState, (_state: RootState, npcId: string) => npcId],
+  (relationships, npcId) =>
+    (relationships.experienceIdsByNpc[npcId] ?? [])
+      .map(id => relationships.experiencesById[id])
+      .filter(Boolean)
+);
 
 export const selectRelationshipExperienceById = (state: RootState, experienceId: string) =>
   selectRelationshipState(state).experiencesById[experienceId];
 
-export const selectRelationshipMemoriesByNpcId = (state: RootState, npcId: string) => {
-  const relationships = selectRelationshipState(state);
-  return (relationships.memoryIdsByNpc[npcId] ?? [])
-    .map(id => relationships.memoriesById[id])
-    .filter(Boolean);
-};
+export const selectRelationshipMemoriesByNpcId = createSelector(
+  [selectRelationshipState, (_state: RootState, npcId: string) => npcId],
+  (relationships, npcId) =>
+    (relationships.memoryIdsByNpc[npcId] ?? [])
+      .map(id => relationships.memoriesById[id])
+      .filter(Boolean)
+);
 
-export const selectVisibleRelationshipMemoriesByNpcId = (
-  state: RootState,
-  npcId: string
-): RelationshipMemory[] =>
-  selectRelationshipMemoriesByNpcId(state, npcId).filter(memory => memory.playerVisible);
+export const selectVisibleRelationshipMemoriesByNpcId = createSelector(
+  [selectRelationshipMemoriesByNpcId],
+  memories => memories.filter(memory => memory.playerVisible)
+);
 
 export const selectRelationshipMemoryById = (state: RootState, memoryId: string) =>
   selectRelationshipState(state).memoriesById[memoryId];
 
-export const selectRelationshipMemoriesByResonanceTag = (
-  state: RootState,
-  npcId: string,
-  tag: string
-) =>
-  selectRelationshipMemoriesByNpcId(state, npcId).filter(memory =>
-    memory.resonanceTags.includes(tag)
-  );
+export const selectRelationshipMemoriesByResonanceTag = createSelector(
+  [
+    selectRelationshipMemoriesByNpcId,
+    (_state: RootState, _npcId: string, tag: string) => tag,
+  ],
+  (memories, tag) => memories.filter(memory => memory.resonanceTags.includes(tag))
+);
 
-export const selectTraitRelevantMemories = (
-  state: RootState,
-  npcId: string,
-  traitId: string
-) =>
-  selectRelationshipMemoriesByNpcId(state, npcId).filter(memory =>
-    memory.traitRelevance?.includes(traitId)
-  );
+export const selectTraitRelevantMemories = createSelector(
+  [
+    selectRelationshipMemoriesByNpcId,
+    (_state: RootState, _npcId: string, traitId: string) => traitId,
+  ],
+  (memories, traitId) => memories.filter(memory => memory.traitRelevance?.includes(traitId))
+);
 
 export const selectHasAppliedRelationshipUniqueKey = (
   state: RootState,
   uniqueKey: string
 ) => Boolean(selectRelationshipState(state).appliedUniqueKeys[uniqueKey]);
 
-export const selectTraitAssimilationState = (
-  state: RootState,
-  sourceNpcId: string,
-  traitId: string
-): TraitAssimilationState => {
-  const relationships = selectRelationshipState(state);
-  const existing = relationships.traitAssimilationByKey[traitAssimilationKey(sourceNpcId, traitId)];
-  return existing ?? createDefaultTraitAssimilationState(sourceNpcId, traitId);
-};
+export const selectTraitAssimilationState = createSelector(
+  [
+    selectRelationshipState,
+    (_state: RootState, sourceNpcId: string) => sourceNpcId,
+    (_state: RootState, _sourceNpcId: string, traitId: string) => traitId,
+  ],
+  (relationships, sourceNpcId, traitId): TraitAssimilationState => {
+    const existing = relationships.traitAssimilationByKey[
+      traitAssimilationKey(sourceNpcId, traitId)
+    ];
+    return existing ?? createDefaultTraitAssimilationState(sourceNpcId, traitId);
+  }
+);
 
 export interface ConnectionQualificationCheck {
   passed: boolean;
@@ -279,18 +296,21 @@ export const deriveSpatialRelationshipTether = (
  * When either side lacks a canonical M18 location, preserve the authored/static
  * BondProfile tether rather than guessing a world position.
  */
-export const selectEffectiveRelationshipTether = (
-  state: RootState,
-  npcId: string
-): EffectiveRelationshipTether => {
-  const profile = selectBondProfileByNpcId(state, npcId);
-  const authoredFallback: EffectiveRelationshipTether = {
-    tetherState: profile.tetherState,
-    source: 'authored',
-  };
+export const selectEffectiveRelationshipTether = createSelector(
+  [
+    selectBondProfileByNpcId,
+    (state: RootState, _npcId: string) => state.player.location,
+    (_state: RootState, npcId: string) => npcId,
+  ],
+  (profile, playerLocation, npcId): EffectiveRelationshipTether => {
+    const authoredFallback: EffectiveRelationshipTether = {
+      tetherState: profile.tetherState,
+      source: 'authored',
+    };
 
-  return deriveSpatialRelationshipTether(npcId, state.player.location) ?? authoredFallback;
-};
+    return deriveSpatialRelationshipTether(npcId, playerLocation) ?? authoredFallback;
+  }
+);
 
 export interface RelationshipEssenceContribution {
   npcId: string;
@@ -306,49 +326,54 @@ export interface RelationshipEssenceContribution {
   explanation: string[];
 }
 
-export const selectRelationshipEssenceContributionByNpcId = (
-  state: RootState,
-  npcId: string
-): RelationshipEssenceContribution => {
-  const config = selectRelationshipProgressionDefinition(state, npcId);
-  const profile = selectBondProfileByNpcId(state, npcId);
-  const effectiveTether = selectEffectiveRelationshipTether(state, npcId);
-  const enabled = Boolean(
-    config?.connectionAuthority === 'relationships' && config.essence?.enabled
-  );
-  const baseRate = CONNECTION_BASE_RATES[Math.max(0, Math.min(10, profile.connectionLevel))] ?? 0;
-  const quality = qualityBand(profile.resonanceQuality);
-  const tetherMultiplier = TETHER_MULTIPLIERS[effectiveTether.tetherState] ?? 1;
-  const stabilityMultiplier = STABILITY_MULTIPLIERS[profile.stability] ?? 1;
-  const effectiveRate = enabled
-    ? baseRate * quality.multiplier * tetherMultiplier * stabilityMultiplier
-    : 0;
+export const selectRelationshipEssenceContributionByNpcId = createSelector(
+  [
+    selectRelationshipProgressionDefinition,
+    selectBondProfileByNpcId,
+    selectEffectiveRelationshipTether,
+    (_state: RootState, npcId: string) => npcId,
+  ],
+  (config, profile, effectiveTether, npcId): RelationshipEssenceContribution => {
+    const enabled = Boolean(
+      config?.connectionAuthority === 'relationships' && config.essence?.enabled
+    );
+    const baseRate = CONNECTION_BASE_RATES[Math.max(0, Math.min(10, profile.connectionLevel))] ?? 0;
+    const quality = qualityBand(profile.resonanceQuality);
+    const tetherMultiplier = TETHER_MULTIPLIERS[effectiveTether.tetherState] ?? 1;
+    const stabilityMultiplier = STABILITY_MULTIPLIERS[profile.stability] ?? 1;
+    const effectiveRate = enabled
+      ? baseRate * quality.multiplier * tetherMultiplier * stabilityMultiplier
+      : 0;
 
-  return {
-    npcId,
-    enabled,
-    baseRate,
-    qualityBand: quality.label,
-    qualityMultiplier: quality.multiplier,
-    tetherState: effectiveTether.tetherState,
-    tetherSource: effectiveTether.source,
-    tetherMultiplier,
-    stabilityMultiplier,
-    effectiveRate,
-    explanation: enabled
-      ? [
-          `Connection L${profile.connectionLevel} base: ${baseRate.toFixed(2)}/sec`,
-          `Resonance Quality ${quality.label}: ${quality.multiplier.toFixed(2)}x`,
-          `Tether ${effectiveTether.tetherState} (${effectiveTether.source}): ${tetherMultiplier.toFixed(2)}x`,
-          `Stability ${profile.stability}: ${stabilityMultiplier.toFixed(2)}x`,
-        ]
-      : ['Relationship-derived Essence is not enabled for this NPC.'],
-  };
-};
+    return {
+      npcId,
+      enabled,
+      baseRate,
+      qualityBand: quality.label,
+      qualityMultiplier: quality.multiplier,
+      tetherState: effectiveTether.tetherState,
+      tetherSource: effectiveTether.source,
+      tetherMultiplier,
+      stabilityMultiplier,
+      effectiveRate,
+      explanation: enabled
+        ? [
+            `Connection L${profile.connectionLevel} base: ${baseRate.toFixed(2)}/sec`,
+            `Resonance Quality ${quality.label}: ${quality.multiplier.toFixed(2)}x`,
+            `Tether ${effectiveTether.tetherState} (${effectiveTether.source}): ${tetherMultiplier.toFixed(2)}x`,
+            `Stability ${profile.stability}: ${stabilityMultiplier.toFixed(2)}x`,
+          ]
+        : ['Relationship-derived Essence is not enabled for this NPC.'],
+    };
+  }
+);
 
-export const selectAllRelationshipEssenceContributions = (state: RootState) => {
-  const relationships = selectRelationshipState(state);
-  return Object.keys(relationships.progressionByNpc)
-    .map(npcId => selectRelationshipEssenceContributionByNpcId(state, npcId))
-    .filter(contribution => contribution.enabled && contribution.effectiveRate > 0);
-};
+export const selectAllRelationshipEssenceContributions = createSelector(
+  [selectRelationshipState, (state: RootState) => state.player.location],
+  (relationships, playerLocation) => Object.keys(relationships.progressionByNpc)
+    .map(npcId => selectRelationshipEssenceContributionByNpcId(
+      { relationships, player: { location: playerLocation } } as RootState,
+      npcId
+    ))
+    .filter(contribution => contribution.enabled && contribution.effectiveRate > 0)
+);

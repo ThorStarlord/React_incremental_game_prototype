@@ -2,7 +2,38 @@
 
 This document provides a high-level overview of the technical architecture, technology stack, and project structure for the React Incremental RPG Prototype.
 
-**Architecture Status**: ✅ **MATURE** - Core architecture implemented with Feature-Sliced Design, Redux Toolkit state management, comprehensive UI framework, complete NPC interaction system, **Phase 1 Navigation Primitives**, **complete layout system with MainContentArea**, **comprehensive page shell architecture with placeholder system**, **Phase 2 Layout State Management**, **✅ COMPLETE GameLayout Component**, **✅ IMPLEMENTED AppRouter Integration**, and **✅ COMPLETE Player UI Component System with StatDisplay and ProgressBar libraries**.
+**Architecture Status**: **COHERENT RELEASE-CANDIDATE BASELINE; PROMOTION BLOCKED**. The
+application has a feature-local Redux architecture, canonical domain authorities,
+production save/load, authored Campaign One content, deterministic qualification,
+and a working player shell. The remaining 1.0 work is evidence and release
+qualification, not a new framework or generalized game engine.
+
+## Current architecture contract
+
+The repository is organized around deep feature modules with narrow seams:
+
+- **Modules:** `GameLoop`, `Player`, `Essence`, `Relationships`, `NPC`, `Quest`,
+  `Trait`, `Knowledge`, `Faction`, `WorldState`, `Copy`, `Story`, and `Meta`
+  own their domain state and player-facing behavior.
+- **Interfaces:** Redux slice actions/thunks are the write interface; selectors,
+  authored definitions, and route/page props are the read interfaces. Save/load
+  and import/export are the persistence interface.
+- **Implementations:** RTK slices and thunks implement state transitions;
+  feature-local selectors implement derived projections; JSON under `public/data`
+  implements authored content; pages and layout components implement the UI.
+- **Adapters:** routing adapts URLs to pages, content-intelligence scripts adapt
+  authored data to static validation, and persistence adapters adapt browser
+  storage to the canonical Redux state. These adapters must not become second
+  domain authorities.
+- **Seams and design debt:** cross-domain projections (Story, Essence, Copy) are
+  intentionally thin adapters over source domains. Selector outputs must be
+  referentially stable when their inputs are unchanged; release scripts must
+  report missing external evidence as blocked rather than passing it implicitly.
+
+This gives the architecture useful depth and locality: domain rules stay in the
+owning module, while composition happens at explicit seams. A future build-tool
+or router migration is separate work and must not introduce a second state or
+content authority.
 
 ## 1. Technology Stack ✅ IMPLEMENTED
 
@@ -17,8 +48,11 @@ This document provides a high-level overview of the technical architecture, tech
     *   MUI's styling solutions (`sx`, `styled`, Theme).
     *   CSS Modules (`.module.css`) for component-specific styles where needed.
     *   Global styles (`index.css`) for base resets and body styles.
-*   **Build Tool:** Create React App (CRA) or Vite. Provides development server and build optimization.
-*   **Testing:** For this prototype phase, automated tests are not required (see NFR-QA-001). Validation is performed via manual exploratory testing and smoke checks.
+*   **Build Tool:** Create React App 5 / `react-scripts`, with a static production build.
+*   **Testing:** Jest and React Testing Library provide unit, integration, production-action,
+    content-intelligence, save/load, and deterministic release qualification. Playwright
+    provides player-facing Chromium/Firefox smoke checks. Human Beta and full-campaign
+    evidence remain separate gates and are not fabricated by automation.
 
 ## 2. Project Structure (Feature-Sliced Design) ✅ IMPLEMENTED
 

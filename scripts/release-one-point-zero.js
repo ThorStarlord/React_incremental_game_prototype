@@ -7,6 +7,7 @@ const commands = [
   ['content intelligence', 'npm', ['run', 'content:intelligence:validate']],
   ['production lint', 'npm', ['run', 'lint:release']],
   ['runtime dependency security policy', 'npm', ['run', 'security:release']],
+  ['release evidence metadata', 'npm', ['run', 'release:evidence:validate']],
   ['Alpha qualification', 'npm', ['run', 'alpha:validate']],
   ['full test suite', 'npm', ['test', '--', '--watchAll=false', '--runInBand']],
   ['production build', 'npm', ['run', 'build']],
