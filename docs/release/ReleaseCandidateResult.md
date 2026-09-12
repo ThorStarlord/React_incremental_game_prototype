@@ -9,7 +9,7 @@
 | Field | Value |
 | --- | --- |
 | Version | `1.0.0` in package metadata; promotion not approved |
-| Commit SHA | `0409696d23e4a9f98aa6c562b8e8562660091525` |
+| Commit SHA | `4afa8aad6c074110a9e54295fb60e3e7f1ac6f0a` |
 | Build Validation run | Local clean detached worktree at the candidate SHA; CI run not recorded |
 | Production artifact/deployment | Local `CI=true npm run build` passed; deployment not recorded |
 | Release date | Not assigned |
