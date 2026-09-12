@@ -1,7 +1,7 @@
 # Release Candidate Result — Campaign One / 1.0
 
-**Status:** NOT A RELEASE CANDIDATE  
-**Reason:** Beta human evidence, full production playthrough evidence and an exact immutable candidate record are not yet present.  
+**Status:** DETERMINISTIC CANDIDATE VERIFIED; PROMOTION BLOCKED
+**Reason:** The immutable candidate gates pass locally, but Beta human evidence, full production playthrough evidence, Firefox CI evidence and release approval are not yet present.
 **Last updated:** 2026-09-12
 
 ## Candidate identity
@@ -9,9 +9,9 @@
 | Field | Value |
 | --- | --- |
 | Version | `1.0.0` in package metadata; promotion not approved |
-| Commit SHA | Current working head must be recorded after a clean candidate commit |
-| Build Validation run | Not recorded for the current working tree |
-| Production artifact/deployment | Not recorded |
+| Commit SHA | `5116a527dd9c3064c21185d5b486fa56f7d4845c` |
+| Build Validation run | Local clean detached worktree at the candidate SHA; CI run not recorded |
+| Production artifact/deployment | Local `CI=true npm run build` passed; deployment not recorded |
 | Release date | Not assigned |
 | Browser matrix | See `docs/release/BrowserQualification.md` |
 
@@ -25,8 +25,8 @@
 | TypeScript | PASS — clean-install verification |
 | Full tests | PASS — 61 suites / 278 tests |
 | Production build | PASS — `CI=true npm run build` |
-| Browser qualification | Chromium local PASS; Firefox host execution blocked; CI rerun required |
-| Dependency security review | PASS — 0 high/critical; 3 moderate findings documented for review |
+| Browser qualification | Candidate Chromium PASS; candidate Firefox host execution blocked; CI rerun required |
+| Dependency security review | Candidate policy PASS — 0 high/critical; 3 moderate findings documented for review |
 
 ## Release blockers
 
@@ -36,8 +36,9 @@
 3. Record save/load/recovery at campaign boundaries, import/export and invalid
    import behavior.
 4. Run Chromium and Firefox browser qualification and attach the exact artifacts.
-5. Create a clean immutable candidate commit/tag and rerun all gates against that
-   exact identity.
+5. Run the CI build-validation workflow against the recorded candidate SHA and
+   attach its browser artifacts.
 
-This record is deliberately conservative: passing deterministic checks does not
-silently convert an uncommitted worktree into a releasable candidate.
+This record is deliberately conservative: the candidate is immutable and its
+deterministic gates are verified, but that does not silently convert missing
+human and CI evidence into release approval.

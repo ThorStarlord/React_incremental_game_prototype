@@ -31,8 +31,8 @@ browser version, operating system, viewport, URL, test results and timestamp.
 
 | Browser | Version | OS | Viewport | Result | Artifact |
 | --- | --- | --- | --- | --- | --- |
-| Chromium | 153.0.8010.12 | Windows 10 x64 | 1280×720 | PASS (local smoke) | `.release-artifacts/final-chromium-2/browser-qualification.md` |
-| Firefox | 155.0 | Windows 10 x64 | 1280×720 | BLOCKED: Playwright page creation timeout on this host | `.release-artifacts/local-firefox/browser-qualification.md` |
+| Chromium | 153.0.8010.12 | Windows 10 x64 | 1280×720 | PASS (candidate smoke) | `.release-artifacts/rc-chromium/browser-qualification.md` |
+| Firefox | 155.0 | Windows 10 x64 | 1280×720 | BLOCKED: Playwright page creation timeout on this host | `.release-artifacts/rc-firefox/browser-qualification.md` |
 
 ## Human follow-up still required
 
