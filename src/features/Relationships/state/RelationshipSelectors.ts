@@ -9,7 +9,6 @@ import type {
   BondProfile,
   ConnectionQualificationRule,
   RelationshipDimensionKey,
-  RelationshipMemory,
   RelationshipState,
   RelationshipStability,
   RelationshipTetherState,

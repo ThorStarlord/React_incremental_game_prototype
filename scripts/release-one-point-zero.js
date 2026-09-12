@@ -67,6 +67,8 @@ async function runBrowserQualification() {
     server = spawn(npmCommand, ['start'], {
       env: { ...process.env, BROWSER: 'none', HOST: '127.0.0.1', PORT: '3000' },
       stdio: 'ignore',
+      shell: process.platform === 'win32',
+      windowsHide: true,
     });
     await waitForHttp(url);
   }
