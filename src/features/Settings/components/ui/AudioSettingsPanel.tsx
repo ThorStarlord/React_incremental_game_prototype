@@ -10,7 +10,7 @@ import {
   Box,
   Divider
 } from '@mui/material';
-import { VolumeUp, VolumeOff, MusicNote, GraphicEq } from '@mui/icons-material';
+import { VolumeUp, MusicNote, GraphicEq } from '@mui/icons-material';
 
 /**
  * Props for AudioSettingsPanel component

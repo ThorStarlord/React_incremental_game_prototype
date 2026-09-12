@@ -105,6 +105,90 @@ export const CHAPTER_DEFINITIONS = [
       },
     ],
   },
+  {
+    id: 'lattice_under_strain',
+    title: 'The Lattice Under Strain',
+    centerOfGravity: 'public pressure, institutional visibility, and the cost of coordination',
+    description:
+      'The first Campaign One chapter converts the Merchant District consequences into an explicit choice about whether pressure should be named or redirected.',
+    routes: [
+      {
+        id: 'public_pressure',
+        label: 'Public Pressure',
+        summary: 'Name the pressure and make institutions carry it in public.',
+        requiredExperienceIds: ['valerius_exp_lattice_public'],
+      },
+      {
+        id: 'quiet_pressure',
+        label: 'Quiet Pressure',
+        summary: 'Redirect pressure through a stable private route.',
+        requiredExperienceIds: ['valerius_exp_lattice_quiet'],
+      },
+    ],
+  },
+  {
+    id: 'chrono_crypt',
+    title: 'The Chrono-Crypt',
+    centerOfGravity: 'contradictory evidence, access, and the right to inspect a dangerous record',
+    description:
+      'Elara and Lyra expose the counterphase map, requiring the protagonist to turn evidence into access without pretending the contradiction is solved.',
+    routes: [
+      {
+        id: 'verified_entry',
+        label: 'Verified Entry',
+        summary: 'Verify the model, coordinate access, and open the crypt.',
+        requiredExperienceIds: ['elara_exp_chrono_verified', 'lyra_exp_chrono_opened'],
+      },
+      {
+        id: 'operational_entry',
+        label: 'Operational Entry',
+        summary: 'Use a workable approximation, then challenge the entry conditions directly.',
+        requiredExperienceIds: ['elara_exp_chrono_operational', 'lyra_exp_chrono_contested'],
+      },
+    ],
+  },
+  {
+    id: 'network_under_pressure',
+    title: 'Network Under Pressure',
+    centerOfGravity: 'load paths, delegated competence, and the ethics of routing leverage',
+    description:
+      'The network chapter tests whether the protagonist can audit a delegated operation before choosing how much leverage to reveal or seal.',
+    routes: [
+      {
+        id: 'trusted_route',
+        label: 'Trusted Route',
+        summary: 'Audit the load path, then route leverage through a trusted channel.',
+        requiredExperienceIds: ['gronk_exp_network_load', 'silas_exp_network_route'],
+      },
+      {
+        id: 'sealed_route',
+        label: 'Sealed Route',
+        summary: 'Accept operational risk and keep the most dangerous leverage sealed.',
+        requiredExperienceIds: ['gronk_exp_network_risk', 'silas_exp_network_sealed'],
+      },
+    ],
+  },
+  {
+    id: 'counterphase_commitment',
+    title: 'Counterphase Commitment',
+    centerOfGravity: 'visible control, adaptive networks, and institutional commitment',
+    description:
+      'Valerius forces the campaign to choose whether stability belongs to a visible institution or to a network that can adapt beyond it.',
+    routes: [
+      {
+        id: 'institutional_commitment',
+        label: 'Institutional Commitment',
+        summary: 'Commit the Watch to the visible line and accept the cost of public control.',
+        requiredExperienceIds: ['valerius_exp_counterphase_commitment'],
+      },
+      {
+        id: 'network_commitment',
+        label: 'Network Commitment',
+        summary: 'Commit to the adaptive network and accept the uncertainty of indirect control.',
+        requiredExperienceIds: ['valerius_exp_counterphase_network'],
+      },
+    ],
+  },
 ] as const satisfies readonly ChapterDefinitionShape[];
 
 /**

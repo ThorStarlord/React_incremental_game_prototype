@@ -3,7 +3,7 @@
  * @description Tab component for managing NPC relationships and triggering high-level actions.
  */
 
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Typography,
@@ -21,7 +21,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   Stack,
-  Divider,
 } from '@mui/material';
 import {
   Favorite,
@@ -41,7 +40,6 @@ import {
 } from '../../../../../config/relationshipConstants';
 import { useAppDispatch } from '../../../../../app/hooks';
 import { updateNPCRelationshipThunk, debugUnlockAllSharedSlots } from '../../../state/NPCThunks';
-import { createCopyThunk } from '../../../../Copy/state/CopyThunks';
 import { COPY_SYSTEM } from '../../../../../constants/gameConstants';
 import { CreateCopyModal } from '../../../../Copy/components/ui/CreateCopyModal';
 
@@ -82,7 +80,6 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
   };
 
   const { progressPercentageInTier, progressLabelText } = useMemo(() => {
-    const currentTierName = currentTierInfo.name;
     if (currentTierInfo.nextTier) {
       const currentTierMin = currentTierInfo.threshold;
       const nextTierMin = currentTierInfo.nextTier.threshold;

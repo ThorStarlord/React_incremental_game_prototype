@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Box,
   Chip
 } from '@mui/material';
 import { Lock } from '@mui/icons-material';

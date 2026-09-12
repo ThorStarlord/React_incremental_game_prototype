@@ -11,16 +11,11 @@ export type TabId =
   | 'dashboard'     // Dashboard overview and analytics
   | 'character'     // Character management (stats, attributes, equipment)
   | 'traits'        // Trait system (slots, management, codex)
-  | 'skills'        // Skills management and progression
   | 'npcs'          // NPC interactions and relationships
   | 'quests'        // Quest log and management
-  | 'copies'        // Copy management (future implementation)
-  | 'essence'       // Essence management (future)
-  | 'inventory'     // Item and equipment management (future)
+  | 'copies'        // Copy management
+  | 'essence'       // Essence management
   | 'settings'      // Game settings and configuration
-  | 'saves'         // Save management interface
-  | 'crafting'      // Crafting system (recipes, materials, management)
-  | 'save-load'     // Save and load game interface
   | 'debug';        // Development and testing tools
 
 /**

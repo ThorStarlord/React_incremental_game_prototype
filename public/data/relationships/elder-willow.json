@@ -280,7 +280,7 @@
         "player",
         "npc_elder_willow"
       ],
-      "sourceType": "quest",
+      "sourceType": "other",
       "sourceId": "willow_independent_application",
       "significance": "defining",
       "relationshipEffects": {

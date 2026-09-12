@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   Button,
-  Grid,
   Alert,
   AlertTitle,
   List,
@@ -27,7 +26,6 @@ import {
 import {
   selectPermanentTraits,
 } from '../../../Player/state/PlayerSelectors';
-import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
 import type { Trait } from '../../state/TraitsTypes';
 

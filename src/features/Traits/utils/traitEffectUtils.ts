@@ -1,14 +1,13 @@
 import { Trait } from '../state/TraitsTypes'; // Assuming TraitDefinition is now Trait from TraitsTypes
 
 /**
- * Calculates a value modified by a trait effect (assuming a simple multiplier)
+ * Calculates a value modified by a fractional trait effect.
  *
  * @param baseValue - The base value before trait modification
  * @param traitModifier - The modifier value from the trait (e.g., 0.1 for +10%)
  * @returns The modified value after applying the trait effect
  */
 export const calculateTraitEffect = (baseValue: number, traitModifier: number): number => {
-    // This is a placeholder implementation. Adjust based on how modifiers work.
     return baseValue * (1 + traitModifier);
 };
 

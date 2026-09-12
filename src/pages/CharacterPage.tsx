@@ -14,11 +14,9 @@ import {
 import {
   Person,
   Star,
-  School,
 } from '@mui/icons-material';
 import { PlayerStatsContainer } from '../features/Player/components/containers/PlayerStatsContainer';
 import { PlayerTraitsContainer } from '../features/Player/components/containers/PlayerTraitsContainer';
-import { PlaceholderPage } from '../shared/components/PlaceholderPage/PlaceholderPage';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -45,7 +43,7 @@ const tabProps = (index: number) => ({
 
 /**
  * CharacterPage provides comprehensive character management interface
- * with tabbed navigation for different aspects of character progression.
+ * with focused tabs for the currently shipped character progression surfaces.
  */
 export const CharacterPage: React.FC = React.memo(() => {
   const [tabValue, setTabValue] = useState(0);
@@ -59,11 +57,10 @@ export const CharacterPage: React.FC = React.memo(() => {
     []
   );
 
-  // Tab configuration with icons and labels (removed Equipment)
+  // Keep the page aligned with the shipped navigation scope.
   const tabs = [
     { label: 'Statistics', icon: Person },
     { label: 'Traits', icon: Star },
-    { label: 'Skills', icon: School },
   ];
 
   return (
@@ -168,26 +165,6 @@ export const CharacterPage: React.FC = React.memo(() => {
             </Box>
           </TabPanel>
 
-          {/* Skills Tab */}
-          <TabPanel value={tabValue} index={2}>
-            <Box>
-              <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-                Skills & Progression
-              </Typography>
-              <PlaceholderPage
-                title="Skills System"
-                status="planned"
-                message="Character advancement through skill trees and specialized abilities rather than traditional leveling."
-                features={[
-                  'Skill point allocation',
-                  'Skill tree visualization',
-                  'Prerequisite tracking',
-                  'Passive ability unlocks',
-                  'Active skill management',
-                ]}
-              />
-            </Box>
-          </TabPanel>
         </Box>
       </Paper>
 
@@ -198,8 +175,8 @@ export const CharacterPage: React.FC = React.memo(() => {
             Character Development Guide
           </Typography>
           <Typography variant="body2" color="text.secondary" paragraph>
-            Your character progresses through trait acquisition, attribute development, and skill advancement rather than traditional leveling.
-            Focus on building relationships with NPCs to unlock new traits and abilities.
+            Your character progresses through attributes, traits, relationship history, and authored capabilities rather than traditional leveling.
+            Focus on meaningful interactions and the evidence they create.
           </Typography>
           <Box component="ul" sx={{ mt: 2, pl: 2 }}>
             <Typography component="li" variant="body2" color="text.secondary">
@@ -209,7 +186,7 @@ export const CharacterPage: React.FC = React.memo(() => {
               <strong>Traits:</strong> Equip traits for active benefits or make them permanent to free up slots
             </Typography>
             <Typography component="li" variant="body2" color="text.secondary">
-              <strong>Skills:</strong> Allocate skill points and unlock new abilities through progression
+              <strong>Capabilities:</strong> Build relationship-derived traits and routines that change which work you can perform
             </Typography>
           </Box>
         </Paper>

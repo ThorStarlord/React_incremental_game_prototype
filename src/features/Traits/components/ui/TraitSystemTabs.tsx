@@ -8,13 +8,11 @@ import {
   Alert,
   AlertTitle,
   Paper,
-  Grid,
-  Button, // Added Button
+  Button,
 } from '@mui/material';
 import BookIcon from '@mui/icons-material/Book'; // Added for the Codex button
-import TraitCodex from './TraitCodex';
 import EquippedSlotsPanel from './EquippedSlotsPanel';
-import TraitManagement, { TraitManagementProps } from './TraitManagement';
+import TraitManagement from './TraitManagement';
 import type { Trait, TraitSlot } from '../../state/TraitsTypes';
 import TraitCodexDrawer from '../containers/TraitCodexDrawer'; // Import the drawer
 
@@ -70,7 +68,7 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
     setActiveTab(newValue);
   }, []);
 
-  const handleOpenCodex = () => setIsCodexDrawerOpen(true);
+  const handleOpenCodex = useCallback(() => setIsCodexDrawerOpen(true), []);
   const handleCloseCodex = () => setIsCodexDrawerOpen(false);
 
   // Define the tabs and their corresponding components

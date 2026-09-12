@@ -127,6 +127,22 @@
       "memoryCandidate": true,
       "memoryDefinitionId": "lyra_memory_enemies_in_phase",
       "interpretation": "They solve a harmonic problem through models built across prior confrontations, producing a consequential bond while ideological hostility remains unresolved."
+    },
+    "lyra_exp_resonance_counterphase_reading": {
+      "id": "lyra_exp_resonance_counterphase_reading",
+      "uniqueKey": "lyra:system:counterphase-reading",
+      "title": "Resonance: Counterphase Reading",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": ["player", "npc_lyra"],
+      "sourceType": "system",
+      "sourceId": "resonance_calibration",
+      "significance": "major",
+      "relationshipEffects": {},
+      "connectionProgressDelta": 0,
+      "resonanceTags": ["AdversarialBond", "MutualCalibration", "ChronoCrypt"],
+      "traitEffects": [{ "traitId": "CounterphaseReading", "assimilationDelta": 35 }],
+      "memoryCandidate": false,
+      "interpretation": "Resonance converts Lyra's contested combat models into a capability the protagonist can apply without adopting her ideology."
     }
   },
   "memories": {

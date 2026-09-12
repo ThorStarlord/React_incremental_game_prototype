@@ -33,6 +33,18 @@ jobs:
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 
+      - name: Production lint gate
+        timeout-minutes: 6
+        run: npm run lint:release
+
+      - name: Runtime dependency security policy
+        timeout-minutes: 6
+        run: npm run security:release
+
+      - name: Campaign One Alpha qualification
+        timeout-minutes: 12
+        run: npm run alpha:validate
+
       - name: Post-M25 second heterogeneous chapter qualification
         timeout-minutes: 6
         run: npm test -- --watchAll=false --runInBand PostM25SecondChapterQualification.test.ts
@@ -102,8 +114,8 @@ jobs:
         if: steps.typecheck.outputs.exit_code != '0'
         run: exit 1
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright browser matrix
+        run: npx playwright install --with-deps chromium firefox
 
       - name: Synthetic review V2 UI-only live smoke qualification
         timeout-minutes: 6
@@ -129,6 +141,12 @@ jobs:
 
           if ! npm run simulated-review:smoke; then
             echo "Synthetic review live smoke failed; app log follows"
+            cat /tmp/simulated-review-app.log
+            exit 1
+          fi
+
+          if ! npm run release:browser -- --browser all --url http://127.0.0.1:3000 --out .release-artifacts/ci-browser; then
+            echo "Release browser qualification failed; app log follows"
             cat /tmp/simulated-review-app.log
             exit 1
           fi
@@ -282,7 +300,12 @@ jobs:
       - name: Production build
         run: npm run build
         env:
-          # The repository currently has substantial pre-existing ESLint warning debt.
-          # CRA treats warnings as build failures when CI=true. This gate is deliberately
-          # scoped to TypeScript correctness + successful production bundling.
-          CI: false
+          CI: true
+
+      - name: Upload release qualification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-qualification-artifacts
+          path: .release-artifacts/
+          if-no-files-found: ignore

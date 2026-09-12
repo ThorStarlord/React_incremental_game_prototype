@@ -8,7 +8,7 @@ import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes
 import { updateEssenceGenerationRateThunk } from '../../Essence';
 import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
-import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from '../../Player/state/PlayerSlice';
+import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints, markRoutineFamiliarity } from '../../Player/state/PlayerSlice';
 import { TRADING } from '../../../constants/gameConstants';
 import { getItemDef } from '../../../shared/data/itemCatalog';
 import { addItem } from '../../Inventory/state/InventorySlice';
@@ -23,6 +23,7 @@ import { selectNpcKnowsFact } from '../../Knowledge/state/KnowledgeSelectors';
 import { adjustFactionReputation } from '../../Factions/state/FactionSlice';
 import { selectFactionReputation } from '../../Factions/state/FactionSelectors';
 import { setWorldStateCondition } from '../../WorldState/state/WorldStateSlice';
+import { markCampaignComplete } from '../../Meta/state/MetaSlice';
 import {
   doesWorldStateRequirementPass,
   selectWorldStateRegions,
@@ -64,6 +65,7 @@ export const initializeNPCsThunk = createAsyncThunk<
       const contentExtensionUrls = [
         '/data/m24-world-state-content.json',
         '/data/m25-chapter-content.json',
+        '/data/campaign-one-content.json',
       ] as const;
 
       for (const extensionUrl of contentExtensionUrls) {
@@ -413,7 +415,14 @@ export const processNPCInteractionThunk = createAsyncThunk<
             dispatch(addNotification({ type: 'info', message: 'A service is now available.' }));
           } else if (eff.type === 'KNOWLEDGE_FACT') {
             if (eff.factId) {
-              dispatch(learnNpcFact({ npcId: npc.id, factId: eff.factId }));
+              // Authored social knowledge may be handed to another NPC. The
+              // speaking NPC remains the default recipient for legacy content;
+              // campaign bundles can opt into an explicit recipient so a
+              // witnessed fact can legally unlock the next conversation.
+              dispatch(learnNpcFact({
+                npcId: eff.targetNpcId || npc.id,
+                factId: eff.factId,
+              }));
             }
           } else if (eff.type === 'FACTION_REPUTATION') {
             if (eff.factionId) {
@@ -438,6 +447,25 @@ export const processNPCInteractionThunk = createAsyncThunk<
                 timestamp: now,
               }));
             }
+          } else if (eff.type === 'ROUTINE_FAMILIARITY') {
+            dispatch(markRoutineFamiliarity({
+              routineId: eff.routineId,
+              source: eff.source,
+              learnedAt: now,
+            }));
+            dispatch(addNotification({
+              type: 'success',
+              message: `Routine mastered: ${eff.routineId.replace(/_/g, ' ')}.`,
+            }));
+          } else if (eff.type === 'CAMPAIGN_COMPLETE') {
+            dispatch(markCampaignComplete({
+              epilogueVariant: eff.epilogueVariant,
+              completedAt: now,
+            }));
+            dispatch(addNotification({
+              type: 'success',
+              message: 'Campaign One complete. Your choices shaped the aftermath.',
+            }));
           }
         }
 

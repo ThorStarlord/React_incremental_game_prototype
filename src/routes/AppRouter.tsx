@@ -12,7 +12,6 @@ import EssencePage from '../pages/EssencePage';
 import QuestsPage from '../pages/QuestsPage';
 import SettingsPage from '../pages/SettingsPage';
 import DebugPage from '../pages/DebugPage';
-import { PlaceholderPage } from '../shared/components/PlaceholderPage';
 
 /**
  * Main application router component
@@ -34,7 +33,6 @@ export const AppRouter: React.FC = () => {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="character" element={<CharacterPage />} />
         <Route path="traits" element={<TraitsPage />} />
-        <Route path="skills" element={<PlaceholderPage title="Skills System" description="Character skill trees and progression system" status="planned" features={['Skill tree visualization', 'Skill point allocation', 'Mastery progression', 'Synergy system']} />} />
         
         {/* Nested route for NPCs to handle list and detail views */}
         <Route path="npcs" element={<NPCsPage />}>
@@ -44,10 +42,7 @@ export const AppRouter: React.FC = () => {
         <Route path="quests" element={<QuestsPage />} />
         <Route path="copies" element={<CopiesPage />} />
         <Route path="essence" element={<EssencePage />} />
-        <Route path="inventory" element={<PlaceholderPage title="Inventory System" description="Item management and storage interface" status="planned" features={['Item organization', 'Equipment management', 'Storage expansion', 'Item crafting']} />} />
-        <Route path="crafting" element={<PlaceholderPage title="Crafting System" description="Item creation and enhancement interface" status="planned" features={['Recipe management', 'Material collection', 'Quality enhancement', 'Advanced crafting']} />} />
         <Route path="settings" element={<SettingsPage />} />
-        <Route path="saves" element={<PlaceholderPage title="Save Management" description="Game save and load management interface" status="in-progress" features={['Save slot management', 'Import/Export functionality', 'Backup system', 'Cloud sync (future)']} />} />
         <Route path="debug" element={<DebugPage />} />
       </Route>
       

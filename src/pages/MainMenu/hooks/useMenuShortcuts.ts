@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { SavedGame } from '../../../hooks/useSavedGames';
-import { DialogState } from './useDialogManager';
 
 interface ShortcutHandlers {
   registerShortcut: (shortcut: any) => () => void;

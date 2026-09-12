@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MetaState } from './MetaTypes';
+import { CampaignCompletion, MetaState } from './MetaTypes';
 import { RootState } from '../../../app/store';
 
 // FIXED: This initialState now correctly implements the full MetaState interface.
@@ -8,7 +8,7 @@ const initialState: MetaState = {
   lastLoadedTimestamp: null,
   currentSaveId: null,
   isImported: false,
-  gameVersion: '0.1.0',
+  gameVersion: '1.0.0',
   sessionStartTime: Date.now(),
   isInProximityToNPC: true,
   // Added missing required properties
@@ -18,6 +18,7 @@ const initialState: MetaState = {
   error: null,
   // New intro flag
   hasSeenIntro: false,
+  campaignCompletion: null,
 };
 
 const metaSlice = createSlice({
@@ -42,6 +43,9 @@ const metaSlice = createSlice({
     setHasSeenIntro: (state, action: PayloadAction<boolean>) => {
       state.hasSeenIntro = action.payload;
     },
+    markCampaignComplete: (state, action: PayloadAction<CampaignCompletion>) => {
+      state.campaignCompletion = action.payload;
+    },
   },
 });
 
@@ -51,7 +55,8 @@ export const {
   setGameVersion,
   resetSessionStartTime,
   setIsInProximityToNPC,
-  setHasSeenIntro
+  setHasSeenIntro,
+  markCampaignComplete
 } = metaSlice.actions;
 
 // FIXED: Corrected and cleaned up selectors to match the final MetaState interface.
@@ -63,5 +68,6 @@ export const selectGameVersion = (state: RootState) => state.meta.gameVersion;
 export const selectSessionStartTime = (state: RootState) => state.meta.sessionStartTime;
 export const selectIsInProximityToNPC = (state: RootState) => state.meta.isInProximityToNPC;
 export const selectHasSeenIntro = (state: RootState) => state.meta.hasSeenIntro === true;
+export const selectCampaignCompletion = (state: RootState) => state.meta.campaignCompletion;
 
 export default metaSlice.reducer;

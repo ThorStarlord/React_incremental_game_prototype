@@ -15,7 +15,6 @@ import {
   ListItemSecondaryAction,
   Divider,
   CircularProgress,
-  useTheme
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -51,8 +50,6 @@ export function LoadGameDialog({
   onDelete,
   onClose
 }: LoadGameDialogProps) {
-  const theme = useTheme();
-
   const formatDate = (timestamp: number): string => {
     return new Date(timestamp).toLocaleString();
   };

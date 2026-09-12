@@ -32,7 +32,7 @@ const App: React.FC = () => {
   await dispatch(processCopyLoyaltyDecayThunk(tickData.deltaTime));
   await dispatch(processCopyTasksThunk(tickData.deltaTime));
     dispatch(processResonanceLevelThunk());
-    await dispatch(processStatusEffectsThunk());
+    await dispatch(processStatusEffectsThunk(tickData.deltaTime));
     await dispatch(regenerateVitalsThunk(tickData.deltaTime));
     dispatch(recalculateStatsThunk());
     await dispatch(processQuestTimersThunk(tickData.deltaTime));

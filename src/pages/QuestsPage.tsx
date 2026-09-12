@@ -14,15 +14,12 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
-  Button,
 } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAllQuests, selectQuestById } from '../features/Quest/state/QuestSelectors';
 import { Quest, QuestObjective, QuestStatus } from '../features/Quest/state/QuestTypes';
 import { getTimeRemaining } from '../shared/utils/time';
-import { deliverQuestItemThunk, solveQuestPuzzleThunk } from '../features/Quest/state/QuestThunks';
-import { selectPlayerLocation } from '../features/Player/state/PlayerSelectors';
-import { selectAllNPCs } from '../features/NPCs';
+import { solveQuestPuzzleThunk } from '../features/Quest/state/QuestThunks';
 import QuestPuzzleModal from '../features/Quest/components/ui/QuestPuzzleModal';
 import QuestLog from '../features/Quest/components/ui/QuestLog';
 
@@ -31,8 +28,6 @@ type SortKey = 'title' | 'status';
 const QuestsPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const allQuests = useAppSelector(selectAllQuests);
-  const playerLocation = useAppSelector(selectPlayerLocation);
-  const allNpcs = useAppSelector(selectAllNPCs);
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<QuestStatus | 'ALL'>('IN_PROGRESS');
   const [sortKey, setSortKey] = useState<SortKey>('title');

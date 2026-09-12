@@ -6,7 +6,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
-import type { Trait, TraitSlot } from '../../../Traits/state/TraitsTypes';
+import type { Trait } from '../../../Traits/state/TraitsTypes';
 
 import {
     selectAllTraits,
@@ -17,7 +17,6 @@ import {
 
 import {
   selectPermanentTraits as selectPermanentTraitIds, // Keep as IDs for filtering
-  selectMaxTraitSlots,
   selectPlayerTraitSlots,
   selectEquippedTraits,
 } from '../../state/PlayerSelectors';
@@ -42,7 +41,6 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   // Use proper selectors from their correct locations
   const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
   const equippedTraits = useAppSelector(selectEquippedTraits);
-  const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
   const allTraits = useAppSelector(selectAllTraits);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);

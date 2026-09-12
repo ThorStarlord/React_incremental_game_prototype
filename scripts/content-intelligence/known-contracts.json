@@ -7,6 +7,10 @@
     "resonance_calibration": {
       "label": "Resonance Calibration",
       "producer": "successful active Trait Resonance"
+    },
+    "archive_fieldwork": {
+      "label": "Archive Fieldwork",
+      "producer": "reported independent archive verification"
     }
   },
   "locations": [
@@ -31,6 +35,9 @@
     "dialogue:ScholarlyInsight",
     "dialogue:willow_tether_teaching",
     "quest:willow_independent_application",
-    "dialogue:WillowsWisdom"
+    "dialogue:WillowsWisdom",
+    "dialogue:CounterphaseReading",
+    "dialogue:LoadPathJudgment",
+    "dialogue:LeverageMapping"
   ]
 }

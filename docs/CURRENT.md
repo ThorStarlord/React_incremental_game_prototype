@@ -3,7 +3,7 @@
 **Status:** CURRENT AUTHORITY for document classification  
 **Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
 **Current maturity:** PLAYABLE PRE-ALPHA  
-**Last reconciled:** 2026-09-11
+**Last reconciled:** 2026-09-12
 
 ## Purpose
 
@@ -128,7 +128,12 @@ Current maturity is:
 PLAYABLE PRE-ALPHA
 ```
 
-The repository has passed proof-of-concept, systems-prototype and bounded vertical-slice stages. It has not yet passed Alpha because Campaign One is not playable New Game -> Epilogue.
+The repository has passed proof-of-concept, systems-prototype and bounded
+vertical-slice stages. The deterministic production-action whole-game
+qualification now passes both authored Campaign One histories and canonical save
+boundaries. Alpha remains open because the contract still requires an ordinary
+fresh-UI New Game -> Epilogue run and evidence record; Beta and release evidence
+remain open as well.
 
 ## Explicit 1.0 scope consequences
 

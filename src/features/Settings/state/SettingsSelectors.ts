@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import type { SettingsState, AudioSettings, GraphicsSettings, GameplaySettings, UISettings } from './SettingsTypes';
+import type { SettingsState, GraphicsSettings, GameplaySettings, UISettings } from './SettingsTypes';
 
 // Selector for the entire settings state
 export const selectSettingsState = (state: RootState): SettingsState => state.settings;

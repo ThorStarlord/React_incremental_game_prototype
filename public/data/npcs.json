@@ -14,6 +14,7 @@
     "loyalty": 15,
     "availableDialogues": [
       "elder_willow_greeting",
+      "elder_willow_lore",
       "elder_willow_offer_seed",
       "willow_disagreement",
       "willow_three_nights_teaching",
@@ -227,6 +228,7 @@
     "loyalty": 20,
     "availableDialogues": [
       "valerius_report",
+      "valerius_greeting",
       "valerius_training_offer",
       "valerius_city_issues",
       "valerius_leak_rumor",
@@ -269,7 +271,7 @@
     "affinity": 50,
     "connectionDepth": 10,
     "loyalty": 30,
-    "availableDialogues": ["rook_greeting", "rook_bounty_explanation"],
+    "availableDialogues": [],
     "completedDialogues": [],
     "availableQuests": [],
     "completedQuests": [],

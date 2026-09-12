@@ -46,7 +46,7 @@ export const PLAYER_STAT_FACTORS = {
  * @returns {PlayerStats} Updated player stats
  */
 export const recalculatePlayerStats = (player: PlayerState): PlayerStats => {
-  const { HEALTH, HEALTH_REGEN, MANA, MANA_REGEN, ATTACK, DEFENSE, SPEED, CRITICAL_CHANCE, CRITICAL_DAMAGE } = PLAYER_STAT_FACTORS;
+  const { HEALTH, HEALTH_REGEN, MANA, MANA_REGEN, CRITICAL_CHANCE, CRITICAL_DAMAGE } = PLAYER_STAT_FACTORS;
   
   // FIXED: Access stats from the 'baseStats' nested object
   const base = player.baseStats;

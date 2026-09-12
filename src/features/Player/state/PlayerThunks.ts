@@ -1,8 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { applyCalculatedStats, updateHealth, updateMana } from './PlayerSlice';
+import { applyCalculatedStats, updateHealth, updateMana, removeStatusEffect, updateStatusEffectDuration } from './PlayerSlice';
 import { processTraitEffects } from '../utils/traitEffectProcessor';
-import { PlayerStats } from '../state/PlayerTypes';
 import { recalculatePlayerStats as calculateStatsFromAttributes } from '../utils/playerStatCalculations';
 
 /**
@@ -46,14 +45,29 @@ export const recalculateStatsThunk = createAsyncThunk(
   }
 );
 
-/**
- * Placeholder thunk for processing status effects (duration, etc.)
- */
-export const processStatusEffectsThunk = createAsyncThunk(
+/** Advance status-effect durations using the same logical time as the game loop. */
+export const processStatusEffectsThunk = createAsyncThunk<
+  string[],
+  number | undefined,
+  { state: RootState }
+>(
   'player/processStatusEffects',
-  async () => {
-    // TODO: Implement duration countdown and effect removal
-    return [];
+  async (deltaTime = 1000, { getState, dispatch }) => {
+    if (!Number.isFinite(deltaTime) || deltaTime <= 0) return [];
+    const elapsedSeconds = deltaTime / 1000;
+    const expiredIds: string[] = [];
+
+    for (const effect of getState().player.statusEffects) {
+      const remaining = effect.duration - elapsedSeconds;
+      if (remaining <= 0) {
+        expiredIds.push(effect.id);
+        dispatch(removeStatusEffect(effect.id));
+      } else {
+        dispatch(updateStatusEffectDuration({ id: effect.id, duration: remaining }));
+      }
+    }
+
+    return expiredIds;
   }
 );
 

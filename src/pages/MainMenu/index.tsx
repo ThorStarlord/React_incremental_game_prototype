@@ -18,7 +18,7 @@ import { MainMenuButtonList } from './components/MainMenuButtonList';
 import { VersionFooter } from './components/VersionFooter';
 import { DialogsContainer } from './components/DialogsContainer';
 
-const APP_VERSION = '0.1.0';
+const APP_VERSION = '1.0.0';
 
 /**
  * MainMenu Component

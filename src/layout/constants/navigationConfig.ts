@@ -9,14 +9,9 @@ import {
   Groups as NPCsIcon,
   Assignment as QuestsIcon,
   ContentCopy as CopiesIcon,
-  Inventory as InventoryIcon,
-  Build as CraftingIcon,
   Settings as SettingsIcon,
-  Save as SaveLoadIcon,
   Dashboard as DashboardIcon,
-  School as SkillsIcon,
   LocalFireDepartment as EssenceIcon,
-  SaveAlt as SavesIcon,
   BugReport as DebugIcon,
 } from '@mui/icons-material';
 
@@ -71,15 +66,6 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     tooltip: 'Manage acquired traits and abilities',
     section: 'character-management',
   },
-  skills: {
-    id: 'skills',
-    label: 'Skills',
-    icon: SkillsIcon,
-    route: '/game/skills',
-    isImplemented: false,
-    tooltip: 'Manage character skills',
-    section: 'character-management',
-  },
   npcs: {
     id: 'npcs',
     label: 'NPCs',
@@ -116,22 +102,6 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     tooltip: 'Manage essence and related mechanics',
     section: 'character-management',
   },
-  inventory: {
-    id: 'inventory',
-    label: 'Inventory',
-    icon: InventoryIcon,
-    route: '/game/inventory',
-    isImplemented: false,
-    tooltip: 'Manage items and equipment'
-  },
-  crafting: {
-    id: 'crafting',
-    label: 'Crafting',
-    icon: CraftingIcon,
-    route: '/game/crafting',
-    isImplemented: false,
-    tooltip: 'Craft items and equipment'
-  },
   settings: {
     id: 'settings',
     label: 'Settings',
@@ -140,23 +110,6 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     isImplemented: true,
     tooltip: 'Configure game settings',
     section: 'systems',
-  },
-  saves: {
-    id: 'saves',
-    label: 'Manage Saves',
-    icon: SavesIcon,
-    route: '/game/saves',
-    isImplemented: false,
-    tooltip: 'Manage multiple save game slots',
-    section: 'systems',
-  },
-  'save-load': {
-    id: 'save-load',
-    label: 'Save/Load',
-    icon: SaveLoadIcon,
-    route: '/game/save-load',
-    isImplemented: true,
-    tooltip: 'Save and load game progress'
   },
   debug: {
     id: 'debug',
@@ -180,9 +133,7 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     items: [
       NAVIGATION_ITEMS.character,
       NAVIGATION_ITEMS.traits,
-      NAVIGATION_ITEMS.skills,
-      NAVIGATION_ITEMS.essence,
-      NAVIGATION_ITEMS.inventory
+      NAVIGATION_ITEMS.essence
     ]
   },
   
@@ -201,10 +152,7 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     title: 'Systems',
     items: [
       NAVIGATION_ITEMS.dashboard,
-      NAVIGATION_ITEMS.crafting,
       NAVIGATION_ITEMS.settings,
-      NAVIGATION_ITEMS['save-load'],
-      NAVIGATION_ITEMS.saves,
       NAVIGATION_ITEMS.debug,
     ]
   }

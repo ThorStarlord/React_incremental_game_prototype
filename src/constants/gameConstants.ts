@@ -59,7 +59,7 @@ export const COPY_SYSTEM = {
   LOYALTY_MAX: 100,
   MATURITY_MIN: 0,
   LOYALTY_MIN: 0,
-  /** Essence cost to promote a Copy to accelerated growth (placeholder). */
+  /** Essence cost to promote a Copy to accelerated growth. */
   PROMOTE_ACCELERATED_COST: 150,
   /** Essence-only creation cost tuning: cost decreases with NPC connection depth. */
   CREATION_BASE_COST: 150,

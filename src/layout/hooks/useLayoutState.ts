@@ -35,16 +35,11 @@ const tabToRouteMap: Record<TabId, string> = {
   dashboard: '/game/dashboard',
   character: '/game/character',
   traits: '/game/traits',
-  skills: '/game/skills',
   npcs: '/game/npcs',
   essence: '/game/essence',
   copies: '/game/copies',
   quests: '/game/quests',
-  inventory: '/game/inventory',
   settings: '/game/settings',
-  saves: '/game/saves',
-  crafting: '/game/crafting',
-  'save-load': '/game/save-load',
   debug: '/game/debug',
 };
 

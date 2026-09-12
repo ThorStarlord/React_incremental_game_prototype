@@ -1,12 +1,10 @@
 import React from 'react';
 import {
-  Box,
   Typography,
   Tooltip,
   Paper
 } from '@mui/material';
 // Import the Trait type from the slice and the selector
-import { Trait } from '../../state/TraitsTypes';
 import { selectTraitById } from '../../state/TraitsSelectors';
 import { useAppSelector } from '../../../../app/hooks';
 

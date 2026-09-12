@@ -21,8 +21,6 @@ import {
   CircularProgress
 } from '@mui/material';
 import {
-  Lock as LockIcon,
-  Add as AddIcon,
   Clear as ClearIcon,
   Info as InfoIcon
 } from '@mui/icons-material';

@@ -37,6 +37,7 @@ const DIALOGUE_CATALOG_PATHS = [
   'public/data/dialogues.json',
   'public/data/m24-world-state-content.json',
   'public/data/m25-chapter-content.json',
+  'public/data/campaign-one-content.json',
 ] as const;
 
 const readJson = (relativePath: string): any =>

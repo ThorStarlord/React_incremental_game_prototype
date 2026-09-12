@@ -21,7 +21,7 @@ import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import { selectNPCById } from '../../../state/NPCSelectors';
 import { addItem, removeItem } from '../../../../Inventory/state/InventorySlice';
 import { spendGold, gainGold } from '../../../../Player/state/PlayerSlice';
-import { getItemDef, itemCatalog } from '../../../../../shared/data/itemCatalog';
+import { getItemDef } from '../../../../../shared/data/itemCatalog';
 import { addNotification } from '../../../../../shared/state/NotificationSlice';
 import { decrementNpcShopItem, incrementNpcShopItem } from '../../../state/NPCSlice';
 

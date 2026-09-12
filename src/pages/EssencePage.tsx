@@ -12,7 +12,6 @@ import { useAppSelector } from '../app/hooks';
 import {
   selectEssenceStats,
   selectCurrentEssence,
-  selectGenerationRate,
 } from '../features/Essence/state/EssenceSelectors';
 import { selectActiveConnectionCount } from '../features/NPCs/state/NPCSelectors';
 // Ensure imports point to the correct components from the barrel file

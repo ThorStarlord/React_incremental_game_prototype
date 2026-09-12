@@ -1,18 +1,8 @@
 import React from 'react';
+import { useNavigate, useParams, Outlet } from 'react-router-dom';
+import { Box, Paper, Button } from '@mui/material';
+import { useAppDispatch } from '../app/hooks';
 import {
-  Routes,
-  Route,
-  useNavigate,
-  useParams,
-  Outlet,
-} from 'react-router-dom';
-import { Box, Paper, Button, CircularProgress, Alert } from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../app/hooks';
-import {
-  initializeNPCsThunk,
-  selectNPCLoading,
-  selectNPCError,
-  NPCPanelContainer,
   NPCListView,
   setSelectedNPCId,
 } from '../features/NPCs';

@@ -336,7 +336,8 @@
       "withhold": "The result is enough. The method is mine."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_independent_verification", "responseId": "report" }
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_independent_verification", "responseId": "report" },
+      { "type": "ROUTINE_FAMILIARITY", "routineId": "archive_fieldwork", "source": "archive_fieldwork", "responseId": "report" }
     ],
     "next": {
       "report": null,

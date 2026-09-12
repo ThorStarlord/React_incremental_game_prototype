@@ -154,6 +154,13 @@ const playerSlice = createSlice({
     removeStatusEffect: (state, action: PayloadAction<string>) => {
       state.statusEffects = state.statusEffects.filter(effect => effect.id !== action.payload);
     },
+    updateStatusEffectDuration: (
+      state,
+      action: PayloadAction<{ id: string; duration: number }>
+    ) => {
+      const effect = state.statusEffects.find(candidate => candidate.id === action.payload.id);
+      if (effect) effect.duration = action.payload.duration;
+    },
     equipTrait: (state, action: PayloadAction<{ traitId: string; slotIndex: number }>) => {
       const { traitId, slotIndex } = action.payload;
       let targetIndex = slotIndex;
@@ -223,6 +230,7 @@ export const {
   setIsAlive,
   addStatusEffect,
   removeStatusEffect,
+  updateStatusEffectDuration,
   equipTrait,
   unequipTrait,
   unlockTraitSlot,

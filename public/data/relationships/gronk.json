@@ -217,6 +217,22 @@
       "resonanceTags": ["SharedDecision", "AppearanceOverConstraint", "ProfessionalConflict"],
       "memoryCandidate": false,
       "interpretation": "Gronk understands the political need to reopen visibly and quickly, which is exactly why the choice costs trust: you know the load-bearing repair is better and choose appearance anyway."
+    },
+    "gronk_exp_resonance_load_path_judgment": {
+      "id": "gronk_exp_resonance_load_path_judgment",
+      "uniqueKey": "gronk:system:load-path-judgment",
+      "title": "Resonance: Load-Path Judgment",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": ["player", "npc_blacksmith_gronk"],
+      "sourceType": "system",
+      "sourceId": "resonance_calibration",
+      "significance": "major",
+      "relationshipEffects": {},
+      "connectionProgressDelta": 0,
+      "resonanceTags": ["ProfessionalReliance", "ConstraintRouting", "ProvenWork"],
+      "traitEffects": [{ "traitId": "LoadPathJudgment", "assimilationDelta": 35 }],
+      "memoryCandidate": false,
+      "interpretation": "Resonance turns Gronk's constraint-first practice into a durable ability to distinguish visible damage from the failure carrying the load."
     }
   },
   "memories": {

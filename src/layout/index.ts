@@ -1,3 +1,5 @@
+import type { NavItem as NavItemType, NavSection as NavSectionType, TabId as TabIdType } from './types/NavigationTypes';
+
 // Modern layout system (Recommended)
 export { GameLayout } from './components/GameLayout';
 export { MainContentArea } from './components/MainContentArea';
@@ -12,8 +14,6 @@ export type {
 } from './hooks/useLayoutState';
 
 // Layout types and constants
-import type { NavItem as NavItemType, NavSection as NavSectionType, TabId as TabIdType } from './types/NavigationTypes'; // Import with alias
-
 export type NavItem = NavItemType;
 export type NavSection = NavSectionType;
 export type TabId = TabIdType; // Re-export TabId as well for consistency here

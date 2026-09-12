@@ -27,3 +27,6 @@ yarn-error.log*
 
 # synthetic-review observation output (freeze selected records explicitly in specification/)
 .simulated-review-output/
+
+# generated release qualification artifacts
+.release-artifacts/

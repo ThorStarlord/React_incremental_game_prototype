@@ -27,8 +27,8 @@ Proof of concept                     PASS
 Technical systems prototype          PASS
 Integrated vertical slice            PASS
 Playable Pre-Alpha                   CURRENT
-Alpha                                NOT YET
-Content Alpha                        NOT YET
+Alpha implementation qualification   PASS / normal fresh-UI evidence pending
+Content Alpha                        DETERMINISTIC PASS / lock not declared
 Beta                                 NOT YET
 Release Candidate                    NOT YET
 1.0                                  NOT YET

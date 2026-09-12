@@ -269,6 +269,22 @@
       "resonanceTags": ["LongHorizon", "BrokerChainRisk", "Reliance", "Reciprocity"],
       "memoryCandidate": false,
       "interpretation": "The live broker chain Silas risked because the older restraint still carried weight survives verification. The callback becomes new operational evidence rather than nostalgia alone."
+    },
+    "silas_exp_resonance_leverage_mapping": {
+      "id": "silas_exp_resonance_leverage_mapping",
+      "uniqueKey": "silas:system:leverage-mapping",
+      "title": "Resonance: Leverage Mapping",
+      "primaryTargetId": "npc_rogue_silas",
+      "participantIds": ["player", "npc_rogue_silas"],
+      "sourceType": "system",
+      "sourceId": "resonance_calibration",
+      "significance": "major",
+      "relationshipEffects": {},
+      "connectionProgressDelta": 0,
+      "resonanceTags": ["Leverage", "OperationalRisk", "SharedDecision"],
+      "traitEffects": [{ "traitId": "LeverageMapping", "assimilationDelta": 35 }],
+      "memoryCandidate": false,
+      "interpretation": "Resonance turns Silas's operational caution into a durable ability to route sensitive knowledge through the person who can act on it."
     }
   },
   "memories": {

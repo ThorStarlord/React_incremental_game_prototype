@@ -337,7 +337,16 @@ function createModel(root, options = {}) {
           }
         }
         if (typeof experience.sourceType === 'string' && typeof experience.sourceId === 'string') {
-          const sourceType = experience.sourceType === 'quest' ? 'quest' : 'dialogue';
+          const sourceType = experience.sourceType === 'quest'
+            ? 'quest'
+            : experience.sourceType === 'system'
+              ? 'system'
+              : experience.sourceType === 'other'
+                ? 'provenance'
+                : 'dialogue';
+          if (sourceType === 'system' || sourceType === 'provenance') {
+            addNode(sourceType, experience.sourceId, 'runtime-system-contract');
+          }
           addEdge(sourceType, experience.sourceId, 'experience', experienceId, 'produces');
         }
         for (const traitEffect of experience.traitEffects || []) {

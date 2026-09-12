@@ -5,7 +5,7 @@
 
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import type { NPC, NPCState } from './NPCTypes';
+import type { NPCState } from './NPCTypes';
 import type { Trait } from '../../Traits/state/TraitsTypes';
 import { selectTraits } from '../../Traits/state/TraitsSelectors';
 

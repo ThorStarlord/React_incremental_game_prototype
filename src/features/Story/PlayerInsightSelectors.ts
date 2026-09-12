@@ -95,6 +95,8 @@ const routineSourceLabel = (
       return 'Practiced Forge Assistance yourself in the City Center.';
     case 'trait_resonance':
       return 'Completed Trait resonance yourself.';
+    case 'archive_fieldwork':
+      return 'Completed an independent archive verification yourself.';
   }
 };
 

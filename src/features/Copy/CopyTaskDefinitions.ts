@@ -53,6 +53,19 @@ export const COPY_PRODUCTION_TASKS: readonly CopyProductionTaskDefinition[] = [
     allowedRoles: ['researcher', 'agent'],
     reward: { essence: 8 },
   },
+  {
+    id: 'archive_fieldwork',
+    name: 'Archive Fieldwork',
+    description:
+      'Run a repeatable evidence audit in the Grand Library and return a verified source trail.',
+    familiarityHint: 'Complete an independent archive verification yourself before delegating fieldwork.',
+    baseDurationSeconds: 120,
+    minimumMaturity: 40,
+    minimumLoyalty: 45,
+    allowedRoles: ['researcher', 'agent'],
+    requiredLocationId: 'location_merchant_district',
+    reward: { gold: 20 },
+  },
 ] as const;
 
 export const getCopyProductionTaskDefinition = (

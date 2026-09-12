@@ -168,7 +168,7 @@ export function useGameActions({
   const handleDeleteConfirm = useCallback(async (saveId: string, saveName: string) => {
     const success = await deleteSave(saveId);
     if (success) {
-      console.log(`Deleted \"${saveName}\"`);
+      console.log(`Deleted "${saveName}"`);
     } else {
       console.error('Failed to delete save.');
     }

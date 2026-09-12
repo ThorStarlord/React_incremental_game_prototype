@@ -1,6 +1,6 @@
 # Repository Runbook — Game Completion Program
 
-**Current maturity:** PLAYABLE PRE-ALPHA  
+**Current maturity:** PLAYABLE PRE-ALPHA / deterministic production-action qualification pass
 **Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
 **Active program:** Campaign One / 1.0 Game Completion  
 **Human Product Review:** issue #109 OPEN / UNPROVEN
@@ -38,6 +38,10 @@ Repository CI uses Node.js 20.
 npm ci
 npx tsc --noEmit
 npm run build
+npm run lint:release
+npm run alpha:validate
+npm run release:browser -- --url http://127.0.0.1:3000
+npm run security:release
 ```
 
 ## Verify current main
@@ -111,6 +115,14 @@ GC-14  Release Candidate / 1.0
 ```
 
 The roadmap may merge/split packages where content proves that clearer, but requirement traceability must remain explicit.
+
+## Current evidence boundary
+
+The deterministic Campaign One qualification now executes both authored divergent
+histories through production interaction effects and exercises canonical save
+boundaries. This closes implementation gaps, not human evidence: ordinary fresh
+UI Alpha play, Beta sessions, browser depth, and exact immutable RC identity are
+still open. See [`docs/release/`](docs/release/) for evidence records.
 
 ## Branch / PR procedure
 

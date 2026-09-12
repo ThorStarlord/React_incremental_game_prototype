@@ -68,10 +68,11 @@ afterEach(() => {
 });
 
 describe('M20 production Copy task automation qualification', () => {
-  test('catalog contains exactly two bounded authored routine tasks with no arbitrary effect callback', () => {
+  test('catalog contains bounded authored routine tasks with no arbitrary effect callback', () => {
     expect(COPY_PRODUCTION_TASKS.map(task => task.id)).toEqual([
       'forge_assistance',
       'resonance_calibration',
+      'archive_fieldwork',
     ]);
 
     for (const task of COPY_PRODUCTION_TASKS) {
@@ -315,11 +316,12 @@ describe('M20 production Copy task automation qualification', () => {
     expect(screen.getByText('Production Delegation')).toBeInTheDocument();
     expect(screen.getByText('Forge Assistance')).toBeInTheDocument();
     expect(screen.getByText('Resonance Calibration')).toBeInTheDocument();
+    expect(screen.getByText('Archive Fieldwork')).toBeInTheDocument();
     expect(screen.getByText(/Narrative and irreversible decisions remain under player authority/)).toBeInTheDocument();
     expect(screen.queryByText('Start timed task:')).not.toBeInTheDocument();
 
     const assignButtons = screen.getAllByRole('button', { name: 'Assign' });
-    expect(assignButtons).toHaveLength(2);
+    expect(assignButtons).toHaveLength(3);
     expect(assignButtons[0]).toBeEnabled();
     expect(assignButtons[1]).toBeDisabled();
 

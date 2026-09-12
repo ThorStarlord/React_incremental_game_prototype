@@ -109,7 +109,7 @@ export interface NPCSharedTraitSlot {
 }
 
 /**
- * NPC personality interface (placeholder)
+ * NPC personality interface.
  */
 export interface NPCPersonality {
   traits: string[];
@@ -118,7 +118,7 @@ export interface NPCPersonality {
 }
 
 /**
- * NPC inventory interface (placeholder)
+ * NPC inventory interface.
  */
 export interface NPCInventory {
   items: any[];
@@ -126,7 +126,7 @@ export interface NPCInventory {
 }
 
 /**
- * NPC service interface (placeholder)
+ * NPC service interface.
  */
 export interface NPCService {
   id: string;
@@ -140,7 +140,7 @@ export interface NPCService {
 }
 
 /**
- * NPC schedule interface (placeholder)
+ * NPC schedule interface.
  */
 export interface NPCSchedule {
   [timeSlot: string]: {
@@ -208,6 +208,15 @@ export type DialogueEffect =
       experienceId?: string;
       /** Optional response-specific Experience mapping for a branching dialogue node. */
       experienceIdByResponse?: Record<string, string>;
+    })
+  | (DialogueEffectScope & {
+      type: 'ROUTINE_FAMILIARITY';
+      routineId: RoutineFamiliarityId;
+      source: import('../../Player/state/PlayerTypes').RoutineFamiliaritySource;
+    })
+  | (DialogueEffectScope & {
+      type: 'CAMPAIGN_COMPLETE';
+      epilogueVariant: string;
     });
 
 export interface FactionReputationRequirement {
