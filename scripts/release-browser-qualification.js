@@ -11,12 +11,34 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 const { chromium, firefox } = require('playwright');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const DEFAULT_URL = process.env.RELEASE_APP_URL || 'http://127.0.0.1:3000';
 const DEFAULT_OUT = path.join(REPO_ROOT, '.release-artifacts', 'browser-qualification');
 const VIEWPORT = { width: 1280, height: 720 };
+
+function candidateMetadata() {
+  let commitSha = process.env.RELEASE_CANDIDATE_SHA || 'unknown';
+  try {
+    commitSha = execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+    }).trim();
+  } catch (error) {
+    // Artifact generation remains useful in source archives without Git.
+  }
+
+  let version = process.env.RELEASE_VERSION || 'unknown';
+  try {
+    version = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8')).version;
+  } catch (error) {
+    // Keep the explicit unknown marker rather than inventing release identity.
+  }
+
+  return { commitSha, version };
+}
 
 function parseArgs(argv) {
   const options = {
@@ -184,6 +206,21 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await assertVisible(page.getByRole('heading', { name: 'Incremental RPG' }), 'recovered main heading');
     });
 
+    await check('invalid-import-stays-in-import-flow', async () => {
+      await page.getByRole('button', { name: /^Import$/ }).click();
+      await assertVisible(page.getByRole('heading', { name: 'Import Save' }), 'import dialog');
+      await page.locator('textarea').fill('not-a-valid-save-code');
+      await page.getByRole('button', { name: /^Import$/ }).last().click();
+      await assertVisible(page.getByRole('heading', { name: 'Import Save' }), 'rejected import dialog');
+      await page.getByRole('button', { name: /^Cancel$/ }).click();
+    });
+
+    await check('empty-load-state-is-explicit', async () => {
+      await page.getByRole('button', { name: /^Load Game$/ }).click();
+      await assertVisible(page.getByText('No saved games found.'), 'empty load state');
+      await page.getByRole('button', { name: /^Cancel$/ }).click();
+    });
+
     return {
       browser: name,
       browserVersion: browser.version(),
@@ -229,6 +266,8 @@ function renderMarkdown(record) {
 
   return `# Browser Qualification\n\n` +
     `- Generated: ${record.generatedAt}\n` +
+    `- Candidate version: ${record.candidate.version}\n` +
+    `- Candidate commit: ${record.candidate.commitSha}\n` +
     `- URL: ${record.url}\n` +
     `- Host: ${record.host}\n` +
     `- Overall result: **${record.status}**\n\n` +
@@ -252,6 +291,7 @@ async function main() {
 
   const record = {
     generatedAt: new Date().toISOString(),
+    candidate: candidateMetadata(),
     host: `${os.platform()} ${os.release()} ${os.arch()}`,
     url: options.url,
     viewport: VIEWPORT,

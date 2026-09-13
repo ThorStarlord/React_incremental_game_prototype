@@ -52,7 +52,24 @@ content authority.
 *   **Testing:** Jest and React Testing Library provide unit, integration, production-action,
     content-intelligence, save/load, and deterministic release qualification. Playwright
     provides player-facing Chromium/Firefox smoke checks. Human Beta and full-campaign
-    evidence remain separate gates and are not fabricated by automation.
+     evidence remain separate gates and are not fabricated by automation.
+
+### Persistence seam (v1 hardening)
+
+Redux `RootState` is runtime composition, not the save-file contract. The
+`src/shared/persistence/PersistedGameState.ts` Module owns the explicit
+`PersistedGameState` projection, strict root-shape validation, and rehydration
+of transient runtime state. `saveSchema.ts` remains the migration Adapter, but
+new saves exclude notifications and incomplete current-version payloads are
+rejected before Redux replacement. Legacy v0 payloads may receive missing
+domain defaults only through the documented legacy migration path.
+
+The root reducer accepts only complete runtime replacements at its typed
+restoration seam. Transient Combat notifications are represented as an
+application event (`CombatEvents.ts`), not as an uncombined pseudo-slice.
+Legacy-shaped payloads must pass through the migration Adapter before they can
+be installed in Redux. This preserves invariant enforcement and keeps the
+runtime Module separate from the persisted Interface.
 
 ## 2. Project Structure (Feature-Sliced Design) ✅ IMPLEMENTED
 

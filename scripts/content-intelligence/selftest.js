@@ -105,4 +105,22 @@ assert(brokenModel.issues.some(issue => issue.code === 'DANGLING_REFERENCE' && i
 assert(brokenModel.issues.some(issue => issue.code === 'DUPLICATE_ID' && issue.entity === 'dialogue:dialogue_root'));
 assert(findReachabilityProblems(brokenModel).some(problem => problem.entity === 'dialogue:dialogue_gated'));
 
+const invalidObjectiveRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'content-intelligence-objective-contract-'));
+buildValidFixture(invalidObjectiveRoot);
+writeJson(invalidObjectiveRoot, 'public/data/quests.json', {
+  escort_without_destination: {
+    id: 'escort_without_destination',
+    title: 'Invalid escort fixture',
+    giver: 'npc_test',
+    type: 'MAIN',
+    objectives: [{ id: 'escort', type: 'ESCORT', target: 'npc_test' }],
+    prerequisites: [],
+  },
+});
+const invalidObjectiveModel = createModel(invalidObjectiveRoot, { knownContracts });
+assert(invalidObjectiveModel.issues.some(issue =>
+  issue.code === 'INVALID_OBJECTIVE_CONTRACT' &&
+  issue.entity === 'quest:escort_without_destination'
+));
+
 console.log('content-intelligence selftest passed');

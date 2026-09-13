@@ -31,6 +31,12 @@ jobs:
       - name: Documentation authority qualification
         run: npm run docs:authority:validate
 
+      - name: Relative import cycle qualification
+        run: npm run architecture:cycles
+
+      - name: Persistence authority qualification
+        run: npm run architecture:persistence
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 

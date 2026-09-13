@@ -26,7 +26,9 @@ No second persisted `lastSaveTime` clock is warranted.
 
 ### Legacy GameLoop local-storage helpers are not authority
 
-`GameLoopThunks.ts` still contains older standalone `gameState` / `lastSaveTime` helpers. They are not the modern versioned save-envelope path used by Main Menu load.
+The older standalone `GameLoopThunks.ts` persistence helpers were removed so
+they cannot become an alternate `gameState` / `lastSaveTime` authority. Main
+Menu load uses the modern versioned save-envelope path.
 
 M21 will not revive or consume them.
 

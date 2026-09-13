@@ -282,6 +282,13 @@ function createModel(root, options = {}) {
           }
         }
         for (const objective of quest.objectives || []) {
+          if (objective?.type === 'ESCORT' && typeof objective.destination !== 'string') {
+            issue(
+              'INVALID_OBJECTIVE_CONTRACT',
+              `quest:${questId} has an ESCORT objective without an explicit destination in ${relative}`,
+              { entity: nodeKey('quest', questId), source: relative }
+            );
+          }
           if (typeof objective?.target === 'string' && objective.target.startsWith('location_')) {
             addEdge('quest', questId, 'location', objective.target, 'requires-location');
           }

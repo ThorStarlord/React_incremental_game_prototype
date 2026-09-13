@@ -124,7 +124,10 @@ CurrentSaveEnvelope {
 
 No second persistent `lastSaveTime` clock was added.
 
-Older standalone helpers still present in `GameLoopThunks.ts` that reference separate `gameState` / `lastSaveTime` local-storage values are legacy/non-authoritative for M21. The canonical Main Menu load path uses `loadSavedGameWithMigration`.
+The former standalone `GameLoopThunks.ts` helpers were removed because they
+referenced separate `gameState`, `gameLoopState`, and `lastSaveTime` storage
+values. The canonical Main Menu load path uses `loadSavedGameWithMigration`;
+all persistence must cross that versioned save-schema boundary.
 
 No save-schema version bump was required for M21 or for the later optional player routine-familiarity repair.
 

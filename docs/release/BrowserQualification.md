@@ -17,6 +17,9 @@ browser family and verifies, through visible UI only:
 - the game route mounts after New Game;
 - the game navigation landmark and at least one navigation control are visible;
 - an invalid route redirects to the entry route.
+- an empty load surface reports that no saves exist;
+- an invalid import remains safely inside the import flow instead of navigating
+  or mutating the session.
 
 The runner does not inspect Redux, localStorage, source maps, hidden debug state or
 content files. It is therefore safe to use as a player-facing smoke check, not as
@@ -44,3 +47,14 @@ The smoke runner does not establish full campaign completion, representative
 divergent histories, save/load recovery, combat/quest depth, Copy/delegation depth,
 screen-reader quality or player comprehension. Those remain required release
 evidence under `specification/Technical/ReleaseQualificationContract.md`.
+
+## Current hardening working-tree run
+
+This is a local verification of the uncommitted hardening work, not a release
+candidate artifact. It is recorded here to prevent it being mistaken for the
+immutable candidate evidence above.
+
+| Browser | Result | Coverage | Artifact |
+| --- | --- | --- | --- |
+| Chromium 153.0.8010.12 | PASS | 8 player-facing checks, including invalid import and empty load state | `.release-artifacts/browser-qualification-current/browser-qualification.md` |
+| Firefox 155.0 | BLOCKED | Page creation timeout on the Windows host | `.release-artifacts/browser-qualification-current-all/browser-qualification.md` |

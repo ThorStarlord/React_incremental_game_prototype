@@ -49,7 +49,9 @@ The saved timestamp comes from the canonical `createSave` / `persistCurrentSaveE
 
 No second persisted offline clock is introduced.
 
-Legacy standalone `GameLoopThunks.ts` helpers using `lastSaveTime` remain non-authoritative and are not consumed by M21.
+The former standalone `GameLoopThunks.ts` helpers were removed. M21 does not
+maintain a second persistence authority; the versioned Main Menu save path is
+the only supported load/save boundary.
 
 ### Frozen interval rule
 
