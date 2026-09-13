@@ -31,8 +31,8 @@ final-release approval and does not replace the candidate result record.
 - Import-cycle qualification: **PASS**.
 - Persistence-authority qualification: **PASS**.
 - Production build: **PASS**; existing CRA/Browserslist maintenance warnings remain.
-- Current-branch Chromium UI smoke: **PASS**, 8/8 checks at 1280×720; artifact
-  `.release-artifacts/rc1-remediation-chromium/browser-qualification.md`.
+- Current-branch Chromium UI smoke: **PASS**, 8/8 checks at 1280×720; the
+  latest artifact is recorded under `.release-artifacts/rc1-remediation-chromium-final/`.
 
 ## Gates deliberately not closed
 
