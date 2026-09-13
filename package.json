@@ -46,6 +46,7 @@
     "release:1.0:check": "node scripts/release-one-point-zero.js",
     "release:validate": "node scripts/release-validate.js",
     "release:evidence:validate": "node scripts/validate-release-evidence.js",
+    "release:manifest": "node scripts/create-release-manifest.js",
     "release:browser": "node scripts/release-browser-qualification.js",
     "lint:release": "node scripts/lint-release.js",
     "security:release": "node scripts/security-release.js",

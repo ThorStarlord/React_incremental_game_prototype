@@ -3,6 +3,8 @@ const { spawn, spawnSync, execFileSync } = require('node:child_process');
 
 const commands = [
   ['TypeScript', 'npx', ['tsc', '--noEmit']],
+  ['relative import cycle qualification', 'npm', ['run', 'architecture:cycles']],
+  ['persistence authority qualification', 'npm', ['run', 'architecture:persistence']],
   ['documentation authority', 'npm', ['run', 'docs:authority:validate']],
   ['content intelligence', 'npm', ['run', 'content:intelligence:validate']],
   ['production lint', 'npm', ['run', 'lint:release']],
@@ -11,6 +13,7 @@ const commands = [
   ['Alpha qualification', 'npm', ['run', 'alpha:validate']],
   ['full test suite', 'npm', ['test', '--', '--watchAll=false', '--runInBand']],
   ['production build', 'npm', ['run', 'build']],
+  ['production artifact manifest', 'npm', ['run', 'release:manifest']],
 ];
 
 function runCommand(label, command, args) {
