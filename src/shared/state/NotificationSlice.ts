@@ -3,7 +3,7 @@
  * @description Global (lightweight) notification system for transient UI messages.
  */
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../app/store';
+import type { RootState } from '../../app/store';
 
 export type NotificationLevel = 'success' | 'error' | 'info' | 'warning';
 

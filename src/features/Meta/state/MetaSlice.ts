@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CampaignCompletion, MetaState } from './MetaTypes';
-import { RootState } from '../../../app/store';
+import type { RootState } from '../../../app/store';
+import { APP_VERSION } from '../../../shared/config/releaseVersion';
 
 // FIXED: This initialState now correctly implements the full MetaState interface.
 const initialState: MetaState = {
@@ -8,7 +9,7 @@ const initialState: MetaState = {
   lastLoadedTimestamp: null,
   currentSaveId: null,
   isImported: false,
-  gameVersion: '1.0.0',
+  gameVersion: APP_VERSION,
   sessionStartTime: Date.now(),
   isInProximityToNPC: true,
   // Added missing required properties

@@ -36,7 +36,7 @@ import { selectHasSeenIntro } from '../../../Meta/state/MetaSlice';
 import { selectPlayerLocation } from '../../../Player/state/PlayerSelectors';
 import { isPlayerAtNpcWorldLocation } from '../../state/NPCWorldLocationDefinitions';
 import { NPC } from '../../state/NPCTypes';
-import { initializeNPCsThunk } from '../..';
+import { initializeNPCsThunk } from '../../state/NPCThunks';
 import { NPCListCard } from '../ui/NPCListCard';
 
 interface NPCListViewProps {

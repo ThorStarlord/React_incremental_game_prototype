@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Alert, Card, CardContent, Stack, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { selectPermanentTraits } from '../../Player/state/PlayerSelectors';
-import { targetKilled } from '../CombatSlice';
+import { targetKilled } from '../CombatEvents';
 import { getCombatEncounterByTargetId } from '../CombatEncounterDefinitions';
 import { getCombatEncounterLocationAvailability } from '../CombatEncounterAvailability';
 import CombatEncounterPanel from './CombatEncounterPanel';

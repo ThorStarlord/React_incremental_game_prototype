@@ -73,8 +73,8 @@ describe('post-M25 contextual causal legibility', () => {
       'utf8'
     );
 
-    expect(source).toContain('evaluateDialogueAvailabilityPresentation');
-    expect(source).toContain('if (!availability.available) return null');
+    expect(source).toContain('selectAvailableNPCDialogueChoices');
+    expect(source).not.toContain('evaluateDialogueAvailabilityPresentation');
     expect(source).toContain('Available because:');
     expect(source).not.toContain('Locked because:');
   });

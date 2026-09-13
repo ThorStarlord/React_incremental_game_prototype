@@ -40,36 +40,46 @@ export function useGameActions({
 }: GameActionsProps) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const currentState = useAppSelector(state => state);
   const copyIds = useAppSelector(state => Object.keys(state.copy.copies));
 
   const handleNewGame = useCallback(async () => {
-    // A fresh onboarding run must not inherit progression/resources from the
-    // previous in-memory game. Relationship evidence is reset by the Willow seed
-    // thunk; reset the other systems that can materially alter the vertical slice.
-    dispatch(resetPlayerState());
-    dispatch(resetEssence());
-    dispatch(resetInventory());
-    dispatch(resetQuestState());
-    dispatch(resetTraitsState());
-    dispatch(setSelectedNPCId(null));
-    copyIds.forEach(copyId => dispatch(removeCopy({ copyId })));
-    dispatch(setHasSeenIntro(false));
+    const previousState = currentState;
+    try {
+      // A fresh onboarding run must not inherit progression/resources from the
+      // previous in-memory game. Relationship evidence is reset by the Willow seed
+      // thunk; reset the other systems that can materially alter the vertical slice.
+      dispatch(resetPlayerState());
+      dispatch(resetEssence());
+      dispatch(resetInventory());
+      dispatch(resetQuestState());
+      dispatch(resetTraitsState());
+      dispatch(setSelectedNPCId(null));
+      copyIds.forEach(copyId => dispatch(removeCopy({ copyId })));
+      dispatch(setHasSeenIntro(false));
 
-    // Rebuild canonical quest definitions after clearing mutated quest progress,
-    // then seed the Willow-only relationship onboarding state.
-    await dispatch(initializeQuestsThunk());
-    await dispatch(newGameSeedNPCsThunk());
-    navigate('/game/npcs');
-  }, [navigate, dispatch, copyIds]);
+      // Rebuild canonical quest definitions after clearing mutated quest progress,
+      // then seed the Willow-only relationship onboarding state. Unwrap both
+      // thunks so a rejected initialization cannot leave a half-created session.
+      await dispatch(initializeQuestsThunk()).unwrap();
+      await dispatch(newGameSeedNPCsThunk()).unwrap();
+      navigate('/game/npcs');
+    } catch (error) {
+      dispatch(replaceState(previousState));
+      console.error('Failed to start a new game; previous state restored.', error);
+    }
+  }, [navigate, dispatch, copyIds, currentState]);
 
   const handleLoadGame = useCallback(async (saveId: string) => {
     console.log('Attempting to load game:', saveId);
+    let previousState: typeof currentState | null = null;
     try {
       // Persistent representation migration happens before Redux replacement.
       // A future/invalid schema fails here rather than masquerading as a
       // successful load with partially repaired runtime state.
       const loaded = await loadSavedGameWithMigration(saveId);
       if (loaded) {
+        previousState = currentState;
         dispatch(replaceState(loaded.state));
 
         // M21 settles exactly the explicit offline-safe allowlist from the
@@ -97,20 +107,13 @@ export function useGameActions({
         // migration. Relationship authoring is current content, and M9's bounded
         // legacy-depth compatibility mapping depends on those live definitions.
         // It must not fabricate persistent historical evidence.
-        try {
-          const migrationResult = await dispatch(
-            initializeRelationshipRuntimeThunk({ migrateLegacyProfiles: true })
-          ).unwrap();
-          if (migrationResult.migratedNpcIds.length > 0) {
-            console.info(
-              'Migrated legacy relationship profiles:',
-              migrationResult.migratedNpcIds.join(', ')
-            );
-          }
-        } catch (migrationError) {
-          console.error(
-            'Game loaded, but relationship runtime reconciliation could not complete:',
-            migrationError
+        const migrationResult = await dispatch(
+          initializeRelationshipRuntimeThunk({ migrateLegacyProfiles: true })
+        ).unwrap();
+        if (migrationResult.migratedNpcIds.length > 0) {
+          console.info(
+            'Migrated legacy relationship profiles:',
+            migrationResult.migratedNpcIds.join(', ')
           );
         }
 
@@ -121,9 +124,12 @@ export function useGameActions({
         console.error('Failed to load game data.');
       }
     } catch (error) {
+      if (previousState) {
+        dispatch(replaceState(previousState));
+      }
       console.error('Error loading or migrating game:', error);
     }
-  }, [navigate, closeDialog, dispatch]);
+  }, [navigate, closeDialog, dispatch, currentState]);
 
   const handleContinue = useCallback(() => {
     if (mostRecentSave) {

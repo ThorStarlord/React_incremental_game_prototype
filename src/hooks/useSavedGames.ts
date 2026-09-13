@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   deleteSavedGame,
   getSavedGames,
+  recoverSavedGameIndex,
   type SavedGame as SaveMetadata,
 } from '../shared/utils/saveUtils';
 
@@ -39,6 +40,10 @@ export function useSavedGames() {
   const loadSavedGames = useCallback(async () => {
     setIsLoading(true);
     try {
+      // Repair interrupted two-key saves before presenting the index. Valid
+      // orphan payloads become visible; stale metadata cannot point at a
+      // missing payload.
+      recoverSavedGameIndex();
       const games = getSavedGames()
         .map(toMenuSave)
         .sort((a, b) => b.timestamp - a.timestamp);

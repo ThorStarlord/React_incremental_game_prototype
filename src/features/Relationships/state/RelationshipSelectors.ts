@@ -368,11 +368,8 @@ export const selectRelationshipEssenceContributionByNpcId = createSelector(
 );
 
 export const selectAllRelationshipEssenceContributions = createSelector(
-  [selectRelationshipState, (state: RootState) => state.player.location],
-  (relationships, playerLocation) => Object.keys(relationships.progressionByNpc)
-    .map(npcId => selectRelationshipEssenceContributionByNpcId(
-      { relationships, player: { location: playerLocation } } as RootState,
-      npcId
-    ))
+  [selectRelationshipState, (state: RootState) => state],
+  (relationships, state) => Object.keys(relationships.progressionByNpc)
+    .map(npcId => selectRelationshipEssenceContributionByNpcId(state, npcId))
     .filter(contribution => contribution.enabled && contribution.effectiveRate > 0)
 );

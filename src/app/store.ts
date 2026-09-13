@@ -1,5 +1,6 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { AnyAction } from 'redux';
+import { isRuntimeGameState } from '../shared/persistence/PersistedGameState';
 
 // Import default exports (reducers) from each slice
 import gameLoopReducer from '../features/GameLoop/state/GameLoopSlice';
@@ -53,9 +54,12 @@ interface ReplaceStateAction {
 /**
  * Root reducer that handles the combined reducers and special actions
  */
-export const rootReducer = (state: RootState | undefined, action: PayloadAction<any>): RootState => {
-  if (action.type === 'meta/replaceState') {
+export const rootReducer = (state: RootState | undefined, action: AnyAction): RootState => {
+  if (action.type === 'meta/replaceState' && 'payload' in action) {
     const replaceAction = action as ReplaceStateAction;
+    if (!isRuntimeGameState(replaceAction.payload)) {
+      return state ?? combinedReducer(undefined, { type: '@@INIT' });
+    }
     return replaceAction.payload;
   }
   return combinedReducer(state, action);

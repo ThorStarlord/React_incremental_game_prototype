@@ -32,8 +32,8 @@ import {
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
 import {
   selectNPCById,
-  shareTraitWithNPCThunk,
-} from '../../../';
+} from '../../../state/NPCSelectors';
+import { shareTraitWithNPCThunk } from '../../../state/NPCThunks';
 import {
   selectPermanentTraits,
   selectEquippedTraits,

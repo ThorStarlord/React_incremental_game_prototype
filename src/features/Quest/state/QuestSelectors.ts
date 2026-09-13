@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../../../app/store';
+import type { RootState } from '../../../app/store';
 import { QuestState } from './QuestTypes';
 
 const selectQuestState = (state: RootState): QuestState => state.quest;

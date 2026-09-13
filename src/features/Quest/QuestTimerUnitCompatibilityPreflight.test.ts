@@ -7,6 +7,7 @@ import {
   createCurrentSaveEnvelope,
   migrateSavePayload,
 } from '../../shared/utils/saveSchema';
+import { rehydratePersistedGameState } from '../../shared/persistence/PersistedGameState';
 import { getTimeRemaining } from '../../shared/utils/time';
 
 const makeStore = () => configureStore({ reducer: rootReducer });
@@ -82,7 +83,10 @@ describe('Timed Quest unit and save-compatibility preflight', () => {
 
     const resumedStore = configureStore({
       reducer: rootReducer,
-      preloadedState: result.envelope.state,
+      preloadedState: rehydratePersistedGameState(
+        result.envelope.state,
+        rootReducer(undefined, { type: '@@INIT' })
+      ),
     });
     await resumedStore.dispatch(processQuestTimersThunk(500));
 

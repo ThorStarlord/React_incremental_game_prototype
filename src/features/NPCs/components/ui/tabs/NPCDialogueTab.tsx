@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -14,26 +14,16 @@ import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import {
   selectNPCById,
   selectNPCDialogueHistory,
-  processNPCInteractionThunk,
-} from '../../../';
-import type { DialogueEntry, DialogueNode } from '../../../state/NPCTypes';
-import { evaluateDialogueAvailabilityPresentation } from '../../../state/DialogueAvailabilityPresentation';
+  selectAvailableNPCDialogueChoices,
+} from '../../../state/NPCSelectors';
+import { processNPCInteractionThunk } from '../../../state/NPCThunks';
+import type { DialogueEntry } from '../../../state/NPCTypes';
+import type { NPCDialogueChoice } from '../../../state/NPCSelectors';
 
 interface NPCDialogueTabProps {
   npcId: string;
 }
 
-type DialogueResponse = { id: string; label: string };
-type Choice = {
-  id: string;
-  title: string;
-  responses: DialogueResponse[];
-  availabilityReasons: string[];
-};
-
-const EMPTY_DIALOGUE_NODES: Record<string, DialogueNode> = {};
-const EMPTY_RECORD = {} as Record<string, never>;
-const EMPTY_IDS: string[] = [];
 
 /**
  * NPCDialogueTab - Handles dialogue interactions with NPCs.
@@ -48,64 +38,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
 
   const npc = useAppSelector(state => selectNPCById(state, npcId));
   const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npcId));
-  const dialogueNodes = useAppSelector(state => state.npcs.dialogueNodes ?? EMPTY_DIALOGUE_NODES);
-  const recordedExperiences = useAppSelector(
-    state => state.relationships?.experiencesById ?? EMPTY_RECORD
+  const availableDialogueChoices = useAppSelector(state =>
+    selectAvailableNPCDialogueChoices(state, npcId)
   );
-  const routineFamiliarity = useAppSelector(
-    state => state.player.routineFamiliarity ?? EMPTY_RECORD
-  );
-  const knownFactIds = useAppSelector(
-    state => state.knowledge?.factIdsByNpcId?.[npcId] ?? EMPTY_IDS
-  );
-  const factionReputationByFactionId = useAppSelector(
-    state => state.factions?.reputationByFactionId ?? EMPTY_RECORD
-  );
-  const worldStateRegions = useAppSelector(
-    state => state.worldState?.regions ?? EMPTY_RECORD
-  );
-
-  const availableDialogueChoices: Choice[] = useMemo(() => {
-    if (!npc?.availableDialogues) return [];
-    const completedDialogues = Array.isArray(npc.completedDialogues) ? npc.completedDialogues : [];
-
-    return npc.availableDialogues
-      .map((dialogueId: string) => {
-        const node = (dialogueNodes as Record<string, DialogueNode>)[dialogueId];
-        if (!node) return null;
-
-        const availability = evaluateDialogueAvailabilityPresentation(node, {
-          completedDialogueIds: completedDialogues,
-          recordedExperiences,
-          routineFamiliarity,
-          knownFactIds,
-          factionReputationByFactionId,
-          worldStateRegions,
-        });
-        if (!availability.available) return null;
-
-        const responses = node.responses || {};
-        return {
-          id: node.id,
-          title: node.title || node.text || node.id,
-          responses: Object.entries(responses).map(([id, label]) => ({
-            id,
-            label: String(label),
-          })),
-          availabilityReasons: availability.availabilityReasons,
-        } as Choice;
-      })
-      .filter(Boolean) as Choice[];
-  }, [
-    npc?.availableDialogues,
-    npc?.completedDialogues,
-    dialogueNodes,
-    recordedExperiences,
-    routineFamiliarity,
-    knownFactIds,
-    factionReputationByFactionId,
-    worldStateRegions,
-  ]);
 
   if (!npc) {
     return (
@@ -134,7 +69,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
     }
   };
 
-  const handleDialogueChoice = async (choice: Choice, responseKey: string) => {
+  const handleDialogueChoice = async (choice: NPCDialogueChoice, responseKey: string) => {
     try {
       await dispatch(processNPCInteractionThunk({
         npcId,
@@ -191,7 +126,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2" gutterBottom>Conversation Topics</Typography>
           <Grid container spacing={1}>
-            {availableDialogueChoices.map((choice: Choice) => (
+            {availableDialogueChoices.map((choice: NPCDialogueChoice) => (
               <Grid item xs={12} key={choice.id}>
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
                   {choice.title}

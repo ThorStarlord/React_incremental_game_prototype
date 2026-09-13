@@ -4,7 +4,7 @@
  * dialogue, trading, and quest systems
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, AnyAction } from '@reduxjs/toolkit';
 import type {
   NPCState,
   NPC,
@@ -13,8 +13,6 @@ import type {
   RelationshipChangeEntry,
   NPCInteraction
 } from './NPCTypes';
-// Import the thunk to handle its lifecycle actions
-import { initializeNPCsThunk } from './NPCThunks';
 import { TRADING } from '../../../constants/gameConstants';
 
 const initialState: NPCState = {
@@ -235,13 +233,20 @@ const npcSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // RESTORED: This block handles the async lifecycle of initializeNPCsThunk.
+    // Keep lifecycle handling local to the slice without importing the thunk
+    // module back into this reducer. This prevents a runtime slice/thunk cycle.
     builder
-      .addCase(initializeNPCsThunk.pending, (state) => {
+      .addMatcher(
+        (action: AnyAction): action is AnyAction => action.type === 'npcs/initialize/pending',
+        (state) => {
         state.loading = true;
         state.error = null;
-      })
-    .addCase(initializeNPCsThunk.fulfilled, (state, action) => {
+        }
+      )
+      .addMatcher(
+        (action: AnyAction): action is AnyAction =>
+          action.type === 'npcs/initialize/fulfilled' && Boolean(action.payload),
+        (state, action) => {
         state.loading = false;
         state.npcs = action.payload;
         // Also populate the discovered list for developer convenience
@@ -263,11 +268,15 @@ const npcSlice = createSlice({
       // initialize lastRestockAt to now to avoid immediate restock burst
       if (!npc.lastRestockAt) npc.lastRestockAt = Date.now();
         }
-      })
-      .addCase(initializeNPCsThunk.rejected, (state, action) => {
+        }
+      )
+      .addMatcher(
+        (action: AnyAction): action is AnyAction => action.type === 'npcs/initialize/rejected',
+        (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to initialize NPCs';
-      });
+        state.error = action.payload || action.error?.message || 'Failed to initialize NPCs';
+        }
+      );
   },
 });
 

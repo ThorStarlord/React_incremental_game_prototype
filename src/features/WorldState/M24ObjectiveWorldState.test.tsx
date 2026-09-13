@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { rootReducer, replaceState } from '../../app/store';
+import { rehydratePersistedGameState } from '../../shared/persistence/PersistedGameState';
 import { setWorldStateCondition } from './state/WorldStateSlice';
 import {
   selectTradeFlow,
@@ -24,6 +25,7 @@ import {
 } from '../Relationships/state/RelationshipThunks';
 import { resetPlayerState } from '../Player/state/PlayerSlice';
 import { createSave, loadSavedGameWithMigration } from '../../shared/utils/saveUtils';
+import { migrateSavePayload } from '../../shared/utils/saveSchema';
 import { MERCHANT_DISTRICT_LOCATION_ID } from '../Exploration/LocationDefinitions';
 
 const CITY_WATCH = 'City Watch';
@@ -292,8 +294,16 @@ describe('M24 objective world state qualification', () => {
 
     const legacyLikeState: any = clone(resumed.getState());
     delete legacyLikeState.worldState;
+    const migratedLegacyState = migrateSavePayload({
+      version: '0.9.0',
+      timestamp: 1,
+      state: legacyLikeState,
+    });
     const legacyLikeStore = makeStore();
-    legacyLikeStore.dispatch(replaceState(legacyLikeState));
+    legacyLikeStore.dispatch(replaceState(rehydratePersistedGameState(
+      migratedLegacyState.envelope.state,
+      rootReducer(undefined, { type: '@@INIT' })
+    )));
     expect(selectWatchPresence(legacyLikeStore.getState(), MERCHANT_DISTRICT_LOCATION_ID)).toBe('normal');
     expect(selectTradeFlow(legacyLikeStore.getState(), MERCHANT_DISTRICT_LOCATION_ID)).toBe('normal');
     expect(legacyLikeStore.getState().relationships).toEqual(relationshipsBeforeSave);

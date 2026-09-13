@@ -90,7 +90,7 @@ export const loadGameThunk = createAsyncThunk<
 );
 
 export const importGameThunk = createAsyncThunk<
-  { success: boolean; saveId: string; importedState?: RootState },
+  { success: boolean; saveId: string },
   string,
   { state: RootState; rejectValue: string }
 >(
@@ -123,7 +123,6 @@ export const importGameThunk = createAsyncThunk<
       return {
         success: true,
         saveId: imported.saveId,
-        importedState: imported.migration.envelope.state,
       };
     } catch (error) {
       console.error('Error during import game thunk:', error);

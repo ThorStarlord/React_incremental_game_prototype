@@ -57,19 +57,11 @@ const replaceWithLegacyRelationshipState = (
     };
   }
 
-  // A pre-Relationships save has no relationship slice at all. replaceState is
-  // intentionally allowed to install that historical shape; the first normal
-  // Redux action will initialize missing additive reducers before migration.
-  store.dispatch(
-    replaceState({
-      ...current,
-      npcs: {
-        ...current.npcs,
-        npcs: legacyNpcs,
-      },
-      relationships: undefined as any,
-    } as RootState)
-  );
+  // Historical NPC fields are retained in the current runtime while the
+  // relationship slice remains an initialized empty domain. The migration
+  // thunk consumes those legacy fields without bypassing the typed replacement
+  // seam with an incomplete runtime state.
+  store.dispatch(setNPCs(legacyNpcs));
 };
 
 const originalFetch = global.fetch;

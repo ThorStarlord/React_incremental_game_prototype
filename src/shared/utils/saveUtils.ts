@@ -7,7 +7,8 @@
  * after migrated state is installed in Redux.
  */
 
-import type { RootState } from '../../app/store';
+import { rootReducer, type RootState } from '../../app/store';
+import { rehydratePersistedGameState } from '../persistence/PersistedGameState';
 import {
   CURRENT_SAVE_SCHEMA_VERSION,
   createCurrentSaveEnvelope,
@@ -38,6 +39,49 @@ export interface ImportedSaveResult {
   saveId: string;
   migration: SaveMigrationResult;
 }
+
+export type SaveStorageErrorCode =
+  | 'STORAGE_UNAVAILABLE'
+  | 'CORRUPT_PAYLOAD';
+
+/** Stable failure category for persistence failures outside schema migration. */
+export class SaveStorageError extends Error {
+  constructor(
+    message: string,
+    public readonly code: SaveStorageErrorCode,
+    public readonly saveId?: string,
+    options?: { cause?: unknown }
+  ) {
+    super(message);
+    this.name = 'SaveStorageError';
+    if (options?.cause !== undefined) {
+      Object.defineProperty(this, 'cause', {
+        configurable: true,
+        enumerable: false,
+        value: options.cause,
+      });
+    }
+  }
+}
+
+export interface SaveRecoveryResult {
+  adoptedSaveIds: string[];
+  removedMetadataIds: string[];
+  invalidPayloadIds: string[];
+}
+
+const isSavedGame = (value: unknown): value is SavedGame => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const candidate = value as Partial<SavedGame>;
+  return typeof candidate.id === 'string' && candidate.id.length > 0 &&
+    typeof candidate.name === 'string' &&
+    typeof candidate.timestamp === 'number' && Number.isFinite(candidate.timestamp) &&
+    typeof candidate.playerLevel === 'number' && Number.isFinite(candidate.playerLevel) &&
+    (candidate.screenshot === undefined || typeof candidate.screenshot === 'string') &&
+    (candidate.playtime === undefined || typeof candidate.playtime === 'number') &&
+    (candidate.version === undefined || typeof candidate.version === 'string') &&
+    (candidate.schemaVersion === undefined || typeof candidate.schemaVersion === 'number');
+};
 
 /**
  * Convert a JavaScript string to the binary-byte string expected by btoa.
@@ -88,11 +132,74 @@ export const decodeSavePayloadFromBase64 = (encoded: string): unknown => {
 export const getSavedGames = (): SavedGame[] => {
   try {
     const savedGamesString = localStorage.getItem('saved_games');
-    return savedGamesString ? JSON.parse(savedGamesString) : [];
+    if (!savedGamesString) return [];
+    const parsed = JSON.parse(savedGamesString) as unknown;
+    return Array.isArray(parsed) ? parsed.filter(isSavedGame) : [];
   } catch (error) {
     console.error('Failed to get saved games:', error);
     return [];
   }
+};
+
+const metadataForEnvelope = (
+  saveId: string,
+  envelope: CurrentSaveEnvelope
+): SavedGame => ({
+  id: saveId,
+  name: `Recovered Save ${new Date(envelope.timestamp).toLocaleTimeString()}`,
+  timestamp: envelope.timestamp,
+  playerLevel: 1,
+  playtime: envelope.state.player.totalPlaytime || 0,
+  version: envelope.gameVersion,
+  schemaVersion: envelope.schemaVersion,
+});
+
+/**
+ * Reconcile the two-key localStorage representation after an interrupted save.
+ * Valid payloads missing from the metadata index are adopted; metadata entries
+ * without a payload are removed. Invalid payloads are left untouched so the
+ * user can export or inspect them before deciding to delete them.
+ */
+export const recoverSavedGameIndex = (): SaveRecoveryResult => {
+  const existingMetadata = getSavedGames();
+  const metadataById = new Map(existingMetadata.map(save => [save.id, save]));
+  const payloadIds: string[] = [];
+  const invalidPayloadIds: string[] = [];
+
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (!key || !key.startsWith('game_save_')) continue;
+
+    const saveId = key.slice('game_save_'.length);
+    payloadIds.push(saveId);
+    if (metadataById.has(saveId)) continue;
+
+    try {
+      const rawPayload = localStorage.getItem(key);
+      const migration = migrateSavePayload(JSON.parse(rawPayload || ''));
+      metadataById.set(saveId, metadataForEnvelope(saveId, migration.envelope));
+    } catch {
+      invalidPayloadIds.push(saveId);
+    }
+  }
+
+  const payloadIdSet = new Set(payloadIds);
+  const removedMetadataIds = existingMetadata
+    .filter(save => !payloadIdSet.has(save.id))
+    .map(save => save.id);
+  removedMetadataIds.forEach(saveId => metadataById.delete(saveId));
+
+  const recoveredMetadata = Array.from(metadataById.values())
+    .sort((left, right) => right.timestamp - left.timestamp);
+  localStorage.setItem('saved_games', JSON.stringify(recoveredMetadata));
+
+  return {
+    adoptedSaveIds: recoveredMetadata
+      .filter(save => !existingMetadata.some(existing => existing.id === save.id))
+      .map(save => save.id),
+    removedMetadataIds,
+    invalidPayloadIds,
+  };
 };
 
 /**
@@ -105,14 +212,37 @@ export const getSavedGames = (): SavedGame[] => {
 export const loadSavedGameWithMigration = async (
   saveId: string
 ): Promise<LoadedSavedGame | null> => {
-  const savedGameString = localStorage.getItem(`game_save_${saveId}`);
+  let savedGameString: string | null;
+  try {
+    savedGameString = localStorage.getItem(`game_save_${saveId}`);
+  } catch (error) {
+    throw new SaveStorageError(
+      `Unable to access saved game ${saveId}.`,
+      'STORAGE_UNAVAILABLE',
+      saveId,
+      { cause: error }
+    );
+  }
   if (!savedGameString) return null;
 
-  const payload = JSON.parse(savedGameString) as unknown;
+  let payload: unknown;
+  try {
+    payload = JSON.parse(savedGameString) as unknown;
+  } catch (error) {
+    throw new SaveStorageError(
+      `Saved game ${saveId} contains invalid JSON.`,
+      'CORRUPT_PAYLOAD',
+      saveId,
+      { cause: error }
+    );
+  }
   const migration = migrateSavePayload(payload);
 
   return {
-    state: migration.envelope.state,
+    state: rehydratePersistedGameState(
+      migration.envelope.state,
+      rootReducer(undefined, { type: '@@INIT', payload: undefined })
+    ),
     envelope: migration.envelope,
     migration,
   };
@@ -155,7 +285,13 @@ const persistCurrentSaveEnvelope = (
   screenshot: string | undefined,
   now: number
 ): string => {
-  const saveId = `save_${now}`;
+  const baseSaveId = `save_${now}`;
+  let saveId = baseSaveId;
+  let suffix = 0;
+  while (localStorage.getItem(`game_save_${saveId}`) !== null) {
+    suffix += 1;
+    saveId = `${baseSaveId}_${suffix}`;
+  }
   const defaultPlayerName = 'Player';
   const defaultPlayerLevel = 1;
   const playtime = envelope.state.player.totalPlaytime || 0;
@@ -175,11 +311,24 @@ const persistCurrentSaveEnvelope = (
     schemaVersion: persistedEnvelope.schemaVersion,
   };
 
-  localStorage.setItem(`game_save_${saveId}`, JSON.stringify(persistedEnvelope));
+  const payloadKey = `game_save_${saveId}`;
+  const previousPayload = localStorage.getItem(payloadKey);
+  const previousMetadata = localStorage.getItem('saved_games');
+  try {
+    localStorage.setItem(payloadKey, JSON.stringify(persistedEnvelope));
 
-  const savedGames = getSavedGames();
-  savedGames.push(saveInfo);
-  localStorage.setItem('saved_games', JSON.stringify(savedGames));
+    const savedGames = getSavedGames();
+    savedGames.push(saveInfo);
+    localStorage.setItem('saved_games', JSON.stringify(savedGames));
+  } catch (error) {
+    // Best-effort rollback keeps a failed save from leaving an orphaned payload
+    // or metadata entry. The original error remains visible to createSave.
+    if (previousPayload === null) localStorage.removeItem(payloadKey);
+    else localStorage.setItem(payloadKey, previousPayload);
+    if (previousMetadata === null) localStorage.removeItem('saved_games');
+    else localStorage.setItem('saved_games', previousMetadata);
+    throw error;
+  }
 
   return saveId;
 };
@@ -271,7 +420,10 @@ export const importSaveFromFile = async (file: File): Promise<RootState | null> 
 
         const payload = JSON.parse(event.target.result as string) as unknown;
         const migration = migrateSavePayload(payload);
-        resolve(migration.envelope.state);
+        resolve(rehydratePersistedGameState(
+          migration.envelope.state,
+          rootReducer(undefined, { type: '@@INIT', payload: undefined })
+        ));
       } catch (error) {
         console.error('Failed to parse or migrate save file:', error);
         resolve(null);

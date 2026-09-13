@@ -5,6 +5,9 @@
 
 export type TraitDiscoveryMode = 'initial' | 'authored';
 
+export type TraitRequirementValue = number | string | boolean | string[];
+export type TraitRequirements = Readonly<Record<string, TraitRequirementValue>>;
+
 /**
  * Core trait interface
  */
@@ -15,7 +18,7 @@ export interface Trait {
   category: string;        // Grouping category (combat, physical, social, etc.)
   rarity: string;          // Trait rarity level (common, rare, epic, legendary, mythic)
   effects: TraitEffect[] | TraitEffectValues;  // Stat modifications
-  requirements?: Record<string, any>; // Acquisition requirements
+  requirements?: TraitRequirements; // Acquisition requirements
   essenceCost?: number;    // Acquisition cost for Resonance
   permanenceCost?: number; // Cost to make permanent (deprecated)
   source?: string;         // Acquisition source (NPC ID, quest, etc.)

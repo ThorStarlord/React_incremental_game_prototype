@@ -1,4 +1,5 @@
 import { rootReducer, type RootState } from '../../app/store';
+import { createPersistedGameState } from '../persistence/PersistedGameState';
 import {
   CURRENT_SAVE_SCHEMA_VERSION,
   LEGACY_SAVE_SCHEMA_VERSION,
@@ -36,7 +37,7 @@ describe('M10 save schema migration pipeline', () => {
     expect(result.sourceVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(result.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(result.appliedMigrations).toEqual([]);
-    expect(result.envelope.state).toEqual(state);
+    expect(result.envelope.state).toEqual(createPersistedGameState(state));
     expect(result.envelope).not.toBe(envelope);
   });
 
@@ -53,7 +54,7 @@ describe('M10 save schema migration pipeline', () => {
     expect(result.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1']);
     expect(result.envelope.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(result.envelope.state).toEqual(state);
+    expect(result.envelope.state).toEqual(createPersistedGameState(state));
     expect(legacy).toEqual(before);
   });
 
@@ -63,7 +64,7 @@ describe('M10 save schema migration pipeline', () => {
 
     expect(result.sourceVersion).toBe(LEGACY_SAVE_SCHEMA_VERSION);
     expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1']);
-    expect(result.envelope.state).toEqual(state);
+    expect(result.envelope.state).toEqual(createPersistedGameState(state));
     expect(result.envelope.timestamp).toBe(0);
   });
 

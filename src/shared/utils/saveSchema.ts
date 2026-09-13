@@ -1,4 +1,10 @@
-import type { RootState } from '../../app/store';
+import { rootReducer, type RootState } from '../../app/store';
+import {
+  createPersistedGameState,
+  isPersistedGameState,
+  type PersistedGameState,
+} from '../persistence/PersistedGameState';
+import { APP_VERSION } from '../config/releaseVersion';
 
 export const LEGACY_SAVE_SCHEMA_VERSION = 0;
 export const CURRENT_SAVE_SCHEMA_VERSION = 1;
@@ -25,7 +31,7 @@ export interface VersionedSaveEnvelope {
   schemaVersion: number;
   gameVersion: string;
   timestamp: number;
-  state: RootState;
+  state: PersistedGameState;
 }
 
 export interface CurrentSaveEnvelope extends VersionedSaveEnvelope {
@@ -57,7 +63,15 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isRootStateLike = (value: unknown): value is RootState => {
   if (!isRecord(value)) return false;
-  return isRecord(value.player) && isRecord(value.meta);
+  if (!isRecord(value.notifications)) return false;
+  const { notifications: _notifications, ...persistedCandidate } = value;
+  return isPersistedGameState(persistedCandidate);
+};
+
+const normalizePersistedState = (value: unknown): PersistedGameState | null => {
+  if (isPersistedGameState(value)) return cloneSerializable(value);
+  if (isRootStateLike(value)) return createPersistedGameState(value);
+  return null;
 };
 
 const cloneSerializable = <T>(value: T): T =>
@@ -71,7 +85,7 @@ const readGameVersion = (state: RootState, explicitVersion?: unknown): string =>
   const meta = state.meta as unknown as Record<string, unknown>;
   return typeof meta.gameVersion === 'string' && meta.gameVersion.length > 0
     ? meta.gameVersion
-    : '1.0.0';
+    : APP_VERSION;
 };
 
 export const detectSaveSchemaVersion = (payload: unknown): number => {
@@ -112,7 +126,23 @@ const normalizeLegacyPayload = (payload: unknown): VersionedSaveEnvelope => {
     ? payload.state
     : payload;
 
-  if (!isRootStateLike(wrappedState)) {
+  const legacyBaseline = rootReducer(undefined, { type: '@@INIT', payload: undefined });
+  const legacyState = isRecord(wrappedState) &&
+    isRecord(wrappedState.player) &&
+    isRecord(wrappedState.meta)
+    ? Object.keys(legacyBaseline).reduce<Record<string, unknown>>(
+        (merged, key) => {
+          const candidate = wrappedState[key];
+          merged[key] = isRecord(candidate)
+            ? candidate
+            : legacyBaseline[key as keyof RootState];
+          return merged;
+        },
+        {}
+      )
+    : null;
+  const persistedState = normalizePersistedState(legacyState);
+  if (!persistedState) {
     throw new SaveMigrationError(
       'Legacy save payload does not contain a recognizable game state.',
       'INVALID_SAVE',
@@ -128,9 +158,9 @@ const normalizeLegacyPayload = (payload: unknown): VersionedSaveEnvelope => {
 
   return {
     schemaVersion: LEGACY_SAVE_SCHEMA_VERSION,
-    gameVersion: readGameVersion(wrappedState, payload.version),
+    gameVersion: readGameVersion(legacyState as RootState, payload.version),
     timestamp,
-    state: cloneSerializable(wrappedState),
+    state: persistedState,
   };
 };
 
@@ -140,7 +170,8 @@ const normalizeVersionedEnvelope = (payload: unknown): VersionedSaveEnvelope => 
   }
 
   const schemaVersion = detectSaveSchemaVersion(payload);
-  if (!isRootStateLike(payload.state)) {
+  const persistedState = normalizePersistedState(payload.state);
+  if (!persistedState) {
     throw new SaveMigrationError(
       `Save schema v${schemaVersion} does not contain a recognizable game state.`,
       'INVALID_SAVE',
@@ -161,9 +192,9 @@ const normalizeVersionedEnvelope = (payload: unknown): VersionedSaveEnvelope => 
 
   return {
     schemaVersion,
-    gameVersion: readGameVersion(payload.state, payload.gameVersion),
+    gameVersion: readGameVersion(payload.state as RootState, payload.gameVersion),
     timestamp,
-    state: cloneSerializable(payload.state),
+    state: persistedState,
   };
 };
 
@@ -289,5 +320,5 @@ export const createCurrentSaveEnvelope = (
   schemaVersion: CURRENT_SAVE_SCHEMA_VERSION,
   gameVersion: readGameVersion(state),
   timestamp,
-  state: cloneSerializable(state),
+  state: createPersistedGameState(state),
 });

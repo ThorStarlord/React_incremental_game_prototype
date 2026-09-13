@@ -16,9 +16,8 @@ import { useMenuShortcuts } from './hooks/useMenuShortcuts';
 import { MainMenuTitle } from './components/MainMenuTitle';
 import { MainMenuButtonList } from './components/MainMenuButtonList';
 import { VersionFooter } from './components/VersionFooter';
+import { APP_VERSION } from '../../shared/config/releaseVersion';
 import { DialogsContainer } from './components/DialogsContainer';
-
-const APP_VERSION = '1.0.0';
 
 /**
  * MainMenu Component

@@ -7,6 +7,7 @@ import {
   createCurrentSaveEnvelope,
   migrateSavePayload,
 } from '../../shared/utils/saveSchema';
+import { rehydratePersistedGameState } from '../../shared/persistence/PersistedGameState';
 import { addQuest } from '../Quest/state/QuestSlice';
 import { processQuestTimersThunk } from '../Quest/state/QuestThunks';
 import { hasReachedQuestTimeLimit } from '../Quest/state/QuestTimerPrecision';
@@ -232,7 +233,10 @@ describe('Package 2 timed Quest precision semantics resolution', () => {
 
     const restoredStore = configureStore({
       reducer: rootReducer,
-      preloadedState: migration.envelope.state,
+      preloadedState: rehydratePersistedGameState(
+        migration.envelope.state,
+        rootReducer(undefined, { type: '@@INIT' })
+      ),
     });
     await restoredStore.dispatch(processQuestTimersThunk(100));
 

@@ -10,7 +10,8 @@ import {
   ButtonGroup
 } from '@mui/material';
 import { useAppDispatch } from '../../../../app/hooks';
-import { updateNpcAffinity, updateNPCConnectionDepthThunk } from '../../';
+import { updateNpcAffinity } from '../../state/NPCSlice';
+import { updateNPCConnectionDepthThunk } from '../../state/NPCThunks';
 import type { NPC } from '../../state/NPCTypes';
 
 /**

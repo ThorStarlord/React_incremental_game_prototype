@@ -121,7 +121,7 @@ export interface NPCPersonality {
  * NPC inventory interface.
  */
 export interface NPCInventory {
-  items: any[];
+  items: string[];
   currency: number;
 }
 
@@ -157,7 +157,7 @@ export interface NPCInteraction {
   npcId: string;
   startTime: number;
   type: InteractionType;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 /**

@@ -32,6 +32,7 @@ import {
   loadSavedGameWithMigration,
 } from '../../../shared/utils/saveUtils';
 import { migrateSavePayload } from '../../../shared/utils/saveSchema';
+import { rehydratePersistedGameState } from '../../../shared/persistence/PersistedGameState';
 
 const LYRA_ID = 'npc_lyra';
 const LYRA_QUEST_ID = 'quest_lyra_chrono_crypt_calibration';
@@ -382,7 +383,10 @@ describe('M11 Lyra production adversarial vertical slice', () => {
     expect(persistentMigration.sourceVersion).toBe(0);
     expect(persistentMigration.targetVersion).toBe(1);
 
-    store.dispatch(replaceState(persistentMigration.envelope.state));
+    store.dispatch(replaceState(rehydratePersistedGameState(
+      persistentMigration.envelope.state,
+      rootReducer(undefined, { type: '@@INIT' })
+    )));
     const reconciliation = await store
       .dispatch(initializeRelationshipRuntimeThunk({ migrateLegacyProfiles: true }))
       .unwrap();

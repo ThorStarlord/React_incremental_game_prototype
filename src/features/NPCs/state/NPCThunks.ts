@@ -5,7 +5,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
-import { updateEssenceGenerationRateThunk } from '../../Essence';
+import { updateEssenceGenerationRateThunk } from '../../Essence/state/EssenceThunks';
 import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints, markRoutineFamiliarity } from '../../Player/state/PlayerSlice';

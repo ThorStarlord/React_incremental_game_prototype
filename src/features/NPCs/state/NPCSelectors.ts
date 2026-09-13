@@ -9,8 +9,18 @@ import type { NPCState } from './NPCTypes';
 import type { Trait } from '../../Traits/state/TraitsTypes';
 import { selectTraits } from '../../Traits/state/TraitsSelectors';
 import { selectAllQuests } from '../../Quest/state/QuestSelectors';
+import { evaluateDialogueAvailabilityPresentation } from './DialogueAvailabilityPresentation';
+import type { DialogueNode } from './NPCTypes';
 
 const EMPTY_QUESTS = [] as const;
+const EMPTY_DIALOGUE_CHOICES: readonly NPCDialogueChoice[] = [];
+
+export interface NPCDialogueChoice {
+  id: string;
+  title: string;
+  responses: Array<{ id: string; label: string }>;
+  availabilityReasons: string[];
+}
 
 // Base selectors
 export const selectNPCState = (state: RootState): NPCState => state.npcs;
@@ -125,4 +135,60 @@ export const selectNPCAvailableQuestsById = createSelector(
       .map(questId => quests[questId])
       .filter(quest => quest !== undefined);
   }
+);
+
+/**
+ * Deep NPC-facing projection for dialogue surfaces. Callers do not need to
+ * know which domain owns prerequisite evidence; that composition is kept at
+ * the NPC selector seam.
+ */
+export const selectAvailableNPCDialogueChoices = createSelector(
+  [
+    selectNPCById,
+    (state: RootState) => state.npcs.dialogueNodes ?? {},
+    (state: RootState) => state.relationships?.experiencesById ?? {},
+    (state: RootState) => state.player.routineFamiliarity ?? {},
+    (state: RootState, _npcId: string) => state.knowledge?.factIdsByNpcId ?? {},
+    (state: RootState) => state.factions?.reputationByFactionId ?? {},
+    (state: RootState) => state.worldState?.regions ?? {},
+  ],
+  (
+    npc,
+    dialogueNodes,
+    recordedExperiences,
+    routineFamiliarity,
+    factIdsByNpcId,
+    factionReputationByFactionId,
+    worldStateRegions,
+  ): readonly NPCDialogueChoice[] => {
+    if (!npc?.availableDialogues?.length) return EMPTY_DIALOGUE_CHOICES;
+
+    const knownFactIds = factIdsByNpcId[npc.id] ?? [];
+    return npc.availableDialogues
+      .map(dialogueId => {
+        const node = (dialogueNodes as Record<string, DialogueNode>)[dialogueId];
+        if (!node) return null;
+
+        const availability = evaluateDialogueAvailabilityPresentation(node, {
+          completedDialogueIds: npc.completedDialogues ?? [],
+          recordedExperiences,
+          routineFamiliarity,
+          knownFactIds,
+          factionReputationByFactionId,
+          worldStateRegions,
+        });
+        if (!availability.available) return null;
+
+        return {
+          id: node.id,
+          title: node.title || node.text || node.id,
+          responses: Object.entries(node.responses || {}).map(([id, label]) => ({
+            id,
+            label: String(label),
+          })),
+          availabilityReasons: availability.availabilityReasons,
+        };
+      })
+      .filter((choice): choice is NPCDialogueChoice => choice !== null);
+  },
 );

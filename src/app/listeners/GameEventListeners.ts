@@ -1,9 +1,9 @@
 import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
-import { RootState } from '../store';
+import type { RootState } from '../store';
 import { addItem, removeItem } from '../../features/Inventory/state/InventorySlice';
 import { setLocation } from '../../features/Player/state/PlayerSlice';
 import { updateNpcLocation } from '../../features/NPCs/state/NPCSlice';
-import { targetKilled } from '../../features/Combat/CombatSlice';
+import { targetKilled } from '../../features/Combat/CombatEvents';
 import { failQuest, updateObjectiveProgress, patchObjectiveFields } from '../../features/Quest/state/QuestSlice';
 import { updateGenerationRate } from '../../features/Essence/state/EssenceSlice';
 import { calculateEssenceGenerationRate } from '../../features/Essence/utils/essenceRate';
@@ -91,8 +91,11 @@ gameEventListeners.startListening({
           listenerApi.dispatch(updateNpcLocation({ npcId, location: newLocation }));
 
           // Check if the destination is reached
-          const destination = objective.destination ?? objective.description.split(' to ')[1]; // prefer explicit field, fallback to legacy parse
-          if (destination && newLocation === destination) {
+          if (!objective.destination) {
+            listenerApi.dispatch(failQuest(quest.id));
+            continue;
+          }
+          if (newLocation === objective.destination) {
             listenerApi.dispatch(
               updateObjectiveProgress({
                 questId: quest.id,

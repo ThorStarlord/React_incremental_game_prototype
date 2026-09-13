@@ -1,4 +1,5 @@
 import { rootReducer, type RootState } from '../../app/store';
+import { createPersistedGameState } from '../persistence/PersistedGameState';
 import {
   createSave,
   createSaveFromPayload,
@@ -6,6 +7,8 @@ import {
   encodeSavePayloadToBase64,
   getSavedGames,
   loadSavedGameWithMigration,
+  recoverSavedGameIndex,
+  SaveStorageError,
 } from './saveUtils';
 import {
   CURRENT_SAVE_SCHEMA_VERSION,
@@ -13,6 +16,7 @@ import {
   SaveMigrationError,
   createCurrentSaveEnvelope,
 } from './saveSchema';
+import { APP_VERSION } from '../config/releaseVersion';
 
 const makeState = (): RootState =>
   rootReducer(undefined, { type: '@@INIT' } as any);
@@ -32,12 +36,13 @@ describe('M10 canonical save protocols', () => {
 
     const stored = JSON.parse(localStorage.getItem('game_save_save_1000') || '{}');
     expect(stored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(stored.state).toEqual(state);
+    expect(stored.state).toEqual(createPersistedGameState(state));
 
     const metadata = getSavedGames();
     expect(metadata).toHaveLength(1);
     expect(metadata[0].schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(metadata[0].id).toBe(saveId);
+    expect(metadata[0].version).toBe(APP_VERSION);
   });
 
   test('save-code base64 transport round-trips Unicode and ignores surrounding whitespace', () => {
@@ -80,7 +85,7 @@ describe('M10 canonical save protocols', () => {
 
     const stored = JSON.parse(localStorage.getItem(`game_save_${imported!.saveId}`) || '{}');
     expect(stored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(stored.state).toEqual(state);
+    expect(stored.state).toEqual(createPersistedGameState(state));
 
     const metadata = getSavedGames().find(save => save.id === imported!.saveId);
     expect(metadata?.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
@@ -129,5 +134,51 @@ describe('M10 canonical save protocols', () => {
       name: 'SaveMigrationError',
       code: 'FUTURE_SCHEMA',
     } as Partial<SaveMigrationError>);
+  });
+
+  test('rejects malformed save metadata instead of exposing it as a saved game', () => {
+    localStorage.setItem('saved_games', JSON.stringify([
+      { id: 'valid', name: 'Valid', timestamp: 1, playerLevel: 1 },
+      { id: 'invalid', name: 'Missing timestamp' },
+    ]));
+
+    expect(getSavedGames()).toEqual([
+      { id: 'valid', name: 'Valid', timestamp: 1, playerLevel: 1 },
+    ]);
+  });
+
+  test('allocates a distinct save id when the clock repeats', () => {
+    jest.spyOn(Date, 'now').mockReturnValue(1000);
+    const state = makeState();
+
+    expect(createSave(state, 'First')).toBe('save_1000');
+    expect(createSave(state, 'Second')).toBe('save_1000_1');
+    expect(getSavedGames().map(save => save.id)).toEqual(['save_1000', 'save_1000_1']);
+  });
+
+  test('classifies malformed JSON as a corrupt save instead of a generic parse failure', async () => {
+    localStorage.setItem('game_save_corrupt', '{not-json');
+
+    await expect(loadSavedGameWithMigration('corrupt')).rejects.toMatchObject({
+      name: 'SaveStorageError',
+      code: 'CORRUPT_PAYLOAD',
+      saveId: 'corrupt',
+    } as Partial<SaveStorageError>);
+  });
+
+  test('recovers valid orphan payloads and removes metadata without payloads', () => {
+    const state = makeState();
+    const envelope = createCurrentSaveEnvelope(state, 1234);
+    localStorage.setItem('game_save_orphan', JSON.stringify(envelope));
+    localStorage.setItem('saved_games', JSON.stringify([
+      { id: 'missing', name: 'Missing', timestamp: 1, playerLevel: 1 },
+    ]));
+
+    expect(recoverSavedGameIndex()).toEqual({
+      adoptedSaveIds: ['orphan'],
+      removedMetadataIds: ['missing'],
+      invalidPayloadIds: [],
+    });
+    expect(getSavedGames().map(save => save.id)).toEqual(['orphan']);
   });
 });

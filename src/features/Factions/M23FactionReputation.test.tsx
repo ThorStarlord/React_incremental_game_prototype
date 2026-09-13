@@ -19,6 +19,8 @@ import { addQuest } from '../Quest/state/QuestSlice';
 import { turnInQuestThunk } from '../Quest/state/QuestThunks';
 import { resetPlayerState } from '../Player/state/PlayerSlice';
 import { createSave, loadSavedGameWithMigration } from '../../shared/utils/saveUtils';
+import { migrateSavePayload } from '../../shared/utils/saveSchema';
+import { rehydratePersistedGameState } from '../../shared/persistence/PersistedGameState';
 
 const CITY_WATCH = 'City Watch';
 const MERCHANTS_GUILD = 'Merchants Guild';
@@ -245,8 +247,16 @@ describe('M23 faction reputation qualification', () => {
 
     const legacyLikeState: any = clone(resumed.getState());
     delete legacyLikeState.factions;
+    const migratedLegacyState = migrateSavePayload({
+      version: '0.9.0',
+      timestamp: 1,
+      state: legacyLikeState,
+    });
     const legacyLikeStore = makeStore();
-    legacyLikeStore.dispatch(replaceState(legacyLikeState));
+    legacyLikeStore.dispatch(replaceState(rehydratePersistedGameState(
+      migratedLegacyState.envelope.state,
+      rootReducer(undefined, { type: '@@INIT' })
+    )));
     expect(selectFactionReputation(legacyLikeStore.getState(), CITY_WATCH)).toBe(0);
     expect(selectFactionReputation(legacyLikeStore.getState(), MERCHANTS_GUILD)).toBe(0);
     expect(
