@@ -6,7 +6,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs, mergeNPCsPreservingExisting } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from '../../Player/state/PlayerSlice';
 import { TRADING } from '../../../constants/gameConstants';
@@ -113,6 +113,93 @@ export const initializeNPCsThunk = createAsyncThunk<
 export const discoverNPCThunk = createAsyncThunk(
   'npcs/discoverNPC',
   async (npcId: string) => npcId
+);
+
+/**
+ * GC-03 bounded campaign-cast expansion.
+ *
+ * Loads only requested authored NPC identities and merges them into the current
+ * save without replacing Willow or any other already-progressed NPC. The
+ * dialogue catalog/extensions are refreshed at the same time so this path is
+ * independently sufficient even if startup initialization was still in flight.
+ */
+export const unlockCampaignNpcsThunk = createAsyncThunk<
+  string[],
+  readonly string[],
+  { rejectValue: string }
+>(
+  'npcs/unlockCampaignNpcs',
+  async (npcIds, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await fetch('/data/npcs.json');
+      if (!response.ok) throw new Error('Failed to fetch NPC data');
+      const catalog: Record<string, NPC> = await response.json();
+
+      let dialogueNodes: Record<string, any> = {};
+      try {
+        const dialogueResponse = await fetch('/data/dialogues.json');
+        if (dialogueResponse.ok) dialogueNodes = await dialogueResponse.json();
+      } catch {}
+
+      for (const extensionUrl of [
+        '/data/m24-world-state-content.json',
+        '/data/m25-chapter-content.json',
+      ] as const) {
+        try {
+          const extensionResponse = await fetch(extensionUrl);
+          if (!extensionResponse.ok) continue;
+          const extension = await extensionResponse.json();
+          const npcDialogueIds = extension?.npcDialogueIds && typeof extension.npcDialogueIds === 'object'
+            ? extension.npcDialogueIds as Record<string, unknown>
+            : {};
+
+          for (const [npcId, rawDialogueIds] of Object.entries(npcDialogueIds)) {
+            const npc = catalog[npcId];
+            if (!npc || !Array.isArray(rawDialogueIds)) continue;
+            const dialogueIds = rawDialogueIds.filter(
+              (id): id is string => typeof id === 'string' && id.length > 0
+            );
+            npc.availableDialogues = Array.from(new Set([
+              ...(npc.availableDialogues ?? []),
+              ...dialogueIds,
+            ]));
+          }
+
+          if (extension?.dialogues && typeof extension.dialogues === 'object') {
+            dialogueNodes = { ...dialogueNodes, ...extension.dialogues };
+          }
+        } catch {}
+      }
+
+      const unlocked = Object.fromEntries(
+        npcIds
+          .map(npcId => [npcId, catalog[npcId]] as const)
+          .filter((entry): entry is readonly [string, NPC] => Boolean(entry[1]))
+          .map(([npcId, npc]) => [
+            npcId,
+            {
+              ...npc,
+              isDiscovered: true,
+              discoveredAt: npc.discoveredAt || Date.now(),
+            },
+          ])
+      );
+
+      if (Object.keys(unlocked).length !== npcIds.length) {
+        const missing = npcIds.filter(npcId => !unlocked[npcId]);
+        throw new Error(`Missing Campaign One NPC definitions: ${missing.join(', ')}`);
+      }
+
+      dispatch(mergeNPCsPreservingExisting(unlocked));
+      if (Object.keys(dialogueNodes).length > 0) {
+        dispatch(setDialogueNodes(dialogueNodes));
+      }
+      return Object.keys(unlocked);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return rejectWithValue(message);
+    }
+  }
 );
 
 /**
