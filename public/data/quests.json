@@ -727,5 +727,149 @@
     ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
+  },
+  "quest_gc10_telluric_echo_distributed": {
+    "id": "quest_gc10_telluric_echo_distributed",
+    "title": "Telluric Echo — Distributed Dissipation",
+    "description": "Carry the distributed counterphase into the Whispering Woods and dissipate the Echo across the broad verified network.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Enter the Whispering Woods and confront the Telluric Echo with the committed counterphase plan",
+        "type": "REACH_LOCATION",
+        "target": "location_whispering_woods",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "resolve_distributed_dissipation",
+        "label": "Dissipate Through the Distributed Network",
+        "description": "Use the broad verified preparation as the counterphase carrier. This remains legal without any optional two-Trait specialization.",
+        "relationshipExperienceId": "lyra_gc10_exp_finale_distributed",
+        "rewards": [],
+        "logMessage": "The prepared network catches the counterphase across many verified response points and dissipates the Echo without requiring a single golden capability."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc10_telluric_echo_structural": {
+    "id": "quest_gc10_telluric_echo_structural",
+    "title": "Telluric Echo — Structural Redirection",
+    "description": "Carry the structural counterphase into the Whispering Woods and redirect the Echo through the load-bearing paths prepared to hold it.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Enter the Whispering Woods and confront the Telluric Echo with the committed counterphase plan",
+        "type": "REACH_LOCATION",
+        "target": "location_whispering_woods",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "resolve_structural_redirection",
+        "label": "Redirect Through the Load-Bearing Paths",
+        "description": "Use Willow's Wisdom and Constraint Sense to route the counterphase through the structures that can actually carry it.",
+        "relationshipExperienceId": "lyra_gc10_exp_finale_structural",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You redirect the Echo through the load-bearing network paths, letting the counterphase travel where the system can actually sustain it."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc10_telluric_echo_diagnostic": {
+    "id": "quest_gc10_telluric_echo_diagnostic",
+    "title": "Telluric Echo — Diagnostic Disruption",
+    "description": "Carry the diagnostic counterphase into the Whispering Woods and break the Echo by forcing its predicted phase into contradiction.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Enter the Whispering Woods and confront the Telluric Echo with the committed counterphase plan",
+        "type": "REACH_LOCATION",
+        "target": "location_whispering_woods",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "resolve_diagnostic_disruption",
+        "label": "Disrupt the Predicted Phase",
+        "description": "Use Scholarly Insight and Adversarial Calibration to predict the Echo's next move and make that prediction fail.",
+        "relationshipExperienceId": "lyra_gc10_exp_finale_diagnostic",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "The network catches the contradiction in the Echo's next phase and disrupts the repeating structure before it can reassert itself."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc10_telluric_echo_fortified": {
+    "id": "quest_gc10_telluric_echo_fortified",
+    "title": "Telluric Echo — Fortified Containment",
+    "description": "Carry the Watch-supported counterphase into the Whispering Woods and hold the Echo inside the bounded response network.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Enter the Whispering Woods and confront the Telluric Echo with the committed counterphase plan",
+        "type": "REACH_LOCATION",
+        "target": "location_whispering_woods",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "resolve_fortified_containment",
+        "label": "Contain Through the Fortified Network",
+        "description": "Use verified counterphase procedures backed by legally available Watch logistics. No optional two-Trait pair is mandatory.",
+        "relationshipExperienceId": "lyra_gc10_exp_finale_fortified",
+        "rewards": [],
+        "logMessage": "The Watch-supported network holds the counterphase long enough to contain the Echo without collapsing institutional authority into personal loyalty."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   }
 }
