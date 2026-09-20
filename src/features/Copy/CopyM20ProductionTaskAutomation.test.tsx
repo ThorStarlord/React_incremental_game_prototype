@@ -318,13 +318,15 @@ describe('M20 production Copy task automation qualification', () => {
     expect(screen.getByText('Production Delegation')).toBeInTheDocument();
     expect(screen.getByText('Forge Assistance')).toBeInTheDocument();
     expect(screen.getByText('Resonance Calibration')).toBeInTheDocument();
+    expect(screen.getByText('Archive Verification')).toBeInTheDocument();
     expect(screen.getByText(/Narrative and irreversible decisions remain under player authority/)).toBeInTheDocument();
     expect(screen.queryByText('Start timed task:')).not.toBeInTheDocument();
 
     const assignButtons = screen.getAllByRole('button', { name: 'Assign' });
-    expect(assignButtons).toHaveLength(2);
+    expect(assignButtons).toHaveLength(3);
     expect(assignButtons[0]).toBeEnabled();
     expect(assignButtons[1]).toBeDisabled();
+    expect(assignButtons[2]).toBeDisabled();
 
     fireEvent.click(assignButtons[0]);
     await waitFor(() => {
