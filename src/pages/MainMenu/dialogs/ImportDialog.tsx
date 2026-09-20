@@ -5,6 +5,7 @@ interface ImportDialogProps {
   importCode: string;
   setImportCode: (code: string) => void;
   isLoading: boolean;
+  error?: string | null;
   onImport: () => void;
   onClose: () => void;
 }
@@ -14,6 +15,7 @@ export function ImportDialog({
   importCode,
   setImportCode,
   isLoading,
+  error,
   onImport,
   onClose
 }: ImportDialogProps) {
@@ -49,6 +51,12 @@ export function ImportDialog({
           placeholder="Paste your import code here..."
         />
         
+        {error && (
+          <p role="alert" className="mb-3 text-sm text-red-700">
+            {error}
+          </p>
+        )}
+
         <div className="flex justify-end space-x-3 mt-4">
           <button
             onClick={onClose}
