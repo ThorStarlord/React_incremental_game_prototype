@@ -1,10 +1,11 @@
 # Repository Status — Playable Pre-Alpha / Campaign One Completion
 
-**Status date:** 2026-09-12
-**Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
+**Status date:** 2026-09-11  
+**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
 **Current maturity:** `PLAYABLE PRE-ALPHA`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
+**GC-01:** `COMPLETE / INTEGRATED`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Active program:** Campaign One / 1.0 Game Completion
 
@@ -27,34 +28,7 @@ Read in this order:
 
 The project has passed proof-of-concept, technical-prototype and bounded vertical-slice stages. It has a runnable game shell, persistent saves/import-export, deterministic time, NPC/dialogue, quests, authored travel, combat, Relationship/Memory progression, Traits/Essence, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progress, three heterogeneous chapter-scale projections, and a qualified complete two-route chapter.
 
-It is therefore best described as a **Playable Pre-Alpha** with a deterministic
-production-action campaign qualification pass. Ordinary fresh-UI playthrough,
-human validation, browser evidence, polish and release qualification remain
-unfinished.
-
-## Deterministic evidence reconciliation
-
-As of this status date:
-
-- `npm run alpha:validate` is the deterministic implementation gate;
-- `CampaignOneWholeGameQualification.test.ts` executes both legal Campaign One
-  histories through production dialogue effects and checks early/mid/pre-finale/
-  post-complete save boundaries, import/export and invalid-import rejection;
-- content intelligence reports 0 warnings and 0 errors;
-- `npm run lint:release` passes; normal repository linting may still show legacy
-  warnings outside the release lint scope;
-- `npm run release:browser` provides Chromium/Firefox fresh-context and keyboard
-  smoke evidence;
-- `npm run release:evidence:validate` validates that the checked-in candidate
-  record names an existing immutable commit and explicitly records pending
-  external evidence;
-- the worktree is not an immutable release candidate until it is committed and
-  rerun under the exact-head release procedure.
-
-The relationship selector seam is now memoized and covered by a focused
-referential-stability regression test. This removes repeated derived-object
-recomputation from unchanged Redux inputs without changing relationship rules
-or introducing a second authority.
+It is therefore best described as a **Playable Pre-Alpha**: a real rudimentary game whose complete campaign, content breadth, human validation, polish and release qualification remain unfinished.
 
 ## Product direction
 
@@ -86,6 +60,20 @@ M26 adds read-only provenance for relationship-derived capabilities and mastered
 
 M26 is the final numbered milestone in the previous sequence. **There is no automatic M27.**
 
+## GC-01 closure
+
+PR #117 is integrated:
+
+```text
+qualified candidate: caabc1581316dab33f7eeb98dac9b32072ec57df
+Build Validation #343 / run 34629859287: PASS
+merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
+```
+
+GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
+
+The next unsatisfied completion-program responsibility is GC-02 Prologue / onboarding.
+
 ## Finished-game target
 
 Campaign One / 1.0 is now explicitly bounded by [`GameCompletionDefinition.md`](specification/GameCompletionDefinition.md):
@@ -97,16 +85,16 @@ Campaign One ends on the isolated planet with the Telluric Echo finale and a sta
 ## Campaign spine
 
 ```text
-Prologue                                      [integrated]
+Prologue                                      [missing]
 Chapter 1 — Merchant District Crisis          [integrated]
 Chapter 2 — Archive Inquiry                   [integrated]
 Chapter 3 — Enemies in Phase                  [integrated]
-Chapter 4 — Lattice Under Strain              [authored / automated qualification passed]
-Chapter 5 — The Chrono-Crypt                  [authored / automated qualification passed]
-Chapter 6 — Network Under Pressure            [authored / automated qualification passed]
-Chapter 7 — Counterphase                      [authored / automated qualification passed]
-Finale — The Telluric Echo                    [authored / automated qualification passed]
-Epilogue — Aftermath / Conditional Reprieve   [authored / automated qualification passed]
+Chapter 4 — Lattice Under Strain              [missing]
+Chapter 5 — The Chrono-Crypt                  [missing]
+Chapter 6 — Network Under Pressure            [missing]
+Chapter 7 — Counterphase                      [missing]
+Finale — The Telluric Echo                    [missing]
+Epilogue — Aftermath / Conditional Reprieve   [missing]
 ```
 
 Chapters 8+, interplanetary continuation and New Game+ are outside the 1.0 critical path unless authority is explicitly revised.
@@ -139,19 +127,19 @@ Before 1.0, the campaign must support at least:
 ```text
 [x] GC-00 M26 closure + completion-program authority
 [x] GC-01 1.0 player-surface scope cleanup
-[x] GC-02 Prologue / onboarding implementation
-[x] GC-03 Chapters 1–3 campaign integration
-[x] GC-04 Buildcraft breadth
-[x] GC-05 Earned-delegation breadth
-[x] GC-06 Chapter 4 — Lattice Under Strain
-[x] GC-07 Chapter 5 — The Chrono-Crypt
-[x] GC-08 Chapter 6 — Network Under Pressure
-[x] GC-09 Chapter 7 — Counterphase
-[x] GC-10 Finale + Epilogue implementation
-[ ] GC-11 Alpha qualification — normal fresh-UI run still pending
-[x] GC-12 Content Alpha deterministic authoring qualification
-[ ] GC-13 Beta — human evidence required
-[ ] GC-14 Release Candidate / 1.0 — exact immutable candidate required
+[ ] GC-02 Prologue / onboarding
+[ ] GC-03 Chapters 1–3 campaign integration
+[ ] GC-04 Buildcraft breadth
+[ ] GC-05 Earned-delegation breadth
+[ ] GC-06 Chapter 4 — Lattice Under Strain
+[ ] GC-07 Chapter 5 — The Chrono-Crypt
+[ ] GC-08 Chapter 6 — Network Under Pressure
+[ ] GC-09 Chapter 7 — Counterphase
+[ ] GC-10 Finale + Epilogue
+[ ] GC-11 Alpha qualification
+[ ] GC-12 Content Alpha completion
+[ ] GC-13 Beta
+[ ] GC-14 Release Candidate / 1.0
 ```
 
 GC-04/GC-05 may be satisfied within chapter packages where that is the natural content-driven implementation; package numbering must not force redundant feature work.
@@ -182,7 +170,7 @@ Under the completion program this is not a blanket pre-Alpha development freeze.
 
 ## Do not restart by inertia
 
-M4–M26, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
+M4–M26, GC-01, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
 
 ## Governing implementation rule
 

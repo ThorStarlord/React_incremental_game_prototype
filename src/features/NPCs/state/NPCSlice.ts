@@ -46,6 +46,26 @@ const npcSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    /**
+     * Add newly reachable authored NPCs without overwriting progress on NPCs
+     * already present in the current save. GC-03 uses this after the Willow-only
+     * prologue so campaign expansion never reinitializes Elder Willow.
+     */
+    mergeNPCsPreservingExisting: (state, action: PayloadAction<Record<string, NPC>>) => {
+      for (const [npcId, incoming] of Object.entries(action.payload)) {
+        if (state.npcs[npcId]) continue;
+        state.npcs[npcId] = {
+          ...incoming,
+          isDiscovered: true,
+          discoveredAt: incoming.discoveredAt || Date.now(),
+        };
+      }
+      state.discoveredNPCs = Object.values(state.npcs)
+        .filter(npc => npc.isDiscovered)
+        .map(npc => npc.id);
+      state.loading = false;
+      state.error = null;
+    },
     updateNpcAffinity: (state, action: PayloadAction<{ npcId: string; change: number; reason?: string }>) => {
       const { npcId, change } = action.payload;
       const npc = state.npcs[npcId];
@@ -284,6 +304,7 @@ export const {
   setLoading,
   setError,
   setNPCs,
+  mergeNPCsPreservingExisting,
   updateNpcAffinity,
   setAffinity,
   increaseConnectionDepth,

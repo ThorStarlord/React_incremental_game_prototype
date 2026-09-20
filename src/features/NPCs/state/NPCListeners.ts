@@ -5,7 +5,9 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import { unequipTrait, equipTrait, addPermanentTrait } from '../../Player/state/PlayerSlice';
-import { setNPCSharedTraitInSlot } from './NPCSlice';
+import { markDialogueCompleted, setNPCSharedTraitInSlot } from './NPCSlice';
+import { recordRelationshipExperience } from '../../Relationships/state/RelationshipSlice';
+import { unlockCampaignNpcsThunk } from './NPCThunks';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 
 export const npcListeners = createListenerMiddleware<RootState>();
@@ -79,3 +81,46 @@ npcListeners.startListening({
 });
 
 export default npcListeners;
+
+
+const GC03_CHAPTER_ONE_NPCS = [
+  'npc_blacksmith_gronk',
+  'npc_rogue_silas',
+  'npc_captain_valerius',
+] as const;
+const GC03_CHAPTER_TWO_NPCS = ['npc_scholar_elara'] as const;
+const GC03_CHAPTER_THREE_NPCS = ['npc_rival_lyra'] as const;
+
+const GC03_FIRST_LESSON = 'willow_exp_first_lesson';
+const GC03_CHAPTER_ONE_CONCLUSIONS = new Set([
+  'valerius_m25_public_order_conclusion',
+  'gronk_m25_quiet_network_conclusion',
+]);
+const GC03_ARCHIVE_CONCLUSION = 'elara_exp_independent_verification';
+
+/**
+ * Expand the visible Campaign One cast only when the prior authored unit has
+ * produced its canonical completion evidence. These listeners unlock content;
+ * they do not create chapter completion state.
+ */
+npcListeners.startListening({
+  actionCreator: recordRelationshipExperience,
+  effect: async (action, api) => {
+    if (action.payload.id === GC03_FIRST_LESSON) {
+      await api.dispatch(unlockCampaignNpcsThunk(GC03_CHAPTER_ONE_NPCS));
+      return;
+    }
+
+    if (action.payload.id === GC03_ARCHIVE_CONCLUSION) {
+      await api.dispatch(unlockCampaignNpcsThunk(GC03_CHAPTER_THREE_NPCS));
+    }
+  },
+});
+
+npcListeners.startListening({
+  actionCreator: markDialogueCompleted,
+  effect: async (action, api) => {
+    if (!GC03_CHAPTER_ONE_CONCLUSIONS.has(action.payload.dialogueId)) return;
+    await api.dispatch(unlockCampaignNpcsThunk(GC03_CHAPTER_TWO_NPCS));
+  },
+});

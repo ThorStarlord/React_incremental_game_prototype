@@ -3,7 +3,7 @@
 This file routes readers to the current product, completion, technical and domain authorities. It does not duplicate every historical milestone narrative.
 
 **Current maturity:** PLAYABLE PRE-ALPHA  
-**Integrated implementation baseline:** `7f306f3b6a69a27c250c1986df976cc518119821`  
+**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
 **Human Product Review:** issue #109 OPEN / UNPROVEN
 
 ## Authority chain
@@ -86,6 +86,27 @@ The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative ref
 - [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for GC-00→GC-14 and the dependency path to 1.0.
 
 There is no automatic M27. Every active package must close a named 1.0 completion requirement or a demonstrated blocker to one.
+
+### Integrated GC-01 result
+
+- [`Technical/GC01PlayerSurfaceScopeCleanupResult.md`](Technical/GC01PlayerSurfaceScopeCleanupResult.md) — **CURRENT AUTHORITY, INTEGRATED** for the first Campaign One completion package after the program transition.
+
+GC-01 removes cut/deferred/duplicate-save placeholders from primary 1.0 player navigation while preserving compatibility IDs and canonical Main Menu persistence authority.
+
+```text
+qualified candidate: caabc1581316dab33f7eeb98dac9b32072ec57df
+Build Validation:    #343 / run 34629859287 / PASS
+PR:                  #117 / merged
+merge commit:        ff829ce6ee4da8a693adfb783fe843775403326d
+```
+
+Focused command:
+
+```bash
+npm run gc01:validate
+```
+
+The next unsatisfied completion responsibility is GC-02 Prologue / onboarding.
 
 ### Maturity gates
 
@@ -260,6 +281,7 @@ Current important commands include:
 
 ```bash
 npm run docs:authority:validate
+npm run gc01:validate
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate

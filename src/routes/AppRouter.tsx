@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom'; // Removed BrowserRouter as Router
+import { Routes, Route, Navigate } from 'react-router-dom';
 import MainMenu from '../pages/MainMenu';
 import { GameLayout } from '../layout/components/GameLayout';
 import NPCsPage from '../pages/NPCsPage';
@@ -14,27 +14,28 @@ import SettingsPage from '../pages/SettingsPage';
 import DebugPage from '../pages/DebugPage';
 
 /**
- * Main application router component
- * Handles routing between MainMenu and the game interface
+ * Main application router component.
+ *
+ * Campaign One exposes only implemented 1.0 player surfaces. Historical
+ * placeholder routes for Skills, Inventory, Crafting, and duplicate save
+ * management are intentionally absent; direct legacy URLs fail closed to the
+ * game dashboard rather than advertising deferred/cut systems.
  */
 export const AppRouter: React.FC = () => {
   return (
-    // <Router> removed
     <Routes>
-      {/* Main Menu Route - Standalone */}
+      {/* Main Menu Route - standalone and canonical save/load/import-export surface. */}
       <Route path="/" element={<MainMenu />} />
       <Route path="/menu" element={<MainMenu />} />
-      
-      {/* Game Routes - Use GameLayout for all game-related paths */}
+
+      {/* Game Routes - use GameLayout for all game-related paths. */}
       <Route path="/game" element={<GameLayout />}>
-        {/* Default route for /game -> /game/dashboard */}
         <Route index element={<Navigate to="dashboard" replace />} />
 
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="character" element={<CharacterPage />} />
         <Route path="traits" element={<TraitsPage />} />
-        
-        {/* Nested route for NPCs to handle list and detail views */}
+
         <Route path="npcs" element={<NPCsPage />}>
           <Route path=":npcId" element={<NPCPanelContainer />} />
         </Route>
@@ -44,11 +45,12 @@ export const AppRouter: React.FC = () => {
         <Route path="essence" element={<EssencePage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="debug" element={<DebugPage />} />
+
+        {/* Cut/deferred or otherwise unknown legacy game URLs return safely to a real surface. */}
+        <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Route>
-      
-      {/* Default redirect to main menu */}
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-    // </Router> removed
   );
 };
