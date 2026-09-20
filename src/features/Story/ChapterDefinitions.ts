@@ -228,6 +228,51 @@ export const CHAPTER_DEFINITIONS = [
       },
     ],
   },
+  {
+    id: 'counterphase',
+    title: 'Counterphase',
+    centerOfGravity: 'causal finale preparation, profile-specific action, and explicit irreversible commitment',
+    description:
+      'The player turns the chosen network posture into a finale plan through authored preparation and one explicit Lyra commitment. Canonical history stays legible; no readiness score replaces it.',
+    routes: [
+      {
+        id: 'distributed',
+        label: 'Distributed Counterphase',
+        summary: 'Prepare and manually commit the broad verified finale plan without requiring every optional capability.',
+        requiredExperienceIds: [
+          'lyra_gc09_exp_prepare_distributed',
+          'lyra_gc09_exp_commit_distributed',
+        ],
+      },
+      {
+        id: 'structural',
+        label: 'Structural Counterphase',
+        summary: 'Prepare and commit the load-path finale plan backed by Willow\'s Wisdom and Constraint Sense.',
+        requiredExperienceIds: [
+          'lyra_gc09_exp_prepare_structural',
+          'lyra_gc09_exp_commit_structural',
+        ],
+      },
+      {
+        id: 'diagnostic',
+        label: 'Diagnostic Counterphase',
+        summary: 'Prepare and commit the prediction-first finale plan backed by Scholarly Insight and Adversarial Calibration.',
+        requiredExperienceIds: [
+          'lyra_gc09_exp_prepare_diagnostic',
+          'lyra_gc09_exp_commit_diagnostic',
+        ],
+      },
+      {
+        id: 'fortified',
+        label: 'Fortified Counterphase',
+        summary: 'Prepare and commit the Watch-supported finale plan while preserving Faction standing as independent evidence.',
+        requiredExperienceIds: [
+          'lyra_gc09_exp_prepare_fortified',
+          'lyra_gc09_exp_commit_fortified',
+        ],
+      },
+    ],
+  },
 ] as const satisfies readonly ChapterDefinitionShape[];
 
 /**
