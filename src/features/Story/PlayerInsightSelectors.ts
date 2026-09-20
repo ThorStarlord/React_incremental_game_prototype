@@ -1,4 +1,8 @@
+import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
+import { selectFactionReputation } from '../Factions/state/FactionSelectors';
+import { selectNetworkPosture } from '../WorldState/state/WorldStateSelectors';
+import type { NetworkPosture } from '../WorldState/state/WorldStateTypes';
 import { COPY_PRODUCTION_TASKS } from '../Copy/CopyTaskDefinitions';
 import type {
   RoutineFamiliarityId,
@@ -82,6 +86,12 @@ export interface MasteredRoutineView {
   source: RoutineFamiliaritySource;
   sourceLabel: string;
   learnedAt: number;
+}
+
+export interface CounterphasePreparationExplanation {
+  profile: NetworkPosture;
+  title: string;
+  reasons: string[];
 }
 
 const npcName = (state: RootState, npcId: string): string =>
@@ -304,3 +314,86 @@ export const selectMasteredRoutines = (state: RootState): MasteredRoutineView[] 
     }];
   });
 };
+
+
+const COUNTERPHASE_PROFILE_LABELS: Record<NetworkPosture, string> = {
+  distributed: 'Distributed Counterphase',
+  structural: 'Structural Counterphase',
+  fortified: 'Fortified Counterphase',
+  diagnostic: 'Diagnostic Counterphase',
+};
+
+/**
+ * Player-facing explanation for GC-09 availability. This reads canonical state
+ * only; it does not choose a preparation profile or expose hidden outcomes.
+ */
+const selectCounterphaseProfile = (state: RootState): NetworkPosture | undefined =>
+  selectNetworkPosture(state, 'location_merchant_district');
+const selectCounterphaseMemories = (state: RootState) =>
+  state.relationships.memoriesById;
+const selectCounterphasePermanentTraits = (state: RootState) =>
+  state.player.permanentTraits;
+const selectCounterphaseRoutineFamiliarity = (state: RootState) =>
+  state.player.routineFamiliarity;
+const selectCounterphaseWatchStanding = (state: RootState) =>
+  selectFactionReputation(state, 'City Watch');
+
+export const selectCounterphasePreparationExplanation = createSelector(
+  [
+    selectCounterphaseProfile,
+    selectCounterphaseMemories,
+    selectCounterphasePermanentTraits,
+    selectCounterphaseRoutineFamiliarity,
+    selectCounterphaseWatchStanding,
+  ],
+  (
+    profile,
+    memoriesById,
+    permanentTraits,
+    routineFamiliarity,
+    watchStanding
+  ): CounterphasePreparationExplanation | null => {
+    if (!profile) return null;
+
+    const reasons: string[] = [
+      `Chapter 6 committed the network to a ${profile} posture.`,
+    ];
+    const memory = memoriesById[`lyra_memory_gc08_${profile}_posture`];
+    if (memory?.playerVisible) {
+      reasons.push(`Remembered commitment: ${memory.title}.`);
+    }
+
+    const permanent = new Set(permanentTraits);
+    if (profile === 'structural') {
+      const available = ['WillowsWisdom', 'ConstraintSense'].filter(id => permanent.has(id));
+      reasons.push(
+        available.length === 2
+          ? 'Willow\'s Wisdom and Constraint Sense are both permanent capabilities.'
+          : `Structural capability evidence is incomplete (${available.length}/2 permanent).`
+      );
+    } else if (profile === 'diagnostic') {
+      const available = ['ScholarlyInsight', 'AdversarialCalibration'].filter(id => permanent.has(id));
+      reasons.push(
+        available.length === 2
+          ? 'Scholarly Insight and Adversarial Calibration are both permanent capabilities.'
+          : `Diagnostic capability evidence is incomplete (${available.length}/2 permanent).`
+      );
+    } else if (profile === 'fortified') {
+      reasons.push(`City Watch standing is ${watchStanding}.`);
+    } else {
+      reasons.push('The distributed plan remains legal without an optional two-Trait capability pair.');
+    }
+
+    if (routineFamiliarity?.archive_verification) {
+      reasons.push(
+        'Archive Verification is personally mastered, so safe repetitive verification can be delegated without delegating the finale decision.'
+      );
+    }
+
+    return {
+      profile,
+      title: COUNTERPHASE_PROFILE_LABELS[profile],
+      reasons,
+    };
+  }
+);
