@@ -337,7 +337,14 @@ function createModel(root, options = {}) {
           }
         }
         if (typeof experience.sourceType === 'string' && typeof experience.sourceId === 'string') {
-          const sourceType = experience.sourceType === 'quest' ? 'quest' : 'dialogue';
+          // Relationship resonance Experiences are produced by an already-authored
+          // permanent Trait, not by a same-named dialogue. Preserve that provenance
+          // explicitly so new Traits do not require repository-policy exceptions.
+          const sourceType = experience.sourceType === 'quest'
+            ? 'quest'
+            : experience.sourceType === 'system'
+              ? 'trait'
+              : 'dialogue';
           addEdge(sourceType, experience.sourceId, 'experience', experienceId, 'produces');
         }
         for (const traitEffect of experience.traitEffects || []) {

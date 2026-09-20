@@ -4,9 +4,9 @@
 
 > Current qualified build summary:
 > - Copy state/thunks cover creation, growth, loyalty decay/bolster, accelerated growth, role assignment, Trait inheritance/sharing, and one active task per Copy.
-> - M20 qualifies exactly two authored routine production tasks: **Forge Assistance** and **Resonance Calibration**.
-> - The Checkpoint-C Incremental Integration Repair adds player-owned routine familiarity as a prerequisite to delegating those tasks.
-> - Forge familiarity is earned by a one-time active City Center Forge Assistance practice; Resonance Calibration familiarity is earned only by a successful active Trait Resonance.
+> - M20 originally qualified two authored routine production tasks: **Forge Assistance** and **Resonance Calibration**; GC-05 adds the bounded third routine **Archive Verification** without changing the one-active-task authority.
+> - Player-owned routine familiarity remains a prerequisite to delegation.
+> - Forge familiarity is earned by one-time active City Center practice; Resonance Calibration by successful active Trait Resonance; Archive Verification by Elara's canonical independent-verification experience.
 > - Familiarity is enforced below the UI by `startCopyProductionTaskThunk`; Copy maturity/loyalty/role/location requirements remain independent.
 > - M21 may advance or complete an already-running authored Copy task during bounded offline settlement, but never selects or chains a new task.
 > - Meaningful/irreversible narrative decisions remain player-owned.

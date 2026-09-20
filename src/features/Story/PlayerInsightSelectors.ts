@@ -95,6 +95,12 @@ const routineSourceLabel = (
       return 'Practiced Forge Assistance yourself in the City Center.';
     case 'trait_resonance':
       return 'Completed Trait resonance yourself.';
+    case 'elara_independent_verification':
+      return 'Completed Elara\'s independent archive verification yourself.';
+    default: {
+      const exhaustive: never = source;
+      return exhaustive;
+    }
   }
 };
 
