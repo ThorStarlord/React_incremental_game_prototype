@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Typography, Grid, Stack, Chip, Button, Alert } from '@mui/material';
+import { Typography, Grid, Stack, Chip, Button } from '@mui/material';
 import { useAppSelector } from '../app/hooks';
 
 // Shared components
@@ -19,7 +19,6 @@ const GamePage: React.FC = () => {
   const activeQuestCount = useAppSelector(state =>
     Object.values(state.quest.quests).filter(quest => quest.status === 'IN_PROGRESS').length
   );
-  const campaignCompletion = useAppSelector(state => state.meta.campaignCompletion);
   const campaignSpine = useAppSelector(selectCampaignSpineProgress);
   // Handler to reset the game: clear storage and reload
   const handleResetGame = useCallback(() => {
@@ -34,15 +33,6 @@ const GamePage: React.FC = () => {
       </Typography>
       
       <Grid container spacing={3}>
-        {campaignCompletion && (
-          <Grid item xs={12}>
-            <Alert severity="success">
-              <strong>Campaign One complete.</strong> The aftermath is recorded as{' '}
-              {campaignCompletion.epilogueVariant.replace(/_/g, ' ')}.
-            </Alert>
-          </Grid>
-        )}
-
         {/* Game Controls Section */}
         <Grid item xs={12}>
           <Panel title="Game Loop Controls">
