@@ -5,6 +5,7 @@ import {
   CITY_CENTER_LOCATION_ID,
   getConnectedLocationDefinitions,
   getLocationDefinition,
+  getMissingLocationExperienceIds,
   resolveCanonicalLocationId,
 } from '../LocationDefinitions';
 import { practiceForgeAssistanceThunk, travelToLocationThunk } from '../TravelThunks';
@@ -26,6 +27,9 @@ const TravelPanel: React.FC = () => {
   const locationValue = useAppSelector(state => state.player.location);
   const forgeFamiliar = useAppSelector(state => Boolean(state.player.routineFamiliarity?.forge_assistance));
   const npcs = useAppSelector(state => state.npcs.npcs);
+  const recordedExperienceIds = useAppSelector(state =>
+    Object.keys(state.relationships.experiencesById)
+  );
   const [error, setError] = useState<string | null>(null);
   const [spatialFeedback, setSpatialFeedback] = useState<SpatialTetherFeedback[]>([]);
 
@@ -111,15 +115,24 @@ const TravelPanel: React.FC = () => {
           )}
 
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {destinations.map(destination => (
-              <Button
-                key={destination.id}
-                variant="outlined"
-                onClick={() => handleTravel(destination.id)}
-              >
-                Travel to {destination.name}
-              </Button>
-            ))}
+            {destinations.map(destination => {
+              const missingExperienceIds = getMissingLocationExperienceIds(
+                destination.id,
+                new Set(recordedExperienceIds)
+              );
+              const locked = missingExperienceIds.length > 0;
+              return (
+                <Button
+                  key={destination.id}
+                  variant="outlined"
+                  disabled={locked}
+                  onClick={() => handleTravel(destination.id)}
+                  title={locked ? 'Travel access has not been established yet.' : undefined}
+                >
+                  {locked ? `Locked: ${destination.name}` : `Travel to ${destination.name}`}
+                </Button>
+              );
+            })}
           </Box>
 
           {destinations.length === 0 && (
