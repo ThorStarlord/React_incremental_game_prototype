@@ -42,6 +42,12 @@
       "structural",
       "fortified",
       "diagnostic"
+    ],
+    "counterphasePlan": [
+      "distributed",
+      "structural",
+      "fortified",
+      "diagnostic"
     ]
   },
   "advisoryDanglingTargets": [
