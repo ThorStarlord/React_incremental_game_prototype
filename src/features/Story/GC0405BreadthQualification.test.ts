@@ -117,12 +117,12 @@ describe('GC-04 / GC-05 breadth qualification', () => {
     store.dispatch(loadTraits(traits));
     store.dispatch(gainEssence({ amount: 200, source: 'gc04-test' }));
 
-    for (const [index, experienceId] of [
+    for (const [index, experienceId] of Array.from([
       'gronk_exp_steel_not_flattery',
       'gronk_exp_measure_twice',
       'gronk_exp_quality_over_finish',
       'gronk_exp_blade_that_held',
-    ].entries()) {
+    ].entries())) {
       await store.dispatch(recordAuthoredRelationshipExperienceThunk({
         experienceId,
         timestamp: 100 + index,
@@ -158,7 +158,7 @@ describe('GC-04 / GC-05 breadth qualification', () => {
       'lyra_exp_ideological_friction',
       'lyra_exp_mutual_calibration',
       'lyra_exp_proto_bond',
-    ].entries()) {
+    ].entries())) {
       await store.dispatch(recordAuthoredRelationshipExperienceThunk({
         experienceId,
         timestamp: 200 + index,
