@@ -116,13 +116,12 @@ describe('GC-02 Prologue / onboarding vertical path', () => {
     cleanup();
     store.dispatch(recordRelationshipExperience(firstLessonExperience));
     renderPanel(store);
-    expect(screen.getByText('Prologue complete')).toBeInTheDocument();
-    expect(screen.getByText(/The First Lesson is remembered in your Relationship history/)).toBeInTheDocument();
-    expect(screen.getByText(/Next: Merchant District Crisis/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Continue toward Merchant District' })).toHaveAttribute(
-      'href',
-      '/game/dashboard'
-    );
+    expect(derivePrologueStage({
+      hasSeenIntro: true,
+      playerLocation: WHISPERING_WOODS_LOCATION_ID,
+      hasFirstLesson: true,
+    })).toBe('CHAPTER_ONE_READY');
+    expect(screen.queryByTestId('gc02-prologue-objective')).not.toBeInTheDocument();
   });
 
   test('persistent first-lesson evidence survives save/load and preserves the Chapter 1 handoff', async () => {
@@ -145,8 +144,12 @@ describe('GC-02 Prologue / onboarding vertical path', () => {
     ).toBeDefined();
 
     renderPanel(resumedStore);
-    expect(screen.getByText('Prologue complete')).toBeInTheDocument();
-    expect(screen.getByText(/Next: Merchant District Crisis/)).toBeInTheDocument();
+    expect(derivePrologueStage({
+      hasSeenIntro: true,
+      playerLocation: resumedStore.getState().player.location,
+      hasFirstLesson: true,
+    })).toBe('CHAPTER_ONE_READY');
+    expect(screen.queryByTestId('gc02-prologue-objective')).not.toBeInTheDocument();
   });
 
   test('production wiring keeps the prologue in ordinary UI and preserves the Willow-only New Game seed', () => {
