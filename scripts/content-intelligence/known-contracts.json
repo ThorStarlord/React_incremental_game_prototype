@@ -63,8 +63,5 @@
     "dialogue:rook_greeting",
     "dialogue:rook_bounty_explanation"
   ],
-  "advisoryProvenanceSources": [
-    "dialogue:willow_tether_teaching",
-    "quest:willow_independent_application"
-  ]
+  "advisoryProvenanceSources": []
 }
