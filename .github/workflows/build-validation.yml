@@ -70,6 +70,10 @@ jobs:
         timeout-minutes: 20
         run: npm run alpha:validate
 
+      - name: GC-12 Content Alpha qualification
+        timeout-minutes: 16
+        run: npm run content-alpha:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 
