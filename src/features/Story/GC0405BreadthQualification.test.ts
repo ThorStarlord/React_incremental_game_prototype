@@ -151,7 +151,7 @@ describe('GC-04 / GC-05 breadth qualification', () => {
     expect(store.getState().relationships.experiencesById.gronk_exp_resonance_constraint_sense)
       .toBeDefined();
 
-    for (const [index, experienceId] of [
+    for (const [index, experienceId] of Array.from([
       'lyra_exp_strategic_defeat',
       'lyra_exp_coercion_reflected',
       'lyra_exp_reluctant_cotraining',
