@@ -50,6 +50,18 @@ const ALL_REPOSITORIES = [
     name: "ThorStarlord/Auteur",
     context: "Narrative compilation, structure diagnostics, story discovery, and chapter-production workflows are established product concerns.",
     enabled: false
+  },
+  {
+    id: "civilizational-superhero",
+    name: "ThorStarlord/civilizational-superhero",
+    context: "Long-form superhero story development focused on civilizational competence, reproducible capability, institutions, and human flourishing is the established project concern.",
+    enabled: false
+  },
+  {
+    id: "dark-factory",
+    name: "ThorStarlord/dark-factory",
+    context: "Autonomous software-production control loops, Campaign authority, evidence discipline, qualified integration, and human-on-exception operation are established product concerns.",
+    enabled: false
   }
 ];
 
