@@ -1,0 +1,338 @@
+{
+  "experiences": {
+    "lyra_gc10_exp_finale_distributed": {
+      "id": "lyra_gc10_exp_finale_distributed",
+      "uniqueKey": "lyra:gc10:finale-distributed",
+      "title": "Distributed Dissipation",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc10_telluric_echo_distributed",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 5,
+        "sharedMeaning": 7,
+        "reliance": 6,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 9,
+      "resonanceTags": [
+        "TelluricEcho",
+        "Finale",
+        "Counterphase",
+        "DistributedPlan"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player uses the broad verified network to dissipate the Echo across many prepared response points without requiring every optional capability."
+    },
+    "lyra_gc10_exp_epilogue_distributed": {
+      "id": "lyra_gc10_exp_epilogue_distributed",
+      "uniqueKey": "lyra:gc10:epilogue-distributed",
+      "title": "After the Distributed Dissipation",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc10_aftermath_distributed",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 8,
+        "reliance": 5,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "TelluricEcho",
+        "CampaignOneComplete",
+        "Aftermath",
+        "DistributedPlan"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc10_distributed_aftermath",
+      "interpretation": "The Telluric Echo is dispersed through the prepared network. The victory came from broad verified coordination rather than one specialized route."
+    },
+    "lyra_gc10_exp_finale_structural": {
+      "id": "lyra_gc10_exp_finale_structural",
+      "uniqueKey": "lyra:gc10:finale-structural",
+      "title": "Structural Redirection",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc10_telluric_echo_structural",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 5,
+        "sharedMeaning": 7,
+        "reliance": 6,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 9,
+      "resonanceTags": [
+        "TelluricEcho",
+        "Finale",
+        "Counterphase",
+        "StructuralPlan"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player redirects the Echo through the network's actual load-bearing paths, using Willow's slow-system cognition and Gronk's constraint sense to make the counterphase carry."
+    },
+    "lyra_gc10_exp_epilogue_structural": {
+      "id": "lyra_gc10_exp_epilogue_structural",
+      "uniqueKey": "lyra:gc10:epilogue-structural",
+      "title": "After the Structural Redirection",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc10_aftermath_structural",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 8,
+        "reliance": 5,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "TelluricEcho",
+        "CampaignOneComplete",
+        "Aftermath",
+        "StructuralPlan"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc10_structural_aftermath",
+      "interpretation": "The Echo is redirected through the network structures that could actually carry the counterphase. The ending foregrounds load paths, restraint, and durable craft judgment."
+    },
+    "lyra_gc10_exp_finale_diagnostic": {
+      "id": "lyra_gc10_exp_finale_diagnostic",
+      "uniqueKey": "lyra:gc10:finale-diagnostic",
+      "title": "Diagnostic Disruption",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc10_telluric_echo_diagnostic",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 5,
+        "sharedMeaning": 7,
+        "reliance": 6,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 9,
+      "resonanceTags": [
+        "TelluricEcho",
+        "Finale",
+        "Counterphase",
+        "DiagnosticPlan"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player treats the Echo as an adversarial model, detects the contradiction in its next phase, and disrupts the repeating structure before it can reassert itself."
+    },
+    "lyra_gc10_exp_epilogue_diagnostic": {
+      "id": "lyra_gc10_exp_epilogue_diagnostic",
+      "uniqueKey": "lyra:gc10:epilogue-diagnostic",
+      "title": "After the Diagnostic Disruption",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc10_aftermath_diagnostic",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 8,
+        "reliance": 5,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "TelluricEcho",
+        "CampaignOneComplete",
+        "Aftermath",
+        "DiagnosticPlan"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc10_diagnostic_aftermath",
+      "interpretation": "The Echo is disrupted by making its own predicted phase fail. The ending foregrounds evidence, contradiction, and calibrated opposition."
+    },
+    "lyra_gc10_exp_finale_fortified": {
+      "id": "lyra_gc10_exp_finale_fortified",
+      "uniqueKey": "lyra:gc10:finale-fortified",
+      "title": "Fortified Containment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc10_telluric_echo_fortified",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 5,
+        "sharedMeaning": 7,
+        "reliance": 6,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 9,
+      "resonanceTags": [
+        "TelluricEcho",
+        "Finale",
+        "Counterphase",
+        "FortifiedPlan"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player uses verified counterphase procedures with legally available Watch logistics to contain the Echo long enough for the prepared network to hold."
+    },
+    "lyra_gc10_exp_epilogue_fortified": {
+      "id": "lyra_gc10_exp_epilogue_fortified",
+      "uniqueKey": "lyra:gc10:epilogue-fortified",
+      "title": "After the Fortified Containment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc10_aftermath_fortified",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 8,
+        "reliance": 5,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "TelluricEcho",
+        "CampaignOneComplete",
+        "Aftermath",
+        "FortifiedPlan"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc10_fortified_aftermath",
+      "interpretation": "The Echo is contained through counterphase preparation backed by institutional logistics. The ending preserves the distinction between personal trust and public authority."
+    }
+  },
+  "memories": {
+    "lyra_memory_gc10_distributed_aftermath": {
+      "id": "lyra_memory_gc10_distributed_aftermath",
+      "originExperienceId": "lyra_gc10_exp_epilogue_distributed",
+      "title": "After the Distributed Dissipation",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The Telluric Echo is dispersed through the prepared network. The victory came from broad verified coordination rather than one specialized route.",
+      "protagonistView": "The ending reflects the plan I actually committed, the people and institutions I prepared, and the capabilities I chose to rely on.",
+      "targetView": "The player carried a chosen counterphase plan through the confrontation personally; the network and its history mattered, but no delegated routine chose the ending.",
+      "resonanceTags": [
+        "TelluricEcho",
+        "CampaignOneComplete",
+        "Aftermath",
+        "DistributedPlan"
+      ],
+      "bondContribution": "Dialectic Counterparts — campaign aftermath",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc10_structural_aftermath": {
+      "id": "lyra_memory_gc10_structural_aftermath",
+      "originExperienceId": "lyra_gc10_exp_epilogue_structural",
+      "title": "After the Structural Redirection",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The Echo is redirected through the network structures that could actually carry the counterphase. The ending foregrounds load paths, restraint, and durable craft judgment.",
+      "protagonistView": "The ending reflects the plan I actually committed, the people and institutions I prepared, and the capabilities I chose to rely on.",
+      "targetView": "The player carried a chosen counterphase plan through the confrontation personally; the network and its history mattered, but no delegated routine chose the ending.",
+      "resonanceTags": [
+        "TelluricEcho",
+        "CampaignOneComplete",
+        "Aftermath",
+        "StructuralPlan"
+      ],
+      "bondContribution": "Dialectic Counterparts — campaign aftermath",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc10_diagnostic_aftermath": {
+      "id": "lyra_memory_gc10_diagnostic_aftermath",
+      "originExperienceId": "lyra_gc10_exp_epilogue_diagnostic",
+      "title": "After the Diagnostic Disruption",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The Echo is disrupted by making its own predicted phase fail. The ending foregrounds evidence, contradiction, and calibrated opposition.",
+      "protagonistView": "The ending reflects the plan I actually committed, the people and institutions I prepared, and the capabilities I chose to rely on.",
+      "targetView": "The player carried a chosen counterphase plan through the confrontation personally; the network and its history mattered, but no delegated routine chose the ending.",
+      "resonanceTags": [
+        "TelluricEcho",
+        "CampaignOneComplete",
+        "Aftermath",
+        "DiagnosticPlan"
+      ],
+      "bondContribution": "Dialectic Counterparts — campaign aftermath",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc10_fortified_aftermath": {
+      "id": "lyra_memory_gc10_fortified_aftermath",
+      "originExperienceId": "lyra_gc10_exp_epilogue_fortified",
+      "title": "After the Fortified Containment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The Echo is contained through counterphase preparation backed by institutional logistics. The ending preserves the distinction between personal trust and public authority.",
+      "protagonistView": "The ending reflects the plan I actually committed, the people and institutions I prepared, and the capabilities I chose to rely on.",
+      "targetView": "The player carried a chosen counterphase plan through the confrontation personally; the network and its history mattered, but no delegated routine chose the ending.",
+      "resonanceTags": [
+        "TelluricEcho",
+        "CampaignOneComplete",
+        "Aftermath",
+        "FortifiedPlan"
+      ],
+      "bondContribution": "Dialectic Counterparts — campaign aftermath",
+      "persistence": "stable"
+    }
+  }
+}
