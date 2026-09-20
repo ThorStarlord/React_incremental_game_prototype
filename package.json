@@ -42,12 +42,11 @@
     "gc02:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC02PrologueOnboarding.test.tsx",
     "gc03:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC03OpeningCampaignSpine.test.tsx",
     "gc0405:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC0405BreadthQualification.test.ts CopyM20ProductionTaskAutomation.test.tsx PostM25CopyRoutineStrategy.test.ts",
+    "gc06:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC06LatticeUnderStrain.test.tsx ChapterDefinitionIntegrity.test.ts",
     "simulated-review:validate": "node --check scripts/simulated-product-review/ui-observer.js && node --check scripts/simulated-product-review/action-contract.js && node --check scripts/simulated-product-review/validate-action-contract.js && node --check scripts/simulated-product-review/validate-config.js && node scripts/simulated-product-review/validate-config.js",
     "simulated-review:action-contract": "node scripts/simulated-product-review/validate-action-contract.js",
     "simulated-review:observe": "node scripts/simulated-product-review/ui-observer.js",
-    "simulated-review:smoke": "node scripts/simulated-product-review/ui-observer.js --smoke --headless --url http://127.0.0.1:3000 --out .simulated-review-output/ci-smoke",
-    "chatgpt:progressive-loop": "node scripts/chatgpt-progressive-loop.js",
-    "chatgpt:progressive-loop:test": "node --test scripts/chatgpt-progressive-loop.test.js"
+    "simulated-review:smoke": "node scripts/simulated-product-review/ui-observer.js --smoke --headless --url http://127.0.0.1:3000 --out .simulated-review-output/ci-smoke"
   },
   "eslintConfig": {
     "extends": [

@@ -57,13 +57,13 @@ export const initializeNPCsThunk = createAsyncThunk<
         }
       } catch {}
 
-      // M24 and M25 each use one bounded content extension rather than rewriting
-      // the large historical NPC/dialogue fixtures. This fixed list is intentionally
-      // not dynamic discovery: two independently authored bundles now justify one
-      // shared merge path while preserving the same optional-extension behavior.
+      // Campaign content uses bounded extensions rather than rewriting the large
+      // historical NPC/dialogue fixtures. This fixed list is intentionally not
+      // dynamic discovery; each new campaign package must be registered explicitly.
       const contentExtensionUrls = [
         '/data/m24-world-state-content.json',
         '/data/m25-chapter-content.json',
+        '/data/gc06-lattice-content.json',
       ] as const;
 
       for (const extensionUrl of contentExtensionUrls) {
@@ -144,6 +144,7 @@ export const unlockCampaignNpcsThunk = createAsyncThunk<
       for (const extensionUrl of [
         '/data/m24-world-state-content.json',
         '/data/m25-chapter-content.json',
+        '/data/gc06-lattice-content.json',
       ] as const) {
         try {
           const extensionResponse = await fetch(extensionUrl);

@@ -3,6 +3,7 @@ import { Alert, AlertTitle, Box, Button, Stack, Typography } from '@mui/material
 import { Link as RouterLink } from 'react-router-dom';
 import { useAppSelector } from '../../../app/hooks';
 import { selectOpeningCampaignStage } from '../CampaignSpine';
+import { selectChapterProgress } from '../ChapterSelectors';
 
 const ActionButton: React.FC<{ to: string; children: React.ReactNode }> = ({
   to,
@@ -22,6 +23,9 @@ const ActionButton: React.FC<{ to: string; children: React.ReactNode }> = ({
  */
 export const CampaignSpinePanel: React.FC = () => {
   const stage = useAppSelector(selectOpeningCampaignStage);
+  const latticeChapterComplete = useAppSelector(state =>
+    selectChapterProgress(state, 'lattice_under_strain').status === 'complete'
+  );
 
   if (stage === 'PROLOGUE') return null;
 
@@ -74,13 +78,37 @@ export const CampaignSpinePanel: React.FC = () => {
     );
   }
 
+  if (!latticeChapterComplete) {
+    return (
+      <Alert severity="info" data-testid="gc06-campaign-objective" sx={{ mb: 2 }}>
+        <AlertTitle>Chapter 4 — Lattice Under Strain</AlertTitle>
+        <Typography variant="body2">
+          The opening campaign is complete, but the Telluric Echo is now stressing the network
+          those relationships built. Start with Elara's diagnosis, share the operational fact
+          where useful, choose a stabilization strategy, then return to Lyra when the local
+          lattice is stable.
+        </Typography>
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
+          <ActionButton to="/game/npcs/npc_scholar_elara">Open Scholar Elara</ActionButton>
+          <ActionButton to="/game/npcs/npc_captain_valerius">Open Valerius</ActionButton>
+          <ActionButton to="/game/npcs/npc_blacksmith_gronk">Open Gronk</ActionButton>
+          <ActionButton to="/game/npcs/npc_lyra">Open Lyra</ActionButton>
+          <ActionButton to="/game/quests">Open quests</ActionButton>
+        </Stack>
+      </Alert>
+    );
+  }
+
   return (
-    <Alert severity="success" data-testid="gc03-campaign-objective" sx={{ mb: 2 }}>
-      <AlertTitle>Opening campaign spine complete</AlertTitle>
+    <Alert severity="success" data-testid="gc06-campaign-objective" sx={{ mb: 2 }}>
+      <AlertTitle>Chapter 4 complete — the Chrono-Crypt is next</AlertTitle>
       <Typography variant="body2">
-        Prologue and Chapters 1–3 are complete through canonical game evidence. The next Campaign
-        One construction responsibility is Chapter 4 — Lattice Under Strain.
+        The local lattice is stabilized and Lyra has recorded why containment is not a
+        countermeasure. Continue into the Chrono-Crypt to investigate the counterphase principle.
       </Typography>
+      <Box sx={{ mt: 1.5 }}>
+        <ActionButton to="/game/npcs/npc_lyra">Continue with Lyra</ActionButton>
+      </Box>
     </Alert>
   );
 };

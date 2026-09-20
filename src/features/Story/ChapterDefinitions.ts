@@ -105,6 +105,42 @@ export const CHAPTER_DEFINITIONS = [
       },
     ],
   },
+  {
+    id: 'lattice_under_strain',
+    title: 'Lattice Under Strain',
+    centerOfGravity: 'network pressure, multi-anchor diagnosis, and capability-shaped stabilization',
+    description:
+      'The Telluric Echo becomes a present network problem. Baseline containment remains viable while two relationship-derived build profiles create distinct legal stabilization strategies.',
+    routes: [
+      {
+        id: 'surface_containment',
+        label: 'Surface Containment',
+        summary: 'Stabilize the visible failures through ordinary local response capacity, then recognize that containment is not the final countermeasure.',
+        requiredExperienceIds: [
+          'valerius_gc06_exp_surface_containment',
+          'lyra_gc06_exp_chrono_crypt_route',
+        ],
+      },
+      {
+        id: 'structural_steward',
+        label: 'Structural Steward',
+        summary: 'Combine Willow\'s slow-system cognition with Gronk\'s constraint sense to reroute lattice load around the actual failure pattern.',
+        requiredExperienceIds: [
+          'gronk_gc06_exp_structural_steward',
+          'lyra_gc06_exp_chrono_crypt_route',
+        ],
+      },
+      {
+        id: 'countermodeler',
+        label: 'Countermodeler',
+        summary: 'Combine Elara\'s contradiction-first inquiry with Lyra\'s adversarial calibration to phase the local response against the Echo.',
+        requiredExperienceIds: [
+          'lyra_gc06_exp_countermodeler',
+          'lyra_gc06_exp_chrono_crypt_route',
+        ],
+      },
+    ],
+  },
 ] as const satisfies readonly ChapterDefinitionShape[];
 
 /**

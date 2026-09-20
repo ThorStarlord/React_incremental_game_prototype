@@ -38,11 +38,12 @@ describe('post-M25 third heterogeneous chapter qualification', () => {
   test('adds a structurally different one-route chapter instead of cloning the prior two-route shape', () => {
     const chapter = getChapterDefinition('adversarial_calibration');
 
-    expect(CHAPTER_DEFINITIONS.map(candidate => candidate.id)).toEqual([
+    expect(CHAPTER_DEFINITIONS.slice(0, 3).map(candidate => candidate.id)).toEqual([
       'merchant_district',
       'archive_inquiry',
       'adversarial_calibration',
     ]);
+    expect(CHAPTER_DEFINITIONS.map(candidate => candidate.id)).toContain('lattice_under_strain');
     expect(chapter.title).toBe('Enemies in Phase');
     expect(chapter.routes).toHaveLength(1);
     expect(getChapterDefinition('merchant_district').routes).toHaveLength(2);

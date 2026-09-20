@@ -14,6 +14,9 @@ const isValidMutation = (mutation: WorldStateMutation): boolean => {
   if (mutation.field === 'tradeFlow') {
     return mutation.value === 'normal' || mutation.value === 'strong';
   }
+  if (mutation.field === 'latticeIntegrity') {
+    return mutation.value === 'strained' || mutation.value === 'stabilized';
+  }
   return false;
 };
 
@@ -30,6 +33,8 @@ const worldStateSlice = createSlice({
         region.watchPresence = mutation.value;
       } else if (mutation.field === 'tradeFlow') {
         region.tradeFlow = mutation.value;
+      } else if (mutation.field === 'latticeIntegrity') {
+        region.latticeIntegrity = mutation.value;
       }
       state.regions[mutation.regionId] = region;
     },

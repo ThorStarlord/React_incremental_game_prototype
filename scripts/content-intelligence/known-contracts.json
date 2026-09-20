@@ -31,6 +31,10 @@
     "tradeFlow": [
       "normal",
       "strong"
+    ],
+    "latticeIntegrity": [
+      "strained",
+      "stabilized"
     ]
   },
   "advisoryDanglingTargets": [
