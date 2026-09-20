@@ -1,11 +1,13 @@
 export type WatchPresence = 'normal' | 'heavy';
 export type TradeFlow = 'normal' | 'strong';
 export type LatticeIntegrity = 'strained' | 'stabilized';
+export type NetworkPosture = 'distributed' | 'structural' | 'fortified' | 'diagnostic';
 
 export interface RegionalWorldState {
   watchPresence?: WatchPresence;
   tradeFlow?: TradeFlow;
   latticeIntegrity?: LatticeIntegrity;
+  networkPosture?: NetworkPosture;
 }
 
 export interface WorldState {
@@ -27,6 +29,11 @@ export type WorldStateMutation =
       regionId: string;
       field: 'latticeIntegrity';
       value: LatticeIntegrity;
+    }
+  | {
+      regionId: string;
+      field: 'networkPosture';
+      value: NetworkPosture;
     };
 
 export type WorldStateRequirement =
@@ -44,4 +51,9 @@ export type WorldStateRequirement =
       regionId: string;
       field: 'latticeIntegrity';
       equals: LatticeIntegrity;
+    }
+  | {
+      regionId: string;
+      field: 'networkPosture';
+      equals: NetworkPosture;
     };

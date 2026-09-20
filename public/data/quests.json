@@ -473,5 +473,115 @@
     ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
+  },
+  "quest_gc08_distributed_preparation": {
+    "id": "quest_gc08_distributed_preparation",
+    "title": "Distributed Network Preparation",
+    "description": "Prepare the Merchant District with verified counterphase procedures that can be understood and repeated without depending on a specialized build.",
+    "giver": "npc_scholar_elara",
+    "type": "SIDE",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Verify distributed counterphase preparation across the Merchant District",
+        "type": "REACH_LOCATION",
+        "target": "location_merchant_district",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_distributed_baseline",
+        "label": "Prepare the Distributed Baseline",
+        "description": "Use ordinary verified procedures to prepare a broad response without relying on optional permanent Traits.",
+        "relationshipExperienceId": "elara_gc08_exp_distributed_preparation",
+        "rewards": [],
+        "logMessage": "You verify a broad distributed preparation pattern that the network can execute without specialized capability dependencies."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc08_structural_preparation": {
+    "id": "quest_gc08_structural_preparation",
+    "title": "Prepare the Load Paths",
+    "description": "Use Gronk's network briefing to harden the actual load-bearing paths that will carry counterphase response through the local network.",
+    "giver": "npc_blacksmith_gronk",
+    "type": "SIDE",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Prepare the City Center load paths for counterphase routing",
+        "type": "REACH_LOCATION",
+        "target": "location_city_center",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_structural_network",
+        "label": "Prepare Structural Load Paths",
+        "description": "Combine Willow's slow-system cognition with Gronk's Constraint Sense to prepare only the network structures that actually carry the response.",
+        "relationshipExperienceId": "gronk_gc08_exp_structural_preparation",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You harden the network's load-bearing response paths instead of distributing preparation evenly."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc08_diagnostic_preparation": {
+    "id": "quest_gc08_diagnostic_preparation",
+    "title": "Prepare the Diagnostic Mesh",
+    "description": "Seed counterphase diagnostics at the City Gate so the network can detect contradiction in the Echo's next phase rather than treating every disturbance identically.",
+    "giver": "npc_scholar_elara",
+    "type": "SIDE",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Establish counterphase diagnostics at the City Gate",
+        "type": "REACH_LOCATION",
+        "target": "location_city_gate",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_diagnostic_network",
+        "label": "Prepare the Diagnostic Mesh",
+        "description": "Combine Scholarly Insight with Adversarial Calibration to place diagnostics where the Echo's model is most likely to contradict itself.",
+        "relationshipExperienceId": "elara_gc08_exp_diagnostic_preparation",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "You prepare a diagnostic mesh that treats the network as an adversarial sensor rather than a uniform shield."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   }
 }

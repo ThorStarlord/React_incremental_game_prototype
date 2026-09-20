@@ -54,6 +54,10 @@ jobs:
         timeout-minutes: 10
         run: npm run gc07:validate
 
+      - name: GC-08 Network Under Pressure qualification
+        timeout-minutes: 12
+        run: npm run gc08:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 

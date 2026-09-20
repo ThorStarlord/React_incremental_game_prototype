@@ -1,0 +1,347 @@
+{
+  "dialogues": {
+    "elara_gc08_network_diagnosis": {
+      "id": "elara_gc08_network_diagnosis",
+      "npcId": "npc_scholar_elara",
+      "title": "Who Actually Knows the Counterphase?",
+      "text": "Elara does not pretend the crypt result has propagated by itself. She asks which people can act on it, which institutions can absorb it, and which parts of the network would fail if preparation were copied without verification.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc07_exp_counterphase_derived",
+        "elara_exp_independent_verification"
+      ],
+      "anyOfExperienceIds": [
+        "gronk_exp_aftermath_quiet_reroute",
+        "valerius_exp_aftermath_public_crackdown"
+      ],
+      "requiredRoutineFamiliarityIds": [
+        "archive_verification"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "stabilized"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc07_counterphase_principle"
+      ],
+      "responses": {
+        "brief": "Brief Elara directly. Treat the counterphase as a network question, not a secret that somehow spread on its own."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc07_counterphase_principle",
+          "responseId": "brief"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "elara_gc08_exp_network_diagnosis",
+          "responseId": "brief"
+        },
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc08_distributed_preparation",
+          "responseId": "brief"
+        },
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc08_diagnostic_preparation",
+          "responseId": "brief"
+        }
+      ],
+      "next": {
+        "brief": null
+      }
+    },
+    "gronk_gc08_counterphase_briefing": {
+      "id": "gronk_gc08_counterphase_briefing",
+      "npcId": "npc_blacksmith_gronk",
+      "title": "Tell Gronk What the Network Must Carry",
+      "text": "Gronk can prepare load paths only if you give him the actual counterphase principle. Prior trust makes the briefing possible; it does not manufacture the fact.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_gc08_exp_network_diagnosis",
+        "gronk_exp_aftermath_quiet_reroute"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "stabilized"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc07_counterphase_principle"
+      ],
+      "responses": {
+        "brief": "Give Gronk the counterphase model and ask him to identify which structures truly carry the response."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc07_counterphase_principle",
+          "responseId": "brief"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "gronk_gc08_exp_counterphase_briefed",
+          "responseId": "brief"
+        },
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc08_structural_preparation",
+          "responseId": "brief"
+        }
+      ],
+      "next": {
+        "brief": null
+      }
+    },
+    "valerius_gc08_counterphase_briefing": {
+      "id": "valerius_gc08_counterphase_briefing",
+      "npcId": "npc_captain_valerius",
+      "title": "Ask the Watch to Mobilize",
+      "text": "Valerius separates the personal history from the institutional question. If the Watch's accumulated standing with you is too damaged, he cannot turn a private briefing into coordinated logistics.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_gc08_exp_network_diagnosis",
+        "valerius_exp_aftermath_public_crackdown"
+      ],
+      "requiredFactionReputation": [
+        {
+          "factionId": "City Watch",
+          "min": 0
+        }
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "stabilized"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc07_counterphase_principle"
+      ],
+      "responses": {
+        "brief": "Put the counterphase in the Watch record and ask for bounded logistics support."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc07_counterphase_principle",
+          "responseId": "brief"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "valerius_gc08_exp_watch_mobilized",
+          "responseId": "brief"
+        }
+      ],
+      "next": {
+        "brief": null
+      }
+    },
+    "lyra_gc08_commit_distributed": {
+      "id": "lyra_gc08_commit_distributed",
+      "npcId": "npc_lyra",
+      "title": "Commit the Distributed Posture",
+      "text": "Commit the network to broad verified preparation. It will not be the most specialized posture, but more of the network can understand and execute it.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_gc08_exp_distributed_preparation"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "stabilized"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc08_network_posture_committed"
+      ],
+      "responses": {
+        "commit": "Commit to the distributed posture."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc08_network_posture_committed",
+          "responseId": "commit"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "value": "distributed",
+          "responseId": "commit"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc08_exp_commit_distributed",
+          "responseId": "commit"
+        }
+      ],
+      "next": {
+        "commit": null
+      }
+    },
+    "lyra_gc08_commit_structural": {
+      "id": "lyra_gc08_commit_structural",
+      "npcId": "npc_lyra",
+      "title": "Commit the Structural Posture",
+      "text": "Commit the network around the load paths Willow and Gronk's methods identify as structurally decisive.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "gronk_gc08_exp_structural_preparation"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "stabilized"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc08_network_posture_committed"
+      ],
+      "responses": {
+        "commit": "Commit to the structural posture."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc08_network_posture_committed",
+          "responseId": "commit"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "value": "structural",
+          "responseId": "commit"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc08_exp_commit_structural",
+          "responseId": "commit"
+        }
+      ],
+      "next": {
+        "commit": null
+      }
+    },
+    "lyra_gc08_commit_diagnostic": {
+      "id": "lyra_gc08_commit_diagnostic",
+      "npcId": "npc_lyra",
+      "title": "Commit the Diagnostic Posture",
+      "text": "Commit the network as an adversarial diagnostic mesh, optimized to detect the Echo's next contradiction.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_gc08_exp_diagnostic_preparation"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "stabilized"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc08_network_posture_committed"
+      ],
+      "responses": {
+        "commit": "Commit to the diagnostic posture."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc08_network_posture_committed",
+          "responseId": "commit"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "value": "diagnostic",
+          "responseId": "commit"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc08_exp_commit_diagnostic",
+          "responseId": "commit"
+        }
+      ],
+      "next": {
+        "commit": null
+      }
+    },
+    "lyra_gc08_commit_fortified": {
+      "id": "lyra_gc08_commit_fortified",
+      "npcId": "npc_lyra",
+      "title": "Commit the Fortified Posture",
+      "text": "Commit the verified baseline preparation with Watch logistics layered around the most exposed corridors.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_gc08_exp_distributed_preparation",
+        "valerius_gc08_exp_watch_mobilized"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "stabilized"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc08_network_posture_committed"
+      ],
+      "responses": {
+        "commit": "Commit to the fortified posture."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc08_network_posture_committed",
+          "responseId": "commit"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "value": "fortified",
+          "responseId": "commit"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc08_exp_commit_fortified",
+          "responseId": "commit"
+        }
+      ],
+      "next": {
+        "commit": null
+      }
+    }
+  },
+  "npcDialogueIds": {
+    "npc_scholar_elara": [
+      "elara_gc08_network_diagnosis"
+    ],
+    "npc_blacksmith_gronk": [
+      "gronk_gc08_counterphase_briefing"
+    ],
+    "npc_captain_valerius": [
+      "valerius_gc08_counterphase_briefing"
+    ],
+    "npc_lyra": [
+      "lyra_gc08_commit_distributed",
+      "lyra_gc08_commit_structural",
+      "lyra_gc08_commit_diagnostic",
+      "lyra_gc08_commit_fortified"
+    ]
+  }
+}

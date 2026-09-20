@@ -1,0 +1,385 @@
+{
+  "experiences": {
+    "elara_gc08_exp_network_diagnosis": {
+      "id": "elara_gc08_exp_network_diagnosis",
+      "uniqueKey": "elara:gc08:network-diagnosis",
+      "title": "Turn Counterphase Into a Network Question",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": [
+        "player",
+        "npc_scholar_elara",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "elara_gc08_network_diagnosis",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 5,
+        "sharedMeaning": 5,
+        "reliance": 3,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPressure",
+        "IndependentVerification",
+        "InformationAsymmetry"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Elara receives the counterphase principle only after the player brings it to her and reframes it as a network preparation problem rather than a crypt result."
+    },
+    "gronk_gc08_exp_counterphase_briefed": {
+      "id": "gronk_gc08_exp_counterphase_briefed",
+      "uniqueKey": "gronk:gc08:counterphase-briefed",
+      "title": "Tell Gronk What the Network Must Carry",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": [
+        "player",
+        "npc_blacksmith_gronk"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_gc08_counterphase_briefing",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 4,
+        "sharedMeaning": 4,
+        "reliance": 4
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPressure",
+        "ConstraintRouting",
+        "Briefed"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Gronk learns the counterphase principle as a load-path problem because the player deliberately briefs him; the fact is not inferred from friendship."
+    },
+    "valerius_gc08_exp_watch_mobilized": {
+      "id": "valerius_gc08_exp_watch_mobilized",
+      "uniqueKey": "valerius:gc08:watch-mobilized",
+      "title": "Institutional Support, Not Personal Favor",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": [
+        "player",
+        "npc_captain_valerius"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "valerius_gc08_counterphase_briefing",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 3,
+        "sharedMeaning": 2,
+        "reliance": 4
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "Counterphase",
+        "CityWatch",
+        "InstitutionalSupport",
+        "Briefed"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Valerius commits Watch logistics only because the player has enough institutional standing to make the briefing actionable; personal Relationship state is not a substitute."
+    },
+    "elara_gc08_exp_distributed_preparation": {
+      "id": "elara_gc08_exp_distributed_preparation",
+      "uniqueKey": "elara:gc08:distributed-preparation",
+      "title": "Distributed Manual Preparation",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc08_distributed_preparation",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 3,
+        "sharedMeaning": 3,
+        "reliance": 2
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": [
+        "NetworkPreparation",
+        "Distributed",
+        "BaselineRoute"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player prepares a distributed response using ordinary verified procedures. It is slower and less specialized, but it remains a legal baseline."
+    },
+    "gronk_gc08_exp_structural_preparation": {
+      "id": "gronk_gc08_exp_structural_preparation",
+      "uniqueKey": "gronk:gc08:structural-preparation",
+      "title": "Structural Network Preparation",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": [
+        "player",
+        "npc_blacksmith_gronk",
+        "npc_elder_willow"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc08_structural_preparation",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 4,
+        "sharedMeaning": 5,
+        "reliance": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "NetworkPreparation",
+        "StructuralSteward",
+        "ConstraintRouting",
+        "SlowSystems"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player prepares the network around the actual load paths that will carry the counterphase instead of spreading preparation evenly."
+    },
+    "elara_gc08_exp_diagnostic_preparation": {
+      "id": "elara_gc08_exp_diagnostic_preparation",
+      "uniqueKey": "elara:gc08:diagnostic-preparation",
+      "title": "Diagnostic Network Preparation",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": [
+        "player",
+        "npc_scholar_elara",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc08_diagnostic_preparation",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 5,
+        "sharedMeaning": 5,
+        "reliance": 4
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "NetworkPreparation",
+        "Countermodeler",
+        "Contradiction",
+        "AdversarialCalibration"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player seeds diagnostic checks where the Echo's model is most likely to break, using the network as an adversarial sensor rather than a uniform shield."
+    },
+    "lyra_gc08_exp_commit_distributed": {
+      "id": "lyra_gc08_exp_commit_distributed",
+      "uniqueKey": "lyra:gc08:commit-distributed",
+      "title": "Distributed Network Commitment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc08_commit_distributed",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 6,
+        "reliance": 5,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPreparation",
+        "DistributedPosture"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc08_distributed_posture",
+      "interpretation": "The player commits to a distributed posture: broad verified preparation with fewer specialized dependencies."
+    },
+    "lyra_gc08_exp_commit_structural": {
+      "id": "lyra_gc08_exp_commit_structural",
+      "uniqueKey": "lyra:gc08:commit-structural",
+      "title": "Structural Network Commitment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc08_commit_structural",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 6,
+        "reliance": 5,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPreparation",
+        "StructuralPosture"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc08_structural_posture",
+      "interpretation": "The player commits to a structural posture centered on the load paths most capable of carrying the counterphase."
+    },
+    "lyra_gc08_exp_commit_diagnostic": {
+      "id": "lyra_gc08_exp_commit_diagnostic",
+      "uniqueKey": "lyra:gc08:commit-diagnostic",
+      "title": "Diagnostic Network Commitment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc08_commit_diagnostic",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 6,
+        "reliance": 5,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPreparation",
+        "DiagnosticPosture"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc08_diagnostic_posture",
+      "interpretation": "The player commits to a diagnostic posture designed to detect and exploit contradiction in the Echo's next phase."
+    },
+    "lyra_gc08_exp_commit_fortified": {
+      "id": "lyra_gc08_exp_commit_fortified",
+      "uniqueKey": "lyra:gc08:commit-fortified",
+      "title": "Fortified Network Commitment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc08_commit_fortified",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 6,
+        "reliance": 5,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPreparation",
+        "FortifiedPosture"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc08_fortified_posture",
+      "interpretation": "The player commits to a fortified posture that combines verified baseline preparation with available Watch logistics."
+    }
+  },
+  "memories": {
+    "lyra_memory_gc08_distributed_posture": {
+      "id": "lyra_memory_gc08_distributed_posture",
+      "originExperienceId": "lyra_gc08_exp_commit_distributed",
+      "title": "Distributed Network Commitment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The player commits to a distributed posture: broad verified preparation with fewer specialized dependencies.",
+      "protagonistView": "I chose what the network should optimize for before the final commitment, rather than letting preparation collapse into one generic readiness number.",
+      "targetView": "The player made the strategic commitment personally. Repetitive work can be delegated; this choice cannot.",
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPreparation",
+        "DistributedPosture"
+      ],
+      "bondContribution": "Dialectic Counterparts — network strategy",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc08_structural_posture": {
+      "id": "lyra_memory_gc08_structural_posture",
+      "originExperienceId": "lyra_gc08_exp_commit_structural",
+      "title": "Structural Network Commitment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The player commits to a structural posture centered on the load paths most capable of carrying the counterphase.",
+      "protagonistView": "I chose what the network should optimize for before the final commitment, rather than letting preparation collapse into one generic readiness number.",
+      "targetView": "The player made the strategic commitment personally. Repetitive work can be delegated; this choice cannot.",
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPreparation",
+        "StructuralPosture"
+      ],
+      "bondContribution": "Dialectic Counterparts — network strategy",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc08_diagnostic_posture": {
+      "id": "lyra_memory_gc08_diagnostic_posture",
+      "originExperienceId": "lyra_gc08_exp_commit_diagnostic",
+      "title": "Diagnostic Network Commitment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The player commits to a diagnostic posture designed to detect and exploit contradiction in the Echo's next phase.",
+      "protagonistView": "I chose what the network should optimize for before the final commitment, rather than letting preparation collapse into one generic readiness number.",
+      "targetView": "The player made the strategic commitment personally. Repetitive work can be delegated; this choice cannot.",
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPreparation",
+        "DiagnosticPosture"
+      ],
+      "bondContribution": "Dialectic Counterparts — network strategy",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc08_fortified_posture": {
+      "id": "lyra_memory_gc08_fortified_posture",
+      "originExperienceId": "lyra_gc08_exp_commit_fortified",
+      "title": "Fortified Network Commitment",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The player commits to a fortified posture that combines verified baseline preparation with available Watch logistics.",
+      "protagonistView": "I chose what the network should optimize for before the final commitment, rather than letting preparation collapse into one generic readiness number.",
+      "targetView": "The player made the strategic commitment personally. Repetitive work can be delegated; this choice cannot.",
+      "resonanceTags": [
+        "Counterphase",
+        "NetworkPreparation",
+        "FortifiedPosture"
+      ],
+      "bondContribution": "Dialectic Counterparts — network strategy",
+      "persistence": "stable"
+    }
+  }
+}

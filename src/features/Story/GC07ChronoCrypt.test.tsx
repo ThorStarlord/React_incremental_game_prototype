@@ -371,7 +371,7 @@ describe('GC-07 The Chrono-Crypt', () => {
         </MemoryRouter>
       </Provider>
     );
-    expect(screen.getByText('Chapter 5 complete — prepare the network')).toBeInTheDocument();
+    expect(screen.getByText('Chapter 6 — Network Under Pressure')).toBeInTheDocument();
   });
 
   test('GC-07 introduces no generalized time simulation or chapter-owned state authority', () => {
