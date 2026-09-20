@@ -537,7 +537,7 @@ describe('GC-09 Counterphase', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Counterphase plan committed — Telluric Echo finale next'))
+    expect(screen.getByText('Finale — The Telluric Echo'))
       .toBeInTheDocument();
   });
 
