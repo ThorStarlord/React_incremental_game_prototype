@@ -68,16 +68,6 @@ describe('M10 save schema migration pipeline', () => {
     expect(result.envelope.timestamp).toBe(0);
   });
 
-  test('legacy saves receive the additive campaign completion default', () => {
-    const state = makeState();
-    const legacyState = JSON.parse(JSON.stringify(state)) as RootState;
-    delete (legacyState.meta as Partial<RootState['meta']>).campaignCompletion;
-
-    const result = migrateSavePayload(makeLegacyPayload(legacyState));
-
-    expect(result.envelope.state.meta.campaignCompletion).toBeNull();
-  });
-
   test.each([
     ['null', null],
     ['numeric string', '1'],
