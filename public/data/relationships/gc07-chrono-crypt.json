@@ -1,0 +1,153 @@
+{
+  "experiences": {
+    "lyra_gc07_exp_manual_triangulation": {
+      "id": "lyra_gc07_exp_manual_triangulation",
+      "uniqueKey": "lyra:gc07:manual-triangulation",
+      "title": "Manual Harmonic Triangulation",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc07_counterphase_principle",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 3,
+        "sharedMeaning": 3,
+        "reliance": 3,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "ChronoCrypt",
+        "Counterphase",
+        "BaselineRoute",
+        "ManualDerivation"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Without optional capability combinations, the player and Lyra still derive the counterphase by comparing repeated failures and manually triangulating the stable inverse pattern."
+    },
+    "lyra_gc07_exp_structural_counterphase": {
+      "id": "lyra_gc07_exp_structural_counterphase",
+      "uniqueKey": "lyra:gc07:structural-counterphase",
+      "title": "Structural Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra",
+        "npc_elder_willow",
+        "npc_blacksmith_gronk"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc07_counterphase_principle",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 4,
+        "sharedMeaning": 5,
+        "reliance": 4,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "ChronoCrypt",
+        "Counterphase",
+        "StructuralSteward",
+        "ConstraintRouting",
+        "SlowSystems"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Willow's slow-system cognition and Gronk's constraint reading let the player identify which crypt structures carry the repeating failure and derive the inverse from those load paths."
+    },
+    "lyra_gc07_exp_adversarial_countermodel": {
+      "id": "lyra_gc07_exp_adversarial_countermodel",
+      "uniqueKey": "lyra:gc07:adversarial-countermodel",
+      "title": "Adversarial Countermodel",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra",
+        "npc_scholar_elara"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc07_counterphase_principle",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 5,
+        "sharedMeaning": 5,
+        "reliance": 4,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "ChronoCrypt",
+        "Counterphase",
+        "Countermodeler",
+        "Contradiction",
+        "AdversarialCalibration"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Elara's contradiction-first method and Lyra's adversarial calibration let the player model the failure as an opponent, predict its next phase, and derive the stable inverse."
+    },
+    "lyra_gc07_exp_counterphase_derived": {
+      "id": "lyra_gc07_exp_counterphase_derived",
+      "uniqueKey": "lyra:gc07:counterphase-derived",
+      "title": "Counterphase Is a Principle",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc07_counterphase_interpretation",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 6,
+        "reliance": 5,
+        "reciprocity": 4
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "ChronoCrypt",
+        "Counterphase",
+        "TelluricEcho",
+        "ReusablePrinciple",
+        "NetworkPreparation"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc07_counterphase_principle",
+      "interpretation": "The crypt's old failures reveal a reusable counterphase principle: the network can be prepared to answer the Echo's repeating structure instead of merely absorbing each local event."
+    }
+  },
+  "memories": {
+    "lyra_memory_gc07_counterphase_principle": {
+      "id": "lyra_memory_gc07_counterphase_principle",
+      "originExperienceId": "lyra_gc07_exp_counterphase_derived",
+      "title": "A Counterphase, Not Another Patch",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "In the Chrono-Crypt, you and Lyra turned repeated harmonic failures into a reusable counterphase principle. The next problem is preparing a network that can actually use it.",
+      "protagonistView": "The crypt did not give us a weapon. It gave us a rule for how the network must answer the Echo.",
+      "targetView": "The player can now carry an adversarial insight beyond this room without confusing the derivation with the final decision.",
+      "resonanceTags": [
+        "ChronoCrypt",
+        "Counterphase",
+        "TelluricEcho",
+        "NetworkPreparation"
+      ],
+      "bondContribution": "Dialectic Counterparts — strategic",
+      "persistence": "stable"
+    }
+  }
+}
