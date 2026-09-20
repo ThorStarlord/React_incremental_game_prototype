@@ -79,7 +79,7 @@ test("rejects PACKAGE with zero pending packages", () => {
       active: 1,
       packageState: "NOT_STARTED"
     })),
-    /requires at least one pending package/
+    /requires an active pending package/
   );
 });
 
@@ -119,7 +119,7 @@ test("rejects open discovery that invents packages", () => {
       active: 1,
       packageState: "NOT_STARTED"
     })),
-    /cannot report pending packages before planning/
+    /cannot report active or pending packages before planning/
   );
 });
 
