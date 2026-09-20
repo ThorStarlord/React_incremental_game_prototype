@@ -4,6 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useAppSelector } from '../../../app/hooks';
 import { selectOpeningCampaignStage } from '../CampaignSpine';
 import { selectChapterProgress } from '../ChapterSelectors';
+import { selectCounterphasePreparationExplanation } from '../PlayerInsightSelectors';
 
 const ActionButton: React.FC<{ to: string; children: React.ReactNode }> = ({
   to,
@@ -31,6 +32,12 @@ export const CampaignSpinePanel: React.FC = () => {
   );
   const networkChapterComplete = useAppSelector(state =>
     selectChapterProgress(state, 'network_under_pressure').status === 'complete'
+  );
+  const counterphaseComplete = useAppSelector(state =>
+    selectChapterProgress(state, 'counterphase').status === 'complete'
+  );
+  const counterphaseExplanation = useAppSelector(
+    selectCounterphasePreparationExplanation
   );
 
   if (stage === 'PROLOGUE') return null;
@@ -145,12 +152,43 @@ export const CampaignSpinePanel: React.FC = () => {
     );
   }
 
+  if (!counterphaseComplete) {
+    return (
+      <Alert severity="info" data-testid="gc09-campaign-objective" sx={{ mb: 2 }}>
+        <AlertTitle>Chapter 7 — Counterphase</AlertTitle>
+        <Typography variant="body2">
+          The network posture is committed. Prepare the matching finale profile, then return to
+          Lyra for the irreversible finale commitment. Copies may continue mastered safe routines,
+          but they cannot choose this plan.
+        </Typography>
+        {counterphaseExplanation && (
+          <Box sx={{ mt: 1.5 }}>
+            <Typography variant="subtitle2">
+              Why {counterphaseExplanation.title} is available
+            </Typography>
+            {counterphaseExplanation.reasons.map(reason => (
+              <Typography key={reason} variant="body2" color="text.secondary">
+                {reason}
+              </Typography>
+            ))}
+          </Box>
+        )}
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
+          <ActionButton to="/game/npcs/npc_lyra">Open Lyra</ActionButton>
+          <ActionButton to="/game/quests">Open quests</ActionButton>
+          <ActionButton to="/game/copies">Open Copies</ActionButton>
+        </Stack>
+      </Alert>
+    );
+  }
+
   return (
-    <Alert severity="success" data-testid="gc08-campaign-objective" sx={{ mb: 2 }}>
-      <AlertTitle>Chapter 6 complete — Counterphase is next</AlertTitle>
+    <Alert severity="success" data-testid="gc09-campaign-objective" sx={{ mb: 2 }}>
+      <AlertTitle>Counterphase plan committed — Telluric Echo finale next</AlertTitle>
       <Typography variant="body2">
-        The network now has an explicit posture, and its uneven Knowledge, institutional support,
-        relationship history, and delegated preparation remain intact for Chapter 7.
+        The finale plan is now explicit and persisted. Campaign One can enter the Telluric Echo
+        confrontation without collapsing prior Relationship, Knowledge, Faction, World State,
+        capability, or delegation history into a readiness score.
       </Typography>
     </Alert>
   );
