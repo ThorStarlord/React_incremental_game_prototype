@@ -114,6 +114,7 @@
   "elder_willow_lore": {
     "id": "elder_willow_lore",
     "npcId": "npc_elder_willow",
+    "title": "Roots Before the City",
     "text": "Long before the city, roots held secrets.",
     "effects": [
       { "type": "AFFINITY_DELTA", "value": 1 },
@@ -142,6 +143,7 @@
   "gronk_smile": {
     "id": "gronk_smile",
     "npcId": "npc_blacksmith_gronk",
+    "title": "A Smith's Approval",
     "text": "Hmph. You got taste.",
     "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
   },
@@ -618,6 +620,7 @@
   "valerius_offer_patrol": {
     "id": "valerius_offer_patrol",
     "npcId": "npc_captain_valerius",
+    "title": "Patrol the Merchant District",
     "text": "Patrol the merchant district and report back.",
     "responses": {
       "accept": "I'll do the rounds.",
