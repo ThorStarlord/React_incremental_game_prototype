@@ -64,6 +64,7 @@ export const initializeNPCsThunk = createAsyncThunk<
         '/data/m24-world-state-content.json',
         '/data/m25-chapter-content.json',
         '/data/gc06-lattice-content.json',
+        '/data/gc07-chrono-crypt-content.json',
       ] as const;
 
       for (const extensionUrl of contentExtensionUrls) {
@@ -145,6 +146,7 @@ export const unlockCampaignNpcsThunk = createAsyncThunk<
         '/data/m24-world-state-content.json',
         '/data/m25-chapter-content.json',
         '/data/gc06-lattice-content.json',
+        '/data/gc07-chrono-crypt-content.json',
       ] as const) {
         try {
           const extensionResponse = await fetch(extensionUrl);
