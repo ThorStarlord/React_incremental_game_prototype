@@ -48,6 +48,15 @@
       "structural",
       "fortified",
       "diagnostic"
+    ],
+    "campaignStatus": [
+      "complete"
+    ],
+    "telluricEchoOutcome": [
+      "distributed_dissipation",
+      "structural_redirection",
+      "diagnostic_disruption",
+      "fortified_containment"
     ]
   },
   "advisoryDanglingTargets": [
