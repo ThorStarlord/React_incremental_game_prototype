@@ -1,0 +1,328 @@
+{
+  "dialogues": {
+    "lyra_gc09_prepare_distributed": {
+      "id": "lyra_gc09_prepare_distributed",
+      "npcId": "npc_lyra",
+      "title": "Prepare the Distributed Counterphase",
+      "text": "Your Chapter 6 distributed network posture defines what can be prepared, but it does not choose the finale plan for you. Lyra asks whether you want to turn that posture into an explicit counterphase preparation.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc08_exp_commit_distributed"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "equals": "distributed"
+        }
+      ],
+      "responses": {
+        "prepare": "Begin the distributed counterphase preparation."
+      },
+      "effects": [
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc09_distributed_counterphase",
+          "responseId": "prepare"
+        }
+      ],
+      "next": {
+        "prepare": null
+      }
+    },
+    "lyra_gc09_commit_distributed": {
+      "id": "lyra_gc09_commit_distributed",
+      "npcId": "npc_lyra",
+      "title": "Commit the Distributed Counterphase",
+      "text": "The preparation is complete. Lyra waits for the irreversible instruction: carry the distributed plan into the Telluric Echo confrontation, or keep preparing.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc09_exp_prepare_distributed"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "equals": "distributed"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc09_finale_commitment_made"
+      ],
+      "responses": {
+        "commit": "Commit the distributed counterphase plan to the finale."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc09_finale_commitment_made",
+          "responseId": "commit"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "value": "distributed",
+          "responseId": "commit"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc09_exp_commit_distributed",
+          "responseId": "commit"
+        }
+      ],
+      "next": {
+        "commit": null
+      }
+    },
+    "lyra_gc09_prepare_structural": {
+      "id": "lyra_gc09_prepare_structural",
+      "npcId": "npc_lyra",
+      "title": "Prepare the Structural Counterphase",
+      "text": "Your Chapter 6 structural network posture defines what can be prepared, but it does not choose the finale plan for you. Lyra asks whether you want to turn that posture into an explicit counterphase preparation.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc08_exp_commit_structural"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "equals": "structural"
+        }
+      ],
+      "responses": {
+        "prepare": "Begin the structural counterphase preparation."
+      },
+      "effects": [
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc09_structural_counterphase",
+          "responseId": "prepare"
+        }
+      ],
+      "next": {
+        "prepare": null
+      }
+    },
+    "lyra_gc09_commit_structural": {
+      "id": "lyra_gc09_commit_structural",
+      "npcId": "npc_lyra",
+      "title": "Commit the Structural Counterphase",
+      "text": "The preparation is complete. Lyra waits for the irreversible instruction: carry the structural plan into the Telluric Echo confrontation, or keep preparing.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc09_exp_prepare_structural"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "equals": "structural"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc09_finale_commitment_made"
+      ],
+      "responses": {
+        "commit": "Commit the structural counterphase plan to the finale."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc09_finale_commitment_made",
+          "responseId": "commit"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "value": "structural",
+          "responseId": "commit"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc09_exp_commit_structural",
+          "responseId": "commit"
+        }
+      ],
+      "next": {
+        "commit": null
+      }
+    },
+    "lyra_gc09_prepare_diagnostic": {
+      "id": "lyra_gc09_prepare_diagnostic",
+      "npcId": "npc_lyra",
+      "title": "Prepare the Diagnostic Counterphase",
+      "text": "Your Chapter 6 diagnostic network posture defines what can be prepared, but it does not choose the finale plan for you. Lyra asks whether you want to turn that posture into an explicit counterphase preparation.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc08_exp_commit_diagnostic"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "equals": "diagnostic"
+        }
+      ],
+      "responses": {
+        "prepare": "Begin the diagnostic counterphase preparation."
+      },
+      "effects": [
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc09_diagnostic_counterphase",
+          "responseId": "prepare"
+        }
+      ],
+      "next": {
+        "prepare": null
+      }
+    },
+    "lyra_gc09_commit_diagnostic": {
+      "id": "lyra_gc09_commit_diagnostic",
+      "npcId": "npc_lyra",
+      "title": "Commit the Diagnostic Counterphase",
+      "text": "The preparation is complete. Lyra waits for the irreversible instruction: carry the diagnostic plan into the Telluric Echo confrontation, or keep preparing.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc09_exp_prepare_diagnostic"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "equals": "diagnostic"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc09_finale_commitment_made"
+      ],
+      "responses": {
+        "commit": "Commit the diagnostic counterphase plan to the finale."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc09_finale_commitment_made",
+          "responseId": "commit"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "value": "diagnostic",
+          "responseId": "commit"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc09_exp_commit_diagnostic",
+          "responseId": "commit"
+        }
+      ],
+      "next": {
+        "commit": null
+      }
+    },
+    "lyra_gc09_prepare_fortified": {
+      "id": "lyra_gc09_prepare_fortified",
+      "npcId": "npc_lyra",
+      "title": "Prepare the Fortified Counterphase",
+      "text": "Your Chapter 6 fortified network posture defines what can be prepared, but it does not choose the finale plan for you. Lyra asks whether you want to turn that posture into an explicit counterphase preparation.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc08_exp_commit_fortified"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "equals": "fortified"
+        }
+      ],
+      "responses": {
+        "prepare": "Begin the fortified counterphase preparation."
+      },
+      "effects": [
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc09_fortified_counterphase",
+          "responseId": "prepare"
+        }
+      ],
+      "next": {
+        "prepare": null
+      },
+      "requiredFactionReputation": [
+        {
+          "factionId": "City Watch",
+          "min": 0
+        }
+      ]
+    },
+    "lyra_gc09_commit_fortified": {
+      "id": "lyra_gc09_commit_fortified",
+      "npcId": "npc_lyra",
+      "title": "Commit the Fortified Counterphase",
+      "text": "The preparation is complete. Lyra waits for the irreversible instruction: carry the fortified plan into the Telluric Echo confrontation, or keep preparing.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc09_exp_prepare_fortified"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "networkPosture",
+          "equals": "fortified"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc09_finale_commitment_made"
+      ],
+      "responses": {
+        "commit": "Commit the fortified counterphase plan to the finale."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc09_finale_commitment_made",
+          "responseId": "commit"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "value": "fortified",
+          "responseId": "commit"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc09_exp_commit_fortified",
+          "responseId": "commit"
+        }
+      ],
+      "next": {
+        "commit": null
+      },
+      "requiredFactionReputation": [
+        {
+          "factionId": "City Watch",
+          "min": 0
+        }
+      ]
+    }
+  },
+  "npcDialogueIds": {
+    "npc_lyra": [
+      "lyra_gc09_prepare_distributed",
+      "lyra_gc09_commit_distributed",
+      "lyra_gc09_prepare_structural",
+      "lyra_gc09_commit_structural",
+      "lyra_gc09_prepare_diagnostic",
+      "lyra_gc09_commit_diagnostic",
+      "lyra_gc09_prepare_fortified",
+      "lyra_gc09_commit_fortified"
+    ]
+  }
+}

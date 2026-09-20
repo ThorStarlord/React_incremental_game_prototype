@@ -673,7 +673,7 @@ describe('GC-08 Network Under Pressure', () => {
         </MemoryRouter>
       </Provider>
     );
-    expect(screen.getByText('Chapter 6 complete — Counterphase is next')).toBeInTheDocument();
+    expect(screen.getByText('Chapter 7 — Counterphase')).toBeInTheDocument();
   });
 
   test('GC-08 introduces no universal readiness meter or autonomous strategic planner', () => {

@@ -1,5 +1,6 @@
 import type { RootState } from '../../../app/store';
 import type {
+  CounterphasePlan,
   LatticeIntegrity,
   NetworkPosture,
   RegionalWorldState,
@@ -76,6 +77,25 @@ export const selectNetworkPosture = (
 ): NetworkPosture | undefined =>
   getNetworkPostureFromRegions(selectWorldStateRegions(state), regionId);
 
+export const getCounterphasePlanFromRegions = (
+  regions: WorldStateRegions,
+  regionId: string
+): CounterphasePlan | undefined => {
+  const value = regions[regionId]?.counterphasePlan;
+  return (
+    value === 'distributed' ||
+    value === 'structural' ||
+    value === 'fortified' ||
+    value === 'diagnostic'
+  ) ? value : undefined;
+};
+
+export const selectCounterphasePlan = (
+  state: RootState,
+  regionId: string
+): CounterphasePlan | undefined =>
+  getCounterphasePlanFromRegions(selectWorldStateRegions(state), regionId);
+
 export const doesWorldStateRequirementPass = (
   regions: WorldStateRegions,
   requirement: unknown
@@ -116,6 +136,18 @@ export const doesWorldStateRequirementPass = (
       return false;
     }
     return getNetworkPostureFromRegions(regions, candidate.regionId) === candidate.equals;
+  }
+
+  if (candidate.field === 'counterphasePlan') {
+    if (
+      candidate.equals !== 'distributed' &&
+      candidate.equals !== 'structural' &&
+      candidate.equals !== 'fortified' &&
+      candidate.equals !== 'diagnostic'
+    ) {
+      return false;
+    }
+    return getCounterphasePlanFromRegions(regions, candidate.regionId) === candidate.equals;
   }
 
   return false;

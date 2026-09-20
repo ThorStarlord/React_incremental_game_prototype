@@ -583,5 +583,149 @@
     ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
+  },
+  "quest_gc09_distributed_counterphase": {
+    "id": "quest_gc09_distributed_counterphase",
+    "title": "Prepare the Distributed Counterphase",
+    "description": "Turn the distributed network posture into a finale-capable deployment using broad verified procedures rather than optional specialization.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Verify distributed counterphase deployment in the Merchant District",
+        "type": "REACH_LOCATION",
+        "target": "location_merchant_district",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_distributed_finale",
+        "label": "Prepare Distributed Counterphase",
+        "description": "Use the broad verified network as the finale preparation baseline. No optional permanent Trait pair is required.",
+        "relationshipExperienceId": "lyra_gc09_exp_prepare_distributed",
+        "rewards": [],
+        "logMessage": "You convert the distributed posture into a concrete counterphase deployment that remains legal without optional specialization."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc09_structural_counterphase": {
+    "id": "quest_gc09_structural_counterphase",
+    "title": "Prepare the Structural Counterphase",
+    "description": "Prepare the load-bearing paths that will carry the counterphase through the finale.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Finalize load-path deployment from the City Center",
+        "type": "REACH_LOCATION",
+        "target": "location_city_center",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_structural_finale",
+        "label": "Prepare Structural Counterphase",
+        "description": "Use Willow's Wisdom and Constraint Sense to align the finale plan with the network structures that actually carry the response.",
+        "relationshipExperienceId": "lyra_gc09_exp_prepare_structural",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You finalize a counterphase deployment around the network's actual load-bearing paths."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc09_diagnostic_counterphase": {
+    "id": "quest_gc09_diagnostic_counterphase",
+    "title": "Prepare the Diagnostic Counterphase",
+    "description": "Return to the Chrono-Crypt and turn the diagnostic network posture into a prediction-first finale plan.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Calibrate the diagnostic finale model in the Chrono-Crypt",
+        "type": "REACH_LOCATION",
+        "target": "location_chrono_crypt",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_diagnostic_finale",
+        "label": "Prepare Diagnostic Counterphase",
+        "description": "Use Scholarly Insight and Adversarial Calibration to build the finale plan around predicted contradiction in the Echo's next phase.",
+        "relationshipExperienceId": "lyra_gc09_exp_prepare_diagnostic",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "You calibrate a finale plan that treats the network as an adversarial diagnostic instrument."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc09_fortified_counterphase": {
+    "id": "quest_gc09_fortified_counterphase",
+    "title": "Prepare the Fortified Counterphase",
+    "description": "Coordinate the Watch-supported network posture into a bounded finale deployment without turning institutional support into a personal Relationship score.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Finalize fortified counterphase logistics at the City Gate",
+        "type": "REACH_LOCATION",
+        "target": "location_city_gate",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_fortified_finale",
+        "label": "Prepare Fortified Counterphase",
+        "description": "Coordinate the already-authorized Watch logistics with the counterphase network. No optional Trait pair is mandatory.",
+        "relationshipExperienceId": "lyra_gc09_exp_prepare_fortified",
+        "rewards": [],
+        "logMessage": "You finalize the Watch-supported counterphase deployment while keeping institutional support distinct from personal Relationship."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   }
 }
