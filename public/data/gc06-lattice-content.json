@@ -1,0 +1,196 @@
+{
+  "dialogues": {
+    "elara_gc06_lattice_diagnosis": {
+      "id": "elara_gc06_lattice_diagnosis",
+      "npcId": "npc_scholar_elara",
+      "title": "The Same Error in Three Systems",
+      "text": "Elara lays the archive contradiction beside current freight failures and the harmonic pattern you survived with Lyra. 'These are not three incidents. The same phase error is appearing wherever the local network carries enough load. The lattice is under strain.'",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_exp_independent_verification",
+        "lyra_exp_proto_bond"
+      ],
+      "anyOfExperienceIds": [
+        "gronk_exp_aftermath_quiet_reroute",
+        "valerius_exp_aftermath_public_crackdown"
+      ],
+      "responses": {
+        "diagnose": "Treat the repeated mismatch as one network problem. Mark what we know and what we do not."
+      },
+      "effects": [
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "elara_gc06_exp_lattice_diagnosed",
+          "responseId": "diagnose"
+        },
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc06_lattice_echo_pattern",
+          "responseId": "diagnose"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "value": "strained",
+          "responseId": "diagnose"
+        },
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc06_lattice_under_strain",
+          "responseId": "diagnose"
+        }
+      ],
+      "next": {
+        "diagnose": null
+      }
+    },
+    "valerius_gc06_lattice_briefing": {
+      "id": "valerius_gc06_lattice_briefing",
+      "npcId": "npc_captain_valerius",
+      "title": "An Institutional Problem, Not a Rumor",
+      "text": "Valerius listens while you separate Elara's evidence from your interpretation. 'If this is one network failure, the Watch changes deployment because of the operational fact, not because I trust your instincts.'",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_gc06_exp_lattice_diagnosed"
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc06_lattice_echo_pattern"
+      ],
+      "responses": {
+        "brief": "Put the lattice pattern in the Watch record. Judge the response institutionally."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc06_lattice_echo_pattern",
+          "responseId": "brief"
+        },
+        {
+          "type": "FACTION_REPUTATION",
+          "factionId": "City Watch",
+          "value": 2,
+          "responseId": "brief"
+        }
+      ],
+      "next": {
+        "brief": null
+      }
+    },
+    "gronk_gc06_lattice_briefing": {
+      "id": "gronk_gc06_lattice_briefing",
+      "npcId": "npc_blacksmith_gronk",
+      "title": "Tell Him Where the Load Actually Moves",
+      "text": "Gronk has seen warped fittings and bad manifests, but not Elara's shared pattern. You can leave those as local craft failures or give him the network diagnosis.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_gc06_exp_lattice_diagnosed"
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc06_lattice_echo_pattern"
+      ],
+      "responses": {
+        "brief": "The failures line up across systems. The load path is larger than the workshop."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc06_lattice_echo_pattern",
+          "responseId": "brief"
+        }
+      ],
+      "next": {
+        "brief": null
+      }
+    },
+    "valerius_gc06_stabilize_lattice": {
+      "id": "valerius_gc06_stabilize_lattice",
+      "npcId": "npc_captain_valerius",
+      "title": "Stabilize What the City Can Hold",
+      "text": "The chosen response has changed the pressure pattern. Valerius checks the district reports against the lattice diagnosis. 'Local failures are dropping. That is an objective condition, not a victory speech.'",
+      "repeatable": false,
+      "anyOfExperienceIds": [
+        "valerius_gc06_exp_surface_containment",
+        "gronk_gc06_exp_structural_steward",
+        "lyra_gc06_exp_countermodeler"
+      ],
+      "requiredKnowledgeFactIds": [
+        "fact_gc06_lattice_echo_pattern"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "strained"
+        }
+      ],
+      "responses": {
+        "stabilize": "Record the local lattice as stabilized. Keep the deeper Echo problem open."
+      },
+      "effects": [
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "value": "stabilized",
+          "responseId": "stabilize"
+        }
+      ],
+      "next": {
+        "stabilize": null
+      }
+    },
+    "lyra_gc06_chrono_crypt_route": {
+      "id": "lyra_gc06_chrono_crypt_route",
+      "npcId": "npc_lyra",
+      "title": "The Local Fix Is Not the Countermeasure",
+      "text": "Lyra studies the stabilized reports without congratulating you. 'You changed the local response. You did not change the thing that keeps producing the phase error. The Chrono-Crypt records older harmonic failures. If there is a counterphase, it will be there.'",
+      "repeatable": false,
+      "anyOfExperienceIds": [
+        "valerius_gc06_exp_surface_containment",
+        "gronk_gc06_exp_structural_steward",
+        "lyra_gc06_exp_countermodeler"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "latticeIntegrity",
+          "equals": "stabilized"
+        }
+      ],
+      "responses": {
+        "agree": "Then we go to the crypt for a countermeasure, not another local patch."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc06_lattice_echo_pattern",
+          "responseId": "agree"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc06_exp_chrono_crypt_route",
+          "responseId": "agree"
+        }
+      ],
+      "next": {
+        "agree": null
+      }
+    }
+  },
+  "npcDialogueIds": {
+    "npc_scholar_elara": [
+      "elara_gc06_lattice_diagnosis"
+    ],
+    "npc_captain_valerius": [
+      "valerius_gc06_lattice_briefing",
+      "valerius_gc06_stabilize_lattice"
+    ],
+    "npc_blacksmith_gronk": [
+      "gronk_gc06_lattice_briefing"
+    ],
+    "npc_lyra": [
+      "lyra_gc06_chrono_crypt_route"
+    ]
+  }
+}
