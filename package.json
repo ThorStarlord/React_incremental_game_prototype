@@ -39,6 +39,7 @@
     "content:intelligence:validate": "node scripts/content-intelligence/selftest.js && node scripts/content-intelligence/content-audit.js && node scripts/content-intelligence/reachability-check.js && node scripts/content-intelligence/route-trace.js --target valerius_m25_public_order_conclusion && node scripts/content-intelligence/route-trace.js --target gronk_m25_quiet_network_conclusion && npm run chapter:validate",
     "m26:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand M26ProvisionalProductDepthQualification.test.ts PostM25PlayerInsightsQualification.test.ts PostM25CopyRoutineStrategy.test.ts",
     "gc01:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC01PlayerSurfaceScopeCleanup.test.ts",
+    "gc02:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC02PrologueOnboarding.test.tsx",
     "simulated-review:validate": "node --check scripts/simulated-product-review/ui-observer.js && node --check scripts/simulated-product-review/action-contract.js && node --check scripts/simulated-product-review/validate-action-contract.js && node --check scripts/simulated-product-review/validate-config.js && node scripts/simulated-product-review/validate-config.js",
     "simulated-review:action-contract": "node scripts/simulated-product-review/validate-action-contract.js",
     "simulated-review:observe": "node scripts/simulated-product-review/ui-observer.js",

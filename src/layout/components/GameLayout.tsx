@@ -11,6 +11,7 @@ import GlobalNotificationHost from '../../shared/components/ui/GlobalNotificatio
 import { useAppSelector } from '../../app/hooks';
 import { selectHasSeenIntro } from '../../features/Meta/state/MetaSlice';
 import { useNpcShopRestock } from '../../features/NPCs/hooks/useNpcShopRestock';
+import { PrologueObjectivePanel } from '../../features/Story/components/PrologueObjectivePanel';
 
 /**
  * New GameLayout component that integrates with useLayoutState hook
@@ -83,6 +84,7 @@ export const GameLayout: React.FC = React.memo(() => {
           activeTabId={activeTab}
           changeTab={setActiveTab}
         >
+          <PrologueObjectivePanel />
           <Outlet />
           {!hasSeenIntro && <IntroNarration />}
         </MainContentArea>

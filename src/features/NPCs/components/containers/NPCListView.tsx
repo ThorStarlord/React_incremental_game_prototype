@@ -3,7 +3,7 @@
  * @description Container component for browsing and managing discovered NPCs
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -30,13 +30,12 @@ import {
   Paper,
 } from '@mui/material';
 import { Search, Person, Star, ViewList, ViewModule } from '@mui/icons-material';
-import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
+import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
 import { selectHasSeenIntro } from '../../../Meta/state/MetaSlice';
 import { selectPlayerLocation } from '../../../Player/state/PlayerSelectors';
 import { isPlayerAtNpcWorldLocation } from '../../state/NPCWorldLocationDefinitions';
 import { NPC } from '../../state/NPCTypes';
-import { initializeNPCsThunk } from '../..';
 import { NPCListCard } from '../ui/NPCListCard';
 
 interface NPCListViewProps {
@@ -55,16 +54,11 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   const discoveredNPCIds = useAppSelector(selectDiscoveredNPCs);
   const playerLocation = useAppSelector(selectPlayerLocation);
   const hasSeenIntro = useAppSelector(selectHasSeenIntro);
-  const dispatch = useAppDispatch();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  useEffect(() => {
-    dispatch(initializeNPCsThunk());
-  }, [dispatch]);
 
   const handleViewChange = (
     event: React.MouseEvent<HTMLElement>,
