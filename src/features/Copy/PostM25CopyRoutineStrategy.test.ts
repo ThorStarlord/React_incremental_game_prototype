@@ -19,10 +19,13 @@ describe('post-M25 Copy routine strategy', () => {
   test('priority is a bounded ordered allowlist of authored production routines', () => {
     expect(normalizeCopyRoutinePriority([
       'unknown_runtime_task',
+      'archive_verification',
       'resonance_calibration',
       'forge_assistance',
+      'archive_verification',
       'resonance_calibration',
     ])).toEqual([
+      'archive_verification',
       'resonance_calibration',
       'forge_assistance',
     ]);
