@@ -1,11 +1,13 @@
 # Repository Status — Playable Pre-Alpha / Campaign One Completion
 
-**Status date:** 2026-09-11  
-**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
+**Status date:** 2026-09-20  
+**Integrated implementation baseline:** `a8f313125b67f5c368033129344092e2e25dd63f`  
 **Current maturity:** `PLAYABLE PRE-ALPHA`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
 **GC-01:** `COMPLETE / INTEGRATED`  
+**GC-02:** `COMPLETE / INTEGRATED`  
+**GC-03:** `COMPLETE / INTEGRATED`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Active program:** Campaign One / 1.0 Game Completion
 
@@ -72,7 +74,7 @@ merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
 
 GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
 
-The next unsatisfied completion-program responsibility is GC-02 Prologue / onboarding.
+GC-02 and GC-03 are now integrated. The next responsibility is **GC-04 / GC-05 evidence reconciliation**: count actual relationship-derived capability/buildcraft and mastered-routine/delegation breadth before authorizing any standalone feature work.
 
 ## Finished-game target
 
@@ -85,10 +87,10 @@ Campaign One ends on the isolated planet with the Telluric Echo finale and a sta
 ## Campaign spine
 
 ```text
-Prologue                                      [missing]
-Chapter 1 — Merchant District Crisis          [integrated]
-Chapter 2 — Archive Inquiry                   [integrated]
-Chapter 3 — Enemies in Phase                  [integrated]
+Prologue                                      [integrated]
+Chapter 1 — Merchant District Crisis          [integrated / connected]
+Chapter 2 — Archive Inquiry                   [integrated / connected]
+Chapter 3 — Enemies in Phase                  [integrated / connected]
 Chapter 4 — Lattice Under Strain              [missing]
 Chapter 5 — The Chrono-Crypt                  [missing]
 Chapter 6 — Network Under Pressure            [missing]
@@ -127,8 +129,8 @@ Before 1.0, the campaign must support at least:
 ```text
 [x] GC-00 M26 closure + completion-program authority
 [x] GC-01 1.0 player-surface scope cleanup
-[ ] GC-02 Prologue / onboarding
-[ ] GC-03 Chapters 1–3 campaign integration
+[x] GC-02 Prologue / onboarding
+[x] GC-03 Chapters 1–3 campaign integration
 [ ] GC-04 Buildcraft breadth
 [ ] GC-05 Earned-delegation breadth
 [ ] GC-06 Chapter 4 — Lattice Under Strain
@@ -170,7 +172,7 @@ Under the completion program this is not a blanket pre-Alpha development freeze.
 
 ## Do not restart by inertia
 
-M4–M26, GC-01, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
+M4–M26, GC-01, GC-02, GC-03, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
 
 ## Governing implementation rule
 
