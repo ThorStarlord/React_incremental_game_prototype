@@ -308,10 +308,24 @@ describe('GC-07 The Chrono-Crypt', () => {
       ...base,
       relationships: {
         ...base.relationships,
-        experiencesById: {
-          lyra_gc06_exp_chrono_crypt_route: { id: 'lyra_gc06_exp_chrono_crypt_route' } as any,
-          valerius_gc06_exp_surface_containment: { id: 'valerius_gc06_exp_surface_containment' } as any,
-        },
+        experiencesById: Object.fromEntries([
+          'willow_exp_first_lesson',
+          'elara_exp_model_challenged',
+          'elara_exp_contradictory_footnote',
+          'elara_exp_tome_committed',
+          'elara_exp_follow_evidence',
+          'elara_exp_revision_mutual',
+          'elara_exp_theory_neither_owned',
+          'elara_exp_independent_verification',
+          'lyra_exp_strategic_defeat',
+          'lyra_exp_coercion_reflected',
+          'lyra_exp_reluctant_cotraining',
+          'lyra_exp_ideological_friction',
+          'lyra_exp_mutual_calibration',
+          'lyra_exp_proto_bond',
+          'valerius_gc06_exp_surface_containment',
+          'lyra_gc06_exp_chrono_crypt_route',
+        ].map(id => [id, { id }])) as RootState['relationships']['experiencesById'],
       },
       npcs: {
         ...base.npcs,
