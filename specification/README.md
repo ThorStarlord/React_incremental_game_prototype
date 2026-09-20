@@ -126,6 +126,7 @@ npm run content-alpha:validate
 
 - [`Technical/GC11AlphaResult.md`](Technical/GC11AlphaResult.md) — **CURRENT AUTHORITY, INTEGRATED** for `ALPHA_PASS / HUMAN_UNVALIDATED`.
 - [`Technical/GC12ContentAlphaResult.md`](Technical/GC12ContentAlphaResult.md) — **CURRENT AUTHORITY, INTEGRATED** for `CONTENT_ALPHA / HUMAN_UNVALIDATED`.
+- [`Technical/GC13BetaTechnicalReadinessPreregistration.md`](Technical/GC13BetaTechnicalReadinessPreregistration.md) — **CURRENT ACTIVE PACKAGE** for deterministic Beta preparation; it cannot satisfy issue #109.
 
 ### Maturity gates
 
