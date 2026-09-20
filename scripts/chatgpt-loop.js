@@ -182,6 +182,14 @@ const STREAM_END_TIMEOUT_MS = Number.isFinite(configuredStreamTimeout) && config
 const SETTLE_DELAY_MS = 6_000;
 const COOLDOWN_DELAY_MS = 4_000;
 const CYCLE_COOLDOWN_MS = 15_000;
+const configuredPromptGap = Number(process.env.CHATGPT_PROMPT_GAP_MS);
+const PROMPT_GAP_MS = Number.isFinite(configuredPromptGap) && configuredPromptGap >= 0
+  ? configuredPromptGap
+  : 20_000;
+const configuredParallelism = Number(process.env.CHATGPT_PARALLELISM);
+const MAX_PARALLEL_SESSIONS = Number.isInteger(configuredParallelism) && configuredParallelism > 0
+  ? configuredParallelism
+  : 1;
 const LOGIN_TIMEOUT_MS = 10 * 60_000;
 
 const COMPOSER_SELECTORS = [
@@ -201,6 +209,14 @@ const ASSISTANT_MESSAGE_SELECTORS = [
   '[data-message-author-role="assistant"]'
 ];
 const REQUIRED_IDLE_MS = 6_000;
+const HUMAN_CHALLENGE_PATTERNS = [
+  /checking if you(?:'|’)re human/i,
+  /checking if you are human/i,
+  /verify (?:that )?you(?:'|’)re human/i,
+  /human verification/i,
+  /captcha/i,
+  /just a moment\.\.\./i
+];
 
 const VERSION_1_READY_STATUS = "STATUS: VERSION_1_REPOSITORY_READY";
 const AWAITING_HUMAN_STATUS_PREFIX = "STATUS: AWAITING_HUMAN_EVIDENCE";
@@ -220,6 +236,8 @@ let _startResolve = null;
 let _startReject = null;
 let readlineInterface = null;
 let browserContext = null;
+let nextPromptAllowedAt = 0;
+let promptSendQueue = Promise.resolve();
 
 const startPromise = new Promise((resolve, reject) => {
   _startResolve = resolve;
@@ -252,6 +270,9 @@ async function findFirstVisible(page, selectors, timeout = 30_000) {
 
   while (Date.now() < deadline) {
     if (stopRequested) throw new Error("Stop requested by operator.");
+    if (await isHumanVerificationChallenge(page)) {
+      await waitForHumanVerification(page, timeout);
+    }
 
     for (const sel of selectors) {
       try {
@@ -277,6 +298,9 @@ async function waitForLogin(page, timeoutMs = LOGIN_TIMEOUT_MS) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     if (stopRequested) throw new Error("Stop requested by operator.");
+    if (await isHumanVerificationChallenge(page)) {
+      await waitForHumanVerification(page, timeoutMs);
+    }
     try {
       for (const sel of COMPOSER_SELECTORS) {
         const locator = page.locator(sel);
@@ -363,9 +387,61 @@ async function waitForComposerCleared(page, composer, timeoutMs = 10_000) {
   throw new Error("Prompt was not cleared after submission; refusing to continue.");
 }
 
+function waitForPromptSlot() {
+  const turn = promptSendQueue.then(async () => {
+    const waitMs = Math.max(0, nextPromptAllowedAt - Date.now());
+    if (waitMs > 0) {
+      console.log(`[throttle] Waiting ${Math.ceil(waitMs / 1000)}s before the next prompt submission...`);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
+    }
+    nextPromptAllowedAt = Date.now() + PROMPT_GAP_MS;
+  });
+
+  promptSendQueue = turn.catch(() => {});
+  return turn;
+}
+
+async function isHumanVerificationChallenge(page) {
+  if (page.isClosed()) return false;
+
+  try {
+    const title = await page.title();
+    const bodyText = await page.locator("body").innerText({ timeout: 1_000 });
+    return HUMAN_CHALLENGE_PATTERNS.some(pattern => pattern.test(`${title}\n${bodyText}`));
+  } catch {
+    return false;
+  }
+}
+
+async function waitForHumanVerification(page, timeoutMs = LOGIN_TIMEOUT_MS) {
+  console.warn("[challenge] Human verification detected. Complete it manually in the browser window.");
+  console.warn("[challenge] Automation is paused for this tab until the normal ChatGPT composer returns.");
+
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (stopRequested) throw new Error("Stop requested by operator.");
+    if (page.isClosed()) throw new Error("The browser tab was closed during human verification.");
+
+    if (!(await isHumanVerificationChallenge(page))) {
+      for (const selector of COMPOSER_SELECTORS) {
+        const composer = page.locator(selector);
+        if ((await composer.count()) > 0 && (await composer.first().isVisible())) {
+          console.log("[challenge] Human verification cleared; continuing.");
+          return;
+        }
+      }
+    }
+
+    await page.waitForTimeout(1_000);
+  }
+
+  throw new Error("Human verification did not clear before the login timeout.");
+}
+
 async function sendPrompt(page, text) {
   if (page.isClosed()) throw new Error("Cannot send a prompt on a closed page.");
   if (!text || !text.trim()) throw new Error("Cannot send empty prompt.");
+  if (await isHumanVerificationChallenge(page)) await waitForHumanVerification(page);
   // ChatGPT's contenteditable composer can drop newline separators. Flatten
   // them explicitly so adjacent words never become concatenated.
   const promptForComposer = text.replace(/\r\n/g, "\n").replace(/\n/g, " ");
@@ -385,6 +461,7 @@ async function sendPrompt(page, text) {
     try {
       const button = page.locator(sel).first();
       if ((await button.count()) > 0 && (await button.isVisible()) && (await button.isEnabled())) {
+        await waitForPromptSlot();
         await button.click();
         sent = true;
         break;
@@ -588,13 +665,21 @@ async function runHandoff({ repo, page }) {
 
 async function runParallelStage(label, sessions, worker) {
   const activeSessions = sessions.filter(session => !session.failed && !session.terminalStatus);
-  console.log(`\n=== ${label} (${activeSessions.length} tabs in parallel) ===`);
-  const results = await Promise.allSettled(activeSessions.map(worker));
+  console.log(
+    `\n=== ${label} (${activeSessions.length} active tabs, concurrency ${MAX_PARALLEL_SESSIONS}) ===`
+  );
+  const results = [];
+  for (let index = 0; index < activeSessions.length; index += MAX_PARALLEL_SESSIONS) {
+    const batch = activeSessions.slice(index, index + MAX_PARALLEL_SESSIONS);
+    const batchResults = await Promise.allSettled(batch.map(worker));
+    batchResults.forEach((result, batchIndex) => {
+      results.push({ result, session: batch[batchIndex] });
+    });
+  }
   const failures = [];
 
-  results.forEach((result, index) => {
+  results.forEach(({ result, session }) => {
     if (result.status === "rejected") {
-      const session = activeSessions[index];
       session.failed = true;
       failures.push(`${session.repo.name}: ${result.reason?.message || String(result.reason)}`);
     }
