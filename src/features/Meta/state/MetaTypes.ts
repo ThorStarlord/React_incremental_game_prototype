@@ -17,10 +17,4 @@ export interface MetaState {
   loadInProgress: boolean;
   error: string | null;
   hasSeenIntro: boolean;
-  campaignCompletion: CampaignCompletion | null;
-}
-
-export interface CampaignCompletion {
-  completedAt: number;
-  epilogueVariant: string;
 }
