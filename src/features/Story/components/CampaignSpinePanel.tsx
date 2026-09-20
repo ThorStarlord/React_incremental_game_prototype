@@ -68,7 +68,7 @@ export const CampaignSpinePanel: React.FC = () => {
           relationship history records the chapter's authored conclusion.
         </Typography>
         <Box sx={{ mt: 1.5 }}>
-          <ActionButton to="/game/npcs/npc_rival_lyra">Open Lyra</ActionButton>
+          <ActionButton to="/game/npcs/npc_lyra">Open Lyra</ActionButton>
         </Box>
       </Alert>
     );
