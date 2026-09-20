@@ -28,7 +28,13 @@ function buildValidFixture(root) {
       id: 'npc_test',
       name: 'Test NPC',
       faction: 'Test Guild',
-      availableDialogues: ['dialogue_root', 'dialogue_gated'],
+      availableDialogues: [
+        'dialogue_root',
+        'dialogue_gated',
+        'dialogue_branch_a',
+        'dialogue_branch_b',
+        'dialogue_fan_in',
+      ],
       availableQuests: [],
     },
   });
@@ -46,6 +52,33 @@ function buildValidFixture(root) {
       npcId: 'npc_test',
       title: 'Gated',
       requiredExperienceIds: ['exp_root'],
+      responses: { close: 'Close' },
+      effects: [],
+      next: { close: null },
+    },
+    dialogue_branch_a: {
+      id: 'dialogue_branch_a',
+      npcId: 'npc_test',
+      title: 'Branch A',
+      requiredExperienceIds: ['exp_root'],
+      responses: { continue: 'Continue A' },
+      effects: [{ type: 'RELATIONSHIP_EXPERIENCE', experienceId: 'exp_branch_a' }],
+      next: { continue: null },
+    },
+    dialogue_branch_b: {
+      id: 'dialogue_branch_b',
+      npcId: 'npc_test',
+      title: 'Branch B',
+      requiredExperienceIds: ['exp_root'],
+      responses: { continue: 'Continue B' },
+      effects: [{ type: 'RELATIONSHIP_EXPERIENCE', experienceId: 'exp_branch_b' }],
+      next: { continue: null },
+    },
+    dialogue_fan_in: {
+      id: 'dialogue_fan_in',
+      npcId: 'npc_test',
+      title: 'Fan In',
+      requiredExperienceIds: ['exp_branch_a', 'exp_branch_b'],
       responses: { close: 'Close' },
       effects: [],
       next: { close: null },
@@ -79,6 +112,22 @@ function buildValidFixture(root) {
         sourceType: 'system',
         sourceId: 'TraitProof',
       },
+      exp_branch_a: {
+        id: 'exp_branch_a',
+        title: 'Branch A experience',
+        primaryTargetId: 'npc_test',
+        participantIds: ['player', 'npc_test'],
+        sourceType: 'dialogue',
+        sourceId: 'dialogue_branch_a',
+      },
+      exp_branch_b: {
+        id: 'exp_branch_b',
+        title: 'Branch B experience',
+        primaryTargetId: 'npc_test',
+        participantIds: ['player', 'npc_test'],
+        sourceType: 'dialogue',
+        sourceId: 'dialogue_branch_b',
+      },
     },
     memories: {},
     progression: {},
@@ -100,6 +149,19 @@ assert(trace.requirements.some(requirement =>
 const resonanceTrace = traceTarget(validModel, 'exp_trait_resonance');
 assert(resonanceTrace, 'expected Trait-owned resonance trace');
 assert(resonanceTrace.producedBy.some(producer => producer.key === 'trait:TraitProof'));
+
+const fanInTrace = traceTarget(validModel, 'dialogue_fan_in');
+assert(fanInTrace, 'expected fan-in dialogue trace');
+assert.strictEqual(fanInTrace.reachable, true);
+const serializedFanInTrace = JSON.stringify(fanInTrace);
+assert(
+  serializedFanInTrace.includes('"reference":true'),
+  'expected shared prerequisite subgraph to collapse to an already-expanded reference'
+);
+assert(
+  serializedFanInTrace.length < 12000,
+  'expected bounded trace serialization for shared prerequisite DAG'
+);
 
 const brokenRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'content-intelligence-broken-'));
 buildValidFixture(brokenRoot);

@@ -4,7 +4,7 @@
       "id": "valerius_m25_public_order_conclusion",
       "npcId": "npc_captain_valerius",
       "title": "The District Holds, But Not Quietly",
-      "text": "Valerius looks over the latest patrol board, then at you. 'The Watch still dislikes the precedent you set. I still think the decision was correct. The freight streets are under pressure, but they are no longer pretending the old order was intact. We paid for control in legitimacy, and we know exactly where the bill came from.'",
+      "text": "Valerius studies the redeployed patrol map, then the record of the order you broke in public. Your earlier service still counts, but so does the institutional cost of overruling the Watch where everyone could see it. 'Good. Then we close this with the whole ledger visible: what you earned, what you spent, and what the district actually needed.'",
       "repeatable": false,
       "requiredExperienceIds": [
         "valerius_exp_aftermath_public_crackdown",
@@ -20,7 +20,7 @@
       "requiredFactionReputation": [
         {
           "factionId": "City Watch",
-          "max": -1
+          "max": 15
         }
       ],
       "requiredWorldState": [
