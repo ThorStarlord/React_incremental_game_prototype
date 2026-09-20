@@ -42,10 +42,10 @@ This direction remains **human-unvalidated**. Repository tests establish determi
 The 1.0 campaign is deliberately bounded:
 
 ```text
-Prologue
-Chapter 1 — Merchant District Crisis        [integrated]
-Chapter 2 — Archive Inquiry                 [integrated]
-Chapter 3 — Enemies in Phase                [integrated]
+Prologue                                    [integrated]
+Chapter 1 — Merchant District Crisis        [integrated / connected]
+Chapter 2 — Archive Inquiry                 [integrated / connected]
+Chapter 3 — Enemies in Phase                [integrated / connected]
 Chapter 4 — Lattice Under Strain            [planned 1.0]
 Chapter 5 — The Chrono-Crypt                [planned 1.0]
 Chapter 6 — Network Under Pressure          [planned 1.0]
@@ -74,10 +74,10 @@ Campaign One ends on the isolated planet. Interplanetary continuation, the large
 ## Current completion queue
 
 ```text
-GC-00  M26 closure + completion-program authority
-GC-01  1.0 player-surface scope cleanup
-GC-02  Prologue / onboarding
-GC-03  Chapters 1–3 campaign integration
+GC-00  M26 closure + completion-program authority     COMPLETE
+GC-01  1.0 player-surface scope cleanup                COMPLETE
+GC-02  Prologue / onboarding                           COMPLETE
+GC-03  Chapters 1–3 campaign integration               COMPLETE
 GC-04  Relationship-derived buildcraft breadth
 GC-05  Earned-delegation breadth
 GC-06  Chapter 4 — Lattice Under Strain

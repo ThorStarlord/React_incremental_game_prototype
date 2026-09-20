@@ -31,7 +31,7 @@ Do not start from an old milestone queue. Do not infer M27 from M26. The active 
 
 > Which unsatisfied 1.0 requirement is the current blocker?
 
-GC-01 is integrated. The next unsatisfied completion-program responsibility is GC-02 Prologue / onboarding.
+GC-01 through GC-03 are integrated. The next responsibility is to reconcile GC-04 buildcraft breadth and GC-05 earned-delegation breadth against actual production evidence before authorizing new feature work.
 
 ## Environment
 
@@ -98,8 +98,8 @@ Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 ```text
 [x] GC-00  M26 closure + completion-program authority
 [x] GC-01  1.0 player-surface scope cleanup
-[ ] GC-02  Prologue / onboarding
-[ ] GC-03  Chapters 1–3 campaign integration
+[x] GC-02  Prologue / onboarding
+[x] GC-03  Chapters 1–3 campaign integration
 [ ] GC-04  Buildcraft breadth
 [ ] GC-05  Earned-delegation breadth
 [ ] GC-06  Chapter 4 — Lattice Under Strain
@@ -203,6 +203,8 @@ A queued check is not a passing check. A green CI run is never permission to cla
 npm ci
 npm run docs:authority:validate
 npm run gc01:validate
+npm run gc02:validate
+npm run gc03:validate
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate

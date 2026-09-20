@@ -212,6 +212,8 @@ A fresh save can reach Chapter 1 through ordinary UI while experiencing the firs
 
 The first three chapters form one legal production campaign spine from a fresh-game opening.
 
+**Integrated result:** `GC03OpeningCampaignSpineResult.md` — PR #121, exact-head Build Validation #353 PASS, merge `a8f313125b67f5c368033129344092e2e25dd63f`.
+
 ## 9. Package GC-04 — Relationship-derived buildcraft breadth
 
 ### Completion requirements closed
@@ -522,9 +524,9 @@ Use this queue in `STATUS.md`:
 
 ```text
 [x] GC-00 M26 closure + completion-program authority
-[ ] GC-01 1.0 player-surface scope cleanup
-[ ] GC-02 Prologue / onboarding
-[ ] GC-03 Chapters 1–3 campaign integration
+[x] GC-01 1.0 player-surface scope cleanup
+[x] GC-02 Prologue / onboarding
+[x] GC-03 Chapters 1–3 campaign integration
 [ ] GC-04 Buildcraft breadth
 [ ] GC-05 Earned-delegation breadth
 [ ] GC-06 Chapter 4 — Lattice Under Strain
