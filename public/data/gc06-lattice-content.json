@@ -171,6 +171,11 @@
           "type": "RELATIONSHIP_EXPERIENCE",
           "experienceId": "lyra_gc06_exp_chrono_crypt_route",
           "responseId": "agree"
+        },
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc07_counterphase_principle",
+          "responseId": "agree"
         }
       ],
       "next": {

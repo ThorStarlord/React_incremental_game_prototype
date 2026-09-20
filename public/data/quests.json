@@ -415,5 +415,63 @@
     ],
     "status": "NOT_STARTED",
     "isAutoComplete": false
+  },
+  "quest_gc07_counterphase_principle": {
+    "id": "quest_gc07_counterphase_principle",
+    "title": "The Counterphase Principle",
+    "description": "Return to the Chrono-Crypt with Lyra and derive a reusable inverse to the Telluric Echo's repeating harmonic structure. The crypt records failures; the decision is how to read them.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Reach the Chrono-Crypt harmonic failure chamber",
+        "type": "REACH_LOCATION",
+        "target": "location_chrono_crypt",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "manual_harmonic_triangulation",
+        "label": "Manual Harmonic Triangulation",
+        "description": "Compare the preserved failures directly and triangulate the stable inverse pattern with Lyra. Slower and less elegant, but fully legal without optional capabilities.",
+        "relationshipExperienceId": "lyra_gc07_exp_manual_triangulation",
+        "rewards": [],
+        "logMessage": "You and Lyra manually compare the crypt's preserved failures until the inverse pattern becomes stable enough to carry forward."
+      },
+      {
+        "id": "structural_counterphase",
+        "label": "Structural Counterphase",
+        "description": "Use Willow's slow-system cognition and Gronk's constraint sense to identify the crypt structures carrying the repeating failure, then derive the inverse from those load paths.",
+        "relationshipExperienceId": "lyra_gc07_exp_structural_counterphase",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You trace the failure through the structures that actually carry it and derive a counterphase from the load-bearing pattern rather than the visible symptoms."
+      },
+      {
+        "id": "adversarial_countermodel",
+        "label": "Adversarial Countermodel",
+        "description": "Use Scholarly Insight and Adversarial Calibration to model the repeating failure as an opponent, predict its next phase, and derive the stable inverse.",
+        "relationshipExperienceId": "lyra_gc07_exp_adversarial_countermodel",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "You model the Echo's preserved failure sequence as an adversary, predict the next phase, and solve for the counterphase that makes that prediction fail."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   }
 }

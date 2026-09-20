@@ -26,6 +26,9 @@ export const CampaignSpinePanel: React.FC = () => {
   const latticeChapterComplete = useAppSelector(state =>
     selectChapterProgress(state, 'lattice_under_strain').status === 'complete'
   );
+  const chronoCryptComplete = useAppSelector(state =>
+    selectChapterProgress(state, 'chrono_crypt').status === 'complete'
+  );
 
   if (stage === 'PROLOGUE') return null;
 
@@ -99,16 +102,32 @@ export const CampaignSpinePanel: React.FC = () => {
     );
   }
 
+  if (!chronoCryptComplete) {
+    return (
+      <Alert severity="info" data-testid="gc07-campaign-objective" sx={{ mb: 2 }}>
+        <AlertTitle>Chapter 5 — The Chrono-Crypt</AlertTitle>
+        <Typography variant="body2">
+          The local lattice is stable, but containment is not a countermeasure. Start Lyra's
+          counterphase Quest, travel through the Whispering Woods into the unlocked Chrono-Crypt,
+          derive one legal solution, then return to Lyra to record what the result means.
+        </Typography>
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
+          <ActionButton to="/game/npcs/npc_lyra">Open Lyra</ActionButton>
+          <ActionButton to="/game/quests">Open quests</ActionButton>
+          <ActionButton to="/game/dashboard">Open travel controls</ActionButton>
+        </Stack>
+      </Alert>
+    );
+  }
+
   return (
-    <Alert severity="success" data-testid="gc06-campaign-objective" sx={{ mb: 2 }}>
-      <AlertTitle>Chapter 4 complete — the Chrono-Crypt is next</AlertTitle>
+    <Alert severity="success" data-testid="gc07-campaign-objective" sx={{ mb: 2 }}>
+      <AlertTitle>Chapter 5 complete — prepare the network</AlertTitle>
       <Typography variant="body2">
-        The local lattice is stabilized and Lyra has recorded why containment is not a
-        countermeasure. Continue into the Chrono-Crypt to investigate the counterphase principle.
+        The Chrono-Crypt has yielded a reusable counterphase principle. Campaign One can now move
+        into Chapter 6 — Network Under Pressure, where who knows what and which institutions will
+        cooperate become strategic preparation constraints.
       </Typography>
-      <Box sx={{ mt: 1.5 }}>
-        <ActionButton to="/game/npcs/npc_lyra">Continue with Lyra</ActionButton>
-      </Box>
     </Alert>
   );
 };

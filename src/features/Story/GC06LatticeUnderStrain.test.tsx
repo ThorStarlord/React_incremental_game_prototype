@@ -409,6 +409,6 @@ describe('GC-06 Lattice Under Strain', () => {
         </MemoryRouter>
       </Provider>
     );
-    expect(screen.getByText('Chapter 4 complete — the Chrono-Crypt is next')).toBeInTheDocument();
+    expect(screen.getByText('Chapter 5 — The Chrono-Crypt')).toBeInTheDocument();
   });
 });

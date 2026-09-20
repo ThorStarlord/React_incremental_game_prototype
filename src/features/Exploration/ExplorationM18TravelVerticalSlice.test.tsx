@@ -87,7 +87,14 @@ afterAll(() => {
 
 describe('M18 narrow exploration / travel vertical slice', () => {
   test('authored topology is bounded, reciprocal, and preserves Player as current-location authority', () => {
-    expect(EXPLORATION_LOCATIONS).toHaveLength(4);
+    const locationIds = EXPLORATION_LOCATIONS.map(location => location.id);
+    expect(locationIds).toEqual(expect.arrayContaining([
+      CITY_CENTER_LOCATION_ID,
+      MERCHANT_DISTRICT_LOCATION_ID,
+      CITY_GATE_LOCATION_ID,
+      WHISPERING_WOODS_LOCATION_ID,
+    ]));
+    expect(new Set(locationIds).size).toBe(locationIds.length);
     expect(resolveCanonicalLocationId('City Center')).toBe(CITY_CENTER_LOCATION_ID);
 
     expect(areLocationsDirectlyConnected(CITY_CENTER_LOCATION_ID, MERCHANT_DISTRICT_LOCATION_ID)).toBe(true);

@@ -50,6 +50,10 @@ jobs:
         timeout-minutes: 10
         run: npm run gc06:validate
 
+      - name: GC-07 Chrono-Crypt qualification
+        timeout-minutes: 10
+        run: npm run gc07:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 

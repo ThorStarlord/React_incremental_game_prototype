@@ -141,6 +141,42 @@ export const CHAPTER_DEFINITIONS = [
       },
     ],
   },
+  {
+    id: 'chrono_crypt',
+    title: 'The Chrono-Crypt',
+    centerOfGravity: 'counterphase derivation, authored travel, and capability-deepened problem solving',
+    description:
+      'A later return to the crypt turns old harmonic failures into a reusable counterphase principle. Baseline derivation remains viable while the two established build profiles create faster, more legible approaches.',
+    routes: [
+      {
+        id: 'manual_triangulation',
+        label: 'Manual Harmonic Triangulation',
+        summary: 'Compare preserved failures directly and derive the stable inverse without optional capabilities.',
+        requiredExperienceIds: [
+          'lyra_gc07_exp_manual_triangulation',
+          'lyra_gc07_exp_counterphase_derived',
+        ],
+      },
+      {
+        id: 'structural_counterphase',
+        label: 'Structural Counterphase',
+        summary: 'Use slow-system cognition and constraint sense to derive the inverse from the structures carrying the failure.',
+        requiredExperienceIds: [
+          'lyra_gc07_exp_structural_counterphase',
+          'lyra_gc07_exp_counterphase_derived',
+        ],
+      },
+      {
+        id: 'adversarial_countermodel',
+        label: 'Adversarial Countermodel',
+        summary: 'Use contradiction-first inquiry and adversarial calibration to predict the repeating phase and solve for its inverse.',
+        requiredExperienceIds: [
+          'lyra_gc07_exp_adversarial_countermodel',
+          'lyra_gc07_exp_counterphase_derived',
+        ],
+      },
+    ],
+  },
 ] as const satisfies readonly ChapterDefinitionShape[];
 
 /**
