@@ -27,8 +27,8 @@ const TravelPanel: React.FC = () => {
   const locationValue = useAppSelector(state => state.player.location);
   const forgeFamiliar = useAppSelector(state => Boolean(state.player.routineFamiliarity?.forge_assistance));
   const npcs = useAppSelector(state => state.npcs.npcs);
-  const recordedExperienceIds = useAppSelector(state =>
-    Object.keys(state.relationships.experiencesById)
+  const recordedExperiences = useAppSelector(state =>
+    state.relationships.experiencesById
   );
   const [error, setError] = useState<string | null>(null);
   const [spatialFeedback, setSpatialFeedback] = useState<SpatialTetherFeedback[]>([]);
@@ -118,7 +118,7 @@ const TravelPanel: React.FC = () => {
             {destinations.map(destination => {
               const missingExperienceIds = getMissingLocationExperienceIds(
                 destination.id,
-                new Set(recordedExperienceIds)
+                new Set(Object.keys(recordedExperiences))
               );
               const locked = missingExperienceIds.length > 0;
               return (
