@@ -25,6 +25,17 @@ const isValidMutation = (mutation: WorldStateMutation): boolean => {
       mutation.value === 'diagnostic'
     );
   }
+  if (mutation.field === 'campaignStatus') {
+    return mutation.value === 'complete';
+  }
+  if (mutation.field === 'telluricEchoOutcome') {
+    return (
+      mutation.value === 'distributed_dissipation' ||
+      mutation.value === 'structural_redirection' ||
+      mutation.value === 'diagnostic_disruption' ||
+      mutation.value === 'fortified_containment'
+    );
+  }
   return false;
 };
 
@@ -47,6 +58,10 @@ const worldStateSlice = createSlice({
         region.networkPosture = mutation.value;
       } else if (mutation.field === 'counterphasePlan') {
         region.counterphasePlan = mutation.value;
+      } else if (mutation.field === 'campaignStatus') {
+        region.campaignStatus = mutation.value;
+      } else if (mutation.field === 'telluricEchoOutcome') {
+        region.telluricEchoOutcome = mutation.value;
       }
       state.regions[mutation.regionId] = region;
     },
