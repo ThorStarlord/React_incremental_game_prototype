@@ -94,7 +94,7 @@ const NEW_CHAT_SELECTORS = [
 ];
 
 const VALID_STATUSES = new Set(["CONTINUE", "COMPLETE", "AWAITING_HUMAN"]);
-const VALID_NEXT = new Set(["SPECIALIZE", "PLAN", "PACKAGE", "HANDOFF", "NEW_CYCLE", "STOP"]);
+const VALID_NEXT = new Set(["SPECIALIZE", "PLAN", "PACKAGE", "RECHECK", "HANDOFF", "NEW_CYCLE", "STOP"]);
 const VALID_MODES = new Set([
   "OPEN_DISCOVERY",
   "LENS_GUIDED",
@@ -102,6 +102,17 @@ const VALID_MODES = new Set([
   "EXECUTION",
   "HANDOFF"
 ]);
+const VALID_PACKAGE_STATES = new Set([
+  "NONE",
+  "NOT_STARTED",
+  "IMPLEMENTING",
+  "IMPLEMENTATION_CANDIDATE",
+  "QUALIFICATION_PENDING",
+  "QUALIFICATION_BLOCKED",
+  "QUALIFIED",
+  "RECONCILED_NO_CHANGE"
+]);
+const VALID_BLOCKERS = new Set(["NONE", "REPOSITORY", "CI_INFRASTRUCTURE", "EXTERNAL", "HUMAN"]);
 
 const REQUIRED_PROTOCOL_KEYS = [
   "LOOP_STATUS",
@@ -110,6 +121,9 @@ const REQUIRED_PROTOCOL_KEYS = [
   "LOOP_LENS",
   "LOOP_GOAL",
   "LOOP_PENDING_PACKAGES",
+  "LOOP_ACTIVE_PACKAGE",
+  "LOOP_PACKAGE_STATE",
+  "LOOP_BLOCKER",
   "LOOP_STATE_FINGERPRINT",
   "LOOP_REASON"
 ];
@@ -119,22 +133,28 @@ function protocolInstructions() {
 End your response with exactly one protocol block using these keys, one per line:
 
 LOOP_STATUS: CONTINUE | COMPLETE | AWAITING_HUMAN
-LOOP_NEXT: SPECIALIZE | PLAN | PACKAGE | HANDOFF | NEW_CYCLE | STOP
+LOOP_NEXT: SPECIALIZE | PLAN | PACKAGE | RECHECK | HANDOFF | NEW_CYCLE | STOP
 LOOP_MODE: OPEN_DISCOVERY | LENS_GUIDED | GOAL_CONSTRAINED | EXECUTION | HANDOFF
 LOOP_LENS: <short lens name or NONE>
 LOOP_GOAL: <committed goal or NONE>
 LOOP_PENDING_PACKAGES: <integer 0-${MAX_PACKAGES_PER_CYCLE}>
+LOOP_ACTIVE_PACKAGE: <1-${MAX_PACKAGES_PER_CYCLE} or NONE>
+LOOP_PACKAGE_STATE: NONE | NOT_STARTED | IMPLEMENTING | IMPLEMENTATION_CANDIDATE | QUALIFICATION_PENDING | QUALIFICATION_BLOCKED | QUALIFIED | RECONCILED_NO_CHANGE
+LOOP_BLOCKER: NONE | REPOSITORY | CI_INFRASTRUCTURE | EXTERNAL | HUMAN
 LOOP_STATE_FINGERPRINT: <short stable description of the material repository state>
 LOOP_REASON: <one-line reason for the transition>
 
 Protocol rules:
 - COMPLETE and AWAITING_HUMAN must use LOOP_NEXT: STOP.
-- OPEN_DISCOVERY and LENS_GUIDED must not invent work packages; use LOOP_PENDING_PACKAGES: 0 until a PLAN turn creates a queue.
+- OPEN_DISCOVERY and LENS_GUIDED must not invent work packages; use LOOP_PENDING_PACKAGES: 0, LOOP_ACTIVE_PACKAGE: NONE, LOOP_PACKAGE_STATE: NONE, and LOOP_BLOCKER: NONE until a PLAN turn creates a queue.
 - Use PLAN only when a concrete goal is genuinely committed by repository authority, explicit user direction, or strong current project evidence. Do not silently convert a hypothesis into a goal.
+- A PLAN that creates work must set LOOP_ACTIVE_PACKAGE to the first unchecked package, LOOP_PACKAGE_STATE: NOT_STARTED, and LOOP_BLOCKER: NONE.
 - Use SPECIALIZE only when a specific additional analytical lens is warranted before planning.
-- Use PACKAGE only when a real pending package exists.
+- Use PACKAGE only when a real pending package exists and repository-resolvable work can make progress now.
+- Use RECHECK when implementation already exists but qualification is pending or blocked by CI/infrastructure/external state; RECHECK must not be used to hide a repository-resolvable defect.
 - Use HANDOFF only when the current package queue exists and LOOP_PENDING_PACKAGES is 0.
 - Use NEW_CYCLE after a verified handoff when more strategic discovery may still be warranted.
+- When there is no active package, use LOOP_ACTIVE_PACKAGE: NONE, LOOP_PACKAGE_STATE: NONE, and LOOP_BLOCKER: NONE.
 - Do not wrap the protocol block in a code fence.
 `.trim();
 }
@@ -244,9 +264,51 @@ EXECUTION POLICY:
 7. Commit/push/open a PR as appropriate. Merge only when the exact candidate head is repository-qualified and required checks pass.
 8. Output the full updated queue with [x] completed/reconciled and [ ] genuinely pending.
 9. LOOP_PENDING_PACKAGES must equal the unchecked queue count after this turn.
-10. If the same package remains pending because of a repository-resolvable implementation or CI failure, keep LOOP_NEXT: PACKAGE and explain the blocker in LOOP_REASON.
-11. If zero packages remain, use LOOP_NEXT: HANDOFF.
-12. Stop after this package; never begin another package in the same assistant turn.
+10. If the same package remains pending because of a repository-resolvable implementation, test, or candidate defect, use LOOP_NEXT: PACKAGE, LOOP_PACKAGE_STATE: IMPLEMENTING, and LOOP_BLOCKER: REPOSITORY.
+11. If implementation exists but qualification is merely pending, use LOOP_NEXT: RECHECK and LOOP_PACKAGE_STATE: QUALIFICATION_PENDING.
+12. If implementation exists but qualification cannot currently run because CI/infrastructure/external state is unavailable, use LOOP_NEXT: RECHECK and LOOP_PACKAGE_STATE: QUALIFICATION_BLOCKED with LOOP_BLOCKER: CI_INFRASTRUCTURE or EXTERNAL.
+13. Do not classify unavailable qualification as a passing or failing repository test.
+14. If this package is qualified/reconciled and another package remains, advance LOOP_ACTIVE_PACKAGE to the next unchecked package, use LOOP_PACKAGE_STATE: NOT_STARTED, LOOP_BLOCKER: NONE, and LOOP_NEXT: PACKAGE.
+15. If zero packages remain, use LOOP_ACTIVE_PACKAGE: NONE, LOOP_PACKAGE_STATE: NONE, LOOP_BLOCKER: NONE, and LOOP_NEXT: HANDOFF.
+16. Stop after this package; never begin another package in the same assistant turn.
+
+${protocolInstructions()}
+`.trim();
+}
+
+function buildRecheckPrompt(repo, outcome) {
+  return `
+@github Recheck the existing qualification state for repository "${repo.name}".
+
+COMMITTED GOAL:
+${outcome.goal}
+
+ACTIVE PACKAGE:
+${outcome.activePackage}
+
+PRIOR PACKAGE STATE:
+${outcome.packageState}
+
+PRIOR BLOCKER:
+${outcome.blocker}
+
+PRIOR STATE FINGERPRINT:
+${outcome.fingerprint}
+
+PRIOR REASON:
+${outcome.reason}
+
+RECHECK POLICY:
+1. Reconcile latest main, the existing implementation candidate/PR, its exact head, and the required qualification/check state.
+2. Do not create a new implementation or broaden package scope merely because qualification was unavailable.
+3. If qualification now passes and existing repository policy already authorizes integration, complete only the already-authorized integration for the exact qualified candidate.
+4. If the active package becomes qualified/reconciled and more packages remain, mark it complete, advance LOOP_ACTIVE_PACKAGE to the next unchecked package, set LOOP_PACKAGE_STATE: NOT_STARTED and LOOP_BLOCKER: NONE, then use LOOP_NEXT: PACKAGE.
+5. If the active package becomes qualified/reconciled and zero packages remain, use LOOP_ACTIVE_PACKAGE: NONE, LOOP_PACKAGE_STATE: NONE, LOOP_BLOCKER: NONE, and LOOP_NEXT: HANDOFF.
+6. If a repository-resolvable defect is now evidenced, use LOOP_NEXT: PACKAGE, LOOP_PACKAGE_STATE: IMPLEMENTING, and LOOP_BLOCKER: REPOSITORY.
+7. If qualification is still running/pending, keep LOOP_NEXT: RECHECK with LOOP_PACKAGE_STATE: QUALIFICATION_PENDING and an appropriate external blocker.
+8. If qualification still cannot run because CI/infrastructure/external state is unavailable, keep LOOP_NEXT: RECHECK with LOOP_PACKAGE_STATE: QUALIFICATION_BLOCKED and LOOP_BLOCKER: CI_INFRASTRUCTURE or EXTERNAL.
+9. If an owner-reserved decision is required, use AWAITING_HUMAN + STOP and LOOP_BLOCKER: HUMAN.
+10. Do not begin a different package in this recheck turn.
 
 ${protocolInstructions()}
 `.trim();
@@ -262,7 +324,7 @@ ${goal}
 The controller observed LOOP_PENDING_PACKAGES: 0. Treat that as evidence to VERIFY, not as an unquestionable assertion.
 
 1. Reconcile current main, relevant PRs, exact candidate heads, merge state, and CI/check state.
-2. If work is not actually integrated or a required package is still unresolved, do not falsely document completion. Return to PLAN or PACKAGE as warranted.
+2. If work is not actually integrated or a required package is still unresolved, do not falsely document completion. Return to PLAN, PACKAGE, or RECHECK as warranted.
 3. If implementation is integrated, update/create STATUS.md or HANDOFF.md with:
    - what changed;
    - current authoritative state;
@@ -304,6 +366,10 @@ function parseLoopProtocol(answerText) {
     throw new Error(`Assistant response omitted protocol field(s): ${missing.join(", ")}`);
   }
 
+  const activePackage = values.LOOP_ACTIVE_PACKAGE === "NONE"
+    ? null
+    : Number(values.LOOP_ACTIVE_PACKAGE);
+
   const outcome = {
     status: values.LOOP_STATUS,
     next: values.LOOP_NEXT,
@@ -311,6 +377,9 @@ function parseLoopProtocol(answerText) {
     lens: values.LOOP_LENS,
     goal: values.LOOP_GOAL,
     pendingPackages: Number(values.LOOP_PENDING_PACKAGES),
+    activePackage,
+    packageState: values.LOOP_PACKAGE_STATE,
+    blocker: values.LOOP_BLOCKER,
     fingerprint: values.LOOP_STATE_FINGERPRINT,
     reason: values.LOOP_REASON
   };
@@ -323,30 +392,56 @@ function validateOutcome(outcome) {
   if (!VALID_STATUSES.has(outcome.status)) throw new Error(`Invalid LOOP_STATUS: ${outcome.status}`);
   if (!VALID_NEXT.has(outcome.next)) throw new Error(`Invalid LOOP_NEXT: ${outcome.next}`);
   if (!VALID_MODES.has(outcome.mode)) throw new Error(`Invalid LOOP_MODE: ${outcome.mode}`);
+  if (!VALID_PACKAGE_STATES.has(outcome.packageState)) throw new Error(`Invalid LOOP_PACKAGE_STATE: ${outcome.packageState}`);
+  if (!VALID_BLOCKERS.has(outcome.blocker)) throw new Error(`Invalid LOOP_BLOCKER: ${outcome.blocker}`);
   if (!Number.isInteger(outcome.pendingPackages) || outcome.pendingPackages < 0 || outcome.pendingPackages > MAX_PACKAGES_PER_CYCLE) {
     throw new Error(`Invalid LOOP_PENDING_PACKAGES: ${outcome.pendingPackages}`);
+  }
+  if (outcome.activePackage !== null &&
+      (!Number.isInteger(outcome.activePackage) || outcome.activePackage < 1 || outcome.activePackage > MAX_PACKAGES_PER_CYCLE)) {
+    throw new Error(`Invalid LOOP_ACTIVE_PACKAGE: ${outcome.activePackage}`);
   }
   if (!outcome.fingerprint) throw new Error("LOOP_STATE_FINGERPRINT must not be empty.");
   if (!outcome.reason) throw new Error("LOOP_REASON must not be empty.");
 
+  if (outcome.activePackage === null && (outcome.packageState !== "NONE" || outcome.blocker !== "NONE")) {
+    throw new Error("No active package requires LOOP_PACKAGE_STATE: NONE and LOOP_BLOCKER: NONE.");
+  }
+  if (outcome.activePackage !== null && outcome.packageState === "NONE") {
+    throw new Error("An active package requires a concrete LOOP_PACKAGE_STATE.");
+  }
+
   const terminal = outcome.status === "COMPLETE" || outcome.status === "AWAITING_HUMAN";
   if (terminal && outcome.next !== "STOP") throw new Error(`${outcome.status} requires LOOP_NEXT: STOP.`);
   if (!terminal && outcome.next === "STOP") throw new Error("LOOP_NEXT: STOP requires COMPLETE or AWAITING_HUMAN.");
-  if ((outcome.mode === "OPEN_DISCOVERY" || outcome.mode === "LENS_GUIDED") && outcome.pendingPackages !== 0) {
-    throw new Error(`${outcome.mode} cannot report pending packages before planning.`);
+  if ((outcome.mode === "OPEN_DISCOVERY" || outcome.mode === "LENS_GUIDED") &&
+      (outcome.pendingPackages !== 0 || outcome.activePackage !== null)) {
+    throw new Error(`${outcome.mode} cannot report active or pending packages before planning.`);
   }
   if (outcome.next === "SPECIALIZE" && (!outcome.lens || outcome.lens === "NONE")) {
     throw new Error("LOOP_NEXT: SPECIALIZE requires a concrete LOOP_LENS.");
   }
-  if ((outcome.next === "PLAN" || outcome.next === "PACKAGE" || outcome.next === "HANDOFF") &&
+  if ((outcome.next === "PLAN" || outcome.next === "PACKAGE" || outcome.next === "RECHECK" || outcome.next === "HANDOFF") &&
       (!outcome.goal || outcome.goal === "NONE")) {
     throw new Error(`LOOP_NEXT: ${outcome.next} requires a concrete LOOP_GOAL.`);
   }
-  if (outcome.next === "PACKAGE" && outcome.pendingPackages < 1) {
-    throw new Error("LOOP_NEXT: PACKAGE requires at least one pending package.");
+  if (outcome.next === "PACKAGE" && (outcome.pendingPackages < 1 || outcome.activePackage === null)) {
+    throw new Error("LOOP_NEXT: PACKAGE requires an active pending package.");
   }
-  if (outcome.next === "HANDOFF" && outcome.pendingPackages !== 0) {
-    throw new Error("LOOP_NEXT: HANDOFF requires zero pending packages.");
+  if (outcome.next === "RECHECK") {
+    if (outcome.pendingPackages < 1 || outcome.activePackage === null) {
+      throw new Error("LOOP_NEXT: RECHECK requires an active pending package.");
+    }
+    if (!["QUALIFICATION_PENDING", "QUALIFICATION_BLOCKED"].includes(outcome.packageState)) {
+      throw new Error("LOOP_NEXT: RECHECK requires a qualification-pending or qualification-blocked package.");
+    }
+    if (!["CI_INFRASTRUCTURE", "EXTERNAL"].includes(outcome.blocker)) {
+      throw new Error("LOOP_NEXT: RECHECK requires CI_INFRASTRUCTURE or EXTERNAL blocker.");
+    }
+  }
+  if (outcome.next === "HANDOFF" &&
+      (outcome.pendingPackages !== 0 || outcome.activePackage !== null || outcome.packageState !== "NONE" || outcome.blocker !== "NONE")) {
+    throw new Error("LOOP_NEXT: HANDOFF requires zero pending packages and no active package.");
   }
   if (outcome.next === "NEW_CYCLE" && (outcome.mode !== "HANDOFF" || outcome.pendingPackages !== 0)) {
     throw new Error("LOOP_NEXT: NEW_CYCLE is only valid after a zero-pending HANDOFF turn.");
@@ -365,6 +460,9 @@ function outcomeSignature(outcome) {
     outcome.lens,
     outcome.goal,
     outcome.pendingPackages,
+    outcome.activePackage === null ? "NONE" : outcome.activePackage,
+    outcome.packageState,
+    outcome.blocker,
     outcome.fingerprint
   ].join("|");
 }
@@ -645,7 +743,8 @@ async function runTurn(session, label, prompt) {
 
   console.log(
     `[${session.repo.id}] -> status=${outcome.status} next=${outcome.next} ` +
-    `mode=${outcome.mode} pending=${outcome.pendingPackages}`
+    `mode=${outcome.mode} pending=${outcome.pendingPackages} active=${outcome.activePackage ?? "NONE"} ` +
+    `packageState=${outcome.packageState} blocker=${outcome.blocker}`
   );
   console.log(`[${session.repo.id}] reason: ${outcome.reason}`);
 
@@ -692,12 +791,27 @@ async function runRepositoryCycle(session, cycleNumber) {
   session.failed = false;
   await startFreshChat(session.page);
 
-  let outcome = await runTurn(session, "open discovery", buildDiscoveryPrompt(session.repo));
-  if (!outcome || applyTerminalOutcome(session, outcome)) return;
-
-  let reasoningTurns = 1;
+  let outcome;
+  let reasoningTurns = 0;
   let packageTurns = 0;
-  let totalTurns = 1;
+  let totalTurns = 0;
+
+  if (session.deferredRecheck) {
+    const deferred = session.deferredRecheck;
+    session.deferredRecheck = null;
+    outcome = await runTurn(
+      session,
+      `recheck package ${deferred.activePackage}`,
+      buildRecheckPrompt(session.repo, deferred)
+    );
+    totalTurns = 1;
+  } else {
+    outcome = await runTurn(session, "open discovery", buildDiscoveryPrompt(session.repo));
+    reasoningTurns = 1;
+    totalTurns = 1;
+  }
+
+  if (!outcome || applyTerminalOutcome(session, outcome)) return;
 
   while (!stopRequested && totalTurns < MAX_TOTAL_TURNS_PER_CYCLE) {
     const action = nextControllerAction(outcome);
@@ -758,6 +872,15 @@ async function runRepositoryCycle(session, cycleNumber) {
       continue;
     }
 
+    if (action === "RECHECK") {
+      session.deferredRecheck = outcome;
+      console.log(
+        `[${session.repo.id}] Deferring qualification recheck for package ${outcome.activePackage}; ` +
+        `state=${outcome.packageState} blocker=${outcome.blocker}.`
+      );
+      break;
+    }
+
     if (action === "HANDOFF") {
       outcome = await runTurn(session, "verified handoff", buildHandoffPrompt(session.repo, outcome.goal));
       totalTurns += 1;
@@ -793,7 +916,8 @@ async function createRepositoryPages(firstPage) {
       terminalStatus: null,
       lastOutcome: null,
       previousCycleSignature: null,
-      stagnantCycles: 0
+      stagnantCycles: 0,
+      deferredRecheck: null
     });
 
     console.log(`[tab ${index + 1}/${REPOSITORIES.length}] Ready for ${repo.name}.`);
@@ -875,6 +999,7 @@ module.exports = {
   buildLensPrompt,
   buildPlanPrompt,
   buildPackagePrompt,
+  buildRecheckPrompt,
   buildHandoffPrompt,
   parseLoopProtocol,
   validateOutcome,
