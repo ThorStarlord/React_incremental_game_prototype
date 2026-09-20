@@ -53,6 +53,19 @@ export const COPY_PRODUCTION_TASKS: readonly CopyProductionTaskDefinition[] = [
     allowedRoles: ['researcher', 'agent'],
     reward: { essence: 8 },
   },
+  {
+    id: 'archive_verification',
+    name: 'Archive Verification',
+    description:
+      'Repeat source collation, contradiction checks, and low-risk verification work after the method has been personally learned.',
+    familiarityHint:
+      'Complete Elara\'s independent-verification work yourself before delegating archive verification.',
+    baseDurationSeconds: 75,
+    minimumMaturity: 60,
+    minimumLoyalty: 45,
+    allowedRoles: ['researcher', 'agent'],
+    reward: { essence: 5 },
+  },
 ] as const;
 
 export const getCopyProductionTaskDefinition = (
