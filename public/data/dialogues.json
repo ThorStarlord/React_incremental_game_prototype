@@ -31,7 +31,10 @@
     "title": "The First Lesson",
     "text": "Look there: two groves, green alike. One will be dead by winter. The difference began below the soil seasons ago. Immediate appearances are poor evidence for slow systems.",
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_first_lesson" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "willow_exp_first_lesson"
+      }
     ]
   },
   "elder_willow_offer_seed": {
@@ -39,15 +42,30 @@
     "npcId": "npc_elder_willow",
     "title": "A Seed of Potential",
     "text": "A dormant seed waits beneath these roots. A Sunstone can wake it, but the same stone can be broken down for immediate Essence. If I tell you which use is correct, you will have learned obedience, not sight.",
-    "requiredExperienceIds": ["willow_exp_first_lesson"],
+    "requiredExperienceIds": [
+      "willow_exp_first_lesson"
+    ],
     "responses": {
       "accept": "Show me the Sunstone. I will decide what its value is.",
       "decline": "I am not ready to spend it yet."
     },
     "effects": [
-      { "type": "UNLOCK_QUEST", "questId": "quest_willow_ancient_seed", "responseId": "accept" },
-      { "type": "GIVE_ITEM", "itemId": "item_sunstone", "amount": 1, "responseId": "accept" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_seed_offered", "responseId": "accept" }
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_willow_ancient_seed",
+        "responseId": "accept"
+      },
+      {
+        "type": "GIVE_ITEM",
+        "itemId": "item_sunstone",
+        "amount": 1,
+        "responseId": "accept"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "willow_exp_seed_offered",
+        "responseId": "accept"
+      }
     ],
     "next": {
       "accept": null,
@@ -68,7 +86,10 @@
       "push_back": "Convenient. Your principle changes when the conclusion does."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_willow_disagrees" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "willow_exp_willow_disagrees"
+      }
     ],
     "next": {
       "challenge": null,
@@ -80,13 +101,19 @@
     "npcId": "npc_elder_willow",
     "title": "Three Nights of Teaching",
     "text": "Willow offers no new maxim. For three nights she presents slow systems, asks you to predict their outcomes, and waits while your mistakes expose which patterns you still fail to see.",
-    "requiredExperienceIds": ["willow_exp_willow_disagrees"],
+    "requiredExperienceIds": [
+      "willow_exp_willow_disagrees"
+    ],
     "responses": {
       "begin": "Begin. I want the pattern, not the slogan.",
       "later": "Not yet."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_three_nights_teaching", "responseId": "begin" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "willow_exp_three_nights_teaching",
+        "responseId": "begin"
+      }
     ],
     "next": {
       "begin": null,
@@ -98,13 +125,19 @@
     "npcId": "npc_elder_willow",
     "title": "The Lesson Made Yours",
     "text": "Away from Willow, you found a failing water channel whose obvious repair would have bought a season and killed the root-bed a year later. You changed the deeper flow instead. When you return, Willow asks only why.",
-    "requiredExperienceIds": ["willow_exp_three_nights_teaching"],
+    "requiredExperienceIds": [
+      "willow_exp_three_nights_teaching"
+    ],
     "responses": {
       "explain": "Because the visible break was downstream of the real failure. Repairing it would only hide the cause.",
       "withhold": "The repair worked. That is enough for now."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "willow_exp_independent_application", "responseId": "explain" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "willow_exp_independent_application",
+        "responseId": "explain"
+      }
     ],
     "next": {
       "explain": null,
@@ -116,9 +149,16 @@
     "npcId": "npc_elder_willow",
     "text": "Long before the city, roots held secrets.",
     "effects": [
-      { "type": "AFFINITY_DELTA", "value": 1 },
-      { "type": "OPEN_SERVICE", "serviceId": "lore_provider_willow" }
-    ]
+      {
+        "type": "AFFINITY_DELTA",
+        "value": 1
+      },
+      {
+        "type": "OPEN_SERVICE",
+        "serviceId": "lore_provider_willow"
+      }
+    ],
+    "title": "Roots Before the City"
   },
   "gronk_greeting": {
     "id": "gronk_greeting",
@@ -131,7 +171,11 @@
       "trade": "Show me what you've got."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_steel_not_flattery", "responseId": "inspect" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_steel_not_flattery",
+        "responseId": "inspect"
+      }
     ],
     "next": {
       "inspect": null,
@@ -143,20 +187,32 @@
     "id": "gronk_smile",
     "npcId": "npc_blacksmith_gronk",
     "text": "Hmph. You got taste.",
-    "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
+    "effects": [
+      {
+        "type": "AFFINITY_DELTA",
+        "value": 2
+      }
+    ],
+    "title": "A Smith's Approval"
   },
   "gronk_craft_request": {
     "id": "gronk_craft_request",
     "npcId": "npc_blacksmith_gronk",
     "title": "Measure Twice",
     "text": "Gronk shows you a cracked caravan guard. The merchant wants the replacement twice as thick. 'That'll make it heavier, not stronger where it failed. What are you actually asking the steel to survive?'",
-    "requiredExperienceIds": ["gronk_exp_steel_not_flattery"],
+    "requiredExperienceIds": [
+      "gronk_exp_steel_not_flattery"
+    ],
     "responses": {
       "specify": "The shock is twisting the bracket at the mount. Reinforce the load path, not the whole plate.",
       "order": "The merchant is paying. Make it twice as thick."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_measure_twice", "responseId": "specify" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_measure_twice",
+        "responseId": "specify"
+      }
     ],
     "next": {
       "specify": null,
@@ -168,13 +224,19 @@
     "npcId": "npc_blacksmith_gronk",
     "title": "Quality Over Finish",
     "text": "A wealthy client wants the guard polished thinner so it looks elegant on display. Gronk refuses and loses the sale. 'Pretty metal that fails is a lie with a shine on it.'",
-    "requiredExperienceIds": ["gronk_exp_measure_twice"],
+    "requiredExperienceIds": [
+      "gronk_exp_measure_twice"
+    ],
     "responses": {
       "back_quality": "Then lose the sale. If the constraint matters, the finish serves it—not the other way around.",
       "please_client": "A customer who pays gets to choose what matters."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_quality_over_finish", "responseId": "back_quality" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_quality_over_finish",
+        "responseId": "back_quality"
+      }
     ],
     "next": {
       "back_quality": null,
@@ -186,13 +248,19 @@
     "npcId": "npc_blacksmith_gronk",
     "title": "The Blade That Held",
     "text": "Weeks later, the same caravan returns after an ambush. The revised guard is scarred but intact. Gronk puts it on the counter between you. 'That's the part I care about. It held where the pretty version would've folded.'",
-    "requiredExperienceIds": ["gronk_exp_quality_over_finish"],
+    "requiredExperienceIds": [
+      "gronk_exp_quality_over_finish"
+    ],
     "responses": {
       "recognize": "Your steel held. Our constraint was right. Keep refusing me when I ask for the wrong thing.",
       "claim": "Good. My specification saved it."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_blade_that_held", "responseId": "recognize" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_blade_that_held",
+        "responseId": "recognize"
+      }
     ],
     "next": {
       "recognize": null,
@@ -209,7 +277,12 @@
       "verify": "I checked the weights against the receipts. The disputed entries reconcile; the Guild can clear the contracts on evidence rather than favors."
     },
     "effects": [
-      { "type": "FACTION_REPUTATION", "factionId": "Merchants Guild", "value": 12, "responseId": "verify" }
+      {
+        "type": "FACTION_REPUTATION",
+        "factionId": "Merchants Guild",
+        "value": 12,
+        "responseId": "verify"
+      }
     ],
     "next": {
       "verify": null
@@ -222,7 +295,10 @@
     "text": "The Merchants Guild has moved your next contract into its verified-priority queue. Gronk taps the stamped order. 'That's their decision, not mine. You made their audit reliable enough that they'll risk institutional priority on your paperwork.'",
     "repeatable": false,
     "requiredFactionReputation": [
-      { "factionId": "Merchants Guild", "min": 10 }
+      {
+        "factionId": "Merchants Guild",
+        "min": 10
+      }
     ],
     "responses": {
       "acknowledge": "Then keep the distinction clear: Guild priority is institutional standing, not personal credit with you."
@@ -243,7 +319,11 @@
       "later": "I am not ready to dig through citations."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_model_challenged", "responseId": "challenge" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "elara_exp_model_challenged",
+        "responseId": "challenge"
+      }
     ],
     "next": {
       "challenge": null,
@@ -256,13 +336,19 @@
     "npcId": "npc_scholar_elara",
     "title": "The Contradictory Footnote",
     "text": "Elara returns with a marginal note from a secondary copy. If authentic, it places the Concordance's author in two cities on the same day. 'The easy answer is a copying error,' she says. 'The useful answer is whichever survives checking.'",
-    "requiredExperienceIds": ["elara_exp_model_challenged"],
+    "requiredExperienceIds": [
+      "elara_exp_model_challenged"
+    ],
     "responses": {
       "follow": "Then we treat the contradiction as evidence until we can kill it.",
       "dismiss": "A single footnote is too thin to threaten the accepted chronology."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_contradictory_footnote", "responseId": "follow" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "elara_exp_contradictory_footnote",
+        "responseId": "follow"
+      }
     ],
     "next": {
       "follow": null,
@@ -274,15 +360,30 @@
     "npcId": "npc_scholar_elara",
     "title": "A Model Put at Risk",
     "text": "Elara produces the recovered source volume. 'This is the copy my published chronology relied on. Take it apart. If the footnote wins, my paper loses.'",
-    "requiredExperienceIds": ["elara_exp_contradictory_footnote"],
+    "requiredExperienceIds": [
+      "elara_exp_contradictory_footnote"
+    ],
     "responses": {
       "accept": "Give me the source. We follow what it supports, not what either of us prefers.",
       "decline": "Not yet. I do not want responsibility for overturning your work."
     },
     "effects": [
-      { "type": "UNLOCK_QUEST", "questId": "quest_elara_lost_tome", "responseId": "accept" },
-      { "type": "GIVE_ITEM", "itemId": "item_elara_contradictory_tome", "amount": 1, "responseId": "accept" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_tome_committed", "responseId": "accept" }
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_elara_lost_tome",
+        "responseId": "accept"
+      },
+      {
+        "type": "GIVE_ITEM",
+        "itemId": "item_elara_contradictory_tome",
+        "amount": 1,
+        "responseId": "accept"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "elara_exp_tome_committed",
+        "responseId": "accept"
+      }
     ],
     "next": {
       "accept": null,
@@ -294,13 +395,20 @@
     "npcId": "npc_scholar_elara",
     "title": "Revision Is Mutual",
     "text": "After the archive result, you present a cleaner replacement chronology. Elara reads it twice and circles one assumption. 'You enjoyed being the correction,' she says. 'Now let the correction happen to you.'",
-    "anyOfExperienceIds": ["elara_exp_follow_evidence", "elara_exp_protect_consensus"],
+    "anyOfExperienceIds": [
+      "elara_exp_follow_evidence",
+      "elara_exp_protect_consensus"
+    ],
     "responses": {
       "revise": "Show me the counterexample. If my model fails, it fails.",
       "defend": "You are trying too hard to make the symmetry elegant."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_revision_mutual", "responseId": "revise" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "elara_exp_revision_mutual",
+        "responseId": "revise"
+      }
     ],
     "next": {
       "revise": null,
@@ -312,13 +420,19 @@
     "npcId": "npc_scholar_elara",
     "title": "A Theory Neither Owned",
     "text": "Neither your replacement nor Elara's original survives the full archive. Between you, a third model emerges: uglier, narrower, and supported by every surviving source.",
-    "requiredExperienceIds": ["elara_exp_revision_mutual"],
+    "requiredExperienceIds": [
+      "elara_exp_revision_mutual"
+    ],
     "responses": {
       "build": "Good. A model neither of us owns is harder for either of us to protect from evidence.",
       "pause": "I need distance before we rewrite this again."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_theory_neither_owned", "responseId": "build" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "elara_exp_theory_neither_owned",
+        "responseId": "build"
+      }
     ],
     "next": {
       "build": null,
@@ -330,13 +444,19 @@
     "npcId": "npc_scholar_elara",
     "title": "The Result Held Without Her",
     "text": "On an unrelated archive problem, you abandoned your first elegant explanation when a shipping ledger contradicted it. Elara has never seen the material. You hand her only your evidence and method; she reproduces the result.",
-    "requiredExperienceIds": ["elara_exp_theory_neither_owned"],
+    "requiredExperienceIds": [
+      "elara_exp_theory_neither_owned"
+    ],
     "responses": {
       "report": "You were not there to correct me. The contradiction did it.",
       "withhold": "The result is enough. The method is mine."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "elara_exp_independent_verification", "responseId": "report" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "elara_exp_independent_verification",
+        "responseId": "report"
+      }
     ],
     "next": {
       "report": null,
@@ -353,7 +473,11 @@
       "yield": "Fine. You have the advantage."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_strategic_defeat", "responseId": "hold_ground" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "lyra_exp_strategic_defeat",
+        "responseId": "hold_ground"
+      }
     ],
     "next": {
       "hold_ground": null,
@@ -365,13 +489,19 @@
     "npcId": "npc_lyra",
     "title": "Coercion Reflected",
     "text": "Lyra uses harmonic pressure to force a clean choice. You recognize the constraint she is trying to impose and mirror its structure back at her, making brute pressure less informative than understanding your response.",
-    "requiredExperienceIds": ["lyra_exp_strategic_defeat"],
+    "requiredExperienceIds": [
+      "lyra_exp_strategic_defeat"
+    ],
     "responses": {
       "reflect": "If your model of me were right, you would not need the pressure. Adjust the model.",
       "retreat": "Not today."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_coercion_reflected", "responseId": "reflect" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "lyra_exp_coercion_reflected",
+        "responseId": "reflect"
+      }
     ],
     "next": {
       "reflect": null,
@@ -383,14 +513,25 @@
     "npcId": "npc_lyra",
     "title": "A Problem Neither Side Can Solo",
     "text": "A Chrono Crypt lock is oscillating across two incompatible harmonic frames. Lyra can stabilize one side and you can model the other, but neither of you can hold both. 'Temporary coordination,' she says. 'Do not mistake necessity for trust.'",
-    "requiredExperienceIds": ["lyra_exp_coercion_reflected"],
+    "requiredExperienceIds": [
+      "lyra_exp_coercion_reflected"
+    ],
     "responses": {
       "accept": "Good. We coordinate exactly as long as the problem requires.",
       "refuse": "Find someone else to synchronize with."
     },
     "effects": [
-      { "type": "UNLOCK_QUEST", "questId": "quest_lyra_chrono_crypt_calibration", "responseId": "accept" },
-      { "type": "GIVE_ITEM", "itemId": "item_lyra_harmonic_key", "amount": 1, "responseId": "accept" }
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_lyra_chrono_crypt_calibration",
+        "responseId": "accept"
+      },
+      {
+        "type": "GIVE_ITEM",
+        "itemId": "item_lyra_harmonic_key",
+        "amount": 1,
+        "responseId": "accept"
+      }
     ],
     "next": {
       "accept": null,
@@ -402,13 +543,19 @@
     "npcId": "npc_lyra",
     "title": "Ideological Friction",
     "text": "After the crypt exercise, Lyra rejects your conclusion that effective coordination weakens the case for rigid command. You reject her claim that discipline justifies hierarchy. Neither argument survives in caricature anymore.",
-    "requiredExperienceIds": ["lyra_exp_reluctant_cotraining"],
+    "requiredExperienceIds": [
+      "lyra_exp_reluctant_cotraining"
+    ],
     "responses": {
       "argue": "I understand your principle better now. I still think it produces the wrong world.",
       "avoid": "We solved the lock. Leave the politics out of it."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_ideological_friction", "responseId": "argue" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "lyra_exp_ideological_friction",
+        "responseId": "argue"
+      }
     ],
     "next": {
       "argue": null,
@@ -420,13 +567,19 @@
     "npcId": "npc_lyra",
     "title": "Mutual Calibration",
     "text": "Lyra changes her opening line before you can exploit it. You had already changed your counter because you expected her to notice. For the first time, the confrontation begins from the model each of you has built of the other rather than from a rehearsed tactic.",
-    "requiredExperienceIds": ["lyra_exp_ideological_friction"],
+    "requiredExperienceIds": [
+      "lyra_exp_ideological_friction"
+    ],
     "responses": {
       "calibrate": "You changed because you knew what I would see. I did the same.",
       "deny": "Coincidence. Do not romanticize adaptation."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_mutual_calibration", "responseId": "calibrate" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "lyra_exp_mutual_calibration",
+        "responseId": "calibrate"
+      }
     ],
     "next": {
       "calibrate": null,
@@ -438,13 +591,19 @@
     "npcId": "npc_lyra",
     "title": "Enemies in Phase",
     "text": "The Chrono Crypt destabilizes again, this time too quickly for explicit coordination. You and Lyra move on predictions built from every prior confrontation. The lock collapses into phase. When the danger passes, neither of you offers reconciliation.",
-    "requiredExperienceIds": ["lyra_exp_mutual_calibration"],
+    "requiredExperienceIds": [
+      "lyra_exp_mutual_calibration"
+    ],
     "responses": {
       "solve": "We still disagree. But neither of us can pretend the other is simple anymore.",
       "break_phase": "That coordination was an accident. It means nothing."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "lyra_exp_proto_bond", "responseId": "solve" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "lyra_exp_proto_bond",
+        "responseId": "solve"
+      }
     ],
     "next": {
       "solve": null,
@@ -461,7 +620,11 @@
       "comfort": "Start with the version that does not create new enemies."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_price_of_truth", "responseId": "dangerous_truth" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_price_of_truth",
+        "responseId": "dangerous_truth"
+      }
     ],
     "next": {
       "dangerous_truth": null,
@@ -473,14 +636,25 @@
     "npcId": "npc_rogue_silas",
     "title": "A Shady Delivery",
     "text": "Silas names a sewer drop containing a sealed package. A runner has already brought it as far as the Rusty Mug; the remaining question is whether you can return it without converting curiosity into leverage.",
-    "requiredExperienceIds": ["silas_exp_price_of_truth"],
+    "requiredExperienceIds": [
+      "silas_exp_price_of_truth"
+    ],
     "responses": {
       "accept": "Give me the package. If you wanted it opened, you would have said so.",
       "decline": "Find someone who enjoys being tested."
     },
     "effects": [
-      { "type": "UNLOCK_QUEST", "questId": "quest_silas_retrieve_item", "responseId": "accept" },
-      { "type": "GIVE_ITEM", "itemId": "item_shady_package", "amount": 1, "responseId": "accept" }
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_silas_retrieve_item",
+        "responseId": "accept"
+      },
+      {
+        "type": "GIVE_ITEM",
+        "itemId": "item_shady_package",
+        "amount": 1,
+        "responseId": "accept"
+      }
     ],
     "next": {
       "accept": null,
@@ -492,13 +666,19 @@
     "npcId": "npc_rogue_silas",
     "title": "Leverage Named",
     "text": "After the package returns, Silas names a detail about you that he should not know. You answer with one about him. Neither threat is spoken as a threat because neither needs explanation.",
-    "requiredExperienceIds": ["silas_exp_package_unopened"],
+    "requiredExperienceIds": [
+      "silas_exp_package_unopened"
+    ],
     "responses": {
       "name_it": "Good. Now neither of us can pretend the leverage only runs one way.",
       "threaten": "Use that information and I will use mine first."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_leverage_named", "responseId": "name_it" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_leverage_named",
+        "responseId": "name_it"
+      }
     ],
     "next": {
       "name_it": null,
@@ -510,13 +690,19 @@
     "npcId": "npc_rogue_silas",
     "title": "The Secret Neither Sold",
     "text": "Two separate buyers approach you and Silas with the same proposition: sell the other's vulnerability. The offers are profitable. Days later, you meet and discover that neither buyer received an answer.",
-    "requiredExperienceIds": ["silas_exp_leverage_named"],
+    "requiredExperienceIds": [
+      "silas_exp_leverage_named"
+    ],
     "responses": {
       "acknowledge": "We are still dangerous to each other. Apparently that is not the same thing as being for sale.",
       "deny": "Do not mistake one missed transaction for trust."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_secret_neither_sold", "responseId": "acknowledge" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_secret_neither_sold",
+        "responseId": "acknowledge"
+      }
     ],
     "next": {
       "acknowledge": null,
@@ -528,14 +714,24 @@
     "npcId": "npc_rogue_silas",
     "title": "A Tip He Did Not Sell",
     "text": "Silas slides a folded set of City Watch patrol timings across the table. 'Someone is buying tomorrow's gaps today. I could sell you the buyer. Instead I'm giving you the pattern. Consider that a very expensive distinction.'",
-    "requiredExperienceIds": ["silas_exp_secret_neither_sold"],
+    "requiredExperienceIds": [
+      "silas_exp_secret_neither_sold"
+    ],
     "responses": {
       "take_tip": "You could have sold this. Instead you're giving me the route. I'll find out whether the pattern is real.",
       "leave_it": "Keep it. I do not want to owe you for unsold information."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_watch_leak_shared", "responseId": "take_tip" },
-      { "type": "UNLOCK_QUEST", "questId": "quest_m13_trace_merchant_leak", "responseId": "take_tip" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_watch_leak_shared",
+        "responseId": "take_tip"
+      },
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_m13_trace_merchant_leak",
+        "responseId": "take_tip"
+      }
     ],
     "next": {
       "take_tip": null,
@@ -547,7 +743,9 @@
     "npcId": "npc_rogue_silas",
     "title": "A Broker's Price",
     "text": "Silas reads the copied ledger without touching it. 'Forgery this good is not about handwriting. It is about buying the right true facts and connecting them with one false transaction. You can prove that without me giving you anyone who is still alive in the market.'",
-    "requiredExperienceIds": ["valerius_exp_forged_ledger_inquiry"],
+    "requiredExperienceIds": [
+      "valerius_exp_forged_ledger_inquiry"
+    ],
     "responses": {
       "take_method": "Then give me the method. I will prove the chain the slow way."
     },
@@ -574,8 +772,16 @@
       "risk_chain": "You are risking a live chain. I will verify it without spending it carelessly."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_old_silence_repaid", "responseId": "risk_chain" },
-      { "type": "UNLOCK_QUEST", "questId": "quest_m15_follow_hidden_chain", "responseId": "risk_chain" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_old_silence_repaid",
+        "responseId": "risk_chain"
+      },
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_m15_follow_hidden_chain",
+        "responseId": "risk_chain"
+      }
     ],
     "next": {
       "risk_chain": null
@@ -596,7 +802,11 @@
       "confirm_limit": "Fair. Confirm what is true. Keep the live names."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_old_silence_reinterpreted", "responseId": "confirm_limit" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_old_silence_reinterpreted",
+        "responseId": "confirm_limit"
+      }
     ],
     "next": {
       "confirm_limit": null
@@ -612,7 +822,10 @@
       "pass": "I'm busy."
     },
     "effects": [],
-    "next": { "offer": "valerius_offer_patrol", "pass": null }
+    "next": {
+      "offer": "valerius_offer_patrol",
+      "pass": null
+    }
   },
   "valerius_offer_patrol": {
     "id": "valerius_offer_patrol",
@@ -622,8 +835,18 @@
       "accept": "I'll do the rounds.",
       "decline": "Not now."
     },
-    "effects": [ { "type": "UNLOCK_QUEST", "questId": "quest_valerius_patrol_duty", "responseId": "accept" } ],
-    "next": { "accept": null, "decline": null }
+    "effects": [
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_valerius_patrol_duty",
+        "responseId": "accept"
+      }
+    ],
+    "next": {
+      "accept": null,
+      "decline": null
+    },
+    "title": "Patrol the Merchant District"
   },
   "valerius_report": {
     "id": "valerius_report",
@@ -635,7 +858,11 @@
       "ask_orders": "You're the captain. Give me the route and I'll follow it exactly."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_objective_before_obedience", "responseId": "state_objective" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_objective_before_obedience",
+        "responseId": "state_objective"
+      }
     ],
     "next": {
       "state_objective": null,
@@ -647,13 +874,19 @@
     "npcId": "npc_captain_valerius",
     "title": "Patrol the City Streets",
     "text": "Valerius marks the merchant district. 'Walk the route once. I do not need a performance. I need to know what the Watch is failing to see.'",
-    "requiredExperienceIds": ["valerius_exp_objective_before_obedience"],
+    "requiredExperienceIds": [
+      "valerius_exp_objective_before_obedience"
+    ],
     "responses": {
       "accept": "Give me the route. I'll report what the district actually needs, not what makes the Watch look clean.",
       "decline": "Not today."
     },
     "effects": [
-      { "type": "UNLOCK_QUEST", "questId": "quest_valerius_patrol_duty", "responseId": "accept" }
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_valerius_patrol_duty",
+        "responseId": "accept"
+      }
     ],
     "next": {
       "accept": null,
@@ -665,13 +898,19 @@
     "npcId": "npc_captain_valerius",
     "title": "The Order He Let You Question",
     "text": "After your report, Valerius orders every patrol fixed at the market gates. The formation will look disciplined, but the alley your report identified will go uncovered. He watches you read the deployment before dismissing the room.",
-    "requiredExperienceIds": ["valerius_exp_report_without_theatre"],
+    "requiredExperienceIds": [
+      "valerius_exp_report_without_theatre"
+    ],
     "responses": {
       "question_order": "That order protects the appearance of control and abandons the objective. Keep the gate post, but free one patrol to cover the alley.",
       "defer": "You're the captain. I'll follow the deployment."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_order_questioned", "responseId": "question_order" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_order_questioned",
+        "responseId": "question_order"
+      }
     ],
     "next": {
       "question_order": null,
@@ -683,7 +922,9 @@
     "npcId": "npc_captain_valerius",
     "title": "A Pattern, Not Yet a Command",
     "text": "You put Silas's verified timing pattern on Valerius's desk. He reads it once. 'Useful. But information from a broker is not a field order. The Watch will verify it through its own chain before I hand anyone discretionary command.'",
-    "requiredExperienceIds": ["silas_exp_watch_leak_traced"],
+    "requiredExperienceIds": [
+      "silas_exp_watch_leak_traced"
+    ],
     "responses": {
       "submit": "Here is the pattern. Verify it through your own chain."
     },
@@ -706,8 +947,16 @@
       "defer": "Not this time. Keep the response inside the Watch."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_merchant_leak_delegated", "responseId": "accept" },
-      { "type": "UNLOCK_QUEST", "questId": "quest_m13_break_merchant_leak", "responseId": "accept" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_merchant_leak_delegated",
+        "responseId": "accept"
+      },
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_m13_break_merchant_leak",
+        "responseId": "accept"
+      }
     ],
     "next": {
       "accept": null,
@@ -731,16 +980,56 @@
       "quiet_reroute": "Do not burn the source or freeze the district. Reroute caravans and patrols until the leaked timing stops buying anyone an advantage."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_aftermath_public_crackdown", "responseId": "public_crackdown" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_aftermath_public_crackdown", "responseId": "public_crackdown" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_aftermath_public_crackdown", "responseId": "public_crackdown" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_aftermath_protect_source", "responseId": "protect_source" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_aftermath_protect_source", "responseId": "protect_source" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_aftermath_protect_source", "responseId": "protect_source" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_aftermath_quiet_reroute", "responseId": "quiet_reroute" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "silas_exp_aftermath_quiet_reroute", "responseId": "quiet_reroute" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_aftermath_quiet_reroute", "responseId": "quiet_reroute" },
-      { "type": "UNLOCK_QUEST", "questId": "quest_m14_quiet_reroute", "responseId": "quiet_reroute" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_aftermath_public_crackdown",
+        "responseId": "public_crackdown"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_aftermath_public_crackdown",
+        "responseId": "public_crackdown"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_aftermath_public_crackdown",
+        "responseId": "public_crackdown"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_aftermath_protect_source",
+        "responseId": "protect_source"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_aftermath_protect_source",
+        "responseId": "protect_source"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_aftermath_protect_source",
+        "responseId": "protect_source"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_aftermath_quiet_reroute",
+        "responseId": "quiet_reroute"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "silas_exp_aftermath_quiet_reroute",
+        "responseId": "quiet_reroute"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_aftermath_quiet_reroute",
+        "responseId": "quiet_reroute"
+      },
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_m14_quiet_reroute",
+        "responseId": "quiet_reroute"
+      }
     ],
     "next": {
       "public_crackdown": null,
@@ -754,13 +1043,23 @@
     "title": "The Ledger That Should Not Exist",
     "text": "Valerius places a broker ledger beside the patrol map you once rewrote. The dates, payments, and Watch routes fit too well: on paper, you sold operational information after he trusted you with discretion. 'I will not call evidence false because I dislike its conclusion,' he says. 'And I will not call an accusation a verdict before we test its chain.'",
     "repeatable": false,
-    "requiredExperienceIds": ["valerius_exp_merchant_leak_broken"],
+    "requiredExperienceIds": [
+      "valerius_exp_merchant_leak_broken"
+    ],
     "responses": {
       "investigate": "Treat the ledger as evidence, not verdict. Give me the chain and I will test where the true facts become a false transaction."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_forged_ledger_inquiry", "responseId": "investigate" },
-      { "type": "UNLOCK_QUEST", "questId": "quest_m15_verify_forged_ledger", "responseId": "investigate" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_forged_ledger_inquiry",
+        "responseId": "investigate"
+      },
+      {
+        "type": "UNLOCK_QUEST",
+        "questId": "quest_m15_verify_forged_ledger",
+        "responseId": "investigate"
+      }
     ],
     "next": {
       "investigate": null
@@ -772,13 +1071,21 @@
     "title": "A Workshop Fact, Not a Reputation Claim",
     "text": "You give Valerius the plain version: you spent a shift at Gronk's forge learning the support routine before delegating it. He does not praise the effort; he records the operational fact. 'Good. Then when you speak about repair throughput, I know which part comes from firsthand work rather than confidence.'",
     "repeatable": false,
-    "requiredRoutineFamiliarityIds": ["forge_assistance"],
-    "forbiddenKnowledgeFactIds": ["fact_m22_player_practiced_forge_assistance"],
+    "requiredRoutineFamiliarityIds": [
+      "forge_assistance"
+    ],
+    "forbiddenKnowledgeFactIds": [
+      "fact_m22_player_practiced_forge_assistance"
+    ],
     "responses": {
       "report": "Record the fact. I worked the routine myself before I delegated it."
     },
     "effects": [
-      { "type": "KNOWLEDGE_FACT", "factId": "fact_m22_player_practiced_forge_assistance", "responseId": "report" }
+      {
+        "type": "KNOWLEDGE_FACT",
+        "factId": "fact_m22_player_practiced_forge_assistance",
+        "responseId": "report"
+      }
     ],
     "next": {
       "report": null
@@ -790,7 +1097,9 @@
     "title": "What the Watch Can Now Ask",
     "text": "Because Valerius knows you actually worked Gronk's support line, he stops treating your repair estimates as second-hand advocacy. He marks two damaged patrol mounts on the map. 'I am not asking whether Gronk likes the schedule or whether I trust your judgment. I am asking what the forge can physically sustain.'",
     "repeatable": false,
-    "requiredKnowledgeFactIds": ["fact_m22_player_practiced_forge_assistance"],
+    "requiredKnowledgeFactIds": [
+      "fact_m22_player_practiced_forge_assistance"
+    ],
     "responses": {
       "answer": "Then use the fact, not my reputation: one support line can carry this load without pretending the deeper repair is already done."
     },
@@ -805,13 +1114,24 @@
     "title": "The Order You Broke in Public",
     "text": "A Watch checkpoint begins detaining every caravan on an order written for yesterday's threat pattern. You override the post in front of witnesses and reopen the lane that keeps civilians supplied. Later, Valerius closes the office door. 'The Watch hates a public precedent it did not authorize. I hate an order that survives after its objective has changed. Those are not the same judgment.'",
     "repeatable": false,
-    "requiredExperienceIds": ["valerius_exp_order_questioned"],
+    "requiredExperienceIds": [
+      "valerius_exp_order_questioned"
+    ],
     "responses": {
       "own_override": "I broke the visible order because following it would have broken the mission. You can trust that judgment personally without asking the Watch to like the precedent."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_m23_public_override", "responseId": "own_override" },
-      { "type": "FACTION_REPUTATION", "factionId": "City Watch", "value": -10, "responseId": "own_override" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_m23_public_override",
+        "responseId": "own_override"
+      },
+      {
+        "type": "FACTION_REPUTATION",
+        "factionId": "City Watch",
+        "value": -10,
+        "responseId": "own_override"
+      }
     ],
     "next": {
       "own_override": null
@@ -823,9 +1143,14 @@
     "title": "Clearance the Captain Cannot Give Alone",
     "text": "Valerius has already made his personal judgment about the checkpoint override. The remaining question belongs to the institution: whether the Watch will place its seal on your access to restricted patrol records. This time his trust is not enough by itself.",
     "repeatable": false,
-    "requiredExperienceIds": ["valerius_exp_m23_public_override"],
+    "requiredExperienceIds": [
+      "valerius_exp_m23_public_override"
+    ],
     "requiredFactionReputation": [
-      { "factionId": "City Watch", "min": 0 }
+      {
+        "factionId": "City Watch",
+        "min": 0
+      }
     ],
     "responses": {
       "accept_clearance": "Then record the distinction: your trust opened the conversation; the Watch's standing authorizes the seal."
@@ -841,16 +1166,34 @@
     "title": "The Repair Ledger",
     "text": "The quiet reroute works, but the district now needs permanent repairs. Valerius can reopen every visible lane by week's end if Gronk plates the damaged mounts and leaves the deeper load path for later. Gronk refuses to call that a repair. 'You already proved you can move the load instead of hiding it. Decide whether that was a principle or a trick.'",
     "repeatable": false,
-    "requiredExperienceIds": ["gronk_exp_quiet_reroute_proven"],
+    "requiredExperienceIds": [
+      "gronk_exp_quiet_reroute_proven"
+    ],
     "responses": {
       "build_for_load": "Repair the load path first. If reopening takes longer, the Watch can explain why. I will not turn a known structural failure into a public-relations schedule.",
       "restore_visible_order": "Plate the visible failures and reopen on schedule. The district needs confidence now; the deeper rebuild can follow."
     },
     "effects": [
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_repair_for_load", "responseId": "build_for_load" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_repair_for_load", "responseId": "build_for_load" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_repair_for_show", "responseId": "restore_visible_order" },
-      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "valerius_exp_repair_for_show", "responseId": "restore_visible_order" }
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_repair_for_load",
+        "responseId": "build_for_load"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_repair_for_load",
+        "responseId": "build_for_load"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "gronk_exp_repair_for_show",
+        "responseId": "restore_visible_order"
+      },
+      {
+        "type": "RELATIONSHIP_EXPERIENCE",
+        "experienceId": "valerius_exp_repair_for_show",
+        "responseId": "restore_visible_order"
+      }
     ],
     "next": {
       "build_for_load": null,
