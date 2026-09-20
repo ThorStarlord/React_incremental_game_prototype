@@ -67,10 +67,10 @@ Personal Agency
 - [`Narrative/CampaignArchitecture.md`](Narrative/CampaignArchitecture.md) — **CURRENT AUTHORITY** for the bounded Campaign One spine:
 
 ```text
-Prologue
-Ch1 Merchant District Crisis      [integrated]
-Ch2 Archive Inquiry               [integrated]
-Ch3 Enemies in Phase              [integrated]
+Prologue                         [integrated]
+Ch1 Merchant District Crisis      [integrated / connected]
+Ch2 Archive Inquiry               [integrated / connected]
+Ch3 Enemies in Phase              [integrated / connected]
 Ch4 Lattice Under Strain          [to build]
 Ch5 The Chrono-Crypt              [to build]
 Ch6 Network Under Pressure        [to build]
@@ -106,7 +106,19 @@ Focused command:
 npm run gc01:validate
 ```
 
-The next unsatisfied completion responsibility is GC-02 Prologue / onboarding.
+The next responsibility is GC-04 / GC-05 breadth reconciliation against actual integrated production evidence.
+
+
+### Integrated GC-03 result
+
+- [`Technical/GC03OpeningCampaignSpineResult.md`](Technical/GC03OpeningCampaignSpineResult.md) — **CURRENT AUTHORITY, INTEGRATED** for the production opening spine from Prologue through Chapters 1–3.
+
+Focused commands:
+
+```bash
+npm run gc02:validate
+npm run gc03:validate
+```
 
 ### Maturity gates
 
