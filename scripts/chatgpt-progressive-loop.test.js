@@ -17,6 +17,9 @@ function protocol(overrides = {}) {
     lens: "NONE",
     goal: "Ship the committed vertical slice",
     pending: 0,
+    active: "NONE",
+    packageState: "NONE",
+    blocker: "NONE",
     fingerprint: "main@abc123: vertical slice incomplete",
     reason: "Repository evidence supports planning against the committed slice.",
     ...overrides
@@ -29,6 +32,9 @@ function protocol(overrides = {}) {
     `LOOP_LENS: ${values.lens}`,
     `LOOP_GOAL: ${values.goal}`,
     `LOOP_PENDING_PACKAGES: ${values.pending}`,
+    `LOOP_ACTIVE_PACKAGE: ${values.active}`,
+    `LOOP_PACKAGE_STATE: ${values.packageState}`,
+    `LOOP_BLOCKER: ${values.blocker}`,
     `LOOP_STATE_FINGERPRINT: ${values.fingerprint}`,
     `LOOP_REASON: ${values.reason}`
   ].join("\n");
@@ -66,14 +72,26 @@ test("rejects missing protocol fields", () => {
 
 test("rejects PACKAGE with zero pending packages", () => {
   assert.throws(
-    () => parseLoopProtocol(protocol({ next: "PACKAGE", mode: "EXECUTION", pending: 0 })),
+    () => parseLoopProtocol(protocol({
+      next: "PACKAGE",
+      mode: "EXECUTION",
+      pending: 0,
+      active: 1,
+      packageState: "NOT_STARTED"
+    })),
     /requires at least one pending package/
   );
 });
 
 test("rejects HANDOFF while packages remain", () => {
   assert.throws(
-    () => parseLoopProtocol(protocol({ next: "HANDOFF", mode: "HANDOFF", pending: 1 })),
+    () => parseLoopProtocol(protocol({
+      next: "HANDOFF",
+      mode: "HANDOFF",
+      pending: 1,
+      active: 1,
+      packageState: "IMPLEMENTING"
+    })),
     /requires zero pending packages/
   );
 });
@@ -94,7 +112,13 @@ test("rejects NEW_CYCLE outside a verified handoff", () => {
 
 test("rejects open discovery that invents packages", () => {
   assert.throws(
-    () => parseLoopProtocol(protocol({ mode: "OPEN_DISCOVERY", next: "PACKAGE", pending: 1 })),
+    () => parseLoopProtocol(protocol({
+      mode: "OPEN_DISCOVERY",
+      next: "PACKAGE",
+      pending: 1,
+      active: 1,
+      packageState: "NOT_STARTED"
+    })),
     /cannot report pending packages before planning/
   );
 });
@@ -130,7 +154,100 @@ test("validateOutcome accepts a normal execution continuation", () => {
     lens: "NONE",
     goal: "Close the committed serialization gap",
     pendingPackages: 2,
+    activePackage: 2,
+    packageState: "NOT_STARTED",
+    blocker: "NONE",
     fingerprint: "main@def456: two serialization packages pending",
     reason: "Package 1 completed; two remain."
   }));
+});
+
+
+test("parses qualification-blocked RECHECK state", () => {
+  const parsed = parseLoopProtocol(protocol({
+    next: "RECHECK",
+    mode: "EXECUTION",
+    pending: 3,
+    active: 1,
+    packageState: "QUALIFICATION_BLOCKED",
+    blocker: "CI_INFRASTRUCTURE",
+    fingerprint: "pr26@abc: implementation candidate; CI job allocated no steps",
+    reason: "Implementation exists but native qualification did not execute."
+  }));
+
+  assert.equal(parsed.activePackage, 1);
+  assert.equal(parsed.packageState, "QUALIFICATION_BLOCKED");
+  assert.equal(parsed.blocker, "CI_INFRASTRUCTURE");
+  assert.equal(nextControllerAction(parsed), "RECHECK");
+});
+
+test("RECHECK rejects repository-resolvable defects", () => {
+  assert.throws(
+    () => parseLoopProtocol(protocol({
+      next: "RECHECK",
+      mode: "EXECUTION",
+      pending: 1,
+      active: 1,
+      packageState: "IMPLEMENTING",
+      blocker: "REPOSITORY"
+    })),
+    /qualification-pending or qualification-blocked package/
+  );
+});
+
+test("RECHECK requires an external qualification blocker", () => {
+  assert.throws(
+    () => parseLoopProtocol(protocol({
+      next: "RECHECK",
+      mode: "EXECUTION",
+      pending: 1,
+      active: 1,
+      packageState: "QUALIFICATION_BLOCKED",
+      blocker: "REPOSITORY"
+    })),
+    /requires CI_INFRASTRUCTURE or EXTERNAL blocker/
+  );
+});
+
+test("package state cannot exist without an active package", () => {
+  assert.throws(
+    () => parseLoopProtocol(protocol({
+      packageState: "QUALIFICATION_BLOCKED",
+      blocker: "CI_INFRASTRUCTURE"
+    })),
+    /No active package requires/
+  );
+});
+
+test("outcome signatures distinguish package lifecycle state", () => {
+  const pending = parseLoopProtocol(protocol({
+    next: "RECHECK",
+    mode: "EXECUTION",
+    pending: 1,
+    active: 1,
+    packageState: "QUALIFICATION_PENDING",
+    blocker: "EXTERNAL"
+  }));
+  const blocked = parseLoopProtocol(protocol({
+    next: "RECHECK",
+    mode: "EXECUTION",
+    pending: 1,
+    active: 1,
+    packageState: "QUALIFICATION_BLOCKED",
+    blocker: "CI_INFRASTRUCTURE"
+  }));
+  assert.notEqual(outcomeSignature(pending), outcomeSignature(blocked));
+});
+
+test("HANDOFF requires no active package lifecycle state", () => {
+  assert.throws(
+    () => parseLoopProtocol(protocol({
+      next: "HANDOFF",
+      mode: "HANDOFF",
+      pending: 0,
+      active: 1,
+      packageState: "QUALIFIED"
+    })),
+    /requires zero pending packages and no active package/
+  );
 });
