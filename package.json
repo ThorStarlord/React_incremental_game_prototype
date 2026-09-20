@@ -50,7 +50,8 @@
     "simulated-review:validate": "node --check scripts/simulated-product-review/ui-observer.js && node --check scripts/simulated-product-review/action-contract.js && node --check scripts/simulated-product-review/validate-action-contract.js && node --check scripts/simulated-product-review/validate-config.js && node scripts/simulated-product-review/validate-config.js",
     "simulated-review:action-contract": "node scripts/simulated-product-review/validate-action-contract.js",
     "simulated-review:observe": "node scripts/simulated-product-review/ui-observer.js",
-    "simulated-review:smoke": "node scripts/simulated-product-review/ui-observer.js --smoke --headless --url http://127.0.0.1:3000 --out .simulated-review-output/ci-smoke"
+    "simulated-review:smoke": "node scripts/simulated-product-review/ui-observer.js --smoke --headless --url http://127.0.0.1:3000 --out .simulated-review-output/ci-smoke",
+    "alpha:validate": "node scripts/content-intelligence/reachability-check.js && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_distributed && cross-env CI=true react-scripts test --watchAll=false --runInBand GC11AlphaWholeGame.test.tsx GC01PlayerSurfaceScopeCleanup.test.ts GC0405BreadthQualification.test.ts CopyM20ProductionTaskAutomation.test.tsx PostM25CopyRoutineStrategy.test.ts GameLoopM21OfflineProgress.test.ts ChapterDefinitionIntegrity.test.ts saveSchema.test.ts saveUtils.test.ts"
   },
   "eslintConfig": {
     "extends": [
