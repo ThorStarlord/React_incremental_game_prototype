@@ -117,13 +117,17 @@ const makeStore = () =>
       getDefaultMiddleware().prepend(npcListeners.middleware),
   });
 
+const productionNpcCatalog = JSON.parse(
+  require('fs').readFileSync(require('path').join(process.cwd(), 'public/data/npcs.json'), 'utf8')
+);
+
 const catalog = {
   npc_elder_willow: npc('npc_elder_willow'),
   npc_blacksmith_gronk: npc('npc_blacksmith_gronk'),
   npc_rogue_silas: npc('npc_rogue_silas'),
   npc_captain_valerius: npc('npc_captain_valerius'),
   npc_scholar_elara: npc('npc_scholar_elara'),
-  npc_rival_lyra: npc('npc_rival_lyra'),
+  npc_lyra: npc('npc_lyra'),
 };
 
 const originalFetch = global.fetch;
@@ -195,6 +199,12 @@ describe('GC-03 opening Campaign One spine', () => {
     ).toBe('GC03_COMPLETE');
   });
 
+  test('uses canonical production NPC identities for the GC-03 chapter cast', () => {
+    expect(productionNpcCatalog.npc_lyra?.id).toBe('npc_lyra');
+    expect(productionNpcCatalog.npc_rival_lyra).toBeUndefined();
+    expect(catalog.npc_lyra?.id).toBe('npc_lyra');
+  });
+
   test('unlocks each next chapter cast from the prior unit evidence while preserving Willow progress', async () => {
     const store = makeStore();
     store.dispatch(setNPCs({ npc_elder_willow: npc('npc_elder_willow') }));
@@ -217,13 +227,13 @@ describe('GC-03 opening Campaign One spine', () => {
     await waitFor(() => {
       expect(store.getState().npcs.npcs.npc_scholar_elara).toBeDefined();
     });
-    expect(store.getState().npcs.npcs.npc_rival_lyra).toBeUndefined();
+    expect(store.getState().npcs.npcs.npc_lyra).toBeUndefined();
 
     store.dispatch(
       recordRelationshipExperience(experience('elara_exp_independent_verification'))
     );
     await waitFor(() => {
-      expect(store.getState().npcs.npcs.npc_rival_lyra).toBeDefined();
+      expect(store.getState().npcs.npcs.npc_lyra).toBeDefined();
     });
   });
 
