@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CampaignCompletion, MetaState } from './MetaTypes';
+import { MetaState } from './MetaTypes';
 import type { RootState } from '../../../app/store';
 import { APP_VERSION } from '../../../shared/config/releaseVersion';
 
@@ -19,7 +19,6 @@ const initialState: MetaState = {
   error: null,
   // New intro flag
   hasSeenIntro: false,
-  campaignCompletion: null,
 };
 
 const metaSlice = createSlice({
@@ -44,9 +43,6 @@ const metaSlice = createSlice({
     setHasSeenIntro: (state, action: PayloadAction<boolean>) => {
       state.hasSeenIntro = action.payload;
     },
-    markCampaignComplete: (state, action: PayloadAction<CampaignCompletion>) => {
-      state.campaignCompletion = action.payload;
-    },
   },
 });
 
@@ -56,8 +52,7 @@ export const {
   setGameVersion,
   resetSessionStartTime,
   setIsInProximityToNPC,
-  setHasSeenIntro,
-  markCampaignComplete
+  setHasSeenIntro
 } = metaSlice.actions;
 
 // FIXED: Corrected and cleaned up selectors to match the final MetaState interface.
@@ -69,6 +64,5 @@ export const selectGameVersion = (state: RootState) => state.meta.gameVersion;
 export const selectSessionStartTime = (state: RootState) => state.meta.sessionStartTime;
 export const selectIsInProximityToNPC = (state: RootState) => state.meta.isInProximityToNPC;
 export const selectHasSeenIntro = (state: RootState) => state.meta.hasSeenIntro === true;
-export const selectCampaignCompletion = (state: RootState) => state.meta.campaignCompletion;
 
 export default metaSlice.reducer;
