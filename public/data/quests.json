@@ -357,5 +357,519 @@
     "rewards": [],
     "status": "NOT_STARTED",
     "isAutoComplete": false
+  },
+  "quest_gc06_lattice_under_strain": {
+    "id": "quest_gc06_lattice_under_strain",
+    "title": "Lattice Under Strain",
+    "description": "The Telluric Echo is stressing the Merchant District as a connected system. Stabilize the local lattice without pretending that one local intervention is the final countermeasure.",
+    "giver": "npc_scholar_elara",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Inspect the stressed Merchant District lattice in person",
+        "type": "REACH_LOCATION",
+        "target": "location_merchant_district",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "contain_surface_failures",
+        "label": "Contain Surface Failures",
+        "description": "Use ordinary local response capacity to isolate the failures that are currently visible. This buys stability without requiring an optional relationship-derived capability.",
+        "relationshipExperienceId": "valerius_gc06_exp_surface_containment",
+        "rewards": [],
+        "logMessage": "You contain the visible failures and stop the local cascade. The district stabilizes enough to act, but the repeating source remains unresolved."
+      },
+      {
+        "id": "reroute_lattice_load",
+        "label": "Reroute the Lattice Load",
+        "description": "Combine Willow's slow-system cognition with Gronk's constraint-first judgment to move pressure away from the lattice paths that are actually failing.",
+        "relationshipExperienceId": "gronk_gc06_exp_structural_steward",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You stop treating each visible break as an isolated repair and reroute the load around the failing lattice pattern."
+      },
+      {
+        "id": "phase_against_echo",
+        "label": "Phase Against the Echo",
+        "description": "Combine Scholarly Insight with Adversarial Calibration: model the contradiction as an opponent and phase the local response against the Echo's repeating structure.",
+        "relationshipExperienceId": "lyra_gc06_exp_countermodeler",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "You treat the Echo's repetition as a model that can be challenged and phase the local response against the predicted next stress."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc07_counterphase_principle": {
+    "id": "quest_gc07_counterphase_principle",
+    "title": "The Counterphase Principle",
+    "description": "Return to the Chrono-Crypt with Lyra and derive a reusable inverse to the Telluric Echo's repeating harmonic structure. The crypt records failures; the decision is how to read them.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Reach the Chrono-Crypt harmonic failure chamber",
+        "type": "REACH_LOCATION",
+        "target": "location_chrono_crypt",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "manual_harmonic_triangulation",
+        "label": "Manual Harmonic Triangulation",
+        "description": "Compare the preserved failures directly and triangulate the stable inverse pattern with Lyra. Slower and less elegant, but fully legal without optional capabilities.",
+        "relationshipExperienceId": "lyra_gc07_exp_manual_triangulation",
+        "rewards": [],
+        "logMessage": "You and Lyra manually compare the crypt's preserved failures until the inverse pattern becomes stable enough to carry forward."
+      },
+      {
+        "id": "structural_counterphase",
+        "label": "Structural Counterphase",
+        "description": "Use Willow's slow-system cognition and Gronk's constraint sense to identify the crypt structures carrying the repeating failure, then derive the inverse from those load paths.",
+        "relationshipExperienceId": "lyra_gc07_exp_structural_counterphase",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You trace the failure through the structures that actually carry it and derive a counterphase from the load-bearing pattern rather than the visible symptoms."
+      },
+      {
+        "id": "adversarial_countermodel",
+        "label": "Adversarial Countermodel",
+        "description": "Use Scholarly Insight and Adversarial Calibration to model the repeating failure as an opponent, predict its next phase, and derive the stable inverse.",
+        "relationshipExperienceId": "lyra_gc07_exp_adversarial_countermodel",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "You model the Echo's preserved failure sequence as an adversary, predict the next phase, and solve for the counterphase that makes that prediction fail."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc08_distributed_preparation": {
+    "id": "quest_gc08_distributed_preparation",
+    "title": "Distributed Network Preparation",
+    "description": "Prepare the Merchant District with verified counterphase procedures that can be understood and repeated without depending on a specialized build.",
+    "giver": "npc_scholar_elara",
+    "type": "SIDE",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Verify distributed counterphase preparation across the Merchant District",
+        "type": "REACH_LOCATION",
+        "target": "location_merchant_district",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_distributed_baseline",
+        "label": "Prepare the Distributed Baseline",
+        "description": "Use ordinary verified procedures to prepare a broad response without relying on optional permanent Traits.",
+        "relationshipExperienceId": "elara_gc08_exp_distributed_preparation",
+        "rewards": [],
+        "logMessage": "You verify a broad distributed preparation pattern that the network can execute without specialized capability dependencies."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc08_structural_preparation": {
+    "id": "quest_gc08_structural_preparation",
+    "title": "Prepare the Load Paths",
+    "description": "Use Gronk's network briefing to harden the actual load-bearing paths that will carry counterphase response through the local network.",
+    "giver": "npc_blacksmith_gronk",
+    "type": "SIDE",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Prepare the City Center load paths for counterphase routing",
+        "type": "REACH_LOCATION",
+        "target": "location_city_center",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_structural_network",
+        "label": "Prepare Structural Load Paths",
+        "description": "Combine Willow's slow-system cognition with Gronk's Constraint Sense to prepare only the network structures that actually carry the response.",
+        "relationshipExperienceId": "gronk_gc08_exp_structural_preparation",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You harden the network's load-bearing response paths instead of distributing preparation evenly."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc08_diagnostic_preparation": {
+    "id": "quest_gc08_diagnostic_preparation",
+    "title": "Prepare the Diagnostic Mesh",
+    "description": "Seed counterphase diagnostics at the City Gate so the network can detect contradiction in the Echo's next phase rather than treating every disturbance identically.",
+    "giver": "npc_scholar_elara",
+    "type": "SIDE",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Establish counterphase diagnostics at the City Gate",
+        "type": "REACH_LOCATION",
+        "target": "location_city_gate",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_diagnostic_network",
+        "label": "Prepare the Diagnostic Mesh",
+        "description": "Combine Scholarly Insight with Adversarial Calibration to place diagnostics where the Echo's model is most likely to contradict itself.",
+        "relationshipExperienceId": "elara_gc08_exp_diagnostic_preparation",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "You prepare a diagnostic mesh that treats the network as an adversarial sensor rather than a uniform shield."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc09_distributed_counterphase": {
+    "id": "quest_gc09_distributed_counterphase",
+    "title": "Prepare the Distributed Counterphase",
+    "description": "Turn the distributed network posture into a finale-capable deployment using broad verified procedures rather than optional specialization.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Verify distributed counterphase deployment in the Merchant District",
+        "type": "REACH_LOCATION",
+        "target": "location_merchant_district",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_distributed_finale",
+        "label": "Prepare Distributed Counterphase",
+        "description": "Use the broad verified network as the finale preparation baseline. No optional permanent Trait pair is required.",
+        "relationshipExperienceId": "lyra_gc09_exp_prepare_distributed",
+        "rewards": [],
+        "logMessage": "You convert the distributed posture into a concrete counterphase deployment that remains legal without optional specialization."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc09_structural_counterphase": {
+    "id": "quest_gc09_structural_counterphase",
+    "title": "Prepare the Structural Counterphase",
+    "description": "Prepare the load-bearing paths that will carry the counterphase through the finale.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Finalize load-path deployment from the City Center",
+        "type": "REACH_LOCATION",
+        "target": "location_city_center",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_structural_finale",
+        "label": "Prepare Structural Counterphase",
+        "description": "Use Willow's Wisdom and Constraint Sense to align the finale plan with the network structures that actually carry the response.",
+        "relationshipExperienceId": "lyra_gc09_exp_prepare_structural",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You finalize a counterphase deployment around the network's actual load-bearing paths."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc09_diagnostic_counterphase": {
+    "id": "quest_gc09_diagnostic_counterphase",
+    "title": "Prepare the Diagnostic Counterphase",
+    "description": "Return to the Chrono-Crypt and turn the diagnostic network posture into a prediction-first finale plan.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Calibrate the diagnostic finale model in the Chrono-Crypt",
+        "type": "REACH_LOCATION",
+        "target": "location_chrono_crypt",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_diagnostic_finale",
+        "label": "Prepare Diagnostic Counterphase",
+        "description": "Use Scholarly Insight and Adversarial Calibration to build the finale plan around predicted contradiction in the Echo's next phase.",
+        "relationshipExperienceId": "lyra_gc09_exp_prepare_diagnostic",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "You calibrate a finale plan that treats the network as an adversarial diagnostic instrument."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc09_fortified_counterphase": {
+    "id": "quest_gc09_fortified_counterphase",
+    "title": "Prepare the Fortified Counterphase",
+    "description": "Coordinate the Watch-supported network posture into a bounded finale deployment without turning institutional support into a personal Relationship score.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Finalize fortified counterphase logistics at the City Gate",
+        "type": "REACH_LOCATION",
+        "target": "location_city_gate",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "prepare_fortified_finale",
+        "label": "Prepare Fortified Counterphase",
+        "description": "Coordinate the already-authorized Watch logistics with the counterphase network. No optional Trait pair is mandatory.",
+        "relationshipExperienceId": "lyra_gc09_exp_prepare_fortified",
+        "rewards": [],
+        "logMessage": "You finalize the Watch-supported counterphase deployment while keeping institutional support distinct from personal Relationship."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc10_telluric_echo_distributed": {
+    "id": "quest_gc10_telluric_echo_distributed",
+    "title": "Telluric Echo — Distributed Dissipation",
+    "description": "Carry the distributed counterphase into the Whispering Woods and dissipate the Echo across the broad verified network.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Enter the Whispering Woods and confront the Telluric Echo with the committed counterphase plan",
+        "type": "REACH_LOCATION",
+        "target": "location_whispering_woods",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "resolve_distributed_dissipation",
+        "label": "Dissipate Through the Distributed Network",
+        "description": "Use the broad verified preparation as the counterphase carrier. This remains legal without any optional two-Trait specialization.",
+        "relationshipExperienceId": "lyra_gc10_exp_finale_distributed",
+        "rewards": [],
+        "logMessage": "The prepared network catches the counterphase across many verified response points and dissipates the Echo without requiring a single golden capability."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc10_telluric_echo_structural": {
+    "id": "quest_gc10_telluric_echo_structural",
+    "title": "Telluric Echo — Structural Redirection",
+    "description": "Carry the structural counterphase into the Whispering Woods and redirect the Echo through the load-bearing paths prepared to hold it.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Enter the Whispering Woods and confront the Telluric Echo with the committed counterphase plan",
+        "type": "REACH_LOCATION",
+        "target": "location_whispering_woods",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "resolve_structural_redirection",
+        "label": "Redirect Through the Load-Bearing Paths",
+        "description": "Use Willow's Wisdom and Constraint Sense to route the counterphase through the structures that can actually carry it.",
+        "relationshipExperienceId": "lyra_gc10_exp_finale_structural",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You redirect the Echo through the load-bearing network paths, letting the counterphase travel where the system can actually sustain it."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc10_telluric_echo_diagnostic": {
+    "id": "quest_gc10_telluric_echo_diagnostic",
+    "title": "Telluric Echo — Diagnostic Disruption",
+    "description": "Carry the diagnostic counterphase into the Whispering Woods and break the Echo by forcing its predicted phase into contradiction.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Enter the Whispering Woods and confront the Telluric Echo with the committed counterphase plan",
+        "type": "REACH_LOCATION",
+        "target": "location_whispering_woods",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "resolve_diagnostic_disruption",
+        "label": "Disrupt the Predicted Phase",
+        "description": "Use Scholarly Insight and Adversarial Calibration to predict the Echo's next move and make that prediction fail.",
+        "relationshipExperienceId": "lyra_gc10_exp_finale_diagnostic",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "The network catches the contradiction in the Echo's next phase and disrupts the repeating structure before it can reassert itself."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
+  },
+  "quest_gc10_telluric_echo_fortified": {
+    "id": "quest_gc10_telluric_echo_fortified",
+    "title": "Telluric Echo — Fortified Containment",
+    "description": "Carry the Watch-supported counterphase into the Whispering Woods and hold the Echo inside the bounded response network.",
+    "giver": "npc_lyra",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Enter the Whispering Woods and confront the Telluric Echo with the committed counterphase plan",
+        "type": "REACH_LOCATION",
+        "target": "location_whispering_woods",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "resolve_fortified_containment",
+        "label": "Contain Through the Fortified Network",
+        "description": "Use verified counterphase procedures backed by legally available Watch logistics. No optional two-Trait pair is mandatory.",
+        "relationshipExperienceId": "lyra_gc10_exp_finale_fortified",
+        "rewards": [],
+        "logMessage": "The Watch-supported network holds the counterphase long enough to contain the Echo without collapsing institutional authority into personal loyalty."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   }
 }

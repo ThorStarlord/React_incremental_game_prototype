@@ -1,0 +1,176 @@
+{
+  "experiences": {
+    "elara_gc06_exp_lattice_diagnosed": {
+      "id": "elara_gc06_exp_lattice_diagnosed",
+      "uniqueKey": "elara:gc06:lattice-diagnosed",
+      "title": "The Lattice Under Strain",
+      "primaryTargetId": "npc_scholar_elara",
+      "participantIds": [
+        "player",
+        "npc_scholar_elara"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "elara_gc06_lattice_diagnosis",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 4,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "TelluricEcho",
+        "Lattice",
+        "ArchiveEvidence",
+        "NetworkPressure"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Elara's archive contradiction now matches a live regional failure pattern: the Echo is stressing connected systems rather than producing one isolated anomaly."
+    },
+    "valerius_gc06_exp_surface_containment": {
+      "id": "valerius_gc06_exp_surface_containment",
+      "uniqueKey": "valerius:gc06:surface-containment",
+      "title": "Contain What Is Failing",
+      "primaryTargetId": "npc_captain_valerius",
+      "participantIds": [
+        "player",
+        "npc_captain_valerius"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc06_lattice_under_strain",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 2,
+        "sharedMeaning": 1,
+        "reliance": 3
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": [
+        "TelluricEcho",
+        "Containment",
+        "InstitutionalResponse",
+        "BaselineRoute"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player accepts a bounded local containment strategy: ordinary action remains viable even without optional capability combinations."
+    },
+    "gronk_gc06_exp_structural_steward": {
+      "id": "gronk_gc06_exp_structural_steward",
+      "uniqueKey": "gronk:gc06:structural-steward",
+      "title": "Reroute the Lattice Load",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": [
+        "player",
+        "npc_blacksmith_gronk",
+        "npc_elder_willow"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc06_lattice_under_strain",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 3,
+        "understanding": 4,
+        "sharedMeaning": 5,
+        "reliance": 4,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "TelluricEcho",
+        "ConstraintRouting",
+        "SlowSystems",
+        "StructuralSteward"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Willow's slow-system reading and Gronk's load-path judgment combine into a structural response that reroutes pressure instead of treating each visible failure separately."
+    },
+    "lyra_gc06_exp_countermodeler": {
+      "id": "lyra_gc06_exp_countermodeler",
+      "uniqueKey": "lyra:gc06:countermodeler",
+      "title": "Phase Against the Echo",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra",
+        "npc_scholar_elara"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc06_lattice_under_strain",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 5,
+        "sharedMeaning": 4,
+        "reliance": 3,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "TelluricEcho",
+        "Contradiction",
+        "AdversarialCalibration",
+        "Countermodeler"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "Elara's contradiction-first inquiry and Lyra's adversarial calibration combine into a response that treats the Echo as a pattern to model and phase against."
+    },
+    "lyra_gc06_exp_chrono_crypt_route": {
+      "id": "lyra_gc06_exp_chrono_crypt_route",
+      "uniqueKey": "lyra:gc06:chrono-crypt-route",
+      "title": "The Local Fix Is Not the Countermeasure",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc06_chrono_crypt_route",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 3,
+        "sharedMeaning": 5,
+        "reliance": 4,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 7,
+      "resonanceTags": [
+        "TelluricEcho",
+        "ChronoCrypt",
+        "Counterphase",
+        "NetworkPressure"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc06_chrono_crypt_route",
+      "interpretation": "The local lattice can be stabilized, but Lyra recognizes that the repeating phase structure points to the Chrono-Crypt as the place to derive a real countermeasure."
+    }
+  },
+  "memories": {
+    "lyra_memory_gc06_chrono_crypt_route": {
+      "id": "lyra_memory_gc06_chrono_crypt_route",
+      "originExperienceId": "lyra_gc06_exp_chrono_crypt_route",
+      "title": "The Route Beneath the Local Fix",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "You stabilized the local lattice, then accepted with Lyra that containment is not a countermeasure. The repeating phase points toward the Chrono-Crypt.",
+      "protagonistView": "The local response bought time. The crypt may explain how to stop needing local responses.",
+      "targetView": "The player can distinguish a successful intervention from a solved problem. That makes a deeper joint investigation possible.",
+      "resonanceTags": [
+        "TelluricEcho",
+        "ChronoCrypt",
+        "Counterphase",
+        "NetworkPressure"
+      ],
+      "bondContribution": "Dialectic Counterparts — operational",
+      "persistence": "stable"
+    }
+  }
+}

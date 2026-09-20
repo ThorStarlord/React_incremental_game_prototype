@@ -1,0 +1,326 @@
+{
+  "experiences": {
+    "lyra_gc09_exp_prepare_distributed": {
+      "id": "lyra_gc09_exp_prepare_distributed",
+      "uniqueKey": "lyra:gc09:prepare-distributed",
+      "title": "Distributed Counterphase Preparation",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc09_distributed_counterphase",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 4,
+        "reliance": 4,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "Counterphase",
+        "FinalePreparation",
+        "DistributedPlan"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player turns the distributed network posture into a concrete counterphase deployment that remains legal without optional capability ownership."
+    },
+    "lyra_gc09_exp_commit_distributed": {
+      "id": "lyra_gc09_exp_commit_distributed",
+      "uniqueKey": "lyra:gc09:commit-distributed",
+      "title": "Commit the Distributed Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc09_commit_distributed",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 7,
+        "reliance": 6,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "FinaleCommitment",
+        "DistributedPlan"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc09_distributed_plan",
+      "interpretation": "The player commits the broad verified network to the finale plan personally; the plan is not inferred from posture or delegated work."
+    },
+    "lyra_gc09_exp_prepare_structural": {
+      "id": "lyra_gc09_exp_prepare_structural",
+      "uniqueKey": "lyra:gc09:prepare-structural",
+      "title": "Structural Counterphase Preparation",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc09_structural_counterphase",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 4,
+        "reliance": 4,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "Counterphase",
+        "FinalePreparation",
+        "StructuralPlan"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player converts the structural network posture into a finale plan centered on the load-bearing paths capable of carrying the counterphase."
+    },
+    "lyra_gc09_exp_commit_structural": {
+      "id": "lyra_gc09_exp_commit_structural",
+      "uniqueKey": "lyra:gc09:commit-structural",
+      "title": "Commit the Structural Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc09_commit_structural",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 7,
+        "reliance": 6,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "FinaleCommitment",
+        "StructuralPlan"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc09_structural_plan",
+      "interpretation": "The player commits a load-path counterphase plan built from Willow's slow-system cognition and Gronk's constraint sense."
+    },
+    "lyra_gc09_exp_prepare_diagnostic": {
+      "id": "lyra_gc09_exp_prepare_diagnostic",
+      "uniqueKey": "lyra:gc09:prepare-diagnostic",
+      "title": "Diagnostic Counterphase Preparation",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc09_diagnostic_counterphase",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 4,
+        "reliance": 4,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "Counterphase",
+        "FinalePreparation",
+        "DiagnosticPlan"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player converts the diagnostic network into a finale plan that treats contradiction and prediction as active sensors for the Echo."
+    },
+    "lyra_gc09_exp_commit_diagnostic": {
+      "id": "lyra_gc09_exp_commit_diagnostic",
+      "uniqueKey": "lyra:gc09:commit-diagnostic",
+      "title": "Commit the Diagnostic Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc09_commit_diagnostic",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 7,
+        "reliance": 6,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "FinaleCommitment",
+        "DiagnosticPlan"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc09_diagnostic_plan",
+      "interpretation": "The player commits an adversarial countermodel plan personally, preserving the distinction between preparation automation and strategic authority."
+    },
+    "lyra_gc09_exp_prepare_fortified": {
+      "id": "lyra_gc09_exp_prepare_fortified",
+      "uniqueKey": "lyra:gc09:prepare-fortified",
+      "title": "Fortified Counterphase Preparation",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "quest",
+      "sourceId": "quest_gc09_fortified_counterphase",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 4,
+        "reliance": 4,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "Counterphase",
+        "FinalePreparation",
+        "FortifiedPlan"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player turns the fortified network posture and its institutional logistics into a bounded finale deployment without folding Faction standing into Relationship."
+    },
+    "lyra_gc09_exp_commit_fortified": {
+      "id": "lyra_gc09_exp_commit_fortified",
+      "uniqueKey": "lyra:gc09:commit-fortified",
+      "title": "Commit the Fortified Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc09_commit_fortified",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 7,
+        "reliance": 6,
+        "reciprocity": 5
+      },
+      "connectionProgressDelta": 8,
+      "resonanceTags": [
+        "Counterphase",
+        "FinaleCommitment",
+        "FortifiedPlan"
+      ],
+      "memoryCandidate": true,
+      "memoryDefinitionId": "lyra_memory_gc09_fortified_plan",
+      "interpretation": "The player commits a Watch-supported counterphase plan personally while institutional standing remains separately legible."
+    }
+  },
+  "memories": {
+    "lyra_memory_gc09_distributed_plan": {
+      "id": "lyra_memory_gc09_distributed_plan",
+      "originExperienceId": "lyra_gc09_exp_commit_distributed",
+      "title": "Commit the Distributed Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The player commits the broad verified network to the finale plan personally; the plan is not inferred from posture or delegated work.",
+      "protagonistView": "This is the finale plan I chose from the history we built, not a score the system calculated for me.",
+      "targetView": "The player owns the irreversible plan. Repetitive preparation can be delegated, but the commitment cannot.",
+      "resonanceTags": [
+        "Counterphase",
+        "FinaleCommitment",
+        "DistributedPlan"
+      ],
+      "bondContribution": "Dialectic Counterparts — final preparation",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc09_structural_plan": {
+      "id": "lyra_memory_gc09_structural_plan",
+      "originExperienceId": "lyra_gc09_exp_commit_structural",
+      "title": "Commit the Structural Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The player commits a load-path counterphase plan built from Willow's slow-system cognition and Gronk's constraint sense.",
+      "protagonistView": "This is the finale plan I chose from the history we built, not a score the system calculated for me.",
+      "targetView": "The player owns the irreversible plan. Repetitive preparation can be delegated, but the commitment cannot.",
+      "resonanceTags": [
+        "Counterphase",
+        "FinaleCommitment",
+        "StructuralPlan"
+      ],
+      "bondContribution": "Dialectic Counterparts — final preparation",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc09_diagnostic_plan": {
+      "id": "lyra_memory_gc09_diagnostic_plan",
+      "originExperienceId": "lyra_gc09_exp_commit_diagnostic",
+      "title": "Commit the Diagnostic Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The player commits an adversarial countermodel plan personally, preserving the distinction between preparation automation and strategic authority.",
+      "protagonistView": "This is the finale plan I chose from the history we built, not a score the system calculated for me.",
+      "targetView": "The player owns the irreversible plan. Repetitive preparation can be delegated, but the commitment cannot.",
+      "resonanceTags": [
+        "Counterphase",
+        "FinaleCommitment",
+        "DiagnosticPlan"
+      ],
+      "bondContribution": "Dialectic Counterparts — final preparation",
+      "persistence": "stable"
+    },
+    "lyra_memory_gc09_fortified_plan": {
+      "id": "lyra_memory_gc09_fortified_plan",
+      "originExperienceId": "lyra_gc09_exp_commit_fortified",
+      "title": "Commit the Fortified Counterphase",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "memoryType": "shared",
+      "significance": "defining",
+      "playerVisible": true,
+      "summary": "The player commits a Watch-supported counterphase plan personally while institutional standing remains separately legible.",
+      "protagonistView": "This is the finale plan I chose from the history we built, not a score the system calculated for me.",
+      "targetView": "The player owns the irreversible plan. Repetitive preparation can be delegated, but the commitment cannot.",
+      "resonanceTags": [
+        "Counterphase",
+        "FinaleCommitment",
+        "FortifiedPlan"
+      ],
+      "bondContribution": "Dialectic Counterparts — final preparation",
+      "persistence": "stable"
+    }
+  }
+}

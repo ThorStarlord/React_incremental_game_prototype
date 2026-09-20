@@ -7,6 +7,7 @@ import {
   areLocationsDirectlyConnected,
   CITY_CENTER_LOCATION_ID,
   getLocationDefinition,
+  getMissingLocationExperienceIds,
   resolveCanonicalLocationId,
 } from './LocationDefinitions';
 
@@ -32,6 +33,19 @@ export const travelToLocationThunk = createAsyncThunk<
     if (!areLocationsDirectlyConnected(fromLocationId, toLocationId)) {
       return rejectWithValue(
         `No direct travel route from ${fromLocationId} to ${toLocationId}.`
+      );
+    }
+
+    const recordedExperienceIds = new Set(
+      Object.keys(getState().relationships.experiencesById)
+    );
+    const missingExperienceIds = getMissingLocationExperienceIds(
+      toLocationId,
+      recordedExperienceIds
+    );
+    if (missingExperienceIds.length > 0) {
+      return rejectWithValue(
+        `Travel access not established. Missing relationship evidence: ${missingExperienceIds.join(', ')}.`
       );
     }
 

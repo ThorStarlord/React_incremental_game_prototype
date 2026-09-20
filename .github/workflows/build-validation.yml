@@ -46,6 +46,30 @@ jobs:
         timeout-minutes: 8
         run: npm run gc0405:validate
 
+      - name: GC-06 Lattice Under Strain qualification
+        timeout-minutes: 10
+        run: npm run gc06:validate
+
+      - name: GC-07 Chrono-Crypt qualification
+        timeout-minutes: 10
+        run: npm run gc07:validate
+
+      - name: GC-08 Network Under Pressure qualification
+        timeout-minutes: 12
+        run: npm run gc08:validate
+
+      - name: GC-09 Counterphase qualification
+        timeout-minutes: 12
+        run: npm run gc09:validate
+
+      - name: GC-10 finale and epilogue qualification
+        timeout-minutes: 14
+        run: npm run gc10:validate
+
+      - name: GC-11 whole-game Alpha qualification
+        timeout-minutes: 20
+        run: npm run alpha:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 

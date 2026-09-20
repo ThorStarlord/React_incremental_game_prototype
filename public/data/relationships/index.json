@@ -8,6 +8,10 @@
     "/data/relationships/valerius.json",
     "/data/relationships/m16-gameplay.json",
     "/data/relationships/m23-faction.json",
-    "/data/relationships/campaign-one.json"
+    "/data/relationships/gc06-lattice.json",
+    "/data/relationships/gc07-chrono-crypt.json",
+    "/data/relationships/gc08-network.json",
+    "/data/relationships/gc09-counterphase.json",
+    "/data/relationships/gc10-finale.json"
   ]
 }

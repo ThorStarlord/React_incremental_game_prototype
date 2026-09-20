@@ -1,6 +1,11 @@
 import type { RootState } from '../../../app/store';
 import type {
+  CampaignStatus,
+  CounterphasePlan,
+  LatticeIntegrity,
+  NetworkPosture,
   RegionalWorldState,
+  TelluricEchoOutcome,
   TradeFlow,
   WatchPresence,
   WorldStateRequirement,
@@ -41,6 +46,89 @@ export const selectTradeFlow = (
 ): TradeFlow =>
   getTradeFlowFromRegions(selectWorldStateRegions(state), regionId);
 
+export const getLatticeIntegrityFromRegions = (
+  regions: WorldStateRegions,
+  regionId: string
+): LatticeIntegrity | undefined => {
+  const value = regions[regionId]?.latticeIntegrity;
+  return value === 'strained' || value === 'stabilized' ? value : undefined;
+};
+
+export const selectLatticeIntegrity = (
+  state: RootState,
+  regionId: string
+): LatticeIntegrity | undefined =>
+  getLatticeIntegrityFromRegions(selectWorldStateRegions(state), regionId);
+
+export const getNetworkPostureFromRegions = (
+  regions: WorldStateRegions,
+  regionId: string
+): NetworkPosture | undefined => {
+  const value = regions[regionId]?.networkPosture;
+  return (
+    value === 'distributed' ||
+    value === 'structural' ||
+    value === 'fortified' ||
+    value === 'diagnostic'
+  ) ? value : undefined;
+};
+
+export const selectNetworkPosture = (
+  state: RootState,
+  regionId: string
+): NetworkPosture | undefined =>
+  getNetworkPostureFromRegions(selectWorldStateRegions(state), regionId);
+
+export const getCounterphasePlanFromRegions = (
+  regions: WorldStateRegions,
+  regionId: string
+): CounterphasePlan | undefined => {
+  const value = regions[regionId]?.counterphasePlan;
+  return (
+    value === 'distributed' ||
+    value === 'structural' ||
+    value === 'fortified' ||
+    value === 'diagnostic'
+  ) ? value : undefined;
+};
+
+export const selectCounterphasePlan = (
+  state: RootState,
+  regionId: string
+): CounterphasePlan | undefined =>
+  getCounterphasePlanFromRegions(selectWorldStateRegions(state), regionId);
+
+export const getCampaignStatusFromRegions = (
+  regions: WorldStateRegions,
+  regionId: string
+): CampaignStatus | undefined =>
+  regions[regionId]?.campaignStatus === 'complete' ? 'complete' : undefined;
+
+export const selectCampaignStatus = (
+  state: RootState,
+  regionId: string
+): CampaignStatus | undefined =>
+  getCampaignStatusFromRegions(selectWorldStateRegions(state), regionId);
+
+export const getTelluricEchoOutcomeFromRegions = (
+  regions: WorldStateRegions,
+  regionId: string
+): TelluricEchoOutcome | undefined => {
+  const value = regions[regionId]?.telluricEchoOutcome;
+  return (
+    value === 'distributed_dissipation' ||
+    value === 'structural_redirection' ||
+    value === 'diagnostic_disruption' ||
+    value === 'fortified_containment'
+  ) ? value : undefined;
+};
+
+export const selectTelluricEchoOutcome = (
+  state: RootState,
+  regionId: string
+): TelluricEchoOutcome | undefined =>
+  getTelluricEchoOutcomeFromRegions(selectWorldStateRegions(state), regionId);
+
 export const doesWorldStateRequirementPass = (
   regions: WorldStateRegions,
   requirement: unknown
@@ -64,6 +152,52 @@ export const doesWorldStateRequirementPass = (
   if (candidate.field === 'tradeFlow') {
     if (candidate.equals !== 'normal' && candidate.equals !== 'strong') return false;
     return getTradeFlowFromRegions(regions, candidate.regionId) === candidate.equals;
+  }
+
+  if (candidate.field === 'latticeIntegrity') {
+    if (candidate.equals !== 'strained' && candidate.equals !== 'stabilized') return false;
+    return getLatticeIntegrityFromRegions(regions, candidate.regionId) === candidate.equals;
+  }
+
+  if (candidate.field === 'networkPosture') {
+    if (
+      candidate.equals !== 'distributed' &&
+      candidate.equals !== 'structural' &&
+      candidate.equals !== 'fortified' &&
+      candidate.equals !== 'diagnostic'
+    ) {
+      return false;
+    }
+    return getNetworkPostureFromRegions(regions, candidate.regionId) === candidate.equals;
+  }
+
+  if (candidate.field === 'counterphasePlan') {
+    if (
+      candidate.equals !== 'distributed' &&
+      candidate.equals !== 'structural' &&
+      candidate.equals !== 'fortified' &&
+      candidate.equals !== 'diagnostic'
+    ) {
+      return false;
+    }
+    return getCounterphasePlanFromRegions(regions, candidate.regionId) === candidate.equals;
+  }
+
+  if (candidate.field === 'campaignStatus') {
+    if (candidate.equals !== 'complete') return false;
+    return getCampaignStatusFromRegions(regions, candidate.regionId) === candidate.equals;
+  }
+
+  if (candidate.field === 'telluricEchoOutcome') {
+    if (
+      candidate.equals !== 'distributed_dissipation' &&
+      candidate.equals !== 'structural_redirection' &&
+      candidate.equals !== 'diagnostic_disruption' &&
+      candidate.equals !== 'fortified_containment'
+    ) {
+      return false;
+    }
+    return getTelluricEchoOutcomeFromRegions(regions, candidate.regionId) === candidate.equals;
   }
 
   return false;

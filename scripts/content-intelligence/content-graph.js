@@ -597,15 +597,27 @@ function traceTarget(model, target) {
   const key = resolveTarget(model, target);
   if (!key) return null;
   const reachability = computeReachability(model);
-  const seen = new Set();
+  const active = new Set();
+  const expanded = new Set();
 
   function build(currentKey) {
     const node = model.nodes.get(currentKey);
     if (!node) return { key: currentKey, missing: true };
-    if (seen.has(currentKey)) {
+    if (active.has(currentKey)) {
       return { key: currentKey, type: node.type, id: node.id, cycle: true };
     }
-    seen.add(currentKey);
+    if (expanded.has(currentKey)) {
+      return {
+        key: currentKey,
+        type: node.type,
+        id: node.id,
+        reachable: reachability.memo.get(currentKey) !== false,
+        reference: true,
+      };
+    }
+
+    active.add(currentKey);
+    expanded.add(currentKey);
 
     const requirements = [];
     for (const edge of model.outgoing.get(currentKey) || []) {
@@ -645,7 +657,7 @@ function traceTarget(model, target) {
       requirements,
       producedBy,
     };
-    seen.delete(currentKey);
+    active.delete(currentKey);
     return result;
   }
 
@@ -662,6 +674,10 @@ function formatTrace(trace) {
     lines.push(`${prefix}${label ? `${label} ` : ''}${node.key} [${status}]${node.title ? ` — ${node.title}` : ''}`);
     if (node.cycle) {
       lines.push(`${prefix}  ↳ cycle boundary`);
+      return;
+    }
+    if (node.reference) {
+      lines.push(`${prefix}  ↳ already expanded above`);
       return;
     }
     for (const requirement of node.requirements || []) {

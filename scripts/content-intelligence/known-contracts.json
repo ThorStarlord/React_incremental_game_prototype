@@ -17,7 +17,8 @@
     "location_city_center",
     "location_city_gate",
     "location_merchant_district",
-    "location_whispering_woods"
+    "location_whispering_woods",
+    "location_chrono_crypt"
   ],
   "factions": [
     "City Watch",
@@ -31,6 +32,31 @@
     "tradeFlow": [
       "normal",
       "strong"
+    ],
+    "latticeIntegrity": [
+      "strained",
+      "stabilized"
+    ],
+    "networkPosture": [
+      "distributed",
+      "structural",
+      "fortified",
+      "diagnostic"
+    ],
+    "counterphasePlan": [
+      "distributed",
+      "structural",
+      "fortified",
+      "diagnostic"
+    ],
+    "campaignStatus": [
+      "complete"
+    ],
+    "telluricEchoOutcome": [
+      "distributed_dissipation",
+      "structural_redirection",
+      "diagnostic_disruption",
+      "fortified_containment"
     ]
   },
   "advisoryDanglingTargets": [

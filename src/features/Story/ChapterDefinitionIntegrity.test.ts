@@ -37,7 +37,11 @@ const DIALOGUE_CATALOG_PATHS = [
   'public/data/dialogues.json',
   'public/data/m24-world-state-content.json',
   'public/data/m25-chapter-content.json',
-  'public/data/campaign-one-content.json',
+  'public/data/gc06-lattice-content.json',
+  'public/data/gc07-chrono-crypt-content.json',
+  'public/data/gc08-network-content.json',
+  'public/data/gc09-counterphase-content.json',
+  'public/data/gc10-finale-content.json',
 ] as const;
 
 const readJson = (relativePath: string): any =>
@@ -182,6 +186,11 @@ describe('chapter definition integrity', () => {
     );
     expect(catalog.completedDialogueIds.has('valerius_m25_public_order_conclusion')).toBe(true);
     expect(catalog.completedDialogueIds.has('gronk_m25_quiet_network_conclusion')).toBe(true);
+    expect(catalog.completedDialogueIds.has('lyra_gc06_chrono_crypt_route')).toBe(true);
+    expect(catalog.completedDialogueIds.has('lyra_gc07_counterphase_interpretation')).toBe(true);
+    expect(catalog.completedDialogueIds.has('lyra_gc08_commit_distributed')).toBe(true);
+    expect(catalog.completedDialogueIds.has('lyra_gc09_commit_distributed')).toBe(true);
+    expect(catalog.completedDialogueIds.has('lyra_gc10_aftermath_distributed')).toBe(true);
   });
 
   test('all current chapter requirements resolve to canonical authored content', () => {

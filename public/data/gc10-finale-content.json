@@ -1,0 +1,374 @@
+{
+  "dialogues": {
+    "lyra_gc10_enter_distributed_finale": {
+      "id": "lyra_gc10_enter_distributed_finale",
+      "npcId": "npc_lyra",
+      "title": "Enter the Telluric Echo Finale — Distributed Counterphase",
+      "text": "The distributed counterphase is committed. Lyra checks the broad verified network one last time. The plan is legal because the network was prepared to carry the response without depending on one optional specialization.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc09_exp_commit_distributed"
+      ],
+      "requiredKnowledgeFactIds": [
+        "fact_gc09_finale_commitment_made"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "equals": "distributed"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc10_campaign_complete"
+      ],
+      "responses": {
+        "enter": "Enter the Telluric Echo confrontation with the committed plan."
+      },
+      "effects": [
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc10_telluric_echo_distributed",
+          "responseId": "enter"
+        }
+      ],
+      "next": {
+        "enter": null
+      }
+    },
+    "lyra_gc10_aftermath_distributed": {
+      "id": "lyra_gc10_aftermath_distributed",
+      "npcId": "npc_lyra",
+      "title": "After the Distributed Dissipation",
+      "text": "The Echo has dispersed across the prepared network. Lyra does not call that inevitability: the distributed plan worked because the player actually committed and carried it through the confrontation.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc10_exp_finale_distributed"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "equals": "distributed"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc10_campaign_complete"
+      ],
+      "responses": {
+        "record": "Record the outcome and close Campaign One."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc10_campaign_complete",
+          "responseId": "record"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_whispering_woods",
+          "field": "campaignStatus",
+          "value": "complete",
+          "responseId": "record"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_whispering_woods",
+          "field": "telluricEchoOutcome",
+          "value": "distributed_dissipation",
+          "responseId": "record"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc10_exp_epilogue_distributed",
+          "responseId": "record"
+        }
+      ],
+      "next": {
+        "record": null
+      }
+    },
+    "lyra_gc10_enter_structural_finale": {
+      "id": "lyra_gc10_enter_structural_finale",
+      "npcId": "npc_lyra",
+      "title": "Enter the Telluric Echo Finale — Structural Counterphase",
+      "text": "The structural counterphase is committed. Lyra traces the load-bearing path one last time: Willow's slow-system reading and Gronk's constraint sense made this plan possible, but the confrontation still belongs to the player.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc09_exp_commit_structural"
+      ],
+      "requiredKnowledgeFactIds": [
+        "fact_gc09_finale_commitment_made"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "equals": "structural"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc10_campaign_complete"
+      ],
+      "responses": {
+        "enter": "Enter the Telluric Echo confrontation with the committed plan."
+      },
+      "effects": [
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc10_telluric_echo_structural",
+          "responseId": "enter"
+        }
+      ],
+      "next": {
+        "enter": null
+      }
+    },
+    "lyra_gc10_aftermath_structural": {
+      "id": "lyra_gc10_aftermath_structural",
+      "npcId": "npc_lyra",
+      "title": "After the Structural Redirection",
+      "text": "The Echo has been redirected through the structures capable of carrying the counterphase. Lyra records that the plan succeeded by respecting load paths rather than treating every visible break as equal.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc10_exp_finale_structural"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "equals": "structural"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc10_campaign_complete"
+      ],
+      "responses": {
+        "record": "Record the outcome and close Campaign One."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc10_campaign_complete",
+          "responseId": "record"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_whispering_woods",
+          "field": "campaignStatus",
+          "value": "complete",
+          "responseId": "record"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_whispering_woods",
+          "field": "telluricEchoOutcome",
+          "value": "structural_redirection",
+          "responseId": "record"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc10_exp_epilogue_structural",
+          "responseId": "record"
+        }
+      ],
+      "next": {
+        "record": null
+      }
+    },
+    "lyra_gc10_enter_diagnostic_finale": {
+      "id": "lyra_gc10_enter_diagnostic_finale",
+      "npcId": "npc_lyra",
+      "title": "Enter the Telluric Echo Finale — Diagnostic Counterphase",
+      "text": "The diagnostic counterphase is committed. Lyra reviews the predicted contradiction with you. Scholarly Insight and Adversarial Calibration made the route legible; neither capability can choose the final action for you.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc09_exp_commit_diagnostic"
+      ],
+      "requiredKnowledgeFactIds": [
+        "fact_gc09_finale_commitment_made"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "equals": "diagnostic"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc10_campaign_complete"
+      ],
+      "responses": {
+        "enter": "Enter the Telluric Echo confrontation with the committed plan."
+      },
+      "effects": [
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc10_telluric_echo_diagnostic",
+          "responseId": "enter"
+        }
+      ],
+      "next": {
+        "enter": null
+      }
+    },
+    "lyra_gc10_aftermath_diagnostic": {
+      "id": "lyra_gc10_aftermath_diagnostic",
+      "npcId": "npc_lyra",
+      "title": "After the Diagnostic Disruption",
+      "text": "The Echo's predicted phase failed against the diagnostic network. Lyra records the disruption as the consequence of a plan that learned the adversary accurately enough to make its model break.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc10_exp_finale_diagnostic"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "equals": "diagnostic"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc10_campaign_complete"
+      ],
+      "responses": {
+        "record": "Record the outcome and close Campaign One."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc10_campaign_complete",
+          "responseId": "record"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_whispering_woods",
+          "field": "campaignStatus",
+          "value": "complete",
+          "responseId": "record"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_whispering_woods",
+          "field": "telluricEchoOutcome",
+          "value": "diagnostic_disruption",
+          "responseId": "record"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc10_exp_epilogue_diagnostic",
+          "responseId": "record"
+        }
+      ],
+      "next": {
+        "record": null
+      }
+    },
+    "lyra_gc10_enter_fortified_finale": {
+      "id": "lyra_gc10_enter_fortified_finale",
+      "npcId": "npc_lyra",
+      "title": "Enter the Telluric Echo Finale — Fortified Counterphase",
+      "text": "The fortified counterphase is committed. Lyra confirms that Watch logistics are still institutionally available. Personal history opened conversations; public authority is what makes this support legal.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc09_exp_commit_fortified"
+      ],
+      "requiredKnowledgeFactIds": [
+        "fact_gc09_finale_commitment_made"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "equals": "fortified"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc10_campaign_complete"
+      ],
+      "requiredFactionReputation": [
+        {
+          "factionId": "City Watch",
+          "min": 0
+        }
+      ],
+      "responses": {
+        "enter": "Enter the Telluric Echo confrontation with the committed plan."
+      },
+      "effects": [
+        {
+          "type": "UNLOCK_QUEST",
+          "questId": "quest_gc10_telluric_echo_fortified",
+          "responseId": "enter"
+        }
+      ],
+      "next": {
+        "enter": null
+      }
+    },
+    "lyra_gc10_aftermath_fortified": {
+      "id": "lyra_gc10_aftermath_fortified",
+      "npcId": "npc_lyra",
+      "title": "After the Fortified Containment",
+      "text": "The Watch-supported network has contained the Echo inside the prepared response corridor. Lyra records the outcome without rewriting institutional support as personal loyalty.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc10_exp_finale_fortified"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "counterphasePlan",
+          "equals": "fortified"
+        }
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc10_campaign_complete"
+      ],
+      "responses": {
+        "record": "Record the outcome and close Campaign One."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc10_campaign_complete",
+          "responseId": "record"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_whispering_woods",
+          "field": "campaignStatus",
+          "value": "complete",
+          "responseId": "record"
+        },
+        {
+          "type": "WORLD_STATE_SET",
+          "regionId": "location_whispering_woods",
+          "field": "telluricEchoOutcome",
+          "value": "fortified_containment",
+          "responseId": "record"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc10_exp_epilogue_fortified",
+          "responseId": "record"
+        }
+      ],
+      "next": {
+        "record": null
+      }
+    }
+  },
+  "npcDialogueIds": {
+    "npc_lyra": [
+      "lyra_gc10_enter_distributed_finale",
+      "lyra_gc10_aftermath_distributed",
+      "lyra_gc10_enter_structural_finale",
+      "lyra_gc10_aftermath_structural",
+      "lyra_gc10_enter_diagnostic_finale",
+      "lyra_gc10_aftermath_diagnostic",
+      "lyra_gc10_enter_fortified_finale",
+      "lyra_gc10_aftermath_fortified"
+    ]
+  }
+}

@@ -14,6 +14,28 @@ const isValidMutation = (mutation: WorldStateMutation): boolean => {
   if (mutation.field === 'tradeFlow') {
     return mutation.value === 'normal' || mutation.value === 'strong';
   }
+  if (mutation.field === 'latticeIntegrity') {
+    return mutation.value === 'strained' || mutation.value === 'stabilized';
+  }
+  if (mutation.field === 'networkPosture' || mutation.field === 'counterphasePlan') {
+    return (
+      mutation.value === 'distributed' ||
+      mutation.value === 'structural' ||
+      mutation.value === 'fortified' ||
+      mutation.value === 'diagnostic'
+    );
+  }
+  if (mutation.field === 'campaignStatus') {
+    return mutation.value === 'complete';
+  }
+  if (mutation.field === 'telluricEchoOutcome') {
+    return (
+      mutation.value === 'distributed_dissipation' ||
+      mutation.value === 'structural_redirection' ||
+      mutation.value === 'diagnostic_disruption' ||
+      mutation.value === 'fortified_containment'
+    );
+  }
   return false;
 };
 
@@ -30,6 +52,16 @@ const worldStateSlice = createSlice({
         region.watchPresence = mutation.value;
       } else if (mutation.field === 'tradeFlow') {
         region.tradeFlow = mutation.value;
+      } else if (mutation.field === 'latticeIntegrity') {
+        region.latticeIntegrity = mutation.value;
+      } else if (mutation.field === 'networkPosture') {
+        region.networkPosture = mutation.value;
+      } else if (mutation.field === 'counterphasePlan') {
+        region.counterphasePlan = mutation.value;
+      } else if (mutation.field === 'campaignStatus') {
+        region.campaignStatus = mutation.value;
+      } else if (mutation.field === 'telluricEchoOutcome') {
+        region.telluricEchoOutcome = mutation.value;
       }
       state.regions[mutation.regionId] = region;
     },

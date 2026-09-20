@@ -1,0 +1,42 @@
+{
+  "dialogues": {
+    "lyra_gc07_counterphase_interpretation": {
+      "id": "lyra_gc07_counterphase_interpretation",
+      "npcId": "npc_lyra",
+      "title": "Counterphase Is a Principle",
+      "text": "Lyra compares the route you used with the crypt's older failures. 'This isn't a trick that works in one room. The inverse stays stable across different failure records. That means we can prepare the network to answer the Echo instead of waiting for each break.'",
+      "repeatable": false,
+      "anyOfExperienceIds": [
+        "lyra_gc07_exp_manual_triangulation",
+        "lyra_gc07_exp_structural_counterphase",
+        "lyra_gc07_exp_adversarial_countermodel"
+      ],
+      "forbiddenKnowledgeFactIds": [
+        "fact_gc07_counterphase_principle"
+      ],
+      "responses": {
+        "record": "Record the counterphase as a reusable principle, not a crypt-specific solution."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_gc07_counterphase_principle",
+          "responseId": "record"
+        },
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc07_exp_counterphase_derived",
+          "responseId": "record"
+        }
+      ],
+      "next": {
+        "record": null
+      }
+    }
+  },
+  "npcDialogueIds": {
+    "npc_lyra": [
+      "lyra_gc07_counterphase_interpretation"
+    ]
+  }
+}

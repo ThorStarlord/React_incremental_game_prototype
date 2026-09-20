@@ -107,85 +107,214 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'lattice_under_strain',
-    title: 'The Lattice Under Strain',
-    centerOfGravity: 'public pressure, institutional visibility, and the cost of coordination',
+    title: 'Lattice Under Strain',
+    centerOfGravity: 'network pressure, multi-anchor diagnosis, and capability-shaped stabilization',
     description:
-      'The first Campaign One chapter converts the Merchant District consequences into an explicit choice about whether pressure should be named or redirected.',
+      'The Telluric Echo becomes a present network problem. Baseline containment remains viable while two relationship-derived build profiles create distinct legal stabilization strategies.',
     routes: [
       {
-        id: 'public_pressure',
-        label: 'Public Pressure',
-        summary: 'Name the pressure and make institutions carry it in public.',
-        requiredExperienceIds: ['valerius_exp_lattice_public'],
+        id: 'surface_containment',
+        label: 'Surface Containment',
+        summary: 'Stabilize the visible failures through ordinary local response capacity, then recognize that containment is not the final countermeasure.',
+        requiredExperienceIds: [
+          'valerius_gc06_exp_surface_containment',
+          'lyra_gc06_exp_chrono_crypt_route',
+        ],
       },
       {
-        id: 'quiet_pressure',
-        label: 'Quiet Pressure',
-        summary: 'Redirect pressure through a stable private route.',
-        requiredExperienceIds: ['valerius_exp_lattice_quiet'],
+        id: 'structural_steward',
+        label: 'Structural Steward',
+        summary: 'Combine Willow\'s slow-system cognition with Gronk\'s constraint sense to reroute lattice load around the actual failure pattern.',
+        requiredExperienceIds: [
+          'gronk_gc06_exp_structural_steward',
+          'lyra_gc06_exp_chrono_crypt_route',
+        ],
+      },
+      {
+        id: 'countermodeler',
+        label: 'Countermodeler',
+        summary: 'Combine Elara\'s contradiction-first inquiry with Lyra\'s adversarial calibration to phase the local response against the Echo.',
+        requiredExperienceIds: [
+          'lyra_gc06_exp_countermodeler',
+          'lyra_gc06_exp_chrono_crypt_route',
+        ],
       },
     ],
   },
   {
     id: 'chrono_crypt',
     title: 'The Chrono-Crypt',
-    centerOfGravity: 'contradictory evidence, access, and the right to inspect a dangerous record',
+    centerOfGravity: 'counterphase derivation, authored travel, and capability-deepened problem solving',
     description:
-      'Elara and Lyra expose the counterphase map, requiring the protagonist to turn evidence into access without pretending the contradiction is solved.',
+      'A later return to the crypt turns old harmonic failures into a reusable counterphase principle. Baseline derivation remains viable while the two established build profiles create faster, more legible approaches.',
     routes: [
       {
-        id: 'verified_entry',
-        label: 'Verified Entry',
-        summary: 'Verify the model, coordinate access, and open the crypt.',
-        requiredExperienceIds: ['elara_exp_chrono_verified', 'lyra_exp_chrono_opened'],
+        id: 'manual_triangulation',
+        label: 'Manual Harmonic Triangulation',
+        summary: 'Compare preserved failures directly and derive the stable inverse without optional capabilities.',
+        requiredExperienceIds: [
+          'lyra_gc07_exp_manual_triangulation',
+          'lyra_gc07_exp_counterphase_derived',
+        ],
       },
       {
-        id: 'operational_entry',
-        label: 'Operational Entry',
-        summary: 'Use a workable approximation, then challenge the entry conditions directly.',
-        requiredExperienceIds: ['elara_exp_chrono_operational', 'lyra_exp_chrono_contested'],
+        id: 'structural_counterphase',
+        label: 'Structural Counterphase',
+        summary: 'Use slow-system cognition and constraint sense to derive the inverse from the structures carrying the failure.',
+        requiredExperienceIds: [
+          'lyra_gc07_exp_structural_counterphase',
+          'lyra_gc07_exp_counterphase_derived',
+        ],
+      },
+      {
+        id: 'adversarial_countermodel',
+        label: 'Adversarial Countermodel',
+        summary: 'Use contradiction-first inquiry and adversarial calibration to predict the repeating phase and solve for its inverse.',
+        requiredExperienceIds: [
+          'lyra_gc07_exp_adversarial_countermodel',
+          'lyra_gc07_exp_counterphase_derived',
+        ],
       },
     ],
   },
   {
     id: 'network_under_pressure',
     title: 'Network Under Pressure',
-    centerOfGravity: 'load paths, delegated competence, and the ethics of routing leverage',
+    centerOfGravity: 'information asymmetry, institutional access, delegated repetition, and manual network commitment',
     description:
-      'The network chapter tests whether the protagonist can audit a delegated operation before choosing how much leverage to reveal or seal.',
+      'The counterphase must be distributed through a network whose members know different things and answer to different institutions. Repetitive preparation may be delegated, but briefing and posture choices remain player-owned.',
     routes: [
       {
-        id: 'trusted_route',
-        label: 'Trusted Route',
-        summary: 'Audit the load path, then route leverage through a trusted channel.',
-        requiredExperienceIds: ['gronk_exp_network_load', 'silas_exp_network_route'],
+        id: 'distributed',
+        label: 'Distributed Preparation',
+        summary: 'Use Elara\'s verified baseline preparation and commit the network to broad distributed execution.',
+        requiredExperienceIds: [
+          'elara_gc08_exp_network_diagnosis',
+          'elara_gc08_exp_distributed_preparation',
+          'lyra_gc08_exp_commit_distributed',
+        ],
       },
       {
-        id: 'sealed_route',
-        label: 'Sealed Route',
-        summary: 'Accept operational risk and keep the most dangerous leverage sealed.',
-        requiredExperienceIds: ['gronk_exp_network_risk', 'silas_exp_network_sealed'],
+        id: 'structural',
+        label: 'Structural Preparation',
+        summary: 'Brief Gronk, prepare the actual load paths, and commit the network to a structural posture.',
+        requiredExperienceIds: [
+          'elara_gc08_exp_network_diagnosis',
+          'gronk_gc08_exp_counterphase_briefed',
+          'gronk_gc08_exp_structural_preparation',
+          'lyra_gc08_exp_commit_structural',
+        ],
+      },
+      {
+        id: 'diagnostic',
+        label: 'Diagnostic Preparation',
+        summary: 'Use Elara\'s diagnostic preparation and commit the network as an adversarial sensor for the Echo.',
+        requiredExperienceIds: [
+          'elara_gc08_exp_network_diagnosis',
+          'elara_gc08_exp_diagnostic_preparation',
+          'lyra_gc08_exp_commit_diagnostic',
+        ],
+      },
+      {
+        id: 'fortified',
+        label: 'Fortified Institutional Preparation',
+        summary: 'Combine the distributed baseline with legal Watch logistics, then commit the network to a fortified posture.',
+        requiredExperienceIds: [
+          'elara_gc08_exp_network_diagnosis',
+          'elara_gc08_exp_distributed_preparation',
+          'valerius_gc08_exp_watch_mobilized',
+          'lyra_gc08_exp_commit_fortified',
+        ],
       },
     ],
   },
   {
-    id: 'counterphase_commitment',
-    title: 'Counterphase Commitment',
-    centerOfGravity: 'visible control, adaptive networks, and institutional commitment',
+    id: 'counterphase',
+    title: 'Counterphase',
+    centerOfGravity: 'causal finale preparation, profile-specific action, and explicit irreversible commitment',
     description:
-      'Valerius forces the campaign to choose whether stability belongs to a visible institution or to a network that can adapt beyond it.',
+      'The player turns the chosen network posture into a finale plan through authored preparation and one explicit Lyra commitment. Canonical history stays legible; no readiness score replaces it.',
     routes: [
       {
-        id: 'institutional_commitment',
-        label: 'Institutional Commitment',
-        summary: 'Commit the Watch to the visible line and accept the cost of public control.',
-        requiredExperienceIds: ['valerius_exp_counterphase_commitment'],
+        id: 'distributed',
+        label: 'Distributed Counterphase',
+        summary: 'Prepare and manually commit the broad verified finale plan without requiring every optional capability.',
+        requiredExperienceIds: [
+          'lyra_gc09_exp_prepare_distributed',
+          'lyra_gc09_exp_commit_distributed',
+        ],
       },
       {
-        id: 'network_commitment',
-        label: 'Network Commitment',
-        summary: 'Commit to the adaptive network and accept the uncertainty of indirect control.',
-        requiredExperienceIds: ['valerius_exp_counterphase_network'],
+        id: 'structural',
+        label: 'Structural Counterphase',
+        summary: 'Prepare and commit the load-path finale plan backed by Willow\'s Wisdom and Constraint Sense.',
+        requiredExperienceIds: [
+          'lyra_gc09_exp_prepare_structural',
+          'lyra_gc09_exp_commit_structural',
+        ],
+      },
+      {
+        id: 'diagnostic',
+        label: 'Diagnostic Counterphase',
+        summary: 'Prepare and commit the prediction-first finale plan backed by Scholarly Insight and Adversarial Calibration.',
+        requiredExperienceIds: [
+          'lyra_gc09_exp_prepare_diagnostic',
+          'lyra_gc09_exp_commit_diagnostic',
+        ],
+      },
+      {
+        id: 'fortified',
+        label: 'Fortified Counterphase',
+        summary: 'Prepare and commit the Watch-supported finale plan while preserving Faction standing as independent evidence.',
+        requiredExperienceIds: [
+          'lyra_gc09_exp_prepare_fortified',
+          'lyra_gc09_exp_commit_fortified',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'telluric_echo_finale',
+    title: 'The Telluric Echo',
+    centerOfGravity: 'final counterphase execution, accumulated-state payoff, and remembered aftermath',
+    description:
+      'The committed counterphase plan enters one authored finale Quest and a state-responsive aftermath. Completion remains derived from Relationship/Memory and objective World State rather than a finale engine.',
+    routes: [
+      {
+        id: 'distributed',
+        label: 'Distributed Dissipation',
+        summary: 'Dissipate the Echo through the broad verified network and record the distributed aftermath.',
+        requiredExperienceIds: [
+          'lyra_gc10_exp_finale_distributed',
+          'lyra_gc10_exp_epilogue_distributed',
+        ],
+      },
+      {
+        id: 'structural',
+        label: 'Structural Redirection',
+        summary: 'Redirect the Echo through the network load paths and record the structural aftermath.',
+        requiredExperienceIds: [
+          'lyra_gc10_exp_finale_structural',
+          'lyra_gc10_exp_epilogue_structural',
+        ],
+      },
+      {
+        id: 'diagnostic',
+        label: 'Diagnostic Disruption',
+        summary: 'Break the Echo through predicted contradiction and record the diagnostic aftermath.',
+        requiredExperienceIds: [
+          'lyra_gc10_exp_finale_diagnostic',
+          'lyra_gc10_exp_epilogue_diagnostic',
+        ],
+      },
+      {
+        id: 'fortified',
+        label: 'Fortified Containment',
+        summary: 'Contain the Echo through the Watch-supported network and record the fortified aftermath.',
+        requiredExperienceIds: [
+          'lyra_gc10_exp_finale_fortified',
+          'lyra_gc10_exp_epilogue_fortified',
+        ],
       },
     ],
   },
