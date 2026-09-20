@@ -41,7 +41,8 @@ const MainMenu: React.FC = () => {
 
   const { 
     exportCode, 
-    importCode, 
+    importCode,
+    importError,
     setImportCode, 
     isLoading: isImportExportLoading, 
     exportSave, 
@@ -168,6 +169,7 @@ const MainMenu: React.FC = () => {
         saveToDelete={saveToDelete}
         exportCode={exportCode}
         importCode={importCode}
+        importError={importError}
         appVersion={APP_VERSION}
         setImportCode={setImportCode}
         onLoadGame={handleLoadGame}
