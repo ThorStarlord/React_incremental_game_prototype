@@ -1,5 +1,6 @@
 import type { RootState } from '../../../app/store';
 import type {
+  LatticeIntegrity,
   RegionalWorldState,
   TradeFlow,
   WatchPresence,
@@ -41,6 +42,20 @@ export const selectTradeFlow = (
 ): TradeFlow =>
   getTradeFlowFromRegions(selectWorldStateRegions(state), regionId);
 
+export const getLatticeIntegrityFromRegions = (
+  regions: WorldStateRegions,
+  regionId: string
+): LatticeIntegrity | undefined => {
+  const value = regions[regionId]?.latticeIntegrity;
+  return value === 'strained' || value === 'stabilized' ? value : undefined;
+};
+
+export const selectLatticeIntegrity = (
+  state: RootState,
+  regionId: string
+): LatticeIntegrity | undefined =>
+  getLatticeIntegrityFromRegions(selectWorldStateRegions(state), regionId);
+
 export const doesWorldStateRequirementPass = (
   regions: WorldStateRegions,
   requirement: unknown
@@ -64,6 +79,11 @@ export const doesWorldStateRequirementPass = (
   if (candidate.field === 'tradeFlow') {
     if (candidate.equals !== 'normal' && candidate.equals !== 'strong') return false;
     return getTradeFlowFromRegions(regions, candidate.regionId) === candidate.equals;
+  }
+
+  if (candidate.field === 'latticeIntegrity') {
+    if (candidate.equals !== 'strained' && candidate.equals !== 'stabilized') return false;
+    return getLatticeIntegrityFromRegions(regions, candidate.regionId) === candidate.equals;
   }
 
   return false;
