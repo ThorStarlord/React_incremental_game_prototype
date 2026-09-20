@@ -36,6 +36,12 @@
     "latticeIntegrity": [
       "strained",
       "stabilized"
+    ],
+    "networkPosture": [
+      "distributed",
+      "structural",
+      "fortified",
+      "diagnostic"
     ]
   },
   "advisoryDanglingTargets": [

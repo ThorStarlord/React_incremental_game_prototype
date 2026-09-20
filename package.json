@@ -44,6 +44,7 @@
     "gc0405:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC0405BreadthQualification.test.ts CopyM20ProductionTaskAutomation.test.tsx PostM25CopyRoutineStrategy.test.ts",
     "gc06:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC06LatticeUnderStrain.test.tsx ChapterDefinitionIntegrity.test.ts",
     "gc07:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC07ChronoCrypt.test.tsx ChapterDefinitionIntegrity.test.ts ExplorationM18TravelVerticalSlice.test.tsx",
+    "gc08:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC08NetworkUnderPressure.test.tsx ChapterDefinitionIntegrity.test.ts CopyM20ProductionTaskAutomation.test.tsx",
     "simulated-review:validate": "node --check scripts/simulated-product-review/ui-observer.js && node --check scripts/simulated-product-review/action-contract.js && node --check scripts/simulated-product-review/validate-action-contract.js && node --check scripts/simulated-product-review/validate-config.js && node scripts/simulated-product-review/validate-config.js",
     "simulated-review:action-contract": "node scripts/simulated-product-review/validate-action-contract.js",
     "simulated-review:observe": "node scripts/simulated-product-review/ui-observer.js",

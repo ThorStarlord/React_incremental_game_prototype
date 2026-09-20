@@ -17,6 +17,14 @@ const isValidMutation = (mutation: WorldStateMutation): boolean => {
   if (mutation.field === 'latticeIntegrity') {
     return mutation.value === 'strained' || mutation.value === 'stabilized';
   }
+  if (mutation.field === 'networkPosture') {
+    return (
+      mutation.value === 'distributed' ||
+      mutation.value === 'structural' ||
+      mutation.value === 'fortified' ||
+      mutation.value === 'diagnostic'
+    );
+  }
   return false;
 };
 
@@ -35,6 +43,8 @@ const worldStateSlice = createSlice({
         region.tradeFlow = mutation.value;
       } else if (mutation.field === 'latticeIntegrity') {
         region.latticeIntegrity = mutation.value;
+      } else if (mutation.field === 'networkPosture') {
+        region.networkPosture = mutation.value;
       }
       state.regions[mutation.regionId] = region;
     },

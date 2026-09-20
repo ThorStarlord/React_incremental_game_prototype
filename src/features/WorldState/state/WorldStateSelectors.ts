@@ -1,6 +1,7 @@
 import type { RootState } from '../../../app/store';
 import type {
   LatticeIntegrity,
+  NetworkPosture,
   RegionalWorldState,
   TradeFlow,
   WatchPresence,
@@ -56,6 +57,25 @@ export const selectLatticeIntegrity = (
 ): LatticeIntegrity | undefined =>
   getLatticeIntegrityFromRegions(selectWorldStateRegions(state), regionId);
 
+export const getNetworkPostureFromRegions = (
+  regions: WorldStateRegions,
+  regionId: string
+): NetworkPosture | undefined => {
+  const value = regions[regionId]?.networkPosture;
+  return (
+    value === 'distributed' ||
+    value === 'structural' ||
+    value === 'fortified' ||
+    value === 'diagnostic'
+  ) ? value : undefined;
+};
+
+export const selectNetworkPosture = (
+  state: RootState,
+  regionId: string
+): NetworkPosture | undefined =>
+  getNetworkPostureFromRegions(selectWorldStateRegions(state), regionId);
+
 export const doesWorldStateRequirementPass = (
   regions: WorldStateRegions,
   requirement: unknown
@@ -84,6 +104,18 @@ export const doesWorldStateRequirementPass = (
   if (candidate.field === 'latticeIntegrity') {
     if (candidate.equals !== 'strained' && candidate.equals !== 'stabilized') return false;
     return getLatticeIntegrityFromRegions(regions, candidate.regionId) === candidate.equals;
+  }
+
+  if (candidate.field === 'networkPosture') {
+    if (
+      candidate.equals !== 'distributed' &&
+      candidate.equals !== 'structural' &&
+      candidate.equals !== 'fortified' &&
+      candidate.equals !== 'diagnostic'
+    ) {
+      return false;
+    }
+    return getNetworkPostureFromRegions(regions, candidate.regionId) === candidate.equals;
   }
 
   return false;

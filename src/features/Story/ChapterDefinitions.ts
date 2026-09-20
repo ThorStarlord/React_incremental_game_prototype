@@ -177,6 +177,57 @@ export const CHAPTER_DEFINITIONS = [
       },
     ],
   },
+  {
+    id: 'network_under_pressure',
+    title: 'Network Under Pressure',
+    centerOfGravity: 'information asymmetry, institutional access, delegated repetition, and manual network commitment',
+    description:
+      'The counterphase must be distributed through a network whose members know different things and answer to different institutions. Repetitive preparation may be delegated, but briefing and posture choices remain player-owned.',
+    routes: [
+      {
+        id: 'distributed',
+        label: 'Distributed Preparation',
+        summary: 'Use Elara\'s verified baseline preparation and commit the network to broad distributed execution.',
+        requiredExperienceIds: [
+          'elara_gc08_exp_network_diagnosis',
+          'elara_gc08_exp_distributed_preparation',
+          'lyra_gc08_exp_commit_distributed',
+        ],
+      },
+      {
+        id: 'structural',
+        label: 'Structural Preparation',
+        summary: 'Brief Gronk, prepare the actual load paths, and commit the network to a structural posture.',
+        requiredExperienceIds: [
+          'elara_gc08_exp_network_diagnosis',
+          'gronk_gc08_exp_counterphase_briefed',
+          'gronk_gc08_exp_structural_preparation',
+          'lyra_gc08_exp_commit_structural',
+        ],
+      },
+      {
+        id: 'diagnostic',
+        label: 'Diagnostic Preparation',
+        summary: 'Use Elara\'s diagnostic preparation and commit the network as an adversarial sensor for the Echo.',
+        requiredExperienceIds: [
+          'elara_gc08_exp_network_diagnosis',
+          'elara_gc08_exp_diagnostic_preparation',
+          'lyra_gc08_exp_commit_diagnostic',
+        ],
+      },
+      {
+        id: 'fortified',
+        label: 'Fortified Institutional Preparation',
+        summary: 'Combine the distributed baseline with legal Watch logistics, then commit the network to a fortified posture.',
+        requiredExperienceIds: [
+          'elara_gc08_exp_network_diagnosis',
+          'elara_gc08_exp_distributed_preparation',
+          'valerius_gc08_exp_watch_mobilized',
+          'lyra_gc08_exp_commit_fortified',
+        ],
+      },
+    ],
+  },
 ] as const satisfies readonly ChapterDefinitionShape[];
 
 /**

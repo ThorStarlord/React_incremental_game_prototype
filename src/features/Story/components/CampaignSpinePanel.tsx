@@ -29,6 +29,9 @@ export const CampaignSpinePanel: React.FC = () => {
   const chronoCryptComplete = useAppSelector(state =>
     selectChapterProgress(state, 'chrono_crypt').status === 'complete'
   );
+  const networkChapterComplete = useAppSelector(state =>
+    selectChapterProgress(state, 'network_under_pressure').status === 'complete'
+  );
 
   if (stage === 'PROLOGUE') return null;
 
@@ -120,13 +123,34 @@ export const CampaignSpinePanel: React.FC = () => {
     );
   }
 
+  if (!networkChapterComplete) {
+    return (
+      <Alert severity="info" data-testid="gc08-campaign-objective" sx={{ mb: 2 }}>
+        <AlertTitle>Chapter 6 — Network Under Pressure</AlertTitle>
+        <Typography variant="body2">
+          Lyra knows the counterphase, but the rest of the network does not. Brief Elara first,
+          choose which other anchors to inform, prepare one legal posture, and return to Lyra for
+          the manual commitment. Archive Verification is already mastered; repetitive verification
+          may be delegated to an eligible Copy, but briefings and the posture choice remain yours.
+        </Typography>
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
+          <ActionButton to="/game/npcs/npc_scholar_elara">Open Scholar Elara</ActionButton>
+          <ActionButton to="/game/npcs/npc_blacksmith_gronk">Open Gronk</ActionButton>
+          <ActionButton to="/game/npcs/npc_captain_valerius">Open Valerius</ActionButton>
+          <ActionButton to="/game/npcs/npc_lyra">Open Lyra</ActionButton>
+          <ActionButton to="/game/quests">Open quests</ActionButton>
+          <ActionButton to="/game/copies">Open Copies</ActionButton>
+        </Stack>
+      </Alert>
+    );
+  }
+
   return (
-    <Alert severity="success" data-testid="gc07-campaign-objective" sx={{ mb: 2 }}>
-      <AlertTitle>Chapter 5 complete — prepare the network</AlertTitle>
+    <Alert severity="success" data-testid="gc08-campaign-objective" sx={{ mb: 2 }}>
+      <AlertTitle>Chapter 6 complete — Counterphase is next</AlertTitle>
       <Typography variant="body2">
-        The Chrono-Crypt has yielded a reusable counterphase principle. Campaign One can now move
-        into Chapter 6 — Network Under Pressure, where who knows what and which institutions will
-        cooperate become strategic preparation constraints.
+        The network now has an explicit posture, and its uneven Knowledge, institutional support,
+        relationship history, and delegated preparation remain intact for Chapter 7.
       </Typography>
     </Alert>
   );
