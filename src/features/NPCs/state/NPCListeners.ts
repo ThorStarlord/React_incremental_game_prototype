@@ -89,7 +89,7 @@ const GC03_CHAPTER_ONE_NPCS = [
   'npc_captain_valerius',
 ] as const;
 const GC03_CHAPTER_TWO_NPCS = ['npc_scholar_elara'] as const;
-const GC03_CHAPTER_THREE_NPCS = ['npc_rival_lyra'] as const;
+const GC03_CHAPTER_THREE_NPCS = ['npc_lyra'] as const;
 
 const GC03_FIRST_LESSON = 'willow_exp_first_lesson';
 const GC03_CHAPTER_ONE_CONCLUSIONS = new Set([
