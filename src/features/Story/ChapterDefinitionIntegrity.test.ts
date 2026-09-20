@@ -41,6 +41,7 @@ const DIALOGUE_CATALOG_PATHS = [
   'public/data/gc07-chrono-crypt-content.json',
   'public/data/gc08-network-content.json',
   'public/data/gc09-counterphase-content.json',
+  'public/data/gc10-finale-content.json',
 ] as const;
 
 const readJson = (relativePath: string): any =>
@@ -189,6 +190,7 @@ describe('chapter definition integrity', () => {
     expect(catalog.completedDialogueIds.has('lyra_gc07_counterphase_interpretation')).toBe(true);
     expect(catalog.completedDialogueIds.has('lyra_gc08_commit_distributed')).toBe(true);
     expect(catalog.completedDialogueIds.has('lyra_gc09_commit_distributed')).toBe(true);
+    expect(catalog.completedDialogueIds.has('lyra_gc10_aftermath_distributed')).toBe(true);
   });
 
   test('all current chapter requirements resolve to canonical authored content', () => {
