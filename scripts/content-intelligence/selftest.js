@@ -52,7 +52,15 @@ function buildValidFixture(root) {
     },
   });
   writeJson(root, 'public/data/quests.json', {});
-  writeJson(root, 'public/data/traits.json', {});
+  writeJson(root, 'public/data/traits.json', {
+    TraitProof: {
+      id: 'TraitProof',
+      name: 'Trait Proof',
+      category: 'test',
+      rarity: 'common',
+      effects: {},
+    },
+  });
   writeJson(root, 'public/data/relationships/test.json', {
     experiences: {
       exp_root: {
@@ -62,6 +70,14 @@ function buildValidFixture(root) {
         participantIds: ['player', 'npc_test'],
         sourceType: 'dialogue',
         sourceId: 'dialogue_root',
+      },
+      exp_trait_resonance: {
+        id: 'exp_trait_resonance',
+        title: 'Trait resonance',
+        primaryTargetId: 'npc_test',
+        participantIds: ['player', 'npc_test'],
+        sourceType: 'system',
+        sourceId: 'TraitProof',
       },
     },
     memories: {},
@@ -81,6 +97,9 @@ assert(trace.requirements.some(requirement => requirement.target === 'experience
 assert(trace.requirements.some(requirement =>
   requirement.producers.some(producer => producer.key === 'dialogue:dialogue_root')
 ));
+const resonanceTrace = traceTarget(validModel, 'exp_trait_resonance');
+assert(resonanceTrace, 'expected Trait-owned resonance trace');
+assert(resonanceTrace.producedBy.some(producer => producer.key === 'trait:TraitProof'));
 
 const brokenRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'content-intelligence-broken-'));
 buildValidFixture(brokenRoot);

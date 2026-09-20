@@ -43,16 +43,16 @@ This direction remains **human-unvalidated**. Repository tests establish determi
 The 1.0 campaign is deliberately bounded:
 
 ```text
-Prologue
-Chapter 1 — Merchant District Crisis        [integrated]
-Chapter 2 — Archive Inquiry                 [integrated]
-Chapter 3 — Enemies in Phase                [integrated]
-Chapter 4 — Lattice Under Strain            [authored / automated qualification passed]
-Chapter 5 — The Chrono-Crypt                [authored / automated qualification passed]
-Chapter 6 — Network Under Pressure          [authored / automated qualification passed]
-Chapter 7 — Counterphase                    [authored / automated qualification passed]
-Finale — The Telluric Echo                  [authored / automated qualification passed]
-Epilogue — Aftermath / Conditional Reprieve [authored / automated qualification passed]
+Prologue                                    [integrated]
+Chapter 1 — Merchant District Crisis        [integrated / connected]
+Chapter 2 — Archive Inquiry                 [integrated / connected]
+Chapter 3 — Enemies in Phase                [integrated / connected]
+Chapter 4 — Lattice Under Strain            [planned 1.0]
+Chapter 5 — The Chrono-Crypt                [planned 1.0]
+Chapter 6 — Network Under Pressure          [planned 1.0]
+Chapter 7 — Counterphase                    [planned 1.0]
+Finale — The Telluric Echo                  [planned 1.0]
+Epilogue — Aftermath / Conditional Reprieve [planned 1.0]
 ```
 
 Campaign One ends on the isolated planet. Interplanetary continuation, the larger AI-war thread, New Game+, endless progression, generic crafting/inventory economies, autonomous Copy planning, and generalized simulations are post-1.0 unless the completion authority is explicitly revised.
@@ -75,21 +75,21 @@ Campaign One ends on the isolated planet. Interplanetary continuation, the large
 ## Current completion queue
 
 ```text
-GC-00  CLOSED — M26 closure + completion-program authority
-GC-01  CLOSED — 1.0 player-surface scope cleanup
-GC-02  CLOSED — Prologue / onboarding implementation
-GC-03  CLOSED — Chapters 1–3 campaign integration
-GC-04  CLOSED — Relationship-derived buildcraft breadth
-GC-05  CLOSED — Earned-delegation breadth
-GC-06  CLOSED — Chapter 4 — Lattice Under Strain
-GC-07  CLOSED — Chapter 5 — The Chrono-Crypt
-GC-08  CLOSED — Chapter 6 — Network Under Pressure
-GC-09  CLOSED — Chapter 7 — Counterphase
-GC-10  CLOSED — Finale + Epilogue implementation
-GC-11  OPEN — ordinary fresh-UI Alpha run and evidence record
-GC-12  DETERMINISTIC PASS — Content Alpha lock/evidence record
-GC-13  OPEN — Beta human evidence
-GC-14  OPEN — Release Candidate / 1.0
+GC-00  M26 closure + completion-program authority     COMPLETE
+GC-01  1.0 player-surface scope cleanup                COMPLETE
+GC-02  Prologue / onboarding                           COMPLETE
+GC-03  Chapters 1–3 campaign integration               COMPLETE
+GC-04  Relationship-derived buildcraft breadth
+GC-05  Earned-delegation breadth
+GC-06  Chapter 4 — Lattice Under Strain
+GC-07  Chapter 5 — The Chrono-Crypt
+GC-08  Chapter 6 — Network Under Pressure
+GC-09  Chapter 7 — Counterphase
+GC-10  Finale + Epilogue
+GC-11  Alpha qualification
+GC-12  Content Alpha
+GC-13  Beta
+GC-14  Release Candidate / 1.0
 ```
 
 The current deterministic implementation aggregate is `npm run alpha:validate`.

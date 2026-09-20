@@ -5,7 +5,10 @@
       "uniqueKey": "lyra:lu01:strategic-defeat",
       "title": "Strategic Defeat, Not Submission",
       "primaryTargetId": "npc_lyra",
-      "participantIds": ["player", "npc_lyra"],
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
       "sourceType": "dialogue",
       "sourceId": "lyra_strategic_defeat",
       "significance": "meaningful",
@@ -17,16 +20,31 @@
         "vulnerability": 3
       },
       "connectionProgressDelta": 10,
-      "resonanceTags": ["Adversarial", "Capture", "MutualAssessment"],
+      "resonanceTags": [
+        "Adversarial",
+        "Capture",
+        "MutualAssessment"
+      ],
       "memoryCandidate": false,
-      "interpretation": "Lyra wins the tactical position without securing submission; each leaves with a sharper model of the other."
+      "interpretation": "Lyra wins the tactical position without securing submission; each leaves with a sharper model of the other.",
+      "traitEffects": [
+        {
+          "traitId": "AdversarialCalibration",
+          "compatibilityDelta": 3,
+          "assimilationDelta": 10,
+          "note": "Accurate opposition becomes a transferable capability for prediction, coordination, and counterplay without ideological convergence."
+        }
+      ]
     },
     "lyra_exp_coercion_reflected": {
       "id": "lyra_exp_coercion_reflected",
       "uniqueKey": "lyra:lu02:coercion-reflected",
       "title": "Coercion Reflected",
       "primaryTargetId": "npc_lyra",
-      "participantIds": ["player", "npc_lyra"],
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
       "sourceType": "dialogue",
       "sourceId": "lyra_coercion_reflected",
       "significance": "meaningful",
@@ -38,16 +56,32 @@
         "vulnerability": 2
       },
       "connectionProgressDelta": 10,
-      "resonanceTags": ["Adversarial", "Resistance", "HarmonicResonance"],
+      "resonanceTags": [
+        "Adversarial",
+        "Resistance",
+        "HarmonicResonance"
+      ],
       "memoryCandidate": false,
-      "interpretation": "Lyra's harmonic pressure is answered by understanding its structure rather than surrendering to it, deepening mutual assessment while warmth falls."
+      "interpretation": "Lyra's harmonic pressure is answered by understanding its structure rather than surrendering to it, deepening mutual assessment while warmth falls.",
+      "traitEffects": [
+        {
+          "traitId": "AdversarialCalibration",
+          "compatibilityDelta": 4,
+          "assimilationDelta": 10,
+          "discover": true,
+          "note": "Accurate opposition becomes a transferable capability for prediction, coordination, and counterplay without ideological convergence."
+        }
+      ]
     },
     "lyra_exp_reluctant_cotraining": {
       "id": "lyra_exp_reluctant_cotraining",
       "uniqueKey": "lyra:lu03:reluctant-cotraining",
       "title": "Reluctant Co-Training",
       "primaryTargetId": "npc_lyra",
-      "participantIds": ["player", "npc_lyra"],
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
       "sourceType": "quest",
       "sourceId": "quest_lyra_chrono_crypt_calibration",
       "significance": "major",
@@ -60,16 +94,32 @@
         "reciprocity": 3
       },
       "connectionProgressDelta": 15,
-      "resonanceTags": ["Adversarial", "Cooperation", "Reliance", "ChronoCrypt"],
+      "resonanceTags": [
+        "Adversarial",
+        "Cooperation",
+        "Reliance",
+        "ChronoCrypt"
+      ],
       "memoryCandidate": false,
-      "interpretation": "The crypt makes cooperation instrumentally necessary; successful coordination creates real reliance without friendship."
+      "interpretation": "The crypt makes cooperation instrumentally necessary; successful coordination creates real reliance without friendship.",
+      "traitEffects": [
+        {
+          "traitId": "AdversarialCalibration",
+          "compatibilityDelta": 5,
+          "assimilationDelta": 20,
+          "note": "Accurate opposition becomes a transferable capability for prediction, coordination, and counterplay without ideological convergence."
+        }
+      ]
     },
     "lyra_exp_ideological_friction": {
       "id": "lyra_exp_ideological_friction",
       "uniqueKey": "lyra:lu04:ideological-friction",
       "title": "Ideological Friction",
       "primaryTargetId": "npc_lyra",
-      "participantIds": ["player", "npc_lyra"],
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
       "sourceType": "dialogue",
       "sourceId": "lyra_ideological_friction",
       "significance": "meaningful",
@@ -80,16 +130,31 @@
         "sharedMeaning": 9
       },
       "connectionProgressDelta": 12,
-      "resonanceTags": ["Adversarial", "IdeologicalFriction", "Dialectic"],
+      "resonanceTags": [
+        "Adversarial",
+        "IdeologicalFriction",
+        "Dialectic"
+      ],
       "memoryCandidate": false,
-      "interpretation": "Open disagreement makes them like each other less while exposing the actual structure of their incompatible values."
+      "interpretation": "Open disagreement makes them like each other less while exposing the actual structure of their incompatible values.",
+      "traitEffects": [
+        {
+          "traitId": "AdversarialCalibration",
+          "compatibilityDelta": 3,
+          "assimilationDelta": 15,
+          "note": "Accurate opposition becomes a transferable capability for prediction, coordination, and counterplay without ideological convergence."
+        }
+      ]
     },
     "lyra_exp_mutual_calibration": {
       "id": "lyra_exp_mutual_calibration",
       "uniqueKey": "lyra:lu05:mutual-calibration",
       "title": "Mutual Calibration",
       "primaryTargetId": "npc_lyra",
-      "participantIds": ["player", "npc_lyra"],
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
       "sourceType": "dialogue",
       "sourceId": "lyra_mutual_calibration",
       "significance": "meaningful",
@@ -100,16 +165,31 @@
         "reciprocity": 7
       },
       "connectionProgressDelta": 16,
-      "resonanceTags": ["Adversarial", "MutualCalibration", "Dialectic"],
+      "resonanceTags": [
+        "Adversarial",
+        "MutualCalibration",
+        "Dialectic"
+      ],
       "memoryCandidate": false,
-      "interpretation": "Neither accepts the other's worldview, but each can now predict the other's reasoning without caricature."
+      "interpretation": "Neither accepts the other's worldview, but each can now predict the other's reasoning without caricature.",
+      "traitEffects": [
+        {
+          "traitId": "AdversarialCalibration",
+          "compatibilityDelta": 5,
+          "assimilationDelta": 20,
+          "note": "Accurate opposition becomes a transferable capability for prediction, coordination, and counterplay without ideological convergence."
+        }
+      ]
     },
     "lyra_exp_proto_bond": {
       "id": "lyra_exp_proto_bond",
       "uniqueKey": "lyra:lu06:proto-bond",
       "title": "Enemies in Phase",
       "primaryTargetId": "npc_lyra",
-      "participantIds": ["player", "npc_lyra"],
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
       "sourceType": "dialogue",
       "sourceId": "lyra_enemies_in_phase",
       "significance": "defining",
@@ -123,26 +203,48 @@
         "reciprocity": 8
       },
       "connectionProgressDelta": 20,
-      "resonanceTags": ["AdversarialBond", "MutualCalibration", "HarmonicResonance", "ChronoCrypt"],
+      "resonanceTags": [
+        "AdversarialBond",
+        "MutualCalibration",
+        "HarmonicResonance",
+        "ChronoCrypt"
+      ],
       "memoryCandidate": true,
       "memoryDefinitionId": "lyra_memory_enemies_in_phase",
-      "interpretation": "They solve a harmonic problem through models built across prior confrontations, producing a consequential bond while ideological hostility remains unresolved."
+      "interpretation": "They solve a harmonic problem through models built across prior confrontations, producing a consequential bond while ideological hostility remains unresolved.",
+      "traitEffects": [
+        {
+          "traitId": "AdversarialCalibration",
+          "compatibilityDelta": 6,
+          "assimilationDelta": 25,
+          "note": "Accurate opposition becomes a transferable capability for prediction, coordination, and counterplay without ideological convergence."
+        }
+      ]
     },
-    "lyra_exp_resonance_counterphase_reading": {
-      "id": "lyra_exp_resonance_counterphase_reading",
-      "uniqueKey": "lyra:system:counterphase-reading",
-      "title": "Resonance: Counterphase Reading",
+    "lyra_exp_resonance_adversarial_calibration": {
+      "id": "lyra_exp_resonance_adversarial_calibration",
+      "uniqueKey": "lyra:gc04:adversarial-calibration-resonance",
+      "title": "Resonance: Adversarial Calibration",
       "primaryTargetId": "npc_lyra",
-      "participantIds": ["player", "npc_lyra"],
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
       "sourceType": "system",
-      "sourceId": "resonance_calibration",
-      "significance": "major",
-      "relationshipEffects": {},
+      "sourceId": "AdversarialCalibration",
+      "significance": "defining",
+      "relationshipEffects": {
+        "sharedMeaning": 2
+      },
       "connectionProgressDelta": 0,
-      "resonanceTags": ["AdversarialBond", "MutualCalibration", "ChronoCrypt"],
-      "traitEffects": [{ "traitId": "CounterphaseReading", "assimilationDelta": 35 }],
+      "resonanceTags": [
+        "AdversarialBond",
+        "MutualCalibration",
+        "Dialectic",
+        "Resonance"
+      ],
       "memoryCandidate": false,
-      "interpretation": "Resonance converts Lyra's contested combat models into a capability the protagonist can apply without adopting her ideology."
+      "interpretation": "Essence stabilizes a capacity earned by repeatedly modeling a hostile counterpart accurately enough to predict and coordinate without false agreement."
     }
   },
   "memories": {
@@ -151,16 +253,27 @@
       "originExperienceId": "lyra_exp_proto_bond",
       "title": "Enemies in Phase",
       "primaryTargetId": "npc_lyra",
-      "participantIds": ["player", "npc_lyra"],
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
       "memoryType": "shared",
       "significance": "defining",
       "playerVisible": true,
       "summary": "You and Lyra aligned long enough to solve what neither of you could solve alone, without resolving why you oppose each other.",
       "protagonistView": "Her principles are constraints I can model, not noise I can erase.",
       "targetView": "The threat understands me more clearly now, which makes cooperation possible and trust more dangerous.",
-      "resonanceTags": ["AdversarialBond", "MutualCalibration", "HarmonicResonance", "IdeologicalFriction"],
+      "resonanceTags": [
+        "AdversarialBond",
+        "MutualCalibration",
+        "HarmonicResonance",
+        "IdeologicalFriction"
+      ],
       "bondContribution": "Dialectic Counterparts — emerging",
-      "persistence": "contested"
+      "persistence": "contested",
+      "traitRelevance": [
+        "AdversarialCalibration"
+      ]
     }
   },
   "progression": {
@@ -189,7 +302,9 @@
             "lyra_exp_mutual_calibration",
             "lyra_exp_proto_bond"
           ],
-          "requiredMemoryTags": ["AdversarialBond"],
+          "requiredMemoryTags": [
+            "AdversarialBond"
+          ],
           "minimumDimensions": {
             "understanding": 55,
             "sharedMeaning": 40,

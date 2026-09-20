@@ -37,7 +37,9 @@ const learnRoutine = (store: TestStore, routineId: RoutineFamiliarityId) => {
     routineId,
     source: routineId === 'forge_assistance'
       ? 'city_center_forge_assistance'
-      : 'trait_resonance',
+      : routineId === 'resonance_calibration'
+        ? 'trait_resonance'
+        : 'elara_independent_verification',
     learnedAt: 1,
   }));
 };
@@ -68,11 +70,11 @@ afterEach(() => {
 });
 
 describe('M20 production Copy task automation qualification', () => {
-  test('catalog contains bounded authored routine tasks with no arbitrary effect callback', () => {
+  test('catalog contains the bounded authored routine tasks with no arbitrary effect callback', () => {
     expect(COPY_PRODUCTION_TASKS.map(task => task.id)).toEqual([
       'forge_assistance',
       'resonance_calibration',
-      'archive_fieldwork',
+      'archive_verification',
     ]);
 
     for (const task of COPY_PRODUCTION_TASKS) {
@@ -316,7 +318,7 @@ describe('M20 production Copy task automation qualification', () => {
     expect(screen.getByText('Production Delegation')).toBeInTheDocument();
     expect(screen.getByText('Forge Assistance')).toBeInTheDocument();
     expect(screen.getByText('Resonance Calibration')).toBeInTheDocument();
-    expect(screen.getByText('Archive Fieldwork')).toBeInTheDocument();
+    expect(screen.getByText('Archive Verification')).toBeInTheDocument();
     expect(screen.getByText(/Narrative and irreversible decisions remain under player authority/)).toBeInTheDocument();
     expect(screen.queryByText('Start timed task:')).not.toBeInTheDocument();
 
@@ -324,6 +326,7 @@ describe('M20 production Copy task automation qualification', () => {
     expect(assignButtons).toHaveLength(3);
     expect(assignButtons[0]).toBeEnabled();
     expect(assignButtons[1]).toBeDisabled();
+    expect(assignButtons[2]).toBeDisabled();
 
     fireEvent.click(assignButtons[0]);
     await waitFor(() => {

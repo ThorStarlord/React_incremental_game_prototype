@@ -1,12 +1,13 @@
 import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 import { addItem, removeItem } from '../../features/Inventory/state/InventorySlice';
-import { setLocation } from '../../features/Player/state/PlayerSlice';
+import { markRoutineFamiliarity, setLocation } from '../../features/Player/state/PlayerSlice';
 import { updateNpcLocation } from '../../features/NPCs/state/NPCSlice';
 import { targetKilled } from '../../features/Combat/CombatEvents';
 import { failQuest, updateObjectiveProgress, patchObjectiveFields } from '../../features/Quest/state/QuestSlice';
 import { updateGenerationRate } from '../../features/Essence/state/EssenceSlice';
 import { calculateEssenceGenerationRate } from '../../features/Essence/utils/essenceRate';
+import { recordRelationshipExperience } from '../../features/Relationships/state/RelationshipSlice';
 
 export const gameEventListeners = createListenerMiddleware();
 
@@ -140,5 +141,20 @@ gameEventListeners.startListening({
         }
       }
     }
+  },
+});
+
+// GC-05: the Chapter 2 independent-verification result is the canonical manual
+// learning event for a third bounded delegatable routine. Merely entering the
+// archive or receiving earlier Elara evidence is insufficient.
+gameEventListeners.startListening({
+  actionCreator: recordRelationshipExperience,
+  effect: async (action, listenerApi) => {
+    if (action.payload.id !== 'elara_exp_independent_verification') return;
+    listenerApi.dispatch(markRoutineFamiliarity({
+      routineId: 'archive_verification',
+      source: 'elara_independent_verification',
+      learnedAt: action.payload.timestamp,
+    }));
   },
 });

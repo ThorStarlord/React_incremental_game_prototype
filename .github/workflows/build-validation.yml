@@ -42,6 +42,10 @@ jobs:
         timeout-minutes: 6
         run: npm run gc03:validate
 
+      - name: GC-04/05 capability and delegation breadth qualification
+        timeout-minutes: 8
+        run: npm run gc0405:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 

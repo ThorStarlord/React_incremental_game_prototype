@@ -21,15 +21,12 @@ export interface PlayerBaseStats {
 export type PlayerStats = PlayerBaseStats;
 
 /** Bounded routines whose manual experience may unlock later Copy delegation. */
-export type RoutineFamiliarityId =
-  | 'forge_assistance'
-  | 'resonance_calibration'
-  | 'archive_fieldwork';
+export type RoutineFamiliarityId = 'forge_assistance' | 'resonance_calibration' | 'archive_verification';
 
 export type RoutineFamiliaritySource =
   | 'city_center_forge_assistance'
   | 'trait_resonance'
-  | 'archive_fieldwork';
+  | 'elara_independent_verification';
 
 export interface RoutineFamiliarityRecord {
   source: RoutineFamiliaritySource;

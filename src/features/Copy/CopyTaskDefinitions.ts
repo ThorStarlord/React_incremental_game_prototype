@@ -54,17 +54,17 @@ export const COPY_PRODUCTION_TASKS: readonly CopyProductionTaskDefinition[] = [
     reward: { essence: 8 },
   },
   {
-    id: 'archive_fieldwork',
-    name: 'Archive Fieldwork',
+    id: 'archive_verification',
+    name: 'Archive Verification',
     description:
-      'Run a repeatable evidence audit in the Grand Library and return a verified source trail.',
-    familiarityHint: 'Complete an independent archive verification yourself before delegating fieldwork.',
-    baseDurationSeconds: 120,
-    minimumMaturity: 40,
+      'Repeat source collation, contradiction checks, and low-risk verification work after the method has been personally learned.',
+    familiarityHint:
+      'Complete Elara\'s independent-verification work yourself before delegating archive verification.',
+    baseDurationSeconds: 75,
+    minimumMaturity: 60,
     minimumLoyalty: 45,
     allowedRoles: ['researcher', 'agent'],
-    requiredLocationId: 'location_merchant_district',
-    reward: { gold: 20 },
+    reward: { essence: 5 },
   },
 ] as const;
 

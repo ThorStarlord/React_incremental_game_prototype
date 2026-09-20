@@ -1,9 +1,9 @@
 # Documentation Authority Index
 
 **Status:** CURRENT AUTHORITY for document classification  
-**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
+**Integrated implementation baseline:** `a8f313125b67f5c368033129344092e2e25dd63f`  
 **Current maturity:** PLAYABLE PRE-ALPHA  
-**Last reconciled:** 2026-09-12
+**Last reconciled:** 2026-09-20
 
 ## Purpose
 
@@ -74,6 +74,8 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | Provisional Product Direction | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProvisionalProductDirectionDecision.md`](../specification/Technical/PostM25ProvisionalProductDirectionDecision.md) | Relationship-derived capability buildcraft + causal legibility + earned delegation. |
 | M26 result | CURRENT AUTHORITY, integrated | [`specification/Technical/M26ProvisionalProductDepthResult.md`](../specification/Technical/M26ProvisionalProductDepthResult.md) | Exact-head #340 PASS; M26 closed. |
 | GC-01 player-surface cleanup | CURRENT AUTHORITY, integrated | [`specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md`](../specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md) | Exact-head #343 PASS; PR #117 merged; cut/deferred placeholders no longer primary 1.0 surfaces. |
+| GC-02 Prologue / onboarding | CURRENT AUTHORITY, integrated | PR #120 + `npm run gc02:validate` | Exact-head #352 PASS; fresh-save Willow First Lesson path integrated. |
+| GC-03 opening campaign spine | CURRENT AUTHORITY, integrated | [`specification/Technical/GC03OpeningCampaignSpineResult.md`](../specification/Technical/GC03OpeningCampaignSpineResult.md) | Exact-head #353 PASS; Prologue -> Chapters 1-3 now one legal derived production sequence. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
 | Post-M25 product evidence boundary | REFERENCE / predecessor authority | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Its anti-expansion/evidence doctrine remains useful; completion scope is now governed above. |
@@ -116,7 +118,8 @@ Important current bounded records also include:
 - `PostM25ThirdHeterogeneousChapter.md` — Enemies in Phase;
 - `PostM25CopyRoutineStrategy.md` — explicit routine priority / Start Preferred;
 - `M26ProvisionalProductDepthResult.md` — visible capability/mastery/delegation provenance;
-- `GC01PlayerSurfaceScopeCleanupResult.md` — integrated 1.0 player-surface cleanup and rejection qualification.
+- `GC01PlayerSurfaceScopeCleanupResult.md` — integrated 1.0 player-surface cleanup and rejection qualification;
+- `GC03OpeningCampaignSpineResult.md` — integrated Prologue -> Chapters 1-3 production spine and bounded cast-unlock qualification.
 
 Use [`specification/README.md`](../specification/README.md) for the broader domain map.
 
@@ -144,7 +147,7 @@ Relationship selectors are memoized at the feature seam so unchanged Redux
 inputs retain stable derived references; this is a performance and correctness
 hardening change, not a new domain authority.
 
-GC-01 is now complete. The next completion-program responsibility is GC-02 Prologue / onboarding.
+GC-01 through GC-03 are complete and integrated. The next completion-program responsibility is GC-04 / GC-05 breadth reconciliation against actual production evidence before any standalone capability or delegation feature work.
 
 ## Explicit 1.0 scope consequences
 
