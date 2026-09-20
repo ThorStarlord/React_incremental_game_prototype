@@ -1,135 +1,161 @@
-# Milestone Handoff — GC-01 / Campaign One 1.0 Completion
+# Milestone Handoff — GC-03 / Campaign One 1.0 Completion
 
 **Handoff status:** INTEGRATED / CURRENT-MAIN AUTHORITY  
-**Prepared:** 2026-09-11  
-**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
+**Prepared:** 2026-09-20  
+**Integrated implementation baseline:** `a8f313125b67f5c368033129344092e2e25dd63f`  
 **Current maturity:** PLAYABLE PRE-ALPHA  
-**Next unsatisfied completion responsibility:** GC-02 Prologue / onboarding
+**Next responsibility:** GC-04 / GC-05 breadth reconciliation
 
 ## Repository reality
 
-The implementation delivered in this milestone is GC-01 — 1.0 player-surface scope cleanup.
-
-Implementation evidence:
+The opening Campaign One production path is now integrated through Chapter 3.
 
 ```text
-PR:                  #117
-branch:              work/gc01-player-surface-scope-cleanup
-qualified head:      caabc1581316dab33f7eeb98dac9b32072ec57df
-Build Validation:    #343 / run 34629859287 / PASS
-merge commit:        ff829ce6ee4da8a693adfb783fe843775403326d
-merge status:        MERGED
+GC-01 player-surface cleanup       COMPLETE
+GC-02 Prologue / onboarding        COMPLETE
+GC-03 Chapters 1-3 opening spine   COMPLETE
 ```
 
-Because PR #117 is merged, GC-01 is **INTEGRATED / CURRENT-MAIN AUTHORITY**.
-
-## Package accounting
-
-The session-level Work Package Queue originally contained three causally ordered packages. Repository evidence does not support claiming that all three were implemented.
+### GC-02 evidence
 
 ```text
-[x] Package 1 — Integrate Qualified GC-01 Candidate
-    Result: COMPLETE / INTEGRATED
-
-[ ] Package 2 — GC-02 Prologue / Onboarding Vertical Path
-    Result: NOT EXECUTED / CARRIED FORWARD
-
-[ ] Package 3 — GC-03 Chapters 1–3 Production Spine
-    Result: NOT EXECUTED / CARRIED FORWARD
+PR:                  #120
+qualified head:      fad589bd439f53f0305a3116a1ac4fd67b4aa566
+Build Validation:    #352 / run 34659502966 / PASS
+merge commit:        8136fd481532705417fcc9a1f0fac84497d7e5a2
 ```
 
-The one-package-per-turn stop rule prevented GC-02 and GC-03 from being started in the GC-01 integration turns. They remain genuine Version 1.0 work; this handoff does not mark them complete by inference.
+GC-02 established the ordinary-UI fresh-save route from the intro through Elder Willow's First Lesson and persisted Relationship evidence.
 
-## What GC-01 delivered
-
-GC-01 closes the first post-transition 1.0 player-surface requirement:
-
-- separate generic Skills no longer appear as an implemented Campaign One player surface;
-- generic Crafting no longer appears as an implemented Campaign One player surface;
-- general Inventory remains deferred rather than advertised as required 1.0 progression;
-- duplicate save-management navigation is removed as a false second persistence authority;
-- the Main Menu remains the canonical New Game / Continue / Load / Import / Export / delete persistence surface;
-- legacy/deferred IDs remain interpretable for compatibility;
-- unknown or cut `/game/*` legacy destinations fail closed to Dashboard;
-- focused positive and rejection qualification is available through `npm run gc01:validate`.
-
-GC-01 does not add a skill tree, crafting system, inventory economy, second save model, new progression authority, or persistence-schema change.
-
-## CI and integration triage
-
-### Implementation PR #117
-
-The exact implementation head `caabc1581316dab33f7eeb98dac9b32072ec57df` passed Build Validation #343 before merge. No implementation CI failure remains to classify.
-
-### Follow-up documentation PR #118
-
-PR #118 (`work/gc01-integration-status`, head `50e8bbf3f91a4ad4bd388756e9c8e99264d95570`) was created only to reconcile stale post-merge authority text. Its Build Validation #344 was observed in `queued` state with no conclusion.
-
-That state is **not a CI failure** and therefore is not classified as IMPLEMENTATION_FAILURE, RELEVANT_ENVIRONMENT_FAILURE, OBSOLETE_CI_CONFIGURATION, NON_REQUIRED_AUXILIARY_FAILURE, or HUMAN_PRODUCT_DECISION.
-
-The repository's `main` branch currently has no branch-protection required-check configuration, but repository operating policy still requires a green exact-head Build Validation before merging a candidate. This handoff preserves that stricter repository policy.
-
-This consolidated handoff supersedes the narrower purpose of PR #118; do not treat #118 as implementation authority.
-
-## Authoritative CI
-
-The active workflow is:
+### GC-03 evidence
 
 ```text
-.github/workflows/build-validation.yml
+PR:                  #121
+branch:              work/gc03-opening-campaign-spine
+qualified head:      dc0fd39420a618ff9ab74cf90e031bb849bac404
+Build Validation:    #353 / run 35523216769 / PASS
+merge commit:        a8f313125b67f5c368033129344092e2e25dd63f
 ```
 
-It intentionally triggers on pull requests and runs on `ubuntu-latest` with Node.js 20. It includes documentation authority, GC-01 rejection/acceptance checks, content intelligence, TypeScript, live synthetic UI smoke, GameLoop timing/backpressure/lifecycle regressions, timed-Quest and offline-boundary qualification, historical milestone regression suites, and the production build.
+GC-03 connects that Prologue to Merchant District Crisis, Archive Inquiry, and Enemies in Phase through existing canonical evidence.
 
-No active CI failure in this milestone was found that requires classification or cleanup. Retired Gemini/API-key review history must not be resurrected as current authority unless repository authority explicitly changes.
+## What is now playable structurally
 
-## Local qualification commands
+```text
+New Game
+-> intro
+-> find Elder Willow
+-> First Lesson
+-> Chapter 1 cast / Merchant District Crisis
+-> either existing Chapter 1 conclusion
+-> Scholar Elara / Archive Inquiry
+-> independent verification
+-> Lyra / Enemies in Phase
+-> GC-03 opening-spine complete
+```
 
-Use these before opening or updating a completion-program PR:
+The sequence is intentionally derived rather than stored in a new chapter reducer.
+
+## Important GC-03 repair
+
+GC-02 exposed a real reachability gap: New Game correctly seeded only Willow, but the other Campaign One anchors had no production re-entry path after the Prologue.
+
+GC-03 repairs that narrowly:
+
+- later NPCs are merged into current NPC state rather than replacing it;
+- Willow and every already-progressed NPC remain untouched;
+- Chapter 1 anchors unlock after First Lesson;
+- Elara unlocks after either Merchant District conclusion;
+- Lyra unlocks after Archive Inquiry's independent-verification evidence;
+- existing dialogue catalogs/extensions remain authoritative.
+
+This is content reachability, not a generalized discovery engine.
+
+## Current campaign spine
+
+```text
+Prologue                                      integrated
+Chapter 1 — Merchant District Crisis          integrated / connected
+Chapter 2 — Archive Inquiry                   integrated / connected
+Chapter 3 — Enemies in Phase                  integrated / connected
+Chapter 4 — Lattice Under Strain              missing
+Chapter 5 — The Chrono-Crypt                  missing
+Chapter 6 — Network Under Pressure            missing
+Chapter 7 — Counterphase                      missing
+Finale — The Telluric Echo                    missing
+Epilogue — Aftermath / Conditional Reprieve   missing
+```
+
+## Current qualification commands
 
 ```bash
 npm ci
 npm run docs:authority:validate
 npm run gc01:validate
+npm run gc02:validate
+npm run gc03:validate
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate
 npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx tsc --noEmit
-CI=true npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
-For exact CI parity, use `.github/workflows/build-validation.yml` as executable truth rather than copying a historical milestone command list.
+Use `.github/workflows/build-validation.yml` as exact CI truth.
+
+## Next responsibility — GC-04 / GC-05 reconciliation
+
+Do **not** start by inventing capabilities or Copy systems.
+
+Audit the integrated production evidence against the 1.0 floors:
+
+### GC-04 buildcraft
+
+- 4 durable relationship-derived capability identities;
+- at least 3 anchor sources;
+- at least 2 capabilities with meaningful cross-domain application;
+- at least 2 viable late-game build profiles.
+
+### GC-05 earned delegation
+
+- 3 personally mastered routine identities;
+- at least 2 learning contexts;
+- meaningful explicit delegation choice;
+- current bounded persistence/offline authority preserved.
+
+Count existing qualified evidence first. Let Chapters 4-7 close missing breadth where that creates better player meaning.
+
+## Repository hygiene
+
+Historical timing and experiment PRs that were superseded by current-main authority were closed during this reconciliation. Their evidence remains preserved in GitHub history.
+
+Issue #122 records the remaining repository-setting mismatch: policy requires exact-head Build Validation, while `main` does not yet mechanically require it through GitHub branch protection/rulesets. The current connected automation cannot mutate administration-level branch rules, so the procedural gate remains authoritative until that setting is applied.
 
 ## Human evidence boundary
 
-Issue #109 remains OPEN / UNPROVEN.
+Issue #109 remains **OPEN / UNPROVEN**.
 
-Repository automation can prove routing/configuration behavior and deterministic technical composition. It cannot establish:
+GC-02/GC-03 automated qualification proves reachability, persistence, deterministic composition, and rejection behavior. It does not prove onboarding comprehension, pacing, enjoyment, balance, retention, or market preference. Human evidence becomes mandatory at Beta under the current completion contracts.
 
-- fresh-player comprehension or discoverability;
-- onboarding quality;
-- pacing;
-- fairness or final balance;
-- enjoyment or emotional impact;
-- retention or desire to continue;
-- market preference.
+## Do not reopen by inertia
 
-Those claims remain human evidence and become required for Beta/final player-quality qualification under the current completion contracts.
+Do not restart:
 
-## Recommended next milestone priorities
+- GameLoop/tick hardening;
+- generic Skills;
+- generic Crafting;
+- general Inventory;
+- duplicate Saves;
+- generalized narrative engines;
+- autonomous Copy planning;
+- generalized simulation;
+- Chapters 8+ / interplanetary continuation / New Game+.
 
-1. **GC-02 — Prologue / onboarding:** create the smallest ordinary-UI fresh-save path from New Game to a clear objective, first meaningful anchor relationship interaction, active player action, visible persistent consequence, Chapter 1 entry, and save/load survival.
-2. **GC-03 — Chapters 1–3 production spine:** connect Prologue -> Merchant District Crisis -> Archive Inquiry -> Enemies in Phase through existing canonical evidence without introducing a generic ChapterEngine, chapter reducer, or narrative DSL.
-3. **Then reconcile GC-04 / GC-05 against actual campaign evidence:** audit current relationship-derived capabilities and mastered routines before creating any standalone buildcraft or delegation feature work. Let chapter content satisfy those floors where it naturally does so.
-
-Do not reopen GameLoop/tick-rate hardening, Skills, Crafting, general Inventory, duplicate Saves, generalized simulation, Chapters 8+, interplanetary continuation, or New Game+ merely because further improvement is possible. A new package requires a named 1.0 completion gap or demonstrated blocker.
+A future package must close a named 1.0 requirement or a demonstrated blocker.
 
 ## Re-entry sequence
-
-Future engineers and chat sessions should start with:
 
 ```text
 latest main
@@ -141,11 +167,12 @@ latest main
 -> specification/Progression/GameProgressionArc.md
 -> specification/Narrative/CampaignArchitecture.md
 -> specification/Technical/GameCompletionRoadmap.md
--> relevant Alpha/Beta/Release contract
+-> specification/Technical/GC03OpeningCampaignSpineResult.md
+-> relevant maturity contract
 -> RUNBOOK.md
 -> fresh repository reconciliation
 ```
 
-## Stop condition for this handoff
+## Governing handoff conclusion
 
-This handoff records GC-01 as integrated and preserves GC-02 as the next unsatisfied Version 1.0 responsibility. It does not authorize or implement GC-02 inside the documentation milestone.
+> The repository no longer needs to prove that its first three chapters can exist independently. The next question is how much of the required buildcraft and earned-delegation breadth those chapters already provide before new content is added.
