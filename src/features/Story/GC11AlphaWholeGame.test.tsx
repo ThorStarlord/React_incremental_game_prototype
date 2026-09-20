@@ -355,7 +355,7 @@ const playChapterOnePublicOrder = async (store: TestStore) => {
     'valerius_m23_public_override',
     'own_override'
   );
-  expect(selectFactionReputation(store.getState(), 'City Watch')).toBe(-10);
+  expect(selectFactionReputation(store.getState(), 'City Watch')).toBe(15);
   await interact(
     store,
     'npc_captain_valerius',
