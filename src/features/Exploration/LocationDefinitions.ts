@@ -4,6 +4,7 @@ export const CITY_CENTER_LOCATION_ID = 'location_city_center';
 export const CITY_GATE_LOCATION_ID = 'location_city_gate';
 export const MERCHANT_DISTRICT_LOCATION_ID = 'location_merchant_district';
 export const WHISPERING_WOODS_LOCATION_ID = 'location_whispering_woods';
+export const CHRONO_CRYPT_LOCATION_ID = 'location_chrono_crypt';
 
 export const EXPLORATION_LOCATIONS: readonly LocationDefinition[] = [
   {
@@ -29,7 +30,14 @@ export const EXPLORATION_LOCATIONS: readonly LocationDefinition[] = [
     id: WHISPERING_WOODS_LOCATION_ID,
     name: 'Whispering Woods',
     description: 'An old-growth woodland where Willow studies slow changes in Essence and ecology.',
-    connections: [CITY_GATE_LOCATION_ID],
+    connections: [CITY_GATE_LOCATION_ID, CHRONO_CRYPT_LOCATION_ID],
+  },
+  {
+    id: CHRONO_CRYPT_LOCATION_ID,
+    name: 'Chrono-Crypt',
+    description: 'An old harmonic archive where repeated failures preserve enough structure to derive a counterphase without turning time itself into a simulation system.',
+    connections: [WHISPERING_WOODS_LOCATION_ID],
+    requiredExperienceIds: ['lyra_gc06_exp_chrono_crypt_route'],
   },
 ];
 
@@ -73,4 +81,16 @@ export const areLocationsDirectlyConnected = (
 
   const from = getLocationDefinition(fromId);
   return Boolean(from?.connections.includes(toId));
+};
+
+
+export const getMissingLocationExperienceIds = (
+  locationId: string,
+  recordedExperienceIds: ReadonlySet<string>
+): string[] => {
+  const location = getLocationDefinition(locationId);
+  if (!location) return [];
+  return (location.requiredExperienceIds ?? []).filter(
+    experienceId => !recordedExperienceIds.has(experienceId)
+  );
 };
