@@ -40,6 +40,7 @@
     "m26:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand M26ProvisionalProductDepthQualification.test.ts PostM25PlayerInsightsQualification.test.ts PostM25CopyRoutineStrategy.test.ts",
     "gc01:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC01PlayerSurfaceScopeCleanup.test.ts",
     "gc02:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC02PrologueOnboarding.test.tsx",
+    "gc03:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC03OpeningCampaignSpine.test.tsx",
     "simulated-review:validate": "node --check scripts/simulated-product-review/ui-observer.js && node --check scripts/simulated-product-review/action-contract.js && node --check scripts/simulated-product-review/validate-action-contract.js && node --check scripts/simulated-product-review/validate-config.js && node scripts/simulated-product-review/validate-config.js",
     "simulated-review:action-contract": "node scripts/simulated-product-review/validate-action-contract.js",
     "simulated-review:observe": "node scripts/simulated-product-review/ui-observer.js",
