@@ -3,6 +3,7 @@ export interface LocationDefinition {
   name: string;
   description: string;
   connections: readonly string[];
+  requiredExperienceIds?: readonly string[];
   legacyAliases?: readonly string[];
 }
 
