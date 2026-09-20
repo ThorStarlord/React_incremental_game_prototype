@@ -1,13 +1,21 @@
-# Repository Status — Playable Pre-Alpha / Campaign One Completion
+# Repository Status — Alpha / Campaign One Completion
 
 **Status date:** 2026-09-20  
-**Integrated implementation baseline:** `a8f313125b67f5c368033129344092e2e25dd63f`  
-**Current maturity:** `PLAYABLE PRE-ALPHA`  
+**Integrated implementation baseline:** `f49dd6c5df67bad4e0e26832f19ee1bc38561411`  
+**Current maturity:** `ALPHA / HUMAN-UNVALIDATED`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
 **GC-01:** `COMPLETE / INTEGRATED`  
 **GC-02:** `COMPLETE / INTEGRATED`  
 **GC-03:** `COMPLETE / INTEGRATED`  
+**GC-04/05:** `COMPLETE / INTEGRATED`  
+**GC-06:** `COMPLETE / INTEGRATED`  
+**GC-07:** `COMPLETE / INTEGRATED`  
+**GC-08:** `COMPLETE / INTEGRATED`  
+**GC-09:** `COMPLETE / INTEGRATED`  
+**GC-10:** `COMPLETE / INTEGRATED`  
+**GC-11 Alpha:** `ALPHA_PASS / HUMAN_UNVALIDATED`  
+**GC-12 Content Alpha:** `IN PROGRESS`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Active program:** Campaign One / 1.0 Game Completion
 
@@ -28,9 +36,9 @@ Read in this order:
 
 ## Big picture
 
-The project has passed proof-of-concept, technical-prototype and bounded vertical-slice stages. It has a runnable game shell, persistent saves/import-export, deterministic time, NPC/dialogue, quests, authored travel, combat, Relationship/Memory progression, Traits/Essence, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progress, three heterogeneous chapter-scale projections, and a qualified complete two-route chapter.
+The project has passed proof-of-concept, technical-prototype, bounded vertical-slice, and deterministic whole-game Alpha stages. Campaign One now has a legal production-equivalent New Game -> Prologue -> Chapters 1-7 -> Telluric Echo finale -> state-responsive Epilogue path with persistence checkpoints and canonical save-code round-trip qualification.
 
-It is therefore best described as a **Playable Pre-Alpha**: a real rudimentary game whose complete campaign, content breadth, human validation, polish and release qualification remain unfinished.
+It is therefore an **Alpha / HUMAN-UNVALIDATED** game. Structural campaign completion is integrated; GC-12 is qualifying authored-content completeness. Fresh-player comprehension, pacing, balance, accessibility/browser evidence, polish, and release qualification remain intentionally unclaimed.
 
 ## Product direction
 
@@ -74,7 +82,7 @@ merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
 
 GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
 
-GC-02 and GC-03 are now integrated. The next responsibility is **GC-04 / GC-05 evidence reconciliation**: count actual relationship-derived capability/buildcraft and mastered-routine/delegation breadth before authorizing any standalone feature work.
+GC-04 through GC-10 are integrated, and GC-11 has recorded `ALPHA_PASS / HUMAN_UNVALIDATED` on exact-head Build Validation #381. The current responsibility is **GC-12 Content Alpha completion**: verify the complete bounded campaign is intentionally authored with no required placeholder/diagnostic copy.
 
 ## Finished-game target
 
@@ -91,12 +99,12 @@ Prologue                                      [integrated]
 Chapter 1 — Merchant District Crisis          [integrated / connected]
 Chapter 2 — Archive Inquiry                   [integrated / connected]
 Chapter 3 — Enemies in Phase                  [integrated / connected]
-Chapter 4 — Lattice Under Strain              [missing]
-Chapter 5 — The Chrono-Crypt                  [missing]
-Chapter 6 — Network Under Pressure            [missing]
-Chapter 7 — Counterphase                      [missing]
-Finale — The Telluric Echo                    [missing]
-Epilogue — Aftermath / Conditional Reprieve   [missing]
+Chapter 4 — Lattice Under Strain              [integrated]
+Chapter 5 — The Chrono-Crypt                  [integrated]
+Chapter 6 — Network Under Pressure            [integrated]
+Chapter 7 — Counterphase                      [integrated]
+Finale — The Telluric Echo                    [integrated]
+Epilogue — state-responsive aftermath          [integrated]
 ```
 
 Chapters 8+, interplanetary continuation and New Game+ are outside the 1.0 critical path unless authority is explicitly revised.
@@ -131,14 +139,14 @@ Before 1.0, the campaign must support at least:
 [x] GC-01 1.0 player-surface scope cleanup
 [x] GC-02 Prologue / onboarding
 [x] GC-03 Chapters 1–3 campaign integration
-[ ] GC-04 Buildcraft breadth
-[ ] GC-05 Earned-delegation breadth
-[ ] GC-06 Chapter 4 — Lattice Under Strain
-[ ] GC-07 Chapter 5 — The Chrono-Crypt
-[ ] GC-08 Chapter 6 — Network Under Pressure
-[ ] GC-09 Chapter 7 — Counterphase
-[ ] GC-10 Finale + Epilogue
-[ ] GC-11 Alpha qualification
+[x] GC-04 Buildcraft breadth
+[x] GC-05 Earned-delegation breadth
+[x] GC-06 Chapter 4 — Lattice Under Strain
+[x] GC-07 Chapter 5 — The Chrono-Crypt
+[x] GC-08 Chapter 6 — Network Under Pressure
+[x] GC-09 Chapter 7 — Counterphase
+[x] GC-10 Finale + Epilogue
+[x] GC-11 Alpha qualification
 [ ] GC-12 Content Alpha completion
 [ ] GC-13 Beta
 [ ] GC-14 Release Candidate / 1.0
@@ -172,7 +180,7 @@ Under the completion program this is not a blanket pre-Alpha development freeze.
 
 ## Do not restart by inertia
 
-M4–M26, GC-01, GC-02, GC-03, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
+M4–M26, GC-01 through GC-11, post-M25 timing/content intelligence, the three-chapter friction repair, Player Insight/provenance, contextual causal dialogue, cross-domain Trait qualification and Copy routine/provenance packages are closed unless a new 1.0 blocker demonstrates a real need.
 
 ## Governing implementation rule
 
