@@ -100,15 +100,15 @@ Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 [x] GC-01  1.0 player-surface scope cleanup
 [x] GC-02  Prologue / onboarding
 [x] GC-03  Chapters 1–3 campaign integration
-[ ] GC-04  Buildcraft breadth
-[ ] GC-05  Earned-delegation breadth
-[ ] GC-06  Chapter 4 — Lattice Under Strain
-[ ] GC-07  Chapter 5 — The Chrono-Crypt
-[ ] GC-08  Chapter 6 — Network Under Pressure
-[ ] GC-09  Chapter 7 — Counterphase
-[ ] GC-10  Finale + Epilogue
-[ ] GC-11  Alpha qualification
-[ ] GC-12  Content Alpha
+[x] GC-04  Buildcraft breadth
+[x] GC-05  Earned-delegation breadth
+[x] GC-06  Chapter 4 — Lattice Under Strain
+[x] GC-07  Chapter 5 — The Chrono-Crypt
+[x] GC-08  Chapter 6 — Network Under Pressure
+[x] GC-09  Chapter 7 — Counterphase
+[x] GC-10  Finale + Epilogue
+[x] GC-11  Alpha qualification
+[x] GC-12  Content Alpha
 [ ] GC-13  Beta
 [ ] GC-14  Release Candidate / 1.0
 ```
@@ -205,6 +205,8 @@ npm run docs:authority:validate
 npm run gc01:validate
 npm run gc02:validate
 npm run gc03:validate
+npm run alpha:validate
+npm run content-alpha:validate
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate
