@@ -214,10 +214,7 @@ export type DialogueEffect =
       routineId: RoutineFamiliarityId;
       source: import('../../Player/state/PlayerTypes').RoutineFamiliaritySource;
     })
-  | (DialogueEffectScope & {
-      type: 'CAMPAIGN_COMPLETE';
-      epilogueVariant: string;
-    });
+  ;
 
 export interface FactionReputationRequirement {
   factionId: string;
