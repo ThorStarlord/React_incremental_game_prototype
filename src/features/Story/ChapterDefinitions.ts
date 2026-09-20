@@ -273,6 +273,51 @@ export const CHAPTER_DEFINITIONS = [
       },
     ],
   },
+  {
+    id: 'telluric_echo_finale',
+    title: 'The Telluric Echo',
+    centerOfGravity: 'final counterphase execution, accumulated-state payoff, and remembered aftermath',
+    description:
+      'The committed counterphase plan enters one authored finale Quest and a state-responsive aftermath. Completion remains derived from Relationship/Memory and objective World State rather than a finale engine.',
+    routes: [
+      {
+        id: 'distributed',
+        label: 'Distributed Dissipation',
+        summary: 'Dissipate the Echo through the broad verified network and record the distributed aftermath.',
+        requiredExperienceIds: [
+          'lyra_gc10_exp_finale_distributed',
+          'lyra_gc10_exp_epilogue_distributed',
+        ],
+      },
+      {
+        id: 'structural',
+        label: 'Structural Redirection',
+        summary: 'Redirect the Echo through the network load paths and record the structural aftermath.',
+        requiredExperienceIds: [
+          'lyra_gc10_exp_finale_structural',
+          'lyra_gc10_exp_epilogue_structural',
+        ],
+      },
+      {
+        id: 'diagnostic',
+        label: 'Diagnostic Disruption',
+        summary: 'Break the Echo through predicted contradiction and record the diagnostic aftermath.',
+        requiredExperienceIds: [
+          'lyra_gc10_exp_finale_diagnostic',
+          'lyra_gc10_exp_epilogue_diagnostic',
+        ],
+      },
+      {
+        id: 'fortified',
+        label: 'Fortified Containment',
+        summary: 'Contain the Echo through the Watch-supported network and record the fortified aftermath.',
+        requiredExperienceIds: [
+          'lyra_gc10_exp_finale_fortified',
+          'lyra_gc10_exp_epilogue_fortified',
+        ],
+      },
+    ],
+  },
 ] as const satisfies readonly ChapterDefinitionShape[];
 
 /**

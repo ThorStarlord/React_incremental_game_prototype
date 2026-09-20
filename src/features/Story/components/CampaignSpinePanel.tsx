@@ -5,6 +5,7 @@ import { useAppSelector } from '../../../app/hooks';
 import { selectOpeningCampaignStage } from '../CampaignSpine';
 import { selectChapterProgress } from '../ChapterSelectors';
 import { selectCounterphasePreparationExplanation } from '../PlayerInsightSelectors';
+import { selectCampaignEpilogueProjection } from '../CampaignEpilogueSelectors';
 
 const ActionButton: React.FC<{ to: string; children: React.ReactNode }> = ({
   to,
@@ -36,9 +37,13 @@ export const CampaignSpinePanel: React.FC = () => {
   const counterphaseComplete = useAppSelector(state =>
     selectChapterProgress(state, 'counterphase').status === 'complete'
   );
+  const finaleComplete = useAppSelector(state =>
+    selectChapterProgress(state, 'telluric_echo_finale').status === 'complete'
+  );
   const counterphaseExplanation = useAppSelector(
     selectCounterphasePreparationExplanation
   );
+  const epilogue = useAppSelector(selectCampaignEpilogueProjection);
 
   if (stage === 'PROLOGUE') return null;
 
@@ -182,14 +187,45 @@ export const CampaignSpinePanel: React.FC = () => {
     );
   }
 
+  if (!finaleComplete || !epilogue) {
+    return (
+      <Alert severity="warning" data-testid="gc10-campaign-objective" sx={{ mb: 2 }}>
+        <AlertTitle>Finale — The Telluric Echo</AlertTitle>
+        <Typography variant="body2">
+          The counterphase plan is committed. Return to Lyra to enter the matching finale Quest,
+          carry that plan into the Whispering Woods, resolve the confrontation personally, then
+          return to Lyra once more to record the aftermath.
+        </Typography>
+        {counterphaseExplanation && (
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Committed preparation: {counterphaseExplanation.title}.
+          </Typography>
+        )}
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
+          <ActionButton to="/game/npcs/npc_lyra">Open Lyra</ActionButton>
+          <ActionButton to="/game/quests">Open finale quest</ActionButton>
+          <ActionButton to="/game/dashboard">Open travel controls</ActionButton>
+        </Stack>
+      </Alert>
+    );
+  }
+
   return (
-    <Alert severity="success" data-testid="gc09-campaign-objective" sx={{ mb: 2 }}>
-      <AlertTitle>Counterphase plan committed — Telluric Echo finale next</AlertTitle>
-      <Typography variant="body2">
-        The finale plan is now explicit and persisted. Campaign One can enter the Telluric Echo
-        confrontation without collapsing prior Relationship, Knowledge, Faction, World State,
-        capability, or delegation history into a readiness score.
-      </Typography>
+    <Alert severity="success" data-testid="gc10-epilogue" sx={{ mb: 2 }}>
+      <AlertTitle>Campaign One Complete — {epilogue.title}</AlertTitle>
+      <Stack spacing={1}>
+        <Typography variant="body2">{epilogue.lyra}</Typography>
+        {epilogue.elara && <Typography variant="body2">{epilogue.elara}</Typography>}
+        {epilogue.secondaryAnchor && (
+          <Typography variant="body2">{epilogue.secondaryAnchor}</Typography>
+        )}
+        <Typography variant="body2">{epilogue.institution}</Typography>
+        <Typography variant="body2">{epilogue.world}</Typography>
+        <Typography variant="body2">{epilogue.build}</Typography>
+        {epilogue.delegation && (
+          <Typography variant="body2">{epilogue.delegation}</Typography>
+        )}
+      </Stack>
     </Alert>
   );
 };
