@@ -7,8 +7,9 @@ import {
   WHISPERING_WOODS_LOCATION_ID,
   resolveCanonicalLocationId,
 } from '../../Exploration/LocationDefinitions';
+import { GC02_FIRST_LESSON_EXPERIENCE_ID } from '../CampaignSpine';
 
-export const GC02_FIRST_LESSON_EXPERIENCE_ID = 'willow_exp_first_lesson';
+export { GC02_FIRST_LESSON_EXPERIENCE_ID } from '../CampaignSpine';
 
 export type PrologueStage =
   | 'INTRO'
@@ -89,20 +90,8 @@ export const PrologueObjectivePanel: React.FC = () => {
     );
   }
 
-  return (
-    <Alert severity="success" data-testid="gc02-prologue-objective" sx={{ mb: 2 }}>
-      <AlertTitle>Prologue complete</AlertTitle>
-      <Typography variant="body2">
-        The First Lesson is remembered in your Relationship history. Next: Merchant District
-        Crisis. Return through City Gate to City Center, then travel to the Merchant District.
-      </Typography>
-      <Box sx={{ mt: 1.5 }}>
-        <Button component={RouterLink} to="/game/dashboard" size="small" variant="outlined">
-          Continue toward Merchant District
-        </Button>
-      </Box>
-    </Alert>
-  );
+  // GC-03 owns the post-prologue campaign objective surface.
+  return null;
 };
 
 export default PrologueObjectivePanel;
