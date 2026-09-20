@@ -50,6 +50,7 @@ const requiredAuthorityFiles = [
   'specification/Technical/GC11AlphaResult.md',
   'specification/Technical/GC12ContentAlphaPreregistration.md',
   'specification/Technical/GC12ContentAlphaResult.md',
+  'specification/Technical/GC13BetaTechnicalReadinessPreregistration.md',
   'specification/Technical/M25CompleteChapterVerticalSliceResult.md',
   'specification/Technical/PostM25ProductDirection.md',
   'specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md',
@@ -96,6 +97,7 @@ if (exists('docs/CURRENT.md')) {
     'M26ProvisionalProductDepthResult.md',
     'GC11AlphaResult.md',
     'GC12ContentAlphaResult.md',
+    'GC13BetaTechnicalReadinessPreregistration.md',
     'GameLoopAsyncTickBacklogPolicyContract.md',
     'GameLoopLifecycleRemainderPolicy.md',
     'M25CompleteChapterVerticalSliceResult.md',
@@ -185,6 +187,8 @@ requireContains('package.json', [
   '"m26:validate"',
   '"alpha:validate"',
   '"content-alpha:validate"',
+  '"beta:technical:validate"',
+  '"release:browser"',
 ]);
 requireContains('.github/workflows/build-validation.yml', [
   'Documentation authority qualification',
@@ -195,6 +199,9 @@ requireContains('.github/workflows/build-validation.yml', [
   'npm run alpha:validate',
   'GC-12 Content Alpha qualification',
   'npm run content-alpha:validate',
+  'GC-13 deterministic Beta technical readiness',
+  'npm run beta:technical:validate',
+  'GC-13 Chromium and Firefox browser/input qualification',
 ]);
 
 if (exists('.github/workflows/gemini-review.yml')) {
