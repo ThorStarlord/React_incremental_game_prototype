@@ -48,7 +48,7 @@ describe('post-M25 third heterogeneous chapter qualification', () => {
         'lattice_under_strain',
         'chrono_crypt',
         'network_under_pressure',
-        'counterphase_commitment',
+        'counterphase',
       ])
     );
     expect(chapter.title).toBe('Enemies in Phase');
