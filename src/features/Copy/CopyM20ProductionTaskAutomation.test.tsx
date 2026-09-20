@@ -37,7 +37,9 @@ const learnRoutine = (store: TestStore, routineId: RoutineFamiliarityId) => {
     routineId,
     source: routineId === 'forge_assistance'
       ? 'city_center_forge_assistance'
-      : 'trait_resonance',
+      : routineId === 'resonance_calibration'
+        ? 'trait_resonance'
+        : 'elara_independent_verification',
     learnedAt: 1,
   }));
 };
@@ -68,10 +70,11 @@ afterEach(() => {
 });
 
 describe('M20 production Copy task automation qualification', () => {
-  test('catalog contains exactly two bounded authored routine tasks with no arbitrary effect callback', () => {
+  test('catalog contains the bounded authored routine tasks with no arbitrary effect callback', () => {
     expect(COPY_PRODUCTION_TASKS.map(task => task.id)).toEqual([
       'forge_assistance',
       'resonance_calibration',
+      'archive_verification',
     ]);
 
     for (const task of COPY_PRODUCTION_TASKS) {
