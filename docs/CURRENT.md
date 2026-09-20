@@ -1,8 +1,8 @@
 # Documentation Authority Index
 
 **Status:** CURRENT AUTHORITY for document classification  
-**Integrated implementation baseline:** `a8f313125b67f5c368033129344092e2e25dd63f`  
-**Current maturity:** PLAYABLE PRE-ALPHA  
+**Integrated implementation baseline:** `f49dd6c5df67bad4e0e26832f19ee1bc38561411`  
+**Current maturity:** ALPHA / HUMAN-UNVALIDATED  
 **Last reconciled:** 2026-09-20
 
 ## Purpose
@@ -76,6 +76,10 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | GC-01 player-surface cleanup | CURRENT AUTHORITY, integrated | [`specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md`](../specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md) | Exact-head #343 PASS; PR #117 merged; cut/deferred placeholders no longer primary 1.0 surfaces. |
 | GC-02 Prologue / onboarding | CURRENT AUTHORITY, integrated | PR #120 + `npm run gc02:validate` | Exact-head #352 PASS; fresh-save Willow First Lesson path integrated. |
 | GC-03 opening campaign spine | CURRENT AUTHORITY, integrated | [`specification/Technical/GC03OpeningCampaignSpineResult.md`](../specification/Technical/GC03OpeningCampaignSpineResult.md) | Exact-head #353 PASS; Prologue -> Chapters 1-3 now one legal derived production sequence. |
+| GC-04/05 breadth | CURRENT AUTHORITY, integrated | `npm run gc0405:validate` + PR #126 | Capability/buildcraft and earned-delegation floors integrated. |
+| GC-06–GC-10 campaign completion | CURRENT AUTHORITY, integrated | `npm run gc06:validate` through `npm run gc10:validate` | Chapters 4–7, finale and state-responsive epilogue integrated. |
+| GC-11 Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC11AlphaResult.md`](../specification/Technical/GC11AlphaResult.md) | Exact-head Build Validation #381 PASS; ALPHA_PASS / HUMAN_UNVALIDATED. |
+| GC-12 Content Alpha | CURRENT ACTIVE PACKAGE | [`specification/Technical/GC12ContentAlphaPreregistration.md`](../specification/Technical/GC12ContentAlphaPreregistration.md) | Qualifying authored-content completeness; not yet declared complete. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
 | Post-M25 product evidence boundary | REFERENCE / predecessor authority | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Its anti-expansion/evidence doctrine remains useful; completion scope is now governed above. |
