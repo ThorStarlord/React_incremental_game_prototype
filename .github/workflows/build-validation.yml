@@ -38,6 +38,10 @@ jobs:
         timeout-minutes: 5
         run: npm run gc02:validate
 
+      - name: GC-03 opening campaign spine qualification
+        timeout-minutes: 6
+        run: npm run gc03:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 
