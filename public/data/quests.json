@@ -357,5 +357,63 @@
     "rewards": [],
     "status": "NOT_STARTED",
     "isAutoComplete": false
+  },
+  "quest_gc06_lattice_under_strain": {
+    "id": "quest_gc06_lattice_under_strain",
+    "title": "Lattice Under Strain",
+    "description": "The Telluric Echo is stressing the Merchant District as a connected system. Stabilize the local lattice without pretending that one local intervention is the final countermeasure.",
+    "giver": "npc_scholar_elara",
+    "type": "MAIN_STORY",
+    "objectives": [
+      {
+        "objectiveId": "1",
+        "description": "Inspect the stressed Merchant District lattice in person",
+        "type": "REACH_LOCATION",
+        "target": "location_merchant_district",
+        "requiredCount": 1,
+        "currentCount": 0,
+        "isHidden": false,
+        "isComplete": false
+      }
+    ],
+    "prerequisites": [],
+    "rewards": [],
+    "resolutionRequired": true,
+    "resolutionOptions": [
+      {
+        "id": "contain_surface_failures",
+        "label": "Contain Surface Failures",
+        "description": "Use ordinary local response capacity to isolate the failures that are currently visible. This buys stability without requiring an optional relationship-derived capability.",
+        "relationshipExperienceId": "valerius_gc06_exp_surface_containment",
+        "rewards": [],
+        "logMessage": "You contain the visible failures and stop the local cascade. The district stabilizes enough to act, but the repeating source remains unresolved."
+      },
+      {
+        "id": "reroute_lattice_load",
+        "label": "Reroute the Lattice Load",
+        "description": "Combine Willow's slow-system cognition with Gronk's constraint-first judgment to move pressure away from the lattice paths that are actually failing.",
+        "relationshipExperienceId": "gronk_gc06_exp_structural_steward",
+        "requiredPermanentTraitIds": [
+          "WillowsWisdom",
+          "ConstraintSense"
+        ],
+        "rewards": [],
+        "logMessage": "You stop treating each visible break as an isolated repair and reroute the load around the failing lattice pattern."
+      },
+      {
+        "id": "phase_against_echo",
+        "label": "Phase Against the Echo",
+        "description": "Combine Scholarly Insight with Adversarial Calibration: model the contradiction as an opponent and phase the local response against the Echo's repeating structure.",
+        "relationshipExperienceId": "lyra_gc06_exp_countermodeler",
+        "requiredPermanentTraitIds": [
+          "ScholarlyInsight",
+          "AdversarialCalibration"
+        ],
+        "rewards": [],
+        "logMessage": "You treat the Echo's repetition as a model that can be challenged and phase the local response against the predicted next stress."
+      }
+    ],
+    "status": "NOT_STARTED",
+    "isAutoComplete": false
   }
 }
