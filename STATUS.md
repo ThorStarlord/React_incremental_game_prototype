@@ -16,6 +16,7 @@
 **GC-10:** `COMPLETE / INTEGRATED`  
 **GC-11 Alpha:** `ALPHA_PASS / HUMAN_UNVALIDATED`  
 **GC-12 Content Alpha:** `CONTENT_ALPHA / HUMAN_UNVALIDATED`  
+**GC-13 deterministic readiness:** `TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED / BETA_PASS=NO`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Active program:** Campaign One / 1.0 Game Completion
 
@@ -38,7 +39,7 @@ Read in this order:
 
 The project has passed proof-of-concept, technical-prototype, bounded vertical-slice, whole-game Alpha, and authored-content completion stages. Campaign One now has a qualified production-equivalent New Game -> Prologue -> Chapters 1-7 -> Telluric Echo finale -> state-responsive Epilogue path, with canonical persistence checkpoints and complete authored route variants.
 
-It is therefore best described as **Content Alpha / HUMAN-UNVALIDATED**. Structural and authored campaign completion are integrated. Fresh-player comprehension, pacing, balance, accessibility quality, supported-browser release evidence, and final release qualification remain intentionally unclaimed.
+It is therefore best described as **Content Alpha / HUMAN-UNVALIDATED** with **TECHNICAL_BETA_READY** deterministic engineering evidence. Structural and authored campaign completion are integrated; Chromium and Firefox visible-UI smoke now pass in CI. Fresh-player comprehension, pacing, balance, human accessibility review, full external playthrough evidence, immutable RC/deployment identity, and final release qualification remain intentionally unclaimed.
 
 ## Product direction
 
@@ -82,7 +83,7 @@ merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
 
 GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
 
-GC-04 through GC-12 are now closed by integrated implementation plus exact-head qualification. The next responsibility is **GC-13 Beta**: finish repository-controlled reliability/browser/accessibility preparation while collecting the genuine human evidence required by issue #109.
+GC-04 through GC-12 are closed by integrated implementation plus exact-head qualification. GC-13 repository-controlled technical preparation is qualified by Build Validation #394, including Chromium + Firefox CI smoke. The active Beta responsibility is now the **genuine human evidence required by issue #109**; automation must not expand scope merely because that external gate remains open.
 
 ## Finished-game target
 
