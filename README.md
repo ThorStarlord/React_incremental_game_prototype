@@ -17,8 +17,9 @@ Human Product Review: OPEN / UNPROVEN
 Alpha: PASS / HUMAN-UNVALIDATED
 Content Alpha: PASS / HUMAN-UNVALIDATED
 Technical Beta readiness: PASS / HUMAN EVIDENCE BLOCKED
-Beta: NOT YET
-1.0: NOT YET
+Beta: NOT YET — HUMAN EVIDENCE BLOCKED
+RC entry: BLOCKED — promotion guard qualified
+1.0: BLOCKED — promotion guard qualified
 ```
 
 The application already has a real game loop, persistent save/load/import-export, Relationship/Memory progression, Traits/Essence, NPC dialogue, quests, authored travel, combat, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progression, and multiple chapter-scale compositions.
@@ -91,7 +92,7 @@ GC-10  Finale + Epilogue                              COMPLETE
 GC-11  Alpha qualification                            COMPLETE
 GC-12  Content Alpha                                  COMPLETE
 GC-13  Beta                                           TECHNICAL READY / HUMAN EVIDENCE OPEN
-GC-14  Release Candidate / 1.0                        BLOCKED ON BETA PASS
+GC-14  Release Candidate / 1.0                        GUARD QUALIFIED / BLOCKED ON BETA PASS
 ```
 
 The structural aggregate is `npm run alpha:validate`; authored-content closure is `npm run content-alpha:validate`; deterministic Beta engineering readiness is `npm run beta:technical:validate`.
@@ -144,6 +145,9 @@ npm run alpha:validate
 npm run content-alpha:validate
 npm run beta:technical:validate
 npm run release:browser -- --browser all
+npm run gc14:validate
+npm run release:rc:eligibility    # expected to fail until BETA_PASS
+npm run release:promotion:eligibility # expected to fail until final release gates pass
 npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx tsc --noEmit
