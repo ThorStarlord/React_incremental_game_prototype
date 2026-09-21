@@ -14,6 +14,7 @@ interface DialogsContainerProps {
   saveToDelete: SaveToDelete | null;
   exportCode: string;
   importCode: string;
+  importError?: string;
   appVersion: string;
   setImportCode: (code: string) => void;
   onLoadGame: (saveId: string) => void; // This is handleLoadGame from useGameActions
@@ -32,6 +33,7 @@ export function DialogsContainer({
   saveToDelete,
   exportCode,
   importCode,
+  importError,
   appVersion,
   setImportCode,
   onLoadGame, // Renamed prop for clarity, maps to handleLoadGame
@@ -86,6 +88,7 @@ export function DialogsContainer({
         importCode={importCode}
         setImportCode={setImportCode}
         isLoading={isLoading}
+        errorMessage={importError}
         onImport={onImport}
         onClose={() => onCloseDialog('importDialog')}
       />
