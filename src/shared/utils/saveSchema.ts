@@ -205,13 +205,6 @@ const migrateV0ToV1: SaveMigrationStep = {
   migrate: envelope => ({
     ...envelope,
     schemaVersion: 1,
-    state: {
-      ...envelope.state,
-      meta: {
-        ...envelope.state.meta,
-        campaignCompletion: envelope.state.meta.campaignCompletion ?? null,
-      },
-    },
   }),
 };
 

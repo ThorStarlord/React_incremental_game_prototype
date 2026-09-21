@@ -1,8 +1,8 @@
 # Documentation Authority Index
 
 **Status:** CURRENT AUTHORITY for document classification  
-**Integrated implementation baseline:** `a8f313125b67f5c368033129344092e2e25dd63f`  
-**Current maturity:** PLAYABLE PRE-ALPHA  
+**Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
+**Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
 **Last reconciled:** 2026-09-20
 
 ## Purpose
@@ -67,7 +67,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | Active implementation program | CURRENT AUTHORITY | [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) | GC-00→GC-14; no automatic M27. |
 | Alpha definition | CURRENT AUTHORITY | [`specification/Technical/AlphaCompletionContract.md`](../specification/Technical/AlphaCompletionContract.md) | Whole structural game playable New Game -> Epilogue. |
 | Beta definition | CURRENT AUTHORITY | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) | Content locked + human product evidence + UX/balance/reliability. |
-| Release / 1.0 qualification | CURRENT AUTHORITY | [`specification/Technical/ReleaseQualificationContract.md`](../specification/Technical/ReleaseQualificationContract.md) | Exact production candidate, browser/full-run/recovery evidence. |
+| Release / 1.0 qualification | CURRENT AUTHORITY | [`specification/Technical/ReleaseQualificationContract.md`](../specification/Technical/ReleaseQualificationContract.md) | Exact production candidate, browser/full-run/recovery evidence. Existing `docs/release/` records are preparation/reference until GC-13/GC-14 entry conditions are met. |
 | Operating / CI procedure | CURRENT AUTHORITY | [`RUNBOOK.md`](../RUNBOOK.md), [`.github/workflows/build-validation.yml`](../.github/workflows/build-validation.yml) | Workflow is executable CI truth; RUNBOOK explains intended use. |
 | Domain authority map | CURRENT AUTHORITY | [`specification/README.md`](../specification/README.md) | Routes to current technical/domain records. |
 | Provisional governance boundary | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProvisionalGovernanceDecision.md`](../specification/Technical/PostM25ProvisionalGovernanceDecision.md) | Allows bounded reversible human-unvalidated product development; does not create human evidence. |
@@ -76,6 +76,11 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | GC-01 player-surface cleanup | CURRENT AUTHORITY, integrated | [`specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md`](../specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md) | Exact-head #343 PASS; PR #117 merged; cut/deferred placeholders no longer primary 1.0 surfaces. |
 | GC-02 Prologue / onboarding | CURRENT AUTHORITY, integrated | PR #120 + `npm run gc02:validate` | Exact-head #352 PASS; fresh-save Willow First Lesson path integrated. |
 | GC-03 opening campaign spine | CURRENT AUTHORITY, integrated | [`specification/Technical/GC03OpeningCampaignSpineResult.md`](../specification/Technical/GC03OpeningCampaignSpineResult.md) | Exact-head #353 PASS; Prologue -> Chapters 1-3 now one legal derived production sequence. |
+| GC-04/05 breadth | CURRENT AUTHORITY, integrated | `npm run gc0405:validate` + PR #126 | Capability/buildcraft and earned-delegation floors integrated. |
+| GC-06–GC-10 campaign completion | CURRENT AUTHORITY, integrated | `npm run gc06:validate` through `npm run gc10:validate` | Chapters 4-7, finale and state-responsive epilogue integrated. |
+| GC-11 Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC11AlphaResult.md`](../specification/Technical/GC11AlphaResult.md) | Exact-head Build Validation #381 PASS; ALPHA_PASS / HUMAN_UNVALIDATED. |
+| GC-12 Content Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC12ContentAlphaResult.md`](../specification/Technical/GC12ContentAlphaResult.md) | Authored-corpus qualification passed; CONTENT_ALPHA / HUMAN_UNVALIDATED. |
+| GC-13 Beta | CURRENT ACTIVE PACKAGE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 | Repository-controlled hardening may proceed; BETA_PASS requires the contract's genuine human evidence floor. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
 | Post-M25 product evidence boundary | REFERENCE / predecessor authority | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Its anti-expansion/evidence doctrine remains useful; completion scope is now governed above. |

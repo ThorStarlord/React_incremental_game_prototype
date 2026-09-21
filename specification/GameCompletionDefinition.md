@@ -1,7 +1,7 @@
 # Game Completion Definition — Campaign One / 1.0
 
 **Status:** CURRENT AUTHORITY — PROVISIONAL / HUMAN-UNVALIDATED  
-**Program stage:** PLAYABLE PRE-ALPHA  
+**Program stage:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
 **Prepared:** 2026-09-11  
 **Product direction:** `Technical/PostM25ProvisionalProductDirectionDecision.md`  
 **Human Product Review:** issue #109 remains OPEN / UNPROVEN
@@ -247,17 +247,17 @@ Mobile/responsive behavior should not be deliberately broken, but full mobile pr
 
 ## 16. Maturity definitions
 
-### Playable Pre-Alpha — current
+### Playable Pre-Alpha
 
-The repository has a real runnable game shell, integrated systems, persistence, and qualified chapter-scale play, but the 1.0 campaign and player-facing product quality are incomplete.
+Historical stage. The repository passed this stage before whole-game Alpha.
 
 ### Alpha
 
-All required 1.0 systems exist at required scope and the entire Campaign One skeleton can be played from New Game to campaign completion through normal UI without debug-only progression.
+The full Campaign One structure can be traversed through qualified production-equivalent actions from New Game to the state-responsive epilogue without debug-only progression.
 
-### Content Alpha
+### Content Alpha — current
 
-The complete Campaign One is fully authored from beginning to ending; no required narrative/content unit is a placeholder.
+The bounded Campaign One is fully authored and structurally complete. Human product evidence, Beta hardening, and release qualification remain open.
 
 ### Beta
 

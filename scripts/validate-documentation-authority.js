@@ -47,6 +47,9 @@ const requiredAuthorityFiles = [
   'specification/Technical/PostM25ProvisionalGovernanceDecision.md',
   'specification/Technical/PostM25ProvisionalProductDirectionDecision.md',
   'specification/Technical/M26ProvisionalProductDepthResult.md',
+  'specification/Technical/GC11AlphaResult.md',
+  'specification/Technical/GC12ContentAlphaPreregistration.md',
+  'specification/Technical/GC12ContentAlphaResult.md',
   'specification/Technical/M25CompleteChapterVerticalSliceResult.md',
   'specification/Technical/PostM25ProductDirection.md',
   'specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md',
@@ -91,6 +94,8 @@ if (exists('docs/CURRENT.md')) {
     'ReleaseQualificationContract.md',
     'PostM25ProvisionalProductDirectionDecision.md',
     'M26ProvisionalProductDepthResult.md',
+    'GC11AlphaResult.md',
+    'GC12ContentAlphaResult.md',
     'GameLoopAsyncTickBacklogPolicyContract.md',
     'GameLoopLifecycleRemainderPolicy.md',
     'M25CompleteChapterVerticalSliceResult.md',
@@ -102,16 +107,17 @@ if (exists('docs/CURRENT.md')) {
 }
 
 requireContains('STATUS.md', [
-  'PLAYABLE PRE-ALPHA',
+  'CONTENT_ALPHA / HUMAN-UNVALIDATED',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
-  'M26',
+  'GC-11 Alpha',
+  'GC-12 Content Alpha',
   'issue #109',
 ]);
 
 requireContains('README.md', [
-  'Playable Pre-Alpha',
+  'Content Alpha / HUMAN-UNVALIDATED',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
@@ -127,6 +133,7 @@ requireContains('RUNBOOK.md', [
   'specification/Technical/GameCompletionRoadmap.md',
   'npm run m26:validate',
   'alpha:validate',
+  'content-alpha:validate',
   'release:validate',
 ]);
 
@@ -144,7 +151,7 @@ requireContains('specification/README.md', [
 ]);
 
 requireContains('specification/GameCompletionDefinition.md', [
-  'PLAYABLE PRE-ALPHA',
+  'CONTENT_ALPHA / HUMAN-UNVALIDATED',
   '1.0 stop condition',
   'Campaign One',
   'Telluric Echo',
@@ -173,12 +180,21 @@ requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
 ]);
 
 requireContains('docs/README.md', ['CURRENT.md', 'HISTORICAL']);
-requireContains('package.json', ['"docs:authority:validate"', '"m26:validate"']);
+requireContains('package.json', [
+  '"docs:authority:validate"',
+  '"m26:validate"',
+  '"alpha:validate"',
+  '"content-alpha:validate"',
+]);
 requireContains('.github/workflows/build-validation.yml', [
   'Documentation authority qualification',
   'npm run docs:authority:validate',
   'M26 provisional learn-to-delegate qualification',
   'npm run m26:validate',
+  'GC-11 whole-game Alpha qualification',
+  'npm run alpha:validate',
+  'GC-12 Content Alpha qualification',
+  'npm run content-alpha:validate',
 ]);
 
 if (exists('.github/workflows/gemini-review.yml')) {

@@ -42,12 +42,15 @@ describe('post-M25 third heterogeneous chapter qualification', () => {
       'merchant_district',
       'archive_inquiry',
       'adversarial_calibration',
-      'lattice_under_strain',
-      'chrono_crypt',
-      'network_under_pressure',
-      'counterphase_commitment',
     ]);
-    expect(CHAPTER_DEFINITIONS.map(candidate => candidate.id)).toContain('lattice_under_strain');
+    expect(CHAPTER_DEFINITIONS.map(candidate => candidate.id)).toEqual(
+      expect.arrayContaining([
+        'lattice_under_strain',
+        'chrono_crypt',
+        'network_under_pressure',
+        'counterphase',
+      ])
+    );
     expect(chapter.title).toBe('Enemies in Phase');
     expect(chapter.routes).toHaveLength(1);
     expect(getChapterDefinition('merchant_district').routes).toHaveLength(2);

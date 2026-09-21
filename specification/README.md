@@ -71,12 +71,12 @@ Prologue                         [integrated]
 Ch1 Merchant District Crisis      [integrated / connected]
 Ch2 Archive Inquiry               [integrated / connected]
 Ch3 Enemies in Phase              [integrated / connected]
-Ch4 Lattice Under Strain          [to build]
-Ch5 The Chrono-Crypt              [to build]
-Ch6 Network Under Pressure        [to build]
-Ch7 Counterphase                  [to build]
-Finale — The Telluric Echo        [to build]
-Epilogue                          [to build]
+Ch4 Lattice Under Strain          [integrated]
+Ch5 The Chrono-Crypt              [integrated]
+Ch6 Network Under Pressure        [integrated]
+Ch7 Counterphase                  [integrated]
+Finale — The Telluric Echo        [integrated]
+Epilogue                          [integrated]
 ```
 
 The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative reference; `CampaignArchitecture.md` owns bounded 1.0 production scope.
@@ -106,7 +106,7 @@ Focused command:
 npm run gc01:validate
 ```
 
-The next responsibility is GC-04 / GC-05 breadth reconciliation against actual integrated production evidence.
+GC-04 through GC-12 are now closed. The next responsibility is GC-13 Beta hardening plus the genuine human evidence floor in issue #109.
 
 
 ### Integrated GC-03 result
@@ -118,7 +118,14 @@ Focused commands:
 ```bash
 npm run gc02:validate
 npm run gc03:validate
+npm run alpha:validate
+npm run content-alpha:validate
 ```
+
+### Integrated GC-11 / GC-12 maturity results
+
+- [`Technical/GC11AlphaResult.md`](Technical/GC11AlphaResult.md) — **CURRENT AUTHORITY, INTEGRATED** for `ALPHA_PASS / HUMAN_UNVALIDATED`.
+- [`Technical/GC12ContentAlphaResult.md`](Technical/GC12ContentAlphaResult.md) — **CURRENT AUTHORITY, INTEGRATED** for `CONTENT_ALPHA / HUMAN_UNVALIDATED`.
 
 ### Maturity gates
 

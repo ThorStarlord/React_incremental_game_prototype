@@ -72,7 +72,7 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
     }
   }, [activeTabId, debugMode]);
 
-  const contentConfig = useMemo((): Record<TabId, ContentConfig> => ({
+  const contentConfig = useMemo((): Partial<Record<TabId, ContentConfig>> & Record<'dashboard', ContentConfig> => ({
     dashboard: { component: DashboardPage, showContainer: true, maxWidth: 'xl', loadingText: 'Loading dashboard...', enableSuspense: true, preloadable: true },
     character: { component: CharacterPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading character data...', enableSuspense: true, preloadable: true },
     traits: { component: TraitsPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading traits system...', enableSuspense: true, preloadable: true },
@@ -85,8 +85,8 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
   }), []);
 
   const currentConfig = useMemo(() => {
-    const isValidTabId = (tabId: string): tabId is TabId => tabId in contentConfig;
-    if (isValidTabId(activeTabId)) return contentConfig[activeTabId];
+    const configured = contentConfig[activeTabId];
+    if (configured) return configured;
     if (debugMode) console.warn(`[MainContentArea] No config for tab: ${activeTabId}, falling back to dashboard`);
     return contentConfig.dashboard;
   }, [activeTabId, contentConfig, debugMode]);

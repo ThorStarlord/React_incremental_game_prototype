@@ -245,8 +245,8 @@
         "player",
         "npc_elder_willow"
       ],
-      "sourceType": "other",
-      "sourceId": "willow_tether_teaching",
+      "sourceType": "dialogue",
+      "sourceId": "willow_three_nights_teaching",
       "significance": "meaningful",
       "relationshipEffects": {
         "trust": 3,
@@ -280,8 +280,8 @@
         "player",
         "npc_elder_willow"
       ],
-      "sourceType": "other",
-      "sourceId": "willow_independent_application",
+      "sourceType": "dialogue",
+      "sourceId": "willow_independent_application_report",
       "significance": "defining",
       "relationshipEffects": {
         "affinity": 3,

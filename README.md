@@ -1,8 +1,8 @@
-# React Incremental RPG — Playable Pre-Alpha
+# React Incremental RPG — Content Alpha
 
 A React/TypeScript narrative incremental RPG where consequential relationships teach durable capabilities, remembered history changes later possibilities, and personally understood repetition can become deliberately delegated work.
 
-> The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **Playable Pre-Alpha**, not a throwaway technical prototype.
+> The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **Content Alpha / HUMAN-UNVALIDATED**, not a throwaway technical prototype.
 
 ## Current state
 
@@ -11,11 +11,11 @@ M25 complete chapter vertical slice: PASS
 Post-M25 timing/content/chapter hardening: COMPLETE / INTEGRATED
 Provisional Product Direction: SELECTED / HUMAN-UNVALIDATED
 M26 learn-to-delegate provenance: COMPLETE / INTEGRATED
-Current maturity: PLAYABLE PRE-ALPHA
+Current maturity: CONTENT_ALPHA / HUMAN-UNVALIDATED
 Active program: Campaign One / 1.0 Game Completion
 Human Product Review: OPEN / UNPROVEN
-Alpha implementation qualification: DETERMINISTIC PASS / NORMAL UI + HUMAN-UNVALIDATED
-Content Alpha implementation qualification: DETERMINISTIC PASS / LOCK NOT YET DECLARED
+Alpha: PASS / HUMAN-UNVALIDATED
+Content Alpha: PASS / HUMAN-UNVALIDATED
 1.0: NOT YET
 ```
 
@@ -47,12 +47,12 @@ Prologue                                    [integrated]
 Chapter 1 — Merchant District Crisis        [integrated / connected]
 Chapter 2 — Archive Inquiry                 [integrated / connected]
 Chapter 3 — Enemies in Phase                [integrated / connected]
-Chapter 4 — Lattice Under Strain            [planned 1.0]
-Chapter 5 — The Chrono-Crypt                [planned 1.0]
-Chapter 6 — Network Under Pressure          [planned 1.0]
-Chapter 7 — Counterphase                    [planned 1.0]
-Finale — The Telluric Echo                  [planned 1.0]
-Epilogue — Aftermath / Conditional Reprieve [planned 1.0]
+Chapter 4 — Lattice Under Strain            [integrated]
+Chapter 5 — The Chrono-Crypt                [integrated]
+Chapter 6 — Network Under Pressure          [integrated]
+Chapter 7 — Counterphase                    [integrated]
+Finale — The Telluric Echo                  [integrated]
+Epilogue — state-responsive aftermath       [integrated]
 ```
 
 Campaign One ends on the isolated planet. Interplanetary continuation, the larger AI-war thread, New Game+, endless progression, generic crafting/inventory economies, autonomous Copy planning, and generalized simulations are post-1.0 unless the completion authority is explicitly revised.
@@ -79,15 +79,15 @@ GC-00  M26 closure + completion-program authority     COMPLETE
 GC-01  1.0 player-surface scope cleanup                COMPLETE
 GC-02  Prologue / onboarding                           COMPLETE
 GC-03  Chapters 1–3 campaign integration               COMPLETE
-GC-04  Relationship-derived buildcraft breadth
-GC-05  Earned-delegation breadth
-GC-06  Chapter 4 — Lattice Under Strain
-GC-07  Chapter 5 — The Chrono-Crypt
-GC-08  Chapter 6 — Network Under Pressure
-GC-09  Chapter 7 — Counterphase
-GC-10  Finale + Epilogue
-GC-11  Alpha qualification
-GC-12  Content Alpha
+GC-04  Relationship-derived buildcraft breadth        COMPLETE
+GC-05  Earned-delegation breadth                      COMPLETE
+GC-06  Chapter 4 — Lattice Under Strain               COMPLETE
+GC-07  Chapter 5 — The Chrono-Crypt                   COMPLETE
+GC-08  Chapter 6 — Network Under Pressure             COMPLETE
+GC-09  Chapter 7 — Counterphase                       COMPLETE
+GC-10  Finale + Epilogue                              COMPLETE
+GC-11  Alpha qualification                            COMPLETE
+GC-12  Content Alpha                                  COMPLETE
 GC-13  Beta
 GC-14  Release Candidate / 1.0
 ```
@@ -140,6 +140,8 @@ npm run docs:authority:validate
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate
+npm run alpha:validate
+npm run content-alpha:validate
 npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx tsc --noEmit
