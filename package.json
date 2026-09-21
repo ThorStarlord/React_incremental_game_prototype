@@ -1,6 +1,6 @@
 {
   "name": "incremental-rpg",
-  "version": "0.1.0",
+  "version": "0.9.0-beta.1",
   "private": true,
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -52,7 +52,17 @@
     "simulated-review:observe": "node scripts/simulated-product-review/ui-observer.js",
     "simulated-review:smoke": "node scripts/simulated-product-review/ui-observer.js --smoke --headless --url http://127.0.0.1:3000 --out .simulated-review-output/ci-smoke",
     "alpha:validate": "node scripts/content-intelligence/reachability-check.js && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_distributed && cross-env CI=true react-scripts test --watchAll=false --runInBand GC11AlphaWholeGame.test.tsx GC01PlayerSurfaceScopeCleanup.test.ts GC0405BreadthQualification.test.ts CopyM20ProductionTaskAutomation.test.tsx PostM25CopyRoutineStrategy.test.ts GameLoopM21OfflineProgress.test.ts ChapterDefinitionIntegrity.test.ts saveSchema.test.ts saveUtils.test.ts",
-    "content-alpha:validate": "node scripts/content-intelligence/selftest.js && node scripts/content-intelligence/content-audit.js && node scripts/content-intelligence/reachability-check.js && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_distributed && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_structural && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_diagnostic && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_fortified && cross-env CI=true react-scripts test --watchAll=false --runInBand GC12ContentAlpha.test.ts ChapterDefinitionIntegrity.test.ts"
+    "content-alpha:validate": "node scripts/content-intelligence/selftest.js && node scripts/content-intelligence/content-audit.js && node scripts/content-intelligence/reachability-check.js && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_distributed && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_structural && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_diagnostic && node scripts/content-intelligence/route-trace.js --target lyra_gc10_aftermath_fortified && cross-env CI=true react-scripts test --watchAll=false --runInBand GC12ContentAlpha.test.ts ChapterDefinitionIntegrity.test.ts",
+    "architecture:cycles": "node scripts/check-import-cycles.js",
+    "architecture:persistence": "node scripts/check-persistence-authority.js",
+    "lint:release": "node scripts/lint-release.js",
+    "security:release": "node scripts/security-release.js",
+    "release:evidence:validate": "node scripts/validate-release-evidence.js",
+    "release:manifest": "node scripts/create-release-manifest.js",
+    "release:browser": "node scripts/release-browser-qualification.js",
+    "release:validate": "node scripts/release-validate.js",
+    "release:1.0": "node scripts/release-one-point-zero.js",
+    "beta:technical:validate": "npm run architecture:cycles && npm run architecture:persistence && npm run content-alpha:validate && cross-env CI=true react-scripts test --watchAll=false --runInBand GC13BetaTechnicalReadiness.test.ts saveSchema.test.ts saveUtils.test.ts PersistedGameState.test.ts GameLoopM21OfflineProgress.test.ts GameLoopLongHorizonCrossProgressionDrift.test.tsx GC01PlayerSurfaceScopeCleanup.test.ts"
   },
   "eslintConfig": {
     "extends": [
