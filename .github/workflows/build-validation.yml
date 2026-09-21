@@ -74,6 +74,10 @@ jobs:
         timeout-minutes: 16
         run: npm run content-alpha:validate
 
+      - name: GC-13 deterministic Beta readiness qualification
+        timeout-minutes: 24
+        run: npm run beta:technical:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 
@@ -146,8 +150,8 @@ jobs:
         if: steps.typecheck.outputs.exit_code != '0'
         run: exit 1
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright release browsers
+        run: npx playwright install --with-deps chromium firefox
 
       - name: Synthetic review V2 UI-only live smoke qualification
         timeout-minutes: 6
@@ -178,6 +182,44 @@ jobs:
           fi
         env:
           CI: true
+
+      - name: GC-13 Chromium and Firefox browser qualification
+        timeout-minutes: 10
+        run: |
+          HOST=127.0.0.1 PORT=3000 BROWSER=none npm start > /tmp/beta-browser-app.log 2>&1 &
+          app_pid=$!
+          trap 'kill "$app_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000 >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo "Beta browser app server failed to become ready"
+            cat /tmp/beta-browser-app.log
+            exit 1
+          fi
+
+          if ! npm run release:browser -- --browser all --url http://127.0.0.1:3000 --out /tmp/beta-browser-qualification; then
+            echo "Beta browser matrix failed; app log follows"
+            cat /tmp/beta-browser-app.log
+            exit 1
+          fi
+        env:
+          CI: true
+
+      - name: Upload GC-13 browser qualification artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gc13-browser-qualification
+          path: /tmp/beta-browser-qualification
+          if-no-files-found: warn
 
       - name: GameLoop timing characterization qualification
         timeout-minutes: 5
