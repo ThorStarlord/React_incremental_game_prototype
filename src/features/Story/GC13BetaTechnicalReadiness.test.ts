@@ -87,7 +87,8 @@ describe('GC-13 deterministic Beta technical readiness', () => {
 
     expect(rc).toContain('**Status:** DETERMINISTIC CANDIDATE VERIFIED; PROMOTION BLOCKED');
     expect(rc).toContain('Beta human evidence');
-    expect(rc).toContain('Firefox CI evidence');
+    expect(rc).toContain('GC-13 CI visible-UI smoke now passes Chromium');
+    expect(rc).toContain('future immutable RC still needs its own exact-candidate evidence');
     expect(rc).toContain('release approval');
 
     for (const defect of ['KD-001', 'KD-002', 'KD-003', 'KD-004']) {
