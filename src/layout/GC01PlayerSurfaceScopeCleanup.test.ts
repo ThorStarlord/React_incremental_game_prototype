@@ -27,6 +27,8 @@ const REQUIRED_PLAYER_SURFACES: TabId[] = [
   'settings',
 ];
 
+const DEVELOPMENT_ONLY_SURFACES: TabId[] = ['debug'];
+
 describe('GC-01 Campaign One player-surface scope cleanup', () => {
   test('implemented/default player navigation excludes cut, deferred, and duplicate-save destinations', () => {
     const implementedIds = getImplementedItems().map(item => item.id);
@@ -42,6 +44,12 @@ describe('GC-01 Campaign One player-surface scope cleanup', () => {
       expect(implementedIds).toContain(id);
       expect(defaultIds).toContain(id);
       expect(isItemAvailable(id)).toBe(true);
+    }
+
+    for (const id of DEVELOPMENT_ONLY_SURFACES) {
+      expect(implementedIds).not.toContain(id);
+      expect(defaultIds).not.toContain(id);
+      expect(isItemAvailable(id)).toBe(false);
     }
   });
 
@@ -71,6 +79,11 @@ describe('GC-01 Campaign One player-surface scope cleanup', () => {
     expect(routerSource).not.toContain('<Route path="crafting"');
     expect(routerSource).not.toContain('<Route path="saves"');
     expect(routerSource).not.toContain('<Route path="save-load"');
+
+    // Debug tooling may exist in development, but production/test builds must
+    // not expose the state-mutating route by direct URL.
+    expect(routerSource).toContain("process.env.NODE_ENV === 'development' && (");
+    expect(routerSource).toContain('<Route path="debug" element={<DebugPage />} />');
 
     expect(routerSource).toContain(
       '<Route path="*" element={<Navigate to="dashboard" replace />} />'

@@ -3,7 +3,7 @@
 **Status:** CURRENT AUTHORITY for document classification  
 **Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
 **Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
-**Last reconciled:** 2026-09-20
+**Last reconciled:** 2026-09-21
 
 ## Purpose
 
@@ -24,14 +24,15 @@ For a new engineering or coding-agent session:
 
 1. [`STATUS.md`](../STATUS.md) — current state, active queue, evidence ceiling.
 2. [`docs/CURRENT.md`](CURRENT.md) — this classification index.
-3. [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) — the product-level 1.0 definition and stop condition.
-4. [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) — what 1.0 includes, minimizes, defers, or cuts.
-5. [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) and [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) — progression and campaign scope.
-6. [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) — active implementation program.
-7. [`RUNBOOK.md`](../RUNBOOK.md) — operating / qualification procedure.
-8. [`specification/README.md`](../specification/README.md) — domain-specific authority map.
-9. The specific current contract/result records relevant to the active package.
-10. Reference / historical evidence only as needed.
+3. [`HANDOFF.md`](../HANDOFF.md) — current re-entry handoff; summarizes the active external gate without superseding the authorities below.
+4. [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) — the product-level 1.0 definition and stop condition.
+5. [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) — what 1.0 includes, minimizes, defers, or cuts.
+6. [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) and [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) — progression and campaign scope.
+7. [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) — active implementation program.
+8. [`RUNBOOK.md`](../RUNBOOK.md) — operating / qualification procedure.
+9. [`specification/README.md`](../specification/README.md) — domain-specific authority map.
+10. The specific current contract/result records relevant to the active package.
+11. Reference / historical evidence only as needed.
 
 `README.md` is orientation, not final technical or product authority.
 
@@ -60,6 +61,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | --- | --- | --- | --- |
 | Repository state | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md) | First source for complete/pending/unproven work. |
 | Documentation classification | CURRENT AUTHORITY | [`docs/CURRENT.md`](CURRENT.md) | This file. |
+| Current handoff / re-entry | CURRENT AUTHORITY, summary | [`HANDOFF.md`](../HANDOFF.md) | Current GC-14 / pre-Beta re-entry summary; subordinate to the product/maturity contracts for disputed details. |
 | 1.0 completion / stop condition | CURRENT AUTHORITY | [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) | Defines the smallest complete Campaign One / 1.0. |
 | 1.0 feature scope | CURRENT AUTHORITY | [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) | Core/minimal/deferred/cut decisions. |
 | Whole-game progression | CURRENT AUTHORITY | [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) | Personal action -> specialization -> networked mastery -> strategic synthesis. |
