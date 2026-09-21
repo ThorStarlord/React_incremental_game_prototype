@@ -44,7 +44,9 @@ export const AppRouter: React.FC = () => {
         <Route path="copies" element={<CopiesPage />} />
         <Route path="essence" element={<EssencePage />} />
         <Route path="settings" element={<SettingsPage />} />
-        <Route path="debug" element={<DebugPage />} />
+        {process.env.NODE_ENV === 'development' && (
+          <Route path="debug" element={<DebugPage />} />
+        )}
 
         {/* Cut/deferred or otherwise unknown legacy game URLs return safely to a real surface. */}
         <Route path="*" element={<Navigate to="dashboard" replace />} />
