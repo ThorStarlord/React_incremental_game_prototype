@@ -5,6 +5,7 @@ interface ImportDialogProps {
   importCode: string;
   setImportCode: (code: string) => void;
   isLoading: boolean;
+  errorMessage?: string;
   onImport: () => void;
   onClose: () => void;
 }
@@ -14,6 +15,7 @@ export function ImportDialog({
   importCode,
   setImportCode,
   isLoading,
+  errorMessage,
   onImport,
   onClose
 }: ImportDialogProps) {
@@ -47,7 +49,14 @@ export function ImportDialog({
           value={importCode}
           onChange={(e) => setImportCode(e.target.value)}
           placeholder="Paste your import code here..."
+          aria-describedby={errorMessage ? 'import-save-error' : undefined}
         />
+
+        {errorMessage && (
+          <p id="import-save-error" role="alert" className="mb-3 text-sm text-red-700">
+            {errorMessage}
+          </p>
+        )}
         
         <div className="flex justify-end space-x-3 mt-4">
           <button
