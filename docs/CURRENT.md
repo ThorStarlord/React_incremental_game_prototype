@@ -3,7 +3,7 @@
 **Status:** CURRENT AUTHORITY for document classification  
 **Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
 **Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
-**Last reconciled:** 2026-09-20
+**Last reconciled:** 2026-09-21
 
 ## Purpose
 
@@ -28,7 +28,7 @@ For a new engineering or coding-agent session:
 4. [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) — the product-level 1.0 definition and stop condition.
 5. [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) — what 1.0 includes, minimizes, defers, or cuts.
 6. [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) and [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) — progression and campaign scope.
-6. [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) — active implementation program.
+7. [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) — active implementation program.
 8. [`RUNBOOK.md`](../RUNBOOK.md) — operating / qualification procedure.
 9. [`specification/README.md`](../specification/README.md) — domain-specific authority map.
 10. The specific current contract/result records relevant to the active package.
