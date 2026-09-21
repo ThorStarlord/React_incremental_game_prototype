@@ -16,6 +16,8 @@ Active program: Campaign One / 1.0 Game Completion
 Human Product Review: OPEN / UNPROVEN
 Alpha: PASS / HUMAN-UNVALIDATED
 Content Alpha: PASS / HUMAN-UNVALIDATED
+Technical Beta readiness: PASS / HUMAN EVIDENCE BLOCKED
+Beta: NOT YET
 1.0: NOT YET
 ```
 
@@ -88,14 +90,12 @@ GC-09  Chapter 7 — Counterphase                       COMPLETE
 GC-10  Finale + Epilogue                              COMPLETE
 GC-11  Alpha qualification                            COMPLETE
 GC-12  Content Alpha                                  COMPLETE
-GC-13  Beta
-GC-14  Release Candidate / 1.0
+GC-13  Beta                                           TECHNICAL READY / HUMAN EVIDENCE OPEN
+GC-14  Release Candidate / 1.0                        BLOCKED ON BETA PASS
 ```
 
-The current deterministic implementation aggregate is `npm run alpha:validate`.
-The whole-game production-action qualification covers both authored divergent
-histories and canonical save boundaries. It does not replace the ordinary-UI
-Alpha requirement, Beta human evidence, or an immutable release candidate.
+The structural aggregate is `npm run alpha:validate`; authored-content closure is `npm run content-alpha:validate`; deterministic Beta engineering readiness is `npm run beta:technical:validate`.
+These commands do not replace the required real-human Beta evidence or an immutable release candidate.
 
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
@@ -142,6 +142,8 @@ npm run chapter:validate
 npm run m26:validate
 npm run alpha:validate
 npm run content-alpha:validate
+npm run beta:technical:validate
+npm run release:browser -- --browser all
 npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx tsc --noEmit
