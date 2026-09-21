@@ -1,5 +1,5 @@
 import { rootReducer, type RootState } from '../../app/store';
-import { selectCampaignSpineProgress } from './CampaignSpine';
+import { selectOpeningCampaignStage } from './CampaignSpine';
 
 const initialState = (): RootState =>
   rootReducer(undefined, { type: '@@INIT', payload: undefined } as any);
@@ -7,13 +7,10 @@ const initialState = (): RootState =>
 describe('Campaign One opening spine', () => {
   it('requires the first Willow relationship evidence before Chapter 1 unlocks', () => {
     const state = initialState();
-    const progress = selectCampaignSpineProgress(state);
-
-    expect(progress.prologue.status).toBe('not_started');
-    expect(progress.merchant_district.unlocked).toBe(false);
+    expect(selectOpeningCampaignStage(state)).toBe('PROLOGUE');
   });
 
-  it('unlocks Chapter 1 from canonical relationship evidence and chains later chapters', () => {
+  it('advances to Chapter 1 from canonical Willow relationship evidence', () => {
     const state = initialState();
     const progressed: RootState = {
       ...state,
@@ -26,11 +23,7 @@ describe('Campaign One opening spine', () => {
       },
     };
 
-    const progress = selectCampaignSpineProgress(progressed);
-
-    expect(progress.prologue.status).toBe('complete');
-    expect(progress.merchant_district.unlocked).toBe(true);
-    expect(progress.archive_inquiry.unlocked).toBe(false);
+    expect(selectOpeningCampaignStage(progressed)).toBe('CHAPTER_1');
   });
 
   it('requires a completed Chapter 1 route before Chapter 2 unlocks', () => {
@@ -56,10 +49,6 @@ describe('Campaign One opening spine', () => {
       },
     };
 
-    const progress = selectCampaignSpineProgress(progressed);
-
-    expect(progress.merchant_district.status).toBe('complete');
-    expect(progress.archive_inquiry.unlocked).toBe(true);
-    expect(progress.adversarial_calibration.unlocked).toBe(false);
+    expect(selectOpeningCampaignStage(progressed)).toBe('CHAPTER_2');
   });
 });
