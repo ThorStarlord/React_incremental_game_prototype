@@ -10,6 +10,7 @@ export function useGameImportExport() {
   const [exportCode, setExportCode] = useState<string>('');
   const [importCode, setImportCode] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [importError, setImportError] = useState<string>('');
 
   const exportSave = useCallback(async (saveId: string): Promise<boolean> => {
     setIsLoading(true);
@@ -34,8 +35,14 @@ export function useGameImportExport() {
     }
   }, []);
 
+  const updateImportCode = useCallback((code: string) => {
+    setImportCode(code);
+    setImportError('');
+  }, []);
+
   const importSave = useCallback(async (): Promise<boolean> => {
     setIsLoading(true);
+    setImportError('');
     try {
       if (!importCode.trim()) {
         throw new Error('No import code provided');
@@ -60,6 +67,7 @@ export function useGameImportExport() {
       return true;
     } catch (error) {
       console.error('Error importing save:', error);
+      setImportError('Invalid or incompatible save code. Check the code and try again.');
       return false;
     } finally {
       setIsLoading(false);
@@ -69,7 +77,8 @@ export function useGameImportExport() {
   return {
     exportCode,
     importCode,
-    setImportCode,
+    setImportCode: updateImportCode,
+    importError,
     isLoading,
     exportSave,
     importSave
