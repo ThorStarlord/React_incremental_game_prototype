@@ -52,6 +52,8 @@ const requiredAuthorityFiles = [
   'specification/Technical/GC12ContentAlphaResult.md',
   'specification/Technical/GC13BetaTechnicalReadinessPreregistration.md',
   'specification/Technical/GC13BetaTechnicalReadinessResult.md',
+  'specification/Technical/GC14ReleaseEligibilityPreregistration.md',
+  'specification/Technical/GC14ReleaseEligibilityBlockedResult.md',
   'docs/release/BetaHumanEvidenceTemplate.md',
   'specification/Technical/M25CompleteChapterVerticalSliceResult.md',
   'specification/Technical/PostM25ProductDirection.md',
@@ -100,6 +102,7 @@ if (exists('docs/CURRENT.md')) {
     'GC11AlphaResult.md',
     'GC12ContentAlphaResult.md',
     'GC13BetaTechnicalReadinessResult.md',
+    'GC14ReleaseEligibilityBlockedResult.md',
     'BetaHumanEvidenceTemplate.md',
     'GameLoopAsyncTickBacklogPolicyContract.md',
     'GameLoopLifecycleRemainderPolicy.md',
@@ -115,6 +118,8 @@ requireContains('STATUS.md', [
   'CONTENT_ALPHA / HUMAN-UNVALIDATED',
   'TECHNICAL_BETA_READY',
   'BETA_PASS=NO',
+  'RC_ENTRY_BLOCKED',
+  '1.0_PROMOTION_BLOCKED',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
@@ -126,6 +131,8 @@ requireContains('STATUS.md', [
 requireContains('README.md', [
   'Content Alpha / HUMAN-UNVALIDATED',
   'Technical Beta readiness: PASS / HUMAN EVIDENCE BLOCKED',
+  'RC entry: BLOCKED',
+  '1.0: BLOCKED',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
@@ -144,6 +151,9 @@ requireContains('RUNBOOK.md', [
   'content-alpha:validate',
   'beta:technical:validate',
   'release:browser',
+  'gc14:validate',
+  'release:rc:eligibility',
+  'release:promotion:eligibility',
   'release:validate',
 ]);
 
@@ -197,6 +207,9 @@ requireContains('package.json', [
   '"content-alpha:validate"',
   '"beta:technical:validate"',
   '"release:browser"',
+  '"gc14:validate"',
+  '"release:rc:eligibility"',
+  '"release:promotion:eligibility"',
 ]);
 requireContains('.github/workflows/build-validation.yml', [
   'Documentation authority qualification',
@@ -210,6 +223,8 @@ requireContains('.github/workflows/build-validation.yml', [
   'GC-13 deterministic Beta readiness qualification',
   'npm run beta:technical:validate',
   'GC-13 Chromium and Firefox browser qualification',
+  'GC-14 release promotion guard qualification',
+  'npm run gc14:validate',
 ]);
 
 if (exists('.github/workflows/gemini-review.yml')) {

@@ -31,8 +31,9 @@ Content Alpha                        PASS / HUMAN-UNVALIDATED
 Beta technical readiness             PASS
 Beta human evidence                  OPEN — 0/5 first sessions, 0/3 full runs
 Beta                                 NOT YET
+Release promotion guard              PASS / fail-closed
 Release Candidate                    BLOCKED ON BETA_PASS
-1.0                                  NOT YET
+1.0                                  BLOCKED
 ```
 
 The repository already demonstrates a real playable application shell and a qualified complete chapter loop. The remaining work is increasingly campaign completion, progression breadth, player-facing comprehension, content, and release quality rather than foundational architecture.
@@ -494,6 +495,23 @@ Qualify one exact production candidate.
 - remove prototype/pre-alpha wording from player-facing/current release docs;
 - create exact RC result and release notes;
 - fix only release blockers after RC creation, requalifying every changed candidate.
+
+### Current deterministic substate
+
+Build Validation #405 qualifies the release-promotion authority guard.
+
+Current valid state:
+
+```text
+TECHNICAL_RELEASE_PREPARED
+RC_ENTRY_BLOCKED
+1.0_PROMOTION_BLOCKED
+```
+
+`release:validate` may be used for deterministic preparation. RC qualification
+itself must not begin until `release:rc:eligibility` passes, which currently
+requires a real `BETA_PASS`. Final promotion additionally requires
+`release:promotion:eligibility`.
 
 ### Exit
 

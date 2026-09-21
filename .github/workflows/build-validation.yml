@@ -78,6 +78,10 @@ jobs:
         timeout-minutes: 24
         run: npm run beta:technical:validate
 
+      - name: GC-14 release promotion guard qualification
+        timeout-minutes: 6
+        run: npm run gc14:validate
+
       - name: Content intelligence qualification
         run: npm run content:intelligence:validate
 

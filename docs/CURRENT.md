@@ -82,6 +82,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | GC-12 Content Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC12ContentAlphaResult.md`](../specification/Technical/GC12ContentAlphaResult.md) | Authored-corpus qualification passed; CONTENT_ALPHA / HUMAN_UNVALIDATED. |
 | GC-13 deterministic Beta readiness | CURRENT AUTHORITY, qualified | [`specification/Technical/GC13BetaTechnicalReadinessResult.md`](../specification/Technical/GC13BetaTechnicalReadinessResult.md) | Build Validation #394 PASS; Chromium + Firefox CI smoke PASS; TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED. |
 | GC-13 Beta human evidence | CURRENT ACTIVE EXTERNAL GATE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO. |
+| GC-14 release eligibility guard | CURRENT AUTHORITY, qualified | [`specification/Technical/GC14ReleaseEligibilityBlockedResult.md`](../specification/Technical/GC14ReleaseEligibilityBlockedResult.md) | Build Validation #405 PASS; deterministic release preparation is safe, but RC_ENTRY_BLOCKED and 1.0_PROMOTION_BLOCKED until governing external gates pass. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
 | Post-M25 product evidence boundary | REFERENCE / predecessor authority | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Its anti-expansion/evidence doctrine remains useful; completion scope is now governed above. |
@@ -140,6 +141,9 @@ CONTENT_ALPHA / HUMAN-UNVALIDATED
 TECHNICAL_BETA_READY
 HUMAN_EVIDENCE_BLOCKED
 BETA_PASS = NO
+TECHNICAL_RELEASE_PREPARED
+RC_ENTRY_BLOCKED
+1.0_PROMOTION_BLOCKED
 ```
 
 The repository has passed proof-of-concept, systems-prototype, whole-game Alpha,

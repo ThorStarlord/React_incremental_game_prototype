@@ -17,6 +17,7 @@
 **GC-11 Alpha:** `ALPHA_PASS / HUMAN_UNVALIDATED`  
 **GC-12 Content Alpha:** `CONTENT_ALPHA / HUMAN_UNVALIDATED`  
 **GC-13 deterministic readiness:** `TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED / BETA_PASS=NO`  
+**GC-14 promotion guard:** `QUALIFIED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Active program:** Campaign One / 1.0 Game Completion
 
@@ -83,7 +84,7 @@ merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
 
 GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
 
-GC-04 through GC-12 are closed by integrated implementation plus exact-head qualification. GC-13 repository-controlled technical preparation is qualified by Build Validation #394, including Chromium + Firefox CI smoke. The active Beta responsibility is now the **genuine human evidence required by issue #109**; automation must not expand scope merely because that external gate remains open.
+GC-04 through GC-12 are closed by integrated implementation plus exact-head qualification. GC-13 repository-controlled technical preparation is qualified by Build Validation #394, including Chromium + Firefox CI smoke. The active Beta responsibility is now the **genuine human evidence required by issue #109**. GC-14's promotion guard is qualified and correctly blocks RC/1.0 entry until that evidence produces a real BETA_PASS. Automation must not expand scope merely because the external gate remains open.
 
 ## Finished-game target
 
