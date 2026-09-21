@@ -1,7 +1,7 @@
 # Known Defects and Accepted Release Debt — Campaign One / 1.0
 
 **Status:** RELEASE REVIEW INPUT; does not grant promotion approval
-**Last updated:** 2026-09-20
+**Last updated:** 2026-09-21
 
 This ledger separates product defects from evidence/tooling limitations. A missing
 qualification artifact is not silently treated as a pass.
