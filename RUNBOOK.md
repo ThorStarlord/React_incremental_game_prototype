@@ -109,8 +109,8 @@ Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 [x] GC-10  Finale + Epilogue
 [x] GC-11  Alpha qualification
 [x] GC-12  Content Alpha
-[ ] GC-13  Beta
-[ ] GC-14  Release Candidate / 1.0
+[ ] GC-13  Beta — technical readiness qualified; real-human floor still open
+[ ] GC-14  Release Candidate / 1.0 — RC entry blocked until BETA_PASS
 ```
 
 The roadmap may merge/split packages where content proves that clearer, but requirement traceability must remain explicit.
@@ -207,6 +207,8 @@ npm run gc02:validate
 npm run gc03:validate
 npm run alpha:validate
 npm run content-alpha:validate
+npm run beta:technical:validate
+npm run release:browser -- --browser all
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate

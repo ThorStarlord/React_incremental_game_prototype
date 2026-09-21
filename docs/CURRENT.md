@@ -80,7 +80,8 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | GC-06–GC-10 campaign completion | CURRENT AUTHORITY, integrated | `npm run gc06:validate` through `npm run gc10:validate` | Chapters 4-7, finale and state-responsive epilogue integrated. |
 | GC-11 Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC11AlphaResult.md`](../specification/Technical/GC11AlphaResult.md) | Exact-head Build Validation #381 PASS; ALPHA_PASS / HUMAN_UNVALIDATED. |
 | GC-12 Content Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC12ContentAlphaResult.md`](../specification/Technical/GC12ContentAlphaResult.md) | Authored-corpus qualification passed; CONTENT_ALPHA / HUMAN_UNVALIDATED. |
-| GC-13 Beta | CURRENT ACTIVE PACKAGE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 | Repository-controlled hardening may proceed; BETA_PASS requires the contract's genuine human evidence floor. |
+| GC-13 deterministic Beta readiness | CURRENT AUTHORITY, qualified | [`specification/Technical/GC13BetaTechnicalReadinessResult.md`](../specification/Technical/GC13BetaTechnicalReadinessResult.md) | Build Validation #394 PASS; Chromium + Firefox CI smoke PASS; TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED. |
+| GC-13 Beta human evidence | CURRENT ACTIVE EXTERNAL GATE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
 | Post-M25 product evidence boundary | REFERENCE / predecessor authority | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Its anti-expansion/evidence doctrine remains useful; completion scope is now governed above. |
@@ -135,24 +136,25 @@ Historical documents and package metadata may still contain the word **prototype
 Current maturity is:
 
 ```text
-PLAYABLE PRE-ALPHA
+CONTENT_ALPHA / HUMAN-UNVALIDATED
+TECHNICAL_BETA_READY
+HUMAN_EVIDENCE_BLOCKED
+BETA_PASS = NO
 ```
 
-The repository has passed proof-of-concept, systems-prototype and bounded
-vertical-slice stages. The deterministic production-action whole-game
-qualification now passes both authored Campaign One histories and canonical save
-boundaries. Alpha remains open because the contract still requires an ordinary
-fresh-UI New Game -> Epilogue run and evidence record; Beta and release evidence
-remain open as well.
+The repository has passed proof-of-concept, systems-prototype, whole-game Alpha,
+and Content Alpha qualification. Build Validation #394 also qualifies the
+repository-controlled Beta engineering baseline, including Chromium 153 and
+Firefox 155 visible-UI smoke on Linux CI, canonical recovery behavior, timing /
+offline contracts, TypeScript, and production build.
 
-The release tooling now includes `npm run release:evidence:validate`, which checks
-that the candidate record is tied to an existing commit and that missing CI,
-Firefox, human, and production-playthrough evidence remains explicitly blocked.
-Relationship selectors are memoized at the feature seam so unchanged Redux
-inputs retain stable derived references; this is a performance and correctness
-hardening change, not a new domain authority.
+This does not satisfy Beta. Issue #109 remains the current human-evidence gate:
+5 accepted fresh-player first sessions and 3 accepted external full fresh-save
+playthroughs are still required. Repository automation must not be relabeled as
+that evidence.
 
-GC-01 through GC-03 are complete and integrated. The next completion-program responsibility is GC-04 / GC-05 breadth reconciliation against actual production evidence before any standalone capability or delegation feature work.
+The next completion-program responsibility is therefore human Beta evidence and
+bounded repairs justified by that evidence, not speculative feature expansion.
 
 ## Explicit 1.0 scope consequences
 

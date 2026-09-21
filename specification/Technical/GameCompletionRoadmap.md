@@ -26,11 +26,12 @@ A package that cannot answer that question is not on the 1.0 critical path unles
 Proof of concept                     PASS
 Technical systems prototype          PASS
 Integrated vertical slice            PASS
-Playable Pre-Alpha                   CURRENT
-Alpha implementation qualification   PASS / normal fresh-UI evidence pending
-Content Alpha                        DETERMINISTIC PASS / lock not declared
+Alpha                                PASS / HUMAN-UNVALIDATED
+Content Alpha                        PASS / HUMAN-UNVALIDATED
+Beta technical readiness             PASS
+Beta human evidence                  OPEN — 0/5 first sessions, 0/3 full runs
 Beta                                 NOT YET
-Release Candidate                    NOT YET
+Release Candidate                    BLOCKED ON BETA_PASS
 1.0                                  NOT YET
 ```
 
@@ -451,9 +452,26 @@ Make the complete game player-usable and release-worthy.
 - desktop browser qualification;
 - performance on representative late-game state.
 
+### Current deterministic substate
+
+Build Validation #394 qualifies the repository-controlled technical Beta baseline,
+including Chromium + Firefox visible-UI smoke, recovery behavior, persistence,
+timing/offline contracts, TypeScript and production build.
+
+Current valid substate:
+
+```text
+TECHNICAL_BETA_READY
+HUMAN_EVIDENCE_BLOCKED
+BETA_PASS = NO
+```
+
 ### Human floor
 
 Use `BetaCompletionContract.md`: minimum 5 fresh first-session observations and 3 beginning-to-ending external playthroughs, with provenance, unless a later explicit authority revises the evidence policy.
+
+Use `docs/release/BetaHumanEvidenceTemplate.md` for real-human records. Synthetic
+or LLM sessions do not count.
 
 ### Exit
 

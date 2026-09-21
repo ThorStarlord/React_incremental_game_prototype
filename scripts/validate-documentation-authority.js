@@ -50,6 +50,9 @@ const requiredAuthorityFiles = [
   'specification/Technical/GC11AlphaResult.md',
   'specification/Technical/GC12ContentAlphaPreregistration.md',
   'specification/Technical/GC12ContentAlphaResult.md',
+  'specification/Technical/GC13BetaTechnicalReadinessPreregistration.md',
+  'specification/Technical/GC13BetaTechnicalReadinessResult.md',
+  'docs/release/BetaHumanEvidenceTemplate.md',
   'specification/Technical/M25CompleteChapterVerticalSliceResult.md',
   'specification/Technical/PostM25ProductDirection.md',
   'specification/Technical/GameLoopAsyncTickBacklogPolicyContract.md',
@@ -96,6 +99,8 @@ if (exists('docs/CURRENT.md')) {
     'M26ProvisionalProductDepthResult.md',
     'GC11AlphaResult.md',
     'GC12ContentAlphaResult.md',
+    'GC13BetaTechnicalReadinessResult.md',
+    'BetaHumanEvidenceTemplate.md',
     'GameLoopAsyncTickBacklogPolicyContract.md',
     'GameLoopLifecycleRemainderPolicy.md',
     'M25CompleteChapterVerticalSliceResult.md',
@@ -108,6 +113,8 @@ if (exists('docs/CURRENT.md')) {
 
 requireContains('STATUS.md', [
   'CONTENT_ALPHA / HUMAN-UNVALIDATED',
+  'TECHNICAL_BETA_READY',
+  'BETA_PASS=NO',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
@@ -118,6 +125,7 @@ requireContains('STATUS.md', [
 
 requireContains('README.md', [
   'Content Alpha / HUMAN-UNVALIDATED',
+  'Technical Beta readiness: PASS / HUMAN EVIDENCE BLOCKED',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
@@ -134,6 +142,8 @@ requireContains('RUNBOOK.md', [
   'npm run m26:validate',
   'alpha:validate',
   'content-alpha:validate',
+  'beta:technical:validate',
+  'release:browser',
   'release:validate',
 ]);
 
@@ -185,6 +195,8 @@ requireContains('package.json', [
   '"m26:validate"',
   '"alpha:validate"',
   '"content-alpha:validate"',
+  '"beta:technical:validate"',
+  '"release:browser"',
 ]);
 requireContains('.github/workflows/build-validation.yml', [
   'Documentation authority qualification',
@@ -195,6 +207,9 @@ requireContains('.github/workflows/build-validation.yml', [
   'npm run alpha:validate',
   'GC-12 Content Alpha qualification',
   'npm run content-alpha:validate',
+  'GC-13 deterministic Beta readiness qualification',
+  'npm run beta:technical:validate',
+  'GC-13 Chromium and Firefox browser qualification',
 ]);
 
 if (exists('.github/workflows/gemini-review.yml')) {
