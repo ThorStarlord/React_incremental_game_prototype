@@ -1,178 +1,157 @@
-# Milestone Handoff — GC-03 / Campaign One 1.0 Completion
+# Milestone Handoff — GC-14 / Pre-Beta
 
-**Handoff status:** INTEGRATED / CURRENT-MAIN AUTHORITY  
-**Prepared:** 2026-09-20  
-**Integrated implementation baseline:** `a8f313125b67f5c368033129344092e2e25dd63f`  
-**Current maturity:** PLAYABLE PRE-ALPHA  
-**Next responsibility:** GC-04 / GC-05 breadth reconciliation
+**Handoff status:** CURRENT RE-ENTRY AUTHORITY  
+**Reconciled baseline:** `8b99ffaf358c67a0532484949e90e6347d69d808`  
+**Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
+**Deterministic readiness:** `TECHNICAL_BETA_READY`  
+**Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
+**Next product responsibility:** genuine human Beta evidence under issue #109
 
 ## Repository reality
 
-The opening Campaign One production path is now integrated through Chapter 3.
+Campaign One is structurally and authorially complete from New Game through the state-responsive Epilogue.
 
 ```text
-GC-01 player-surface cleanup       COMPLETE
-GC-02 Prologue / onboarding        COMPLETE
-GC-03 Chapters 1-3 opening spine   COMPLETE
+GC-00  completion-program authority                  COMPLETE
+GC-01  1.0 player-surface cleanup                    COMPLETE
+GC-02  Prologue / onboarding                         COMPLETE
+GC-03  Chapters 1-3 campaign integration             COMPLETE
+GC-04  relationship-derived buildcraft breadth       COMPLETE
+GC-05  earned-delegation breadth                     COMPLETE
+GC-06  Chapter 4 — Lattice Under Strain              COMPLETE
+GC-07  Chapter 5 — The Chrono-Crypt                  COMPLETE
+GC-08  Chapter 6 — Network Under Pressure            COMPLETE
+GC-09  Chapter 7 — Counterphase                      COMPLETE
+GC-10  Finale + state-responsive Epilogue            COMPLETE
+GC-11  Alpha qualification                           COMPLETE
+GC-12  Content Alpha                                 COMPLETE
+GC-13  deterministic Beta readiness                  QUALIFIED
+GC-13  genuine human Beta evidence                   OPEN
+GC-14  release-promotion guard                       QUALIFIED
+GC-14  immutable RC / final 1.0 promotion            BLOCKED
 ```
 
-### GC-02 evidence
-
-```text
-PR:                  #120
-qualified head:      fad589bd439f53f0305a3116a1ac4fd67b4aa566
-Build Validation:    #352 / run 34659502966 / PASS
-merge commit:        8136fd481532705417fcc9a1f0fac84497d7e5a2
-```
-
-GC-02 established the ordinary-UI fresh-save route from the intro through Elder Willow's First Lesson and persisted Relationship evidence.
-
-### GC-03 evidence
-
-```text
-PR:                  #121
-branch:              work/gc03-opening-campaign-spine
-qualified head:      dc0fd39420a618ff9ab74cf90e031bb849bac404
-Build Validation:    #353 / run 35523216769 / PASS
-merge commit:        a8f313125b67f5c368033129344092e2e25dd63f
-```
-
-GC-03 connects that Prologue to Merchant District Crisis, Archive Inquiry, and Enemies in Phase through existing canonical evidence.
-
-## What is now playable structurally
-
-```text
-New Game
--> intro
--> find Elder Willow
--> First Lesson
--> Chapter 1 cast / Merchant District Crisis
--> either existing Chapter 1 conclusion
--> Scholar Elara / Archive Inquiry
--> independent verification
--> Lyra / Enemies in Phase
--> GC-03 opening-spine complete
-```
-
-The sequence is intentionally derived rather than stored in a new chapter reducer.
-
-## Important GC-03 repair
-
-GC-02 exposed a real reachability gap: New Game correctly seeded only Willow, but the other Campaign One anchors had no production re-entry path after the Prologue.
-
-GC-03 repairs that narrowly:
-
-- later NPCs are merged into current NPC state rather than replacing it;
-- Willow and every already-progressed NPC remain untouched;
-- Chapter 1 anchors unlock after First Lesson;
-- Elara unlocks after either Merchant District conclusion;
-- Lyra unlocks after Archive Inquiry's independent-verification evidence;
-- existing dialogue catalogs/extensions remain authoritative.
-
-This is content reachability, not a generalized discovery engine.
+The repository must not restart closed GC packages merely because Beta is externally blocked.
 
 ## Current campaign spine
 
 ```text
-Prologue                                      integrated
-Chapter 1 — Merchant District Crisis          integrated / connected
-Chapter 2 — Archive Inquiry                   integrated / connected
-Chapter 3 — Enemies in Phase                  integrated / connected
-Chapter 4 — Lattice Under Strain              missing
-Chapter 5 — The Chrono-Crypt                  missing
-Chapter 6 — Network Under Pressure            missing
-Chapter 7 — Counterphase                      missing
-Finale — The Telluric Echo                    missing
-Epilogue — Aftermath / Conditional Reprieve   missing
+New Game
+-> Prologue / Elder Willow First Lesson
+-> Chapter 1 — Merchant District Crisis
+-> Chapter 2 — Archive Inquiry
+-> Chapter 3 — Enemies in Phase
+-> Chapter 4 — Lattice Under Strain
+-> Chapter 5 — The Chrono-Crypt
+-> Chapter 6 — Network Under Pressure
+-> Chapter 7 — Counterphase
+-> Finale — The Telluric Echo
+-> state-responsive Epilogue
 ```
 
-## Current qualification commands
+Campaign One ends on the isolated planet. Chapters 8+, interplanetary continuation, the larger AI-war thread and New Game+ remain post-1.0 unless current authority is explicitly revised.
 
-```bash
-npm ci
-npm run docs:authority:validate
-npm run gc01:validate
-npm run gc02:validate
-npm run gc03:validate
-npm run content:intelligence:validate
-npm run chapter:validate
-npm run m26:validate
-npm run simulated-review:validate
-npm run simulated-review:action-contract
-npx tsc --noEmit
-npm run build
+## Product promise
+
+> A narrative incremental RPG in which consequential relationships teach the protagonist durable capabilities, remembered history explains why later options exist, and personally understood repetitive work can be deliberately delegated so the player increasingly focuses on novel strategic and relational decisions.
+
+Current provisional hierarchy:
+
+```text
+Primary promise      -> relationship-derived capability buildcraft
+Supporting identity  -> causal legibility
+Incremental identity -> earned delegation / mastery compression
+Architecture         -> heterogeneous authored composition
 ```
 
-Use `.github/workflows/build-validation.yml` as exact CI truth.
+This remains human-unvalidated. Deterministic qualification does not prove comprehension, pacing, fun, fairness, emotional impact, retention or preference.
 
-## Next responsibility — GC-04 / GC-05 reconciliation
+## Immediate responsibility — human Beta evidence
 
-Do **not** start by inventing capabilities or Copy systems.
+Issue #109 is the canonical active product-evidence backlog.
 
-Audit the integrated production evidence against the 1.0 floors:
+Before `BETA_PASS`, current authority requires at least:
 
-### GC-04 buildcraft
+- 5 fresh-player first-session observations on a current supported build;
+- 3 external beginning-to-ending fresh-save playthroughs without developer intervention in required progression;
+- classification and bounded repair of recurring severe findings;
+- exact build/browser/session provenance for accepted evidence.
 
-- 4 durable relationship-derived capability identities;
-- at least 3 anchor sources;
-- at least 2 capabilities with meaningful cross-domain application;
-- at least 2 viable late-game build profiles.
+Synthetic observation, automated UI traversal, repository analysis and LLM judgment do not satisfy this gate.
 
-### GC-05 earned delegation
+## Deterministic work still allowed before/during Beta
 
-- 3 personally mastered routine identities;
-- at least 2 learning contexts;
-- meaningful explicit delegation choice;
-- current bounded persistence/offline authority preserved.
+Only bounded work that closes a demonstrated release blocker is authorized. Examples include:
 
-Count existing qualified evidence first. Let Chapters 4-7 close missing breadth where that creates better player meaning.
+- production-surface integrity defects;
+- save/recovery defects;
+- browser/reliability defects;
+- accessibility/input defects;
+- documentation/governance drift that can misroute agents;
+- small repairs directly justified by accepted human observations.
 
-## Repository hygiene
+Do not create speculative systems to fill time while human evidence is pending.
 
-Historical timing and experiment PRs that were superseded by current-main authority were closed during this reconciliation. Their evidence remains preserved in GitHub history.
+## Release path after BETA_PASS
 
-Issue #122 records the remaining repository-setting mismatch: policy requires exact-head Build Validation, while `main` does not yet mechanically require it through GitHub branch protection/rulesets. The current connected automation cannot mutate administration-level branch rules, so the procedural gate remains authoritative until that setting is applied.
+```text
+BETA_PASS
+-> intentionally version one immutable 1.0.0-rc.N candidate
+-> exact-head Build Validation
+-> full ordinary-UI New Game -> Epilogue qualification
+-> representative divergent-history qualification
+-> save/load/recovery/import-export qualification
+-> Chromium + Firefox exact-RC evidence
+-> deployment/static-host evidence
+-> no release-blocking Known Defect
+-> final promotion eligibility
+-> 1.0.0
+```
 
-## Human evidence boundary
+The GC-14 guard must continue to fail closed until these authorities are satisfied.
 
-Issue #109 remains **OPEN / UNPROVEN**.
+## Governance boundary
 
-GC-02/GC-03 automated qualification proves reachability, persistence, deterministic composition, and rejection behavior. It does not prove onboarding comprehension, pacing, enjoyment, balance, retention, or market preference. Human evidence becomes mandatory at Beta under the current completion contracts.
+Issue #122 remains open: repository policy requires exact-head Build Validation before merge, but GitHub branch protection/ruleset enforcement is not currently enabled on `main`.
+
+The connected GitHub workspace can inspect but cannot administer the required branch-protection setting. Until an administrator applies it, the procedural exact-head gate remains mandatory.
 
 ## Do not reopen by inertia
 
-Do not restart:
+Do not restart without new evidence:
 
 - GameLoop/tick hardening;
 - generic Skills;
 - generic Crafting;
-- general Inventory;
+- general Inventory/Equipment economy;
 - duplicate Saves;
-- generalized narrative engines;
+- generalized ChapterEngine / narrative DSL;
 - autonomous Copy planning;
 - generalized simulation;
-- Chapters 8+ / interplanetary continuation / New Game+.
+- Chapters 8+ / interplanetary continuation / New Game+;
+- broad framework or toolchain migrations before they become demonstrated blockers.
 
-A future package must close a named 1.0 requirement or a demonstrated blocker.
+Cross-repository ChatGPT/controller experiments are not part of the Campaign One completion path and should live outside this game's release queue.
 
 ## Re-entry sequence
 
 ```text
 latest main
 -> STATUS.md
--> HANDOFF.md
 -> docs/CURRENT.md
+-> HANDOFF.md
 -> specification/GameCompletionDefinition.md
 -> specification/Features/FeatureScopeMatrix.md
 -> specification/Progression/GameProgressionArc.md
 -> specification/Narrative/CampaignArchitecture.md
 -> specification/Technical/GameCompletionRoadmap.md
--> specification/Technical/GC03OpeningCampaignSpineResult.md
--> relevant maturity contract
+-> specification/Technical/BetaCompletionContract.md
+-> specification/Technical/ReleaseQualificationContract.md
+-> docs/release/BetaResult.md
+-> docs/release/KnownDefects.md
 -> RUNBOOK.md
--> fresh repository reconciliation
 ```
 
 ## Governing handoff conclusion
 
-> The repository no longer needs to prove that its first three chapters can exist independently. The next question is how much of the required buildcraft and earned-delegation breadth those chapters already provide before new content is added.
+> Campaign One no longer needs speculative implementation to prove that a complete game can exist. The next product question is whether fresh players can understand, complete and value the game that has already been built; repository changes should now be driven by release blockers or observed human evidence.
