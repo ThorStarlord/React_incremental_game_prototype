@@ -6,7 +6,6 @@ import { useAppSelector } from '../app/hooks';
 import Panel from '../shared/components/layout/Panel';
 import { GameControlPanel } from '../features/GameLoop';
 import { PlayerStatsContainer } from '../features/Player/components/containers/PlayerStatsContainer';
-import { selectCampaignSpineProgress } from '../features/Story/CampaignSpine';
 
 /**
  * Main Game Page Content Component
@@ -19,7 +18,6 @@ const GamePage: React.FC = () => {
   const activeQuestCount = useAppSelector(state =>
     Object.values(state.quest.quests).filter(quest => quest.status === 'IN_PROGRESS').length
   );
-  const campaignSpine = useAppSelector(selectCampaignSpineProgress);
   // Handler to reset the game: clear storage and reload
   const handleResetGame = useCallback(() => {
     localStorage.clear();
@@ -52,17 +50,6 @@ const GamePage: React.FC = () => {
                 <Chip label={`${Math.round(player.stats.mana)} / ${Math.round(player.stats.maxMana)} mana`} color="info" />
                 <Chip label={`${activeQuestCount} active quest${activeQuestCount === 1 ? '' : 's'}`} />
                 <Chip label={`${player.statusEffects.length} status effect${player.statusEffects.length === 1 ? '' : 's'}`} />
-              </Stack>
-              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap aria-label="Campaign progress">
-                {Object.values(campaignSpine).map(unit => (
-                  <Chip
-                    key={unit.id}
-                    size="small"
-                    variant={unit.status === 'complete' ? 'filled' : 'outlined'}
-                    color={unit.status === 'complete' ? 'success' : unit.unlocked ? 'primary' : 'default'}
-                    label={`${unit.title}: ${unit.status.replace('_', ' ')}`}
-                  />
-                ))}
               </Stack>
               <PlayerStatsContainer showDetails={false} />
               <Button variant="outlined" onClick={handleResetGame} sx={{ alignSelf: 'flex-start' }}>
