@@ -212,6 +212,10 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await page.locator('textarea').fill('not-a-valid-save-code');
       await page.getByRole('button', { name: /^Import$/ }).last().click();
       await assertVisible(page.getByRole('heading', { name: 'Import Save' }), 'rejected import dialog');
+      await assertVisible(
+        page.getByRole('alert').filter({ hasText: 'Invalid or incompatible save code' }),
+        'invalid import error feedback'
+      );
       await page.getByRole('button', { name: /^Cancel$/ }).click();
     });
 
