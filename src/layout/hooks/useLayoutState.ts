@@ -31,7 +31,7 @@ const DEFAULT_OPTIONS: Required<UseLayoutStateOptions> = {
   syncWithRouter: true,
 };
 
-const tabToRouteMap: Record<TabId, string> = {
+const tabToRouteMap: Partial<Record<TabId, string>> = {
   dashboard: '/game/dashboard',
   character: '/game/character',
   traits: '/game/traits',
