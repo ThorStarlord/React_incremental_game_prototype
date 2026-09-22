@@ -1,6 +1,6 @@
 # Claude Repository Instructions
 
-Read and follow [`AGENTS.md`](AGENTS.md) as the repository-wide coding-agent policy.
+This file is a thin adapter for Claude-based coding agents. Read and follow [`AGENTS.md`](AGENTS.md) as the repository-wide coding-agent policy.
 
 Then follow the authority and re-entry order defined there. In particular:
 
