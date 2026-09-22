@@ -1,6 +1,6 @@
 # Repository Status — Content Alpha / Campaign One Completion
 
-**Status date:** 2026-09-20  
+**Status date:** 2026-09-21  
 **Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
@@ -85,6 +85,10 @@ merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
 GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
 
 GC-04 through GC-12 are closed by integrated implementation plus exact-head qualification. GC-13 repository-controlled technical preparation is qualified by Build Validation #394, including Chromium + Firefox CI smoke. The active Beta responsibility is now the **genuine human evidence required by issue #109**. GC-14's promotion guard is qualified and correctly blocks RC/1.0 entry until that evidence produces a real BETA_PASS. Automation must not expand scope merely because the external gate remains open.
+
+## Pre-Beta player-surface hygiene
+
+A bounded repository-only audit found release-facing residue that did not justify new systems: prototype/debug controls embedded in normal NPC/Essence pages, deferred Equipment wording, internal tick terminology, no-op Settings import/export actions, and an unreachable legacy `GamePage` with origin-wide reset behavior. The current pre-Beta hygiene package removes those affordances and extends GC-01 regression coverage. It does **not** create human product evidence or change the Campaign One feature/content scope.
 
 ## Finished-game target
 

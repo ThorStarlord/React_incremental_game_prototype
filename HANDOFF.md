@@ -33,6 +33,8 @@ GC-14  immutable RC / final 1.0 promotion            BLOCKED
 
 The repository must not restart closed GC packages merely because Beta is externally blocked.
 
+A bounded pre-Beta player-surface hygiene pass also removes confirmed release-facing residue without expanding scope: normal NPC/Essence pages no longer expose prototype/debug mutations, the Dashboard/Character surfaces no longer advertise deferred or internal concepts, Settings no longer exposes no-op import/export actions, and the unreachable legacy `GamePage` reset surface is removed. GC-01 regression coverage owns these rejection checks.
+
 ## Current campaign spine
 
 ```text

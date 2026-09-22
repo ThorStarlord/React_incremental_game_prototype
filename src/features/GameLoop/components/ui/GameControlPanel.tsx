@@ -88,9 +88,6 @@ export const GameControlPanel: React.FC = () => {
             <Typography variant="body2" color="text.secondary">
               Game Time: {formatTime(gameLoop.totalGameTime)}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Tick: {gameLoop.currentTick}
-            </Typography>
           </Box>
         )}
 

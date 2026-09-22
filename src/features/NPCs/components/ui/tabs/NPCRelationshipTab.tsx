@@ -29,8 +29,6 @@ import {
   EmojiEvents,
   Schedule,
   ExpandMore as ExpandMoreIcon,
-  AddCircleOutline as AddCircleOutlineIcon,
-  LockOpen as LockOpenIcon,
   ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import type { NPC, RelationshipChangeEntry } from '../../../state/NPCTypes';
@@ -38,8 +36,6 @@ import {
   RELATIONSHIP_TIERS, 
   getTierBenefits 
 } from '../../../../../config/relationshipConstants';
-import { useAppDispatch } from '../../../../../app/hooks';
-import { updateNPCRelationshipThunk, debugUnlockAllSharedSlots } from '../../../state/NPCThunks';
 import { COPY_SYSTEM } from '../../../../../constants/gameConstants';
 import { CreateCopyModal } from '../../../../Copy/components/ui/CreateCopyModal';
 
@@ -54,7 +50,6 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
   relationshipChanges = [],
   onImproveRelationship,
 }) => {
-  const dispatch = useAppDispatch();
   const currentTierInfo = getTierBenefits(npc.affinity);
   
   const SEDUCTION_CONNECTION_REQUIREMENT = COPY_SYSTEM.SEDUCTION_CONNECTION_REQUIREMENT;
@@ -63,21 +58,6 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
   const [openCreate, setOpenCreate] = useState(false);
   const handleOpenCreate = () => setOpenCreate(true);
   const handleCloseCreate = () => setOpenCreate(false);
-
-  const handleDebugIncreaseAffinity = () => {
-    dispatch(updateNPCRelationshipThunk({
-      npcId: npc.id,
-      change: 10,
-      reason: 'Debug: +10 Affinity'
-    }));
-  };
-  
-  const handleDebugUnlockSlots = () => {
-    // This thunk doesn't exist, but the reducer action does.
-    // However, it's better practice to create a thunk for this debug action if it might have side effects.
-    // For now, let's assume a thunk should exist for it.
-    dispatch(debugUnlockAllSharedSlots(npc.id));
-  };
 
   const { progressPercentageInTier, progressLabelText } = useMemo(() => {
     if (currentTierInfo.nextTier) {
@@ -174,28 +154,6 @@ const NPCRelationshipTab: React.FC<NPCRelationshipTabProps> = ({
                   disabled={npc.affinity >= 100}
                 >
                   {npc.affinity >= 100 ? 'Maximum Relationship' : 'Spend Time Together'}
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth
-                  startIcon={<AddCircleOutlineIcon />}
-                  onClick={handleDebugIncreaseAffinity}
-                  disabled={npc.affinity >= 100}
-                  sx={{textTransform: 'none'}}
-                >
-                  Debug: +10 Affinity
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth
-                  startIcon={<LockOpenIcon />}
-                  onClick={handleDebugUnlockSlots}
-                  disabled={!npc.sharedTraitSlots || npc.sharedTraitSlots.length === 0}
-                  sx={{textTransform: 'none'}}
-                >
-                  Debug: Unlock All Trait Slots
                 </Button>
               </Stack>
             </CardContent>

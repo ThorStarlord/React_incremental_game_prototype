@@ -315,7 +315,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                         Character
                       </Typography>
                       <Typography variant="body2" color="text.secondary" textAlign="center">
-                        Stats & Equipment
+                        Stats & Attributes
                       </Typography>
                     </Stack>
                   </Grid>
@@ -398,10 +398,10 @@ export const DashboardPage: React.FC = React.memo(() => {
                 <Grid item xs={12} sm={4}>
                   <Stack alignItems="center" spacing={1}>
                     <Typography variant="h4" color="success.main" fontWeight={600}>
-                      {gameLoop.currentTick.toLocaleString()}
+                      {formatGameTime(gameLoop.totalGameTime)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" textAlign="center">
-                      Game Ticks Elapsed
+                      Active Game Time
                     </Typography>
                   </Stack>
                 </Grid>

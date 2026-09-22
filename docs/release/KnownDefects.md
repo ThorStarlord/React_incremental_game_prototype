@@ -16,9 +16,11 @@ qualification artifact is not silently treated as a pass.
 | KD-006 | Moderate / maintenance | React Router 6 advisory line | Accepted pending migration | No known impact on this client-only static route usage; two moderate advisories remain. | Qualify a CRA-to-modern-build/router migration separately; do not force-upgrade the current candidate. |
 | KD-007 | Low / maintenance | Browserslist data age | Open | Build emits a maintenance warning; no current runtime failure identified. | Refresh browser data as part of the next dependency/toolchain qualification. |
 | KD-008 | Release blocker | Production debug boundary | Resolved | Direct navigation to `/game/debug` could expose state-mutating developer tools even though production navigation hid the item. | Production routing now mounts the debug route only in development; GC-01 regression coverage rejects debug availability in non-development builds. Exact-head Build Validation remains required before integration. |
+| KD-009 | Moderate / presentation-authority | Player-surface prototype/debug residue | Resolved pending exact-head qualification | Normal Campaign One pages still exposed prototype/debug wording or controls: manual prototype Essence generation, NPC relationship debug mutations, deferred Equipment wording, internal tick counters, no-op Settings import/export, and an unreachable legacy reset page. | Remove those affordances rather than invent replacement systems; extend GC-01 regression coverage so primary 1.0 surfaces cannot silently re-advertise them. |
 
 KD-001, KD-002 and KD-004 still prohibit 1.0 promotion. KD-003 is resolved by
 the GC-13 dual-browser CI artifact. KD-008 is resolved by the production debug-route
-boundary repair and its GC-01 regression coverage. KD-005 through KD-007 are
+boundary repair and its GC-01 regression coverage. KD-009 is resolved by the
+pre-Beta player-surface hygiene package and its extended GC-01 coverage. KD-005 through KD-007 are
 documented debt and do not independently prohibit release unless new evidence
 shows player-facing impact.

@@ -90,6 +90,58 @@ describe('GC-01 Campaign One player-surface scope cleanup', () => {
     );
   });
 
+  test('required player surfaces reject known prototype, debug, deferred, and dead-page residue', () => {
+    const dashboardSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/pages/DashboardPage.tsx'),
+      'utf8'
+    );
+    const controlsSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/features/GameLoop/components/ui/GameControlPanel.tsx'),
+      'utf8'
+    );
+    const characterSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/pages/CharacterPage.tsx'),
+      'utf8'
+    );
+    const essenceSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/pages/EssencePage.tsx'),
+      'utf8'
+    );
+    const relationshipSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/features/NPCs/components/ui/tabs/NPCRelationshipTab.tsx'),
+      'utf8'
+    );
+    const settingsSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/pages/SettingsPage.tsx'),
+      'utf8'
+    );
+    const pagesBarrelSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/pages/index.ts'),
+      'utf8'
+    );
+
+    expect(dashboardSource).not.toContain('Stats & Equipment');
+    expect(dashboardSource).not.toContain('Game Ticks Elapsed');
+    expect(controlsSource).not.toContain('Tick: {gameLoop.currentTick}');
+    expect(characterSource).not.toContain('skill progression');
+    expect(characterSource).not.toContain('Trait System Integration');
+
+    expect(essenceSource).not.toContain('ManualEssenceButton');
+    expect(essenceSource).not.toContain('For testing and prototyping purposes');
+    expect(essenceSource).not.toContain('Upcoming Features');
+
+    expect(relationshipSource).not.toContain('Debug: +10 Affinity');
+    expect(relationshipSource).not.toContain('Debug: Unlock All Trait Slots');
+
+    expect(settingsSource).not.toContain('Import settings functionality coming soon');
+    expect(settingsSource).not.toContain('Export settings:');
+
+    expect(
+      fs.existsSync(path.join(process.cwd(), 'src/pages/GamePage.tsx'))
+    ).toBe(false);
+    expect(pagesBarrelSource).not.toContain("from './GamePage'");
+  });
+
   test('main menu remains the canonical persistence entry surface', () => {
     const menuSource = fs.readFileSync(
       path.join(process.cwd(), 'src/pages/MainMenu/index.tsx'),
