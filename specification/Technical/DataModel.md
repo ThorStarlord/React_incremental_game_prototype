@@ -48,6 +48,9 @@ interface PlayerState {
   equippedTraits: (string | null)[];
   permanentTraits: string[];
   traitSlots: TraitSlot[];
+  doctrineFocus: {
+    foregroundedPermanentTraitIds: string[];
+  };
   totalPlaytime: number;
   isAlive: boolean;
 }
@@ -211,7 +214,7 @@ interface TraitsState {
 **Key Changes**:
 - **Removed `acquiredTraits`**: The general acquired traits list has been eliminated as part of the streamlined trait lifecycle
 - **Discovery Focus**: Only `discoveredTraits` tracks trait awareness for the Trait Codex
-- **Player-Specific Traits**: Player permanent traits are managed in `PlayerSlice.permanentTraits`
+- **Player-Specific Traits**: Player permanent traits are managed in `PlayerSlice.permanentTraits`; current bounded build specialization is managed separately in `PlayerSlice.doctrineFocus`, while active doctrine identities are derived rather than persisted
 - **Simplified Flow**: Follows the Discover -> Equip -> Resonate lifecycle without intermediate acquisition states
 
 ## 5. NPC Data Model ✅ IMPLEMENTED
