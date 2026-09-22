@@ -18,6 +18,8 @@ import {
   selectRelationshipBuildCapabilities,
   type RelationshipCapabilityStatus,
 } from '../PlayerInsightSelectors';
+import { DOCTRINE_DEFINITIONS } from '../../Traits/state/DoctrineDefinitions';
+import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 
 const capabilityColor = (
   status: RelationshipCapabilityStatus
@@ -44,6 +46,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
   const journal = useAppSelector(state => selectCausalJournalEntries(state, 5));
   const opportunities = useAppSelector(selectOpportunityMap);
   const capabilities = useAppSelector(selectRelationshipBuildCapabilities);
+  const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
   const masteredRoutines = useAppSelector(selectMasteredRoutines);
   const visibleOpportunities = opportunities.filter(
     chapter => chapter.status !== 'not_started'
@@ -144,6 +147,27 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                 <Typography variant="subtitle1" fontWeight={600}>
                   Relationship-Derived Build
                 </Typography>
+                {activeDoctrineIds.length > 0 ? (
+                  <Box data-testid="player-insight-active-doctrine">
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+                      Current doctrine
+                    </Typography>
+                    <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap">
+                      {activeDoctrineIds.map(doctrineId => (
+                        <Chip
+                          key={doctrineId}
+                          label={DOCTRINE_DEFINITIONS[doctrineId].name}
+                          size="small"
+                          color="primary"
+                        />
+                      ))}
+                    </Stack>
+                  </Box>
+                ) : (
+                  <Typography variant="caption" color="text.secondary">
+                    Current doctrine: none selected.
+                  </Typography>
+                )}
                 {capabilities.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
                     Relationship-mediated capabilities remain hidden until discovered through play.
