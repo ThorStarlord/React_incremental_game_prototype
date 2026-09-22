@@ -377,12 +377,10 @@ export const processNPCInteractionThunk = createAsyncThunk<
 
         const currentState = getState() as RootState;
 
-        const activeDoctrineIds = new Set(selectActiveDoctrineIds(currentState));
-        const missingActiveDoctrine = Array.isArray(node.requiredActiveDoctrineIds)
-          ? (node.requiredActiveDoctrineIds as string[]).find(
-              doctrineId => !activeDoctrineIds.has(doctrineId as any)
-            )
-          : undefined;
+        const activeDoctrineIds = selectActiveDoctrineIds(currentState);
+        const missingActiveDoctrine = node.requiredActiveDoctrineIds?.find(
+          doctrineId => !activeDoctrineIds.includes(doctrineId)
+        );
         if (missingActiveDoctrine) {
           dispatch(addNotification({
             type: 'info',
