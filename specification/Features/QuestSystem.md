@@ -113,6 +113,7 @@ Semantics:
 - available doctrine-gated options explain the active doctrine without exposing unavailable future doctrine requirements;
 - GC06 is the first production campaign decision converted to this stronger specialization semantic; later campaign pair routes remain on their existing permanent-Trait gates until separate product evidence warrants conversion.
 
+These bounded requirement contracts intentionally do **not** define:
 
 - temporary/equipped-Trait gameplay authority;
 - OR/NOT Trait expressions;
