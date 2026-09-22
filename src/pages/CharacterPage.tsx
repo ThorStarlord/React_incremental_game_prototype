@@ -84,7 +84,7 @@ export const CharacterPage: React.FC = React.memo(() => {
           color="text.secondary"
           sx={{ maxWidth: 600, mx: 'auto' }}
         >
-          Manage your character's statistics, traits, and skill progression
+          Manage your character's statistics, traits, and relationship-derived capabilities
         </Typography>
       </Box>
 
@@ -158,8 +158,8 @@ export const CharacterPage: React.FC = React.memo(() => {
                 Trait Management
               </Typography>
               <Alert severity="info" sx={{ mb: 3 }}>
-                <AlertTitle>Trait System Integration</AlertTitle>
-                Manage your equipped traits and permanent traits. Visit the main Traits section for full trait acquisition and management capabilities.
+                <AlertTitle>Traits and Capabilities</AlertTitle>
+                Equip active traits, review permanent traits, and follow the capabilities your character has learned through the campaign. Visit Traits for acquisition and Resonance details.
               </Alert>
               <PlayerTraitsContainer />
             </Box>
