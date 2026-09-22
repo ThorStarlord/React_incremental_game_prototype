@@ -189,7 +189,11 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await newGame.focus();
       await page.keyboard.press('Enter');
       await page.waitForURL(/\/game(?:\/|$)/, { timeout: 30000 });
-      await assertVisible(page.getByRole('main').first(), 'game main landmark');
+      await assertVisible(page.getByRole('dialog'), 'intro dialog after New Game');
+      await assertVisible(
+        page.getByRole('button', { name: /^(Continue|Begin)$/i }),
+        'intro action after New Game'
+      );
     });
 
     await check('first-actionable-prologue-objective-visible', async () => {
@@ -215,6 +219,7 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         throw new Error('intro did not reach Begin within 10 steps');
       }
 
+      await assertVisible(page.getByRole('main').first(), 'game main landmark after intro');
       await assertVisible(
         page.getByText('Prologue — Find Elder Willow', { exact: true }),
         'first Campaign One objective'
