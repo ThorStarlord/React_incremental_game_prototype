@@ -1,7 +1,7 @@
 # Repository Status — Content Alpha / Campaign One Completion
 
-**Status date:** 2026-09-21  
-**Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
+**Status date:** 2026-09-22  
+**Current reconciled main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
@@ -19,6 +19,7 @@
 **GC-13 deterministic readiness:** `TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED / BETA_PASS=NO`  
 **GC-14 promotion guard:** `QUALIFIED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
+**Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
 **Active program:** Campaign One / 1.0 Game Completion
 
 ## Current authority
@@ -41,6 +42,12 @@ Read in this order:
 The project has passed proof-of-concept, technical-prototype, bounded vertical-slice, whole-game Alpha, and authored-content completion stages. Campaign One now has a qualified production-equivalent New Game -> Prologue -> Chapters 1-7 -> Telluric Echo finale -> state-responsive Epilogue path, with canonical persistence checkpoints and complete authored route variants.
 
 It is therefore best described as **Content Alpha / HUMAN-UNVALIDATED** with **TECHNICAL_BETA_READY** deterministic engineering evidence. Structural and authored campaign completion are integrated; Chromium and Firefox visible-UI smoke now pass in CI. Fresh-player comprehension, pacing, balance, human accessibility review, full external playthrough evidence, immutable RC/deployment identity, and final release qualification remain intentionally unclaimed.
+
+## Active Beta frontier — evidence-driven refinement
+
+Repository-controlled feature/content construction is complete for the bounded Campaign One scope. The active frontier is genuine human Beta evidence under issue #109, using [`docs/release/BetaExecutionRunbook.md`](docs/release/BetaExecutionRunbook.md) and [`docs/release/BetaHumanEvidenceTemplate.md`](docs/release/BetaHumanEvidenceTemplate.md).
+
+Until accepted human evidence exposes a concrete defect, implementation is frozen against speculative new systems, chapters, progression pillars, generalized engines, or post-1.0 scope. A repository change must close a named Beta/Release requirement, repair an independently demonstrated release blocker, or make the human-evidence process executable without weakening its evidence boundary.
 
 ## Product direction
 
@@ -88,7 +95,7 @@ GC-04 through GC-12 are closed by integrated implementation plus exact-head qual
 
 ## Pre-Beta player-surface hygiene
 
-A bounded repository-only audit found release-facing residue that did not justify new systems: prototype/debug controls embedded in normal NPC/Essence pages, deferred Equipment wording, internal tick terminology, no-op Settings import/export actions, and an unreachable legacy `GamePage` with origin-wide reset behavior. The current pre-Beta hygiene package removes those affordances and extends GC-01 regression coverage. It does **not** create human product evidence or change the Campaign One feature/content scope.
+A bounded repository-only audit found release-facing residue that did not justify new systems: prototype/debug controls embedded in normal NPC/Essence pages, deferred Equipment wording, internal tick terminology, no-op Settings import/export actions, and an unreachable legacy `GamePage` with origin-wide reset behavior. PR #139 removed those affordances and extended GC-01 regression coverage. Exact head `4a64d8d53aea1a9c3385894ac89af570dec778d7` passed Build Validation #419 / run `35680087869` before merge as `4b725286eadaf6b2c61076e532b0f48513a3687e`. This does **not** create human product evidence or change the Campaign One feature/content scope.
 
 ## Finished-game target
 
