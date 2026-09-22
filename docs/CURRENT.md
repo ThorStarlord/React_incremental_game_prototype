@@ -22,17 +22,20 @@ SUPERSEDED
 
 For a new engineering or coding-agent session:
 
-1. [`STATUS.md`](../STATUS.md) — current state, active queue, evidence ceiling.
-2. [`docs/CURRENT.md`](CURRENT.md) — this classification index.
-3. [`HANDOFF.md`](../HANDOFF.md) — current re-entry handoff; summarizes the active external gate without superseding the authorities below.
-4. [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) — the product-level 1.0 definition and stop condition.
-5. [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) — what 1.0 includes, minimizes, defers, or cuts.
-6. [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) and [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) — progression and campaign scope.
-7. [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) — active implementation program.
-8. [`RUNBOOK.md`](../RUNBOOK.md) — operating / qualification procedure.
-9. [`specification/README.md`](../specification/README.md) — domain-specific authority map.
-10. The specific current contract/result records relevant to the active package.
-11. Reference / historical evidence only as needed.
+1. [`AGENTS.md`](../AGENTS.md) — repository-wide agent behavior and evidence-to-authority policy.
+2. [`STATUS.md`](../STATUS.md) — current state, active lanes, evidence ceiling.
+3. [`docs/CURRENT.md`](CURRENT.md) — this classification index.
+4. [`HANDOFF.md`](../HANDOFF.md) — current re-entry summary; subordinate to the authorities below where scope differs.
+5. [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) — the product-level 1.0 definition and stop condition.
+6. [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) — what 1.0 includes, minimizes, defers, or cuts.
+7. [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) and [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) — progression and campaign scope.
+8. [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) — active implementation program.
+9. [`RUNBOOK.md`](../RUNBOOK.md) — operating / qualification procedure.
+10. [`specification/README.md`](../specification/README.md) — domain-specific authority map.
+11. The specific current contract/result records relevant to the active package.
+12. Reference / historical evidence only as needed.
+
+[`CLAUDE.md`](../CLAUDE.md) is a thin adapter to `AGENTS.md`; it is not an independent source of policy.
 
 `README.md` is orientation, not final technical or product authority.
 
@@ -59,6 +62,8 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 
 | Concern | Classification | Current source(s) | Notes |
 | --- | --- | --- | --- |
+| Agent operating policy | CURRENT AUTHORITY | [`AGENTS.md`](../AGENTS.md) | Defines evidence classes, work authorization, scope lock, and stop conditions for coding agents. |
+| Claude adapter | ORIENTATION / NON-INDEPENDENT | [`CLAUDE.md`](../CLAUDE.md) | Delegates to `AGENTS.md`; must not duplicate mutable repository state or policy. |
 | Repository state | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md) | First source for complete/pending/unproven work. |
 | Documentation classification | CURRENT AUTHORITY | [`docs/CURRENT.md`](CURRENT.md) | This file. |
 | Current handoff / re-entry | CURRENT AUTHORITY, summary | [`HANDOFF.md`](../HANDOFF.md) | Current GC-14 / pre-Beta re-entry summary; subordinate to the product/maturity contracts for disputed details. |
@@ -163,8 +168,12 @@ This does not satisfy Beta. Issue #109 remains the current human-evidence gate:
 playthroughs are still required. Repository automation must not be relabeled as
 that evidence.
 
-The next completion-program responsibility is therefore human Beta evidence and
-bounded repairs justified by that evidence, not speculative feature expansion.
+Two responsibilities now run concurrently:
+
+1. collect the genuine human Beta evidence required by the current promotion contract; and
+2. continue bounded repository-answerable hardening of the already-authorized Campaign One when deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, or release-readiness evidence identifies a concrete improvement.
+
+The human-evidence gate limits human-experience claims; it is not a universal implementation freeze.
 
 ## Explicit 1.0 scope consequences
 
@@ -183,17 +192,26 @@ Do not treat old feature specs, placeholder routes, lore hooks, or expansion ide
 
 ## Human evidence authority
 
-Issue #109 remains open. Under the completion program it is no longer a total freeze on bounded pre-Alpha development; it becomes required evidence for Beta and final player-quality claims.
+Issue #109 remains open and owns the current genuine-human Beta obligation. Non-human evidence must never be relabeled as accepted human observation.
 
-Automated tests, synthetic UI observation, code review and repository analysis do **not** establish:
+Evidence classes have different claim ceilings:
+
+- **deterministic findings** establish implementation/runtime behavior within exercised evidence;
+- **heuristic findings** identify plausible UX, accessibility, pacing, presentation, terminology, or design risks;
+- **synthetic findings** identify reproducible automated/simulated player-facing risks;
+- **human findings** support actual participant-experience claims within the recorded sessions.
+
+Automated tests, synthetic UI observation, code review and repository analysis do **not** establish actual:
 
 - fresh-player comprehension/discoverability;
-- pacing;
-- fairness/final balance;
+- perceived pacing;
+- perceived fairness/final balance;
 - enjoyment;
 - emotional impact;
 - retention/desire to continue;
 - market preference.
+
+That claim boundary does not prohibit bounded repair work. Deterministic, heuristic and synthetic evidence may justify improvements to the existing 1.0 scope while the human lane remains open.
 
 ## Historical evidence
 
@@ -230,12 +248,14 @@ When work creates, supersedes or materially reinterprets authority:
 2. update this index in the same handoff;
 3. update `STATUS.md` when repository state or queue changes;
 4. update `RUNBOOK.md` when commands/procedure changes;
-5. keep `README.md` navigational;
-6. update `specification/README.md` when authority routing changes;
-7. preserve historical evidence instead of deleting useful provenance;
-8. run `npm run docs:authority:validate`;
-9. require exact-head Build Validation before merge.
+5. update `AGENTS.md` when repository-wide agent behavior or evidence-to-authority policy changes;
+6. keep `CLAUDE.md` as a thin adapter rather than a second policy source;
+7. keep `README.md` navigational;
+8. update `specification/README.md` when authority routing changes;
+9. preserve historical evidence instead of deleting useful provenance;
+10. run `npm run docs:authority:validate`;
+11. require exact-head Build Validation before merge.
 
 ## Governing rule
 
-> **A future package must close a named 1.0 completion requirement or a demonstrated blocker to one. Technical possibility alone is not authorization.**
+> **A future package must improve an already-authorized Campaign One / release surface through a named requirement or a concrete deterministic, heuristic, synthetic, or human finding. Technical possibility alone is not authorization; missing human evidence alone is not a universal stop condition.**
