@@ -195,18 +195,21 @@ async function runBrowserQualification(name, browserType, options, outDir) {
     await check('first-actionable-prologue-objective-visible', async () => {
       let introCompleted = false;
       for (let step = 0; step < 10; step += 1) {
-        const begin = page.getByRole('button', { name: /^Begin$/ });
-        if (await begin.isVisible().catch(() => false)) {
-          await begin.click();
+        const introAction = page.getByRole('button', {
+          name: /^(Continue|Begin)$/i,
+        });
+        await assertVisible(introAction, 'intro Continue/Begin action');
+
+        const label = ((await introAction.innerText()) || '').trim().toLowerCase();
+        await introAction.click();
+
+        if (label === 'begin') {
           introCompleted = true;
           break;
         }
-
-        const continueButton = page.getByRole('button', { name: /^Continue$/ });
-        if (!(await continueButton.isVisible().catch(() => false))) {
-          throw new Error('intro did not expose Continue or Begin');
+        if (label !== 'continue') {
+          throw new Error(`unexpected intro action '${label}'`);
         }
-        await continueButton.click();
       }
       if (!introCompleted) {
         throw new Error('intro did not reach Begin within 10 steps');
