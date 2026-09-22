@@ -15,6 +15,7 @@ import EquippedSlotsPanel from './EquippedSlotsPanel';
 import TraitManagement from './TraitManagement';
 import type { Trait, TraitSlot } from '../../state/TraitsTypes';
 import TraitCodexDrawer from '../containers/TraitCodexDrawer'; // Import the drawer
+import DoctrineFocusPanel from './DoctrineFocusPanel';
 
 // Define the props interface for TraitSystemTabs (formerly TraitSystemUI)
 export interface TraitSystemTabsProps {
@@ -76,6 +77,7 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
     { id: 'slots', label: 'Slots', component: EquippedSlotsPanel },
     { id: 'management', label: 'Management', component: TraitManagement },
     { id: 'codex', label: 'Codex', component: 'codex_placeholder' }, // Special case for the codex
+    { id: 'doctrine', label: 'Doctrine', component: DoctrineFocusPanel },
   ], []);
 
   const renderTabContent = useCallback(() => {
@@ -100,6 +102,8 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
             </Button>
           </Box>
         );
+      case 3: // Doctrine
+        return <DoctrineFocusPanel />;
       default:
         return null;
     }

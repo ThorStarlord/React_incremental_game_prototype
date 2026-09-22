@@ -142,6 +142,20 @@ A doctrine is active only when every required Trait is both:
 
 This double check intentionally fails closed if a malformed/corrupt runtime state foregrounds a Trait that the player does not permanently own.
 
+## Player-facing selection and legibility
+
+The normal Traits surface now exposes a bounded **Doctrine** tab.
+
+Player-safe behavior:
+
+- doctrines remain hidden until every required Trait is permanently learned, so future relationship-derived capabilities are not leaked;
+- an eligible doctrine shows the permanent Trait names and their source-NPC provenance;
+- **Adopt**, **Switch**, and **Clear doctrine focus** dispatch the validated doctrine thunks rather than raw reducers;
+- switching remains atomic and never removes permanent Traits;
+- Player Insight projects the currently active doctrine read-only during the normal play loop.
+
+This closes the previous gap between canonical doctrine state and a legal player action. It does **not** prove that fresh players understand the distinction or that switching is enjoyable.
+
 ## Quest consumption
 
 `QuestResolutionOption` now supports:
@@ -192,17 +206,22 @@ Unavailable topics remain hidden without leaking the missing doctrine as a futur
 
 ## Existing Campaign One content
 
-This package deliberately **does not** rewrite existing GC06-GC10 two-Trait quest routes from `requiredPermanentTraitIds` to `requiredActiveDoctrineIds`.
+GC06 is now the first bounded production conversion from learned-pair gating to current-specialization gating.
 
-Reason:
+```text
+Contain Surface Failures
+-> baseline; no optional doctrine
 
-- the new Redux authority and consumption seam are being qualified here;
-- Campaign One currently has no dedicated player-facing doctrine-selection surface;
-- converting existing production content immediately would create invisible specialization locks.
+Reroute the Lattice Load
+-> structural_steward active
 
-The existing routes therefore remain backward-compatible while the bounded active-doctrine contract becomes available to authored content that has an explicit, legible selection path.
+Phase Against the Echo
+-> countermodeler active
+```
 
-Promoting existing campaign routes to active-doctrine gating requires a player-facing selection/legibility package and its own normal-UI qualification; it does not require a new state architecture.
+Both optional routes remain impossible without their permanent learned Trait pairs because doctrine selectors require permanent ownership and current foregrounding simultaneously.
+
+GC07-GC10 intentionally retain their previously qualified `requiredPermanentTraitIds` pair gates. This package does not mechanically propagate doctrine locking through the remainder of the campaign. Broader conversion now depends on evidence that the GC06 selection loop is legible and valuable rather than merely adding pre-choice menu friction.
 
 ## Save schema v2
 
@@ -249,9 +268,12 @@ The qualification covers:
 7. activating the doctrine makes the same Quest action legal;
 8. direct Dialogue thunk invocation rejects inactive doctrine;
 9. the same Dialogue becomes legal after doctrine activation;
-10. schema v1 gains neutral doctrine focus through explicit v2 migration.
+10. schema v1 gains neutral doctrine focus through explicit v2 migration;
+11. the normal Traits UI hides ineligible doctrines, reveals provenance for eligible learned pairs, and supports Adopt / Switch / Clear;
+12. Player Insight reports the current doctrine read-only;
+13. the GC06 normal Quest UI exposes only the synthesis matching the active doctrine and explains the causal doctrine requirement.
 
-Existing whole-game tests remain regression authority for all Campaign One baseline routes.
+`DoctrineFocusPlayerSurface.test.tsx` is bound into `npm run gc06:validate`. Existing whole-game tests remain regression authority for baseline campaign traversal.
 
 ## Non-goals
 
@@ -283,7 +305,8 @@ It may **not** claim that:
 - two focus slots are the ideal balance;
 - Structural Steward or Countermodeler is more fun;
 - doctrine gating improves pacing or replayability;
-- the selection UX is complete.
+- fresh players understand the selection UX without assistance;
+- switching before later campaign decisions adds enough identity to justify converting GC07-GC10.
 
 Those require player-facing selection work and/or human Beta evidence.
 

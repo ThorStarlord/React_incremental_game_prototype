@@ -87,9 +87,9 @@ player.doctrineFocus   -> currently foregrounded permanent principles
 derived doctrine       -> emergent active build profile
 ```
 
-Campaign One doctrine derivation is intentionally limited to the two already-established profiles, **Structural Steward** and **Countermodeler**. Quest and Dialogue runtimes can consume explicit active-doctrine requirements with matching presentation + authoritative thunk enforcement. Existing GC06-GC10 production routes retain their permanent-Trait pair gates until a player-facing doctrine-selection surface is separately qualified, preventing invisible progression locks. Save schema v2 persists doctrine focus while old saves migrate to neutral empty focus rather than receiving invented specialization.
+Campaign One doctrine derivation is intentionally limited to the two already-established profiles, **Structural Steward** and **Countermodeler**. The normal Traits surface now exposes eligible doctrine adoption/switching/clearing with permanent-Trait provenance, and Player Insight reports the active doctrine read-only. GC06 is the first production decision converted to `requiredActiveDoctrineIds`, so Structural Steward and Countermodeler now produce mutually exclusive current-specialization syntheses while the baseline route remains legal. GC07-GC10 retain their qualified permanent-Trait pair gates pending evidence that broader conversion adds player value rather than repetitive switching friction. Save schema v2 persists doctrine focus while old saves migrate to neutral empty focus rather than receiving invented specialization.
 
-This is bounded repository-answerable hardening of the primary relationship-derived capability-buildcraft promise. Human comprehension, usability, balance, and preference remain unproven.
+This is bounded repository-answerable hardening of the primary relationship-derived capability-buildcraft promise. Deterministic/UI qualification now proves the interaction path exists and changes GC06 availability; fresh-player comprehension, usability, balance, enjoyment, and preference remain unproven.
 
 ## M26 closure
 

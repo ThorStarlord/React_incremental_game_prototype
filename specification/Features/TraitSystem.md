@@ -138,7 +138,7 @@ Campaign One currently qualifies only two established two-Trait profiles:
 
 A doctrine is not a separately acquired Trait and is not independently persisted as a boolean. Runtime selectors derive it only when all required Traits are both permanently learned and foregrounded.
 
-Quest and Dialogue authoring may use `requiredActiveDoctrineIds` where a choice specifically depends on current specialization. Existing Campaign One routes continue to use their qualified permanent-Trait pair gates until a player-facing doctrine-selection surface is separately qualified.
+Quest and Dialogue authoring may use `requiredActiveDoctrineIds` where a choice specifically depends on current specialization. The player-facing Doctrine tab now qualifies explicit Adopt / Switch / Clear control for eligible learned pairs, Player Insight projects the active doctrine read-only, and GC06's two optional build-profile resolutions consume active doctrine. GC07-GC10 retain their previously qualified permanent-Trait pair gates pending separate evidence that broader conversion adds value rather than menu friction.
 
 See `RelationshipCapabilityConstellation.md` for the bounded Redux, persistence, consumption, and evidence contract.
 

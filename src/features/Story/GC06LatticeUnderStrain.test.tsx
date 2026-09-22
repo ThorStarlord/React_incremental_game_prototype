@@ -18,6 +18,7 @@ import { selectLatticeIntegrity } from '../WorldState/state/WorldStateSelectors'
 import { selectChapterProgress } from './ChapterSelectors';
 import { CampaignSpinePanel } from './components/CampaignSpinePanel';
 import { createSave, loadSavedGameWithMigration } from '../../shared/utils/saveUtils';
+import { activateDoctrineThunk } from '../Traits/state/DoctrineThunks';
 
 const readJson = (relativePath: string): any =>
   JSON.parse(fs.readFileSync(path.join(process.cwd(), relativePath), 'utf8'));
@@ -181,7 +182,7 @@ const stabilizeAndExit = async (store: TestStore) => {
 };
 
 describe('GC-06 Lattice Under Strain', () => {
-  test('authors a baseline route and two differentiated two-Trait build profiles', () => {
+  test('authors a baseline route and two differentiated active-doctrine build profiles', () => {
     const quest = quests.quest_gc06_lattice_under_strain;
     const baseline = quest.resolutionOptions.find((option: any) =>
       option.id === 'contain_surface_failures'
@@ -196,24 +197,30 @@ describe('GC-06 Lattice Under Strain', () => {
     expect(baseline.requiredPermanentTraitIds).toBeUndefined();
     expect(canUseQuestResolution(baseline, [])).toBe(true);
 
-    expect(structural.requiredPermanentTraitIds).toEqual([
-      'WillowsWisdom',
-      'ConstraintSense',
-    ]);
-    expect(canUseQuestResolution(structural, ['WillowsWisdom'])).toBe(false);
+    expect(structural.requiredPermanentTraitIds).toBeUndefined();
+    expect(structural.requiredActiveDoctrineIds).toEqual(['structural_steward']);
     expect(canUseQuestResolution(
       structural,
-      ['WillowsWisdom', 'ConstraintSense']
+      ['WillowsWisdom', 'ConstraintSense'],
+      []
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      structural,
+      ['WillowsWisdom', 'ConstraintSense'],
+      ['structural_steward']
     )).toBe(true);
 
-    expect(countermodeler.requiredPermanentTraitIds).toEqual([
-      'ScholarlyInsight',
-      'AdversarialCalibration',
-    ]);
-    expect(canUseQuestResolution(countermodeler, ['ScholarlyInsight'])).toBe(false);
+    expect(countermodeler.requiredPermanentTraitIds).toBeUndefined();
+    expect(countermodeler.requiredActiveDoctrineIds).toEqual(['countermodeler']);
     expect(canUseQuestResolution(
       countermodeler,
-      ['ScholarlyInsight', 'AdversarialCalibration']
+      ['ScholarlyInsight', 'AdversarialCalibration'],
+      []
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      countermodeler,
+      ['ScholarlyInsight', 'AdversarialCalibration'],
+      ['countermodeler']
     )).toBe(true);
   });
 
@@ -277,18 +284,21 @@ describe('GC-06 Lattice Under Strain', () => {
       traits: ['WillowsWisdom', 'ConstraintSense'],
       experienceId: 'gronk_gc06_exp_structural_steward',
       routeId: 'structural_steward',
+      doctrineId: 'structural_steward' as const,
     },
     {
       resolutionId: 'phase_against_echo',
       traits: ['ScholarlyInsight', 'AdversarialCalibration'],
       experienceId: 'lyra_gc06_exp_countermodeler',
       routeId: 'countermodeler',
+      doctrineId: 'countermodeler' as const,
     },
   ])('build profile $routeId is a real legal campaign route', async ({
     resolutionId,
     traits,
     experienceId,
     routeId,
+    doctrineId,
   }) => {
     const store = makeStore();
     await seedChapterFourEntry(store);
@@ -296,6 +306,17 @@ describe('GC-06 Lattice Under Strain', () => {
     for (const traitId of traits) store.dispatch(addPermanentTrait(traitId));
 
     await reachReadyQuest(store);
+
+    const blockedWithoutFocus = await store.dispatch(resolveQuestOutcomeThunk({
+      questId: 'quest_gc06_lattice_under_strain',
+      resolutionId,
+    }));
+    expect(resolveQuestOutcomeThunk.rejected.match(blockedWithoutFocus)).toBe(true);
+    expect(store.getState().quest.quests.quest_gc06_lattice_under_strain.selectedResolutionId)
+      .toBeUndefined();
+
+    await store.dispatch(activateDoctrineThunk(doctrineId)).unwrap();
+
     const resolved = await store.dispatch(resolveQuestOutcomeThunk({
       questId: 'quest_gc06_lattice_under_strain',
       resolutionId,
