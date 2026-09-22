@@ -11,7 +11,11 @@ import {
 } from './QuestSlice';
 import type { Quest, QuestReward } from './QuestTypes';
 import { hasReachedQuestTimeLimit } from './QuestTimerPrecision';
-import { getMissingPermanentTraitIdsForResolution } from './QuestResolutionAvailability';
+import {
+  getMissingActiveDoctrineIdsForResolution,
+  getMissingPermanentTraitIdsForResolution,
+} from './QuestResolutionAvailability';
+import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import { gainGold, addStatusEffect } from '../../Player/state/PlayerSlice';
 import { addAvailableQuestToNPC } from '../../NPCs/state/NPCSlice';
@@ -216,6 +220,16 @@ export const resolveQuestOutcomeThunk = createAsyncThunk<
       if (missingPermanentTraitIds.length > 0) {
         throw new Error(
           `Resolution requires permanent Trait${missingPermanentTraitIds.length === 1 ? '' : 's'}: ${missingPermanentTraitIds.join(', ')}.`
+        );
+      }
+
+      const missingActiveDoctrineIds = getMissingActiveDoctrineIdsForResolution(
+        option,
+        selectActiveDoctrineIds(state)
+      );
+      if (missingActiveDoctrineIds.length > 0) {
+        throw new Error(
+          `Resolution requires active doctrine${missingActiveDoctrineIds.length === 1 ? '' : 's'}: ${missingActiveDoctrineIds.join(', ')}.`
         );
       }
 
