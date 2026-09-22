@@ -1,7 +1,7 @@
 # Milestone Handoff — GC-14 / Pre-Beta
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
-**Reconciled baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
+**Reconciled baseline before this activation package:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
 **Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
