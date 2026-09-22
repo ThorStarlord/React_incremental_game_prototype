@@ -14,7 +14,6 @@ import {
   MonetizationOn as GoldIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
-import { RootState } from '../../../../app/store'; // Import RootState
 import {
   selectTotalPlaytime,
   selectIsPlayerAlive,
@@ -34,7 +33,7 @@ interface ProgressionProps {
 
 /**
  * Player progression and advancement tracking component
- * Displays playtime, attribute points, and skill points
+ * Displays playtime, attribute progression, durable Traits, and current Trait capacity
  */
 export const Progression: React.FC<ProgressionProps> = React.memo(({
   showDetails = true,
@@ -44,8 +43,6 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
   const totalPlaytime = useAppSelector(selectTotalPlaytime);
   const isAlive = useAppSelector(selectIsPlayerAlive);
   const attributePoints = useAppSelector(selectAvailableAttributePoints);
-  // FIXED: Correctly type the state parameter for the inline selector
-  const skillPoints = useAppSelector((state: RootState) => state.player.availableSkillPoints);
   const resonanceLevel = useAppSelector(selectResonanceLevel);
   const maxTraitSlots = useAppSelector(selectMaxTraitSlots);
   const permanentTraits = useAppSelector(selectPermanentTraits);
@@ -122,19 +119,11 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
           </Box>
 
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <StatDisplay
                 label="Attribute Points"
                 value={attributePoints}
                 color="warning"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <StatDisplay
-                label="Skill Points"
-                value={skillPoints}
-                color="info"
               />
             </Grid>
           </Grid>
@@ -178,14 +167,6 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
                   label="Unspent Attribute Points"
                   value={attributePoints}
                   color={attributePoints > 0 ? 'warning' : 'secondary'}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <StatDisplay
-                  label="Unspent Skill Points"
-                  value={skillPoints}
-                  color={skillPoints > 0 ? 'info' : 'secondary'}
                 />
               </Grid>
 
