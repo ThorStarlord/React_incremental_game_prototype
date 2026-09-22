@@ -103,6 +103,26 @@ describe('GC-01 Campaign One player-surface scope cleanup', () => {
       path.join(process.cwd(), 'src/pages/CharacterPage.tsx'),
       'utf8'
     );
+    const progressionSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/features/Player/components/containers/Progression.tsx'),
+      'utf8'
+    );
+    const npcServicesSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/features/NPCs/components/ui/tabs/NPCServicesTab.tsx'),
+      'utf8'
+    );
+    const npcThunksSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/features/NPCs/state/NPCThunks.ts'),
+      'utf8'
+    );
+    const copyModalSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/features/Copy/components/ui/CreateCopyModal.tsx'),
+      'utf8'
+    );
+    const copyThunksSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/features/Copy/state/CopyThunks.ts'),
+      'utf8'
+    );
     const essenceSource = fs.readFileSync(
       path.join(process.cwd(), 'src/pages/EssencePage.tsx'),
       'utf8'
@@ -122,9 +142,24 @@ describe('GC-01 Campaign One player-surface scope cleanup', () => {
 
     expect(dashboardSource).not.toContain('Stats & Equipment');
     expect(dashboardSource).not.toContain('Game Ticks Elapsed');
+    expect(dashboardSource).not.toContain('Game Dashboard');
+    expect(dashboardSource).toContain('Campaign Overview');
     expect(controlsSource).not.toContain('Tick: {gameLoop.currentTick}');
     expect(characterSource).not.toContain('skill progression');
     expect(characterSource).not.toContain('Trait System Integration');
+    expect(progressionSource).not.toContain('Skill Points');
+    expect(progressionSource).not.toContain('availableSkillPoints');
+
+    expect(npcServicesSource).toContain('isExcludedLegacyService');
+    expect(npcServicesSource).toContain('/trait_teacher|crafter_/i');
+    expect(npcThunksSource).toContain('isExcludedCampaignOneService');
+    expect(npcThunksSource).not.toContain('addAvailableSkillPoints');
+    expect(npcThunksSource).not.toContain('+1 Skill Point');
+
+    expect(copyModalSource).toContain('Attempt Creation');
+    expect(copyModalSource).toContain('whether the attempt succeeds');
+    expect(copyThunksSource).not.toContain('Seduction attempt');
+    expect(copyThunksSource).toContain('Copy creation attempt');
 
     expect(essenceSource).not.toContain('ManualEssenceButton');
     expect(essenceSource).not.toContain('For testing and prototyping purposes');
