@@ -165,9 +165,9 @@ Exact-head Build Validation is required before merge. A green automated run esta
 
 ## Human evidence
 
-Issue #109 remains the human Product Review evidence backlog. It will become a formal Beta input for first-session comprehension and beginning-to-ending external playthrough evidence.
+Issue #109 remains the human Product Review evidence backlog. Use [`docs/release/BetaExecutionRunbook.md`](docs/release/BetaExecutionRunbook.md) to run the evidence program and [`docs/release/BetaHumanEvidenceTemplate.md`](docs/release/BetaHumanEvidenceTemplate.md) for accepted session records.
 
-Do not relabel synthetic UI traversal, code review, automated tests or LLM analysis as human playtest evidence.
+The minimum floor remains 5 accepted fresh-player first-session observations plus 3 accepted external beginning-to-ending fresh-save playthroughs. Do not relabel synthetic UI traversal, code review, automated tests or LLM analysis as human playtest evidence.
 
 ## Governing rule
 
