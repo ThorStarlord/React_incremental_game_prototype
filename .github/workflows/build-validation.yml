@@ -103,7 +103,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          npm test -- --watchAll=false --runInBand PostM25RuleOfTwoChapterArchitecture.test.ts PostM25ContextualCausalLegibility.test.ts PostM25CrossDomainTraitBuildcraft.test.ts PostM25ThirdHeterogeneousChapterQualification.test.ts PostM25CopyRoutineStrategy.test.ts 2>&1 | tee /tmp/product-depth-errors.txt
+          npm test -- --watchAll=false --runInBand PostM25RuleOfTwoChapterArchitecture.test.ts PostM25ContextualCausalLegibility.test.ts PostM25CrossDomainTraitBuildcraft.test.ts RelationshipCapabilityConstellation.test.ts PostM25ThirdHeterogeneousChapterQualification.test.ts PostM25CopyRoutineStrategy.test.ts 2>&1 | tee /tmp/product-depth-errors.txt
           product_depth_exit=${PIPESTATUS[0]}
           echo "exit_code=${product_depth_exit}" >> "$GITHUB_OUTPUT"
           exit 0

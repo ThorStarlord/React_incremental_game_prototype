@@ -194,7 +194,10 @@ interface PlayerState {
   // Traits and effects
   statusEffects: StatusEffect[];
   permanentTraits: string[]; // IDs of traits the player has permanently acquired
-  traitSlots: TraitSlot[];   // Player's active trait slots, each can hold a traitId
+  traitSlots: TraitSlot[];   // Temporary/pre-permanence Trait slots
+  doctrineFocus: {
+    foregroundedPermanentTraitIds: string[]; // Current bounded build specialization
+  };
 }
 ```
 
@@ -223,7 +226,8 @@ interface TraitsState {
 **Key Features**:
 - **Trait Definitions & Discovery**: Manages all trait definitions (loaded via `fetchTraitsThunk`) and tracks discovered traits (`discoverTrait`, `discoveredTraits` state)
 - **Streamlined Lifecycle**: Follows the simplified Discover -> Equip -> Resonate flow without intermediate acquisition states
-- **Trait Permanence (Player-Specific)**: Player-specific permanent traits are managed in `PlayerSlice`. The "Resonance" mechanic (`acquireTraitWithEssenceThunk`) makes traits permanent for the player by updating `PlayerSlice.permanentTraits`
+- **Trait Permanence (Player-Specific)**: Player-specific permanent traits are managed in `PlayerSlice`. The "Resonance" mechanic (`acquireTraitWithEssenceThunk`) makes traits permanent for the player by updating `PlayerSlice.permanentTraits`.
+- **Doctrine Focus (Player-Specific)**: `PlayerSlice.doctrineFocus` records which permanently learned principles are currently foregrounded. Emergent doctrine identities are derived by Trait selectors and are not stored as independent booleans.
 - **Codex Data**: Provides the necessary data (`traits`, `discoveredTraits`) for a Trait Codex UI displaying all discovered traits
 - **Trait Presets**: Manages saving, loading, and deleting trait presets (`saveTraitPreset`, `loadTraitPreset`, `deleteTraitPreset`)
 

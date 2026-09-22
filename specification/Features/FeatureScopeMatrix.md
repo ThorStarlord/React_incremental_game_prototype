@@ -27,7 +27,7 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | GameLoop / deterministic time | CORE_1_0 | implemented / qualified | Preserve current fixed-step, backpressure, lifecycle and precision contracts. |
 | Player state / vitals / attributes | CORE_1_0 | implemented | Keep only progression needed by campaign play; no universal new progression currency. |
 | Relationship Experience / Memory / Bond / Connection | CORE_1_0 | implemented / qualified | Central source of durable social history and learning provenance. |
-| Traits / permanent capabilities | CORE_1_0 | implemented / qualified | Own durable learned capability identity; expand only to bounded 1.0 build floor. |
+| Traits / permanent capabilities | CORE_1_0 | implemented / qualified + bounded doctrine specialization | Own durable learned capability identity; Player doctrine focus may compose only established Campaign One build profiles without creating a generic skill tree/capability graph. |
 | Essence / Resonance | CORE_1_0 | implemented / qualified | Supports relationship-mediated capability progression. |
 | NPC interaction | CORE_1_0 | implemented | Required for anchor cast and campaign decisions. |
 | Dialogue | CORE_1_0 | implemented / content-driven | Primary authored decision/consequence surface; preserve spoiler-safe prerequisite behavior. |
@@ -59,7 +59,7 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Generic ChapterEngine | CUT | intentionally absent | Continue bounded chapter projections. Reconsider only after repeated concrete content friction. |
 | Generic narrative condition DSL | CUT | intentionally absent | Existing canonical domain prerequisites remain authoritative. |
 | Dynamic chapter/plugin registry | DEFER_POST_1_0 | absent | Not required for bounded Campaign One. |
-| Generic capability graph | DEFER_POST_1_0 | absent | Use explicit Trait/domain applications while 1.0 scope is bounded. |
+| Generic capability graph | DEFER_POST_1_0 | absent | Use explicit Trait/domain applications plus the bounded two-profile doctrine derivation. The Relationship Capability Constellation does not promote an arbitrary graph or combination engine into 1.0. |
 | Large Trait catalog | DEFER_POST_1_0 | not needed | Meet the completion-definition build floor only. |
 | Automatic Copy task chaining | CUT | intentionally prohibited | Player retains task/start authority. |
 | Autonomous Copy planning | CUT | intentionally prohibited | No irreversible or strategic decision delegation. |

@@ -77,6 +77,9 @@ const initialState: PlayerState = {
   statusEffects: [],
   permanentTraits: [],
   traitSlots: createInitialTraitSlots(),
+  doctrineFocus: {
+    foregroundedPermanentTraitIds: [],
+  },
   routineFamiliarity: {},
   totalPlaytime: 0,
   isAlive: true,
@@ -130,6 +133,15 @@ const playerSlice = createSlice({
     },
     removePermanentTrait: (state, action: PayloadAction<string>) => {
         state.permanentTraits = state.permanentTraits.filter(id => id !== action.payload);
+        state.doctrineFocus.foregroundedPermanentTraitIds =
+          state.doctrineFocus.foregroundedPermanentTraitIds.filter(id => id !== action.payload);
+    },
+    setDoctrineFocus: (state, action: PayloadAction<string[]>) => {
+      state.doctrineFocus.foregroundedPermanentTraitIds =
+        Array.from(new Set(action.payload));
+    },
+    clearDoctrineFocus: (state) => {
+      state.doctrineFocus.foregroundedPermanentTraitIds = [];
     },
     setResonanceLevel: (state, action: PayloadAction<number>) => {
       state.resonanceLevel = action.payload;
@@ -224,6 +236,8 @@ export const {
   resetPlayerState,
   addPermanentTrait,
   removePermanentTrait,
+  setDoctrineFocus,
+  clearDoctrineFocus,
   setResonanceLevel,
   addAvailableAttributePoints,
   addAvailableSkillPoints,

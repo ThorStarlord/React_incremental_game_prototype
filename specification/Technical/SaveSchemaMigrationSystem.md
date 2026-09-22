@@ -68,6 +68,7 @@ Therefore the supported model is deliberately minimal:
 ```text
 v0 = any recognizable supported historical payload with no schemaVersion
 v1 = explicit M10 SaveEnvelope
+v2 = Player doctrine-focus representation
 ```
 
 Missing `schemaVersion` means **legacy v0**.
@@ -126,7 +127,18 @@ The current production registry contains:
 
 ```text
 v0 -> v1
+v1 -> v2
 ```
+
+The v1 -> v2 transition is `save-schema-v1-to-v2-doctrine-focus`. It introduces neutral/default Player state:
+
+```ts
+player.doctrineFocus = {
+  foregroundedPermanentTraitIds: []
+}
+```
+
+when the source save did not record doctrine focus. It does **not** infer specialization from permanent Trait ownership, because that would manufacture a historical player choice.
 
 A migration step declares:
 
@@ -187,8 +199,8 @@ Migration returns observable evidence:
 A caller can therefore report:
 
 ```text
-v0 -> v1
-applied: save-schema-v0-to-v1
+v0 -> v2
+applied: save-schema-v0-to-v1, save-schema-v1-to-v2-doctrine-focus
 ```
 
 without reverse engineering incidental load behavior.
@@ -239,10 +251,10 @@ The decoder does not use JavaScript numeric coercion to reinterpret malformed id
 
 ### Future schema
 
-If the runtime supports v1 and receives v2:
+If the runtime supports v2 and receives v3:
 
 ```text
-v2 > current v1
+v3 > current v2
 -> reject
 ```
 
@@ -393,7 +405,7 @@ It still must not fabricate:
 - Trait compatibility;
 - authored Trait discovery.
 
-Schema v1 does not weaken those rules.
+Schema v2 does not weaken those rules. The v2 doctrine-focus migration likewise adds only neutral representation state; it never fabricates an active doctrine from old Trait ownership.
 
 ---
 

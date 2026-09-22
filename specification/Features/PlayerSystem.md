@@ -68,6 +68,21 @@ The Player system focuses on skill-based progression and a unique "Resonance Lev
 
 **Implementation**: Complete progression tracking with time management and point allocation systems.
 
+### 4.3. Doctrine Focus
+
+Player state distinguishes permanent learning from current build specialization:
+
+```text
+permanentTraits -> what the protagonist has durably learned
+doctrineFocus   -> which learned principles are currently foregrounded together
+```
+
+`doctrineFocus.foregroundedPermanentTraitIds` is canonical persisted Player state. Campaign One currently permits at most two foregrounded permanent Traits. Active doctrine identities such as **Structural Steward** and **Countermodeler** are derived by Trait selectors rather than stored as independent Player flags.
+
+Temporary `traitSlots` remain a separate pre-permanence equipping mechanism and must not be interpreted as doctrine focus.
+
+See `../Technical/RelationshipCapabilityConstellation.md`.
+
 ## 5. Character Management UI ✅ COMPLETE IMPLEMENTATION
 
 ### 5.1. CharacterPage Component ✅ IMPLEMENTED

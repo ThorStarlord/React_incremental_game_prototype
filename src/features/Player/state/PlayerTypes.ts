@@ -72,6 +72,17 @@ export interface TraitSlot {
 }
 
 /**
+ * Current build expression over permanently learned Traits.
+ *
+ * This is intentionally distinct from temporary Trait slots: permanent Traits
+ * represent durable learned capability, while doctrine focus represents which
+ * learned principles the player is deliberately foregrounding together.
+ */
+export interface DoctrineFocusState {
+  foregroundedPermanentTraitIds: string[];
+}
+
+/**
  * Core Player state interface
  */
 export interface PlayerState {
@@ -88,6 +99,7 @@ export interface PlayerState {
   statusEffects: StatusEffect[];
   permanentTraits: string[];
   traitSlots: TraitSlot[];
+  doctrineFocus: DoctrineFocusState;
 
   /**
    * Player-owned knowledge that a bounded routine has been personally learned.

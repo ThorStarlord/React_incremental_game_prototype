@@ -205,7 +205,7 @@ describe('Package 2 timed Quest precision semantics resolution', () => {
     }
   });
 
-  test('exact and accumulated schema-v1 timer histories preserve raw values and resolve on the same next nominal step', async () => {
+  test('exact and accumulated current-schema timer histories preserve raw values and resolve on the same next nominal step', async () => {
     const exactStore = makeStore();
     seedTimedQuest(exactStore, { elapsedSeconds: 0.9 });
     await exactStore.dispatch(processQuestTimersThunk(100));
@@ -226,8 +226,8 @@ describe('Package 2 timed Quest precision semantics resolution', () => {
     const migration = migrateSavePayload(envelope);
     const persistedElapsed = migration.envelope.state.quest.quests[QUEST_ID].elapsedSeconds;
 
-    expect(migration.sourceVersion).toBe(1);
-    expect(migration.targetVersion).toBe(1);
+    expect(migration.sourceVersion).toBe(2);
+    expect(migration.targetVersion).toBe(2);
     expect(migration.appliedMigrations).toEqual([]);
     expect(persistedElapsed).toBe(accumulatedBeforeSave);
 

@@ -10,6 +10,7 @@ const baseContext = {
   knownFactIds: [] as string[],
   factionReputationByFactionId: {} as Record<string, number>,
   worldStateRegions: {},
+  activeDoctrineIds: [] as const,
 };
 
 describe('post-M25 contextual causal legibility', () => {
@@ -46,6 +47,27 @@ describe('post-M25 contextual causal legibility', () => {
     expect(evaluateDialogueAvailabilityPresentation(node, baseContext)).toEqual({
       available: false,
       availabilityReasons: [],
+    });
+  });
+
+  test('active doctrine requirements stay spoiler-safe while explaining available specialization', () => {
+    const node: DialogueNode = {
+      id: 'structural_topic',
+      title: 'Read the Load Paths',
+      requiredActiveDoctrineIds: ['structural_steward'],
+    };
+
+    expect(evaluateDialogueAvailabilityPresentation(node, baseContext)).toEqual({
+      available: false,
+      availabilityReasons: [],
+    });
+
+    expect(evaluateDialogueAvailabilityPresentation(node, {
+      ...baseContext,
+      activeDoctrineIds: ['structural_steward'],
+    })).toEqual({
+      available: true,
+      availabilityReasons: ['Active doctrine: Structural Steward'],
     });
   });
 

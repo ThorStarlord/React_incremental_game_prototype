@@ -1,3 +1,5 @@
+import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
+
 // These types mirror the persisted quest data model.
 export type QuestType = 'MAIN_STORY' | 'SIDE' | 'REPEATABLE' | 'TUTORIAL';
 export type ObjectiveType = 'GATHER' | 'KILL' | 'TALK' | 'REACH_LOCATION' | 'USE_ITEM' | 'ESCORT' | 'DELIVER' | 'PUZZLE' | 'INTERACT_PUZZLE';
@@ -36,6 +38,11 @@ export interface QuestResolutionOption {
    * semantics are deliberately not implied by this field.
    */
   requiredPermanentTraitIds?: string[];
+  /**
+   * Optional specialization gate. All listed doctrines must currently be
+   * derived as active from the player's permanent Traits + doctrine focus.
+   */
+  requiredActiveDoctrineIds?: DoctrineId[];
   consumeItems?: QuestResolutionItemCost[];
   rewards?: QuestReward[];
   logMessage?: string;

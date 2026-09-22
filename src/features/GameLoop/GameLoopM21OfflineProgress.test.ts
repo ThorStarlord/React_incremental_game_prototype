@@ -265,6 +265,6 @@ describe('M21 bounded offline progress qualification', () => {
       path.join(process.cwd(), 'src/shared/utils/saveSchema.ts'),
       'utf8'
     );
-    expect(saveSchemaSource).toContain('CURRENT_SAVE_SCHEMA_VERSION = 1');
+    expect(saveSchemaSource).toContain('CURRENT_SAVE_SCHEMA_VERSION = 2');
   });
 });

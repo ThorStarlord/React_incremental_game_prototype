@@ -7,7 +7,7 @@ import {
 import { APP_VERSION } from '../config/releaseVersion';
 
 export const LEGACY_SAVE_SCHEMA_VERSION = 0;
-export const CURRENT_SAVE_SCHEMA_VERSION = 1;
+export const CURRENT_SAVE_SCHEMA_VERSION = 2;
 
 export type SaveMigrationErrorCode =
   | 'INVALID_SAVE'
@@ -208,8 +208,46 @@ const migrateV0ToV1: SaveMigrationStep = {
   }),
 };
 
+const migrateV1ToV2: SaveMigrationStep = {
+  id: 'save-schema-v1-to-v2-doctrine-focus',
+  fromVersion: 1,
+  toVersion: 2,
+  migrate: envelope => {
+    const player = envelope.state.player as PersistedGameState['player'] & {
+      doctrineFocus?: {
+        foregroundedPermanentTraitIds?: unknown;
+      };
+    };
+
+    const rawFocus = player.doctrineFocus?.foregroundedPermanentTraitIds;
+    const foregroundedPermanentTraitIds = Array.isArray(rawFocus)
+      ? Array.from(new Set(
+          rawFocus.filter(
+            (traitId): traitId is string =>
+              typeof traitId === 'string' && traitId.length > 0
+          )
+        ))
+      : [];
+
+    return {
+      ...envelope,
+      schemaVersion: 2,
+      state: {
+        ...envelope.state,
+        player: {
+          ...player,
+          doctrineFocus: {
+            foregroundedPermanentTraitIds,
+          },
+        },
+      },
+    };
+  },
+};
+
 export const SAVE_MIGRATIONS: SaveMigrationRegistry = {
   0: migrateV0ToV1,
+  1: migrateV1ToV2,
 };
 
 export const runSaveMigrationChain = (

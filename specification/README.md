@@ -185,6 +185,7 @@ Player       -> chooses whether to use it
 
 Current relevant records include:
 
+- [`Technical/RelationshipCapabilityConstellation.md`](Technical/RelationshipCapabilityConstellation.md) — bounded learned-Trait vs current-doctrine specialization, derived Structural Steward/Countermodeler authority, and Quest/Dialogue consumption;
 - [`Technical/PostM25CrossDomainTraitBuildcraft.md`](Technical/PostM25CrossDomainTraitBuildcraft.md) — semantic cross-domain capability use;
 - [`Technical/PostM25PlayerInsightProjection.md`](Technical/PostM25PlayerInsightProjection.md) — read-only build/provenance projections;
 - [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — player-visible qualifying-Memory provenance.

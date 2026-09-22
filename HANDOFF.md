@@ -37,6 +37,8 @@ The repository must not restart closed GC packages merely because Beta is extern
 
 PR #139 completed the bounded pre-Beta player-surface hygiene pass without expanding scope: normal NPC/Essence pages no longer expose prototype/debug mutations, the Dashboard/Character surfaces no longer advertise deferred or internal concepts, Settings no longer exposes no-op import/export actions, and the unreachable legacy `GamePage` reset surface is removed. Exact head `4a64d8d53aea1a9c3385894ac89af570dec778d7` passed Build Validation #419 / run `35680087869`; GC-01 regression coverage owns these rejection checks.
 
+The bounded Relationship Capability Constellation hardening separates permanently learned Traits from current two-Trait doctrine focus without promoting the deferred generic capability graph. Runtime derivation is limited to the already-established **Structural Steward** and **Countermodeler** profiles; Quest/Dialogue consumers now have explicit active-doctrine gates with matching presentation + thunk enforcement, and save schema v2 persists the player's focus without inventing specialization for old saves. Existing GC06-GC10 production routes remain on their qualified permanent-Trait pair gates until a player-facing doctrine-selection surface is separately qualified. Human comprehension and value remain unproven.
+
 ## Current campaign spine
 
 ```text

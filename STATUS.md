@@ -77,6 +77,20 @@ Architecture         -> heterogeneous authored composition
 
 This may guide bounded reversible development under the provisional governance decision. It does **not** prove fresh-player comprehension, fun, pacing, fairness, retention or preference.
 
+### Bounded capability-specialization hardening
+
+The current Trait/Player authority distinguishes durable learned capability from current specialization without adding a second skill tree:
+
+```text
+player.permanentTraits -> durable learned capability
+player.doctrineFocus   -> currently foregrounded permanent principles
+derived doctrine       -> emergent active build profile
+```
+
+Campaign One doctrine derivation is intentionally limited to the two already-established profiles, **Structural Steward** and **Countermodeler**. Quest and Dialogue runtimes can consume explicit active-doctrine requirements with matching presentation + authoritative thunk enforcement. Existing GC06-GC10 production routes retain their permanent-Trait pair gates until a player-facing doctrine-selection surface is separately qualified, preventing invisible progression locks. Save schema v2 persists doctrine focus while old saves migrate to neutral empty focus rather than receiving invented specialization.
+
+This is bounded repository-answerable hardening of the primary relationship-derived capability-buildcraft promise. Human comprehension, usability, balance, and preference remain unproven.
+
 ## M26 closure
 
 PR #114 is integrated:

@@ -4,6 +4,7 @@ import { addQuest, incrementQuestElapsed } from './state/QuestSlice';
 import { processQuestTimersThunk } from './state/QuestThunks';
 import type { Quest } from './state/QuestTypes';
 import {
+  CURRENT_SAVE_SCHEMA_VERSION,
   createCurrentSaveEnvelope,
   migrateSavePayload,
 } from '../../shared/utils/saveSchema';
@@ -68,15 +69,15 @@ describe('Timed Quest unit and save-compatibility preflight', () => {
     expect(getTimeRemaining(undefined, 5, elapsedSeconds)).toBe(4);
   });
 
-  test('current schema-v1 save/load preserves stored timer values and normalized live increments resume from that value', async () => {
+  test('current schema-v2 save/load preserves stored timer values and normalized live increments resume from that value', async () => {
     const store = makeStore();
     seedTimedQuest(store, { elapsedSeconds: 4.5, timeLimitSeconds: 10 });
 
     const envelope = createCurrentSaveEnvelope(store.getState(), 123456);
     const result = migrateSavePayload(envelope);
 
-    expect(result.sourceVersion).toBe(1);
-    expect(result.targetVersion).toBe(1);
+    expect(result.sourceVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+    expect(result.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(result.appliedMigrations).toEqual([]);
     expect(result.envelope.state.quest.quests[QUEST_ID].elapsedSeconds).toBe(4.5);
     expect(result.envelope.state.quest.quests[QUEST_ID].timeLimitSeconds).toBe(10);
@@ -106,8 +107,11 @@ describe('Timed Quest unit and save-compatibility preflight', () => {
     const result = migrateSavePayload(legacyPayload);
 
     expect(result.sourceVersion).toBe(0);
-    expect(result.targetVersion).toBe(1);
-    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1']);
+    expect(result.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+    expect(result.appliedMigrations).toEqual([
+      'save-schema-v0-to-v1',
+      'save-schema-v1-to-v2-doctrine-focus',
+    ]);
     expect(result.envelope.state.quest.quests[QUEST_ID].elapsedSeconds).toBe(1250);
     expect(result.envelope.state.quest.quests[QUEST_ID].timeLimitSeconds).toBe(5000);
   });
