@@ -4,6 +4,7 @@ import path from 'path';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import {
+  act,
   cleanup,
   render,
   screen,
@@ -115,7 +116,7 @@ describe('Doctrine Focus player surface', () => {
     expect(within(panel).queryByText('Countermodeler')).not.toBeInTheDocument();
     expect(within(panel).getByText(/No doctrine is available yet/i)).toBeInTheDocument();
 
-    learn(store, STRUCTURAL_TRAITS);
+    act(() => learn(store, STRUCTURAL_TRAITS));
 
     expect(await within(panel).findByText('Structural Steward')).toBeInTheDocument();
     expect(within(panel).queryByText('Countermodeler')).not.toBeInTheDocument();
@@ -126,7 +127,7 @@ describe('Doctrine Focus player surface', () => {
       within(panel).getByText(/Constraint Sense .* learned with .*Gronk/i)
     ).toBeInTheDocument();
 
-    learn(store, COUNTERMODELER_TRAITS);
+    act(() => learn(store, COUNTERMODELER_TRAITS));
     expect(await within(panel).findByText('Countermodeler')).toBeInTheDocument();
 
     await user.click(
