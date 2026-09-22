@@ -55,7 +55,7 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
     : undefined;
 
   return (
-    <Stack spacing={2.5} data-testid="doctrine-focus-panel">
+    <Stack spacing={2.5} data-test-id="doctrine-focus-panel">
       <Box>
         <Typography variant="h6" gutterBottom>
           Doctrine Focus
@@ -71,7 +71,7 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
         learned pair is currently foregrounded for higher-order synthesis.
       </Alert>
 
-      <Box data-testid="active-doctrine-summary">
+      <Box data-test-id="active-doctrine-summary">
         <Typography variant="subtitle2" gutterBottom>
           Current doctrine
         </Typography>
@@ -80,7 +80,7 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
             <Chip
               label={activeDoctrine.name}
               color="primary"
-              data-testid={`active-doctrine-${activeDoctrine.id}`}
+              data-test-id={`active-doctrine-${activeDoctrine.id}`}
             />
             <Typography variant="body2" color="text.secondary">
               {activeDoctrine.description}
@@ -116,7 +116,7 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
               <Card
                 key={doctrineId}
                 variant="outlined"
-                data-testid={`doctrine-card-${doctrineId}`}
+                data-test-id={`doctrine-card-${doctrineId}`}
               >
                 <CardContent>
                   <Stack spacing={1.5}>
