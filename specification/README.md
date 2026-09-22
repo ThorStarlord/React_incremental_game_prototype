@@ -2,8 +2,8 @@
 
 This file routes readers to the current product, completion, technical and domain authorities. It does not duplicate every historical milestone narrative.
 
-**Current maturity:** PLAYABLE PRE-ALPHA  
-**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
+**Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
+**Repository-controlled readiness:** TECHNICAL_BETA_READY  
 **Human Product Review:** issue #109 OPEN / UNPROVEN
 
 ## Authority chain
@@ -11,8 +11,10 @@ This file routes readers to the current product, completion, technical and domai
 Read current authority in this order:
 
 ```text
-STATUS.md
+AGENTS.md
+-> STATUS.md
 -> docs/CURRENT.md
+-> HANDOFF.md
 -> GameCompletionDefinition.md
 -> Features/FeatureScopeMatrix.md
 -> Progression/GameProgressionArc.md + Narrative/CampaignArchitecture.md
@@ -22,6 +24,8 @@ STATUS.md
 -> executable implementation + qualification
 -> reference / historical evidence only as needed
 ```
+
+`CLAUDE.md` delegates to `AGENTS.md` and is not an independent authority.
 
 Authority is scope-sensitive. Older detailed prose does not override the current 1.0 scope, and a green technical test does not promote a human-quality claim.
 
@@ -85,7 +89,7 @@ The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative ref
 
 - [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for GC-00→GC-14 and the dependency path to 1.0.
 
-There is no automatic M27. Every active package must close a named 1.0 completion requirement or a demonstrated blocker to one.
+There is no automatic M27. Every active package must improve an already-authorized 1.0 surface through a named requirement or a concrete deterministic, heuristic, synthetic, or human finding. Missing human evidence alone is not a universal stop condition.
 
 ### Integrated GC-01 result
 
@@ -106,7 +110,7 @@ Focused command:
 npm run gc01:validate
 ```
 
-GC-04 through GC-12 are now closed. The next responsibility is GC-13 Beta hardening plus the genuine human evidence floor in issue #109.
+GC-04 through GC-12 are now closed. Current responsibilities run concurrently: GC-13 human evidence under issue #109 and bounded Beta/release hardening of the existing Campaign One using correctly classified deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, release-readiness, or human evidence.
 
 
 ### Integrated GC-03 result
