@@ -11,6 +11,8 @@ Turn the technically ready Content Alpha into an evidence-driven Beta without re
 
 This runbook governs how to collect, classify, repair, and accept the human evidence required before `BETA_PASS`.
 
+It governs the **human-evidence lane only**. Repository-wide work authorization remains governed by `AGENTS.md`, `STATUS.md`, and the current completion contracts.
+
 ## Hard boundary
 
 The following do **not** count toward the human-evidence floor:
@@ -21,7 +23,7 @@ The following do **not** count toward the human-evidence floor:
 - repository analysis;
 - the repository author/developer acting as a "fresh" participant.
 
-Use those tools to reproduce, diagnose, and regression-test findings after a real participant exposes them.
+Use those tools to reproduce, diagnose, regression-test, and independently inspect the product. They may justify bounded repository repairs under `AGENTS.md`, but they do not count toward the human-evidence floor.
 
 ## Entry state
 
@@ -131,19 +133,25 @@ human observation
 
 Do not automatically add a tutorial, popup, generic framework, new progression pillar, or new campaign content.
 
-A repair package is authorized only when it closes a demonstrated Beta/Release requirement or defect.
+A human-observation repair package is authorized when it closes a demonstrated Beta/Release requirement or defect. Separately, deterministic, heuristic, or synthetic findings may justify bounded hardening under `AGENTS.md`; preserve that evidence class rather than relabeling it as human evidence.
 
-## 6. Freeze rule while evidence is incomplete
+## 6. Scope lock while evidence is incomplete
 
-While issue #109 remains below the required evidence floor, ordinary implementation is limited to:
+While issue #109 remains below the required evidence floor, **Campaign One feature/content scope stays locked**, but repository work is not universally frozen.
+
+Bounded implementation may continue when justified by:
 
 - defects exposed by accepted human evidence;
+- deterministic runtime/test findings;
+- heuristic UX, information-hierarchy, terminology, pacing, balance, presentation, or accessibility findings;
+- synthetic/browser playthrough findings;
 - production-surface integrity defects;
-- save/recovery defects;
-- supported-browser/reliability defects;
-- accessibility/input defects;
+- save/recovery and persistence defects;
+- supported-browser/reliability/performance defects;
 - documentation/governance drift that could misroute implementation;
-- release qualification infrastructure required by the current contracts.
+- release qualification/deployment-readiness requirements owned by the current contracts.
+
+Every such package must stay inside already-authorized 1.0 scope and preserve its evidence class.
 
 The following remain outside the Campaign One 1.0 critical path unless authority is explicitly revised from evidence:
 
@@ -198,4 +206,8 @@ Do not create an RC merely to make progress while human evidence is open.
 
 ## Stop condition
 
-If there is no accepted human finding and no independently demonstrated release blocker, **do not invent repository work**. The active task is to collect the next genuine human session.
+For this **human-evidence lane**, if there is no accepted human finding, the next human-evidence task is to collect the next genuine session.
+
+That does not impose a repository-wide stop. Independent bounded hardening may continue under `AGENTS.md` when a deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, or release-readiness finding has material expected value.
+
+Do not invent new product scope merely because the human lane is waiting.
