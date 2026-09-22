@@ -20,7 +20,7 @@ build and supported browser matrix.
 | Five fresh-player first-session observations | NOT RECORDED | Human session records required | Product owner |
 | Three beginning-to-ending external playthroughs | NOT RECORDED | Human playthrough records required | Product owner |
 | Deterministic technical readiness | PASS | GC-13 Build Validation #394 / run `35549032298` | Engineering |
-| Latest pre-Beta full requalification | PASS | Player-surface candidate `4a64d8d53aea1a9c3385894ac89af570dec778d7`, Build Validation #419 / run `35680087869`; merged by PR #139 | Engineering |
+| Player-surface hygiene full requalification | PASS | Candidate `4a64d8d53aea1a9c3385894ac89af570dec778d7`, Build Validation #419 / run `35680087869`; merged by PR #139 | Engineering |
 | Exact build/browser provenance | CI ARTIFACT RECORDED | `gc13-browser-qualification` artifact 10617277390 | Engineering |
 | Chromium visible-UI smoke | PASS | Chromium 153.0.8010.12, Build Validation #394 | Engineering |
 | Firefox visible-UI smoke | PASS | Firefox 155.0, Build Validation #394 | Engineering |
