@@ -52,6 +52,20 @@ new autonomous authority
 post-1.0 feature pulled forward without release-blocking evidence
 ```
 
+### Evidence-to-authority distinction
+
+The Beta evidence contract and repository work authorization are separate concerns.
+
+```text
+missing human evidence
+!= bounded repository hardening forbidden
+
+missing human evidence
+= human-experience claims and BETA_PASS remain unproven
+```
+
+Deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, and release-readiness findings may justify bounded repairs inside the already-authorized Campaign One / 1.0 scope. Non-human evidence must retain its provenance and does not satisfy any gate that explicitly requires genuine human observation.
+
 ## Human product evidence
 
 Beta is the first maturity gate that **requires genuine human evidence**.
@@ -92,7 +106,7 @@ Beta does not require every participant to like every design choice. It requires
 
 ## Pacing gates
 
-Pacing must be evaluated with both instrumentation/repository evidence and human play.
+Pacing should be improved using instrumentation/repository analysis, heuristic/synthetic review, and human play where available. Final human-experience claims and Beta exit still require the human evidence defined by this contract.
 
 - [ ] Early game reaches the first meaningful consequence without excessive idle wait.
 - [ ] First relationship-derived capability arrives after enough history to feel causally grounded, not after opaque grind.

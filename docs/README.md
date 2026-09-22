@@ -8,6 +8,8 @@ The `docs/analysis/` directory contains earlier analysis material. It is preserv
 
 Top-level roles:
 
+- [`../AGENTS.md`](../AGENTS.md) — repository-wide coding-agent behavior and evidence-to-authority policy;
+- [`../CLAUDE.md`](../CLAUDE.md) — thin Claude adapter to `AGENTS.md`, not independent policy;
 - [`../STATUS.md`](../STATUS.md) — current repository/milestone truth;
 - [`CURRENT.md`](CURRENT.md) — documentation authority and supersession;
 - [`../RUNBOOK.md`](../RUNBOOK.md) — operational and CI procedure;

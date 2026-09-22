@@ -1,9 +1,9 @@
 # Repository Runbook — Game Completion Program
 
-**Current maturity:** PLAYABLE PRE-ALPHA  
-**Integrated implementation baseline:** `ff829ce6ee4da8a693adfb783fe843775403326d`  
+**Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
+**Repository-controlled readiness:** TECHNICAL_BETA_READY  
 **Active program:** Campaign One / 1.0 Game Completion  
-**Human Product Review:** issue #109 OPEN / UNPROVEN
+**Human Product Review:** issue #109 OPEN / UNPROVEN — 0/5 first sessions, 0/3 full external runs
 
 This file owns **operational procedure**. It does not define what the finished game is; that authority belongs to `specification/GameCompletionDefinition.md`.
 
@@ -13,9 +13,10 @@ For every new coding-agent / engineering session:
 
 ```text
 latest main
+-> AGENTS.md
 -> STATUS.md
--> HANDOFF.md when present for the latest completed milestone/session
 -> docs/CURRENT.md
+-> HANDOFF.md when present for the latest session
 -> specification/GameCompletionDefinition.md
 -> specification/Features/FeatureScopeMatrix.md
 -> specification/Progression/GameProgressionArc.md
@@ -24,14 +25,16 @@ latest main
 -> relevant Alpha/Beta/Release contract
 -> affected current domain contract/result
 -> RUNBOOK.md commands/procedure
--> fresh current-bottleneck reconciliation
+-> fresh current-frontier reconciliation
 ```
 
-Do not start from an old milestone queue. Do not infer M27 from M26. The active question is always:
+Do not start from an old milestone queue. Do not infer M27 from M26. Ask both:
 
-> Which unsatisfied 1.0 requirement is the current blocker?
+> Which current 1.0 player/release surface has a concrete improvement opportunity?
 
-GC-01 through GC-03 are integrated. The next responsibility is to reconcile GC-04 buildcraft breadth and GC-05 earned-delegation breadth against actual production evidence before authorizing new feature work.
+> What evidence class justifies acting on it, and what stronger claim will remain unproven afterward?
+
+GC-01 through GC-12 are integrated and deterministic Beta readiness is qualified. Current work has two concurrent lanes: genuine human Beta evidence and bounded repository-answerable hardening of the existing Campaign One. Missing human evidence is not a universal stop condition.
 
 ## Environment
 
@@ -66,19 +69,20 @@ If `main` moved, reconcile the candidate and rerun authoritative validation on t
 Before creating an implementation branch, record:
 
 ```text
-1. Completion requirement being closed
-2. Current concrete blocker
-3. Current authority owning the behavior
-4. Smallest proposed intervention
-5. Explicit non-goals
-6. Positive acceptance criteria
-7. Negative/rejection criteria
-8. Save/persistence impact
-9. Human-evidence ceiling
-10. Stop condition
+1. Current 1.0 player/release surface being improved
+2. Evidence class: DETERMINISTIC / HEURISTIC / SYNTHETIC / HUMAN
+3. Concrete risk, defect, friction, or requirement being addressed
+4. Current authority owning the behavior
+5. Smallest proposed intervention
+6. Explicit non-goals
+7. Positive acceptance criteria
+8. Negative/rejection criteria
+9. Save/persistence impact
+10. Claim ceiling after the work
+11. Diminishing-returns / stop condition
 ```
 
-A package without a traceable completion requirement is not authorized for the 1.0 critical path unless the completion authority is revised first.
+A package must trace to an already-authorized Campaign One / release surface and concrete evidence. It need not wait for human observation when deterministic, heuristic, or synthetic evidence independently justifies bounded hardening.
 
 ### Scope lookup
 
@@ -396,15 +400,15 @@ Campaign work should progressively add representative save/load qualification at
 
 Authority: `specification/Technical/AlphaCompletionContract.md`.
 
-Alpha is **not currently achieved**.
+Alpha is **PASS / HUMAN-UNVALIDATED** and GC-11 is integrated.
 
-Before declaring Alpha, GC-11 must implement an executable aggregate command expected to be named:
+The aggregate qualification command exists:
 
 ```bash
 npm run alpha:validate
 ```
 
-Do **not** run or document that command as currently available until GC-11 implements it.
+Use it as regression authority when changes can affect whole-game structural completion.
 
 `ALPHA_PASS` requires a legal normal-player path:
 
@@ -423,14 +427,13 @@ Alpha may remain explicitly HUMAN-UNVALIDATED; it is an implementation-completen
 
 ## Content Alpha operating gate
 
-After Alpha, GC-12 replaces temporary/diagnostic campaign prose and closes every required content placeholder.
+GC-12 is **PASS / HUMAN-UNVALIDATED**. The entire bounded campaign is authored and no required campaign unit is a placeholder.
 
 At `CONTENT_ALPHA`:
 
-- the entire bounded campaign is authored;
-- no required campaign unit is a placeholder;
-- feature expansion freezes by default;
-- system work becomes responsive to demonstrated content/player blockers.
+- feature/content scope remains locked by default;
+- new generalized systems and post-1.0 expansion remain prohibited without explicit scope revision;
+- bounded hardening of existing 1.0 surfaces may continue from deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, release-readiness, or human findings.
 
 ## Beta operating gate
 
@@ -455,19 +458,21 @@ visual/terminology consistency
 desktop browser support
 ```
 
+These concerns may be investigated through deterministic, heuristic, synthetic, and human evidence. Only genuine human evidence satisfies the current human-session floor or supports actual player-experience claims.
+
 Do not use test count as a substitute for resolving repeated severe player failures.
 
 ## Release Candidate / 1.0 operating gate
 
 Authority: `specification/Technical/ReleaseQualificationContract.md`.
 
-Before creating an RC, GC-14 must implement the automatable aggregate command expected to be named:
+The automatable release aggregate exists:
 
 ```bash
 npm run release:validate
 ```
 
-Do **not** claim this command exists until implemented.
+The GC-14 promotion guard is qualified, but current policy still blocks immutable RC entry until a real `BETA_PASS`. Repository hardening before that point should improve the existing release surface without pretending the RC gate is open.
 
 RC must identify one exact:
 
@@ -497,11 +502,11 @@ Full mobile product qualification is deferred from the 1.0 critical path unless 
 
 ## Human Product Review issue #109
 
-Issue #109 remains open.
+Issue #109 remains open and is the human-evidence backlog required by the current Beta/final promotion policy.
 
-Under provisional governance it is not a blanket freeze on all pre-Alpha development. It is the human-evidence backlog and becomes mandatory for Beta/final player-quality claims.
+It is **not** the sole source of engineering work. Deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, and release-readiness findings may independently justify bounded improvements to the already-authorized Campaign One.
 
-Repository automation may prepare builds, prompts, provenance templates and deterministic evidence. It may not invent participant observations or close the issue as a human PASS.
+Repository automation may prepare builds, run synthetic journeys, perform heuristic review, diagnose findings, implement bounded repairs, and produce deterministic evidence. It may not invent participant observations or close the issue as a human PASS.
 
 ## Documentation change procedure
 
@@ -544,12 +549,13 @@ Do not implement from historical placeholders/ideas alone:
 ## Final operating principle
 
 ```text
-1.0 requirement
--> current blocker
+authorized 1.0 surface
+-> concrete evidence-classified finding
 -> smallest existing-authority solution
--> focused positive + rejection tests
--> exact-head qualification
--> update completion status
+-> focused positive + rejection qualification
+-> exact-head validation
+-> preserve claim ceiling
+-> continue until diminishing returns / owner / external boundary
 ```
 
-> **Finish Campaign One before expanding the architecture.**
+> **Finish and harden Campaign One before expanding the architecture. Missing human evidence limits claims, not all useful action.**

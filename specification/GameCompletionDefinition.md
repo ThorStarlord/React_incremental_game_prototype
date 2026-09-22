@@ -12,9 +12,11 @@ This document defines what counts as a **complete 1.0 game**. It is the product-
 
 The repository is no longer governed by an open-ended rule of “build the next technically plausible subsystem.” Future work must answer:
 
-> Which unsatisfied 1.0 requirement does this change close, or which repeated concrete blocker prevents that requirement from being closed?
+> Which already-authorized 1.0 player/release surface does this change improve, what concrete evidence justifies it, and what claim remains unproven afterward?
 
-If no such requirement exists, the change is outside the 1.0 critical path unless this document is explicitly revised.
+Valid evidence may be deterministic, heuristic, synthetic, accessibility/reliability/presentation/pacing/balance analysis, or genuine human observation. Non-human evidence does not become human evidence.
+
+A change that neither closes an unsatisfied requirement nor repairs a concrete evidence-backed risk/defect in the authorized 1.0 surface is outside the critical path unless this document is explicitly revised.
 
 ## 1. Product identity
 
@@ -293,9 +295,11 @@ Issue #109 remains the human product-evidence authority. Human evidence may revi
 A proposed 1.0 change must satisfy at least one:
 
 1. directly closes an unsatisfied requirement in this document or a referenced completion contract;
-2. repairs a demonstrated blocker to such a requirement;
-3. resolves repeated content-authoring friction that materially obstructs campaign completion;
+2. repairs a concrete deterministic, heuristic, synthetic, or human finding that degrades an already-authorized 1.0 player/release surface;
+3. resolves repeated content-authoring friction that materially obstructs campaign completion or release hardening;
 4. is a release-quality fix required by Beta/RC criteria.
+
+Missing human evidence alone is not a universal implementation stop. It limits human-experience claims and the promotion gates that explicitly require genuine human evidence.
 
 Otherwise classify it as `DEFER_POST_1_0`, `CUT`, or a separate future decision.
 

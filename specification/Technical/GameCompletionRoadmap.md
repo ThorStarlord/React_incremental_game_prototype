@@ -14,11 +14,13 @@
 
 This roadmap replaces open-ended milestone accumulation with a bounded program whose stop condition is **Campaign One / 1.0**.
 
-The governing question for every package is:
+The governing questions for every package are:
 
-> Which explicit unsatisfied Game Completion requirement does this package close?
+> Which already-authorized 1.0 player/release surface does this package improve?
 
-A package that cannot answer that question is not on the 1.0 critical path unless the completion definition is explicitly revised.
+> What concrete evidence class justifies the work, and what stronger claim remains unproven?
+
+A package may close an unsatisfied completion requirement or repair a deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, release-readiness, or human finding. A package that cannot identify either is not on the 1.0 critical path unless the completion definition is explicitly revised.
 
 ## 2. Current maturity
 
@@ -36,16 +38,16 @@ Release Candidate                    BLOCKED ON BETA_PASS
 1.0                                  BLOCKED
 ```
 
-The repository already demonstrates a real playable application shell and a qualified complete chapter loop. The remaining work is increasingly campaign completion, progression breadth, player-facing comprehension, content, and release quality rather than foundational architecture.
+The repository now has a complete authored Campaign One, whole-game Alpha, Content Alpha, and qualified deterministic Beta readiness. The remaining work is Beta convergence: genuine human evidence plus bounded repository-answerable UX/pacing/balance/accessibility/presentation/reliability/persistence/release hardening, followed by immutable RC qualification after BETA_PASS.
 
 ## 3. Program invariants
 
-1. **Completion-driven scope:** every active package traces to a completion requirement.
+1. **Completion-driven scope:** every active package traces to an already-authorized 1.0 surface plus either a completion requirement or a concrete evidence-classified finding.
 2. **Content-first pressure:** prefer authoring against existing authorities; introduce abstractions only after repeated concrete friction.
 3. **No automatic M-number continuation:** M26 closes the old provisional milestone sequence. There is no implied M27.
 4. **One large critical-path package at a time:** avoid parallel architectural expansion that makes causal diagnosis difficult.
 5. **Exact-head qualification:** every merge requires the current repository validation policy on the exact candidate.
-6. **Human claims stay human:** automated/synthetic evidence never becomes player comprehension, fun, pacing, fairness, or retention evidence.
+6. **Human claims stay human:** automated/synthetic/heuristic evidence never becomes actual player comprehension, enjoyment, preference, perceived pacing/fairness, or retention evidence; it may still justify bounded hardening.
 7. **Cut means cut:** `CUT`/`DEFER_POST_1_0` surfaces do not remain in player-facing navigation as promises of 1.0 work.
 8. **Player judgment remains manual:** Copy/offline authority cannot expand into irreversible narrative/social/world decisions by implication.
 9. **Finish before expand:** Chapters 8+, interplanetary content, generalized crafting/inventory, skill trees, New Game+, live-service systems, and generic simulation are outside the 1.0 critical path.

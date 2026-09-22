@@ -5,7 +5,7 @@
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
 **Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
-**Next product responsibility:** genuine human Beta evidence under issue #109  
+**Current product responsibilities:** human Beta evidence + bounded repository-answerable 1.0 hardening  
 **Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
 
@@ -70,37 +70,55 @@ Architecture         -> heterogeneous authored composition
 
 This remains human-unvalidated. Deterministic qualification does not prove comprehension, pacing, fun, fairness, emotional impact, retention or preference.
 
-## Immediate responsibility — human Beta evidence
+## Concurrent responsibilities
 
-Issue #109 is the canonical active product-evidence backlog.
+### Lane A — genuine human Beta evidence
 
-Before `BETA_PASS`, current authority requires at least:
+Issue #109 remains the canonical human product-evidence backlog.
+
+Before `BETA_PASS`, current authority still requires at least:
 
 - 5 fresh-player first-session observations on a current supported build;
 - 3 external beginning-to-ending fresh-save playthroughs without developer intervention in required progression;
 - classification and bounded repair of recurring severe findings;
 - exact build/browser/session provenance for accepted evidence.
 
-Synthetic observation, automated UI traversal, repository analysis and LLM judgment do not satisfy this gate.
+Synthetic observation, automated UI traversal, repository analysis and LLM judgment do not satisfy this human-evidence gate.
 
-## Evidence-driven implementation freeze
+### Lane B — repository-answerable 1.0 hardening
 
-The normal implementation loop is now `human observation -> classification -> smallest repair -> deterministic regression -> human rerun when warranted`. If there is no accepted human finding and no independently demonstrated release blocker, do not invent repository work to fill the open Beta gate.
+Human evidence is not the only valid source of useful engineering work. While Lane A is open, continue bounded hardening of the existing Campaign One when deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, or release-readiness evidence identifies a concrete improvement.
 
-Use `docs/release/BetaExecutionRunbook.md` for candidate pinning, session acceptance, finding classification, repair routing, and promotion sequencing.
+Preserve the evidence class. Non-human work may improve the product, but it must not be reported as proof of actual player comprehension, enjoyment, preference, retention, or other human-experience claims.
 
-## Deterministic work still allowed before/during Beta
+## Scope lock, not work freeze
 
-Only bounded work that closes a demonstrated release blocker is authorized. Examples include:
+For the human lane, the preferred loop remains `human observation -> classification -> smallest repair -> deterministic regression -> human rerun when warranted`.
 
-- production-surface integrity defects;
-- save/recovery defects;
-- browser/reliability defects;
+For repository-answerable hardening, use `finding -> evidence classification -> smallest repair -> deterministic regression -> exact-head qualification`.
+
+Allowed evidence classes include:
+
+- deterministic implementation/runtime findings;
+- heuristic UX, information-hierarchy, terminology, accessibility, pacing and design findings;
+- synthetic/browser playthrough findings;
+- genuine human findings.
+
+Examples of authorized bounded work include:
+
+- navigation/discoverability and causal/state-legibility repairs;
+- pacing, grind, balance, and delegation-timing repairs supported by concrete analysis;
+- production-surface integrity and presentation polish;
+- save/recovery and persistence hardening;
+- browser/reliability/performance defects;
 - accessibility/input defects;
 - documentation/governance drift that can misroute agents;
-- small repairs directly justified by accepted human observations.
+- release qualification/deployment readiness;
+- repairs directly justified by accepted human observations.
 
-Do not create speculative systems to fill time while human evidence is pending.
+Do not create speculative systems, chapters, generalized engines, or post-1.0 scope merely to keep development busy while human evidence is pending.
+
+Use `docs/release/BetaExecutionRunbook.md` for the human-evidence lane and `AGENTS.md` for the repository-wide evidence-to-authority rule.
 
 ## Release path after BETA_PASS
 

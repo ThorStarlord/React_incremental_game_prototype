@@ -72,7 +72,7 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Endless/endgame progression | DEFER_POST_1_0 | absent | Campaign completion is the 1.0 end condition. |
 | Interplanetary campaign / AI-war continuation | DEFER_POST_1_0 | narrative seed | Post-1.0 campaign/expansion material. |
 | Audio / music | SUPPORTING_1_0 | not completion-critical yet | Basic release presentation required before RC; no large audio pipeline needed for Alpha. |
-| Final visual/art pass | SUPPORTING_1_0 | Beta presentation review / human evidence pending | Make bounded presentation repairs from Beta evidence; do not turn this into a speculative art-system expansion. |
+| Final visual/art pass | SUPPORTING_1_0 | Beta presentation review / human evidence pending | Make bounded presentation repairs from heuristic, synthetic, accessibility, release-review, or human evidence; only human sessions establish actual player perception. Do not turn this into a speculative art-system expansion. |
 | Onboarding / first-session guidance | CORE_1_0 | implemented / human-unvalidated | Alpha provides a normal-UI path into the first meaningful loop; Beta must validate comprehension with humans. |
 | Accessibility baseline | SUPPORTING_1_0 | incomplete | Keyboard/focus/readability issues become Beta/RC blockers according to completion contracts. |
 | Desktop browser support | CORE_1_0 release | Chromium + Firefox CI qualified; exact-RC evidence pending | Chromium-class + Firefox desktop are primary 1.0 targets. |
