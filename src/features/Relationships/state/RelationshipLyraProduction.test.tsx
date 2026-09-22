@@ -381,7 +381,7 @@ describe('M11 Lyra production adversarial vertical slice', () => {
 
     const persistentMigration = migrateSavePayload(historicalState);
     expect(persistentMigration.sourceVersion).toBe(0);
-    expect(persistentMigration.targetVersion).toBe(1);
+    expect(persistentMigration.targetVersion).toBe(2);
 
     store.dispatch(replaceState(rehydratePersistedGameState(
       persistentMigration.envelope.state,
