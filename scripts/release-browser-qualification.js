@@ -192,6 +192,36 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await assertVisible(page.getByRole('main').first(), 'game main landmark');
     });
 
+    await check('first-actionable-prologue-objective-visible', async () => {
+      let introCompleted = false;
+      for (let step = 0; step < 10; step += 1) {
+        const begin = page.getByRole('button', { name: /^Begin$/ });
+        if (await begin.isVisible().catch(() => false)) {
+          await begin.click();
+          introCompleted = true;
+          break;
+        }
+
+        const continueButton = page.getByRole('button', { name: /^Continue$/ });
+        if (!(await continueButton.isVisible().catch(() => false))) {
+          throw new Error('intro did not expose Continue or Begin');
+        }
+        await continueButton.click();
+      }
+      if (!introCompleted) {
+        throw new Error('intro did not reach Begin within 10 steps');
+      }
+
+      await assertVisible(
+        page.getByText('Prologue — Find Elder Willow', { exact: true }),
+        'first Campaign One objective'
+      );
+      await assertVisible(
+        page.getByRole('link', { name: /^Open travel controls$/ }),
+        'first Campaign One next action'
+      );
+    });
+
     await check('game-navigation-visible', async () => {
       const navigation = page.getByRole('button', { name: /^Navigate to / }).first();
       await assertVisible(navigation, 'game navigation control');
