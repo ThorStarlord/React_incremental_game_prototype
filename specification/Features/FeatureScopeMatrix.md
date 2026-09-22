@@ -52,10 +52,10 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Navigation / dashboard | SUPPORTING_1_0 | implemented | Must expose only real 1.0 surfaces; remove misleading placeholders. |
 | Settings | MINIMAL_1_0 | implemented | Only settings required for basic play/release usability. |
 | Dedicated in-game Save Management page | CUT as separate system | removed from primary navigation / compatibility IDs retained | Existing main-menu save authority is canonical. Do not restore a duplicate persistence surface. |
-| Separate Skills / skill-tree system | CUT | removed from primary navigation / compatibility IDs retained | Traits already own capability progression. Do not restore the player-facing placeholder for 1.0. |
+| Separate Skills / skill-tree system | CUT | removed from primary navigation / compatibility IDs and legacy serialized field retained inertly | Traits already own capability progression. Compatibility state such as `availableSkillPoints` may remain for old-save stability, but Campaign One must not display, award, or consume it as player progression. |
 | General Inventory system | DEFER_POST_1_0 | removed from primary navigation / reference spec retained | Current 1.0 campaign does not require a general item-storage economy. Reconsider only if accepted campaign evidence proves need. |
 | General Equipment system | DEFER_POST_1_0 | deferred; current player-facing wording reconciled | Do not make equipment a 1.0 pillar unless a concrete campaign/combat requirement cannot be expressed through current authorities. |
-| General Crafting system | CUT for Campaign One | removed from primary navigation / reference ideas retained | Gronk/forge content may remain authored interaction/routine content without a generic crafting economy. Do not restore a generic crafting surface. |
+| General Crafting system | CUT for Campaign One | removed from primary navigation / reference and compatibility fixture IDs retained inertly | Gronk/forge content may remain authored interaction/routine content without a generic crafting economy. Generic `crafter_*` service fixtures must not become executable Campaign One progression authority. |
 | Generic ChapterEngine | CUT | intentionally absent | Continue bounded chapter projections. Reconsider only after repeated concrete content friction. |
 | Generic narrative condition DSL | CUT | intentionally absent | Existing canonical domain prerequisites remain authoritative. |
 | Dynamic chapter/plugin registry | DEFER_POST_1_0 | absent | Not required for bounded Campaign One. |
@@ -106,7 +106,7 @@ required but not yet implemented -> show only when the active Alpha package need
 cut/deferred surface -> remove from primary player navigation
 ```
 
-Do not advertise `Skills`, `Inventory`, `Crafting`, or a duplicate `Saves` system as upcoming required game features merely because historical navigation scaffolding exists.
+Do not advertise `Skills`, `Inventory`, `Crafting`, or a duplicate `Saves` system as upcoming required game features merely because historical navigation scaffolding exists. Compatibility fields or fixture IDs may remain when removal would create migration risk, but they must stay inert and non-player-authoritative unless this matrix is explicitly revised.
 
 ## Scope-change rule
 
