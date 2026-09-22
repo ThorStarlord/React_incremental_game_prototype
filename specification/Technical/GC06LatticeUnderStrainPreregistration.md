@@ -33,10 +33,26 @@ The Chapter 4 stabilization quest has three legal resolution strategies:
 
 The two capability routes are the first explicit campaign consumers of differentiated two-Trait build profiles. Baseline viability remains mandatory.
 
+## Post-implementation doctrine reconciliation
+
+The original GC06 preregistration above correctly established the two learned Trait pairs. After the bounded Relationship Capability Constellation gained a qualified player-facing selection surface, GC06 became the first production decision to distinguish permanent knowledge from current specialization:
+
+```text
+Reroute the Lattice Load
+-> requiredActiveDoctrineIds: structural_steward
+
+Phase Against the Echo
+-> requiredActiveDoctrineIds: countermodeler
+```
+
+The matching permanent Traits are still required indirectly because doctrine derivation fails closed unless every required Trait is permanently learned and currently foregrounded. The baseline **Contain Surface Failures** route remains legal with no optional doctrine.
+
+This is a bounded reconciliation of the implemented route gate, not a retroactive claim that the original preregistration already specified doctrine focus.
+
 ## Canonical authorities consumed
 
 - Relationship Experience / Memory — Chapter 1, Elara, Lyra, capability provenance;
-- Traits / permanent capability authority — only through existing Quest resolution gates;
+- Traits / permanent capability authority + Player doctrine focus — the two optional build-profile resolutions consume active doctrine while the baseline remains ungated;
 - Knowledge — NPC-specific awareness of the lattice diagnosis;
 - Faction Reputation — City Watch response remains institutional rather than Relationship state;
 - World State — objective regional lattice condition;
@@ -86,7 +102,7 @@ None required in Chapter 4. GC-05 breadth is reserved for later preparation pres
 ## Negative/rejection paths
 
 - later evidence cannot skip GC-03;
-- missing permanent Traits hide/reject only their optional resolution;
+- missing permanent Traits or an inactive matching doctrine hide/reject only the corresponding optional resolution;
 - baseline resolution remains legal without optional Traits;
 - Valerius institutional response cannot occur before he knows the diagnosis;
 - lattice stabilization cannot be claimed before a route decision;
@@ -95,4 +111,4 @@ None required in Chapter 4. GC-05 breadth is reserved for later preparation pres
 
 ## Save/load expectations
 
-All Chapter 4 state is derived from existing persisted authorities: Relationship, Quest, Knowledge, Faction, World State and permanent Traits. No new save-schema root is permitted.
+All Chapter 4 state is derived from existing persisted authorities: Relationship, Quest, Knowledge, Faction, World State, permanent Traits and Player-owned `doctrineFocus`. No chapter-owned save-schema root is permitted.
