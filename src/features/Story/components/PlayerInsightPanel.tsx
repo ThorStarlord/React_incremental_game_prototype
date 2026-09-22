@@ -53,7 +53,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
   );
 
   return (
-    <Card elevation={2} data-testid="player-insight-panel">
+    <Card elevation={2} data-test-id="player-insight-panel">
       <CardContent>
         <Stack spacing={3}>
           <Box>
@@ -148,7 +148,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                   Relationship-Derived Build
                 </Typography>
                 {activeDoctrineIds.length > 0 ? (
-                  <Box data-testid="player-insight-active-doctrine">
+                  <Box data-test-id="player-insight-active-doctrine">
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
                       Current doctrine
                     </Typography>
