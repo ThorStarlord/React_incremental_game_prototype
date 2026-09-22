@@ -13,10 +13,8 @@ import {
   Typography
 } from '@mui/material';
 import { 
-  RestartAlt, 
-  FileDownload, 
-  FileUpload, 
-  Settings 
+  RestartAlt,
+  Settings
 } from '@mui/icons-material';
 
 /**
@@ -24,8 +22,6 @@ import {
  */
 interface SettingsActionsProps {
   onReset: () => void;
-  onExport: () => void;
-  onImport: () => void;
 }
 
 /**
@@ -33,14 +29,10 @@ interface SettingsActionsProps {
  * 
  * Features:
  * - Reset to defaults with confirmation
- * - Export settings functionality
- * - Import settings functionality
- * - Confirmation dialogs for destructive actions
+  * - Confirmation dialogs for destructive actions
  */
 export const SettingsActions: React.FC<SettingsActionsProps> = ({
-  onReset,
-  onExport,
-  onImport
+  onReset
 }) => {
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
@@ -82,27 +74,6 @@ export const SettingsActions: React.FC<SettingsActionsProps> = ({
               Reset to Defaults
             </Button>
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              {/* Export Settings */}
-              <Button
-                variant="outlined"
-                startIcon={<FileDownload />}
-                onClick={onExport}
-                fullWidth
-              >
-                Export Settings
-              </Button>
-
-              {/* Import Settings */}
-              <Button
-                variant="outlined"
-                startIcon={<FileUpload />}
-                onClick={onImport}
-                fullWidth
-              >
-                Import Settings
-              </Button>
-            </Box>
           </Box>
         </CardContent>
       </Card>
