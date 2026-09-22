@@ -159,9 +159,9 @@ Observer classification:
 
 Record findings individually. Repeated severe findings matter more than raw participant count.
 
-| Finding ID | Severity | Area | Reproduction / evidence | Blocks ordinary progression or intentional choice? | Disposition |
-| --- | --- | --- | --- | --- | --- |
-| | | | | | |
+| Finding ID | Severity | Finding class | Area | Reproduction / evidence | Blocks ordinary progression or intentional choice? | Disposition |
+| --- | --- | --- | --- | --- | --- | --- |
+| | | | | | | |
 
 Suggested severity vocabulary:
 
@@ -170,6 +170,28 @@ Suggested severity vocabulary:
 - `HIGH` — major repeated failure likely to prevent ordinary understanding/completion;
 - `MEDIUM` — meaningful friction/confusion with workaround or recovery;
 - `LOW` — polish/clarity issue without material progression risk.
+
+Classify each finding before choosing a repair:
+
+- `NAVIGATION_DISCOVERABILITY` — the player cannot find the relevant surface/action;
+- `STATE_LEGIBILITY` — the player sees the surface but cannot tell what changed;
+- `CAUSAL_MODEL` — the player observes the change but infers the wrong cause;
+- `TERMINOLOGY` — labels obscure an otherwise recoverable mental model;
+- `PACING_GRIND` — waiting or repetition displaces consequential choices;
+- `BALANCE` — costs/rewards/encounters distort intended viable choices;
+- `PRESENTATION_ACCESSIBILITY` — visual hierarchy, feedback, input, readability, or focus blocks use;
+- `MECHANICAL_CONTRADICTION` — runtime behavior teaches or enforces the wrong rule.
+
+## Repair routing
+
+Do not default to adding a tutorial, popup, or new system. For an accepted finding:
+
+1. preserve the near-verbatim observation and reproduction evidence;
+2. classify the failure at the smallest causal layer above;
+3. repair the smallest layer that explains the failure;
+4. add deterministic regression coverage when the repair changes repository-owned behavior;
+5. rerun the affected human scenario on the new exact build when the finding was severe or repeated;
+6. never count a synthetic or LLM rerun as replacement human evidence.
 
 ## Session acceptance
 

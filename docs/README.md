@@ -11,6 +11,8 @@ Top-level roles:
 - [`../STATUS.md`](../STATUS.md) — current repository/milestone truth;
 - [`CURRENT.md`](CURRENT.md) — documentation authority and supersession;
 - [`../RUNBOOK.md`](../RUNBOOK.md) — operational and CI procedure;
+- [`release/BetaExecutionRunbook.md`](release/BetaExecutionRunbook.md) — human-Beta candidate/session/repair/promotion procedure;
+- [`release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) — accepted human-session evidence record format;
 - [`../README.md`](../README.md) — repository orientation;
 - [`../specification/README.md`](../specification/README.md) — domain-specific technical/product authority map.
 

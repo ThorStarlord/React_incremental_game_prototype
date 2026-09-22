@@ -54,6 +54,7 @@ const requiredAuthorityFiles = [
   'specification/Technical/GC13BetaTechnicalReadinessResult.md',
   'specification/Technical/GC14ReleaseEligibilityPreregistration.md',
   'specification/Technical/GC14ReleaseEligibilityBlockedResult.md',
+  'docs/release/BetaExecutionRunbook.md',
   'docs/release/BetaHumanEvidenceTemplate.md',
   'specification/Technical/M25CompleteChapterVerticalSliceResult.md',
   'specification/Technical/PostM25ProductDirection.md',
@@ -103,6 +104,7 @@ if (exists('docs/CURRENT.md')) {
     'GC12ContentAlphaResult.md',
     'GC13BetaTechnicalReadinessResult.md',
     'GC14ReleaseEligibilityBlockedResult.md',
+    'BetaExecutionRunbook.md',
     'BetaHumanEvidenceTemplate.md',
     'GameLoopAsyncTickBacklogPolicyContract.md',
     'GameLoopLifecycleRemainderPolicy.md',
@@ -199,7 +201,7 @@ requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
   '7f306f3b6a69a27c250c1986df976cc518119821',
 ]);
 
-requireContains('docs/README.md', ['CURRENT.md', 'HISTORICAL']);
+requireContains('docs/README.md', ['CURRENT.md', 'HISTORICAL', 'BetaExecutionRunbook.md', 'BetaHumanEvidenceTemplate.md']);
 requireContains('package.json', [
   '"docs:authority:validate"',
   '"m26:validate"',

@@ -127,6 +127,7 @@ Important current bounded records also include:
 - `PostM25ThirdHeterogeneousChapter.md` — Enemies in Phase;
 - `PostM25CopyRoutineStrategy.md` — explicit routine priority / Start Preferred;
 - `M26ProvisionalProductDepthResult.md` — visible capability/mastery/delegation provenance;
+- `../docs/release/BetaExecutionRunbook.md` — operational human-evidence collection, classification, repair routing and promotion sequence;
 - `GC01PlayerSurfaceScopeCleanupResult.md` — integrated 1.0 player-surface cleanup and rejection qualification;
 - `GC03OpeningCampaignSpineResult.md` — integrated Prologue -> Chapters 1-3 production spine and bounded cast-unlock qualification.
 
@@ -134,7 +135,7 @@ Use [`specification/README.md`](../specification/README.md) for the broader doma
 
 ## Current maturity interpretation
 
-Historical documents and package metadata may still contain the word **prototype**. That is not a current maturity verdict.
+Historical documents and package metadata may still contain the word **prototype**. That is not a current maturity verdict. Likewise, the private package prerelease label `0.9.0-beta.1` is historical/tooling metadata and does not constitute `BETA_PASS`; maturity authority comes from the completion records below.
 
 Current maturity is:
 
@@ -149,10 +150,13 @@ RC_ENTRY_BLOCKED
 ```
 
 The repository has passed proof-of-concept, systems-prototype, whole-game Alpha,
-and Content Alpha qualification. Build Validation #394 also qualifies the
+and Content Alpha qualification. Build Validation #394 established the GC-13
 repository-controlled Beta engineering baseline, including Chromium 153 and
 Firefox 155 visible-UI smoke on Linux CI, canonical recovery behavior, timing /
-offline contracts, TypeScript, and production build.
+offline contracts, TypeScript, and production build. The later pre-Beta
+player-surface candidate `4a64d8d53aea1a9c3385894ac89af570dec778d7` re-ran the
+full Build Validation chain successfully as #419 / run `35680087869` before PR #139
+merged to `main`.
 
 This does not satisfy Beta. Issue #109 remains the current human-evidence gate:
 5 accepted fresh-player first sessions and 3 accepted external full fresh-save
@@ -213,7 +217,8 @@ The following must not govern new work:
 - any statement that Product Direction is still entirely unselected: it is now **provisionally selected / human-unvalidated**;
 - any statement that M26 remains unauthorized: it has been explicitly authorized, qualified and integrated;
 - any implication that technical green tests authorize M27;
-- any old feature placeholder that implies Skills, Crafting, general Inventory, or a duplicate save system must ship in 1.0.
+- any old feature placeholder that implies Skills, Crafting, general Inventory, or a duplicate save system must ship in 1.0;
+- any statement that those cut/deferred placeholder routes remain active player-facing Campaign One surfaces after GC-01.
 
 A `SUPERSEDED` label applies to the identified conclusion/scope, not necessarily every historical fact in the file.
 

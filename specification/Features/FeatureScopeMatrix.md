@@ -38,12 +38,12 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Faction Reputation | CORE_1_0 | implemented / qualified | Owns institutional standing independent from personal relationships. |
 | World State | CORE_1_0 | implemented / qualified | Owns persistent objective regional conditions. |
 | Copy system | CORE_1_0 | implemented / qualified | Bounded execution of understood repeatable work. |
-| Routine familiarity / earned delegation | CORE_1_0 | implemented, limited breadth | Reach minimum 1.0 breadth without automatic chaining or hidden mastery. |
+| Routine familiarity / earned delegation | CORE_1_0 | implemented / qualified breadth | Preserve the qualified 1.0 breadth without automatic chaining or hidden mastery. |
 | Persistence / save / load | CORE_1_0 | implemented | Must survive whole-campaign progression. |
 | Save import / export | CORE_1_0 | implemented through main menu | Preserve as recovery/portability path. |
 | Autosave | SUPPORTING_1_0 | implemented | Must not corrupt or overwrite progression unexpectedly. |
 | Bounded offline progression | CORE_1_0 | implemented / qualified | Safe already-running work only; no narrative auto-resolution. |
-| Chapter-scale composition | CORE_1_0 | three heterogeneous projections qualified | Continue as composition over canonical authorities; no chapter-local shadow state. |
+| Chapter-scale composition | CORE_1_0 | full Campaign One integrated / qualified | Preserve composition over canonical authorities; no chapter-local shadow state. |
 | Content intelligence / reachability / chapter validation | SUPPORTING_1_0 | implemented | Required developer-side authoring protection as campaign content grows. |
 | Player Insight / causal journal / build provenance | SUPPORTING_1_0 | implemented / M26 deepens | Make consequence and capability provenance understandable without spoilers. |
 | Contextual `Available because` explanation | SUPPORTING_1_0 | implemented | Keep explanations causal and player-facing, not debug output. |
@@ -51,11 +51,11 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Main menu | CORE_1_0 | implemented | New Game, Continue, Load, Import, Export must remain usable. |
 | Navigation / dashboard | SUPPORTING_1_0 | implemented | Must expose only real 1.0 surfaces; remove misleading placeholders. |
 | Settings | MINIMAL_1_0 | implemented | Only settings required for basic play/release usability. |
-| Dedicated in-game Save Management page | CUT as separate system | placeholder | Existing main-menu save authority is canonical. Remove/redirect placeholder rather than duplicate persistence semantics. |
-| Separate Skills / skill-tree system | CUT | placeholder | Traits already own capability progression. Remove the player-facing placeholder from 1.0 navigation. |
-| General Inventory system | DEFER_POST_1_0 | placeholder / reference spec | Current 1.0 campaign does not require a general item-storage economy. Remove placeholder from primary navigation; reconsider only if campaign content proves need. |
-| General Equipment system | DEFER_POST_1_0 | partial/reference language | Do not make equipment a 1.0 pillar unless a concrete campaign/combat requirement cannot be expressed through current authorities. |
-| General Crafting system | CUT for Campaign One | placeholder / reference ideas | Gronk/forge content may remain authored interaction/routine content without a generic crafting economy. Remove placeholder from primary navigation. |
+| Dedicated in-game Save Management page | CUT as separate system | removed from primary navigation / compatibility IDs retained | Existing main-menu save authority is canonical. Do not restore a duplicate persistence surface. |
+| Separate Skills / skill-tree system | CUT | removed from primary navigation / compatibility IDs retained | Traits already own capability progression. Do not restore the player-facing placeholder for 1.0. |
+| General Inventory system | DEFER_POST_1_0 | removed from primary navigation / reference spec retained | Current 1.0 campaign does not require a general item-storage economy. Reconsider only if accepted campaign evidence proves need. |
+| General Equipment system | DEFER_POST_1_0 | deferred; current player-facing wording reconciled | Do not make equipment a 1.0 pillar unless a concrete campaign/combat requirement cannot be expressed through current authorities. |
+| General Crafting system | CUT for Campaign One | removed from primary navigation / reference ideas retained | Gronk/forge content may remain authored interaction/routine content without a generic crafting economy. Do not restore a generic crafting surface. |
 | Generic ChapterEngine | CUT | intentionally absent | Continue bounded chapter projections. Reconsider only after repeated concrete content friction. |
 | Generic narrative condition DSL | CUT | intentionally absent | Existing canonical domain prerequisites remain authoritative. |
 | Dynamic chapter/plugin registry | DEFER_POST_1_0 | absent | Not required for bounded Campaign One. |
@@ -72,10 +72,10 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Endless/endgame progression | DEFER_POST_1_0 | absent | Campaign completion is the 1.0 end condition. |
 | Interplanetary campaign / AI-war continuation | DEFER_POST_1_0 | narrative seed | Post-1.0 campaign/expansion material. |
 | Audio / music | SUPPORTING_1_0 | not completion-critical yet | Basic release presentation required before RC; no large audio pipeline needed for Alpha. |
-| Final visual/art pass | SUPPORTING_1_0 | pre-alpha presentation | Beta work after content scope stabilizes. |
+| Final visual/art pass | SUPPORTING_1_0 | Beta presentation review / human evidence pending | Make bounded presentation repairs from Beta evidence; do not turn this into a speculative art-system expansion. |
 | Onboarding / first-session guidance | CORE_1_0 | implemented / human-unvalidated | Alpha provides a normal-UI path into the first meaningful loop; Beta must validate comprehension with humans. |
 | Accessibility baseline | SUPPORTING_1_0 | incomplete | Keyboard/focus/readability issues become Beta/RC blockers according to completion contracts. |
-| Desktop browser support | CORE_1_0 release | web app exists | Chromium-class + Firefox desktop are primary 1.0 targets. |
+| Desktop browser support | CORE_1_0 release | Chromium + Firefox CI qualified; exact-RC evidence pending | Chromium-class + Firefox desktop are primary 1.0 targets. |
 | Full mobile product support | DEFER_POST_1_0 | responsive code exists | Avoid regressions, but mobile is not a primary 1.0 release target. |
 | Analytics / telemetry | DEFER_POST_1_0 | absent | Not required to ship a bounded standalone web game. |
 | Live-service backend | CUT | absent | 1.0 remains a client-side bounded game unless a later explicit product decision changes this. |
@@ -96,7 +96,7 @@ The completion floor is:
 
 ## Placeholder policy
 
-Player-facing placeholders are not harmless once the project is treated as a playable pre-alpha.
+Player-facing placeholders are not harmless now that the project is a playable Content Alpha.
 
 For 1.0 navigation:
 

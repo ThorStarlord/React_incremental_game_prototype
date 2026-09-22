@@ -1,11 +1,13 @@
 # Milestone Handoff — GC-14 / Pre-Beta
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
-**Reconciled baseline:** `8b99ffaf358c67a0532484949e90e6347d69d808`  
+**Reconciled baseline before this activation package:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
 **Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
-**Next product responsibility:** genuine human Beta evidence under issue #109
+**Next product responsibility:** genuine human Beta evidence under issue #109  
+**Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs  
+**Operator procedure:** `docs/release/BetaExecutionRunbook.md`
 
 ## Repository reality
 
@@ -33,7 +35,7 @@ GC-14  immutable RC / final 1.0 promotion            BLOCKED
 
 The repository must not restart closed GC packages merely because Beta is externally blocked.
 
-A bounded pre-Beta player-surface hygiene pass also removes confirmed release-facing residue without expanding scope: normal NPC/Essence pages no longer expose prototype/debug mutations, the Dashboard/Character surfaces no longer advertise deferred or internal concepts, Settings no longer exposes no-op import/export actions, and the unreachable legacy `GamePage` reset surface is removed. GC-01 regression coverage owns these rejection checks.
+PR #139 completed the bounded pre-Beta player-surface hygiene pass without expanding scope: normal NPC/Essence pages no longer expose prototype/debug mutations, the Dashboard/Character surfaces no longer advertise deferred or internal concepts, Settings no longer exposes no-op import/export actions, and the unreachable legacy `GamePage` reset surface is removed. Exact head `4a64d8d53aea1a9c3385894ac89af570dec778d7` passed Build Validation #419 / run `35680087869`; GC-01 regression coverage owns these rejection checks.
 
 ## Current campaign spine
 
@@ -80,6 +82,12 @@ Before `BETA_PASS`, current authority requires at least:
 - exact build/browser/session provenance for accepted evidence.
 
 Synthetic observation, automated UI traversal, repository analysis and LLM judgment do not satisfy this gate.
+
+## Evidence-driven implementation freeze
+
+The normal implementation loop is now `human observation -> classification -> smallest repair -> deterministic regression -> human rerun when warranted`. If there is no accepted human finding and no independently demonstrated release blocker, do not invent repository work to fill the open Beta gate.
+
+Use `docs/release/BetaExecutionRunbook.md` for candidate pinning, session acceptance, finding classification, repair routing, and promotion sequencing.
 
 ## Deterministic work still allowed before/during Beta
 
