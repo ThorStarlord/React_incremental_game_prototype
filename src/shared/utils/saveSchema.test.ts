@@ -52,10 +52,34 @@ describe('M10 save schema migration pipeline', () => {
 
     expect(result.sourceVersion).toBe(LEGACY_SAVE_SCHEMA_VERSION);
     expect(result.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1']);
+    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus']);
     expect(result.envelope.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(result.envelope.state).toEqual(createPersistedGameState(state));
     expect(legacy).toEqual(before);
+  });
+
+  test('schema-v1 saves gain neutral doctrine focus without inventing specialization', () => {
+    const state = makeState();
+    const v1State = JSON.parse(JSON.stringify(createPersistedGameState(state))) as any;
+    delete v1State.player.doctrineFocus;
+
+    const v1Envelope = {
+      schemaVersion: 1,
+      gameVersion: '1.0.0-test',
+      timestamp: 321,
+      state: v1State,
+    };
+
+    const result = migrateSavePayload(v1Envelope);
+
+    expect(result.sourceVersion).toBe(1);
+    expect(result.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+    expect(result.appliedMigrations).toEqual([
+      'save-schema-v1-to-v2-doctrine-focus',
+    ]);
+    expect(result.envelope.state.player.doctrineFocus).toEqual({
+      foregroundedPermanentTraitIds: [],
+    });
   });
 
   test('historical raw RootState exports are also interpreted as legacy v0', () => {
@@ -63,7 +87,7 @@ describe('M10 save schema migration pipeline', () => {
     const result = migrateSavePayload(state);
 
     expect(result.sourceVersion).toBe(LEGACY_SAVE_SCHEMA_VERSION);
-    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1']);
+    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus']);
     expect(result.envelope.state).toEqual(createPersistedGameState(state));
     expect(result.envelope.timestamp).toBe(0);
   });
@@ -158,7 +182,7 @@ describe('M10 save schema migration pipeline', () => {
     const first = migrateSavePayload(makeLegacyPayload(makeState()));
     const second = migrateSavePayload(first.envelope);
 
-    expect(first.appliedMigrations).toEqual(['save-schema-v0-to-v1']);
+    expect(first.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus']);
     expect(second.appliedMigrations).toEqual([]);
     expect(second.envelope).toEqual(first.envelope);
   });
