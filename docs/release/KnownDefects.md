@@ -1,7 +1,7 @@
 # Known Defects and Accepted Release Debt — Campaign One / 1.0
 
 **Status:** RELEASE REVIEW INPUT; does not grant promotion approval
-**Last updated:** 2026-09-21
+**Last updated:** 2026-09-22
 
 This ledger separates product defects from evidence/tooling limitations. A missing
 qualification artifact is not silently treated as a pass.
@@ -16,7 +16,7 @@ qualification artifact is not silently treated as a pass.
 | KD-006 | Moderate / maintenance | React Router 6 advisory line | Accepted pending migration | No known impact on this client-only static route usage; two moderate advisories remain. | Qualify a CRA-to-modern-build/router migration separately; do not force-upgrade the current candidate. |
 | KD-007 | Low / maintenance | Browserslist data age | Open | Build emits a maintenance warning; no current runtime failure identified. | Refresh browser data as part of the next dependency/toolchain qualification. |
 | KD-008 | Release blocker | Production debug boundary | Resolved | Direct navigation to `/game/debug` could expose state-mutating developer tools even though production navigation hid the item. | Production routing now mounts the debug route only in development; GC-01 regression coverage rejects debug availability in non-development builds. Exact-head Build Validation remains required before integration. |
-| KD-009 | Moderate / presentation-authority | Player-surface prototype/debug residue | Resolved pending exact-head qualification | Normal Campaign One pages still exposed prototype/debug wording or controls: manual prototype Essence generation, NPC relationship debug mutations, deferred Equipment wording, internal tick counters, no-op Settings import/export, and an unreachable legacy reset page. | Remove those affordances rather than invent replacement systems; extend GC-01 regression coverage so primary 1.0 surfaces cannot silently re-advertise them. |
+| KD-009 | Moderate / presentation-authority | Player-surface prototype/debug residue | Resolved | Normal Campaign One pages exposed prototype/debug wording or controls: manual prototype Essence generation, NPC relationship debug mutations, deferred Equipment wording, internal tick counters, no-op Settings import/export, and an unreachable legacy reset page. | Closed by PR #139; exact head `4a64d8d53aea1a9c3385894ac89af570dec778d7` passed Build Validation #419 / run `35680087869` before merge to `main`. GC-01 regression coverage now rejects recurrence. |
 
 KD-001, KD-002 and KD-004 still prohibit 1.0 promotion. KD-003 is resolved by
 the GC-13 dual-browser CI artifact. KD-008 is resolved by the production debug-route
