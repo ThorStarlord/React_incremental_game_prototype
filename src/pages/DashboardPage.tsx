@@ -22,8 +22,7 @@ import {
   Star as StarIcon,
   Group as GroupIcon,
   AutoAwesome as EssenceIcon,
-  Settings as SettingsIcon,
-  Save as SaveIcon,
+  Explore as ExploreIcon,
   TrendingUp as TrendingUpIcon,
   Schedule as ScheduleIcon
 } from '@mui/icons-material';
@@ -160,7 +159,7 @@ export const DashboardPage: React.FC = React.memo(() => {
           <Card elevation={2}>
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                <SettingsIcon color="primary" />
+                <ScheduleIcon color="primary" />
                 <Typography variant="h6" component="h2">
                   Time & Activity
                 </Typography>
@@ -295,7 +294,7 @@ export const DashboardPage: React.FC = React.memo(() => {
           <Card elevation={2}>
             <CardContent>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                <SaveIcon color="primary" />
+                <ExploreIcon color="primary" />
                 <Typography variant="h6" component="h2">
                   Core Actions
                 </Typography>
