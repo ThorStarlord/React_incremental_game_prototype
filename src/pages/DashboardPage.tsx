@@ -152,7 +152,7 @@ export const DashboardPage: React.FC = React.memo(() => {
           color: theme.palette.primary.main
         }}
       >
-        Game Dashboard
+        Campaign Overview
       </Typography>
 
       <Grid container spacing={3}>
@@ -162,7 +162,7 @@ export const DashboardPage: React.FC = React.memo(() => {
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                 <SettingsIcon color="primary" />
                 <Typography variant="h6" component="h2">
-                  Game Controls
+                  Time & Activity
                 </Typography>
                 <Chip
                   label={gameLoop.isRunning ? 'Running' : 'Stopped'}
@@ -263,7 +263,7 @@ export const DashboardPage: React.FC = React.memo(() => {
           <Card elevation={2}>
             <CardContent>
               <Typography variant="h6" component="h2" gutterBottom>
-                Resources Overview
+                Current State
               </Typography>
 
               <List dense>
@@ -297,13 +297,13 @@ export const DashboardPage: React.FC = React.memo(() => {
               <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                 <SaveIcon color="primary" />
                 <Typography variant="h6" component="h2">
-                  Quick Navigation
+                  Core Actions
                 </Typography>
               </Stack>
 
               <Alert severity="info" sx={{ mb: 2 }}>
-                <AlertTitle>Navigation Guide</AlertTitle>
-                Use the sidebar navigation to access different game systems:
+                <AlertTitle>Where to act</AlertTitle>
+                Use the sidebar to act through your character, learned capabilities, relationships, and resources:
               </Alert>
 
               <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
@@ -315,7 +315,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                         Character
                       </Typography>
                       <Typography variant="body2" color="text.secondary" textAlign="center">
-                        Stats & Attributes
+                        Vitals & attributes
                       </Typography>
                     </Stack>
                   </Grid>
@@ -327,7 +327,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                         Traits
                       </Typography>
                       <Typography variant="body2" color="text.secondary" textAlign="center">
-                        Abilities & Powers
+                        Learned capabilities
                       </Typography>
                     </Stack>
                   </Grid>
@@ -339,7 +339,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                         NPCs
                       </Typography>
                       <Typography variant="body2" color="text.secondary" textAlign="center">
-                        Relationships
+                        Relationships & decisions
                       </Typography>
                     </Stack>
                   </Grid>
@@ -351,7 +351,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                         Essence
                       </Typography>
                       <Typography variant="body2" color="text.secondary" textAlign="center">
-                        Core Resource
+                        Resonance resource
                       </Typography>
                     </Stack>
                   </Grid>
@@ -369,7 +369,7 @@ export const DashboardPage: React.FC = React.memo(() => {
           <Card elevation={2}>
             <CardContent>
               <Typography variant="h6" component="h2" gutterBottom>
-                Session Statistics
+                Progress Snapshot
               </Typography>
 
               <Grid container spacing={2}>
