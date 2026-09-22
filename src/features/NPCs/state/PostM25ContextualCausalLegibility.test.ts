@@ -50,6 +50,27 @@ describe('post-M25 contextual causal legibility', () => {
     });
   });
 
+  test('active doctrine requirements stay spoiler-safe while explaining available specialization', () => {
+    const node: DialogueNode = {
+      id: 'structural_topic',
+      title: 'Read the Load Paths',
+      requiredActiveDoctrineIds: ['structural_steward'],
+    };
+
+    expect(evaluateDialogueAvailabilityPresentation(node, baseContext)).toEqual({
+      available: false,
+      availabilityReasons: [],
+    });
+
+    expect(evaluateDialogueAvailabilityPresentation(node, {
+      ...baseContext,
+      activeDoctrineIds: ['structural_steward'],
+    })).toEqual({
+      available: true,
+      availabilityReasons: ['Active doctrine: Structural Steward'],
+    });
+  });
+
   test('negative prerequisites constrain availability without being narrated as hints', () => {
     const node: DialogueNode = {
       id: 'knowledge_sensitive_topic',
