@@ -76,7 +76,7 @@ export const activateDoctrineThunk = createAsyncThunk<
   }
 );
 
-export const clearDoctrineFocusThunk = createAsyncThunk(
+export const clearDoctrineFocusThunk = createAsyncThunk<void, void>(
   'traits/clearDoctrineFocus',
   async (_, { dispatch }) => {
     dispatch(clearDoctrineFocus());
