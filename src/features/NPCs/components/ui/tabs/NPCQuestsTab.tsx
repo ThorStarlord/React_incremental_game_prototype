@@ -33,6 +33,7 @@ import {
 import { canUseQuestResolution } from '../../../../Quest/state/QuestResolutionAvailability';
 import type { Quest, QuestObjective, QuestStatus } from '../../../../Quest/state/QuestTypes';
 import { selectActiveDoctrineIds } from '../../../../Traits/state/DoctrineSelectors';
+import { DOCTRINE_DEFINITIONS } from '../../../../Traits/state/DoctrineDefinitions';
 
 interface NPCQuestsTabProps {
   npcId: string;
@@ -188,6 +189,19 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
                           <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
                             {option.description}
                           </Typography>
+                          {option.requiredActiveDoctrineIds && option.requiredActiveDoctrineIds.length > 0 && (
+                            <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" sx={{ mb: 1 }}>
+                              {option.requiredActiveDoctrineIds.map(doctrineId => (
+                                <Chip
+                                  key={doctrineId}
+                                  label={`Active doctrine: ${DOCTRINE_DEFINITIONS[doctrineId].name}`}
+                                  size="small"
+                                  color="primary"
+                                  variant="outlined"
+                                />
+                              ))}
+                            </Stack>
+                          )}
                           <Button
                             size="small"
                             variant="outlined"
