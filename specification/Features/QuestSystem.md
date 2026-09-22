@@ -1,6 +1,6 @@
 # Quest System Specification
 
-**Implementation Status:** ✅ Expanded foundation + authored resolution choices + permanent-Trait resolution gates + M23 faction-tagged reputation routing  
+**Implementation Status:** ✅ Expanded foundation + authored resolution choices + permanent-Trait and active-doctrine resolution gates + M23 faction-tagged reputation routing  
 **Relationship migration:** ✅ Ancient Seed uses M4 resolution semantics; M16 qualifies Trait-driven authored resolutions.  
 **Faction integration:** ✅ M23 qualifies faction-tagged `REPUTATION` rewards as institutional standing rather than giver-NPC Affinity.
 
@@ -37,7 +37,8 @@ Implemented:
 - return-to-giver turn-in checks;
 - repeatable/radiant quest foundation;
 - authored pre-turn-in resolution choices;
-- generic permanent-Trait requirements on authored resolution choices.
+- generic permanent-Trait requirements on authored resolution choices;
+- bounded active-doctrine requirements for choices that depend on the player's current learned-capability specialization.
 
 ## 3. Quest states
 
@@ -70,6 +71,7 @@ interface QuestResolutionOption {
   label: string;
   description: string;
   requiredPermanentTraitIds?: string[];
+  requiredActiveDoctrineIds?: DoctrineId[];
   relationshipExperienceId?: string;
   consumeItems?: Array<{ itemId: string; quantity: number }>;
   rewards?: QuestReward[];
@@ -95,7 +97,22 @@ Semantics:
 - UI hiding is not the correctness boundary: direct thunk invocation without the required permanent Trait is rejected;
 - rejection occurs before Relationship evidence, item consumption, rewards, or resolution lock.
 
-This contract intentionally does **not** define:
+### Active-doctrine availability
+
+The bounded Relationship Capability Constellation adds a second explicit requirement:
+
+```text
+requiredActiveDoctrineIds
+```
+
+Semantics:
+
+- every listed doctrine must be derived as active from permanent Trait ownership plus `player.doctrineFocus`;
+- learned Traits alone are insufficient for an active-doctrine-gated resolution;
+- presentation and `resolveQuestOutcomeThunk` consume the same derived doctrine authority;
+- available doctrine-gated options explain the active doctrine without exposing unavailable future doctrine requirements;
+- GC06 is the first production campaign decision converted to this stronger specialization semantic; later campaign pair routes remain on their existing permanent-Trait gates until separate product evidence warrants conversion.
+
 
 - temporary/equipped-Trait gameplay authority;
 - OR/NOT Trait expressions;
@@ -111,12 +128,13 @@ This contract intentionally does **not** define:
 3. no mutually exclusive resolution was already selected;
 4. resolution id is valid;
 5. required permanent Traits are owned;
-6. required items exist;
-7. referenced Relationship Experience validates/records;
-8. items are consumed;
-9. independently justified option rewards are applied;
-10. resolution id is locked;
-11. player feedback is emitted.
+6. required active doctrines are currently derived;
+7. required items exist;
+8. referenced Relationship Experience validates/records;
+9. items are consumed;
+10. independently justified option rewards are applied;
+11. resolution id is locked;
+12. player feedback is emitted.
 
 This order prevents bad authoring or invalid capability access from consuming items, paying rewards, or locking a resolution before the consequence is valid and durably recordable.
 
