@@ -4,7 +4,6 @@
 export { default as CharacterPage } from './CharacterPage';
 export { default as DashboardPage } from './DashboardPage';
 export { default as EssencePage } from './EssencePage';
-export { default as GamePage } from './GamePage';
 export { default as NotFoundPage } from './NotFoundPage';
 // export { default as NPCPage } from './NPCPage'; // Assuming NPCPage.tsx does not exist, NPCsPage.tsx is used.
 export { default as NPCsPage } from './NPCsPage';
