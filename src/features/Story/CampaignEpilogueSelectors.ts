@@ -7,7 +7,12 @@ import {
   selectNetworkPosture,
   selectTelluricEchoOutcome,
 } from '../WorldState/state/WorldStateSelectors';
-import type { CounterphasePlan } from '../WorldState/state/WorldStateTypes';
+import type {
+  CounterphasePlan,
+  LatticeIntegrity,
+  NetworkPosture,
+  TelluricEchoOutcome,
+} from '../WorldState/state/WorldStateTypes';
 
 export interface CampaignEpilogueProjection {
   plan: CounterphasePlan;
@@ -26,6 +31,25 @@ const PLAN_LABELS: Record<CounterphasePlan, string> = {
   structural: 'Structural Redirection',
   fortified: 'Fortified Containment',
   diagnostic: 'Diagnostic Disruption',
+};
+
+const LATTICE_LABELS: Record<LatticeIntegrity, string> = {
+  strained: 'Strained',
+  stabilized: 'Stabilized',
+};
+
+const NETWORK_LABELS: Record<NetworkPosture, string> = {
+  distributed: 'Distributed',
+  structural: 'Structural',
+  fortified: 'Fortified',
+  diagnostic: 'Diagnostic',
+};
+
+const OUTCOME_LABELS: Record<TelluricEchoOutcome, string> = {
+  distributed_dissipation: 'Distributed Dissipation',
+  structural_redirection: 'Structural Redirection',
+  diagnostic_disruption: 'Diagnostic Disruption',
+  fortified_containment: 'Fortified Containment',
 };
 
 const hasExperience = (state: RootState, experienceId: string): boolean =>
@@ -87,11 +111,11 @@ export const selectCampaignEpilogueProjection = (
   const latticeIntegrity = selectLatticeIntegrity(
     state,
     'location_merchant_district'
-  ) ?? 'unknown';
+  );
   const networkPosture = selectNetworkPosture(
     state,
     'location_merchant_district'
-  ) ?? 'unknown';
+  );
 
   const permanent = new Set(state.player.permanentTraits);
   let build: string;
@@ -131,7 +155,7 @@ export const selectCampaignEpilogueProjection = (
     elara,
     secondaryAnchor,
     institution: `Institutional aftermath: City Watch standing is ${watchStanding}.`,
-    world: `World aftermath: lattice integrity is ${latticeIntegrity}; network posture is ${networkPosture}; counterphase plan is ${plan}; Telluric Echo outcome is ${outcome}.`,
+    world: `World aftermath: Lattice integrity: ${latticeIntegrity ? LATTICE_LABELS[latticeIntegrity] : 'Unknown'}. Network posture: ${networkPosture ? NETWORK_LABELS[networkPosture] : 'Unknown'}. Counterphase plan: ${PLAN_LABELS[plan]}. Telluric Echo outcome: ${OUTCOME_LABELS[outcome]}.`,
     build,
     delegation,
   };
