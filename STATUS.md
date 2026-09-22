@@ -26,14 +26,15 @@
 
 Read in this order:
 
-1. [`docs/CURRENT.md`](docs/CURRENT.md)
-2. [`specification/GameCompletionDefinition.md`](specification/GameCompletionDefinition.md)
-3. [`specification/Features/FeatureScopeMatrix.md`](specification/Features/FeatureScopeMatrix.md)
-4. [`specification/Progression/GameProgressionArc.md`](specification/Progression/GameProgressionArc.md)
-5. [`specification/Narrative/CampaignArchitecture.md`](specification/Narrative/CampaignArchitecture.md)
-6. [`specification/Technical/GameCompletionRoadmap.md`](specification/Technical/GameCompletionRoadmap.md)
-7. relevant [`Alpha`](specification/Technical/AlphaCompletionContract.md) / [`Beta`](specification/Technical/BetaCompletionContract.md) / [`Release`](specification/Technical/ReleaseQualificationContract.md) contract
-8. [`RUNBOOK.md`](RUNBOOK.md) and [`specification/README.md`](specification/README.md)
+1. [`AGENTS.md`](AGENTS.md) — coding-agent behavior and evidence-to-authority rules.
+2. [`docs/CURRENT.md`](docs/CURRENT.md)
+3. [`specification/GameCompletionDefinition.md`](specification/GameCompletionDefinition.md)
+4. [`specification/Features/FeatureScopeMatrix.md`](specification/Features/FeatureScopeMatrix.md)
+5. [`specification/Progression/GameProgressionArc.md`](specification/Progression/GameProgressionArc.md)
+6. [`specification/Narrative/CampaignArchitecture.md`](specification/Narrative/CampaignArchitecture.md)
+7. [`specification/Technical/GameCompletionRoadmap.md`](specification/Technical/GameCompletionRoadmap.md)
+8. relevant [`Alpha`](specification/Technical/AlphaCompletionContract.md) / [`Beta`](specification/Technical/BetaCompletionContract.md) / [`Release`](specification/Technical/ReleaseQualificationContract.md) contract
+9. [`RUNBOOK.md`](RUNBOOK.md) and [`specification/README.md`](specification/README.md)
 
 `STATUS.md` owns current state. The completion records above own the path to 1.0.
 
@@ -43,11 +44,25 @@ The project has passed proof-of-concept, technical-prototype, bounded vertical-s
 
 It is therefore best described as **Content Alpha / HUMAN-UNVALIDATED** with **TECHNICAL_BETA_READY** deterministic engineering evidence. Structural and authored campaign completion are integrated; Chromium and Firefox visible-UI smoke now pass in CI. Fresh-player comprehension, pacing, balance, human accessibility review, full external playthrough evidence, immutable RC/deployment identity, and final release qualification remain intentionally unclaimed.
 
-## Active Beta frontier — evidence-driven refinement
+## Active Beta frontier — convergence + bounded hardening
 
-Repository-controlled feature/content construction is complete for the bounded Campaign One scope. The active frontier is genuine human Beta evidence under issue #109, using [`docs/release/BetaExecutionRunbook.md`](docs/release/BetaExecutionRunbook.md) and [`docs/release/BetaHumanEvidenceTemplate.md`](docs/release/BetaHumanEvidenceTemplate.md).
+Repository-controlled feature/content construction is complete for the bounded Campaign One scope. Two lanes are now active in parallel:
 
-Until accepted human evidence exposes a concrete defect, implementation is frozen against speculative new systems, chapters, progression pillars, generalized engines, or post-1.0 scope. A repository change must close a named Beta/Release requirement, repair an independently demonstrated release blocker, or make the human-evidence process executable without weakening its evidence boundary.
+1. **Human Beta evidence:** collect genuine sessions under issue #109 using [`docs/release/BetaExecutionRunbook.md`](docs/release/BetaExecutionRunbook.md) and [`docs/release/BetaHumanEvidenceTemplate.md`](docs/release/BetaHumanEvidenceTemplate.md).
+2. **Repository-answerable 1.0 hardening:** continue bounded improvement of the already-authorized Campaign One through deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, and release-readiness evidence.
+
+The feature/content **scope is locked**; repository work is not universally frozen. Missing human evidence limits human-experience claims but does not prohibit bounded non-speculative hardening.
+
+Use explicit evidence provenance:
+
+```text
+DETERMINISTIC_FINDING -> implementation behavior within exercised evidence
+HEURISTIC_FINDING     -> plausible UX/design/accessibility/pacing risk
+SYNTHETIC_FINDING     -> reproducible automated/simulated player-facing risk
+HUMAN_FINDING         -> actual recorded participant experience
+```
+
+Only `HUMAN_FINDING` evidence can satisfy the current human Beta floor. Any of the four classes may justify the smallest bounded repair when the work stays inside existing 1.0 scope.
 
 ## Product direction
 
@@ -91,7 +106,7 @@ merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
 
 GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
 
-GC-04 through GC-12 are closed by integrated implementation plus exact-head qualification. GC-13 repository-controlled technical preparation is qualified by Build Validation #394, including Chromium + Firefox CI smoke. The active Beta responsibility is now the **genuine human evidence required by issue #109**. GC-14's promotion guard is qualified and correctly blocks RC/1.0 entry until that evidence produces a real BETA_PASS. Automation must not expand scope merely because the external gate remains open.
+GC-04 through GC-12 are closed by integrated implementation plus exact-head qualification. GC-13 repository-controlled technical preparation is qualified by Build Validation #394, including Chromium + Firefox CI smoke. The **human-evidence lane** remains open under issue #109 while bounded repository-answerable hardening may continue concurrently. GC-14's promotion guard remains qualified and correctly blocks RC/1.0 entry until the current Beta contract produces a real BETA_PASS. Automation must neither expand scope merely because the external gate remains open nor treat that external gate as a universal stop signal.
 
 ## Pre-Beta player-surface hygiene
 
@@ -187,9 +202,9 @@ Timed-Quest precision remains comparison-only. M21 offline authority remains bou
 
 ## Human evidence boundary
 
-Issue #109 remains open. Automation can prove implementation correctness and deterministic composition, but cannot prove fresh-player comprehension, pacing, fairness, enjoyment, emotional impact, retention or market preference.
+Issue #109 remains open. Automation and repository analysis cannot prove fresh-player comprehension, fairness, enjoyment, emotional impact, retention or market preference, and synthetic/model-assisted review must never be relabeled as human observation.
 
-Under the completion program this is not a blanket pre-Alpha development freeze. It becomes required evidence for Beta and final player-quality claims.
+That epistemic boundary is **not** an execution freeze. Deterministic, heuristic and synthetic evidence may still expose concrete risks and justify bounded repairs to the already-authorized Campaign One. Human evidence remains required for the human-experience claims and promotion conditions owned by the current Beta contract.
 
 ## Do not restart by inertia
 
@@ -197,7 +212,9 @@ M4–M26, GC-01 through GC-12, post-M25 timing/content intelligence, the three-c
 
 ## Governing implementation rule
 
-> **Every future 1.0 package must close a named completion requirement or a demonstrated blocker to one. Technical possibility alone is not authorization.**
+> **Every future 1.0 package must improve an already-authorized Campaign One / release surface through a named requirement or a concrete deterministic, heuristic, synthetic, or human finding. Technical possibility alone is not authorization; missing human evidence alone is not a universal stop condition.**
+
+Continue bounded repository-answerable hardening until no remaining intervention has material expected value, the next change would expand unauthorized scope, or a genuine owner/external boundary is reached.
 
 
 ## Concurrent release-hardening reconciliation
