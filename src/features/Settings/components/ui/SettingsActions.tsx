@@ -29,7 +29,7 @@ interface SettingsActionsProps {
  * 
  * Features:
  * - Reset to defaults with confirmation
-  * - Confirmation dialogs for destructive actions
+ * - Confirmation dialogs for destructive actions
  */
 export const SettingsActions: React.FC<SettingsActionsProps> = ({
   onReset
@@ -60,7 +60,7 @@ export const SettingsActions: React.FC<SettingsActionsProps> = ({
         <CardContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Use these actions to manage your settings configuration:
+              Reset your saved settings when you want to restore the defaults.
             </Typography>
 
             {/* Reset Settings */}
