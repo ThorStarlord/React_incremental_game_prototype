@@ -8,7 +8,6 @@ import {
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
-  selectSettings,
   selectAudioSettings,
   selectGraphicsSettings,
   selectGameplaySettings,
@@ -39,7 +38,6 @@ const SettingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   // Settings selectors
-  const settings = useAppSelector(selectSettings);
   const audioSettings = useAppSelector(selectAudioSettings);
   const graphicsSettings = useAppSelector(selectGraphicsSettings);
   const gameplaySettings = useAppSelector(selectGameplaySettings);
@@ -119,17 +117,7 @@ const SettingsPage: React.FC = () => {
         />
 
         {/* Settings Actions */}
-        <SettingsActions
-          onReset={handleReset}
-          onExport={() => {
-            // Future: Export settings functionality
-            console.log('Export settings:', settings);
-          }}
-          onImport={() => {
-            // Future: Import settings functionality
-            console.log('Import settings functionality coming soon');
-          }}
-        />
+        <SettingsActions onReset={handleReset} />
       </Box>
     </Container>
   );
