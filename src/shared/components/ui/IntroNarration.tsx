@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Backdrop, Box, Paper, Typography, Button, Fade } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { setHasSeenIntro, selectHasSeenIntro } from '../../../features/Meta/state/MetaSlice';
 
@@ -17,26 +17,41 @@ export const IntroNarration: React.FC<{ lines?: string[] }> = ({ lines = DEFAULT
   if (hasSeen) return null;
   const last = index === lines.length - 1;
   return (
-    <Backdrop open sx={{ zIndex: (t) => t.zIndex.drawer + 10, backdropFilter: 'blur(2px)', backgroundColor: 'rgba(0,0,0,0.7)' }}>
-      <Fade in>
-        <Paper elevation={4} sx={{ maxWidth: 640, p: 4, mx: 2 }}>
-          <Typography variant="body1" sx={{ mb: 3, whiteSpace: 'pre-line' }}>
-            {lines[index]}
-          </Typography>
-          <Box textAlign="right">
-            <Button
-              variant="contained"
-              color={last ? 'secondary' : 'primary'}
-              onClick={() => {
-                if (!last) setIndex(i => i + 1); else dispatch(setHasSeenIntro(true));
-              }}
-            >
-              {last ? 'Begin' : 'Continue'}
-            </Button>
-          </Box>
-        </Paper>
-      </Fade>
-    </Backdrop>
+    <Dialog
+      open
+      fullWidth
+      maxWidth="sm"
+      disableEscapeKeyDown
+      aria-describedby="intro-narration-text"
+      sx={{
+        '& .MuiBackdrop-root': {
+          backdropFilter: 'blur(2px)',
+          backgroundColor: 'rgba(0,0,0,0.7)',
+        },
+      }}
+    >
+      <DialogContent sx={{ p: 4 }}>
+        <Typography
+          id="intro-narration-text"
+          variant="body1"
+          sx={{ mb: 3, whiteSpace: 'pre-line' }}
+        >
+          {lines[index]}
+        </Typography>
+        <Box textAlign="right">
+          <Button
+            autoFocus
+            variant="contained"
+            color={last ? 'secondary' : 'primary'}
+            onClick={() => {
+              if (!last) setIndex(i => i + 1); else dispatch(setHasSeenIntro(true));
+            }}
+          >
+            {last ? 'Begin' : 'Continue'}
+          </Button>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };
 
