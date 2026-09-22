@@ -97,6 +97,20 @@ export interface CounterphasePreparationExplanation {
 const npcName = (state: RootState, npcId: string): string =>
   state.npcs.npcs[npcId]?.name ?? npcId;
 
+const formatPlayerFacingToken = (value: string): string =>
+  value
+    .replace(/[_-]+/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(word => (
+      word.length <= 3 && word === word.toUpperCase()
+        ? word
+        : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`
+    ))
+    .join(' ');
+
 const routineSourceLabel = (
   source: RoutineFamiliaritySource
 ): string => {
@@ -135,7 +149,7 @@ export const selectCausalJournalEntries = (
         npcId: memory.primaryTargetId,
         npcName: npcName(state, memory.primaryTargetId),
         causeLabel: origin?.title ?? 'Recorded experience',
-        tags: [...memory.resonanceTags],
+        tags: memory.resonanceTags.map(formatPlayerFacingToken),
         timestamp: memory.timestamp,
       };
     });
