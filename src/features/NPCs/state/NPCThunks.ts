@@ -29,6 +29,7 @@ import {
 } from '../../WorldState/state/WorldStateSelectors';
 import type { WorldStateMutation } from '../../WorldState/state/WorldStateTypes';
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
+import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -378,8 +379,11 @@ export const processNPCInteractionThunk = createAsyncThunk<
         const currentState = getState() as RootState;
 
         const activeDoctrineIds = selectActiveDoctrineIds(currentState);
-        const missingActiveDoctrine = node.requiredActiveDoctrineIds?.find(
-          doctrineId => !activeDoctrineIds.includes(doctrineId)
+        const requiredActiveDoctrineIds = Array.isArray(node.requiredActiveDoctrineIds)
+          ? node.requiredActiveDoctrineIds as DoctrineId[]
+          : [];
+        const missingActiveDoctrine = requiredActiveDoctrineIds.find(
+          (doctrineId: DoctrineId) => !activeDoctrineIds.includes(doctrineId)
         );
         if (missingActiveDoctrine) {
           dispatch(addNotification({
