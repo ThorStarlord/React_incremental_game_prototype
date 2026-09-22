@@ -62,16 +62,20 @@ Campaign One ends on the isolated planet. Interplanetary continuation, the large
 
 ## Read the repository in this order
 
-1. [`STATUS.md`](STATUS.md) — current repository state and active queue.
-2. [`docs/CURRENT.md`](docs/CURRENT.md) — documentation classification and conflict resolution.
-3. [`specification/GameCompletionDefinition.md`](specification/GameCompletionDefinition.md) — authoritative 1.0 definition and stop condition.
-4. [`specification/Features/FeatureScopeMatrix.md`](specification/Features/FeatureScopeMatrix.md) — what is core, supporting, minimal, deferred or cut.
-5. [`specification/Progression/GameProgressionArc.md`](specification/Progression/GameProgressionArc.md) — whole-game player transformation.
-6. [`specification/Narrative/CampaignArchitecture.md`](specification/Narrative/CampaignArchitecture.md) — bounded Campaign One spine.
-7. [`specification/Technical/GameCompletionRoadmap.md`](specification/Technical/GameCompletionRoadmap.md) — active GC-00→GC-14 implementation program.
-8. [`specification/Technical/AlphaCompletionContract.md`](specification/Technical/AlphaCompletionContract.md), [`BetaCompletionContract.md`](specification/Technical/BetaCompletionContract.md), and [`ReleaseQualificationContract.md`](specification/Technical/ReleaseQualificationContract.md) — maturity gates.
-9. [`RUNBOOK.md`](RUNBOOK.md) — commands, qualification and exact-head merge procedure.
-10. [`specification/README.md`](specification/README.md) — domain authority map.
+1. [`AGENTS.md`](AGENTS.md) — coding-agent operating policy and evidence-to-authority rules.
+2. [`STATUS.md`](STATUS.md) — current repository state and active lanes.
+3. [`docs/CURRENT.md`](docs/CURRENT.md) — documentation classification and conflict resolution.
+4. [`HANDOFF.md`](HANDOFF.md) — current re-entry summary.
+5. [`specification/GameCompletionDefinition.md`](specification/GameCompletionDefinition.md) — authoritative 1.0 definition and stop condition.
+6. [`specification/Features/FeatureScopeMatrix.md`](specification/Features/FeatureScopeMatrix.md) — what is core, supporting, minimal, deferred or cut.
+7. [`specification/Progression/GameProgressionArc.md`](specification/Progression/GameProgressionArc.md) — whole-game player transformation.
+8. [`specification/Narrative/CampaignArchitecture.md`](specification/Narrative/CampaignArchitecture.md) — bounded Campaign One spine.
+9. [`specification/Technical/GameCompletionRoadmap.md`](specification/Technical/GameCompletionRoadmap.md) — active GC-00→GC-14 implementation program.
+10. [`specification/Technical/AlphaCompletionContract.md`](specification/Technical/AlphaCompletionContract.md), [`BetaCompletionContract.md`](specification/Technical/BetaCompletionContract.md), and [`ReleaseQualificationContract.md`](specification/Technical/ReleaseQualificationContract.md) — maturity gates.
+11. [`RUNBOOK.md`](RUNBOOK.md) — commands, qualification and exact-head merge procedure.
+12. [`specification/README.md`](specification/README.md) — domain authority map.
+
+[`CLAUDE.md`](CLAUDE.md) is a thin adapter to `AGENTS.md`, not a separate policy source.
 
 `README.md` is orientation. For disputed current state, follow the authority chain above.
 
@@ -101,7 +105,7 @@ These commands do not replace the required real-human Beta evidence or an immuta
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
 
-There is **no automatic M27**. Future implementation must close an explicit 1.0 requirement or a demonstrated blocker to one.
+There is **no automatic M27**. Future implementation must improve an already-authorized 1.0 player/release surface through an explicit requirement or a concrete deterministic, heuristic, synthetic, or human finding. Missing human evidence alone is not a universal stop condition.
 
 ## Important 1.0 scope decisions
 
@@ -169,6 +173,8 @@ Issue #109 remains the human Product Review evidence backlog. Use [`docs/release
 
 The minimum floor remains 5 accepted fresh-player first-session observations plus 3 accepted external beginning-to-ending fresh-save playthroughs. Do not relabel synthetic UI traversal, code review, automated tests or LLM analysis as human playtest evidence.
 
+That human-evidence obligation limits human-quality claims and `BETA_PASS`; it does not freeze bounded heuristic, synthetic, deterministic, accessibility, reliability, presentation, pacing, balance, persistence, or release-hardening work on the existing Campaign One.
+
 ## Governing rule
 
-> **Finish the smallest game that fully delivers the relationship → capability → consequence → mastery → delegation promise before expanding the architecture.**
+> **Finish and harden the smallest game that fully delivers the relationship → capability → consequence → mastery → delegation promise before expanding the architecture. Evidence strength limits claim strength; it does not automatically prohibit useful bounded work.**
