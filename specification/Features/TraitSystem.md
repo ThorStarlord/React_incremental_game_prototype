@@ -1,9 +1,10 @@
 # Trait System Specification
 
-**Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Trait quest capability qualified in M16  
+**Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Trait capability + bounded two-profile doctrine composition implemented  
 **Relationship migration:** ✅ Willow and Elara use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
 **Discovery contract:** [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md)  
-**Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)
+**Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)  
+**Build specialization:** [`../Technical/RelationshipCapabilityConstellation.md`](../Technical/RelationshipCapabilityConstellation.md)
 
 Traits represent internalized capabilities or patterns that can change what the protagonist can perceive, understand, attempt, perform, or passively sustain. Numerical/passive modifiers remain legitimate Trait effects, but they are not the complete product definition of a Trait.
 
@@ -114,6 +115,32 @@ they can now ____________________________________.
 Significant uses of the same Trait should be defensible from the same underlying learned pattern rather than behaving as unrelated content keys.
 
 Trait-enabled options should usually expand meaningful solution space rather than become a guaranteed "best" answer. See `PostM16TraitGameplayReconciliation.md` for the full doctrine and evidence/design boundary.
+
+### 1.5 Learned capability vs active doctrine
+
+Permanent learning and current specialization are separate authorities.
+
+```text
+player.permanentTraits
+= durable learned capability
+
+player.doctrineFocus
+= permanently learned principles currently foregrounded together
+
+derived active doctrine
+= emergent interpretation of that focus
+```
+
+Campaign One currently qualifies only two established two-Trait profiles:
+
+- **Structural Steward** — `WillowsWisdom + ConstraintSense`;
+- **Countermodeler** — `ScholarlyInsight + AdversarialCalibration`.
+
+A doctrine is not a separately acquired Trait and is not independently persisted as a boolean. Runtime selectors derive it only when all required Traits are both permanently learned and foregrounded.
+
+Quest and Dialogue authoring may use `requiredActiveDoctrineIds` where a choice specifically depends on current specialization. Existing Campaign One routes continue to use their qualified permanent-Trait pair gates until a player-facing doctrine-selection surface is separately qualified.
+
+See `RelationshipCapabilityConstellation.md` for the bounded Redux, persistence, consumption, and evidence contract.
 
 ## 2. Resonance authority
 
@@ -409,8 +436,8 @@ M8 does not redesign Copy Trait inheritance.
 - Relationship Experiences are only one possible future discovery source; quests, exploration, combat, research, or items may reveal other Traits.
 - Historical pre-Relationships saves do not reconstruct perfect discovery provenance; M8 only performs conservative additive repair from existing authored evidence.
 - Temporary/equipped Trait gameplay authority beyond existing effects is not qualified by M16.
-- Advanced Trait combinations, synergies, and broad Copy redesign remain out of scope.
-- M16 qualifies a bounded permanent-Trait quest-resolution gate, not a general stat/skill/ability condition system.
+- The two established Campaign One doctrine pairs are the only qualified synergy composition; a generic capability graph, arbitrary pair lattice, N-way combinations, and broad Copy redesign remain out of scope.
+- Permanent-Trait and active-doctrine gates remain explicit bounded fields, not a general stat/skill/ability condition DSL.
 
 For the full M8 migration rationale and qualification evidence, see [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md).
 
