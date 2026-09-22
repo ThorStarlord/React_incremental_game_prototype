@@ -393,9 +393,8 @@
         "label": "Reroute the Lattice Load",
         "description": "Combine Willow's slow-system cognition with Gronk's constraint-first judgment to move pressure away from the lattice paths that are actually failing.",
         "relationshipExperienceId": "gronk_gc06_exp_structural_steward",
-        "requiredPermanentTraitIds": [
-          "WillowsWisdom",
-          "ConstraintSense"
+        "requiredActiveDoctrineIds": [
+          "structural_steward"
         ],
         "rewards": [],
         "logMessage": "You stop treating each visible break as an isolated repair and reroute the load around the failing lattice pattern."
@@ -405,9 +404,8 @@
         "label": "Phase Against the Echo",
         "description": "Combine Scholarly Insight with Adversarial Calibration: model the contradiction as an opponent and phase the local response against the Echo's repeating structure.",
         "relationshipExperienceId": "lyra_gc06_exp_countermodeler",
-        "requiredPermanentTraitIds": [
-          "ScholarlyInsight",
-          "AdversarialCalibration"
+        "requiredActiveDoctrineIds": [
+          "countermodeler"
         ],
         "rewards": [],
         "logMessage": "You treat the Echo's repetition as a model that can be challenged and phase the local response against the predicted next stress."
