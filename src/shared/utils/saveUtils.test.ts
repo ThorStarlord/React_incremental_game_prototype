@@ -69,7 +69,7 @@ describe('M10 canonical save protocols', () => {
     expect(loaded).not.toBeNull();
     expect(loaded!.migration.sourceVersion).toBe(LEGACY_SAVE_SCHEMA_VERSION);
     expect(loaded!.migration.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(loaded!.migration.appliedMigrations).toEqual(['save-schema-v0-to-v1']);
+    expect(loaded!.migration.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus']);
     expect(loaded!.state).toEqual(state);
   });
 
@@ -81,7 +81,7 @@ describe('M10 canonical save protocols', () => {
 
     expect(imported).not.toBeNull();
     expect(imported!.migration.sourceVersion).toBe(LEGACY_SAVE_SCHEMA_VERSION);
-    expect(imported!.migration.appliedMigrations).toEqual(['save-schema-v0-to-v1']);
+    expect(imported!.migration.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus']);
 
     const stored = JSON.parse(localStorage.getItem(`game_save_${imported!.saveId}`) || '{}');
     expect(stored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
