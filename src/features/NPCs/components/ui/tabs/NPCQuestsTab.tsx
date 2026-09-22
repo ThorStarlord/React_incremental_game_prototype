@@ -32,6 +32,7 @@ import {
 } from '../../../../Quest/state/QuestThunks';
 import { canUseQuestResolution } from '../../../../Quest/state/QuestResolutionAvailability';
 import type { Quest, QuestObjective, QuestStatus } from '../../../../Quest/state/QuestTypes';
+import { selectActiveDoctrineIds } from '../../../../Traits/state/DoctrineSelectors';
 
 interface NPCQuestsTabProps {
   npcId: string;
@@ -53,6 +54,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const dispatch = useAppDispatch();
   const npc = useAppSelector(state => selectNPCById(state, npcId));
   const permanentTraitIds = useAppSelector(state => state.player.permanentTraits);
+  const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
   const availableQuests = useAppSelector(state =>
     selectNPCAvailableQuestsById(state, npcId)
   );
@@ -116,7 +118,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {availableQuests.map((quest: Quest) => {
           const availableResolutionOptions = quest.resolutionOptions?.filter(option =>
-            canUseQuestResolution(option, permanentTraitIds)
+            canUseQuestResolution(option, permanentTraitIds, activeDoctrineIds)
           );
 
           return (
