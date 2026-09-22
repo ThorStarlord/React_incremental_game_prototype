@@ -395,7 +395,7 @@ describe('GC-10 Telluric Echo finale and epilogue', () => {
     expect(epilogue?.elara).toMatch(/Elara/i);
     expect(epilogue?.secondaryAnchor).toMatch(/Gronk/i);
     expect(epilogue?.institution).toMatch(/City Watch standing/i);
-    expect(epilogue?.world).toMatch(/structural_redirection/i);
+    expect(epilogue?.world).toMatch(/Structural Redirection/i);
     expect(epilogue?.build).toMatch(/Willow.*Constraint Sense/i);
     expect(epilogue?.delegation).toMatch(/Archive Verification/i);
 
@@ -572,7 +572,7 @@ describe('GC-10 Telluric Echo finale and epilogue', () => {
     );
     expect(screen.getByText('Campaign One Complete — Distributed Dissipation'))
       .toBeInTheDocument();
-    expect(screen.getByText(/Telluric Echo outcome is distributed_dissipation/i))
+    expect(screen.getByText(/Telluric Echo outcome: Distributed Dissipation/i))
       .toBeInTheDocument();
   });
 
