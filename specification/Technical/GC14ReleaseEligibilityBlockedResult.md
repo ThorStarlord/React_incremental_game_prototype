@@ -116,14 +116,20 @@ connector authority.
 
 ## Stop condition
 
-There is no further warranted repository feature construction merely because the
-external gates are incomplete.
+The release disposition remains fail-closed: incomplete external gates do not
+authorize RC entry, 1.0 promotion, or speculative feature/scope expansion.
 
-The next legal sequence is:
+This result does **not** impose a universal repository implementation freeze.
+Current higher-level agent/state authority may continue bounded hardening of the
+already-authorized Campaign One when deterministic, heuristic, synthetic,
+accessibility, reliability, presentation, pacing, balance, persistence,
+release-readiness, or human evidence identifies a concrete improvement.
+
+The promotion sequence remains:
 
 ```text
-collect real Beta human evidence
--> repair only demonstrated blockers
+collect real Beta human evidence + continue bounded evidence-classified hardening
+-> resolve release-relevant findings without expanding scope
 -> record BETA_PASS on exact supported build
 -> intentionally version an immutable 1.0.0-rc.N candidate
 -> run release:rc:validate + required full-UI/deployment evidence
