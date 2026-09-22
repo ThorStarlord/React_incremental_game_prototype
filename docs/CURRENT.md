@@ -44,7 +44,8 @@ For a new engineering or coding-agent session:
 Authority is scope-sensitive:
 
 ```text
-STATUS / docs/CURRENT
+AGENTS (agent behavior / evidence-to-authority)
++ STATUS / docs/CURRENT (state / classification)
 -> GameCompletionDefinition
 -> FeatureScopeMatrix + ProgressionArc + CampaignArchitecture
 -> GameCompletionRoadmap + relevant maturity contract
