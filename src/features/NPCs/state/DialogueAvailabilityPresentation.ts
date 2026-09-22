@@ -3,6 +3,7 @@ import {
   type WorldStateRegions,
 } from '../../WorldState/state/WorldStateSelectors';
 import type { DialogueNode } from './NPCTypes';
+import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
 
 export interface DialogueAvailabilityPresentationContext {
   completedDialogueIds: readonly string[];
@@ -11,6 +12,7 @@ export interface DialogueAvailabilityPresentationContext {
   knownFactIds: readonly string[];
   factionReputationByFactionId: Record<string, number | undefined>;
   worldStateRegions: WorldStateRegions;
+  activeDoctrineIds: readonly DoctrineId[];
 }
 
 export interface DialogueAvailabilityPresentation {
@@ -88,6 +90,13 @@ export const evaluateDialogueAvailabilityPresentation = (
     return { available: false, availabilityReasons: [] };
   }
 
+  const requiredActiveDoctrines = node.requiredActiveDoctrineIds ?? [];
+  if (requiredActiveDoctrines.some(
+    doctrineId => !context.activeDoctrineIds.includes(doctrineId)
+  )) {
+    return { available: false, availabilityReasons: [] };
+  }
+
   const availabilityReasons: string[] = [];
 
   requiredExperiences.forEach(id => {
@@ -118,6 +127,10 @@ export const evaluateDialogueAvailabilityPresentation = (
   if (requiredWorldState.length > 0) {
     availabilityReasons.push('Current world conditions support this option');
   }
+
+  requiredActiveDoctrines.forEach(doctrineId => {
+    availabilityReasons.push(`Active doctrine: ${humanizeId(doctrineId)}`);
+  });
 
   return {
     available: true,
