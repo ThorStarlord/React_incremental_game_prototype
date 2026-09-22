@@ -28,6 +28,7 @@ import {
   selectWorldStateRegions,
 } from '../../WorldState/state/WorldStateSelectors';
 import type { WorldStateMutation } from '../../WorldState/state/WorldStateTypes';
+import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -375,6 +376,24 @@ export const processNPCInteractionThunk = createAsyncThunk<
         }
 
         const currentState = getState() as RootState;
+
+        const activeDoctrineIds = new Set(selectActiveDoctrineIds(currentState));
+        const missingActiveDoctrine = Array.isArray(node.requiredActiveDoctrineIds)
+          ? (node.requiredActiveDoctrineIds as string[]).find(
+              doctrineId => !activeDoctrineIds.has(doctrineId as any)
+            )
+          : undefined;
+        if (missingActiveDoctrine) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'Your current approach does not support this conversation yet.',
+          }));
+          return {
+            success: false,
+            message: `Required doctrine not active: ${missingActiveDoctrine}`,
+          } as InteractionResult;
+        }
+
         const recordedExperiences = currentState.relationships?.experiencesById ?? {};
         const requiredExperienceIds = Array.isArray(node.requiredExperienceIds)
           ? node.requiredExperienceIds as string[]
