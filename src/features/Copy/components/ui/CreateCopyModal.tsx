@@ -72,8 +72,9 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
       <DialogTitle>Create a Copy of {npcName}</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ mb: 2 }}>
-          Choose the growth method for your new copy. Accelerated growth is much
-          faster but requires a significant Essence investment.
+          Choose the growth method for your new Copy. Creation is an attempt: the
+          displayed Essence cost is spent when you try, whether the attempt succeeds
+          or fails. Accelerated growth adds an extra Essence cost.
         </DialogContentText>
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2">Estimated success chance: <b>{successChancePct}%</b> (based on Charisma)</Typography>
@@ -86,7 +87,7 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
             </Typography>
           )}
           <Typography variant="caption" color={lacksEssence ? 'error.main' : 'text.secondary'} display="block">
-            Total cost: <b>{totalCost}</b> Essence — You have {currentEssence}
+            Attempt cost: <b>{totalCost}</b> Essence — You have {currentEssence}
           </Typography>
         </Box>
         <Box sx={{ mb: 2 }}>
@@ -144,8 +145,8 @@ export const CreateCopyModal: React.FC<CreateCopyModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-  <Button onClick={handleCreate} variant="contained" disabled={lacksEssence}>
-          Create
+        <Button onClick={handleCreate} variant="contained" disabled={lacksEssence}>
+          Attempt Creation
         </Button>
       </DialogActions>
     </Dialog>
