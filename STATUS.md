@@ -1,7 +1,7 @@
 # Repository Status — Content Alpha / Campaign One Completion
 
 **Status date:** 2026-09-22  
-**Current reconciled main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
+**Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
