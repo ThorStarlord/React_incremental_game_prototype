@@ -1,6 +1,6 @@
 # Relationship Capability Constellation
 
-**Status:** CURRENT BOUNDED TECHNICAL AUTHORITY — candidate until exact-head qualification/merge  
+**Status:** CURRENT BOUNDED TECHNICAL AUTHORITY — HUMAN-UNVALIDATED  
 **Evidence basis:** HEURISTIC design finding + deterministic implementation qualification  
 **Human product-value evidence:** UNPROVEN  
 **Scope:** Campaign One relationship-derived build specialization only
