@@ -10,6 +10,7 @@ const baseContext = {
   knownFactIds: [] as string[],
   factionReputationByFactionId: {} as Record<string, number>,
   worldStateRegions: {},
+  activeDoctrineIds: [] as const,
 };
 
 describe('post-M25 contextual causal legibility', () => {
