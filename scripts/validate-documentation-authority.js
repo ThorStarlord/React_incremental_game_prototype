@@ -37,6 +37,8 @@ const completionAuthorityFiles = [
 ];
 
 const requiredAuthorityFiles = [
+  'AGENTS.md',
+  'CLAUDE.md',
   'docs/CURRENT.md',
   'docs/README.md',
   'README.md',
@@ -81,12 +83,30 @@ for (const requiredFile of requiredAuthorityFiles) {
   }
 }
 
+requireContains('AGENTS.md', [
+  'CURRENT AUTHORITY for coding-agent behavior',
+  'Missing human evidence limits the claims this repository may make',
+  'DETERMINISTIC_FINDING',
+  'HEURISTIC_FINDING',
+  'SYNTHETIC_FINDING',
+  'HUMAN_FINDING',
+  'Absence of human evidence alone is not a universal stop condition',
+]);
+
+requireContains('CLAUDE.md', [
+  'AGENTS.md',
+  'thin adapter',
+  'missing human evidence limits human-experience claims',
+]);
+
 if (exists('docs/CURRENT.md')) {
   requireContains('docs/CURRENT.md', [
     'CURRENT AUTHORITY',
     'REFERENCE',
     'HISTORICAL EVIDENCE',
     'SUPERSEDED',
+    'AGENTS.md',
+    'CLAUDE.md',
     'STATUS.md',
     'RUNBOOK.md',
     'specification/README.md',
@@ -144,6 +164,7 @@ requireContains('README.md', [
 ]);
 
 requireContains('RUNBOOK.md', [
+  'AGENTS.md',
   'docs/CURRENT.md',
   'specification/GameCompletionDefinition.md',
   'specification/Features/FeatureScopeMatrix.md',
