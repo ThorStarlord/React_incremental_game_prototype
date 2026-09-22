@@ -73,7 +73,7 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Interplanetary campaign / AI-war continuation | DEFER_POST_1_0 | narrative seed | Post-1.0 campaign/expansion material. |
 | Audio / music | SUPPORTING_1_0 | not completion-critical yet | Basic release presentation required before RC; no large audio pipeline needed for Alpha. |
 | Final visual/art pass | SUPPORTING_1_0 | pre-alpha presentation | Beta work after content scope stabilizes. |
-| Onboarding / first-session guidance | CORE_1_0 | incomplete / human-unvalidated | Alpha must provide a normal-UI path into the first meaningful loop; Beta must validate comprehension with humans. |
+| Onboarding / first-session guidance | CORE_1_0 | implemented / human-unvalidated | Alpha provides a normal-UI path into the first meaningful loop; Beta must validate comprehension with humans. |
 | Accessibility baseline | SUPPORTING_1_0 | incomplete | Keyboard/focus/readability issues become Beta/RC blockers according to completion contracts. |
 | Desktop browser support | CORE_1_0 release | web app exists | Chromium-class + Firefox desktop are primary 1.0 targets. |
 | Full mobile product support | DEFER_POST_1_0 | responsive code exists | Avoid regressions, but mobile is not a primary 1.0 release target. |
