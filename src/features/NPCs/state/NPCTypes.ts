@@ -4,6 +4,7 @@
  */
 
 import type { RoutineFamiliarityId } from '../../Player/state/PlayerTypes';
+import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
 import type {
   WorldStateMutation,
   WorldStateRequirement,
@@ -250,6 +251,8 @@ export interface DialogueNode {
   requiredFactionReputation?: FactionReputationRequirement[];
   /** Objective regional conditions; all exact-value requirements must pass. */
   requiredWorldState?: WorldStateRequirement[];
+  /** All listed emergent doctrines must currently be active. */
+  requiredActiveDoctrineIds?: DoctrineId[];
   /**
    * Opt-in one-shot semantics. Undefined/true preserves legacy repeatable behavior.
    * A successful valid response records this node id in NPC.completedDialogues.
