@@ -10,6 +10,14 @@ interface NPCServicesTabProps {
   npcId: string;
 }
 
+/**
+ * Campaign One keeps bounded NPC services but does not expose the historical
+ * generic Skill-teacher or Crafting progression paths. Their fixture data stays
+ * available for compatibility/reference without becoming current player authority.
+ */
+const isExcludedLegacyService = (serviceId: string): boolean =>
+  /trait_teacher|crafter_/i.test(serviceId);
+
 const NPCServicesTab: React.FC<NPCServicesTabProps> = React.memo(({ npcId }) => {
   const dispatch = useAppDispatch();
   const npc = useAppSelector(state => selectNPCById(state, npcId));
@@ -37,7 +45,9 @@ const NPCServicesTab: React.FC<NPCServicesTabProps> = React.memo(({ npcId }) => 
     );
   }
 
-  const services = (npc.services || []).filter(s => s.isAvailable !== false);
+  const services = (npc.services || []).filter(
+    service => service.isAvailable !== false && !isExcludedLegacyService(service.id)
+  );
 
   return (
     <Box sx={{ p: 2 }}>
