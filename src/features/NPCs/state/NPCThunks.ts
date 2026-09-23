@@ -8,7 +8,7 @@ import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes
 import { updateEssenceGenerationRateThunk } from '../../Essence';
 import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs, mergeNPCsPreservingExisting } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
-import { spendGold, addAvailableAttributePoints, addAvailableSkillPoints } from '../../Player/state/PlayerSlice';
+import { spendGold, addAvailableAttributePoints } from '../../Player/state/PlayerSlice';
 import { TRADING } from '../../../constants/gameConstants';
 import { getItemDef } from '../../../shared/data/itemCatalog';
 import { addItem } from '../../Inventory/state/InventorySlice';
@@ -30,6 +30,9 @@ import {
 import type { WorldStateMutation } from '../../WorldState/state/WorldStateTypes';
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
+
+const isExcludedCampaignOneService = (serviceId: string): boolean =>
+  /trait_teacher|crafter_/i.test(serviceId);
 
 /**
  * Thunk for initializing NPCs by fetching data from the JSON file.
@@ -717,6 +720,14 @@ export const purchaseNPCServiceThunk = createAsyncThunk(
       return payload;
     }
 
+    if (isExcludedCampaignOneService(serviceId)) {
+      dispatch(addNotification({
+        type: 'info',
+        message: 'That legacy service is outside Campaign One. Traits are learned through relationship history and Resonance; generic Crafting is not a 1.0 progression path.',
+      }));
+      return payload;
+    }
+
     if (typeof service.minAffinity === 'number' && (npc.affinity || 0) < service.minAffinity) {
       dispatch(addNotification({ type: 'warning', message: `Requires affinity ${service.minAffinity} to use ${service.name}.` }));
       return payload;
@@ -744,11 +755,6 @@ export const purchaseNPCServiceThunk = createAsyncThunk(
       dispatch(addNotification({ type: 'success', message: `${service.name} completed: +1 Attribute Point.` }));
     } else if (/information_broker|lore_provider/i.test(serviceId)) {
       dispatch(addNotification({ type: 'success', message: `${service.name}: You gained useful information.` }));
-    } else if (/trait_teacher/i.test(serviceId)) {
-      dispatch(addAvailableSkillPoints(1));
-      dispatch(addNotification({ type: 'success', message: `${service.name} completed: +1 Skill Point.` }));
-    } else if (/crafter_/i.test(serviceId)) {
-      dispatch(addNotification({ type: 'success', message: `${service.name} commissioned. It will be ready soon.` }));
     } else {
       dispatch(addNotification({ type: 'success', message: `Purchased: ${service.name}.` }));
     }

@@ -1,7 +1,8 @@
-# Pre-Beta Player-Surface Audit — 2026-09-21
+# Pre-Beta Player-Surface Audit — 2026-09-22
 
 **Status:** repository-only release-hygiene evidence; **not human Beta evidence**  
-**Baseline:** `main@6a56fbfde6a2007436147e4268ff90153adba845`  
+**Initial baseline:** `main@6a56fbfde6a2007436147e4268ff90153adba845`  
+**System-coherence continuation baseline:** `main@4cdd2e13dc8430630db0555abde7fb81fb951f6e`  
 **Authority:** `GameCompletionDefinition.md`, `FeatureScopeMatrix.md`, `BetaCompletionContract.md`
 
 ## Purpose
@@ -18,10 +19,14 @@ Inspect the currently exposed Campaign One surfaces for concrete contradictions 
 | PB-004 | The normal NPC Relationship tab exposed `Debug: +10 Affinity` and `Debug: Unlock All Trait Slots`, both state-mutating shortcuts. | The Relationship page is a normal Campaign One surface; debug mutations are not legitimate player progression. | Remove the debug mutations from the normal component. Dedicated development tooling remains separately governed. |
 | PB-005 | Settings exposed Import/Export buttons whose callbacks only logged messages, including “coming soon”. | Settings is `MINIMAL_1_0`; no-op controls create false affordances and violate intentional-presentation expectations. | Remove the no-op actions rather than implementing an unnecessary settings portability subsystem. |
 | PB-006 | The authoritative Feature Scope Matrix still described first-session onboarding as “incomplete” after GC-02/Alpha closure. | Current Alpha/Content Alpha authority says the normal-UI opening path is implemented; human comprehension remains unvalidated. | Reconcile posture to `implemented / human-unvalidated`. |
+| PB-007 | Character Progress still displayed `Skill Points`; separately, retained compatibility service code could still award +1 Skill Point through legacy `trait_teacher_*` dispatch even though generic Skills are `CUT` for Campaign One. | `Progression.tsx` is on the current Character surface. `NPCServicesTab.tsx` is not mounted by the current routed NPC detail, but it and `purchaseNPCServiceThunk` retained a parallel progression authority that could be reused accidentally. | Remove Skill Points from current player presentation, filter the retained compatibility Services component, and reject direct legacy service dispatch. Retain compatibility state rather than risking old-save breakage. |
+| PB-008 | Retained compatibility service code still treated Gronk's generic `Craft Equipment` service as executable even though generic Crafting is `CUT` for Campaign One. | The service catalog still contains `crafter_gronk`; the unmounted generic Services component and direct service thunk would accept it if reused. | Filter generic crafter services from the retained Services component and reject direct legacy service dispatch. Keep authored forge/routine content intact. |
+| PB-009 | The Copy modal presented a `Create` action while failed attempts were reported as `Seduction attempt failed`; the Essence cost is consumed before the probabilistic Charisma check. | Current code and the earlier simulated-product-review record show that this wording caused a participant to infer a miswired action. | Preserve the existing bounded mechanic, but label the control `Attempt Creation`, explicitly state that the shown Essence cost is spent on the attempt whether it succeeds or fails, and use `Copy creation attempt` consistently in failure feedback. |
+| PB-010 | The primary Dashboard still foregrounded generic control-panel language such as `Game Dashboard`, `Game Controls`, and `different game systems` after the product identity had converged on Campaign One, relationships, capabilities, and deliberate delegation. | This is a heuristic presentation-coherence finding, not human evidence. | Reframe headings and navigation guidance around the campaign, current state, and player actions without changing any canonical mechanics or navigation authority. |
 
 ## Regression ownership
 
-`src/layout/GC01PlayerSurfaceScopeCleanup.test.ts` now rejects the known residue above in addition to its existing cut/deferred-route checks.
+`src/layout/GC01PlayerSurfaceScopeCleanup.test.ts` now rejects the known residue above in addition to its existing cut/deferred-route checks, including Skill-point presentation, legacy Skill/Crafting service authority, old Copy-failure terminology, and generic Dashboard framing.
 
 This is deliberately a **negative scope/presentation guard**. It does not assert that the UI is understandable, fun, well paced, balanced, accessible to a particular participant, or visually final.
 

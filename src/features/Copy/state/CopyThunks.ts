@@ -188,8 +188,8 @@ export const bolsterCopyLoyaltyThunk = createAsyncThunk(
 );
 
 /**
- * Attempt to create a new Copy from an NPC via "Seduction" style interaction.
- * Success chance currently derived from player's Charisma modifier.
+ * Attempt to create a new Copy from an NPC.
+ * Success chance currently derives from the player's Charisma modifier.
  * On success: adds Copy and emits success notification.
  * On failure: emits failure notification.
  */
@@ -223,10 +223,10 @@ export const createCopyThunk = createAsyncThunk(
     if (Math.random() > successChance) {
       const successChancePercent = Math.round(successChance * 100);
       dispatch(addNotification({
-        message: `Seduction attempt on ${npc.name} failed. (Success Chance: ${successChancePercent}%)`,
+        message: `Copy creation attempt with ${npc.name} failed. (Success Chance: ${successChancePercent}%)`,
         type: 'error',
       }));
-      return rejectWithValue(`Seduction attempt failed. (Success Chance: ${successChancePercent}%)`);
+      return rejectWithValue(`Copy creation attempt failed. (Success Chance: ${successChancePercent}%)`);
     }
 
     // --- Create the Copy Object ---
