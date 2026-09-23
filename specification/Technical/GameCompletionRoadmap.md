@@ -260,10 +260,19 @@ First audit current routine familiarity/task definitions. Existing Forge Assista
 
 ### Non-goals
 
-- no automatic task chaining;
-- no Copy planner;
-- no narrative/offline decisions;
+- no generic or unbounded task chaining / arbitrary repeat queues;
+- no Copy-authored priorities or strategic planner;
+- no leftover-delta chaining and no offline standing-order selection;
+- no narrative/social/world decision delegation;
 - no generic job/economy system.
+
+**Post-completion bounded extension:** explicit owner direction later authorized the
+Archive Verification standing-order vertical slice documented in
+`CopyStandingOrdersAndExceptionEscalationResult.md`. That extension permits one
+player-authored mastered procedure to maintain a typed condition live through the
+existing eligibility/one-active-task authority and requires out-of-envelope
+exceptions to return to player judgment. It does not reopen GC-05 or authorize a
+general Copy planner.
 
 ### Exit
 
