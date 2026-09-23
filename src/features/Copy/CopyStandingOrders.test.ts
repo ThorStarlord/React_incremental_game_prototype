@@ -233,17 +233,20 @@ describe('Copy Standing Orders and Exception Escalation', () => {
     expect(store.getState().copy.archiveVerificationCasesById?.archive_case_gc08_network_diagnosis)
       .toMatchObject({ status: 'pending', classification: 'routine' });
 
+    await store.dispatch(processCopyStandingOrdersThunk());
+    await store.dispatch(processCopyTasksThunk(100_000));
+    expect(store.getState().copy.archiveVerificationCasesById?.archive_case_gc08_network_diagnosis.status)
+      .toBe('verified');
+
     store.dispatch(experience('elara_gc08_exp_diagnostic_preparation', 1100));
     expect(store.getState().copy.archiveVerificationCasesById?.archive_case_gc08_diagnostic_anomaly)
       .toMatchObject({ status: 'pending', classification: 'source_contradiction' });
 
     await store.dispatch(processCopyStandingOrdersThunk());
     await store.dispatch(processCopyTasksThunk(100_000));
-    await store.dispatch(processCopyStandingOrdersThunk());
-    await store.dispatch(processCopyTasksThunk(100_000));
 
-    const exception = Object.values(store.getState().copy.exceptionsById ?? {})[0];
-    expect(exception?.status).toBe('open');
+    const exception = Object.values(store.getState().copy.exceptionsById ?? {})[0]!;
+    expect(exception.status).toBe('open');
 
     store.dispatch(experience('lyra_gc08_exp_commit_diagnostic', 1200));
 
