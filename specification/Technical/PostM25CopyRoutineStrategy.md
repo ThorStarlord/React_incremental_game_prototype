@@ -1,6 +1,6 @@
 # Post-M25 Copy Routine Strategy
 
-**Status:** REPOSITORY-ONLY / HERMETIC QUALIFICATION  
+**Status:** HISTORICAL BASELINE / EXTENDED BY `CopyStandingOrdersAndExceptionEscalationResult.md`  
 **Human product-value evidence:** UNPROVEN  
 **Autonomous irreversible planning:** Not introduced
 
@@ -30,7 +30,9 @@ The new strategy layer does not create a second task executor. It delegates to t
 - the one-active-task invariant;
 - existing allowlisted rewards.
 
-The feature does not chain tasks automatically when one completes. Starting the preferred routine remains an explicit player action.
+At this historical baseline, the feature did not chain tasks automatically when one completed and starting the preferred routine remained an explicit player action.
+
+The later bounded standing-order extension deliberately revises only that start boundary: an explicitly authorized Archive Verification Standing Order may start one typed unit of mastered work on a later **live** fixed tick. `Start Preferred` itself remains one-shot. Generic queues, leftover-delta chaining, offline selection, autonomous strategic planning, and irreversible decision delegation remain prohibited.
 
 Unknown ids are removed from the stored priority and cannot become arbitrary timed-task execution.
 
