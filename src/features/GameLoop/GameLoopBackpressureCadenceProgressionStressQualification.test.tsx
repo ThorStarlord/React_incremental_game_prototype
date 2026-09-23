@@ -10,6 +10,7 @@ import {
   processCopyLoyaltyDecayThunk,
   processCopyTasksThunk,
 } from '../Copy/state/CopyThunks';
+import { processCopyStandingOrdersThunk } from '../Copy/state/CopyStrategyThunks';
 import { updateCopy } from '../Copy/state/CopySlice';
 import {
   processStatusEffectsThunk,
@@ -138,6 +139,7 @@ const runOnlineProgressionTick = async (store: TestStore, tickData: TickData) =>
   await store.dispatch(processCopyGrowthThunk(tickData.deltaTime));
   await store.dispatch(processCopyLoyaltyDecayThunk(tickData.deltaTime));
   await store.dispatch(processCopyTasksThunk(tickData.deltaTime));
+  await store.dispatch(processCopyStandingOrdersThunk());
   store.dispatch(processResonanceLevelThunk());
   await store.dispatch(processStatusEffectsThunk());
   await store.dispatch(regenerateVitalsThunk(tickData.deltaTime));
