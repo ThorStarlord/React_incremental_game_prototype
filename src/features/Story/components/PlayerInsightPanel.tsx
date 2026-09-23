@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Box,
-  Button,
   Card,
   CardContent,
   Chip,
@@ -11,7 +10,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import { useAppSelector } from '../../../app/hooks';
 import {
   selectCausalJournalEntries,
   selectMasteredRoutines,
@@ -22,7 +21,6 @@ import {
 } from '../PlayerInsightSelectors';
 import { DOCTRINE_DEFINITIONS } from '../../Traits/state/DoctrineDefinitions';
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
-import { acknowledgeCopyException } from '../../Copy/state/CopySlice';
 
 const capabilityColor = (
   status: RelationshipCapabilityStatus
@@ -46,14 +44,12 @@ const capabilityLabel = (status: RelationshipCapabilityStatus): string => {
  * player has already earned.
  */
 export const PlayerInsightPanel: React.FC = React.memo(() => {
-  const dispatch = useAppDispatch();
   const journal = useAppSelector(state => selectCausalJournalEntries(state, 5));
   const opportunities = useAppSelector(selectOpportunityMap);
   const capabilities = useAppSelector(selectRelationshipBuildCapabilities);
   const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
   const masteredRoutines = useAppSelector(selectMasteredRoutines);
   const copyExceptions = useAppSelector(selectOpenCopyExceptions);
-  const currentTick = useAppSelector(state => state.gameLoop.currentTick);
   const visibleOpportunities = opportunities.filter(
     chapter => chapter.status !== 'not_started'
   );
@@ -101,21 +97,8 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                     <Typography variant="body2" sx={{ mt: 0.5 }}>
                       {exception.summary}
                     </Typography>
-                    {exception.status === 'open' && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        sx={{ mt: 1 }}
-                        onClick={() => dispatch(acknowledgeCopyException({
-                          exceptionId: exception.exceptionId,
-                          tick: currentTick,
-                        }))}
-                      >
-                        Acknowledge
-                      </Button>
-                    )}
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.75 }}>
-                      Acknowledging records that you saw the exception; it does not resolve the underlying player-owned decision.
+                      Open this Copy's details to acknowledge the operational exception. Player Insight remains read-only, and acknowledgement still does not resolve the underlying player-owned decision.
                     </Typography>
                   </Box>
                 ))}
