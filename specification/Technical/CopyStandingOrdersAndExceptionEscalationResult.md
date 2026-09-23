@@ -193,7 +193,8 @@ The notification is not persistence authority.
 
 `selectOpenCopyExceptions` projects durable exceptions into a **Needs your judgment** section.
 
-The player may acknowledge an open exception. The UI explicitly states that acknowledgement does not resolve it.
+Player Insight remains strictly read-only. It explains the exception and directs the
+player to the relevant Copy management surface without dispatching state changes.
 
 ### Copy Detail
 
@@ -202,7 +203,11 @@ Archive Verification now exposes:
 - Standing Order switch;
 - pending authored verification count;
 - current standing-order status;
-- a visible pause explanation when an unresolved exception blocks that responsibility.
+- a visible pause explanation when an unresolved exception blocks that responsibility;
+- **Acknowledge** for open exceptions.
+
+Acknowledgement records that the player has seen the operational exception. It
+does not resolve the underlying player-owned decision.
 
 `Start Preferred` remains a separate one-shot action.
 
