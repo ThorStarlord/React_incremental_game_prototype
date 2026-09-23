@@ -15,6 +15,7 @@ import {
   setCopyStandingOrderThunk,
 } from './state/CopyStrategyThunks';
 import { processCopyTasksThunk } from './state/CopyThunks';
+import { selectOpenCopyExceptions } from '../Story/PlayerInsightSelectors';
 
 const makeStore = () => configureStore({
   reducer: rootReducer,
@@ -209,6 +210,16 @@ describe('Copy Standing Orders and Exception Escalation', () => {
     expect(store.getState().notifications.items.some(item =>
       /contradictory sources require your judgment/i.test(item.message)
     )).toBe(true);
+
+    expect(selectOpenCopyExceptions(store.getState())).toEqual([
+      expect.objectContaining({
+        copyId: 'copy-001',
+        routineName: 'Archive Verification',
+        title: 'Archive source contradiction',
+        status: 'open',
+        severity: 'blocking',
+      }),
+    ]);
 
     await store.dispatch(processCopyStandingOrdersThunk());
     expect(store.getState().copy.copies['copy-001'].activeTask).toBeNull();
