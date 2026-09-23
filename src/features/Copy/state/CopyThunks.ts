@@ -8,9 +8,25 @@ import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import type { RootState, AppDispatch } from '../../../app/store';
 import { spendEssence, gainEssence } from '../../Essence/state/EssenceSlice';
 import { PlayerStats } from '../../Player/state/PlayerTypes';
-import { addCopy, updateCopy, updateMultipleCopies, promoteCopyToAccelerated, shareTraitToCopy, unshareTraitFromCopy, unlockCopySlotsIfEligible, assignCopyRole, startCopyTask, progressCopyTask, clearCopyActiveTask, setCopySharePreference } from './CopySlice';
+import {
+  addCopy,
+  updateCopy,
+  updateMultipleCopies,
+  promoteCopyToAccelerated,
+  shareTraitToCopy,
+  unshareTraitFromCopy,
+  unlockCopySlotsIfEligible,
+  assignCopyRole,
+  startCopyTask,
+  progressCopyTask,
+  clearCopyActiveTask,
+  setCopySharePreference,
+  markArchiveVerificationCaseVerified,
+  markArchiveVerificationCaseEscalated,
+  recordCopyException,
+} from './CopySlice';
 import { applyGrowth, applyLoyaltyDecay, computeInheritedTraits, getCopyCreationCost } from '../utils/copyUtils';
-import type { Copy, CopyGrowthType, CopyTask } from './CopyTypes';
+import type { Copy, CopyGrowthType, CopyTask, CopyTaskOrigin } from './CopyTypes';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { generateCopyId, generateCopyName } from '../utils/copyUtils';
 import { gainGold } from '../../Player/state/PlayerSlice';
@@ -289,7 +305,15 @@ export const startCopyTimedTaskThunk = createAsyncThunk(
 export const startCopyProductionTaskThunk = createAsyncThunk(
   'copy/startProductionTask',
   async (
-    { copyId, taskId }: { copyId: string; taskId: string },
+    {
+      copyId,
+      taskId,
+      origin,
+    }: {
+      copyId: string;
+      taskId: string;
+      origin?: CopyTaskOrigin;
+    },
     { getState, dispatch, rejectWithValue }
   ) => {
     const definition = getCopyProductionTaskDefinition(taskId);
@@ -323,18 +347,27 @@ export const startCopyProductionTaskThunk = createAsyncThunk(
       Math.round(definition.baseDurationSeconds * multiplier)
     );
     const now = Date.now();
+    const startedAtTick = state.gameLoop.currentTick;
+    const resolvedOrigin: CopyTaskOrigin = origin ?? { type: 'manual' };
+    const taskIdentity = resolvedOrigin.type === 'standing_order'
+      ? `tick_${startedAtTick}_${copyId}`
+      : String(now);
     const task: CopyTask = {
-      id: `task_${definition.id}_${now}`,
+      id: `task_${definition.id}_${taskIdentity}`,
       type: 'timed',
       productionTaskId: definition.id,
       durationSeconds: adjustedDuration,
       progressSeconds: 0,
       status: 'running',
       startedAt: now,
+      startedAtTick,
+      origin: resolvedOrigin,
     };
 
     dispatch(startCopyTask({ copyId, task }));
-    dispatch(addNotification({ type: 'info', message: `${definition.name} started.` }));
+    if (resolvedOrigin.type !== 'standing_order') {
+      dispatch(addNotification({ type: 'info', message: `${definition.name} started.` }));
+    }
     return { success: true, taskId: definition.id, durationSeconds: adjustedDuration };
   }
 );
@@ -366,6 +399,47 @@ export const processCopyTasksThunk = createAsyncThunk(
             continue;
           }
 
+          if (
+            updated.origin?.type === 'standing_order' &&
+            updated.origin.routineId === 'archive_verification' &&
+            updated.origin.subjectId
+          ) {
+            const currentState = getState() as RootState;
+            const archiveCase =
+              currentState.copy.archiveVerificationCasesById?.[updated.origin.subjectId];
+
+            if (!archiveCase) {
+              dispatch(addNotification({
+                type: 'warning',
+                message: `${copy.name} stopped Archive Verification because its standing-order work item is no longer available.`,
+              }));
+              dispatch(clearCopyActiveTask({ copyId: copy.id }));
+              continue;
+            }
+
+            if (archiveCase.classification === 'source_contradiction') {
+              dispatch(markArchiveVerificationCaseEscalated({ caseId: archiveCase.id }));
+              dispatch(recordCopyException({
+                id: `copy_exception:${copy.id}:archive_verification:${archiveCase.id}`,
+                copyId: copy.id,
+                routineId: 'archive_verification',
+                severity: 'blocking',
+                status: 'open',
+                detectedAtTick: currentState.gameLoop.currentTick,
+                detectedAtGameTimeMs: currentState.gameLoop.totalGameTime,
+                context: {
+                  code: 'archive_source_contradiction',
+                  archiveCaseId: archiveCase.id,
+                  conflictingSourceIds: [...archiveCase.sourceIds],
+                },
+              }));
+              dispatch(clearCopyActiveTask({ copyId: copy.id }));
+              continue;
+            }
+
+            dispatch(markArchiveVerificationCaseVerified({ caseId: archiveCase.id }));
+          }
+
           // Role-based completion bonus remains Copy-owned progression flavor.
           const bonus = getCompletionBonusTextAndUpdates(copy);
           if (bonus.updates) {
@@ -391,10 +465,12 @@ export const processCopyTasksThunk = createAsyncThunk(
           if (bonus.text) rewardParts.push(bonus.text);
           const suffix = rewardParts.length > 0 ? ` (${rewardParts.join(', ')})` : '';
 
-          dispatch(addNotification({
-            type: 'success',
-            message: `${copy.name} completed ${definition.name}${suffix}.`,
-          }));
+          if (updated.origin?.type !== 'standing_order') {
+            dispatch(addNotification({
+              type: 'success',
+              message: `${copy.name} completed ${definition.name}${suffix}.`,
+            }));
+          }
           dispatch(clearCopyActiveTask({ copyId: copy.id }));
         }
       }
