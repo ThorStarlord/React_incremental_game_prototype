@@ -76,7 +76,9 @@ export const evaluateCopyStandingOrder = (
 
   const pendingCases = Object.values(state.copy.archiveVerificationCasesById ?? {})
     .filter(candidate => candidate.status === 'pending')
-    .sort((a, b) => a.id.localeCompare(b.id));
+    .sort((a, b) =>
+      a.createdAtTick - b.createdAtTick || a.id.localeCompare(b.id)
+    );
 
   if (pendingCases.length <= order.condition.targetPending) {
     return { kind: 'satisfied' };
