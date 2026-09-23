@@ -39,6 +39,7 @@ import {
   getFirstEligiblePreferredProductionTask,
   presentCopyProductionTaskReadiness,
 } from '../../CopyRoutineStrategy';
+import { acknowledgeCopyException } from '../../state/CopySlice';
 
 interface CopyDetailPanelProps {
   copyId: string;
@@ -77,6 +78,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
         exception.status !== 'resolved'
       )
   );
+  const currentTick = useAppSelector((s: RootState) => s.gameLoop.currentTick);
 
   const title = useMemo(() => (copy ? `${copy.name}` : 'Copy Details'), [copy]);
 
@@ -276,11 +278,37 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                               <Typography variant="caption" color="text.secondary" display="block">
                                 Maintain the authored Archive verification backlog automatically when this Copy is idle and eligible. Pending: {archivePendingCount}.
                               </Typography>
-                              {unresolvedCopyExceptions.some(exception => exception.routineId === 'archive_verification') && (
-                                <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 0.5 }}>
-                                  Paused by exception: player judgment is required before Archive Verification can continue.
-                                </Typography>
-                              )}
+                              {unresolvedCopyExceptions
+                                .filter(exception => exception.routineId === 'archive_verification')
+                                .map(exception => (
+                                  <Box
+                                    key={exception.id}
+                                    sx={{ mt: 0.75, borderLeft: 2, borderColor: 'warning.main', pl: 1 }}
+                                  >
+                                    <Typography variant="caption" color="warning.main" display="block">
+                                      Paused by exception: player judgment is required before Archive Verification can continue.
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                      {exception.context.conflictingSourceIds.length} archive sources conflict outside the mastered procedure.
+                                    </Typography>
+                                    {exception.status === 'open' && (
+                                      <Button
+                                        size="small"
+                                        variant="text"
+                                        sx={{ mt: 0.25 }}
+                                        onClick={() => dispatch(acknowledgeCopyException({
+                                          exceptionId: exception.id,
+                                          tick: currentTick,
+                                        }))}
+                                      >
+                                        Acknowledge
+                                      </Button>
+                                    )}
+                                    {exception.status === 'acknowledged' && (
+                                      <Chip size="small" label="Acknowledged — decision still unresolved" color="warning" variant="outlined" sx={{ mt: 0.5 }} />
+                                    )}
+                                  </Box>
+                                ))}
                             </Box>
                           )}
                         </Box>
