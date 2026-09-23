@@ -167,6 +167,10 @@ export interface Copy {
  */
 export interface CopiesState {
   copies: Record<string, Copy>; // All created copies, indexed by ID
+  /** Bounded procedural work queue for the first Archive standing-order slice. */
+  archiveVerificationCasesById?: Record<string, ArchiveVerificationCase>;
+  /** Durable player-attention objects produced when routine authority runs out. */
+  exceptionsById?: Record<string, CopyException>;
   isLoading: boolean;
   error: string | null;
 }
