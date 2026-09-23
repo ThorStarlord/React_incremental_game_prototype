@@ -3,7 +3,7 @@
 **Status:** CURRENT AUTHORITY for document classification  
 **Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
 **Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
-**Last reconciled:** 2026-09-21
+**Last reconciled:** 2026-09-23
 
 ## Purpose
 
@@ -81,6 +81,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | Provisional governance boundary | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProvisionalGovernanceDecision.md`](../specification/Technical/PostM25ProvisionalGovernanceDecision.md) | Allows bounded reversible human-unvalidated product development; does not create human evidence. |
 | Provisional Product Direction | CURRENT AUTHORITY, bounded | [`specification/Technical/PostM25ProvisionalProductDirectionDecision.md`](../specification/Technical/PostM25ProvisionalProductDirectionDecision.md) | Relationship-derived capability buildcraft + causal legibility + earned delegation. |
 | Relationship Capability Constellation | CURRENT AUTHORITY, bounded / HUMAN-UNVALIDATED | [`specification/Technical/RelationshipCapabilityConstellation.md`](../specification/Technical/RelationshipCapabilityConstellation.md) | Separates durable learned Traits from Player-owned doctrine focus; exposes a bounded player-facing selection/legibility surface; GC06 consumes active doctrine while later pair routes remain unchanged pending evidence. |
+| Copy standing responsibility / exception escalation | CURRENT AUTHORITY, bounded / HUMAN-UNVALIDATED | [`specification/Technical/CopyStandingOrdersAndExceptionEscalationResult.md`](../specification/Technical/CopyStandingOrdersAndExceptionEscalationResult.md), [`specification/Features/CopySystem.md`](../specification/Features/CopySystem.md) | Explicit owner-directed scope revision: Archive Verification may maintain typed live work; generic queues/planners, offline chaining, and irreversible Copy decisions remain CUT. |
 | M26 result | CURRENT AUTHORITY, integrated | [`specification/Technical/M26ProvisionalProductDepthResult.md`](../specification/Technical/M26ProvisionalProductDepthResult.md) | Exact-head #340 PASS; M26 closed. |
 | GC-01 player-surface cleanup | CURRENT AUTHORITY, integrated | [`specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md`](../specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md) | Exact-head #343 PASS; PR #117 merged; cut/deferred placeholders no longer primary 1.0 surfaces. |
 | GC-02 Prologue / onboarding | CURRENT AUTHORITY, integrated | PR #120 + `npm run gc02:validate` | Exact-head #352 PASS; fresh-save Willow First Lesson path integrated. |
@@ -132,7 +133,8 @@ Important current bounded records also include:
 - `PostM25ContextualCausalLegibility.md` — spoiler-safe explanation;
 - `PostM25CrossDomainTraitBuildcraft.md` — semantic cross-domain Trait use;
 - `PostM25ThirdHeterogeneousChapter.md` — Enemies in Phase;
-- `PostM25CopyRoutineStrategy.md` — explicit routine priority / Start Preferred;
+- `PostM25CopyRoutineStrategy.md` — historical one-shot routine-priority baseline, extended by current standing-order authority;
+- `CopyStandingOrdersAndExceptionEscalationResult.md` — bounded live condition maintenance + durable exception escalation;
 - `M26ProvisionalProductDepthResult.md` — visible capability/mastery/delegation provenance;
 - `../docs/release/BetaExecutionRunbook.md` — operational human-evidence collection, classification, repair routing and promotion sequence;
 - `GC01PlayerSurfaceScopeCleanupResult.md` — integrated 1.0 player-surface cleanup and rejection qualification;
