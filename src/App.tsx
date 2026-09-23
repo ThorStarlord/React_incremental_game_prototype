@@ -8,6 +8,7 @@ import { useGameLoop } from './features/GameLoop/hooks/useGameLoop';
 import type { TickData } from './features/GameLoop/state/GameLoopTypes';
 import { processPassiveGenerationThunk, processResonanceLevelThunk } from './features/Essence/state/EssenceThunks';
 import { processCopyGrowthThunk, processCopyLoyaltyDecayThunk, processCopyTasksThunk } from './features/Copy/state/CopyThunks';
+import { processCopyStandingOrdersThunk } from './features/Copy/state/CopyStrategyThunks';
 import { processStatusEffectsThunk, regenerateVitalsThunk, recalculateStatsThunk } from './features/Player/state/PlayerThunks';
 import { AppRouter } from './routes/AppRouter';
 import { ThemeProviderWrapper as ThemeProvider } from './theme/provider';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
   await dispatch(processCopyGrowthThunk(tickData.deltaTime));
   await dispatch(processCopyLoyaltyDecayThunk(tickData.deltaTime));
   await dispatch(processCopyTasksThunk(tickData.deltaTime));
+  await dispatch(processCopyStandingOrdersThunk());
     dispatch(processResonanceLevelThunk());
     await dispatch(processStatusEffectsThunk(tickData.deltaTime));
     await dispatch(regenerateVitalsThunk(tickData.deltaTime));
