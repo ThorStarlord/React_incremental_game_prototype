@@ -1,6 +1,6 @@
 # Copy System Specification
 
-**Implementation Status:** ✅ **CORE COPY RUNTIME + TRAIT SHARING + BOUNDED M20 AUTOMATION + M21 OFFLINE CONTINUATION + CHECKPOINT-C FAMILIARITY REPAIR QUALIFIED**
+**Implementation Status:** ✅ **CORE COPY RUNTIME + TRAIT SHARING + BOUNDED M20 AUTOMATION + LIVE ARCHIVE STANDING RESPONSIBILITY + EXCEPTION ESCALATION + M21 OFFLINE CONTINUATION + CHECKPOINT-C FAMILIARITY REPAIR QUALIFIED**
 
 > Current qualified build summary:
 > - Copy state/thunks cover creation, growth, loyalty decay/bolster, accelerated growth, role assignment, Trait inheritance/sharing, and one active task per Copy.
@@ -8,6 +8,8 @@
 > - Player-owned routine familiarity remains a prerequisite to delegation.
 > - Forge familiarity is earned by one-time active City Center practice; Resonance Calibration by successful active Trait Resonance; Archive Verification by Elara's canonical independent-verification experience.
 > - Familiarity is enforced below the UI by `startCopyProductionTaskThunk`; Copy maturity/loyalty/role/location requirements remain independent.
+> - A player may now authorize one bounded **Archive Verification Standing Order**. Live fixed-tick evaluation may start one authored unit of mastered work when the Copy is idle and eligible.
+> - A source contradiction becomes a persisted Copy Exception and returns to player judgment instead of being auto-resolved.
 > - M21 may advance or complete an already-running authored Copy task during bounded offline settlement, but never selects or chains a new task.
 > - Meaningful/irreversible narrative decisions remain player-owned.
 
@@ -365,6 +367,51 @@ Unknown/legacy task state may finish its timer but receives no M20 production re
 
 Clearing `activeTask` after completion supplies the existing exact-once replay control.
 
+### 10.1 Bounded standing responsibility
+
+The post-Content-Alpha extension in
+`../Technical/CopyStandingOrdersAndExceptionEscalationResult.md` introduces one
+authored condition-maintenance policy without replacing the M20 task executor.
+
+```text
+routineFamiliarity
+-> player-authorized Copy.standingOrders.archive_verification
+-> existing routinePriority arbitration
+-> processCopyStandingOrdersThunk()
+-> existing startCopyProductionTaskThunk
+-> Copy.activeTask
+```
+
+The v1 condition is exactly:
+
+```text
+archive_verification_backlog
+targetPending = 0
+```
+
+Evaluation occurs live after `processCopyTasksThunk(deltaTime)`. A task started
+by the standing evaluator begins at progress zero and cannot consume leftover
+delta from the task that just finished.
+
+Normal standing-order starts/completions are intentionally quiet. An authored
+`source_contradiction` work item instead:
+
+```text
+completes procedure
+-> no ordinary reward
+-> archive case escalated
+-> durable CopyException recorded once
+-> transient warning notification
+-> Player Insight "Needs your judgment"
+-> standing Archive responsibility remains blocked until authored player resolution
+```
+
+Acknowledging the alert does not resolve the exception.
+
+Generic repeat queues, autonomous strategic planning, Copy-authored priorities,
+offline standing-order selection, and irreversible decision delegation remain
+outside the qualified boundary.
+
 ---
 
 ## 11. Save/load and M21 offline continuation
@@ -470,10 +517,12 @@ M20 tests preserve Relationship and Quest state across qualified task completion
 | Below-UI familiarity enforcement | **Repair PASS** | assignment thunk authority |
 | Live task progression/reward | **M20 PASS** | deterministic, exact-once |
 | Mid-task save/load | **M20 PASS** | RootState persistence |
-| Bounded offline task continuation | **M21 PASS** | already-running task only |
+| Live Archive standing responsibility | **REPOSITORY-IMPLEMENTED / deterministic qualification** | player-authorized mastered procedure; one bounded unit per later live tick |
+| Durable exception escalation | **REPOSITORY-IMPLEMENTED / deterministic qualification** | source contradiction persists and returns to player judgment |
+| Bounded offline task continuation | **M21 PASS** | already-running task only; standing orders do not select new offline work |
 | Visible offline return summary | **Repair PASS** | shared notification host |
 | Copy travel/autonomous movement | Not qualified | outside current boundary |
-| Autonomous/strategic delegation | Not qualified | outside current boundary |
+| Autonomous strategic planning / generic task chaining | Not qualified / CUT | no invented goals, priorities, strategies, arbitrary queues, or irreversible decisions |
 | Social knowledge | Future | M22 remains unauthorized pending fresh Checkpoint C PASS |
 
 ---
@@ -506,8 +555,8 @@ The current Copy/automation evidence does **not** qualify:
 - generalized routine-learning/activity discovery;
 - additional production task IDs beyond the current two;
 - generalized crafting/manual production systems;
-- autonomous task choice/planning;
-- task queues/priorities/chaining;
+- autonomous strategic task choice/planning;
+- generic/unbounded task queues or arbitrary chaining beyond the authored Archive standing-order contract;
 - task failure/risk simulation;
 - team Copy tasks;
 - Copy travel/pathfinding/schedules;
