@@ -174,6 +174,9 @@ copyListeners.startListening({
 copyListeners.startListening({
   actionCreator: recordCopyException,
   effect: async (action, api) => {
+    const originalState = api.getOriginalState();
+    if (originalState.copy.exceptionsById?.[action.payload.id]) return;
+
     const state = api.getState();
     const copy = state.copy.copies[action.payload.copyId];
     const copyName = copy?.name ?? 'A Copy';
