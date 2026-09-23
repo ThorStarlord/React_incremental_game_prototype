@@ -268,6 +268,33 @@ describe('Copy Standing Orders and Exception Escalation', () => {
       .toBe('verified');
   });
 
+  test('a player-owned diagnostic commitment made before Copy completion prevents a stale later exception', async () => {
+    const store = makeStore();
+    prepareArchiveCopy(store);
+    await enableArchiveStandingOrder(store);
+
+    store.dispatch(upsertArchiveVerificationCase({
+      id: 'case_resolution_race',
+      status: 'pending',
+      classification: 'source_contradiction',
+      sourceIds: ['source_a', 'source_b'],
+      createdAtTick: 0,
+    }));
+
+    await store.dispatch(processCopyStandingOrdersThunk());
+    expect(store.getState().copy.archiveVerificationCasesById?.case_resolution_race.status)
+      .toBe('in_progress');
+
+    store.dispatch(experience('lyra_gc08_exp_commit_diagnostic', 1200));
+    expect(store.getState().copy.archiveVerificationCasesById?.case_resolution_race.status)
+      .toBe('verified');
+
+    await store.dispatch(processCopyTasksThunk(100_000));
+
+    expect(Object.values(store.getState().copy.exceptionsById ?? {})).toHaveLength(0);
+    expect(store.getState().copy.copies['copy-001'].activeTask).toBeNull();
+  });
+
   test('unresolved exceptions survive save/load while transient notification state does not become authority', async () => {
     const store = makeStore();
     prepareArchiveCopy(store);
