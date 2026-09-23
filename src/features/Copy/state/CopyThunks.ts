@@ -350,7 +350,7 @@ export const startCopyProductionTaskThunk = createAsyncThunk(
     const startedAtTick = state.gameLoop.currentTick;
     const resolvedOrigin: CopyTaskOrigin = origin ?? { type: 'manual' };
     const taskIdentity = resolvedOrigin.type === 'standing_order'
-      ? `tick_${startedAtTick}_${copyId}`
+      ? `tick_${startedAtTick}_${copyId}_${resolvedOrigin.subjectId ?? definition.id}`
       : String(now);
     const task: CopyTask = {
       id: `task_${definition.id}_${taskIdentity}`,
