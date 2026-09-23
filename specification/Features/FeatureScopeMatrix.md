@@ -37,8 +37,8 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Knowledge | CORE_1_0 | implemented / qualified | Owns who knows objective facts. |
 | Faction Reputation | CORE_1_0 | implemented / qualified | Owns institutional standing independent from personal relationships. |
 | World State | CORE_1_0 | implemented / qualified | Owns persistent objective regional conditions. |
-| Copy system | CORE_1_0 | implemented / qualified | Bounded execution of understood repeatable work. |
-| Routine familiarity / earned delegation | CORE_1_0 | implemented / qualified breadth | Preserve the qualified 1.0 breadth without automatic chaining or hidden mastery. |
+| Copy system | CORE_1_0 | implemented / qualified + bounded standing responsibility | Bounded execution of understood repeatable work, including explicitly authorized live condition-maintenance for authored mastered routines. |
+| Routine familiarity / earned delegation | CORE_1_0 | implemented / qualified breadth + Archive standing-order slice | Preserve explicit personal mastery. A player-authorized standing order may maintain one typed authored condition live through existing Copy eligibility; unknown/irreversible work escalates instead of auto-resolving. |
 | Persistence / save / load | CORE_1_0 | implemented | Must survive whole-campaign progression. |
 | Save import / export | CORE_1_0 | implemented through main menu | Preserve as recovery/portability path. |
 | Autosave | SUPPORTING_1_0 | implemented | Must not corrupt or overwrite progression unexpectedly. |
@@ -61,8 +61,8 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Dynamic chapter/plugin registry | DEFER_POST_1_0 | absent | Not required for bounded Campaign One. |
 | Generic capability graph | DEFER_POST_1_0 | absent | Use explicit Trait/domain applications plus the bounded two-profile doctrine derivation. The Relationship Capability Constellation does not promote an arbitrary graph or combination engine into 1.0. |
 | Large Trait catalog | DEFER_POST_1_0 | not needed | Meet the completion-definition build floor only. |
-| Automatic Copy task chaining | CUT | intentionally prohibited | Player retains task/start authority. |
-| Autonomous Copy planning | CUT | intentionally prohibited | No irreversible or strategic decision delegation. |
+| Generic / unbounded Copy task chaining | CUT | intentionally prohibited | No arbitrary repeat queues, generic chaining, autonomous reprioritization, leftover-delta chaining, or offline standing selection. The bounded Archive standing-order contract is a CORE Copy extension, not a general planner. |
+| Autonomous Copy planning | CUT | intentionally prohibited | Copies may apply an explicitly player-authorized mastered procedure inside a typed safe envelope, but may not invent goals, priorities, strategies, or irreversible decisions. Out-of-envelope states escalate to the player. |
 | Offline narrative/social/quest/world progression | CUT | intentionally prohibited | Offline settlement remains bounded to approved routine/passive authority. |
 | Open-world NPC schedules | DEFER_POST_1_0 | absent | Campaign-authored presence is sufficient. |
 | General rumor/belief simulation | DEFER_POST_1_0 | absent | Per-NPC Knowledge plus authored transfer remains sufficient. |
