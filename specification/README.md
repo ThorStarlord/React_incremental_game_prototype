@@ -51,7 +51,7 @@ General Inventory/Equipment    -> DEFER_POST_1_0 unless campaign evidence promot
 canonical save/load/import     -> CORE_1_0
 duplicate Saves system         -> CUT
 ChapterEngine / narrative DSL  -> CUT absent repeated concrete need
-autonomous Copy decisions      -> CUT
+autonomous strategic Copy decisions -> CUT; bounded mastered standing maintenance -> CORE
 interplanetary campaign / NG+  -> DEFER_POST_1_0
 ```
 
@@ -226,7 +226,8 @@ Do not collapse these into a universal progression/condition system without a ne
 
 - [`Technical/M20ProductionCopyTaskAutomationResult.md`](Technical/M20ProductionCopyTaskAutomationResult.md) — bounded Copy task execution.
 - [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md) — bounded offline snapshot settlement.
-- [`Technical/PostM25CopyRoutineStrategy.md`](Technical/PostM25CopyRoutineStrategy.md) — player-authored routine priority and explicit `Start Preferred` action.
+- [`Technical/PostM25CopyRoutineStrategy.md`](Technical/PostM25CopyRoutineStrategy.md) — historical one-shot routine-priority baseline.
+- [`Technical/CopyStandingOrdersAndExceptionEscalationResult.md`](Technical/CopyStandingOrdersAndExceptionEscalationResult.md) — **CURRENT bounded authority** for live Archive standing responsibility, durable exceptions, and the remaining no-planner/offline boundary.
 - [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — personal mastery provenance vs Copy-specific readiness.
 
 Product doctrine:
@@ -235,7 +236,9 @@ Product doctrine:
 player personally learns routine
 -> familiarity persists
 -> player may deliberately delegate approved repetition
+-> one-shot assignment OR explicitly authorized standing condition maintenance
 -> Copy executes bounded ordinary consequence
+-> out-of-envelope anomaly becomes durable exception
 
 novel / meaningful / irreversible decision
 -> remains player authority
@@ -309,6 +312,7 @@ npm run gc01:validate
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate
+npm run copy-standing-orders:validate
 npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx tsc --noEmit

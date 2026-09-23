@@ -26,6 +26,7 @@ import { selectCopyById, selectCopyEffectiveTraitsWithSource, selectCopyEligible
 import { assignCopyRoleThunk, startCopyProductionTaskThunk, setCopySharePreferenceThunk, applySharePreferencesForCopyThunk } from '../../state/CopyThunks';
 import {
   setCopyRoutinePriorityThunk,
+  setCopyStandingOrderThunk,
   startPreferredCopyProductionTaskThunk,
 } from '../../state/CopyStrategyThunks';
 import { selectTraits } from '../../../Traits/state/TraitsSelectors';
@@ -38,6 +39,7 @@ import {
   getFirstEligiblePreferredProductionTask,
   presentCopyProductionTaskReadiness,
 } from '../../CopyRoutineStrategy';
+import { acknowledgeCopyException } from '../../state/CopySlice';
 
 interface CopyDetailPanelProps {
   copyId: string;
@@ -65,6 +67,18 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
   const allTraits = useAppSelector(selectTraits);
   const hasRunningTask = useAppSelector((s: RootState) => selectCopyHasRunningTask(s, copyId));
   const routineFamiliarity = useAppSelector((s: RootState) => s.player.routineFamiliarity ?? {});
+  const archivePendingCount = useAppSelector((s: RootState) =>
+    Object.values(s.copy.archiveVerificationCasesById ?? {})
+      .filter(item => item.status === 'pending').length
+  );
+  const unresolvedCopyExceptions = useAppSelector((s: RootState) =>
+    Object.values(s.copy.exceptionsById ?? {})
+      .filter(exception =>
+        exception.copyId === copyId &&
+        exception.status !== 'resolved'
+      )
+  );
+  const currentTick = useAppSelector((s: RootState) => s.gameLoop.currentTick);
 
   const title = useMemo(() => (copy ? `${copy.name}` : 'Copy Details'), [copy]);
 
@@ -183,7 +197,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                       {priorityLabel}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Start Preferred chooses only the first currently eligible routine from this player-approved order. It never chains another task automatically.
+                      Start Preferred is a one-shot action. Enabled Standing Orders may start one bounded unit of known work on a later live tick; they never consume leftover task time or resolve exceptions.
                     </Typography>
                   </Box>
                   <Button
@@ -243,6 +257,59 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                             <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 0.5 }}>
                               This Copy still needs: {readiness.reasons.join(' ')}
                             </Typography>
+                          )}
+                          {task.id === 'archive_verification' && (
+                            <Box sx={{ mt: 1 }}>
+                              <FormControlLabel
+                                control={
+                                  <Switch
+                                    size="small"
+                                    checked={Boolean(copy.standingOrders?.archive_verification?.enabled)}
+                                    disabled={!isFamiliar}
+                                    onChange={(event) => dispatch(setCopyStandingOrderThunk({
+                                      copyId: copy.id,
+                                      taskId: 'archive_verification',
+                                      enabled: event.target.checked,
+                                    }))}
+                                  />
+                                }
+                                label="Standing Order"
+                              />
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Maintain the authored Archive verification backlog automatically when this Copy is idle and eligible. Pending: {archivePendingCount}.
+                              </Typography>
+                              {unresolvedCopyExceptions
+                                .filter(exception => exception.routineId === 'archive_verification')
+                                .map(exception => (
+                                  <Box
+                                    key={exception.id}
+                                    sx={{ mt: 0.75, borderLeft: 2, borderColor: 'warning.main', pl: 1 }}
+                                  >
+                                    <Typography variant="caption" color="warning.main" display="block">
+                                      Paused by exception: player judgment is required before Archive Verification can continue.
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                      {exception.context.conflictingSourceIds.length} archive sources conflict outside the mastered procedure.
+                                    </Typography>
+                                    {exception.status === 'open' && (
+                                      <Button
+                                        size="small"
+                                        variant="text"
+                                        sx={{ mt: 0.25 }}
+                                        onClick={() => dispatch(acknowledgeCopyException({
+                                          exceptionId: exception.id,
+                                          tick: currentTick,
+                                        }))}
+                                      >
+                                        Acknowledge
+                                      </Button>
+                                    )}
+                                    {exception.status === 'acknowledged' && (
+                                      <Chip size="small" label="Acknowledged — decision still unresolved" color="warning" variant="outlined" sx={{ mt: 0.5 }} />
+                                    )}
+                                  </Box>
+                                ))}
+                            </Box>
                           )}
                         </Box>
                         <Stack spacing={0.75} sx={{ alignSelf: { xs: 'stretch', sm: 'center' }, minWidth: 130 }}>

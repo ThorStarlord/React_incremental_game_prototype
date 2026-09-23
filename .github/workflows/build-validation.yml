@@ -46,6 +46,10 @@ jobs:
         timeout-minutes: 8
         run: npm run gc0405:validate
 
+      - name: Copy standing orders and exception escalation qualification
+        timeout-minutes: 8
+        run: npm run copy-standing-orders:validate
+
       - name: GC-06 Lattice Under Strain qualification
         timeout-minutes: 10
         run: npm run gc06:validate

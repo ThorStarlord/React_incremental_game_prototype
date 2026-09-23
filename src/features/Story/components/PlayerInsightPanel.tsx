@@ -15,6 +15,7 @@ import {
   selectCausalJournalEntries,
   selectMasteredRoutines,
   selectOpportunityMap,
+  selectOpenCopyExceptions,
   selectRelationshipBuildCapabilities,
   type RelationshipCapabilityStatus,
 } from '../PlayerInsightSelectors';
@@ -48,6 +49,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
   const capabilities = useAppSelector(selectRelationshipBuildCapabilities);
   const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
   const masteredRoutines = useAppSelector(selectMasteredRoutines);
+  const copyExceptions = useAppSelector(selectOpenCopyExceptions);
   const visibleOpportunities = opportunities.filter(
     chapter => chapter.status !== 'not_started'
   );
@@ -64,6 +66,45 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               A read-only view of consequences, unresolved opportunities, learned capabilities, and repeatable work you have already mastered.
             </Typography>
           </Box>
+
+          {copyExceptions.length > 0 && (
+            <Box
+              data-test-id="copy-exception-inbox"
+              sx={{ border: 1, borderColor: 'warning.main', borderRadius: 1, p: 2 }}
+            >
+              <Typography variant="subtitle1" fontWeight={600}>
+                Needs your judgment
+              </Typography>
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
+                Copies handle known procedures. When a routine encounters something outside that authority, it stops and returns the problem to you.
+              </Typography>
+              <Stack spacing={1.5}>
+                {copyExceptions.map(exception => (
+                  <Box key={exception.exceptionId}>
+                    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+                      <Typography variant="body2" fontWeight={600}>
+                        {exception.title}
+                      </Typography>
+                      <Chip
+                        label={exception.status === 'acknowledged' ? 'Acknowledged' : 'Action required'}
+                        size="small"
+                        color="warning"
+                      />
+                    </Stack>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      {exception.copyName} · {exception.routineName} · tick {exception.detectedAtTick}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {exception.summary}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.75 }}>
+                      Open this Copy's details to acknowledge the operational exception. Player Insight remains read-only, and acknowledgement still does not resolve the underlying player-owned decision.
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
 
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={3}>
@@ -261,7 +302,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
 
           <Divider />
           <Typography variant="caption" color="text.secondary">
-            This view explains recorded state; it does not create chapter completion, reveal undiscovered authored Traits, grant routine mastery, or make delegation decisions for the player.
+            This view explains recorded state; it does not create chapter completion, reveal undiscovered authored Traits, grant routine mastery, resolve Copy exceptions, or make delegation decisions for the player.
           </Typography>
         </Stack>
       </CardContent>

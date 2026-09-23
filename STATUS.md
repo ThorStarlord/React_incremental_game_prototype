@@ -1,6 +1,6 @@
 # Repository Status — Content Alpha / Campaign One Completion
 
-**Status date:** 2026-09-22  
+**Status date:** 2026-09-23  
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
@@ -76,6 +76,48 @@ Architecture         -> heterogeneous authored composition
 ```
 
 This may guide bounded reversible development under the provisional governance decision. It does **not** prove fresh-player comprehension, fun, pacing, fairness, retention or preference.
+
+### Bounded Mastery Compression hardening — Standing Orders
+
+Explicit owner direction extends the existing earned-delegation identity with one
+bounded Archive Verification standing responsibility.
+
+The current authority is
+[`CopyStandingOrdersAndExceptionEscalationResult.md`](specification/Technical/CopyStandingOrdersAndExceptionEscalationResult.md).
+
+The scope revision is deliberately narrow:
+
+```text
+personally mastered Archive Verification
++ player-enabled Standing Order
++ authored verification backlog
++ eligible idle Copy
+-> one bounded unit may start on a later live fixed tick
+
+source contradiction
+-> no ordinary reward
+-> persistent Copy Exception
+-> notification + Player Insight
+-> player-owned authored resolution required
+```
+
+The existing `routinePriority`, one-active-task, production eligibility, fixed-step
+GameLoop, and M21 offline boundaries remain authoritative. Normal standing work is
+quiet; exceptions preserve player attention.
+
+This does **not** authorize generic task queues, arbitrary repeat loops, autonomous
+Copy strategy, offline standing selection/chaining, or irreversible
+narrative/social/world decisions. Those remain outside Campaign One scope.
+
+Dedicated deterministic qualification:
+
+```bash
+npm run copy-standing-orders:validate
+```
+
+This hardening is repository-implemented but still **HUMAN-UNVALIDATED**. It does
+not establish that fresh players understand, prefer, or enjoy the standing-order
+UX or its exception frequency.
 
 ### Bounded capability-specialization hardening
 

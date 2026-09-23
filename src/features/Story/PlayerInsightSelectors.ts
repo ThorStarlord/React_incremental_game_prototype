@@ -3,7 +3,8 @@ import type { RootState } from '../../app/store';
 import { selectFactionReputation } from '../Factions/state/FactionSelectors';
 import { selectNetworkPosture } from '../WorldState/state/WorldStateSelectors';
 import type { NetworkPosture } from '../WorldState/state/WorldStateTypes';
-import { COPY_PRODUCTION_TASKS } from '../Copy/CopyTaskDefinitions';
+import { COPY_PRODUCTION_TASKS, getCopyProductionTaskDefinition } from '../Copy/CopyTaskDefinitions';
+import type { CopyExceptionStatus } from '../Copy/state/CopyTypes';
 import type {
   RoutineFamiliarityId,
   RoutineFamiliaritySource,
@@ -86,6 +87,18 @@ export interface MasteredRoutineView {
   source: RoutineFamiliaritySource;
   sourceLabel: string;
   learnedAt: number;
+}
+
+export interface CopyExceptionInsight {
+  exceptionId: string;
+  copyId: string;
+  copyName: string;
+  routineName: string;
+  title: string;
+  summary: string;
+  status: CopyExceptionStatus;
+  severity: 'attention' | 'blocking';
+  detectedAtTick: number;
 }
 
 export interface CounterphasePreparationExplanation {
@@ -314,6 +327,42 @@ export const selectMasteredRoutines = (state: RootState): MasteredRoutineView[] 
     }];
   });
 };
+
+
+/**
+ * Durable Copy exceptions projected into player-facing attention items.
+ * Notification state is intentionally not consulted: dismissing a Snackbar
+ * cannot resolve an unresolved automation boundary.
+ */
+export const selectOpenCopyExceptions = (
+  state: RootState
+): CopyExceptionInsight[] =>
+  Object.values(state.copy.exceptionsById ?? {})
+    .filter(exception => exception.status !== 'resolved')
+    .sort((a, b) =>
+      b.detectedAtTick - a.detectedAtTick || a.id.localeCompare(b.id)
+    )
+    .map(exception => {
+      const copy = state.copy.copies[exception.copyId];
+      const definition = getCopyProductionTaskDefinition(exception.routineId);
+      const sourceCount = exception.context.code === 'archive_source_contradiction'
+        ? exception.context.conflictingSourceIds.length
+        : 0;
+
+      return {
+        exceptionId: exception.id,
+        copyId: exception.copyId,
+        copyName: copy?.name ?? exception.copyId,
+        routineName: definition?.name ?? exception.routineId,
+        title: 'Archive source contradiction',
+        summary: sourceCount > 0
+          ? `${sourceCount} established archive sources conflict outside the mastered verification procedure. The Copy stopped rather than choosing an interpretation for you.`
+          : 'The mastered verification procedure reached a contradiction that requires player judgment.',
+        status: exception.status,
+        severity: exception.severity,
+        detectedAtTick: exception.detectedAtTick,
+      };
+    });
 
 
 const COUNTERPHASE_PROFILE_LABELS: Record<NetworkPosture, string> = {

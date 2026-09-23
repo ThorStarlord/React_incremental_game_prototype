@@ -4,7 +4,17 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CopiesState, Copy, CopyTraitSlot, CopyRole, CopyTask } from './CopyTypes';
+import {
+  ArchiveVerificationCase,
+  CopiesState,
+  Copy,
+  CopyException,
+  CopyProductionTaskId,
+  CopyRole,
+  CopyStandingOrder,
+  CopyTask,
+  CopyTraitSlot,
+} from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import { clamp } from '../utils/copyUtils';
 
@@ -85,6 +95,8 @@ const initialState: CopiesState = {
       currentTask: 'Researching ancient texts',
     },
   },
+  archiveVerificationCasesById: {},
+  exceptionsById: {},
   isLoading: false,
   error: null,
 };
@@ -100,6 +112,7 @@ const copiesSlice = createSlice({
       if (!newCopy.sharePreferences) newCopy.sharePreferences = {};
       if (newCopy.role === undefined) newCopy.role = 'none';
       if (newCopy.activeTask === undefined) newCopy.activeTask = null;
+      if (!newCopy.standingOrders) newCopy.standingOrders = {};
       state.copies[newCopy.id] = newCopy;
     },
     
@@ -174,6 +187,116 @@ const copiesSlice = createSlice({
       if (!copy) return;
       if (!copy.sharePreferences) copy.sharePreferences = {};
       copy.sharePreferences[traitId] = enabled;
+    },
+
+    /** Add, update, or clear a bounded standing responsibility on a Copy. */
+    setCopyStandingOrder: (
+      state,
+      action: PayloadAction<{
+        copyId: string;
+        routineId: CopyProductionTaskId;
+        order: CopyStandingOrder | null;
+      }>
+    ) => {
+      const { copyId, routineId, order } = action.payload;
+      const copy = state.copies[copyId];
+      if (!copy) return;
+      copy.standingOrders ??= {};
+      if (order) {
+        copy.standingOrders[routineId] = order;
+      } else {
+        delete copy.standingOrders[routineId];
+      }
+    },
+
+    markCopyStandingOrderTriggered: (
+      state,
+      action: PayloadAction<{
+        copyId: string;
+        routineId: CopyProductionTaskId;
+        tick: number;
+      }>
+    ) => {
+      const { copyId, routineId, tick } = action.payload;
+      const order = state.copies[copyId]?.standingOrders?.[routineId];
+      if (order) order.lastTriggeredTick = tick;
+    },
+
+    /** Create or update one authored Archive verification work item. */
+    upsertArchiveVerificationCase: (
+      state,
+      action: PayloadAction<ArchiveVerificationCase>
+    ) => {
+      state.archiveVerificationCasesById ??= {};
+      const existing = state.archiveVerificationCasesById[action.payload.id];
+      if (existing && existing.status !== 'pending') return;
+      state.archiveVerificationCasesById[action.payload.id] = {
+        ...action.payload,
+        ...(existing ?? {}),
+      };
+    },
+
+    assignArchiveVerificationCase: (
+      state,
+      action: PayloadAction<{ caseId: string; copyId: string }>
+    ) => {
+      state.archiveVerificationCasesById ??= {};
+      const item = state.archiveVerificationCasesById[action.payload.caseId];
+      if (!item || item.status !== 'pending') return;
+      item.status = 'in_progress';
+      item.assignedCopyId = action.payload.copyId;
+    },
+
+    markArchiveVerificationCaseVerified: (
+      state,
+      action: PayloadAction<{ caseId: string }>
+    ) => {
+      const item = state.archiveVerificationCasesById?.[action.payload.caseId];
+      if (!item) return;
+      item.status = 'verified';
+    },
+
+    markArchiveVerificationCaseEscalated: (
+      state,
+      action: PayloadAction<{ caseId: string }>
+    ) => {
+      const item = state.archiveVerificationCasesById?.[action.payload.caseId];
+      if (!item) return;
+      item.status = 'escalated';
+    },
+
+    recordCopyException: (state, action: PayloadAction<CopyException>) => {
+      state.exceptionsById ??= {};
+      if (!state.exceptionsById[action.payload.id]) {
+        state.exceptionsById[action.payload.id] = action.payload;
+      }
+    },
+
+    acknowledgeCopyException: (
+      state,
+      action: PayloadAction<{ exceptionId: string; tick: number }>
+    ) => {
+      const exception = state.exceptionsById?.[action.payload.exceptionId];
+      if (!exception || exception.status !== 'open') return;
+      exception.status = 'acknowledged';
+      exception.acknowledgedAtTick = action.payload.tick;
+    },
+
+    resolveCopyException: (
+      state,
+      action: PayloadAction<{
+        exceptionId: string;
+        tick: number;
+        action: 'player_resolved' | 'resume_order' | 'disable_order';
+      }>
+    ) => {
+      const exception = state.exceptionsById?.[action.payload.exceptionId];
+      if (!exception || exception.status === 'resolved') return;
+      exception.status = 'resolved';
+      exception.resolution = {
+        resolvedAtTick: action.payload.tick,
+        action: action.payload.action,
+      };
     },
 
     /** Start a task on a copy, replacing any existing active task. */
@@ -260,7 +383,19 @@ const copiesSlice = createSlice({
         if (!copy.sharePreferences) {
           copy.sharePreferences = {};
         }
+        if (!copy.standingOrders) {
+          copy.standingOrders = {};
+        }
       }
+    },
+
+    /** Initialize additive automation maps after loading older saves. */
+    ensureCopyAutomationState: (state) => {
+      state.archiveVerificationCasesById ??= {};
+      state.exceptionsById ??= {};
+      Object.values(state.copies).forEach(copy => {
+        copy.standingOrders ??= {};
+      });
     }
   },
 });
@@ -280,6 +415,16 @@ export const {
   ensureCopyTraitSlots,
     assignCopyRole,
     setCopySharePreference,
+    setCopyStandingOrder,
+    markCopyStandingOrderTriggered,
+    upsertArchiveVerificationCase,
+    assignArchiveVerificationCase,
+    markArchiveVerificationCaseVerified,
+    markArchiveVerificationCaseEscalated,
+    recordCopyException,
+    acknowledgeCopyException,
+    resolveCopyException,
+    ensureCopyAutomationState,
     startCopyTask,
     progressCopyTask,
     clearCopyActiveTask,

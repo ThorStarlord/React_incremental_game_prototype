@@ -16,6 +16,71 @@ export type CopyRole = 'infiltrator' | 'researcher' | 'guardian' | 'agent' | 'no
 /** Authored M20 production tasks that may be delegated to a Copy. */
 export type CopyProductionTaskId = RoutineFamiliarityId;
 
+export type CopyTaskOrigin =
+  | { type: 'manual' }
+  | { type: 'preferred_manual' }
+  | {
+      type: 'standing_order';
+      routineId: CopyProductionTaskId;
+      subjectId?: string;
+    };
+
+export type CopyStandingOrderCondition = {
+  type: 'archive_verification_backlog';
+  targetPending: number;
+};
+
+export interface CopyStandingOrder {
+  enabled: boolean;
+  condition: CopyStandingOrderCondition;
+  enabledAtTick: number;
+  lastTriggeredTick?: number;
+}
+
+export type ArchiveVerificationCaseStatus =
+  | 'pending'
+  | 'in_progress'
+  | 'verified'
+  | 'escalated';
+
+export type ArchiveVerificationCaseClassification =
+  | 'routine'
+  | 'source_contradiction';
+
+export interface ArchiveVerificationCase {
+  id: string;
+  status: ArchiveVerificationCaseStatus;
+  classification: ArchiveVerificationCaseClassification;
+  sourceIds: string[];
+  createdAtTick: number;
+  assignedCopyId?: string;
+}
+
+export type CopyExceptionStatus = 'open' | 'acknowledged' | 'resolved';
+export type CopyExceptionSeverity = 'attention' | 'blocking';
+
+export type CopyExceptionContext = {
+  code: 'archive_source_contradiction';
+  archiveCaseId: string;
+  conflictingSourceIds: string[];
+};
+
+export interface CopyException {
+  id: string;
+  copyId: string;
+  routineId: CopyProductionTaskId;
+  severity: CopyExceptionSeverity;
+  status: CopyExceptionStatus;
+  detectedAtTick: number;
+  detectedAtGameTimeMs: number;
+  context: CopyExceptionContext;
+  acknowledgedAtTick?: number;
+  resolution?: {
+    resolvedAtTick: number;
+    action: 'player_resolved' | 'resume_order' | 'disable_order';
+  };
+}
+
 /**
  * States a task can be in during its lifecycle.
  */
@@ -37,7 +102,11 @@ export interface CopyTask {
   status: CopyTaskStatus;
   /** Epoch ms when task started (if running). */
   startedAt?: number;
-  /** Optional arbitrary payload for later integrations. */
+  /** Logical GameLoop tick when execution began. */
+  startedAtTick?: number;
+  /** Typed provenance for manual, preferred, or standing-order execution. */
+  origin?: CopyTaskOrigin;
+  /** Optional arbitrary payload retained only for legacy integrations. */
   data?: Record<string, unknown>;
 }
 
@@ -82,6 +151,11 @@ export interface Copy {
    * historical saves valid; only authored CopyProductionTaskIds may persist.
    */
   routinePriority?: CopyProductionTaskId[];
+  /**
+   * Player-authored standing responsibilities. Optional for historical saves;
+   * absence means no autonomous standing work is authorized.
+   */
+  standingOrders?: Partial<Record<CopyProductionTaskId, CopyStandingOrder>>;
   
   // The current task the copy is assigned to (optional)
   currentTask?: string;
@@ -93,6 +167,10 @@ export interface Copy {
  */
 export interface CopiesState {
   copies: Record<string, Copy>; // All created copies, indexed by ID
+  /** Bounded procedural work queue for the first Archive standing-order slice. */
+  archiveVerificationCasesById?: Record<string, ArchiveVerificationCase>;
+  /** Durable player-attention objects produced when routine authority runs out. */
+  exceptionsById?: Record<string, CopyException>;
   isLoading: boolean;
   error: string | null;
 }

@@ -10,7 +10,8 @@ For empirical authority, read:
 - `../Technical/M21BoundedOfflineProgressReconAmendment.md` — frozen time/cap/allowlist decisions;
 - `../Technical/M21BoundedOfflineProgressResult.md` — qualified M21 result/evidence ceiling;
 - `../Technical/CheckpointCIncrementalIntegrationResult.md` — historical first Checkpoint-C finding;
-- `../Technical/IncrementalIntegrationRepairResult.md` — qualified visible-return repair.
+- `../Technical/IncrementalIntegrationRepairResult.md` — qualified visible-return repair;
+- `../Technical/CopyStandingOrdersAndExceptionEscalationResult.md` — bounded live-only standing-order consumer and no-leftover-delta contract.
 
 ---
 
@@ -53,7 +54,16 @@ Current defaults include:
 
 The hook resets its frame baseline from `performance.now()` when it starts. Wall-clock absence is therefore not silently converted into one giant live-frame delta.
 
-`App.tsx` owns the ordinary online consumer sequence. It includes systems such as passive Essence, Copy growth/loyalty/tasks, player regeneration/status processing, and Quest timers.
+`App.tsx` owns the ordinary online consumer sequence. It includes systems such as passive Essence, Copy growth/loyalty/tasks, bounded live standing-order evaluation, player regeneration/status processing, and Quest timers.
+
+The Copy order is deliberately:
+
+```text
+processCopyTasksThunk(deltaTime)
+-> processCopyStandingOrdersThunk()
+```
+
+so a task started after another task completes begins at progress zero and receives no leftover delta from that completion tick.
 
 That online list is **not** the offline allowlist.
 
@@ -343,7 +353,8 @@ Not qualified by M21 or the bounded presentation repair:
 - offline Copy growth/loyalty decay beyond task-owned completion bonuses;
 - offline routine learning;
 - offline Quest/Relationship/dialogue/Combat/travel;
-- automatic task chains;
+- offline standing-order selection or task chains;
+- generic/unbounded automatic chaining or Copy planning;
 - generalized offline economy/world simulation;
 - background simulation merely because a browser tab is unfocused;
 - final notification UX/timeout policy at scale;

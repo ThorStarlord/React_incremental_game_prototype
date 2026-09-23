@@ -5,8 +5,17 @@ import {
   getFirstEligiblePreferredProductionTask,
   normalizeCopyRoutinePriority,
 } from '../CopyRoutineStrategy';
-import type { CopyProductionTaskId } from './CopyTypes';
-import { updateCopy } from './CopySlice';
+import { evaluateCopyStandingOrder } from '../CopyStandingOrderEngine';
+import type {
+  CopyProductionTaskId,
+  CopyStandingOrder,
+} from './CopyTypes';
+import {
+  assignArchiveVerificationCase,
+  markCopyStandingOrderTriggered,
+  setCopyStandingOrder,
+  updateCopy,
+} from './CopySlice';
 import { startCopyProductionTaskThunk } from './CopyThunks';
 
 export const setCopyRoutinePriorityThunk = createAsyncThunk<
@@ -64,7 +73,135 @@ export const startPreferredCopyProductionTaskThunk = createAsyncThunk<
       return rejectWithValue(message);
     }
 
-    await dispatch(startCopyProductionTaskThunk({ copyId, taskId })).unwrap();
+    await dispatch(startCopyProductionTaskThunk({
+      copyId,
+      taskId,
+      origin: { type: 'preferred_manual' },
+    })).unwrap();
     return { copyId, taskId };
+  }
+);
+
+
+/**
+ * Enable or disable a bounded standing responsibility.
+ *
+ * v1 intentionally supports Archive Verification only. Enabling does not make
+ * an ineligible Copy eligible; the live evaluator will report it as blocked
+ * until the existing production-task requirements are satisfied.
+ */
+export const setCopyStandingOrderThunk = createAsyncThunk<
+  { copyId: string; taskId: CopyProductionTaskId; enabled: boolean },
+  { copyId: string; taskId: CopyProductionTaskId; enabled: boolean },
+  { state: RootState; dispatch: AppDispatch; rejectValue: string }
+>(
+  'copy/setStandingOrder',
+  async ({ copyId, taskId, enabled }, { getState, dispatch, rejectWithValue }) => {
+    const state = getState();
+    const copy = state.copy.copies[copyId];
+    if (!copy) return rejectWithValue('Copy not found.');
+
+    if (taskId !== 'archive_verification') {
+      return rejectWithValue('No authored standing order exists for this routine.');
+    }
+
+    if (!state.player.routineFamiliarity?.[taskId]) {
+      return rejectWithValue('Master this routine personally before assigning a standing responsibility.');
+    }
+
+    if (!enabled) {
+      dispatch(setCopyStandingOrder({ copyId, routineId: taskId, order: null }));
+      dispatch(addNotification({
+        type: 'info',
+        message: 'Archive Verification standing order disabled.',
+      }));
+      return { copyId, taskId, enabled };
+    }
+
+    const order: CopyStandingOrder = {
+      enabled: true,
+      condition: {
+        type: 'archive_verification_backlog',
+        targetPending: 0,
+      },
+      enabledAtTick: state.gameLoop.currentTick,
+    };
+
+    dispatch(setCopyStandingOrder({ copyId, routineId: taskId, order }));
+
+    const normalizedPriority = normalizeCopyRoutinePriority([
+      ...(copy.routinePriority ?? []),
+      taskId,
+    ]);
+    dispatch(updateCopy({ copyId, updates: { routinePriority: normalizedPriority } }));
+
+    dispatch(addNotification({
+      type: 'success',
+      message: 'Archive Verification standing order enabled. Known verification work may now start automatically; anomalies still require your judgment.',
+    }));
+
+    return { copyId, taskId, enabled };
+  }
+);
+
+/**
+ * Evaluate standing orders once per admitted live GameLoop tick.
+ *
+ * Copies are processed in stable id order and each Copy may start at most one
+ * task per tick. Existing production-task authority performs final validation.
+ */
+export const processCopyStandingOrdersThunk = createAsyncThunk<
+  { started: number },
+  void,
+  { state: RootState; dispatch: AppDispatch }
+>(
+  'copy/processStandingOrders',
+  async (_payload, { getState, dispatch }) => {
+    let started = 0;
+    const copyIds = Object.keys(getState().copy.copies).sort();
+
+    for (const copyId of copyIds) {
+      let state = getState();
+      let copy = state.copy.copies[copyId];
+      if (!copy || copy.activeTask?.status === 'running') continue;
+
+      const priority = normalizeCopyRoutinePriority(copy.routinePriority ?? []);
+
+      for (const routineId of priority) {
+        state = getState();
+        copy = state.copy.copies[copyId];
+        const order = copy?.standingOrders?.[routineId];
+        if (!copy || !order?.enabled || copy.activeTask?.status === 'running') continue;
+
+        const evaluation = evaluateCopyStandingOrder(state, copy, routineId, order);
+        if (evaluation.kind !== 'start_task') continue;
+
+        const result = await dispatch(startCopyProductionTaskThunk({
+          copyId,
+          taskId: evaluation.taskId,
+          origin: {
+            type: 'standing_order',
+            routineId: evaluation.taskId,
+            subjectId: evaluation.subjectId,
+          },
+        }));
+
+        if (!startCopyProductionTaskThunk.fulfilled.match(result)) continue;
+
+        dispatch(assignArchiveVerificationCase({
+          caseId: evaluation.subjectId,
+          copyId,
+        }));
+        dispatch(markCopyStandingOrderTriggered({
+          copyId,
+          routineId: evaluation.taskId,
+          tick: getState().gameLoop.currentTick,
+        }));
+        started += 1;
+        break;
+      }
+    }
+
+    return { started };
   }
 );
