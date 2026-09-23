@@ -7,9 +7,20 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import { unequipTrait, equipTrait, addPermanentTrait } from '../../Player/state/PlayerSlice';
-import { unshareTraitFromCopy, ensureCopyTraitSlots, unlockCopySlotsIfEligible, setCopySharePreference } from './CopySlice';
+import {
+  unshareTraitFromCopy,
+  ensureCopyTraitSlots,
+  unlockCopySlotsIfEligible,
+  setCopySharePreference,
+  ensureCopyAutomationState,
+  markArchiveVerificationCaseVerified,
+  recordCopyException,
+  resolveCopyException,
+  upsertArchiveVerificationCase,
+} from './CopySlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { applySharePreferencesForCopyThunk } from './CopyThunks';
+import { recordRelationshipExperience } from '../../Relationships/state/RelationshipSlice';
 
 // Create a dedicated listener middleware instance for the Copy feature cross-slice sync.
 export const copyListeners = createListenerMiddleware<RootState>();
@@ -126,6 +137,7 @@ export default copyListeners;
 copyListeners.startListening({
   predicate: (action) => action.type === 'meta/replaceState',
   effect: async (action, api) => {
+    api.dispatch(ensureCopyAutomationState());
     const state = api.getState();
     const copies = Object.values(state.copy.copies);
     for (const copy of copies) {
@@ -151,5 +163,84 @@ copyListeners.startListening({
   effect: async (action, api) => {
     const { copyId, enabled } = action.payload;
     if (enabled) api.dispatch(applySharePreferencesForCopyThunk(copyId) as any);
+  },
+});
+
+
+/**
+ * Durable exception state is the authority; notifications are only the
+ * immediate attention surface and are intentionally not persisted.
+ */
+copyListeners.startListening({
+  actionCreator: recordCopyException,
+  effect: async (action, api) => {
+    const state = api.getState();
+    const copy = state.copy.copies[action.payload.copyId];
+    const copyName = copy?.name ?? 'A Copy';
+    api.dispatch(addNotification({
+      type: 'warning',
+      message: `${copyName} paused Archive Verification: contradictory sources require your judgment.`,
+    }));
+  },
+});
+
+/**
+ * Feed the first standing-order vertical slice from existing authored Campaign
+ * One events. These cases represent procedural verification work only; they do
+ * not replace Knowledge, Relationship, or World State authority.
+ */
+copyListeners.startListening({
+  actionCreator: recordRelationshipExperience,
+  effect: async (action, api) => {
+    const tick = api.getState().gameLoop.currentTick;
+
+    if (action.payload.id === 'elara_gc08_exp_network_diagnosis') {
+      api.dispatch(upsertArchiveVerificationCase({
+        id: 'archive_case_gc08_network_diagnosis',
+        status: 'pending',
+        classification: 'routine',
+        sourceIds: [
+          'fact_gc07_counterphase_principle',
+          'elara_gc08_exp_network_diagnosis',
+        ],
+        createdAtTick: tick,
+      }));
+      return;
+    }
+
+    if (action.payload.id === 'elara_gc08_exp_diagnostic_preparation') {
+      api.dispatch(upsertArchiveVerificationCase({
+        id: 'archive_case_gc08_diagnostic_anomaly',
+        status: 'pending',
+        classification: 'source_contradiction',
+        sourceIds: [
+          'archive_source_gc08_lattice_pattern',
+          'archive_source_gc08_counterphase_projection',
+        ],
+        createdAtTick: tick,
+      }));
+      return;
+    }
+
+    if (action.payload.id === 'lyra_gc08_exp_commit_diagnostic') {
+      const state = api.getState();
+      Object.values(state.copy.exceptionsById ?? {})
+        .filter(exception =>
+          exception.routineId === 'archive_verification' &&
+          exception.status !== 'resolved'
+        )
+        .forEach(exception => {
+          api.dispatch(resolveCopyException({
+            exceptionId: exception.id,
+            tick,
+            action: 'player_resolved',
+          }));
+          if (exception.context.code === 'archive_source_contradiction') {
+            api.dispatch(markArchiveVerificationCaseVerified({
+              caseId: exception.context.archiveCaseId,
+            }));
+          }
+        });
+    }
   },
 });
