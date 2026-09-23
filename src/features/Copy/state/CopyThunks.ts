@@ -417,7 +417,10 @@ export const processCopyTasksThunk = createAsyncThunk(
               continue;
             }
 
-            if (archiveCase.classification === 'source_contradiction') {
+            if (
+              archiveCase.classification === 'source_contradiction' &&
+              archiveCase.status !== 'verified'
+            ) {
               dispatch(markArchiveVerificationCaseEscalated({ caseId: archiveCase.id }));
               dispatch(recordCopyException({
                 id: `copy_exception:${copy.id}:archive_verification:${archiveCase.id}`,
