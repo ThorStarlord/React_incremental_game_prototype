@@ -227,6 +227,16 @@ copyListeners.startListening({
 
     if (action.payload.id === 'lyra_gc08_exp_commit_diagnostic') {
       const state = api.getState();
+
+      Object.values(state.copy.archiveVerificationCasesById ?? {})
+        .filter(item =>
+          item.classification === 'source_contradiction' &&
+          item.status !== 'verified'
+        )
+        .forEach(item => {
+          api.dispatch(markArchiveVerificationCaseVerified({ caseId: item.id }));
+        });
+
       Object.values(state.copy.exceptionsById ?? {})
         .filter(exception =>
           exception.routineId === 'archive_verification' &&
@@ -238,11 +248,6 @@ copyListeners.startListening({
             tick,
             action: 'player_resolved',
           }));
-          if (exception.context.code === 'archive_source_contradiction') {
-            api.dispatch(markArchiveVerificationCaseVerified({
-              caseId: exception.context.archiveCaseId,
-            }));
-          }
         });
     }
   },
