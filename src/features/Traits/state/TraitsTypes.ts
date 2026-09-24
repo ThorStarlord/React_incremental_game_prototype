@@ -119,7 +119,11 @@ export interface DeleteTraitPresetPayload {
 // Acquisition thunk payload
 export interface AcquireTraitWithEssencePayload {
   traitId: string;
-  essenceCost: number;
+  /**
+   * @deprecated Compatibility-only input. Resonance cost is owned by the
+   * authoritative Trait definition and callers cannot override it.
+   */
+  essenceCost?: number;
 }
 
 // Trait validation result
