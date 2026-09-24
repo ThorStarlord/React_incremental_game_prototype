@@ -144,7 +144,19 @@ const playerSlice = createSlice({
       state.doctrineFocus.foregroundedPermanentTraitIds = [];
     },
     setResonanceLevel: (state, action: PayloadAction<number>) => {
-      state.resonanceLevel = action.payload;
+      const nextLevel = Math.max(0, Math.floor(action.payload));
+      state.resonanceLevel = nextLevel;
+
+      // Trait-slot unlock requirements are expressed as Resonance Levels in
+      // createInitialTraitSlots. Keep the runtime state synchronized with that
+      // visible contract whenever Resonance changes, including save repair and
+      // direct/manual level increases.
+      state.traitSlots.forEach(slot => {
+        const requiredLevel = slot.slotIndex + 1;
+        if (requiredLevel <= nextLevel && slot.slotIndex < state.maxTraitSlots) {
+          slot.isLocked = false;
+        }
+      });
     },
     addAvailableAttributePoints: (state, action: PayloadAction<number>) => {
         state.availableAttributePoints += action.payload;
