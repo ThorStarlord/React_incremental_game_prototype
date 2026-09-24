@@ -3,6 +3,7 @@
 **Status:** CURRENT AUTHORITY for document classification  
 **Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
 **Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
+**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
 **Last reconciled:** 2026-09-23
 
 ## Purpose
@@ -67,12 +68,12 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | Claude adapter | ORIENTATION / NON-INDEPENDENT | [`CLAUDE.md`](../CLAUDE.md) | Delegates to `AGENTS.md`; must not duplicate mutable repository state or policy. |
 | Repository state | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md) | First source for complete/pending/unproven work. |
 | Documentation classification | CURRENT AUTHORITY | [`docs/CURRENT.md`](CURRENT.md) | This file. |
-| Current handoff / re-entry | CURRENT AUTHORITY, summary | [`HANDOFF.md`](../HANDOFF.md) | Current GC-14 / pre-Beta re-entry summary; subordinate to the product/maturity contracts for disputed details. |
+| Current handoff / re-entry | CURRENT AUTHORITY, summary | [`HANDOFF.md`](../HANDOFF.md) | Feature Completion / Product Depth re-entry summary; historical GC/Beta-readiness evidence is preserved but no longer defines the active optimization target. |
 | 1.0 completion / stop condition | CURRENT AUTHORITY | [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) | Defines the smallest complete Campaign One / 1.0. |
-| 1.0 feature scope | CURRENT AUTHORITY | [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) | Core/minimal/deferred/cut decisions. |
+| 1.0 feature scope + maturity | CURRENT AUTHORITY | [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) | Core/minimal/deferred/cut decisions plus current L0-L6 feature-maturity interpretation. |
 | Whole-game progression | CURRENT AUTHORITY | [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) | Personal action -> specialization -> networked mastery -> strategic synthesis. |
 | Campaign One structure | CURRENT AUTHORITY | [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) | Prologue + Ch1–7 + finale + epilogue. |
-| Active implementation program | CURRENT AUTHORITY | [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) | GC-00→GC-14; no automatic M27. |
+| Active implementation program | CURRENT AUTHORITY | [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) | Preserves GC-00→GC-14 history and inserts Feature Completion / Product Depth before Beta activation; no automatic M27/GC-15. |
 | Alpha definition | CURRENT AUTHORITY | [`specification/Technical/AlphaCompletionContract.md`](../specification/Technical/AlphaCompletionContract.md) | Whole structural game playable New Game -> Epilogue. |
 | Beta definition | CURRENT AUTHORITY | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) | Content locked + human product evidence + UX/balance/reliability. |
 | Release / 1.0 qualification | CURRENT AUTHORITY | [`specification/Technical/ReleaseQualificationContract.md`](../specification/Technical/ReleaseQualificationContract.md) | Exact production candidate, browser/full-run/recovery evidence. Existing `docs/release/` records are preparation/reference until GC-13/GC-14 entry conditions are met. |
@@ -91,7 +92,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | GC-11 Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC11AlphaResult.md`](../specification/Technical/GC11AlphaResult.md) | Exact-head Build Validation #381 PASS; ALPHA_PASS / HUMAN_UNVALIDATED. |
 | GC-12 Content Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC12ContentAlphaResult.md`](../specification/Technical/GC12ContentAlphaResult.md) | Authored-corpus qualification passed; CONTENT_ALPHA / HUMAN_UNVALIDATED. |
 | GC-13 deterministic Beta readiness | CURRENT AUTHORITY, qualified | [`specification/Technical/GC13BetaTechnicalReadinessResult.md`](../specification/Technical/GC13BetaTechnicalReadinessResult.md) | Build Validation #394 PASS; Chromium + Firefox CI smoke PASS; TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED. |
-| GC-13 Beta human evidence | CURRENT ACTIVE EXTERNAL GATE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO. |
+| GC-13 Beta human evidence | CURRENT FUTURE EXTERNAL GATE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO. |
 | GC-14 release eligibility guard | CURRENT AUTHORITY, qualified | [`specification/Technical/GC14ReleaseEligibilityBlockedResult.md`](../specification/Technical/GC14ReleaseEligibilityBlockedResult.md) | Build Validation #405 PASS; deterministic release preparation is safe, but RC_ENTRY_BLOCKED and 1.0_PROMOTION_BLOCKED until governing external gates pass. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
