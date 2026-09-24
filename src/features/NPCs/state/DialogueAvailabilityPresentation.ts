@@ -12,6 +12,7 @@ export interface DialogueAvailabilityPresentationContext {
   knownFactIds: readonly string[];
   factionReputationByFactionId: Record<string, number | undefined>;
   worldStateRegions: WorldStateRegions;
+  permanentTraitIds: readonly string[];
   activeDoctrineIds: readonly DoctrineId[];
 }
 
@@ -90,6 +91,13 @@ export const evaluateDialogueAvailabilityPresentation = (
     return { available: false, availabilityReasons: [] };
   }
 
+  const requiredPermanentTraits = node.requiredPermanentTraitIds ?? [];
+  if (requiredPermanentTraits.some(
+    traitId => !context.permanentTraitIds.includes(traitId)
+  )) {
+    return { available: false, availabilityReasons: [] };
+  }
+
   const requiredActiveDoctrines = node.requiredActiveDoctrineIds ?? [];
   if (requiredActiveDoctrines.some(
     doctrineId => !context.activeDoctrineIds.includes(doctrineId)
@@ -127,6 +135,10 @@ export const evaluateDialogueAvailabilityPresentation = (
   if (requiredWorldState.length > 0) {
     availabilityReasons.push('Current world conditions support this option');
   }
+
+  requiredPermanentTraits.forEach(traitId => {
+    availabilityReasons.push(`Permanent capability: ${humanizeId(traitId)}`);
+  });
 
   requiredActiveDoctrines.forEach(doctrineId => {
     availabilityReasons.push(`Active doctrine: ${humanizeId(doctrineId)}`);
