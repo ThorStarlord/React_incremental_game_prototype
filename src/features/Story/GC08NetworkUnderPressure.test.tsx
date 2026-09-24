@@ -18,6 +18,8 @@ import {
 } from '../Quest/state/QuestThunks';
 import { canUseQuestResolution } from '../Quest/state/QuestResolutionAvailability';
 import { addPermanentTrait, setLocation } from '../Player/state/PlayerSlice';
+import { activateDoctrineThunk } from '../Traits/state/DoctrineThunks';
+import type { DoctrineId } from '../Traits/state/DoctrineDefinitions';
 import { recordAuthoredRelationshipExperienceThunk } from '../Relationships/state/RelationshipThunks';
 import { learnNpcFact } from '../Knowledge/state/KnowledgeSlice';
 import { selectNpcKnowsFact } from '../Knowledge/state/KnowledgeSelectors';
@@ -318,20 +320,27 @@ describe('GC-08 Network Under Pressure', () => {
     const diagnostic = quests.quest_gc08_diagnostic_preparation.resolutionOptions[0];
 
     expect(canUseQuestResolution(baseline, [])).toBe(true);
-    expect(structural.requiredPermanentTraitIds).toEqual([
-      'WillowsWisdom',
-      'ConstraintSense',
-    ]);
-    expect(canUseQuestResolution(structural, ['WillowsWisdom'])).toBe(false);
-    expect(canUseQuestResolution(structural, ['WillowsWisdom', 'ConstraintSense'])).toBe(true);
-    expect(diagnostic.requiredPermanentTraitIds).toEqual([
-      'ScholarlyInsight',
-      'AdversarialCalibration',
-    ]);
-    expect(canUseQuestResolution(diagnostic, ['ScholarlyInsight'])).toBe(false);
+    expect(structural.requiredPermanentTraitIds).toBeUndefined();
+    expect(structural.requiredActiveDoctrineIds).toEqual(['structural_steward']);
+    expect(canUseQuestResolution(
+      structural,
+      ['WillowsWisdom', 'ConstraintSense']
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      structural,
+      ['WillowsWisdom', 'ConstraintSense'],
+      ['structural_steward']
+    )).toBe(true);
+    expect(diagnostic.requiredPermanentTraitIds).toBeUndefined();
+    expect(diagnostic.requiredActiveDoctrineIds).toEqual(['countermodeler']);
     expect(canUseQuestResolution(
       diagnostic,
       ['ScholarlyInsight', 'AdversarialCalibration']
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      diagnostic,
+      ['ScholarlyInsight', 'AdversarialCalibration'],
+      ['countermodeler']
     )).toBe(true);
   });
 
@@ -344,6 +353,7 @@ describe('GC-08 Network Under Pressure', () => {
       destination: 'location_merchant_district',
       resolutionId: 'prepare_distributed_baseline',
       traits: [] as string[],
+      doctrineId: null as null | DoctrineId,
       preparationExperienceId: 'elara_gc08_exp_distributed_preparation',
     },
     {
@@ -357,6 +367,7 @@ describe('GC-08 Network Under Pressure', () => {
       destination: 'location_city_center',
       resolutionId: 'prepare_structural_network',
       traits: ['WillowsWisdom', 'ConstraintSense'],
+      doctrineId: 'structural_steward' as DoctrineId,
       preparationExperienceId: 'gronk_gc08_exp_structural_preparation',
     },
     {
@@ -367,6 +378,7 @@ describe('GC-08 Network Under Pressure', () => {
       destination: 'location_city_gate',
       resolutionId: 'prepare_diagnostic_network',
       traits: ['ScholarlyInsight', 'AdversarialCalibration'],
+      doctrineId: 'countermodeler' as DoctrineId,
       preparationExperienceId: 'elara_gc08_exp_diagnostic_preparation',
     },
   ])('$route preparation produces a legal manual network commitment', async ({
@@ -377,6 +389,7 @@ describe('GC-08 Network Under Pressure', () => {
     destination,
     resolutionId,
     traits,
+    doctrineId,
     preparationExperienceId,
   }) => {
     const store = makeStore();
@@ -389,6 +402,9 @@ describe('GC-08 Network Under Pressure', () => {
       expect(briefed.success).toBe(true);
     }
     traits.forEach(traitId => store.dispatch(addPermanentTrait(traitId)));
+    if (doctrineId) {
+      await store.dispatch(activateDoctrineThunk(doctrineId)).unwrap();
+    }
 
     await completePreparationQuest(
       store,
