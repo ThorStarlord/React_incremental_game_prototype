@@ -91,6 +91,7 @@ The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative ref
 - [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for the preserved GC history plus the active Feature Completion / Product Depth phase and downstream path to Beta/RC/1.0.
 
 - [`Technical/FeatureCompletionGapAnalysis.md`](Technical/FeatureCompletionGapAnalysis.md) — **CURRENT STRATEGIC ANALYSIS** for the completed breadth scan, maturity reassessment, selected depth candidates, and current Candidate B frontier.
+- [`Technical/CandidateBMasteryCompressionDepthSpecification.md`](Technical/CandidateBMasteryCompressionDepthSpecification.md) — **CURRENT DEPTH SPECIFICATION** for the selected Candidate B Forge Standing Responsibility implementation frontier.
 
 There is no automatic M27 or GC-15. The Feature Completion Gap Analysis is complete. Its selected depth order is Candidate B (Mastery Compression / Copy organization), Candidate A (relationship-derived capability buildcraft), then Candidate C (strategic consequence composition), subject to depth-search evidence. Historical milestone closure proves stated contracts; it does not automatically confer L4 feature completeness.
 
