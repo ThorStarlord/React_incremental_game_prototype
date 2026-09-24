@@ -152,6 +152,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
     (state: RootState, _npcId: string) => state.knowledge?.factIdsByNpcId ?? {},
     (state: RootState) => state.factions?.reputationByFactionId ?? {},
     (state: RootState) => state.worldState?.regions ?? {},
+    (state: RootState) => state.player.permanentTraits,
     selectActiveDoctrineIds,
   ],
   (
@@ -162,6 +163,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
     factIdsByNpcId,
     factionReputationByFactionId,
     worldStateRegions,
+    permanentTraitIds,
     activeDoctrineIds,
   ): readonly NPCDialogueChoice[] => {
     if (!npc?.availableDialogues?.length) return EMPTY_DIALOGUE_CHOICES;
@@ -179,6 +181,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
           knownFactIds,
           factionReputationByFactionId,
           worldStateRegions,
+          permanentTraitIds,
           activeDoctrineIds,
         });
         if (!availability.available) return null;
