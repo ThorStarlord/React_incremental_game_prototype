@@ -122,7 +122,9 @@ describe('Authored relationship discovery integration', () => {
 
     expect(store.getState().traits.discoveredTraits).not.toContain(WISDOM_ID);
     expect(store.getState().traits.discoveredTraits).not.toContain(INSIGHT_ID);
-    expect(store.getState().traits.discoveredTraits).toContain('BargainingMaster');
+    expect(store.getState().traits.discoveredTraits).toContain('BattleHardened');
+    expect(store.getState().traits.discoveredTraits).not.toContain('BargainingMaster');
+    expect(store.getState().traits.discoveredTraits).not.toContain('QuickLearner');
 
     await store.dispatch(
       recordAuthoredRelationshipExperienceThunk({ experienceId: 'willow_exp_first_question_admit' })
