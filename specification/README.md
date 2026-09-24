@@ -4,6 +4,7 @@ This file routes readers to the current product, completion, technical and domai
 
 **Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
+**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
 **Human Product Review:** issue #109 OPEN / UNPROVEN
 
 ## Authority chain
@@ -87,9 +88,9 @@ The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative ref
 
 ### Active implementation roadmap
 
-- [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for GC-00→GC-14 and the dependency path to 1.0.
+- [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for the preserved GC history plus the active Feature Completion / Product Depth phase and downstream path to Beta/RC/1.0.
 
-There is no automatic M27. Every active package must improve an already-authorized 1.0 surface through a named requirement or a concrete deterministic, heuristic, synthetic, or human finding. Missing human evidence alone is not a universal stop condition.
+There is no automatic M27 or GC-15. The next operation is a Feature Completion Gap Analysis across `CORE_1_0` systems, followed by breadth search and depth analysis before selecting bounded implementation packages. Historical milestone closure proves stated contracts; it does not automatically confer L4 feature completeness.
 
 ### Integrated GC-01 result
 
@@ -110,7 +111,7 @@ Focused command:
 npm run gc01:validate
 ```
 
-GC-04 through GC-12 are now closed. Current responsibilities run concurrently: GC-13 human evidence under issue #109 and bounded Beta/release hardening of the existing Campaign One using correctly classified deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, release-readiness, or human evidence.
+GC-04 through GC-12 remain closed as historical qualification packages. The current responsibility is to assess and close player-facing feature-depth gaps inside the bounded Campaign One product. GC-13 human evidence and Beta/release hardening remain downstream gates after required core features reach sufficient L4 maturity.
 
 
 ### Integrated GC-03 result
