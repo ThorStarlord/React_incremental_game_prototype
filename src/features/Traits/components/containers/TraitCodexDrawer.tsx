@@ -44,6 +44,7 @@ import {
   selectTraitError
 } from '../../state/TraitsSelectors'; 
 import { fetchTraitsThunk, acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
+import { selectTraitResonanceReadinessById } from '../../state/TraitResonanceReadiness';
 import { Trait } from '../../state/TraitsTypes';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { selectPermanentTraits as selectPlayerPermanentTraitIds } from '../../../Player/state/PlayerSelectors';
@@ -76,6 +77,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   const currentEssence = useAppSelector(selectCurrentEssence);
+  const readinessById = useAppSelector(selectTraitResonanceReadinessById);
 
   useEffect(() => {
     if (open && Object.keys(allTraits).length === 0 && !isLoading) {
@@ -124,8 +126,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   }, []);
 
   const handleAcquireTrait = useCallback((trait: Trait) => {
-    const cost = trait.essenceCost ?? 0;
-    dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id, essenceCost: cost }));
+    dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id }));
   }, [dispatch]);
 
   const filteredAndSortedTraits = useMemo(() => {
@@ -217,8 +218,9 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
           const isDiscovered = discoveredTraitIds.includes(trait.id);
           const isPermanent = permanentTraitIds.includes(trait.id);
           const cost = trait.essenceCost || 0;
-          const canAfford = currentEssence >= cost;
+          const readiness = readinessById[trait.id];
           const canBeMadePermanent = isDiscovered && !isPermanent && trait.essenceCost !== undefined;
+          const canResonate = canBeMadePermanent && Boolean(readiness?.ready);
 
           return (
             <ListItem
@@ -230,12 +232,12 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               }}
               secondaryAction={
                 canBeMadePermanent ? (
-                  <Tooltip title={canAfford ? "Make Trait Permanent (Resonate)" : `Requires ${cost} Essence`}>
+                  <Tooltip title={canResonate ? "Make Trait Permanent (Resonate)" : readiness?.blockingMessage ?? 'Trait is not ready for Resonance'}>
                     <span> 
                       <IconButton
                         edge="end"
                         color="primary"
-                        disabled={!canAfford}
+                        disabled={!canResonate}
                         onClick={() => handleAcquireTrait(trait)}
                       >
                         <AddCircleIcon />
