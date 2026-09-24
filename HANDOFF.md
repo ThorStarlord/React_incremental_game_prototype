@@ -1,17 +1,20 @@
-# Milestone Handoff — GC-14 / Pre-Beta
+# Handoff — Feature Completion / Product Depth
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
 **Reconciled baseline before this activation package:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
 **Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
-**Current product responsibilities:** human Beta evidence + bounded repository-answerable 1.0 hardening  
+**Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
+**Current product responsibilities:** feature-completion gap analysis + bounded core-feature development  
 **Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
 
 ## Repository reality
 
 Campaign One is structurally and authorially complete from New Game through the state-responsive Epilogue.
+
+That sentence describes **campaign-spine and integration completeness**, not a claim that every core gameplay feature is at finished-game depth. The GC records below remain valid historical qualification; several associated systems are still L1/L2 bounded implementations and may be deepened without reopening or rewriting those milestones.
 
 ```text
 GC-00  completion-program authority                  COMPLETE
@@ -33,7 +36,7 @@ GC-14  release-promotion guard                       QUALIFIED
 GC-14  immutable RC / final 1.0 promotion            BLOCKED
 ```
 
-The repository must not restart closed GC packages merely because Beta is externally blocked.
+Do not reopen closed GC packages as if their historical contracts failed. Instead, deepen the current gameplay domains directly when feature-maturity analysis shows that the bounded implementation is still below L4.
 
 PR #139 completed the bounded pre-Beta player-surface hygiene pass without expanding scope: normal NPC/Essence pages no longer expose prototype/debug mutations, the Dashboard/Character surfaces no longer advertise deferred or internal concepts, Settings no longer exposes no-op import/export actions, and the unreachable legacy `GamePage` reset surface is removed. Exact head `4a64d8d53aea1a9c3385894ac89af570dec778d7` passed Build Validation #419 / run `35680087869`; GC-01 regression coverage owns these rejection checks.
 
@@ -72,55 +75,41 @@ Architecture         -> heterogeneous authored composition
 
 This remains human-unvalidated. Deterministic qualification does not prove comprehension, pacing, fun, fairness, emotional impact, retention or preference.
 
-## Concurrent responsibilities
+## Current responsibilities
 
-### Lane A — genuine human Beta evidence
+### Primary lane — feature completion / product depth
 
-Issue #109 remains the canonical human product-evidence backlog.
+The immediate repository-owned task is a Feature Completion Gap Analysis across every `CORE_1_0` system, followed by breadth search across the resulting opportunities and depth analysis of the strongest candidates.
 
-Before `BETA_PASS`, current authority still requires at least:
+Prioritize missing gameplay depth such as:
 
-- 5 fresh-player first-session observations on a current supported build;
-- 3 external beginning-to-ending fresh-save playthroughs without developer intervention in required progression;
-- classification and bounded repair of recurring severe findings;
-- exact build/browser/session provenance for accepted evidence.
+- meaningful progression and variation inside existing systems;
+- broader, authored use of relationship-derived capabilities;
+- Mastery Compression that changes player attention across more than one narrow slice;
+- useful cross-system interactions among Relationship, Traits, Knowledge, Faction, World State, Quest, Copy, Exploration, and Combat;
+- player-facing consequences that make those systems feel like game features rather than state authorities.
 
-Synthetic observation, automated UI traversal, repository analysis and LLM judgment do not satisfy this human-evidence gate.
+Do not assume every system must become large. The purpose of the gap analysis is also to identify systems already sufficient for their supporting role.
 
-### Lane B — repository-answerable 1.0 hardening
+### Secondary lane — human evidence / future Beta gate
 
-Human evidence is not the only valid source of useful engineering work. While Lane A is open, continue bounded hardening of the existing Campaign One when deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, or release-readiness evidence identifies a concrete improvement.
+Issue #109 remains the canonical human product-evidence backlog. Existing and future genuine sessions remain useful evidence, but their absence does not block current feature construction and their collection does not convert an L1/L2 feature into an L4 feature.
 
-Preserve the evidence class. Non-human work may improve the product, but it must not be reported as proof of actual player comprehension, enjoyment, preference, retention, or other human-experience claims.
+The current Beta contract still requires at least 5 accepted first sessions and 3 accepted external full playthroughs before `BETA_PASS`. Treat that as a downstream gate after feature completion, not as the present repository work queue.
 
-## Scope lock, not work freeze
+## Scope boundary, not depth freeze
 
-For the human lane, the preferred loop remains `human observation -> classification -> smallest repair -> deterministic regression -> human rerun when warranted`.
+Preserve the bounded Campaign One product boundary:
 
-For repository-answerable hardening, use `finding -> evidence classification -> smallest repair -> deterministic regression -> exact-head qualification`.
+- no Chapters 8+ or interplanetary continuation;
+- no generic Skills or Crafting;
+- no generalized ChapterEngine / narrative DSL without repeated concrete need;
+- no autonomous irreversible Copy planning;
+- no generalized simulation or New Game+ merely to create work.
 
-Allowed evidence classes include:
+Inside that boundary, feature depth is explicitly open. A historical vertical-slice or integration PASS is permission to build on a proven foundation, not a command to stop development.
 
-- deterministic implementation/runtime findings;
-- heuristic UX, information-hierarchy, terminology, accessibility, pacing and design findings;
-- synthetic/browser playthrough findings;
-- genuine human findings.
-
-Examples of authorized bounded work include:
-
-- navigation/discoverability and causal/state-legibility repairs;
-- pacing, grind, balance, and delegation-timing repairs supported by concrete analysis;
-- production-surface integrity and presentation polish;
-- save/recovery and persistence hardening;
-- browser/reliability/performance defects;
-- accessibility/input defects;
-- documentation/governance drift that can misroute agents;
-- release qualification/deployment readiness;
-- repairs directly justified by accepted human observations.
-
-Do not create speculative systems, chapters, generalized engines, or post-1.0 scope merely to keep development busy while human evidence is pending.
-
-Use `docs/release/BetaExecutionRunbook.md` for the human-evidence lane and `AGENTS.md` for the repository-wide evidence-to-authority rule.
+Use `AGENTS.md`, `GameCompletionDefinition.md`, and `FeatureScopeMatrix.md` for the maturity model and work-selection rules.
 
 ## Release path after BETA_PASS
 
@@ -146,7 +135,7 @@ Issue #122 remains open: repository policy requires exact-head Build Validation 
 
 The connected GitHub workspace can inspect but cannot administer the required branch-protection setting. Until an administrator applies it, the procedural exact-head gate remains mandatory.
 
-## Do not reopen by inertia
+## Do not expand by inertia
 
 Do not restart without new evidence:
 
@@ -184,4 +173,4 @@ latest main
 
 ## Governing handoff conclusion
 
-> Campaign One no longer needs speculative implementation to prove that a complete game can exist. The next product question is whether fresh players can understand, complete and value the game that has already been built; repository changes should now be driven by release blockers or observed human evidence.
+> Campaign One has proved that its architecture, state authorities, campaign spine, persistence, and bounded gameplay slices can compose. The current question is no longer merely whether the game can traverse from New Game to Epilogue; it is whether the core features have enough depth, progression, variation, and cross-system consequence to constitute the finished game. Complete those features first. Dedicated Beta/release hardening comes afterward.
