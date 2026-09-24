@@ -221,7 +221,7 @@ Phase Against the Echo
 
 Both optional routes remain impossible without their permanent learned Trait pairs because doctrine selectors require permanent ownership and current foregrounding simultaneously.
 
-GC07-GC10 intentionally retain their previously qualified `requiredPermanentTraitIds` pair gates. This package does not mechanically propagate doctrine locking through the remainder of the campaign. Broader conversion now depends on evidence that the GC06 selection loop is legible and valuable rather than merely adding pre-choice menu friction.
+Candidate A depth deliberately extends active-doctrine consumption through GC07 counterphase derivation and GC08 network preparation, so specialization now affects a meaningful multi-chapter stretch. GC09-GC10 intentionally retain durable `requiredPermanentTraitIds` pair gates for culmination: once the player has committed a network posture, the finale should not require repetitive last-minute doctrine switching merely to prove already-learned capability ownership.
 
 ## Save schema v2
 
