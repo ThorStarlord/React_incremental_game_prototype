@@ -31,6 +31,7 @@ const completionAuthorityFiles = [
   'specification/Progression/GameProgressionArc.md',
   'specification/Narrative/CampaignArchitecture.md',
   'specification/Technical/GameCompletionRoadmap.md',
+  'specification/Technical/FeatureCompletionGapAnalysis.md',
   'specification/Technical/AlphaCompletionContract.md',
   'specification/Technical/BetaCompletionContract.md',
   'specification/Technical/ReleaseQualificationContract.md',
@@ -216,9 +217,18 @@ requireContains('specification/Technical/GameCompletionRoadmap.md', [
   'GC-00',
   'GC-14',
   'Feature Completion Gap Analysis',
+  'FeatureCompletionGapAnalysis.md',
   'Alpha qualification',
   'Release Candidate',
   'No automatic M-number continuation',
+]);
+
+requireContains('specification/Technical/FeatureCompletionGapAnalysis.md', [
+  'FEATURE_COMPLETION / PRODUCT_DEPTH',
+  'Candidate B',
+  'Candidate A',
+  'Candidate C',
+  'A vertical slice proves that a feature can work',
 ]);
 
 requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
