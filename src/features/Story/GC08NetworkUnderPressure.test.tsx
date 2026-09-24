@@ -344,6 +344,65 @@ describe('GC-08 Network Under Pressure', () => {
     )).toBe(true);
   });
 
+  test('Constraint Sense and Adversarial Calibration retain independent authored uses outside doctrine synthesis', async () => {
+    const store = makeStore();
+    await initialize(store);
+    await seedCounterphaseEntry(store, 'gronk_exp_aftermath_quiet_reroute');
+    await diagnoseWithElara(store);
+
+    const blockedConstraint = await interact(
+      store,
+      'npc_blacksmith_gronk',
+      'gronk_gc08_constraint_audit',
+      'audit'
+    );
+    expect(blockedConstraint.success).toBe(false);
+    expect(blockedConstraint.message).toContain('Required permanent Trait missing');
+
+    const blockedAdversarial = await interact(
+      store,
+      'npc_lyra',
+      'lyra_gc08_adversarial_probe',
+      'probe'
+    );
+    expect(blockedAdversarial.success).toBe(false);
+    expect(blockedAdversarial.message).toContain('Required permanent Trait missing');
+
+    store.dispatch(addPermanentTrait('ConstraintSense'));
+    store.dispatch(addPermanentTrait('AdversarialCalibration'));
+
+    const briefed = await interact(
+      store,
+      'npc_blacksmith_gronk',
+      'gronk_gc08_counterphase_briefing',
+      'brief'
+    );
+    expect(briefed.success).toBe(true);
+
+    const constraint = await interact(
+      store,
+      'npc_blacksmith_gronk',
+      'gronk_gc08_constraint_audit',
+      'audit'
+    );
+    expect(constraint.success).toBe(true);
+    expect(store.getState().relationships.experiencesById.gronk_gc08_exp_constraint_audit)
+      .toBeDefined();
+
+    const adversarial = await interact(
+      store,
+      'npc_lyra',
+      'lyra_gc08_adversarial_probe',
+      'probe'
+    );
+    expect(adversarial.success).toBe(true);
+    expect(store.getState().relationships.experiencesById.lyra_gc08_exp_adversarial_probe)
+      .toBeDefined();
+
+    expect(store.getState().player.doctrineFocus.foregroundedPermanentTraitIds)
+      .toEqual([]);
+  });
+
   test.each([
     {
       route: 'distributed',
