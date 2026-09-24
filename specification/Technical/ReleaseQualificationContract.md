@@ -2,13 +2,13 @@
 
 **Status:** CURRENT AUTHORITY — PROVISIONAL 1.0 RELEASE CONTRACT  
 **Parent:** `../GameCompletionDefinition.md`  
-**Requires:** `BetaCompletionContract.md`
+**Requires:** `BetaCompletionContract.md` + `FEATURE_COMPLETE`
 **Public contracts:** `PublicContracts.md`
 **Prepared:** 2026-09-11
 
 ## Purpose
 
-A Release Candidate is a **specific production candidate**, not a general statement that `main` looks healthy.
+A Release Candidate is a **specific production candidate**, not a general statement that `main` looks healthy. RC qualification is intentionally downstream of feature completion and Beta convergence; deterministic release readiness recorded earlier does not make RC the current product goal.
 
 This contract defines the evidence required to promote one exact build to 1.0.
 
@@ -31,6 +31,7 @@ Full mobile product support, live-service infrastructure, and post-campaign cont
 
 Do not create an RC until:
 
+- `FEATURE_COMPLETE` is recorded under the current completion/maturity authority;
 - `BETA_PASS` is recorded;
 - feature scope is locked;
 - campaign content is locked except release-blocking corrections;
