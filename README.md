@@ -96,8 +96,8 @@ GC-09  Chapter 7 — Counterphase                       COMPLETE
 GC-10  Finale + Epilogue                              COMPLETE
 GC-11  Alpha qualification                            COMPLETE
 GC-12  Content Alpha / authored integration evidence COMPLETE
-CURRENT Feature Completion Gap Analysis                ACTIVE
-NEXT    Breadth search -> depth analysis -> build      PENDING
+CURRENT Feature Completion Gap Analysis                COMPLETE
+NEXT    Candidate B — Mastery Compression / Copy depth ACTIVE
 GATE    FEATURE_COMPLETE                               PENDING
 GC-13   Beta                                           DOWNSTREAM / TECHNICAL READINESS ALREADY QUALIFIED
 GC-14   Release Candidate / 1.0                        DOWNSTREAM / GUARD QUALIFIED
@@ -109,7 +109,7 @@ These commands do not replace the required real-human Beta evidence or an immuta
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
 
-There is **no automatic M27 or GC-15**. The next operation is a repository-wide Feature Completion Gap Analysis. A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished. Future implementation should deepen the highest-value existing core features inside the bounded Campaign One scope before dedicated Beta/release hardening.
+There is **no automatic M27 or GC-15**. The repository-wide breadth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md); the current depth frontier is **Candidate B — Mastery Compression / Copy organization**, followed provisionally by buildcraft and strategic consequence composition. A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished.
 
 ## Important 1.0 scope decisions
 
