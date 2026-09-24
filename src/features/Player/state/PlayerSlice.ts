@@ -149,8 +149,8 @@ const playerSlice = createSlice({
 
       // Trait-slot unlocks are a Player-state invariant, not a UI convention.
       // Slot 0 starts unlocked; slot N unlocks at Resonance Level N + 1.
-      // Raising Resonance Level therefore repairs older saves that may contain
-      // a high level while still carrying stale locked-slot flags.
+      // Keeping the invariant here ensures every production level-up path
+      // unlocks the same slots without a separate UI-owned dispatcher.
       state.traitSlots.forEach(slot => {
         if (slot.isLocked && nextLevel >= slot.slotIndex + 1) {
           slot.isLocked = false;
