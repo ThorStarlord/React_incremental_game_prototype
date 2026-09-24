@@ -15,6 +15,8 @@ import {
 } from '../Quest/state/QuestThunks';
 import { canUseQuestResolution } from '../Quest/state/QuestResolutionAvailability';
 import { addPermanentTrait, setLocation } from '../Player/state/PlayerSlice';
+import { activateDoctrineThunk } from '../Traits/state/DoctrineThunks';
+import type { DoctrineId } from '../Traits/state/DoctrineDefinitions';
 import { recordAuthoredRelationshipExperienceThunk } from '../Relationships/state/RelationshipThunks';
 import { selectNpcKnowsFact } from '../Knowledge/state/KnowledgeSelectors';
 import { setWorldStateCondition } from '../WorldState/state/WorldStateSlice';
@@ -185,20 +187,27 @@ describe('GC-07 The Chrono-Crypt', () => {
     );
 
     expect(canUseQuestResolution(baseline, [])).toBe(true);
-    expect(structural.requiredPermanentTraitIds).toEqual([
-      'WillowsWisdom',
-      'ConstraintSense',
-    ]);
-    expect(canUseQuestResolution(structural, ['WillowsWisdom'])).toBe(false);
-    expect(canUseQuestResolution(structural, ['WillowsWisdom', 'ConstraintSense'])).toBe(true);
-    expect(adversarial.requiredPermanentTraitIds).toEqual([
-      'ScholarlyInsight',
-      'AdversarialCalibration',
-    ]);
-    expect(canUseQuestResolution(adversarial, ['ScholarlyInsight'])).toBe(false);
+    expect(structural.requiredPermanentTraitIds).toBeUndefined();
+    expect(structural.requiredActiveDoctrineIds).toEqual(['structural_steward']);
+    expect(canUseQuestResolution(
+      structural,
+      ['WillowsWisdom', 'ConstraintSense']
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      structural,
+      ['WillowsWisdom', 'ConstraintSense'],
+      ['structural_steward']
+    )).toBe(true);
+    expect(adversarial.requiredPermanentTraitIds).toBeUndefined();
+    expect(adversarial.requiredActiveDoctrineIds).toEqual(['countermodeler']);
     expect(canUseQuestResolution(
       adversarial,
       ['ScholarlyInsight', 'AdversarialCalibration']
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      adversarial,
+      ['ScholarlyInsight', 'AdversarialCalibration'],
+      ['countermodeler']
     )).toBe(true);
   });
 
@@ -227,24 +236,28 @@ describe('GC-07 The Chrono-Crypt', () => {
     {
       resolutionId: 'manual_harmonic_triangulation',
       traits: [] as string[],
+      doctrineId: null as null | DoctrineId,
       experienceId: 'lyra_gc07_exp_manual_triangulation',
       routeId: 'manual_triangulation',
     },
     {
       resolutionId: 'structural_counterphase',
       traits: ['WillowsWisdom', 'ConstraintSense'],
+      doctrineId: 'structural_steward' as DoctrineId,
       experienceId: 'lyra_gc07_exp_structural_counterphase',
       routeId: 'structural_counterphase',
     },
     {
       resolutionId: 'adversarial_countermodel',
       traits: ['ScholarlyInsight', 'AdversarialCalibration'],
+      doctrineId: 'countermodeler' as DoctrineId,
       experienceId: 'lyra_gc07_exp_adversarial_countermodel',
       routeId: 'adversarial_countermodel',
     },
   ])('$routeId is a legal Chapter 5 route with durable counterphase consequence', async ({
     resolutionId,
     traits,
+    doctrineId,
     experienceId,
     routeId,
   }) => {
@@ -252,6 +265,9 @@ describe('GC-07 The Chrono-Crypt', () => {
     await initialize(store);
     await establishChapterFiveEntry(store);
     traits.forEach(traitId => store.dispatch(addPermanentTrait(traitId)));
+    if (doctrineId) {
+      await store.dispatch(activateDoctrineThunk(doctrineId)).unwrap();
+    }
     await enterCryptWithActiveQuest(store);
 
     const resolved = await store.dispatch(resolveQuestOutcomeThunk({
