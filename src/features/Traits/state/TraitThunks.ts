@@ -13,17 +13,10 @@ import {
   unequipTrait,
 } from '../../Player/state/PlayerSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
-import { TRAIT_RESONANCE } from '../../../constants/gameConstants';
 import type {
   Trait,
   AcquireTraitWithEssencePayload,
 } from './TraitsTypes';
-import {
-  selectBondProfileByNpcId,
-  selectRelationshipMemoriesByNpcId,
-  selectTraitAssimilationState,
-  selectUsesRelationshipConnectionAuthority,
-} from '../../Relationships/state/RelationshipSelectors';
 import { recordAuthoredRelationshipExperienceThunk } from '../../Relationships/state/RelationshipThunks';
 import { evaluateTraitResonanceReadiness } from './TraitResonanceReadiness';
 
