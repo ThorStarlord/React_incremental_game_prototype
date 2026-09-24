@@ -96,7 +96,7 @@ M16 production examples:
 - both problems retain an ordinary valid route without the Trait;
 - invalid direct invocation of a permanent-Trait-only resolution is rejected below the UI.
 
-Current qualified quest consumption uses `QuestResolutionOption.requiredPermanentTraitIds`.
+Current qualified permanent-capability consumption uses `QuestResolutionOption.requiredPermanentTraitIds` and `DialogueNode.requiredPermanentTraitIds`. Both presentation and authoritative execution fail closed; relationship state is never substituted for permanent capability ownership.
 
 The design invariant is:
 
