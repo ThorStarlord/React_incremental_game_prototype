@@ -15,6 +15,7 @@ import {
 } from '../Quest/state/QuestThunks';
 import { canUseQuestResolution } from '../Quest/state/QuestResolutionAvailability';
 import { addPermanentTrait, setLocation } from '../Player/state/PlayerSlice';
+import { activateDoctrineThunk } from '../Traits/state/DoctrineThunks';
 import { recordAuthoredRelationshipExperienceThunk } from '../Relationships/state/RelationshipThunks';
 import { learnNpcFact } from '../Knowledge/state/KnowledgeSlice';
 import { selectNpcKnowsFact } from '../Knowledge/state/KnowledgeSelectors';
@@ -179,6 +180,11 @@ const seedFinaleEntry = async (
   }
 
   traitsByRoute[route].forEach(traitId => store.dispatch(addPermanentTrait(traitId)));
+  if (route === 'structural') {
+    await store.dispatch(activateDoctrineThunk('structural_steward')).unwrap();
+  } else if (route === 'diagnostic') {
+    await store.dispatch(activateDoctrineThunk('countermodeler')).unwrap();
+  }
 };
 
 const enterFinale = async (store: TestStore, route: Route) => {
@@ -219,24 +225,30 @@ describe('GC-10 Telluric Echo finale and epilogue', () => {
     expect(canUseQuestResolution(distributed, [])).toBe(true);
     expect(canUseQuestResolution(fortified, [])).toBe(true);
 
-    expect(structural.requiredPermanentTraitIds).toEqual([
-      'WillowsWisdom',
-      'ConstraintSense',
-    ]);
-    expect(canUseQuestResolution(structural, ['WillowsWisdom'])).toBe(false);
+    expect(structural.requiredPermanentTraitIds).toBeUndefined();
+    expect(structural.requiredActiveDoctrineIds).toEqual(['structural_steward']);
     expect(canUseQuestResolution(
       structural,
-      ['WillowsWisdom', 'ConstraintSense']
+      ['WillowsWisdom', 'ConstraintSense'],
+      []
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      structural,
+      ['WillowsWisdom', 'ConstraintSense'],
+      ['structural_steward']
     )).toBe(true);
 
-    expect(diagnostic.requiredPermanentTraitIds).toEqual([
-      'ScholarlyInsight',
-      'AdversarialCalibration',
-    ]);
-    expect(canUseQuestResolution(diagnostic, ['ScholarlyInsight'])).toBe(false);
+    expect(diagnostic.requiredPermanentTraitIds).toBeUndefined();
+    expect(diagnostic.requiredActiveDoctrineIds).toEqual(['countermodeler']);
     expect(canUseQuestResolution(
       diagnostic,
-      ['ScholarlyInsight', 'AdversarialCalibration']
+      ['ScholarlyInsight', 'AdversarialCalibration'],
+      []
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      diagnostic,
+      ['ScholarlyInsight', 'AdversarialCalibration'],
+      ['countermodeler']
     )).toBe(true);
   });
 

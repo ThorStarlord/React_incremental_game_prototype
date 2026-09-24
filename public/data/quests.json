@@ -533,10 +533,7 @@
         "label": "Prepare Structural Load Paths",
         "description": "Combine Willow's slow-system cognition with Gronk's Constraint Sense to prepare only the network structures that actually carry the response.",
         "relationshipExperienceId": "gronk_gc08_exp_structural_preparation",
-        "requiredPermanentTraitIds": [
-          "WillowsWisdom",
-          "ConstraintSense"
-        ],
+        "requiredActiveDoctrineIds": ["structural_steward"],
         "rewards": [],
         "logMessage": "You harden the network's load-bearing response paths instead of distributing preparation evenly."
       }
@@ -571,10 +568,7 @@
         "label": "Prepare the Diagnostic Mesh",
         "description": "Combine Scholarly Insight with Adversarial Calibration to place diagnostics where the Echo's model is most likely to contradict itself.",
         "relationshipExperienceId": "elara_gc08_exp_diagnostic_preparation",
-        "requiredPermanentTraitIds": [
-          "ScholarlyInsight",
-          "AdversarialCalibration"
-        ],
+        "requiredActiveDoctrineIds": ["countermodeler"],
         "rewards": [],
         "logMessage": "You prepare a diagnostic mesh that treats the network as an adversarial sensor rather than a uniform shield."
       }
@@ -787,10 +781,7 @@
         "label": "Redirect Through the Load-Bearing Paths",
         "description": "Use Willow's Wisdom and Constraint Sense to route the counterphase through the structures that can actually carry it.",
         "relationshipExperienceId": "lyra_gc10_exp_finale_structural",
-        "requiredPermanentTraitIds": [
-          "WillowsWisdom",
-          "ConstraintSense"
-        ],
+        "requiredActiveDoctrineIds": ["structural_steward"],
         "rewards": [],
         "logMessage": "You redirect the Echo through the load-bearing network paths, letting the counterphase travel where the system can actually sustain it."
       }
@@ -825,10 +816,7 @@
         "label": "Disrupt the Predicted Phase",
         "description": "Use Scholarly Insight and Adversarial Calibration to predict the Echo's next move and make that prediction fail.",
         "relationshipExperienceId": "lyra_gc10_exp_finale_diagnostic",
-        "requiredPermanentTraitIds": [
-          "ScholarlyInsight",
-          "AdversarialCalibration"
-        ],
+        "requiredActiveDoctrineIds": ["countermodeler"],
         "rewards": [],
         "logMessage": "The network catches the contradiction in the Echo's next phase and disrupts the repeating structure before it can reassert itself."
       }

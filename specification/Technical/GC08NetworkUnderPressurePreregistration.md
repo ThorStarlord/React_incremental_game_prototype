@@ -95,19 +95,25 @@ Elara briefing unlocks a baseline preparation Quest requiring no optional Trait 
 
 ### 2. Structural preparation — Structural Steward
 
-Gronk briefing unlocks a preparation Quest whose legal resolution requires:
+Gronk briefing unlocks a preparation Quest whose legal resolution requires the currently active **Structural Steward** doctrine:
 
 ```text
-WillowsWisdom + ConstraintSense
+active doctrine = structural_steward
+derived from permanent WillowsWisdom + ConstraintSense
 ```
+
+The permanent pair remains learned capability authority; the GC08 preparation choice specifically asks which learned principles are currently foregrounded as the network posture.
 
 ### 3. Diagnostic preparation — Countermodeler
 
-Elara briefing also exposes a capability route requiring:
+Elara briefing also exposes a capability route requiring the currently active **Countermodeler** doctrine:
 
 ```text
-ScholarlyInsight + AdversarialCalibration
+active doctrine = countermodeler
+derived from permanent ScholarlyInsight + AdversarialCalibration
 ```
+
+This is current-specialization authority, not a new capability acquisition.
 
 ### 4. Fortified institutional support — optional
 

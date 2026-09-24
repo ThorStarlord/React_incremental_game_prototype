@@ -73,11 +73,11 @@ named consumer
 
 ## Candidate-A next depth question
 
-The next Candidate-A depth package should investigate where the existing two doctrines should matter again after GC06 without turning every quest into a free menu-switch tax.
+The first Candidate-A depth package resolves this selectively: GC08 preparation and GC10 finale consume active doctrine after GC06, while GC07 and GC09 remain permanent-capability gates. This creates repeated strategic-posture meaning without turning every chapter into a menu-switch tax.
 
 Prefer selective strategic-posture consumers and independent source-Trait uses over:
 
-- mass conversion of GC07-GC10 pair gates;
+- further mass conversion of remaining late-campaign pair gates;
 - a generic N-way capability graph;
 - a large new Trait catalogue;
 - Trait presets before temporary-attunement depth creates a real loadout problem.

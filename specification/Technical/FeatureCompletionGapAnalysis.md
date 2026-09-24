@@ -113,6 +113,7 @@ The repository already proves:
 - permanent Traits can alter legal Quest/Combat choices;
 - two established two-Trait doctrines can be deliberately foregrounded;
 - GC06 consumes active doctrine with distinct legal synthesis options;
+- the first bounded Candidate-A depth package extends active-doctrine consumption to GC08 preparation and GC10 finale while preserving GC07/GC09 as permanent-capability gates;
 - capability provenance is visible through Player Insight / Traits surfaces.
 
 ### Gap
@@ -122,8 +123,8 @@ The architecture now supports a real build system, but Campaign One does not yet
 Current limitations include:
 
 - only two qualified doctrine profiles;
-- GC06 is the first major active-doctrine consumer;
-- GC07-GC10 largely retain permanent-Trait-pair gates;
+- active doctrine now matters at GC06, GC08 preparation, and GC10 finale;
+- GC07 and GC09 intentionally retain permanent-Trait-pair gates so learned capability remains useful without repetitive switching;
 - several Trait identities have sparse cross-domain application;
 - temporary/equipped Trait semantics remain intentionally unresolved;
 - successful buildcraft often proves that an option exists rather than making the player's evolving build reshape a meaningful stretch of play.
@@ -159,7 +160,7 @@ A plausible L3 target is:
 - switching is meaningful enough to justify the focus mechanic but not required as repetitive menu tax;
 - the player can explain, from visible provenance, why the build option exists.
 
-This is a depth-search hypothesis, not yet an implementation contract.
+The first bounded implementation package now satisfies part of this exit shape by giving both doctrines repeated consumers in GC06, GC08, and GC10 while deliberately leaving GC07/GC09 as learned-capability gates. Remaining L3 questions are independent source-Trait use, temporary-attunement semantics, and eventual human comprehension/preference.
 
 ## Candidate B — Mastery Compression / Copy organization
 
