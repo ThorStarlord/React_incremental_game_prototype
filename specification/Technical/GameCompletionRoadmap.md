@@ -122,7 +122,7 @@ intended player role
 -> finished-feature gap
 ```
 
-The completed breadth search selects three depth candidates: **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. The current depth frontier is Candidate B. Historical GC closure remains intact; new work targets the living feature, not the old milestone record.
+The completed breadth search selects three depth candidates: **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. Candidate B depth is now specified in [`CandidateBMasteryCompressionDepthSpecification.md`](CandidateBMasteryCompressionDepthSpecification.md). The current implementation frontier is the bounded **Forge Standing Responsibility** slice defined there. Historical GC closure remains intact; new work targets the living feature, not the old milestone record.
 
 ## 5. Package GC-00 — Close inherited M26 and transition authority
 
