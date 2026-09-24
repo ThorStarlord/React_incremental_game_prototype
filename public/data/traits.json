@@ -86,7 +86,7 @@
     "description": "Increases your essence generation rate from all sources.",
     "essenceCost": 150,
     "effects": {
-      "essenceGenerationMultiplier": 1.15
+      "essenceGenerationMultiplier": 0.15
     },
     "rarity": "Rare",
     "iconPath": "waterfall"

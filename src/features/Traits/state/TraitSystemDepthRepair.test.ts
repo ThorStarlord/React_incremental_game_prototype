@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from '../../../app/store';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
@@ -21,6 +23,13 @@ const SIMPLE_TRAIT: Trait = {
 };
 
 describe('Trait system depth repair', () => {
+  test('Essence Flow encodes a 15% additive contribution for the Copy multiplier formula', () => {
+    const traits = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'public/data/traits.json'), 'utf8')
+    );
+    expect(traits.EssenceFlow.effects.essenceGenerationMultiplier).toBe(0.15);
+  });
+
   test('effect metadata has explicit execution authority instead of implying every key is live', () => {
     expect(classifyTraitEffectAuthority('attack')).toBe('direct_player_stat');
     expect(classifyTraitEffectAuthority('essenceGenerationMultiplier')).toBe('named_runtime');
