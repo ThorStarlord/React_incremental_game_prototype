@@ -110,7 +110,7 @@ These commands do not replace the required real-human Beta evidence or an immuta
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
 
-There is **no automatic M27 or GC-15**. The repository-wide breadth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md); the current depth frontier is **Candidate B — Mastery Compression / Copy organization**, followed provisionally by buildcraft and strategic consequence composition. A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished.
+There is **no automatic M27 or GC-15**. The repository-wide breadth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). **Candidate B — Mastery Compression / Copy organization** remains the top-level depth frontier; a bounded Candidate A package now also deepens relationship-derived Trait buildcraft without changing that priority. See [`CandidateATraitBuildcraftDepthImplementation.md`](specification/Technical/CandidateATraitBuildcraftDepthImplementation.md) and [`TraitCatalogDisposition.md`](specification/Technical/TraitCatalogDisposition.md). A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished.
 
 ## Important 1.0 scope decisions
 
@@ -150,6 +150,7 @@ npm run docs:authority:validate
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate
+npm run trait-depth:validate
 npm run alpha:validate
 npm run content-alpha:validate
 npm run beta:technical:validate
