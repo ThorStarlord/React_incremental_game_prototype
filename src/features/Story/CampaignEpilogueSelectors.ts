@@ -8,6 +8,10 @@ import {
   selectTelluricEchoOutcome,
 } from '../WorldState/state/WorldStateSelectors';
 import type { CounterphasePlan } from '../WorldState/state/WorldStateTypes';
+import {
+  deriveMasteryCompressionOverview,
+  formatMasteryCompressionEpilogue,
+} from '../Copy/MasteryCompression';
 
 export interface CampaignEpilogueProjection {
   plan: CounterphasePlan;
@@ -19,6 +23,7 @@ export interface CampaignEpilogueProjection {
   world: string;
   build: string;
   delegation: string | null;
+  masteryCompression: string | null;
 }
 
 const PLAN_LABELS: Record<CounterphasePlan, string> = {
@@ -123,6 +128,9 @@ export const selectCampaignEpilogueProjection = (
   const delegation = routines.length > 0
     ? `Delegation aftermath: ${routines.join(', ')} remained personally mastered and safely delegable; ${delegatedCopies} Copy${delegatedCopies === 1 ? '' : 's'} held an assigned role. No delegated routine chose the finale.`
     : null;
+  const masteryCompression = formatMasteryCompressionEpilogue(
+    deriveMasteryCompressionOverview(state)
+  );
 
   return {
     plan,
@@ -134,5 +142,6 @@ export const selectCampaignEpilogueProjection = (
     world: `World aftermath: lattice integrity is ${latticeIntegrity}; network posture is ${networkPosture}; counterphase plan is ${plan}; Telluric Echo outcome is ${outcome}.`,
     build,
     delegation,
+    masteryCompression,
   };
 };

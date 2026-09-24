@@ -42,7 +42,7 @@
     "gc02:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC02PrologueOnboarding.test.tsx",
     "gc03:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC03OpeningCampaignSpine.test.tsx",
     "gc0405:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC0405BreadthQualification.test.ts CopyM20ProductionTaskAutomation.test.tsx PostM25CopyRoutineStrategy.test.ts",
-    "copy-standing-orders:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand CopyStandingOrders.test.ts CopyM20ProductionTaskAutomation.test.tsx PostM25CopyRoutineStrategy.test.ts",
+    "copy-standing-orders:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand MasteryCompression.test.ts CopyStandingOrders.test.ts CopyM20ProductionTaskAutomation.test.tsx PostM25CopyRoutineStrategy.test.ts",
     "gc06:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC06LatticeUnderStrain.test.tsx DoctrineFocusPlayerSurface.test.tsx ChapterDefinitionIntegrity.test.ts",
     "gc07:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC07ChronoCrypt.test.tsx ChapterDefinitionIntegrity.test.ts ExplorationM18TravelVerticalSlice.test.tsx",
     "gc08:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC08NetworkUnderPressure.test.tsx ChapterDefinitionIntegrity.test.ts CopyM20ProductionTaskAutomation.test.tsx",

@@ -132,6 +132,54 @@ This vertical slice is repository-implemented but remains an **initial bounded f
 not establish that fresh players understand, prefer, or enjoy the standing-order
 UX or its exception frequency.
 
+### Mastery Compression organizational-legibility foundation
+
+A bounded read-only projection now makes the existing delegation ladder legible
+without creating a new reducer, save authority, planner, or task identity.
+
+Current bounded feature record:
+[`MasteryCompressionProcedureFamiliesResult.md`](specification/Technical/MasteryCompressionProcedureFamiliesResult.md).
+
+```text
+Resonance Calibration + Archive Verification
+-> Network Assurance
+
+Network Assurance + Forge Assistance personal mastery
+-> Known-State Stewardship READY
+
+READY + active authored Archive standing responsibility
+-> OPERATING
+
+OPERATING + unresolved exception
+-> ATTENTION REQUIRED
+```
+
+Player Insight exposes the procedure-family/domain distinction, standing
+responsibility ownership, and the reason an exception crossed the automation
+boundary. The state-responsive epilogue can report which mastered work has
+become quiet standing responsibility while preserving player judgment for
+unknown conditions.
+
+This is **Candidate B foundation, not Candidate B completion**. The newer
+[`CandidateBMasteryCompressionDepthSpecification.md`](specification/Technical/CandidateBMasteryCompressionDepthSpecification.md)
+remains the active runtime-depth plan and selects **Forge Assistance as the
+second standing responsibility**. This projection neither pre-authorizes that
+Forge behavior nor closes the need to implement and qualify it.
+
+Campaign One's organizational ceiling remains:
+
+```text
+player
+-> specialized Copies
+-> player-authored routine priorities
+-> authored standing responsibilities
+-> exception escalation back to player
+```
+
+Managers-of-managers, Copy-authored strategy, generic behavior planners,
+irreversible delegated decisions, and offline standing-order selection/chaining
+remain outside scope.
+
 ### Bounded capability-specialization feature development
 
 The current Trait/Player authority distinguishes durable learned capability from current specialization without adding a second skill tree:
