@@ -111,7 +111,7 @@ Semantics:
 - learned Traits alone are insufficient for an active-doctrine-gated resolution;
 - presentation and `resolveQuestOutcomeThunk` consume the same derived doctrine authority;
 - available doctrine-gated options explain the active doctrine without exposing unavailable future doctrine requirements;
-- GC06 is the first production campaign decision converted to this stronger specialization semantic; later campaign pair routes remain on their existing permanent-Trait gates until separate product evidence warrants conversion.
+- GC06 establishes this stronger specialization semantic; Candidate A depth extends it through GC07 counterphase derivation and GC08 network preparation. GC09-GC10 intentionally use durable permanent-pair gates for culmination to avoid repetitive doctrine-switching tax.
 
 These bounded requirement contracts intentionally do **not** define:
 
