@@ -325,6 +325,58 @@
       "next": {
         "commit": null
       }
+    },
+    "gronk_gc08_constraint_audit": {
+      "id": "gronk_gc08_constraint_audit",
+      "npcId": "npc_blacksmith_gronk",
+      "title": "Read the Load Before the Blueprint",
+      "text": "You can now follow Gronk's constraint-first method without borrowing Willow's slow-system frame. Together you trace which junctions actually carry the network response before anyone starts reinforcing what merely looks important.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "gronk_gc08_exp_counterphase_briefed"
+      ],
+      "requiredPermanentTraitIds": [
+        "ConstraintSense"
+      ],
+      "responses": {
+        "audit": "Audit the load path with Constraint Sense before committing any structural plan."
+      },
+      "effects": [
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "gronk_gc08_exp_constraint_audit",
+          "responseId": "audit"
+        }
+      ],
+      "next": {
+        "audit": null
+      }
+    },
+    "lyra_gc08_adversarial_probe": {
+      "id": "lyra_gc08_adversarial_probe",
+      "npcId": "npc_lyra",
+      "title": "Model the Objection Before Lyra Makes It",
+      "text": "Adversarial Calibration lets you predict the pressure Lyra will apply to the network plan even without using Elara's contradiction-first method. You test the plan against the opponent model instead of waiting for her to expose the weakness.",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "elara_gc08_exp_network_diagnosis"
+      ],
+      "requiredPermanentTraitIds": [
+        "AdversarialCalibration"
+      ],
+      "responses": {
+        "probe": "Run the network plan against Lyra's likely objection before she states it."
+      },
+      "effects": [
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc08_exp_adversarial_probe",
+          "responseId": "probe"
+        }
+      ],
+      "next": {
+        "probe": null
+      }
     }
   },
   "npcDialogueIds": {
@@ -332,7 +384,8 @@
       "elara_gc08_network_diagnosis"
     ],
     "npc_blacksmith_gronk": [
-      "gronk_gc08_counterphase_briefing"
+      "gronk_gc08_counterphase_briefing",
+      "gronk_gc08_constraint_audit"
     ],
     "npc_captain_valerius": [
       "valerius_gc08_counterphase_briefing"
@@ -341,7 +394,8 @@
       "lyra_gc08_commit_distributed",
       "lyra_gc08_commit_structural",
       "lyra_gc08_commit_diagnostic",
-      "lyra_gc08_commit_fortified"
+      "lyra_gc08_commit_fortified",
+      "lyra_gc08_adversarial_probe"
     ]
   }
 }
