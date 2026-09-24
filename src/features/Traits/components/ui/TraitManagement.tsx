@@ -28,6 +28,7 @@ import {
 } from '../../../Player/state/PlayerSelectors';
 import { acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
 import type { Trait } from '../../state/TraitsTypes';
+import { evaluateTraitResonanceReadiness } from '../../state/TraitResonanceReadiness';
 
 export interface TraitManagementProps {
   currentEssence: number;
@@ -39,17 +40,16 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
   const dispatch = useAppDispatch();
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const rootState = useAppSelector(state => state);
 
   const traitsToMakePermanent = useMemo(() => {
     return discoveredTraits.filter(trait => !permanentTraitIds.includes(trait.id));
   }, [discoveredTraits, permanentTraitIds]);
 
   const handleMakePermanent = (trait: Trait) => {
-    if (trait.essenceCost !== undefined && currentEssence >= trait.essenceCost) {
-      dispatch(acquireTraitWithEssenceThunk({
-        traitId: trait.id,
-        essenceCost: trait.essenceCost
-      }));
+    const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+    if (readiness.ready) {
+      dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id }));
     }
   };
 
@@ -82,20 +82,20 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
           <List>
             {traitsToMakePermanent.length > 0 ? (
               traitsToMakePermanent.map((trait) => {
-                const cost = trait.essenceCost ?? 0;
-                const canAfford = currentEssence >= cost;
+                const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+                const cost = readiness.cost;
                 return (
                   <ListItem
                     key={trait.id}
                     divider
                     secondaryAction={
-                      <Tooltip title={!canAfford ? `Requires ${cost} Essence` : 'Make this trait permanent'}>
+                      <Tooltip title={readiness.ready ? 'Make this trait permanent' : readiness.blockers.join(' • ')}>
                         <span>
                           <Button
                             variant="contained"
                             size="small"
                             onClick={() => handleMakePermanent(trait)}
-                            disabled={!canAfford}
+                            disabled={!readiness.ready}
                             startIcon={<ResonateIcon />}
                           >
                             Resonate
@@ -122,6 +122,16 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
                               sx={{ display: 'block', mt: 0.5, fontWeight: 'medium' }}
                             >
                               Cost: {cost.toLocaleString()} Essence
+                            </Typography>
+                          )}
+                          {!readiness.ready && (
+                            <Typography
+                              component="span"
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ display: 'block', mt: 0.5 }}
+                            >
+                              {readiness.blockers.join(' • ')}
                             </Typography>
                           )}
                         </React.Fragment>
