@@ -21,7 +21,9 @@
 **GC-14 promotion guard:** `QUALIFIED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
-**Active program:** Campaign One / 1.0 Feature Completion
+**Active program:** Campaign One / 1.0 Feature Completion  
+**Feature Completion Gap Analysis:** `COMPLETE / CURRENT`  
+**Current depth frontier:** `Candidate B — Mastery Compression / Copy organization`
 
 ## Current authority
 
@@ -53,12 +55,11 @@ The active optimization target is:
 
 Current work should:
 
-1. perform a repository-wide **Feature Completion Gap Analysis** across all `CORE_1_0` systems;
-2. distinguish scaffold, vertical-slice, integrated, developed, feature-complete, hardened, and release-qualified maturity;
-3. identify where a system technically exists but does not yet sustain its intended player-facing role;
-4. select the highest-value feature-development gaps through breadth search, then perform depth analysis before implementation;
-5. build depth primarily inside existing authorities and Campaign One scope rather than inventing generalized engines;
-6. preserve all historical qualification evidence while refusing to treat a passed bounded milestone as proof that its associated feature is finished.
+1. use [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md) as the completed breadth pass across `CORE_1_0` systems;
+2. deepen the selected candidates in order of current expected value: **B Mastery Compression / Copy organization**, **A relationship-derived capability buildcraft**, then **C strategic consequence composition**;
+3. perform depth analysis before each implementation package rather than expanding by subsystem symmetry;
+4. build depth primarily inside existing authorities and Campaign One scope rather than inventing generalized engines;
+5. preserve all historical qualification evidence while refusing to treat a passed bounded milestone as proof that its associated feature is finished.
 
 The **scope boundary remains bounded**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. What is reopened is **depth within the existing core product**, not arbitrary scope growth.
 
