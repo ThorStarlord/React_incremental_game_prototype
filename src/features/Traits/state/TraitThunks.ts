@@ -19,6 +19,7 @@ import type {
 } from './TraitsTypes';
 import { recordAuthoredRelationshipExperienceThunk } from '../../Relationships/state/RelationshipThunks';
 import { evaluateTraitResonanceReadiness } from './TraitResonanceReadiness';
+import { classifyTraitEffectAuthority } from './TraitEffectAuthority';
 
 export const fetchTraitsThunk = createAsyncThunk(
   'traits/fetchTraits',
@@ -194,6 +195,15 @@ export const validateTraitThunk = createAsyncThunk(
 
       if (!trait.effects || (Array.isArray(trait.effects) && trait.effects.length === 0)) {
         warnings.push('Trait has no effects defined');
+      } else if (!Array.isArray(trait.effects)) {
+        for (const effectName of Object.keys(trait.effects)) {
+          const authority = classifyTraitEffectAuthority(effectName);
+          if (authority === 'deferred_legacy') {
+            warnings.push(
+              `Trait effect "${effectName}" is deferred legacy metadata and has no qualified generic runtime authority.`
+            );
+          }
+        }
       }
 
       if (trait.essenceCost !== undefined && trait.essenceCost < 0) {
