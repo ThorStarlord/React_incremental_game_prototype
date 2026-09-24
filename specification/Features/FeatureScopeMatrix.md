@@ -18,39 +18,53 @@ Every major capability belongs to one scope class:
 - `CUT` — do not implement for 1.0; remove misleading player-facing placeholders where applicable.
 - `UNDECIDED` — permitted only temporarily; an unresolved critical-path item blocks scope lock.
 
-## Scope lock
+## Scope boundary and maturity
 
-There are **no `UNDECIDED` critical-path items** in this provisional matrix.
+There are **no `UNDECIDED` critical-path scope-class items** in this provisional matrix. That locks the **outer Campaign One boundary**, not the depth of every system already inside it.
+
+Use the maturity ladder from `../GameCompletionDefinition.md`:
+
+```text
+L0 Scaffold
+L1 Vertical Slice
+L2 Integrated Feature
+L3 Developed Feature
+L4 Feature Complete
+L5 Hardened
+L6 Release Qualified
+```
+
+A system can be `CORE_1_0`, fully integrated, and still remain below L4. Historical “implemented / qualified” wording records successful proof at the stated contract; it must not be interpreted as a blanket prohibition on further player-facing feature development.
 
 | System / surface | 1.0 class | Current posture | 1.0 requirement / decision |
 | --- | --- | --- | --- |
-| GameLoop / deterministic time | CORE_1_0 | implemented / qualified | Preserve current fixed-step, backpressure, lifecycle and precision contracts. |
-| Player state / vitals / attributes | CORE_1_0 | implemented | Keep only progression needed by campaign play; no universal new progression currency. |
-| Relationship Experience / Memory / Bond / Connection | CORE_1_0 | implemented / qualified | Central source of durable social history and learning provenance. |
-| Traits / permanent capabilities | CORE_1_0 | implemented / qualified + bounded doctrine specialization | Own durable learned capability identity; Player doctrine focus may compose only established Campaign One build profiles without creating a generic skill tree/capability graph. |
-| Essence / Resonance | CORE_1_0 | implemented / qualified | Supports relationship-mediated capability progression. |
-| NPC interaction | CORE_1_0 | implemented | Required for anchor cast and campaign decisions. |
-| Dialogue | CORE_1_0 | implemented / content-driven | Primary authored decision/consequence surface; preserve spoiler-safe prerequisite behavior. |
-| Quest | CORE_1_0 | implemented / qualified | Active objective structure for campaign problems. |
-| Exploration / authored travel | CORE_1_0 | implemented / qualified | Location remains objective player state; only campaign-needed locations required. |
-| Combat | CORE_1_0 | bounded MVP implemented | Required where campaign conflict needs active tactical resolution; do not expand into a separate combat game by inertia. |
-| Knowledge | CORE_1_0 | implemented / qualified | Owns who knows objective facts. |
-| Faction Reputation | CORE_1_0 | implemented / qualified | Owns institutional standing independent from personal relationships. |
-| World State | CORE_1_0 | implemented / qualified | Owns persistent objective regional conditions. |
-| Copy system | CORE_1_0 | implemented / qualified + bounded standing responsibility | Bounded execution of understood repeatable work, including explicitly authorized live condition-maintenance for authored mastered routines. |
-| Routine familiarity / earned delegation | CORE_1_0 | implemented / qualified breadth + Archive standing-order slice | Preserve explicit personal mastery. A player-authorized standing order may maintain one typed authored condition live through existing Copy eligibility; unknown/irreversible work escalates instead of auto-resolving. |
-| Persistence / save / load | CORE_1_0 | implemented | Must survive whole-campaign progression. |
-| Save import / export | CORE_1_0 | implemented through main menu | Preserve as recovery/portability path. |
-| Autosave | SUPPORTING_1_0 | implemented | Must not corrupt or overwrite progression unexpectedly. |
-| Bounded offline progression | CORE_1_0 | implemented / qualified | Safe already-running work only; no narrative auto-resolution. |
-| Chapter-scale composition | CORE_1_0 | full Campaign One integrated / qualified | Preserve composition over canonical authorities; no chapter-local shadow state. |
-| Content intelligence / reachability / chapter validation | SUPPORTING_1_0 | implemented | Required developer-side authoring protection as campaign content grows. |
-| Player Insight / causal journal / build provenance | SUPPORTING_1_0 | implemented / M26 deepens | Make consequence and capability provenance understandable without spoilers. |
-| Contextual `Available because` explanation | SUPPORTING_1_0 | implemented | Keep explanations causal and player-facing, not debug output. |
-| Notifications / return summary | SUPPORTING_1_0 | implemented | Ensure meaningful changes and offline progress are visible. |
-| Main menu | CORE_1_0 | implemented | New Game, Continue, Load, Import, Export must remain usable. |
-| Navigation / dashboard | SUPPORTING_1_0 | implemented | Must expose only real 1.0 surfaces; remove misleading placeholders. |
-| Settings | MINIMAL_1_0 | implemented | Only settings required for basic play/release usability. |
+| GameLoop / deterministic time | CORE_1_0 | L5 — Hardened / qualified | Preserve current fixed-step, backpressure, lifecycle and precision contracts. |
+| Player state / vitals / attributes | CORE_1_0 | L2/L3 — Integrated foundation; progression depth depends on consuming systems | Keep only progression needed by campaign play; no universal new progression currency. |
+| Relationship Experience / Memory / Bond / Connection | CORE_1_0 | L3 — Developed core; further depth should be driven by campaign/player-role gaps | Central source of durable social history and learning provenance. |
+| Traits / permanent capabilities | CORE_1_0 | L2 — Integrated; bounded doctrine slice, feature-depth expansion active | Own durable learned capability identity; Player doctrine focus may compose only established Campaign One build profiles without creating a generic skill tree/capability graph. |
+| Essence / Resonance | CORE_1_0 | L2/L3 — Integrated economy/progression support; final role depth not yet established | Supports relationship-mediated capability progression. |
+| NPC interaction | CORE_1_0 | L2 — Integrated campaign surface | Required for anchor cast and campaign decisions. |
+| Dialogue | CORE_1_0 | L3 — Developed authored decision surface | Primary authored decision/consequence surface; preserve spoiler-safe prerequisite behavior. |
+| Quest | CORE_1_0 | L2/L3 — Integrated and repeatedly consumed; depth varies by chapter | Active objective structure for campaign problems. |
+| Exploration / authored travel | CORE_1_0 | L1/L2 — Bounded authored-travel slice; not yet established as a developed gameplay pillar | Location remains objective player state; only campaign-needed locations required. |
+| Combat | CORE_1_0 | L1 — Bounded MVP vertical slice; explicitly not a general/developed combat feature | Required where campaign conflict needs active tactical resolution; do not expand into a separate combat game by inertia. |
+| Knowledge | CORE_1_0 | L1/L2 — Bounded fact authority with production consumers | Owns who knows objective facts. |
+| Faction Reputation | CORE_1_0 | L1/L2 — Bounded institutional-standing authority with production consumers | Owns institutional standing independent from personal relationships. |
+| World State | CORE_1_0 | L1/L2 — Bounded objective-state authority with production consumers | Owns persistent objective regional conditions. |
+| Copy system | CORE_1_0 | L2 — Integrated delegation feature; deeper policy/organizational role remains open | Bounded execution of understood repeatable work, including explicitly authorized live condition-maintenance for authored mastered routines. |
+| Routine familiarity / earned delegation | CORE_1_0 | L2 — Three mastered routines integrated; Standing Orders/Exceptions currently one L1 vertical slice | Preserve explicit personal mastery. A player-authorized standing order may maintain one typed authored condition live through existing Copy eligibility; unknown/irreversible work escalates instead of auto-resolving. |
+| Persistence / save / load | CORE_1_0 | L5 — Hardened core infrastructure | Must survive whole-campaign progression. |
+| Save import / export | CORE_1_0 | L4/L5 — Feature complete support path; recovery hardening remains release work | Preserve as recovery/portability path. |
+| Autosave | SUPPORTING_1_0 | L4/L5 — Feature complete support path; preserve reliability | Must not corrupt or overwrite progression unexpectedly. |
+| Bounded offline progression | CORE_1_0 | L5 — Hardened bounded authority | Safe already-running work only; no narrative auto-resolution. |
+| Chapter-scale composition | CORE_1_0 | L3/L4 — Full Campaign One composition integrated; feature-depth changes may alter consumers | Preserve composition over canonical authorities; no chapter-local shadow state. |
+| Content intelligence / reachability / chapter validation | SUPPORTING_1_0 | L5 — Hardened developer support authority | Required developer-side authoring protection as campaign content grows. |
+| Player Insight / causal journal / build provenance | SUPPORTING_1_0 | L2/L3 — Integrated legibility feature; depth should track causal-complexity growth | Make consequence and capability provenance understandable without spoilers. |
+| Contextual `Available because` explanation | SUPPORTING_1_0 | L2/L3 — Integrated causal explanation pattern | Keep explanations causal and player-facing, not debug output. |
+| Notifications / return summary | SUPPORTING_1_0 | L3 — Developed supporting feedback | Ensure meaningful changes and offline progress are visible. |
+| Main menu | CORE_1_0 | L4 — Feature complete support surface | New Game, Continue, Load, Import, Export must remain usable. |
+| Navigation / dashboard | SUPPORTING_1_0 | L3/L4 — Developed support surface | Must expose only real 1.0 surfaces; remove misleading placeholders. |
+| Settings | MINIMAL_1_0 | L2 — Minimal implemented surface by design | Only settings required for basic play/release usability. |
 | Dedicated in-game Save Management page | CUT as separate system | removed from primary navigation / compatibility IDs retained | Existing main-menu save authority is canonical. Do not restore a duplicate persistence surface. |
 | Separate Skills / skill-tree system | CUT | removed from primary navigation / compatibility IDs and legacy serialized field retained inertly | Traits already own capability progression. Compatibility state such as `availableSkillPoints` may remain for old-save stability, but Campaign One must not display, award, or consume it as player progression. |
 | General Inventory system | DEFER_POST_1_0 | removed from primary navigation / reference spec retained | Current 1.0 campaign does not require a general item-storage economy. Reconsider only if accepted campaign evidence proves need. |
@@ -73,18 +87,18 @@ There are **no `UNDECIDED` critical-path items** in this provisional matrix.
 | Interplanetary campaign / AI-war continuation | DEFER_POST_1_0 | narrative seed | Post-1.0 campaign/expansion material. |
 | Audio / music | SUPPORTING_1_0 | not completion-critical yet | Basic release presentation required before RC; no large audio pipeline needed for Alpha. |
 | Final visual/art pass | SUPPORTING_1_0 | Beta presentation review / human evidence pending | Make bounded presentation repairs from heuristic, synthetic, accessibility, release-review, or human evidence; only human sessions establish actual player perception. Do not turn this into a speculative art-system expansion. |
-| Onboarding / first-session guidance | CORE_1_0 | implemented / human-unvalidated | Alpha provides a normal-UI path into the first meaningful loop; Beta must validate comprehension with humans. |
-| Accessibility baseline | SUPPORTING_1_0 | incomplete | Keyboard/focus/readability issues become Beta/RC blockers according to completion contracts. |
-| Desktop browser support | CORE_1_0 release | Chromium + Firefox CI qualified; exact-RC evidence pending | Chromium-class + Firefox desktop are primary 1.0 targets. |
+| Onboarding / first-session guidance | CORE_1_0 | L2 — Integrated opening path / HUMAN-UNVALIDATED | Alpha provides a normal-UI path into the first meaningful loop; Beta must validate comprehension with humans. |
+| Accessibility baseline | SUPPORTING_1_0 | L1/L2 — Incomplete supporting feature | Keyboard/focus/readability issues become Beta/RC blockers according to completion contracts. |
+| Desktop browser support | CORE_1_0 release | L5 technical evidence / L6 exact-RC pending | Chromium-class + Firefox desktop are primary 1.0 targets. |
 | Full mobile product support | DEFER_POST_1_0 | responsive code exists | Avoid regressions, but mobile is not a primary 1.0 release target. |
 | Analytics / telemetry | DEFER_POST_1_0 | absent | Not required to ship a bounded standalone web game. |
 | Live-service backend | CUT | absent | 1.0 remains a client-side bounded game unless a later explicit product decision changes this. |
 
 ## 1.0 content-system obligations
 
-A `CORE_1_0` system is not complete merely because its reducer/component exists. It must participate where required by the campaign.
+A `CORE_1_0` system is not complete merely because its reducer/component exists **or because one bounded campaign consumer passed qualification**. It must participate where required by the campaign and reach sufficient player-facing depth for its intended role.
 
-The completion floor is:
+The historical integration floor is:
 
 - all six anchor Relationship NPCs receive meaningful long-horizon use;
 - at least four durable relationship-derived capability identities across at least three anchors;
@@ -121,4 +135,4 @@ To promote a `DEFER_POST_1_0` or `CUT` item into 1.0, record:
 
 ## Governing principle
 
-> **A smaller complete game beats a larger collection of unfinished systems.**
+> **A smaller complete game beats a larger collection of unfinished systems. A qualified vertical slice is proof that a feature can work, not proof that the feature is finished.**
