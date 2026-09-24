@@ -206,8 +206,8 @@ requireContains('specification/GameCompletionDefinition.md', [
 
 requireContains('specification/Features/FeatureScopeMatrix.md', [
   'CORE_1_0',
-  'L1 — Vertical Slice',
-  'L4 — Feature Complete',
+  'L1 Vertical Slice',
+  'L4 Feature Complete',
   'DEFER_POST_1_0',
   'CUT',
   'Separate Skills',
