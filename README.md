@@ -97,7 +97,8 @@ GC-10  Finale + Epilogue                              COMPLETE
 GC-11  Alpha qualification                            COMPLETE
 GC-12  Content Alpha / authored integration evidence COMPLETE
 CURRENT Feature Completion Gap Analysis                COMPLETE
-NEXT    Candidate B — Mastery Compression / Copy depth ACTIVE
+DEPTH   Candidate B — Mastery Compression / Copy       COMPLETE
+NEXT    Forge Standing Responsibility implementation   ACTIVE
 GATE    FEATURE_COMPLETE                               PENDING
 GC-13   Beta                                           DOWNSTREAM / TECHNICAL READINESS ALREADY QUALIFIED
 GC-14   Release Candidate / 1.0                        DOWNSTREAM / GUARD QUALIFIED
