@@ -232,6 +232,7 @@ Do not collapse these into a universal progression/condition system without a ne
 - [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md) — bounded offline snapshot settlement.
 - [`Technical/PostM25CopyRoutineStrategy.md`](Technical/PostM25CopyRoutineStrategy.md) — historical one-shot routine-priority baseline.
 - [`Technical/CopyStandingOrdersAndExceptionEscalationResult.md`](Technical/CopyStandingOrdersAndExceptionEscalationResult.md) — **CURRENT bounded authority** for live Archive standing responsibility, durable exceptions, and the remaining no-planner/offline boundary.
+- [`Technical/MasteryCompressionProcedureFamiliesResult.md`](Technical/MasteryCompressionProcedureFamiliesResult.md) — bounded read-only procedure-family / Known-State Stewardship projection, escalation categories, organizational ceiling, and epilogue legibility; this is a foundation for, not a replacement of, the current Candidate B Forge standing-responsibility depth specification.
 - [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — personal mastery provenance vs Copy-specific readiness.
 
 Product doctrine:

@@ -10,6 +10,7 @@
 > - Familiarity is enforced below the UI by `startCopyProductionTaskThunk`; Copy maturity/loyalty/role/location requirements remain independent.
 > - A player may now authorize one bounded **Archive Verification Standing Order**. Live fixed-tick evaluation may start one authored unit of mastered work when the Copy is idle and eligible.
 > - A source contradiction becomes a persisted Copy Exception and returns to player judgment instead of being auto-resolved.
+> - Read-only Mastery Compression projection recognizes the evidence-qualified **Network Assurance** procedure family and **Known-State Stewardship** readiness without adding another Redux/save authority.
 > - M21 may advance or complete an already-running authored Copy task during bounded offline settlement, but never selects or chains a new task.
 > - Meaningful/irreversible narrative decisions remain player-owned.
 
@@ -175,12 +176,13 @@ Existing role completion flavor remains separate from authored production reward
 
 ## 7. Player-owned routine familiarity
 
-The Checkpoint-C repair introduces an optional player-owned familiarity map for exactly the two current production routines:
+The Checkpoint-C repair introduced an optional player-owned familiarity map; Campaign One now uses it for the three qualified production routines:
 
 ```text
 PlayerState.routineFamiliarity
   forge_assistance?
   resonance_calibration?
+  archive_verification?
 ```
 
 Each record stores:
@@ -198,6 +200,9 @@ forge_assistance
 
 resonance_calibration
 -> trait_resonance
+
+archive_verification
+-> elara_independent_verification
 ```
 
 This state answers:
@@ -408,6 +413,41 @@ completes procedure
 
 Acknowledging the alert does not resolve the exception.
 
+### 10.2 Derived Mastery Compression
+
+`MasteryCompression.ts` adds no canonical state. It projects existing state into
+a player-facing abstraction ladder:
+
+```text
+Resonance Calibration + Archive Verification
+-> Network Assurance procedure family
+
+Network Assurance + Forge Assistance
+-> Known-State Stewardship READY
+
+READY + active Archive standing responsibility
+-> OPERATING
+
+OPERATING + unresolved exception
+-> ATTENTION REQUIRED
+```
+
+The projection also names the Campaign One organizational ceiling:
+
+```text
+player
+-> specialized Copies
+-> player-authored priorities
+-> authored standing responsibilities
+-> exception escalation
+```
+
+The current runtime-generated Archive source contradiction maps to the explicit
+**unknown or conflicting evidence** escalation boundary. Additional semantic
+boundary classes (conflicting policy, irreversible consequence, social novelty,
+repeated procedure failure) define player-owned limits but do not create new
+runtime exception generators in this package.
+
 Generic repeat queues, autonomous strategic planning, Copy-authored priorities,
 offline standing-order selection, and irreversible decision delegation remain
 outside the qualified boundary.
@@ -474,7 +514,8 @@ The Copy detail UI includes:
 - disabled assignment while busy/ineligible;
 - active task/progress;
 - Trait sharing preferences;
-- effective Traits.
+- effective Traits;
+- Player Insight read-only Mastery Compression family/domain status, standing-responsibility ownership, and exception-boundary explanation.
 
 Current delegation copy states the boundary directly: the player must experience a routine before delegating repeatable execution, while narrative/irreversible decisions remain player authority.
 
@@ -510,7 +551,7 @@ M20 tests preserve Relationship and Quest state across qualified task completion
 | Roles | Implemented | duration + completion flavor |
 | Trait inheritance/sharing | Implemented | slots/preferences/auto-unshare |
 | Passive Essence contribution | Implemented/partial-balance | existing threshold model |
-| Production catalog | **M20 PASS** | exactly two authored tasks |
+| Production catalog | **M20 PASS + GC-05 integrated** | three authored Campaign One tasks |
 | Routine familiarity prerequisite | **Repair PASS** | player-owned Rule-of-Two |
 | Forge active learning | **Repair PASS** | City Center, +5 Gold once |
 | Calibration active learning | **Repair PASS** | successful Trait Resonance |
@@ -519,6 +560,7 @@ M20 tests preserve Relationship and Quest state across qualified task completion
 | Mid-task save/load | **M20 PASS** | RootState persistence |
 | Live Archive standing responsibility | **REPOSITORY-IMPLEMENTED / deterministic qualification** | player-authorized mastered procedure; one bounded unit per later live tick |
 | Durable exception escalation | **REPOSITORY-IMPLEMENTED / deterministic qualification** | source contradiction persists and returns to player judgment |
+| Derived Mastery Compression ladder | **REPOSITORY-IMPLEMENTED / qualification pending exact-head CI** | no new state; projects routine -> procedure family -> known-state stewardship -> standing responsibility -> exception |
 | Bounded offline task continuation | **M21 PASS** | already-running task only; standing orders do not select new offline work |
 | Visible offline return summary | **Repair PASS** | shared notification host |
 | Copy travel/autonomous movement | Not qualified | outside current boundary |

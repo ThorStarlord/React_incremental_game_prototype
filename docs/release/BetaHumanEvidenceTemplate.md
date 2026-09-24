@@ -136,6 +136,13 @@ Record enough state to establish that playthroughs are genuinely external and ma
 
 Notes:
 
+## Mastery Compression / delegation comprehension
+
+- Did the participant understand the difference between **personally mastered routine**, **procedure family**, and **standing responsibility**? YES / PARTIAL / NO — evidence:
+- When a Copy exception appeared, did the participant understand why automation stopped and why judgment returned to them? YES / PARTIAL / NO — evidence:
+- Did the participant perceive standing delegation as freeing attention for a more novel decision, or as extra management overhead? FREEING / NEUTRAL / OVERHEAD / NOT OBSERVED — evidence:
+- Did the epilogue's delegation aftermath help the participant understand what could now continue without direct scheduling? YES / PARTIAL / NO / NOT REACHED — evidence:
+
 ## Finale / epilogue comprehension
 
 Ask the participant:

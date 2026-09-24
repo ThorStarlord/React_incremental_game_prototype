@@ -14,6 +14,7 @@ import { useAppSelector } from '../../../app/hooks';
 import {
   selectCausalJournalEntries,
   selectMasteredRoutines,
+  selectMasteryCompressionOverview,
   selectOpportunityMap,
   selectOpenCopyExceptions,
   selectRelationshipBuildCapabilities,
@@ -50,6 +51,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
   const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
   const masteredRoutines = useAppSelector(selectMasteredRoutines);
   const copyExceptions = useAppSelector(selectOpenCopyExceptions);
+  const masteryCompression = useAppSelector(selectMasteryCompressionOverview);
   const visibleOpportunities = opportunities.filter(
     chapter => chapter.status !== 'not_started'
   );
@@ -96,6 +98,9 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 0.5 }}>
                       {exception.summary}
+                    </Typography>
+                    <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 0.5 }}>
+                      Escalation boundary: {exception.boundaryLabel}. {exception.boundaryDescription}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.75 }}>
                       Open this Copy's details to acknowledge the operational exception. Player Insight remains read-only, and acknowledgement still does not resolve the underlying player-owned decision.
@@ -299,6 +304,87 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               </Stack>
             </Grid>
           </Grid>
+
+          <Box
+            data-test-id="mastery-compression-overview"
+            sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 2 }}
+          >
+            <Typography variant="subtitle1" fontWeight={600}>
+              Mastery Compression
+            </Typography>
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
+              Solved work can rise from personal routine to shared procedure to a standing responsibility. Unknown or irreversible judgment still returns to you.
+            </Typography>
+
+            <Stack spacing={1.5}>
+              {masteryCompression.procedureFamilies.map(family => (
+                <Box key={family.id}>
+                  <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+                    <Typography variant="body2" fontWeight={600}>
+                      Procedure family — {family.name}
+                    </Typography>
+                    <Chip
+                      label={family.status === 'mastered' ? 'Generalized' : `${family.masteredRoutineIds.length}/${family.requiredRoutineIds.length} evidence`}
+                      size="small"
+                      color={family.status === 'mastered' ? 'success' : 'default'}
+                    />
+                  </Stack>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    {family.description}
+                  </Typography>
+                </Box>
+              ))}
+
+              <Box>
+                <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+                  <Typography variant="body2" fontWeight={600}>
+                    Operational domain — {masteryCompression.operationalDomain.name}
+                  </Typography>
+                  <Chip
+                    label={masteryCompression.operationalDomain.status.replace(/_/g, ' ')}
+                    size="small"
+                    color={
+                      masteryCompression.operationalDomain.status === 'operating'
+                        ? 'success'
+                        : masteryCompression.operationalDomain.status === 'attention_required'
+                          ? 'warning'
+                          : 'default'
+                    }
+                  />
+                </Stack>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  {masteryCompression.operationalDomain.description}
+                </Typography>
+                {masteryCompression.operationalDomain.reasons.map(reason => (
+                  <Typography key={reason} variant="caption" color="text.secondary" display="block">
+                    {reason}
+                  </Typography>
+                ))}
+              </Box>
+
+              {masteryCompression.standingResponsibilities.length > 0 && (
+                <Box>
+                  <Typography variant="caption" fontWeight={600} display="block">
+                    Standing responsibilities
+                  </Typography>
+                  {masteryCompression.standingResponsibilities.map(responsibility => (
+                    <Typography
+                      key={`${responsibility.copyId}:${responsibility.routineId}`}
+                      variant="caption"
+                      color="text.secondary"
+                      display="block"
+                    >
+                      {responsibility.routineName} — {responsibility.copyName}
+                    </Typography>
+                  ))}
+                </Box>
+              )}
+
+              <Typography variant="caption" color="text.secondary">
+                Campaign One ceiling: {masteryCompression.organizationalCeiling.summary} Managers-of-managers and autonomous strategy remain outside this campaign.
+              </Typography>
+            </Stack>
+          </Box>
 
           <Divider />
           <Typography variant="caption" color="text.secondary">

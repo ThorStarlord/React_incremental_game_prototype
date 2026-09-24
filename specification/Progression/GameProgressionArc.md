@@ -163,6 +163,65 @@ The network does not need a generalized AI planner.
 
 For 1.0, networked mastery means the player can maintain more than one useful Copy/routine relationship and make explicit choices about what known work deserves delegation. Each Copy remains bounded by existing eligibility and task authority.
 
+### Mastery Compression abstraction ladder
+
+Campaign One may make already-earned mastery legible at progressively higher
+levels without adding another canonical progression state:
+
+```text
+specific routine
+-> evidence-qualified procedure family
+-> known-state operational readiness
+-> authored standing responsibility
+-> exception escalation
+-> player judgment
+```
+
+The first bounded generalization is **Network Assurance**:
+
+```text
+Resonance Calibration
++
+Archive Verification
+-> Network Assurance
+```
+
+The first bounded operational-domain projection is **Known-State Stewardship**:
+
+```text
+Network Assurance
++
+Forge Assistance
+-> READY
+
+READY
++
+active authored Archive standing responsibility
+-> OPERATING
+```
+
+An unresolved exception changes `OPERATING` to `ATTENTION REQUIRED`; automation
+must never describe itself as healthy while player judgment is pending.
+
+This ladder is derived from existing routine familiarity, standing-order and
+exception authorities. It does not unlock tasks by itself.
+
+### Campaign One organizational ceiling
+
+Campaign One stops at:
+
+```text
+player
+-> specialized Copies
+-> player-authored routine priorities
+-> authored standing responsibilities
+-> exception escalation back to player
+```
+
+Managers-of-managers, Copy-authored strategy, generic behavior planners,
+irreversible delegated decisions, and offline standing selection/chaining remain
+outside Campaign One.
+
 ### Stage-3 exit
 
 The player has enough network leverage and accumulated consequences that a planetary-scale problem can credibly consume their prior history.
@@ -260,7 +319,8 @@ Minimum:
 - 3 learnable routine identities;
 - at least 2 source contexts for learning;
 - at least one point where choosing what to delegate creates meaningful attention/resource prioritization;
-- no autonomous irreversible choices.
+- no autonomous irreversible choices;
+- at least one visible distinction between personal routine mastery, higher-order procedure understanding, active standing responsibility, and exception escalation.
 
 ## Resource/economy doctrine
 

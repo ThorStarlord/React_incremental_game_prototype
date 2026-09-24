@@ -225,6 +225,11 @@ export const CampaignSpinePanel: React.FC = () => {
         {epilogue.delegation && (
           <Typography variant="body2">{epilogue.delegation}</Typography>
         )}
+        {epilogue.masteryCompression && (
+          <Typography variant="body2" data-testid="gc10-mastery-compression-aftermath">
+            {epilogue.masteryCompression}
+          </Typography>
+        )}
       </Stack>
     </Alert>
   );

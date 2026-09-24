@@ -4,6 +4,10 @@ import { selectFactionReputation } from '../Factions/state/FactionSelectors';
 import { selectNetworkPosture } from '../WorldState/state/WorldStateSelectors';
 import type { NetworkPosture } from '../WorldState/state/WorldStateTypes';
 import { COPY_PRODUCTION_TASKS, getCopyProductionTaskDefinition } from '../Copy/CopyTaskDefinitions';
+import {
+  deriveMasteryCompressionOverview,
+  getCopyExceptionBoundaryDefinition,
+} from '../Copy/MasteryCompression';
 import type { CopyExceptionStatus } from '../Copy/state/CopyTypes';
 import type {
   RoutineFamiliarityId,
@@ -99,6 +103,8 @@ export interface CopyExceptionInsight {
   status: CopyExceptionStatus;
   severity: 'attention' | 'blocking';
   detectedAtTick: number;
+  boundaryLabel: string;
+  boundaryDescription: string;
 }
 
 export interface CounterphasePreparationExplanation {
@@ -311,6 +317,11 @@ export const selectRelationshipBuildCapabilities = (
  * whether any Copy may execute a routine; it only translates existing recorded
  * familiarity into a player-facing explanation.
  */
+export const selectMasteryCompressionOverview = createSelector(
+  [(state: RootState) => state],
+  deriveMasteryCompressionOverview
+);
+
 export const selectMasteredRoutines = (state: RootState): MasteredRoutineView[] => {
   const familiarity = state.player.routineFamiliarity ?? {};
 
@@ -348,6 +359,7 @@ export const selectOpenCopyExceptions = (
       const sourceCount = exception.context.code === 'archive_source_contradiction'
         ? exception.context.conflictingSourceIds.length
         : 0;
+      const boundary = getCopyExceptionBoundaryDefinition(exception.context);
 
       return {
         exceptionId: exception.id,
@@ -361,6 +373,8 @@ export const selectOpenCopyExceptions = (
         status: exception.status,
         severity: exception.severity,
         detectedAtTick: exception.detectedAtTick,
+        boundaryLabel: boundary.label,
+        boundaryDescription: boundary.description,
       };
     });
 
