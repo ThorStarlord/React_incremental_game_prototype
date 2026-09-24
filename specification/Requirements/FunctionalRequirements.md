@@ -65,11 +65,11 @@ This document lists the functional requirements for the React Incremental RPG Pr
 *   **FR-TRAIT-003:** ✅ **IMPLEMENTED** - The system shall track the player's acquired traits.
 *   **FR-TRAIT-004:** ✅ **IMPLEMENTED** - The system shall provide the player with a limited number of slots to equip acquired traits.
 *   **FR-TRAIT-005:** ✅ **IMPLEMENTED** - The system shall apply the effects of equipped traits to the player character.
-*   **FR-TRAIT-006:** 🔄 **UI READY** - The system shall allow the player to spend a significant amount of Essence to make an acquired trait permanent, freeing up an equip slot while keeping the trait's effects active. *UI framework implemented, backend integration pending.*
+*   **FR-TRAIT-006:** ✅ **IMPLEMENTED** - The system shall allow the player to permanently Resonate a discovered Trait only after its applicable evidence gates pass; Essence is the final authoritative catalogue cost, and successful permanence frees any temporary equip slot while preserving the learned capability.
 *   **FR-TRAIT-007:** ✅ **IMPLEMENTED** - The system shall track the player's permanent traits.
 *   **FR-TRAIT-008:** ✅ **IMPLEMENTED** - The system allows NPCs to have "Shared Trait Slots" (defined in their data and managed by `NPCSlice`). Dynamic granting based on connection/loyalty is planned.
-*   **FR-TRAIT-009:** ✅ **IMPLEMENTED** - The system allows the player to place their acquired/permanent traits into an NPC's Shared Trait Slot via `NPCTraitsTab` and `shareTraitWithNPCThunk`.
-*   **FR-TRAIT-010:** 📋 **PLANNED** - The system shall apply the effects of shared traits to the target NPC or Copy.
+*   **FR-TRAIT-009:** ✅ **IMPLEMENTED** - The system allows the player to share currently equipped, non-permanent Traits into eligible NPC/Copy shared slots. Unequip, replacement, or permanent Resonance clears incompatible temporary shares.
+*   **FR-TRAIT-010:** 🟡 **BOUNDED / PARTIAL** - Copy runtime consumes the explicitly qualified `essenceGenerationMultiplier` shared/inherited effect. Broad generic application of every shared Trait effect to NPCs/Copies is not a Campaign One authority and remains deferred unless a concrete gameplay consumer warrants it.
 *   **FR-TRAIT-011:** ✅ **IMPLEMENTED** - The system shall provide a UI for viewing trait definitions (Codex).
 *   **FR-TRAIT-012:** ✅ **IMPLEMENTED** - The system shall provide a UI for managing player equipped traits and slots.
 
@@ -80,7 +80,9 @@ This document lists the functional requirements for the React Incremental RPG Pr
 - ✅ **Accessibility**: Full keyboard navigation, ARIA support, and screen reader compatibility
 - ✅ **Performance**: Memoized components, efficient rendering, and optimized state management
 - ✅ **State Integration**: Complete Redux integration with typed selectors and actions
-- ✅ **Trait Sharing with NPCs**: Implemented, including UI in `NPCTraitsTab` and state updates in `NPCSlice`. Relationship level requirement for sharing removed for testing.
+- ✅ **Trait Sharing**: Implemented for equipped, non-permanent player Traits with listener cleanup on unequip/replacement/permanence; domain effects require explicit runtime consumers rather than generic propagation.
+- ✅ **Campaign One Catalogue Authority**: `campaignOneDisposition` prevents deferred/rework/removed historical perk definitions from appearing as ordinary supported 1.0 progression.
+- ✅ **Resonance Readiness**: Generic Trait UI and authoritative acquisition consume the same discovery/evidence/prerequisite/Essence readiness projection.
 
 ## FR-ESSENCE: Essence System ✅ **UI IMPLEMENTED + STATE MANAGEMENT**
 
