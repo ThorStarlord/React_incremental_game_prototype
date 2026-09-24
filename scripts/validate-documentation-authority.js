@@ -31,6 +31,8 @@ const completionAuthorityFiles = [
   'specification/Progression/GameProgressionArc.md',
   'specification/Narrative/CampaignArchitecture.md',
   'specification/Technical/GameCompletionRoadmap.md',
+  'specification/Technical/FeatureCompletionGapAnalysis.md',
+  'specification/Technical/CandidateBMasteryCompressionDepthSpecification.md',
   'specification/Technical/AlphaCompletionContract.md',
   'specification/Technical/BetaCompletionContract.md',
   'specification/Technical/ReleaseQualificationContract.md',
@@ -140,6 +142,7 @@ requireContains('STATUS.md', [
   'CONTENT_ALPHA / HUMAN-UNVALIDATED',
   'TECHNICAL_BETA_READY',
   'BETA_PASS=NO',
+  'FEATURE_COMPLETION / PRODUCT_DEPTH',
   'RC_ENTRY_BLOCKED',
   '1.0_PROMOTION_BLOCKED',
   'GameCompletionDefinition.md',
@@ -158,6 +161,7 @@ requireContains('README.md', [
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
+  'FEATURE_COMPLETION / PRODUCT_DEPTH',
   'AlphaCompletionContract.md',
   'BetaCompletionContract.md',
   'ReleaseQualificationContract.md',
@@ -202,6 +206,8 @@ requireContains('specification/GameCompletionDefinition.md', [
 
 requireContains('specification/Features/FeatureScopeMatrix.md', [
   'CORE_1_0',
+  'L1 Vertical Slice',
+  'L4 Feature Complete',
   'DEFER_POST_1_0',
   'CUT',
   'Separate Skills',
@@ -211,9 +217,26 @@ requireContains('specification/Features/FeatureScopeMatrix.md', [
 requireContains('specification/Technical/GameCompletionRoadmap.md', [
   'GC-00',
   'GC-14',
+  'Feature Completion Gap Analysis',
+  'FeatureCompletionGapAnalysis.md',
   'Alpha qualification',
   'Release Candidate',
   'No automatic M-number continuation',
+]);
+
+requireContains('specification/Technical/FeatureCompletionGapAnalysis.md', [
+  'FEATURE_COMPLETION / PRODUCT_DEPTH',
+  'Candidate B',
+  'Candidate A',
+  'Candidate C',
+  'A vertical slice proves that a feature can work',
+]);
+
+requireContains('specification/Technical/CandidateBMasteryCompressionDepthSpecification.md', [
+  'FEATURE COMPLETION CANDIDATE B',
+  'Forge Assistance',
+  'forge_structural_deviation',
+  'attention moves upward from repeated procedure to policy and exception judgment',
 ]);
 
 requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [

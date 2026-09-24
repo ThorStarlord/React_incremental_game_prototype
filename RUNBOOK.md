@@ -2,7 +2,8 @@
 
 **Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Active program:** Campaign One / 1.0 Game Completion  
+**Active program:** Campaign One / 1.0 Feature Completion  
+**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
 **Human Product Review:** issue #109 OPEN / UNPROVEN — 0/5 first sessions, 0/3 full external runs
 
 This file owns **operational procedure**. It does not define what the finished game is; that authority belongs to `specification/GameCompletionDefinition.md`.
@@ -30,11 +31,11 @@ latest main
 
 Do not start from an old milestone queue. Do not infer M27 from M26. Ask both:
 
-> Which current 1.0 player/release surface has a concrete improvement opportunity?
+> Which `CORE_1_0` feature is still below sufficient player-facing maturity for its intended role?
 
-> What evidence class justifies acting on it, and what stronger claim will remain unproven afterward?
+> What breadth/depth/progression/cross-system evidence demonstrates the gap, and what bounded feature development would close it?
 
-GC-01 through GC-12 are integrated and deterministic Beta readiness is qualified. Current work has two concurrent lanes: genuine human Beta evidence and bounded repository-answerable hardening of the existing Campaign One. Missing human evidence is not a universal stop condition.
+GC-01 through GC-12 remain integrated and deterministic Beta readiness remains qualified as historical evidence. Current repository work is **Feature Completion / Product Depth**; Beta convergence and release hardening are downstream after required core features reach sufficient L4 maturity.
 
 ## Environment
 
@@ -64,25 +65,27 @@ git merge-base --is-ancestor origin/main HEAD
 
 If `main` moved, reconcile the candidate and rerun authoritative validation on the new exact head.
 
-## Game-completion work intake
+## Feature-completion work intake
 
 Before creating an implementation branch, record:
 
 ```text
-1. Current 1.0 player/release surface being improved
-2. Evidence class: DETERMINISTIC / HEURISTIC / SYNTHETIC / HUMAN
-3. Concrete risk, defect, friction, or requirement being addressed
-4. Current authority owning the behavior
-5. Smallest proposed intervention
-6. Explicit non-goals
-7. Positive acceptance criteria
-8. Negative/rejection criteria
-9. Save/persistence impact
-10. Claim ceiling after the work
-11. Diminishing-returns / stop condition
+1. Intended player-facing role of the current CORE_1_0 feature
+2. Current maturity: L0 Scaffold / L1 Vertical Slice / L2 Integrated / L3 Developed / L4 Feature Complete / L5 Hardened / L6 Release Qualified
+3. Evidence class: DETERMINISTIC / HEURISTIC / SYNTHETIC / HUMAN
+4. Concrete breadth/depth/progression/cross-system gap
+5. Current authority owning the behavior
+6. Highest-value rationale relative to other feature candidates
+7. Bounded proposed intervention
+8. Explicit non-goals / scope boundary
+9. Positive acceptance criteria
+10. Negative/rejection criteria
+11. Save/persistence impact
+12. Claim ceiling after the work
+13. Diminishing-returns / stop condition
 ```
 
-A package must trace to an already-authorized Campaign One / release surface and concrete evidence. It need not wait for human observation when deterministic, heuristic, or synthetic evidence independently justifies bounded hardening.
+A package must trace to an already-authorized Campaign One feature and concrete evidence. It need not wait for human observation when deterministic, heuristic, or synthetic evidence demonstrates missing feature depth.
 
 ### Scope lookup
 
@@ -112,9 +115,14 @@ Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 [x] GC-09  Chapter 7 — Counterphase
 [x] GC-10  Finale + Epilogue
 [x] GC-11  Alpha qualification
-[x] GC-12  Content Alpha
-[ ] GC-13  Beta — technical readiness qualified; real-human floor still open
-[ ] GC-14  Release Candidate / 1.0 — promotion guard qualified; RC entry blocked until BETA_PASS
+[x] GC-12  Content Alpha / authored-spine integration evidence
+[x] CURRENT  Feature Completion Gap Analysis across CORE_1_0 systems
+[x] NEXT     Candidate B depth specification — Mastery Compression / Copy organization
+[>] BUILD    Forge Standing Responsibility — Candidate B implementation
+[ ] LATER    Candidate A buildcraft depth; Candidate C strategic-composition depth
+[ ] GATE     FEATURE_COMPLETE — required core features reach sufficient L4 depth
+[ ] GC-13    Beta — technical readiness already qualified; convergence + human evidence after FEATURE_COMPLETE
+[ ] GC-14    Release Candidate / 1.0 — promotion guard qualified; RC entry blocked until BETA_PASS
 ```
 
 The roadmap may merge/split packages where content proves that clearer, but requirement traceability must remain explicit.
