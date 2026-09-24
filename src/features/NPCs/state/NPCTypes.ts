@@ -251,6 +251,8 @@ export interface DialogueNode {
   requiredFactionReputation?: FactionReputationRequirement[];
   /** Objective regional conditions; all exact-value requirements must pass. */
   requiredWorldState?: WorldStateRequirement[];
+  /** All listed learned capabilities must exist in player.permanentTraits. */
+  requiredPermanentTraitIds?: string[];
   /** All listed emergent doctrines must currently be active. */
   requiredActiveDoctrineIds?: DoctrineId[];
   /**
