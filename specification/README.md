@@ -92,8 +92,10 @@ The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative ref
 
 - [`Technical/FeatureCompletionGapAnalysis.md`](Technical/FeatureCompletionGapAnalysis.md) — **CURRENT STRATEGIC ANALYSIS** for the completed breadth scan, maturity reassessment, selected depth candidates, and current Candidate B frontier.
 - [`Technical/CandidateBMasteryCompressionDepthSpecification.md`](Technical/CandidateBMasteryCompressionDepthSpecification.md) — **CURRENT DEPTH SPECIFICATION** for the selected Candidate B Forge Standing Responsibility implementation frontier.
+- [`Technical/CandidateATraitBuildcraftDepthImplementation.md`](Technical/CandidateATraitBuildcraftDepthImplementation.md) — **BOUNDED IMPLEMENTATION AUTHORITY / HUMAN-UNVALIDATED** for Trait catalogue curation, Resonance/effect authority, GC06-GC08 doctrine consumption, and independent component-capability uses.
+- [`Technical/TraitCatalogDisposition.md`](Technical/TraitCatalogDisposition.md) — **CURRENT BOUNDED CATALOGUE AUTHORITY** for which historical Trait definitions are supported, reworked, deferred, or removed from Campaign One.
 
-There is no automatic M27 or GC-15. The Feature Completion Gap Analysis is complete. Its selected depth order is Candidate B (Mastery Compression / Copy organization), Candidate A (relationship-derived capability buildcraft), then Candidate C (strategic consequence composition), subject to depth-search evidence. Historical milestone closure proves stated contracts; it does not automatically confer L4 feature completeness.
+There is no automatic M27 or GC-15. The Feature Completion Gap Analysis is complete. Candidate B (Mastery Compression / Copy organization) remains the selected top-level frontier. Candidate A (relationship-derived capability buildcraft) now has a bounded implementation package that may be reconciled without pretending human product-quality evidence exists; Candidate C remains downstream. Historical milestone closure proves stated contracts; it does not automatically confer L4 feature completeness.
 
 ### Integrated GC-01 result
 
