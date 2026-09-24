@@ -79,7 +79,7 @@ This remains human-unvalidated. Deterministic qualification does not prove compr
 
 ### Primary lane — feature completion / product depth
 
-The immediate repository-owned task is a Feature Completion Gap Analysis across every `CORE_1_0` system, followed by breadth search across the resulting opportunities and depth analysis of the strongest candidates.
+The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). The breadth pass selected **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. The current repository-owned task is the Candidate B depth specification.
 
 Prioritize missing gameplay depth such as:
 
