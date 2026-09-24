@@ -15,15 +15,21 @@ Governance exists to improve the product and preserve justified scope. Governanc
 
 ## Current objective
 
-Finish the already-bounded Campaign One / 1.0 experience through evidence-driven refinement and release hardening until:
+Advance the already-bounded Campaign One from technically integrated vertical slices toward **feature-complete player-facing depth**.
 
-- the current 1.0 requirements are satisfied;
-- no bounded repository-answerable improvement has material expected value;
-- a genuine owner-reserved decision is required;
-- a genuinely external blocker is reached; or
-- the governing release contract requires evidence that the repository cannot itself produce.
+The active sequence is:
 
-Human Beta remains required for the current `BETA_PASS` and RC-entry policy. That requirement does **not** make human observation the only valid source of engineering work.
+```text
+feature-completion gap analysis
+-> breadth search across CORE_1_0 systems
+-> depth analysis of strongest candidates
+-> bounded feature development inside existing authorities
+-> FEATURE_COMPLETE
+-> Beta convergence / hardening
+-> RC qualification
+```
+
+Historical Alpha, Content Alpha, GC, and deterministic Beta-readiness results remain valid evidence. They do not mean every associated gameplay feature is finished. Human Beta remains required for eventual `BETA_PASS` and RC entry, but it is a downstream maturity gate rather than the current repository-wide optimization target.
 
 ## Required reading order
 
@@ -100,12 +106,15 @@ Within the existing Campaign One / 1.0 scope, agents may proactively:
 - harden save/load/recovery/import-export behavior;
 - remove prototype/debug residue from normal player surfaces;
 - repair concrete architecture/integration defects that block the current product;
+- perform repository-wide feature-completion gap analysis across `CORE_1_0` systems;
+- deepen bounded core features when their current L1/L2 implementation cannot yet sustain the intended player role;
+- expand meaningful cross-system use, progression, authored variation, and player choice without inventing generalized engines;
 - improve release qualification and deployment readiness;
 - repair documentation/governance drift that can misroute future work.
 
-Prefer the smallest intervention that improves the existing product. Add deterministic regression coverage where the repaired behavior is testable.
+Prefer the smallest **sufficient** intervention that moves the intended feature role toward L4. A tiny repair is not preferred when the demonstrated problem is missing feature depth. Add deterministic regression coverage where the new behavior is testable.
 
-## Scope lock
+## Scope boundary — not a depth freeze
 
 Do not create work merely to keep an agent busy.
 
@@ -121,21 +130,22 @@ The following remain outside Campaign One / 1.0 unless current authority is expl
 - Chapters 8+, interplanetary continuation, New Game+, or endless endgame;
 - generalized simulation/live-service infrastructure.
 
-Do not restart closed M4–M26 or GC-01–GC-12 packages merely because a related implementation can still be improved. Improve the current product surface directly and preserve historical closure.
+Do not rewrite or invalidate closed M4–M26 or GC-01–GC-12 evidence. However, **historical milestone closure does not freeze the associated gameplay feature**. Deepen the living current product surface directly when maturity analysis shows it remains below finished-game depth, and preserve the old milestone as historical qualification evidence.
 
 ## Work-selection rule
 
 Before a package, answer:
 
-1. What current 1.0 player/release surface is being improved?
-2. What evidence class justifies the work?
-3. What concrete risk, defect, friction, or release requirement is addressed?
-4. What is the smallest intervention?
-5. What claim will be stronger after the work?
-6. What stronger claim will still remain unproven?
-7. What would make further work on this concern reach diminishing returns?
+1. What intended player-facing role does this `CORE_1_0` system serve?
+2. What is its current L0-L6 maturity and what evidence supports that classification?
+3. What concrete breadth/depth/progression/cross-system gap keeps it below feature-complete maturity?
+4. Why is this gap higher value than the other current feature-completion candidates?
+5. What bounded intervention closes the gap without creating unnecessary generalized scope?
+6. What positive and rejection evidence will show the intervention works?
+7. What claim will be stronger afterward, and what stronger claim remains unproven?
+8. What would make further work on this feature reach diminishing returns?
 
-Technical possibility alone is not authorization. Evidence-backed improvement of the authorized product is.
+Technical possibility alone is not authorization. Evidence-backed **feature completion inside the authorized product boundary** is.
 
 ## Human Beta and release policy
 
@@ -151,15 +161,17 @@ Non-human evidence must never be relabeled as satisfying that floor.
 Under current authority:
 
 ```text
-CONTENT_ALPHA
-+ TECHNICAL_BETA_READY
-+ bounded repository-answerable hardening may continue
+CONTENT_ALPHA + TECHNICAL_BETA_READY
+= retained historical integration/readiness evidence
+
+current frontier
+= FEATURE_COMPLETION / PRODUCT_DEPTH
 
 BETA_PASS
-= still requires the current human evidence contract
+= downstream; still requires the human evidence contract after FEATURE_COMPLETE
 
 RC entry
-= remains blocked until BETA_PASS under the current release contract
+= downstream; remains blocked until BETA_PASS under the current release contract
 ```
 
 Changing those promotion requirements is an owner/product-policy decision. Improving the existing game while they remain open is not.
@@ -168,7 +180,7 @@ Changing those promotion requirements is an owner/product-policy decision. Impro
 
 Stop repository work only when at least one is true:
 
-- no bounded repository-answerable improvement has material expected value;
+- no bounded repository-answerable feature-development improvement has material expected value;
 - the next change would require unauthorized product-scope expansion;
 - the next decision is genuinely owner-reserved;
 - the next required evidence is genuinely external and there is no independent repository-answerable hardening work worth doing;
