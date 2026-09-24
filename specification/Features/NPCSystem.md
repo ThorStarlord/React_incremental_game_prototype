@@ -271,6 +271,19 @@ M24 does not infer World State from quest completion flags.
 
 NPC services may include training, information, Trait teaching, crafting, trading, or routing to other feature surfaces.
 
+Authored dialogue availability may consume durable capability and specialization authority directly:
+
+```ts
+requiredPermanentTraitIds?: string[];
+requiredActiveDoctrineIds?: DoctrineId[];
+```
+
+`requiredPermanentTraitIds` means the protagonist has permanently learned the
+capability. `requiredActiveDoctrineIds` means the currently foregrounded
+permanent Traits synthesize the authored doctrine. The dialogue presentation
+surface hides unmet requirements rather than exposing future-content spoilers,
+and `processNPCInteractionThunk` enforces both gates below the UI.
+
 Existing service/trade behavior may continue using legacy Affinity-based compatibility rules.
 
 M24 intentionally does **not** qualify World-State-gated trade transactions because the current `NPCTradeTab` purchase/sell path lacks a separate below-UI transaction authority suitable for this milestone without an unrelated refactor.
