@@ -45,7 +45,7 @@ import {
 } from '../../state/TraitsSelectors'; 
 import { fetchTraitsThunk, acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
-import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
+import { evaluateTraitResonanceReadiness } from '../../state/TraitResonanceReadiness';
 import { selectPermanentTraits as selectPlayerPermanentTraitIds } from '../../../Player/state/PlayerSelectors';
 
 interface TraitCodexDrawerProps {
@@ -75,7 +75,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const currentEssence = useAppSelector(selectCurrentEssence);
+  const rootState = useAppSelector(state => state);
 
   useEffect(() => {
     if (open && Object.keys(allTraits).length === 0 && !isLoading) {
@@ -124,9 +124,11 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   }, []);
 
   const handleAcquireTrait = useCallback((trait: Trait) => {
-    const cost = trait.essenceCost ?? 0;
-    dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id, essenceCost: cost }));
-  }, [dispatch]);
+    const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+    if (readiness.ready) {
+      dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id }));
+    }
+  }, [dispatch, rootState]);
 
   const filteredAndSortedTraits = useMemo(() => {
     let traitsArray = Object.values(allTraits); 
@@ -216,8 +218,8 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
         {filteredAndSortedTraits.map(trait => {
           const isDiscovered = discoveredTraitIds.includes(trait.id);
           const isPermanent = permanentTraitIds.includes(trait.id);
-          const cost = trait.essenceCost || 0;
-          const canAfford = currentEssence >= cost;
+          const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+          const cost = readiness.cost;
           const canBeMadePermanent = isDiscovered && !isPermanent && trait.essenceCost !== undefined;
 
           return (
@@ -230,12 +232,12 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               }}
               secondaryAction={
                 canBeMadePermanent ? (
-                  <Tooltip title={canAfford ? "Make Trait Permanent (Resonate)" : `Requires ${cost} Essence`}>
+                  <Tooltip title={readiness.ready ? "Make Trait Permanent (Resonate)" : readiness.blockers.join(' • ')}>
                     <span> 
                       <IconButton
                         edge="end"
                         color="primary"
-                        disabled={!canAfford}
+                        disabled={!readiness.ready}
                         onClick={() => handleAcquireTrait(trait)}
                       >
                         <AddCircleIcon />

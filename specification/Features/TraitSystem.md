@@ -1,7 +1,7 @@
 # Trait System Specification
 
 **Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Trait capability + bounded two-profile doctrine composition implemented  
-**Relationship migration:** ✅ Willow and Elara use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
+**Relationship migration:** ✅ Willow, Elara, Gronk, and Lyra use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
 **Discovery contract:** [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md)  
 **Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)  
 **Build specialization:** [`../Technical/RelationshipCapabilityConstellation.md`](../Technical/RelationshipCapabilityConstellation.md)
@@ -430,7 +430,27 @@ M8 does not redesign Copy Trait inheritance.
 16. Relationship deterioration does not normally erase an already permanent internalized Trait.
 17. Trait-enabled actions are interpreted by their consequences; Trait use does not automatically produce positive Relationship reward.
 
-## 13. Known limitations / deferred work
+## 13. Depth-repair authority
+
+The bounded Trait depth repair establishes three additional runtime invariants:
+
+- `player.resonanceLevel` automatically unlocks every Player Trait slot whose documented Resonance-level requirement is met;
+- `Trait.essenceCost` is the only authoritative permanent-Resonance price; callers cannot discount or override it;
+- `evaluateTraitResonanceReadiness` is the shared player-facing/runtime projection for discovery, Relationship/legacy source gates, prerequisites, Memory evidence, assimilation, compatibility, and Essence affordability.
+
+The general Traits management surface consumes that readiness projection instead of presenting an Essence-only Resonance affordance.
+
+The authored production catalogue also normalizes `ConstraintSense` and `AdversarialCalibration` category/rarity casing and removes stale legacy `requirements.relationshipLevel` fields from Willow/Elara. Modern Relationship authority is expressed only through the explicit Connection/assimilation/compatibility/Memory contract.
+
+Focused qualification:
+
+```bash
+npm run trait-depth:validate
+```
+
+This repair does **not** promote the full Trait catalogue to feature-complete status and does not authorize a generic capability graph.
+
+## 14. Known limitations / deferred work
 
 - Most legacy/simple Traits still default to initially known; they have not been given authored discovery content.
 - Relationship Experiences are only one possible future discovery source; quests, exploration, combat, research, or items may reveal other Traits.

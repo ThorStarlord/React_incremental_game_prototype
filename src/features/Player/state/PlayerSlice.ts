@@ -144,7 +144,18 @@ const playerSlice = createSlice({
       state.doctrineFocus.foregroundedPermanentTraitIds = [];
     },
     setResonanceLevel: (state, action: PayloadAction<number>) => {
-      state.resonanceLevel = action.payload;
+      const nextLevel = Math.max(0, Math.floor(action.payload));
+      state.resonanceLevel = nextLevel;
+
+      // Trait-slot unlocks are a Player-state invariant, not a UI convention.
+      // Slot 0 starts unlocked; slot N unlocks at Resonance Level N + 1.
+      // Keeping the invariant here ensures every production level-up path
+      // unlocks the same slots without a separate UI-owned dispatcher.
+      state.traitSlots.forEach(slot => {
+        if (slot.isLocked && nextLevel >= slot.slotIndex + 1) {
+          slot.isLocked = false;
+        }
+      });
     },
     addAvailableAttributePoints: (state, action: PayloadAction<number>) => {
         state.availableAttributePoints += action.payload;

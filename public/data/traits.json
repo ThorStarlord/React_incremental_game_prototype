@@ -143,10 +143,7 @@
       "learningSpeed": 0.15
     },
     "rarity": "Uncommon",
-    "iconPath": "nature_people",
-    "requirements": {
-      "relationshipLevel": 50
-    }
+    "iconPath": "nature_people"
   },
   "ScholarlyInsight": {
     "id": "ScholarlyInsight",
@@ -175,10 +172,7 @@
       "knowledgeEssence": 0.1
     },
     "rarity": "Uncommon",
-    "iconPath": "menu_book",
-    "requirements": {
-      "relationshipLevel": 40
-    }
+    "iconPath": "menu_book"
   },
   "ResilientConstitution": {
     "id": "ResilientConstitution",
@@ -366,8 +360,8 @@
     "id": "ConstraintSense",
     "name": "Constraint Sense",
     "description": "Read load-bearing constraints beneath surface appearance and preserve the part of a system that actually carries the work.",
-    "category": "mental",
-    "rarity": "rare",
+    "category": "Mental",
+    "rarity": "Rare",
     "effects": {
       "constraintAnalysis": 1
     },
@@ -395,8 +389,8 @@
     "id": "AdversarialCalibration",
     "name": "Adversarial Calibration",
     "description": "Model an opponent precisely enough to predict, coordinate with, or counter them without requiring agreement or affection.",
-    "category": "mental",
-    "rarity": "rare",
+    "category": "Mental",
+    "rarity": "Rare",
     "effects": {
       "adversarialCalibration": 1
     },
