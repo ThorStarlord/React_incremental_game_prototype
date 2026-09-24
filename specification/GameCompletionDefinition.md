@@ -2,6 +2,7 @@
 
 **Status:** CURRENT AUTHORITY — PROVISIONAL / HUMAN-UNVALIDATED  
 **Program stage:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
+**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
 **Prepared:** 2026-09-11  
 **Product direction:** `Technical/PostM25ProvisionalProductDirectionDecision.md`  
 **Human Product Review:** issue #109 remains OPEN / UNPROVEN
@@ -10,13 +11,31 @@
 
 This document defines what counts as a **complete 1.0 game**. It is the product-level stop condition that future implementation work must serve.
 
-The repository is no longer governed by an open-ended rule of “build the next technically plausible subsystem.” Future work must answer:
+The repository is no longer governed by an open-ended rule of “build the next technically plausible subsystem.” It is also no longer permitted to equate a successful bounded vertical slice with a finished feature. Future work must answer:
 
-> Which already-authorized 1.0 player/release surface does this change improve, what concrete evidence justifies it, and what claim remains unproven afterward?
+> Which intended player-facing role of an already-authorized 1.0 system is still shallow, what evidence demonstrates the gap, and what bounded development would move that feature toward finished-game depth?
 
 Valid evidence may be deterministic, heuristic, synthetic, accessibility/reliability/presentation/pacing/balance analysis, or genuine human observation. Non-human evidence does not become human evidence.
 
-A change that neither closes an unsatisfied requirement nor repairs a concrete evidence-backed risk/defect in the authorized 1.0 surface is outside the critical path unless this document is explicitly revised.
+A change is on the current critical path when it closes an unsatisfied feature-completion requirement or a concrete evidence-backed defect/risk inside the authorized Campaign One product. New generalized systems and post-1.0 expansion still require explicit scope revision.
+
+## Feature maturity semantics
+
+The repository distinguishes **integration proof** from **feature completion**. Use this maturity ladder for current product decisions:
+
+| Level | Meaning |
+| --- | --- |
+| **L0 — Scaffold** | Data, UI, reducer, component, or contract exists, but there is not yet a production gameplay proof. |
+| **L1 — Vertical Slice** | At least one real production gameplay case proves the concept end to end. |
+| **L2 — Integrated Feature** | The feature participates legally in Campaign One and composes with the relevant canonical authorities. |
+| **L3 — Developed Feature** | The feature has enough breadth, variation, progression, and cross-system use to sustain its intended player-facing role. |
+| **L4 — Feature Complete** | The intended Campaign One gameplay for this feature is present; remaining work is predominantly defects, tuning, presentation, accessibility, and polish. |
+| **L5 — Hardened** | Reliability, UX, accessibility, balance, recovery, performance, and edge cases have materially converged. |
+| **L6 — Release Qualified** | One exact immutable release candidate has satisfied the release contract. |
+
+Historical milestone closure remains valid evidence. A closed milestone means its stated contract was satisfied; it does **not** permanently freeze the associated gameplay domain at that depth. A feature may be deepened without reopening or rewriting the historical result.
+
+The current repository-wide objective is to move required core gameplay toward **L4 Feature Complete** before dedicated Beta/release hardening becomes the dominant optimization target. Hardening may still occur locally when necessary for safe development, but it must not substitute for missing feature depth.
 
 ## 1. Product identity
 
@@ -138,7 +157,7 @@ Minimum target:
 - baseline progression must remain viable without one universal mandatory Trait unless an authored branch explicitly establishes a different local contract;
 - capability origin/provenance must remain legible without exposing hidden future content.
 
-These numbers are a scope floor, not a mandate to create a large Trait catalog.
+These numbers are an integration floor, not a completion ceiling and not a mandate to create a large Trait catalog. Meeting the count does not by itself establish L4 feature completeness; capability buildcraft must also have enough meaningful use, variation, progression, and campaign consequence to sustain its intended role.
 
 ## 9. Delegation breadth requirement
 
