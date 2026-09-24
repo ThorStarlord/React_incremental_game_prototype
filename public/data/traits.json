@@ -9,7 +9,8 @@
       "shopDiscount": 0.05
     },
     "rarity": "Common",
-    "iconPath": "storefront"
+    "iconPath": "storefront",
+    "campaignOneDisposition": "defer"
   },
   "QuickLearner": {
     "id": "QuickLearner",
@@ -21,7 +22,8 @@
       "skillXpMultiplier": 0.15
     },
     "rarity": "Uncommon",
-    "iconPath": "school"
+    "iconPath": "school",
+    "campaignOneDisposition": "remove_1_0"
   },
   "MentorsInsight": {
     "id": "MentorsInsight",
@@ -34,7 +36,8 @@
     },
     "tier": 1,
     "rarity": "Uncommon",
-    "iconPath": "psychology"
+    "iconPath": "psychology",
+    "campaignOneDisposition": "defer"
   },
   "BattleHardened": {
     "id": "BattleHardened",
@@ -47,7 +50,8 @@
       "defense": 3
     },
     "rarity": "Uncommon",
-    "iconPath": "swords"
+    "iconPath": "swords",
+    "campaignOneDisposition": "keep"
   },
   "EssenceSiphon": {
     "id": "EssenceSiphon",
@@ -65,7 +69,8 @@
       "prerequisiteTraits": [
         "MentorsInsight"
       ]
-    }
+    },
+    "campaignOneDisposition": "defer"
   },
   "RelationshipSage": {
     "id": "RelationshipSage",
@@ -77,19 +82,21 @@
       "relationshipGainMultiplier": 1.2
     },
     "rarity": "Uncommon",
-    "iconPath": "groups"
+    "iconPath": "groups",
+    "campaignOneDisposition": "defer"
   },
   "EssenceFlow": {
     "id": "EssenceFlow",
     "name": "Essence Flow",
     "category": "Knowledge",
-    "description": "Increases your essence generation rate from all sources.",
+    "description": "A transmissible Essence-circulation pattern. When shared with or inherited by a Copy, it increases that Copy's passive Essence generation by 15%.",
     "essenceCost": 150,
     "effects": {
-      "essenceGenerationMultiplier": 1.15
+      "essenceGenerationMultiplier": 0.15
     },
     "rarity": "Rare",
-    "iconPath": "waterfall"
+    "iconPath": "waterfall",
+    "campaignOneDisposition": "keep"
   },
   "CombatReflexes": {
     "id": "CombatReflexes",
@@ -101,7 +108,8 @@
       "dodgeChance": 0.1
     },
     "rarity": "Uncommon",
-    "iconPath": "directions_run"
+    "iconPath": "directions_run",
+    "campaignOneDisposition": "defer"
   },
   "GrowingAffinity": {
     "id": "GrowingAffinity",
@@ -113,7 +121,8 @@
       "passiveRelationshipGrowth": 1
     },
     "rarity": "Common",
-    "iconPath": "favorite"
+    "iconPath": "favorite",
+    "campaignOneDisposition": "defer"
   },
   "WillowsWisdom": {
     "id": "WillowsWisdom",
@@ -144,9 +153,7 @@
     },
     "rarity": "Uncommon",
     "iconPath": "nature_people",
-    "requirements": {
-      "relationshipLevel": 50
-    }
+    "campaignOneDisposition": "keep"
   },
   "ScholarlyInsight": {
     "id": "ScholarlyInsight",
@@ -176,9 +183,7 @@
     },
     "rarity": "Uncommon",
     "iconPath": "menu_book",
-    "requirements": {
-      "relationshipLevel": 40
-    }
+    "campaignOneDisposition": "keep"
   },
   "ResilientConstitution": {
     "id": "ResilientConstitution",
@@ -190,7 +195,8 @@
       "maxHealth": 50
     },
     "rarity": "Uncommon",
-    "iconPath": "shield"
+    "iconPath": "shield",
+    "campaignOneDisposition": "keep"
   },
   "ArcaneIntellect": {
     "id": "ArcaneIntellect",
@@ -203,7 +209,8 @@
       "manaRegen": 0.25
     },
     "rarity": "Rare",
-    "iconPath": "auto_stories"
+    "iconPath": "auto_stories",
+    "campaignOneDisposition": "keep"
   },
   "SwiftStrikes": {
     "id": "SwiftStrikes",
@@ -216,7 +223,8 @@
       "attack": 3
     },
     "rarity": "Rare",
-    "iconPath": "speed"
+    "iconPath": "speed",
+    "campaignOneDisposition": "keep"
   },
   "IronWill": {
     "id": "IronWill",
@@ -228,7 +236,8 @@
       "defense": 10
     },
     "rarity": "Uncommon",
-    "iconPath": "security"
+    "iconPath": "security",
+    "campaignOneDisposition": "keep"
   },
   "SilverTongue": {
     "id": "SilverTongue",
@@ -240,7 +249,8 @@
       "charismaBonus": 2
     },
     "rarity": "Uncommon",
-    "iconPath": "record_voice_over"
+    "iconPath": "record_voice_over",
+    "campaignOneDisposition": "defer"
   },
   "MasterCraftsman": {
     "id": "MasterCraftsman",
@@ -252,7 +262,8 @@
       "craftingQualityBonus": 0.15
     },
     "rarity": "Rare",
-    "iconPath": "construction"
+    "iconPath": "construction",
+    "campaignOneDisposition": "remove_1_0"
   },
   "ShadowWalker": {
     "id": "ShadowWalker",
@@ -264,7 +275,8 @@
       "stealthEffectiveness": 0.2
     },
     "rarity": "Rare",
-    "iconPath": "visibility_off"
+    "iconPath": "visibility_off",
+    "campaignOneDisposition": "defer"
   },
   "ElementalAffinity": {
     "id": "ElementalAffinity",
@@ -276,7 +288,8 @@
       "magicDamageBonus": 0.1
     },
     "rarity": "Epic",
-    "iconPath": "filter_vintage"
+    "iconPath": "filter_vintage",
+    "campaignOneDisposition": "defer"
   },
   "LuckyCharm": {
     "id": "LuckyCharm",
@@ -288,7 +301,8 @@
       "criticalChance": 0.02
     },
     "rarity": "Common",
-    "iconPath": "casino"
+    "iconPath": "casino",
+    "campaignOneDisposition": "keep"
   },
   "TomeOfForbiddenKnowledge": {
     "id": "TomeOfForbiddenKnowledge",
@@ -308,7 +322,8 @@
       "prerequisiteTraits": [
         "ArcaneIntellect"
       ]
-    }
+    },
+    "campaignOneDisposition": "rework"
   },
   "HeartOfTheMountain": {
     "id": "HeartOfTheMountain",
@@ -321,7 +336,8 @@
       "defense": 15
     },
     "rarity": "Epic",
-    "iconPath": "landscape"
+    "iconPath": "landscape",
+    "campaignOneDisposition": "keep"
   },
   "WhispersOfTheVoid": {
     "id": "WhispersOfTheVoid",
@@ -334,7 +350,8 @@
       "manaRegen": -0.1
     },
     "rarity": "Epic",
-    "iconPath": "hearing"
+    "iconPath": "hearing",
+    "campaignOneDisposition": "keep"
   },
   "EssenceAffinity": {
     "id": "EssenceAffinity",
@@ -347,7 +364,8 @@
       "essenceCapacity": 50
     },
     "rarity": "Rare",
-    "iconPath": "bolt"
+    "iconPath": "bolt",
+    "campaignOneDisposition": "defer"
   },
   "MentalFocus": {
     "id": "MentalFocus",
@@ -360,22 +378,20 @@
       "intelligence": 5
     },
     "rarity": "Common",
-    "iconPath": "psychology"
+    "iconPath": "psychology",
+    "campaignOneDisposition": "rework"
   },
   "ConstraintSense": {
     "id": "ConstraintSense",
     "name": "Constraint Sense",
     "description": "Read load-bearing constraints beneath surface appearance and preserve the part of a system that actually carries the work.",
-    "category": "mental",
-    "rarity": "rare",
+    "category": "Mental",
+    "rarity": "Rare",
     "effects": {
       "constraintAnalysis": 1
     },
     "essenceCost": 35,
-    "source": "npc_blacksmith_gronk",
     "sourceNpc": "npc_blacksmith_gronk",
-    "tier": 1,
-    "level": 1,
     "discoveryMode": "authored",
     "minimumConnectionLevel": 2,
     "resonanceTags": [
@@ -389,22 +405,20 @@
     "assimilationDifficulty": 1,
     "assimilationThreshold": 100,
     "minimumCompatibility": 20,
-    "resonanceExperienceId": "gronk_exp_resonance_constraint_sense"
+    "resonanceExperienceId": "gronk_exp_resonance_constraint_sense",
+    "campaignOneDisposition": "keep"
   },
   "AdversarialCalibration": {
     "id": "AdversarialCalibration",
     "name": "Adversarial Calibration",
     "description": "Model an opponent precisely enough to predict, coordinate with, or counter them without requiring agreement or affection.",
-    "category": "mental",
-    "rarity": "rare",
+    "category": "Mental",
+    "rarity": "Rare",
     "effects": {
       "adversarialCalibration": 1
     },
     "essenceCost": 40,
-    "source": "npc_lyra",
     "sourceNpc": "npc_lyra",
-    "tier": 1,
-    "level": 1,
     "discoveryMode": "authored",
     "minimumConnectionLevel": 2,
     "resonanceTags": [
@@ -418,6 +432,7 @@
     "assimilationDifficulty": 1,
     "assimilationThreshold": 100,
     "minimumCompatibility": 24,
-    "resonanceExperienceId": "lyra_exp_resonance_adversarial_calibration"
+    "resonanceExperienceId": "lyra_exp_resonance_adversarial_calibration",
+    "campaignOneDisposition": "keep"
   }
 }
