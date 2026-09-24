@@ -229,7 +229,7 @@ interface TraitsState {
 - **Trait Permanence (Player-Specific)**: Player-specific permanent traits are managed in `PlayerSlice`. The "Resonance" mechanic (`acquireTraitWithEssenceThunk`) makes traits permanent for the player by updating `PlayerSlice.permanentTraits`.
 - **Doctrine Focus (Player-Specific)**: `PlayerSlice.doctrineFocus` records which permanently learned principles are currently foregrounded. Emergent doctrine identities are derived by Trait selectors and are not stored as independent booleans.
 - **Codex Data**: Provides the necessary data (`traits`, `discoveredTraits`) for a Trait Codex UI displaying all discovered traits
-- **Trait Presets**: Manages saving, loading, and deleting trait presets (`saveTraitPreset`, `loadTraitPreset`, `deleteTraitPreset`)
+- **Trait Presets**: Compatibility state/reducers remain, but player-facing preset loading is **DEFER_POST_1_0**. `loadTraitPreset` is only a middleware hook today; do not count presets as a finished Campaign One feature or build them by inertia.
 
 ### 4.3. NPCs Slice ✅ COMPLETE
 **Location**: `src/features/NPCs/state/NPCSlice.ts`
