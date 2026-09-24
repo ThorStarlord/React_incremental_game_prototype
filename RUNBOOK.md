@@ -117,7 +117,8 @@ Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 [x] GC-11  Alpha qualification
 [x] GC-12  Content Alpha / authored-spine integration evidence
 [x] CURRENT  Feature Completion Gap Analysis across CORE_1_0 systems
-[>] NEXT     Candidate B depth specification — Mastery Compression / Copy organization
+[x] NEXT     Candidate B depth specification — Mastery Compression / Copy organization
+[>] BUILD    Forge Standing Responsibility — Candidate B implementation
 [ ] LATER    Candidate A buildcraft depth; Candidate C strategic-composition depth
 [ ] GATE     FEATURE_COMPLETE — required core features reach sufficient L4 depth
 [ ] GC-13    Beta — technical readiness already qualified; convergence + human evidence after FEATURE_COMPLETE
