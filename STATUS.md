@@ -1,8 +1,9 @@
-# Repository Status — Content Alpha / Campaign One Completion
+# Repository Status — Feature Completion / Campaign One Product Depth
 
-**Status date:** 2026-09-23  
+**Status date:** 2026-09-24  
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
+**Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
 **GC-01:** `COMPLETE / INTEGRATED`  
@@ -20,7 +21,7 @@
 **GC-14 promotion guard:** `QUALIFIED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
-**Active program:** Campaign One / 1.0 Game Completion
+**Active program:** Campaign One / 1.0 Feature Completion
 
 ## Current authority
 
@@ -40,29 +41,39 @@ Read in this order:
 
 ## Big picture
 
-The project has passed proof-of-concept, technical-prototype, bounded vertical-slice, whole-game Alpha, and authored-content completion stages. Campaign One now has a qualified production-equivalent New Game -> Prologue -> Chapters 1-7 -> Telluric Echo finale -> state-responsive Epilogue path, with canonical persistence checkpoints and complete authored route variants.
+The project has passed proof-of-concept, technical-prototype, bounded vertical-slice, whole-game traversal, authored-campaign integration, and deterministic Beta-readiness qualification. Campaign One has a production-equivalent New Game -> Prologue -> Chapters 1-7 -> Telluric Echo finale -> state-responsive Epilogue path, with canonical persistence checkpoints and authored route variants.
 
-It is therefore best described as **Content Alpha / HUMAN-UNVALIDATED** with **TECHNICAL_BETA_READY** deterministic engineering evidence. Structural and authored campaign completion are integrated; Chromium and Firefox visible-UI smoke now pass in CI. Fresh-player comprehension, pacing, balance, human accessibility review, full external playthrough evidence, immutable RC/deployment identity, and final release qualification remain intentionally unclaimed.
+Those results establish **integration maturity**, not automatic **feature maturity**. Several core gameplay systems remain deliberately narrow: Combat is a bounded MVP; Doctrine specialization has two established profiles with its first major production consumer in GC06; and Standing Orders / exception escalation currently have one Archive Verification vertical slice. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence about what was qualified, but they no longer imply that repository-owned feature construction is finished.
 
-## Active Beta frontier — convergence + bounded hardening
+## Current goal — feature completion / product depth
 
-Repository-controlled feature/content construction is complete for the bounded Campaign One scope. Two lanes are now active in parallel:
+The active optimization target is:
 
-1. **Human Beta evidence:** collect genuine sessions under issue #109 using [`docs/release/BetaExecutionRunbook.md`](docs/release/BetaExecutionRunbook.md) and [`docs/release/BetaHumanEvidenceTemplate.md`](docs/release/BetaHumanEvidenceTemplate.md).
-2. **Repository-answerable 1.0 hardening:** continue bounded improvement of the already-authorized Campaign One through deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, and release-readiness evidence.
+> **Develop the existing core game systems from bounded or vertical-slice implementations into sufficiently deep, interconnected, player-facing features before dedicated Beta/release hardening becomes the repository-wide frontier.**
 
-The feature/content **scope is locked**; repository work is not universally frozen. Missing human evidence limits human-experience claims but does not prohibit bounded non-speculative hardening.
+Current work should:
 
-Use explicit evidence provenance:
+1. perform a repository-wide **Feature Completion Gap Analysis** across all `CORE_1_0` systems;
+2. distinguish scaffold, vertical-slice, integrated, developed, feature-complete, hardened, and release-qualified maturity;
+3. identify where a system technically exists but does not yet sustain its intended player-facing role;
+4. select the highest-value feature-development gaps through breadth search, then perform depth analysis before implementation;
+5. build depth primarily inside existing authorities and Campaign One scope rather than inventing generalized engines;
+6. preserve all historical qualification evidence while refusing to treat a passed bounded milestone as proof that its associated feature is finished.
+
+The **scope boundary remains bounded**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. What is reopened is **depth within the existing core product**, not arbitrary scope growth.
+
+Dedicated Beta convergence, release hardening, immutable RC qualification, and 1.0 promotion remain downstream gates. Human evidence under issue #109 remains valid and useful, but it does not own the current repository work queue while core features remain below feature-complete maturity.
+
+Use explicit evidence provenance throughout feature development:
 
 ```text
 DETERMINISTIC_FINDING -> implementation behavior within exercised evidence
-HEURISTIC_FINDING     -> plausible UX/design/accessibility/pacing risk
+HEURISTIC_FINDING     -> plausible design/UX/depth risk
 SYNTHETIC_FINDING     -> reproducible automated/simulated player-facing risk
 HUMAN_FINDING         -> actual recorded participant experience
 ```
 
-Only `HUMAN_FINDING` evidence can satisfy the current human Beta floor. Any of the four classes may justify the smallest bounded repair when the work stays inside existing 1.0 scope.
+A green vertical slice is evidence that a feature **can work**. It is not, by itself, evidence that the feature is **complete**.
 
 ## Product direction
 
@@ -77,7 +88,7 @@ Architecture         -> heterogeneous authored composition
 
 This may guide bounded reversible development under the provisional governance decision. It does **not** prove fresh-player comprehension, fun, pacing, fairness, retention or preference.
 
-### Bounded Mastery Compression hardening — Standing Orders
+### Bounded Mastery Compression feature development — Standing Orders
 
 Explicit owner direction extends the existing earned-delegation identity with one
 bounded Archive Verification standing responsibility.
@@ -115,11 +126,11 @@ Dedicated deterministic qualification:
 npm run copy-standing-orders:validate
 ```
 
-This hardening is repository-implemented but still **HUMAN-UNVALIDATED**. It does
+This vertical slice is repository-implemented but remains an **initial bounded feature slice / HUMAN-UNVALIDATED**. It does
 not establish that fresh players understand, prefer, or enjoy the standing-order
 UX or its exception frequency.
 
-### Bounded capability-specialization hardening
+### Bounded capability-specialization feature development
 
 The current Trait/Player authority distinguishes durable learned capability from current specialization without adding a second skill tree:
 
@@ -131,7 +142,7 @@ derived doctrine       -> emergent active build profile
 
 Campaign One doctrine derivation is intentionally limited to the two already-established profiles, **Structural Steward** and **Countermodeler**. The normal Traits surface now exposes eligible doctrine adoption/switching/clearing with permanent-Trait provenance, and Player Insight reports the active doctrine read-only. GC06 is the first production decision converted to `requiredActiveDoctrineIds`, so Structural Steward and Countermodeler now produce mutually exclusive current-specialization syntheses while the baseline route remains legal. GC07-GC10 retain their qualified permanent-Trait pair gates pending evidence that broader conversion adds player value rather than repetitive switching friction. Save schema v2 persists doctrine focus while old saves migrate to neutral empty focus rather than receiving invented specialization.
 
-This is bounded repository-answerable hardening of the primary relationship-derived capability-buildcraft promise. Deterministic/UI qualification now proves the interaction path exists and changes GC06 availability; fresh-player comprehension, usability, balance, enjoyment, and preference remain unproven.
+This is bounded feature development of the primary relationship-derived capability-buildcraft promise. Its successful implementation proves the specialization interaction exists; it does not establish that capability buildcraft has reached sufficient finished-game depth. Deterministic/UI qualification now proves the interaction path exists and changes GC06 availability; fresh-player comprehension, usability, balance, enjoyment, and preference remain unproven.
 
 ## M26 closure
 
