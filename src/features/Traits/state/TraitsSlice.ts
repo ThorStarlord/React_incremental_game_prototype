@@ -17,9 +17,10 @@ const initialState: TraitsState = {
 };
 
 /**
- * Legacy/simple Traits remain initially known unless they explicitly opt into
- * authored discovery. This keeps the prototype backward-compatible while making
- * relationship-mediated discovery a real gameplay gate.
+ * Only Campaign One-supported Traits seed ordinary initial knowledge, and authored
+ * patterns remain hidden until their gameplay evidence reveals them. Definitions
+ * retained for rework/defer/remove compatibility do not become player-known merely
+ * because the catalogue loaded.
  */
 export const getInitiallyDiscoveredTraitIds = (
   traits: Record<string, Trait>
