@@ -1,10 +1,12 @@
 # Trait System Specification
 
 **Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Trait capability + bounded two-profile doctrine composition implemented  
-**Relationship migration:** ✅ Willow and Elara use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
+**Relationship migration:** ✅ Willow, Elara, Gronk, and Lyra use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
 **Discovery contract:** [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md)  
 **Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)  
-**Build specialization:** [`../Technical/RelationshipCapabilityConstellation.md`](../Technical/RelationshipCapabilityConstellation.md)
+**Build specialization:** [`../Technical/RelationshipCapabilityConstellation.md`](../Technical/RelationshipCapabilityConstellation.md)  
+**Campaign One catalogue:** [`../Technical/TraitCatalogDisposition.md`](../Technical/TraitCatalogDisposition.md)  
+**Candidate A depth package:** [`../Technical/CandidateATraitBuildcraftDepthImplementation.md`](../Technical/CandidateATraitBuildcraftDepthImplementation.md)
 
 Traits represent internalized capabilities or patterns that can change what the protagonist can perceive, understand, attempt, perform, or passively sustain. Numerical/passive modifiers remain legitimate Trait effects, but they are not the complete product definition of a Trait.
 
@@ -38,9 +40,14 @@ type TraitDiscoveryMode = 'initial' | 'authored';
 discoveryMode?: TraitDiscoveryMode;
 ```
 
-- `initial` — known when definitions load;
+- `initial` — eligible to be known when definitions load;
 - `authored` — definition exists, but an explicit authored event must reveal the pattern;
 - omitted — treated as `initial` for legacy/prototype compatibility.
+
+Campaign One catalogue disposition is an additional gate. Only Traits with
+`campaignOneDisposition = keep` (or legacy definitions with the field omitted)
+seed ordinary initial discovery. `rework`, `defer`, and `remove_1_0`
+definitions remain data-compatible but are not presented as current progression.
 
 `loadTraits` preserves already-earned discoveries while adding only initially-known Traits. It no longer treats an empty discovery list as permission to discover the entire catalogue.
 
@@ -138,15 +145,38 @@ Campaign One currently qualifies only two established two-Trait profiles:
 
 A doctrine is not a separately acquired Trait and is not independently persisted as a boolean. Runtime selectors derive it only when all required Traits are both permanently learned and foregrounded.
 
-Quest and Dialogue authoring may use `requiredActiveDoctrineIds` where a choice specifically depends on current specialization. The player-facing Doctrine tab now qualifies explicit Adopt / Switch / Clear control for eligible learned pairs, Player Insight projects the active doctrine read-only, and GC06's two optional build-profile resolutions consume active doctrine. GC07-GC10 retain their previously qualified permanent-Trait pair gates pending separate evidence that broader conversion adds value rather than menu friction.
+Quest and Dialogue authoring may use `requiredActiveDoctrineIds` where a choice specifically depends on current specialization. The player-facing Doctrine tab qualifies explicit Adopt / Switch / Clear control for eligible learned pairs, and Player Insight projects the active doctrine read-only.
+
+Campaign One now uses active doctrine at three deliberate posture-setting points: GC06 Lattice Under Strain, GC07 Counterphase derivation, and GC08 Network preparation. GC09 and GC10 intentionally return to durable learned-pair requirements for culmination so the system does not create repetitive last-minute menu switching merely to prove capability ownership.
+
+The component Traits also retain independent identity: Willow's Wisdom and Scholarly Insight keep their single-capability Quest/Combat applications, while Constraint Sense and Adversarial Calibration have optional independent GC08 dialogue applications.
 
 See `RelationshipCapabilityConstellation.md` for the bounded Redux, persistence, consumption, and evidence contract.
+
+### 1.6 Effect execution authority
+
+Trait effect metadata is not self-executing. `TraitEffectContract.ts` classifies
+every production effect key as `player_stat`, `copy_essence`,
+`semantic_capability`, `deferred_1_0`, or `removed_1_0`.
+
+The generic Player stat processor consumes only `player_stat` effects.
+Domain-specific effects require an explicit domain consumer. A recognized JSON
+key therefore cannot silently imply supported gameplay.
+
+`EssenceFlow` uses additive fractional Copy semantics: `0.15` means +15% in
+the Copy formula `1 + sum(bonuses)`.
 
 ## 2. Resonance authority
 
 Permanent acquisition is centralized in:
 
 `src/features/Traits/state/TraitThunks.ts#acquireTraitWithEssenceThunk`
+
+Pre-commit readiness is centralized in
+`src/features/Traits/state/TraitResonanceReadiness.ts`. Trait Management, the
+Codex, and the acquisition thunk consume this same projection. Runtime Essence
+cost is always read from the authoritative Trait definition; caller-supplied
+compatibility values cannot change the price.
 
 The gate depends on whether the Trait's source NPC has migrated to Relationship authority.
 
@@ -432,10 +462,10 @@ M8 does not redesign Copy Trait inheritance.
 
 ## 13. Known limitations / deferred work
 
-- Most legacy/simple Traits still default to initially known; they have not been given authored discovery content.
+- The historical catalogue is explicitly curated by `campaignOneDisposition`; deferred/rework/removed definitions remain present for compatibility but are not ordinary Campaign One discoveries.
 - Relationship Experiences are only one possible future discovery source; quests, exploration, combat, research, or items may reveal other Traits.
 - Historical pre-Relationships saves do not reconstruct perfect discovery provenance; M8 only performs conservative additive repair from existing authored evidence.
-- Temporary/equipped Trait gameplay authority beyond existing effects is not qualified by M16.
+- Temporary/equipped Trait gameplay authority beyond existing effects remains intentionally distinct from permanent learned capability; slot progression now follows its documented Resonance-level unlock requirements.
 - The two established Campaign One doctrine pairs are the only qualified synergy composition; a generic capability graph, arbitrary pair lattice, N-way combinations, and broad Copy redesign remain out of scope.
 - Permanent-Trait and active-doctrine gates remain explicit bounded fields, not a general stat/skill/ability condition DSL.
 
