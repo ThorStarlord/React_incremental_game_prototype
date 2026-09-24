@@ -10,6 +10,7 @@ const baseContext = {
   knownFactIds: [] as string[],
   factionReputationByFactionId: {} as Record<string, number>,
   worldStateRegions: {},
+  permanentTraitIds: [] as string[],
   activeDoctrineIds: [] as const,
 };
 
@@ -47,6 +48,27 @@ describe('post-M25 contextual causal legibility', () => {
     expect(evaluateDialogueAvailabilityPresentation(node, baseContext)).toEqual({
       available: false,
       availabilityReasons: [],
+    });
+  });
+
+  test('permanent capability requirements stay spoiler-safe while explaining available learning', () => {
+    const node: DialogueNode = {
+      id: 'constraint_topic',
+      title: 'Read the Constraint',
+      requiredPermanentTraitIds: ['ConstraintSense'],
+    };
+
+    expect(evaluateDialogueAvailabilityPresentation(node, baseContext)).toEqual({
+      available: false,
+      availabilityReasons: [],
+    });
+
+    expect(evaluateDialogueAvailabilityPresentation(node, {
+      ...baseContext,
+      permanentTraitIds: ['ConstraintSense'],
+    })).toEqual({
+      available: true,
+      availabilityReasons: ['Permanent capability: ConstraintSense'],
     });
   });
 
