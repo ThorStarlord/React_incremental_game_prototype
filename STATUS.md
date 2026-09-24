@@ -23,7 +23,8 @@
 **Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
 **Active program:** Campaign One / 1.0 Feature Completion  
 **Feature Completion Gap Analysis:** `COMPLETE / CURRENT`  
-**Current depth frontier:** `Candidate B — Mastery Compression / Copy organization`
+**Candidate B depth specification:** `COMPLETE / CURRENT`  
+**Current implementation frontier:** `Forge Standing Responsibility — Candidate B implementation`
 
 ## Current authority
 
