@@ -25,6 +25,7 @@ import {
   selectUsesRelationshipConnectionAuthority,
 } from '../../Relationships/state/RelationshipSelectors';
 import { recordAuthoredRelationshipExperienceThunk } from '../../Relationships/state/RelationshipThunks';
+import { evaluateTraitResonanceReadiness } from './TraitResonanceReadiness';
 
 export const fetchTraitsThunk = createAsyncThunk(
   'traits/fetchTraits',
@@ -68,7 +69,7 @@ export const fetchTraitsThunk = createAsyncThunk(
 export const acquireTraitWithEssenceThunk = createAsyncThunk(
   'traits/acquireTraitWithEssence',
   async (
-    { traitId, essenceCost }: AcquireTraitWithEssencePayload,
+    { traitId }: AcquireTraitWithEssencePayload,
     { getState, dispatch, rejectWithValue }
   ) => {
     try {
@@ -79,90 +80,16 @@ export const acquireTraitWithEssenceThunk = createAsyncThunk(
         throw new Error(`Trait with ID ${traitId} not found`);
       }
 
-      if (!state.traits.discoveredTraits.includes(traitId)) {
-        const msg = `Discover ${trait.name} before attempting Resonance.`;
-        dispatch(addNotification({ message: msg, type: 'info' }));
-        throw new Error('Trait not discovered');
-      }
-
-      if (state.player.permanentTraits.includes(traitId)) {
-        throw new Error('Trait is already permanently acquired');
-      }
-
-      const sourceNpcId = trait.sourceNpc || trait.source;
-      if (sourceNpcId) {
-        const usesRelationshipAuthority = selectUsesRelationshipConnectionAuthority(
-          state,
-          sourceNpcId
-        );
-
-        if (usesRelationshipAuthority) {
-          const profile = selectBondProfileByNpcId(state, sourceNpcId);
-          const requiredLevel =
-            trait.minimumConnectionLevel ?? TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
-          if (profile.connectionLevel < requiredLevel) {
-            const msg = `Connection ${requiredLevel} required. Current: ${profile.connectionLevel}.`;
-            dispatch(addNotification({ message: msg, type: 'info' }));
-            throw new Error('Insufficient qualified Connection for resonance');
-          }
-
-          const assimilation = selectTraitAssimilationState(state, sourceNpcId, traitId);
-          const assimilationThreshold = trait.assimilationThreshold ?? 100;
-          if (assimilation.progress < assimilationThreshold) {
-            const msg = `Assimilation incomplete: ${Math.floor(assimilation.progress)}% / ${assimilationThreshold}%.`;
-            dispatch(addNotification({ message: msg, type: 'info' }));
-            throw new Error('Insufficient Trait assimilation for resonance');
-          }
-
-          const minimumCompatibility = trait.minimumCompatibility ?? 0;
-          if (assimilation.compatibility < minimumCompatibility) {
-            const msg = `Resonance compatibility too low: ${Math.floor(assimilation.compatibility)} / ${minimumCompatibility}.`;
-            dispatch(addNotification({ message: msg, type: 'info' }));
-            throw new Error('Insufficient Trait compatibility for resonance');
-          }
-
-          const memories = selectRelationshipMemoriesByNpcId(state, sourceNpcId);
-          for (const requiredTag of trait.requiredMemoryTags ?? []) {
-            const hasEvidence = memories.some(memory =>
-              memory.resonanceTags.includes(requiredTag)
-            );
-            if (!hasEvidence) {
-              const msg = `Resonance requires a Memory demonstrating: ${requiredTag}.`;
-              dispatch(addNotification({ message: msg, type: 'info' }));
-              throw new Error(`Missing Memory evidence: ${requiredTag}`);
-            }
-          }
-        } else {
-          const npc = state.npcs.npcs[sourceNpcId];
-          const requiredDepth = TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
-          if (!npc || (npc.connectionDepth ?? 0) < requiredDepth) {
-            const msg = `Increase your connection with this NPC (required depth ${requiredDepth}) before resonating.`;
-            dispatch(addNotification({ message: msg, type: 'info' }));
-            throw new Error('Insufficient connectionDepth for resonance');
-          }
-        }
-      }
-
-      const prerequisiteTraits = Array.isArray(trait.requirements?.prerequisiteTraits)
-        ? (trait.requirements?.prerequisiteTraits as string[])
-        : [];
-      const missingPrerequisite = prerequisiteTraits.find(
-        prerequisite => !state.player.permanentTraits.includes(prerequisite)
-      );
-      if (missingPrerequisite) {
-        const msg = `Missing prerequisite Trait: ${missingPrerequisite}.`;
+      const readiness = evaluateTraitResonanceReadiness(state, traitId);
+      if (!readiness.ready) {
+        const msg = readiness.blockers[0] ?? 'Trait is not ready for Resonance.';
         dispatch(addNotification({ message: msg, type: 'info' }));
         throw new Error(msg);
       }
 
-      state = getState() as RootState;
-      const currentEssence = state.essence.currentEssence;
-      const actualCost = essenceCost ?? trait.essenceCost ?? 0;
-      if (currentEssence < actualCost) {
-        const msg = `Insufficient Essence. Required: ${actualCost}, Available: ${currentEssence}`;
-        dispatch(addNotification({ message: msg, type: 'warning' }));
-        throw new Error(msg);
-      }
+      // Resonance cost is catalog-owned. Callers may still pass the historical
+      // compatibility field, but it is intentionally ignored.
+      const actualCost = trait.essenceCost ?? 0;
 
       // Validate and durably record the authored Resonance beat before committing
       // irreversible currency/permanence reducers. The event thunk is idempotent,
