@@ -39,13 +39,15 @@ Four route-specific finale Quests use the existing Quest authority:
 
 ### Structural
 
-- requires `WillowsWisdom + ConstraintSense`;
-- uses load-bearing network paths.
+- requires active `structural_steward` doctrine, derived from permanent `WillowsWisdom + ConstraintSense`;
+- uses load-bearing network paths;
+- represents carrying the foregrounded structural posture into the finale rather than merely proving the pair was learned once.
 
 ### Diagnostic
 
-- requires `ScholarlyInsight + AdversarialCalibration`;
-- uses prediction/contradiction sensing.
+- requires active `countermodeler` doctrine, derived from permanent `ScholarlyInsight + AdversarialCalibration`;
+- uses prediction/contradiction sensing;
+- represents carrying the foregrounded diagnostic posture into the finale rather than merely proving the pair was learned once.
 
 ### Fortified
 
