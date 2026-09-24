@@ -61,7 +61,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <AlertTitle>Make Traits Permanent</AlertTitle>
-        Spend Essence to "resonate" with a discovered trait, making it a permanent part of your character. Permanent traits are always active and do not require a slot.
+        Resonance makes a discovered Trait permanent. Essence is the final stabilization cost; relationship-derived Traits may also require qualified Connection, assimilation, compatibility, and Memory evidence. Permanent Traits are always active and do not require a slot.
       </Alert>
 
       <Card>
