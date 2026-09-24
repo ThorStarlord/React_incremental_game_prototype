@@ -1,4 +1,4 @@
-# React Incremental RPG — Content Alpha
+# React Incremental RPG — Feature Completion / Product Depth
 
 A React/TypeScript narrative incremental RPG where consequential relationships teach durable capabilities, remembered history changes later possibilities, and personally understood repetition can become deliberately delegated work.
 
@@ -12,7 +12,8 @@ Post-M25 timing/content/chapter hardening: COMPLETE / INTEGRATED
 Provisional Product Direction: SELECTED / HUMAN-UNVALIDATED
 M26 learn-to-delegate provenance: COMPLETE / INTEGRATED
 Current maturity: CONTENT_ALPHA / HUMAN-UNVALIDATED
-Active program: Campaign One / 1.0 Game Completion
+Current strategic stage: FEATURE_COMPLETION / PRODUCT_DEPTH
+Active program: Campaign One / 1.0 Feature Completion
 Human Product Review: OPEN / UNPROVEN
 Alpha: PASS / HUMAN-UNVALIDATED
 Content Alpha: PASS / HUMAN-UNVALIDATED
@@ -24,7 +25,7 @@ RC entry: BLOCKED — promotion guard qualified
 
 The application already has a real game loop, persistent save/load/import-export, Relationship/Memory progression, Traits/Essence, NPC dialogue, quests, authored travel, combat, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progression, and multiple chapter-scale compositions.
 
-What is missing is no longer mainly “prove that these systems can coexist.” The repository is now governed by a bounded **Game Completion Program** whose goal is to finish Campaign One from New Game to a state-responsive ending.
+The repository has already proved that these systems can coexist and that the authored campaign spine can traverse from New Game to a state-responsive ending. The current problem is different: **integration maturity is ahead of feature maturity**. Several core systems remain bounded MVPs or first vertical slices, so the active program is Feature Completion / Product Depth before dedicated Beta/release hardening.
 
 ## 1.0 product promise
 
@@ -94,9 +95,12 @@ GC-08  Chapter 6 — Network Under Pressure             COMPLETE
 GC-09  Chapter 7 — Counterphase                       COMPLETE
 GC-10  Finale + Epilogue                              COMPLETE
 GC-11  Alpha qualification                            COMPLETE
-GC-12  Content Alpha                                  COMPLETE
-GC-13  Beta                                           TECHNICAL READY / HUMAN EVIDENCE OPEN
-GC-14  Release Candidate / 1.0                        GUARD QUALIFIED / BLOCKED ON BETA PASS
+GC-12  Content Alpha / authored integration evidence COMPLETE
+CURRENT Feature Completion Gap Analysis                ACTIVE
+NEXT    Breadth search -> depth analysis -> build      PENDING
+GATE    FEATURE_COMPLETE                               PENDING
+GC-13   Beta                                           DOWNSTREAM / TECHNICAL READINESS ALREADY QUALIFIED
+GC-14   Release Candidate / 1.0                        DOWNSTREAM / GUARD QUALIFIED
 ```
 
 The structural aggregate is `npm run alpha:validate`; authored-content closure is `npm run content-alpha:validate`; deterministic Beta engineering readiness is `npm run beta:technical:validate`.
@@ -105,7 +109,7 @@ These commands do not replace the required real-human Beta evidence or an immuta
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
 
-There is **no automatic M27**. Future implementation must improve an already-authorized 1.0 player/release surface through an explicit requirement or a concrete deterministic, heuristic, synthetic, or human finding. Missing human evidence alone is not a universal stop condition.
+There is **no automatic M27 or GC-15**. The next operation is a repository-wide Feature Completion Gap Analysis. A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished. Future implementation should deepen the highest-value existing core features inside the bounded Campaign One scope before dedicated Beta/release hardening.
 
 ## Important 1.0 scope decisions
 
