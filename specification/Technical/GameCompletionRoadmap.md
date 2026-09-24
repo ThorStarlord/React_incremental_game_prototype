@@ -107,7 +107,7 @@ Packages GC-04 and GC-05 may be satisfied partly inside campaign chapters rather
 
 ### Active feature-completion frontier
 
-The next repository-owned operation is a **Feature Completion Gap Analysis**, not an automatic GC-15/M27 package and not release hardening.
+The repository-wide **Feature Completion Gap Analysis** is complete in [`FeatureCompletionGapAnalysis.md`](FeatureCompletionGapAnalysis.md). It is not an automatic GC-15/M27 package and does not reopen release hardening.
 
 For every `CORE_1_0` system, assess:
 
@@ -122,7 +122,7 @@ intended player role
 -> finished-feature gap
 ```
 
-Then perform a breadth search across the resulting opportunities and depth analysis on the strongest candidates before selecting implementation packages. The analysis may conclude that some systems are already deep enough and should not expand. Historical GC closure remains intact; new work targets the living feature, not the old milestone record.
+The completed breadth search selects three depth candidates: **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. The current depth frontier is Candidate B. Historical GC closure remains intact; new work targets the living feature, not the old milestone record.
 
 ## 5. Package GC-00 — Close inherited M26 and transition authority
 
