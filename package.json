@@ -68,7 +68,8 @@
     "release:promotion:eligibility": "node scripts/check-release-eligibility.js --stage final",
     "release:rc:validate": "npm run release:rc:eligibility && npm run release:validate",
     "release:promote:validate": "npm run release:promotion:eligibility && npm run release:validate",
-    "gc14:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC14ReleaseEligibility.test.ts"
+    "gc14:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC14ReleaseEligibility.test.ts",
+    "trait-depth:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand TraitAuthorityAndDepth.test.ts TraitDiscovery.test.ts RelationshipCapabilityConstellation.test.ts PostM25ContextualCausalLegibility.test.ts DoctrineFocusPlayerSurface.test.tsx GC07ChronoCrypt.test.tsx GC08NetworkUnderPressure.test.tsx"
   },
   "eslintConfig": {
     "extends": [
