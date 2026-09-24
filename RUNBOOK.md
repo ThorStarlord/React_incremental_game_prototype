@@ -227,6 +227,7 @@ npm run release:promotion:eligibility
 npm run content:intelligence:validate
 npm run chapter:validate
 npm run m26:validate
+npm run trait-depth:validate
 npm run simulated-review:validate
 npm run simulated-review:action-contract
 npx tsc --noEmit
@@ -237,6 +238,21 @@ npm run build
 `chapter:validate` already runs at the tail of `content:intelligence:validate`; the standalone command is useful for focused diagnosis.
 
 Build Validation remains final executable authority because it also runs live UI smoke and the accumulated technical/milestone gates.
+
+## Candidate A Trait depth qualification
+
+Focused command:
+
+```bash
+npm run trait-depth:validate
+```
+
+This gate covers Campaign One Trait catalogue disposition, authoritative effect
+contracts, Resonance readiness/cost/discovery authority, Resonance-level slot
+unlocking, permanent-capability dialogue gates, doctrine focus, and GC07-GC08
+specialization. It establishes deterministic repository behavior only; it does
+not create human evidence for comprehension, balance, enjoyment or preferred
+switching cadence.
 
 ## M26 integrated qualification
 
