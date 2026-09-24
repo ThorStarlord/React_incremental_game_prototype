@@ -32,6 +32,7 @@ const completionAuthorityFiles = [
   'specification/Narrative/CampaignArchitecture.md',
   'specification/Technical/GameCompletionRoadmap.md',
   'specification/Technical/FeatureCompletionGapAnalysis.md',
+  'specification/Technical/CandidateBMasteryCompressionDepthSpecification.md',
   'specification/Technical/AlphaCompletionContract.md',
   'specification/Technical/BetaCompletionContract.md',
   'specification/Technical/ReleaseQualificationContract.md',
@@ -229,6 +230,13 @@ requireContains('specification/Technical/FeatureCompletionGapAnalysis.md', [
   'Candidate A',
   'Candidate C',
   'A vertical slice proves that a feature can work',
+]);
+
+requireContains('specification/Technical/CandidateBMasteryCompressionDepthSpecification.md', [
+  'FEATURE COMPLETION CANDIDATE B',
+  'Forge Assistance',
+  'forge_structural_deviation',
+  'attention moves upward from repeated procedure to policy and exception judgment',
 ]);
 
 requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
