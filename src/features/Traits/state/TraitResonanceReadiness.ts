@@ -161,8 +161,9 @@ export const evaluateTraitResonanceReadiness = (
     }
   }
 
-  const prerequisiteTraits = Array.isArray(trait.requirements?.prerequisiteTraits)
-    ? trait.requirements.prerequisiteTraits as string[]
+  const prerequisiteTraitRequirement = trait.requirements?.prerequisiteTraits;
+  const prerequisiteTraits = Array.isArray(prerequisiteTraitRequirement)
+    ? prerequisiteTraitRequirement as string[]
     : [];
   for (const prerequisite of prerequisiteTraits) {
     requirements.push(requirement(
