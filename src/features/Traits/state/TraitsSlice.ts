@@ -24,6 +24,7 @@ const initialState: TraitsState = {
 export const getInitiallyDiscoveredTraitIds = (
   traits: Record<string, Trait>
 ): string[] => Object.values(traits)
+  .filter(trait => (trait.campaignOneDisposition ?? 'keep') === 'keep')
   .filter(trait => (trait.discoveryMode ?? 'initial') === 'initial')
   .map(trait => trait.id);
 
