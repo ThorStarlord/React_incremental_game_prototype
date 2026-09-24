@@ -194,6 +194,8 @@ Campaign One doctrine derivation is intentionally limited to the two already-est
 
 This is bounded feature development of the primary relationship-derived capability-buildcraft promise. Its successful implementation proves the specialization interaction exists; it does not establish that capability buildcraft has reached sufficient finished-game depth. Deterministic/UI qualification now proves the interaction path exists and changes GC06 availability; fresh-player comprehension, usability, balance, enjoyment, and preference remain unproven.
 
+A bounded owner-directed Trait depth repair now closes three concrete implementation gaps without changing the selected B -> A -> C depth order: Player Trait slots unlock from their documented Resonance levels, permanent Resonance pricing is catalogue-authoritative, and the general Traits/Codex surfaces use the same readiness authority as runtime validation. [`CampaignOneTraitCatalogueAudit.md`](specification/Technical/CampaignOneTraitCatalogueAudit.md) also classifies the legacy catalogue so historical effect metadata cannot resurrect cut Skills/Crafting systems by inertia. This is a foundation repair for Candidate A, not Candidate-A depth completion; selective post-GC06 doctrine consumption remains a future depth-search question.
+
 ## M26 closure
 
 PR #114 is integrated:
