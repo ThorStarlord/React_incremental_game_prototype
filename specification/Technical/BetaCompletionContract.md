@@ -213,7 +213,7 @@ Create a bounded Beta result document recording:
 - known-defect inventory and severity;
 - human-session provenance and recurring findings;
 - explicit accepted risks;
-- evidence that feature/content scope is locked.
+- evidence that the outer Campaign One scope boundary is locked and required core features have reached `FEATURE_COMPLETE` maturity.
 
 ## Beta exit
 
