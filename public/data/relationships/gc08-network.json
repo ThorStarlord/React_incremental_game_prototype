@@ -286,6 +286,60 @@
       "memoryCandidate": true,
       "memoryDefinitionId": "lyra_memory_gc08_fortified_posture",
       "interpretation": "The player commits to a fortified posture that combines verified baseline preparation with available Watch logistics."
+    },
+    "gronk_gc08_exp_constraint_audit": {
+      "id": "gronk_gc08_exp_constraint_audit",
+      "uniqueKey": "gronk:gc08:constraint-audit",
+      "title": "Constraint Sense Without a Composite Doctrine",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": [
+        "player",
+        "npc_blacksmith_gronk"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_gc08_constraint_audit",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 1,
+        "understanding": 3,
+        "sharedMeaning": 2,
+        "reliance": 2
+      },
+      "connectionProgressDelta": 3,
+      "resonanceTags": [
+        "NetworkPressure",
+        "ConstraintSense",
+        "IndependentApplication"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player applies Gronk's constraint-first judgment on its own, proving Constraint Sense remains a learned capability even when Structural Steward is not the active synthesis."
+    },
+    "lyra_gc08_exp_adversarial_probe": {
+      "id": "lyra_gc08_exp_adversarial_probe",
+      "uniqueKey": "lyra:gc08:adversarial-probe",
+      "title": "Adversarial Calibration Without Countermodeling",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc08_adversarial_probe",
+      "significance": "meaningful",
+      "relationshipEffects": {
+        "trust": 1,
+        "understanding": 4,
+        "sharedMeaning": 2,
+        "reciprocity": 2
+      },
+      "connectionProgressDelta": 3,
+      "resonanceTags": [
+        "NetworkPressure",
+        "AdversarialCalibration",
+        "IndependentApplication"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player predicts Lyra's pressure accurately using Adversarial Calibration alone, preserving the capability's identity outside the Countermodeler synthesis."
     }
   },
   "memories": {
