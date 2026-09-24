@@ -140,6 +140,7 @@ requireContains('STATUS.md', [
   'CONTENT_ALPHA / HUMAN-UNVALIDATED',
   'TECHNICAL_BETA_READY',
   'BETA_PASS=NO',
+  'FEATURE_COMPLETION / PRODUCT_DEPTH',
   'RC_ENTRY_BLOCKED',
   '1.0_PROMOTION_BLOCKED',
   'GameCompletionDefinition.md',
@@ -158,6 +159,7 @@ requireContains('README.md', [
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
+  'FEATURE_COMPLETION / PRODUCT_DEPTH',
   'AlphaCompletionContract.md',
   'BetaCompletionContract.md',
   'ReleaseQualificationContract.md',
@@ -202,6 +204,8 @@ requireContains('specification/GameCompletionDefinition.md', [
 
 requireContains('specification/Features/FeatureScopeMatrix.md', [
   'CORE_1_0',
+  'L1 — Vertical Slice',
+  'L4 — Feature Complete',
   'DEFER_POST_1_0',
   'CUT',
   'Separate Skills',
@@ -211,6 +215,7 @@ requireContains('specification/Features/FeatureScopeMatrix.md', [
 requireContains('specification/Technical/GameCompletionRoadmap.md', [
   'GC-00',
   'GC-14',
+  'Feature Completion Gap Analysis',
   'Alpha qualification',
   'Release Candidate',
   'No automatic M-number continuation',
