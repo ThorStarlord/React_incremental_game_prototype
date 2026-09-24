@@ -5,6 +5,7 @@ import { setResonanceLevel } from '../../Player/state/PlayerSlice';
 import { loadTraits } from './TraitsSlice';
 import { acquireTraitWithEssenceThunk } from './TraitThunks';
 import { evaluateTraitResonanceReadiness } from './TraitResonanceReadiness';
+import { classifyTraitEffectAuthority } from './TraitEffectAuthority';
 import type { Trait } from './TraitsTypes';
 
 const makeStore = () => configureStore({ reducer: rootReducer });
@@ -20,6 +21,13 @@ const SIMPLE_TRAIT: Trait = {
 };
 
 describe('Trait system depth repair', () => {
+  test('effect metadata has explicit execution authority instead of implying every key is live', () => {
+    expect(classifyTraitEffectAuthority('attack')).toBe('direct_player_stat');
+    expect(classifyTraitEffectAuthority('essenceGenerationMultiplier')).toBe('named_runtime');
+    expect(classifyTraitEffectAuthority('constraintAnalysis')).toBe('semantic_capability');
+    expect(classifyTraitEffectAuthority('craftingQualityBonus')).toBe('deferred_legacy');
+  });
+
   test('Resonance Level automatically unlocks the player Trait slots it promises', () => {
     const store = makeStore();
 
