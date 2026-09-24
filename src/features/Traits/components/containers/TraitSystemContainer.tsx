@@ -70,7 +70,7 @@ const TraitSystemContainer: React.FC = React.memo(() => {
   const handleAcquireTrait = useCallback((traitId: string) => {
     const trait = allTraits[traitId];
     if (trait) {
-      dispatch(acquireTraitWithEssenceThunk({ traitId, essenceCost: trait.essenceCost || 0 }));
+      dispatch(acquireTraitWithEssenceThunk({ traitId }));
     }
   }, [dispatch, allTraits]);
 
