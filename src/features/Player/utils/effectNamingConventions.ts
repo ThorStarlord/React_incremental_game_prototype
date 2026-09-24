@@ -6,6 +6,7 @@
  */
 
 import { TRAIT_EFFECT_CONSTANTS } from '../../../constants/playerConstants';
+import { getTraitEffectContract } from '../../Traits/state/TraitEffectContract';
 
 export interface ParsedEffectName {
   baseStat: string;
@@ -70,12 +71,16 @@ export const parseEffectName = (effectName: string): ParsedEffectName => {
     }
   }
 
-  // Special effects (everything else)
+  // Special/domain effects are valid only when the authoritative Trait
+  // effect contract gives them an explicit runtime or scope disposition.
+  const contract = getTraitEffectContract(effectName);
   return {
     baseStat: effectName,
     effectType: 'special',
-    isValid: TRAIT_EFFECT_CONSTANTS.SPECIAL_EFFECTS.includes(effectName as any),
-    description: `Special effect: ${effectName}`
+    isValid: Boolean(contract),
+    description: contract
+      ? `${contract.authority}: ${contract.note}`
+      : `Uncontracted Trait effect: ${effectName}`
   };
 };
 
