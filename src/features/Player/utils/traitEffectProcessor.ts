@@ -1,5 +1,6 @@
 import type { Trait } from '../../Traits/state/TraitsTypes';
 import type { PlayerStats } from '../state/PlayerTypes';
+import { isPlayerStatTraitEffect } from '../../Traits/state/TraitEffectContract';
 
 /**
  * Processes an array of active traits and applies their effects to a set of base stats.
@@ -19,7 +20,7 @@ export function processTraitEffects(activeTraits: Trait[], baseStats: PlayerStat
     }
 
     for (const [effectName, value] of Object.entries(trait.effects)) {
-      if (typeof value !== 'number') continue;
+      if (typeof value !== 'number' || !isPlayerStatTraitEffect(effectName)) continue;
 
       if (effectName.endsWith('PercentBonus')) {
         const statName = effectName.replace('PercentBonus', '');
