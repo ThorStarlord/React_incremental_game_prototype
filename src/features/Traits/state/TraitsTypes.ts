@@ -5,6 +5,12 @@
 
 export type TraitDiscoveryMode = 'initial' | 'authored';
 
+export type TraitCampaignOneDisposition =
+  | 'keep'
+  | 'rework'
+  | 'defer'
+  | 'remove_1_0';
+
 export type TraitRequirementValue = number | string | boolean | string[];
 export type TraitRequirements = Readonly<Record<string, TraitRequirementValue>>;
 
@@ -33,6 +39,14 @@ export interface Trait {
    * compatibility. `authored` Traits must be revealed by an authored event.
    */
   discoveryMode?: TraitDiscoveryMode;
+
+  /**
+   * Campaign One catalogue disposition. Only `keep` Traits seed ordinary
+   * initial discovery. `rework`, `defer`, and `remove_1_0` definitions may
+   * remain in data for compatibility/reference without presenting incomplete
+   * mechanics as current player progression.
+   */
+  campaignOneDisposition?: TraitCampaignOneDisposition;
 
   // Relationship-mediated Resonance metadata. Optional so simple Traits remain simple.
   minimumConnectionLevel?: number;
@@ -119,7 +133,11 @@ export interface DeleteTraitPresetPayload {
 // Acquisition thunk payload
 export interface AcquireTraitWithEssencePayload {
   traitId: string;
-  essenceCost: number;
+  /**
+   * Deprecated compatibility field. Runtime authority always derives the cost
+   * from the current Trait definition and ignores caller-supplied values.
+   */
+  essenceCost?: number;
 }
 
 // Trait validation result
