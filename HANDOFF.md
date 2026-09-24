@@ -79,7 +79,7 @@ This remains human-unvalidated. Deterministic qualification does not prove compr
 
 ### Primary lane — feature completion / product depth
 
-The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). The breadth pass selected **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. The current repository-owned task is the Candidate B depth specification.
+The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). The breadth pass selected **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. Candidate B depth is now specified in [`specification/Technical/CandidateBMasteryCompressionDepthSpecification.md`](specification/Technical/CandidateBMasteryCompressionDepthSpecification.md). The next implementation package is the bounded **Forge Standing Responsibility** slice.
 
 Prioritize missing gameplay depth such as:
 
