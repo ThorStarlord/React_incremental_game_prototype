@@ -38,7 +38,7 @@ Release Candidate                    BLOCKED ON BETA_PASS
 1.0                                  BLOCKED
 ```
 
-The repository now has a complete authored Campaign One, whole-game Alpha, Content Alpha, and qualified deterministic Beta readiness. The remaining work is Beta convergence: genuine human evidence plus bounded repository-answerable UX/pacing/balance/accessibility/presentation/reliability/persistence/release hardening, followed by immutable RC qualification after BETA_PASS.
+The repository has a complete authored Campaign One spine, whole-game traversal evidence, Content Alpha evidence, and qualified deterministic Beta-readiness infrastructure. A strategic reassessment found that these milestones proved **integration and bounded contract satisfaction**, while several core gameplay features remain at L1/L2 initial or vertical-slice depth. The active work therefore returns to **Feature Completion / Product Depth** before Beta convergence becomes the dominant frontier.
 
 ## 3. Program invariants
 
@@ -47,10 +47,12 @@ The repository now has a complete authored Campaign One, whole-game Alpha, Conte
 3. **No automatic M-number continuation:** M26 closes the old provisional milestone sequence. There is no implied M27.
 4. **One large critical-path package at a time:** avoid parallel architectural expansion that makes causal diagnosis difficult.
 5. **Exact-head qualification:** every merge requires the current repository validation policy on the exact candidate.
-6. **Human claims stay human:** automated/synthetic/heuristic evidence never becomes actual player comprehension, enjoyment, preference, perceived pacing/fairness, or retention evidence; it may still justify bounded hardening.
+6. **Human claims stay human:** automated/synthetic/heuristic evidence never becomes actual player comprehension, enjoyment, preference, perceived pacing/fairness, or retention evidence; it may justify bounded feature development or local hardening.
 7. **Cut means cut:** `CUT`/`DEFER_POST_1_0` surfaces do not remain in player-facing navigation as promises of 1.0 work.
 8. **Player judgment remains manual:** Copy/offline authority cannot expand into irreversible narrative/social/world decisions by implication.
-9. **Finish before expand:** Chapters 8+, interplanetary content, generalized crafting/inventory, skill trees, New Game+, live-service systems, and generic simulation are outside the 1.0 critical path.
+9. **Finish before expand:** deepen existing core features before adding Chapters 8+, interplanetary content, generalized crafting/inventory, skill trees, New Game+, live-service systems, or generic simulation.
+10. **Vertical slice != feature complete:** a closed GC/M milestone preserves its evidence but does not freeze the associated gameplay domain below L4.
+11. **Depth before repository-wide hardening:** dedicated Beta/release convergence follows feature completion; local reliability/accessibility repairs remain allowed when they unblock safe feature development.
 
 ## 4. Critical path
 
@@ -81,11 +83,17 @@ GC-11  Whole-game Alpha qualification
   ↓
 ALPHA_PASS
   ↓
-GC-12  Content Alpha completion pass
+GC-12  Content Alpha / authored-spine integration evidence
   ↓
-CONTENT_ALPHA
+CONTENT_ALPHA (historical qualification retained)
   ↓
-GC-13  Beta: human review + UX/pacing/balance/reliability
+FEATURE COMPLETION GAP ANALYSIS
+  ↓
+bounded feature-development packages selected by breadth -> depth analysis
+  ↓
+FEATURE_COMPLETE (required CORE_1_0 systems at sufficient L4 depth)
+  ↓
+GC-13  Beta: human review + convergence / tuning / accessibility / reliability
   ↓
 BETA_PASS
   ↓
@@ -95,6 +103,26 @@ GC-14  Release Candidate qualification
 ```
 
 Packages GC-04 and GC-05 may be satisfied partly inside campaign chapters rather than by isolated feature work. Do not create standalone feature packages if chapter implementation naturally closes the same requirements with clearer player meaning.
+
+
+### Active feature-completion frontier
+
+The next repository-owned operation is a **Feature Completion Gap Analysis**, not an automatic GC-15/M27 package and not release hardening.
+
+For every `CORE_1_0` system, assess:
+
+```text
+intended player role
+-> current implementation
+-> current maturity L0-L6
+-> actual gameplay breadth
+-> actual gameplay depth
+-> progression across Campaign One
+-> cross-system interactions
+-> finished-feature gap
+```
+
+Then perform a breadth search across the resulting opportunities and depth analysis on the strongest candidates before selecting implementation packages. The analysis may conclude that some systems are already deep enough and should not expand. Historical GC closure remains intact; new work targets the living feature, not the old milestone record.
 
 ## 5. Package GC-00 — Close inherited M26 and transition authority
 
