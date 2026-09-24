@@ -54,7 +54,7 @@ strategic importance
 | GameLoop / deterministic time | L5 | Reliable temporal substrate | No material product-depth gap identified | Preserve; no expansion |
 | Player state / vitals / attributes | L2/L3 | Hold player progression facts consumed elsewhere | Depth should come through consuming systems, not a new universal progression layer | Preserve foundation |
 | Relationship Experience / Memory / Connection | L3 | Make relationships consequential history and learning provenance | More later-game consequences should visibly consume accumulated relationship history | Deepen through buildcraft/strategic consumers |
-| Traits / permanent capabilities | L2 | Primary relationship-derived capability buildcraft | Two bounded doctrine profiles and sparse downstream specialization consumption do not yet sustain a full buildcraft identity | **Depth candidate A** |
+| Traits / permanent capabilities | L2/L3 candidate | Primary relationship-derived capability buildcraft | Candidate A now curates the 1.0 catalogue, centralizes Resonance/effect authority, and makes doctrine matter in GC06-GC08 while preserving independent component uses; human comprehension/balance and final depth sufficiency remain unproven | **Depth candidate A — bounded package implemented** |
 | Essence / Resonance | L2/L3 | Resource expression of relationship-mediated progression | Final balance and progression pressure are unproven; avoid expanding the economy before capability/delegation loops clarify demand | Tune later; support A/B |
 | NPC interaction | L2 | Human-facing access to relationships, dialogue, services, and decisions | Breadth is mostly authored-content dependent | Deepen only through selected feature packages |
 | Dialogue | L3 | Primary authored decision/consequence surface | Needs richer consumption of mature build/delegation/strategic state rather than a new dialogue engine | Use as integration surface |
@@ -119,14 +119,16 @@ The repository already proves:
 
 The architecture now supports a real build system, but Campaign One does not yet make specialization matter often enough to sustain the **primary product promise**.
 
-Current limitations include:
+The first bounded Candidate A package now establishes:
 
-- only two qualified doctrine profiles;
-- GC06 is the first major active-doctrine consumer;
-- GC07-GC10 largely retain permanent-Trait-pair gates;
-- several Trait identities have sparse cross-domain application;
-- temporary/equipped Trait semantics remain intentionally unresolved;
-- successful buildcraft often proves that an option exists rather than making the player's evolving build reshape a meaningful stretch of play.
+- the two-doctrine scope remains intentionally bounded;
+- active doctrine is consumed across GC06, GC07, and GC08 posture-setting decisions;
+- GC09-GC10 preserve durable pair culmination instead of forcing repetitive menu switching;
+- all four component relationship-derived Traits have independent authored applications;
+- the historical catalogue is curated so unsupported generic perks are no longer ordinary 1.0 discoveries;
+- Resonance readiness and effect execution have explicit shared authority.
+
+Remaining uncertainty is now less architectural and more product-facing: switching cadence, relative route value, readability, balance, and whether this depth is sufficient for the primary product promise remain human-unvalidated. Temporary/equipped Trait semantics beyond qualified effects also remain intentionally unresolved.
 
 ### Depth-search target
 
