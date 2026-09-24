@@ -90,7 +90,9 @@ The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative ref
 
 - [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for the preserved GC history plus the active Feature Completion / Product Depth phase and downstream path to Beta/RC/1.0.
 
-There is no automatic M27 or GC-15. The next operation is a Feature Completion Gap Analysis across `CORE_1_0` systems, followed by breadth search and depth analysis before selecting bounded implementation packages. Historical milestone closure proves stated contracts; it does not automatically confer L4 feature completeness.
+- [`Technical/FeatureCompletionGapAnalysis.md`](Technical/FeatureCompletionGapAnalysis.md) — **CURRENT STRATEGIC ANALYSIS** for the completed breadth scan, maturity reassessment, selected depth candidates, and current Candidate B frontier.
+
+There is no automatic M27 or GC-15. The Feature Completion Gap Analysis is complete. Its selected depth order is Candidate B (Mastery Compression / Copy organization), Candidate A (relationship-derived capability buildcraft), then Candidate C (strategic consequence composition), subject to depth-search evidence. Historical milestone closure proves stated contracts; it does not automatically confer L4 feature completeness.
 
 ### Integrated GC-01 result
 
