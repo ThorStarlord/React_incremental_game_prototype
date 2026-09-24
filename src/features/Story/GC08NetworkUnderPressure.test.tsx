@@ -18,6 +18,7 @@ import {
 } from '../Quest/state/QuestThunks';
 import { canUseQuestResolution } from '../Quest/state/QuestResolutionAvailability';
 import { addPermanentTrait, setLocation } from '../Player/state/PlayerSlice';
+import { activateDoctrineThunk } from '../Traits/state/DoctrineThunks';
 import { recordAuthoredRelationshipExperienceThunk } from '../Relationships/state/RelationshipThunks';
 import { learnNpcFact } from '../Knowledge/state/KnowledgeSlice';
 import { selectNpcKnowsFact } from '../Knowledge/state/KnowledgeSelectors';
@@ -312,26 +313,37 @@ describe('GC-08 Network Under Pressure', () => {
     )).toBe(true);
   });
 
-  test('baseline preparation remains viable and the two established build profiles remain capability-gated', () => {
+  test('baseline preparation remains viable while specialized preparation requires current doctrine focus', () => {
     const baseline = quests.quest_gc08_distributed_preparation.resolutionOptions[0];
     const structural = quests.quest_gc08_structural_preparation.resolutionOptions[0];
     const diagnostic = quests.quest_gc08_diagnostic_preparation.resolutionOptions[0];
 
     expect(canUseQuestResolution(baseline, [])).toBe(true);
-    expect(structural.requiredPermanentTraitIds).toEqual([
-      'WillowsWisdom',
-      'ConstraintSense',
-    ]);
-    expect(canUseQuestResolution(structural, ['WillowsWisdom'])).toBe(false);
-    expect(canUseQuestResolution(structural, ['WillowsWisdom', 'ConstraintSense'])).toBe(true);
-    expect(diagnostic.requiredPermanentTraitIds).toEqual([
-      'ScholarlyInsight',
-      'AdversarialCalibration',
-    ]);
-    expect(canUseQuestResolution(diagnostic, ['ScholarlyInsight'])).toBe(false);
+
+    expect(structural.requiredPermanentTraitIds).toBeUndefined();
+    expect(structural.requiredActiveDoctrineIds).toEqual(['structural_steward']);
+    expect(canUseQuestResolution(
+      structural,
+      ['WillowsWisdom', 'ConstraintSense'],
+      []
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      structural,
+      ['WillowsWisdom', 'ConstraintSense'],
+      ['structural_steward']
+    )).toBe(true);
+
+    expect(diagnostic.requiredPermanentTraitIds).toBeUndefined();
+    expect(diagnostic.requiredActiveDoctrineIds).toEqual(['countermodeler']);
     expect(canUseQuestResolution(
       diagnostic,
-      ['ScholarlyInsight', 'AdversarialCalibration']
+      ['ScholarlyInsight', 'AdversarialCalibration'],
+      []
+    )).toBe(false);
+    expect(canUseQuestResolution(
+      diagnostic,
+      ['ScholarlyInsight', 'AdversarialCalibration'],
+      ['countermodeler']
     )).toBe(true);
   });
 
@@ -389,6 +401,11 @@ describe('GC-08 Network Under Pressure', () => {
       expect(briefed.success).toBe(true);
     }
     traits.forEach(traitId => store.dispatch(addPermanentTrait(traitId)));
+    if (route === 'structural') {
+      await store.dispatch(activateDoctrineThunk('structural_steward')).unwrap();
+    } else if (route === 'diagnostic') {
+      await store.dispatch(activateDoctrineThunk('countermodeler')).unwrap();
+    }
 
     await completePreparationQuest(
       store,
