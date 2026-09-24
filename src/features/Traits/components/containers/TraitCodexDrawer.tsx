@@ -46,7 +46,6 @@ import {
 import { fetchTraitsThunk, acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
 import { evaluateTraitResonanceReadiness } from '../../state/TraitResonanceReadiness';
-import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import { selectPermanentTraits as selectPlayerPermanentTraitIds } from '../../../Player/state/PlayerSelectors';
 
 interface TraitCodexDrawerProps {
@@ -76,7 +75,6 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const currentEssence = useAppSelector(selectCurrentEssence);
   const rootState = useAppSelector(state => state);
 
   useEffect(() => {
