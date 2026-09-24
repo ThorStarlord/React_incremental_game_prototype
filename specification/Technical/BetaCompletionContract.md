@@ -1,13 +1,14 @@
 # Beta Completion Contract — Campaign One / 1.0
 
-**Status:** CURRENT AUTHORITY — PROVISIONAL 1.0 RELEASE CONTRACT  
+**Status:** CURRENT FUTURE-GATE AUTHORITY — PROVISIONAL 1.0 RELEASE CONTRACT  
+**Activation:** DOWNSTREAM OF FEATURE_COMPLETE  
 **Parent:** `../GameCompletionDefinition.md`  
 **Requires:** `AlphaCompletionContract.md` + Content Alpha  
 **Prepared:** 2026-09-11
 
 ## Purpose
 
-Beta begins only after the whole intended Campaign One exists. Beta is for **making the complete game understandable, stable, balanced, usable, and presentable**, not for resuming feature invention.
+Beta begins only after the whole intended Campaign One exists **and its required core gameplay features have reached sufficient L4 Feature Complete maturity**. Beta is for making that feature-complete game understandable, stable, balanced, usable, and presentable; it must not be used as a substitute for unfinished feature development.
 
 ## Beta entry
 
@@ -16,11 +17,11 @@ Beta may begin only when:
 - `ALPHA_PASS` has been recorded on an exact qualified candidate;
 - every Campaign One unit from Prologue through Epilogue has production content;
 - no required chapter/content unit is a placeholder;
-- all `CORE_1_0` scope requirements are implemented;
-- the feature scope is locked except for release-blocking change control;
+- all `CORE_1_0` scope requirements are implemented at sufficient **L4 Feature Complete** depth for their intended Campaign One role;
+- the outer feature scope is locked except for release-blocking change control; feature depth is no longer materially unfinished;
 - a full fresh-save run can legally reach campaign completion through ordinary UI.
 
-This state is **Content Alpha**.
+Historically the repository recorded **Content Alpha** after authored-spine and integration qualification. Under the corrected strategy, that historical record remains valid but is **not by itself sufficient Beta entry**. Beta activation additionally requires `FEATURE_COMPLETE`.
 
 ## Beta doctrine
 
@@ -58,7 +59,7 @@ The Beta evidence contract and repository work authorization are separate concer
 
 ```text
 missing human evidence
-!= bounded repository hardening forbidden
+!= bounded repository feature development forbidden
 
 missing human evidence
 = human-experience claims and BETA_PASS remain unproven
