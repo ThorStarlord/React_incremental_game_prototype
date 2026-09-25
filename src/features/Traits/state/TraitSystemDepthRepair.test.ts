@@ -57,7 +57,7 @@ describe('Trait system depth repair', () => {
     expect(classifyTraitEffectAuthority('craftingQualityBonus')).toBe('deferred_legacy');
   });
 
-  test('permanent Resonance requires a durable Player authority rather than any historical effect key', () => {
+  test('permanent Resonance requires durable Player authority and spends nothing when authority is absent', async () => {
     const deferredOnly: Trait = {
       ...SIMPLE_TRAIT,
       id: 'DeferredOnly',
@@ -97,6 +97,21 @@ describe('Trait system depth repair', () => {
         'This Trait has a live shared/runtime use but no permanent Player effect in Campaign One; keep it temporary/shareable instead of Resonating it.',
       ]),
     });
+
+    const essenceBefore = store.getState().essence.currentEssence;
+    const deferredAttempt = await store.dispatch(
+      acquireTraitWithEssenceThunk({ traitId: deferredOnly.id })
+    );
+    const sharedRuntimeAttempt = await store.dispatch(
+      acquireTraitWithEssenceThunk({ traitId: sharedRuntimeOnly.id })
+    );
+
+    expect(acquireTraitWithEssenceThunk.rejected.match(deferredAttempt)).toBe(true);
+    expect(acquireTraitWithEssenceThunk.rejected.match(sharedRuntimeAttempt)).toBe(true);
+    expect(store.getState().essence.currentEssence).toBe(essenceBefore);
+    expect(store.getState().player.permanentTraits).not.toEqual(
+      expect.arrayContaining([deferredOnly.id, sharedRuntimeOnly.id])
+    );
   });
 
   test('Resonance Level automatically unlocks the player Trait slots it promises', () => {
