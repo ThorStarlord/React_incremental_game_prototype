@@ -14,9 +14,11 @@ import {
   setCopySharePreference,
   ensureCopyAutomationState,
   markArchiveVerificationCaseVerified,
+  markForgeMaintenanceCaseMaintained,
   recordCopyException,
   resolveCopyException,
   upsertArchiveVerificationCase,
+  upsertForgeMaintenanceCase,
 } from './CopySlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { applySharePreferencesForCopyThunk } from './CopyThunks';
@@ -249,6 +251,49 @@ copyListeners.startListening({
             exceptionId: exception.id,
             tick,
             action: 'player_resolved',
+          }));
+        });
+      return;
+    }
+
+    if (action.payload.id === 'lyra_gc09_exp_prepare_structural') {
+      api.dispatch(upsertForgeMaintenanceCase({
+        id: 'forge_case_gc09_structural_upkeep',
+        status: 'pending',
+        classification: 'routine_upkeep',
+        createdAtTick: tick,
+      }));
+      return;
+    }
+
+    if (action.payload.id === 'lyra_gc09_exp_commit_structural') {
+      api.dispatch(upsertForgeMaintenanceCase({
+        id: 'forge_case_gc09_load_path_deviation',
+        status: 'pending',
+        classification: 'structural_deviation',
+        createdAtTick: tick,
+      }));
+      return;
+    }
+
+    if (action.payload.id === 'gronk_exp_forge_inspect_reframe') {
+      const state = api.getState();
+
+      Object.values(state.copy.exceptionsById ?? {})
+        .filter(exception =>
+          exception.routineId === 'forge_assistance' &&
+          exception.status !== 'resolved' &&
+          exception.context.code === 'forge_structural_deviation'
+        )
+        .forEach(exception => {
+          if (exception.context.code !== 'forge_structural_deviation') return;
+          api.dispatch(resolveCopyException({
+            exceptionId: exception.id,
+            tick,
+            action: 'player_resolved',
+          }));
+          api.dispatch(markForgeMaintenanceCaseMaintained({
+            caseId: exception.context.forgeCaseId,
           }));
         });
     }

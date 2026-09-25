@@ -143,8 +143,9 @@
       "gronk_greeting",
       "gronk_craft_request",
       "gronk_rumors",
-      "gronk_blade_held",
-      "gronk_m14_repair_ledger",
+  "gronk_blade_held",
+  "gronk_forge_inspect_reframe",
+  "gronk_m14_repair_ledger",
       "gronk_m23_guild_audit",
       "gronk_m23_guild_priority"
     ],

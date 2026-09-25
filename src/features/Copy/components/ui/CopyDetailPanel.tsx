@@ -71,6 +71,10 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
     Object.values(s.copy.archiveVerificationCasesById ?? {})
       .filter(item => item.status === 'pending').length
   );
+  const forgePendingCount = useAppSelector((s: RootState) =>
+    Object.values(s.copy.forgeMaintenanceCasesById ?? {})
+      .filter(item => item.status === 'pending').length
+  );
   const unresolvedCopyExceptions = useAppSelector((s: RootState) =>
     Object.values(s.copy.exceptionsById ?? {})
       .filter(exception =>
@@ -293,6 +297,59 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                                         {exception.context.conflictingSourceIds.length} archive sources conflict outside the mastered procedure.
                                       </Typography>
                                     )}
+                                    {exception.status === 'open' && (
+                                      <Button
+                                        size="small"
+                                        variant="text"
+                                        sx={{ mt: 0.25 }}
+                                        onClick={() => dispatch(acknowledgeCopyException({
+                                          exceptionId: exception.id,
+                                          tick: currentTick,
+                                        }))}
+                                      >
+                                        Acknowledge
+                                      </Button>
+                                    )}
+                                    {exception.status === 'acknowledged' && (
+                                      <Chip size="small" label="Acknowledged — decision still unresolved" color="warning" variant="outlined" sx={{ mt: 0.5 }} />
+                                    )}
+                                  </Box>
+                                ))}
+                            </Box>
+                          )}
+                          {task.id === 'forge_assistance' && (
+                            <Box sx={{ mt: 1 }}>
+                              <FormControlLabel
+                                control={
+                                  <Switch
+                                    size="small"
+                                    checked={Boolean(copy.standingOrders?.forge_assistance?.enabled)}
+                                    disabled={!isFamiliar}
+                                    onChange={(event) => dispatch(setCopyStandingOrderThunk({
+                                      copyId: copy.id,
+                                      taskId: 'forge_assistance',
+                                      enabled: event.target.checked,
+                                    }))}
+                                  />
+                                }
+                                label="Standing Order"
+                              />
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Maintain the authored Forge maintenance backlog automatically when this Copy is idle and eligible. Pending: {forgePendingCount}.
+                              </Typography>
+                              {unresolvedCopyExceptions
+                                .filter(exception => exception.routineId === 'forge_assistance')
+                                .map(exception => (
+                                  <Box
+                                    key={exception.id}
+                                    sx={{ mt: 0.75, borderLeft: 2, borderColor: 'warning.main', pl: 1 }}
+                                  >
+                                    <Typography variant="caption" color="warning.main" display="block">
+                                      Paused by exception: a structural deviation requires your judgment before Forge Assistance can continue.
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                      Resolve it explicitly with Gronk at the City Center (Inspect and Reframe). Acknowledge does not resolve.
+                                    </Typography>
                                     {exception.status === 'open' && (
                                       <Button
                                         size="small"

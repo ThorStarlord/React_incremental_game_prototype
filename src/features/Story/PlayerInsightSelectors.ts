@@ -356,7 +356,8 @@ export const selectOpenCopyExceptions = (
     .map(exception => {
       const copy = state.copy.copies[exception.copyId];
       const definition = getCopyProductionTaskDefinition(exception.routineId);
-      const sourceCount = exception.context.code === 'archive_source_contradiction'
+      const isForgeDeviation = exception.context.code === 'forge_structural_deviation';
+      const sourceCount = !isForgeDeviation && exception.context.code === 'archive_source_contradiction'
         ? exception.context.conflictingSourceIds.length
         : 0;
       const boundary = getCopyExceptionBoundaryDefinition(exception.context);
@@ -366,10 +367,14 @@ export const selectOpenCopyExceptions = (
         copyId: exception.copyId,
         copyName: copy?.name ?? exception.copyId,
         routineName: definition?.name ?? exception.routineId,
-        title: 'Archive source contradiction',
-        summary: sourceCount > 0
-          ? `${sourceCount} established archive sources conflict outside the mastered verification procedure. The Copy stopped rather than choosing an interpretation for you.`
-          : 'The mastered verification procedure reached a contradiction that requires player judgment.',
+        title: isForgeDeviation
+          ? 'Forge structural deviation'
+          : 'Archive source contradiction',
+        summary: isForgeDeviation
+          ? 'A Forge maintenance load exceeded the mastered assistance procedure. The Copy stopped rather than improvising structural work for you.'
+          : sourceCount > 0
+            ? `${sourceCount} established archive sources conflict outside the mastered verification procedure. The Copy stopped rather than choosing an interpretation for you.`
+            : 'The mastered verification procedure reached a contradiction that requires player judgment.',
         status: exception.status,
         severity: exception.severity,
         detectedAtTick: exception.detectedAtTick,
