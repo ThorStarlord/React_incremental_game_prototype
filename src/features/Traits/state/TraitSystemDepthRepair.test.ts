@@ -23,11 +23,31 @@ const SIMPLE_TRAIT: Trait = {
 };
 
 describe('Trait system depth repair', () => {
-  test('Essence Flow encodes a 15% additive contribution for the Copy multiplier formula', () => {
+  test('catalogue promises match their qualified Campaign One runtime authority', () => {
     const traits = JSON.parse(
       fs.readFileSync(path.join(process.cwd(), 'public/data/traits.json'), 'utf8')
     );
+
     expect(traits.EssenceFlow.effects.essenceGenerationMultiplier).toBe(0.15);
+    expect(traits.EssenceFlow.description).toContain('shared with or inherited by a Copy');
+    expect(traits.WillowsWisdom.description).toContain('slow-pattern cognition');
+    expect(traits.WillowsWisdom.description).not.toContain('15%');
+
+    const deferredOnly = Object.values(traits)
+      .filter((trait): trait is Trait => !!trait && typeof trait === 'object')
+      .filter(trait => summarizeTraitAuthority(trait).isDeferredOnly);
+
+    expect(deferredOnly.length).toBeGreaterThan(0);
+    deferredOnly.forEach(trait => {
+      expect(trait.description).toContain('not active in Campaign One');
+    });
+
+    expect(traits.TomeOfForbiddenKnowledge.description).toContain(
+      'Historical Intelligence metadata is not active in Campaign One'
+    );
+    expect(traits.MentalFocus.description).toContain(
+      'Historical Intelligence metadata is not active in Campaign One'
+    );
   });
 
   test('effect metadata has explicit execution authority instead of implying every key is live', () => {
