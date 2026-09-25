@@ -23,6 +23,8 @@ import {
   setCopySharePreference,
   markArchiveVerificationCaseVerified,
   markArchiveVerificationCaseEscalated,
+  markForgeMaintenanceCaseMaintained,
+  markForgeMaintenanceCaseEscalated,
   recordCopyException,
 } from './CopySlice';
 import { applyGrowth, applyLoyaltyDecay, computeInheritedTraits, getCopyCreationCost } from '../utils/copyUtils';
@@ -441,6 +443,49 @@ export const processCopyTasksThunk = createAsyncThunk(
             }
 
             dispatch(markArchiveVerificationCaseVerified({ caseId: archiveCase.id }));
+          }
+
+          if (
+            updated.origin?.type === 'standing_order' &&
+            updated.origin.routineId === 'forge_assistance' &&
+            updated.origin.subjectId
+          ) {
+            const currentState = getState() as RootState;
+            const forgeCase =
+              currentState.copy.forgeMaintenanceCasesById?.[updated.origin.subjectId];
+
+            if (!forgeCase) {
+              dispatch(addNotification({
+                type: 'warning',
+                message: `${copy.name} stopped Forge Assistance because its standing-order work item is no longer available.`,
+              }));
+              dispatch(clearCopyActiveTask({ copyId: copy.id }));
+              continue;
+            }
+
+            if (
+              forgeCase.classification === 'structural_deviation' &&
+              forgeCase.status !== 'maintained'
+            ) {
+              dispatch(markForgeMaintenanceCaseEscalated({ caseId: forgeCase.id }));
+              dispatch(recordCopyException({
+                id: `copy_exception:${copy.id}:forge_assistance:${forgeCase.id}`,
+                copyId: copy.id,
+                routineId: 'forge_assistance',
+                severity: 'blocking',
+                status: 'open',
+                detectedAtTick: currentState.gameLoop.currentTick,
+                detectedAtGameTimeMs: currentState.gameLoop.totalGameTime,
+                context: {
+                  code: 'forge_structural_deviation',
+                  forgeCaseId: forgeCase.id,
+                },
+              }));
+              dispatch(clearCopyActiveTask({ copyId: copy.id }));
+              continue;
+            }
+
+            dispatch(markForgeMaintenanceCaseMaintained({ caseId: forgeCase.id }));
           }
 
           // Role-based completion bonus remains Copy-owned progression flavor.

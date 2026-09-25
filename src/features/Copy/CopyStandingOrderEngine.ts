@@ -33,10 +33,14 @@ export const evaluateCopyStandingOrder = (
 ): CopyStandingOrderEvaluation => {
   if (!order.enabled) return { kind: 'satisfied' };
 
-  if (
-    routineId !== 'archive_verification' ||
-    order.condition.type !== 'archive_verification_backlog'
-  ) {
+  const isArchive =
+    routineId === 'archive_verification' &&
+    order.condition.type === 'archive_verification_backlog';
+  const isForge =
+    routineId === 'forge_assistance' &&
+    order.condition.type === 'forge_maintenance_backlog';
+
+  if (!isArchive && !isForge) {
     return {
       kind: 'blocked',
       reasons: ['No authored standing-order evaluator exists for this routine.'],
@@ -74,7 +78,11 @@ export const evaluateCopyStandingOrder = (
     return { kind: 'blocked', reasons: eligibility.reasons };
   }
 
-  const pendingCases = Object.values(state.copy.archiveVerificationCasesById ?? {})
+  const candidateCases: Array<{ id: string; status: string; createdAtTick: number }> = isForge
+    ? Object.values(state.copy.forgeMaintenanceCasesById ?? {})
+    : Object.values(state.copy.archiveVerificationCasesById ?? {});
+
+  const pendingCases = candidateCases
     .filter(candidate => candidate.status === 'pending')
     .sort((a, b) =>
       a.createdAtTick - b.createdAtTick || a.id.localeCompare(b.id)

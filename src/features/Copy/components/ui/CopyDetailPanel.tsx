@@ -288,9 +288,11 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                                     <Typography variant="caption" color="warning.main" display="block">
                                       Paused by exception: player judgment is required before Archive Verification can continue.
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" display="block">
-                                      {exception.context.conflictingSourceIds.length} archive sources conflict outside the mastered procedure.
-                                    </Typography>
+                                    {exception.context.code === 'archive_source_contradiction' && (
+                                      <Typography variant="caption" color="text.secondary" display="block">
+                                        {exception.context.conflictingSourceIds.length} archive sources conflict outside the mastered procedure.
+                                      </Typography>
+                                    )}
                                     {exception.status === 'open' && (
                                       <Button
                                         size="small"

@@ -182,7 +182,9 @@ copyListeners.startListening({
     const copyName = copy?.name ?? 'A Copy';
     api.dispatch(addNotification({
       type: 'warning',
-      message: `${copyName} paused Archive Verification: contradictory sources require your judgment.`,
+      message: action.payload.routineId === 'forge_assistance'
+        ? `${copyName} paused Forge Assistance: a structural deviation requires your judgment.`
+        : `${copyName} paused Archive Verification: contradictory sources require your judgment.`,
     }));
   },
 });
