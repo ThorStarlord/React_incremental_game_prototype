@@ -688,9 +688,13 @@ export const shareTraitWithNPCThunk = createAsyncThunk(
         .filter(s => !!s.traitId)
         .map(s => s.traitId as string)
     );
-    const playerHasTrait = playerPermanent.has(traitId) || equippedTraitIds.has(traitId);
-    if (!playerHasTrait) {
-      dispatch(addNotification({ type: 'warning', message: 'You must have this trait equipped or permanent to share it.' }));
+    const isPermanent = playerPermanent.has(traitId);
+    const isEquipped = equippedTraitIds.has(traitId);
+    if (isPermanent || !isEquipped) {
+      dispatch(addNotification({
+        type: 'warning',
+        message: 'Only equipped, non-permanent Traits can be shared with an NPC.',
+      }));
       return payload;
     }
 
