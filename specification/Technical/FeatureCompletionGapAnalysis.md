@@ -114,6 +114,8 @@ The repository already proves:
 - two established two-Trait doctrines can be deliberately foregrounded;
 - GC06 consumes active doctrine with distinct legal synthesis options;
 - the first bounded Candidate-A depth package extends active-doctrine consumption to GC08 preparation and GC10 finale while preserving GC07/GC09 as permanent-capability gates;
+- `ConstraintSense` and `AdversarialCalibration` now each have an independent GC08 distributed-preparation consumer in addition to doctrine participation;
+- permanent Resonance now fails closed when a catalogue Trait has no durable Player runtime authority, and temporary slots are explicitly scoped to experimentation/direct-effect/share staging;
 - capability provenance is visible through Player Insight / Traits surfaces.
 
 ### Gap
@@ -125,8 +127,8 @@ Current limitations include:
 - only two qualified doctrine profiles;
 - active doctrine now matters at GC06, GC08 preparation, and GC10 finale;
 - GC07 and GC09 intentionally retain permanent-Trait-pair gates so learned capability remains useful without repetitive switching;
-- several Trait identities have sparse cross-domain application;
-- temporary/equipped Trait semantics remain intentionally unresolved;
+- independent source-Trait use now exists for all four authored capability Traits, but repeated cross-domain application is still sparse for Gronk/Lyra relative to Willow/Elara;
+- temporary/equipped Trait semantics are now bounded to experimentation/direct-effect/share staging, but the human value of that loop remains unproven;
 - successful buildcraft often proves that an option exists rather than making the player's evolving build reshape a meaningful stretch of play.
 
 ### Depth-search target
@@ -160,7 +162,7 @@ A plausible L3 target is:
 - switching is meaningful enough to justify the focus mechanic but not required as repetitive menu tax;
 - the player can explain, from visible provenance, why the build option exists.
 
-The first bounded implementation package now satisfies part of this exit shape by giving both doctrines repeated consumers in GC06, GC08, and GC10 while deliberately leaving GC07/GC09 as learned-capability gates. Remaining L3 questions are independent source-Trait use, temporary-attunement semantics, and eventual human comprehension/preference.
+The first bounded implementation package gives both doctrines repeated consumers in GC06, GC08, and GC10 while deliberately leaving GC07/GC09 as learned-capability gates. The follow-on Trait coherence package closes the first independent-use gap for `ConstraintSense` and `AdversarialCalibration` and defines temporary attunement's Campaign One role. Remaining L3 questions are richer repeated cross-domain use, whether temporary experimentation/sharing earns enough player attention to remain prominent, and eventual human comprehension/preference.
 
 ## Candidate B — Mastery Compression / Copy organization
 
