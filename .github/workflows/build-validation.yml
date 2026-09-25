@@ -62,6 +62,10 @@ jobs:
         timeout-minutes: 12
         run: npm run gc08:validate
 
+      - name: Trait coherence qualification
+        timeout-minutes: 10
+        run: npm run trait-depth:validate
+
       - name: GC-09 Counterphase qualification
         timeout-minutes: 12
         run: npm run gc09:validate

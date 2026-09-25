@@ -18,7 +18,7 @@ const EquippedSlotsPanel: React.FC = React.memo(() => {
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Manage your active trait slots. Equip traits to gain their benefits or leave slots empty for future use.
+        Use slots to try discovered, non-permanent Traits and make selected Traits available for sharing. Permanent Traits no longer need a slot; Doctrine owns current late-game specialization.
       </Typography>
 
       {/* Integration Point for TraitSlotsContainer */}
@@ -36,10 +36,10 @@ const EquippedSlotsPanel: React.FC = React.memo(() => {
           • <strong>Equipped Traits:</strong> Click to unequip and free the slot
         </Typography>
         <Typography variant="body2" sx={{ mb: 1 }}>
-          • <strong>Locked Slots:</strong> Unlock through progression and achievements
+          • <strong>Locked Slots:</strong> Unlock automatically as Resonance Level increases
         </Typography>
         <Typography variant="body2">
-          • <strong>Permanent Traits:</strong> Do not require slots and are always active
+          • <strong>Permanent Traits:</strong> Do not require slots, remain active, and are no longer shared from Player slots
         </Typography>
       </Alert>
     </Box>

@@ -65,10 +65,10 @@ This document lists the functional requirements for the React Incremental RPG Pr
 *   **FR-TRAIT-003:** ✅ **IMPLEMENTED** - The system shall track the player's acquired traits.
 *   **FR-TRAIT-004:** ✅ **IMPLEMENTED** - The system shall provide the player with a limited number of slots to equip acquired traits.
 *   **FR-TRAIT-005:** ✅ **IMPLEMENTED** - The system shall apply the effects of equipped traits to the player character.
-*   **FR-TRAIT-006:** 🔄 **UI READY** - The system shall allow the player to spend a significant amount of Essence to make an acquired trait permanent, freeing up an equip slot while keeping the trait's effects active. *UI framework implemented, backend integration pending.*
+*   **FR-TRAIT-006:** ✅ **IMPLEMENTED / AUTHORITY-BOUNDED** - The system allows the player to spend catalogue-owned Essence cost to make a discovered Trait permanent when that Trait has qualified durable Player authority, freeing any temporary equip slot while preserving its supported permanent effect/capability. Deferred-only and shared-runtime-only Traits cannot consume Essence through permanent Resonance.
 *   **FR-TRAIT-007:** ✅ **IMPLEMENTED** - The system shall track the player's permanent traits.
 *   **FR-TRAIT-008:** ✅ **IMPLEMENTED** - The system allows NPCs to have "Shared Trait Slots" (defined in their data and managed by `NPCSlice`). Dynamic granting based on connection/loyalty is planned.
-*   **FR-TRAIT-009:** ✅ **IMPLEMENTED** - The system allows the player to place their acquired/permanent traits into an NPC's Shared Trait Slot via `NPCTraitsTab` and `shareTraitWithNPCThunk`.
+*   **FR-TRAIT-009:** ✅ **IMPLEMENTED** - The system allows the player to place a currently equipped, non-permanent Trait into an NPC Shared Trait Slot via `NPCTraitsTab` and `shareTraitWithNPCThunk`. Permanent Traits are deliberately not shareable from Player slots.
 *   **FR-TRAIT-010:** 📋 **PLANNED** - The system shall apply the effects of shared traits to the target NPC or Copy.
 *   **FR-TRAIT-011:** ✅ **IMPLEMENTED** - The system shall provide a UI for viewing trait definitions (Codex).
 *   **FR-TRAIT-012:** ✅ **IMPLEMENTED** - The system shall provide a UI for managing player equipped traits and slots.

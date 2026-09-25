@@ -69,7 +69,7 @@
     "release:rc:validate": "npm run release:rc:eligibility && npm run release:validate",
     "release:promote:validate": "npm run release:promotion:eligibility && npm run release:validate",
     "gc14:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand GC14ReleaseEligibility.test.ts",
-    "trait-depth:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand TraitSystemDepthRepair.test.ts RelationshipRuntime.test.ts RelationshipCapabilityConstellation.test.ts DoctrineFocusPlayerSurface.test.tsx GC08NetworkUnderPressure.test.tsx GC10FinaleEpilogue.test.tsx"
+    "trait-depth:validate": "cross-env CI=true react-scripts test --watchAll=false --runInBand TraitSystemDepthRepair.test.ts NPCTraitSharingAuthority.test.ts RelationshipRuntime.test.ts RelationshipCapabilityConstellation.test.ts DoctrineFocusPlayerSurface.test.tsx GC08NetworkUnderPressure.test.tsx GC10FinaleEpilogue.test.tsx"
   },
   "eslintConfig": {
     "extends": [

@@ -501,6 +501,24 @@
         "relationshipExperienceId": "elara_gc08_exp_distributed_preparation",
         "rewards": [],
         "logMessage": "You verify a broad distributed preparation pattern that the network can execute without specialized capability dependencies."
+      },
+      {
+        "id": "prepare_constraint_bottlenecks",
+        "label": "Protect the Critical Bottlenecks",
+        "description": "Use Constraint Sense on its own: identify which procedural and physical dependencies actually carry the distributed response, then protect those bottlenecks without adopting the full Structural Steward doctrine.",
+        "relationshipExperienceId": "gronk_gc08_exp_constraint_bottleneck_preparation",
+        "requiredPermanentTraitIds": ["ConstraintSense"],
+        "rewards": [],
+        "logMessage": "You use Constraint Sense to strip non-load-bearing work from the distributed procedure and protect the few dependencies whose failure would collapse the response."
+      },
+      {
+        "id": "prepare_adversarial_stress_test",
+        "label": "Red-Team the Distributed Procedure",
+        "description": "Use Adversarial Calibration on its own: model how the procedure is most likely to fail under hostile timing and stress-test those weak points without adopting the full Countermodeler doctrine.",
+        "relationshipExperienceId": "lyra_gc08_exp_adversarial_stress_test",
+        "requiredPermanentTraitIds": ["AdversarialCalibration"],
+        "rewards": [],
+        "logMessage": "You red-team the distributed procedure against its most likely failure moves and revise the sequence before the network has to rely on it."
       }
     ],
     "status": "NOT_STARTED",

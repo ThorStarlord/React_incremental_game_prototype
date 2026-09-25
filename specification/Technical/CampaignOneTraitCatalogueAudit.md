@@ -27,8 +27,8 @@ legacy JSON effect
 | --- | --- | --- |
 | `WillowsWisdom` | Elder Willow | systemic/slow-pattern reasoning; independent Quest/Combat use; Structural Steward component |
 | `ScholarlyInsight` | Elara | evidence-first model revision; independent Quest/Combat use; Countermodeler component |
-| `ConstraintSense` | Gronk | constraint-first judgment; Structural Steward component |
-| `AdversarialCalibration` | Lyra | opponent-model calibration; Countermodeler component |
+| `ConstraintSense` | Gronk | constraint-first judgment; independent GC08 bottleneck use; Structural Steward component |
+| `AdversarialCalibration` | Lyra | opponent-model calibration; independent GC08 stress-test use; Countermodeler component |
 
 These four authored Traits are the canonical Candidate-A capability-buildcraft core. Future depth should preferentially add repeated, causally legible consumers of these identities rather than grow the catalogue.
 
@@ -42,7 +42,9 @@ Examples include `BattleHardened`, `ResilientConstitution`, `ArcaneIntellect` fo
 
 ### REWORK only when pulled by an existing Campaign One system
 
-Definitions such as `EssenceFlow`, `CombatReflexes`, `RelationshipSage`, or `EssenceSiphon` may remain catalogue content, but a named consumer and tested value proposition must exist before their special-effect metadata is treated as production authority.
+`EssenceFlow` now has one explicit named consumer: when shared with or inherited by a Copy, `essenceGenerationMultiplier` contributes to that Copy's Essence generation. Its player-facing description states that exact scope. Because Campaign One has no permanent Player-owned consumer for that effect, `EssenceFlow` is **temporary/shareable runtime content, not a legal permanent Resonance purchase**.
+
+Definitions such as `CombatReflexes`, `RelationshipSage`, or `EssenceSiphon` may remain catalogue content for compatibility, but a named consumer and tested value proposition must exist before their special-effect metadata is treated as production authority.
 
 ### DEFER rather than resurrect cut systems
 
@@ -53,6 +55,36 @@ Definitions such as `EssenceFlow`, `CombatReflexes`, `RelationshipSage`, or `Ess
 ### REMOVE / CHANGE only through a bounded content package
 
 No mass deletion is authorized by this audit. Existing saves/content references remain stable until a concrete removal package proves a definition is unreachable or harmful.
+
+## Permanent Resonance authority
+
+Runtime authority and permanent Player authority are deliberately different questions.
+
+```text
+direct Player-stat effect
+OR semantic capability
+-> may support permanent Resonance
+
+named runtime effect with no permanent Player consumer
+-> may remain temporary/shareable
+-> cannot consume Essence for permanent Resonance
+
+deferred-only historical metadata
+-> cannot consume Essence for permanent Resonance
+```
+
+This closes the player-trust failure mode where a catalogue entry could spend Essence while its advertised effect had no current Player runtime. Mixed Traits remain legal when at least one durable Player effect is real; compatibility metadata is not mass-deleted.
+
+Temporary slots therefore have a bounded Campaign One role:
+
+```text
+discover
+-> experiment / use a qualified temporary effect
+-> optionally share while equipped
+-> permanently internalize only when permanent Player authority exists
+```
+
+Doctrine remains the current-specialization layer for learned relationship capabilities. Trait presets remain deferred until temporary attunement creates a demonstrated loadout problem.
 
 ## Effect execution contract
 
@@ -73,7 +105,7 @@ named consumer
 
 ## Candidate-A next depth question
 
-The first Candidate-A depth package resolves this selectively: GC08 preparation and GC10 finale consume active doctrine after GC06, while GC07 and GC09 remain permanent-capability gates. This creates repeated strategic-posture meaning without turning every chapter into a menu-switch tax.
+The first Candidate-A depth package resolves doctrine consumption selectively: GC08 preparation and GC10 finale consume active doctrine after GC06, while GC07 and GC09 remain permanent-capability gates. The coherence package additionally gives `ConstraintSense` and `AdversarialCalibration` independent GC08 distributed-preparation uses, so all four authored source Traits now have at least one identity outside merely being half of a doctrine.
 
 Prefer selective strategic-posture consumers and independent source-Trait uses over:
 

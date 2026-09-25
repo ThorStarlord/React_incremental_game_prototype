@@ -1,6 +1,6 @@
 # Trait System Specification
 
-**Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Trait capability + bounded two-profile doctrine composition implemented  
+**Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Resonance runtime-authority gating + bounded two-profile doctrine composition implemented  
 **Relationship migration:** ✅ Willow, Elara, Gronk, and Lyra use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
 **Discovery contract:** [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md)  
 **Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)  
@@ -47,7 +47,9 @@ discoveryMode?: TraitDiscoveryMode;
 Current authored relationship discoveries:
 
 - `WillowsWisdom` — discovered during **The First Lesson**;
-- `ScholarlyInsight` — discovered during **The Contradictory Footnote**.
+- `ScholarlyInsight` — discovered during **The Contradictory Footnote**;
+- `ConstraintSense` — discovered during **Measure Twice** with Gronk;
+- `AdversarialCalibration` — discovered during **Coercion Reflected** with Lyra.
 
 Discovery is attached to the event where the pattern becomes recognizable, not to Connection level by itself.
 
@@ -59,14 +61,15 @@ Temporary equipping:
 
 - costs no Essence;
 - is reversible;
-- can provide existing Trait effects while slotted;
-- may participate in NPC/Copy sharing where existing rules allow it.
+- can provide qualified direct Player-stat effects while slotted;
+- stages an equipped non-permanent Trait for NPC/Copy sharing where the target rules allow it;
+- supports experimentation before the player commits Essence to permanent Resonance.
 
-Permanent Traits do not require an active slot.
+Permanent Traits do not require an active slot and are no longer shareable from Player Trait slots.
 
 Undiscovered authored patterns cannot be equipped from the NPC Overview.
 
-M16 does **not** qualify temporary/equipped Traits as equivalent to permanent learned capability for authored gameplay gates. Whether temporary attunement grants full, partial, unstable, or only passive capability access remains a future production question.
+Campaign One does **not** treat temporary/equipped Traits as equivalent to permanent learned capability for authored gameplay gates. The finished-game role of temporary slots is therefore bounded: **experiment / temporarily benefit / share before internalization**. Doctrine, not temporary slots, owns current late-game specialization. This does not claim that temporary attunement already has enough human-validated strategic depth to justify presets or a larger loadout system.
 
 ### 1.3 Gameplay capability authority
 
@@ -141,6 +144,30 @@ A doctrine is not a separately acquired Trait and is not independently persisted
 Quest and Dialogue authoring may use `requiredActiveDoctrineIds` where a choice specifically depends on current specialization. The player-facing Doctrine tab now qualifies explicit Adopt / Switch / Clear control for eligible learned pairs, and Player Insight projects the active doctrine read-only. GC06 establishes the first specialization gate; GC08 preparation and GC10 finale routes now reuse active doctrine where the player is explicitly choosing or carrying a strategic posture. GC07 and GC09 intentionally retain permanent-Trait-pair gates so learned capability remains useful without forcing repetitive menu switching every chapter.
 
 See `RelationshipCapabilityConstellation.md` for the bounded Redux, persistence, consumption, and evidence contract.
+
+### 1.4 Permanent Resonance runtime authority
+
+A discovered Trait is not automatically a legal permanent Essence purchase merely because it has historical effect metadata.
+
+`summarizeTraitAuthority` distinguishes:
+
+```text
+direct_player_stat
+named_runtime
+semantic_capability
+deferred_legacy
+```
+
+Permanent Player Resonance requires at least one **durable Player authority**:
+
+- a direct Player-stat effect consumed by the Player stat pipeline; or
+- a semantic capability consumed by authored gameplay requirements.
+
+A `named_runtime` effect may be real without being a permanent Player effect. The production example is `EssenceFlow.essenceGenerationMultiplier`: it is consumed by Copy Essence generation when the Trait is shared/inherited by a Copy, so the Trait remains meaningful as temporary/shareable content but cannot consume Essence to become a permanent Player Trait.
+
+A Trait whose effects are entirely `deferred_legacy` cannot be permanently Resonated. This prevents obsolete JSON metadata from charging the player for a capability the current game does not execute.
+
+The shared readiness projection exposes these blockers to the Management/Codex surfaces and the acquisition thunk reuses the same fail-closed authority before any Essence is spent.
 
 ## 2. Resonance authority
 
@@ -321,12 +348,13 @@ The thunk:
 2. validates source NPC and qualified Connection;
 3. validates assimilation and compatibility;
 4. validates required Memory evidence and Trait prerequisites;
-5. validates enough Essence;
-6. validates/records the authored final Resonance Experience;
-7. spends Essence;
-8. adds the Trait to `player.permanentTraits`;
-9. frees any temporary player slot containing that Trait;
-10. emits success feedback.
+5. validates that the Trait has qualified durable Player authority for permanent Resonance;
+6. validates enough Essence;
+7. validates/records the authored final Resonance Experience;
+8. spends Essence;
+9. adds the Trait to `player.permanentTraits`;
+10. frees any temporary player slot containing that Trait;
+11. emits success feedback.
 
 The authored event is idempotent, and the permanent-Trait check prevents repeated acquisition from spending Essence twice.
 
@@ -405,7 +433,8 @@ Temporary equipping must not be silently treated as equivalent to permanent auth
 
 Existing sharing behavior remains outside the relationship redesign:
 
-- equipped, non-permanent player Traits may be shared where NPC/Copy slot rules allow;
+- only equipped, non-permanent Player Traits may be shared where NPC/Copy slot rules allow;
+- both the normal UI and mutation thunks enforce that boundary;
 - listeners remove incompatible shares when a Trait is unequipped, replaced, or made permanent.
 
 M8 does not redesign Copy Trait inheritance.
@@ -442,6 +471,13 @@ The general Traits management surface consumes that readiness projection instead
 
 The authored production catalogue also normalizes `ConstraintSense` and `AdversarialCalibration` category/rarity casing and removes stale legacy `requirements.relationshipLevel` fields from Willow/Elara. Modern Relationship authority is expressed only through the explicit Connection/assimilation/compatibility/Memory contract.
 
+The coherence package adds independent semantic use for the two previously pair-dominant source Traits during GC08 distributed preparation:
+
+- permanent `ConstraintSense` may identify and protect the procedure's critical bottlenecks without requiring Structural Steward;
+- permanent `AdversarialCalibration` may red-team the distributed procedure without requiring Countermodeler.
+
+Both are local refinements of the distributed preparation path. They do not replace the two-Trait doctrines or manufacture new doctrine identities.
+
 Focused qualification:
 
 ```bash
@@ -455,8 +491,8 @@ This repair does **not** promote the full Trait catalogue to feature-complete st
 - Most legacy/simple Traits still default to initially known; they have not been given authored discovery content.
 - Relationship Experiences are only one possible future discovery source; quests, exploration, combat, research, or items may reveal other Traits.
 - Historical pre-Relationships saves do not reconstruct perfect discovery provenance; M8 only performs conservative additive repair from existing authored evidence.
-- Temporary/equipped Trait gameplay authority beyond existing effects is not qualified by M16.
-- The two established Campaign One doctrine pairs are the only qualified synergy composition; GC06/GC08/GC10 consume current doctrine while GC07/GC09 preserve permanent-pair capability gates. A generic capability graph, arbitrary pair lattice, N-way combinations, and broad Copy redesign remain out of scope.
+- Temporary/equipped Traits are qualified as reversible experimentation/direct-effect/share staging, but temporary ownership still does not satisfy permanent-capability gameplay gates. Human value of that slot loop remains unproven.
+- The two established Campaign One doctrine pairs are the only qualified synergy composition; GC06/GC08/GC10 consume current doctrine while GC07/GC09 preserve permanent-pair capability gates. GC08 now also gives `ConstraintSense` and `AdversarialCalibration` bounded independent uses. A generic capability graph, arbitrary pair lattice, N-way combinations, and broad Copy redesign remain out of scope.
 - Permanent-Trait and active-doctrine gates remain explicit bounded fields, not a general stat/skill/ability condition DSL.
 
 For the full M8 migration rationale and qualification evidence, see [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md).

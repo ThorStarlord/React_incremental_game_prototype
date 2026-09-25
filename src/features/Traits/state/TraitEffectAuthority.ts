@@ -1,3 +1,5 @@
+import type { Trait } from './TraitsTypes';
+
 export type TraitEffectAuthority =
   | 'direct_player_stat'
   | 'named_runtime'
@@ -19,6 +21,8 @@ const DIRECT_PLAYER_STATS = new Set([
 ]);
 
 // These keys have a concrete non-PlayerStats production consumer.
+// They are live runtime metadata, but they do not automatically imply that
+// making the Trait permanent on the Player has a durable Player-owned effect.
 const NAMED_RUNTIME_EFFECTS = new Set([
   'essenceGenerationMultiplier',
 ]);
@@ -37,6 +41,52 @@ export const classifyTraitEffectAuthority = (effectName: string): TraitEffectAut
   if (NAMED_RUNTIME_EFFECTS.has(effectName)) return 'named_runtime';
   if (SEMANTIC_CAPABILITY_EFFECTS.has(effectName)) return 'semantic_capability';
   return 'deferred_legacy';
+};
+
+const getTraitEffectNames = (trait: Trait): string[] => {
+  if (!trait.effects) return [];
+  if (Array.isArray(trait.effects)) {
+    return trait.effects
+      .map(effect => effect.type)
+      .filter((effectName): effectName is string => typeof effectName === 'string');
+  }
+  return Object.keys(trait.effects);
+};
+
+export interface TraitAuthoritySummary {
+  effectNames: string[];
+  authorities: TraitEffectAuthority[];
+  hasDirectPlayerStatAuthority: boolean;
+  hasNamedRuntimeAuthority: boolean;
+  hasSemanticCapabilityAuthority: boolean;
+  hasPermanentPlayerAuthority: boolean;
+  isDeferredOnly: boolean;
+}
+
+export const summarizeTraitAuthority = (trait: Trait): TraitAuthoritySummary => {
+  const effectNames = getTraitEffectNames(trait);
+  const authorities = Array.from(new Set(effectNames.map(classifyTraitEffectAuthority)));
+
+  const hasDirectPlayerStatAuthority = authorities.includes('direct_player_stat');
+  const hasNamedRuntimeAuthority = authorities.includes('named_runtime');
+  const hasSemanticCapabilityAuthority = authorities.includes('semantic_capability');
+
+  return {
+    effectNames,
+    authorities,
+    hasDirectPlayerStatAuthority,
+    hasNamedRuntimeAuthority,
+    hasSemanticCapabilityAuthority,
+    // Permanent Player Resonance must create either an always-active Player stat
+    // effect or a durable semantic capability. A runtime effect that only matters
+    // while shared/inherited elsewhere is not enough to justify spending Essence
+    // to make the Player Trait permanent.
+    hasPermanentPlayerAuthority:
+      hasDirectPlayerStatAuthority || hasSemanticCapabilityAuthority,
+    isDeferredOnly:
+      effectNames.length === 0 ||
+      authorities.every(authority => authority === 'deferred_legacy'),
+  };
 };
 
 export const isTraitEffectExecutedGenerically = (effectName: string): boolean =>

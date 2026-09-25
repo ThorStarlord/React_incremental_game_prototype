@@ -3,7 +3,7 @@
     "id": "BargainingMaster",
     "name": "Bargaining Master",
     "category": "Social",
-    "description": "Your keen business sense allows you to get better deals from merchants.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical merchant-discount effect is not active in Campaign One.",
     "essenceCost": 50,
     "effects": {
       "shopDiscount": 0.05
@@ -15,7 +15,7 @@
     "id": "QuickLearner",
     "name": "Quick Learner",
     "category": "Knowledge",
-    "description": "You gain 15% more skill experience from all sources.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical generic skill-XP effect is not active in Campaign One.",
     "essenceCost": 75,
     "effects": {
       "skillXpMultiplier": 0.15
@@ -27,7 +27,7 @@
     "id": "MentorsInsight",
     "name": "Mentor's Insight",
     "category": "Mental",
-    "description": "Increases essence gained from all sources by 10%",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical global Essence-gain multiplier is not active in Campaign One.",
     "essenceCost": 50,
     "effects": {
       "essenceGainMultiplier": 1.1
@@ -53,7 +53,7 @@
     "id": "EssenceSiphon",
     "name": "Essence Siphon",
     "category": "Combat",
-    "description": "You have a chance to gain essence when landing hits in combat.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical on-hit Essence siphon effect is not active in Campaign One.",
     "essenceCost": 120,
     "effects": {
       "essenceSiphonChance": 0.05,
@@ -71,7 +71,7 @@
     "id": "RelationshipSage",
     "name": "Relationship Sage",
     "category": "Social",
-    "description": "Your actions have a greater impact on NPC relationships.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical relationship-gain multiplier is not active in Campaign One.",
     "essenceCost": 90,
     "effects": {
       "relationshipGainMultiplier": 1.2
@@ -83,7 +83,7 @@
     "id": "EssenceFlow",
     "name": "Essence Flow",
     "category": "Knowledge",
-    "description": "Increases your essence generation rate from all sources.",
+    "description": "When this Trait is shared with or inherited by a Copy, that Copy generates 15% more Essence. Campaign One does not give this effect a permanent Player-owned runtime consumer.",
     "essenceCost": 150,
     "effects": {
       "essenceGenerationMultiplier": 0.15
@@ -95,7 +95,7 @@
     "id": "CombatReflexes",
     "name": "Combat Reflexes",
     "category": "Combat",
-    "description": "Increases your chance to dodge enemy attacks.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical dodge-chance effect is not active in Campaign One.",
     "essenceCost": 100,
     "effects": {
       "dodgeChance": 0.1
@@ -107,7 +107,7 @@
     "id": "GrowingAffinity",
     "name": "Growing Affinity",
     "category": "Social",
-    "description": "Automatically increases relationships with all NPCs by 1 point every minute.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical passive relationship growth is not active in Campaign One.",
     "essenceCost": 20,
     "effects": {
       "passiveRelationshipGrowth": 1
@@ -119,7 +119,7 @@
     "id": "WillowsWisdom",
     "name": "Willow's Wisdom",
     "category": "Knowledge",
-    "description": "Elder Willow's ancient knowledge increases your learning speed by 15%.",
+    "description": "Internalized slow-pattern cognition from Elder Willow: trace visible symptoms back to the slower systemic cause and act on the underlying flow.",
     "essenceCost": 40,
     "sourceNpc": "npc_elder_willow",
     "discoveryMode": "authored",
@@ -228,7 +228,7 @@
     "id": "SilverTongue",
     "name": "Silver Tongue",
     "category": "Social",
-    "description": "You have a way with words, making social interactions more favorable.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical charisma/social modifier is not active in Campaign One.",
     "essenceCost": 70,
     "effects": {
       "charismaBonus": 2
@@ -240,7 +240,7 @@
     "id": "MasterCraftsman",
     "name": "Master Craftsman",
     "category": "Knowledge",
-    "description": "Your skill in crafting is unparalleled, yielding better quality items.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical generic Crafting-quality effect is not active in Campaign One.",
     "essenceCost": 200,
     "effects": {
       "craftingQualityBonus": 0.15
@@ -252,7 +252,7 @@
     "id": "ShadowWalker",
     "name": "Shadow Walker",
     "category": "Physical",
-    "description": "You move like a whisper in the dark, enhancing your stealth capabilities.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical stealth-effectiveness modifier is not active in Campaign One.",
     "essenceCost": 180,
     "effects": {
       "stealthEffectiveness": 0.2
@@ -264,7 +264,7 @@
     "id": "ElementalAffinity",
     "name": "Elemental Affinity",
     "category": "Mental",
-    "description": "You have a natural connection to the elements, boosting your magical damage.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical magic-damage modifier is not active in Campaign One.",
     "essenceCost": 250,
     "effects": {
       "magicDamageBonus": 0.1
@@ -288,7 +288,7 @@
     "id": "TomeOfForbiddenKnowledge",
     "name": "Tome of Forbidden Knowledge",
     "category": "Knowledge",
-    "description": "Unlocking secrets man was not meant to know. Grants immense power at a potential cost.",
+    "description": "Forbidden techniques expand maximum Mana and Mana regeneration at a direct Health cost. Historical Intelligence metadata is not active in Campaign One.",
     "essenceCost": 1000,
     "effects": {
       "intelligence": 10,
@@ -334,7 +334,7 @@
     "id": "EssenceAffinity",
     "name": "Essence Affinity",
     "category": "Essence",
-    "description": "Natural connection to essence energy, improving generation and control.",
+    "description": "Legacy catalogue Trait retained for save/content compatibility. Its historical Essence generation/capacity effects are not active in Campaign One.",
     "essenceCost": 25,
     "effects": {
       "essenceGeneration": 1.2,
@@ -347,7 +347,7 @@
     "id": "MentalFocus",
     "name": "Mental Focus",
     "category": "Mental",
-    "description": "Enhances mental clarity and concentration, improving spellcasting and thought processes.",
+    "description": "Disciplined focus improves Mana regeneration. Historical Intelligence metadata is not active in Campaign One.",
     "essenceCost": 30,
     "effects": {
       "manaRegen": 0.1,

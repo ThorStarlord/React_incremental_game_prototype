@@ -111,10 +111,10 @@ describe('Checkpoint C incremental integration repair qualification', () => {
       repair_resonance_trait: {
         id: 'repair_resonance_trait',
         name: 'Repair Resonance Trait',
-        description: 'A source-free qualification Trait for the repair probe.',
+        description: 'A source-free qualification Trait with a real Player effect for the repair probe.',
         category: 'utility',
         rarity: 'common',
-        effects: {},
+        effects: { attack: 1 },
         essenceCost: 0,
       },
     }));
