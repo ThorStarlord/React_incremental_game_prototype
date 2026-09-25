@@ -62,14 +62,14 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <AlertTitle>Make Traits Permanent</AlertTitle>
-        Spend Essence to "resonate" with a discovered trait, making it a permanent part of your character. Permanent traits are always active and do not require a slot.
+        Resonance can make a discovered Trait permanent only when Campaign One has a qualified durable Player effect for it. Permanent Traits stay active without occupying a slot.
       </Alert>
 
       <Card>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="h6">
-              Discovered Traits ({traitsToMakePermanent.length} available to make permanent)
+              Discovered Non-Permanent Traits ({traitsToMakePermanent.length})
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <EssenceIcon color="secondary" />
@@ -144,7 +144,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
               <Box sx={{ p: 3, textAlign: 'center' }}>
                 <PermanentIcon color="disabled" sx={{ fontSize: 48, mb: 2 }} />
                 <Typography color="text.secondary">
-                  You have made all your discovered traits permanent.
+                  No discovered non-permanent Traits remain.
                 </Typography>
               </Box>
             )}
