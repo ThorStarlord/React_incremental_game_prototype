@@ -151,9 +151,6 @@
       "title": "Commit the Distributed Posture",
       "text": "Commit the network to broad verified preparation. It will not be the most specialized posture, but more of the network can understand and execute it.",
       "repeatable": false,
-      "requiredExperienceIds": [
-        "elara_gc08_exp_distributed_preparation"
-      ],
       "requiredWorldState": [
         {
           "regionId": "location_merchant_district",
@@ -188,7 +185,12 @@
       ],
       "next": {
         "commit": null
-      }
+      },
+      "anyOfExperienceIds": [
+        "elara_gc08_exp_distributed_preparation",
+        "gronk_gc08_exp_constraint_bottleneck_preparation",
+        "lyra_gc08_exp_adversarial_stress_test"
+      ]
     },
     "lyra_gc08_commit_structural": {
       "id": "lyra_gc08_commit_structural",
