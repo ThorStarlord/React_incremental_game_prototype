@@ -6,6 +6,7 @@ import {
   selectTraitAssimilationState,
   selectUsesRelationshipConnectionAuthority,
 } from '../../Relationships/state/RelationshipSelectors';
+import { summarizeTraitAuthority } from './TraitEffectAuthority';
 
 export interface TraitResonanceReadiness {
   traitId: string;
@@ -42,6 +43,19 @@ export const evaluateTraitResonanceReadiness = (
 
   if (!discovered) blockers.push(`Discover ${trait.name} before Resonance.`);
   if (permanent) blockers.push('Trait is already permanent.');
+
+  const authority = summarizeTraitAuthority(trait);
+  if (!authority.hasPermanentPlayerAuthority) {
+    if (authority.hasNamedRuntimeAuthority) {
+      blockers.push(
+        'This Trait has a live shared/runtime use but no permanent Player effect in Campaign One; keep it temporary/shareable instead of Resonating it.'
+      );
+    } else {
+      blockers.push(
+        'This legacy Trait has no qualified Campaign One runtime effect and is not available for permanent Resonance.'
+      );
+    }
+  }
 
   const sourceNpcId = trait.sourceNpc || trait.source;
   if (sourceNpcId) {
