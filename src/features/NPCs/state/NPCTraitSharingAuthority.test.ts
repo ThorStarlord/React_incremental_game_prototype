@@ -54,7 +54,7 @@ describe('NPC Trait sharing authority', () => {
 
     expect(store.getState().npcs.npcs.npc_share_probe.sharedTraitSlots?.[0].traitId)
       .toBeNull();
-    expect(store.getState().notifications.notifications.some(notification =>
+    expect(store.getState().notifications.items.some(notification =>
       notification.message.includes('Only equipped, non-permanent Traits')
     )).toBe(true);
   });
