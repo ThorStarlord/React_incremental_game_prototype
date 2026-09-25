@@ -313,12 +313,23 @@ describe('GC-08 Network Under Pressure', () => {
     )).toBe(true);
   });
 
-  test('baseline preparation remains viable while specialized preparation requires current doctrine focus', () => {
-    const baseline = quests.quest_gc08_distributed_preparation.resolutionOptions[0];
+  test('baseline and independent source-Trait preparation remain viable while doctrine routes require current focus', () => {
+    const distributedOptions = quests.quest_gc08_distributed_preparation.resolutionOptions;
+    const baseline = distributedOptions.find((option: any) => option.id === 'prepare_distributed_baseline');
+    const constraint = distributedOptions.find((option: any) => option.id === 'prepare_constraint_bottlenecks');
+    const adversarial = distributedOptions.find((option: any) => option.id === 'prepare_adversarial_stress_test');
     const structural = quests.quest_gc08_structural_preparation.resolutionOptions[0];
     const diagnostic = quests.quest_gc08_diagnostic_preparation.resolutionOptions[0];
 
     expect(canUseQuestResolution(baseline, [])).toBe(true);
+
+    expect(constraint.requiredPermanentTraitIds).toEqual(['ConstraintSense']);
+    expect(canUseQuestResolution(constraint, [])).toBe(false);
+    expect(canUseQuestResolution(constraint, ['ConstraintSense'])).toBe(true);
+
+    expect(adversarial.requiredPermanentTraitIds).toEqual(['AdversarialCalibration']);
+    expect(canUseQuestResolution(adversarial, [])).toBe(false);
+    expect(canUseQuestResolution(adversarial, ['AdversarialCalibration'])).toBe(true);
 
     expect(structural.requiredPermanentTraitIds).toBeUndefined();
     expect(structural.requiredActiveDoctrineIds).toEqual(['structural_steward']);
@@ -345,6 +356,50 @@ describe('GC-08 Network Under Pressure', () => {
       ['ScholarlyInsight', 'AdversarialCalibration'],
       ['countermodeler']
     )).toBe(true);
+  });
+
+  test.each([
+    {
+      traitId: 'ConstraintSense',
+      resolutionId: 'prepare_constraint_bottlenecks',
+      experienceId: 'gronk_gc08_exp_constraint_bottleneck_preparation',
+    },
+    {
+      traitId: 'AdversarialCalibration',
+      resolutionId: 'prepare_adversarial_stress_test',
+      experienceId: 'lyra_gc08_exp_adversarial_stress_test',
+    },
+  ])('$traitId independently refines distributed preparation without requiring a doctrine', async ({
+    traitId,
+    resolutionId,
+    experienceId,
+  }) => {
+    const store = makeStore();
+    await initialize(store);
+    await seedCounterphaseEntry(store, 'gronk_exp_aftermath_quiet_reroute');
+    await diagnoseWithElara(store);
+    store.dispatch(addPermanentTrait(traitId));
+
+    await completePreparationQuest(
+      store,
+      'quest_gc08_distributed_preparation',
+      'location_merchant_district',
+      resolutionId
+    );
+
+    expect(store.getState().relationships.experiencesById[experienceId]).toBeDefined();
+
+    const committed = await interact(
+      store,
+      'npc_lyra',
+      'lyra_gc08_commit_distributed',
+      'commit'
+    );
+    expect(committed.success).toBe(true);
+    expect(selectNetworkPosture(
+      store.getState(),
+      'location_merchant_district'
+    )).toBe('distributed');
   });
 
   test.each([
