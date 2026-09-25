@@ -83,7 +83,7 @@
     "id": "EssenceFlow",
     "name": "Essence Flow",
     "category": "Knowledge",
-    "description": "Increases your essence generation rate from all sources.",
+    "description": "When this Trait is shared with or inherited by a Copy, that Copy generates 15% more Essence. Campaign One does not give this effect a permanent Player-owned runtime consumer.",
     "essenceCost": 150,
     "effects": {
       "essenceGenerationMultiplier": 0.15
