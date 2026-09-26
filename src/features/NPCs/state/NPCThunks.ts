@@ -381,6 +381,23 @@ export const processNPCInteractionThunk = createAsyncThunk<
 
         const currentState = getState() as RootState;
 
+        const requiredPermanentTraitIds = Array.isArray(node.requiredPermanentTraitIds)
+          ? node.requiredPermanentTraitIds as string[]
+          : [];
+        const missingPermanentTrait = requiredPermanentTraitIds.find(
+          (traitId: string) => !currentState.player.permanentTraits.includes(traitId)
+        );
+        if (missingPermanentTrait) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'You have not permanently learned the capability this conversation depends on yet.',
+          }));
+          return {
+            success: false,
+            message: `Required permanent Trait not learned: ${missingPermanentTrait}`,
+          } as InteractionResult;
+        }
+
         const activeDoctrineIds = selectActiveDoctrineIds(currentState);
         const requiredActiveDoctrineIds = Array.isArray(node.requiredActiveDoctrineIds)
           ? node.requiredActiveDoctrineIds as DoctrineId[]
