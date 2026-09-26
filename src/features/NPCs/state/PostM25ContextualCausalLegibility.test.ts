@@ -10,6 +10,7 @@ const baseContext = {
   knownFactIds: [] as string[],
   factionReputationByFactionId: {} as Record<string, number>,
   worldStateRegions: {},
+  permanentTraitIds: [] as string[],
   activeDoctrineIds: [] as const,
 };
 
