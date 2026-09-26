@@ -30,6 +30,7 @@ import {
 import type { WorldStateMutation } from '../../WorldState/state/WorldStateTypes';
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
+import { getMissingPermanentTraitIds } from '../../Traits/state/TraitCapabilityRequirements';
 
 const isExcludedCampaignOneService = (serviceId: string): boolean =>
   /trait_teacher|crafter_/i.test(serviceId);
@@ -380,6 +381,24 @@ export const processNPCInteractionThunk = createAsyncThunk<
         }
 
         const currentState = getState() as RootState;
+
+        const requiredPermanentTraitIds = Array.isArray(node.requiredPermanentTraitIds)
+          ? node.requiredPermanentTraitIds as string[]
+          : [];
+        const missingPermanentTraitIds = getMissingPermanentTraitIds(
+          requiredPermanentTraitIds,
+          currentState.player.permanentTraits
+        );
+        if (missingPermanentTraitIds.length > 0) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'You have not learned the capability this conversation depends on yet.',
+          }));
+          return {
+            success: false,
+            message: `Missing permanent Trait: ${missingPermanentTraitIds[0]}`,
+          } as InteractionResult;
+        }
 
         const activeDoctrineIds = selectActiveDoctrineIds(currentState);
         const requiredActiveDoctrineIds = Array.isArray(node.requiredActiveDoctrineIds)
