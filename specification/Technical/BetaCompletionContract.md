@@ -1,7 +1,7 @@
 # Beta Completion Contract — Campaign One / 1.0
 
-**Status:** CURRENT FUTURE-GATE AUTHORITY — PROVISIONAL 1.0 RELEASE CONTRACT  
-**Activation:** DOWNSTREAM OF FEATURE_COMPLETE  
+**Status:** CURRENT ACTIVE GATE AUTHORITY — PROVISIONAL 1.0 RELEASE CONTRACT  
+**Activation:** ACTIVE AFTER FEATURE_COMPLETE — human evidence open  
 **Parent:** `../GameCompletionDefinition.md`  
 **Requires:** `AlphaCompletionContract.md` + Content Alpha  
 **Prepared:** 2026-09-11
@@ -21,7 +21,7 @@ Beta may begin only when:
 - the outer feature scope is locked except for release-blocking change control; feature depth is no longer materially unfinished;
 - a full fresh-save run can legally reach campaign completion through ordinary UI.
 
-Historically the repository recorded **Content Alpha** after authored-spine and integration qualification. Under the corrected strategy, that historical record remains valid but is **not by itself sufficient Beta entry**. Beta activation additionally requires `FEATURE_COMPLETE`.
+Historically the repository recorded **Content Alpha** after authored-spine and integration qualification. Under the corrected strategy, that historical record remains valid but is **not by itself sufficient Beta entry**. The B -> A -> C feature-depth sequence subsequently closed in [`FeatureCompletionConvergenceResult.md`](FeatureCompletionConvergenceResult.md), so `FEATURE_COMPLETE / REPOSITORY-QUALIFIED / HUMAN-UNVALIDATED` is now satisfied and this Beta contract is the active maturity gate.
 
 ## Beta doctrine
 
