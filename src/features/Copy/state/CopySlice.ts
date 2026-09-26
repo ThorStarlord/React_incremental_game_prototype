@@ -14,6 +14,7 @@ import {
   CopyStandingOrder,
   CopyTask,
   CopyTraitSlot,
+  ForgeMaintenanceCase,
 } from './CopyTypes';
 import { COPY_SYSTEM } from '../../../constants/gameConstants';
 import { clamp } from '../utils/copyUtils';
@@ -265,6 +266,49 @@ const copiesSlice = createSlice({
       item.status = 'escalated';
     },
 
+    /** Create or update one authored Forge maintenance work item. */
+    upsertForgeMaintenanceCase: (
+      state,
+      action: PayloadAction<ForgeMaintenanceCase>
+    ) => {
+      state.forgeMaintenanceCasesById ??= {};
+      const existing = state.forgeMaintenanceCasesById[action.payload.id];
+      if (existing && existing.status !== 'pending') return;
+      state.forgeMaintenanceCasesById[action.payload.id] = {
+        ...action.payload,
+        ...(existing ?? {}),
+      };
+    },
+
+    assignForgeMaintenanceCase: (
+      state,
+      action: PayloadAction<{ caseId: string; copyId: string }>
+    ) => {
+      state.forgeMaintenanceCasesById ??= {};
+      const item = state.forgeMaintenanceCasesById[action.payload.caseId];
+      if (!item || item.status !== 'pending') return;
+      item.status = 'in_progress';
+      item.assignedCopyId = action.payload.copyId;
+    },
+
+    markForgeMaintenanceCaseMaintained: (
+      state,
+      action: PayloadAction<{ caseId: string }>
+    ) => {
+      const item = state.forgeMaintenanceCasesById?.[action.payload.caseId];
+      if (!item) return;
+      item.status = 'maintained';
+    },
+
+    markForgeMaintenanceCaseEscalated: (
+      state,
+      action: PayloadAction<{ caseId: string }>
+    ) => {
+      const item = state.forgeMaintenanceCasesById?.[action.payload.caseId];
+      if (!item) return;
+      item.status = 'escalated';
+    },
+
     recordCopyException: (state, action: PayloadAction<CopyException>) => {
       state.exceptionsById ??= {};
       if (!state.exceptionsById[action.payload.id]) {
@@ -421,6 +465,10 @@ export const {
     assignArchiveVerificationCase,
     markArchiveVerificationCaseVerified,
     markArchiveVerificationCaseEscalated,
+    upsertForgeMaintenanceCase,
+    assignForgeMaintenanceCase,
+    markForgeMaintenanceCaseMaintained,
+    markForgeMaintenanceCaseEscalated,
     recordCopyException,
     acknowledgeCopyException,
     resolveCopyException,

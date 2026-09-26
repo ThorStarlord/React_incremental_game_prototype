@@ -12,6 +12,7 @@ import type {
 } from './CopyTypes';
 import {
   assignArchiveVerificationCase,
+  assignForgeMaintenanceCase,
   markCopyStandingOrderTriggered,
   setCopyStandingOrder,
   updateCopy,
@@ -86,9 +87,10 @@ export const startPreferredCopyProductionTaskThunk = createAsyncThunk<
 /**
  * Enable or disable a bounded standing responsibility.
  *
- * v1 intentionally supports Archive Verification only. Enabling does not make
- * an ineligible Copy eligible; the live evaluator will report it as blocked
- * until the existing production-task requirements are satisfied.
+ * Authored standing orders exist for Archive Verification and Forge Assistance
+ * only. Enabling does not make an ineligible Copy eligible; the live evaluator
+ * will report it as blocked until the existing production-task requirements
+ * are satisfied.
  */
 export const setCopyStandingOrderThunk = createAsyncThunk<
   { copyId: string; taskId: CopyProductionTaskId; enabled: boolean },
@@ -101,7 +103,7 @@ export const setCopyStandingOrderThunk = createAsyncThunk<
     const copy = state.copy.copies[copyId];
     if (!copy) return rejectWithValue('Copy not found.');
 
-    if (taskId !== 'archive_verification') {
+    if (taskId !== 'archive_verification' && taskId !== 'forge_assistance') {
       return rejectWithValue('No authored standing order exists for this routine.');
     }
 
@@ -109,21 +111,28 @@ export const setCopyStandingOrderThunk = createAsyncThunk<
       return rejectWithValue('Master this routine personally before assigning a standing responsibility.');
     }
 
+    const routineName = taskId === 'forge_assistance' ? 'Forge Assistance' : 'Archive Verification';
+
     if (!enabled) {
       dispatch(setCopyStandingOrder({ copyId, routineId: taskId, order: null }));
       dispatch(addNotification({
         type: 'info',
-        message: 'Archive Verification standing order disabled.',
+        message: `${routineName} standing order disabled.`,
       }));
       return { copyId, taskId, enabled };
     }
 
     const order: CopyStandingOrder = {
       enabled: true,
-      condition: {
-        type: 'archive_verification_backlog',
-        targetPending: 0,
-      },
+      condition: taskId === 'forge_assistance'
+        ? {
+            type: 'forge_maintenance_backlog',
+            targetPending: 0,
+          }
+        : {
+            type: 'archive_verification_backlog',
+            targetPending: 0,
+          },
       enabledAtTick: state.gameLoop.currentTick,
     };
 
@@ -137,7 +146,9 @@ export const setCopyStandingOrderThunk = createAsyncThunk<
 
     dispatch(addNotification({
       type: 'success',
-      message: 'Archive Verification standing order enabled. Known verification work may now start automatically; anomalies still require your judgment.',
+      message: taskId === 'forge_assistance'
+        ? 'Forge Assistance standing order enabled. Known maintenance work may now start automatically; structural deviations still require your judgment.'
+        : 'Archive Verification standing order enabled. Known verification work may now start automatically; anomalies still require your judgment.',
     }));
 
     return { copyId, taskId, enabled };
@@ -188,10 +199,17 @@ export const processCopyStandingOrdersThunk = createAsyncThunk<
 
         if (!startCopyProductionTaskThunk.fulfilled.match(result)) continue;
 
-        dispatch(assignArchiveVerificationCase({
-          caseId: evaluation.subjectId,
-          copyId,
-        }));
+        if (evaluation.taskId === 'forge_assistance') {
+          dispatch(assignForgeMaintenanceCase({
+            caseId: evaluation.subjectId,
+            copyId,
+          }));
+        } else {
+          dispatch(assignArchiveVerificationCase({
+            caseId: evaluation.subjectId,
+            copyId,
+          }));
+        }
         dispatch(markCopyStandingOrderTriggered({
           copyId,
           routineId: evaluation.taskId,

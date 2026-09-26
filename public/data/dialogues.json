@@ -147,6 +147,21 @@
     "text": "Hmph. You got taste.",
     "effects": [{ "type": "AFFINITY_DELTA", "value": 2 }]
   },
+  "gronk_forge_inspect_reframe": {
+    "id": "gronk_forge_inspect_reframe",
+    "npcId": "npc_blacksmith_gronk",
+    "title": "Inspect and Reframe",
+    "text": "Gronk wipes his hands and looks at the Copy's stalled maintenance frame. 'It stopped because the load stopped matching the procedure. Show me exactly where it diverged, and I'll reframe the work so the procedure holds.'",
+    "responses": {
+      "inspect_reframe": "Walk the load path together: name the divergence, reframe the maintenance envelope, and return the quiet standing work to the Copy."
+    },
+    "effects": [
+      { "type": "RELATIONSHIP_EXPERIENCE", "experienceId": "gronk_exp_forge_inspect_reframe", "responseId": "inspect_reframe" }
+    ],
+    "next": {
+      "inspect_reframe": null
+    }
+  },
   "gronk_craft_request": {
     "id": "gronk_craft_request",
     "npcId": "npc_blacksmith_gronk",

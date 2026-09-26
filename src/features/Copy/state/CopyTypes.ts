@@ -25,10 +25,15 @@ export type CopyTaskOrigin =
       subjectId?: string;
     };
 
-export type CopyStandingOrderCondition = {
-  type: 'archive_verification_backlog';
-  targetPending: number;
-};
+export type CopyStandingOrderCondition =
+  | {
+      type: 'archive_verification_backlog';
+      targetPending: number;
+    }
+  | {
+      type: 'forge_maintenance_backlog';
+      targetPending: number;
+    };
 
 export interface CopyStandingOrder {
   enabled: boolean;
@@ -56,14 +61,37 @@ export interface ArchiveVerificationCase {
   assignedCopyId?: string;
 }
 
+export type ForgeMaintenanceCaseStatus =
+  | 'pending'
+  | 'in_progress'
+  | 'maintained'
+  | 'escalated';
+
+export type ForgeMaintenanceCaseClassification =
+  | 'routine_upkeep'
+  | 'structural_deviation';
+
+export interface ForgeMaintenanceCase {
+  id: string;
+  status: ForgeMaintenanceCaseStatus;
+  classification: ForgeMaintenanceCaseClassification;
+  createdAtTick: number;
+  assignedCopyId?: string;
+}
+
 export type CopyExceptionStatus = 'open' | 'acknowledged' | 'resolved';
 export type CopyExceptionSeverity = 'attention' | 'blocking';
 
-export type CopyExceptionContext = {
-  code: 'archive_source_contradiction';
-  archiveCaseId: string;
-  conflictingSourceIds: string[];
-};
+export type CopyExceptionContext =
+  | {
+      code: 'archive_source_contradiction';
+      archiveCaseId: string;
+      conflictingSourceIds: string[];
+    }
+  | {
+      code: 'forge_structural_deviation';
+      forgeCaseId: string;
+    };
 
 export interface CopyException {
   id: string;
@@ -169,6 +197,8 @@ export interface CopiesState {
   copies: Record<string, Copy>; // All created copies, indexed by ID
   /** Bounded procedural work queue for the first Archive standing-order slice. */
   archiveVerificationCasesById?: Record<string, ArchiveVerificationCase>;
+  /** Bounded procedural work queue for the Forge Assistance standing-order slice. */
+  forgeMaintenanceCasesById?: Record<string, ForgeMaintenanceCase>;
   /** Durable player-attention objects produced when routine authority runs out. */
   exceptionsById?: Record<string, CopyException>;
   isLoading: boolean;

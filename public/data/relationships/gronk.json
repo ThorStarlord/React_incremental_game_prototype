@@ -110,6 +110,31 @@
         }
       ]
     },
+    "gronk_exp_forge_inspect_reframe": {
+      "id": "gronk_exp_forge_inspect_reframe",
+      "uniqueKey": "gronk:gc11:forge-inspect-reframe",
+      "title": "Inspect and Reframe the Forge Deviation",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": [
+        "player",
+        "npc_blacksmith_gronk"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_forge_inspect_reframe",
+      "significance": "defining",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 4
+      },
+      "connectionProgressDelta": 6,
+      "resonanceTags": [
+        "CraftJudgment",
+        "StandingResponsibility"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The player explicitly reframes a Forge maintenance envelope that exceeded the mastered procedure, returning quiet standing work to the Copy without granting it new judgment."
+    },
     "gronk_exp_blade_that_held": {
       "id": "gronk_exp_blade_that_held",
       "uniqueKey": "gronk:m12:04:blade-that-held",
