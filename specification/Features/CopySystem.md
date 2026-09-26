@@ -1,6 +1,6 @@
 # Copy System Specification
 
-**Implementation Status:** ✅ **CORE COPY RUNTIME + TRAIT SHARING + BOUNDED M20 AUTOMATION + LIVE ARCHIVE STANDING RESPONSIBILITY + EXCEPTION ESCALATION + M21 OFFLINE CONTINUATION + CHECKPOINT-C FAMILIARITY REPAIR QUALIFIED**
+**Implementation Status:** ✅ **CORE COPY RUNTIME + TRAIT SHARING + BOUNDED M20 AUTOMATION + LIVE ARCHIVE + FORGE STANDING RESPONSIBILITIES + DISTINCT EXCEPTION ESCALATION + M21 OFFLINE CONTINUATION QUALIFIED**
 
 > Current qualified build summary:
 > - Copy state/thunks cover creation, growth, loyalty decay/bolster, accelerated growth, role assignment, Trait inheritance/sharing, and one active task per Copy.
@@ -8,8 +8,8 @@
 > - Player-owned routine familiarity remains a prerequisite to delegation.
 > - Forge familiarity is earned by one-time active City Center practice; Resonance Calibration by successful active Trait Resonance; Archive Verification by Elara's canonical independent-verification experience.
 > - Familiarity is enforced below the UI by `startCopyProductionTaskThunk`; Copy maturity/loyalty/role/location requirements remain independent.
-> - A player may now authorize one bounded **Archive Verification Standing Order**. Live fixed-tick evaluation may start one authored unit of mastered work when the Copy is idle and eligible.
-> - A source contradiction becomes a persisted Copy Exception and returns to player judgment instead of being auto-resolved.
+> - A player may authorize bounded **Archive Verification** and **Forge Assistance** Standing Orders. Live fixed-tick evaluation may start one authored unit of mastered work when the Copy is idle and eligible.
+> - Archive source contradictions and Forge structural deviations become distinct persisted Copy Exceptions and return to player judgment instead of being auto-resolved.
 > - Read-only Mastery Compression projection recognizes the evidence-qualified **Network Assurance** procedure family and **Known-State Stewardship** readiness without adding another Redux/save authority.
 > - M21 may advance or complete an already-running authored Copy task during bounded offline settlement, but never selects or chains a new task.
 > - Meaningful/irreversible narrative decisions remain player-owned.
@@ -374,9 +374,9 @@ Clearing `activeTask` after completion supplies the existing exact-once replay c
 
 ### 10.1 Bounded standing responsibility
 
-The post-Content-Alpha extension in
-`../Technical/CopyStandingOrdersAndExceptionEscalationResult.md` introduces one
-authored condition-maintenance policy without replacing the M20 task executor.
+The post-Content-Alpha standing-responsibility work now qualifies two authored
+condition-maintenance policies without replacing the M20 task executor: Archive
+Verification and Forge Assistance.
 
 ```text
 routineFamiliarity
@@ -387,12 +387,16 @@ routineFamiliarity
 -> Copy.activeTask
 ```
 
-The v1 condition is exactly:
+The bounded conditions are:
 
 ```text
 archive_verification_backlog
+forge_maintenance_backlog
 targetPending = 0
 ```
+
+Forge eligibility additionally reuses existing role, maturity, personal mastery, and
+canonical City Center presence authority.
 
 Evaluation occurs live after `processCopyTasksThunk(deltaTime)`. A task started
 by the standing evaluator begins at progress zero and cannot consume leftover
@@ -442,8 +446,9 @@ player
 -> exception escalation
 ```
 
-The current runtime-generated Archive source contradiction maps to the explicit
-**unknown or conflicting evidence** escalation boundary. Additional semantic
+The current runtime generates both Archive **source contradiction** and Forge
+**structural deviation** boundaries. Archive and Forge block independently, so one
+Copy responsibility can continue while another awaits player judgment. Additional semantic
 boundary classes (conflicting policy, irreversible consequence, social novelty,
 repeated procedure failure) define player-owned limits but do not create new
 runtime exception generators in this package.
