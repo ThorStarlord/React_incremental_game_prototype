@@ -111,6 +111,22 @@ and release-readiness findings may still justify bounded repairs inside the lock
 **Learning:** Beta should narrow the kinds of changes allowed, not prohibit
 repository-owned improvement while genuine human evidence is being collected.
 
+### 7. Procedural qualification is not mechanical enforcement
+
+After PR #156 merged, the reconciliation commits
+`6b907333653872373571b6a9ec27a5e4faf54974`,
+`55bc07e0416065b7f8cdae1fe889ae6208bbab8c`, and
+`1938f1406ddef5fda687fc69f5e4404553bba837` updated current documentation
+directly on `main`. Those changes were documentation-only, but they did not pass through
+a new exact-head pull-request Build Validation before becoming `main`.
+
+**Learning:** the repository's exact-head policy remains procedural until issue #122 is
+resolved with branch protection/ruleset enforcement. A documented rule can be bypassed
+accidentally even by well-intentioned maintenance.
+
+This convergence package therefore returns documentation authority changes to the normal
+branch -> PR -> exact-head Build Validation path.
+
 ## Construction stop rule
 
 Do not reopen Candidate A, B, or C merely because another implementation is
