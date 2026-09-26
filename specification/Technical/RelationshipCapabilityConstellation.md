@@ -186,23 +186,25 @@ requiredActiveDoctrineIds
 
 ## Dialogue consumption
 
-`DialogueNode` now supports:
+`DialogueNode` now supports both durable-capability and current-specialization gates:
 
 ```ts
+requiredPermanentTraitIds?: string[];
 requiredActiveDoctrineIds?: DoctrineId[];
 ```
 
-`selectAvailableNPCDialogueChoices` composes current active doctrine state into the existing spoiler-safe prerequisite projection.
+`selectAvailableNPCDialogueChoices` composes permanent learned Traits and current active doctrine state into the existing spoiler-safe prerequisite projection.
 
-Available doctrine-qualified topics may explain themselves with player-safe causal text such as:
+Available qualified topics may explain themselves with player-safe causal text such as:
 
 ```text
+Learned capability: Constraint Sense
 Active doctrine: Structural Steward
 ```
 
-Unavailable topics remain hidden without leaking the missing doctrine as a future-content hint.
+Unavailable topics remain hidden without leaking the missing Trait or doctrine as a future-content hint.
 
-`processNPCInteractionThunk` independently enforces the same doctrine requirement so direct thunk invocation cannot bypass presentation.
+`processNPCInteractionThunk` independently enforces both requirements before effects execute, so direct thunk invocation cannot bypass presentation. The permanent-Trait contract reuses the same durable Player authority used by Quest/Combat rather than querying Relationship state as a substitute.
 
 ## Existing Campaign One content
 
@@ -221,7 +223,21 @@ Phase Against the Echo
 
 Both optional routes remain impossible without their permanent learned Trait pairs because doctrine selectors require permanent ownership and current foregrounding simultaneously.
 
-GC07-GC10 intentionally retain their previously qualified `requiredPermanentTraitIds` pair gates. This package does not mechanically propagate doctrine locking through the remainder of the campaign. Broader conversion now depends on evidence that the GC06 selection loop is legible and valuable rather than merely adding pre-choice menu friction.
+GC07 and GC09 intentionally retain their previously qualified permanent-Trait pair gates, while GC08 preparation and GC10 finale consume active doctrine only where current strategic posture matters. This avoids repetitive switching tax.
+
+Candidate A additionally gives the two previously sparse source capabilities independent **Quest + Dialogue** use in GC08:
+
+```text
+ConstraintSense
+-> protect distributed bottlenecks (Quest)
+-> identify the actual constraint in a later Gronk conversation (Dialogue)
+
+AdversarialCalibration
+-> red-team the distributed procedure (Quest)
+-> predict Lyra's next hostile move in a later relational exchange (Dialogue)
+```
+
+Both dialogue routes are optional, require the corresponding durable learned Trait, produce authored Relationship Experience consequences, and fail closed in both selector presentation and direct thunk execution. Willow/Elara already provide independent Quest + Combat consumption, so all four canonical capability identities now cross more than one gameplay domain without adding more doctrines or a generic capability graph.
 
 ## Save schema v2
 
@@ -296,7 +312,7 @@ This package does not add:
 
 After deterministic qualification the repository may claim:
 
-> The runtime has a bounded canonical distinction between durably learned Relationship-derived Traits and the player's current two-Trait specialization; the two established Campaign One profiles can be derived fail-closed and consumed symmetrically by Quest and Dialogue availability/enforcement.
+> The runtime has a bounded canonical distinction between durably learned Relationship-derived Traits and the player's current two-Trait specialization; permanent capabilities and the two established Campaign One profiles are consumed fail-closed by authored Quest, Combat, and Dialogue contexts, with all four canonical relationship-derived capability identities now having independent cross-domain use.
 
 It may **not** claim that:
 
