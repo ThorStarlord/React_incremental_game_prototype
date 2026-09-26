@@ -251,6 +251,8 @@ export interface DialogueNode {
   requiredFactionReputation?: FactionReputationRequirement[];
   /** Objective regional conditions; all exact-value requirements must pass. */
   requiredWorldState?: WorldStateRequirement[];
+  /** All listed permanent Relationship-derived Traits must already be learned. */
+  requiredPermanentTraitIds?: string[];
   /** All listed emergent doctrines must currently be active. */
   requiredActiveDoctrineIds?: DoctrineId[];
   /**
