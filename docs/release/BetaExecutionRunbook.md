@@ -31,6 +31,7 @@ Before starting a human session, confirm:
 
 ```text
 CONTENT_ALPHA
+FEATURE_COMPLETE / REPOSITORY-QUALIFIED / HUMAN-UNVALIDATED
 TECHNICAL_BETA_READY
 BETA_PASS = NO
 feature/content scope locked
@@ -210,4 +211,4 @@ For this **human-evidence lane**, if there is no accepted human finding, the nex
 
 That does not impose a repository-wide stop. Independent bounded hardening may continue under `AGENTS.md` when a deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, or release-readiness finding has material expected value.
 
-Do not invent new product scope merely because the human lane is waiting.
+The feature-construction lane is nevertheless closed by `FeatureCompletionConvergenceResult.md`. Reopen A/B/C only from concrete contradictory evidence or explicit governance revision. Do not invent new product scope merely because the human lane is waiting.

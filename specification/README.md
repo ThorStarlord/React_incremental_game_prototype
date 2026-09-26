@@ -2,9 +2,9 @@
 
 This file routes readers to the current product, completion, technical and domain authorities. It does not duplicate every historical milestone narrative.
 
-**Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
+**Current maturity:** CONTENT_ALPHA / FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
+**Current strategic stage:** BETA_CONVERGENCE / HUMAN_EVIDENCE  
 **Human Product Review:** issue #109 OPEN / UNPROVEN
 
 ## Authority chain
@@ -88,12 +88,12 @@ The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative ref
 
 ### Active implementation roadmap
 
-- [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for the preserved GC history plus the active Feature Completion / Product Depth phase and downstream path to Beta/RC/1.0.
+- [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for the preserved GC history and active GC-13 Beta convergence path to RC/1.0.
+- [`Technical/FeatureCompletionConvergenceResult.md`](Technical/FeatureCompletionConvergenceResult.md) — **CURRENT CLOSURE AUTHORITY** for the completed B -> A -> C feature-depth sequence, the `FEATURE_COMPLETE / REPOSITORY-QUALIFIED / HUMAN-UNVALIDATED` transition, and reopening conditions.
+- [`Technical/FeatureCompletionGapAnalysis.md`](Technical/FeatureCompletionGapAnalysis.md) — **HISTORICAL INPUT / CLOSED STRATEGIC ANALYSIS** that selected B, A, and C; it is no longer an active work queue.
+- [`Technical/CandidateBMasteryCompressionDepthSpecification.md`](Technical/CandidateBMasteryCompressionDepthSpecification.md) — **CURRENT CLOSED DEPTH SPECIFICATION** for Forge Assistance and Candidate B's bounded convergence.
 
-- [`Technical/FeatureCompletionGapAnalysis.md`](Technical/FeatureCompletionGapAnalysis.md) — **CURRENT STRATEGIC ANALYSIS** for the completed breadth scan, maturity reassessment, selected depth candidates, and current Candidate B frontier.
-- [`Technical/CandidateBMasteryCompressionDepthSpecification.md`](Technical/CandidateBMasteryCompressionDepthSpecification.md) — **CURRENT DEPTH SPECIFICATION** for the selected Candidate B Forge Standing Responsibility implementation frontier.
-
-There is no automatic M27 or GC-15. The Feature Completion Gap Analysis is complete. Its selected depth order is Candidate B (Mastery Compression / Copy organization), Candidate A (relationship-derived capability buildcraft), then Candidate C (strategic consequence composition), subject to depth-search evidence. Historical milestone closure proves stated contracts; it does not automatically confer L4 feature completeness.
+There is no automatic M27 or GC-15. Feature Completion is closed. GC-13 Beta convergence is active; reopening A/B/C requires concrete contradictory evidence or explicit governance revision.
 
 ### Integrated GC-01 result
 
@@ -114,7 +114,7 @@ Focused command:
 npm run gc01:validate
 ```
 
-GC-04 through GC-12 remain closed as historical qualification packages. The current responsibility is to assess and close player-facing feature-depth gaps inside the bounded Campaign One product. GC-13 human evidence and Beta/release hardening remain downstream gates after required core features reach sufficient L4 maturity.
+GC-04 through GC-12 remain closed as historical qualification packages. The A/B/C feature-depth sequence is also closed and repository-qualified. The current responsibility is GC-13 Beta convergence: collect genuine human evidence and apply only bounded evidence-backed hardening inside the locked Campaign One scope.
 
 
 ### Integrated GC-03 result
@@ -157,7 +157,7 @@ The earlier [`Technical/PostM25ProductDirectionDecisionReadiness.md`](Technical/
 
 Issue #109 — **Human Integrated Playability / Product Review** — remains open and unproven.
 
-Under the game-completion program it is not a blanket freeze on all pre-Alpha work. It is the authority for claims that require fresh human observation and becomes a required input to `BETA_PASS`.
+Under the game-completion program it is not a blanket repository freeze. It is the active authority for claims that require fresh human observation and is a required input to `BETA_PASS`. Independent bounded hardening may proceed from concrete non-human findings without being relabeled as human evidence.
 
 Automation must not claim:
 
@@ -232,7 +232,7 @@ Do not collapse these into a universal progression/condition system without a ne
 - [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md) — bounded offline snapshot settlement.
 - [`Technical/PostM25CopyRoutineStrategy.md`](Technical/PostM25CopyRoutineStrategy.md) — historical one-shot routine-priority baseline.
 - [`Technical/CopyStandingOrdersAndExceptionEscalationResult.md`](Technical/CopyStandingOrdersAndExceptionEscalationResult.md) — **CURRENT bounded authority** for live Archive standing responsibility, durable exceptions, and the remaining no-planner/offline boundary.
-- [`Technical/MasteryCompressionProcedureFamiliesResult.md`](Technical/MasteryCompressionProcedureFamiliesResult.md) — bounded read-only procedure-family / Known-State Stewardship projection, escalation categories, organizational ceiling, and epilogue legibility; this is a foundation for, not a replacement of, the current Candidate B Forge standing-responsibility depth specification.
+- [`Technical/MasteryCompressionProcedureFamiliesResult.md`](Technical/MasteryCompressionProcedureFamiliesResult.md) — bounded read-only procedure-family / Known-State Stewardship projection, escalation categories, organizational ceiling, and epilogue legibility; together with Archive + Forge it supports Candidate B's closed bounded-convergence result.
 - [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — personal mastery provenance vs Copy-specific readiness.
 
 Product doctrine:
@@ -324,7 +324,7 @@ npx tsc --noEmit
 npm run build
 ```
 
-`alpha:validate` and `release:validate` are **future required commands** defined by the maturity contracts. Do not claim they exist until their owning completion packages implement them.
+`alpha:validate` is implemented and exercised by current qualification. `release:validate` is available for deterministic release preparation, but RC qualification remains blocked until the Beta contract records a real `BETA_PASS`.
 
 ## Historical / closed program records
 
@@ -364,4 +364,4 @@ identify unsatisfied Game Completion requirement
 -> update completion status
 ```
 
-> **Technical possibility is not a 1.0 requirement. Finish the bounded Campaign One before expanding the architecture.**
+> **Technical possibility is not a 1.0 requirement. Feature Completion is closed; improve the locked Campaign One only from concrete Beta/release evidence until promotion gates are satisfied.**

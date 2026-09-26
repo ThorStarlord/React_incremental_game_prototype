@@ -1,9 +1,10 @@
-# Repository Status — Feature Completion / Campaign One Product Depth
+# Repository Status — Beta Convergence / Campaign One 1.0
 
 **Status date:** 2026-09-26
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
-**Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
+**Current strategic stage:** `BETA_CONVERGENCE / HUMAN_EVIDENCE`  
+**Feature-completion state:** `FEATURE_COMPLETE / REPOSITORY-QUALIFIED / HUMAN-UNVALIDATED`  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
 **GC-01:** `COMPLETE / INTEGRATED`  
@@ -21,11 +22,12 @@
 **GC-14 promotion guard:** `QUALIFIED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN`  
 **Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
-**Active program:** Campaign One / 1.0 Feature Completion  
+**Active program:** Campaign One / 1.0 Beta Convergence  
 **Feature Completion Gap Analysis:** `COMPLETE / CURRENT`  
 **Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
 **Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
-**Current implementation frontier:** `A/B/C REPOSITORY CONSTRUCTION CONVERGED / QUALIFIED — next lane is Beta/human convergence`
+**Current implementation frontier:** `FEATURE_COMPLETE — Beta convergence / human evidence; bounded repository hardening only from concrete findings`
+**Feature-completion result:** [`FeatureCompletionConvergenceResult.md`](specification/Technical/FeatureCompletionConvergenceResult.md)
 
 ### Feature-completion convergence disposition
 
@@ -61,25 +63,27 @@ Read in this order:
 
 The project has passed proof-of-concept, technical-prototype, bounded vertical-slice, whole-game traversal, authored-campaign integration, and deterministic Beta-readiness qualification. Campaign One has a production-equivalent New Game -> Prologue -> Chapters 1-7 -> Telluric Echo finale -> state-responsive Epilogue path, with canonical persistence checkpoints and authored route variants.
 
-Those results establish **integration maturity**, not automatic **feature maturity**. Several core gameplay systems remain deliberately narrow: Combat is a bounded MVP; Doctrine specialization has two established profiles with its first major production consumer in GC06; and Standing Orders / exception escalation now have two materially distinct qualified contexts: Archive Verification and City Center Forge Assistance. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence about what was qualified, but they no longer imply that repository-owned feature construction is finished.
+The repository now records **feature maturity as reached for the bounded Campaign One 1.0 scope**. Candidate B is bounded-converged, Candidate A is repository-converged and qualified, and Candidate C already satisfies its strategic-composition exit shape without a generalized subsystem. The closure rationale and lessons are recorded in [`FeatureCompletionConvergenceResult.md`](specification/Technical/FeatureCompletionConvergenceResult.md).
 
-## Current goal — feature completion / product depth
+This does not upgrade the product beyond `HUMAN-UNVALIDATED`. Combat remains intentionally bounded, doctrine remains limited to two authored profiles, and Mastery Compression remains bounded to authored standing responsibilities. Those are now accepted 1.0 scope decisions rather than automatic invitations for more subsystem construction.
+
+## Current goal — Beta convergence / human evidence
 
 The active optimization target is:
 
-> **Develop the existing core game systems from bounded or vertical-slice implementations into sufficiently deep, interconnected, player-facing features before dedicated Beta/release hardening becomes the repository-wide frontier.**
+> **Make the locked, feature-complete Campaign One understandable, stable, balanced, usable, accessible, and presentable while collecting the genuine human evidence required for `BETA_PASS`.**
 
 Current work should:
 
-1. use [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md) as the completed breadth pass across `CORE_1_0` systems;
-2. deepen the selected candidates in order of current expected value: **B Mastery Compression / Copy organization**, **A relationship-derived capability buildcraft**, then **C strategic consequence composition**;
-3. perform depth analysis before each implementation package rather than expanding by subsystem symmetry;
-4. build depth primarily inside existing authorities and Campaign One scope rather than inventing generalized engines;
-5. preserve all historical qualification evidence while refusing to treat a passed bounded milestone as proof that its associated feature is finished.
+1. preserve the A/B/C construction stop recorded in [`FeatureCompletionConvergenceResult.md`](specification/Technical/FeatureCompletionConvergenceResult.md);
+2. use issue #109 and [`BetaExecutionRunbook.md`](docs/release/BetaExecutionRunbook.md) for genuine human evidence;
+3. allow bounded repository-owned repairs only when tied to a concrete deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, or release-readiness finding;
+4. prefer the smallest repair inside existing Campaign One authorities;
+5. keep all human-experience claims explicitly unproven until accepted human sessions exist.
 
-The **scope boundary remains bounded**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. What is reopened is **depth within the existing core product**, not arbitrary scope growth.
+The **scope boundary is now locked by default**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. Reopening A/B/C requires concrete contradictory evidence or explicit governance revision, not implementation possibility.
 
-Dedicated Beta convergence, release hardening, immutable RC qualification, and 1.0 promotion remain downstream gates. Human evidence under issue #109 remains valid and useful, but it does not own the current repository work queue while core features remain below feature-complete maturity.
+GC-13 Beta convergence is active. Release hardening, immutable RC qualification, and 1.0 promotion remain downstream gates. Human evidence under issue #109 now owns the promotion-critical product-validation lane, while independent bounded hardening may proceed only from concrete findings.
 
 Use explicit evidence provenance throughout feature development:
 
@@ -180,7 +184,7 @@ unknown conditions.
 Candidate B's bounded exit test is now satisfied by the integrated Archive + Forge
 network. Forge was qualified at exact head `70c24d5` in Build Validation #468 and
 merged through PR #154 as `fbc19da`. A third standing responsibility is not
-authorized by inertia; the active depth frontier advances to Candidate A.
+authorized by inertia; Candidate B remains closed unless concrete Beta evidence reopens it.
 
 Campaign One's organizational ceiling remains:
 
@@ -212,7 +216,7 @@ This is bounded feature development of the primary relationship-derived capabili
 
 A bounded owner-directed Trait depth repair now closes three concrete implementation gaps without changing the selected B -> A -> C depth order: Player Trait slots unlock from their documented Resonance levels, permanent Resonance pricing is catalogue-authoritative, and the general Traits/Codex surfaces use the same readiness authority as runtime validation. [`CampaignOneTraitCatalogueAudit.md`](specification/Technical/CampaignOneTraitCatalogueAudit.md) also classifies the legacy catalogue so historical effect metadata cannot resurrect cut Skills/Crafting systems by inertia. This is a foundation repair for Candidate A, not Candidate-A depth completion; selective post-GC06 doctrine consumption is now bounded to GC08 preparation and GC10 finale, while GC07/GC09 remain learned-capability gates.
 
-A follow-on Trait coherence package makes that authority player-safe rather than merely documented: permanent Resonance now rejects deferred-only catalogue entries and live effects that have no durable Player consumer; `EssenceFlow` is explicitly Copy-sharing/inheritance content rather than a permanent Player bonus; NPC sharing now enforces the same equipped + non-permanent contract as Copy sharing; and temporary slots are defined as experimentation/direct-effect/share staging rather than the late-game specialization layer. GC08 distributed preparation also gives `ConstraintSense` and `AdversarialCalibration` independent semantic uses without creating more doctrines. Focused validation remains `npm run trait-depth:validate`. Candidate B has since converged at its bounded exit shape, so Candidate A is now active. The current Candidate-A package extends `ConstraintSense` and `AdversarialCalibration` from GC08 independent uses into GC09 authored judgment and finale aftermath without adding Traits or doctrines.
+A follow-on Trait coherence package makes that authority player-safe rather than merely documented: permanent Resonance now rejects deferred-only catalogue entries and live effects that have no durable Player consumer; `EssenceFlow` is explicitly Copy-sharing/inheritance content rather than a permanent Player bonus; NPC sharing now enforces the same equipped + non-permanent contract as Copy sharing; and temporary slots are defined as experimentation/direct-effect/share staging rather than the late-game specialization layer. GC08 distributed preparation also gives `ConstraintSense` and `AdversarialCalibration` independent semantic uses without creating more doctrines. Focused validation remains `npm run trait-depth:validate`. Candidate A subsequently converged and qualified through repeated GC08/GC09 single-capability use plus GC06/GC08/GC10 doctrine consumption and finale payoff. Do not add Traits, doctrines, or a generic capability graph merely to continue feature construction.
 
 ## M26 closure
 
