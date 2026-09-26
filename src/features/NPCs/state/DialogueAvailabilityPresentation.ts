@@ -4,6 +4,7 @@ import {
 } from '../../WorldState/state/WorldStateSelectors';
 import type { DialogueNode } from './NPCTypes';
 import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
+import { getMissingPermanentTraitIds } from '../../Traits/state/TraitCapabilityRequirements';
 
 export interface DialogueAvailabilityPresentationContext {
   completedDialogueIds: readonly string[];
@@ -12,6 +13,7 @@ export interface DialogueAvailabilityPresentationContext {
   knownFactIds: readonly string[];
   factionReputationByFactionId: Record<string, number | undefined>;
   worldStateRegions: WorldStateRegions;
+  permanentTraitIds: readonly string[];
   activeDoctrineIds: readonly DoctrineId[];
 }
 
@@ -90,6 +92,14 @@ export const evaluateDialogueAvailabilityPresentation = (
     return { available: false, availabilityReasons: [] };
   }
 
+  const requiredPermanentTraits = node.requiredPermanentTraitIds ?? [];
+  if (getMissingPermanentTraitIds(
+    requiredPermanentTraits,
+    context.permanentTraitIds
+  ).length > 0) {
+    return { available: false, availabilityReasons: [] };
+  }
+
   const requiredActiveDoctrines = node.requiredActiveDoctrineIds ?? [];
   if (requiredActiveDoctrines.some(
     doctrineId => !context.activeDoctrineIds.includes(doctrineId)
@@ -127,6 +137,10 @@ export const evaluateDialogueAvailabilityPresentation = (
   if (requiredWorldState.length > 0) {
     availabilityReasons.push('Current world conditions support this option');
   }
+
+  requiredPermanentTraits.forEach(traitId => {
+    availabilityReasons.push(`Learned capability: ${humanizeId(traitId)}`);
+  });
 
   requiredActiveDoctrines.forEach(doctrineId => {
     availabilityReasons.push(`Active doctrine: ${humanizeId(doctrineId)}`);
