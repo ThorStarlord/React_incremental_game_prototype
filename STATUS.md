@@ -25,7 +25,21 @@
 **Feature Completion Gap Analysis:** `COMPLETE / CURRENT`  
 **Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
 **Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
-**Current implementation frontier:** `Candidate A — repeated independent relationship-capability use and later-campaign consequence`
+**Current implementation frontier:** `A/B/C REPOSITORY CONSTRUCTION CONVERGED — exact-head qualification pending; next lane is Beta/human convergence`
+
+### Feature-completion convergence disposition
+
+Candidate B is bounded-converged through Archive + Forge standing responsibility.
+Candidate A now has repeated independent source-capability use, repeated doctrine
+consumers, causal Player Insight, and finale payoff without catalogue expansion.
+Candidate C's own exit shape is already realized by GC08-GC10 authored composition,
+including a fortified finale entry that simultaneously consumes Relationship, Knowledge,
+World State, and Faction authority.
+
+After the current Candidate-A exact head passes deterministic qualification, no further
+A/B/C construction package is authorized by inertia. The repository returns to the
+existing Beta/human-evidence lane. This does **not** mean `BETA_PASS`, RC eligibility,
+or 1.0 promotion has occurred.
 
 ## Current authority
 
