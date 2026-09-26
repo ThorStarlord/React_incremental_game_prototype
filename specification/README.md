@@ -2,9 +2,9 @@
 
 This file routes readers to the current product, completion, technical and domain authorities. It does not duplicate every historical milestone narrative.
 
-**Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
+**Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
+**Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
 **Human Product Review:** issue #109 OPEN / UNPROVEN
 
 ## Authority chain
@@ -88,12 +88,12 @@ The broad [`Narrative/Synopsis.md`](Narrative/Synopsis.md) remains narrative ref
 
 ### Active implementation roadmap
 
-- [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for the preserved GC history plus the active Feature Completion / Product Depth phase and downstream path to Beta/RC/1.0.
+- [`Technical/GameCompletionRoadmap.md`](Technical/GameCompletionRoadmap.md) — **CURRENT AUTHORITY** for the preserved GC history, recorded FEATURE_COMPLETE gate, active Beta convergence, and downstream RC/1.0 path.
+- [`Technical/FeatureCompleteResult.md`](Technical/FeatureCompleteResult.md) — **CURRENT MATURITY AUTHORITY** recording FEATURE_COMPLETE / HUMAN-UNVALIDATED and the A/B/C construction stop.
+- [`Technical/FeatureCompletionGapAnalysis.md`](Technical/FeatureCompletionGapAnalysis.md) — **COMPLETED STRATEGIC AUTHORITY** for the breadth scan and reconciled Candidate B/A/C depth exits.
+- [`Technical/CandidateBMasteryCompressionDepthSpecification.md`](Technical/CandidateBMasteryCompressionDepthSpecification.md) — **IMPLEMENTED BOUNDED AUTHORITY** for Archive + Forge Mastery Compression depth.
 
-- [`Technical/FeatureCompletionGapAnalysis.md`](Technical/FeatureCompletionGapAnalysis.md) — **CURRENT STRATEGIC ANALYSIS** for the completed breadth scan, maturity reassessment, selected depth candidates, and current Candidate B frontier.
-- [`Technical/CandidateBMasteryCompressionDepthSpecification.md`](Technical/CandidateBMasteryCompressionDepthSpecification.md) — **CURRENT DEPTH SPECIFICATION** for the selected Candidate B Forge Standing Responsibility implementation frontier.
-
-There is no automatic M27 or GC-15. The Feature Completion Gap Analysis is complete. Its selected depth order is Candidate B (Mastery Compression / Copy organization), Candidate A (relationship-derived capability buildcraft), then Candidate C (strategic consequence composition), subject to depth-search evidence. Historical milestone closure proves stated contracts; it does not automatically confer L4 feature completeness.
+There is no automatic M27 or GC-15. Feature construction is closed unless a concrete Beta finding disproves the recorded Campaign One feature-complete contract or the 1.0 scope authority is explicitly revised. The active lane is Beta convergence / human validation.
 
 ### Integrated GC-01 result
 
@@ -232,7 +232,7 @@ Do not collapse these into a universal progression/condition system without a ne
 - [`Technical/M21BoundedOfflineProgressResult.md`](Technical/M21BoundedOfflineProgressResult.md) — bounded offline snapshot settlement.
 - [`Technical/PostM25CopyRoutineStrategy.md`](Technical/PostM25CopyRoutineStrategy.md) — historical one-shot routine-priority baseline.
 - [`Technical/CopyStandingOrdersAndExceptionEscalationResult.md`](Technical/CopyStandingOrdersAndExceptionEscalationResult.md) — **CURRENT bounded authority** for live Archive standing responsibility, durable exceptions, and the remaining no-planner/offline boundary.
-- [`Technical/MasteryCompressionProcedureFamiliesResult.md`](Technical/MasteryCompressionProcedureFamiliesResult.md) — bounded read-only procedure-family / Known-State Stewardship projection, escalation categories, organizational ceiling, and epilogue legibility; this is a foundation for, not a replacement of, the current Candidate B Forge standing-responsibility depth specification.
+- [`Technical/MasteryCompressionProcedureFamiliesResult.md`](Technical/MasteryCompressionProcedureFamiliesResult.md) — bounded read-only procedure-family / Known-State Stewardship projection, escalation categories, organizational ceiling, and epilogue legibility; Archive + Forge now provide the qualified bounded standing-responsibility contexts.
 - [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — personal mastery provenance vs Copy-specific readiness.
 
 Product doctrine:
