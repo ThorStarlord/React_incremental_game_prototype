@@ -27,8 +27,8 @@ legacy JSON effect
 | --- | --- | --- |
 | `WillowsWisdom` | Elder Willow | systemic/slow-pattern reasoning; independent Quest/Combat use; Structural Steward component |
 | `ScholarlyInsight` | Elara | evidence-first model revision; independent Quest/Combat use; Countermodeler component |
-| `ConstraintSense` | Gronk | constraint-first judgment; independent GC08 bottleneck use; Structural Steward component |
-| `AdversarialCalibration` | Lyra | opponent-model calibration; independent GC08 stress-test use; Countermodeler component |
+| `ConstraintSense` | Gronk | constraint-first judgment; independent GC08 Quest + Dialogue use; Structural Steward component |
+| `AdversarialCalibration` | Lyra | opponent-model calibration; independent GC08 Quest + Dialogue use; Countermodeler component |
 
 These four authored Traits are the canonical Candidate-A capability-buildcraft core. Future depth should preferentially add repeated, causally legible consumers of these identities rather than grow the catalogue.
 
@@ -103,13 +103,22 @@ named consumer
 + player-facing causal explanation where meaningful
 ```
 
-## Candidate-A next depth question
+## Candidate-A depth disposition
 
-The first Candidate-A depth package resolves doctrine consumption selectively: GC08 preparation and GC10 finale consume active doctrine after GC06, while GC07 and GC09 remain permanent-capability gates. The coherence package additionally gives `ConstraintSense` and `AdversarialCalibration` independent GC08 distributed-preparation uses, so all four authored source Traits now have at least one identity outside merely being half of a doctrine.
+The bounded Candidate-A sequence now closes the repository-owned L3 depth gap without expanding the catalogue:
 
-Prefer selective strategic-posture consumers and independent source-Trait uses over:
+- GC06, GC08 preparation, and GC10 finale repeatedly consume the two existing doctrines where current strategic posture matters;
+- GC07 and GC09 remain permanent-capability pair gates, avoiding repetitive switching tax;
+- all four source Traits have independent use outside doctrine participation;
+- Willow/Elara already span Quest + Combat;
+- Gronk/Lyra now span Quest + Dialogue through permanent-Trait-gated GC08 follow-up conversations;
+- visible Trait/doctrine provenance remains available through the existing Traits and Player Insight surfaces.
 
-- further mass conversion of remaining late-campaign pair gates;
-- a generic N-way capability graph;
-- a large new Trait catalogue;
-- Trait presets before temporary-attunement depth creates a real loadout problem.
+No additional Candidate-A construction is currently warranted merely to increase consumer count. Temporary attunement/sharing prominence, switching enjoyment, comprehension, and preference remain human/product questions for Beta rather than reasons to invent another buildcraft framework.
+
+Preserve these boundaries:
+
+- no further mass conversion of remaining late-campaign pair gates;
+- no generic N-way capability graph;
+- no large new Trait catalogue;
+- no Trait presets before temporary-attunement depth creates a demonstrated loadout problem.
