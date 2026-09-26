@@ -1,6 +1,6 @@
 # Candidate B Depth Specification — Mastery Compression / Copy Organization
 
-**Status:** CURRENT DEPTH SPECIFICATION — FEATURE COMPLETION CANDIDATE B  
+**Status:** IMPLEMENTED / BOUNDED L3 EXIT SATISFIED — HUMAN-UNVALIDATED  
 **Prepared:** 2026-09-24  
 **Parent analysis:** FeatureCompletionGapAnalysis.md  
 **Runtime authority:** CopyStandingOrdersAndExceptionEscalationResult.md + ../Features/CopySystem.md
@@ -186,6 +186,18 @@ After this slice, reassess before adding more automation. Candidate B moves towa
 - attention compression is structurally real rather than passive-income multiplication.
 
 If that is true, do not automatically add Resonance Calibration. Add another standing responsibility only if it creates a materially different player role.
+
+## Implementation receipt
+
+The selected second standing responsibility is now integrated.
+
+- PR: #154
+- qualified exact head: `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`
+- Build Validation: #468 / run `36120244452` — PASS
+- merge: `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
+- result: Archive + Forge satisfy the bounded Candidate B exit test across two contexts, two role/location shapes, and two exception families.
+
+No third standing responsibility is authorized by this result. Candidate B reopens only if later composition or human evidence identifies a concrete missing responsibility.
 
 ## Governing conclusion
 
