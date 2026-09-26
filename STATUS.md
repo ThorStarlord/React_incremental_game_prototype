@@ -23,8 +23,9 @@
 **Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
 **Active program:** Campaign One / 1.0 Feature Completion  
 **Feature Completion Gap Analysis:** `COMPLETE / CURRENT`  
-**Candidate B depth specification:** `COMPLETE / CURRENT`  
-**Current implementation frontier:** `Forge Standing Responsibility — Candidate B implementation`
+**Candidate B depth specification:** `IMPLEMENTED / BOUNDED L3 EXIT SATISFIED`  
+**Candidate A depth:** `BOUNDED L3 EXIT SATISFIED / HUMAN-UNVALIDATED`  
+**Current implementation frontier:** `Candidate C — Strategic consequence composition`
 
 ## Current authority
 
@@ -160,11 +161,9 @@ boundary. The state-responsive epilogue can report which mastered work has
 become quiet standing responsibility while preserving player judgment for
 unknown conditions.
 
-This is **Candidate B foundation, not Candidate B completion**. The newer
-[`CandidateBMasteryCompressionDepthSpecification.md`](specification/Technical/CandidateBMasteryCompressionDepthSpecification.md)
-remains the active runtime-depth plan and selects **Forge Assistance as the
-second standing responsibility**. This projection neither pre-authorizes that
-Forge behavior nor closes the need to implement and qualify it.
+Candidate B's selected second standing responsibility is now integrated. Archive Verification and Forge Assistance jointly demonstrate two operational contexts, role/location differentiation, contradiction versus structural-deviation exceptions, and a small multi-Copy responsibility network. PR #154 exact head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0` passed Build Validation #468 / run `36120244452` and merged as `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`.
+
+This satisfies the bounded Candidate B L3 exit test. Do not add Resonance Calibration or another standing responsibility by symmetry; reopen Candidate B only for a materially different player responsibility or a later concrete completion defect.
 
 Campaign One's organizational ceiling remains:
 
@@ -194,9 +193,11 @@ Campaign One doctrine derivation is intentionally limited to the two already-est
 
 This is bounded feature development of the primary relationship-derived capability-buildcraft promise. Its successful implementation proves the specialization interaction exists; it does not establish that capability buildcraft has reached sufficient finished-game depth. Deterministic/UI qualification now proves the interaction path exists and changes GC06 availability; fresh-player comprehension, usability, balance, enjoyment, and preference remain unproven.
 
-A bounded owner-directed Trait depth repair now closes three concrete implementation gaps without changing the selected B -> A -> C depth order: Player Trait slots unlock from their documented Resonance levels, permanent Resonance pricing is catalogue-authoritative, and the general Traits/Codex surfaces use the same readiness authority as runtime validation. [`CampaignOneTraitCatalogueAudit.md`](specification/Technical/CampaignOneTraitCatalogueAudit.md) also classifies the legacy catalogue so historical effect metadata cannot resurrect cut Skills/Crafting systems by inertia. This is a foundation repair for Candidate A, not Candidate-A depth completion; selective post-GC06 doctrine consumption is now bounded to GC08 preparation and GC10 finale, while GC07/GC09 remain learned-capability gates.
+Candidate A's bounded depth sequence now closes the repository-owned L3 gap without adding a third doctrine or a larger Trait catalogue. Player Trait slots, permanent Resonance pricing, temporary/share staging, doctrine focus, and Player Insight remain distinct authorities. Structural Steward and Countermodeler are repeatedly consumed at GC06, GC08 preparation, and GC10, while GC07/GC09 intentionally remain permanent-capability pair gates.
 
-A follow-on Trait coherence package makes that authority player-safe rather than merely documented: permanent Resonance now rejects deferred-only catalogue entries and live effects that have no durable Player consumer; `EssenceFlow` is explicitly Copy-sharing/inheritance content rather than a permanent Player bonus; NPC sharing now enforces the same equipped + non-permanent contract as Copy sharing; and temporary slots are defined as experimentation/direct-effect/share staging rather than the late-game specialization layer. GC08 distributed preparation also gives `ConstraintSense` and `AdversarialCalibration` independent semantic uses without creating more doctrines. Focused validation remains `npm run trait-depth:validate`. The active repository frontier remains Candidate B / Forge Standing Responsibility; this package does not reorder B -> A -> C.
+All four canonical source capabilities now have independent cross-domain use. Willow/Elara already span Quest + Combat; `ConstraintSense` and `AdversarialCalibration` now each span GC08 Quest + permanent-Trait-gated Dialogue, with authored Relationship Experience consequences. Selector presentation and direct thunk execution enforce the same permanent Player Trait authority. Focused validation remains `npm run trait-depth:validate`.
+
+This is a bounded repository-depth exit, not a human product claim. Comprehension, switching value, temporary-attunement prominence, balance, enjoyment and preference remain HUMAN-UNVALIDATED. The active feature-completion frontier is now Candidate C — strategic consequence composition.
 
 ## M26 closure
 
