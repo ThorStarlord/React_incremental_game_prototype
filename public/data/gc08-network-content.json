@@ -327,6 +327,58 @@
       "next": {
         "commit": null
       }
+    },
+    "gronk_gc08_constraint_reflection": {
+      "id": "gronk_gc08_constraint_reflection",
+      "npcId": "npc_blacksmith_gronk",
+      "title": "The Constraint After the Procedure",
+      "text": "After the distributed preparation holds, Gronk points past the protected bottlenecks to a repair request that looks urgent but carries no load. 'You learned the useful part. Tell me what actually fails if we ignore this one.'",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "gronk_gc08_exp_constraint_bottleneck_preparation"
+      ],
+      "requiredPermanentTraitIds": [
+        "ConstraintSense"
+      ],
+      "responses": {
+        "name_constraint": "Nothing load-bearing fails. Preserve the constrained work first; this visible repair can wait."
+      },
+      "effects": [
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "gronk_gc08_exp_constraint_reflection",
+          "responseId": "name_constraint"
+        }
+      ],
+      "next": {
+        "name_constraint": null
+      }
+    },
+    "lyra_gc08_adversarial_reflection": {
+      "id": "lyra_gc08_adversarial_reflection",
+      "npcId": "npc_lyra",
+      "title": "Model the Move, Not the Mood",
+      "text": "The red-team pass is complete, but Lyra gives you one more hostile timing pattern with no tactical reward attached. 'Do not tell me whether you trust me. Tell me what I do next if I am trying to break your sequence.'",
+      "repeatable": false,
+      "requiredExperienceIds": [
+        "lyra_gc08_exp_adversarial_stress_test"
+      ],
+      "requiredPermanentTraitIds": [
+        "AdversarialCalibration"
+      ],
+      "responses": {
+        "model_move": "You attack the handoff, not the strongest node. That is where the procedure depends on prediction rather than force."
+      },
+      "effects": [
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc08_exp_adversarial_reflection",
+          "responseId": "model_move"
+        }
+      ],
+      "next": {
+        "model_move": null
+      }
     }
   },
   "npcDialogueIds": {
@@ -334,7 +386,8 @@
       "elara_gc08_network_diagnosis"
     ],
     "npc_blacksmith_gronk": [
-      "gronk_gc08_counterphase_briefing"
+      "gronk_gc08_counterphase_briefing",
+      "gronk_gc08_constraint_reflection"
     ],
     "npc_captain_valerius": [
       "valerius_gc08_counterphase_briefing"
@@ -343,7 +396,8 @@
       "lyra_gc08_commit_distributed",
       "lyra_gc08_commit_structural",
       "lyra_gc08_commit_diagnostic",
-      "lyra_gc08_commit_fortified"
+      "lyra_gc08_commit_fortified",
+      "lyra_gc08_adversarial_reflection"
     ]
   }
 }
