@@ -33,6 +33,7 @@ const completionAuthorityFiles = [
   'specification/Technical/GameCompletionRoadmap.md',
   'specification/Technical/FeatureCompletionGapAnalysis.md',
   'specification/Technical/CandidateBMasteryCompressionDepthSpecification.md',
+  'specification/Technical/CandidateARelationshipCapabilityDepthResult.md',
   'specification/Technical/AlphaCompletionContract.md',
   'specification/Technical/BetaCompletionContract.md',
   'specification/Technical/ReleaseQualificationContract.md',
@@ -140,6 +141,7 @@ if (exists('docs/CURRENT.md')) {
 
 requireContains('STATUS.md', [
   'CONTENT_ALPHA / HUMAN-UNVALIDATED',
+  'Candidate C — Strategic consequence composition',
   'TECHNICAL_BETA_READY',
   'BETA_PASS=NO',
   'FEATURE_COMPLETION / PRODUCT_DEPTH',
@@ -186,6 +188,7 @@ requireContains('RUNBOOK.md', [
 
 requireContains('specification/README.md', [
   'Authority chain',
+  'CandidateARelationshipCapabilityDepthResult.md',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameProgressionArc.md',
@@ -233,10 +236,19 @@ requireContains('specification/Technical/FeatureCompletionGapAnalysis.md', [
 ]);
 
 requireContains('specification/Technical/CandidateBMasteryCompressionDepthSpecification.md', [
-  'FEATURE COMPLETION CANDIDATE B',
+  'IMPLEMENTED / BOUNDED L3 EXIT SATISFIED',
   'Forge Assistance',
   'forge_structural_deviation',
   'attention moves upward from repeated procedure to policy and exception judgment',
+  'Build Validation: #468',
+]);
+
+requireContains('specification/Technical/CandidateARelationshipCapabilityDepthResult.md', [
+  'BOUNDED REPOSITORY-DEPTH RESULT',
+  'ConstraintSense',
+  'AdversarialCalibration',
+  'requiredPermanentTraitIds',
+  'Candidate C',
 ]);
 
 requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
