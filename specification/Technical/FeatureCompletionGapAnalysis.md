@@ -64,8 +64,8 @@ strategic importance
 | Knowledge | L1/L2 | Track who knows objective facts independently from relationships and institutions | Very narrow fact breadth and limited strategic use | **Depth candidate C as part of composition** |
 | Faction Reputation | L1/L2 | Track institutional standing independently from personal relationships | Bounded examples exist, but institutional standing rarely drives sustained strategy | **Depth candidate C as part of composition** |
 | World State | L1/L2 | Persist objective regional consequences independently from beliefs/relationships | Bounded conditions exist but are not yet a strong strategic planning surface | **Depth candidate C as part of composition** |
-| Copy system | L2 | Turn learned procedures into delegated execution while preserving player judgment | Copies execute tasks, but their campaign-wide organizational/policy role remains shallow | **Depth candidate B** |
-| Routine familiarity / earned delegation | L2 | Make personal mastery unlock attention compression | Three routines exist; Standing Orders/Exceptions are only one Archive Verification vertical slice | **Depth candidate B — highest gap** |
+| Copy system | L3 | Turn learned procedures into delegated execution while preserving player judgment | Archive + Forge now provide distinct standing contexts and exception families; further automation needs qualitatively new value | Preserve bounded Candidate B exit |
+| Routine familiarity / earned delegation | L3 | Make personal mastery unlock attention compression | Archive + Forge prove quiet known work and distinct player-return exceptions across role/location contexts | Preserve; no third standing responsibility by symmetry |
 | Persistence / save / load | L5 | Preserve the whole campaign and progression model safely | No product-depth expansion needed | Preserve/harden only on concrete defects |
 | Save import / export | L4/L5 | Recovery/portability | Already sufficient for intended role | Preserve |
 | Autosave | L4/L5 | Safe ordinary continuity | Already sufficient for intended role | Preserve |
@@ -301,18 +301,9 @@ repeat existing source capabilities across later authored contexts, preserve the
 independent identity outside doctrine pairs, and make resulting evidence visible in
 Player Insight / aftermath without expanding the Trait catalogue.
 
-It should produce:
+The Candidate-A package should preserve the existing four canonical capabilities and two doctrines while adding repeated independent late-campaign consumption, durable provenance, and causal payoff. It must not expand the Trait catalogue or introduce a generic capability graph.
 
-1. a concrete finished-game role for Copies in late Campaign One;
-2. the exact additional standing-responsibility patterns justified by existing mastered routines/content;
-3. typed condition and exception semantics;
-4. deterministic GameLoop ordering and offline boundaries;
-5. player-facing management/Insight behavior;
-6. one end-to-end campaign trace from personal mastery -> standing responsibility -> quiet autonomous execution -> exception -> player judgment;
-7. a minimal implementation plan with explicit non-goals;
-8. evidence that the result increases attention compression rather than passive-income automation.
-
-After Candidate B reaches a bounded implementation decision, repeat the same depth process for A, then C.
+After Candidate A is deterministically qualified, reconcile Candidate C against the already-authored GC08 -> GC10 composition before adding new code. If Relationship, Knowledge, Faction, World State, build, and delegation already satisfy the C exit shape, record that sufficiency rather than inventing a simulator.
 
 ## Stop rule
 
