@@ -25,6 +25,7 @@ export interface DialogueAvailabilityPresentation {
 const humanizeId = (id: string): string =>
   id
     .replace(/^.*?:/, '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
     .split('_')
     .filter(Boolean)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
