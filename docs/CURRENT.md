@@ -4,9 +4,9 @@
 
 - Candidate B / Mastery Compression is **bounded-converged** after Archive Verification + Forge Assistance standing responsibilities.
 - Forge exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0` passed Build Validation #468 and merged in PR #154 as `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`.
-- Candidate A is repository-converged by repeated existing-capability use across GC08/GC09 plus doctrine consumers in GC06/GC08/GC10; exact-head qualification is the remaining repository gate for this package.
+- Candidate A is repository-converged and qualified by repeated existing-capability use across GC08/GC09 plus doctrine consumers in GC06/GC08/GC10. PR #156 merged as `fd94adef92b30124e9d96e722f0d60ead811c4fa` after exact-head Build Validation PASS.
 - Candidate C is `SUFFICIENT / NO NEW SUBSYSTEM WARRANTED`: existing GC08-GC10 authored decisions already compose Relationship, Knowledge, Faction, World State, build and delegation.
-- After exact-head PASS, the active lane returns to Beta/human convergence; `BETA_PASS`, RC and 1.0 remain blocked by their own evidence contracts.
+- The active lane is now Beta/human convergence; `BETA_PASS`, RC and 1.0 remain blocked by their own evidence contracts.
 - Do not add a third standing responsibility by symmetry. Prefer repeated independent uses and later consequences for existing capabilities before adding Traits/doctrines.
 - Human Beta/product-value evidence remains external and unproven; deterministic feature qualification does not promote Beta/RC/1.0 claims.
 
