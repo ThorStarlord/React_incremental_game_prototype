@@ -106,114 +106,92 @@ Combat and Exploration remain legitimate supporting systems, but the breadth pas
 
 ### Current proof
 
-The repository already proves:
+Campaign One now proves a bounded relationship-derived buildcraft loop without a generic skill tree:
 
-- relationships can create authored Experiences and Memories;
-- qualified history can discover and permanently teach Traits;
-- permanent Traits can alter legal Quest/Combat choices;
-- two established two-Trait doctrines can be deliberately foregrounded;
-- GC06 consumes active doctrine with distinct legal synthesis options;
-- the first bounded Candidate-A depth package extends active-doctrine consumption to GC08 preparation and GC10 finale while preserving GC07/GC09 as permanent-capability gates;
-- `ConstraintSense` and `AdversarialCalibration` now each have an independent GC08 distributed-preparation consumer in addition to doctrine participation;
-- permanent Resonance now fails closed when a catalogue Trait has no durable Player runtime authority, and temporary slots are explicitly scoped to experimentation/direct-effect/share staging;
-- capability provenance is visible through Player Insight / Traits surfaces.
+- authored Relationship Experiences and Memories qualify capability provenance;
+- four canonical relationship-derived Traits can become permanent Player capability;
+- Willow/Elara capabilities have independent Quest + Combat consumers;
+- Gronk/Lyra capabilities now have independent Quest + Dialogue consumers;
+- Structural Steward and Countermodeler remain the only two authorized doctrine profiles;
+- active doctrine matters repeatedly at GC06, GC08 preparation, and GC10 finale;
+- GC07 and GC09 remain permanent-capability pair gates so permanent learning matters without repetitive switching tax;
+- permanent Resonance, temporary/share staging, and doctrine focus have distinct fail-closed authority;
+- Traits / Player Insight expose capability and doctrine provenance.
 
-### Gap
+### Repository-owned depth disposition
 
-The architecture now supports a real build system, but Campaign One does not yet make specialization matter often enough to sustain the **primary product promise**.
+The provisional L3 exit shape is now satisfied:
 
-Current limitations include:
+- both established doctrines have repeated meaningful consumers across multiple later contexts;
+- every canonical source Trait matters independently outside doctrine participation;
+- doctrine choices change legal approaches without deleting baseline routes;
+- specialization remains bounded to strategic moments rather than mandatory menu churn;
+- permanent capability availability is causally legible from visible provenance;
+- Gronk/Lyra no longer lag Willow/Elara in cross-domain application.
 
-- only two qualified doctrine profiles;
-- active doctrine now matters at GC06, GC08 preparation, and GC10 finale;
-- GC07 and GC09 intentionally retain permanent-Trait-pair gates so learned capability remains useful without repetitive switching;
-- independent source-Trait use now exists for all four authored capability Traits, but repeated cross-domain application is still sparse for Gronk/Lyra relative to Willow/Elara;
-- temporary/equipped Trait semantics are now bounded to experimentation/direct-effect/share staging, but the human value of that loop remains unproven;
-- successful buildcraft often proves that an option exists rather than making the player's evolving build reshape a meaningful stretch of play.
-
-### Depth-search target
-
-Investigate the smallest content/system changes that would make the two existing doctrine identities and their source Traits create **repeated, causally legible, non-dominant strategic differences** across later Campaign One.
-
-Prefer:
+The new GC08 dialogue consumers deliberately reuse the existing `DialogueNode` prerequisite seam:
 
 ~~~
-existing Traits
-+ existing doctrines
-+ multiple authored consumers
-+ cross-domain consequences
+ConstraintSense
+-> independent distributed-preparation Quest use
+-> permanent-Trait-gated Gronk dialogue
+-> authored Relationship Experience consequence
+
+AdversarialCalibration
+-> independent distributed-preparation Quest use
+-> permanent-Trait-gated Lyra dialogue
+-> authored Relationship Experience consequence
 ~~~
 
-over:
+Presentation and direct thunk execution enforce the same durable Player Trait authority. Missing Traits hide the topic without spoilers and reject direct invocation before effects commit.
 
-~~~
-large new Trait catalog
-+ generic capability graph
-+ arbitrary combination engine
-~~~
+### Remaining uncertainty
 
-### Provisional L3 exit shape
+No additional Candidate-A construction is currently warranted merely to increase consumer count. The remaining questions are predominantly human/product-value questions:
 
-A plausible L3 target is:
+- whether temporary experimentation/sharing deserves prominent player attention;
+- whether doctrine switching feels meaningful rather than cumbersome;
+- whether players understand the provenance/capability/specialization distinction;
+- whether either profile is disproportionately attractive in practice.
 
-- each established doctrine has multiple meaningful consumers across more than one later chapter/context;
-- at least some source Traits matter independently as learned capabilities outside the doctrine gate;
-- doctrine choice changes legal approaches/consequences without becoming a universally superior answer;
-- switching is meaningful enough to justify the focus mechanic but not required as repetitive menu tax;
-- the player can explain, from visible provenance, why the build option exists.
-
-The first bounded implementation package gives both doctrines repeated consumers in GC06, GC08, and GC10 while deliberately leaving GC07/GC09 as learned-capability gates. The follow-on Trait coherence package closes the first independent-use gap for `ConstraintSense` and `AdversarialCalibration` and defines temporary attunement's Campaign One role. Remaining L3 questions are richer repeated cross-domain use, whether temporary experimentation/sharing earns enough player attention to remain prominent, and eventual human comprehension/preference.
+Those remain HUMAN-UNVALIDATED and belong to Beta convergence unless later repository evidence exposes a concrete missing capability.
 
 ## Candidate B — Mastery Compression / Copy organization
 
 ### Current proof
 
-The repository already proves:
+Candidate B now has the bounded second standing-responsibility proof selected by its depth specification:
 
-- personal action can establish routine familiarity;
+- personal action establishes routine familiarity;
 - Copy readiness remains separate from personal mastery;
-- three authored production routine identities exist;
-- Copies can execute understood repeatable work;
-- one Archive Verification Standing Order can maintain a typed backlog;
-- an out-of-envelope source contradiction creates a durable exception and returns judgment to the player;
-- safe already-running tasks can continue offline without autonomous task selection.
+- Archive Verification gives researcher/agent epistemic standing responsibility;
+- Forge Assistance gives guardian/agent City Center physical-maintenance standing responsibility;
+- routine Archive backlog and Forge upkeep can become quiet known work;
+- source contradiction and structural deviation are distinct exception families;
+- unresolved exceptions pause only the affected responsibility and return judgment to the player;
+- Archive and Forge responsibilities can coexist across multiple Copies;
+- acknowledge does not resolve; player action must explicitly close out-of-envelope work;
+- safe offline continuation does not select new standing work.
 
-### Gap
+PR #154 qualified exact head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0` with Build Validation #468 / run `36120244452` and merged as `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`.
 
-This is the largest mismatch between **conceptual importance** and **campaign breadth**.
+### Repository-owned depth disposition
 
-The product promise says the player should increasingly focus on novel strategic/relational decisions because understood repetition becomes delegated. Yet full standing responsibility currently exists for only one routine and one exception class.
+The Candidate B exit test is satisfied:
 
-The system therefore proves the model but does not yet create a campaign-wide transformation of player attention.
+- standing responsibility exists in more than one operational context;
+- Copy role/location eligibility changes what can be owned;
+- at least two qualitatively different exception families return player judgment;
+- multiple Copies form a legible small responsibility network;
+- normality becomes quiet while unfamiliar uncertainty remains durable and visible.
 
-### Depth-search target
+Do **not** add Resonance Calibration or another standing responsibility by symmetry. Additional B construction now requires evidence of a materially different player role, not a desire for a third example.
 
-Investigate how the existing three routine identities, Copy roles, routine priority, Standing Orders, and typed exceptions can form a **small policy-driven operating network** without becoming autonomous strategy.
-
-Questions to resolve in depth:
-
-- Which additional mastered procedures deserve standing responsibility rather than one-shot assignment?
-- What conditions should those responsibilities maintain?
-- What distinct exception classes force player judgment instead of being silently auto-resolved?
-- How should several Copies divide recurring responsibility without a generic planner?
-- What late-game UI makes normality disappear while exceptional states surface?
-- Which campaign chapters create enough recurring work for delegation to feel earned rather than cosmetic?
-- How does delegation reduce attention cost rather than merely increase passive income?
-
-Prefer typed authored policies over a generic condition DSL or arbitrary queue.
-
-### Provisional L3 exit shape
-
-A plausible L3 target is:
-
-- standing responsibility exists across more than one gameplay context/routine;
-- distinct safe work patterns demonstrate that Copies maintain known procedures rather than merely repeat one task;
-- at least two exception families return qualitatively different judgment to the player;
-- Copy role/readiness meaningfully affects organizational assignment;
-- later Campaign One has a perceptible before/after transition from personal repetition to policy-level supervision;
-- normal delegated work is quiet while exceptions are legible and durable.
+Human comprehension, perceived attention compression, pacing, and enjoyment remain unproven.
 
 ## Candidate C — Strategic consequence composition
+
+**Current status:** ACTIVE FEATURE-COMPLETION FRONTIER after bounded Candidate B and Candidate A depth exits.
 
 ### Current proof
 
@@ -277,51 +255,43 @@ Authored travel currently proves location can matter to Quest, encounters, and s
 
 Use as supporting pressure for buildcraft/delegation. Do not redesign the economy before A/B clarify what resources and pacing the finished loops actually need.
 
-## Selected depth order
+## Depth progression state
 
-Proceed without waiting for a new milestone number:
+The original selected order remains useful as historical rationale:
 
 ~~~
-1. Candidate B — Mastery Compression / Copy organization
-2. Candidate A — Relationship-derived capability buildcraft
-3. Candidate C — Strategic consequence composition
+1. Candidate B — Mastery Compression / Copy organization       [bounded L3 exit satisfied]
+2. Candidate A — Relationship-derived capability buildcraft   [bounded L3 exit satisfied]
+3. Candidate C — Strategic consequence composition            [ACTIVE]
 ~~~
 
-Rationale:
-
-- **B** has the largest gap between the game's incremental identity and its current single standing-order slice, and it can transform the player's level of attention without requiring new campaign acts.
-- **A** is the primary product promise and already has a strong architecture; its next value comes from broader meaningful consumption rather than a new capability framework.
-- **C** becomes most valuable once A/B provide richer strategic inputs to compose; it should deepen the consequences of those systems rather than grow as an isolated simulation.
-
-This ordering is for **depth investigation**, not an irreversible implementation sequence. If the B depth search demonstrates that meaningful standing responsibility cannot be expanded without low-value repetition, move A ahead rather than forcing the architecture.
+B and A should not receive another package merely to increase example count. Their next changes must be pulled by a concrete completion defect, Candidate C composition pressure, or later human evidence.
 
 ## Immediate next work
 
-The next package is a **depth specification for Candidate B**.
+The next package is a **depth specification and bounded implementation for Candidate C**.
 
-It should produce:
+It should identify the smallest authored late-Campaign-One decision set that makes the already-separate authorities strategically legible together:
 
-1. a concrete finished-game role for Copies in late Campaign One;
-2. the exact additional standing-responsibility patterns justified by existing mastered routines/content;
-3. typed condition and exception semantics;
-4. deterministic GameLoop ordering and offline boundaries;
-5. player-facing management/Insight behavior;
-6. one end-to-end campaign trace from personal mastery -> standing responsibility -> quiet autonomous execution -> exception -> player judgment;
-7. a minimal implementation plan with explicit non-goals;
-8. evidence that the result increases attention compression rather than passive-income automation.
-
-After Candidate B reaches a bounded implementation decision, repeat the same depth process for A, then C.
+1. Relationship history remains personal-history authority;
+2. Knowledge remains who-knows-what authority;
+3. Faction Reputation remains institutional-standing authority;
+4. World State remains objective regional-condition authority;
+5. capability/doctrine and mastered delegation may be consumed as additional inputs without becoming shadow state;
+6. changing one axis while holding another fixed must change an available strategy or persistent consequence;
+7. Player Insight or the decision surface must explain the causal distinction;
+8. no generalized political/world simulator or universal condition DSL is authorized.
 
 ## Stop rule
 
 Feature-completion work stops when:
 
-- required core systems perform their intended Campaign One roles at sufficient L4 depth;
+- required core systems perform their intended Campaign One roles at sufficient bounded depth;
 - further depth has low expected player value relative to Beta convergence;
 - the next improvement would require unauthorized outer-scope expansion;
 - a genuine owner/external boundary is reached.
 
-Only then should repository-wide optimization shift to dedicated Beta/human validation, tuning, accessibility, presentation, reliability, and release hardening.
+After Candidate C, explicitly run the **FEATURE_COMPLETE NOW?** check rather than discovering another construction frontier by inertia. Only then should repository-wide optimization shift to dedicated Beta/human validation, tuning, accessibility, presentation, reliability, and release hardening.
 
 ## Governing interpretation
 
