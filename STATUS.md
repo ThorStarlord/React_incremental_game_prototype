@@ -25,7 +25,7 @@
 **Feature Completion Gap Analysis:** `COMPLETE / CURRENT`  
 **Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
 **Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
-**Current implementation frontier:** `A/B/C REPOSITORY CONSTRUCTION CONVERGED — exact-head qualification pending; next lane is Beta/human convergence`
+**Current implementation frontier:** `A/B/C REPOSITORY CONSTRUCTION CONVERGED / QUALIFIED — next lane is Beta/human convergence`
 
 ### Feature-completion convergence disposition
 
@@ -36,7 +36,7 @@ Candidate C's own exit shape is already realized by GC08-GC10 authored compositi
 including a fortified finale entry that simultaneously consumes Relationship, Knowledge,
 World State, and Faction authority.
 
-After the current Candidate-A exact head passes deterministic qualification, no further
+The Candidate-A exact head passed deterministic qualification and merged as `fd94adef92b30124e9d96e722f0d60ead811c4fa`; no further
 A/B/C construction package is authorized by inertia. The repository returns to the
 existing Beta/human-evidence lane. This does **not** mean `BETA_PASS`, RC eligibility,
 or 1.0 promotion has occurred.
