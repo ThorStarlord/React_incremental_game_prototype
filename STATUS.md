@@ -1,6 +1,6 @@
 # Repository Status — Feature Completion / Campaign One Product Depth
 
-**Status date:** 2026-09-24  
+**Status date:** 2026-09-26  
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
@@ -46,7 +46,7 @@ Read in this order:
 
 The project has passed proof-of-concept, technical-prototype, bounded vertical-slice, whole-game traversal, authored-campaign integration, and deterministic Beta-readiness qualification. Campaign One has a production-equivalent New Game -> Prologue -> Chapters 1-7 -> Telluric Echo finale -> state-responsive Epilogue path, with canonical persistence checkpoints and authored route variants.
 
-Those results establish **integration maturity**, not automatic **feature maturity**. Several core gameplay systems remain deliberately narrow: Combat is a bounded MVP; Doctrine specialization has two established profiles with its first major production consumer in GC06; and Standing Orders / exception escalation currently have one Archive Verification vertical slice. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence about what was qualified, but they no longer imply that repository-owned feature construction is finished.
+Those results establish **integration maturity**, not automatic **feature maturity**. Several core gameplay systems remain deliberately narrow: Combat is a bounded MVP; Doctrine specialization has two established profiles with its first major production consumer in GC06; and Standing Orders / exception escalation now have two materially distinct qualified contexts: Archive Verification and City Center Forge Assistance. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence about what was qualified, but they no longer imply that repository-owned feature construction is finished.
 
 ## Current goal — feature completion / product depth
 
@@ -92,8 +92,10 @@ This may guide bounded reversible development under the provisional governance d
 
 ### Bounded Mastery Compression feature development — Standing Orders
 
-Explicit owner direction extends the existing earned-delegation identity with one
-bounded Archive Verification standing responsibility.
+Candidate B now contains two bounded standing responsibilities: Archive Verification
+and Forge Assistance. Archive handles epistemic verification with source-contradiction
+exceptions; Forge handles City Center physical upkeep with structural-deviation
+exceptions. Both return out-of-envelope judgment to the player rather than improvising.
 
 The current authority is
 [`CopyStandingOrdersAndExceptionEscalationResult.md`](specification/Technical/CopyStandingOrdersAndExceptionEscalationResult.md).
@@ -160,11 +162,10 @@ boundary. The state-responsive epilogue can report which mastered work has
 become quiet standing responsibility while preserving player judgment for
 unknown conditions.
 
-This is **Candidate B foundation, not Candidate B completion**. The newer
-[`CandidateBMasteryCompressionDepthSpecification.md`](specification/Technical/CandidateBMasteryCompressionDepthSpecification.md)
-remains the active runtime-depth plan and selects **Forge Assistance as the
-second standing responsibility**. This projection neither pre-authorizes that
-Forge behavior nor closes the need to implement and qualify it.
+Candidate B's bounded exit test is now satisfied by the integrated Archive + Forge
+network. Forge was qualified at exact head `70c24d5` in Build Validation #468 and
+merged through PR #154 as `fbc19da`. A third standing responsibility is not
+authorized by inertia; the active depth frontier advances to Candidate A.
 
 Campaign One's organizational ceiling remains:
 
@@ -196,7 +197,7 @@ This is bounded feature development of the primary relationship-derived capabili
 
 A bounded owner-directed Trait depth repair now closes three concrete implementation gaps without changing the selected B -> A -> C depth order: Player Trait slots unlock from their documented Resonance levels, permanent Resonance pricing is catalogue-authoritative, and the general Traits/Codex surfaces use the same readiness authority as runtime validation. [`CampaignOneTraitCatalogueAudit.md`](specification/Technical/CampaignOneTraitCatalogueAudit.md) also classifies the legacy catalogue so historical effect metadata cannot resurrect cut Skills/Crafting systems by inertia. This is a foundation repair for Candidate A, not Candidate-A depth completion; selective post-GC06 doctrine consumption is now bounded to GC08 preparation and GC10 finale, while GC07/GC09 remain learned-capability gates.
 
-A follow-on Trait coherence package makes that authority player-safe rather than merely documented: permanent Resonance now rejects deferred-only catalogue entries and live effects that have no durable Player consumer; `EssenceFlow` is explicitly Copy-sharing/inheritance content rather than a permanent Player bonus; NPC sharing now enforces the same equipped + non-permanent contract as Copy sharing; and temporary slots are defined as experimentation/direct-effect/share staging rather than the late-game specialization layer. GC08 distributed preparation also gives `ConstraintSense` and `AdversarialCalibration` independent semantic uses without creating more doctrines. Focused validation remains `npm run trait-depth:validate`. The active repository frontier remains Candidate B / Forge Standing Responsibility; this package does not reorder B -> A -> C.
+A follow-on Trait coherence package makes that authority player-safe rather than merely documented: permanent Resonance now rejects deferred-only catalogue entries and live effects that have no durable Player consumer; `EssenceFlow` is explicitly Copy-sharing/inheritance content rather than a permanent Player bonus; NPC sharing now enforces the same equipped + non-permanent contract as Copy sharing; and temporary slots are defined as experimentation/direct-effect/share staging rather than the late-game specialization layer. GC08 distributed preparation also gives `ConstraintSense` and `AdversarialCalibration` independent semantic uses without creating more doctrines. Focused validation remains `npm run trait-depth:validate`. Candidate B has since converged at its bounded exit shape, so Candidate A is now active. The current Candidate-A package extends `ConstraintSense` and `AdversarialCalibration` from GC08 independent uses into GC09 authored judgment and finale aftermath without adding Traits or doctrines.
 
 ## M26 closure
 
