@@ -2,11 +2,13 @@
 
 This document provides a high-level overview of the technical architecture, technology stack, and project structure for the React Incremental RPG Prototype.
 
-**Architecture Status**: **COHERENT RELEASE-CANDIDATE BASELINE; PROMOTION BLOCKED**. The
+**Architecture Status**: **COHERENT FEATURE-COMPLETION BASELINE; RELEASE PROMOTION BLOCKED**. The
 application has a feature-local Redux architecture, canonical domain authorities,
 production save/load, authored Campaign One content, deterministic qualification,
-and a working player shell. The remaining 1.0 work is evidence and release
-qualification, not a new framework or generalized game engine.
+and a working player shell. The active repository stage is **FEATURE_COMPLETION /
+PRODUCT_DEPTH**: remaining 1.0 construction deepens the existing bounded gameplay
+authorities before dedicated Beta/release convergence. This does not authorize a
+new framework or generalized game engine.
 
 ## Current architecture contract
 
