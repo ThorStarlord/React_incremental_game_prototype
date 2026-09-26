@@ -11,6 +11,7 @@ import {
   initializeNPCsThunk,
   processNPCInteractionThunk,
 } from '../NPCs/state/NPCThunks';
+import { selectAvailableNPCDialogueChoices } from '../NPCs/state/NPCSelectors';
 import {
   initializeQuestsThunk,
   resolveQuestOutcomeThunk,
@@ -400,6 +401,65 @@ describe('GC-08 Network Under Pressure', () => {
       store.getState(),
       'location_merchant_district'
     )).toBe('distributed');
+  });
+
+  test.each([
+    {
+      npcId: 'npc_blacksmith_gronk',
+      prerequisiteExperienceId: 'gronk_gc08_exp_constraint_bottleneck_preparation',
+      traitId: 'ConstraintSense',
+      dialogueId: 'gronk_gc08_constraint_reflection',
+      responseId: 'name_constraint',
+      consequenceExperienceId: 'gronk_gc08_exp_constraint_reflection',
+      reason: 'Learned capability: Constraint Sense',
+    },
+    {
+      npcId: 'npc_lyra',
+      prerequisiteExperienceId: 'lyra_gc08_exp_adversarial_stress_test',
+      traitId: 'AdversarialCalibration',
+      dialogueId: 'lyra_gc08_adversarial_reflection',
+      responseId: 'model_move',
+      consequenceExperienceId: 'lyra_gc08_exp_adversarial_reflection',
+      reason: 'Learned capability: Adversarial Calibration',
+    },
+  ])('$traitId independently unlocks a cross-domain dialogue and direct invocation fails closed', async ({
+    npcId,
+    prerequisiteExperienceId,
+    traitId,
+    dialogueId,
+    responseId,
+    consequenceExperienceId,
+    reason,
+  }) => {
+    const store = makeStore();
+    await initialize(store);
+    await store.dispatch(recordAuthoredRelationshipExperienceThunk({
+      experienceId: prerequisiteExperienceId,
+      timestamp: 1700000000000,
+    })).unwrap();
+
+    expect(
+      selectAvailableNPCDialogueChoices(store.getState(), npcId)
+        .some(choice => choice.id === dialogueId)
+    ).toBe(false);
+
+    const blocked = await interact(store, npcId, dialogueId, responseId);
+    expect(blocked.success).toBe(false);
+    expect(blocked.message).toBe(`Missing permanent Trait: ${traitId}`);
+    expect(store.getState().relationships.experiencesById[consequenceExperienceId])
+      .toBeUndefined();
+
+    store.dispatch(addPermanentTrait(traitId));
+
+    const available = selectAvailableNPCDialogueChoices(store.getState(), npcId)
+      .find(choice => choice.id === dialogueId);
+    expect(available).toBeDefined();
+    expect(available?.availabilityReasons).toContain(reason);
+
+    const allowed = await interact(store, npcId, dialogueId, responseId);
+    expect(allowed.success).toBe(true);
+    expect(store.getState().relationships.experiencesById[consequenceExperienceId])
+      .toBeDefined();
   });
 
   test.each([
