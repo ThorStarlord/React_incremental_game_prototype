@@ -1,6 +1,6 @@
 # Repository Status — Feature Completion / Campaign One Product Depth
 
-**Status date:** 2026-09-26  
+**Status date:** 2026-09-26
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
@@ -23,8 +23,9 @@
 **Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
 **Active program:** Campaign One / 1.0 Feature Completion  
 **Feature Completion Gap Analysis:** `COMPLETE / CURRENT`  
-**Candidate B depth specification:** `COMPLETE / CURRENT`  
-**Current implementation frontier:** `Forge Standing Responsibility — Candidate B implementation`
+**Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
+**Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
+**Current implementation frontier:** `Candidate A — repeated independent relationship-capability use and later-campaign consequence`
 
 ## Current authority
 
