@@ -114,7 +114,7 @@ The repository already proves:
 - two established two-Trait doctrines can be deliberately foregrounded;
 - GC06 consumes active doctrine with distinct legal synthesis options;
 - the first bounded Candidate-A depth package extends active-doctrine consumption to GC08 preparation and GC10 finale while preserving GC07/GC09 as permanent-capability gates;
-- `ConstraintSense` and `AdversarialCalibration` now each have an independent GC08 distributed-preparation consumer in addition to doctrine participation;
+- `ConstraintSense` and `AdversarialCalibration` each have independent GC08 distributed-preparation consumers and now also have independent GC09 judgment uses whose durable evidence carries into the finale aftermath;
 - permanent Resonance now fails closed when a catalogue Trait has no durable Player runtime authority, and temporary slots are explicitly scoped to experimentation/direct-effect/share staging;
 - capability provenance is visible through Player Insight / Traits surfaces.
 
@@ -127,7 +127,7 @@ Current limitations include:
 - only two qualified doctrine profiles;
 - active doctrine now matters at GC06, GC08 preparation, and GC10 finale;
 - GC07 and GC09 intentionally retain permanent-Trait-pair gates so learned capability remains useful without repetitive switching;
-- independent source-Trait use now exists for all four authored capability Traits, but repeated cross-domain application is still sparse for Gronk/Lyra relative to Willow/Elara;
+- independent source-Trait use now repeats into late Campaign One for Gronk/Lyra: `ConstraintSense` can review hard load margins and `AdversarialCalibration` can red-team a prepared counterphase without requiring their doctrine partner;
 - temporary/equipped Trait semantics are now bounded to experimentation/direct-effect/share staging, but the human value of that loop remains unproven;
 - successful buildcraft often proves that an option exists rather than making the player's evolving build reshape a meaningful stretch of play.
 
@@ -182,9 +182,7 @@ The repository already proves:
 
 This is the largest mismatch between **conceptual importance** and **campaign breadth**.
 
-The product promise says the player should increasingly focus on novel strategic/relational decisions because understood repetition becomes delegated. Yet full standing responsibility currently exists for only one routine and one exception class.
-
-The system therefore proves the model but does not yet create a campaign-wide transformation of player attention.
+The product promise says the player should increasingly focus on novel strategic/relational decisions because understood repetition becomes delegated. Archive Verification and Forge Assistance now supply two materially distinct standing contexts and exception families. Candidate B has therefore reached its bounded developed-feature exit; additional automation is not currently warranted unless it creates a qualitatively different player role.
 
 ### Depth-search target
 
@@ -297,7 +295,11 @@ This ordering is for **depth investigation**, not an irreversible implementation
 
 ## Immediate next work
 
-The next package is a **depth specification for Candidate B**.
+Candidate B is bounded-converged after the qualified Archive + Forge implementation.
+The active package is **Candidate A relationship-derived capability buildcraft**:
+repeat existing source capabilities across later authored contexts, preserve their
+independent identity outside doctrine pairs, and make resulting evidence visible in
+Player Insight / aftermath without expanding the Trait catalogue.
 
 It should produce:
 
