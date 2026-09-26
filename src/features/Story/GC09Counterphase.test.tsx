@@ -11,6 +11,7 @@ import {
   initializeNPCsThunk,
   processNPCInteractionThunk,
 } from '../NPCs/state/NPCThunks';
+import { selectAvailableNPCDialogueChoices } from '../NPCs/state/NPCSelectors';
 import {
   initializeQuestsThunk,
   resolveQuestOutcomeThunk,
@@ -367,6 +368,73 @@ describe('GC-09 Counterphase', () => {
       'Archive Verification is personally mastered, so safe repetitive verification can be delegated without delegating the finale decision.',
     ]));
     expect(explanation?.reasons.join(' ')).not.toMatch(/readiness|score/i);
+  });
+
+  test('Constraint Sense and Adversarial Calibration gain independent late-campaign uses without requiring their doctrine pairs', async () => {
+    const store = makeStore();
+    await initialize(store);
+    await record(store, 'lyra_gc09_exp_prepare_distributed', 200);
+
+    expect(selectAvailableNPCDialogueChoices(store.getState(), 'npc_blacksmith_gronk')
+      .some(choice => choice.id === 'gronk_gc09_constraint_margin_review')).toBe(false);
+    expect(selectAvailableNPCDialogueChoices(store.getState(), 'npc_lyra')
+      .some(choice => choice.id === 'lyra_gc09_adversarial_failure_probe')).toBe(false);
+
+    const blocked = await store.dispatch(processNPCInteractionThunk({
+      npcId: 'npc_blacksmith_gronk',
+      interactionType: 'dialogue',
+      context: {
+        choiceId: 'gronk_gc09_constraint_margin_review',
+        selectedResponse: 'review',
+        playerMessage: 'review',
+      },
+    })).unwrap();
+    expect(blocked.success).toBe(false);
+    expect(blocked.message).toContain('Required permanent Trait not learned: ConstraintSense');
+
+    store.dispatch(addPermanentTrait('ConstraintSense'));
+    const gronkChoice = selectAvailableNPCDialogueChoices(
+      store.getState(),
+      'npc_blacksmith_gronk'
+    ).find(choice => choice.id === 'gronk_gc09_constraint_margin_review');
+    expect(gronkChoice?.availabilityReasons).toContain('Permanent capability: ConstraintSense');
+
+    const gronkResult = await store.dispatch(processNPCInteractionThunk({
+      npcId: 'npc_blacksmith_gronk',
+      interactionType: 'dialogue',
+      context: {
+        choiceId: 'gronk_gc09_constraint_margin_review',
+        selectedResponse: 'review',
+        playerMessage: 'review',
+      },
+    })).unwrap();
+    expect(gronkResult.success).toBe(true);
+    expect(store.getState().relationships.experiencesById.gronk_gc09_exp_constraint_margin_review)
+      .toBeDefined();
+    expect(store.getState().player.permanentTraits).not.toContain('WillowsWisdom');
+
+    store.dispatch(addPermanentTrait('AdversarialCalibration'));
+    const lyraChoice = selectAvailableNPCDialogueChoices(
+      store.getState(),
+      'npc_lyra'
+    ).find(choice => choice.id === 'lyra_gc09_adversarial_failure_probe');
+    expect(lyraChoice?.availabilityReasons).toContain('Permanent capability: AdversarialCalibration');
+
+    const lyraResult = await interact(
+      store,
+      'lyra_gc09_adversarial_failure_probe',
+      'probe'
+    );
+    expect(lyraResult.success).toBe(true);
+    expect(store.getState().relationships.experiencesById.lyra_gc09_exp_adversarial_failure_probe)
+      .toBeDefined();
+    expect(store.getState().player.permanentTraits).not.toContain('ScholarlyInsight');
+
+    const explanation = selectCounterphasePreparationExplanation(store.getState());
+    expect(explanation?.reasons).toEqual(expect.arrayContaining([
+      'Constraint Sense independently exposed a hard load margin during final preparation.',
+      'Adversarial Calibration independently red-teamed the prepared counterphase before commitment.',
+    ]));
   });
 
   test('Copy routine execution cannot create finale preparation or commitment authority', async () => {
