@@ -62,7 +62,7 @@ Read in this order:
 
 The project has passed proof-of-concept, technical-prototype, bounded vertical-slice, whole-game traversal, authored-campaign integration, and deterministic Beta-readiness qualification. Campaign One has a production-equivalent New Game -> Prologue -> Chapters 1-7 -> Telluric Echo finale -> state-responsive Epilogue path, with canonical persistence checkpoints and authored route variants.
 
-Those results establish **integration maturity**, not automatic **feature maturity**. Several core gameplay systems remain deliberately narrow: Combat is a bounded MVP; Doctrine specialization has two established profiles with its first major production consumer in GC06; and Standing Orders / exception escalation now have two materially distinct qualified contexts: Archive Verification and City Center Forge Assistance. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence about what was qualified, but they no longer imply that repository-owned feature construction is finished.
+Those historical results established **integration maturity**, not automatic **feature maturity**. The subsequent B/A/C depth sequence has now closed that gap at the bounded Campaign One scope: Combat remains intentionally bounded, Doctrine specialization remains two-profile, and Standing Orders remain Archive + Forge rather than expanding into general planners. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence, and `FeatureCompleteResult.md` now records that repository-owned feature construction has converged.
 
 ## Current goal — feature completion / product depth
 
