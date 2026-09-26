@@ -1,22 +1,25 @@
-# Handoff — Feature Completion / Product Depth
+# Handoff — Beta Convergence / Human Evidence
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
 **Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
 **Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
-**Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
-**Current product responsibilities:** Candidate A relationship-derived capability buildcraft; Candidate B is bounded-converged after Archive + Forge  
+**Current strategic stage:** `BETA_CONVERGENCE / HUMAN_EVIDENCE`  
+**Feature-completion state:** `FEATURE_COMPLETE / REPOSITORY-QUALIFIED / HUMAN-UNVALIDATED`  
+**Current product responsibilities:** collect genuine Beta evidence; apply only bounded evidence-backed hardening inside locked Campaign One scope  
 **Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
 
 ## Current re-entry frontier
 
-PR #154 merged the second materially distinct Mastery Compression standing responsibility.
-Archive Verification and Forge Assistance now differ by role/location context, work type,
-and exception family while preserving player-owned resolution. Candidate B therefore
-passes its bounded exit test; do not add a third standing responsibility unless later
-evidence shows genuinely different player value.
+The A/B/C feature-depth sequence is closed. Candidate B converged through Archive + Forge,
+Candidate A converged through repeated independent capability use plus selective doctrine
+consumption, and Candidate C already satisfies its authored strategic-composition exit shape.
+The closure rationale and reopening conditions are recorded in
+[`specification/Technical/FeatureCompletionConvergenceResult.md`](specification/Technical/FeatureCompletionConvergenceResult.md).
+
+Do not restart feature-depth construction merely because another implementation is possible.
 
 ## Feature-completion stop boundary — 2026-09-26
 
@@ -30,15 +33,16 @@ The B -> A -> C repository construction sequence has converged and the Candidate
   Faction, World State, build and delegation deeply enough for Campaign One; no generic
   strategy simulator is warranted.
 
-The next lane is the already-defined human Beta/product-validation
-and convergence work. Preserve `TECHNICAL_BETA_READY` while keeping `BETA_PASS=NO`
-until the governing human evidence exists.
+The active lane is the already-defined Beta/product-validation and convergence work.
+Preserve `TECHNICAL_BETA_READY` while keeping `BETA_PASS=NO` until the governing human
+evidence exists. Bounded repository-owned hardening may continue only from concrete
+findings inside the locked 1.0 scope.
 
 ## Repository reality
 
 Campaign One is structurally and authorially complete from New Game through the state-responsive Epilogue.
 
-That sentence describes **campaign-spine and integration completeness**, not a claim that every core gameplay feature is at finished-game depth. The GC records below remain valid historical qualification; several associated systems are still L1/L2 bounded implementations and may be deepened without reopening or rewriting those milestones.
+That sentence describes **campaign-spine and integration completeness**. The repository now also records the bounded Campaign One feature set as `FEATURE_COMPLETE / REPOSITORY-QUALIFIED / HUMAN-UNVALIDATED`. Some systems remain intentionally narrow by design; narrowness alone is no longer authority to deepen them. Reopening feature construction requires concrete contradictory evidence or explicit governance revision.
 
 ```text
 GC-00  completion-program authority                  COMPLETE
@@ -60,7 +64,7 @@ GC-14  release-promotion guard                       QUALIFIED
 GC-14  immutable RC / final 1.0 promotion            BLOCKED
 ```
 
-Do not reopen closed GC packages as if their historical contracts failed. Instead, deepen the current gameplay domains directly when feature-maturity analysis shows that the bounded implementation is still below L4.
+Do not reopen closed GC packages or the completed A/B/C sequence as if their historical contracts failed. Route current work through the Beta contract and concrete findings.
 
 PR #139 completed the bounded pre-Beta player-surface hygiene pass without expanding scope: normal NPC/Essence pages no longer expose prototype/debug mutations, the Dashboard/Character surfaces no longer advertise deferred or internal concepts, Settings no longer exposes no-op import/export actions, and the unreachable legacy `GamePage` reset surface is removed. Exact head `4a64d8d53aea1a9c3385894ac89af570dec778d7` passed Build Validation #419 / run `35680087869`; GC-01 regression coverage owns these rejection checks.
 
@@ -105,27 +109,37 @@ This remains human-unvalidated. Deterministic qualification does not prove compr
 
 ## Current responsibilities
 
-### Primary lane — feature completion / product depth
+### Primary lane — Beta human evidence / product convergence
 
-The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). The breadth pass selected **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. Candidate B is now bounded-converged after the qualified Archive + Forge responsibilities. The active implementation frontier is **Candidate A relationship-derived capability buildcraft**; deepen existing capabilities before adding new Traits or doctrines.
+Issue #109 is the canonical human product-evidence backlog. The Beta contract requires
+at least 5 accepted first sessions and 3 accepted external full playthroughs before
+`BETA_PASS`.
 
-Prioritize missing gameplay depth such as:
+Human evidence must remain genuine. Automated tests, synthetic traversal, repository
+analysis, and LLM review may diagnose or reproduce findings but cannot count toward the
+human floor.
 
-- meaningful progression and variation inside existing systems;
-- broader, authored use of relationship-derived capabilities;
-- Mastery Compression that changes player attention across more than one narrow slice;
-- useful cross-system interactions among Relationship, Traits, Knowledge, Faction, World State, Quest, Copy, Exploration, and Combat;
-- player-facing consequences that make those systems feel like game features rather than state authorities.
+### Concurrent repository lane — bounded evidence-backed hardening
 
-Do not assume every system must become large. The purpose of the gap analysis is also to identify systems already sufficient for their supporting role.
+While human evidence is being collected, repository work may continue only when a
+concrete finding justifies a bounded change inside the locked Campaign One scope.
 
-### Secondary lane — human evidence / future Beta gate
+Allowed evidence classes include deterministic, heuristic, synthetic, accessibility,
+reliability, presentation, pacing, balance, persistence, and release-readiness findings.
 
-Issue #109 remains the canonical human product-evidence backlog. Existing and future genuine sessions remain useful evidence, but their absence does not block current feature construction and their collection does not convert an L1/L2 feature into an L4 feature.
+Default response:
 
-The current Beta contract still requires at least 5 accepted first sessions and 3 accepted external full playthroughs before `BETA_PASS`. Treat that as a downstream gate after feature completion, not as the present repository work queue.
+```text
+concrete finding
+-> smallest affected layer
+-> bounded repair
+-> deterministic regression coverage where applicable
+-> exact-head Build Validation
+```
 
-## Scope boundary, not depth freeze
+Do not use the open human gate as permission to invent new feature depth.
+
+## Scope lock, not repository freeze
 
 Preserve the bounded Campaign One product boundary:
 
@@ -135,7 +149,7 @@ Preserve the bounded Campaign One product boundary:
 - no autonomous irreversible Copy planning;
 - no generalized simulation or New Game+ merely to create work.
 
-Inside that boundary, feature depth is explicitly open. A historical vertical-slice or integration PASS is permission to build on a proven foundation, not a command to stop development.
+Inside that boundary, bounded repair remains open but speculative feature depth is closed. A historical PASS is evidence to preserve; it is not a queue to restart.
 
 Use `AGENTS.md`, `GameCompletionDefinition.md`, and `FeatureScopeMatrix.md` for the maturity model and work-selection rules.
 
@@ -201,4 +215,4 @@ latest main
 
 ## Governing handoff conclusion
 
-> Campaign One has proved that its architecture, state authorities, campaign spine, persistence, and bounded gameplay slices can compose. The current question is no longer merely whether the game can traverse from New Game to Epilogue; it is whether the core features have enough depth, progression, variation, and cross-system consequence to constitute the finished game. Complete those features first. Dedicated Beta/release hardening comes afterward.
+> Campaign One's bounded 1.0 feature construction is repository-complete and deterministically qualified, but the product remains human-unvalidated. The active question is now whether real players can understand, use, complete, and value the finished interaction model. Collect that evidence, repair concrete failures at the smallest layer, and do not reopen feature construction by inertia.
