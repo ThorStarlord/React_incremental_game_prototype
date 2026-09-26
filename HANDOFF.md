@@ -1,14 +1,43 @@
 # Handoff — Feature Completion / Product Depth
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
-**Reconciled baseline before this activation package:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
+**Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
 **Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
 **Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
-**Current product responsibilities:** feature-completion gap analysis + bounded core-feature development  
+**Current product responsibilities:** Candidate A relationship-derived capability buildcraft; Candidate B is bounded-converged after Archive + Forge  
 **Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
+
+## Current re-entry frontier
+
+PR #154 merged the second materially distinct Mastery Compression standing responsibility.
+Archive Verification and Forge Assistance now differ by role/location context, work type,
+and exception family while preserving player-owned resolution. Candidate B therefore
+passes its bounded exit test; do not add a third standing responsibility unless later
+evidence shows genuinely different player value.
+
+The active frontier is **Candidate A**. Deepen existing relationship-derived capabilities
+through repeated independent use, causal provenance, and later consequences. Do not grow
+the Trait catalogue or doctrine count by default.
+
+## Feature-completion stop boundary — 2026-09-26
+
+The B -> A -> C repository construction sequence has converged, subject to exact-head
+qualification of the current Candidate-A PR:
+
+- **B:** Archive + Forge standing responsibilities provide distinct role/location work
+  and exception families; do not add a third by symmetry.
+- **A:** existing capabilities/doctrines now repeat across GC06/GC08/GC09/GC10 with
+  single-capability independent use, visible provenance, and finale payoff.
+- **C:** existing GC08-GC10 authored decisions already compose Relationship, Knowledge,
+  Faction, World State, build and delegation deeply enough for Campaign One; no generic
+  strategy simulator is warranted.
+
+On a green exact head, the next lane is the already-defined human Beta/product-validation
+and convergence work. Preserve `TECHNICAL_BETA_READY` while keeping `BETA_PASS=NO`
+until the governing human evidence exists.
 
 ## Repository reality
 
@@ -83,7 +112,7 @@ This remains human-unvalidated. Deterministic qualification does not prove compr
 
 ### Primary lane — feature completion / product depth
 
-The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). The breadth pass selected **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. Candidate B depth is now specified in [`specification/Technical/CandidateBMasteryCompressionDepthSpecification.md`](specification/Technical/CandidateBMasteryCompressionDepthSpecification.md). The next implementation package is the bounded **Forge Standing Responsibility** slice.
+The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). The breadth pass selected **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. Candidate B is now bounded-converged after the qualified Archive + Forge responsibilities. The active implementation frontier is **Candidate A relationship-derived capability buildcraft**; deepen existing capabilities before adding new Traits or doctrines.
 
 Prioritize missing gameplay depth such as:
 

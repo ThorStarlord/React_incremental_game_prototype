@@ -221,7 +221,14 @@ Phase Against the Echo
 
 Both optional routes remain impossible without their permanent learned Trait pairs because doctrine selectors require permanent ownership and current foregrounding simultaneously.
 
-GC07-GC10 intentionally retain their previously qualified `requiredPermanentTraitIds` pair gates. This package does not mechanically propagate doctrine locking through the remainder of the campaign. Broader conversion now depends on evidence that the GC06 selection loop is legible and valuable rather than merely adding pre-choice menu friction.
+GC07 and GC09 retain permanent-capability gates while GC08 preparation and GC10 finale selectively consume active doctrine. This avoids repetitive doctrine-switching tax while keeping permanent learning useful.
+
+Candidate A now also adds a bounded Dialogue prerequisite, `requiredPermanentTraitIds`, enforced both in availability projection and direct interaction. GC09 uses it for two independent late-campaign judgments:
+
+- `ConstraintSense` -> Gronk's **Review the Failure Margin**;
+- `AdversarialCalibration` -> Lyra's **Attack the Plan Before the Echo Does**.
+
+Each use requires only its single permanent capability, records durable Relationship evidence, and carries into Player Insight / epilogue explanation. Neither creates a new doctrine, bypasses route requirements, or manufactures permanent learning.
 
 ## Save schema v2
 
@@ -306,7 +313,8 @@ It may **not** claim that:
 - Structural Steward or Countermodeler is more fun;
 - doctrine gating improves pacing or replayability;
 - fresh players understand the selection UX without assistance;
-- switching before later campaign decisions adds enough identity to justify converting GC07-GC10.
+- switching before later campaign decisions adds enough identity to justify broader doctrine gating;
+- the new independent GC09 uses are understood or preferred by players.
 
 Those require player-facing selection work and/or human Beta evidence.
 

@@ -399,6 +399,8 @@ const selectCounterphaseProfile = (state: RootState): NetworkPosture | undefined
   selectNetworkPosture(state, 'location_merchant_district');
 const selectCounterphaseMemories = (state: RootState) =>
   state.relationships.memoriesById;
+const selectCounterphaseExperiences = (state: RootState) =>
+  state.relationships.experiencesById;
 const selectCounterphasePermanentTraits = (state: RootState) =>
   state.player.permanentTraits;
 const selectCounterphaseRoutineFamiliarity = (state: RootState) =>
@@ -410,6 +412,7 @@ export const selectCounterphasePreparationExplanation = createSelector(
   [
     selectCounterphaseProfile,
     selectCounterphaseMemories,
+    selectCounterphaseExperiences,
     selectCounterphasePermanentTraits,
     selectCounterphaseRoutineFamiliarity,
     selectCounterphaseWatchStanding,
@@ -417,6 +420,7 @@ export const selectCounterphasePreparationExplanation = createSelector(
   (
     profile,
     memoriesById,
+    experiencesById,
     permanentTraits,
     routineFamiliarity,
     watchStanding
@@ -455,6 +459,17 @@ export const selectCounterphasePreparationExplanation = createSelector(
     if (routineFamiliarity?.archive_verification) {
       reasons.push(
         'Archive Verification is personally mastered, so safe repetitive verification can be delegated without delegating the finale decision.'
+      );
+    }
+
+    if (experiencesById.gronk_gc09_exp_constraint_margin_review) {
+      reasons.push(
+        'Constraint Sense independently exposed a hard load margin during final preparation.'
+      );
+    }
+    if (experiencesById.lyra_gc09_exp_adversarial_failure_probe) {
+      reasons.push(
+        'Adversarial Calibration independently red-teamed the prepared counterphase before commitment.'
       );
     }
 

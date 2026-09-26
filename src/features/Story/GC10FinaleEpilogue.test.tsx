@@ -342,6 +342,27 @@ describe('GC-10 Telluric Echo finale and epilogue', () => {
     });
   });
 
+  test('epilogue preserves independent capability judgments as later-campaign causal payoff', async () => {
+    const store = makeStore();
+    await initialize(store);
+    await seedFinaleEntry(store, 'distributed');
+
+    await record(store, 'gronk_gc09_exp_constraint_margin_review', 106);
+    await record(store, 'lyra_gc09_exp_adversarial_failure_probe', 107);
+
+    await enterFinale(store, 'distributed');
+    await resolveFinale(store, 'distributed');
+    await closeCampaign(store, 'distributed');
+
+    const projection = selectCampaignEpilogueProjection(store.getState());
+    expect(projection?.build).toContain(
+      'Constraint Sense independently identified a hard load margin during final preparation.'
+    );
+    expect(projection?.build).toContain(
+      'Adversarial Calibration independently red-teamed the counterphase against a hostile failure assumption.'
+    );
+  });
+
   test('Copy routine completion cannot create finale or campaign-completion authority', async () => {
     const store = makeStore();
     await initialize(store);

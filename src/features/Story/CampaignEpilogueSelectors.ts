@@ -121,6 +121,21 @@ export const selectCampaignEpilogueProjection = (
       'Build contribution: the distributed route remained viable without requiring every optional relationship-derived capability.';
   }
 
+  const capabilityEchoes: string[] = [];
+  if (hasExperience(state, 'gronk_gc09_exp_constraint_margin_review')) {
+    capabilityEchoes.push(
+      'Constraint Sense independently identified a hard load margin during final preparation.'
+    );
+  }
+  if (hasExperience(state, 'lyra_gc09_exp_adversarial_failure_probe')) {
+    capabilityEchoes.push(
+      'Adversarial Calibration independently red-teamed the counterphase against a hostile failure assumption.'
+    );
+  }
+  if (capabilityEchoes.length > 0) {
+    build = `${build} ${capabilityEchoes.join(' ')}`;
+  }
+
   const routines = masteredRoutineNames(state);
   const delegatedCopies = Object.values(state.copy.copies).filter(copy =>
     copy.role && copy.role !== 'none'
