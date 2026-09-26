@@ -13,9 +13,9 @@
 
 **Status:** CURRENT AUTHORITY for document classification  
 **Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
-**Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
-**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
-**Last reconciled:** 2026-09-23
+**Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
+**Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
+**Last reconciled:** 2026-09-26
 
 ## Purpose
 
@@ -79,14 +79,15 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | Claude adapter | ORIENTATION / NON-INDEPENDENT | [`CLAUDE.md`](../CLAUDE.md) | Delegates to `AGENTS.md`; must not duplicate mutable repository state or policy. |
 | Repository state | CURRENT AUTHORITY | [`STATUS.md`](../STATUS.md) | First source for complete/pending/unproven work. |
 | Documentation classification | CURRENT AUTHORITY | [`docs/CURRENT.md`](CURRENT.md) | This file. |
-| Current handoff / re-entry | CURRENT AUTHORITY, summary | [`HANDOFF.md`](../HANDOFF.md) | Feature Completion / Product Depth re-entry summary; historical GC/Beta-readiness evidence is preserved but no longer defines the active optimization target. |
+| Current handoff / re-entry | CURRENT AUTHORITY, summary | [`HANDOFF.md`](../HANDOFF.md) | FEATURE_COMPLETE / Beta-convergence re-entry summary; historical GC and depth evidence remain preserved. |
 | 1.0 completion / stop condition | CURRENT AUTHORITY | [`specification/GameCompletionDefinition.md`](../specification/GameCompletionDefinition.md) | Defines the smallest complete Campaign One / 1.0. |
 | 1.0 feature scope + maturity | CURRENT AUTHORITY | [`specification/Features/FeatureScopeMatrix.md`](../specification/Features/FeatureScopeMatrix.md) | Core/minimal/deferred/cut decisions plus current L0-L6 feature-maturity interpretation. |
 | Whole-game progression | CURRENT AUTHORITY | [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) | Personal action -> specialization -> networked mastery -> strategic synthesis. |
 | Campaign One structure | CURRENT AUTHORITY | [`specification/Narrative/CampaignArchitecture.md`](../specification/Narrative/CampaignArchitecture.md) | Prologue + Ch1–7 + finale + epilogue. |
-| Active implementation program | CURRENT AUTHORITY | [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) | Preserves GC-00→GC-14 history and inserts Feature Completion / Product Depth before Beta activation; no automatic M27/GC-15. |
-| Feature-completion breadth analysis | CURRENT STRATEGIC ANALYSIS | [`specification/Technical/FeatureCompletionGapAnalysis.md`](../specification/Technical/FeatureCompletionGapAnalysis.md) | Completed L0-L6 breadth scan; selects Candidate B Copy/Mastery Compression, then Candidate A buildcraft and Candidate C strategic consequence composition for depth investigation. |
-| Candidate B depth specification | CURRENT DEPTH SPECIFICATION | [`specification/Technical/CandidateBMasteryCompressionDepthSpecification.md`](../specification/Technical/CandidateBMasteryCompressionDepthSpecification.md) | Specifies Forge Assistance as the second standing responsibility, with a distinct physical maintenance envelope and structural-deviation exception; current implementation frontier. |
+| Active implementation program | CURRENT AUTHORITY | [`specification/Technical/GameCompletionRoadmap.md`](../specification/Technical/GameCompletionRoadmap.md) | Preserves GC-00→GC-14 history; FEATURE_COMPLETE is recorded and Beta convergence is active. No automatic M27/GC-15. |
+| Feature Complete result | CURRENT MATURITY AUTHORITY | [`specification/Technical/FeatureCompleteResult.md`](../specification/Technical/FeatureCompleteResult.md) | Records FEATURE_COMPLETE / HUMAN-UNVALIDATED after Candidate B bounded convergence, Candidate A PR #156 qualification, and Candidate C sufficiency reconciliation. |
+| Feature-completion breadth/depth analysis | COMPLETED STRATEGIC AUTHORITY | [`specification/Technical/FeatureCompletionGapAnalysis.md`](../specification/Technical/FeatureCompletionGapAnalysis.md) | Historical breadth scan plus reconciled Candidate B/A/C exits; no open construction frontier. |
+| Candidate B depth specification | IMPLEMENTED BOUNDED AUTHORITY | [`specification/Technical/CandidateBMasteryCompressionDepthSpecification.md`](../specification/Technical/CandidateBMasteryCompressionDepthSpecification.md) | Archive + Forge satisfy the bounded Candidate B exit; no third responsibility by symmetry. |
 | Alpha definition | CURRENT AUTHORITY | [`specification/Technical/AlphaCompletionContract.md`](../specification/Technical/AlphaCompletionContract.md) | Whole structural game playable New Game -> Epilogue. |
 | Beta definition | CURRENT AUTHORITY | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) | Content locked + human product evidence + UX/balance/reliability. |
 | Release / 1.0 qualification | CURRENT AUTHORITY | [`specification/Technical/ReleaseQualificationContract.md`](../specification/Technical/ReleaseQualificationContract.md) | Exact production candidate, browser/full-run/recovery evidence. Existing `docs/release/` records are preparation/reference until GC-13/GC-14 entry conditions are met. |
@@ -97,7 +98,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | Relationship Capability Constellation | CURRENT AUTHORITY, bounded / HUMAN-UNVALIDATED | [`specification/Technical/RelationshipCapabilityConstellation.md`](../specification/Technical/RelationshipCapabilityConstellation.md) | Separates durable learned Traits from Player-owned doctrine focus; exposes bounded player-facing selection/legibility; GC06, GC08 preparation, and GC10 finale consume active doctrine while GC07/GC09 retain permanent-pair capability gates. |
 | Campaign One Trait Catalogue Audit | CURRENT SUPPORTING AUTHORITY | [`specification/Technical/CampaignOneTraitCatalogueAudit.md`](../specification/Technical/CampaignOneTraitCatalogueAudit.md) | Keeps the four authored relationship capabilities as the buildcraft core, classifies legacy effect metadata, and forbids old Trait JSON from implicitly resurrecting cut Skills/Crafting systems. |
 | Copy standing responsibility / exception escalation | CURRENT AUTHORITY, bounded / HUMAN-UNVALIDATED | [`specification/Technical/CopyStandingOrdersAndExceptionEscalationResult.md`](../specification/Technical/CopyStandingOrdersAndExceptionEscalationResult.md), [`specification/Features/CopySystem.md`](../specification/Features/CopySystem.md) | Explicit owner-directed scope revision: Archive Verification may maintain typed live work; generic queues/planners, offline chaining, and irreversible Copy decisions remain CUT. |
-| Mastery Compression organizational projection | BOUNDED FEATURE AUTHORITY / HUMAN-UNVALIDATED | [`specification/Technical/MasteryCompressionProcedureFamiliesResult.md`](../specification/Technical/MasteryCompressionProcedureFamiliesResult.md), [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) | Derives Network Assurance / Known-State Stewardship from existing mastery, standing-order and exception state without a new save root or planner. Foundation only: Candidate B's Forge standing responsibility remains the active runtime-depth package. |
+| Mastery Compression organizational projection | BOUNDED FEATURE AUTHORITY / HUMAN-UNVALIDATED | [`specification/Technical/MasteryCompressionProcedureFamiliesResult.md`](../specification/Technical/MasteryCompressionProcedureFamiliesResult.md), [`specification/Progression/GameProgressionArc.md`](../specification/Progression/GameProgressionArc.md) | Derives Network Assurance / Known-State Stewardship from existing mastery, standing-order and exception state without a new save root or planner; Archive + Forge now supply the qualified standing-responsibility contexts. |
 | M26 result | CURRENT AUTHORITY, integrated | [`specification/Technical/M26ProvisionalProductDepthResult.md`](../specification/Technical/M26ProvisionalProductDepthResult.md) | Exact-head #340 PASS; M26 closed. |
 | GC-01 player-surface cleanup | CURRENT AUTHORITY, integrated | [`specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md`](../specification/Technical/GC01PlayerSurfaceScopeCleanupResult.md) | Exact-head #343 PASS; PR #117 merged; cut/deferred placeholders no longer primary 1.0 surfaces. |
 | GC-02 Prologue / onboarding | CURRENT AUTHORITY, integrated | PR #120 + `npm run gc02:validate` | Exact-head #352 PASS; fresh-save Willow First Lesson path integrated. |
@@ -107,7 +108,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | GC-11 Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC11AlphaResult.md`](../specification/Technical/GC11AlphaResult.md) | Exact-head Build Validation #381 PASS; ALPHA_PASS / HUMAN_UNVALIDATED. |
 | GC-12 Content Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC12ContentAlphaResult.md`](../specification/Technical/GC12ContentAlphaResult.md) | Authored-corpus qualification passed; CONTENT_ALPHA / HUMAN_UNVALIDATED. |
 | GC-13 deterministic Beta readiness | CURRENT AUTHORITY, qualified | [`specification/Technical/GC13BetaTechnicalReadinessResult.md`](../specification/Technical/GC13BetaTechnicalReadinessResult.md) | Build Validation #394 PASS; Chromium + Firefox CI smoke PASS; TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED. |
-| GC-13 Beta human evidence | CURRENT FUTURE EXTERNAL GATE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO. |
+| GC-13 Beta human evidence | CURRENT ACTIVE EXTERNAL GATE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | FEATURE_COMPLETE prerequisite satisfied; 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO. |
 | GC-14 release eligibility guard | CURRENT AUTHORITY, qualified | [`specification/Technical/GC14ReleaseEligibilityBlockedResult.md`](../specification/Technical/GC14ReleaseEligibilityBlockedResult.md) | Build Validation #405 PASS; deterministic release preparation is safe, but RC_ENTRY_BLOCKED and 1.0_PROMOTION_BLOCKED until governing external gates pass. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
@@ -165,7 +166,7 @@ Historical documents and package metadata may still contain the word **prototype
 Current maturity is:
 
 ```text
-CONTENT_ALPHA / HUMAN-UNVALIDATED
+FEATURE_COMPLETE / HUMAN-UNVALIDATED
 TECHNICAL_BETA_READY
 HUMAN_EVIDENCE_BLOCKED
 BETA_PASS = NO
