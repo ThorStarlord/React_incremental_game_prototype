@@ -164,6 +164,25 @@ A plausible L3 target is:
 
 The first bounded implementation package gives both doctrines repeated consumers in GC06, GC08, and GC10 while deliberately leaving GC07/GC09 as learned-capability gates. The follow-on Trait coherence package closes the first independent-use gap for `ConstraintSense` and `AdversarialCalibration` and defines temporary attunement's Campaign One role. Remaining L3 questions are richer repeated cross-domain use, whether temporary experimentation/sharing earns enough player attention to remain prominent, and eventual human comprehension/preference.
 
+### 2026-09-26 Candidate A exit reconciliation
+
+The current package closes the highest-value remaining repository-owned A gap without
+adding catalogue breadth:
+
+- `ConstraintSense` repeats from its GC08 independent preparation use into a distinct
+  GC09 Gronk judgment and durable finale-aftereffect provenance;
+- `AdversarialCalibration` repeats from GC08 into a distinct GC09 Lyra red-team
+  judgment and durable finale-aftereffect provenance;
+- both uses require only the single permanent learned capability, not the doctrine pair;
+- Player Insight and the epilogue explain the resulting evidence;
+- the two established doctrines already have repeated strategic consumers across
+  GC06, GC08 and GC10, while baseline routes remain viable.
+
+This is sufficient Campaign One repository depth for Candidate A. Additional Traits,
+doctrines, generic capability graphs, or more menu switching are not warranted by the
+current product role. Human comprehension, preference, pacing and balance remain
+unproven and do not become deterministic claims.
+
 ## Candidate B — Mastery Compression / Copy organization
 
 ### Current proof
@@ -259,6 +278,27 @@ A plausible L3 target is:
 - at least one late-game synthesis consumes prior Relationship + institutional/world/knowledge history together;
 - Player Insight or contextual explanation makes the causal chain legible without exposing hidden future checks.
 
+### 2026-09-26 Candidate C reconciliation
+
+No new Candidate-C runtime is warranted. The existing late campaign already satisfies
+the provisional developed-feature exit shape through authored composition:
+
+- GC08-GC10 repeatedly combine Relationship history with independently owned Knowledge,
+  Faction, World State and build state;
+- GC09 keeps a committed network posture fixed while City Watch standing can independently
+  enable/block fortified preparation;
+- GC10 keeps a committed plan fixed while the required active doctrine can independently
+  enable/block structural or diagnostic resolution;
+- `lyra_gc10_enter_fortified_finale` is an explicit late-game synthesis that requires
+  prior Relationship Experience + a Knowledge fact + committed World State + institutional
+  Faction standing together, without deriving one authority from another;
+- the finale/epilogue projection separately explains relationship, institution, world,
+  build and delegation consequences.
+
+Candidate C is therefore **SUFFICIENT / NO NEW SUBSYSTEM WARRANTED** for Campaign One.
+Further expansion would primarily repeat already-proven composition or drift toward a
+generic simulator.
+
 ## Secondary systems
 
 ### Combat
@@ -275,14 +315,12 @@ Authored travel currently proves location can matter to Quest, encounters, and s
 
 Use as supporting pressure for buildcraft/delegation. Do not redesign the economy before A/B clarify what resources and pacing the finished loops actually need.
 
-## Selected depth order
-
-Proceed without waiting for a new milestone number:
+## Selected depth order — reconciled 2026-09-26
 
 ~~~
-1. Candidate B — Mastery Compression / Copy organization
-2. Candidate A — Relationship-derived capability buildcraft
-3. Candidate C — Strategic consequence composition
+1. Candidate B — BOUNDED-CONVERGED (Archive + Forge)
+2. Candidate A — REPOSITORY-CONVERGED after repeated GC08/GC09/GC10 capability use
+3. Candidate C — SUFFICIENT in existing GC08-GC10 authored composition
 ~~~
 
 Rationale:
@@ -306,6 +344,11 @@ The Candidate-A package should preserve the existing four canonical capabilities
 After Candidate A is deterministically qualified, reconcile Candidate C against the already-authored GC08 -> GC10 composition before adding new code. If Relationship, Knowledge, Faction, World State, build, and delegation already satisfy the C exit shape, record that sufficiency rather than inventing a simulator.
 
 ## Stop rule
+
+**Current disposition:** GLOBAL CONSTRUCTION STOP after exact-head qualification of the
+Candidate-A package. The remaining material gates are human experience evidence,
+tuning/accessibility/presentation, concrete defects, and release qualification rather
+than another A/B/C subsystem.
 
 Feature-completion work stops when:
 
