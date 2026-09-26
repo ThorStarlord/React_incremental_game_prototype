@@ -22,6 +22,23 @@ The active frontier is **Candidate A**. Deepen existing relationship-derived cap
 through repeated independent use, causal provenance, and later consequences. Do not grow
 the Trait catalogue or doctrine count by default.
 
+## Feature-completion stop boundary — 2026-09-26
+
+The B -> A -> C repository construction sequence has converged, subject to exact-head
+qualification of the current Candidate-A PR:
+
+- **B:** Archive + Forge standing responsibilities provide distinct role/location work
+  and exception families; do not add a third by symmetry.
+- **A:** existing capabilities/doctrines now repeat across GC06/GC08/GC09/GC10 with
+  single-capability independent use, visible provenance, and finale payoff.
+- **C:** existing GC08-GC10 authored decisions already compose Relationship, Knowledge,
+  Faction, World State, build and delegation deeply enough for Campaign One; no generic
+  strategy simulator is warranted.
+
+On a green exact head, the next lane is the already-defined human Beta/product-validation
+and convergence work. Preserve `TECHNICAL_BETA_READY` while keeping `BETA_PASS=NO`
+until the governing human evidence exists.
+
 ## Repository reality
 
 Campaign One is structurally and authorially complete from New Game through the state-responsive Epilogue.
