@@ -18,14 +18,9 @@ and exception family while preserving player-owned resolution. Candidate B there
 passes its bounded exit test; do not add a third standing responsibility unless later
 evidence shows genuinely different player value.
 
-The active frontier is **Candidate A**. Deepen existing relationship-derived capabilities
-through repeated independent use, causal provenance, and later consequences. Do not grow
-the Trait catalogue or doctrine count by default.
-
 ## Feature-completion stop boundary — 2026-09-26
 
-The B -> A -> C repository construction sequence has converged, subject to exact-head
-qualification of the current Candidate-A PR:
+The B -> A -> C repository construction sequence has converged and the Candidate-A exact head qualified before PR #156 merged as `fd94adef92b30124e9d96e722f0d60ead811c4fa`:
 
 - **B:** Archive + Forge standing responsibilities provide distinct role/location work
   and exception families; do not add a third by symmetry.
@@ -35,7 +30,7 @@ qualification of the current Candidate-A PR:
   Faction, World State, build and delegation deeply enough for Campaign One; no generic
   strategy simulator is warranted.
 
-On a green exact head, the next lane is the already-defined human Beta/product-validation
+The next lane is the already-defined human Beta/product-validation
 and convergence work. Preserve `TECHNICAL_BETA_READY` while keeping `BETA_PASS=NO`
 until the governing human evidence exists.
 
