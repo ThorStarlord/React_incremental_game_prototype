@@ -374,6 +374,11 @@ describe('GC-09 Counterphase', () => {
     const store = makeStore();
     await initialize(store);
     await record(store, 'lyra_gc09_exp_prepare_distributed', 200);
+    store.dispatch(setWorldStateCondition({
+      regionId: 'location_merchant_district',
+      field: 'networkPosture',
+      value: 'distributed',
+    }));
 
     expect(selectAvailableNPCDialogueChoices(store.getState(), 'npc_blacksmith_gronk')
       .some(choice => choice.id === 'gronk_gc09_constraint_margin_review')).toBe(false);
