@@ -227,6 +227,60 @@
       "memoryCandidate": true,
       "memoryDefinitionId": "lyra_memory_gc09_fortified_plan",
       "interpretation": "The player commits a Watch-supported counterphase plan personally while institutional standing remains separately legible."
+    },
+    "gronk_gc09_exp_constraint_margin_review": {
+      "id": "gronk_gc09_exp_constraint_margin_review",
+      "uniqueKey": "gronk:gc09:constraint-margin-review",
+      "title": "Review the Failure Margin",
+      "primaryTargetId": "npc_blacksmith_gronk",
+      "participantIds": [
+        "player",
+        "npc_blacksmith_gronk"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "gronk_gc09_constraint_margin_review",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 3,
+        "reliance": 3
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": [
+        "ConstraintSense",
+        "FinalePreparation",
+        "IndependentCapability"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist applies Gronk's learned Constraint Sense independently of Structural Steward, identifying a hard load margin and revising finale preparation before commitment."
+    },
+    "lyra_gc09_exp_adversarial_failure_probe": {
+      "id": "lyra_gc09_exp_adversarial_failure_probe",
+      "uniqueKey": "lyra:gc09:adversarial-failure-probe",
+      "title": "Attack the Plan Before the Echo Does",
+      "primaryTargetId": "npc_lyra",
+      "participantIds": [
+        "player",
+        "npc_lyra"
+      ],
+      "sourceType": "dialogue",
+      "sourceId": "lyra_gc09_adversarial_failure_probe",
+      "significance": "major",
+      "relationshipEffects": {
+        "trust": 2,
+        "understanding": 4,
+        "sharedMeaning": 4,
+        "reciprocity": 3
+      },
+      "connectionProgressDelta": 5,
+      "resonanceTags": [
+        "AdversarialCalibration",
+        "FinalePreparation",
+        "IndependentCapability"
+      ],
+      "memoryCandidate": false,
+      "interpretation": "The protagonist applies Lyra's learned Adversarial Calibration independently of Countermodeler, red-teaming the prepared counterphase against a hostile failure assumption before commitment."
     }
   },
   "memories": {
