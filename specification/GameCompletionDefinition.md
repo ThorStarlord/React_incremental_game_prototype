@@ -1,8 +1,8 @@
 # Game Completion Definition — Campaign One / 1.0
 
 **Status:** CURRENT AUTHORITY — PROVISIONAL / HUMAN-UNVALIDATED  
-**Program stage:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
-**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
+**Program stage:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
+**Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
 **Prepared:** 2026-09-11  
 **Product direction:** `Technical/PostM25ProvisionalProductDirectionDecision.md`  
 **Human Product Review:** issue #109 remains OPEN / UNPROVEN
@@ -35,7 +35,7 @@ The repository distinguishes **integration proof** from **feature completion**. 
 
 Historical milestone closure remains valid evidence. A closed milestone means its stated contract was satisfied; it does **not** permanently freeze the associated gameplay domain at that depth. A feature may be deepened without reopening or rewriting the historical result.
 
-The current repository-wide objective is to move required core gameplay toward **L4 Feature Complete** before dedicated Beta/release hardening becomes the dominant optimization target. Hardening may still occur locally when necessary for safe development, but it must not substitute for missing feature depth.
+`FEATURE_COMPLETE` is now recorded in `Technical/FeatureCompleteResult.md`. The repository-wide objective is therefore Beta convergence / human validation: make the bounded feature-complete Campaign One understandable, balanced, accessible, presentable, reliable, and release-ready without reopening feature construction by inertia. New feature depth requires concrete evidence that the recorded feature-complete contract is false or an explicit scope revision.
 
 ## 1. Product identity
 

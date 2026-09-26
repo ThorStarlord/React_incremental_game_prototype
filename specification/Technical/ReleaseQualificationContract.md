@@ -2,7 +2,7 @@
 
 **Status:** CURRENT AUTHORITY — PROVISIONAL 1.0 RELEASE CONTRACT  
 **Parent:** `../GameCompletionDefinition.md`  
-**Requires:** `BetaCompletionContract.md` + `FEATURE_COMPLETE`
+**Requires:** `BetaCompletionContract.md` + recorded `FeatureCompleteResult.md`
 **Public contracts:** `PublicContracts.md`
 **Prepared:** 2026-09-11
 

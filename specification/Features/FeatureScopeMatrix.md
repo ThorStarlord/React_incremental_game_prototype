@@ -36,35 +36,39 @@ L6 Release Qualified
 
 A system can be `CORE_1_0`, fully integrated, and still remain below L4. Historical “implemented / qualified” wording records successful proof at the stated contract; it must not be interpreted as a blanket prohibition on further player-facing feature development.
 
+### 2026-09-26 post-depth maturity reconciliation
+
+`FeatureCompleteResult.md` records `FEATURE_COMPLETE / HUMAN-UNVALIDATED`. The L4 labels below are relative to each system's **bounded Campaign One role**. They do not promote CUT/DEFER scope or claim that a subsystem is generally broad, polished, balanced, accessible, or human-validated.
+
 | System / surface | 1.0 class | Current posture | 1.0 requirement / decision |
 | --- | --- | --- | --- |
 | GameLoop / deterministic time | CORE_1_0 | L5 — Hardened / qualified | Preserve current fixed-step, backpressure, lifecycle and precision contracts. |
-| Player state / vitals / attributes | CORE_1_0 | L2/L3 — Integrated foundation; progression depth depends on consuming systems | Keep only progression needed by campaign play; no universal new progression currency. |
-| Relationship Experience / Memory / Bond / Connection | CORE_1_0 | L3 — Developed core; further depth should be driven by campaign/player-role gaps | Central source of durable social history and learning provenance. |
-| Traits / permanent capabilities | CORE_1_0 | L2 — Integrated; bounded doctrine slice, feature-depth expansion active | Own durable learned capability identity; Player doctrine focus may compose only established Campaign One build profiles without creating a generic skill tree/capability graph. |
-| Essence / Resonance | CORE_1_0 | L2/L3 — Integrated economy/progression support; final role depth not yet established | Supports relationship-mediated capability progression. |
-| NPC interaction | CORE_1_0 | L2 — Integrated campaign surface | Required for anchor cast and campaign decisions. |
-| Dialogue | CORE_1_0 | L3 — Developed authored decision surface | Primary authored decision/consequence surface; preserve spoiler-safe prerequisite behavior. |
-| Quest | CORE_1_0 | L2/L3 — Integrated and repeatedly consumed; depth varies by chapter | Active objective structure for campaign problems. |
-| Exploration / authored travel | CORE_1_0 | L1/L2 — Bounded authored-travel slice; not yet established as a developed gameplay pillar | Location remains objective player state; only campaign-needed locations required. |
-| Combat | CORE_1_0 | L1 — Bounded MVP vertical slice; explicitly not a general/developed combat feature | Required where campaign conflict needs active tactical resolution; do not expand into a separate combat game by inertia. |
-| Knowledge | CORE_1_0 | L1/L2 — Bounded fact authority with production consumers | Owns who knows objective facts. |
-| Faction Reputation | CORE_1_0 | L1/L2 — Bounded institutional-standing authority with production consumers | Owns institutional standing independent from personal relationships. |
-| World State | CORE_1_0 | L1/L2 — Bounded objective-state authority with production consumers | Owns persistent objective regional conditions. |
-| Copy system | CORE_1_0 | L2 — Integrated delegation + derived organizational legibility; Candidate B runtime-depth expansion active | Bounded execution of understood repeatable work, including explicitly authorized live condition-maintenance for authored mastered routines. Procedure-family/domain projections may explain existing authority but never grant new executable authority by themselves. |
-| Routine familiarity / earned delegation | CORE_1_0 | L2 — Three mastered routines integrated; Archive Standing Orders/Exceptions one L1 runtime slice + derived Mastery Compression projection | Preserve explicit personal mastery. Existing mastery may be projected into bounded procedure-family / operational-readiness language without new canonical state. A player-authorized standing order may maintain one typed authored condition live through existing Copy eligibility; unknown/irreversible work escalates instead of auto-resolving. Candidate B's Forge standing responsibility remains the selected next depth package. |
+| Player state / vitals / attributes | CORE_1_0 | L4 — Feature complete for bounded Campaign One support | Holds the progression facts Campaign One actually consumes; no universal new progression currency is required. |
+| Relationship Experience / Memory / Bond / Connection | CORE_1_0 | L4 — Feature complete / HUMAN-UNVALIDATED | Six-anchor long-horizon history and capability provenance are present; remaining work is Beta comprehension/tuning, not more relationship authority. |
+| Traits / permanent capabilities | CORE_1_0 | L4 — Feature complete bounded four-capability / two-doctrine build | Durable learned capability, selective doctrine focus, repeated independent use, causal provenance, and finale payoff are present without a generic skill tree. |
+| Essence / Resonance | CORE_1_0 | L4 — Feature complete supporting progression / balance HUMAN-UNVALIDATED | Supports relationship-mediated capability progression; remaining uncertainty is tuning/pacing rather than missing feature identity. |
+| NPC interaction | CORE_1_0 | L4 — Feature complete authored campaign surface | Provides anchor relationships, decisions, services, prerequisite-gated dialogue, and current campaign interactions. |
+| Dialogue | CORE_1_0 | L4 — Feature complete authored decision/consequence surface | Preserve spoiler-safe prerequisite behavior and contextual causal explanation; remaining work is presentation/comprehension tuning. |
+| Quest | CORE_1_0 | L4 — Feature complete bounded Campaign One objective structure | Campaign problems repeatedly consume capability, relationship, knowledge, faction, world, travel, combat, and finale state. |
+| Exploration / authored travel | CORE_1_0 | L4 — Feature complete at bounded authored-travel scope | Location matters where Campaign One requires it; no open-world topology, schedules, coordinates, or pathfinding pillar is required for 1.0. |
+| Combat | CORE_1_0 | L4 — Feature complete at bounded Campaign One tactical scope | The campaign includes the active tactical conflict it requires; a separate combat-progression game is outside the 1.0 product role. |
+| Knowledge | CORE_1_0 | L4 — Feature complete bounded fact authority / HUMAN-UNVALIDATED | Owns who knows objective facts and participates independently in GC08-GC10 strategic composition. |
+| Faction Reputation | CORE_1_0 | L4 — Feature complete bounded institutional-standing authority / HUMAN-UNVALIDATED | Institutional standing remains independent from personal relationships and changes authored late-campaign options. |
+| World State | CORE_1_0 | L4 — Feature complete bounded objective-state authority / HUMAN-UNVALIDATED | Persistent regional conditions remain independent and materially constrain authored preparation/finale choices. |
+| Copy system | CORE_1_0 | L4 — Feature complete bounded delegation / Mastery Compression | Archive + Forge standing responsibilities provide distinct role/location contexts and exception families while preserving player judgment. |
+| Routine familiarity / earned delegation | CORE_1_0 | L4 — Feature complete bounded mastery-to-delegation progression | Three personally learned routines plus Archive + Forge standing responsibility establish attention compression without generic queues or autonomous planning. |
 | Persistence / save / load | CORE_1_0 | L5 — Hardened core infrastructure | Must survive whole-campaign progression. |
 | Save import / export | CORE_1_0 | L4/L5 — Feature complete support path; recovery hardening remains release work | Preserve as recovery/portability path. |
 | Autosave | SUPPORTING_1_0 | L4/L5 — Feature complete support path; preserve reliability | Must not corrupt or overwrite progression unexpectedly. |
 | Bounded offline progression | CORE_1_0 | L5 — Hardened bounded authority | Safe already-running work only; no narrative auto-resolution. |
-| Chapter-scale composition | CORE_1_0 | L3/L4 — Full Campaign One composition integrated; feature-depth changes may alter consumers | Preserve composition over canonical authorities; no chapter-local shadow state. |
+| Chapter-scale composition | CORE_1_0 | L4 — Feature complete Campaign One composition | GC08-GC10 and the full spine compose canonical authorities without chapter-local shadow state or a generic ChapterEngine. |
 | Content intelligence / reachability / chapter validation | SUPPORTING_1_0 | L5 — Hardened developer support authority | Required developer-side authoring protection as campaign content grows. |
-| Player Insight / causal journal / build provenance | SUPPORTING_1_0 | L2/L3 — Integrated legibility feature; depth should track causal-complexity growth | Make consequence and capability provenance understandable without spoilers. |
-| Contextual `Available because` explanation | SUPPORTING_1_0 | L2/L3 — Integrated causal explanation pattern | Keep explanations causal and player-facing, not debug output. |
-| Notifications / return summary | SUPPORTING_1_0 | L3 — Developed supporting feedback | Ensure meaningful changes and offline progress are visible. |
+| Player Insight / causal journal / build provenance | SUPPORTING_1_0 | L4 — Feature complete supporting legibility / HUMAN-UNVALIDATED | Existing projections explain relationship history, build provenance, mastery/exception state, and late-game capability consequences; human comprehension remains Beta evidence. |
+| Contextual `Available because` explanation | SUPPORTING_1_0 | L4 — Feature complete supporting causal explanation / HUMAN-UNVALIDATED | Available choices explain qualifying evidence without revealing locked future prerequisites. |
+| Notifications / return summary | SUPPORTING_1_0 | L4 — Feature complete supporting feedback | Meaningful ordinary change and durable exception attention have a player-facing feedback path. |
 | Main menu | CORE_1_0 | L4 — Feature complete support surface | New Game, Continue, Load, Import, Export must remain usable. |
-| Navigation / dashboard | SUPPORTING_1_0 | L3/L4 — Developed support surface | Must expose only real 1.0 surfaces; remove misleading placeholders. |
-| Settings | MINIMAL_1_0 | L2 — Minimal implemented surface by design | Only settings required for basic play/release usability. |
+| Navigation / dashboard | SUPPORTING_1_0 | L4 — Feature complete support surface / HUMAN-UNVALIDATED | Real 1.0 surfaces are reachable and cut/deferred placeholders are removed; Beta may still tune comprehension/presentation. |
+| Settings | MINIMAL_1_0 | L4 — Feature complete at minimal intended scope | Only settings required for basic play/release usability are in scope; remaining work is Beta/RC usability or accessibility repair. |
 | Dedicated in-game Save Management page | CUT as separate system | removed from primary navigation / compatibility IDs retained | Existing main-menu save authority is canonical. Do not restore a duplicate persistence surface. |
 | Separate Skills / skill-tree system | CUT | removed from primary navigation / compatibility IDs and legacy serialized field retained inertly | Traits already own capability progression. Compatibility state such as `availableSkillPoints` may remain for old-save stability, but Campaign One must not display, award, or consume it as player progression. |
 | General Inventory system | DEFER_POST_1_0 | removed from primary navigation / reference spec retained | Current 1.0 campaign does not require a general item-storage economy. Reconsider only if accepted campaign evidence proves need. |
@@ -87,7 +91,7 @@ A system can be `CORE_1_0`, fully integrated, and still remain below L4. Histori
 | Interplanetary campaign / AI-war continuation | DEFER_POST_1_0 | narrative seed | Post-1.0 campaign/expansion material. |
 | Audio / music | SUPPORTING_1_0 | not completion-critical yet | Basic release presentation required before RC; no large audio pipeline needed for Alpha. |
 | Final visual/art pass | SUPPORTING_1_0 | Beta presentation review / human evidence pending | Make bounded presentation repairs from heuristic, synthetic, accessibility, release-review, or human evidence; only human sessions establish actual player perception. Do not turn this into a speculative art-system expansion. |
-| Onboarding / first-session guidance | CORE_1_0 | L2 — Integrated opening path / HUMAN-UNVALIDATED | Alpha provides a normal-UI path into the first meaningful loop; Beta must validate comprehension with humans. |
+| Onboarding / first-session guidance | CORE_1_0 | L4 — Feature complete path / HUMAN-UNVALIDATED | Normal UI teaches the first meaningful loop; human Beta must validate comprehension and may drive bounded tuning. |
 | Accessibility baseline | SUPPORTING_1_0 | L1/L2 — Incomplete supporting feature | Keyboard/focus/readability issues become Beta/RC blockers according to completion contracts. |
 | Desktop browser support | CORE_1_0 release | L5 technical evidence / L6 exact-RC pending | Chromium-class + Firefox desktop are primary 1.0 targets. |
 | Full mobile product support | DEFER_POST_1_0 | responsive code exists | Avoid regressions, but mobile is not a primary 1.0 release target. |
