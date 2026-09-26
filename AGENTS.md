@@ -162,11 +162,14 @@ Under current authority:
 CONTENT_ALPHA + TECHNICAL_BETA_READY
 = retained historical integration/readiness evidence
 
+FEATURE_COMPLETE
+= recorded / HUMAN-UNVALIDATED
+
 current frontier
-= FEATURE_COMPLETION / PRODUCT_DEPTH
+= BETA_CONVERGENCE / HUMAN_VALIDATION
 
 BETA_PASS
-= downstream; still requires the human evidence contract after FEATURE_COMPLETE
+= not yet; still requires the human evidence contract
 
 RC entry
 = downstream; remains blocked until BETA_PASS under the current release contract
