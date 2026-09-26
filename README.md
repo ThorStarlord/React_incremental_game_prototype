@@ -97,9 +97,10 @@ GC-10  Finale + Epilogue                              COMPLETE
 GC-11  Alpha qualification                            COMPLETE
 GC-12  Content Alpha / authored integration evidence COMPLETE
 CURRENT Feature Completion Gap Analysis                COMPLETE
-DEPTH   Candidate B — Mastery Compression / Copy       COMPLETE
-NEXT    Forge Standing Responsibility implementation   ACTIVE
-GATE    FEATURE_COMPLETE                               PENDING
+DEPTH   Candidate B — Mastery Compression / Copy       BOUNDED EXIT SATISFIED
+DEPTH   Candidate A — Relationship capability buildcraft BOUNDED EXIT SATISFIED
+NEXT    Candidate C — Strategic consequence composition ACTIVE
+GATE    FEATURE_COMPLETE                                PENDING
 GC-13   Beta                                           DOWNSTREAM / TECHNICAL READINESS ALREADY QUALIFIED
 GC-14   Release Candidate / 1.0                        DOWNSTREAM / GUARD QUALIFIED
 ```
@@ -110,7 +111,7 @@ These commands do not replace the required real-human Beta evidence or an immuta
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
 
-There is **no automatic M27 or GC-15**. The repository-wide breadth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md); the current depth frontier is **Candidate B — Mastery Compression / Copy organization**, followed provisionally by buildcraft and strategic consequence composition. A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished.
+There is **no automatic M27 or GC-15**. The repository-wide breadth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). Candidate B and Candidate A have reached their bounded repository-owned depth exits; the current depth frontier is **Candidate C — Strategic consequence composition**. After Candidate C, the next action is an explicit **FEATURE_COMPLETE NOW?** reconciliation rather than discovering another construction package by inertia. A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished.
 
 ## Important 1.0 scope decisions
 
