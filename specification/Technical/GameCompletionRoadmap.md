@@ -108,7 +108,7 @@ Packages GC-04 and GC-05 may be satisfied partly inside campaign chapters rather
 
 ### Feature-completion closure / active Beta frontier
 
-The repository-wide **Feature Completion Gap Analysis** selected three depth candidates:
+The repository-wide **Feature Completion Gap Analysis** in [`FeatureCompletionGapAnalysis.md`](FeatureCompletionGapAnalysis.md) selected three depth candidates:
 **B — Mastery Compression / Copy organization**, **A — relationship-derived capability
 buildcraft**, and **C — strategic consequence composition**.
 
