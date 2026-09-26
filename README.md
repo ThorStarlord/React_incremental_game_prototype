@@ -1,4 +1,4 @@
-# React Incremental RPG — Feature Completion / Product Depth
+# React Incremental RPG — Beta Convergence / Campaign One 1.0
 
 A React/TypeScript narrative incremental RPG where consequential relationships teach durable capabilities, remembered history changes later possibilities, and personally understood repetition can become deliberately delegated work.
 
@@ -11,9 +11,9 @@ M25 complete chapter vertical slice: PASS
 Post-M25 timing/content/chapter hardening: COMPLETE / INTEGRATED
 Provisional Product Direction: SELECTED / HUMAN-UNVALIDATED
 M26 learn-to-delegate provenance: COMPLETE / INTEGRATED
-Current maturity: CONTENT_ALPHA / HUMAN-UNVALIDATED
-Current strategic stage: FEATURE_COMPLETION / PRODUCT_DEPTH
-Active program: Campaign One / 1.0 Feature Completion
+Current maturity: CONTENT_ALPHA / FEATURE_COMPLETE / HUMAN-UNVALIDATED
+Current strategic stage: BETA_CONVERGENCE / HUMAN_EVIDENCE
+Active program: Campaign One / 1.0 Beta Convergence
 Human Product Review: OPEN / UNPROVEN
 Alpha: PASS / HUMAN-UNVALIDATED
 Content Alpha: PASS / HUMAN-UNVALIDATED
@@ -25,7 +25,7 @@ RC entry: BLOCKED — promotion guard qualified
 
 The application already has a real game loop, persistent save/load/import-export, Relationship/Memory progression, Traits/Essence, NPC dialogue, quests, authored travel, combat, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progression, and multiple chapter-scale compositions.
 
-The repository has already proved that these systems can coexist and that the authored campaign spine can traverse from New Game to a state-responsive ending. The current problem is different: **integration maturity is ahead of feature maturity**. Several core systems remain bounded MVPs or first vertical slices, so the active program is Feature Completion / Product Depth before dedicated Beta/release hardening.
+The repository has already proved that these systems can coexist, that the authored campaign spine can traverse from New Game to a state-responsive ending, and that the bounded A/B/C feature-depth sequence is repository-qualified. The current problem is now **Beta convergence**: validate the finished interaction model with genuine players and repair concrete comprehension, pacing, balance, accessibility, presentation, reliability, persistence, performance, or release-readiness failures without reopening feature construction by inertia.
 
 ## 1.0 product promise
 
@@ -96,11 +96,8 @@ GC-09  Chapter 7 — Counterphase                       COMPLETE
 GC-10  Finale + Epilogue                              COMPLETE
 GC-11  Alpha qualification                            COMPLETE
 GC-12  Content Alpha / authored integration evidence COMPLETE
-CURRENT Feature Completion Gap Analysis                COMPLETE
-DEPTH   Candidate B — Mastery Compression / Copy       COMPLETE
-NEXT    Forge Standing Responsibility implementation   ACTIVE
-GATE    FEATURE_COMPLETE                               PENDING
-GC-13   Beta                                           DOWNSTREAM / TECHNICAL READINESS ALREADY QUALIFIED
+FEATURE Feature Completion — B/A/C convergence          COMPLETE / REPOSITORY-QUALIFIED / HUMAN-UNVALIDATED
+GC-13   Beta                                           ACTIVE / TECHNICAL READINESS QUALIFIED / HUMAN EVIDENCE OPEN
 GC-14   Release Candidate / 1.0                        DOWNSTREAM / GUARD QUALIFIED
 ```
 
@@ -110,7 +107,7 @@ These commands do not replace the required real-human Beta evidence or an immuta
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
 
-There is **no automatic M27 or GC-15**. The repository-wide breadth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md); the current depth frontier is **Candidate B — Mastery Compression / Copy organization**, followed provisionally by buildcraft and strategic consequence composition. A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished.
+There is **no automatic M27 or GC-15**. The repository-wide breadth pass is preserved in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md), while [`FeatureCompletionConvergenceResult.md`](specification/Technical/FeatureCompletionConvergenceResult.md) closes the B -> A -> C sequence as `FEATURE_COMPLETE / REPOSITORY-QUALIFIED / HUMAN-UNVALIDATED`. Reopen feature depth only from concrete contradictory evidence or explicit governance revision.
 
 ## Important 1.0 scope decisions
 
@@ -182,4 +179,4 @@ That human-evidence obligation limits human-quality claims and `BETA_PASS`; it d
 
 ## Governing rule
 
-> **Finish and harden the smallest game that fully delivers the relationship → capability → consequence → mastery → delegation promise before expanding the architecture. Evidence strength limits claim strength; it does not automatically prohibit useful bounded work.**
+> **Feature Completion is closed. Improve the locked Campaign One only from concrete Beta/release evidence; evidence strength limits claim strength, and genuine human evidence remains required for `BETA_PASS`.**
