@@ -311,6 +311,64 @@
           "min": 0
         }
       ]
+    },
+    "gronk_gc09_constraint_margin_review": {
+      "id": "gronk_gc09_constraint_margin_review",
+      "npcId": "npc_blacksmith_gronk",
+      "title": "Review the Failure Margin",
+      "text": "Gronk studies the counterphase deployment and taps the point where the load path narrows. You recognize the constraint pattern before he names it: the plan can hold, but only if the margin around this joint is treated as a hard boundary rather than spare capacity.",
+      "repeatable": false,
+      "requiredPermanentTraitIds": [
+        "ConstraintSense"
+      ],
+      "anyOfExperienceIds": [
+        "lyra_gc09_exp_prepare_distributed",
+        "lyra_gc09_exp_prepare_structural",
+        "lyra_gc09_exp_prepare_diagnostic",
+        "lyra_gc09_exp_prepare_fortified"
+      ],
+      "responses": {
+        "review": "Use Constraint Sense to identify the hard margin and revise the preparation around it."
+      },
+      "effects": [
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "gronk_gc09_exp_constraint_margin_review",
+          "responseId": "review"
+        }
+      ],
+      "next": {
+        "review": null
+      }
+    },
+    "lyra_gc09_adversarial_failure_probe": {
+      "id": "lyra_gc09_adversarial_failure_probe",
+      "npcId": "npc_lyra",
+      "title": "Attack the Plan Before the Echo Does",
+      "text": "Lyra asks what would make the prepared counterphase fail if the Echo behaved just outside the model. You do not need Elara's reconstruction method to answer. The learned adversarial habit is enough to force the plan to survive a hostile assumption before commitment.",
+      "repeatable": false,
+      "requiredPermanentTraitIds": [
+        "AdversarialCalibration"
+      ],
+      "anyOfExperienceIds": [
+        "lyra_gc09_exp_prepare_distributed",
+        "lyra_gc09_exp_prepare_structural",
+        "lyra_gc09_exp_prepare_diagnostic",
+        "lyra_gc09_exp_prepare_fortified"
+      ],
+      "responses": {
+        "probe": "Red-team the prepared counterphase against the failure assumption it is least ready to face."
+      },
+      "effects": [
+        {
+          "type": "RELATIONSHIP_EXPERIENCE",
+          "experienceId": "lyra_gc09_exp_adversarial_failure_probe",
+          "responseId": "probe"
+        }
+      ],
+      "next": {
+        "probe": null
+      }
     }
   },
   "npcDialogueIds": {
@@ -322,7 +380,11 @@
       "lyra_gc09_prepare_diagnostic",
       "lyra_gc09_commit_diagnostic",
       "lyra_gc09_prepare_fortified",
-      "lyra_gc09_commit_fortified"
+      "lyra_gc09_commit_fortified",
+      "lyra_gc09_adversarial_failure_probe"
+    ],
+    "npc_blacksmith_gronk": [
+      "gronk_gc09_constraint_margin_review"
     ]
   }
 }
