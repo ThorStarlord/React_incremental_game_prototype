@@ -1,14 +1,26 @@
 # Handoff — Feature Completion / Product Depth
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
-**Reconciled baseline before this activation package:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
+**Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
 **Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
 **Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
 **Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
-**Current product responsibilities:** feature-completion gap analysis + bounded core-feature development  
+**Current product responsibilities:** Candidate A relationship-derived capability buildcraft; Candidate B is bounded-converged after Archive + Forge  
 **Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
+
+## Current re-entry frontier
+
+PR #154 merged the second materially distinct Mastery Compression standing responsibility.
+Archive Verification and Forge Assistance now differ by role/location context, work type,
+and exception family while preserving player-owned resolution. Candidate B therefore
+passes its bounded exit test; do not add a third standing responsibility unless later
+evidence shows genuinely different player value.
+
+The active frontier is **Candidate A**. Deepen existing relationship-derived capabilities
+through repeated independent use, causal provenance, and later consequences. Do not grow
+the Trait catalogue or doctrine count by default.
 
 ## Repository reality
 
