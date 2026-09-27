@@ -1,8 +1,8 @@
-# React Incremental RPG — Feature Completion / Product Depth
+# React Incremental RPG — Campaign One Beta Convergence
 
 A React/TypeScript narrative incremental RPG where consequential relationships teach durable capabilities, remembered history changes later possibilities, and personally understood repetition can become deliberately delegated work.
 
-> The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **Content Alpha / HUMAN-UNVALIDATED**, not a throwaway technical prototype.
+> The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **FEATURE_COMPLETE / HUMAN-UNVALIDATED**; Beta convergence is active.
 
 ## Current state
 
@@ -25,7 +25,7 @@ RC entry: BLOCKED — promotion guard qualified
 
 The application already has a real game loop, persistent save/load/import-export, Relationship/Memory progression, Traits/Essence, NPC dialogue, quests, authored travel, combat, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progression, and multiple chapter-scale compositions.
 
-The repository has already proved that these systems can coexist and that the authored campaign spine can traverse from New Game to a state-responsive ending. The current problem is different: **integration maturity is ahead of feature maturity**. Several core systems remain bounded MVPs or first vertical slices, so the active program is Feature Completion / Product Depth before dedicated Beta/release hardening.
+The repository has already proved that these systems can coexist, that the authored campaign spine can traverse from New Game to a state-responsive ending, and that the bounded B/A/C depth program has reached its Campaign One feature-completion stop. The active program is now **Beta convergence / human validation**: comprehension, pacing, balance, accessibility, presentation, reliability, recovery, supported-browser behavior, and evidence-backed hardening of the existing 1.0 scope.
 
 ## 1.0 product promise
 
