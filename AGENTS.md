@@ -104,15 +104,13 @@ Within the existing Campaign One / 1.0 scope, agents may proactively:
 - harden save/load/recovery/import-export behavior;
 - remove prototype/debug residue from normal player surfaces;
 - repair concrete architecture/integration defects that block the current product;
-- perform repository-wide feature-completion gap analysis across `CORE_1_0` systems;
-- deepen bounded core features when their current L1/L2 implementation cannot yet sustain the intended player role;
-- expand meaningful cross-system use, progression, authored variation, and player choice without inventing generalized engines;
+- inspect an alleged missing feature role only when a concrete finding may falsify the recorded `FEATURE_COMPLETE` contract;
 - improve release qualification and deployment readiness;
 - repair documentation/governance drift that can misroute future work.
 
-Prefer the smallest **sufficient** intervention that moves the intended feature role toward L4. A tiny repair is not preferred when the demonstrated problem is missing feature depth. Add deterministic regression coverage where the new behavior is testable.
+Prefer the smallest **sufficient** intervention that resolves the evidenced Beta/release problem inside existing authorities. Do not reopen feature-depth search merely because broader implementation is possible. Add deterministic regression coverage where the repaired behavior is testable.
 
-## Scope boundary — not a depth freeze
+## Scope lock — not a repository freeze
 
 Do not create work merely to keep an agent busy.
 
@@ -128,22 +126,23 @@ The following remain outside Campaign One / 1.0 unless current authority is expl
 - Chapters 8+, interplanetary continuation, New Game+, or endless endgame;
 - generalized simulation/live-service infrastructure.
 
-Do not rewrite or invalidate closed M4–M26 or GC-01–GC-12 evidence. However, **historical milestone closure does not freeze the associated gameplay feature**. Deepen the living current product surface directly when maturity analysis shows it remains below finished-game depth, and preserve the old milestone as historical qualification evidence.
+Do not rewrite or invalidate closed M4–M26, GC-01–GC-12, or B/A/C evidence. Historical milestone closure remains evidence; `FEATURE_COMPLETE` is the current construction stop. A core feature may be reopened only when a concrete finding demonstrates that its required Campaign One role is actually absent or false, or when owner authority explicitly revises scope.
 
 ## Work-selection rule
 
 Before a package, answer:
 
-1. What intended player-facing role does this `CORE_1_0` system serve?
-2. What is its current L0-L6 maturity and what evidence supports that classification?
-3. What concrete breadth/depth/progression/cross-system gap keeps it below feature-complete maturity?
-4. Why is this gap higher value than the other current feature-completion candidates?
-5. What bounded intervention closes the gap without creating unnecessary generalized scope?
-6. What positive and rejection evidence will show the intervention works?
+1. What named Beta/Release requirement or concrete finding justifies work now?
+2. What evidence class supports the finding?
+3. Which existing Campaign One authority owns the behavior?
+4. What is the smallest intervention that resolves the finding without expanding feature scope?
+5. What positive and rejection evidence will show the intervention works?
+6. What persistence/browser/accessibility/recovery implications exist?
 7. What claim will be stronger afterward, and what stronger claim remains unproven?
-8. What would make further work on this feature reach diminishing returns?
+8. What is the stop condition?
+9. Does this finding actually falsify `FEATURE_COMPLETE`? If not, do not reopen feature construction.
 
-Technical possibility alone is not authorization. Evidence-backed **feature completion inside the authorized product boundary** is.
+Technical possibility alone is not authorization. Evidence-backed **Beta convergence and release hardening inside the locked product boundary** is.
 
 ## Human Beta and release policy
 
@@ -181,7 +180,7 @@ Changing those promotion requirements is an owner/product-policy decision. Impro
 
 Stop repository work only when at least one is true:
 
-- no bounded repository-answerable feature-development improvement has material expected value;
+- no bounded repository-answerable hardening or release-readiness improvement has material expected value;
 - the next change would require unauthorized product-scope expansion;
 - the next decision is genuinely owner-reserved;
 - the next required evidence is genuinely external and there is no independent repository-answerable hardening work worth doing;
@@ -189,6 +188,44 @@ Stop repository work only when at least one is true:
 - the relevant requirement is already satisfied and additional work would be polishing beyond meaningful expected value.
 
 **Absence of human evidence alone is not a universal stop condition.**
+
+## Maturity-transition closure protocol
+
+When the repository crosses a named maturity or strategic-stage boundary such as:
+
+```text
+FEATURE_COMPLETION -> BETA_CONVERGENCE
+BETA_PASS -> RC_QUALIFICATION
+RC_QUALIFIED -> 1.0_PROMOTION
+```
+
+treat the transition as an **authority migration**, not as a label edit.
+
+A transition is not complete merely because the new state appears somewhere. In the same bounded package:
+
+1. update the positive current-state declarations;
+2. remove or reclassify old active work-selection instructions that contradict the new state;
+3. update re-entry questions, intake templates, stop conditions, and continuation rules;
+4. reconcile `STATUS.md`, `docs/CURRENT.md`, `HANDOFF.md`, `README.md`, `RUNBOOK.md`, and any affected completion/maturity contracts;
+5. preserve superseded reasoning as historical evidence rather than leaving it executable as current procedure;
+6. add or update documentation-authority validation for both the **presence of the new state** and the **absence of known stale current-authority phrases**;
+7. require exact-head Build Validation before merge;
+8. close or supersede competing transition PRs so one canonical transition remains.
+
+The governing invariant is:
+
+```text
+new maturity label
++ old active queue
+= incomplete transition
+
+new maturity label
++ reconciled work-selection logic
++ stale-authority rejection
+= closed transition
+```
+
+Do not infer authority from the newest file or PR alone. The repository must have one coherent current re-entry path after the transition.
 
 ## Documentation discipline
 

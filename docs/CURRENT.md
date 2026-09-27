@@ -17,6 +17,25 @@
 **Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
 **Last reconciled:** 2026-09-26
 
+## 2026-09-27 maturity-transition lesson
+
+The FEATURE_COMPLETE -> Beta convergence transition exposed a documentation failure mode that presence-only validation did not catch: the new maturity state was recorded correctly while old feature-construction instructions remained active in other current-authority files.
+
+Current interpretation:
+
+```text
+stage declaration coherence
+!=
+work-selection coherence
+```
+
+A transition is fully reconciled only when a fresh reader following the canonical reading order reaches one consistent frontier. Current-authority validation must therefore check both:
+
+- **positive state** — the new maturity/stage, queue, and claim ceiling are present;
+- **negative state** — known superseded active instructions are absent from current-authority surfaces.
+
+Historical files may retain prior queues as evidence. Current-authority files may not retain them as executable guidance.
+
 ## Purpose
 
 This file is the canonical documentation-classification index. Do not infer authority from file age, folder depth, detail, or historical confidence.
@@ -274,8 +293,11 @@ When work creates, supersedes or materially reinterprets authority:
 7. keep `README.md` navigational;
 8. update `specification/README.md` when authority routing changes;
 9. preserve historical evidence instead of deleting useful provenance;
-10. run `npm run docs:authority:validate`;
-11. require exact-head Build Validation before merge.
+10. when maturity/stage changes, search current-authority files for stale old-stage queues, "next" instructions, intake questions, and stop conditions;
+11. validate both positive new-state declarations and negative absence of known stale current-authority text;
+12. close or supersede divergent transition PRs so there is one canonical transition;
+13. run `npm run docs:authority:validate`;
+14. require exact-head Build Validation before merge.
 
 ## Governing rule
 
