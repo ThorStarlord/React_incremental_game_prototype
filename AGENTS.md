@@ -189,6 +189,35 @@ Stop repository work only when at least one is true:
 
 **Absence of human evidence alone is not a universal stop condition.**
 
+## External/tool blocker freshness
+
+Treat an external, infrastructure, credential, or tool-capability blocker as an observation about a specific execution surface, not as a timeless repository fact.
+
+Before stopping on such a blocker, when the check is safe and cheap:
+
+1. re-verify the currently available capability rather than relying only on an older issue, handoff, or prior-session limitation;
+2. record the observed surface and evidence precisely: actor/integration, operation attempted, result, and relevant date or candidate;
+3. distinguish **resource state** from **observation authority** — for example, "rulesets list is empty" is evidence about rulesets, while a `403` on branch protection means protection state is **unknown to this integration**, not absent;
+4. distinguish read capability from write capability; successful inspection does not imply mutation authority, and failed inspection does not prove the repository resource is unconfigured;
+5. if the blocker is now resolvable within current authority, continue instead of preserving a stale stop boundary;
+6. if it remains blocked, preserve the claim ceiling, record fresh evidence in the canonical issue/result when useful, and still check for independently warranted repository work.
+
+```text
+previously unavailable
+!= currently unavailable
+
+cannot observe
+!= does not exist
+
+can observe
+!= can mutate
+
+external blocker
+= capability-scoped + evidence-dated
+```
+
+Do not repeatedly probe expensive or sensitive external surfaces when no capability or state has changed. Freshness checking exists to prevent stale blocker inheritance, not to create polling work.
+
 ## Maturity-transition closure protocol
 
 When the repository crosses a named maturity or strategic-stage boundary such as:
