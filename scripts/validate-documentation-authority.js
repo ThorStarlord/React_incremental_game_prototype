@@ -319,6 +319,21 @@ if (exists('gemini.md')) {
   fail('retired gemini.md must not be restored implicitly');
 }
 
+// Prevent stale feature-construction authority from surviving the FEATURE_COMPLETE transition.
+const forbiddenCurrentAuthorityPhrases = [
+  ['STATUS.md', 'Current goal — feature completion / product depth'],
+  ['HANDOFF.md', 'Primary lane — feature completion / product depth'],
+  ['HANDOFF.md', 'Complete those features first. Dedicated Beta/release hardening comes afterward.'],
+  ['README.md', 'active program is Feature Completion / Product Depth before dedicated Beta/release hardening'],
+];
+
+for (const [file, phrase] of forbiddenCurrentAuthorityPhrases) {
+  const content = read(file);
+  if (content.includes(phrase)) {
+    fail(`${file} contains stale pre-FEATURE_COMPLETE authority: "${phrase}"`);
+  }
+}
+
 if (!process.exitCode) {
   console.log('documentation-authority validation passed');
 }
