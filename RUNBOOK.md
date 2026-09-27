@@ -87,6 +87,39 @@ Before creating an implementation branch, record:
 
 A package must trace to an already-authorized Campaign One or release surface and concrete evidence. It need not wait for human observation when deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, or release-readiness evidence justifies bounded repair.
 
+### Revalidate external/tool blockers before stop
+
+When the next action appears blocked by infrastructure, credentials, GitHub administration, a connector/tool capability, or another external surface, do not inherit an old blocker statement as current truth without checking whether the relevant capability has changed.
+
+Use this bounded checklist when the check is safe and inexpensive:
+
+```text
+1. Identify the exact blocked operation.
+2. Identify the current actor/integration/tool surface.
+3. Re-run the smallest read/capability check that can distinguish stale blocker from current blocker.
+4. Record observed resource state separately from permission/visibility state.
+5. Record read authority separately from write authority.
+6. If newly resolvable, continue the authorized work.
+7. If still blocked, update the canonical issue/result with fresh evidence when useful.
+8. Check for independent repository-answerable work before stopping globally.
+```
+
+Interpretation examples:
+
+```text
+GET rulesets -> []
+= no rulesets observed
+
+GET branch protection -> 403 for current integration
+= branch-protection state unknown to this integration
+!= branch protection absent
+
+read succeeds
+!= administration write is available
+```
+
+Do not turn this into repeated polling. Recheck on re-entry, when capabilities/integrations changed, or when the blocker is decision-critical to the current stop.
+
 ### Scope lookup
 
 Use:

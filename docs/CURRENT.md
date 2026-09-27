@@ -36,6 +36,41 @@ A transition is fully reconciled only when a fresh reader following the canonica
 
 Historical files may retain prior queues as evidence. Current-authority files may not retain them as executable guidance.
 
+## 2026-09-27 external-blocker freshness lesson
+
+Issue #122 exposed a second re-entry failure mode: a previously true tool or administration limitation can be inherited as if it were a permanent repository fact.
+
+Fresh verification distinguished three separate claims:
+
+```text
+repository rulesets query -> []
+= no rulesets observed
+
+main branch-protection query -> 403 for the connected integration
+= protection state unknown to that integration
+
+no administration write surface exposed
+= the connected execution environment cannot configure the required protection
+```
+
+These claims must not be collapsed into "main is unprotected" or "GitHub cannot enforce this." The durable rule is:
+
+```text
+external/tool blocker
+= operation + actor/integration + observed result + evidence date
+
+previous blocker
+!= current blocker automatically
+
+permission failure
+!= resource absence
+
+read capability
+!= write authority
+```
+
+Current agents should re-verify a decision-critical external/tool blocker on re-entry when the check is safe and cheap, then update the canonical issue/result if the observation materially changes or usefully refreshes the stop boundary. This prevents stale capability assumptions without creating a polling loop.
+
 ## Purpose
 
 This file is the canonical documentation-classification index. Do not infer authority from file age, folder depth, detail, or historical confidence.
