@@ -319,12 +319,34 @@ if (exists('gemini.md')) {
   fail('retired gemini.md must not be restored implicitly');
 }
 
+requireContains('AGENTS.md', [
+  'Maturity-transition closure protocol',
+  'authority migration',
+  'new maturity label',
+]);
+
+requireContains('RUNBOOK.md', [
+  'Maturity-transition reconciliation',
+  'Beta-convergence work intake',
+  'A maturity transition is incomplete if a fresh agent',
+]);
+
+requireContains('docs/CURRENT.md', [
+  '2026-09-27 maturity-transition lesson',
+  'positive state',
+  'negative state',
+]);
+
 // Prevent stale feature-construction authority from surviving the FEATURE_COMPLETE transition.
 const forbiddenCurrentAuthorityPhrases = [
   ['STATUS.md', 'Current goal — feature completion / product depth'],
   ['HANDOFF.md', 'Primary lane — feature completion / product depth'],
   ['HANDOFF.md', 'Complete those features first. Dedicated Beta/release hardening comes afterward.'],
   ['README.md', 'active program is Feature Completion / Product Depth before dedicated Beta/release hardening'],
+  ['RUNBOOK.md', 'Which `CORE_1_0` feature is still below sufficient player-facing maturity for its intended role?'],
+  ['RUNBOOK.md', '## Feature-completion work intake'],
+  ['STATUS.md', 'What is reopened is **depth within the existing core product**'],
+  ['HANDOFF.md', 'Inside that boundary, feature depth is explicitly open'],
 ];
 
 for (const [file, phrase] of forbiddenCurrentAuthorityPhrases) {
