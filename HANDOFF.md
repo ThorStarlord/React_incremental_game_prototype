@@ -1,4 +1,4 @@
-# Handoff — Feature Completion / Product Depth
+# Handoff — Campaign One Beta Convergence
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
 **Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
@@ -105,27 +105,28 @@ This remains human-unvalidated. Deterministic qualification does not prove compr
 
 ## Current responsibilities
 
-### Primary lane — feature completion / product depth
+### Primary lane — Beta convergence / evidence-backed hardening
 
-The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md), and [`specification/Technical/FeatureCompleteResult.md`](specification/Technical/FeatureCompleteResult.md) records the construction stop. Candidate B is bounded-converged, Candidate A qualified and merged through PR #156 / Build Validation #477, and Candidate C is sufficient through existing GC08-GC10 composition. There is **no open feature-construction frontier**; the active lane is Beta convergence / human validation.
+`FeatureCompleteResult.md` records the construction stop. Candidate B is bounded-converged, Candidate A is qualified/merged, and Candidate C is sufficient through existing GC08-GC10 composition. There is **no open feature-construction frontier**.
 
-Prioritize missing gameplay depth such as:
+Repository-owned work may continue when a concrete finding justifies it, especially in:
 
-- meaningful progression and variation inside existing systems;
-- broader, authored use of relationship-derived capabilities;
-- Mastery Compression that changes player attention across more than one narrow slice;
-- useful cross-system interactions among Relationship, Traits, Knowledge, Faction, World State, Quest, Copy, Exploration, and Combat;
-- player-facing consequences that make those systems feel like game features rather than state authorities.
+- accessibility and input;
+- presentation and state legibility;
+- reliability, soft-lock prevention, persistence, and recovery;
+- supported-browser behavior;
+- pacing/balance fixes supported by an identified evidence class;
+- release-readiness defects inside the locked Campaign One scope.
 
-Do not assume every system must become large. The purpose of the gap analysis is also to identify systems already sufficient for their supporting role.
+Do not create another gameplay-depth package merely because a system could be broader.
 
-### Secondary lane — human evidence / future Beta gate
+### Human evidence lane — active Beta gate
 
-Issue #109 remains the canonical human product-evidence backlog. Existing and future genuine sessions remain useful evidence, but their absence does not block current feature construction and their collection does not convert an L1/L2 feature into an L4 feature.
+Issue #109 is the canonical human product-evidence backlog. The Beta contract still requires at least 5 accepted first sessions and 3 accepted external full playthroughs before `BETA_PASS`.
 
-The current Beta contract still requires at least 5 accepted first sessions and 3 accepted external full playthroughs before `BETA_PASS`. That evidence lane is now active because `FEATURE_COMPLETE` has been recorded; do not fabricate or substitute automated evidence for those sessions.
+Automation, synthetic traversal, repository analysis, and LLM judgment may diagnose or repair the product, but they may not be relabeled as accepted human evidence.
 
-## Scope boundary, not depth freeze
+## Scope lock, not repository freeze
 
 Preserve the bounded Campaign One product boundary:
 
@@ -135,9 +136,9 @@ Preserve the bounded Campaign One product boundary:
 - no autonomous irreversible Copy planning;
 - no generalized simulation or New Game+ merely to create work.
 
-Inside that boundary, feature depth is explicitly open. A historical vertical-slice or integration PASS is permission to build on a proven foundation, not a command to stop development.
+`FEATURE_COMPLETE` closes feature construction by inertia; it does **not** freeze evidence-backed repair and hardening of existing 1.0 surfaces. Reopen B/A/C only when a concrete finding demonstrates that the recorded Campaign One role is actually missing or false, or when owner authority explicitly changes scope.
 
-Use `AGENTS.md`, `GameCompletionDefinition.md`, and `FeatureScopeMatrix.md` for the maturity model and work-selection rules.
+Use `AGENTS.md`, `GameCompletionDefinition.md`, `FeatureScopeMatrix.md`, and the Beta/Release contracts for work selection.
 
 ## Release path after BETA_PASS
 
@@ -201,4 +202,4 @@ latest main
 
 ## Governing handoff conclusion
 
-> Campaign One has proved that its architecture, state authorities, campaign spine, persistence, and bounded gameplay slices can compose. The current question is no longer merely whether the game can traverse from New Game to Epilogue; it is whether the core features have enough depth, progression, variation, and cross-system consequence to constitute the finished game. Complete those features first. Dedicated Beta/release hardening comes afterward.
+> Campaign One is now feature-complete at its bounded 1.0 scope and remains human-unvalidated. The active question is whether the existing game is understandable, reliable, accessible, well-paced, and release-ready enough to earn Beta and later RC/1.0 evidence. Repair concrete findings without inventing new feature scope.
