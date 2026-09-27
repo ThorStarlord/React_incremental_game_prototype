@@ -1,9 +1,9 @@
 # Repository Runbook — Game Completion Program
 
-**Current maturity:** CONTENT_ALPHA / HUMAN-UNVALIDATED  
+**Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Active program:** Campaign One / 1.0 Feature Completion  
-**Current strategic stage:** FEATURE_COMPLETION / PRODUCT_DEPTH  
+**Active program:** Campaign One / 1.0 Beta Convergence  
+**Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
 **Human Product Review:** issue #109 OPEN / UNPROVEN — 0/5 first sessions, 0/3 full external runs
 
 This file owns **operational procedure**. It does not define what the finished game is; that authority belongs to `specification/GameCompletionDefinition.md`.
@@ -35,7 +35,7 @@ Do not start from an old milestone queue. Do not infer M27 from M26. Ask both:
 
 > What breadth/depth/progression/cross-system evidence demonstrates the gap, and what bounded feature development would close it?
 
-GC-01 through GC-12 remain integrated and deterministic Beta readiness remains qualified as historical evidence. Current repository work is **Feature Completion / Product Depth**; Beta convergence and release hardening are downstream after required core features reach sufficient L4 maturity.
+GC-01 through GC-12 remain integrated and deterministic Beta readiness remains qualified as historical evidence. `FEATURE_COMPLETE` is now recorded in `specification/Technical/FeatureCompleteResult.md`; current repository work is **Beta convergence / human validation** on the bounded Campaign One. New feature construction requires concrete evidence that the recorded feature-complete contract is false or an explicit scope revision.
 
 ## Environment
 
@@ -116,12 +116,12 @@ Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 [x] GC-10  Finale + Epilogue
 [x] GC-11  Alpha qualification
 [x] GC-12  Content Alpha / authored-spine integration evidence
-[x] CURRENT  Feature Completion Gap Analysis across CORE_1_0 systems
-[x] NEXT     Candidate B depth specification — Mastery Compression / Copy organization
-[>] BUILD    Forge Standing Responsibility — Candidate B implementation
-[ ] LATER    Candidate A buildcraft depth; Candidate C strategic-composition depth
-[ ] GATE     FEATURE_COMPLETE — required core features reach sufficient L4 depth
-[ ] GC-13    Beta — technical readiness already qualified; convergence + human evidence after FEATURE_COMPLETE
+[x] Feature Completion Gap Analysis across CORE_1_0 systems
+[x] Candidate B — Archive + Forge bounded convergence
+[x] Candidate A — repeated capability depth; PR #156 / Build Validation #477
+[x] Candidate C — sufficient through existing GC08-GC10 composition
+[x] GATE     FEATURE_COMPLETE — recorded / HUMAN-UNVALIDATED
+[>] GC-13    Beta convergence — technical readiness qualified; human evidence active
 [ ] GC-14    Release Candidate / 1.0 — promotion guard qualified; RC entry blocked until BETA_PASS
 ```
 

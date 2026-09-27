@@ -32,6 +32,7 @@ const completionAuthorityFiles = [
   'specification/Narrative/CampaignArchitecture.md',
   'specification/Technical/GameCompletionRoadmap.md',
   'specification/Technical/FeatureCompletionGapAnalysis.md',
+  'specification/Technical/FeatureCompleteResult.md',
   'specification/Technical/CandidateBMasteryCompressionDepthSpecification.md',
   'specification/Technical/AlphaCompletionContract.md',
   'specification/Technical/BetaCompletionContract.md',
@@ -117,6 +118,7 @@ if (exists('docs/CURRENT.md')) {
     'GameProgressionArc.md',
     'CampaignArchitecture.md',
     'GameCompletionRoadmap.md',
+    'FeatureCompleteResult.md',
     'AlphaCompletionContract.md',
     'BetaCompletionContract.md',
     'ReleaseQualificationContract.md',
@@ -139,10 +141,11 @@ if (exists('docs/CURRENT.md')) {
 }
 
 requireContains('STATUS.md', [
-  'CONTENT_ALPHA / HUMAN-UNVALIDATED',
+  'FEATURE_COMPLETE / HUMAN-UNVALIDATED',
   'TECHNICAL_BETA_READY',
   'BETA_PASS=NO',
-  'FEATURE_COMPLETION / PRODUCT_DEPTH',
+  'BETA_CONVERGENCE / HUMAN_VALIDATION',
+  'FeatureCompleteResult.md',
   'RC_ENTRY_BLOCKED',
   '1.0_PROMOTION_BLOCKED',
   'GameCompletionDefinition.md',
@@ -154,14 +157,16 @@ requireContains('STATUS.md', [
 ]);
 
 requireContains('README.md', [
-  'Content Alpha / HUMAN-UNVALIDATED',
+  'Current maturity: FEATURE_COMPLETE / HUMAN-UNVALIDATED',
+  'Current strategic stage: BETA_CONVERGENCE / HUMAN_VALIDATION',
   'Technical Beta readiness: PASS / HUMAN EVIDENCE BLOCKED',
   'RC entry: BLOCKED',
   '1.0: BLOCKED',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
-  'FEATURE_COMPLETION / PRODUCT_DEPTH',
+  'FEATURE_COMPLETE',
+  'FeatureCompleteResult.md',
   'AlphaCompletionContract.md',
   'BetaCompletionContract.md',
   'ReleaseQualificationContract.md',
@@ -173,6 +178,8 @@ requireContains('RUNBOOK.md', [
   'specification/GameCompletionDefinition.md',
   'specification/Features/FeatureScopeMatrix.md',
   'specification/Technical/GameCompletionRoadmap.md',
+  'FEATURE_COMPLETE / HUMAN-UNVALIDATED',
+  'Beta convergence',
   'npm run m26:validate',
   'alpha:validate',
   'content-alpha:validate',
@@ -191,6 +198,7 @@ requireContains('specification/README.md', [
   'GameProgressionArc.md',
   'CampaignArchitecture.md',
   'GameCompletionRoadmap.md',
+  'FeatureCompleteResult.md',
   'AlphaCompletionContract.md',
   'BetaCompletionContract.md',
   'ReleaseQualificationContract.md',
@@ -198,7 +206,9 @@ requireContains('specification/README.md', [
 ]);
 
 requireContains('specification/GameCompletionDefinition.md', [
-  'CONTENT_ALPHA / HUMAN-UNVALIDATED',
+  'FEATURE_COMPLETE / HUMAN-UNVALIDATED',
+  'BETA_CONVERGENCE / HUMAN_VALIDATION',
+  'Technical/FeatureCompleteResult.md',
   '1.0 stop condition',
   'Campaign One',
   'Telluric Echo',
@@ -212,6 +222,9 @@ requireContains('specification/Features/FeatureScopeMatrix.md', [
   'CUT',
   'Separate Skills',
   'General Crafting',
+  'post-depth maturity reconciliation',
+  'Combat | CORE_1_0 | L4',
+  'Copy system | CORE_1_0 | L4',
 ]);
 
 requireContains('specification/Technical/GameCompletionRoadmap.md', [
@@ -219,26 +232,51 @@ requireContains('specification/Technical/GameCompletionRoadmap.md', [
   'GC-14',
   'Feature Completion Gap Analysis',
   'FeatureCompletionGapAnalysis.md',
+  'FeatureCompleteResult.md',
+  'Feature Complete                     PASS / HUMAN-UNVALIDATED',
+  'Beta convergence                     ACTIVE',
+  'FEATURE_COMPLETE = YES / HUMAN-UNVALIDATED',
   'Alpha qualification',
   'Release Candidate',
   'No automatic M-number continuation',
 ]);
 
 requireContains('specification/Technical/FeatureCompletionGapAnalysis.md', [
-  'FEATURE_COMPLETION / PRODUCT_DEPTH',
+  'FEATURE_COMPLETE RECORDED',
   'Candidate B',
   'Candidate A',
   'Candidate C',
+  'No new feature-depth package is active',
+  'GLOBAL CONSTRUCTION STOP / FEATURE_COMPLETE RECORDED',
   'A vertical slice proves that a feature can work',
 ]);
 
 requireContains('specification/Technical/CandidateBMasteryCompressionDepthSpecification.md', [
-  'FEATURE COMPLETION CANDIDATE B',
+  'IMPLEMENTED / DETERMINISTICALLY QUALIFIED / BOUNDED EXIT SATISFIED',
+  'Build Validation #468',
   'Forge Assistance',
   'forge_structural_deviation',
   'attention moves upward from repeated procedure to policy and exception judgment',
 ]);
 
+
+requireContains('specification/Technical/FeatureCompleteResult.md', [
+  'FEATURE_COMPLETE = YES',
+  'HUMAN_PRODUCT_QUALITY = UNVALIDATED',
+  'BETA_PASS = NO',
+  'Build Validation #468',
+  'Build Validation #477',
+  '81d1dad23d9b61ba3ccf7cae8de584095876886c',
+  'Candidate C',
+  'SUFFICIENT / NO NEW SUBSYSTEM WARRANTED',
+  'Beta convergence / human validation',
+]);
+
+requireContains('specification/Technical/BetaCompletionContract.md', [
+  'CURRENT ACTIVE BETA-CONVERGENCE AUTHORITY',
+  'FEATURE_COMPLETE RECORDED / BETA_PASS=NO',
+  'FeatureCompleteResult.md',
+]);
 requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
   'COMPLETE / INTEGRATED',
   'Build Validation #340',

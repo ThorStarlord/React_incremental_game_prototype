@@ -7,7 +7,7 @@
 
 ## Purpose
 
-Turn the technically ready Content Alpha into an evidence-driven Beta without reopening speculative feature development.
+Operate the recorded `FEATURE_COMPLETE / HUMAN-UNVALIDATED` Campaign One through evidence-driven Beta convergence without reopening speculative feature development.
 
 This runbook governs how to collect, classify, repair, and accept the human evidence required before `BETA_PASS`.
 
@@ -31,6 +31,7 @@ Before starting a human session, confirm:
 
 ```text
 CONTENT_ALPHA
+FEATURE_COMPLETE
 TECHNICAL_BETA_READY
 BETA_PASS = NO
 feature/content scope locked

@@ -2,11 +2,11 @@
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
 **Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
-**Current maturity:** `CONTENT_ALPHA / HUMAN-UNVALIDATED`  
+**Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
 **Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
-**Current strategic stage:** `FEATURE_COMPLETION / PRODUCT_DEPTH`  
-**Current product responsibilities:** Candidate A relationship-derived capability buildcraft; Candidate B is bounded-converged after Archive + Forge  
+**Current strategic stage:** `BETA_CONVERGENCE / HUMAN_VALIDATION`  
+**Current product responsibilities:** Beta convergence / human validation on the existing feature-complete Campaign One  
 **Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
 
@@ -107,7 +107,7 @@ This remains human-unvalidated. Deterministic qualification does not prove compr
 
 ### Primary lane — feature completion / product depth
 
-The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md). The breadth pass selected **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. Candidate B is now bounded-converged after the qualified Archive + Forge responsibilities. The active implementation frontier is **Candidate A relationship-derived capability buildcraft**; deepen existing capabilities before adding new Traits or doctrines.
+The Feature Completion Gap Analysis is complete in [`specification/Technical/FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md), and [`specification/Technical/FeatureCompleteResult.md`](specification/Technical/FeatureCompleteResult.md) records the construction stop. Candidate B is bounded-converged, Candidate A qualified and merged through PR #156 / Build Validation #477, and Candidate C is sufficient through existing GC08-GC10 composition. There is **no open feature-construction frontier**; the active lane is Beta convergence / human validation.
 
 Prioritize missing gameplay depth such as:
 
@@ -123,7 +123,7 @@ Do not assume every system must become large. The purpose of the gap analysis is
 
 Issue #109 remains the canonical human product-evidence backlog. Existing and future genuine sessions remain useful evidence, but their absence does not block current feature construction and their collection does not convert an L1/L2 feature into an L4 feature.
 
-The current Beta contract still requires at least 5 accepted first sessions and 3 accepted external full playthroughs before `BETA_PASS`. Treat that as a downstream gate after feature completion, not as the present repository work queue.
+The current Beta contract still requires at least 5 accepted first sessions and 3 accepted external full playthroughs before `BETA_PASS`. That evidence lane is now active because `FEATURE_COMPLETE` has been recorded; do not fabricate or substitute automated evidence for those sessions.
 
 ## Scope boundary, not depth freeze
 

@@ -1,6 +1,6 @@
 # Feature Completion Gap Analysis — Campaign One / 1.0
 
-**Status:** CURRENT STRATEGIC ANALYSIS — FEATURE_COMPLETION / PRODUCT_DEPTH  
+**Status:** COMPLETED STRATEGIC ANALYSIS — FEATURE_COMPLETE RECORDED  
 **Prepared:** 2026-09-24  
 **Parent authorities:** ../GameCompletionDefinition.md, ../Features/FeatureScopeMatrix.md  
 **Historical evidence preserved:** GC-00 through GC-14 qualification records remain valid for the contracts they actually proved.
@@ -47,9 +47,11 @@ finished-feature gap
 strategic importance
 ~~~
 
-## Breadth scan
+## Historical breadth scan before depth packages
 
-| System / feature | Current maturity | Intended Campaign One role | Highest-value remaining gap | Current action |
+This table records the pre-depth diagnosis that selected A/B/C. Current post-depth maturity is governed by `../Features/FeatureScopeMatrix.md` and `FeatureCompleteResult.md`.
+
+| System / feature | Breadth-scan maturity | Intended Campaign One role | Highest-value remaining gap | Current action |
 | --- | --- | --- | --- | --- |
 | GameLoop / deterministic time | L5 | Reliable temporal substrate | No material product-depth gap identified | Preserve; no expansion |
 | Player state / vitals / attributes | L2/L3 | Hold player progression facts consumed elsewhere | Depth should come through consuming systems, not a new universal progression layer | Preserve foundation |
@@ -333,22 +335,32 @@ This ordering is for **depth investigation**, not an irreversible implementation
 
 ## Immediate next work
 
-Candidate B is bounded-converged after the qualified Archive + Forge implementation.
-The active package is **Candidate A relationship-derived capability buildcraft**:
-repeat existing source capabilities across later authored contexts, preserve their
-independent identity outside doctrine pairs, and make resulting evidence visible in
-Player Insight / aftermath without expanding the Trait catalogue.
+No new feature-depth package is active.
 
-The Candidate-A package should preserve the existing four canonical capabilities and two doctrines while adding repeated independent late-campaign consumption, durable provenance, and causal payoff. It must not expand the Trait catalogue or introduce a generic capability graph.
+`FeatureCompleteResult.md` records:
 
-After Candidate A is deterministically qualified, reconcile Candidate C against the already-authored GC08 -> GC10 composition before adding new code. If Relationship, Knowledge, Faction, World State, build, and delegation already satisfy the C exit shape, record that sufficiency rather than inventing a simulator.
+```text
+FEATURE_COMPLETE = YES / HUMAN-UNVALIDATED
+Candidate B = BOUNDED-CONVERGED
+Candidate A = QUALIFIED / MERGED
+Candidate C = SUFFICIENT / NO NEW SUBSYSTEM WARRANTED
+```
+
+The active lane is Beta convergence / human validation. Repository work should now be pulled by concrete findings in:
+
+- comprehension / discoverability;
+- pacing / balance;
+- accessibility / presentation;
+- defects / soft locks / reliability;
+- save/recovery and browser robustness;
+- genuine human first-session and full-run evidence.
+
+Do not reopen A/B/C merely to add examples or architectural symmetry.
+
 
 ## Stop rule
 
-**Current disposition:** GLOBAL CONSTRUCTION STOP after exact-head qualification of the
-Candidate-A package. The remaining material gates are human experience evidence,
-tuning/accessibility/presentation, concrete defects, and release qualification rather
-than another A/B/C subsystem.
+**Current disposition:** GLOBAL CONSTRUCTION STOP / FEATURE_COMPLETE RECORDED. Candidate A exact-head `81d1dad23d9b61ba3ccf7cae8de584095876886c` passed Build Validation #477 and merged through PR #156 as `fd94adef92b30124e9d96e722f0d60ead811c4fa`. The remaining material gates are human experience evidence, tuning/accessibility/presentation, concrete defects, Beta convergence, and release qualification rather than another A/B/C subsystem.
 
 Feature-completion work stops when:
 

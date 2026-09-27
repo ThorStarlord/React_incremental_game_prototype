@@ -15,21 +15,19 @@ Governance exists to improve the product and preserve justified scope. Governanc
 
 ## Current objective
 
-Advance the already-bounded Campaign One from technically integrated vertical slices toward **feature-complete player-facing depth**.
+Campaign One is now **FEATURE_COMPLETE / HUMAN-UNVALIDATED** under `specification/Technical/FeatureCompleteResult.md`.
 
 The active sequence is:
 
 ```text
-feature-completion gap analysis
--> breadth search across CORE_1_0 systems
--> depth analysis of strongest candidates
--> bounded feature development inside existing authorities
--> FEATURE_COMPLETE
--> Beta convergence / hardening
+FEATURE_COMPLETE
+-> Beta convergence / human validation
+-> bounded tuning / accessibility / presentation / reliability repairs
+-> BETA_PASS
 -> RC qualification
 ```
 
-Historical Alpha, Content Alpha, GC, and deterministic Beta-readiness results remain valid evidence. They do not mean every associated gameplay feature is finished. Human Beta remains required for eventual `BETA_PASS` and RC entry, but it is a downstream maturity gate rather than the current repository-wide optimization target.
+Historical Alpha, Content Alpha, GC, Candidate B, Candidate A, Candidate C, and deterministic Beta-readiness results remain valid evidence. Do not invent another feature-construction package by inertia. Human Beta is now the active maturity lane for actual player-experience claims and eventual `BETA_PASS`; deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, and persistence findings may still justify bounded repairs to the existing feature-complete game.
 
 ## Required reading order
 
@@ -164,11 +162,14 @@ Under current authority:
 CONTENT_ALPHA + TECHNICAL_BETA_READY
 = retained historical integration/readiness evidence
 
+FEATURE_COMPLETE
+= recorded / HUMAN-UNVALIDATED
+
 current frontier
-= FEATURE_COMPLETION / PRODUCT_DEPTH
+= BETA_CONVERGENCE / HUMAN_VALIDATION
 
 BETA_PASS
-= downstream; still requires the human evidence contract after FEATURE_COMPLETE
+= not yet; still requires the human evidence contract
 
 RC entry
 = downstream; remains blocked until BETA_PASS under the current release contract

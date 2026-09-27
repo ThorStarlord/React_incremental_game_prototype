@@ -11,10 +11,10 @@ Exact head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0` passed Build Validation #4
 Archive + Forge now demonstrate two operational contexts, role/location differentiation,
 two exception families, quiet known work, durable escalation, explicit player resolution,
 and independent responsibility blocking. The bounded Candidate B exit test is satisfied.
-Do not add a third standing responsibility merely to increase count; advance to Candidate A.
+Do not add a third standing responsibility merely to increase count. Candidate B remains closed at its bounded exit; the repository-wide active lane is Beta convergence unless new evidence disproves this contract.
 
 
-**Status:** CURRENT DEPTH SPECIFICATION — FEATURE COMPLETION CANDIDATE B  
+**Original package status (2026-09-24):** FEATURE COMPLETION CANDIDATE B  
 **Prepared:** 2026-09-24  
 **Parent analysis:** FeatureCompletionGapAnalysis.md  
 **Runtime authority:** CopyStandingOrdersAndExceptionEscalationResult.md + ../Features/CopySystem.md

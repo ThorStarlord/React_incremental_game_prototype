@@ -11,9 +11,9 @@ M25 complete chapter vertical slice: PASS
 Post-M25 timing/content/chapter hardening: COMPLETE / INTEGRATED
 Provisional Product Direction: SELECTED / HUMAN-UNVALIDATED
 M26 learn-to-delegate provenance: COMPLETE / INTEGRATED
-Current maturity: CONTENT_ALPHA / HUMAN-UNVALIDATED
-Current strategic stage: FEATURE_COMPLETION / PRODUCT_DEPTH
-Active program: Campaign One / 1.0 Feature Completion
+Current maturity: FEATURE_COMPLETE / HUMAN-UNVALIDATED
+Current strategic stage: BETA_CONVERGENCE / HUMAN_VALIDATION
+Active program: Campaign One / 1.0 Beta Convergence
 Human Product Review: OPEN / UNPROVEN
 Alpha: PASS / HUMAN-UNVALIDATED
 Content Alpha: PASS / HUMAN-UNVALIDATED
@@ -97,10 +97,11 @@ GC-10  Finale + Epilogue                              COMPLETE
 GC-11  Alpha qualification                            COMPLETE
 GC-12  Content Alpha / authored integration evidence COMPLETE
 CURRENT Feature Completion Gap Analysis                COMPLETE
-DEPTH   Candidate B — Mastery Compression / Copy       COMPLETE
-NEXT    Forge Standing Responsibility implementation   ACTIVE
-GATE    FEATURE_COMPLETE                               PENDING
-GC-13   Beta                                           DOWNSTREAM / TECHNICAL READINESS ALREADY QUALIFIED
+DEPTH   Candidate B — Mastery Compression / Copy       BOUNDED-CONVERGED
+DEPTH   Candidate A — relationship capability build    QUALIFIED / MERGED
+DEPTH   Candidate C — strategic consequence composition SUFFICIENT
+GATE    FEATURE_COMPLETE                               RECORDED / HUMAN-UNVALIDATED
+GC-13   Beta                                           ACTIVE / HUMAN EVIDENCE REQUIRED
 GC-14   Release Candidate / 1.0                        DOWNSTREAM / GUARD QUALIFIED
 ```
 
@@ -110,7 +111,7 @@ These commands do not replace the required real-human Beta evidence or an immuta
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
 
-There is **no automatic M27 or GC-15**. The repository-wide breadth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md); the current depth frontier is **Candidate B — Mastery Compression / Copy organization**, followed provisionally by buildcraft and strategic consequence composition. A qualified vertical slice is evidence that a feature can work, not evidence that the feature is finished.
+There is **no automatic M27 or GC-15**. The repository-wide breadth/depth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md), and [`FeatureCompleteResult.md`](specification/Technical/FeatureCompleteResult.md) records the construction stop. Candidate B is bounded-converged, Candidate A is qualified/merged, and Candidate C is sufficient without a new subsystem. The active lane is Beta convergence / human validation, with `BETA_PASS=NO` until genuine sessions satisfy the Beta contract.
 
 ## Important 1.0 scope decisions
 

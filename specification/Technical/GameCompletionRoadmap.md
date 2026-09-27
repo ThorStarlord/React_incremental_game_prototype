@@ -30,15 +30,17 @@ Technical systems prototype          PASS
 Integrated vertical slice            PASS
 Alpha                                PASS / HUMAN-UNVALIDATED
 Content Alpha                        PASS / HUMAN-UNVALIDATED
+Feature Complete                     PASS / HUMAN-UNVALIDATED
 Beta technical readiness             PASS
+Beta convergence                     ACTIVE
 Beta human evidence                  OPEN — 0/5 first sessions, 0/3 full runs
-Beta                                 NOT YET
+BETA_PASS                            NO
 Release promotion guard              PASS / fail-closed
 Release Candidate                    BLOCKED ON BETA_PASS
 1.0                                  BLOCKED
 ```
 
-The repository has a complete authored Campaign One spine, whole-game traversal evidence, Content Alpha evidence, and qualified deterministic Beta-readiness infrastructure. A strategic reassessment found that these milestones proved **integration and bounded contract satisfaction**, while several core gameplay features remain at L1/L2 initial or vertical-slice depth. The active work therefore returns to **Feature Completion / Product Depth** before Beta convergence becomes the dominant frontier.
+The repository has a complete authored Campaign One spine, whole-game traversal evidence, Content Alpha evidence, qualified deterministic Beta-readiness infrastructure, and a recorded `FEATURE_COMPLETE / HUMAN-UNVALIDATED` result. Candidate B is bounded-converged, Candidate A qualified through PR #156 / Build Validation #477, and Candidate C is sufficient through existing GC08-GC10 composition. The active work is now **Beta convergence / human validation** rather than further feature construction.
 
 ## 3. Program invariants
 
@@ -105,24 +107,38 @@ GC-14  Release Candidate qualification
 Packages GC-04 and GC-05 may be satisfied partly inside campaign chapters rather than by isolated feature work. Do not create standalone feature packages if chapter implementation naturally closes the same requirements with clearer player meaning.
 
 
-### Active feature-completion frontier
+### Feature-completion closure / active Beta frontier
 
-The repository-wide **Feature Completion Gap Analysis** is complete in [`FeatureCompletionGapAnalysis.md`](FeatureCompletionGapAnalysis.md). It is not an automatic GC-15/M27 package and does not reopen release hardening.
+The repository-wide **Feature Completion Gap Analysis** is complete in [`FeatureCompletionGapAnalysis.md`](FeatureCompletionGapAnalysis.md), and [`FeatureCompleteResult.md`](FeatureCompleteResult.md) records the construction stop.
 
-For every `CORE_1_0` system, assess:
+The reconciled depth sequence is:
 
 ```text
-intended player role
--> current implementation
--> current maturity L0-L6
--> actual gameplay breadth
--> actual gameplay depth
--> progression across Campaign One
--> cross-system interactions
--> finished-feature gap
+Candidate B — BOUNDED-CONVERGED
+  Archive Verification + Forge Assistance
+  two operational contexts + two exception families
+
+Candidate A — QUALIFIED / MERGED
+  repeated doctrine use + independent source-capability judgments
+  PR #156 / exact-head Build Validation #477
+
+Candidate C — SUFFICIENT / NO NEW SUBSYSTEM WARRANTED
+  GC08-GC10 already compose Relationship + Knowledge + Faction + World State
+  with capability/delegation inputs and causal explanation
 ```
 
-The completed breadth search selects three depth candidates: **B — Mastery Compression / Copy organization**, **A — relationship-derived capability buildcraft**, and **C — strategic consequence composition**. Candidate B depth is now specified in [`CandidateBMasteryCompressionDepthSpecification.md`](CandidateBMasteryCompressionDepthSpecification.md). The current implementation frontier is the bounded **Forge Standing Responsibility** slice defined there. Historical GC closure remains intact; new work targets the living feature, not the old milestone record.
+Therefore:
+
+```text
+FEATURE_COMPLETE = YES / HUMAN-UNVALIDATED
+BETA_CONVERGENCE = ACTIVE
+BETA_PASS = NO
+RC_ENTRY = BLOCKED
+```
+
+Do not create another A/B/C construction package by inertia. New feature construction requires a concrete Beta finding that demonstrates a required Campaign One role is actually missing, a deterministic contradiction of the Feature Complete record, or an explicit scope revision.
+
+Beta work may now include bounded repository changes for comprehension, pacing, balance, accessibility, presentation, reliability, defects, recovery, browser behavior, and evidence-driven tuning while preserving the feature/scope lock.
 
 ## 5. Package GC-00 — Close inherited M26 and transition authority
 
@@ -611,7 +627,8 @@ Use this queue in `STATUS.md`:
 [x] GC-10 Finale + Epilogue
 [x] GC-11 Alpha qualification
 [x] GC-12 Content Alpha completion
-[ ] GC-13 Beta
+[x] FEATURE_COMPLETE / HUMAN-UNVALIDATED
+[>] GC-13 Beta convergence / human evidence
 [ ] GC-14 Release Candidate / 1.0
 ```
 
