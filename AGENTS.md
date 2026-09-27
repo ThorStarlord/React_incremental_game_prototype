@@ -181,7 +181,7 @@ Changing those promotion requirements is an owner/product-policy decision. Impro
 
 Stop repository work only when at least one is true:
 
-- no bounded repository-answerable feature-development improvement has material expected value;
+- no bounded repository-answerable hardening or release-readiness improvement has material expected value;
 - the next change would require unauthorized product-scope expansion;
 - the next decision is genuinely owner-reserved;
 - the next required evidence is genuinely external and there is no independent repository-answerable hardening work worth doing;
@@ -189,6 +189,44 @@ Stop repository work only when at least one is true:
 - the relevant requirement is already satisfied and additional work would be polishing beyond meaningful expected value.
 
 **Absence of human evidence alone is not a universal stop condition.**
+
+## Maturity-transition closure protocol
+
+When the repository crosses a named maturity or strategic-stage boundary such as:
+
+```text
+FEATURE_COMPLETION -> BETA_CONVERGENCE
+BETA_PASS -> RC_QUALIFICATION
+RC_QUALIFIED -> 1.0_PROMOTION
+```
+
+treat the transition as an **authority migration**, not as a label edit.
+
+A transition is not complete merely because the new state appears somewhere. In the same bounded package:
+
+1. update the positive current-state declarations;
+2. remove or reclassify old active work-selection instructions that contradict the new state;
+3. update re-entry questions, intake templates, stop conditions, and continuation rules;
+4. reconcile `STATUS.md`, `docs/CURRENT.md`, `HANDOFF.md`, `README.md`, `RUNBOOK.md`, and any affected completion/maturity contracts;
+5. preserve superseded reasoning as historical evidence rather than leaving it executable as current procedure;
+6. add or update documentation-authority validation for both the **presence of the new state** and the **absence of known stale current-authority phrases**;
+7. require exact-head Build Validation before merge;
+8. close or supersede competing transition PRs so one canonical transition remains.
+
+The governing invariant is:
+
+```text
+new maturity label
++ old active queue
+= incomplete transition
+
+new maturity label
++ reconciled work-selection logic
++ stale-authority rejection
+= closed transition
+```
+
+Do not infer authority from the newest file or PR alone. The repository must have one coherent current re-entry path after the transition.
 
 ## Documentation discipline
 
