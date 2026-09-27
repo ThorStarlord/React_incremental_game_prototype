@@ -1,4 +1,4 @@
-# Repository Status — Feature Completion / Campaign One Product Depth
+# Repository Status — Campaign One Beta Convergence
 
 **Status date:** 2026-09-26
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
@@ -64,25 +64,24 @@ The project has passed proof-of-concept, technical-prototype, bounded vertical-s
 
 Those historical results established **integration maturity**, not automatic **feature maturity**. The subsequent B/A/C depth sequence has now closed that gap at the bounded Campaign One scope: Combat remains intentionally bounded, Doctrine specialization remains two-profile, and Standing Orders remain Archive + Forge rather than expanding into general planners. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence, and `FeatureCompleteResult.md` now records that repository-owned feature construction has converged.
 
-## Current goal — feature completion / product depth
+## Current goal — Beta convergence / human validation
 
 The active optimization target is:
 
-> **Develop the existing core game systems from bounded or vertical-slice implementations into sufficiently deep, interconnected, player-facing features before dedicated Beta/release hardening becomes the repository-wide frontier.**
+> **Harden, clarify, validate, and prepare the existing feature-complete Campaign One for Beta without reopening feature construction by inertia.**
 
-Current work should:
+Current repository-answerable work requires a named requirement or a concrete deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, release-readiness, or human finding. Prefer the smallest repair to the existing authority that owns the behavior.
 
-1. use [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md) as the completed breadth pass across `CORE_1_0` systems;
-2. deepen the selected candidates in order of current expected value: **B Mastery Compression / Copy organization**, **A relationship-derived capability buildcraft**, then **C strategic consequence composition**;
-3. perform depth analysis before each implementation package rather than expanding by subsystem symmetry;
-4. build depth primarily inside existing authorities and Campaign One scope rather than inventing generalized engines;
-5. preserve all historical qualification evidence while refusing to treat a passed bounded milestone as proof that its associated feature is finished.
+The **scope boundary remains bounded**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. B/A/C feature construction is closed unless a concrete finding falsifies the recorded feature-complete role or the owner explicitly revises scope.
 
-The **scope boundary remains bounded**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. What is reopened is **depth within the existing core product**, not arbitrary scope growth.
+The active lanes are:
 
-Feature construction has reached the recorded `FEATURE_COMPLETE` boundary. The active repository-wide lane is now Beta convergence / human validation: comprehension, pacing, balance, accessibility, presentation, reliability, defects, recovery, and genuine human evidence. `BETA_PASS`, immutable RC qualification, and 1.0 promotion remain downstream and blocked until their own contracts are satisfied.
+1. genuine human Beta evidence under issue #109;
+2. bounded evidence-backed hardening of the existing Campaign One;
+3. release-readiness preparation that does not claim RC or 1.0 authority early;
+4. repository governance enforcement under issue #122 when the required GitHub administration capability is available.
 
-Use explicit evidence provenance throughout feature development:
+Use explicit evidence provenance throughout Beta convergence:
 
 ```text
 DETERMINISTIC_FINDING -> implementation behavior within exercised evidence
@@ -91,7 +90,7 @@ SYNTHETIC_FINDING     -> reproducible automated/simulated player-facing risk
 HUMAN_FINDING         -> actual recorded participant experience
 ```
 
-A green vertical slice is evidence that a feature **can work**. It is not, by itself, evidence that the feature is **complete**.
+`BETA_PASS`, immutable RC qualification, and 1.0 promotion remain blocked until their governing evidence exists.
 
 ## Product direction
 
