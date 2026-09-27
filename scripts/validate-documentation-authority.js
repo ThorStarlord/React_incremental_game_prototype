@@ -337,6 +337,27 @@ requireContains('docs/CURRENT.md', [
   'negative state',
 ]);
 
+requireContains('AGENTS.md', [
+  'External/tool blocker freshness',
+  'cannot observe',
+  'can observe',
+  'capability-scoped + evidence-dated',
+]);
+
+requireContains('RUNBOOK.md', [
+  'Revalidate external/tool blockers before stop',
+  'branch-protection state unknown to this integration',
+  'read succeeds',
+  'administration write is available',
+]);
+
+requireContains('docs/CURRENT.md', [
+  '2026-09-27 external-blocker freshness lesson',
+  'previous blocker',
+  'permission failure',
+  'read capability',
+]);
+
 // Prevent stale feature-construction authority from surviving the FEATURE_COMPLETE transition.
 const forbiddenCurrentAuthorityPhrases = [
   ['STATUS.md', 'Current goal — feature completion / product depth'],
