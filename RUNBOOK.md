@@ -29,13 +29,13 @@ latest main
 -> fresh current-frontier reconciliation
 ```
 
-Do not start from an old milestone queue. Do not infer M27 from M26. Ask both:
+Do not start from an old milestone queue. Do not infer M27 from M26. Because `FEATURE_COMPLETE` is recorded, ask:
 
-> Which `CORE_1_0` feature is still below sufficient player-facing maturity for its intended role?
+> What concrete finding or named Beta/Release requirement is currently unsatisfied?
 
-> What breadth/depth/progression/cross-system evidence demonstrates the gap, and what bounded feature development would close it?
+> Which existing Campaign One authority owns that behavior, and what is the smallest repair or qualification that resolves it without reopening feature scope?
 
-GC-01 through GC-12 remain integrated and deterministic Beta readiness remains qualified as historical evidence. `FEATURE_COMPLETE` is now recorded in `specification/Technical/FeatureCompleteResult.md`; current repository work is **Beta convergence / human validation** on the bounded Campaign One. New feature construction requires concrete evidence that the recorded feature-complete contract is false or an explicit scope revision.
+GC-01 through GC-12 remain integrated and deterministic Beta readiness remains qualified as historical evidence. `FEATURE_COMPLETE` is recorded in `specification/Technical/FeatureCompleteResult.md`; current repository work is **Beta convergence / human validation** on the bounded Campaign One. New feature construction requires concrete evidence that the recorded feature-complete contract is false or an explicit scope revision.
 
 ## Environment
 
@@ -65,27 +65,27 @@ git merge-base --is-ancestor origin/main HEAD
 
 If `main` moved, reconcile the candidate and rerun authoritative validation on the new exact head.
 
-## Feature-completion work intake
+## Beta-convergence work intake
 
 Before creating an implementation branch, record:
 
 ```text
-1. Intended player-facing role of the current CORE_1_0 feature
-2. Current maturity: L0 Scaffold / L1 Vertical Slice / L2 Integrated / L3 Developed / L4 Feature Complete / L5 Hardened / L6 Release Qualified
-3. Evidence class: DETERMINISTIC / HEURISTIC / SYNTHETIC / HUMAN
-4. Concrete breadth/depth/progression/cross-system gap
-5. Current authority owning the behavior
-6. Highest-value rationale relative to other feature candidates
-7. Bounded proposed intervention
-8. Explicit non-goals / scope boundary
-9. Positive acceptance criteria
-10. Negative/rejection criteria
-11. Save/persistence impact
-12. Claim ceiling after the work
-13. Diminishing-returns / stop condition
+1. Named Beta/Release requirement or concrete finding
+2. Evidence class: DETERMINISTIC / HEURISTIC / SYNTHETIC / HUMAN
+3. Existing Campaign One authority owning the behavior
+4. Current observed failure/risk/gap
+5. Smallest bounded intervention
+6. Explicit non-goals / locked-scope boundary
+7. Positive acceptance criteria
+8. Negative/rejection criteria
+9. Save/persistence impact
+10. Browser/accessibility/recovery impact when relevant
+11. Claim ceiling after the work
+12. Diminishing-returns / stop condition
+13. Reopen-feature-construction trigger, if and only if the finding falsifies FEATURE_COMPLETE
 ```
 
-A package must trace to an already-authorized Campaign One feature and concrete evidence. It need not wait for human observation when deterministic, heuristic, or synthetic evidence demonstrates missing feature depth.
+A package must trace to an already-authorized Campaign One or release surface and concrete evidence. It need not wait for human observation when deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, or release-readiness evidence justifies bounded repair.
 
 ### Scope lookup
 
@@ -147,6 +147,28 @@ Default bounded workflow:
 ```
 
 Do not combine unrelated architecture cleanup into a content package.
+
+## Maturity-transition reconciliation
+
+Use this checklist whenever a package changes the repository's active maturity or strategic stage.
+
+```text
+1. Record the new maturity/stage in the governing completion result.
+2. Update STATUS.md current state and queue.
+3. Update docs/CURRENT.md classification/routing.
+4. Update HANDOFF.md re-entry responsibility and stop boundary.
+5. Update README.md orientation.
+6. Update AGENTS.md work-selection/stop rules if agent behavior changes.
+7. Update RUNBOOK.md questions, intake, procedures, and gates.
+8. Update affected Beta/Release/domain contracts.
+9. Search current-authority files for the old stage name, old queue, old "next" instructions, and old stop conditions.
+10. Reclassify legitimate history; remove contradictory current instructions.
+11. Extend docs:authority:validate with positive assertions for the new state and negative assertions for known stale current-authority text.
+12. Ensure only one transition PR remains canonical; close divergent duplicates as superseded.
+13. Run exact-head Build Validation and merge only the qualified candidate.
+```
+
+A maturity transition is incomplete if a fresh agent can follow the documented reading order and reasonably derive the old frontier.
 
 ## Documentation authority qualification
 
