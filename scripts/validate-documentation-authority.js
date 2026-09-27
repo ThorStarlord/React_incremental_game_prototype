@@ -347,6 +347,9 @@ const forbiddenCurrentAuthorityPhrases = [
   ['RUNBOOK.md', '## Feature-completion work intake'],
   ['STATUS.md', 'What is reopened is **depth within the existing core product**'],
   ['HANDOFF.md', 'Inside that boundary, feature depth is explicitly open'],
+  ['AGENTS.md', 'perform repository-wide feature-completion gap analysis across `CORE_1_0` systems'],
+  ['AGENTS.md', 'What concrete breadth/depth/progression/cross-system gap keeps it below feature-complete maturity?'],
+  ['AGENTS.md', 'Evidence-backed **feature completion inside the authorized product boundary** is.'],
 ];
 
 for (const [file, phrase] of forbiddenCurrentAuthorityPhrases) {
