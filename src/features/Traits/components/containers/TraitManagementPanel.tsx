@@ -61,9 +61,16 @@ const TraitManagementPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose })
   }, [permanentTraitIds, allTraitsData]);
 
   const availableTraits = useMemo(() => {
-    const equippedIds = equippedTraits.map(t => t.id);
-    return acquiredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
-  }, [acquiredTraits, equippedTraits, permanentTraitIds]);
+    const equippedIds = new Set(equippedTraits.map(t => t.id));
+    const candidateIds = new Set([
+      ...acquiredTraits.map(trait => trait.id),
+      ...permanentTraitIds,
+    ]);
+    return Array.from(candidateIds)
+      .map(traitId => allTraitsData[traitId])
+      .filter((trait): trait is Trait => Boolean(trait))
+      .filter(trait => !equippedIds.has(trait.id));
+  }, [allTraitsData, acquiredTraits, equippedTraits, permanentTraitIds]);
 
   const unlockedSlotCount = playerSlots.filter(s => !s.isLocked).length;
   const usedSlots = equippedTraits.length;
@@ -98,7 +105,7 @@ const TraitManagementPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose })
   return (
     <Panel title={panelTitle}>
       <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" sx={{ mb: 2 }}>
-        <Tab label="Equipped" />
+        <Tab label="Expressed" />
         <Tab label={<Badge badgeContent={availableTraits.length} color="secondary">Available</Badge>} />
       </Tabs>
       <Box role="tabpanel" hidden={activeTab !== 0}>
@@ -118,7 +125,7 @@ const TraitManagementPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose })
             )}
             {permanentTraits.length > 0 && (
               <Box sx={{ mt: 3 }}>
-                <Divider sx={{ my: 2 }}><Chip label="Permanent Traits" /></Divider>
+                <Divider sx={{ my: 2 }}><Chip label="Assimilated Library" /></Divider>
                 <Grid container spacing={2}>
                   {permanentTraits.map(trait => (
                     <Grid item xs={12} sm={6} md={4} key={trait.id}>
