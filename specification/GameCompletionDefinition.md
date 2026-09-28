@@ -41,11 +41,11 @@ Historical milestone closure remains valid evidence. A closed milestone means it
 
 The smallest complete game this repository is now targeting is:
 
-> **A narrative incremental RPG in which consequential relationships teach the protagonist durable capabilities, remembered history explains why later options exist, and personally understood repetitive work can be deliberately delegated so the player increasingly focuses on novel strategic and relational decisions.**
+> **A narrative incremental RPG in which meaningful relationships and encounters make other beings' salient Traits legible, the protagonist assimilates and selectively expresses those patterns, remembered history explains why later possibilities exist, and personally understood repetitive work can be deliberately delegated so the player increasingly focuses on novel strategic and relational decisions.**
 
 Provisional hierarchy:
 
-1. **Primary promise:** relationship-derived capability buildcraft.
+1. **Primary promise:** relationship-mediated universal Trait assimilation and expression buildcraft.
 2. **Supporting identity:** causal legibility.
 3. **Incremental identity:** earned delegation / mastery compression.
 4. **Enabling architecture:** heterogeneous authored composition over existing domain authorities.
@@ -74,7 +74,7 @@ isolated operator
 The player's late-game power fantasy is not merely larger numbers. It is the ability to understand and orchestrate a network of:
 
 - meaningful relationships and Memories;
-- learned durable Traits/capabilities;
+- an assimilated Trait library and deliberately expressed current build;
 - selective information/Knowledge;
 - institutional standing;
 - objective world consequences;
@@ -101,8 +101,8 @@ Early play should teach the product promise through action before exposing a lar
 Before the finale, a normal successful run must be capable of producing a player who has:
 
 - a meaningful history with the bounded 1.0 anchor cast;
-- several permanent relationship-derived capabilities;
-- at least one consequential build choice where learned capabilities materially change legal solution space;
+- several assimilated relationship-derived Trait patterns;
+- at least one consequential expression/build choice where currently expressed Traits materially change legal solution space;
 - persistent differences across Relationship, Knowledge, Faction Reputation, and World State;
 - personally mastered repeatable work;
 - a useful Copy network handling approved repetition while consequential judgment remains player-owned;
@@ -146,18 +146,20 @@ The remaining 1.0 campaign budget is therefore four new substantive chapters, on
 
 Adding Chapters 8+ is **not** on the 1.0 critical path unless playability or narrative dependency evidence proves the bounded spine cannot deliver the product promise.
 
-## 8. Capability breadth requirement
+## 8. Trait assimilation / expression breadth requirement
 
-1.0 must provide enough build expression to make relationship-derived capability buildcraft real rather than decorative.
+1.0 must provide enough build expression to make universal Trait assimilation more than decorative fiction.
 
 Minimum target:
 
-- at least **4 distinct durable relationship-derived capability identities** across at least **3 anchor relationships**;
-- at least **2** of those capabilities must have meaningful application in more than one gameplay context/domain;
+- at least **4 distinct assimilated relationship-derived Trait identities** across at least **3 anchor relationships**;
+- at least **2** of those expressed Traits must enable meaningful capability use in more than one gameplay context/domain;
+- the same universal Trait ontology must be capable of describing materially different pattern natures without requiring a parallel Skills system;
+- stabilized ownership and current expression must remain distinct;
 - baseline progression must remain viable without one universal mandatory Trait unless an authored branch explicitly establishes a different local contract;
-- capability origin/provenance must remain legible without exposing hidden future content.
+- source/provenance must remain legible without exposing hidden future content.
 
-These numbers are an integration floor, not a completion ceiling and not a mandate to create a large Trait catalog. Meeting the count does not by itself establish L4 feature completeness; capability buildcraft must also have enough meaningful use, variation, progression, and campaign consequence to sustain its intended role.
+These are an integration floor, not a completion ceiling and not a mandate to create a large Trait catalog. Cross-category ontology proof may reuse existing catalogue content rather than expanding Campaign One.
 
 ## 9. Delegation breadth requirement
 
@@ -341,4 +343,4 @@ At that point, further ideas belong to `1.1`, an expansion, or a later campaign 
 
 ## 20. Governing principle
 
-> **Finish the smallest game that fully delivers the relationship → capability → consequence → mastery → delegation promise before expanding the architecture.**
+> **Finish the smallest game that fully delivers resonance/relationship → Trait assimilation → expression/capability → consequence → mastery → delegation before expanding the architecture.**
