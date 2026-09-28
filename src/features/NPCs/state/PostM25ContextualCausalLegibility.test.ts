@@ -10,7 +10,7 @@ const baseContext = {
   knownFactIds: [] as string[],
   factionReputationByFactionId: {} as Record<string, number>,
   worldStateRegions: {},
-  permanentTraitIds: [] as string[],
+  expressedTraitIds: [] as string[],
   activeDoctrineIds: [] as const,
 };
 
@@ -65,7 +65,7 @@ describe('post-M25 contextual causal legibility', () => {
 
     expect(evaluateDialogueAvailabilityPresentation(node, {
       ...baseContext,
-      permanentTraitIds: ['ConstraintSense'],
+      expressedTraitIds: ['ConstraintSense'],
     })).toEqual({
       available: true,
       availabilityReasons: ['Permanent capability: ConstraintSense'],
