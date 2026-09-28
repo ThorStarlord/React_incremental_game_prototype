@@ -244,9 +244,9 @@ Not every NPC needs equal screen time or a Trait.
 
 ### Buildcraft
 
-Campaign content must support four durable relationship-derived capabilities across at least three relationships, with at least two cross-domain capabilities and at least two viable late-game build profiles.
+Campaign content must support four assimilated relationship-derived Trait identities across at least three relationships, with at least two expressed Traits enabling cross-domain capability use and at least two viable late-game expression/Doctrine profiles.
 
-Trait authoring should preserve the creative identity in [`../Features/TraitIdentity.md`](../Features/TraitIdentity.md): major authored Traits represent internalized patterns or transformations, and doctrine should express meaningful synthesis rather than arbitrary bonus combination.
+[TraitIdentity.md](../Features/TraitIdentity.md) defines the broader universal ontology: the four Campaign One cognitive Traits are a relationship-derived subset, not the whole meaning of Trait. Relationship significance may be positive, adversarial, or otherwise emotionally meaningful. Doctrine should express meaningful synthesis rather than arbitrary bonus combination.
 
 ### Delegation
 
