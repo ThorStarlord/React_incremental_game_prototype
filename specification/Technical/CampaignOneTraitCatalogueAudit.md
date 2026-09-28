@@ -2,6 +2,7 @@
 
 **Status:** CURRENT / bounded feature-completion audit  
 **Scope:** Campaign One Trait catalogue and runtime effect authority  
+**Trait-family identity:** [`../Features/TraitIdentity.md`](../Features/TraitIdentity.md)  
 **Purpose:** Prevent legacy perk metadata from forcing obsolete Skills/Crafting-era systems back into 1.0.
 
 ## Decision rule
@@ -31,6 +32,8 @@ legacy JSON effect
 | `AdversarialCalibration` | Lyra | opponent-model calibration; independent GC08 stress-test use; Countermodeler component |
 
 These four authored Traits are the canonical Candidate-A capability-buildcraft core. Future depth should preferentially add repeated, causally legible consumers of these identities rather than grow the catalogue.
+
+For creative/authoring fit, use `TraitIdentity.md`. This audit owns runtime/catalogue disposition; Trait Identity owns what a major Trait should mean and feel like.
 
 ## Legacy catalogue policy
 

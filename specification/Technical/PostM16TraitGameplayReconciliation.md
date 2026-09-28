@@ -3,7 +3,8 @@
 **Status:** Canonical design reconciliation after M16  
 **Baseline:** `main` at `3fc4fe2dc6049aaf03d825faccafde64780d17f8`  
 **Baseline tree:** `d26b8dd400fabb63ac8987794575ac6c500b88db`  
-**Scope:** Documentation/product-design reconciliation only; no runtime/content behavior changes
+**Scope:** Documentation/product-design reconciliation only; no runtime/content behavior changes  
+**Current Trait-family identity:** [`../Features/TraitIdentity.md`](../Features/TraitIdentity.md)
 
 ## 1. Purpose
 

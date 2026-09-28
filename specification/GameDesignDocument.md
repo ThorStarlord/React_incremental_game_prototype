@@ -237,6 +237,8 @@ M21 additionally qualifies bounded offline settlement of the saved Essence gener
 
 ### Trait System
 
+The creative/authoring identity for the Trait family is defined in [`Features/TraitIdentity.md`](Features/TraitIdentity.md). The runtime lifecycle and authority contract remain in [`Features/TraitSystem.md`](Features/TraitSystem.md).
+
 Traits are internalized capabilities or patterns: durable changes in what the protagonist can perceive, understand, attempt, perform, or passively sustain.
 
 The migrated relationship-mediated lifecycle is:

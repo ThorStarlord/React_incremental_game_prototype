@@ -246,6 +246,8 @@ Not every NPC needs equal screen time or a Trait.
 
 Campaign content must support four durable relationship-derived capabilities across at least three relationships, with at least two cross-domain capabilities and at least two viable late-game build profiles.
 
+Trait authoring should preserve the creative identity in [`../Features/TraitIdentity.md`](../Features/TraitIdentity.md): major authored Traits represent internalized patterns or transformations, and doctrine should express meaningful synthesis rather than arbitrary bonus combination.
+
 ### Delegation
 
 Campaign content must support at least three mastered routines across at least two contexts. Delegation increasingly removes solved repetition while final decisions remain player-owned.

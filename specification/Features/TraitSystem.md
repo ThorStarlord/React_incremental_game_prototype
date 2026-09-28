@@ -2,6 +2,7 @@
 
 **Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Resonance runtime-authority gating + bounded two-profile doctrine composition implemented  
 **Relationship migration:** ✅ Willow, Elara, Gronk, and Lyra use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
+**Trait identity:** [`TraitIdentity.md`](TraitIdentity.md) — canonical creative/authoring identity for what Traits mean and feel like  
 **Discovery contract:** [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md)  
 **Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)  
 **Build specialization:** [`../Technical/RelationshipCapabilityConstellation.md`](../Technical/RelationshipCapabilityConstellation.md)
