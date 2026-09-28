@@ -178,6 +178,8 @@ Use current Relationship contracts/results under [`Technical/`](Technical/) and 
 
 ### Trait / capability authority
 
+- [`Features/TraitIdentity.md`](Features/TraitIdentity.md) — **CURRENT DESIGN AUTHORITY** for the creative/authoring identity of Traits as internalized protagonist transformations, including the 27-Trait breadth classification and future authoring tests.
+
 The governing separation remains:
 
 ```text
@@ -189,6 +191,7 @@ Player       -> chooses whether to use it
 
 Current relevant records include:
 
+- [`Features/TraitIdentity.md`](Features/TraitIdentity.md) — Trait-family story/product identity and catalogue breadth interpretation;
 - [`Technical/RelationshipCapabilityConstellation.md`](Technical/RelationshipCapabilityConstellation.md) — bounded learned-Trait vs current-doctrine specialization, derived Structural Steward/Countermodeler authority, and Quest/Dialogue consumption;
 - [`Technical/PostM25CrossDomainTraitBuildcraft.md`](Technical/PostM25CrossDomainTraitBuildcraft.md) — semantic cross-domain capability use;
 - [`Technical/PostM25PlayerInsightProjection.md`](Technical/PostM25PlayerInsightProjection.md) — read-only build/provenance projections;
