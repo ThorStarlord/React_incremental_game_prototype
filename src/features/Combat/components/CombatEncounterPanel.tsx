@@ -23,13 +23,13 @@ import type {
 
 interface CombatEncounterPanelProps {
   definition: CombatEncounterDefinition;
-  permanentTraitIds: readonly string[];
+  expressedTraitIds: readonly string[];
   onTargetKilled: (targetId: string) => void;
 }
 
 export const CombatEncounterPanel: React.FC<CombatEncounterPanelProps> = ({
   definition,
-  permanentTraitIds,
+  expressedTraitIds,
   onTargetKilled,
 }) => {
   const [started, setStarted] = useState(false);
@@ -42,8 +42,8 @@ export const CombatEncounterPanel: React.FC<CombatEncounterPanelProps> = ({
   const victoryReported = useRef(false);
 
   const actions = useMemo(
-    () => getCombatActionPresentations(definition, state, permanentTraitIds),
-    [definition, state, permanentTraitIds]
+    () => getCombatActionPresentations(definition, state, expressedTraitIds),
+    [definition, state, expressedTraitIds]
   );
 
   const beginEncounter = () => {
@@ -58,7 +58,7 @@ export const CombatEncounterPanel: React.FC<CombatEncounterPanelProps> = ({
       definition,
       state,
       actionId,
-      permanentTraitIds
+      expressedTraitIds
     );
 
     if (!result.ok) {
