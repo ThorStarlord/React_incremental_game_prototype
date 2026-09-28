@@ -69,7 +69,7 @@ describe('Timed Quest unit and save-compatibility preflight', () => {
     expect(getTimeRemaining(undefined, 5, elapsedSeconds)).toBe(4);
   });
 
-  test('current schema-v2 save/load preserves stored timer values and normalized live increments resume from that value', async () => {
+  test('current schema-v3 save/load preserves stored timer values and normalized live increments resume from that value', async () => {
     const store = makeStore();
     seedTimedQuest(store, { elapsedSeconds: 4.5, timeLimitSeconds: 10 });
 
@@ -111,6 +111,7 @@ describe('Timed Quest unit and save-compatibility preflight', () => {
     expect(result.appliedMigrations).toEqual([
       'save-schema-v0-to-v1',
       'save-schema-v1-to-v2-doctrine-focus',
+      'save-schema-v2-to-v3-trait-expression',
     ]);
     expect(result.envelope.state.quest.quests[QUEST_ID].elapsedSeconds).toBe(1250);
     expect(result.envelope.state.quest.quests[QUEST_ID].timeLimitSeconds).toBe(5000);
