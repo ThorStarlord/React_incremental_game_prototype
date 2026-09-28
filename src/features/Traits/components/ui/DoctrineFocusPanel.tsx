@@ -34,20 +34,20 @@ const doctrineIds = Object.keys(DOCTRINE_DEFINITIONS) as DoctrineId[];
  */
 const DoctrineFocusPanel: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
-  const permanentTraitIds = useAppSelector(state => state.player.permanentTraits);
+  const assimilatedTraitIds = useAppSelector(state => state.player.permanentTraits);
   const allTraits = useAppSelector(state => state.traits.traits);
   const npcs = useAppSelector(state => state.npcs.npcs);
   const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
   const focusTraitIds = useAppSelector(selectDoctrineFocusTraitIds);
 
   const eligibleDoctrineIds = useMemo(() => {
-    const permanent = new Set(permanentTraitIds);
+    const assimilated = new Set(assimilatedTraitIds);
     return doctrineIds.filter(doctrineId =>
       DOCTRINE_DEFINITIONS[doctrineId].requiredPermanentTraitIds.every(
-        traitId => permanent.has(traitId)
+        traitId => assimilated.has(traitId)
       )
     );
-  }, [permanentTraitIds]);
+  }, [assimilatedTraitIds]);
 
   const activeDoctrineId = activeDoctrineIds[0];
   const activeDoctrine = activeDoctrineId
@@ -61,14 +61,14 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
           Doctrine Focus
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Permanent Traits stay learned. Doctrine focus chooses which learned
-          principles currently organize your approach.
+          Assimilated Traits stay permanently available. Doctrine focus organizes
+          a currently expressed pair into a higher-order strategic posture.
         </Typography>
       </Box>
 
       <Alert severity="info">
-        Changing doctrine never removes a permanent Trait. It only changes which
-        learned pair is currently foregrounded for higher-order synthesis.
+        Adopting a doctrine expresses its assimilated pair when open expression slots
+        are available. Changing doctrine never removes an assimilated Trait.
       </Alert>
 
       <Box data-test-id="active-doctrine-summary">
@@ -99,7 +99,7 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
       {eligibleDoctrineIds.length === 0 ? (
         <Alert severity="info">
           No doctrine is available yet. Compatible doctrines appear here only
-          after every required relationship-derived Trait has become permanent.
+          after every required relationship-derived Trait has been assimilated.
         </Alert>
       ) : (
         <Stack spacing={2}>
@@ -140,7 +140,7 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
 
                     <Stack spacing={0.75}>
                       <Typography variant="caption" fontWeight={600}>
-                        Permanent capabilities in this doctrine
+                        Assimilated patterns in this doctrine
                       </Typography>
                       {definition.requiredPermanentTraitIds.map(traitId => {
                         const trait = allTraits[traitId];
@@ -155,7 +155,7 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
                             variant="caption"
                             color="text.secondary"
                           >
-                            {trait?.name ?? traitId} · Permanent
+                            {trait?.name ?? traitId} · Assimilated
                             {sourceNpcName ? ` · learned with ${sourceNpcName}` : ''}
                           </Typography>
                         );
