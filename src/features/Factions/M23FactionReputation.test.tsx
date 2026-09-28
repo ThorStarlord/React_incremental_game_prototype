@@ -3,7 +3,7 @@ import path from 'path';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { rootReducer, replaceState } from '../../app/store';
 import { adjustFactionReputation } from './state/FactionSlice';
 import { selectFactionReputation } from './state/FactionSelectors';
@@ -130,16 +130,18 @@ describe('M23 faction reputation qualification', () => {
       expect(screen.queryByText('Clearance the Captain Cannot Give Alone')).not.toBeInTheDocument();
     });
 
-    const blockedWatch = await store.dispatch(processNPCInteractionThunk({
+    const blockedWatch = await act(() => store.dispatch(processNPCInteractionThunk({
       npcId: VALERIUS_ID,
       interactionType: 'dialogue',
       context: { choiceId: WATCH_CLEARANCE_ID, selectedResponse: 'accept_clearance' },
-    })).unwrap();
+    })).unwrap());
     expect(blockedWatch.success).toBe(false);
     expect(blockedWatch.message).toContain('Faction reputation gate not met');
 
     const relationshipAtNegativeWatch = clone(store.getState().relationships);
-    store.dispatch(adjustFactionReputation({ factionId: CITY_WATCH, amount: 10 }));
+    act(() => {
+      store.dispatch(adjustFactionReputation({ factionId: CITY_WATCH, amount: 10 }));
+    });
     expect(selectFactionReputation(store.getState(), CITY_WATCH)).toBe(0);
     expect(store.getState().relationships).toEqual(relationshipAtNegativeWatch);
 
@@ -147,11 +149,11 @@ describe('M23 faction reputation qualification', () => {
       expect(screen.getByText('Clearance the Captain Cannot Give Alone')).toBeInTheDocument();
     });
 
-    const allowedWatch = await store.dispatch(processNPCInteractionThunk({
+    const allowedWatch = await act(() => store.dispatch(processNPCInteractionThunk({
       npcId: VALERIUS_ID,
       interactionType: 'dialogue',
       context: { choiceId: WATCH_CLEARANCE_ID, selectedResponse: 'accept_clearance' },
-    })).unwrap();
+    })).unwrap());
     expect(allowedWatch.success).toBe(true);
 
     cleanup();
@@ -164,11 +166,11 @@ describe('M23 faction reputation qualification', () => {
     expect(screen.getByText('Weights That Match the Ledger')).toBeInTheDocument();
     expect(screen.queryByText('A Guild Queue, Not a Favor')).not.toBeInTheDocument();
 
-    const blockedGuild = await store.dispatch(processNPCInteractionThunk({
+    const blockedGuild = await act(() => store.dispatch(processNPCInteractionThunk({
       npcId: GRONK_ID,
       interactionType: 'dialogue',
       context: { choiceId: GUILD_PRIORITY_ID, selectedResponse: 'acknowledge' },
-    })).unwrap();
+    })).unwrap());
     expect(blockedGuild.success).toBe(false);
     expect(blockedGuild.message).toContain('Faction reputation gate not met');
 
@@ -189,36 +191,36 @@ describe('M23 faction reputation qualification', () => {
       expect(screen.getByText('A Guild Queue, Not a Favor')).toBeInTheDocument();
     });
 
-    const allowedGuild = await store.dispatch(processNPCInteractionThunk({
+    const allowedGuild = await act(() => store.dispatch(processNPCInteractionThunk({
       npcId: GRONK_ID,
       interactionType: 'dialogue',
       context: { choiceId: GUILD_PRIORITY_ID, selectedResponse: 'acknowledge' },
-    })).unwrap();
+    })).unwrap());
     expect(allowedGuild.success).toBe(true);
 
     const guildStandingBeforeRelationshipControl = selectFactionReputation(
       store.getState(),
       MERCHANTS_GUILD
     );
-    const blockedInterpersonal = await store.dispatch(processNPCInteractionThunk({
+    const blockedInterpersonal = await act(() => store.dispatch(processNPCInteractionThunk({
       npcId: GRONK_ID,
       interactionType: 'dialogue',
       context: { choiceId: 'gronk_blade_held', selectedResponse: 'recognize' },
-    })).unwrap();
+    })).unwrap());
     expect(blockedInterpersonal.success).toBe(false);
     expect(blockedInterpersonal.message).toContain('Missing relationship evidence');
 
-    await store.dispatch(recordAuthoredRelationshipExperienceThunk({
+    await act(() => store.dispatch(recordAuthoredRelationshipExperienceThunk({
       experienceId: 'gronk_exp_quality_over_finish',
-    })).unwrap();
+    })).unwrap());
     expect(selectFactionReputation(store.getState(), MERCHANTS_GUILD))
       .toBe(guildStandingBeforeRelationshipControl);
 
-    const allowedInterpersonal = await store.dispatch(processNPCInteractionThunk({
+    const allowedInterpersonal = await act(() => store.dispatch(processNPCInteractionThunk({
       npcId: GRONK_ID,
       interactionType: 'dialogue',
       context: { choiceId: 'gronk_blade_held', selectedResponse: 'recognize' },
-    })).unwrap();
+    })).unwrap());
     expect(allowedInterpersonal.success).toBe(true);
   });
 
