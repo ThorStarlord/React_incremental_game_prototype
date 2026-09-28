@@ -26,6 +26,7 @@ export type RoutineFamiliarityId = 'forge_assistance' | 'resonance_calibration' 
 export type RoutineFamiliaritySource =
   | 'city_center_forge_assistance'
   | 'trait_resonance'
+  | 'trait_stabilization'
   | 'elara_independent_verification';
 
 export interface RoutineFamiliarityRecord {
@@ -61,7 +62,11 @@ export interface StatusEffect {
 }
 
 /**
- * Trait slot interface
+ * Trait expression slot.
+ *
+ * A slot represents a Trait pattern the protagonist is currently expressing.
+ * The historical "equipped" name remains in some compatibility surfaces, but
+ * expression is the canonical product meaning.
  */
 export interface TraitSlot {
   id: string;
@@ -72,11 +77,11 @@ export interface TraitSlot {
 }
 
 /**
- * Current build expression over permanently learned Traits.
+ * Current strategic synthesis over assimilated Traits.
  *
- * This is intentionally distinct from temporary Trait slots: permanent Traits
- * represent durable learned capability, while doctrine focus represents which
- * learned principles the player is deliberately foregrounding together.
+ * Doctrine focus is persisted independently from expression slots. An active
+ * doctrine is derived only when its required assimilated Traits are also
+ * currently expressed.
  */
 export interface DoctrineFocusState {
   foregroundedPermanentTraitIds: string[];
@@ -97,7 +102,12 @@ export interface PlayerState {
   maxTraitSlots: number;
   
   statusEffects: StatusEffect[];
+  /**
+   * Legacy persisted field name. Canonical meaning: permanently assimilated
+   * Trait library. Assimilated means permanently available, not always active.
+   */
   permanentTraits: string[];
+  /** Currently expressed Trait patterns, bounded by unlocked expression capacity. */
   traitSlots: TraitSlot[];
   doctrineFocus: DoctrineFocusState;
 
