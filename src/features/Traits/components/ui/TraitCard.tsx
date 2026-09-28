@@ -140,7 +140,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
 
           {showMakePermanentButton && (
             <Tooltip
-              title={canAffordPermanence ? `Make permanent for ${permanenceCost} Essence` : `Need ${permanenceCost} Essence`}
+              title={canAffordPermanence ? `Stabilize for ${permanenceCost} Essence` : `Need ${permanenceCost} Essence`}
             >
               <span>
                 <Button
@@ -150,7 +150,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
                   disabled={!canAffordPermanence}
                   color="warning"
                 >
-                  Make Permanent
+                  Stabilize
                 </Button>
               </span>
             </Tooltip>
