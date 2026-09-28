@@ -384,17 +384,20 @@ export const processNPCInteractionThunk = createAsyncThunk<
         const requiredPermanentTraitIds = Array.isArray(node.requiredPermanentTraitIds)
           ? node.requiredPermanentTraitIds as string[]
           : [];
+        const expressedTraitIds = currentState.player.traitSlots
+          .map(slot => slot.traitId)
+          .filter((traitId): traitId is string => Boolean(traitId));
         const missingPermanentTrait = requiredPermanentTraitIds.find(
-          (traitId: string) => !currentState.player.permanentTraits.includes(traitId)
+          (traitId: string) => !expressedTraitIds.includes(traitId)
         );
         if (missingPermanentTrait) {
           dispatch(addNotification({
             type: 'info',
-            message: 'You have not permanently learned the capability this conversation depends on yet.',
+            message: 'Express the Trait pattern this conversation depends on first.',
           }));
           return {
             success: false,
-            message: `Required permanent Trait not learned: ${missingPermanentTrait}`,
+            message: `Required Trait not expressed: ${missingPermanentTrait}`,
           } as InteractionResult;
         }
 
