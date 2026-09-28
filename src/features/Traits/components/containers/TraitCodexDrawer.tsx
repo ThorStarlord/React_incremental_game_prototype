@@ -43,9 +43,9 @@ import {
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSelectors'; 
-import { fetchTraitsThunk, acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
+import { fetchTraitsThunk, stabilizeTraitWithEssenceThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
-import { evaluateTraitResonanceReadiness } from '../../state/TraitResonanceReadiness';
+import { evaluateTraitStabilizationReadiness } from '../../state/TraitResonanceReadiness';
 import { selectPermanentTraits as selectPlayerPermanentTraitIds } from '../../../Player/state/PlayerSelectors';
 
 interface TraitCodexDrawerProps {
@@ -124,9 +124,9 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   }, []);
 
   const handleAcquireTrait = useCallback((trait: Trait) => {
-    const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+    const readiness = evaluateTraitStabilizationReadiness(rootState, trait.id);
     if (readiness.ready) {
-      dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id }));
+      dispatch(stabilizeTraitWithEssenceThunk({ traitId: trait.id }));
     }
   }, [dispatch, rootState]);
 
@@ -218,7 +218,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
         {filteredAndSortedTraits.map(trait => {
           const isDiscovered = discoveredTraitIds.includes(trait.id);
           const isPermanent = permanentTraitIds.includes(trait.id);
-          const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+          const readiness = evaluateTraitStabilizationReadiness(rootState, trait.id);
           const cost = readiness.cost;
           const canBeMadePermanent = isDiscovered && !isPermanent && trait.essenceCost !== undefined;
 
@@ -232,7 +232,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               }}
               secondaryAction={
                 canBeMadePermanent ? (
-                  <Tooltip title={readiness.ready ? "Make Trait Permanent (Resonate)" : readiness.blockers.join(' • ')}>
+                  <Tooltip title={readiness.ready ? "Stabilize Trait for permanent availability" : readiness.blockers.join(' • ')}>
                     <span> 
                       <IconButton
                         edge="end"
@@ -261,7 +261,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
                     </Typography>
                     <br />
                     {trait.essenceCost !== undefined && <Chip label={`Cost: ${trait.essenceCost}`} size="small" sx={{ mr: 0.5 }} />}
-                    {isPermanent && <Chip label="Permanent" color="success" size="small" sx={{ mr: 0.5 }} />}
+                    {isPermanent && <Chip label="Assimilated" color="success" size="small" sx={{ mr: 0.5 }} />}
                     {isDiscovered && !isPermanent && <Chip label="Discovered" color="primary" variant="outlined" size="small" sx={{ mr: 0.5 }} />}
                     <Chip label={`Type: ${trait.category || 'General'}`} size="small" />
                   </>
@@ -300,8 +300,8 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               onChange={(e) => setFilter('traitStatusFilter', e.target.value)}
             >
               <MenuItem value="all">All Statuses</MenuItem>
-              <MenuItem value="available">Available (Not Permanent)</MenuItem>
-              <MenuItem value="permanent">Permanent</MenuItem>
+              <MenuItem value="available">Discovered (Not Assimilated)</MenuItem>
+              <MenuItem value="permanent">Assimilated</MenuItem>
             </Select>
           </FormControl>
           <Box>
