@@ -7,7 +7,7 @@ import {
   selectTraits,
   selectDiscoveredTraitObjects,
 } from '../../state/TraitsSelectors';
-import { selectPlayerTraitSlots, selectEquippedTraits } from '../../../Player/state/PlayerSelectors';
+import { selectAssimilatedTraitIds, selectPlayerTraitSlots, selectEquippedTraits } from '../../../Player/state/PlayerSelectors';
 // FIXED: Importing actions from PlayerSlice
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import EquippedSlotsPanel from '../ui/EquippedSlotsPanel';
@@ -22,14 +22,22 @@ const ManageTraitsTab: React.FC = () => {
   const allTraits = useAppSelector(selectTraits);
   const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const equippedTraitObjects = useAppSelector(selectEquippedTraits);
+  const assimilatedTraitIds = useAppSelector(selectAssimilatedTraitIds);
   const traitSlots = useAppSelector(selectPlayerTraitSlots); // Get official slots
 
   // Any discovered pattern not currently expressed can be selected.
   // Assimilated Traits remain in this pool when suppressed.
   const availableTraits = useMemo(() => {
-    const equippedIds = equippedTraitObjects.map(t => t.id);
-    return acquiredTraits.filter(trait => !equippedIds.includes(trait.id));
-  }, [acquiredTraits, equippedTraitObjects]);
+    const equippedIds = new Set(equippedTraitObjects.map(t => t.id));
+    const candidateIds = new Set([
+      ...acquiredTraits.map(trait => trait.id),
+      ...assimilatedTraitIds,
+    ]);
+    return Array.from(candidateIds)
+      .map(traitId => allTraits[traitId])
+      .filter((trait): trait is Trait => Boolean(trait))
+      .filter(trait => !equippedIds.has(trait.id));
+  }, [allTraits, acquiredTraits, assimilatedTraitIds, equippedTraitObjects]);
 
   const [activeTraitId, setActiveTraitId] = useState<string | null>(null);
 
