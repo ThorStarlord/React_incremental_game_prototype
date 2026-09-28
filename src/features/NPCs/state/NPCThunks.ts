@@ -702,18 +702,15 @@ export const shareTraitWithNPCThunk = createAsyncThunk(
       return payload;
     }
 
-    const playerPermanent = new Set(state.player.permanentTraits);
-    const equippedTraitIds = new Set(
+    const expressedTraitIds = new Set(
       state.player.traitSlots
         .filter(s => !!s.traitId)
         .map(s => s.traitId as string)
     );
-    const isPermanent = playerPermanent.has(traitId);
-    const isEquipped = equippedTraitIds.has(traitId);
-    if (isPermanent || !isEquipped) {
+    if (!expressedTraitIds.has(traitId)) {
       dispatch(addNotification({
         type: 'warning',
-        message: 'Only equipped, non-permanent Traits can be shared with an NPC.',
+        message: 'Only currently expressed Traits can be shared with an NPC.',
       }));
       return payload;
     }
