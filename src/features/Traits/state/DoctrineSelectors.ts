@@ -16,16 +16,23 @@ export const selectDoctrineFocusTraitIds = (
 export const selectActiveDoctrineIds = createSelector(
   [
     (state: RootState) => state.player.permanentTraits,
+    (state: RootState) => state.player.traitSlots
+      .map(slot => slot.traitId)
+      .filter((traitId): traitId is string => Boolean(traitId)),
     selectDoctrineFocusTraitIds,
   ],
-  (permanentTraitIds, foregroundedTraitIds): DoctrineId[] => {
-    const learned = new Set(permanentTraitIds);
+  (assimilatedTraitIds, expressedTraitIds, foregroundedTraitIds): DoctrineId[] => {
+    const assimilated = new Set(assimilatedTraitIds);
+    const expressed = new Set(expressedTraitIds);
     const foregrounded = new Set(foregroundedTraitIds);
 
     return (Object.keys(DOCTRINE_DEFINITIONS) as DoctrineId[]).filter(
       doctrineId =>
         DOCTRINE_DEFINITIONS[doctrineId].requiredPermanentTraitIds.every(
-          traitId => learned.has(traitId) && foregrounded.has(traitId)
+          traitId =>
+            assimilated.has(traitId) &&
+            expressed.has(traitId) &&
+            foregrounded.has(traitId)
         )
     );
   }
@@ -38,12 +45,20 @@ export const selectIsDoctrineActive = (
   const definition = DOCTRINE_DEFINITIONS[doctrineId];
   if (!definition) return false;
 
-  const learned = new Set(state.player.permanentTraits);
+  const assimilated = new Set(state.player.permanentTraits);
+  const expressed = new Set(
+    state.player.traitSlots
+      .map(slot => slot.traitId)
+      .filter((traitId): traitId is string => Boolean(traitId))
+  );
   const foregrounded = new Set(
     state.player.doctrineFocus?.foregroundedPermanentTraitIds ?? []
   );
 
   return definition.requiredPermanentTraitIds.every(
-    traitId => learned.has(traitId) && foregrounded.has(traitId)
+    traitId =>
+      assimilated.has(traitId) &&
+      expressed.has(traitId) &&
+      foregrounded.has(traitId)
   );
 };
