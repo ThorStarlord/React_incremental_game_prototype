@@ -8,6 +8,7 @@ import {
   selectTraitError
 } from '../../state/TraitsSelectors';
 import {
+  selectAssimilatedTraitIds,
   selectEquippedTraits,
   selectPlayerTraitSlots
 } from '../../../Player/state/PlayerSelectors';
@@ -25,6 +26,7 @@ export const TraitSlotsContainer: React.FC = () => {
   const allTraits = useAppSelector(selectTraits);
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects); // Use discovered traits
   const equippedTraits = useAppSelector(selectEquippedTraits);
+  const assimilatedTraitIds = useAppSelector(selectAssimilatedTraitIds);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
@@ -41,10 +43,15 @@ export const TraitSlotsContainer: React.FC = () => {
 
   // THIS IS THE KEY CHANGE: Base the list of equippable traits on what has been discovered.
   const availableTraitsForEquip = useMemo(() => {
-    return discoveredTraits.filter(trait =>
-      !equippedTraitIds.includes(trait.id)
-    );
-  }, [discoveredTraits, equippedTraitIds]);
+    const candidateIds = new Set([
+      ...discoveredTraits.map(trait => trait.id),
+      ...assimilatedTraitIds,
+    ]);
+    return Array.from(candidateIds)
+      .map(traitId => allTraits[traitId])
+      .filter((trait): trait is Trait => Boolean(trait))
+      .filter(trait => !equippedTraitIds.includes(trait.id));
+  }, [allTraits, discoveredTraits, assimilatedTraitIds, equippedTraitIds]);
 
   // --- Callback Handlers ---
   const handleSlotClick = useCallback((slot: TraitSlot) => {
