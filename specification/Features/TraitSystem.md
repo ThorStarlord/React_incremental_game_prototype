@@ -1,241 +1,156 @@
 # Trait System Specification
 
-**Implementation Status:** ✅ Core discovery/equip/permanent Trait flow implemented; permanent-Resonance runtime-authority gating + bounded two-profile doctrine composition implemented  
-**Relationship migration:** ✅ Willow, Elara, Gronk, and Lyra use authored discovery + evidence/assimilation Resonance; unmigrated Traits retain compatibility behavior  
-**Trait identity:** [`TraitIdentity.md`](TraitIdentity.md) — canonical creative/authoring identity for what Traits mean and feel like  
-**Discovery contract:** [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md)  
-**Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)  
-**Build specialization:** [`../Technical/RelationshipCapabilityConstellation.md`](../Technical/RelationshipCapabilityConstellation.md)
+**Implementation status:** Universal Trait ownership/expression migration implemented on current candidate; exact-head qualification pending  
+**Identity authority:** [TraitIdentity.md](TraitIdentity.md)  
+**Scope reconciliation:** [UniversalTraitOntologyReconciliation.md](../Technical/UniversalTraitOntologyReconciliation.md)  
+**Catalogue audit:** [CampaignOneTraitCatalogueAudit.md](../Technical/CampaignOneTraitCatalogueAudit.md)  
+**Discovery contract:** [TraitDiscoveryContract.md](../Technical/TraitDiscoveryContract.md)  
+**Doctrine:** [RelationshipCapabilityConstellation.md](../Technical/RelationshipCapabilityConstellation.md)
 
-Traits represent internalized capabilities or patterns that can change what the protagonist can perceive, understand, attempt, perform, or passively sustain. Numerical/passive modifiers remain legitimate Trait effects, but they are not the complete product definition of a Trait.
+## 1. Purpose
 
-## 1. Trait lifecycle
+This document owns **how Traits work mechanically**.
 
-```text
-Pattern exists in catalogue
--> Discover / recognize
--> temporarily Equip / Attune
--> (for relationship-mediated Traits) Assimilate
--> Resonate permanently
-```
+Trait Identity owns what a Trait means creatively:
 
-The three progression terms must not be collapsed:
+> A Trait is a discrete, stable, salient pattern of being.
 
-- **Discovery = recognition:** the player knows the Trait pattern exists.
-- **Assimilation = learning/internalization:** the protagonist can increasingly reproduce the pattern.
-- **Resonance = permanence:** Essence stabilizes an already-qualified pattern permanently.
+The runtime intentionally represents only salient authored patterns.
 
-### 1.1 Discovery
+## 2. Current state model
 
-A Trait must be present in `traits.discoveredTraits` before permanent Resonance.
+The compatibility-preserving state mapping is:
 
-Catalogue loading and discovery are now separate concerns.
+~~~text
+player.permanentTraits
+= assimilated Trait library
+= permanently available patterns
 
-A Trait may declare:
+player.traitSlots
+= expression capacity
+= currently manifested patterns
 
-```typescript
+traits.discoveredTraits
+= recognized patterns
+
+relationships.traitAssimilation
+= relationship-mediated reconstruction evidence
+
+player.doctrineFocus.foregroundedPermanentTraitIds
+= compatibility field for deliberately foregrounded assimilated Trait IDs
+~~~
+
+Historical field names do not preserve historical semantics.
+
+## 3. Universal Trait lifecycle
+
+~~~text
+source instantiates pattern
+-> Resonance / meaningful contact
+-> Discovery / recognition
+-> Assimilation / reconstruction
+-> temporary Expression may become available
+-> evidence reaches Stabilization readiness
+-> Essence Stabilization
+-> permanent assimilated ownership
+-> free Expression / Suppression within capacity
+~~~
+
+These progression terms must remain distinct.
+
+### Resonance
+
+Alignment/contact that makes a foreign pattern legible and transferable.
+
+### Discovery
+
+Recognition that the pattern exists.
+
+### Assimilation
+
+Increasing ability to reconstruct/reproduce the pattern.
+
+### Stabilization
+
+Essence-backed durable ownership.
+
+### Expression
+
+Current manifestation of an available pattern.
+
+## 4. Discovery
+
+A Trait must be discovered before Stabilization.
+
+Trait definitions may declare:
+
+~~~typescript
 type TraitDiscoveryMode = 'initial' | 'authored';
 
 discoveryMode?: TraitDiscoveryMode;
-```
+~~~
 
-- `initial` — known when definitions load;
-- `authored` — definition exists, but an explicit authored event must reveal the pattern;
-- omitted — treated as `initial` for legacy/prototype compatibility.
-
-`loadTraits` preserves already-earned discoveries while adding only initially-known Traits. It no longer treats an empty discovery list as permission to discover the entire catalogue.
+- initial — recognized when definitions load;
+- authored — hidden until an authored event reveals the pattern;
+- omitted — compatibility behavior equivalent to initial.
 
 Current authored relationship discoveries:
 
-- `WillowsWisdom` — discovered during **The First Lesson**;
-- `ScholarlyInsight` — discovered during **The Contradictory Footnote**;
-- `ConstraintSense` — discovered during **Measure Twice** with Gronk;
-- `AdversarialCalibration` — discovered during **Coercion Reflected** with Lyra.
+- Willow's Wisdom — The First Lesson;
+- Scholarly Insight — The Contradictory Footnote;
+- Constraint Sense — Measure Twice;
+- Adversarial Calibration — Coercion Reflected.
 
-Discovery is attached to the event where the pattern becomes recognizable, not to Connection level by itself.
+Loading definitions preserves earned discovery.
 
-### 1.2 Temporary equipping
+New Game recomputes discovery from initial patterns and clears authored discoveries.
 
-Discovered non-permanent Traits may occupy the player's limited Trait slots.
+## 5. Trait nature metadata
 
-Temporary equipping:
+A Trait may declare optional identity metadata:
 
-- costs no Essence;
-- is reversible;
-- can provide qualified direct Player-stat effects while slotted;
-- stages an equipped non-permanent Trait for NPC/Copy sharing where the target rules allow it;
-- supports experimentation before the player commits Essence to permanent Resonance.
+~~~typescript
+interface TraitIdentityMetadata {
+  nature: string;
+  sourceProvenance?: string;
+  notes?: string;
+}
 
-Permanent Traits do not require an active slot and are no longer shareable from Player Trait slots.
+identity?: TraitIdentityMetadata;
+~~~
 
-Undiscovered authored patterns cannot be equipped from the NPC Overview.
+This is authoring metadata, not a closed enum.
 
-Campaign One does **not** treat temporary/equipped Traits as equivalent to permanent learned capability for authored gameplay gates. The finished-game role of temporary slots is therefore bounded: **experiment / temporarily benefit / share before internalization**. Doctrine, not temporary slots, owns current late-game specialization. This does not claim that temporary attunement already has enough human-validated strategic depth to justify presets or a larger loadout system.
+Current bounded proof includes cognitive, physiological, procedural, semantic-knowledge and metaphysical examples.
 
-### 1.3 Gameplay capability authority
+## 6. Source provenance
 
-M16 qualifies the following authority chain for Relationship-derived permanent Traits:
+Trait source is no longer assumed to mean NPC.
 
-```text
-Relationship history -> explains / qualifies how the capability was learned
-Trait state           -> owns whether the durable capability now exists
-Gameplay system       -> decides whether that capability is applicable here
-Player                 -> decides whether to use the available capability
-Relationship          -> later interprets what the player actually did
-```
+A Trait may originate from:
 
-A strong Relationship, Memory, Affinity value, Connection level, or legacy `connectionDepth` must not substitute for permanent Trait ownership when gameplay is asking whether the protagonist has learned the capability.
+- another person;
+- practice;
+- knowledge;
+- an event;
+- a relic;
+- a place;
+- an organism;
+- metaphysical exposure;
+- another authored source.
 
-M16 production examples:
+Relationship gating applies only when:
 
-- permanent `WillowsWisdom` enables the optional **Restore the Underlying Flow** resolution in **The Withering Grove**;
-- permanent `ScholarlyInsight` enables the optional **Reopen the Model Around the Contradiction** resolution in **The Impossible Inventory**;
-- both problems retain an ordinary valid route without the Trait;
-- invalid direct invocation of a permanent-Trait-only resolution is rejected below the UI.
+- sourceNpc is explicitly declared; or
+- a legacy source value resolves to an actual NPC.
 
-Current qualified quest consumption uses `QuestResolutionOption.requiredPermanentTraitIds`.
+This prevents a relic or place identifier from accidentally being treated as an NPC Connection requirement.
 
-The design invariant is:
+## 7. Relationship-mediated assimilation
 
-```text
-capability != decision
-```
+Relationship-derived Traits store assimilation evidence by source NPC + Trait:
 
-A Trait may reveal or authorize an action without automatically choosing it for the player.
-
-### 1.4 Capability identity
-
-Important Relationship-derived Traits should ideally express a coherent capability identity beyond an interchangeable percentage bonus.
-
-Useful authoring concepts include perceptual, interpretive, procedural, tactical, social, physical, productive, and passive capabilities. These are design categories, not a required runtime enum.
-
-Authoring test:
-
-```text
-Because the protagonist internalized [TRAIT],
-they can now ____________________________________.
-```
-
-Significant uses of the same Trait should be defensible from the same underlying learned pattern rather than behaving as unrelated content keys.
-
-Trait-enabled options should usually expand meaningful solution space rather than become a guaranteed "best" answer. See `PostM16TraitGameplayReconciliation.md` for the full doctrine and evidence/design boundary.
-
-### 1.5 Learned capability vs active doctrine
-
-Permanent learning and current specialization are separate authorities.
-
-```text
-player.permanentTraits
-= durable learned capability
-
-player.doctrineFocus
-= permanently learned principles currently foregrounded together
-
-derived active doctrine
-= emergent interpretation of that focus
-```
-
-Campaign One currently qualifies only two established two-Trait profiles:
-
-- **Structural Steward** — `WillowsWisdom + ConstraintSense`;
-- **Countermodeler** — `ScholarlyInsight + AdversarialCalibration`.
-
-A doctrine is not a separately acquired Trait and is not independently persisted as a boolean. Runtime selectors derive it only when all required Traits are both permanently learned and foregrounded.
-
-Quest and Dialogue authoring may use `requiredActiveDoctrineIds` where a choice specifically depends on current specialization. The player-facing Doctrine tab now qualifies explicit Adopt / Switch / Clear control for eligible learned pairs, and Player Insight projects the active doctrine read-only. GC06 establishes the first specialization gate; GC08 preparation and GC10 finale routes now reuse active doctrine where the player is explicitly choosing or carrying a strategic posture. GC07 and GC09 intentionally retain permanent-Trait-pair gates so learned capability remains useful without forcing repetitive menu switching every chapter.
-
-See `RelationshipCapabilityConstellation.md` for the bounded Redux, persistence, consumption, and evidence contract.
-
-### 1.4 Permanent Resonance runtime authority
-
-A discovered Trait is not automatically a legal permanent Essence purchase merely because it has historical effect metadata.
-
-`summarizeTraitAuthority` distinguishes:
-
-```text
-direct_player_stat
-named_runtime
-semantic_capability
-deferred_legacy
-```
-
-Permanent Player Resonance requires at least one **durable Player authority**:
-
-- a direct Player-stat effect consumed by the Player stat pipeline; or
-- a semantic capability consumed by authored gameplay requirements.
-
-A `named_runtime` effect may be real without being a permanent Player effect. The production example is `EssenceFlow.essenceGenerationMultiplier`: it is consumed by Copy Essence generation when the Trait is shared/inherited by a Copy, so the Trait remains meaningful as temporary/shareable content but cannot consume Essence to become a permanent Player Trait.
-
-A Trait whose effects are entirely `deferred_legacy` cannot be permanently Resonated. This prevents obsolete JSON metadata from charging the player for a capability the current game does not execute.
-
-The shared readiness projection exposes these blockers to the Management/Codex surfaces and the acquisition thunk reuses the same fail-closed authority before any Essence is spent.
-
-## 2. Resonance authority
-
-Permanent acquisition is centralized in:
-
-`src/features/Traits/state/TraitThunks.ts#acquireTraitWithEssenceThunk`
-
-The gate depends on whether the Trait's source NPC has migrated to Relationship authority.
-
-### 2.1 Legacy NPC-sourced Traits
-
-For unmigrated NPCs, the compatibility gate remains:
-
-```text
-Trait discovered
-+ source NPC connectionDepth >= legacy minimum
-+ Trait prerequisites
-+ enough Essence
--> spend Essence
--> permanent Trait
-```
-
-`TRAIT_RESONANCE.MIN_CONNECTION_DEPTH` remains the default legacy threshold.
-
-### 2.2 Relationship-mediated Traits
-
-For a source NPC whose `RelationshipProgressionDefinition.connectionAuthority` is `relationships`, the gate is:
-
-```text
-Trait discovered
-+ source NPC resolved
-+ qualified Bond Connection
-+ assimilation threshold met
-+ compatibility threshold met
-+ required landmark Memory evidence
-+ Trait prerequisites
-+ enough Essence
-+ authored final Resonance event validates
--> spend Essence
--> permanent Trait
-```
-
-Essence is the final stabilization cost. It cannot substitute for discovery, relationship evidence, or assimilation.
-
-## 3. Relationship-mediated Trait metadata
-
-A Trait may declare:
-
-```typescript
-discoveryMode?: 'initial' | 'authored';
-sourceNpc?: string;
-minimumConnectionLevel?: number;
-resonanceTags?: string[];
-requiredMemoryTags?: string[];
-assimilationDifficulty?: number;
-assimilationThreshold?: number;
-minimumCompatibility?: number;
-resonanceExperienceId?: string;
-```
-
-These fields are optional so ordinary or legacy Traits remain simple.
-
-## 4. Trait assimilation and discovery evidence
-
-Relationship-mediated assimilation is stored by `(sourceNpcId, traitId)`:
-
-```typescript
+~~~typescript
 interface TraitAssimilationState {
   traitId: string;
   sourceNpcId: string;
@@ -244,258 +159,419 @@ interface TraitAssimilationState {
   lastUpdatedAt: number;
   qualifyingMemoryIds: string[];
 }
-```
+~~~
 
-Progress and compatibility are clamped to `0..100`.
+Authored Relationship Experiences may:
 
-Relationship Experiences may provide:
+- discover a Trait;
+- increase assimilation;
+- increase compatibility;
+- create landmark Memory evidence.
 
-```typescript
-traitEffects: [{
-  traitId,
-  discover?,
-  compatibilityDelta?,
-  assimilationDelta?
-}]
-```
+Positive Affinity is not required as the universal cause.
 
-These effects are independent:
+Meaningful rivalry, conflict, dependence and adversarial calibration may also qualify authored learning.
 
-- `discover: true` reveals the pattern;
-- compatibility evidence says the pattern fits the protagonist/source relationship;
-- assimilation evidence says the protagonist is learning to reproduce it.
+Campaign One deliberately uses authored Experiences rather than a continuous proximity simulator.
 
-A single Experience may do more than one, but discovery does not imply mastery.
+## 8. Stabilization readiness
 
-Landmark Memories whose `traitRelevance` contains the Trait are recorded as qualifying Memory evidence.
+Current Stabilization readiness evaluates:
 
-## 5. Willow's Wisdom
+~~~text
+Trait definition exists
++ Trait discovered
++ not already assimilated
++ live runtime/capability authority exists
++ relationship evidence when source is relationship-mediated
++ Trait prerequisites are assimilated
++ enough Essence
+-> ready
+~~~
 
-`WillowsWisdom` declares:
+### Live authority
 
-- source: `npc_elder_willow`;
-- discovery mode: `authored`;
-- discovery Experience: **The First Lesson**;
-- permanent Essence cost: `40`;
-- minimum qualified Connection: `2`;
-- assimilation threshold: `100%`;
-- minimum compatibility threshold;
-- required Memory tag: `Application`;
-- final authored Resonance event: `willow_exp_resonance_wisdom`.
+A Trait may stabilize when at least one effect has:
 
-### 5.1 Discovery and assimilation path
+- direct Player-stat authority;
+- named runtime authority;
+- semantic capability authority.
 
-The Willow slice uses bounded authored evidence:
+Deferred-only legacy effect metadata cannot stabilize.
 
-1. **The First Lesson** — recognizes the slow-pattern cognition, discovers `WillowsWisdom`, and begins low assimilation.
-2. **Three Nights of Teaching** — primary sustained practice segment.
-3. **The Lesson Made Yours** — independent application, completing the authored assimilation proof.
+This differs from the previous permanent-Player-only rule.
 
-The canonical authored path totals 100% assimilation.
+A named-runtime pattern such as Essence Flow may be legitimately assimilated even though its current useful consumer is Copy sharing/inheritance.
 
-The distinction is intentional:
+## 9. Stabilization transaction
 
-```text
-see the pattern
--> discover it
--> practice it
--> apply it independently
--> qualify permanent Resonance
-```
+Canonical thunk:
 
-### 5.2 Evidence requirement
+~~~typescript
+stabilizeTraitWithEssenceThunk
+~~~
 
-`The Lesson Made Yours` and/or another qualifying Memory carrying the required `Application` tag matters mechanically.
+Historical compatibility alias:
 
-Having 40 Essence without this evidence is insufficient.
+~~~typescript
+acquireTraitWithEssenceThunk
+~~~
 
-### 5.3 Qualified gameplay identity
+Transaction order:
 
-M16 uses Willow's Wisdom as a bounded interpretive/systemic capability: the player can recognize that visible grove corruption is a symptom of an underlying slow Essence-flow imbalance and may choose a restoration route.
+1. resolve Trait;
+2. evaluate Stabilization readiness;
+3. resolve catalogue-owned Essence cost;
+4. validate/record authored final relationship event if declared;
+5. spend Essence;
+6. ensure discovery;
+7. add Trait to assimilated library;
+8. record Resonance Calibration familiarity;
+9. preserve current expression;
+10. notify success.
 
-This does not imply that every future Willow's Wisdom use is automatically correct or superior. Future uses should remain coherent with the underlying slow-pattern/systemic-causation identity.
+A failed gate spends no Essence and grants no ownership.
 
-## 6. Scholarly Insight
+Stabilization is idempotently protected by assimilated ownership.
 
-`ScholarlyInsight` is the second production relationship-mediated Trait and declares:
+## 10. Assimilated ownership
 
-- source: `npc_scholar_elara`;
-- discovery mode: `authored`;
-- discovery Experience: **The Contradictory Footnote**;
-- permanent Essence cost: `30`;
-- minimum qualified Connection: `2`;
-- assimilation threshold: `100%`;
-- minimum compatibility: `25`;
-- required Memory tag: `IndependentVerification`;
-- final authored Resonance event: `elara_exp_resonance_scholarly_insight`.
+Assimilated means:
 
-Its semantic pattern is evidence-first model revision:
+> **The protagonist can reconstruct this pattern without continued source proximity.**
 
-> Contradictory evidence prompts revision instead of defense of the first plausible explanation.
+It does not mean always active.
 
-The first challenge to Elara does not discover this Trait. The Contradictory Footnote does, because that is where Elara actually demonstrates the defining pattern.
+Relationship deterioration therefore does not normally erase assimilated ownership.
 
-Later reciprocal correction and independent verification complete assimilation.
+Removal of an assimilated Trait requires an explicit future mechanic/fictional cause and is not part of current Campaign One.
 
-M16 then reused that same semantic identity in **The Impossible Inventory**, where permanent `ScholarlyInsight` allows the protagonist to reopen a model around mutually incompatible records rather than accept the first plausible reconstruction.
+## 11. Expression
 
-## 7. Transaction order
+Player Trait slots are expression capacity.
 
-For migrated Resonance, validation occurs before irreversible state changes.
+A currently expressed Trait:
 
-The thunk:
+- contributes qualified direct Player-stat effects;
+- may satisfy authored semantic Trait requirements;
+- may be shared/projected to supported NPC/Copy targets;
+- can participate in active Doctrine when foregrounded.
 
-1. validates Trait definition and discovery;
-2. validates source NPC and qualified Connection;
-3. validates assimilation and compatibility;
-4. validates required Memory evidence and Trait prerequisites;
-5. validates that the Trait has qualified durable Player authority for permanent Resonance;
-6. validates enough Essence;
-7. validates/records the authored final Resonance Experience;
-8. spends Essence;
-9. adds the Trait to `player.permanentTraits`;
-10. frees any temporary player slot containing that Trait;
-11. emits success feedback.
+An assimilated but suppressed Trait:
 
-The authored event is idempotent, and the permanent-Trait check prevents repeated acquisition from spending Essence twice.
+- remains permanently owned;
+- contributes no current Player stat effect;
+- does not satisfy current-expression capability gates;
+- cannot be shared until expressed;
+- may be re-expressed freely when capacity permits.
 
-## 8. Save / reload / New Game behavior
+## 12. Expression swapping
 
-### Definition reload
+Expression management no longer requires NPC proximity.
 
-Reloading Trait definitions preserves authored discoveries already present in the save while seeding only `initial` Traits.
+Current policy:
 
-### Additive relationship-save repair
+- player may express/suppress available patterns at will;
+- no generic swap cost;
+- no generic swap cooldown;
+- no source NPC presence requirement;
+- locked slots still bound expression capacity;
+- one Trait cannot occupy multiple Player expression slots simultaneously.
 
-If an older relationship save already contains the authored discovery Experience but lacks the later discovery flag, idempotently replaying the authored Experience repairs the missing discovery state without duplicating relationship history.
+Expression choices may include:
 
-### New Game
+- discovered temporary patterns;
+- assimilated patterns.
 
-New Game explicitly resets Trait progression while retaining the loaded catalogue.
+Expression capacity remains governed by Player Trait-slot unlocks.
 
-`resetTraitsState` recomputes discovery from only `initial` Traits, so authored relationship patterns must be recognized again in the new run.
+## 13. Direct stat effects
 
-Permanent Trait ownership is part of saved player progression. M16 qualified permanent `WillowsWisdom` surviving save/load before its gameplay capability was consumed.
+Player stat recalculation consumes **expressed Traits only**.
 
-## 9. NPC Trait UI
+~~~text
+assimilated + suppressed
+-> no active Player stat effect
 
-### Before discovery
+expressed
+-> qualified effect applies
+~~~
 
-An authored hidden pattern is not fully identified.
+This makes ownership and build expression mechanically distinct.
 
-`NPCTraitsTab` shows only:
+## 14. Semantic capabilities
 
-```text
-Undiscovered Pattern
-Meaningful relationship evidence may reveal a Trait pattern here.
-```
+Authored Quest, Dialogue and Combat definitions retain the historical content key:
 
-It does not expose:
+~~~typescript
+requiredPermanentTraitIds?: string[];
+~~~
 
-- name;
-- description;
-- Essence cost;
-- Connection requirement;
-- assimilation/compatibility values;
-- Memory requirements.
+For compatibility, the key is not mass-renamed in existing content.
 
-The action is disabled as `Undiscovered`.
+Current interpretation:
 
-The NPC Overview also filters innate Traits to discovered patterns and refuses temporary equip of an undiscovered id.
+> every listed Trait pattern must currently be **expressed**.
 
-### After discovery
+Therefore:
 
-The normal migrated Trait card explains:
+~~~text
+assimilated
+!= sufficient
 
-- Connection current / required;
-- assimilation current / required;
-- compatibility current / required;
-- required Memory tag status;
-- Essence cost.
+expressed
+= current capability availability
+~~~
 
-The Resonate button is enabled only when every applicable gate passes.
+The underlying design invariant remains:
 
-Legacy NPC Traits continue to show the older `connectionDepth` requirement.
+~~~text
+capability != decision
+~~~
 
-Gameplay-option presentation is owned by the consuming gameplay system. M16 qualifies hidden unavailable permanent-Trait quest resolutions; visible-but-unavailable presentation remains a future design/UI choice.
+A Trait can make an action legal without choosing it for the player or guaranteeing it is best.
 
-## 10. NPC innate Trait equipping
+## 15. Temporary Expression
 
-The temporary innate-Trait flow remains conceptually separate from permanent Resonance:
+Discovered non-stabilized Traits may use expression slots.
 
-- the NPC retains its Trait;
-- only discovered patterns are player-visible/equippable;
-- the player temporarily equips a usable instance into a player Trait slot;
-- no permanent acquisition occurs merely from equipping.
+Current bounded Campaign One semantics use Discovery as enough for temporary expression.
 
-Temporary equipping must not be silently treated as equivalent to permanent authored gameplay mastery without dedicated evidence.
+This supports experimentation and sharing before permanent ownership.
 
-## 11. Trait sharing
+The runtime does not currently model partial-expression strength from assimilation percentage.
 
-Existing sharing behavior remains outside the relationship redesign:
+That remains deferred until a real content case warrants it.
 
-- only equipped, non-permanent Player Traits may be shared where NPC/Copy slot rules allow;
-- both the normal UI and mutation thunks enforce that boundary;
-- listeners remove incompatible shares when a Trait is unequipped, replaced, or made permanent.
+## 16. Sharing
 
-M8 does not redesign Copy Trait inheritance.
+Player sharing is controlled by current expression:
 
-## 12. Invariants
+~~~text
+expressed
+-> shareable where target supports sharing
 
-1. Loading a Trait definition is not automatically discovery when `discoveryMode = authored`.
-2. Discovery is recognition, not assimilation or permanence.
-3. Undiscovered authored patterns cannot be permanently Resonated.
-4. Undiscovered authored patterns cannot be temporarily equipped through the NPC Overview.
-5. Player-facing UI must not leak the full hidden Trait contract before discovery.
-6. Reloading definitions preserves earned discoveries.
-7. New Game clears authored discoveries while preserving definitions and initial knowledge.
-8. Permanent Resonance is not equivalent to paying Essence for a Trait.
-9. Migrated relationship-mediated Traits require evidence and assimilation.
-10. Unmigrated Traits preserve existing compatibility behavior until deliberately migrated.
-11. A failed gate spends no Essence and adds no permanent Trait.
-12. A successful permanent acquisition spends its Essence cost exactly once.
-13. Missing authored final-event data must fail before currency/permanence reducers commit.
-14. Relationship history qualifies learning; permanent Trait state owns the currently qualified durable gameplay capability.
-15. Capability availability does not automatically make the player's decision.
-16. Relationship deterioration does not normally erase an already permanent internalized Trait.
-17. Trait-enabled actions are interpreted by their consequences; Trait use does not automatically produce positive Relationship reward.
+suppressed
+-> not shareable
+~~~
 
-## 13. Depth-repair authority
+Assimilated Traits remain shareable while expressed.
 
-The bounded Trait depth repair establishes three additional runtime invariants:
+Stabilization no longer unshares a Trait automatically.
 
-- `player.resonanceLevel` automatically unlocks every Player Trait slot whose documented Resonance-level requirement is met;
-- `Trait.essenceCost` is the only authoritative permanent-Resonance price; callers cannot discount or override it;
-- `evaluateTraitResonanceReadiness` is the shared player-facing/runtime projection for discovery, Relationship/legacy source gates, prerequisites, Memory evidence, assimilation, compatibility, and Essence affordability.
+Unequipping/suppressing or replacing an expressed Trait continues to remove incompatible current shares.
 
-The general Traits management surface consumes that readiness projection instead of presenting an Essence-only Resonance affordance.
+Sharing is projection, not permanent target assimilation.
 
-The authored production catalogue also normalizes `ConstraintSense` and `AdversarialCalibration` category/rarity casing and removes stale legacy `requirements.relationshipLevel` fields from Willow/Elara. Modern Relationship authority is expressed only through the explicit Connection/assimilation/compatibility/Memory contract.
+## 17. Copy relationship
 
-The coherence package adds independent semantic use for the two previously pair-dominant source Traits during GC08 distributed preparation:
+Copy inherited/shared Trait behavior remains a separate bounded authority.
 
-- permanent `ConstraintSense` may identify and protect the procedure's critical bottlenecks without requiring Structural Steward;
-- permanent `AdversarialCalibration` may red-team the distributed procedure without requiring Countermodeler.
+Universal Player Trait identity does not imply:
 
-Both are local refinements of the distributed preparation path. They do not replace the two-Trait doctrines or manufacture new doctrine identities.
+- Copies can permanently assimilate arbitrary Traits;
+- Copies can select their own Traits strategically;
+- Copies can perform irreversible decisions;
+- generic inheritance simulation.
 
-Focused qualification:
+Those require independent future evidence/authority.
 
-```bash
-npm run trait-depth:validate
-```
+## 18. Doctrine
 
-This repair does **not** promote the full Trait catalogue to feature-complete status and does not authorize a generic capability graph.
+Permanent ownership and strategic posture remain separate.
 
-## 14. Known limitations / deferred work
+~~~text
+assimilated library
+= what patterns are permanently available
 
-- Most legacy/simple Traits still default to initially known; they have not been given authored discovery content.
-- Relationship Experiences are only one possible future discovery source; quests, exploration, combat, research, or items may reveal other Traits.
-- Historical pre-Relationships saves do not reconstruct perfect discovery provenance; M8 only performs conservative additive repair from existing authored evidence.
-- Temporary/equipped Traits are qualified as reversible experimentation/direct-effect/share staging, but temporary ownership still does not satisfy permanent-capability gameplay gates. Human value of that slot loop remains unproven.
-- The two established Campaign One doctrine pairs are the only qualified synergy composition; GC06/GC08/GC10 consume current doctrine while GC07/GC09 preserve permanent-pair capability gates. GC08 now also gives `ConstraintSense` and `AdversarialCalibration` bounded independent uses in GC08 and now repeat them as single-capability GC09 judgment surfaces with finale-aftereffect provenance. A generic capability graph, arbitrary pair lattice, N-way combinations, and broad Copy redesign remain out of scope.
-- Permanent-Trait and active-doctrine gates remain explicit bounded fields, not a general stat/skill/ability condition DSL.
+expression
+= what patterns are manifested now
 
-For the full M8 migration rationale and qualification evidence, see [`../Technical/TraitDiscoveryContract.md`](../Technical/TraitDiscoveryContract.md).
+doctrine focus
+= which expressed learned principles are deliberately foregrounded
 
-For the post-M16 gameplay doctrine and evidence/design boundary, see [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md).
+active doctrine
+= derived higher-order synthesis
+~~~
+
+Current doctrines:
+
+- Structural Steward — Willow's Wisdom + Constraint Sense;
+- Countermodeler — Scholarly Insight + Adversarial Calibration.
+
+An active Doctrine requires each component Trait to be:
+
+~~~text
+assimilated
++ expressed
++ foregrounded
+~~~
+
+Doctrine adoption may express missing assimilated components into open unlocked expression slots.
+
+It fails instead of silently evicting unrelated expressed Traits when capacity is insufficient.
+
+## 19. Campaign One relationship examples
+
+### Willow's Wisdom
+
+- source: Elder Willow;
+- discovery: The First Lesson;
+- relationship-mediated assimilation;
+- Memory evidence: Application;
+- authored final stabilization event: willow_exp_resonance_wisdom;
+- pattern: slow systemic causation.
+
+### Scholarly Insight
+
+- source: Elara;
+- discovery: The Contradictory Footnote;
+- Memory evidence: IndependentVerification;
+- pattern: evidence-first model revision.
+
+### Constraint Sense
+
+- source: Gronk;
+- discovery: Measure Twice;
+- Memory evidence: ProfessionalReliance;
+- pattern: load-bearing constraint recognition.
+
+### Adversarial Calibration
+
+- source: Lyra;
+- discovery: Coercion Reflected;
+- Memory evidence: AdversarialBond;
+- pattern: precise opponent-modeling without requiring agreement/affection.
+
+These are cognitive examples inside a universal ontology, not a definition of the full Trait family.
+
+## 20. Save schema v3
+
+Universal ownership/expression semantics are a save-semantic change.
+
+Current schema:
+
+~~~text
+v3
+~~~
+
+v2 -> v3 migration:
+
+1. preserves permanentTraits as assimilated ownership;
+2. preserves existing expression-slot contents;
+3. preserves doctrine focus;
+4. fills unlocked empty slots deterministically:
+   - doctrine-focus Traits first;
+   - then remaining assimilated Traits in saved order;
+5. never discards assimilated ownership when expression capacity is insufficient.
+
+This prevents old always-active permanent Traits from silently becoming inaccessible after migration.
+
+## 21. UI semantics
+
+Current player-facing vocabulary should prefer:
+
+- Discovered;
+- Assimilation;
+- Stabilization;
+- Assimilated;
+- Expressed;
+- Suppressed;
+- Doctrine.
+
+Avoid teaching:
+
+- permanent = always active;
+- make permanent to free a slot;
+- permanent Traits cannot be shared;
+- close NPC proximity is required to swap Traits.
+
+## 22. Universal domain boundaries
+
+Trait is not a universal replacement for all state.
+
+~~~text
+Relationship
+-> shared history and bond interpretation
+
+Relationship Memory
+-> historical evidence
+
+Knowledge
+-> who knows selected facts
+
+Trait
+-> salient internalizable pattern of being
+
+Capability
+-> what expressed Trait pattern(s) make possible
+
+Routine familiarity
+-> personal mastery evidence for delegation
+
+Faction Reputation
+-> institutional regard
+
+World State
+-> objective persistent conditions
+~~~
+
+Memory Traits and Knowledge Traits may exist without collapsing Relationship Memory or Knowledge authority.
+
+## 23. Runtime invariants
+
+1. Loading a definition is not automatically authored discovery.
+2. Discovery is not assimilation.
+3. Assimilation is not stabilization.
+4. Stabilization is not always-active expression.
+5. Assimilated ownership survives suppression.
+6. Expression owns active Player Trait effects.
+7. Expression owns current semantic Trait capabilities.
+8. Expression is freely swappable within unlocked capacity.
+9. Expression does not require source proximity.
+10. The same Trait cannot occupy multiple Player expression slots.
+11. A failed Stabilization gate spends no Essence.
+12. A successful Stabilization spends catalogue cost once.
+13. Stabilization preserves current expression.
+14. Relationship evidence qualifies relationship-mediated assimilation.
+15. Positive affection is not universally required for meaningful resonance.
+16. Non-NPC provenance does not trigger NPC Connection gates.
+17. Deferred-only legacy effects cannot stabilize.
+18. Named-runtime patterns may stabilize when their runtime authority is real.
+19. Sharing requires expression, not non-permanence.
+20. Sharing does not grant target assimilation.
+21. Doctrine requires assimilated + expressed + foregrounded components.
+22. Capability availability does not make the Player's decision.
+
+## 24. Non-goals
+
+This migration does not introduce:
+
+- continuous proximity simulation;
+- every-memory serialization;
+- every-knowledge-fact Traits;
+- a closed universal Trait taxonomy enum;
+- generic Skills;
+- generic Crafting;
+- generic inventory/equipment;
+- automatic Trait extraction;
+- arbitrary swap taxes/cooldowns;
+- automatic personality overwrite;
+- generic Trait-combination engine;
+- new Campaign One chapters.
+
+## 25. Evidence ceiling
+
+Deterministic qualification can establish the runtime contracts above.
+
+It cannot establish:
+
+- comprehension;
+- fun;
+- pacing;
+- desired expression capacity;
+- satisfying assimilation timing;
+- whether Trait hoarding feels powerful;
+- whether universal Trait breadth feels coherent to players.
+
+Those remain HUMAN-UNVALIDATED Beta questions.
