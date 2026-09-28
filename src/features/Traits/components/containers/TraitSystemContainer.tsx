@@ -7,9 +7,9 @@ import {
   selectTraitError,
 } from '../../state/TraitsSelectors';
 import {
+  selectAssimilatedTraitIds,
   selectEquippedTraits,
   selectPlayerTraitSlots,
-  selectPermanentTraits as selectPermanentTraitIds,
 } from '../../../Player/state/PlayerSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import {
@@ -42,7 +42,7 @@ const TraitSystemContainer: React.FC = React.memo(() => {
   const allTraits = useAppSelector(selectTraits);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
   const equippedTraits = useAppSelector(selectEquippedTraits);
-  const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
+  const permanentTraitIds = useAppSelector(selectAssimilatedTraitIds);
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const currentEssence = useAppSelector(selectCurrentEssence);
   const loading = useAppSelector(selectTraitLoading);
@@ -53,9 +53,16 @@ const TraitSystemContainer: React.FC = React.memo(() => {
   }, [permanentTraitIds, allTraits]);
 
   const availableTraitsForEquip = useMemo(() => {
-    const equippedIds = equippedTraits.map(t => t.id);
-    return discoveredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
-  }, [discoveredTraits, equippedTraits, permanentTraitIds]);
+    const equippedIds = new Set(equippedTraits.map(t => t.id));
+    const candidateIds = new Set([
+      ...discoveredTraits.map(trait => trait.id),
+      ...permanentTraitIds,
+    ]);
+    return Array.from(candidateIds)
+      .map(traitId => allTraits[traitId])
+      .filter((trait): trait is Trait => Boolean(trait))
+      .filter(trait => !equippedIds.has(trait.id));
+  }, [allTraits, discoveredTraits, equippedTraits, permanentTraitIds]);
 
 
   // Define action handlers
@@ -80,7 +87,7 @@ const TraitSystemContainer: React.FC = React.memo(() => {
 
   // Define utility functions to pass as props
   const canAcquireTrait = useCallback((trait: Trait) => {
-    // A trait can be "acquired" (made permanent) if it's discovered and not already permanent.
+    // Stabilization makes a discovered pattern permanently available in the assimilated library.
     const isDiscovered = discoveredTraits.some(t => t.id === trait.id);
     const isPermanent = permanentTraits.some(t => t.id === trait.id);
     return isDiscovered && !isPermanent;
