@@ -3,7 +3,7 @@ import path from 'path';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { rootReducer, replaceState } from '../../app/store';
 import { rehydratePersistedGameState } from '../../shared/persistence/PersistedGameState';
 import { setWorldStateCondition } from './state/WorldStateSlice';
@@ -190,11 +190,11 @@ describe('M24 objective world state qualification', () => {
       </Provider>
     );
     expect(screen.getByText('Too Many Uniforms for the Old Route')).toBeInTheDocument();
-    const allowedPatrolConsumer = await store.dispatch(processNPCInteractionThunk({
+    const allowedPatrolConsumer = await act(() => store.dispatch(processNPCInteractionThunk({
       npcId: SILAS_ID,
       interactionType: 'dialogue',
       context: { choiceId: PATROL_CONSUMER_ID, selectedResponse: 'acknowledge' },
-    })).unwrap();
+    })).unwrap());
     expect(allowedPatrolConsumer.success).toBe(true);
     cleanup();
 
@@ -252,11 +252,11 @@ describe('M24 objective world state qualification', () => {
       </Provider>
     );
     expect(screen.getByText('Supplies Are Moving Again')).toBeInTheDocument();
-    const allowedFreightConsumer = await store.dispatch(processNPCInteractionThunk({
+    const allowedFreightConsumer = await act(() => store.dispatch(processNPCInteractionThunk({
       npcId: VALERIUS_ID,
       interactionType: 'dialogue',
       context: { choiceId: FREIGHT_CONSUMER_ID, selectedResponse: 'acknowledge' },
-    })).unwrap();
+    })).unwrap());
     expect(allowedFreightConsumer.success).toBe(true);
   });
 
