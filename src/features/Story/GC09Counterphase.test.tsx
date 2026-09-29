@@ -364,7 +364,7 @@ describe('GC-09 Counterphase', () => {
     }));
     expect(explanation?.reasons).toEqual(expect.arrayContaining([
       'Chapter 6 committed the network to a structural posture.',
-      'Willow\'s Wisdom and Constraint Sense are both permanent capabilities.',
+      'Willow\'s Wisdom and Constraint Sense are both assimilated patterns.',
       'Archive Verification is personally mastered, so safe repetitive verification can be delegated without delegating the finale decision.',
     ]));
     expect(explanation?.reasons.join(' ')).not.toMatch(/readiness|score/i);
