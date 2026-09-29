@@ -98,7 +98,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
                             disabled={!readiness.ready}
                             startIcon={<ResonateIcon />}
                           >
-                            Resonate
+                            Stabilize
                           </Button>
                         </span>
                       </Tooltip>
