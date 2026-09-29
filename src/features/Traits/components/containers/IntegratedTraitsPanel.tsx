@@ -144,7 +144,7 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   return (
     <Panel title={panelTitle}>
       <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" sx={{ mb: 2 }}>
-        <Tab label="Equipped" />
+        <Tab label="Expressed" />
         <Tab label={ <Badge badgeContent={availableTraits.length} color="secondary">Available</Badge> } />
       </Tabs>
       <Box role="tabpanel" hidden={activeTab !== 0}>
@@ -211,14 +211,14 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
             setSelectedTrait(null);
           }}>Express Selected</Button>
         )}
-        {selectedTrait && activeTab === 0 && !assimilatedTraits.some(t => t.id === selectedTrait.id) && (
+        {selectedTrait && activeTab === 0 && expressedTraits.some(t => t.id === selectedTrait.id) && (
           <Button variant="outlined" color="secondary" onClick={() => {
-            const slotIndex = expressedTraits.findIndex(t => t.id === selectedTrait.id);
-            if (slotIndex !== -1) {
-              dispatch(unequipTrait({ slotIndex }));
+            const slot = playerSlots.find(candidate => candidate.traitId === selectedTrait.id);
+            if (slot) {
+              dispatch(suppressTrait({ slotIndex: slot.slotIndex }));
               setSelectedTrait(null);
             }
-          }}>Unequip Selected</Button>
+          }}>Suppress Selected</Button>
         )}
         <Button onClick={onClose} variant="outlined">Close</Button>
       </Stack>
