@@ -230,6 +230,11 @@ export const selectRelationshipBuildCapabilities = (
 ): RelationshipBuildCapability[] => {
   const discovered = new Set(state.traits.discoveredTraits);
   const assimilated = new Set(state.player.permanentTraits);
+  const expressed = new Set(
+    state.player.traitSlots
+      .map(slot => slot.traitId)
+      .filter((traitId): traitId is string => Boolean(traitId))
+  );
 
   return Object.values(state.traits.traits)
     .filter(trait => {
