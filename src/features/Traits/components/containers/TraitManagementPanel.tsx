@@ -121,7 +121,7 @@ const TraitManagementPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose })
                 ))}
               </Grid>
             ) : (
-              <Alert severity="info">You have no traits equipped.</Alert>
+              <Alert severity="info">You have no Traits currently expressed.</Alert>
             )}
             {permanentTraits.length > 0 && (
               <Box sx={{ mt: 3 }}>
