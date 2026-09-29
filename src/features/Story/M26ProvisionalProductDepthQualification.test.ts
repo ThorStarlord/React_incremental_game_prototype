@@ -166,7 +166,7 @@ describe('M26 provisional product-depth qualification', () => {
       'forge_assistance',
       'resonance_calibration',
     ]);
-    expect(mastered[1].sourceLabel).toBe('Completed Trait resonance yourself.');
+    expect(mastered[1].sourceLabel).toBe('Stabilized an assimilated Trait pattern yourself.');
   });
 
   test('delegation readiness remains a presentation over existing M20 eligibility', () => {
