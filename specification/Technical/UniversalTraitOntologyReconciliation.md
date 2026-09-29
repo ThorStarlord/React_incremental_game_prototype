@@ -268,6 +268,8 @@ Current policy:
 - expression/suppression is freely player-owned;
 - no NPC proximity is required;
 - no generic swap currency or cooldown is required;
+- Campaign One starts with two expression slots so the first two-Trait Doctrine is legal;
+- later Resonance levels expand capacity up to the existing maximum;
 - one Trait pattern cannot occupy multiple Player expression slots simultaneously;
 - discovered temporary patterns remain expressible under the bounded existing Campaign One rule;
 - stabilized patterns remain in the assimilated library when suppressed.
@@ -330,9 +332,9 @@ AND foregrounded
 -> Doctrine active
 ~~~
 
-Doctrine adoption may express missing assimilated components into empty unlocked expression slots.
+Doctrine adoption/switch is itself an explicit Player expression decision and atomically places the Doctrine pair into the first two unlocked slots. Replaced Traits remain assimilated.
 
-It must fail rather than silently evict unrelated expressed Traits when insufficient capacity exists.
+It fails only if the required Doctrine pair exceeds unlocked expression capacity.
 
 ## 16. Authored Quest / Dialogue / Combat compatibility
 
