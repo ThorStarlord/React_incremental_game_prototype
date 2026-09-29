@@ -33,14 +33,14 @@ export interface QuestResolutionOption {
   description: string;
   relationshipExperienceId?: string;
   /**
-   * Optional capability gate for choices that require permanently assimilated Traits.
-   * All listed Traits must exist in player.permanentTraits. Temporary/equipped Trait
-   * semantics are deliberately not implied by this field.
+   * Historical content key retained for compatibility.
+   * Current runtime meaning: every listed Trait must be currently expressed.
+   * Assimilated ownership alone is not sufficient for this capability gate.
    */
   requiredPermanentTraitIds?: string[];
   /**
    * Optional specialization gate. All listed doctrines must currently be
-   * derived as active from the player's permanent Traits + doctrine focus.
+   * derived as active from assimilated + expressed + foregrounded Traits.
    */
   requiredActiveDoctrineIds?: DoctrineId[];
   consumeItems?: QuestResolutionItemCost[];
