@@ -5,6 +5,7 @@ import {
   type PersistedGameState,
 } from '../persistence/PersistedGameState';
 import { APP_VERSION } from '../config/releaseVersion';
+import { INITIAL_TRAIT_SLOTS } from '../../constants/playerConstants';
 
 export const LEGACY_SAVE_SCHEMA_VERSION = 0;
 export const CURRENT_SAVE_SCHEMA_VERSION = 3;
@@ -257,7 +258,13 @@ const migrateV2ToV3: SaveMigrationStep = {
           typeof traitId === 'string' && traitId.length > 0
       )
     ));
-    const expressionSlots = (player.traitSlots ?? []).map(slot => ({ ...slot }));
+    const expressionSlots = (player.traitSlots ?? []).map(slot => ({
+      ...slot,
+      // v3 changes the baseline from one to two starting expression slots.
+      // Preserve later unlocks while ensuring migrated saves receive the same
+      // minimum expression capacity as a fresh v3 game.
+      isLocked: slot.slotIndex < INITIAL_TRAIT_SLOTS ? false : slot.isLocked,
+    }));
     const occupied = new Set(
       expressionSlots
         .map(slot => slot.traitId)
