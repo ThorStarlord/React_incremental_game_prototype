@@ -81,6 +81,7 @@ export interface RelationshipBuildCapability {
   compatibility: number;
   minimumCompatibility: number;
   missingMemoryTags: string[];
+  expressed: boolean;
   evidence: RelationshipCapabilityEvidence[];
 }
 
@@ -306,6 +307,7 @@ export const selectRelationshipBuildCapabilities = (
         compatibility,
         minimumCompatibility,
         missingMemoryTags,
+        expressed: expressed.has(trait.id),
         evidence,
       };
     })
