@@ -150,7 +150,7 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
                               onUnequipTrait?.(slot.slotIndex);
                             }}
                           >
-                            Unequip
+                            Suppress
                           </Button>
                         </Box>
                       </Box>
