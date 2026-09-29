@@ -16,14 +16,16 @@ export const selectDoctrineFocusTraitIds = (
 export const selectActiveDoctrineIds = createSelector(
   [
     (state: RootState) => state.player.permanentTraits,
-    (state: RootState) => state.player.traitSlots
-      .map(slot => slot.traitId)
-      .filter((traitId): traitId is string => Boolean(traitId)),
+    (state: RootState) => state.player.traitSlots,
     selectDoctrineFocusTraitIds,
   ],
-  (assimilatedTraitIds, expressedTraitIds, foregroundedTraitIds): DoctrineId[] => {
+  (assimilatedTraitIds, traitSlots, foregroundedTraitIds): DoctrineId[] => {
     const assimilated = new Set(assimilatedTraitIds);
-    const expressed = new Set(expressedTraitIds);
+    const expressed = new Set(
+      traitSlots
+        .map(slot => slot.traitId)
+        .filter((traitId): traitId is string => Boolean(traitId))
+    );
     const foregrounded = new Set(foregroundedTraitIds);
 
     return (Object.keys(DOCTRINE_DEFINITIONS) as DoctrineId[]).filter(
