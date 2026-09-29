@@ -28,7 +28,7 @@ interface PlayerTraitsUIProps {
   availableTraits: Trait[];
   allTraits: Record<string, Trait>;
   onEquipTrait?: (traitId: string, slotIndex: number) => void;
-  onSuppressTrait?: (slotIndex: number) => void;
+  onUnequipTrait?: (slotIndex: number) => void;
   onTraitSelect?: (traitId: string) => void;
   className?: string;
   isLoading?: boolean;
@@ -39,7 +39,7 @@ interface PlayerTraitsUIProps {
  * PlayerTraitsUI Component
  * 
  * Presentational component for displaying and managing player trait slots.
- * Handles trait equipping, unequipping, and slot management.
+ * Handles Trait expression, suppression, and expression-capacity presentation.
  */
 export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
   traitSlots,
@@ -172,7 +172,7 @@ export const PlayerTraitsUI: React.FC<PlayerTraitsUIProps> = React.memo(({
                             console.log('Open trait selection for slot', slot.slotIndex);
                           }}
                         >
-                          Expression Slot
+                          Choose Trait
                         </Button>
                       </Box>
                     )
