@@ -112,7 +112,7 @@ describe('post-M25 player insight projection qualification', () => {
     expect(archive?.routes.some(route => route.routeId === 'cautious_then_reopened')).toBe(false);
   });
 
-  test('relationship build hides undiscovered authored Traits and derives developing, ready, and permanent states', () => {
+  test('relationship build hides undiscovered authored Traits and derives developing, Stabilization-ready, and assimilated states', () => {
     const state = makeState();
     (state.npcs.npcs as any)[ELARA_ID] = { id: ELARA_ID, name: 'Scholar Elara' };
     (state.traits.traits as any)[INSIGHT_ID] = traits[INSIGHT_ID];
@@ -145,12 +145,13 @@ describe('post-M25 player insight projection qualification', () => {
     };
 
     capability = selectRelationshipBuildCapabilities(state)[0];
-    expect(capability.status).toBe('resonance_ready');
+    expect(capability.status).toBe('stabilization_ready');
     expect(capability.missingMemoryTags).toEqual([]);
 
     state.player.permanentTraits.push(INSIGHT_ID);
     capability = selectRelationshipBuildCapabilities(state)[0];
-    expect(capability.status).toBe('permanent');
+    expect(capability.status).toBe('assimilated');
+    expect(capability.expressed).toBe(false);
   });
 
   test('player insight implementation remains a read-only projection and is surfaced on the Dashboard', () => {
