@@ -89,12 +89,33 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
         <Card
           sx={{ minHeight: 120, cursor: isInProximityToNPC ? 'pointer' : 'not-allowed', transition: 'all 0.2s', '&:hover': { transform: isInProximityToNPC ? 'translateY(-2px)' : 'none', boxShadow: isInProximityToNPC ? 3 : 'none' }, border: 2, borderColor: 'primary.main' }}
           onClick={() => onSlotClick(slot)}
+          role="button"
+          tabIndex={isInProximityToNPC ? 0 : -1}
+          aria-disabled={!isInProximityToNPC}
+          aria-label={`Manage ${trait.name} in trait slot ${slot.slotIndex + 1}`}
+          onKeyDown={(event) => {
+            if (isInProximityToNPC && (event.key === 'Enter' || event.key === ' ')) {
+              event.preventDefault();
+              onSlotClick(slot);
+            }
+          }}
         >
           <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', flexGrow: 1 }}>{trait.name}</Typography>
               <Tooltip title="Unequip Trait">
-                <IconButton size="small" color="error" aria-label="Unequip trait" disabled={!isInProximityToNPC}><ClearIcon fontSize="small" /></IconButton>
+                <IconButton
+                  size="small"
+                  color="error"
+                  aria-label={`Unequip ${trait.name}`}
+                  disabled={!isInProximityToNPC}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onSlotClick(slot);
+                  }}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
               </Tooltip>
             </Box>
             <Chip label={trait.rarity} size="small" color={getRarityColor(trait.rarity)} sx={{ mb: 1 }} />
@@ -106,7 +127,20 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
     
     // Render an empty, clickable slot
     return (
-      <Box onClick={() => onSlotClick(slot)} sx={{ cursor: isInProximityToNPC ? 'pointer' : 'not-allowed', height: '100%' }}>
+      <Box
+        onClick={() => onSlotClick(slot)}
+        onKeyDown={(event) => {
+          if (isInProximityToNPC && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            onSlotClick(slot);
+          }
+        }}
+        role="button"
+        tabIndex={isInProximityToNPC ? 0 : -1}
+        aria-disabled={!isInProximityToNPC}
+        aria-label={`Equip a trait in slot ${slot.slotIndex + 1}`}
+        sx={{ cursor: isInProximityToNPC ? 'pointer' : 'not-allowed', height: '100%' }}
+      >
         <EmptySlotCard />
       </Box>
     );
@@ -133,7 +167,11 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
         <Typography variant="h5" component="h2">Trait Slots</Typography>
-        <Tooltip title="Equip traits to gain their effects. Click empty slots to equip, or equipped traits to unequip."><IconButton size="small"><InfoIcon fontSize="small" /></IconButton></Tooltip>
+        <Tooltip title="Equip traits to gain their effects. Click empty slots to equip, or equipped traits to unequip.">
+          <IconButton size="small" aria-label="Trait slot help">
+            <InfoIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </Box>
 
       {!isInProximityToNPC && (
