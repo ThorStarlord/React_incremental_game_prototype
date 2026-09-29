@@ -3,6 +3,8 @@
  * @description A drawer component for displaying a list of Traits with filtering and sorting.
  */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { createSelector } from '@reduxjs/toolkit';
+import type { RootState } from '../../../../app/store';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import {
   Drawer,
@@ -54,6 +56,23 @@ interface TraitCodexDrawerProps {
     focusedId?: string;
 }
 
+const selectTraitReadinessState = createSelector(
+  [
+    (state: RootState) => state.traits,
+    (state: RootState) => state.player,
+    (state: RootState) => state.essence,
+    (state: RootState) => state.npcs,
+    (state: RootState) => state.relationships,
+  ],
+  (traits, player, essence, npcs, relationships) => ({
+    traits,
+    player,
+    essence,
+    npcs,
+    relationships,
+  } as RootState)
+);
+
 type SortableTraitKey = 'name' | 'essenceCost' | 'category';
 
 interface FilterOptions {
@@ -75,7 +94,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const rootState = useAppSelector(state => state);
+  const readinessState = useAppSelector(selectTraitReadinessState);
 
   useEffect(() => {
     if (open && Object.keys(allTraits).length === 0 && !isLoading) {
@@ -124,11 +143,11 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   }, []);
 
   const handleAcquireTrait = useCallback((trait: Trait) => {
-    const readiness = evaluateTraitStabilizationReadiness(rootState, trait.id);
+    const readiness = evaluateTraitStabilizationReadiness(readinessState, trait.id);
     if (readiness.ready) {
       dispatch(stabilizeTraitWithEssenceThunk({ traitId: trait.id }));
     }
-  }, [dispatch, rootState]);
+  }, [dispatch, readinessState]);
 
   const filteredAndSortedTraits = useMemo(() => {
     let traitsArray = Object.values(allTraits); 
@@ -218,7 +237,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
         {filteredAndSortedTraits.map(trait => {
           const isDiscovered = discoveredTraitIds.includes(trait.id);
           const isPermanent = permanentTraitIds.includes(trait.id);
-          const readiness = evaluateTraitStabilizationReadiness(rootState, trait.id);
+          const readiness = evaluateTraitStabilizationReadiness(readinessState, trait.id);
           const cost = readiness.cost;
           const canBeMadePermanent = isDiscovered && !isPermanent && trait.essenceCost !== undefined;
 
