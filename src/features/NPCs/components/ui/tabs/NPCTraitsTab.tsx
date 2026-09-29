@@ -43,6 +43,7 @@ import { selectCurrentEssence } from '../../../../Essence/state/EssenceSelectors
 import { stabilizeTraitWithEssenceThunk } from '../../../../Traits/state/TraitThunks';
 import { TRAIT_RESONANCE } from '../../../../../constants/gameConstants';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
+import { summarizeTraitAuthority } from '../../../../Traits/state/TraitEffectAuthority';
 import {
   selectBondProfileByNpcId,
   selectRelationshipMemoriesByNpcId,
@@ -175,15 +176,18 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                 }
 
                 const canAfford = (trait.essenceCost || 0) <= currentEssence;
-                const sourceNpcId = trait.sourceNpc || trait.source;
+                const sourceNpcId = trait.sourceNpc ||
+                  (trait.source === npcId ? trait.source : undefined);
                 const isRelationshipMediated =
                   usesRelationshipAuthority && sourceNpcId === npcId;
 
                 const requiredConnection =
                   trait.minimumConnectionLevel ?? TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
-                const connectionOk = isRelationshipMediated
-                  ? bondProfile.connectionLevel >= requiredConnection
-                  : !sourceNpcId || (currentNPC.connectionDepth ?? 0) >= TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
+                const connectionOk = !sourceNpcId
+                  ? true
+                  : isRelationshipMediated
+                    ? bondProfile.connectionLevel >= requiredConnection
+                    : (currentNPC.connectionDepth ?? 0) >= TRAIT_RESONANCE.MIN_CONNECTION_DEPTH;
 
                 const assimilation = relationshipTraitStates[trait.id];
                 const requiredAssimilation = trait.assimilationThreshold ?? 100;
@@ -198,19 +202,31 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                     )
                   : [];
                 const memoryOk = missingMemoryTags.length === 0;
+                const prerequisiteTraits = Array.isArray(trait.requirements?.prerequisiteTraits)
+                  ? trait.requirements.prerequisiteTraits as string[]
+                  : [];
+                const missingPrerequisites = prerequisiteTraits.filter(
+                  prerequisite => !playerAssimilatedTraitIds.includes(prerequisite)
+                );
+                const prerequisitesOk = missingPrerequisites.length === 0;
+                const authorityOk = summarizeTraitAuthority(trait).hasStabilizableAuthority;
 
                 const canStabilize =
                   canAfford &&
                   connectionOk &&
                   assimilationOk &&
                   compatibilityOk &&
-                  memoryOk;
+                  memoryOk &&
+                  prerequisitesOk &&
+                  authorityOk;
 
                 const blockers = [
+                  !authorityOk ? 'No qualified live runtime effect' : null,
                   !connectionOk ? `Connection ${requiredConnection} required` : null,
                   !assimilationOk ? `Assimilation ${Math.floor(assimilation?.progress ?? 0)}% / ${requiredAssimilation}%` : null,
                   !compatibilityOk ? `Compatibility ${Math.floor(assimilation?.compatibility ?? 0)} / ${requiredCompatibility}` : null,
                   !memoryOk ? `Missing Memory evidence: ${missingMemoryTags.join(', ')}` : null,
+                  !prerequisitesOk ? `Missing assimilated prerequisite: ${missingPrerequisites.join(', ')}` : null,
                   !canAfford ? `Requires ${trait.essenceCost || 0} Essence` : null,
                 ].filter(Boolean) as string[];
 
