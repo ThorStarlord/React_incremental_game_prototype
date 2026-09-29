@@ -26,7 +26,6 @@ export type RoutineFamiliarityId = 'forge_assistance' | 'resonance_calibration' 
 export type RoutineFamiliaritySource =
   | 'city_center_forge_assistance'
   | 'trait_resonance'
-  | 'trait_stabilization'
   | 'elara_independent_verification';
 
 export interface RoutineFamiliarityRecord {
