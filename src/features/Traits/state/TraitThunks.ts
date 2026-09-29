@@ -108,7 +108,7 @@ export const stabilizeTraitWithEssenceThunk = createAsyncThunk(
       dispatch(addAssimilatedTrait(traitId));
       dispatch(markRoutineFamiliarity({
         routineId: 'resonance_calibration',
-        source: 'trait_stabilization',
+        source: 'trait_resonance',
         learnedAt: Date.now(),
       }));
 
