@@ -86,24 +86,18 @@ export const activateDoctrineThunk = createAsyncThunk<
       );
     }
 
-    const expressed = new Set(
-      state.player.traitSlots
-        .map(slot => slot.traitId)
-        .filter((traitId): traitId is string => Boolean(traitId))
-    );
-    const missingExpression = requiredTraits.filter(traitId => !expressed.has(traitId));
-    const emptySlots = state.player.traitSlots.filter(
-      slot => !slot.isLocked && slot.traitId === null
-    );
-
-    if (missingExpression.length > emptySlots.length) {
+    const unlockedSlots = state.player.traitSlots.filter(slot => !slot.isLocked);
+    if (requiredTraits.length > unlockedSlots.length) {
       return rejectWithValue(
-        'Not enough open expression slots. Suppress other Traits before adopting this doctrine.'
+        `This doctrine requires ${requiredTraits.length} expression slots, but only ${unlockedSlots.length} are unlocked.`
       );
     }
 
-    missingExpression.forEach((traitId, index) => {
-      dispatch(equipTrait({ traitId, slotIndex: emptySlots[index].slotIndex }));
+    // Adopting/switching doctrine is itself an explicit Player expression
+    // decision. Deterministically place the doctrine pair into the first
+    // unlocked slots; equipTrait handles duplicate removal and replacement.
+    requiredTraits.forEach((traitId, index) => {
+      dispatch(equipTrait({ traitId, slotIndex: unlockedSlots[index].slotIndex }));
     });
 
     state = getState();
