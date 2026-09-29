@@ -67,8 +67,9 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
       </Box>
 
       <Alert severity="info">
-        Adopting a doctrine expresses its assimilated pair when open expression slots
-        are available. Changing doctrine never removes an assimilated Trait.
+        Adopting or switching a doctrine explicitly expresses its assimilated pair
+        in the first two available expression slots. Replaced patterns stay safely
+        assimilated and can be expressed again at any time.
       </Alert>
 
       <Box data-test-id="active-doctrine-summary">
