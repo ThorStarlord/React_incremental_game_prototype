@@ -355,7 +355,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
         <DialogTitle>Confirm Trait Stabilization</DialogTitle>
         <DialogContent>
           <Typography>
-            Spend {selectedTraitForDialog?.essenceCost || 0} Essence to stabilize the already-assimilated pattern "{selectedTraitForDialog?.name}" for permanent availability?
+            Spend {selectedTraitForDialog?.essenceCost || 0} Essence to Stabilize the sufficiently assimilated pattern "{selectedTraitForDialog?.name}" for permanent availability?
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
             Essence is the final stabilization cost; it does not replace the relationship, Memory, and assimilation evidence shown in the Trait card.
