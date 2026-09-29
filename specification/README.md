@@ -36,7 +36,7 @@ Authority is scope-sensitive. Older detailed prose does not override the current
 
 - [`GameCompletionDefinition.md`](GameCompletionDefinition.md) — **CURRENT AUTHORITY** for what Campaign One / 1.0 is, what counts as complete, and when to stop adding 1.0 scope.
 
-The current target is a bounded isolated-planet Campaign One where consequential relationships teach durable capabilities, remembered history explains later possibilities, and understood repetition becomes deliberately delegatable.
+The current target is a bounded isolated-planet Campaign One where meaningful relationships and encounters make salient Trait patterns legible, the protagonist assimilates and selectively expresses those patterns, remembered history explains later possibilities, and understood repetition becomes deliberately delegatable.
 
 ### Feature scope
 
@@ -45,7 +45,7 @@ The current target is a bounded isolated-planet Campaign One where consequential
 Important consequences:
 
 ```text
-Traits                         -> capability/skill authority for 1.0
+Universal Traits / expression  -> pattern substrate and build authority for 1.0
 separate generic Skills        -> CUT
 Generic Crafting               -> CUT for Campaign One
 General Inventory/Equipment    -> DEFER_POST_1_0 unless campaign evidence promotes it
@@ -145,7 +145,7 @@ npm run content-alpha:validate
 
 - [`Technical/PostM25ProvisionalGovernanceDecision.md`](Technical/PostM25ProvisionalGovernanceDecision.md) — current bounded governance exception permitting reversible human-unvalidated product development while preserving the human-evidence ceiling.
 - [`Technical/PostM25ProvisionalProductDirectionDecision.md`](Technical/PostM25ProvisionalProductDirectionDecision.md) — provisional hierarchy:
-  1. relationship-derived capability buildcraft;
+  1. relationship-mediated universal Trait assimilation and expression buildcraft;
   2. causal legibility;
   3. earned delegation / mastery compression;
   4. heterogeneous authored composition.
@@ -178,15 +178,17 @@ Use current Relationship contracts/results under [`Technical/`](Technical/) and 
 
 ### Trait / capability authority
 
-- [`Features/TraitIdentity.md`](Features/TraitIdentity.md) — **CURRENT DESIGN AUTHORITY** for the creative/authoring identity of Traits as internalized protagonist transformations, including the 27-Trait breadth classification and future authoring tests.
+- [`Features/TraitIdentity.md`](Features/TraitIdentity.md) — **CURRENT DESIGN AUTHORITY** for Traits as selectively represented universal patterns of being, including nature/provenance, Resonance, Assimilation, Stabilization, expression, domain boundaries, and catalogue breadth.
 
 The governing separation remains:
 
 ```text
-Relationship -> qualifies learning / explains provenance
-Trait        -> owns durable capability
-Gameplay     -> determines local applicability
-Player       -> chooses whether to use it
+Relationship / source evidence -> qualifies acquisition and explains provenance
+Trait library                  -> owns durable assimilated patterns
+Expression                     -> determines which patterns are manifested now
+Capability                     -> follows from expressed Trait pattern(s)
+Gameplay                       -> determines local applicability
+Player                         -> chooses whether to use the capability
 ```
 
 Current relevant records include:
@@ -197,7 +199,7 @@ Current relevant records include:
 - [`Technical/PostM25PlayerInsightProjection.md`](Technical/PostM25PlayerInsightProjection.md) — read-only build/provenance projections;
 - [`Technical/M26ProvisionalProductDepthResult.md`](Technical/M26ProvisionalProductDepthResult.md) — player-visible qualifying-Memory provenance.
 
-The 1.0 completion floor is four durable relationship-derived capability identities across at least three anchor relationships, at least two with meaningful cross-domain use, and at least two viable late-game build profiles.
+The 1.0 completion floor remains four relationship-derived assimilated Trait identities across at least three anchor relationships, at least two with meaningful cross-domain capability use, and at least two viable late-game expression/Doctrine profiles. Existing catalogue entries provide bounded non-cognitive ontology proof without requiring catalogue expansion.
 
 ## Current causal-state separation
 
@@ -207,7 +209,7 @@ WORLD STATE              -> persistent objective regional conditions
 KNOWLEDGE                -> who knows selected facts
 RELATIONSHIP             -> what shared history means personally
 FACTION REPUTATION       -> how institutions regard the player
-TRAIT                    -> durable learned capability
+TRAIT                    -> salient internalized pattern; assimilated ownership + current expression
 COPY                     -> bounded execution of understood routine
 CHAPTER PROJECTION       -> read-only composition of existing authorities
 ```
