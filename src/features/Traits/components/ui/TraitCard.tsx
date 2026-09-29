@@ -41,7 +41,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
   isPermanent = false, // ADDED default value
   showUnequipButton = false,
   canUnequip = true,
-  unequipButtonText = "Unequip",
+  unequipButtonText = "Suppress",
   unequipButtonColor = "secondary",
   showMakePermanentButton = false,
   currentEssence,
