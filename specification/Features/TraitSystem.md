@@ -275,6 +275,8 @@ Current policy:
 - no generic swap cost;
 - no generic swap cooldown;
 - no source NPC presence requirement;
+- the Player begins with two unlocked expression slots so the two-Trait Doctrine model is legal from its first authored use;
+- later Resonance levels expand expression capacity up to the existing maximum;
 - locked slots still bound expression capacity;
 - one Trait cannot occupy multiple Player expression slots simultaneously.
 
@@ -407,9 +409,9 @@ assimilated
 + foregrounded
 ~~~
 
-Doctrine adoption may express missing assimilated components into open unlocked expression slots.
+Doctrine adoption/switch is an explicit Player expression action. It places the Doctrine's pair into the first two unlocked expression slots, replacing current expression there if necessary while preserving assimilated ownership of replaced Traits.
 
-It fails instead of silently evicting unrelated expressed Traits when capacity is insufficient.
+It fails only when the Doctrine requires more expression slots than are unlocked.
 
 ## 19. Campaign One relationship examples
 
