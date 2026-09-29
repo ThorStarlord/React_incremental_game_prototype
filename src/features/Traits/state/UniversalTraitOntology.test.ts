@@ -82,20 +82,28 @@ describe('Universal Trait ontology', () => {
       name: 'Second Universal Pattern',
       effects: { defense: 2 },
     };
+    const third: Trait = {
+      ...ATTACK_TRAIT,
+      id: 'ThirdUniversalPattern',
+      name: 'Third Universal Pattern',
+      effects: { speed: 1 },
+    };
     store.dispatch(loadTraits({
       [ATTACK_TRAIT.id]: ATTACK_TRAIT,
       [second.id]: second,
+      [third.id]: third,
     }));
 
-    // New Game begins with one unlocked expression slot.
+    // New Game begins with two unlocked expression slots.
     store.dispatch(addAssimilatedTrait(ATTACK_TRAIT.id));
     store.dispatch(addAssimilatedTrait(second.id));
+    store.dispatch(addAssimilatedTrait(third.id));
 
     expect(store.getState().player.permanentTraits).toEqual(
-      expect.arrayContaining([ATTACK_TRAIT.id, second.id])
+      expect.arrayContaining([ATTACK_TRAIT.id, second.id, third.id])
     );
     expect(
-      store.getState().player.traitSlots.filter(slot => slot.traitId === second.id)
+      store.getState().player.traitSlots.filter(slot => slot.traitId === third.id)
     ).toHaveLength(0);
   });
 
