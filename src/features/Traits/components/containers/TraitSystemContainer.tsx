@@ -8,16 +8,16 @@ import {
 } from '../../state/TraitsSelectors';
 import {
   selectAssimilatedTraitIds,
-  selectEquippedTraits,
+  selectExpressedTraits,
   selectPlayerTraitSlots,
 } from '../../../Player/state/PlayerSelectors';
 import { selectCurrentEssence } from '../../../Essence/state/EssenceSelectors';
 import {
   fetchTraitsThunk,
-  acquireTraitWithEssenceThunk,
+  stabilizeTraitWithEssenceThunk,
   discoverTraitThunk,
 } from '../../state/TraitThunks';
-import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
+import { expressTrait, suppressTrait } from '../../../Player/state/PlayerSlice';
 import type { Trait } from '../../state/TraitsTypes';
 import TraitSystemErrorBoundary from './TraitSystemErrorBoundary';
 import TraitSystemTabs from '../ui/TraitSystemTabs';
@@ -41,43 +41,43 @@ const TraitSystemContainer: React.FC = React.memo(() => {
   // Select all necessary data from the Redux store
   const allTraits = useAppSelector(selectTraits);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
-  const equippedTraits = useAppSelector(selectEquippedTraits);
-  const permanentTraitIds = useAppSelector(selectAssimilatedTraitIds);
+  const expressedTraits = useAppSelector(selectExpressedTraits);
+  const assimilatedTraitIds = useAppSelector(selectAssimilatedTraitIds);
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const currentEssence = useAppSelector(selectCurrentEssence);
   const loading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
 
-  const permanentTraits = useMemo(() => {
-    return permanentTraitIds.map(id => allTraits[id]).filter(Boolean) as Trait[];
-  }, [permanentTraitIds, allTraits]);
+  const assimilatedTraits = useMemo(() => {
+    return assimilatedTraitIds.map(id => allTraits[id]).filter(Boolean) as Trait[];
+  }, [assimilatedTraitIds, allTraits]);
 
   const availableTraitsForEquip = useMemo(() => {
-    const equippedIds = new Set(equippedTraits.map(t => t.id));
+    const expressedIds = new Set(expressedTraits.map(t => t.id));
     const candidateIds = new Set([
       ...discoveredTraits.map(trait => trait.id),
-      ...permanentTraitIds,
+      ...assimilatedTraitIds,
     ]);
     return Array.from(candidateIds)
       .map(traitId => allTraits[traitId])
       .filter((trait): trait is Trait => Boolean(trait))
-      .filter(trait => !equippedIds.has(trait.id));
-  }, [allTraits, discoveredTraits, equippedTraits, permanentTraitIds]);
+      .filter(trait => !expressedIds.has(trait.id));
+  }, [allTraits, discoveredTraits, expressedTraits, assimilatedTraitIds]);
 
 
   // Define action handlers
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
-    dispatch(equipTrait({ traitId, slotIndex }));
+    dispatch(expressTrait({ traitId, slotIndex }));
   }, [dispatch]);
 
   const handleUnequipTrait = useCallback((slotIndex: number) => {
-    dispatch(unequipTrait({ slotIndex }));
+    dispatch(suppressTrait({ slotIndex }));
   }, [dispatch]);
 
   const handleAcquireTrait = useCallback((traitId: string) => {
     const trait = allTraits[traitId];
     if (trait) {
-      dispatch(acquireTraitWithEssenceThunk({ traitId, essenceCost: trait.essenceCost || 0 }));
+      dispatch(stabilizeTraitWithEssenceThunk({ traitId }));
     }
   }, [dispatch, allTraits]);
 
@@ -89,9 +89,9 @@ const TraitSystemContainer: React.FC = React.memo(() => {
   const canAcquireTrait = useCallback((trait: Trait) => {
     // Stabilization makes a discovered pattern permanently available in the assimilated library.
     const isDiscovered = discoveredTraits.some(t => t.id === trait.id);
-    const isPermanent = permanentTraits.some(t => t.id === trait.id);
-    return isDiscovered && !isPermanent;
-  }, [discoveredTraits, permanentTraits]);
+    const isAssimilated = assimilatedTraits.some(t => t.id === trait.id);
+    return isDiscovered && !isAssimilated;
+  }, [discoveredTraits, assimilatedTraits]);
 
   const getTraitAffordability = useCallback((trait: Trait) => {
     const cost = trait.essenceCost || 0;
@@ -108,13 +108,13 @@ const TraitSystemContainer: React.FC = React.memo(() => {
   const traitSystemProps = {
     allTraits,
     traitSlots,
-    equippedTraits,
-    permanentTraits,
+    // TraitSystemTabs retains compatibility prop names at its presentational boundary.
+    equippedTraits: expressedTraits,
+    permanentTraits: assimilatedTraits,
     acquiredTraits: discoveredTraits, // Pass discovered traits as the base for "acquired" logic
     discoveredTraits,
     availableTraitsForEquip,
     currentEssence,
-    isInProximityToNPC: true, // Assuming default proximity or get from meta state
     loading,
     error,
     onEquipTrait: handleEquipTrait,
