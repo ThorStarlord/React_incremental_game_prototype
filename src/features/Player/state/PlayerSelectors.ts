@@ -92,7 +92,10 @@ export const selectPlayerTraitInfo = createSelector(
     availableSlots,
     usedSlots,
     maxSlots,
-    totalTraits: equippedTraits.length + permanentTraits.length
+    totalTraits: new Set([
+      ...permanentTraits,
+      ...equippedTraits.map(trait => trait.id),
+    ]).size
   })
 );
 
