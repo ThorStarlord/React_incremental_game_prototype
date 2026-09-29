@@ -229,6 +229,14 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                         size="small"
                         color={capabilityColor(capability.status)}
                       />
+                      {capability.status === 'permanent' && (
+                        <Chip
+                          label={capability.expressed ? 'Expressed' : 'Suppressed'}
+                          size="small"
+                          variant="outlined"
+                          color={capability.expressed ? 'primary' : 'default'}
+                        />
+                      )}
                     </Stack>
                     <Typography variant="caption" color="text.secondary" display="block">
                       Assimilated from {capability.sourceNpcName} · Connection {capability.connectionLevel}/{capability.requiredConnectionLevel}
