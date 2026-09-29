@@ -85,9 +85,10 @@ describe('M10 save schema migration pipeline', () => {
 
   test('schema-v2 saves retain assimilated ownership and deterministically express focus-first patterns', () => {
     const state = JSON.parse(JSON.stringify(createPersistedGameState(makeState()))) as any;
-    state.player.resonanceLevel = 3;
+    state.player.resonanceLevel = 0;
     state.player.traitSlots.forEach((slot: any, index: number) => {
-      slot.isLocked = index >= 3;
+      // Historical v2 baseline: only slot 0 started unlocked.
+      slot.isLocked = index >= 1;
       slot.traitId = null;
     });
     state.player.permanentTraits = [
@@ -117,7 +118,7 @@ describe('M10 save schema migration pipeline', () => {
       result.envelope.state.player.traitSlots
         .filter(slot => !slot.isLocked)
         .map(slot => slot.traitId)
-    ).toEqual(['WillowsWisdom', 'ConstraintSense', 'ScholarlyInsight']);
+    ).toEqual(['WillowsWisdom', 'ConstraintSense']);
     expect(result.envelope.state.player.permanentTraits).toContain(
       'AdversarialCalibration'
     );
