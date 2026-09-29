@@ -107,6 +107,7 @@ To avoid destructive save/state churn, several historical identifiers remain.
 | requiredPermanentTraitIds | Authored compatibility key; current runtime consumes it against expressed Trait IDs |
 | acquireTraitWithEssenceThunk | Compatibility alias for Stabilization thunk |
 | resonanceExperienceId | Authored final relationship Stabilization beat |
+| trait_resonance routine-familiarity source | Compatibility key meaning the protagonist personally completed Trait Stabilization |
 | TraitResonanceReadiness | Compatibility type/name for current Stabilization readiness |
 
 Compatibility naming must not be used to infer old semantics.
