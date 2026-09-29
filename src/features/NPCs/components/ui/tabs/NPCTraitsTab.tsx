@@ -285,7 +285,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                 );
               }) : (
                 <Typography variant="body2" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
-                  You have resonated with all of {currentNPC.name}'s available traits.
+                  All currently available Trait patterns from {currentNPC.name} are already assimilated.
                 </Typography>
               )}
             </List>
@@ -299,7 +299,7 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
               Shared Trait Slots
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Share your equipped traits to empower {currentNPC.name}. Unlock more slots by increasing your relationship.
+              Project your currently expressed Traits to empower {currentNPC.name}. Unlock more target slots by increasing your relationship.
             </Typography>
             <Grid container spacing={2}>
               {currentNPC.sharedTraitSlots?.map(slot => (
@@ -336,10 +336,10 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
       </Grid>
 
       <Dialog open={stabilizeDialogOpen} onClose={() => setStabilizeDialogOpen(false)}>
-        <DialogTitle>Confirm Trait Resonance</DialogTitle>
+        <DialogTitle>Confirm Trait Stabilization</DialogTitle>
         <DialogContent>
           <Typography>
-            Spend {selectedTraitForDialog?.essenceCost || 0} Essence to stabilize the already-assimilated pattern "{selectedTraitForDialog?.name}" as a permanent Trait?
+            Spend {selectedTraitForDialog?.essenceCost || 0} Essence to stabilize the already-assimilated pattern "{selectedTraitForDialog?.name}" for permanent availability?
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
             Essence is the final stabilization cost; it does not replace the relationship, Memory, and assimilation evidence shown in the Trait card.
@@ -347,14 +347,14 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setStabilizeDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleConfirmStabilization} variant="contained" color="primary">Confirm & Resonate</Button>
+          <Button onClick={handleConfirmStabilization} variant="contained" color="primary">Confirm Stabilization</Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={shareDialogOpen} onClose={() => setShareDialogOpen(false)}>
         <DialogTitle>Share a Trait</DialogTitle>
         <DialogContent>
-          <Typography sx={{ mb: 2 }}>Select a trait to share with {currentNPC.name}.</Typography>
+          <Typography sx={{ mb: 2 }}>Select a currently expressed Trait to share with {currentNPC.name}.</Typography>
           <List>
             {shareablePlayerTraits.length > 0 ? shareablePlayerTraits.map(trait => (
               <ListItem key={trait.id} disablePadding>
