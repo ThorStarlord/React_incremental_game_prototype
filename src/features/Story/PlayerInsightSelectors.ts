@@ -124,8 +124,6 @@ const routineSourceLabel = (
     case 'city_center_forge_assistance':
       return 'Practiced Forge Assistance yourself in the City Center.';
     case 'trait_resonance':
-      return 'Completed historical Trait resonance yourself.';
-    case 'trait_stabilization':
       return 'Stabilized an assimilated Trait pattern yourself.';
     case 'elara_independent_verification':
       return 'Completed Elara\'s independent archive verification yourself.';
