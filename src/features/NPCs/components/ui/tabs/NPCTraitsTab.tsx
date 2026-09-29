@@ -202,8 +202,9 @@ const NPCTraitsTab: React.FC<NPCTraitsTabProps> = ({ npcId }) => {
                     )
                   : [];
                 const memoryOk = missingMemoryTags.length === 0;
-                const prerequisiteTraits = Array.isArray(trait.requirements?.prerequisiteTraits)
-                  ? trait.requirements.prerequisiteTraits as string[]
+                const prerequisiteRequirement = trait.requirements?.prerequisiteTraits;
+                const prerequisiteTraits = Array.isArray(prerequisiteRequirement)
+                  ? prerequisiteRequirement as string[]
                   : [];
                 const missingPrerequisites = prerequisiteTraits.filter(
                   prerequisite => !playerAssimilatedTraitIds.includes(prerequisite)
