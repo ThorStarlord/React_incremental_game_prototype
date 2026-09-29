@@ -156,7 +156,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
       if (filterState.traitStatusFilter === 'permanent' && !isPermanent) return false;
       if (filterState.traitStatusFilter === 'available' && (isPermanent || !isDiscovered)) return false; 
       
-      // "Acquired" is now "Discovered but not permanent"
+      // Compatibility filter: acquired means discovered but not yet assimilated
       if (filterState.traitStatusFilter === 'acquired' && (!isDiscovered || isPermanent)) return false;
 
 
@@ -300,7 +300,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               onChange={(e) => setFilter('traitStatusFilter', e.target.value)}
             >
               <MenuItem value="all">All Statuses</MenuItem>
-              <MenuItem value="available">Discovered (Not Assimilated)</MenuItem>
+              <MenuItem value="available">Stabilization Candidate</MenuItem>
               <MenuItem value="permanent">Assimilated</MenuItem>
             </Select>
           </FormControl>
