@@ -27,12 +27,12 @@ import {
   selectDiscoveredTraitObjects
 } from '../../state/TraitsSelectors';
 import {
-  selectPermanentTraits as selectPermanentTraitIds, // Renamed to clarify it returns IDs
+  selectAssimilatedTraitIds,
   selectPlayerTraitSlots,
-  selectEquippedTraits
+  selectExpressedTraits
 } from '../../../Player/state/PlayerSelectors';
 // FIXED: Importing actions from the correct slice (PlayerSlice)
-import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
+import { expressTrait, suppressTrait } from '../../../Player/state/PlayerSlice';
 import { Trait } from '../../state/TraitsTypes';
 import { fetchTraitsThunk } from '../../state/TraitThunks';
 import AvailableTraitList from './AvailableTraitList';
@@ -43,8 +43,8 @@ interface IntegratedTraitsPanelProps {
 
 interface TraitItemProps {
   trait: Trait;
-  isEquipped?: boolean;
-  isPermanent?: boolean;
+  isExpressed?: boolean;
+  isAssimilated?: boolean;
 }
 
 const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }) => {
@@ -57,24 +57,30 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
 
-  const equippedTraits = useAppSelector(selectEquippedTraits);
-  const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
+  const expressedTraits = useAppSelector(selectExpressedTraits);
+  const assimilatedTraitIds = useAppSelector(selectAssimilatedTraitIds);
   const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const playerSlots = useAppSelector(selectPlayerTraitSlots);
 
-  // Get full trait objects for permanent traits
-  const permanentTraits = React.useMemo(() => {
-    return permanentTraitIds.map(id => allTraitsData[id]).filter(Boolean) as Trait[];
-  }, [permanentTraitIds, allTraitsData]);
+  // Resolve full objects for the assimilated library
+  const assimilatedTraits = React.useMemo(() => {
+    return assimilatedTraitIds.map(id => allTraitsData[id]).filter(Boolean) as Trait[];
+  }, [assimilatedTraitIds, allTraitsData]);
   
-  // Get traits available for equipping (known but not equipped or permanent)
   const availableTraits = React.useMemo(() => {
-    const equippedIds = equippedTraits.map(t => t.id);
-    return acquiredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
-  }, [acquiredTraits, equippedTraits, permanentTraitIds]);
+    const expressedIds = new Set(expressedTraits.map(t => t.id));
+    const candidateIds = new Set([
+      ...acquiredTraits.map(trait => trait.id),
+      ...assimilatedTraitIds,
+    ]);
+    return Array.from(candidateIds)
+      .map(traitId => allTraitsData[traitId])
+      .filter((trait): trait is Trait => Boolean(trait))
+      .filter(trait => !expressedIds.has(trait.id));
+  }, [acquiredTraits, assimilatedTraitIds, allTraitsData, expressedTraits]);
 
   const unlockedSlotCount = playerSlots.filter(s => !s.isLocked).length;
-  const usedSlots = equippedTraits.length;
+  const usedSlots = expressedTraits.length;
 
   useEffect(() => {
     if (Object.keys(allTraitsData).length === 0 && !isLoading) {
@@ -87,7 +93,7 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
     setSelectedTrait(null);
   };
 
-  const TraitItem: React.FC<TraitItemProps> = ({ trait, isEquipped = false, isPermanent = false }) => (
+  const TraitItem: React.FC<TraitItemProps> = ({ trait, isExpressed = false, isAssimilated = false }) => (
     <Paper
       elevation={1}
       sx={{
@@ -95,7 +101,7 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
         cursor: 'pointer',
         border: selectedTrait?.id === trait.id ? '2px solid' : '1px solid',
         borderColor: selectedTrait?.id === trait.id ? 'primary.main' : 'divider',
-        bgcolor: isPermanent ? 'rgba(76, 175, 80, 0.08)' : 'background.paper'
+        bgcolor: isAssimilated ? 'rgba(76, 175, 80, 0.08)' : 'background.paper'
       }}
       onClick={() => setSelectedTrait(trait)}
     >
@@ -103,8 +109,8 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
         {trait.description?.substring(0, 60)}{trait.description?.length > 60 ? '...' : ''}
       </Typography>
-      {isEquipped && (<Chip label="Equipped" color="primary" size="small" sx={{ mr: 1 }} />)}
-      {isPermanent && (<Chip label="Permanent" color="success" size="small" />)}
+      {isExpressed && (<Chip label="Expressed" color="primary" size="small" sx={{ mr: 1 }} />)}
+      {isAssimilated && (<Chip label="Assimilated" color="success" size="small" />)}
     </Paper>
   );
 
@@ -144,24 +150,24 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
       <Box role="tabpanel" hidden={activeTab !== 0}>
         {activeTab === 0 && (
           <>
-            {equippedTraits.length > 0 ? (
+            {expressedTraits.length > 0 ? (
               <Grid container spacing={2}>
-                {equippedTraits.map(trait => (
+                {expressedTraits.map(trait => (
                   <Grid item xs={12} sm={6} md={4} key={trait.id}>
-                    <TraitItem trait={trait} isEquipped={true} />
+                    <TraitItem trait={trait} isExpressed={true} />
                   </Grid>
                 ))}
               </Grid>
             ) : (
-              <Alert severity="info">You have no traits equipped.</Alert>
+              <Alert severity="info">You have no Traits currently expressed.</Alert>
             )}
-            {permanentTraits.length > 0 && (
+            {assimilatedTraits.length > 0 && (
               <Box sx={{ mt: 3 }}>
-                <Divider sx={{ my: 2 }}><Chip label="Permanent Traits" /></Divider>
+                <Divider sx={{ my: 2 }}><Chip label="Assimilated Library" /></Divider>
                 <Grid container spacing={2}>
-                  {permanentTraits.map(trait => (
+                  {assimilatedTraits.map(trait => (
                     <Grid item xs={12} sm={6} md={4} key={trait.id}>
-                      <TraitItem trait={trait} isPermanent={true} />
+                      <TraitItem trait={trait} isAssimilated={true} />
                     </Grid>
                   ))}
                 </Grid>
@@ -201,13 +207,13 @@ const IntegratedTraitsPanel: React.FC<IntegratedTraitsPanelProps> = ({ onClose }
       <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'flex-end' }}>
         {selectedTrait && activeTab === 1 && usedSlots < unlockedSlotCount && (
           <Button variant="contained" color="primary" onClick={() => {
-            dispatch(equipTrait({ traitId: selectedTrait.id, slotIndex: -1 }));
+            dispatch(expressTrait({ traitId: selectedTrait.id, slotIndex: -1 }));
             setSelectedTrait(null);
-          }}>Equip Selected</Button>
+          }}>Express Selected</Button>
         )}
-        {selectedTrait && activeTab === 0 && !permanentTraits.some(t => t.id === selectedTrait.id) && (
+        {selectedTrait && activeTab === 0 && !assimilatedTraits.some(t => t.id === selectedTrait.id) && (
           <Button variant="outlined" color="secondary" onClick={() => {
-            const slotIndex = equippedTraits.findIndex(t => t.id === selectedTrait.id);
+            const slotIndex = expressedTraits.findIndex(t => t.id === selectedTrait.id);
             if (slotIndex !== -1) {
               dispatch(unequipTrait({ slotIndex }));
               setSelectedTrait(null);
