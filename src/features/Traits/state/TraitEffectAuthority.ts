@@ -59,6 +59,9 @@ export interface TraitAuthoritySummary {
   hasDirectPlayerStatAuthority: boolean;
   hasNamedRuntimeAuthority: boolean;
   hasSemanticCapabilityAuthority: boolean;
+  /** Any live runtime/capability authority is enough for durable assimilation. */
+  hasStabilizableAuthority: boolean;
+  /** @deprecated Compatibility alias for hasStabilizableAuthority. */
   hasPermanentPlayerAuthority: boolean;
   isDeferredOnly: boolean;
 }
@@ -71,18 +74,22 @@ export const summarizeTraitAuthority = (trait: Trait): TraitAuthoritySummary => 
   const hasNamedRuntimeAuthority = authorities.includes('named_runtime');
   const hasSemanticCapabilityAuthority = authorities.includes('semantic_capability');
 
+  const hasStabilizableAuthority =
+    hasDirectPlayerStatAuthority ||
+    hasNamedRuntimeAuthority ||
+    hasSemanticCapabilityAuthority;
+
   return {
     effectNames,
     authorities,
     hasDirectPlayerStatAuthority,
     hasNamedRuntimeAuthority,
     hasSemanticCapabilityAuthority,
-    // Permanent Player Resonance must create either an always-active Player stat
-    // effect or a durable semantic capability. A runtime effect that only matters
-    // while shared/inherited elsewhere is not enough to justify spending Essence
-    // to make the Player Trait permanent.
-    hasPermanentPlayerAuthority:
-      hasDirectPlayerStatAuthority || hasSemanticCapabilityAuthority,
+    // Under the universal Trait ontology, stabilization means durable ownership
+    // of a real pattern. The pattern does not have to be an always-active Player
+    // stat: a live named runtime use (for example Copy sharing) is sufficient.
+    hasStabilizableAuthority,
+    hasPermanentPlayerAuthority: hasStabilizableAuthority,
     isDeferredOnly:
       effectNames.length === 0 ||
       authorities.every(authority => authority === 'deferred_legacy'),

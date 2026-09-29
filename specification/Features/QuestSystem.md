@@ -1,6 +1,6 @@
 # Quest System Specification
 
-**Implementation Status:** ✅ Expanded foundation + authored resolution choices + permanent-Trait and active-doctrine resolution gates + M23 faction-tagged reputation routing  
+**Implementation Status:** ✅ Expanded foundation + authored resolution choices + expressed-Trait and active-Doctrine resolution gates + M23 faction-tagged reputation routing  
 **Relationship migration:** ✅ Ancient Seed uses M4 resolution semantics; M16 qualifies Trait-driven authored resolutions.  
 **Faction integration:** ✅ M23 qualifies faction-tagged `REPUTATION` rewards as institutional standing rather than giver-NPC Affinity.
 
@@ -37,8 +37,8 @@ Implemented:
 - return-to-giver turn-in checks;
 - repeatable/radiant quest foundation;
 - authored pre-turn-in resolution choices;
-- generic permanent-Trait requirements on authored resolution choices;
-- bounded active-doctrine requirements for choices that depend on the player's current learned-capability specialization.
+- generic expressed-Trait requirements through the historical `requiredPermanentTraitIds` content key;
+- bounded active-Doctrine requirements for choices that depend on current Trait synthesis.
 
 ## 3. Quest states
 
@@ -81,7 +81,7 @@ interface QuestResolutionOption {
 
 This is intentionally generic. The Quest system does not contain an `if Ancient Seed`, `if Willow`, `if Elara`, or `if M16` branch.
 
-### Permanent-Trait availability
+### Expressed-Trait availability
 
 M16 introduced and qualified the bounded contract:
 
@@ -89,13 +89,17 @@ M16 introduced and qualified the bounded contract:
 requiredPermanentTraitIds
 ```
 
-Semantics:
+Current semantics:
 
-- every listed Trait id must exist in `player.permanentTraits`;
+- `requiredPermanentTraitIds` is a historical compatibility key; every listed Trait must be **currently expressed**;
+- assimilated ownership alone is insufficient;
+- temporarily expressed discovered Traits may satisfy an ordinary expressed-Trait gate where the authored content allows that pattern to be expressed;
 - absent/empty requirements preserve prior resolution behavior;
 - one shared pure availability check is used by both presentation and authoritative resolution processing;
-- UI hiding is not the correctness boundary: direct thunk invocation without the required permanent Trait is rejected;
+- UI hiding is not the correctness boundary: direct thunk invocation without the required expressed Trait is rejected;
 - rejection occurs before Relationship evidence, item consumption, rewards, or resolution lock.
+
+M16 historically qualified permanent ownership as the gate. The owner-directed universal Trait migration intentionally supersedes that current runtime semantic while preserving the content field name and M16 historical evidence.
 
 ### Active-doctrine availability
 
@@ -107,15 +111,15 @@ requiredActiveDoctrineIds
 
 Semantics:
 
-- every listed doctrine must be derived as active from permanent Trait ownership plus `player.doctrineFocus`;
-- learned Traits alone are insufficient for an active-doctrine-gated resolution;
+- every listed Doctrine must be derived as active from assimilated + expressed + foregrounded component Traits;
+- assimilated Traits alone are insufficient for an active-Doctrine-gated resolution;
 - presentation and `resolveQuestOutcomeThunk` consume the same derived doctrine authority;
 - available doctrine-gated options explain the active doctrine without exposing unavailable future doctrine requirements;
-- GC06 is the first production campaign decision converted to this stronger specialization semantic; later campaign pair routes remain on their existing permanent-Trait gates until separate product evidence warrants conversion.
+- GC06 is the first production campaign decision using this stronger synthesis semantic; individual component-Trait gates elsewhere remain expressed-Trait gates unless Doctrine is explicitly authored.
 
 These bounded requirement contracts intentionally do **not** define:
 
-- temporary/equipped-Trait gameplay authority;
+- partial-strength expression based on assimilation percentage;
 - OR/NOT Trait expressions;
 - stat/skill checks;
 - a generalized ability-condition DSL.
@@ -128,8 +132,8 @@ These bounded requirement contracts intentionally do **not** define:
 2. objectives are complete;
 3. no mutually exclusive resolution was already selected;
 4. resolution id is valid;
-5. required permanent Traits are owned;
-6. required active doctrines are currently derived;
+5. required Trait patterns are currently expressed;
+6. required active Doctrines are currently derived;
 7. required items exist;
 8. referenced Relationship Experience validates/records;
 9. items are consumed;
@@ -219,14 +223,14 @@ M16 qualifies two independent production probes using the same generic quest-res
 
 ### The Withering Grove
 
-Without permanent `WillowsWisdom`:
+Without expressed `WillowsWisdom`:
 
 - **Remove the Corrupted Roots** remains a valid completion route;
 - **Restore the Underlying Flow** is unavailable;
 - a direct attempt to invoke the Wisdom-only resolution is rejected;
 - the ordinary route records `willow_exp_grove_saved_by_cutting`.
 
-With permanent `WillowsWisdom`:
+With expressed `WillowsWisdom`:
 
 - both routes are available;
 - the player still chooses whether to use the capability;
@@ -234,12 +238,12 @@ With permanent `WillowsWisdom`:
 
 ### The Impossible Inventory
 
-Without permanent `ScholarlyInsight`:
+Without expressed `ScholarlyInsight`:
 
 - **Accept the Most Plausible Inventory** remains valid;
 - **Reopen the Model Around the Contradiction** is unavailable.
 
-With permanent `ScholarlyInsight`:
+With expressed `ScholarlyInsight`:
 
 - the alternate route becomes available;
 - the production path records `elara_exp_insight_reopens_inventory`.
@@ -249,11 +253,12 @@ These two independent probes justified exactly one bounded generic addition: `re
 The authority boundary is:
 
 ```text
-Relationship -> qualifies learning
-Trait        -> owns durable capability
-Quest        -> decides local applicability
-Player       -> chooses the resolution
-Relationship -> interprets the consequence
+Relationship / source evidence -> qualifies acquisition and provenance
+Trait library                  -> owns durable assimilated pattern
+Expression                     -> makes the pattern currently manifest
+Quest                          -> decides local applicability
+Player                         -> chooses the resolution
+Relationship                   -> interprets the consequence
 ```
 
 See `../Technical/PostM16TraitGameplayReconciliation.md`.
@@ -311,8 +316,8 @@ Procedural quest generation is not automatically authorized to produce deep Rela
 4. Relationship Experiences are not interchangeable with quest rewards.
 5. GATHER objectives consider items already held when the quest starts.
 6. Completion rewards are applied once through the normal quest lifecycle.
-7. Missing required permanent Traits reject the resolution below the UI before consequence/reward/lock.
-8. Relationship state does not substitute for permanent Trait ownership when the resolution requires a learned capability.
+7. Missing required expressed Traits reject the resolution below the UI before consequence/reward/lock.
+8. Relationship state or assimilated ownership alone does not substitute for current Trait expression when the resolution requires that pattern.
 9. Capability availability does not automatically make the player's decision.
 10. Faction-tagged `REPUTATION` rewards update Faction authority, not giver-NPC Affinity.
 11. Faction Reputation does not automatically imply a Relationship or Knowledge consequence.
@@ -327,7 +332,7 @@ Procedural quest generation is not automatically authorized to produce deep Rela
 - broad relationship consequences for every quest;
 - procedural generation of deep Relationship Experiences;
 - richer campaign-scale acceptance/hand-in presentation;
-- temporary/equipped-Trait resolution semantics;
+- partial/unstable-expression strength semantics;
 - OR/NOT Trait requirements;
 - generalized stat/skill/ability condition language;
 - reputation tiers/bands;

@@ -12,6 +12,7 @@ import { selectAllQuests } from '../../Quest/state/QuestSelectors';
 import { evaluateDialogueAvailabilityPresentation } from './DialogueAvailabilityPresentation';
 import type { DialogueNode } from './NPCTypes';
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
+import { selectExpressedTraitIds } from '../../Player/state/PlayerSelectors';
 
 const EMPTY_QUESTS = [] as const;
 const EMPTY_DIALOGUE_CHOICES: readonly NPCDialogueChoice[] = [];
@@ -152,7 +153,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
     (state: RootState, _npcId: string) => state.knowledge?.factIdsByNpcId ?? {},
     (state: RootState) => state.factions?.reputationByFactionId ?? {},
     (state: RootState) => state.worldState?.regions ?? {},
-    (state: RootState) => state.player.permanentTraits ?? [],
+    selectExpressedTraitIds,
     selectActiveDoctrineIds,
   ],
   (
@@ -163,7 +164,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
     factIdsByNpcId,
     factionReputationByFactionId,
     worldStateRegions,
-    permanentTraitIds,
+    expressedTraitIds,
     activeDoctrineIds,
   ): readonly NPCDialogueChoice[] => {
     if (!npc?.availableDialogues?.length) return EMPTY_DIALOGUE_CHOICES;
@@ -181,7 +182,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
           knownFactIds,
           factionReputationByFactionId,
           worldStateRegions,
-          permanentTraitIds,
+          expressedTraitIds,
           activeDoctrineIds,
         });
         if (!availability.available) return null;

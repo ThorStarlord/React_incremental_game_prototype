@@ -57,7 +57,7 @@ The Player system focuses on skill-based progression and a unique "Resonance Lev
 - **Resonance Level**: A core player ability that increases based on accumulated Essence. This level directly unlocks additional Player Trait Slots and may influence other Essence-related mechanics.
 - **Attribute Points**: Gained through gameplay achievements and milestones
 - **Skill Points**: Acquired through various in-game activities
-- **Trait Progression**: Character development through trait acquisition and permanence
+- **Trait Progression**: Character development through discovery, assimilation, Stabilization, and selective expression
 - **Time Tracking**: Total playtime monitoring for progression metrics
 
 ### 4.2. Progression Sources
@@ -70,11 +70,12 @@ The Player system focuses on skill-based progression and a unique "Resonance Lev
 
 ### 4.3. Doctrine Focus
 
-Player state distinguishes permanent learning from current build specialization:
+Player state distinguishes permanent assimilated ownership from current expression and higher-order build specialization:
 
 ```text
-permanentTraits -> what the protagonist has durably learned
-doctrineFocus   -> which learned principles are currently foregrounded together
+permanentTraits -> legacy persisted key for what the protagonist has permanently assimilated
+traitSlots       -> which available Trait patterns are currently expressed
+doctrineFocus    -> which expressed assimilated principles are foregrounded together
 ```
 
 `doctrineFocus.foregroundedPermanentTraitIds` is canonical persisted Player state. Campaign One currently permits at most two foregrounded permanent Traits. Active doctrine identities such as **Structural Steward** and **Countermodeler** are derived by Trait selectors rather than stored as independent Player flags.

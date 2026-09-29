@@ -3,6 +3,8 @@
  * @description A drawer component for displaying a list of Traits with filtering and sorting.
  */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { createSelector } from '@reduxjs/toolkit';
+import type { RootState } from '../../../../app/store';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
 import {
   Drawer,
@@ -43,9 +45,9 @@ import {
   selectTraitLoading,
   selectTraitError
 } from '../../state/TraitsSelectors'; 
-import { fetchTraitsThunk, acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
+import { fetchTraitsThunk, stabilizeTraitWithEssenceThunk } from '../../state/TraitThunks';
 import { Trait } from '../../state/TraitsTypes';
-import { evaluateTraitResonanceReadiness } from '../../state/TraitResonanceReadiness';
+import { evaluateTraitStabilizationReadiness } from '../../state/TraitResonanceReadiness';
 import { selectPermanentTraits as selectPlayerPermanentTraitIds } from '../../../Player/state/PlayerSelectors';
 
 interface TraitCodexDrawerProps {
@@ -53,6 +55,23 @@ interface TraitCodexDrawerProps {
     onClose: () => void;
     focusedId?: string;
 }
+
+const selectTraitReadinessState = createSelector(
+  [
+    (state: RootState) => state.traits,
+    (state: RootState) => state.player,
+    (state: RootState) => state.essence,
+    (state: RootState) => state.npcs,
+    (state: RootState) => state.relationships,
+  ],
+  (traits, player, essence, npcs, relationships) => ({
+    traits,
+    player,
+    essence,
+    npcs,
+    relationships,
+  } as RootState)
+);
 
 type SortableTraitKey = 'name' | 'essenceCost' | 'category';
 
@@ -75,7 +94,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   const permanentTraitIds = useAppSelector(selectPlayerPermanentTraitIds); 
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
-  const rootState = useAppSelector(state => state);
+  const readinessState = useAppSelector(selectTraitReadinessState);
 
   useEffect(() => {
     if (open && Object.keys(allTraits).length === 0 && !isLoading) {
@@ -124,11 +143,11 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
   }, []);
 
   const handleAcquireTrait = useCallback((trait: Trait) => {
-    const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+    const readiness = evaluateTraitStabilizationReadiness(readinessState, trait.id);
     if (readiness.ready) {
-      dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id }));
+      dispatch(stabilizeTraitWithEssenceThunk({ traitId: trait.id }));
     }
-  }, [dispatch, rootState]);
+  }, [dispatch, readinessState]);
 
   const filteredAndSortedTraits = useMemo(() => {
     let traitsArray = Object.values(allTraits); 
@@ -156,7 +175,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
       if (filterState.traitStatusFilter === 'permanent' && !isPermanent) return false;
       if (filterState.traitStatusFilter === 'available' && (isPermanent || !isDiscovered)) return false; 
       
-      // "Acquired" is now "Discovered but not permanent"
+      // Compatibility filter: acquired means discovered but not yet assimilated
       if (filterState.traitStatusFilter === 'acquired' && (!isDiscovered || isPermanent)) return false;
 
 
@@ -218,7 +237,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
         {filteredAndSortedTraits.map(trait => {
           const isDiscovered = discoveredTraitIds.includes(trait.id);
           const isPermanent = permanentTraitIds.includes(trait.id);
-          const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+          const readiness = evaluateTraitStabilizationReadiness(readinessState, trait.id);
           const cost = readiness.cost;
           const canBeMadePermanent = isDiscovered && !isPermanent && trait.essenceCost !== undefined;
 
@@ -232,7 +251,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               }}
               secondaryAction={
                 canBeMadePermanent ? (
-                  <Tooltip title={readiness.ready ? "Make Trait Permanent (Resonate)" : readiness.blockers.join(' • ')}>
+                  <Tooltip title={readiness.ready ? "Stabilize Trait for permanent availability" : readiness.blockers.join(' • ')}>
                     <span> 
                       <IconButton
                         edge="end"
@@ -261,7 +280,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
                     </Typography>
                     <br />
                     {trait.essenceCost !== undefined && <Chip label={`Cost: ${trait.essenceCost}`} size="small" sx={{ mr: 0.5 }} />}
-                    {isPermanent && <Chip label="Permanent" color="success" size="small" sx={{ mr: 0.5 }} />}
+                    {isPermanent && <Chip label="Assimilated" color="success" size="small" sx={{ mr: 0.5 }} />}
                     {isDiscovered && !isPermanent && <Chip label="Discovered" color="primary" variant="outlined" size="small" sx={{ mr: 0.5 }} />}
                     <Chip label={`Type: ${trait.category || 'General'}`} size="small" />
                   </>
@@ -300,8 +319,8 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
               onChange={(e) => setFilter('traitStatusFilter', e.target.value)}
             >
               <MenuItem value="all">All Statuses</MenuItem>
-              <MenuItem value="available">Available (Not Permanent)</MenuItem>
-              <MenuItem value="permanent">Permanent</MenuItem>
+              <MenuItem value="available">Stabilization Candidate</MenuItem>
+              <MenuItem value="permanent">Assimilated</MenuItem>
             </Select>
           </FormControl>
           <Box>

@@ -26,14 +26,14 @@ import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 const capabilityColor = (
   status: RelationshipCapabilityStatus
 ): 'default' | 'warning' | 'success' => {
-  if (status === 'permanent') return 'success';
-  if (status === 'resonance_ready') return 'warning';
+  if (status === 'assimilated') return 'success';
+  if (status === 'stabilization_ready') return 'warning';
   return 'default';
 };
 
 const capabilityLabel = (status: RelationshipCapabilityStatus): string => {
-  if (status === 'permanent') return 'Permanent';
-  if (status === 'resonance_ready') return 'Resonance ready';
+  if (status === 'assimilated') return 'Assimilated';
+  if (status === 'stabilization_ready') return 'Stabilization ready';
   return 'Developing';
 };
 
@@ -65,7 +65,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               Player Insight
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              A read-only view of consequences, unresolved opportunities, learned capabilities, and repeatable work you have already mastered.
+              A read-only view of consequences, unresolved opportunities, assimilated Trait patterns, current doctrine, and repeatable work you have already mastered.
             </Typography>
           </Box>
 
@@ -191,7 +191,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
             <Grid item xs={12} md={6} lg={3}>
               <Stack spacing={1.5}>
                 <Typography variant="subtitle1" fontWeight={600}>
-                  Relationship-Derived Build
+                  Relationship-Derived Traits
                 </Typography>
                 {activeDoctrineIds.length > 0 ? (
                   <Box data-test-id="player-insight-active-doctrine">
@@ -216,7 +216,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                 )}
                 {capabilities.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
-                    Relationship-mediated capabilities remain hidden until discovered through play.
+                    Relationship-mediated Trait patterns remain hidden until discovered through play.
                   </Typography>
                 ) : capabilities.map(capability => (
                   <Box key={capability.traitId}>
@@ -229,9 +229,17 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                         size="small"
                         color={capabilityColor(capability.status)}
                       />
+                      {capability.status === 'assimilated' && (
+                        <Chip
+                          label={capability.expressed ? 'Expressed' : 'Suppressed'}
+                          size="small"
+                          variant="outlined"
+                          color={capability.expressed ? 'primary' : 'default'}
+                        />
+                      )}
                     </Stack>
                     <Typography variant="caption" color="text.secondary" display="block">
-                      Learned with {capability.sourceNpcName} · Connection {capability.connectionLevel}/{capability.requiredConnectionLevel}
+                      Assimilated from {capability.sourceNpcName} · Connection {capability.connectionLevel}/{capability.requiredConnectionLevel}
                     </Typography>
                     <LinearProgress
                       variant="determinate"

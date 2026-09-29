@@ -99,7 +99,7 @@ describe('Checkpoint C incremental integration repair qualification', () => {
       startCopyProductionTaskThunk({ copyId: 'copy-001', taskId: 'resonance_calibration' })
     );
     expect(startCopyProductionTaskThunk.rejected.match(before)).toBe(true);
-    expect(before.payload).toContain('Successfully Resonate a Trait yourself before delegating calibration.');
+    expect(before.payload).toContain('Successfully Stabilize a Trait yourself before delegating calibration.');
 
     const failed = await store.dispatch(
       acquireTraitWithEssenceThunk({ traitId: 'missing_repair_trait', essenceCost: 0 })

@@ -46,6 +46,8 @@ export const selectIsPlayerAlive = createSelector([selectPlayer], (player) => pl
 export const selectResonanceLevel = createSelector([selectPlayer], (player) => player.resonanceLevel);
 export const selectMaxTraitSlots = createSelector([selectPlayer], (player) => player.maxTraitSlots);
 export const selectPermanentTraits = createSelector([selectPlayer], (player) => player.permanentTraits);
+/** Canonical name for the legacy persisted permanentTraits field. */
+export const selectAssimilatedTraitIds = selectPermanentTraits;
 export const selectPlayerAttributes = createSelector([selectPlayer], (player) => player.attributes);
 export const selectTotalPlaytime = createSelector([selectPlayer], (player) => player.totalPlaytime);
 export const selectStatusEffects = createSelector([selectPlayer],(player) => player.statusEffects);
@@ -53,15 +55,22 @@ export const selectPlayerTraitSlots = createSelector([selectPlayer], (player) =>
 
 // --- MOVED AND FIXED SELECTORS (Cross-Feature Logic) ---
 
-export const selectEquippedTraits = createSelector(
-  [selectPlayerTraitSlots, selectTraits],
-  (traitSlots, allTraits) => {
-    return traitSlots
-      .filter(slot => slot.traitId !== null)
-      .map(slot => allTraits[slot.traitId!])
-      .filter(Boolean);
-  }
+export const selectExpressedTraitIds = createSelector(
+  [selectPlayerTraitSlots],
+  (traitSlots) => traitSlots
+    .map(slot => slot.traitId)
+    .filter((traitId): traitId is string => Boolean(traitId))
 );
+
+export const selectEquippedTraits = createSelector(
+  [selectExpressedTraitIds, selectTraits],
+  (expressedTraitIds, allTraits) => expressedTraitIds
+    .map(traitId => allTraits[traitId])
+    .filter(Boolean)
+);
+
+/** Canonical universal-Trait name; selectEquippedTraits remains compatibility API. */
+export const selectExpressedTraits = selectEquippedTraits;
 
 export const selectAvailableTraitSlots = createSelector(
   [selectPlayerTraitSlots],
@@ -77,11 +86,16 @@ export const selectPlayerTraitInfo = createSelector(
   [selectEquippedTraits, selectPermanentTraits, selectAvailableTraitSlots, selectUsedTraitSlots, selectMaxTraitSlots],
   (equippedTraits, permanentTraits, availableSlots, usedSlots, maxSlots) => ({
     equipped: equippedTraits,
+    expressed: equippedTraits,
     permanent: permanentTraits,
+    assimilated: permanentTraits,
     availableSlots,
     usedSlots,
     maxSlots,
-    totalTraits: equippedTraits.length + permanentTraits.length
+    totalTraits: new Set([
+      ...permanentTraits,
+      ...equippedTraits.map(trait => trait.id),
+    ]).size
   })
 );
 

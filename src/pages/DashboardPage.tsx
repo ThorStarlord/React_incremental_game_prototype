@@ -89,14 +89,14 @@ export const DashboardPage: React.FC = React.memo(() => {
     {
       title: 'Active Traits',
       value: traits.length,
-      subtitle: `${traits.length} equipped`,
+      subtitle: `${traits.length} expressed`,
       color: 'success',
       icon: StarIcon
     },
     {
       title: 'Discovered Traits',
       value: traitsState.discoveredTraits.length,
-      subtitle: `${permanentTraits.length} permanent`,
+      subtitle: `${permanentTraits.length} assimilated`,
       color: 'warning',
       icon: GroupIcon
     }

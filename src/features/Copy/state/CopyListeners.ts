@@ -6,7 +6,7 @@
 
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { unequipTrait, equipTrait, addPermanentTrait } from '../../Player/state/PlayerSlice';
+import { unequipTrait, equipTrait } from '../../Player/state/PlayerSlice';
 import {
   unshareTraitFromCopy,
   ensureCopyTraitSlots,
@@ -99,37 +99,6 @@ copyListeners.startListening({
         api.dispatch(applySharePreferencesForCopyThunk(copy.id) as any);
       }
     }
-  },
-});
-
-// When a trait is made permanent, it ceases to be shareable; unshare from all copies.
-copyListeners.startListening({
-  actionCreator: addPermanentTrait,
-  effect: async (action, api) => {
-    const { payload: traitId } = action;
-    if (!traitId) return;
-    const state = api.getState();
-    const copies = Object.values(state.copy.copies);
-    let unsharedCount = 0;
-    const affected = new Set<string>();
-    for (const copy of copies) {
-      if (!copy.traitSlots) {
-        api.dispatch(ensureCopyTraitSlots({ copyId: copy.id }));
-      }
-      for (const slot of copy.traitSlots ?? []) {
-        if (slot.traitId === traitId) {
-          api.dispatch(unshareTraitFromCopy({ copyId: copy.id, slotIndex: slot.slotIndex }));
-          unsharedCount++;
-          affected.add(copy.id);
-        }
-      }
-    }
-    if (unsharedCount > 0) {
-      api.dispatch(addNotification({ type: 'info', message: `Unshared trait from ${unsharedCount} Copy slot(s) due to permanence.` }));
-    }
-
-    // Try to fill freed slots with other enabled preferences
-    affected.forEach((copyId) => api.dispatch(applySharePreferencesForCopyThunk(copyId) as any));
   },
 });
 

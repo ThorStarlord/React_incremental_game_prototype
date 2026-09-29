@@ -57,7 +57,7 @@ describe('Trait system depth repair', () => {
     expect(classifyTraitEffectAuthority('craftingQualityBonus')).toBe('deferred_legacy');
   });
 
-  test('permanent Resonance requires durable Player authority and spends nothing when authority is absent', async () => {
+  test('Stabilization requires a live Trait authority while named-runtime patterns remain assimilable', async () => {
     const deferredOnly: Trait = {
       ...SIMPLE_TRAIT,
       id: 'DeferredOnly',
@@ -71,11 +71,11 @@ describe('Trait system depth repair', () => {
       effects: { essenceGenerationMultiplier: 0.15 },
     };
 
-    expect(summarizeTraitAuthority(SIMPLE_TRAIT).hasPermanentPlayerAuthority).toBe(true);
+    expect(summarizeTraitAuthority(SIMPLE_TRAIT).hasStabilizableAuthority).toBe(true);
     expect(summarizeTraitAuthority(deferredOnly).isDeferredOnly).toBe(true);
     expect(summarizeTraitAuthority(sharedRuntimeOnly)).toMatchObject({
       hasNamedRuntimeAuthority: true,
-      hasPermanentPlayerAuthority: false,
+      hasStabilizableAuthority: true,
     });
 
     const store = makeStore();
@@ -88,14 +88,12 @@ describe('Trait system depth repair', () => {
     expect(evaluateTraitResonanceReadiness(store.getState(), deferredOnly.id)).toMatchObject({
       ready: false,
       blockers: expect.arrayContaining([
-        'This legacy Trait has no qualified Campaign One runtime effect and is not available for permanent Resonance.',
+        'This legacy Trait has no qualified Campaign One runtime effect and is not available for Stabilization.',
       ]),
     });
     expect(evaluateTraitResonanceReadiness(store.getState(), sharedRuntimeOnly.id)).toMatchObject({
-      ready: false,
-      blockers: expect.arrayContaining([
-        'This Trait has a live shared/runtime use but no permanent Player effect in Campaign One; keep it temporary/shareable instead of Resonating it.',
-      ]),
+      ready: true,
+      blockers: [],
     });
 
     const essenceBefore = store.getState().essence.currentEssence;
@@ -107,18 +105,17 @@ describe('Trait system depth repair', () => {
     );
 
     expect(acquireTraitWithEssenceThunk.rejected.match(deferredAttempt)).toBe(true);
-    expect(acquireTraitWithEssenceThunk.rejected.match(sharedRuntimeAttempt)).toBe(true);
-    expect(store.getState().essence.currentEssence).toBe(essenceBefore);
-    expect(store.getState().player.permanentTraits).not.toEqual(
-      expect.arrayContaining([deferredOnly.id, sharedRuntimeOnly.id])
-    );
+    expect(acquireTraitWithEssenceThunk.fulfilled.match(sharedRuntimeAttempt)).toBe(true);
+    expect(store.getState().essence.currentEssence).toBe(essenceBefore - (sharedRuntimeOnly.essenceCost ?? 0));
+    expect(store.getState().player.permanentTraits).toContain(sharedRuntimeOnly.id);
+    expect(store.getState().player.permanentTraits).not.toContain(deferredOnly.id);
   });
 
   test('Resonance Level automatically unlocks the player Trait slots it promises', () => {
     const store = makeStore();
 
     expect(store.getState().player.traitSlots.map(slot => slot.isLocked)).toEqual([
-      false, true, true, true, true,
+      false, false, true, true, true,
     ]);
 
     store.dispatch(setResonanceLevel(3));
@@ -144,7 +141,7 @@ describe('Trait system depth repair', () => {
     expect(readiness.blockers).toEqual([]);
   });
 
-  test('callers cannot override the authoritative catalog Resonance cost', async () => {
+  test('callers cannot override the authoritative catalog Stabilization cost', async () => {
     const store = makeStore();
     store.dispatch(loadTraits({ [SIMPLE_TRAIT.id]: SIMPLE_TRAIT }));
     store.dispatch(gainEssence({ amount: 10, source: 'test' }));

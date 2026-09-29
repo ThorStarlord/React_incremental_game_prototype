@@ -52,7 +52,7 @@ describe('M10 save schema migration pipeline', () => {
 
     expect(result.sourceVersion).toBe(LEGACY_SAVE_SCHEMA_VERSION);
     expect(result.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus']);
+    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus', 'save-schema-v2-to-v3-trait-expression']);
     expect(result.envelope.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(result.envelope.state).toEqual(createPersistedGameState(state));
     expect(legacy).toEqual(before);
@@ -76,10 +76,52 @@ describe('M10 save schema migration pipeline', () => {
     expect(result.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(result.appliedMigrations).toEqual([
       'save-schema-v1-to-v2-doctrine-focus',
+      'save-schema-v2-to-v3-trait-expression',
     ]);
     expect(result.envelope.state.player.doctrineFocus).toEqual({
       foregroundedPermanentTraitIds: [],
     });
+  });
+
+  test('schema-v2 saves retain assimilated ownership and deterministically express focus-first patterns', () => {
+    const state = JSON.parse(JSON.stringify(createPersistedGameState(makeState()))) as any;
+    state.player.resonanceLevel = 0;
+    state.player.traitSlots.forEach((slot: any, index: number) => {
+      // Historical v2 baseline: only slot 0 started unlocked.
+      slot.isLocked = index >= 1;
+      slot.traitId = null;
+    });
+    state.player.permanentTraits = [
+      'ScholarlyInsight',
+      'WillowsWisdom',
+      'ConstraintSense',
+      'AdversarialCalibration',
+    ];
+    state.player.doctrineFocus = {
+      foregroundedPermanentTraitIds: ['WillowsWisdom', 'ConstraintSense'],
+    };
+
+    const result = migrateSavePayload({
+      schemaVersion: 2,
+      gameVersion: '1.0.0-test',
+      timestamp: 500,
+      state,
+    });
+
+    expect(result.appliedMigrations).toEqual([
+      'save-schema-v2-to-v3-trait-expression',
+    ]);
+    expect(result.envelope.state.player.permanentTraits).toEqual(
+      state.player.permanentTraits
+    );
+    expect(
+      result.envelope.state.player.traitSlots
+        .filter(slot => !slot.isLocked)
+        .map(slot => slot.traitId)
+    ).toEqual(['WillowsWisdom', 'ConstraintSense']);
+    expect(result.envelope.state.player.permanentTraits).toContain(
+      'AdversarialCalibration'
+    );
   });
 
   test('historical raw RootState exports are also interpreted as legacy v0', () => {
@@ -87,7 +129,7 @@ describe('M10 save schema migration pipeline', () => {
     const result = migrateSavePayload(state);
 
     expect(result.sourceVersion).toBe(LEGACY_SAVE_SCHEMA_VERSION);
-    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus']);
+    expect(result.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus', 'save-schema-v2-to-v3-trait-expression']);
     expect(result.envelope.state).toEqual(createPersistedGameState(state));
     expect(result.envelope.timestamp).toBe(0);
   });
@@ -182,7 +224,7 @@ describe('M10 save schema migration pipeline', () => {
     const first = migrateSavePayload(makeLegacyPayload(makeState()));
     const second = migrateSavePayload(first.envelope);
 
-    expect(first.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus']);
+    expect(first.appliedMigrations).toEqual(['save-schema-v0-to-v1', 'save-schema-v1-to-v2-doctrine-focus', 'save-schema-v2-to-v3-trait-expression']);
     expect(second.appliedMigrations).toEqual([]);
     expect(second.envelope).toEqual(first.envelope);
   });

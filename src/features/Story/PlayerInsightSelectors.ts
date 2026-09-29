@@ -56,8 +56,8 @@ export interface OpportunityChapterView {
 
 export type RelationshipCapabilityStatus =
   | 'developing'
-  | 'resonance_ready'
-  | 'permanent';
+  | 'stabilization_ready'
+  | 'assimilated';
 
 export interface RelationshipCapabilityEvidence {
   memoryId: string;
@@ -81,6 +81,7 @@ export interface RelationshipBuildCapability {
   compatibility: number;
   minimumCompatibility: number;
   missingMemoryTags: string[];
+  expressed: boolean;
   evidence: RelationshipCapabilityEvidence[];
 }
 
@@ -123,7 +124,7 @@ const routineSourceLabel = (
     case 'city_center_forge_assistance':
       return 'Practiced Forge Assistance yourself in the City Center.';
     case 'trait_resonance':
-      return 'Completed Trait resonance yourself.';
+      return 'Stabilized an assimilated Trait pattern yourself.';
     case 'elara_independent_verification':
       return 'Completed Elara\'s independent archive verification yourself.';
     default: {
@@ -228,16 +229,26 @@ export const selectRelationshipBuildCapabilities = (
   state: RootState
 ): RelationshipBuildCapability[] => {
   const discovered = new Set(state.traits.discoveredTraits);
-  const permanent = new Set(state.player.permanentTraits);
+  const assimilated = new Set(state.player.permanentTraits);
+  const expressed = new Set(
+    state.player.traitSlots
+      .map(slot => slot.traitId)
+      .filter((traitId): traitId is string => Boolean(traitId))
+  );
 
   return Object.values(state.traits.traits)
     .filter(trait => {
-      const sourceNpcId = trait.sourceNpc ?? trait.source;
+      const sourceNpcId = trait.sourceNpc ??
+        (trait.source && state.npcs.npcs[trait.source] ? trait.source : undefined);
       if (!sourceNpcId) return false;
-      return discovered.has(trait.id) || permanent.has(trait.id);
+      return discovered.has(trait.id) || assimilated.has(trait.id);
     })
     .map((trait): RelationshipBuildCapability => {
-      const sourceNpcId = trait.sourceNpc ?? trait.source!;
+      const sourceNpcId = trait.sourceNpc ??
+        (trait.source && state.npcs.npcs[trait.source] ? trait.source : undefined);
+      if (!sourceNpcId) {
+        throw new Error(`Relationship build projection received non-NPC Trait source: ${trait.id}`);
+      }
       const profile = state.relationships.bondProfilesByNpc[sourceNpcId];
       const assimilation =
         state.relationships.traitAssimilationByKey[`${sourceNpcId}::${trait.id}`];
@@ -273,16 +284,16 @@ export const selectRelationshipBuildCapabilities = (
       const connectionLevel = profile?.connectionLevel ?? 0;
       const assimilationProgress = assimilation?.progress ?? 0;
       const compatibility = assimilation?.compatibility ?? 0;
-      const resonanceReady =
+      const stabilizationReady =
         discovered.has(trait.id) &&
         connectionLevel >= requiredConnectionLevel &&
         assimilationProgress >= assimilationThreshold &&
         compatibility >= minimumCompatibility &&
         missingMemoryTags.length === 0;
-      const status: RelationshipCapabilityStatus = permanent.has(trait.id)
-        ? 'permanent'
-        : resonanceReady
-          ? 'resonance_ready'
+      const status: RelationshipCapabilityStatus = assimilated.has(trait.id)
+        ? 'assimilated'
+        : stabilizationReady
+          ? 'stabilization_ready'
           : 'developing';
 
       return {
@@ -299,13 +310,14 @@ export const selectRelationshipBuildCapabilities = (
         compatibility,
         minimumCompatibility,
         missingMemoryTags,
+        expressed: expressed.has(trait.id),
         evidence,
       };
     })
     .sort((a, b) => {
       const rank: Record<RelationshipCapabilityStatus, number> = {
-        permanent: 0,
-        resonance_ready: 1,
+        assimilated: 0,
+        stabilization_ready: 1,
         developing: 2,
       };
       return rank[a.status] - rank[b.status] || a.name.localeCompare(b.name);
@@ -401,7 +413,7 @@ const selectCounterphaseMemories = (state: RootState) =>
   state.relationships.memoriesById;
 const selectCounterphaseExperiences = (state: RootState) =>
   state.relationships.experiencesById;
-const selectCounterphasePermanentTraits = (state: RootState) =>
+const selectCounterphaseAssimilatedTraits = (state: RootState) =>
   state.player.permanentTraits;
 const selectCounterphaseRoutineFamiliarity = (state: RootState) =>
   state.player.routineFamiliarity;
@@ -413,7 +425,7 @@ export const selectCounterphasePreparationExplanation = createSelector(
     selectCounterphaseProfile,
     selectCounterphaseMemories,
     selectCounterphaseExperiences,
-    selectCounterphasePermanentTraits,
+    selectCounterphaseAssimilatedTraits,
     selectCounterphaseRoutineFamiliarity,
     selectCounterphaseWatchStanding,
   ],
@@ -421,7 +433,7 @@ export const selectCounterphasePreparationExplanation = createSelector(
     profile,
     memoriesById,
     experiencesById,
-    permanentTraits,
+    assimilatedTraits,
     routineFamiliarity,
     watchStanding
   ): CounterphasePreparationExplanation | null => {
@@ -435,20 +447,20 @@ export const selectCounterphasePreparationExplanation = createSelector(
       reasons.push(`Remembered commitment: ${memory.title}.`);
     }
 
-    const permanent = new Set(permanentTraits);
+    const assimilated = new Set(assimilatedTraits);
     if (profile === 'structural') {
-      const available = ['WillowsWisdom', 'ConstraintSense'].filter(id => permanent.has(id));
+      const available = ['WillowsWisdom', 'ConstraintSense'].filter(id => assimilated.has(id));
       reasons.push(
         available.length === 2
-          ? 'Willow\'s Wisdom and Constraint Sense are both permanent capabilities.'
-          : `Structural capability evidence is incomplete (${available.length}/2 permanent).`
+          ? 'Willow\'s Wisdom and Constraint Sense are both assimilated patterns.'
+          : `Structural Trait provenance is incomplete (${available.length}/2 assimilated).`
       );
     } else if (profile === 'diagnostic') {
-      const available = ['ScholarlyInsight', 'AdversarialCalibration'].filter(id => permanent.has(id));
+      const available = ['ScholarlyInsight', 'AdversarialCalibration'].filter(id => assimilated.has(id));
       reasons.push(
         available.length === 2
-          ? 'Scholarly Insight and Adversarial Calibration are both permanent capabilities.'
-          : `Diagnostic capability evidence is incomplete (${available.length}/2 permanent).`
+          ? 'Scholarly Insight and Adversarial Calibration are both assimilated patterns.'
+          : `Diagnostic Trait provenance is incomplete (${available.length}/2 assimilated).`
       );
     } else if (profile === 'fortified') {
       reasons.push(`City Watch standing is ${watchStanding}.`);

@@ -34,6 +34,7 @@ import { canUseQuestResolution } from '../../../../Quest/state/QuestResolutionAv
 import type { Quest, QuestObjective, QuestStatus } from '../../../../Quest/state/QuestTypes';
 import { selectActiveDoctrineIds } from '../../../../Traits/state/DoctrineSelectors';
 import { DOCTRINE_DEFINITIONS } from '../../../../Traits/state/DoctrineDefinitions';
+import { selectExpressedTraitIds } from '../../../../Player/state/PlayerSelectors';
 
 interface NPCQuestsTabProps {
   npcId: string;
@@ -54,7 +55,7 @@ const formatObjectiveText = (objective: QuestObjective) => {
 const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
   const dispatch = useAppDispatch();
   const npc = useAppSelector(state => selectNPCById(state, npcId));
-  const permanentTraitIds = useAppSelector(state => state.player.permanentTraits);
+  const expressedTraitIds = useAppSelector(selectExpressedTraitIds);
   const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
   const availableQuests = useAppSelector(state =>
     selectNPCAvailableQuestsById(state, npcId)
@@ -119,7 +120,7 @@ const NPCQuestsTab: React.FC<NPCQuestsTabProps> = React.memo(({ npcId }) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {availableQuests.map((quest: Quest) => {
           const availableResolutionOptions = quest.resolutionOptions?.filter(option =>
-            canUseQuestResolution(option, permanentTraitIds, activeDoctrineIds)
+            canUseQuestResolution(option, expressedTraitIds, activeDoctrineIds)
           );
 
           return (

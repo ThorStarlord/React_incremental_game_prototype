@@ -9,6 +9,20 @@ export type TraitRequirementValue = number | string | boolean | string[];
 export type TraitRequirements = Readonly<Record<string, TraitRequirementValue>>;
 
 /**
+ * Optional authoring metadata for the universal Trait ontology.
+ *
+ * These values are descriptive authoring lenses, not a closed runtime enum.
+ * They may describe patterns such as physiological, sensory, procedural,
+ * semantic knowledge, episodic memory, cognitive, dispositional, or
+ * metaphysical Traits without forcing every future form into a fixed taxonomy.
+ */
+export interface TraitIdentityMetadata {
+  nature: string;
+  sourceProvenance?: string;
+  notes?: string;
+}
+
+/**
  * Core trait interface
  */
 export interface Trait {
@@ -19,13 +33,14 @@ export interface Trait {
   rarity: string;          // Trait rarity level (common, rare, epic, legendary, mythic)
   effects: TraitEffect[] | TraitEffectValues;  // Stat modifications
   requirements?: TraitRequirements; // Acquisition requirements
-  essenceCost?: number;    // Acquisition cost for Resonance
+  essenceCost?: number;    // Essence cost for durable stabilization (historically called Resonance)
   permanenceCost?: number; // Cost to make permanent (deprecated)
   source?: string;         // Acquisition source (NPC ID, quest, etc.)
   sourceNpc?: string;      // Explicit NPC provenance for relationship-mediated Traits
   tier?: number;           // Optional trait tier
   iconPath?: string;       // Optional icon path
   level?: number;          // Optional trait level
+  identity?: TraitIdentityMetadata; // Universal-Trait authoring identity/provenance
 
   /**
    * Discovery controls whether loading the Trait catalogue should make this
@@ -34,7 +49,7 @@ export interface Trait {
    */
   discoveryMode?: TraitDiscoveryMode;
 
-  // Relationship-mediated Resonance metadata. Optional so simple Traits remain simple.
+  // Relationship-mediated assimilation/stabilization metadata. Optional so simple Traits remain simple.
   minimumConnectionLevel?: number;
   resonanceTags?: string[];
   requiredMemoryTags?: string[];

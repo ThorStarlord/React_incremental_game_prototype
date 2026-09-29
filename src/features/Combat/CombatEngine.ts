@@ -33,7 +33,7 @@ const inactiveReason = (state: CombatEncounterState): string | undefined => {
 export const getCombatActionPresentations = (
   definition: CombatEncounterDefinition,
   state: CombatEncounterState,
-  permanentTraitIds: readonly string[]
+  expressedTraitIds: readonly string[]
 ): CombatActionPresentation[] => {
   const inactive = inactiveReason(state);
   const actions: CombatActionPresentation[] = [
@@ -58,7 +58,7 @@ export const getCombatActionPresentations = (
 
   const hasTraitAccess = hasRequiredPermanentTraits(
     feedback.requiredPermanentTraitIds,
-    permanentTraitIds
+    expressedTraitIds
   );
 
   if (!hasTraitAccess || state.feedbackDisrupted) {
@@ -143,7 +143,7 @@ export const performCombatAction = (
   definition: CombatEncounterDefinition,
   state: CombatEncounterState,
   actionId: CombatActionId,
-  permanentTraitIds: readonly string[]
+  expressedTraitIds: readonly string[]
 ): CombatActionResult => {
   const inactive = inactiveReason(state);
   if (inactive) return rejected(state, inactive);
@@ -157,12 +157,12 @@ export const performCombatAction = (
 
     const missingTraitIds = getMissingPermanentTraitIds(
       feedback.requiredPermanentTraitIds,
-      permanentTraitIds
+      expressedTraitIds
     );
     if (missingTraitIds.length > 0) {
       return rejected(
         state,
-        `Action requires permanent Trait${missingTraitIds.length === 1 ? '' : 's'}: ${missingTraitIds.join(', ')}.`
+        `Action requires expressed Trait${missingTraitIds.length === 1 ? '' : 's'}: ${missingTraitIds.join(', ')}.`
       );
     }
   }

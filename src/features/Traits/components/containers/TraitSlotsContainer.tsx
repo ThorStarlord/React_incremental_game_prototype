@@ -8,11 +8,10 @@ import {
   selectTraitError
 } from '../../state/TraitsSelectors';
 import {
+  selectAssimilatedTraitIds,
   selectEquippedTraits,
-  selectPermanentTraits,
   selectPlayerTraitSlots
 } from '../../../Player/state/PlayerSelectors';
-import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice';
 // Actions and Thunks
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks';
@@ -27,9 +26,8 @@ export const TraitSlotsContainer: React.FC = () => {
   const allTraits = useAppSelector(selectTraits);
   const discoveredTraits = useAppSelector(selectDiscoveredTraitObjects); // Use discovered traits
   const equippedTraits = useAppSelector(selectEquippedTraits);
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const assimilatedTraitIds = useAppSelector(selectAssimilatedTraitIds);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
-  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
 
@@ -45,15 +43,19 @@ export const TraitSlotsContainer: React.FC = () => {
 
   // THIS IS THE KEY CHANGE: Base the list of equippable traits on what has been discovered.
   const availableTraitsForEquip = useMemo(() => {
-    return discoveredTraits.filter(trait =>
-      !equippedTraitIds.includes(trait.id) &&
-      !permanentTraitIds.includes(trait.id)
-    );
-  }, [discoveredTraits, equippedTraitIds, permanentTraitIds]);
+    const candidateIds = new Set([
+      ...discoveredTraits.map(trait => trait.id),
+      ...assimilatedTraitIds,
+    ]);
+    return Array.from(candidateIds)
+      .map(traitId => allTraits[traitId])
+      .filter((trait): trait is Trait => Boolean(trait))
+      .filter(trait => !equippedTraitIds.includes(trait.id));
+  }, [allTraits, discoveredTraits, assimilatedTraitIds, equippedTraitIds]);
 
   // --- Callback Handlers ---
   const handleSlotClick = useCallback((slot: TraitSlot) => {
-    if (!isInProximityToNPC || slot.isLocked) return;
+    if (slot.isLocked) return;
 
     if (slot.traitId) {
       const equippedTrait = equippedTraits.find(t => t.id === slot.traitId);
@@ -63,7 +65,7 @@ export const TraitSlotsContainer: React.FC = () => {
     } else {
       setSelectedSlotIndex(slot.slotIndex);
     }
-  }, [equippedTraits, isInProximityToNPC]);
+  }, [equippedTraits]);
 
   const handleCloseSelector = useCallback(() => {
     setSelectedSlotIndex(null);
@@ -99,7 +101,6 @@ export const TraitSlotsContainer: React.FC = () => {
       traitSlots={traitSlots}
       equippedTraits={equippedTraits}
       availableTraits={[]}
-      isInProximityToNPC={isInProximityToNPC}
       isLoading={true}
       error={null} 
       onSlotClick={() => {}} 
@@ -126,7 +127,6 @@ export const TraitSlotsContainer: React.FC = () => {
       traitSlots={traitSlots}
       equippedTraits={equippedTraits}
       availableTraits={availableTraitsForEquip}
-      isInProximityToNPC={isInProximityToNPC}
       isLoading={false}
       error={error}
       selectedSlotIndexForModal={selectedSlotIndex}

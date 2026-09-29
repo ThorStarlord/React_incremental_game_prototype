@@ -56,12 +56,11 @@ export const selectTraitPresetById = createSelector(
 );
 
 /**
- * Selector: Resonance ETAs
- * Computes estimated time (seconds) until the player can afford resonance for discovered, non-permanent traits.
- * Requires: essence slice with currentEssence & generationRate, player slice with permanentTraits, trait essenceCost.
- * Returns sorted array by ETA ascending. If generationRate is 0, ETA defaults to Infinity for unaffordable traits.
+ * Selector: Stabilization ETAs.
+ * Computes estimated time until the player can afford catalogue-owned
+ * Stabilization cost for discovered, not-yet-assimilated Traits.
  */
-export const selectResonanceETAs = createSelector(
+export const selectStabilizationETAs = createSelector(
   [
     (state: RootState) => state.essence.currentEssence,
     (state: RootState) => state.essence.generationRate,
@@ -72,7 +71,7 @@ export const selectResonanceETAs = createSelector(
   (currentEssence, generationRate, discoveredTraitIds, allTraits, permanentTraits) => {
     const results: { traitId: string; traitName: string; cost: number; etaSeconds: number }[] = [];
     for (const id of discoveredTraitIds) {
-      if (permanentTraits.includes(id)) continue; // skip already permanent
+      if (permanentTraits.includes(id)) continue; // skip already assimilated
       const trait = allTraits[id];
       if (!trait) continue;
       const cost = trait.essenceCost ?? 0;
@@ -84,3 +83,5 @@ export const selectResonanceETAs = createSelector(
     return results.sort((a, b) => a.etaSeconds - b.etaSeconds);
   }
 );
+/** @deprecated Compatibility alias. */
+export const selectResonanceETAs = selectStabilizationETAs;

@@ -18,7 +18,7 @@ The data model follows a normalized approach where possible while balancing perf
 ```
 Player 1:M StatusEffects
 Player 1:M TraitSlots
-Player M:M Traits (equipped/permanent)
+Player M:M Traits (expressed/assimilated)
 Player 1:M NPCRelationships
 
 NPC 1:M TraitSlots
@@ -26,7 +26,7 @@ NPC M:M Traits (available/shared)
 NPC 1:M Interactions
 
 Trait 1:M TraitEffects
-Trait M:M NPCs (acquisition sources)
+Trait M:M Sources (NPCs and other authored provenance)
 
 Copy 1:1 NPC (parent)
 Copy M:M Traits (inherited)
@@ -45,9 +45,8 @@ interface PlayerState {
   availableAttributePoints: number;
   availableSkillPoints: number;
   statusEffects: StatusEffect[];
-  equippedTraits: (string | null)[];
-  permanentTraits: string[];
-  traitSlots: TraitSlot[];
+  permanentTraits: string[]; // legacy serialized key: assimilated Trait IDs
+  traitSlots: TraitSlot[];   // currently expressed Trait IDs by capacity slot
   doctrineFocus: {
     foregroundedPermanentTraitIds: string[];
   };
@@ -111,7 +110,7 @@ interface StatusEffect {
 interface TraitSlot {
   id: string;                // Unique slot identifier
   slotIndex: number;         // Position in trait array
-  traitId: string | null;    // Equipped trait ID (null = empty)
+  traitId: string | null;    // Expressed Trait ID (null = empty)
   isLocked: boolean;         // Whether slot is accessible
   unlockRequirement?: string; // Condition to unlock slot
 }
@@ -151,13 +150,14 @@ interface Trait {
   rarity: string;          // Trait rarity level (code uses string)
   effects: TraitEffect[] | TraitEffectValues;  // Stat modifications (updated type)
   requirements?: Record<string, any>; // Acquisition requirements (simplified to match general object structure)
-  essenceCost?: number;    // Acquisition cost (optional in code)
+  essenceCost?: number;    // Stabilization cost (optional in code)
   permanenceCost?: number; // Cost to make permanent (optional in code)
   // isDiscovered is handled in TraitsState.discoveredTraits in code
-  source?: string;         // Acquisition source (NPC ID, quest, etc.)
+  source?: string;         // Provenance source (NPC, relic, event, place, etc.)
   tier?: number;           // New optional in code
   iconPath?: string;       // New optional in code
-  level?: number;          // New optional in code
+  level?: number;
+  identity?: { nature: string; sourceProvenance?: string; notes?: string }; // open authoring metadata
 }
 ```
 

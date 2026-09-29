@@ -83,9 +83,10 @@ The player now has multiple meaningful relationships and begins expressing a bui
 Expected experience:
 
 - multiple anchor relationships carry distinct histories;
-- first permanent relationship-derived capabilities become available;
-- at least one capability changes a quest/investigation solution;
-- at least one capability changes tactical or other active gameplay;
+- first relationship-derived Trait patterns become assimilated;
+- expression capacity begins creating real build choices between owned patterns;
+- at least one expressed Trait changes a quest/investigation solution;
+- at least one expressed Trait changes tactical or other active gameplay;
 - old Memories return as causal prerequisites/callbacks;
 - per-NPC Knowledge begins to diverge;
 - at least one institutional consequence becomes independent from personal approval;
@@ -96,7 +97,8 @@ Expected experience:
 
 ```text
 Relationship Memory
-Trait assimilation / Resonance
+Trait Resonance / assimilation / Stabilization
+Trait expression
 Player Insight / provenance
 Knowledge
 Faction Reputation
@@ -105,9 +107,9 @@ Copy familiarity / first delegation
 
 ### Buildcraft requirement
 
-The player must begin making a real choice between capability identities rather than simply collecting a linear mandatory list.
+The player must begin making a real choice between which assimilated patterns to express rather than simply collecting a linear mandatory list.
 
-A capability qualifies as meaningful buildcraft when it changes at least one of:
+An expressed Trait/capability qualifies as meaningful buildcraft when it changes at least one of:
 
 - legal action/solution availability;
 - tactical action set;
@@ -121,7 +123,7 @@ Pure numeric bonuses may support a capability but do not satisfy the buildcraft 
 
 The player can plausibly answer:
 
-> “My character can do this because of what happened with these people.”
+> “My character carries this pattern because of what happened with these people, and I chose to express it here.”
 
 Human comprehension of that sentence remains an empirical Beta question; the game state and presentation must at least make the causal relationship expressible.
 
@@ -138,7 +140,7 @@ Expected experience:
 - different NPCs know different objective facts;
 - Faction standing and personal relationships may point in different directions;
 - objective World State changes independently from either;
-- capabilities combine to create more than one viable strategic approach;
+- expressed Trait patterns and Doctrines create more than one viable strategic approach;
 - multiple routine identities have been personally mastered;
 - Copies handle selected repetition;
 - offline continuation advances only already-authorized safe work;
@@ -151,7 +153,7 @@ multi-NPC Relationship history
 Knowledge divergence / transfer
 Faction consequences
 World State
-capability combinations
+Trait expression / Doctrine combinations
 multiple mastered routines
 Copy priority / delegation
 bounded offline continuation

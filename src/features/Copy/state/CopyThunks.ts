@@ -565,13 +565,11 @@ export const applySharePreferencesForCopyThunk = createAsyncThunk<
     if (!enabledTraitIds.length) return { applied: 0 };
 
     const playerEquipped = state.player.traitSlots.map(s => s.traitId).filter((id): id is string => !!id);
-    const permanent = state.player.permanentTraits;
     let applied = 0;
 
     for (const traitId of enabledTraitIds) {
       const already = new Set([...(copy.inheritedTraits || []), ...((copy.traitSlots || []).map(s => s.traitId).filter(Boolean) as string[])]);
       if (already.has(traitId)) continue;
-      if (permanent.includes(traitId)) continue;
       if (!playerEquipped.includes(traitId)) continue;
       const empty = (copy.traitSlots || []).find(s => !s.isLocked && !s.traitId);
       if (!empty) continue;
@@ -608,7 +606,7 @@ export const promoteCopyToAcceleratedThunk = createAsyncThunk(
   }
 );
 
-/** Share a player-equipped, non-permanent trait to a Copy slot. */
+/** Share a currently expressed Player Trait to a Copy slot. */
 export const shareTraitWithCopyThunk = createAsyncThunk<
   { copyId: string; slotIndex: number; traitId: string },
   { copyId: string; slotIndex: number; traitId: string; suppressNotify?: boolean },
@@ -640,9 +638,7 @@ export const shareTraitWithCopyThunk = createAsyncThunk<
     const equippedIds = state.player.traitSlots
       .map(s => s.traitId)
       .filter((id): id is string => !!id);
-    const isPermanent = state.player.permanentTraits.includes(traitId);
-    if (isPermanent) return reject('Permanent traits are not shareable');
-    if (!equippedIds.includes(traitId)) return reject('Trait must be equipped to share');
+    if (!equippedIds.includes(traitId)) return reject('Trait must be expressed to share');
 
     dispatch(shareTraitToCopy({ copyId, slotIndex, traitId }));
     // Lightweight role effect: researchers integrate traits slightly better -> tiny maturity gain

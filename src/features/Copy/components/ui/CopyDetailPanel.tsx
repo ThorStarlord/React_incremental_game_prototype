@@ -430,8 +430,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                   let reason = '';
                   if (!eligible) {
                     const reasons: string[] = [];
-                    if (!eligibility.equipped.includes(id)) reasons.push('not equipped');
-                    if (eligibility.permanent.includes(id)) reasons.push('made permanent');
+                    if (!eligibility.equipped.includes(id)) reasons.push('not expressed');
                     if (eligibility.already.has(id)) reasons.push('already present');
                     if (eligibility.emptySlots === 0) reasons.push('no empty slots');
                     reason = `Not eligible: ${reasons.join(', ')}`;
@@ -454,7 +453,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                   );
                 })}
                 {eligibleShareIds.length === 0 && (
-                  <Typography variant="caption" color="text.secondary">No eligible player traits to share right now.</Typography>
+                  <Typography variant="caption" color="text.secondary">No currently expressed player Traits are eligible to share right now.</Typography>
                 )}
               </FormGroup>
               <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>

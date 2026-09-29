@@ -1,7 +1,7 @@
 # Combat System MVP Specification
 
 **Implementation Status:** ✅ Event bus + one M17-qualified transient deterministic encounter vertical slice + bounded world-presence launch gate; not a general combat system  
-**Trait doctrine:** See `../Technical/PostM16TraitGameplayReconciliation.md`.  
+**Current Trait authority:** See [TraitSystem.md](TraitSystem.md) and [UniversalTraitOntologyReconciliation.md](../Technical/UniversalTraitOntologyReconciliation.md). Historical M16/M17 records remain evidence for the implementation qualified at their exact heads.  
 **M17 evidence:** See `../Technical/M17NarrowCombatVerticalSliceQualification.md`, `../Technical/M17NarrowCombatVerticalSliceReconAmendment.md`, and `../Technical/M17NarrowCombatVerticalSliceResult.md`.  
 **Active-loop repair evidence:** See `../Technical/ActiveRpgLoopIntegrationRepairQualification.md`, `../Technical/ActiveRpgLoopIntegrationRepairReconAmendment.md`, and `../Technical/ActiveRpgLoopIntegrationRepairResult.md`.
 
@@ -134,7 +134,7 @@ No-Trait victory is deliberately valid.
 
 ### 3.2 Willow's Wisdom tactical expression
 
-Permanent `WillowsWisdom` does not grant a flat combat bonus in M17. It exposes a two-step tactical possibility coherent with the Trait's slow-pattern/systemic-causation identity:
+Currently expressed `WillowsWisdom` does not grant a flat combat bonus. It exposes a two-step tactical possibility coherent with the Trait's slow-pattern/systemic-causation identity:
 
 ```text
 Trace the Cycle
@@ -153,14 +153,17 @@ The ordinary Strike/Guard strategy remains available to a Trait owner.
 
 ## 4. Capability authority
 
-M17 preserves the post-M16 authority chain:
+The current authority chain is:
 
 ```text
-Relationship -> qualifies how the capability was learned
-Trait        -> owns durable learned capability
-Combat       -> determines local tactical applicability
-Player       -> decides whether to use it
+Relationship / source evidence -> qualifies acquisition/provenance
+Trait library                  -> owns durable assimilated pattern
+Expression                     -> determines current manifestation
+Combat                         -> determines local tactical applicability
+Player                         -> decides whether to use it
 ```
+
+M17 historically qualified permanent ownership as sufficient. The universal Trait migration intentionally supersedes that current runtime semantic while preserving M17 as historical exact-head evidence.
 
 The active-loop repair adds an orthogonal world authority:
 
@@ -169,15 +172,15 @@ Player.location + encounter.requiredLocationId
 -> whether the encounter can be entered here
 ```
 
-World presence does not substitute for Trait ownership, and Trait ownership does not bypass world presence.
+World presence does not substitute for Trait expression, and Trait expression does not bypass world presence.
 
-Combat does not query Willow Connection, Affinity, Trust, Memory, or legacy `connectionDepth` as substitutes for capability ownership.
+Combat does not query Willow Connection, Affinity, Trust, Memory, or legacy `connectionDepth` as substitutes for current Trait expression.
 
-Permanent capability requirements are evaluated against `player.permanentTraits`.
+The historical `requiredPermanentTraitIds` definition key is evaluated against the Player's **currently expressed Trait IDs**. Assimilated ownership alone is insufficient.
 
 ### 4.1 Shared bounded predicate
 
-M16 first qualified the semantic that an authored gameplay option may require permanent Traits. M17 independently needed the same semantic in a second gameplay domain.
+M16/M17 first qualified a shared Trait-requirement abstraction. The universal migration keeps that abstraction but changes the current predicate semantics from permanent ownership to current expression.
 
 The pure predicate therefore lives in:
 
@@ -191,7 +194,7 @@ This is a bounded positive abstraction result. It does **not** imply support for
 
 - any-of Trait requirements;
 - forbidden Traits;
-- temporary/equipped Trait capability equivalence;
+- partial/unstable expression strength;
 - stat checks;
 - skill checks;
 - arbitrary boolean condition trees;
@@ -209,7 +212,7 @@ Once an encounter is legitimately entered, `CombatEncounterPanel` renders curren
 
 Rejected tactical cases include:
 
-- missing permanent Trait;
+- missing required expressed Trait;
 - tracing an already-read pattern;
 - disrupting before tracing;
 - disrupting in the wrong phase;
@@ -267,7 +270,7 @@ victory
 feedback not disrupted
 ```
 
-### Permanent Willow's Wisdom
+### Expressed Willow's Wisdom
 
 ```text
 Strike
@@ -288,7 +291,7 @@ feedback disrupted
 
 The Trait route is faster in the frozen line but accepts more tempo/health risk. It is therefore materially different without being universally dominant.
 
-A player who owns Willow's Wisdom may still use the ordinary control route and obtain the same ordinary outcome.
+A player who has Willow's Wisdom assimilated and expressed may still use the ordinary control route and obtain the same ordinary outcome. An assimilated but suppressed Willow's Wisdom does not expose the Trait action.
 
 The active-loop repair does not change any of this arithmetic.
 
@@ -297,11 +300,12 @@ The active-loop repair does not change any of this arithmetic.
 M17 qualifies:
 
 ```text
-permanent WillowsWisdom
+assimilated WillowsWisdom
++ expressed slot state
 -> ordinary save
 -> load/migration
 -> begin fresh encounter
--> Trait tactical option remains available
+-> Trait tactical option remains available while still expressed
 ```
 
 M17 does **not** save an active encounter.
@@ -338,8 +342,8 @@ The suite covers:
 2. deterministic no-Trait and Willow routes;
 3. missing-Trait and wrong-phase direct bypass rejection before mutation;
 4. no-Trait production UI and real Quest advancement;
-5. permanent Willow's Wisdom through save/load and the tactical production route;
-6. strong Willow Relationship history without permanent Trait remaining insufficient;
+5. Willow's Wisdom ownership/expression through save/load and the tactical production route;
+6. strong Willow Relationship history without required Trait expression remaining insufficient;
 7. defeat producing no Quest consequence;
 8. one-shot victory and terminal replay rejection.
 
@@ -377,7 +381,7 @@ See `../Technical/ActiveRpgLoopIntegrationRepairResult.md` for the diagnostic hi
 
 M17 may establish only:
 
-> One bounded production encounter demonstrates that an existing Relationship-derived permanent Trait can create a meaningful optional tactical combat capability, while a viable no-Trait strategy remains available, player choice remains authoritative, and combat victory integrates with an existing Quest objective through the ordinary combat event bridge.
+> One bounded production encounter demonstrates that a relationship-derived Trait pattern, when currently expressed, can create a meaningful optional tactical combat capability while a viable no-Trait strategy remains available, player choice remains authoritative, and combat victory integrates with an existing Quest objective through the ordinary combat event bridge.
 
 The active-loop repair additionally establishes only:
 
@@ -396,7 +400,7 @@ These results do **not** establish:
 - enemy-AI quality;
 - multi-enemy or party combat;
 - targeting architecture;
-- temporary/equipped Trait combat semantics;
+- partial/unstable-expression combat semantics;
 - campaign build diversity;
 - long-term combat progression;
 - mid-combat persistence;
@@ -417,7 +421,7 @@ Potential future work, only when separately justified, includes:
 - equipment and item use;
 - status effects;
 - Trait combinations;
-- temporary Trait combat semantics;
+- partial/unstable Trait-expression semantics;
 - richer encounter placement only if repeated production evidence warrants it.
 
 Do not infer that any of these are required merely because M17 or the bounded active-loop repair passed.

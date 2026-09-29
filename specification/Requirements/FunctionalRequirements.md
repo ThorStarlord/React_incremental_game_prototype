@@ -58,29 +58,30 @@ This document lists the functional requirements for the React Incremental RPG Pr
 - ✅ **Progression System**: Character advancement through attribute points, skill points, and playtime tracking without traditional leveling
 - ✅ **Integration Readiness**: Architecture prepared for attribute allocation, trait actions, and progression logic implementation
 
-## FR-TRAIT: Trait System ✅ UI IMPLEMENTED
+## FR-TRAIT: Universal Trait System ✅ IMPLEMENTED / REQUALIFICATION IN PROGRESS
 
-*   **FR-TRAIT-001:** ✅ **IMPLEMENTED** - The system shall define a collection of traits with unique effects, categories, rarities, and potential requirements.
-*   **FR-TRAIT-002:** 🔄 **UI READY** - The system shall allow the player to acquire traits from target NPCs by spending Essence (Resonance mechanic). *UI framework implemented, backend integration pending.*
-*   **FR-TRAIT-003:** ✅ **IMPLEMENTED** - The system shall track the player's acquired traits.
-*   **FR-TRAIT-004:** ✅ **IMPLEMENTED** - The system shall provide the player with a limited number of slots to equip acquired traits.
-*   **FR-TRAIT-005:** ✅ **IMPLEMENTED** - The system shall apply the effects of equipped traits to the player character.
-*   **FR-TRAIT-006:** ✅ **IMPLEMENTED / AUTHORITY-BOUNDED** - The system allows the player to spend catalogue-owned Essence cost to make a discovered Trait permanent when that Trait has qualified durable Player authority, freeing any temporary equip slot while preserving its supported permanent effect/capability. Deferred-only and shared-runtime-only Traits cannot consume Essence through permanent Resonance.
-*   **FR-TRAIT-007:** ✅ **IMPLEMENTED** - The system shall track the player's permanent traits.
-*   **FR-TRAIT-008:** ✅ **IMPLEMENTED** - The system allows NPCs to have "Shared Trait Slots" (defined in their data and managed by `NPCSlice`). Dynamic granting based on connection/loyalty is planned.
-*   **FR-TRAIT-009:** ✅ **IMPLEMENTED** - The system allows the player to place a currently equipped, non-permanent Trait into an NPC Shared Trait Slot via `NPCTraitsTab` and `shareTraitWithNPCThunk`. Permanent Traits are deliberately not shareable from Player slots.
-*   **FR-TRAIT-010:** 📋 **PLANNED** - The system shall apply the effects of shared traits to the target NPC or Copy.
-*   **FR-TRAIT-011:** ✅ **IMPLEMENTED** - The system shall provide a UI for viewing trait definitions (Codex).
-*   **FR-TRAIT-012:** ✅ **IMPLEMENTED** - The system shall provide a UI for managing player equipped traits and slots.
+*   **FR-TRAIT-001:** ✅ **IMPLEMENTED** - The system defines authored Traits as selectively represented, stable, salient patterns of being. Trait definitions may describe physiological, sensory, procedural, knowledge, memory-like, cognitive, dispositional, or metaphysical patterns without requiring a closed runtime taxonomy.
+*   **FR-TRAIT-002:** ✅ **IMPLEMENTED / AUTHORITY-BOUNDED** - Relationship-mediated Traits support authored Discovery plus assimilation/compatibility/Memory/Connection evidence. Meaningful relationship evidence may be positive, cooperative, adversarial, or otherwise significant; positive Affinity is not a universal prerequisite.
+*   **FR-TRAIT-003:** ✅ **IMPLEMENTED** - The system separately tracks recognized/discovered Trait patterns and the Player's permanently assimilated Trait library.
+*   **FR-TRAIT-004:** ✅ **IMPLEMENTED** - The Player has bounded Trait **expression slots**. Available discovered or assimilated Traits may be expressed or suppressed freely within unlocked capacity; NPC proximity is not required for Player swapping.
+*   **FR-TRAIT-005:** ✅ **IMPLEMENTED** - Qualified direct Player-stat Trait effects and authored Trait capability gates are active only while the corresponding Trait is currently expressed.
+*   **FR-TRAIT-006:** ✅ **IMPLEMENTED / AUTHORITY-BOUNDED** - The Player may spend catalogue-owned Essence cost to **Stabilize** a qualified assimilated pattern into permanent availability. Stabilization requires a live direct-stat, named-runtime, or semantic-capability authority; deferred-only legacy metadata cannot consume Essence. Stabilization does not make the Trait always active and does not automatically suppress it.
+*   **FR-TRAIT-007:** ✅ **IMPLEMENTED** - The legacy serialized `player.permanentTraits` field is compatibility storage for the assimilated Trait library. Assimilated ownership survives suppression and save/load.
+*   **FR-TRAIT-008:** ✅ **IMPLEMENTED** - NPCs and Copies may expose bounded shared Trait slots under their existing target-specific authority.
+*   **FR-TRAIT-009:** ✅ **IMPLEMENTED** - The Player may project a **currently expressed** Trait into a supported NPC/Copy shared slot. Assimilated Traits remain shareable while expressed; suppressed Traits are not shareable. Sharing does not transfer permanent ownership to the target.
+*   **FR-TRAIT-010:** 🔄 **AUTHORITY-BOUNDED** - Shared Traits affect a target only where that target has a qualified runtime consumer. Existing named runtime behavior such as Copy `EssenceFlow` is valid; legacy metadata does not automatically gain a generic NPC/Copy effect engine.
+*   **FR-TRAIT-011:** ✅ **IMPLEMENTED** - The system provides player-facing Trait discovery/Codex, assimilation/Stabilization, assimilated-library, and expression surfaces.
+*   **FR-TRAIT-012:** ✅ **IMPLEMENTED** - The system exposes current expression capacity, supports Express/Suppress controls, and starts Campaign One with two expression slots so the first two-Trait Doctrine is mechanically legal.
+*   **FR-TRAIT-013:** ✅ **IMPLEMENTED / BOUNDED** - Campaign One Doctrine is a higher-order synthesis derived from assimilated + expressed + foregrounded component Traits. Doctrine switching is an explicit Player expression action; no generic N-way Trait synergy engine is authorized.
+*   **FR-TRAIT-014:** ✅ **IMPLEMENTED** - Save schema v3 migrates historical permanent-Trait saves into assimilated ownership plus deterministic expression, preserves all owned Traits, and enforces the current two-slot minimum baseline.
 
 **Implementation Notes**:
-- ✅ **Complete UI System**: TraitSystemWrapper with tabbed navigation (Slots, Management, Codex)
-- ✅ **Click-Based Interactions**: Accessible trait slot management replacing drag-and-drop
-- ✅ **Visual Design**: Material-UI integration with proper theming and responsive design
-- ✅ **Accessibility**: Full keyboard navigation, ARIA support, and screen reader compatibility
-- ✅ **Performance**: Memoized components, efficient rendering, and optimized state management
-- ✅ **State Integration**: Complete Redux integration with typed selectors and actions
-- ✅ **Trait Sharing with NPCs**: Implemented, including UI in `NPCTraitsTab` and state updates in `NPCSlice`. Relationship level requirement for sharing removed for testing.
+- The canonical creative ontology is `Features/TraitIdentity.md`.
+- The canonical runtime contract is `Features/TraitSystem.md`.
+- Historical identifiers such as `permanentTraits`, `requiredPermanentTraitIds`, `resonanceExperienceId`, and `trait_resonance` may remain compatibility names; current semantics are defined by the canonical Trait contracts.
+- Universal in-world ontology does **not** require universal serialization. Do not create a Trait for every fact, memory, body feature, mood, Relationship state, Faction state, or World-State condition.
+- Procedural skills may be Traits where salient; the separate generic Skills tree remains cut for Campaign One.
+- Human comprehension, fun, pacing, expression-capacity quality, and Trait-hoarder satisfaction remain HUMAN-UNVALIDATED.
 
 ## FR-ESSENCE: Essence System ✅ **UI IMPLEMENTED + STATE MANAGEMENT**
 
@@ -222,7 +223,7 @@ This document lists the functional requirements for the React Incremental RPG Pr
 *   **FR-UI-052:** ✅ **NEWLY IMPLEMENTED** - The system shall provide reusable ProgressBar component for player progression visualization with customizable colors, heights, animations, and value display options.
 *   **FR-UI-053:** ✅ **NEWLY IMPLEMENTED** - The system shall implement PlayerStatsUI component for comprehensive stat display with vital stats progress bars, combat statistics grid, and performance metrics visualization.
 *   **FR-UI-054:** ✅ **NEWLY IMPLEMENTED** - The system shall provide PlayerEquipment component for equipment slot visualization organized by category with interactive equip/unequip actions and rarity indicators.
-*   **FR-UI-055:** ✅ **NEWLY IMPLEMENTED** - The system shall implement PlayerTraitsUI component for trait management with slot grid visualization, equipped trait display, and permanent trait tracking.
+*   **FR-UI-055:** ✅ **NEWLY IMPLEMENTED** - The system shall implement PlayerTraitsUI component for Trait expression management with slot-grid visualization, expressed Trait display, and assimilated-library tracking.
 *   **FR-UI-056:** ✅ **NEWLY IMPLEMENTED** - The system shall provide container components (PlayerStatsContainer, PlayerTraitsContainer, Progression) for clean separation between UI presentation and Redux state management.
 *   **FR-UI-057:** ✅ **NEWLY IMPLEMENTED** - The system shall implement CharacterPage with Material-UI tabbed navigation integrating stats, traits, equipment, and skills management in responsive interface.
 *   **FR-UI-058:** ✅ **NEWLY IMPLEMENTED** - The system shall provide CSS Modules integration for component-specific styling with responsive design patterns and hover effect implementations.

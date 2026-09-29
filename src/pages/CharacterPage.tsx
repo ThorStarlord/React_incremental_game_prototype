@@ -159,7 +159,7 @@ export const CharacterPage: React.FC = React.memo(() => {
               </Typography>
               <Alert severity="info" sx={{ mb: 3 }}>
                 <AlertTitle>Traits and Capabilities</AlertTitle>
-                Equip active traits, review permanent traits, and follow the capabilities your character has learned through the campaign. Visit Traits for acquisition and Resonance details.
+                Express active Traits, review the assimilated library, and follow the patterns your character has internalized through the campaign. Visit Traits for assimilation and Stabilization details.
               </Alert>
               <PlayerTraitsContainer />
             </Box>
@@ -183,10 +183,10 @@ export const CharacterPage: React.FC = React.memo(() => {
               <strong>Statistics:</strong> Monitor your vital stats, combat capabilities, and performance metrics
             </Typography>
             <Typography component="li" variant="body2" color="text.secondary">
-              <strong>Traits:</strong> Equip traits for active benefits or make them permanent to free up slots
+              <strong>Traits:</strong> Express available patterns for active effects; Stabilization makes a pattern permanently available
             </Typography>
             <Typography component="li" variant="body2" color="text.secondary">
-              <strong>Capabilities:</strong> Build relationship-derived traits and routines that change which work you can perform
+              <strong>Capabilities:</strong> Capabilities emerge from the Traits you currently express and the routines you have mastered
             </Typography>
           </Box>
         </Paper>

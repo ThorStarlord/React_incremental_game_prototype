@@ -4,16 +4,16 @@
  */
 
 /**
- * The amount of Essence required to make a trait permanent.
- * This is now the cost for the "Resonance" mechanic.
+ * Legacy fallback cost retained for compatibility. Current production
+ * Stabilization cost is owned by each Trait definition.
  */
 export const TRAIT_PERMANENT_ESSENCE_COST = 250;
 
 /**
- * Constants for Trait Resonance gating and tuning
+ * Compatibility constants for relationship-mediated Trait assimilation/Stabilization
  */
 export const TRAIT_RESONANCE = {
-  /** Minimum NPC connectionDepth required to resonate a trait tied to an NPC. */
+  /** Minimum legacy NPC connectionDepth fallback for a relationship-mediated Trait. */
   MIN_CONNECTION_DEPTH: 1,
 } as const;
 

@@ -1,7 +1,7 @@
 # Essence and Resonance Model
 
 **Design status:** Canonical model; substantial runtime implementation qualified through M19  
-**Scope:** Relationship-derived Essence generation and relationship-mediated Trait discovery / assimilation / permanent Resonance  
+**Scope:** Relationship-derived Essence generation and relationship-mediated Trait Resonance / discovery / assimilation / Stabilization  
 **Current gap:** broader spatial/activity Tether coverage, wider Trait migration, offline progression, and economy balancing
 
 ## 1. Purpose
@@ -11,7 +11,7 @@ This document defines how relationship history becomes power without turning mea
 It has two connected responsibilities:
 
 1. **Essence generation** — continuously accumulating metaphysical resource produced by meaningful relational significance;
-2. **Trait Resonance** — permanent integration of a capability pattern after it has been discovered and sufficiently internalized.
+2. **Trait transfer and Stabilization** — meaningful Resonance makes a foreign Trait pattern legible, assimilation reconstructs it, and Essence Stabilization makes the reconstructed pattern durably available.
 
 Canonical rule:
 
@@ -190,15 +190,17 @@ Stability is not a morality score.
 For relationship-mediated Traits, the runtime already supports the conceptual lifecycle:
 
 ```text
-Discover
--> temporarily Equip / Attune
+meaningful Resonance / contact
+-> Discover / recognize
+-> temporarily Express / Attune
 -> accumulate assimilation + compatibility evidence
 -> form qualifying Memory evidence
 -> meet Relationship Connection requirement
 -> satisfy prerequisites
 -> spend Essence
--> record authored final Resonance Experience
--> permanent Trait integration
+-> record authored final Stabilization beat
+-> permanent assimilated availability
+-> selective Expression / Suppression
 ```
 
 The earlier design framing that assimilation was wholly future work is obsolete.
@@ -242,7 +244,7 @@ But this more continuous formula is **not required to claim that assimilation ex
 
 The current bounded authored approach is already production-qualified for Willow/Elara.
 
-## 12. Resonance qualification
+## 12. Stabilization qualification
 
 A migrated sourced Trait may require:
 
@@ -253,7 +255,7 @@ A migrated sourced Trait may require:
 5. **Evidence** — required Memory/resonance tags;
 6. **Prerequisites** — any Trait-specific dependencies;
 7. **Essence** — enough spendable resource;
-8. **Final authored event** — where configured, a valid final Resonance Experience.
+8. **Final authored event** — where configured, a valid authored final Stabilization beat (historical data keys may still say resonance).
 
 The UI should explain these gates at an appropriate abstraction level.
 
@@ -274,8 +276,8 @@ The Lesson Made Yours
 -> independent application / qualifying evidence
 
 qualified Connection + assimilation + compatibility + Memory + Essence
--> final Resonance
--> permanent Willow's Wisdom
+-> final Stabilization
+-> permanently assimilated Willow's Wisdom
 ```
 
 This is not a future-only target; it is an implemented/qualified reference slice.

@@ -1,8 +1,9 @@
 # Trait Discovery Contract
 
-**Status:** M8 implemented and exact-head qualified; Build Validation #104 passed  
+**Status:** CURRENT discovery authority; M8 historical exact-head evidence preserved; universal Trait terminology reconciled 2026-09-28  
 **Scope:** Trait catalogue loading, authored discovery, New Game reset, relationship evidence integration, and player-facing information boundaries  
-**Purpose:** Make `Discover -> Equip/Attune -> Assimilate -> Resonate` a real progression lifecycle rather than a nominal gate that catalogue loading satisfied automatically.
+**Current ontology:** [TraitIdentity.md](../Features/TraitIdentity.md), [TraitSystem.md](../Features/TraitSystem.md)  
+**Purpose:** Make discovery/recognition a real causal information boundary inside the broader Resonance -> Discovery -> Assimilation -> Stabilization -> Expression lifecycle.
 
 ---
 
@@ -13,12 +14,12 @@ Before M8, `TraitsSlice.loadTraits` treated definition loading as discovery. On 
 That created a mismatch between the documented lifecycle and runtime semantics:
 
 ```text
-claimed:
-Discover -> Equip -> Assimilate -> Resonate
+claimed at M8:
+Discover -> Equip -> Assimilate -> permanent integration
 
-actual:
+actual before M8:
 load catalogue -> everything discovered
-             -> Equip -> Assimilate -> Resonate
+             -> temporary use -> later permanent integration
 ```
 
 `acquireTraitWithEssenceThunk` already rejected an undiscovered Trait, but the predicate was usually vacuous because normal catalogue loading discovered everything.
@@ -31,25 +32,31 @@ M8 separates **definition availability** from **player knowledge**.
 
 ## 2. Canonical lifecycle
 
-The relationship-mediated Trait lifecycle is now:
+The current relationship-mediated Trait lifecycle is:
 
 ```text
-Pattern exists in catalogue
+source instantiates pattern
+-> meaningful Resonance / contact makes the pattern increasingly legible
 -> authored evidence makes the pattern recognizable
--> Trait is discovered
--> player may temporarily Equip / Attune
+-> Discovery
+-> temporary Expression may become available
 -> later Experiences build assimilation + compatibility
--> Connection / Memory / prerequisite evidence qualifies Resonance
--> Essence stabilizes the already-qualified pattern permanently
+-> Connection / Memory / prerequisite evidence qualifies Stabilization
+-> Essence Stabilization makes the assimilated pattern permanently available
+-> Player may Express / Suppress it within capacity
 ```
 
 The semantic distinctions are:
 
-- **Discovery = recognition.** The player has encountered enough evidence to identify the pattern as something that exists and could potentially be learned.
-- **Assimilation = learning/internalization.** The protagonist is becoming able to reproduce the pattern rather than merely recognizing it in another person.
-- **Resonance = permanence.** Essence stabilizes a pattern already recognized, learned, and otherwise qualified.
+- **Resonance = alignment/contact.** A source pattern becomes legible or transferable; Resonance is not the final permanent purchase.
+- **Discovery = recognition.** The player/protagonist has enough evidence to identify the pattern as something that exists and could potentially be learned.
+- **Assimilation = reconstruction/internalization.** The protagonist is becoming able to reproduce the pattern rather than merely recognizing it in another source.
+- **Stabilization = permanent availability.** Essence makes a sufficiently assimilated pattern durably self-sustaining.
+- **Expression = current manifestation.** An assimilated Trait affects active play only while expressed where the current runtime requires expression.
 
-These are separate state transitions. One does not substitute for another.
+These are separate transitions. One does not substitute for another.
+
+Historical identifiers and M8 evidence that use “Resonance” for the final purchase remain historical/compatibility naming; current semantics are owned by Trait Identity and Trait System.
 
 ---
 
@@ -77,10 +84,14 @@ The catalogue contains the definition, but loading it does **not** add the id to
 
 An explicit authored event must reveal the pattern.
 
-Current production relationship-mediated authored Traits:
+Current production relationship-mediated authored Traits include:
 
 - `WillowsWisdom`;
-- `ScholarlyInsight`.
+- `ScholarlyInsight`;
+- `ConstraintSense`;
+- `AdversarialCalibration`.
+
+The latter two were authored after M8. Their presence here updates the current discovery inventory without rewriting M8's historical qualification scope.
 
 ---
 
@@ -169,7 +180,7 @@ The First Lesson therefore both:
 - reveals that the Trait pattern exists;
 - begins low-rate assimilation/compatibility work.
 
-Later teaching and independent application are still necessary for full assimilation and permanent Resonance.
+Later teaching and independent application are still necessary for full assimilation and Stabilization.
 
 So:
 
@@ -294,16 +305,17 @@ The UI does not reveal:
 
 The action is disabled as `Undiscovered`.
 
-Once the authored discovery event occurs, the full existing Resonance gate becomes visible.
+Once the authored discovery event occurs, the full existing assimilation/Stabilization gate becomes visible.
 
 This preserves the information lifecycle:
 
 ```text
 unknown pattern
 -> recognized pattern
--> understandable gate
--> assimilated pattern
--> permanent pattern
+-> understandable assimilation/Stabilization gate
+-> assimilating pattern
+-> assimilated permanently available pattern
+-> current expression choice
 ```
 
 ---
@@ -332,7 +344,7 @@ unknown pattern
 
 The routed Willow M5 fixture now marks `WillowsWisdom` as authored discovery and reveals it only in the First Lesson.
 
-The complete UI path must therefore successfully discover the Trait before it can later inspect/Resonate it.
+The complete UI path must therefore successfully discover the Trait before it can later inspect/Stabilize it.
 
 The production-data-backed Elara M7 suite now additionally proves:
 
@@ -340,7 +352,7 @@ The production-data-backed Elara M7 suite now additionally proves:
 - enough Essence cannot bypass that state;
 - the first challenge alone does not discover it;
 - The Contradictory Footnote does;
-- the rest of the collaborative path can then assimilate and permanently Resonate it.
+- the rest of the collaborative path can then assimilate and Stabilize it.
 
 ### Exact-head result
 
@@ -399,7 +411,7 @@ Meet a person
 -> ASSIMILATE it
 -> satisfy Connection + Memory evidence
 -> spend Essence
--> RESONATE it permanently
+-> STABILIZE it permanently
 ```
 
-**Discovery is recognition. Assimilation is learning. Resonance is permanence.**
+**Discovery is recognition. Assimilation is reconstruction. Stabilization is permanent availability. Expression is current manifestation.**

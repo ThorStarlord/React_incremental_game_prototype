@@ -364,7 +364,7 @@ describe('GC-09 Counterphase', () => {
     }));
     expect(explanation?.reasons).toEqual(expect.arrayContaining([
       'Chapter 6 committed the network to a structural posture.',
-      'Willow\'s Wisdom and Constraint Sense are both permanent capabilities.',
+      'Willow\'s Wisdom and Constraint Sense are both assimilated patterns.',
       'Archive Verification is personally mastered, so safe repetitive verification can be delegated without delegating the finale decision.',
     ]));
     expect(explanation?.reasons.join(' ')).not.toMatch(/readiness|score/i);
@@ -395,14 +395,14 @@ describe('GC-09 Counterphase', () => {
       },
     })).unwrap();
     expect(blocked.success).toBe(false);
-    expect(blocked.message).toContain('Required permanent Trait not learned: ConstraintSense');
+    expect(blocked.message).toContain('Required Trait not expressed: ConstraintSense');
 
     store.dispatch(addPermanentTrait('ConstraintSense'));
     const gronkChoice = selectAvailableNPCDialogueChoices(
       store.getState(),
       'npc_blacksmith_gronk'
     ).find(choice => choice.id === 'gronk_gc09_constraint_margin_review');
-    expect(gronkChoice?.availabilityReasons).toContain('Permanent capability: ConstraintSense');
+    expect(gronkChoice?.availabilityReasons).toContain('Expressed Trait: ConstraintSense');
 
     const gronkResult = await store.dispatch(processNPCInteractionThunk({
       npcId: 'npc_blacksmith_gronk',
@@ -423,7 +423,7 @@ describe('GC-09 Counterphase', () => {
       store.getState(),
       'npc_lyra'
     ).find(choice => choice.id === 'lyra_gc09_adversarial_failure_probe');
-    expect(lyraChoice?.availabilityReasons).toContain('Permanent capability: AdversarialCalibration');
+    expect(lyraChoice?.availabilityReasons).toContain('Expressed Trait: AdversarialCalibration');
 
     const lyraResult = await interact(
       store,
