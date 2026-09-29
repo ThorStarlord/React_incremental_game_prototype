@@ -229,7 +229,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                         size="small"
                         color={capabilityColor(capability.status)}
                       />
-                      {capability.status === 'permanent' && (
+                      {capability.status === 'assimilated' && (
                         <Chip
                           label={capability.expressed ? 'Expressed' : 'Suppressed'}
                           size="small"
