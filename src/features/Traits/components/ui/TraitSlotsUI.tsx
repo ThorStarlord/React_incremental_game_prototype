@@ -92,7 +92,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', flexGrow: 1 }}>{trait.name}</Typography>
               <Tooltip title="Suppress Trait">
-                <IconButton size="small" color="error" aria-label="Unequip trait"><ClearIcon fontSize="small" /></IconButton>
+                <IconButton size="small" color="error" aria-label="Suppress trait"><ClearIcon fontSize="small" /></IconButton>
               </Tooltip>
             </Box>
             <Chip label={trait.rarity} size="small" color={getRarityColor(trait.rarity)} sx={{ mb: 1 }} />
