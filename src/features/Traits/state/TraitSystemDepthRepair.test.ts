@@ -115,7 +115,7 @@ describe('Trait system depth repair', () => {
     const store = makeStore();
 
     expect(store.getState().player.traitSlots.map(slot => slot.isLocked)).toEqual([
-      false, true, true, true, true,
+      false, false, true, true, true,
     ]);
 
     store.dispatch(setResonanceLevel(3));
