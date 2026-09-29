@@ -111,7 +111,7 @@ describe('M26 provisional product-depth qualification', () => {
     };
 
     let capability = selectRelationshipBuildCapabilities(state)[0];
-    expect(capability.status).toBe('resonance_ready');
+    expect(capability.status).toBe('stabilization_ready');
     expect(capability.evidence.map(item => item.memoryId)).toEqual([
       'visible_new',
       'visible_old',
@@ -126,7 +126,8 @@ describe('M26 provisional product-depth qualification', () => {
 
     state.player.permanentTraits.push(INSIGHT_ID);
     capability = selectRelationshipBuildCapabilities(state)[0];
-    expect(capability.status).toBe('permanent');
+    expect(capability.status).toBe('assimilated');
+    expect(capability.expressed).toBe(false);
     expect(capability.evidence.map(item => item.memoryId)).toEqual([
       'visible_new',
       'visible_old',
