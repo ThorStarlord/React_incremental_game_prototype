@@ -21,7 +21,7 @@
 ## Delegated choices (agent-made, not owner answers)
 The owner delegated these choices to the agent on 2026-10-12. They are working defaults, not owner intent. Each stays a `[hypothesis]` until the owner confirms or replaces it with an `[owner: date]` line.
 - Next evidence step: run the M5 comprehension protocol in issue #26 with one fresh participant before any tuning work. It is the smallest written protocol already in the repo. [hypothesis] (defers to issue #109 for the evidence authority)
-- Beta tuning targets: none set. Tuning waits for human-session findings, because the repo's own rules bar synthetic evidence from setting player-facing targets. [hypothesis] [code: AGENTS.md]
+- Beta tuning targets: none set. The Beta contract says no duration target is authoritative until play data exists, so ranges are recorded from human sessions rather than invented. [hypothesis] [code: specification/Technical/BetaCompletionContract.md]
 
 ## Answered owner questions
 - None recorded in this pack yet. Record answers here with `[owner: YYYY-MM-DD]`.
