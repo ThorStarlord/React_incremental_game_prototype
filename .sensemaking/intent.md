@@ -13,7 +13,7 @@
 - No autonomous Copy planning, offline narrative/quest progression, or generic Copy task chaining. [code: specification/Features/FeatureScopeMatrix.md]
 - No general crafting economy or separate Skills/skill-tree system; Traits own capability progression. [code: specification/Features/FeatureScopeMatrix.md]
 - Equipment and interplanetary continuation are deferred post-1.0. [code: specification/Features/FeatureScopeMatrix.md]
-- Do not expand cut or deferred scope merely to create work. [code: AGENTS.md]
+- Do not expand cut or deferred scope merely to create work. [code: CLAUDE.md]
 
 ## Open owner questions
 - [ ] Human Product Review (issue #109) is open and unproven. Who runs the next external playtest, and when? [code: specification/GameCompletionDefinition.md]

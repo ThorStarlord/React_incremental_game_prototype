@@ -1,7 +1,7 @@
 # Invariants and traps
 
 ## Invariants the code does not enforce
-- Never relabel non-human evidence as human Beta evidence. [code: AGENTS.md]
+- Never relabel non-human evidence as human Beta evidence. [code: CLAUDE.md]
 - Missing human evidence limits claims, not repository-answerable work. [code: AGENTS.md]
 - Repairs stay inside the already-authorized Campaign One scope. [code: AGENTS.md]
 
