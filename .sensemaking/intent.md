@@ -16,7 +16,8 @@
 - Do not expand cut or deferred scope merely to create work. [policy: CLAUDE.md]
 
 ## Open owner questions
-- [ ] Human Product Review (issue #109) is open and unproven. Who runs the next external playtest, and when? [policy: specification/GameCompletionDefinition.md]
+- Human Product Review (issue #109) is open and unproven. External playtesting: DEFERRED / TBD, with no assigned owner or date at this time. [owner: 2026-10-12]
+- Intent review: approved by the owner on 2026-10-12, with the external-playtesting deferral above. [owner: 2026-10-12]
 
 ## Delegated choices (agent-made, not owner answers)
 The owner delegated these choices to the agent on 2026-10-12. They are working defaults, not owner intent. Each stays `[delegated]` until the owner confirms or replaces it with an `[owner: date]` line. A plain `[hypothesis]` is an agent inference, not a decision.
