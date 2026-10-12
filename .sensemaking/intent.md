@@ -2,7 +2,7 @@
 
 ## Users and job
 - Players of a narrative incremental RPG where relationships teach capabilities and remembered history explains later options. [policy: specification/GameDesignDocument.md]
-- The repo owner, who reviews human-evidence claims and decides scope. [policy: AGENTS.md]
+- The repo owner, who can revise scope and change Beta/RC promotion requirements ([CLAUDE.md](../CLAUDE.md)). [policy: AGENTS.md]
 
 ## Current goals
 - Beta convergence: make Campaign One understandable, balanced, accessible, presentable, reliable, and release-ready. [policy: specification/GameCompletionDefinition.md]

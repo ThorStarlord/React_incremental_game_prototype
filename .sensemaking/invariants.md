@@ -9,5 +9,5 @@
 - Documentation authority is consistent. [test: scripts/validate-documentation-authority.js]
 
 ## Known traps
-- Adding a generic system (chapter engine, planner, crafting economy) to solve a single case. Cut in FeatureScopeMatrix; prefer a bounded projection. [policy: specification/Features/FeatureScopeMatrix.md]
+- Adding a generic system (chapter engine, planner, crafting economy) Cut in FeatureScopeMatrix; continue bounded projections and reconsider only after repeated concrete content friction. [policy: specification/Features/FeatureScopeMatrix.md]
 - Restoring a duplicate save surface or the old Skills point system. Both are cut; compatibility state stays inert. [policy: specification/Features/FeatureScopeMatrix.md]
