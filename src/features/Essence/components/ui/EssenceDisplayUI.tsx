@@ -71,7 +71,7 @@ const EssenceDisplay: React.FC<EssenceDisplayProps> = ({
           sx={{ display: 'block', textAlign: 'right', mb: 1 }}
         >
           {/* Ensure essenceRate is a number before formatting */}
-          +{(essenceRate ?? 0).toLocaleString()}/min 
+          +{(essenceRate ?? 0).toLocaleString()}/sec 
         </Typography>
       )}
       
