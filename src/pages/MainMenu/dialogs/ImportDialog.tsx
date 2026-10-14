@@ -23,13 +23,15 @@ export function ImportDialog({
 
   return (
     <div
+      role="dialog"
+      aria-labelledby="import-save-title"
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       style={{ zIndex: 1300 }}
     >
       <div className="bg-white rounded-lg p-6 w-full max-w-lg">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Import Save</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <h2 id="import-save-title" className="text-2xl font-bold">Import Save</h2>
+          <button type="button" onClick={onClose} aria-label="Close import dialog" className="text-gray-500 hover:text-gray-700">
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -40,11 +42,12 @@ export function ImportDialog({
           </button>
         </div>
         
-        <p className="mb-3 text-gray-700">
+        <label htmlFor="import-save-code" className="block mb-3 text-gray-700">
           Paste your save code below to import:
-        </p>
+        </label>
         
         <textarea
+          id="import-save-code"
           className="w-full h-32 p-2 border border-gray-300 rounded bg-gray-50 font-mono text-sm mb-4"
           value={importCode}
           onChange={(e) => setImportCode(e.target.value)}

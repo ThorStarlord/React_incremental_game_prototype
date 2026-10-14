@@ -1,3 +1,6 @@
+import React from 'react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { ImportDialog } from '../pages/MainMenu/dialogs/ImportDialog';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -188,5 +191,32 @@ describe('GC-01 Campaign One player-surface scope cleanup', () => {
     expect(menuSource).toContain('handleLoadGame');
     expect(menuSource).toContain('handleShowExport');
     expect(menuSource).toContain('handleImport');
+  });
+});
+ 
+
+describe('GC-01 canonical save import accessibility', () => {
+  test('import controls have programmatic names and preserve editable input', () => {
+    const setImportCode = jest.fn();
+    const onClose = jest.fn();
+    render(React.createElement(ImportDialog, {
+      isOpen: true,
+      importCode: 'example',
+      setImportCode,
+      isLoading: false,
+      onImport: jest.fn(),
+      onClose,
+    }));
+
+    expect(screen.getByRole('dialog', { name: 'Import Save' })).toBeInTheDocument();
+    const field = screen.getByRole('textbox', {
+      name: /paste your save code below to import/i,
+    });
+    expect(field).toHaveValue('example');
+    fireEvent.change(field, { target: { value: 'new save payload' } });
+    expect(setImportCode).toHaveBeenCalledWith('new save payload');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close import dialog' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
