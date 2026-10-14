@@ -13,7 +13,8 @@ interface ShortcutHandlers {
 
 export function useMenuShortcuts(
   mostRecentSave: SavedGame | null,
-  handlers: ShortcutHandlers
+  handlers: ShortcutHandlers,
+  isDialogOpen: boolean
 ) {
   const { 
     registerShortcut, 
@@ -25,8 +26,11 @@ export function useMenuShortcuts(
     openAboutDialog
   } = handlers;
 
-  // Setup keyboard shortcuts
+  // Suspend single-letter menu shortcuts while any dialog is open, including
+  // when its focus is on a button rather than an editable field.
   useEffect(() => {
+    if (isDialogOpen) return;
+
     const shortcuts = [
       { key: 'n', action: handleNewGame, description: 'New Game' },
       { key: 'c', action: () => mostRecentSave && handleContinue(), description: 'Continue' },
@@ -57,7 +61,8 @@ export function useMenuShortcuts(
     handleShowExport,
     openLoadDialog,
     openImportDialog,
-    openAboutDialog
+    openAboutDialog,
+    isDialogOpen
   ]);
 
   // Return the keyboard shortcut info for the footer
