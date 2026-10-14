@@ -30,6 +30,12 @@ jobs:
       - name: Documentation authority qualification
         run: npm run docs:authority:validate
 
+      - name: Essence generation rate presentation regression
+        timeout-minutes: 5
+        run: npm test -- --watchAll=false --runInBand EssenceDisplayUI.test.tsx
+        env:
+          CI: true
+
       - name: GC-01 1.0 player-surface scope qualification
         timeout-minutes: 5
         run: npm run gc01:validate
