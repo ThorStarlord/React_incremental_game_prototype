@@ -31,7 +31,7 @@ import {
   Star as StarIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
-import { selectEquippedTraits } from '../../../../Player/state/PlayerSelectors';
+import { selectExpressedTraits, selectPlayerTraitSlots } from '../../../../Player/state/PlayerSelectors';
 import {
   selectTraits,
   selectTraitLoading,
@@ -59,7 +59,8 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
   const allTraits = useAppSelector(selectTraits);
   const traitsLoading = useAppSelector(selectTraitLoading);
   const discoveredTraitIds = useAppSelector(selectDiscoveredTraits);
-  const playerEquippedTraits = useAppSelector(selectEquippedTraits);
+  const playerExpressedTraits = useAppSelector(selectExpressedTraits);
+  const playerTraitSlots = useAppSelector(selectPlayerTraitSlots);
   const usesRelationshipAuthority = useAppSelector(state =>
     selectUsesRelationshipConnectionAuthority(state, npc.id)
   );
@@ -82,7 +83,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
 
   const handleEquipNPCTrait = useCallback((traitId: string) => {
     // The Overview never exposes an undiscovered Trait, preserving the lifecycle
-    // Discover -> Equip/Attune -> Assimilate -> Resonate.
+    // Discover -> temporary Expression -> Assimilate -> Stabilize.
     if (!discoveredTraitIds.includes(traitId)) return;
     dispatch(equipTrait({ traitId, slotIndex: -1 }));
     dispatch(recalculateStatsThunk());
@@ -203,7 +204,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  These are Trait patterns you have already recognized in this NPC. Discovered patterns can be temporarily equipped before they are permanently Resonated.
+                  These are Trait patterns you have already recognized in this NPC. Discovered patterns can be expressed temporarily while deeper evidence supports assimilation and eventual Stabilization.
                 </Typography>
                 <Grid container spacing={2}>
                   {npcInnateTraitsDisplay.map((trait: Trait) => (
@@ -221,9 +222,9 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                             size="small"
                             fullWidth
                             onClick={() => handleEquipNPCTrait(trait.id)}
-                            disabled={playerEquippedTraits.length >= 6 || playerEquippedTraits.some(t => t.id === trait.id)}
+                            disabled={!playerTraitSlots.some(slot => !slot.isLocked && slot.traitId === null) || playerExpressedTraits.some(t => t.id === trait.id)}
                           >
-                            {playerEquippedTraits.some(t => t.id === trait.id) ? 'Already Equipped' : 'Equip Trait'}
+                            {playerExpressedTraits.some(t => t.id === trait.id) ? 'Already Expressed' : 'Express Trait'}
                           </Button>
                         </CardContent>
                       </Card>

@@ -26,9 +26,9 @@ import {
 import {
   selectPermanentTraits,
 } from '../../../Player/state/PlayerSelectors';
-import { acquireTraitWithEssenceThunk } from '../../state/TraitThunks';
+import { stabilizeTraitWithEssenceThunk } from '../../state/TraitThunks';
 import type { Trait } from '../../state/TraitsTypes';
-import { evaluateTraitResonanceReadiness } from '../../state/TraitResonanceReadiness';
+import { evaluateTraitStabilizationReadiness } from '../../state/TraitResonanceReadiness';
 
 export interface TraitManagementProps {
   currentEssence: number;
@@ -47,9 +47,9 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
   }, [discoveredTraits, permanentTraitIds]);
 
   const handleMakePermanent = (trait: Trait) => {
-    const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+    const readiness = evaluateTraitStabilizationReadiness(rootState, trait.id);
     if (readiness.ready) {
-      dispatch(acquireTraitWithEssenceThunk({ traitId: trait.id }));
+      dispatch(stabilizeTraitWithEssenceThunk({ traitId: trait.id }));
     }
   };
 
@@ -57,19 +57,19 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
     <Box sx={{ p: 2 }}>
       <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <ResonateIcon color="primary" />
-        Trait Resonance
+        Trait Stabilization
       </Typography>
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        <AlertTitle>Make Traits Permanent</AlertTitle>
-        Resonance can make a discovered Trait permanent only when Campaign One has a qualified durable Player effect for it. Permanent Traits stay active without occupying a slot.
+        <AlertTitle>Stabilize Assimilated Patterns</AlertTitle>
+        Essence can stabilize a discovered, sufficiently assimilated Trait pattern so it remains permanently available. Stabilized Traits still affect active play only while expressed in an expression slot.
       </Alert>
 
       <Card>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="h6">
-              Discovered Non-Permanent Traits ({traitsToMakePermanent.length})
+              Discovered Unstabilized Traits ({traitsToMakePermanent.length})
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <EssenceIcon color="secondary" />
@@ -82,14 +82,14 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
           <List>
             {traitsToMakePermanent.length > 0 ? (
               traitsToMakePermanent.map((trait) => {
-                const readiness = evaluateTraitResonanceReadiness(rootState, trait.id);
+                const readiness = evaluateTraitStabilizationReadiness(rootState, trait.id);
                 const cost = readiness.cost;
                 return (
                   <ListItem
                     key={trait.id}
                     divider
                     secondaryAction={
-                      <Tooltip title={readiness.ready ? 'Make this trait permanent' : readiness.blockers.join(' • ')}>
+                      <Tooltip title={readiness.ready ? 'Stabilize this Trait pattern' : readiness.blockers.join(' • ')}>
                         <span>
                           <Button
                             variant="contained"
@@ -98,7 +98,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
                             disabled={!readiness.ready}
                             startIcon={<ResonateIcon />}
                           >
-                            Resonate
+                            Stabilize
                           </Button>
                         </span>
                       </Tooltip>
@@ -144,7 +144,7 @@ export const TraitManagement: React.FC<TraitManagementProps> = React.memo(({
               <Box sx={{ p: 3, textAlign: 'center' }}>
                 <PermanentIcon color="disabled" sx={{ fontSize: 48, mb: 2 }} />
                 <Typography color="text.secondary">
-                  No discovered non-permanent Traits remain.
+                  No discovered unstabilized Traits remain.
                 </Typography>
               </Box>
             )}

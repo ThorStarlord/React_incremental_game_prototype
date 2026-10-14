@@ -31,7 +31,7 @@ const EssencePage: React.FC = React.memo(() => {
       </Typography>
 
       <Typography variant="body1" color="text.secondary" paragraph>
-        Essence is the resource used to stabilize permanent Trait Resonance. Its generation
+        Essence is the resource used to Stabilize sufficiently assimilated Trait patterns into permanent availability. Its generation
         reflects your active relationships and other qualified sources.
       </Typography>
 

@@ -46,7 +46,7 @@ export const COPY_PRODUCTION_TASKS: readonly CopyProductionTaskDefinition[] = [
     name: 'Resonance Calibration',
     description:
       'Run a controlled repeatable Essence calibration routine and return the stabilized yield.',
-    familiarityHint: 'Successfully Resonate a Trait yourself before delegating calibration.',
+    familiarityHint: 'Successfully Stabilize a Trait yourself before delegating calibration.',
     baseDurationSeconds: 90,
     minimumMaturity: 75,
     minimumLoyalty: 55,

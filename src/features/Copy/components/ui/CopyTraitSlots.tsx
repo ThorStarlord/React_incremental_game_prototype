@@ -60,7 +60,7 @@ const TraitSelectionDialog: React.FC<{
   onShare: (traitId: string) => void;
 }> = ({ open, onClose, eligibleTraits, onShare }) => (
   <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-    <DialogTitle>Share an Equipped Trait</DialogTitle>
+    <DialogTitle>Share an Expressed Trait</DialogTitle>
     <DialogContent>
       <List>
         {eligibleTraits.length > 0 ? (
@@ -78,7 +78,7 @@ const TraitSelectionDialog: React.FC<{
           ))
         ) : (
           <ListItem>
-            <ListItemText primary="No eligible traits available." secondary="Shareable traits must be equipped, not permanent, and not already on this Copy." />
+            <ListItemText primary="No eligible traits available." secondary="Shareable Traits must be currently expressed and not already present on this Copy." />
           </ListItem>
         )}
       </List>
