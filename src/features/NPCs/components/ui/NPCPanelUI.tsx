@@ -230,7 +230,7 @@ export const NPCPanelUI: React.FC<NPCPanelUIProps> = ({
             {npc ? npc.name : "NPC Interaction"} 
           </Typography>
           {onClose && (
-            <IconButton onClick={onClose} size="small">
+            <IconButton onClick={onClose} size="small" aria-label="Close NPC panel">
               <CloseIcon />
             </IconButton>
           )}

@@ -239,6 +239,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
                         color="primary"
                         disabled={!readiness.ready}
                         onClick={() => handleAcquireTrait(trait)}
+                        aria-label={`Make ${trait.name} permanent`}
                       >
                         <AddCircleIcon />
                       </IconButton>
@@ -307,6 +308,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
           <Box>
             <Typography gutterBottom variant="caption">Cost Range (Essence)</Typography>
             <Slider
+              aria-label="Trait Essence cost range"
               value={filterState.traitCostRange}
               onChange={(e, newValue) => setFilter('traitCostRange', newValue as number[])}
               valueLabelDisplay="auto"
@@ -336,7 +338,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
           <Typography variant="h6">Trait Codex</Typography>
-          <IconButton onClick={onClose}>
+          <IconButton onClick={onClose} aria-label="Close Trait Codex">
             <CloseIcon />
           </IconButton>
         </Box>
@@ -346,6 +348,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
             size="small"
             variant="outlined"
             placeholder="Search Traits..."
+            inputProps={{ 'aria-label': 'Search traits' }}
             value={filterState.searchQuery}
             onChange={(e) => setFilter('searchQuery', e.target.value)}
             InputProps={{
@@ -357,7 +360,11 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
             }}
           />
           <Tooltip title="Toggle Filters">
-            <IconButton onClick={toggleFilters} color={filterState.showFilters ? 'primary' : 'default'}>
+            <IconButton
+              onClick={toggleFilters}
+              color={filterState.showFilters ? 'primary' : 'default'}
+              aria-label={filterState.showFilters ? 'Hide Trait Codex filters' : 'Show Trait Codex filters'}
+            >
               <FilterListIcon />
             </IconButton>
           </Tooltip>
