@@ -13,6 +13,23 @@ export function useKeyboardShortcuts() {
   const shortcuts = useRef<ShortcutAction[]>([]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // Menu/trait shortcuts must never override focused editing, modal
+    // interactions, IME composition, browser shortcuts, or handled key events.
+    if (event.defaultPrevented || event.isComposing || event.repeat || event.metaKey) {
+      return;
+    }
+
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest(
+        'input, textarea, select, [contenteditable]:not([contenteditable="false"]), ' +
+        '[role="textbox"], [role="dialog"], [aria-modal="true"]'
+      )
+    ) {
+      return;
+    }
+
     for (const shortcut of shortcuts.current) {
       if (
         event.key.toLowerCase() === shortcut.key.toLowerCase() &&

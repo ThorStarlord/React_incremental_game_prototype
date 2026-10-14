@@ -85,7 +85,8 @@ const MainMenu: React.FC = () => {
     clearDeleteTarget
   });
 
-  // Keyboard shortcuts
+  // A modal action must not be interrupted by global single-letter shortcuts.
+  const isMenuDialogOpen = Object.values(dialogState).some(Boolean);
   const shortcutInfo = useMenuShortcuts(mostRecentSave, {
     registerShortcut,
     handleNewGame,
@@ -94,7 +95,7 @@ const MainMenu: React.FC = () => {
     openLoadDialog: () => openDialog('loadDialog'),
     openImportDialog: () => openDialog('importDialog'),
     openAboutDialog: () => openDialog('aboutDialog')
-  });
+  }, isMenuDialogOpen);
 
   // This file must remain .tsx since it contains JSX like:
   return (
