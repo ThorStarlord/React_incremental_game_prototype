@@ -4,7 +4,7 @@ import { Box, Typography, LinearProgress, Chip, Stack, useTheme } from '@mui/mat
 // Define interface for the component props - making required props non-optional
 interface EssenceDisplayProps {
   currentEssence: number;
-  maxEssence?: number; // Made optional
+  maxEssence?: number; // Supply only when the underlying system has a real capacity
   essenceTypes?: Array<{
     id: string;
     name: string;
@@ -34,22 +34,24 @@ const EssenceDisplay: React.FC<EssenceDisplayProps> = ({
   
   // Ensure values are numbers before calculations/display
   const current = currentEssence ?? 0;
-  const max = maxEssence ?? 1000; // Default max essence if undefined
-  
-  const progress = max > 0 ? Math.min(100, (current / max) * 100) : 0;
+  // The Essence state is uncapped. Do not invent a 1,000-Essence limit for the UI.
+  // If a future caller has a genuine cap, retain the familiar progress display.
+  const max = typeof maxEssence === 'number' && Number.isFinite(maxEssence) && maxEssence > 0
+    ? maxEssence
+    : undefined;
+  const progress = max !== undefined ? Math.min(100, Math.max(0, (current / max) * 100)) : 0;
   
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
         <Typography variant="subtitle1" fontWeight="medium">Essence</Typography>
         <Typography variant="body2" color="text.secondary">
-          {/* Use the defaulted values */}
-          {current.toLocaleString()} / {max.toLocaleString()}
+          {current.toLocaleString()}{max !== undefined && ` / ${max.toLocaleString()}`}
         </Typography>
       </Box>
       
-      {/* Progress bar for essence */}
-      <LinearProgress 
+      {/* Only show a capacity bar when a real maximum is known. */}
+      {max !== undefined && <LinearProgress 
         variant="determinate" 
         value={progress} 
         sx={{ 
@@ -61,7 +63,7 @@ const EssenceDisplay: React.FC<EssenceDisplayProps> = ({
             backgroundColor: '#3a7ca5',
           }
         }} 
-      />
+      />}
       
       {/* Essence generation rate */}
       {essenceRate !== undefined && (
