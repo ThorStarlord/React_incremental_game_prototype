@@ -37,17 +37,15 @@ const EssencePanel: React.FC<EssencePanelProps> = ({
   const essenceState = useAppSelector(selectEssenceState);
   const essenceAmount = essenceState.currentEssence;
   const totalCollected = essenceState.totalCollected || 0;
-  const maxEssence = 1000; // Default max since maxAmount doesn't exist in state
   const generationRate = essenceState.generationRate || 0; // Use 0 as default if undefined
   
   return (
     <Box sx={{ width: '100%' }}>
       <Typography variant="h6" gutterBottom>{title}</Typography>
       
-      {/* Display current essence and max */}
+      {/* Show the actual, uncapped Essence balance. */}
       <EssenceDisplayUI 
         currentEssence={essenceAmount}
-        maxEssence={maxEssence}
         essenceRate={generationRate}
       />
       
