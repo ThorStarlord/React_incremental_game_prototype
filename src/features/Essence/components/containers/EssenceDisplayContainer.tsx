@@ -12,8 +12,8 @@ import useEssenceGeneration from '../../hooks/useEssenceGeneration';
 /**
  * EssenceDisplayContainer Component
  *
- * Fetches current and max essence from the Redux store and renders the
- * EssenceDisplayUI component with the fetched data.
+ * Fetches the uncapped current Essence amount and renders the UI without
+ * inventing a maximum not present in the canonical Essence state.
  */
 const EssenceDisplayContainer: React.FC = React.memo(() => {
   // Sync generation rate and start auto-generation interval
@@ -23,12 +23,9 @@ const EssenceDisplayContainer: React.FC = React.memo(() => {
   // Select the current essence amount from the Redux store
   const currentEssence = useAppSelector(selectCurrentEssence);
   
-  // Since there's no maxEssence in the current system, use a reasonable default
-  // or remove the maxEssence prop if EssenceDisplayUI doesn't need it
-  const maxEssence = 1000; // Default max for display purposes
 
   // Render the UI component, passing the data as props
-  return <EssenceDisplayUI currentEssence={currentEssence} maxEssence={maxEssence} />;
+  return <EssenceDisplayUI currentEssence={currentEssence} />;
 });
 
 EssenceDisplayContainer.displayName = 'EssenceDisplayContainer';
