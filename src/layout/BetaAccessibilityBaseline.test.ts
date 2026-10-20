@@ -27,9 +27,13 @@ describe('Beta accessibility baseline', () => {
       'aria-label={`Equip a trait in slot ${slot.slotIndex + 1}`}'
     );
     expect(traitSlots).toContain(
-      'aria-label={`Unequip ${trait.name}`}'
+      'aria-label={`Suppress ${trait.name}`}'
     );
     expect(traitSlots).toContain('aria-label="Trait slot help"');
+    // An expressed Trait may be suppressed without losing assimilated ownership.
+    // Accessible keyboard operation must remain independent of NPC proximity.
+    expect(traitSlots).not.toContain('isInProximityToNPC');
+    expect(traitSlots).toContain('tabIndex={0}');
     expect(traitSlots).toContain('role="button"');
     expect(traitSlots).toContain("event.key === 'Enter' || event.key === ' '");
   });
