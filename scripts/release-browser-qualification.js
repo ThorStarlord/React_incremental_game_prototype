@@ -235,7 +235,7 @@ async function runBrowserQualification(name, browserType, options, outDir) {
     await check('invalid-import-stays-in-import-flow', async () => {
       await page.getByRole('button', { name: /^Import$/ }).click();
       await assertVisible(page.getByRole('heading', { name: 'Import Save' }), 'import dialog');
-      await page.locator('textarea').fill('not-a-valid-save-code');
+      await page.getByRole('textbox', { name: /paste your save code/i }).fill('not-a-valid-save-code');
       await page.getByRole('button', { name: /^Import$/ }).last().click();
       await assertVisible(page.getByRole('heading', { name: 'Import Save' }), 'rejected import dialog');
       await assertVisible(

@@ -16,7 +16,8 @@ interface VersionFooterProps {
 export function VersionFooter({ version, shortcuts = [], sx }: VersionFooterProps) {
   return (
     // Replace div with Box and apply sx prop
-    <Box sx={{ textAlign: 'center', color: 'text.secondary', mt: 8, ...sx }}> 
+    // Fixed light colors: the main menu always sits on a dark gradient.
+    <Box sx={{ textAlign: 'center', color: 'grey.400', mt: 8, ...sx }}> 
       <Typography variant="body2">Version {version}</Typography>
       
       {shortcuts.length > 0 && (
@@ -49,7 +50,8 @@ export function VersionFooter({ version, shortcuts = [], sx }: VersionFooterProp
                     fontSize: '0.7rem', 
                     fontWeight: 'bold', 
                     fontFamily: 'monospace',
-                    bgcolor: 'action.hover' // Use theme color
+                    bgcolor: 'rgba(255, 255, 255, 0.16)',
+                    color: 'common.white'
                   }} 
                 />
                 <Typography variant="caption" sx={{ ml: 1 }}>

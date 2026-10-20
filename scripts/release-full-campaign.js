@@ -78,6 +78,7 @@ const turnIn = (quest) => ({ kind: 'turnIn', quest });
 const travel = (location) => ({ kind: 'travel', location });
 const forge = () => ({ kind: 'forge' });
 const checkpoint = (name, expectText) => ({ kind: 'checkpoint', name, expectText });
+const exportImport = (expectText) => ({ kind: 'exportImport', expectText });
 
 const WILLOW = 'npc_elder_willow';
 const GRONK = 'npc_blacksmith_gronk';
@@ -212,6 +213,7 @@ const ROUTES = {
       turnIn('quest_gc10_telluric_echo_distributed'),
       talk(LYRA, 'lyra_gc10_aftermath_distributed', 'record'),
       checkpoint('after campaign completion', 'Campaign One Complete — Distributed Dissipation'),
+      exportImport('Campaign One Complete — Distributed Dissipation'),
     ],
   },
   fortified: {
@@ -246,6 +248,7 @@ const ROUTES = {
       turnIn('quest_gc10_telluric_echo_fortified'),
       talk(LYRA, 'lyra_gc10_aftermath_fortified', 'record'),
       checkpoint('after campaign completion', 'Campaign One Complete — Fortified Containment'),
+      exportImport('Campaign One Complete — Fortified Containment'),
     ],
   },
 };
@@ -418,6 +421,35 @@ class CampaignRunner {
     }
     return { heading: after, saveStatus };
   }
+
+  // Export the completed save from the main menu, import the code as a new
+  // slot, load that slot, and confirm the same completed campaign comes back.
+  async exportImport({ expectText }) {
+    await this.page.getByRole('button', { name: 'Save & Main Menu', exact: true }).click();
+    await this.page.getByRole('heading', { name: 'Incremental RPG' }).waitFor({ timeout: STEP_TIMEOUT });
+
+    await this.page.getByRole('button', { name: /^Export$/ }).click();
+    const exportDialog = this.page.getByRole('dialog', { name: 'Export Save' });
+    const code = await exportDialog.getByRole('textbox').inputValue();
+    if (code.length < 1000) throw new Error(`export code is implausibly short (${code.length} chars)`);
+    await exportDialog.getByRole('button', { name: 'Close', exact: true }).click();
+    await exportDialog.waitFor({ state: 'hidden', timeout: STEP_TIMEOUT });
+
+    await this.page.getByRole('button', { name: /^Import$/ }).click();
+    const importDialog = this.page.getByRole('dialog', { name: 'Import Save' });
+    await importDialog.getByRole('textbox').fill(code);
+    await importDialog.getByRole('button', { name: 'Import', exact: true }).click();
+    await importDialog.waitFor({ state: 'hidden', timeout: STEP_TIMEOUT });
+
+    await this.page.getByRole('button', { name: /^Load Game$/ }).click();
+    const loadDialog = this.page.getByRole('dialog', { name: 'Load Saved Game' });
+    await loadDialog.getByRole('button', { name: /^Imported Save/ }).first().click();
+    await this.page.waitForURL(/\/game(\/|$)/, { timeout: STEP_TIMEOUT });
+    await this.nav('Dashboard');
+    const heading = await this.campaignHeading();
+    if (heading !== expectText) throw new Error(`imported save shows "${heading}", expected "${expectText}"`);
+    return { heading, exportCodeLength: code.length };
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -461,6 +493,7 @@ function describeStep(step) {
     case 'travel': return `travel ${step.location}`;
     case 'forge': return 'practice Forge Assistance';
     case 'checkpoint': return `save/Continue checkpoint: ${step.name}`;
+    case 'exportImport': return 'export -> import -> load round trip';
     default: return step.kind;
   }
 }
@@ -501,6 +534,7 @@ async function runRoute(browserName, browserType, routeId, options, content) {
       try {
         const detail = await runner[step.kind](step);
         if (step.kind === 'checkpoint') result.checkpoints.push({ name: step.name, ...detail });
+        if (step.kind === 'exportImport') result.exportImport = detail;
       } catch (error) {
         result.failedStep = label;
         result.error = error instanceof Error ? error.message.split('\n')[0] : String(error);
@@ -537,10 +571,10 @@ function writeArtifacts(options, report) {
     `- Evidence class: SYNTHETIC_FINDING (ordinary UI only; not human evidence)`,
     `- Overall result: **${report.overall}**`,
     '',
-    '| Browser | Version | Route | Steps | Checkpoints | Duration | Result |',
-    '| --- | --- | --- | --- | --- | --- | --- |',
+    '| Browser | Version | Route | Steps | Save/Continue checkpoints | Export/import | Duration | Result |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |',
     ...report.runs.map(run =>
-      `| ${run.browser} | ${run.browserVersion} | ${run.title} | ${run.completedSteps}/${run.steps} | ${run.checkpoints.length} | ${run.durationSeconds}s | ${run.status} |`),
+      `| ${run.browser} | ${run.browserVersion} | ${run.title} | ${run.completedSteps}/${run.steps} | ${run.checkpoints.length} | ${run.exportImport ? 'PASS' : '—'} | ${run.durationSeconds}s | ${run.status} |`),
     '',
   ];
   for (const run of report.runs.filter(candidate => candidate.status !== 'PASS')) {

@@ -23,7 +23,7 @@ export function MainMenuTitle({ title, subtitle, sx }: MainMenuTitleProps) {
       {subtitle && (
         <Typography
           variant="h6"
-          color="text.secondary"
+          color="grey.300"
         >
           {subtitle}
         </Typography>
