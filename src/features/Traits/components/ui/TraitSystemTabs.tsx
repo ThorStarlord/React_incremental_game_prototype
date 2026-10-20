@@ -27,7 +27,6 @@ export interface TraitSystemTabsProps {
   discoveredTraits: Trait[];
   availableTraitsForEquip: Trait[];
   currentEssence: number;
-  isInProximityToNPC: boolean;
   loading: boolean;
   error: string | null;
   onEquipTrait: (traitId: string, slotIndex: number) => void;
@@ -52,7 +51,6 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
   discoveredTraits,
   availableTraitsForEquip,
   currentEssence,
-  isInProximityToNPC,
   loading,
   error,
   onEquipTrait,
@@ -74,7 +72,7 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
 
   // Define the tabs and their corresponding components
   const tabs = useMemo(() => [
-    { id: 'slots', label: 'Slots', component: EquippedSlotsPanel },
+    { id: 'slots', label: 'Expression', component: EquippedSlotsPanel },
     { id: 'management', label: 'Management', component: TraitManagement },
     { id: 'codex', label: 'Codex', component: 'codex_placeholder' }, // Special case for the codex
     { id: 'doctrine', label: 'Doctrine', component: DoctrineFocusPanel },

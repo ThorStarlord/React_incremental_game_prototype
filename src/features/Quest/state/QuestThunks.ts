@@ -213,13 +213,16 @@ export const resolveQuestOutcomeThunk = createAsyncThunk<
       const option = quest.resolutionOptions?.find(candidate => candidate.id === resolutionId);
       if (!option) throw new Error(`Unknown quest resolution: ${resolutionId}`);
 
+      const expressedTraitIds = state.player.traitSlots
+        .map(slot => slot.traitId)
+        .filter((traitId): traitId is string => Boolean(traitId));
       const missingPermanentTraitIds = getMissingPermanentTraitIdsForResolution(
         option,
-        state.player.permanentTraits
+        expressedTraitIds
       );
       if (missingPermanentTraitIds.length > 0) {
         throw new Error(
-          `Resolution requires permanent Trait${missingPermanentTraitIds.length === 1 ? '' : 's'}: ${missingPermanentTraitIds.join(', ')}.`
+          `Resolution requires expressed Trait${missingPermanentTraitIds.length === 1 ? '' : 's'}: ${missingPermanentTraitIds.join(', ')}.`
         );
       }
 

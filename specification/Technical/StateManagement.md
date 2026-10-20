@@ -193,10 +193,10 @@ interface PlayerState {
   
   // Traits and effects
   statusEffects: StatusEffect[];
-  permanentTraits: string[]; // IDs of traits the player has permanently acquired
-  traitSlots: TraitSlot[];   // Temporary/pre-permanence Trait slots
+  permanentTraits: string[]; // legacy field name: permanently assimilated Trait library
+  traitSlots: TraitSlot[];   // current Trait expression capacity / manifested patterns
   doctrineFocus: {
-    foregroundedPermanentTraitIds: string[]; // Current bounded build specialization
+    foregroundedPermanentTraitIds: string[]; // compatibility field: foregrounded assimilated Trait IDs
   };
 }
 ```
@@ -206,7 +206,7 @@ interface PlayerState {
 - **Stat Calculations**: Provides `recalculateStats` reducer for automatic recalculation of derived stats when attributes, traits, or status effects change
 - **Attribute Management**: Handles attribute point allocation (`allocateAttributePoint`) with validation against available points
 - **Status Effects**: Manages the list of active status effects (`addStatusEffect`, `removeStatusEffect`) with stat impact handled via `recalculateStats`
-- **Trait Integration**: Manages player's active trait slots (`equipTrait`, `unequipTrait`) and list of player-specific permanent traits (`addPermanentTrait`)
+- **Trait Integration**: Manages Player Trait expression slots (`equipTrait`/`expressTrait`, `unequipTrait`/`suppressTrait`) and the compatibility-backed assimilated library (`permanentTraits` / `addPermanentTrait`)
 - **Playtime Tracking**: Manages `totalPlaytime` (`updatePlaytime`)
 
 ### 4.2. Traits Slice ✅ COMPLETE
@@ -225,9 +225,9 @@ interface TraitsState {
 
 **Key Features**:
 - **Trait Definitions & Discovery**: Manages all trait definitions (loaded via `fetchTraitsThunk`) and tracks discovered traits (`discoverTrait`, `discoveredTraits` state)
-- **Streamlined Lifecycle**: Follows the simplified Discover -> Equip -> Resonate flow without intermediate acquisition states
-- **Trait Permanence (Player-Specific)**: Player-specific permanent traits are managed in `PlayerSlice`. The "Resonance" mechanic (`acquireTraitWithEssenceThunk`) makes traits permanent for the player by updating `PlayerSlice.permanentTraits`.
-- **Doctrine Focus (Player-Specific)**: `PlayerSlice.doctrineFocus` records which permanently learned principles are currently foregrounded. Emergent doctrine identities are derived by Trait selectors and are not stored as independent booleans.
+- **Universal Trait Lifecycle**: Discovery/recognition -> assimilation evidence where applicable -> temporary expression -> Essence Stabilization -> permanent assimilated availability -> selective expression/suppression
+- **Trait Assimilation/Stabilization (Player-Specific)**: `PlayerSlice.permanentTraits` is the legacy serialized name for the assimilated Trait library. `stabilizeTraitWithEssenceThunk` (with compatibility alias `acquireTraitWithEssenceThunk`) makes a qualified pattern permanently available; it does not make the Trait always active.
+- **Doctrine Focus (Player-Specific)**: `PlayerSlice.doctrineFocus` records which assimilated principles are currently foregrounded; active Doctrine also requires those Traits to be expressed. Emergent doctrine identities are derived by Trait selectors and are not stored as independent booleans.
 - **Codex Data**: Provides the necessary data (`traits`, `discoveredTraits`) for a Trait Codex UI displaying all discovered traits
 - **Trait Presets**: Manages saving, loading, and deleting trait presets (`saveTraitPreset`, `loadTraitPreset`, `deleteTraitPreset`)
 

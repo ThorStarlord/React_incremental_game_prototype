@@ -384,17 +384,20 @@ export const processNPCInteractionThunk = createAsyncThunk<
         const requiredPermanentTraitIds = Array.isArray(node.requiredPermanentTraitIds)
           ? node.requiredPermanentTraitIds as string[]
           : [];
+        const expressedTraitIds = currentState.player.traitSlots
+          .map(slot => slot.traitId)
+          .filter((traitId): traitId is string => Boolean(traitId));
         const missingPermanentTrait = requiredPermanentTraitIds.find(
-          (traitId: string) => !currentState.player.permanentTraits.includes(traitId)
+          (traitId: string) => !expressedTraitIds.includes(traitId)
         );
         if (missingPermanentTrait) {
           dispatch(addNotification({
             type: 'info',
-            message: 'You have not permanently learned the capability this conversation depends on yet.',
+            message: 'Express the Trait pattern this conversation depends on first.',
           }));
           return {
             success: false,
-            message: `Required permanent Trait not learned: ${missingPermanentTrait}`,
+            message: `Required Trait not expressed: ${missingPermanentTrait}`,
           } as InteractionResult;
         }
 
@@ -699,18 +702,15 @@ export const shareTraitWithNPCThunk = createAsyncThunk(
       return payload;
     }
 
-    const playerPermanent = new Set(state.player.permanentTraits);
-    const equippedTraitIds = new Set(
+    const expressedTraitIds = new Set(
       state.player.traitSlots
         .filter(s => !!s.traitId)
         .map(s => s.traitId as string)
     );
-    const isPermanent = playerPermanent.has(traitId);
-    const isEquipped = equippedTraitIds.has(traitId);
-    if (isPermanent || !isEquipped) {
+    if (!expressedTraitIds.has(traitId)) {
       dispatch(addNotification({
         type: 'warning',
-        message: 'Only equipped, non-permanent Traits can be shared with an NPC.',
+        message: 'Only currently expressed Traits can be shared with an NPC.',
       }));
       return payload;
     }

@@ -75,8 +75,8 @@ Players should feel that:
 ### Unique selling points
 
 1. **Evidence-based Relationship progression** — Experiences, Memories, Bond dimensions, and qualified Connection rather than one universal relationship XP bar.
-2. **Relationship-mediated Trait learning** — discovery, temporary attunement, assimilation, Memory evidence, and permanent Resonance for migrated Traits.
-3. **Trait-driven gameplay capability** — permanent learned Traits can expose materially different gameplay solutions while baseline progression remains viable.
+2. **Universal Trait assimilation** — salient physiological, procedural, informational, cognitive, experiential, or metaphysical patterns can become legible through meaningful resonance and be assimilated into the protagonist.
+3. **Trait expression buildcraft** — stabilized Traits remain permanently available while limited expression capacity determines which patterns and capabilities are active now.
 4. **Relationship-derived Essence** — ongoing passive power generated from meaningful relational significance rather than relationship milestones acting as loot drops.
 5. **Narrative causal memory** — persisted Relationship evidence can unlock or alter later story consequences across substantial causal distance.
 6. **Multi-NPC social consequence** — one shared event can be interpreted differently by several characters.
@@ -87,7 +87,7 @@ Players should feel that:
 11. **Earned routine delegation** — player-understood repeatable work can become Copy-delegatable while meaningful decisions remain player-owned.
 12. **Bounded offline continuation** — safe already-running work can progress while away without replaying the narrative RPG.
 13. **Composed chapter causality** — two complete M25 routes prove that the same system authorities can support materially divergent outcomes.
-14. **Character customization** — permanent and slotted Traits can support different gameplay solutions and future builds.
+14. **Trait-hoarder character composition** — the protagonist can carry many assimilated patterns while selectively expressing a current build.
 
 ---
 
@@ -99,7 +99,9 @@ Discover person / problem
 -> record Relationship Experience where relationally meaningful
 -> form/alter Bond Profile and possibly Memory
 -> qualify Connection and change ongoing Essence / Trait-learning conditions
--> discover / assimilate / Resonate capability
+-> resonate with / discover / assimilate a salient Trait pattern
+-> stabilize qualified assimilation with Essence
+-> choose which available Traits to express
 -> travel to an authored location when the problem requires it
 -> current world presence may alter effective Tether / Essence intensity
 -> use capability in gameplay
@@ -134,9 +136,9 @@ Discover person / problem
 3. Move between bounded authored locations as objectives require.
 4. Choose spatial presence knowing that being near one qualified Relationship may mean being more remote from another.
 5. Accumulate passive Essence.
-6. Discover and assimilate useful Traits.
-7. Spend Essence to stabilize qualified Traits permanently.
-8. Use learned capabilities to solve later problems differently.
+6. Discover and assimilate useful Trait patterns.
+7. Spend Essence to Stabilize qualified patterns into permanent availability.
+8. Express the patterns relevant to the current build/problem and use the resulting capabilities.
 9. Decide who learns selected objective facts when authored options make information control meaningful.
 10. Accept institutional consequences that may diverge from personal approval.
 11. Shape objective regional conditions through explicit actions.
@@ -146,7 +148,7 @@ Discover person / problem
 
 1. Build a diverse Relationship network.
 2. Accumulate Memories and long-horizon callbacks.
-3. Develop specialized permanent capabilities and, where later evidence warrants it, coherent Trait combinations.
+3. Accumulate an assimilated Trait library and develop specialized expression/Doctrine combinations.
 4. Build an increasingly capable Copy network around mastered routines.
 5. Revisit old choices when later story situations consume historical evidence.
 6. Navigate persistent differences between personal bonds, who knows what, institutional standing, and objective world conditions.
@@ -237,39 +239,48 @@ M21 additionally qualifies bounded offline settlement of the saved Essence gener
 
 ### Trait System
 
-The creative/authoring identity for the Trait family is defined in [`Features/TraitIdentity.md`](Features/TraitIdentity.md). The runtime lifecycle and authority contract remain in [`Features/TraitSystem.md`](Features/TraitSystem.md).
+The creative ontology is defined in [Features/TraitIdentity.md](Features/TraitIdentity.md). The runtime lifecycle is defined in [Features/TraitSystem.md](Features/TraitSystem.md).
 
-Traits are internalized capabilities or patterns: durable changes in what the protagonist can perceive, understand, attempt, perform, or passively sustain.
+Traits are universal, selectively represented patterns of being. A salient Trait may describe physiology, a sense, procedural skill, semantic knowledge, episodic memory, cognition, disposition, or metaphysical structure.
 
-The migrated relationship-mediated lifecycle is:
+The protagonist's distinctive progression is:
 
-```text
-Discover
--> temporarily Equip / Attune
--> accumulate assimilation + compatibility evidence
--> form required Memory evidence
--> meet qualified Connection requirement
--> spend Essence
--> Resonate permanently
-```
+~~~text
+meaningful proximity / attention / relationship significance
+-> Resonance makes a source pattern legible
+-> Discovery
+-> Assimilation
+-> temporary Expression may become possible
+-> Essence Stabilization
+-> permanent assimilated availability
+-> selective Expression / Suppression
+~~~
 
-Willow's Wisdom and Scholarly Insight exercise this model in production qualification.
+The state distinction is fundamental:
 
-M16 qualified permanent Trait ownership as a gameplay capability boundary through a bounded generic quest-resolution gate. M17 independently consumed the same permanent-Trait authority in Combat.
+~~~text
+Assimilated
+= permanently available
 
-```text
-Relationship -> qualifies learning
-Trait        -> owns durable capability
-Gameplay     -> determines local applicability
-Player       -> chooses whether to use it
-Relationship -> interprets the result when relationally meaningful
-```
+Expressed
+= currently active / manifested
 
-A Trait should usually expand meaningful solution space rather than become an automatic best answer. Capability availability must not automatically make irreversible player decisions.
+Capability
+= what expressed Trait pattern(s) make possible
+~~~
 
-Passive modifiers remain valid, but important Relationship-derived Traits should ideally have a coherent capability identity beyond an interchangeable percentage bonus.
+Relationship history may qualify and explain assimilation without becoming ownership. Trait state owns the assimilated pattern. Expression determines current active Trait effects/capability access. Gameplay determines local applicability. The Player still makes the decision.
 
-Temporary/equipped Trait gameplay authority beyond existing effects remains deliberately unqualified.
+~~~text
+Relationship / source evidence -> explains and qualifies acquisition
+Trait library                  -> owns durable pattern
+Expression                     -> owns current manifestation
+Gameplay                       -> determines local applicability
+Player                         -> chooses action
+Relationship                   -> interprets consequence when relevant
+~~~
+
+Campaign One does not collapse Relationship Memory, per-NPC Knowledge, Faction Reputation, World State, or routine familiarity into Traits. Universal ontology means patterns may be universal in-world, not that all game state becomes one Trait system.
 
 ### Quest and Narrative System
 

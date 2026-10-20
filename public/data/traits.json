@@ -47,7 +47,12 @@
       "defense": 3
     },
     "rarity": "Uncommon",
-    "iconPath": "swords"
+    "iconPath": "swords",
+    "identity": {
+      "nature": "procedural",
+      "sourceProvenance": "practice",
+      "notes": "Combat-conditioned procedural and embodied patterning."
+    }
   },
   "EssenceSiphon": {
     "id": "EssenceSiphon",
@@ -89,7 +94,12 @@
       "essenceGenerationMultiplier": 0.15
     },
     "rarity": "Rare",
-    "iconPath": "waterfall"
+    "iconPath": "waterfall",
+    "identity": {
+      "nature": "metaphysical",
+      "sourceProvenance": "essence_pattern",
+      "notes": "A transferable Essence-flow pattern whose current live consumer is Copy sharing/inheritance."
+    }
   },
   "CombatReflexes": {
     "id": "CombatReflexes",
@@ -143,7 +153,12 @@
       "learningSpeed": 0.15
     },
     "rarity": "Uncommon",
-    "iconPath": "nature_people"
+    "iconPath": "nature_people",
+    "identity": {
+      "nature": "cognitive",
+      "sourceProvenance": "relationship_assimilated",
+      "notes": "Slow-pattern and systemic-causation cognition learned through Elder Willow."
+    }
   },
   "ScholarlyInsight": {
     "id": "ScholarlyInsight",
@@ -172,7 +187,11 @@
       "knowledgeEssence": 0.1
     },
     "rarity": "Uncommon",
-    "iconPath": "menu_book"
+    "iconPath": "menu_book",
+    "identity": {
+      "nature": "cognitive",
+      "sourceProvenance": "relationship_assimilated"
+    }
   },
   "ResilientConstitution": {
     "id": "ResilientConstitution",
@@ -184,7 +203,12 @@
       "maxHealth": 50
     },
     "rarity": "Uncommon",
-    "iconPath": "shield"
+    "iconPath": "shield",
+    "identity": {
+      "nature": "physiological",
+      "sourceProvenance": "embodied",
+      "notes": "A durable bodily pattern expressed as increased health capacity."
+    }
   },
   "ArcaneIntellect": {
     "id": "ArcaneIntellect",
@@ -302,6 +326,11 @@
       "prerequisiteTraits": [
         "ArcaneIntellect"
       ]
+    },
+    "identity": {
+      "nature": "semantic_knowledge",
+      "sourceProvenance": "knowledge_exposure",
+      "notes": "Compatibility ID names the source artifact; the Trait represents the dangerous knowledge pattern internalized from it."
     }
   },
   "HeartOfTheMountain": {
@@ -383,7 +412,11 @@
     "assimilationDifficulty": 1,
     "assimilationThreshold": 100,
     "minimumCompatibility": 20,
-    "resonanceExperienceId": "gronk_exp_resonance_constraint_sense"
+    "resonanceExperienceId": "gronk_exp_resonance_constraint_sense",
+    "identity": {
+      "nature": "cognitive_procedural",
+      "sourceProvenance": "relationship_assimilated"
+    }
   },
   "AdversarialCalibration": {
     "id": "AdversarialCalibration",
@@ -412,6 +445,10 @@
     "assimilationDifficulty": 1,
     "assimilationThreshold": 100,
     "minimumCompatibility": 24,
-    "resonanceExperienceId": "lyra_exp_resonance_adversarial_calibration"
+    "resonanceExperienceId": "lyra_exp_resonance_adversarial_calibration",
+    "identity": {
+      "nature": "cognitive_relational",
+      "sourceProvenance": "relationship_assimilated"
+    }
   }
 }

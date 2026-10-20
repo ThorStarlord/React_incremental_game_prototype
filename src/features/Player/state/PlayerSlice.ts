@@ -130,9 +130,21 @@ const playerSlice = createSlice({
       if (!state.permanentTraits.includes(traitId)) {
         state.permanentTraits.push(traitId);
       }
+
+      // Stabilization means permanent availability, not permanent activation.
+      // Preserve a Trait that was already expressed; otherwise express it in
+      // the first available unlocked slot when capacity exists.
+      const alreadyExpressed = state.traitSlots.some(slot => slot.traitId === traitId);
+      if (!alreadyExpressed) {
+        const firstEmpty = state.traitSlots.find(slot => !slot.isLocked && slot.traitId === null);
+        if (firstEmpty) firstEmpty.traitId = traitId;
+      }
     },
     removePermanentTrait: (state, action: PayloadAction<string>) => {
         state.permanentTraits = state.permanentTraits.filter(id => id !== action.payload);
+        state.traitSlots.forEach(slot => {
+          if (slot.traitId === action.payload) slot.traitId = null;
+        });
         state.doctrineFocus.foregroundedPermanentTraitIds =
           state.doctrineFocus.foregroundedPermanentTraitIds.filter(id => id !== action.payload);
     },
@@ -193,6 +205,10 @@ const playerSlice = createSlice({
       }
 
       if (targetIndex !== -1 && state.traitSlots[targetIndex] && !state.traitSlots[targetIndex].isLocked) {
+        // A pattern can only occupy one Player expression slot at a time.
+        state.traitSlots.forEach((slot, index) => {
+          if (index !== targetIndex && slot.traitId === traitId) slot.traitId = null;
+        });
         state.traitSlots[targetIndex].traitId = traitId;
       }
     },
@@ -264,5 +280,11 @@ export const {
   spendGold,
   markRoutineFamiliarity,
 } = playerSlice.actions;
+
+/** Canonical universal-Trait vocabulary over compatibility action names. */
+export const addAssimilatedTrait = addPermanentTrait;
+export const removeAssimilatedTrait = removePermanentTrait;
+export const expressTrait = equipTrait;
+export const suppressTrait = unequipTrait;
 
 export default playerSlice.reducer;

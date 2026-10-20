@@ -9,7 +9,7 @@ import { selectPlayerTraitSlots, selectMaxTraitSlots, selectResonanceLevel } fro
 /**
  * TraitSlotProgressIndicator Component
  *
- * Displays a progress bar indicating progress toward unlocking the next trait slot.
+ * Displays progress toward unlocking the next Trait expression slot.
  */
 const TraitSlotProgressIndicator: React.FC = () => {
   const totalEssenceCollected = useAppSelector(selectTotalCollected);
@@ -31,18 +31,19 @@ const TraitSlotProgressIndicator: React.FC = () => {
       };
     }
 
-    // Example logic: A new slot unlocks every 2 resonance levels. RL is 1 per 100 essence.
-    // This logic needs to be aligned with your game design. For now, a placeholder:
-    const nextSlotUnlockLevel = (currentUnlockedSlots - 2 < 1) ? 1 : (currentUnlockedSlots - 2) + 1;
+    const nextLockedSlot = traitSlots.find(slot => slot.isLocked);
+    const nextSlotUnlockLevel = nextLockedSlot
+      ? nextLockedSlot.slotIndex + 1
+      : currentResonanceLevel;
     const essenceForNextSlot = nextSlotUnlockLevel * 100;
-    const previousSlotUnlockEssence = (nextSlotUnlockLevel - 1) * 100;
-    
-    const essenceInCurrentTier = totalEssenceCollected - previousSlotUnlockEssence;
-    const essenceNeededForNext = essenceForNextSlot - previousSlotUnlockEssence;
-    
-    const progressPercentage = essenceNeededForNext > 0
-      ? Math.min(100, (essenceInCurrentTier / essenceNeededForNext) * 100)
-      : 100;
+    const currentLevelFloor = Math.max(0, currentResonanceLevel * 100);
+    const essenceInCurrentTier = Math.max(0, totalEssenceCollected - currentLevelFloor);
+    const essenceNeededForNext = Math.max(1, essenceForNextSlot - currentLevelFloor);
+
+    const progressPercentage = Math.min(
+      100,
+      (essenceInCurrentTier / essenceNeededForNext) * 100
+    );
 
     return {
       progressPercentage,
@@ -65,7 +66,7 @@ const TraitSlotProgressIndicator: React.FC = () => {
   return (
     <Tooltip
       title={allSlotsUnlocked
-        ? "All trait slots unlocked!"
+        ? "All Trait expression slots unlocked!"
         : `Resonance Level ${currentResonanceLevel} (Next slot at RL ${nextSlotUnlockLevel})`
       }
       arrow
@@ -77,8 +78,8 @@ const TraitSlotProgressIndicator: React.FC = () => {
           </Typography>
           <Typography variant="caption" color="text.secondary">
             {allSlotsUnlocked
-              ? "All Slots Unlocked"
-              : `Slots: ${currentUnlockedSlots}/${maxTraitSlots}`}
+              ? "All Expression Slots Unlocked"
+              : `Expression slots: ${currentUnlockedSlots}/${maxTraitSlots}`}
           </Typography>
         </Box>
 

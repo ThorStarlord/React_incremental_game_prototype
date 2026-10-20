@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import {
   clearDoctrineFocus,
+  equipTrait,
   setDoctrineFocus,
 } from '../../Player/state/PlayerSlice';
 import {
@@ -20,14 +21,24 @@ const validateFocus = (
   const uniqueTraitIds = normalizeFocus(traitIds);
 
   if (uniqueTraitIds.length > DOCTRINE_FOCUS_CAPACITY) {
-    return `Doctrine focus supports at most ${DOCTRINE_FOCUS_CAPACITY} permanent Traits.`;
+    return `Doctrine focus supports at most ${DOCTRINE_FOCUS_CAPACITY} Traits.`;
   }
 
-  const permanent = new Set(state.player.permanentTraits);
-  const missing = uniqueTraitIds.filter(traitId => !permanent.has(traitId));
+  const assimilated = new Set(state.player.permanentTraits);
+  const missingAssimilated = uniqueTraitIds.filter(traitId => !assimilated.has(traitId));
 
-  if (missing.length > 0) {
-    return `Cannot foreground unlearned Traits: ${missing.join(', ')}.`;
+  if (missingAssimilated.length > 0) {
+    return `Cannot foreground unassimilated Traits: ${missingAssimilated.join(', ')}.`;
+  }
+
+  const expressed = new Set(
+    state.player.traitSlots
+      .map(slot => slot.traitId)
+      .filter((traitId): traitId is string => Boolean(traitId))
+  );
+  const missingExpressed = uniqueTraitIds.filter(traitId => !expressed.has(traitId));
+  if (missingExpressed.length > 0) {
+    return `Cannot foreground suppressed Traits: ${missingExpressed.join(', ')}.`;
   }
 
   return null;
@@ -65,8 +76,32 @@ export const activateDoctrineThunk = createAsyncThunk<
     }
 
     const requiredTraits = [...definition.requiredPermanentTraitIds];
-    const error = validateFocus(getState(), requiredTraits);
+    let state = getState();
 
+    const assimilated = new Set(state.player.permanentTraits);
+    const missingAssimilated = requiredTraits.filter(traitId => !assimilated.has(traitId));
+    if (missingAssimilated.length > 0) {
+      return rejectWithValue(
+        `Cannot adopt doctrine without assimilated Traits: ${missingAssimilated.join(', ')}.`
+      );
+    }
+
+    const unlockedSlots = state.player.traitSlots.filter(slot => !slot.isLocked);
+    if (requiredTraits.length > unlockedSlots.length) {
+      return rejectWithValue(
+        `This doctrine requires ${requiredTraits.length} expression slots, but only ${unlockedSlots.length} are unlocked.`
+      );
+    }
+
+    // Adopting/switching doctrine is itself an explicit Player expression
+    // decision. Deterministically place the doctrine pair into the first
+    // unlocked slots; equipTrait handles duplicate removal and replacement.
+    requiredTraits.forEach((traitId, index) => {
+      dispatch(equipTrait({ traitId, slotIndex: unlockedSlots[index].slotIndex }));
+    });
+
+    state = getState();
+    const error = validateFocus(state, requiredTraits);
     if (error) {
       return rejectWithValue(error);
     }
