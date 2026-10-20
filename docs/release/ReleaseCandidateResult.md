@@ -1,66 +1,35 @@
 # Release Candidate Result — Campaign One / 1.0
 
-**Status:** DETERMINISTIC CANDIDATE VERIFIED; PROMOTION BLOCKED
-**Reason:** The historical deterministic candidate is not current promotion authority. Beta human evidence, full production playthrough evidence, an intentionally versioned immutable RC/deployment identity, and release approval are not yet present.
-**Last updated:** 2026-09-20
+**Status:** RC-1 DECLARED — QUALIFICATION PENDING
+**Basis:** owner waiver (`specification/Technical/OwnerPersonalReleaseDecision.md`); BETA_PASS = NO / HUMAN-UNVALIDATED
+**Last updated:** 2026-10-20
 
 ## Candidate identity
 
 | Field | Value |
 | --- | --- |
-| Version | `1.0.0` in package metadata; promotion not approved |
-| Commit SHA | `4afa8aad6c074110a9e54295fb60e3e7f1ac6f0a` |
-| Build Validation run | Local clean detached worktree at the candidate SHA; CI run not recorded |
-| Production artifact/deployment | Local `CI=true npm run build` passed; deployment not recorded |
-| Release date | Not assigned |
-| Browser matrix | See `docs/release/BrowserQualification.md` |
-| Known defects | See `docs/release/KnownDefects.md` |
+| Version | `1.0.0-rc.1` |
+| Source baseline | `ea7ea010b8f22bfa13aa06deb7d5a672517b7b12` (main before the version change; the candidate adds only version metadata and release records) |
+| Commit SHA | Recorded here once the candidate's exact-head Build Validation passes |
+| Build Validation run | Recorded with the commit SHA |
+| Static hosting | `npm run release:serve` (root) in Build Validation; GitHub Pages via `.github/workflows/deploy-pages.yml` once enabled |
+| Browser matrix | Chromium + Firefox — see `docs/release/BrowserQualification.md` |
+| Known defects | `docs/release/KnownDefects.md` — no open release-blocking row |
+| Release notes | `docs/release/ReleaseNotes.md` — states the game was not externally playtested |
 
-## Deterministic gates
+## Qualification plan
 
-| Gate | Result |
-| --- | --- |
-| Documentation authority | PASS — `npm run docs:authority:validate` |
-| Content integrity/reachability | PASS — 0 warnings / 0 errors |
-| Alpha qualification | PASS — deterministic production-action gate |
-| TypeScript | PASS — clean-install verification |
-| Release evidence metadata | PASS — candidate SHA and external evidence blockers validated by `npm run release:evidence:validate` |
-| Full tests | PASS — 63 suites / 280 tests |
-| Production build | PASS — `CI=true npm run build`; main bundle 278.25 kB gzip |
-| Browser qualification | GC-13 CI visible-UI smoke now passes Chromium 153.0.8010.12 and Firefox 155.0; future immutable RC still needs its own exact-candidate evidence |
-| Dependency security review | Candidate policy PASS — 0 high/critical; 2 React Router moderate findings documented for review |
+The candidate's exact-head Build Validation provides:
 
-## Current promotion guard
+- documentation authority, content integrity, Alpha/Content Alpha/Beta-technical, timing, offline and persistence qualifications;
+- TypeScript and production build;
+- Chromium + Firefox visible-UI browser qualification (`gc13-browser-qualification`);
+- the ordinary-UI full campaign on the static production build in Chromium and Firefox: two divergent histories, four save → Main Menu → Continue checkpoints each, and an export → import → load round trip (`full-campaign-release-run`).
 
-GC-14 Build Validation #405 / run `35550537898` qualifies the explicit
-promotion guard.
+## Human evidence
 
-The current repository identity remains `0.9.0-beta.1`; no current
-`1.0.0-rc.N` candidate exists.
+None. The human Beta floor is waived for 1.0, not satisfied. No human-experience claim is made.
 
-Expected current commands:
+## Historical deterministic candidate (2026-09-20)
 
-```text
-npm run release:rc:eligibility
--> BLOCKED: BetaCompletionContract is not PASS
-
-npm run release:promotion:eligibility
--> BLOCKED: BetaCompletionContract is not PASS
-```
-
-This is intentional. The historical candidate table below does not grant current
-RC or 1.0 authority.
-
-## Release blockers
-
-1. Record Beta PASS using the required human evidence.
-2. Run the whole-game qualification through the production UI, including two
-   materially divergent histories.
-3. Record save/load/recovery at campaign boundaries, import/export and invalid
-   import behavior.
-4. After Beta PASS, create an intentionally versioned immutable `1.0.0-rc.N` candidate.
-5. Run Build Validation, Chromium+Firefox qualification, full UI release scenarios, deployment/static-host checks and recovery evidence against that exact RC.
-
-This record is deliberately conservative: the candidate is immutable and its
-deterministic gates are verified, but that does not silently convert missing
-human and CI evidence into release approval.
+Commit `4afa8aad6c074110a9e54295fb60e3e7f1ac6f0a` passed local deterministic gates (63 suites / 280 tests, production build) before the owner decision. It is superseded by the 1.0.0-rc.1 candidate and grants no promotion authority.

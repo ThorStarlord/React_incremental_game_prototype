@@ -169,11 +169,22 @@ describe('GC-14 release promotion eligibility guard', () => {
     expect(disclosed.status).toBe(0);
   });
 
-  test('current repository still fails RC entry and final promotion closed', () => {
-    for (const stage of ['rc', 'final'] as const) {
-      const result = runGuard(stage);
-      expect(result.status).not.toBe(0);
-      expect(result.stderr).toContain('release eligibility blocked');
+  test('current repository guard outcome matches its declared release stage', () => {
+    const version: string = readJson('package.json').version;
+    const rc = runGuard('rc');
+    const final = runGuard('final');
+
+    if (/^1\.0\.0-rc\.\d+$/.test(version)) {
+      // A declared release candidate may enter RC but is not yet promotable.
+      expect(rc.stderr).toBe('');
+      expect(rc.status).toBe(0);
+      expect(final.status).not.toBe(0);
+    } else if (version === '1.0.0') {
+      expect(final.stderr).toBe('');
+      expect(final.status).toBe(0);
+    } else {
+      expect(rc.status).not.toBe(0);
+      expect(final.status).not.toBe(0);
     }
   });
 

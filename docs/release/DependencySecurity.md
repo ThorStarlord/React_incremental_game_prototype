@@ -2,7 +2,7 @@
 
 **Status:** POLICY PASS; RESIDUAL AUDIT FINDINGS MUST BE REVIEWED
 **Command:** `npm run security:release`  
-**Last updated:** 2026-09-12
+**Last updated:** 2026-10-20
 
 ## Policy
 
@@ -15,6 +15,23 @@
   silently introduce major-version behavior changes.
 - Every residual high/critical advisory must be classified as fixed, accepted
   with a documented mitigation, or release-blocking.
+
+## 2026-10-20 regression and restoration
+
+RC-1 qualification found `npm run security:release` failing with 4 critical and
+78 high advisories. All of them came from the CRA build toolchain
+(`react-scripts` and its Jest/webpack-dev-server/Workbox/SVGO dependencies), which
+had returned to `dependencies`: commit `2051b0f` recreated `package.json` from an
+older copy, undoing the September move of build tooling to `devDependencies` and
+the hardened `react-router-dom`, `uuid` and `@emotion/styled` ranges. The lockfile
+still carried the hardened state.
+
+`package.json` is restored to match the lockfile root (`react-scripts`,
+`typescript` and `cross-env` in `devDependencies`; `react-router-dom ^6.30.6`,
+`uuid ^11.1.1`, `@emotion/styled ^11.14.1`). The runtime audit now reports only the
+two moderate React Router advisories described below, and the gate passes. The
+build-toolchain advisories still affect developer machines, not the shipped static
+bundle; they are part of the CRA end-of-life debt tracked as KD-006/KD-007.
 
 ## Current record
 
