@@ -2,8 +2,9 @@
 
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Active program:** Campaign One / 1.0 Release Qualification  
-**Current strategic stage:** RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA  
+**Active program:** Campaign One / post-1.0 maintenance  
+**Current strategic stage:** RELEASED_1_0 / HUMAN-UNVALIDATED  
+**Release:** 1.0.0 (2026-10-20); RC-1 qualified by Build Validation #564  
 **Owner decision:** `specification/Technical/OwnerPersonalReleaseDecision.md` (2026-10-20)  
 **Human Product Review:** issue #109 OPEN / UNPROVEN — 0/5 first sessions, 0/3 full external runs; floor waived as a 1.0 gate, BETA_PASS=NO
 
@@ -156,7 +157,7 @@ Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 [x] Candidate C — sufficient through existing GC08-GC10 composition
 [x] GATE     FEATURE_COMPLETE — recorded / HUMAN-UNVALIDATED
 [~] GC-13    Beta — technical readiness qualified; human floor OWNER-WAIVED for 1.0 (BETA_PASS=NO)
-[>] GC-14    Release Candidate / 1.0 — active under the owner waiver; KD-002 and KD-004 open
+[x] GC-14    Release Candidate / 1.0 — 1.0.0-rc.1 qualified (#564); 1.0.0 released under the owner waiver
 ```
 
 The roadmap may merge/split packages where content proves that clearer, but requirement traceability must remain explicit.

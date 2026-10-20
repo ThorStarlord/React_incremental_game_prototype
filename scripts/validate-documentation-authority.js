@@ -147,11 +147,11 @@ requireContains('STATUS.md', [
   'TECHNICAL_BETA_READY',
   'BETA_PASS=NO',
   'BETA_OWNER_WAIVED',
-  'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA',
+  'RELEASED_1_0 / HUMAN-UNVALIDATED',
+  'Build Validation #564',
   'OwnerPersonalReleaseDecision.md',
   'FeatureCompleteResult.md',
-  'KD-002',
-  'KD-004',
+  'not externally playtested',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
@@ -162,11 +162,11 @@ requireContains('STATUS.md', [
 
 requireContains('README.md', [
   'Current maturity: FEATURE_COMPLETE / HUMAN-UNVALIDATED',
-  'Current strategic stage: RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA',
+  'Current strategic stage: RELEASED_1_0 / HUMAN-UNVALIDATED',
   'Technical Beta readiness: PASS',
   'Beta: BETA_PASS=NO',
-  'RC entry: OPEN UNDER OWNER WAIVER',
-  '1.0: NOT YET PROMOTED',
+  'Release candidate: 1.0.0-rc.1 QUALIFIED',
+  '1.0: RELEASED 1.0.0',
   'not externally playtested',
   'OwnerPersonalReleaseDecision.md',
   'GameCompletionDefinition.md',
@@ -214,7 +214,7 @@ requireContains('specification/README.md', [
 
 requireContains('specification/GameCompletionDefinition.md', [
   'FEATURE_COMPLETE / HUMAN-UNVALIDATED',
-  'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA',
+  'RELEASED_1_0 / HUMAN-UNVALIDATED',
   'Technical/OwnerPersonalReleaseDecision.md',
   'Technical/FeatureCompleteResult.md',
   '1.0 stop condition',
@@ -243,7 +243,8 @@ requireContains('specification/Technical/GameCompletionRoadmap.md', [
   'FeatureCompleteResult.md',
   'Feature Complete                     PASS / HUMAN-UNVALIDATED',
   'Beta convergence                     ACTIVE',
-  'Release Candidate                    ACTIVE UNDER OWNER WAIVER',
+  'Release Candidate                    PASS — 1.0.0-rc.1',
+  '1.0                                  RELEASED 1.0.0 / HUMAN-UNVALIDATED',
   'BETA_OWNER_WAIVED / HUMAN-UNVALIDATED',
   'FEATURE_COMPLETE = YES / HUMAN-UNVALIDATED',
   'Alpha qualification',
@@ -307,7 +308,15 @@ requireContains('specification/Technical/OwnerPersonalReleaseDecision.md', [
 requireContains('AGENTS.md', [
   'OwnerPersonalReleaseDecision.md',
   'BETA_OWNER_WAIVED / HUMAN-UNVALIDATED',
-  'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA',
+  'RELEASED_1_0 / HUMAN-UNVALIDATED',
+  'release-hotfix',
+]);
+
+requireContains('docs/release/ReleaseCandidateResult.md', [
+  'RC-1 QUALIFIED',
+  'Build Validation #564',
+  'full-campaign-release-run',
+  'BETA_PASS = NO / HUMAN-UNVALIDATED',
 ]);
 
 requireContains('docs/release/BetaResult.md', [
@@ -436,6 +445,18 @@ const forbiddenPreWaiverPhrases = [
   ['specification/Technical/GameCompletionRoadmap.md', 'BLOCKED ON BETA_PASS'],
   ['specification/Technical/GameCompletionRoadmap.md', 'RC_ENTRY_BLOCKED'],
 ];
+
+// Prevent pre-release "RC/1.0 pending" authority from surviving the 1.0.0 release.
+forbiddenPreWaiverPhrases.push(
+  ['STATUS.md', 'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA'],
+  ['STATUS.md', '1.0 NOT YET PROMOTED'],
+  ['HANDOFF.md', 'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA'],
+  ['README.md', '1.0: NOT YET PROMOTED'],
+  ['README.md', 'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA'],
+  ['RUNBOOK.md', 'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA'],
+  ['docs/CURRENT.md', '1.0 NOT YET PROMOTED'],
+  ['AGENTS.md', '= RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA'],
+);
 
 for (const [file, phrase] of forbiddenPreWaiverPhrases) {
   if (read(file).includes(phrase)) {

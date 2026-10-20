@@ -2,7 +2,7 @@
 
 **Status:** CURRENT AUTHORITY — PROVISIONAL / HUMAN-UNVALIDATED  
 **Program stage:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
-**Current strategic stage:** RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA  
+**Current strategic stage:** RELEASED_1_0 / HUMAN-UNVALIDATED (1.0.0, 2026-10-20)  
 **Owner decision:** `Technical/OwnerPersonalReleaseDecision.md` (2026-10-20) — personal 1.0 release; human Beta floor waived, BETA_PASS=NO  
 **Prepared:** 2026-09-11  
 **Product direction:** `Technical/PostM25ProvisionalProductDirectionDecision.md`  
