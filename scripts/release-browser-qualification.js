@@ -180,6 +180,14 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await assertVisible(page.getByRole('button', { name: /^About$/ }), 'About button');
     });
 
+    // Checked before New Game: once a session exists, leaving the page writes a
+    // rolling autosave, so the load list is no longer empty afterwards.
+    await check('empty-load-state-is-explicit', async () => {
+      await page.getByRole('button', { name: /^Load Game$/ }).click();
+      await assertVisible(page.getByText('No saved games found.'), 'empty load state');
+      await page.getByRole('button', { name: /^Cancel$/ }).click();
+    });
+
     await check('keyboard-focus-visible', async () => {
       await page.keyboard.press('Tab');
       const focused = page.locator(':focus-visible');
@@ -237,11 +245,6 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await page.getByRole('button', { name: /^Cancel$/ }).click();
     });
 
-    await check('empty-load-state-is-explicit', async () => {
-      await page.getByRole('button', { name: /^Load Game$/ }).click();
-      await assertVisible(page.getByText('No saved games found.'), 'empty load state');
-      await page.getByRole('button', { name: /^Cancel$/ }).click();
-    });
 
     return {
       browser: name,
