@@ -23,7 +23,7 @@ const App: React.FC = () => {
   useEffect(() => {
     dispatch(fetchTraitsThunk());
     dispatch(initializeNPCsThunk());
-    dispatch(initializeQuestsThunk());
+    dispatch(initializeQuestsThunk({ preserveExisting: true }));
   }, [dispatch]);
 
   // Game loop for passive generation and time-based events

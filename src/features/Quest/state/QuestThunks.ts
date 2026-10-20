@@ -74,11 +74,24 @@ const applyQuestRewards = async (
   return rewardSummaries;
 };
 
-export const initializeQuestsThunk = createAsyncThunk('quest/initializeQuests', async (_, { dispatch }) => {
+/**
+ * Loads canonical quest definitions. With `preserveExisting`, quests already in
+ * state keep their progress and only missing definitions are added; App startup
+ * uses this so a catalog load that finishes after New Game or Load cannot reset
+ * the session's quest progress.
+ */
+export const initializeQuestsThunk = createAsyncThunk<
+  void,
+  { preserveExisting?: boolean } | undefined
+>('quest/initializeQuests', async (options, { dispatch, getState }) => {
   try {
     const response = await fetch('/data/quests.json');
     const quests: Record<string, Quest> = await response.json();
+    const existing = options?.preserveExisting
+      ? (getState() as RootState).quest.quests
+      : {};
     Object.values(quests).forEach(quest => {
+      if (existing[quest.id]) return;
       dispatch(addQuest(quest));
     });
   } catch (error) {
