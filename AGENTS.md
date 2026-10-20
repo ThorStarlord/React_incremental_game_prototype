@@ -24,7 +24,8 @@ FEATURE_COMPLETE
 -> owner waiver of the human Beta floor for 1.0 (BETA_PASS = NO)
 -> bounded release-blocking repairs found by RC qualification
 -> 1.0.0-rc.N exact-candidate qualification
--> 1.0.0 personal release, disclosed as not externally playtested
+-> 1.0.0 personal release, disclosed as not externally playtested  [released 2026-10-20]
+-> post-1.0: release-hotfix repairs; 1.1 scope only by owner decision
 ```
 
 Historical Alpha, Content Alpha, GC, Candidate B, Candidate A, Candidate C, and deterministic Beta-readiness results remain valid evidence. Do not invent another feature-construction package by inertia. Human Beta remains the only route to actual player-experience claims and a genuine `BETA_PASS`, but it no longer gates 1.0; deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, and persistence findings may still justify bounded repairs to the existing feature-complete game.
@@ -172,14 +173,14 @@ BETA_PASS
 BETA_OWNER_WAIVED / HUMAN-UNVALIDATED
 = recorded 2026-10-20; satisfies RC/1.0 entry only
 
-current frontier
-= RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA
+1.0.0-rc.1
+= qualified by Build Validation #564 (docs/release/ReleaseCandidateResult.md)
 
-RC entry
-= open under the owner waiver once 1.0.0-rc.N metadata is set and no release blocker remains
+current frontier
+= RELEASED_1_0 / HUMAN-UNVALIDATED (1.0.0 released 2026-10-20, not externally playtested)
 ```
 
-Remaining release work follows `ReleaseQualificationContract.md`: full ordinary-UI campaign evidence, divergent histories, save/recovery evidence, exact-candidate browser and static-hosting evidence, and honest release notes. The universal Trait redesign (PR #165) is parked until after 1.0.
+After 1.0, ordinary work is release-hotfix repair of defects in the shipped Campaign One scope, with the same exact-head Build Validation (including the full ordinary-UI campaign run). New ideas belong to 1.1 or an expansion and need an owner decision; the universal Trait redesign (PR #165) is the parked 1.1 candidate.
 
 An agent may merge its own pull request into `main` once exact-head Build Validation passes on that head (owner decision D3). It may not merge other people's pull requests or bypass Build Validation.
 

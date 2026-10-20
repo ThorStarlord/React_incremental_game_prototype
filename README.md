@@ -2,7 +2,7 @@
 
 A React/TypeScript narrative incremental RPG where consequential relationships teach durable capabilities, remembered history changes later possibilities, and personally understood repetition can become deliberately delegated work.
 
-> The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **FEATURE_COMPLETE / HUMAN-UNVALIDATED**; 1.0 release qualification is active as a personal release that has not been externally playtested.
+> The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **FEATURE_COMPLETE / HUMAN-UNVALIDATED**, released as **1.0.0**: a personal release that has not been externally playtested.
 
 ## Current state
 
@@ -12,15 +12,15 @@ Post-M25 timing/content/chapter hardening: COMPLETE / INTEGRATED
 Provisional Product Direction: SELECTED / HUMAN-UNVALIDATED
 M26 learn-to-delegate provenance: COMPLETE / INTEGRATED
 Current maturity: FEATURE_COMPLETE / HUMAN-UNVALIDATED
-Current strategic stage: RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA
-Active program: Campaign One / 1.0 Release Qualification
+Current strategic stage: RELEASED_1_0 / HUMAN-UNVALIDATED
+Active program: Campaign One / post-1.0 maintenance
 Human Product Review: OPEN / UNPROVEN (optional post-1.0)
 Alpha: PASS / HUMAN-UNVALIDATED
 Content Alpha: PASS / HUMAN-UNVALIDATED
 Technical Beta readiness: PASS
 Beta: BETA_PASS=NO — human floor OWNER-WAIVED for 1.0 (2026-10-20)
-RC entry: OPEN UNDER OWNER WAIVER — needs 1.0.0-rc.N metadata and no open release blocker
-1.0: NOT YET PROMOTED
+Release candidate: 1.0.0-rc.1 QUALIFIED — Build Validation #564
+1.0: RELEASED 1.0.0 — personal release, not externally playtested
 ```
 
 The application already has a real game loop, persistent save/load/import-export, Relationship/Memory progression, Traits/Essence, NPC dialogue, quests, authored travel, combat, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progression, and multiple chapter-scale compositions.

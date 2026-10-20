@@ -60,7 +60,7 @@ A coding agent may merge its own pull requests into `main` once exact-head Build
 - All timing, persistence, offline and content-integrity contracts.
 - `ReleaseQualificationContract.md` candidate immutability, browser matrix, known-defect policy and versioning rules.
 
-## Current state after this decision
+## State at the time of this decision
 
 ```text
 FEATURE_COMPLETE / HUMAN-UNVALIDATED
@@ -71,6 +71,10 @@ current strategic stage = RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA
 RC entry = OPEN under owner waiver once 1.0.0-rc.N metadata is set and no release blocker remains
 1.0 = NOT YET PROMOTED
 ```
+
+## Outcome
+
+`1.0.0-rc.1` was qualified by Build Validation #564 and Campaign One was released as `1.0.0` on 2026-10-20 (`docs/release/ReleaseCandidateResult.md`). The current stage is `RELEASED_1_0 / HUMAN-UNVALIDATED`.
 
 ## Machine enforcement
 

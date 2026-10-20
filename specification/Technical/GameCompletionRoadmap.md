@@ -36,8 +36,8 @@ Beta convergence                     ACTIVE — release-finding repairs only
 Beta human evidence                  OWNER-WAIVED FOR 1.0 — 0/5 first sessions, 0/3 full runs
 BETA_PASS                            NO
 Release promotion guard              PASS / fail-closed
-Release Candidate                    ACTIVE UNDER OWNER WAIVER (2026-10-20)
-1.0                                  BLOCKED
+Release Candidate                    PASS — 1.0.0-rc.1, Build Validation #564
+1.0                                  RELEASED 1.0.0 / HUMAN-UNVALIDATED (2026-10-20)
 ```
 
 The repository has a complete authored Campaign One spine, whole-game traversal evidence, Content Alpha evidence, qualified deterministic Beta-readiness infrastructure, and a recorded `FEATURE_COMPLETE / HUMAN-UNVALIDATED` result. Candidate B is bounded-converged, Candidate A qualified through PR #156 / Build Validation #477, and Candidate C is sufficient through existing GC08-GC10 composition. The active work moved to **Beta convergence / human validation** rather than further feature construction; since the 2026-10-20 owner waiver (`OwnerPersonalReleaseDecision.md`) it is **1.0 release qualification**, with `BETA_PASS = NO`.
@@ -562,8 +562,8 @@ Current valid state:
 TECHNICAL_RELEASE_PREPARED
 BETA_PASS = NO
 BETA_OWNER_WAIVED / HUMAN-UNVALIDATED
-RC entry open under owner waiver
-1.0 not yet promoted
+RC-1 QUALIFIED (Build Validation #564)
+RELEASED_1_0 / HUMAN-UNVALIDATED
 ```
 
 The owner waived the human Beta floor as a 1.0 gate on 2026-10-20

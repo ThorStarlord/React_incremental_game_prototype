@@ -3,7 +3,7 @@
 ## 2026-10-20 owner personal-release decision
 
 - [`specification/Technical/OwnerPersonalReleaseDecision.md`](../specification/Technical/OwnerPersonalReleaseDecision.md) is **CURRENT AUTHORITY**: 1.0 is a personal release; the human Beta floor is waived as a 1.0 gate, not satisfied (`BETA_PASS = NO`, `BETA_OWNER_WAIVED / HUMAN-UNVALIDATED`); draft PR #165 is parked post-1.0; agents may merge their own PRs after exact-head Build Validation passes.
-- The current strategic stage is `RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA`. Remaining release blockers are KD-002 (full ordinary-UI campaign evidence) and KD-004 (immutable RC / deployment identity).
+- `1.0.0-rc.1` was qualified by Build Validation #564 and Campaign One was released as `1.0.0` the same day. The current strategic stage is `RELEASED_1_0 / HUMAN-UNVALIDATED`; ordinary work is release-hotfix repair, and new scope needs an owner decision.
 - Release notes must state that the game was not externally playtested; the GC-14 guard enforces this for a waived final promotion.
 
 ## 2026-09-26 feature-depth reconciliation
@@ -20,7 +20,7 @@
 **Status:** CURRENT AUTHORITY for document classification  
 **Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
-**Current strategic stage:** RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA  
+**Current strategic stage:** RELEASED_1_0 / HUMAN-UNVALIDATED  
 **Last reconciled:** 2026-10-20
 
 ## 2026-09-27 maturity-transition lesson
@@ -232,8 +232,8 @@ TECHNICAL_BETA_READY
 BETA_PASS = NO
 BETA_OWNER_WAIVED / HUMAN-UNVALIDATED
 TECHNICAL_RELEASE_PREPARED
-RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA
-1.0 NOT YET PROMOTED
+RC-1 QUALIFIED (Build Validation #564)
+RELEASED_1_0 / HUMAN-UNVALIDATED
 ```
 
 The repository has passed proof-of-concept, systems-prototype, whole-game Alpha,

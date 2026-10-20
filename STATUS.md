@@ -1,9 +1,10 @@
-# Repository Status — Campaign One Release Qualification
+# Repository Status — Campaign One 1.0 Released
 
 **Status date:** 2026-10-20
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
-**Current strategic stage:** `RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA`  
+**Current release:** `1.0.0` — personal release, **not externally playtested** (`docs/release/ReleaseNotes.md`)  
+**Current strategic stage:** `RELEASED_1_0 / HUMAN-UNVALIDATED`  
 **Owner decision (2026-10-20):** `specification/Technical/OwnerPersonalReleaseDecision.md` — personal 1.0 release; human Beta floor waived, not satisfied; PR #165 parked post-1.0  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
@@ -19,15 +20,16 @@
 **GC-11 Alpha:** `ALPHA_PASS / HUMAN_UNVALIDATED`  
 **GC-12 Content Alpha:** `CONTENT_ALPHA / HUMAN_UNVALIDATED`  
 **GC-13 deterministic readiness:** `TECHNICAL_BETA_READY / BETA_PASS=NO / BETA_OWNER_WAIVED`  
-**GC-14 promotion guard:** `QUALIFIED / RC ENTRY OPEN UNDER OWNER WAIVER / 1.0 NOT YET PROMOTED`  
+**GC-14 promotion guard:** `QUALIFIED / FINAL PROMOTION PASS (owner waiver / HUMAN-UNVALIDATED)`  
+**RC-1:** `1.0.0-rc.1` qualified by Build Validation #564 — `docs/release/ReleaseCandidateResult.md`  
 **Human Product Review:** issue #109 `OPEN / UNPROVEN` — optional post-1.0 lane; no longer a 1.0 gate  
 **Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
-**Active program:** Campaign One / 1.0 Release Qualification  
+**Active program:** Campaign One / post-1.0 maintenance  
 **Feature Completion Gap Analysis:** `COMPLETE / HISTORICAL BREADTH + DEPTH AUTHORITY`  
 **Feature Complete:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED` — see `specification/Technical/FeatureCompleteResult.md`  
 **Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
 **Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
-**Current implementation frontier:** `NO OPEN FEATURE-CONSTRUCTION PACKAGE — 1.0.0-rc.1 declared; KD-002 and KD-004 resolved; RC record and 1.0.0 promotion next`
+**Current implementation frontier:** `NONE — 1.0.0 released; release-hotfix repairs only; 1.1 scope needs an owner decision`
 
 ### Feature-completion convergence disposition
 
@@ -66,7 +68,19 @@ The project has passed proof-of-concept, technical-prototype, bounded vertical-s
 
 Those historical results established **integration maturity**, not automatic **feature maturity**. The subsequent B/A/C depth sequence has now closed that gap at the bounded Campaign One scope: Combat remains intentionally bounded, Doctrine specialization remains two-profile, and Standing Orders remain Archive + Forge rather than expanding into general planners. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence, and `FeatureCompleteResult.md` now records that repository-owned feature construction has converged.
 
-## Current goal — 1.0 release qualification under the owner waiver
+## Current state — 1.0.0 released (2026-10-20)
+
+Campaign One `1.0.0` is released as a personal release. `1.0.0-rc.1` passed exact-head Build Validation #564, including the ordinary-UI full campaign for two divergent histories in Chromium and Firefox on the static production build (`ReleaseCandidateResult.md`). Release qualification found and fixed KD-010 through KD-015. The game was not externally playtested; `BETA_PASS=NO` remains true.
+
+Post-1.0 work:
+
+- **release hotfixes** for defects in the shipped scope, under the same exact-head Build Validation;
+- **GitHub Pages**: `deploy-pages.yml` publishes `main` once a repository admin enables Pages with the "GitHub Actions" source;
+- **1.1 or expansion** only by owner decision (the universal Trait redesign, PR #165, is parked there);
+- **optional human sessions** under issue #109;
+- **issue #122** (branch protection) still needs a GitHub administrator.
+
+## Release qualification under the owner waiver (completed)
 
 On 2026-10-20 the owner made Campaign One / 1.0 a **personal release** (`specification/Technical/OwnerPersonalReleaseDecision.md`):
 
@@ -74,24 +88,9 @@ On 2026-10-20 the owner made Campaign One / 1.0 a **personal release** (`specifi
 - **D2:** the universal Trait redesign (draft PR #165) is parked until after 1.0. 1.0 ships the merged Trait model (save schema v2).
 - **D3:** an agent may merge its own PRs once exact-head Build Validation passes.
 
-The active optimization target is:
+The qualification target was one exact `1.0.0-rc.N` candidate against `ReleaseQualificationContract.md`, repairing only what that qualification found. It closed KD-002 (ordinary-UI full campaign, two divergent histories, save/load/import-export checkpoints) and KD-004 (immutable `1.0.0-rc.1` identity with exact-head Chromium + Firefox and static-host evidence), and integrated PR #163. KD-001 (human Beta evidence) is accepted for release under the waiver and remains a disclosed limitation.
 
-> **Qualify one exact 1.0.0-rc.N candidate against `ReleaseQualificationContract.md` and promote it to 1.0.0, repairing only what that qualification finds.**
-
-The remaining release blockers are tracked in `docs/release/KnownDefects.md`:
-
-1. **KD-002** — one ordinary-UI clean-storage New Game -> Epilogue run plus two materially divergent histories, with save/load/import-export checkpoints;
-2. **KD-004** — an intentionally versioned immutable `1.0.0-rc.N` candidate with exact-head Build Validation, Chromium + Firefox evidence and release-like static hosting evidence.
-
-KD-001 (human Beta evidence) is accepted for release under the waiver and remains a disclosed limitation.
-
-The **scope boundary remains locked**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. B/A/C feature construction is closed.
-
-Other open lanes:
-
-1. bounded accessibility/reliability/presentation repairs that the release qualification surfaces (including open PR #163);
-2. repository governance enforcement under issue #122, which needs a GitHub administrator;
-3. optional post-1.0 human sessions under issue #109.
+The **scope boundary remains locked**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority unless the owner opens a 1.1 or expansion scope.
 
 Use explicit evidence provenance throughout:
 

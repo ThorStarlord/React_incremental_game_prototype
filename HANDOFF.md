@@ -1,13 +1,13 @@
-# Handoff — Campaign One Release Qualification
+# Handoff — Campaign One 1.0 Released
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
 **Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
 **Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
-**Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC ENTRY OPEN UNDER OWNER WAIVER / 1.0 NOT YET PROMOTED`  
-**Current strategic stage:** `RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA`  
+**Release:** `1.0.0` released 2026-10-20 (personal release, not externally playtested); RC-1 qualified by Build Validation #564  
+**Current strategic stage:** `RELEASED_1_0 / HUMAN-UNVALIDATED`  
 **Owner decision:** `specification/Technical/OwnerPersonalReleaseDecision.md` (2026-10-20)  
-**Current product responsibilities:** qualify and promote one exact 1.0.0-rc.N candidate of the existing feature-complete Campaign One  
+**Current product responsibilities:** release-hotfix repairs on the shipped Campaign One; 1.1 scope only by owner decision  
 **Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs — floor waived as a 1.0 gate; `BETA_PASS=NO`  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
 
@@ -26,7 +26,9 @@ Progress since the decision:
 3. KD-004 closed: `1.0.0-rc.1` declared; `deploy-pages.yml` publishes the static build once Pages is enabled;
 4. `docs/release/ReleaseNotes.md` carries the not-externally-playtested disclosure.
 
-Next: record the exact rc.1 candidate evidence in `ReleaseCandidateResult.md` and promote to `1.0.0`.
+5. RC-1 qualified by Build Validation #564 and recorded in `ReleaseCandidateResult.md`; `1.0.0` promoted and tagged by `release-tag.yml`.
+
+Re-entry after 1.0: fix release defects in the shipped scope (exact-head Build Validation, including `release:campaign`), keep the release records honest, and bring any new scope (1.1, PR #165) to the owner first.
 
 ## Previous frontier — feature-completion stop
 
