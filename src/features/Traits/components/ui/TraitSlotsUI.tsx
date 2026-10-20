@@ -133,7 +133,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
         }}
         role="button"
         tabIndex={0}
-                aria-label={`Equip a trait in slot ${slot.slotIndex + 1}`}
+                aria-label={`Express a Trait in slot ${slot.slotIndex + 1}`}
         sx={{ cursor: 'pointer', height: '100%' }}
       >
         <EmptySlotCard />
