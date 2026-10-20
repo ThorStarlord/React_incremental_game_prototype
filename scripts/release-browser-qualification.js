@@ -223,6 +223,34 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await assertVisible(navigation, 'game navigation control');
     });
 
+    // 1.1 universal Trait expression: a fresh player must be able to discover
+    // and temporarily express an initially known procedural pattern through
+    // normal player controls, using keyboard alone for the slot. No debug,
+    // direct store mutation, NPC proximity or hidden test action is allowed.
+    await check('universal-trait-expression-ordinary-ui', async () => {
+      await page.getByRole('button', { name: 'Navigate to Traits' }).click();
+      await page.getByRole('tab', { name: 'Expression' }).waitFor({ state: 'visible', timeout: 15000 });
+      const empty = page.getByRole('button', { name: 'Express a Trait in slot 1' });
+      await empty.waitFor({ state: 'visible', timeout: 15000 });
+      await empty.focus();
+      await page.keyboard.press('Enter');
+
+      const selector = page.getByRole('dialog', { name: 'Select a Trait to Express in Slot 1' });
+      await selector.waitFor({ state: 'visible', timeout: 15000 });
+      await selector.getByText('Battle Hardened', { exact: true }).click();
+      await selector.getByRole('button', { name: 'Express' }).click();
+      await page.getByRole('button', {
+        name: 'Manage Battle Hardened in trait slot 1',
+      }).waitFor({ state: 'visible', timeout: 15000 });
+      const suppress = page.getByRole('button', { name: 'Suppress Battle Hardened' });
+      await suppress.click();
+      const confirmation = page.getByRole('dialog', { name: 'Suppress Trait' });
+      await confirmation.waitFor({ state: 'visible', timeout: 15000 });
+      await confirmation.getByRole('button', { name: 'Suppress' }).click();
+      await empty.waitFor({ state: 'visible', timeout: 15000 });
+      await page.getByRole('button', { name: 'Navigate to Dashboard' }).click();
+    });
+
     await check('invalid-route-recovers', async () => {
       await page.goto(new URL('/route-that-does-not-exist', options.url).toString(), {
         waitUntil: name === 'firefox' ? 'commit' : 'domcontentloaded',
