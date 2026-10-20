@@ -15,17 +15,19 @@ export interface TraitResonanceReadiness {
   cost: number;
   currentEssence: number;
   discovered: boolean;
+  assimilated: boolean;
+  /** @deprecated Compatibility projection of assimilated. */
   permanent: boolean;
 }
 
-export const evaluateTraitResonanceReadiness = (
+export const evaluateTraitStabilizationReadiness = (
   state: RootState,
   traitId: string
 ): TraitResonanceReadiness => {
   const trait = state.traits.traits[traitId];
   const blockers: string[] = [];
   const discovered = state.traits.discoveredTraits.includes(traitId);
-  const permanent = state.player.permanentTraits.includes(traitId);
+  const assimilated = state.player.permanentTraits.includes(traitId);
   const currentEssence = state.essence.currentEssence;
   const cost = trait?.essenceCost ?? 0;
 
@@ -37,27 +39,26 @@ export const evaluateTraitResonanceReadiness = (
       cost: 0,
       currentEssence,
       discovered: false,
+      assimilated: false,
       permanent: false,
     };
   }
 
-  if (!discovered) blockers.push(`Discover ${trait.name} before Resonance.`);
-  if (permanent) blockers.push('Trait is already permanent.');
+  if (!discovered) blockers.push(`Discover ${trait.name} before Stabilization.`);
+  if (assimilated) blockers.push('Trait is already assimilated.');
 
   const authority = summarizeTraitAuthority(trait);
-  if (!authority.hasPermanentPlayerAuthority) {
-    if (authority.hasNamedRuntimeAuthority) {
-      blockers.push(
-        'This Trait has a live shared/runtime use but no permanent Player effect in Campaign One; keep it temporary/shareable instead of Resonating it.'
-      );
-    } else {
-      blockers.push(
-        'This legacy Trait has no qualified Campaign One runtime effect and is not available for permanent Resonance.'
-      );
-    }
+  if (!authority.hasStabilizableAuthority) {
+    blockers.push(
+      'This legacy Trait has no qualified Campaign One runtime effect and is not available for Stabilization.'
+    );
   }
 
-  const sourceNpcId = trait.sourceNpc || trait.source;
+  // source is universal provenance and may identify a relic, place, event, etc.
+  // Only explicit sourceNpc, or a legacy source that resolves to a real NPC,
+  // participates in Relationship connection/assimilation gating.
+  const sourceNpcId = trait.sourceNpc ||
+    (trait.source && state.npcs.npcs[trait.source] ? trait.source : undefined);
   if (sourceNpcId) {
     if (selectUsesRelationshipConnectionAuthority(state, sourceNpcId)) {
       const profile = selectBondProfileByNpcId(state, sourceNpcId);
@@ -102,7 +103,7 @@ export const evaluateTraitResonanceReadiness = (
     : [];
   for (const prerequisite of prerequisiteTraits) {
     if (!state.player.permanentTraits.includes(prerequisite)) {
-      blockers.push(`Missing prerequisite Trait: ${prerequisite}.`);
+      blockers.push(`Missing assimilated prerequisite Trait: ${prerequisite}.`);
     }
   }
 
@@ -117,6 +118,10 @@ export const evaluateTraitResonanceReadiness = (
     cost,
     currentEssence,
     discovered,
-    permanent,
+    assimilated,
+    permanent: assimilated,
   };
 };
+
+/** Historical name retained so existing callers migrate without a flag day. */
+export const evaluateTraitResonanceReadiness = evaluateTraitStabilizationReadiness;
