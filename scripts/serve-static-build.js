@@ -8,7 +8,10 @@
  * transform is involved, so a release run against this host exercises the
  * shipped bundle.
  *
- * Usage: node scripts/serve-static-build.js [--dir build] [--host 127.0.0.1] [--port 5000]
+ * With --base, the build is served under that path prefix and unknown paths get
+ * 404.html when present, mirroring a GitHub Pages project site.
+ *
+ * Usage: node scripts/serve-static-build.js [--dir build] [--host 127.0.0.1] [--port 5000] [--base /repo-name]
  */
 const http = require('node:http');
 const fs = require('node:fs');
@@ -30,18 +33,19 @@ const CONTENT_TYPES = {
 };
 
 function parseArgs(argv) {
-  const options = { dir: 'build', host: '127.0.0.1', port: 5000 };
+  const options = { dir: 'build', host: '127.0.0.1', port: 5000, base: '' };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--dir') options.dir = argv[++index];
     else if (arg === '--host') options.host = argv[++index];
     else if (arg === '--port') options.port = Number(argv[++index]);
+    else if (arg === '--base') options.base = argv[++index].replace(/\/+$/, '');
     else throw new Error(`Unknown argument: ${arg}`);
   }
   return options;
 }
 
-function createStaticServer(rootDir) {
+function createStaticServer(rootDir, base = '') {
   const root = path.resolve(rootDir);
   const indexPath = path.join(root, 'index.html');
   if (!fs.existsSync(indexPath)) {
@@ -50,7 +54,15 @@ function createStaticServer(rootDir) {
 
   return http.createServer((request, response) => {
     const url = new URL(request.url, 'http://localhost');
-    const decoded = decodeURIComponent(url.pathname);
+    let decoded = decodeURIComponent(url.pathname);
+    if (base) {
+      if (decoded !== base && !decoded.startsWith(`${base}/`)) {
+        response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        response.end('Not found');
+        return;
+      }
+      decoded = decoded.slice(base.length) || '/';
+    }
     const candidate = path.normalize(path.join(root, decoded));
 
     // Never serve anything outside the build directory.
@@ -62,8 +74,12 @@ function createStaticServer(rootDir) {
       filePath = null;
     }
 
-    // Client routes fall back to the SPA shell; missing assets stay 404.
-    if (!filePath && !path.extname(decoded)) filePath = indexPath;
+    // Client routes fall back to the SPA shell (404.html under a base path,
+    // as GitHub Pages does); missing assets stay 404.
+    if (!filePath && !path.extname(decoded)) {
+      const pagesFallback = path.join(root, '404.html');
+      filePath = base && fs.existsSync(pagesFallback) ? pagesFallback : indexPath;
+    }
 
     if (!filePath) {
       response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -86,9 +102,9 @@ function createStaticServer(rootDir) {
 
 if (require.main === module) {
   const options = parseArgs(process.argv.slice(2));
-  const server = createStaticServer(options.dir);
+  const server = createStaticServer(options.dir, options.base);
   server.listen(options.port, options.host, () => {
-    console.log(`static build served at http://${options.host}:${options.port}`);
+    console.log(`static build served at http://${options.host}:${options.port}${options.base}/`);
   });
 }
 

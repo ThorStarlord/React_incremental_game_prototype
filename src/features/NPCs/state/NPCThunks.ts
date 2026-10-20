@@ -30,6 +30,7 @@ import {
 import type { WorldStateMutation } from '../../WorldState/state/WorldStateTypes';
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
+import { publicAsset } from '../../../shared/utils/publicAsset';
 
 const isExcludedCampaignOneService = (serviceId: string): boolean =>
   /trait_teacher|crafter_/i.test(serviceId);
@@ -45,7 +46,7 @@ export const initializeNPCsThunk = createAsyncThunk<
   'npcs/initialize',
   async (_, { rejectWithValue, dispatch }) => {
     try {
-      const response = await fetch('/data/npcs.json');
+      const response = await fetch(publicAsset('/data/npcs.json'));
       if (!response.ok) {
         throw new Error('Failed to fetch NPC data');
       }
@@ -56,7 +57,7 @@ export const initializeNPCsThunk = createAsyncThunk<
 
       let dialogueNodes: Record<string, any> | undefined;
       try {
-        const dres = await fetch('/data/dialogues.json');
+        const dres = await fetch(publicAsset('/data/dialogues.json'));
         if (dres.ok) {
           dialogueNodes = await dres.json();
         }
@@ -77,7 +78,7 @@ export const initializeNPCsThunk = createAsyncThunk<
 
       for (const extensionUrl of contentExtensionUrls) {
         try {
-          const extensionResponse = await fetch(extensionUrl);
+          const extensionResponse = await fetch(publicAsset(extensionUrl));
           if (!extensionResponse.ok) continue;
 
           const extension = await extensionResponse.json();
@@ -140,13 +141,13 @@ export const unlockCampaignNpcsThunk = createAsyncThunk<
   'npcs/unlockCampaignNpcs',
   async (npcIds, { dispatch, rejectWithValue }) => {
     try {
-      const response = await fetch('/data/npcs.json');
+      const response = await fetch(publicAsset('/data/npcs.json'));
       if (!response.ok) throw new Error('Failed to fetch NPC data');
       const catalog: Record<string, NPC> = await response.json();
 
       let dialogueNodes: Record<string, any> = {};
       try {
-        const dialogueResponse = await fetch('/data/dialogues.json');
+        const dialogueResponse = await fetch(publicAsset('/data/dialogues.json'));
         if (dialogueResponse.ok) dialogueNodes = await dialogueResponse.json();
       } catch {}
 
@@ -160,7 +161,7 @@ export const unlockCampaignNpcsThunk = createAsyncThunk<
         '/data/gc10-finale-content.json',
       ] as const) {
         try {
-          const extensionResponse = await fetch(extensionUrl);
+          const extensionResponse = await fetch(publicAsset(extensionUrl));
           if (!extensionResponse.ok) continue;
           const extension = await extensionResponse.json();
           const npcDialogueIds = extension?.npcDialogueIds && typeof extension.npcDialogueIds === 'object'
@@ -223,7 +224,7 @@ export const newGameSeedNPCsThunk = createAsyncThunk(
   'npcs/newGameSeed',
   async (_, { dispatch }) => {
     try {
-      const res = await fetch('/data/npcs.json');
+      const res = await fetch(publicAsset('/data/npcs.json'));
       if (!res.ok) throw new Error('Failed to fetch npc data');
       const data: Record<string, NPC> = await res.json();
       const elder = data['npc_elder_willow'];

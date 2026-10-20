@@ -24,6 +24,7 @@ import type {
   RelationshipProgressionDefinition,
   RelationshipTraitEffect,
 } from './RelationshipTypes';
+import { publicAsset } from '../../../shared/utils/publicAsset';
 
 const AUTHORING_MANIFEST_URL = '/data/relationships/index.json';
 let definitionBundlePromise: Promise<RelationshipDefinitionBundle> | null = null;
@@ -47,7 +48,7 @@ const mergeBundles = (
 });
 
 const fetchDefinitionBundle = async (url: string): Promise<RelationshipDefinitionBundle> => {
-  const response = await fetch(url);
+  const response = await fetch(publicAsset(url));
   if (!response.ok) {
     throw new Error(`Failed to load relationship definitions: ${url}`);
   }
@@ -61,7 +62,7 @@ const fetchDefinitionBundle = async (url: string): Promise<RelationshipDefinitio
 const loadRelationshipDefinitions = async (): Promise<RelationshipDefinitionBundle> => {
   if (!definitionBundlePromise) {
     definitionBundlePromise = (async () => {
-      const response = await fetch(AUTHORING_MANIFEST_URL);
+      const response = await fetch(publicAsset(AUTHORING_MANIFEST_URL));
       if (!response.ok) {
         throw new Error(`Failed to load relationship definition manifest: ${AUTHORING_MANIFEST_URL}`);
       }

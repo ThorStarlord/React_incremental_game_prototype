@@ -27,6 +27,14 @@ The application already has a real game loop, persistent save/load/import-export
 
 The repository has already proved that these systems can coexist, that the authored campaign spine can traverse from New Game to a state-responsive ending, and that the bounded B/A/C depth program has reached its Campaign One feature-completion stop. On 2026-10-20 the owner made 1.0 a personal release ([`OwnerPersonalReleaseDecision.md`](specification/Technical/OwnerPersonalReleaseDecision.md)): the human playtest floor is waived as a release gate, not satisfied. The active program is now **1.0 release qualification**: one exact candidate must pass the release contract's technical gates, including a full ordinary-UI campaign run, before promotion.
 
+## Play
+
+The production build is published from `main` to GitHub Pages by `.github/workflows/deploy-pages.yml`:
+
+**https://thorstarlord.github.io/React_incremental_game_prototype/**
+
+The site goes live once a repository admin sets **Settings → Pages → Source: GitHub Actions**; until then the workflow skips the deploy with a notice. Progress is saved in the browser's local storage. Use **Save Game** in the game, and **Export** on the main menu to keep a copy.
+
 ## 1.0 product promise
 
 > **A narrative incremental RPG in which consequential relationships teach the protagonist durable capabilities, remembered history explains why later options exist, and personally understood repetitive work can be deliberately delegated so the player increasingly focuses on novel strategic and relational decisions.**
