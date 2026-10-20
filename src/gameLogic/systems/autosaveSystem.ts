@@ -4,6 +4,8 @@ import { saveGameThunk } from '../../features/Meta/state/MetaThunks';
 // Verify this path points to the newly created/updated SettingsSelectors file
 import { selectAutosaveInterval, selectAutosaveEnabled } from '../../features/Settings/state/SettingsSelectors';
 import { selectLastSavedTimestamp } from '../../features/Meta/state/MetaSelectors';
+import { selectSessionActive } from '../../features/Meta/state/MetaSlice';
+import { AUTOSAVE_NAME_PREFIX, AUTOSAVE_RETENTION, pruneAutosaves } from '../../shared/utils/saveUtils';
 
 /**
  * Custom hook to manage the autosave system.
@@ -16,6 +18,9 @@ export const useAutosaveSystem = () => {
   const autosaveIntervalMinutes = useAppSelector(selectAutosaveInterval);
   const isAutosaveEnabled = useAppSelector(selectAutosaveEnabled);
   const lastSavedTimestamp = useAppSelector(selectLastSavedTimestamp);
+  // Only a New Game or loaded save is worth persisting; the startup world on
+  // the main menu (or after a reload) is not a playable session.
+  const sessionActive = useAppSelector(selectSessionActive);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -27,7 +32,7 @@ export const useAutosaveSystem = () => {
     }
 
     // Check if autosave is enabled and interval is valid
-    if (isAutosaveEnabled && autosaveIntervalMinutes > 0) {
+    if (isAutosaveEnabled && sessionActive && autosaveIntervalMinutes > 0) {
       const intervalMilliseconds = autosaveIntervalMinutes * 60 * 1000;
 
       console.log(`Autosave enabled: Interval set to ${autosaveIntervalMinutes} minutes (${intervalMilliseconds}ms).`);
@@ -46,7 +51,9 @@ export const useAutosaveSystem = () => {
         // Consider adding checks based on lastSavedTimestamp if needed to prevent rapid saves
 
         // Dispatch the save thunk with a specific name format
-        dispatch(saveGameThunk(`Autosave_${Date.now()}`))
+        // Make room first so the rolling autosave set never exceeds its cap.
+        pruneAutosaves(AUTOSAVE_RETENTION - 1);
+        dispatch(saveGameThunk(`${AUTOSAVE_NAME_PREFIX}${Date.now()}`))
           .unwrap() // Use unwrap to handle the promise result/error directly
           .then((result) => {
             if (result.success) {
@@ -68,7 +75,7 @@ export const useAutosaveSystem = () => {
       }, intervalMilliseconds);
 
     } else {
-      console.log(`Autosave disabled (Enabled: ${isAutosaveEnabled}, Interval: ${autosaveIntervalMinutes} mins).`);
+      console.log(`Autosave inactive (Enabled: ${isAutosaveEnabled}, Session: ${sessionActive}, Interval: ${autosaveIntervalMinutes} mins).`);
     }
 
     // Cleanup function: Clear interval when the hook unmounts or dependencies change
@@ -80,7 +87,7 @@ export const useAutosaveSystem = () => {
       }
     };
     // Dependencies: Rerun effect if enabled status, interval, or dispatch function changes
-  }, [isAutosaveEnabled, autosaveIntervalMinutes, dispatch, lastSavedTimestamp]);
+  }, [isAutosaveEnabled, sessionActive, autosaveIntervalMinutes, dispatch, lastSavedTimestamp]);
 
   // This hook manages the side effect and doesn't need to return anything for UI
 };

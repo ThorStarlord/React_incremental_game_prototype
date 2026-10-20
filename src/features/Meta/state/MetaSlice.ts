@@ -19,6 +19,7 @@ const initialState: MetaState = {
   error: null,
   // New intro flag
   hasSeenIntro: false,
+  sessionActive: false,
 };
 
 const metaSlice = createSlice({
@@ -43,6 +44,9 @@ const metaSlice = createSlice({
     setHasSeenIntro: (state, action: PayloadAction<boolean>) => {
       state.hasSeenIntro = action.payload;
     },
+    setSessionActive: (state, action: PayloadAction<boolean>) => {
+      state.sessionActive = action.payload;
+    },
   },
 });
 
@@ -52,7 +56,8 @@ export const {
   setGameVersion,
   resetSessionStartTime,
   setIsInProximityToNPC,
-  setHasSeenIntro
+  setHasSeenIntro,
+  setSessionActive
 } = metaSlice.actions;
 
 // FIXED: Corrected and cleaned up selectors to match the final MetaState interface.
@@ -64,5 +69,6 @@ export const selectGameVersion = (state: RootState) => state.meta.gameVersion;
 export const selectSessionStartTime = (state: RootState) => state.meta.sessionStartTime;
 export const selectIsInProximityToNPC = (state: RootState) => state.meta.isInProximityToNPC;
 export const selectHasSeenIntro = (state: RootState) => state.meta.hasSeenIntro === true;
+export const selectSessionActive = (state: RootState) => state.meta.sessionActive === true;
 
 export default metaSlice.reducer;

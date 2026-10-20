@@ -6,7 +6,7 @@ import { loadSavedGameWithMigration } from '../../../shared/utils/saveUtils';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { replaceState } from '../../../app/store';
 import { resetPlayerState } from '../../../features/Player/state/PlayerSlice';
-import { setHasSeenIntro } from '../../../features/Meta/state/MetaSlice';
+import { setHasSeenIntro, setSessionActive, updateLastSaved } from '../../../features/Meta/state/MetaSlice';
 import { newGameSeedNPCsThunk, setSelectedNPCId } from '../../../features/NPCs';
 import { resetEssence } from '../../../features/Essence/state/EssenceSlice';
 import { resetInventory } from '../../../features/Inventory/state/InventorySlice';
@@ -63,6 +63,7 @@ export function useGameActions({
       // thunks so a rejected initialization cannot leave a half-created session.
       await dispatch(initializeQuestsThunk()).unwrap();
       await dispatch(newGameSeedNPCsThunk()).unwrap();
+      dispatch(setSessionActive(true));
       navigate('/game/npcs');
     } catch (error) {
       dispatch(replaceState(previousState));
@@ -81,6 +82,12 @@ export function useGameActions({
       if (loaded) {
         previousState = currentState;
         dispatch(replaceState(loaded.state));
+        // Saves from before session tracking carry no flag; loading always
+        // establishes a playable session.
+        dispatch(setSessionActive(true));
+        // A save snapshots state just before its own timestamp is recorded, so
+        // the loaded session would otherwise report that it was never saved.
+        dispatch(updateLastSaved(loaded.envelope.timestamp));
 
         // M21 settles exactly the explicit offline-safe allowlist from the
         // canonical save-envelope timestamp. This occurs after state replacement

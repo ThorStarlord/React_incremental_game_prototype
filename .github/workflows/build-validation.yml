@@ -396,3 +396,37 @@ jobs:
           # CRA treats warnings as build failures when CI=true. This gate is deliberately
           # scoped to TypeScript correctness + successful production bundling.
           CI: false
+
+      # Release contract: clean-storage New Game -> Epilogue through ordinary UI,
+      # two materially divergent histories, and save/Main Menu/Continue checkpoints,
+      # against the production bundle on a release-like static host.
+      - name: Full ordinary-UI campaign release run (static production build)
+        timeout-minutes: 15
+        run: |
+          npm run release:serve -- --port 5000 > /tmp/static-build.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:5000 >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "Static build server failed to become ready"
+            cat /tmp/static-build.log
+            exit 1
+          fi
+
+          npm run release:campaign -- --browser all --route all --url http://127.0.0.1:5000 --out /tmp/full-campaign
+
+      - name: Upload full campaign release artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-campaign-release-run
+          path: /tmp/full-campaign
+          if-no-files-found: warn
