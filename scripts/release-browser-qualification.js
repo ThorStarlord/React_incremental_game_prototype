@@ -106,7 +106,13 @@ async function runBrowserQualification(name, browserType, options, outDir) {
   const startedAt = new Date().toISOString();
   let browser;
   try {
-    browser = await browserType.launch({ headless: options.headless, timeout: 30000 });
+    // Optional local override (e.g. a preinstalled browser); CI uses Playwright's own.
+    const executablePath = process.env[`RELEASE_${name.toUpperCase()}_EXECUTABLE`];
+    browser = await browserType.launch({
+      headless: options.headless,
+      timeout: 30000,
+      ...(executablePath ? { executablePath } : {}),
+    });
   } catch (error) {
     return {
       browser: name,
@@ -189,10 +195,22 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await newGame.focus();
       await page.keyboard.press('Enter');
       await page.waitForURL(/\/game(?:\/|$)/, { timeout: 30000 });
-      await assertVisible(page.getByRole('main').first(), 'game main landmark');
+      await assertVisible(page.getByRole('dialog', { name: 'Introduction' }), 'introduction dialog');
+    });
+
+    // The modal intro must be confirmable from the keyboard alone: focus starts
+    // on its action and Enter advances it until it closes.
+    await check('intro-dialog-keyboard-confirmation', async () => {
+      const intro = page.getByRole('dialog', { name: 'Introduction' });
+      for (let step = 0; step < 10 && await intro.isVisible(); step += 1) {
+        await intro.locator('button:focus').waitFor({ state: 'visible', timeout: 5000 });
+        await page.keyboard.press('Enter');
+      }
+      await intro.waitFor({ state: 'hidden', timeout: 10000 });
     });
 
     await check('game-navigation-visible', async () => {
+      await assertVisible(page.getByRole('main').first(), 'game main landmark');
       const navigation = page.getByRole('button', { name: /^Navigate to / }).first();
       await assertVisible(navigation, 'game navigation control');
     });

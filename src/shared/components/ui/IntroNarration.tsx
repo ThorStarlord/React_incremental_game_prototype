@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Backdrop, Box, Paper, Typography, Button, Fade } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { setHasSeenIntro, selectHasSeenIntro } from '../../../features/Meta/state/MetaSlice';
 
@@ -16,27 +16,40 @@ export const IntroNarration: React.FC<{ lines?: string[] }> = ({ lines = DEFAULT
   const [index, setIndex] = useState(0);
   if (hasSeen) return null;
   const last = index === lines.length - 1;
+  // A modal Dialog (not a bare Backdrop, which is aria-hidden) so the first
+  // required action is exposed to assistive technology and keyboard focus
+  // starts on it. The intro must be acknowledged, so Escape/backdrop clicks
+  // do not dismiss it.
   return (
-    <Backdrop open sx={{ zIndex: (t) => t.zIndex.drawer + 10, backdropFilter: 'blur(2px)', backgroundColor: 'rgba(0,0,0,0.7)' }}>
-      <Fade in>
-        <Paper elevation={4} sx={{ maxWidth: 640, p: 4, mx: 2 }}>
-          <Typography variant="body1" sx={{ mb: 3, whiteSpace: 'pre-line' }}>
-            {lines[index]}
-          </Typography>
-          <Box textAlign="right">
-            <Button
-              variant="contained"
-              color={last ? 'secondary' : 'primary'}
-              onClick={() => {
-                if (!last) setIndex(i => i + 1); else dispatch(setHasSeenIntro(true));
-              }}
-            >
-              {last ? 'Begin' : 'Continue'}
-            </Button>
-          </Box>
-        </Paper>
-      </Fade>
-    </Backdrop>
+    <Dialog
+      open
+      aria-describedby="intro-narration-text"
+      maxWidth="sm"
+      disableEscapeKeyDown
+      slotProps={{
+        // The paper slot carries role="dialog", so it must carry the name too.
+        paper: { 'aria-label': 'Introduction' },
+        backdrop: { sx: { backdropFilter: 'blur(2px)', backgroundColor: 'rgba(0,0,0,0.7)' } },
+      }}
+    >
+      <DialogContent sx={{ p: 4 }}>
+        <Typography id="intro-narration-text" variant="body1" sx={{ mb: 3, whiteSpace: 'pre-line' }}>
+          {lines[index]}
+        </Typography>
+        <Box textAlign="right">
+          <Button
+            autoFocus
+            variant="contained"
+            color={last ? 'secondary' : 'primary'}
+            onClick={() => {
+              if (!last) setIndex(i => i + 1); else dispatch(setHasSeenIntro(true));
+            }}
+          >
+            {last ? 'Begin' : 'Continue'}
+          </Button>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };
 

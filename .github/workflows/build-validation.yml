@@ -40,6 +40,12 @@ jobs:
         timeout-minutes: 5
         run: npm run gc01:validate
 
+      - name: Startup catalog race and delegation breadth regression
+        timeout-minutes: 5
+        run: npm test -- --watchAll=false --runInBand StartupCatalogRaceRegression.test.ts OnePointZeroDelegationQualification.test.ts
+        env:
+          CI: true
+
       - name: GC-02 Prologue / onboarding qualification
         timeout-minutes: 5
         run: npm run gc02:validate

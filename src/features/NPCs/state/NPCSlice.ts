@@ -268,6 +268,11 @@ const npcSlice = createSlice({
           action.type === 'npcs/initialize/fulfilled' && Boolean(action.payload),
         (state, action) => {
         state.loading = false;
+        // Startup catalog loading runs concurrently with the main menu. If New
+        // Game or Load has already established a session world, a late catalog
+        // result must not replace it (that would reveal every NPC in a fresh
+        // game or discard a loaded save's NPC progress).
+        if (Object.keys(state.npcs).length > 0) return;
         state.npcs = action.payload;
         // Also populate the discovered list for developer convenience
         state.discoveredNPCs = Object.keys(action.payload);
