@@ -258,7 +258,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
                         color="primary"
                         disabled={!readiness.ready}
                         onClick={() => handleAcquireTrait(trait)}
-                        aria-label={`Make ${trait.name} permanent`}
+                        aria-label={`Stabilize ${trait.name}`}
                       >
                         <AddCircleIcon />
                       </IconButton>
@@ -327,7 +327,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
           <Box>
             <Typography gutterBottom variant="caption">Cost Range (Essence)</Typography>
             <Slider
-              aria-label="Trait Essence cost range"
+              getAriaLabel={(index: number) => index === 0 ? "Minimum Trait Essence cost" : "Maximum Trait Essence cost"
               value={filterState.traitCostRange}
               onChange={(e, newValue) => setFilter('traitCostRange', newValue as number[])}
               valueLabelDisplay="auto"
