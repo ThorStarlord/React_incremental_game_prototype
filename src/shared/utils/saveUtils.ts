@@ -263,6 +263,24 @@ export const loadSavedGame = async (saveId: string): Promise<RootState | null> =
   }
 };
 
+export const AUTOSAVE_NAME_PREFIX = 'Autosave_';
+export const AUTOSAVE_RETENTION = 3;
+
+/**
+ * Keep only the newest `keep` autosaves. Every save stores the whole session,
+ * so unbounded periodic autosaves would eventually exhaust localStorage and
+ * make every later save fail. Player-named saves and imports are never pruned.
+ */
+export const pruneAutosaves = (keep: number = AUTOSAVE_RETENTION): string[] => {
+  const removed = getSavedGames()
+    .filter(save => save.name.startsWith(AUTOSAVE_NAME_PREFIX))
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(Math.max(0, keep))
+    .map(save => save.id);
+  removed.forEach(saveId => deleteSavedGame(saveId));
+  return removed;
+};
+
 /** Delete a save and its metadata entry. */
 export const deleteSavedGame = (saveId: string): boolean => {
   try {

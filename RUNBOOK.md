@@ -536,6 +536,14 @@ The automatable release aggregate exists:
 npm run release:validate
 ```
 
+The ordinary-UI campaign run plays both representative histories (Distributed Dissipation and Fortified Containment) through the production bundle on a release-like static host, with save/Main Menu/Continue checkpoints. Build Validation runs it in Chromium and Firefox and uploads the `full-campaign-release-run` artifact:
+
+```bash
+npm run build
+npm run release:serve -- --port 5000 &
+npm run release:campaign -- --browser all --route all --url http://127.0.0.1:5000
+```
+
 The GC-14 promotion guard is qualified. Since the 2026-10-20 owner waiver it accepts either a real `BETA_PASS` or the recorded waiver. RC entry still requires `1.0.0-rc.N` metadata and no open release-blocking KnownDefects row; final promotion also requires the RC record, browser evidence, and (for a waived release) `docs/release/ReleaseNotes.md` disclosing that the game was not externally playtested.
 
 RC must identify one exact:
