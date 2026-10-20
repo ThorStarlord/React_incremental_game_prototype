@@ -15,7 +15,8 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <ReduxProvider store={store}>
-      <BrowserRouter>
+      {/* PUBLIC_URL is set when the build is hosted under a subpath (GitHub Pages). */}
+      <BrowserRouter basename={process.env.PUBLIC_URL || undefined}>
         <ThemeProviderWrapper>
           <CssBaseline />
           <App />

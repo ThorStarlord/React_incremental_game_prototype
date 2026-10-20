@@ -1,0 +1,88 @@
+name: Deploy to GitHub Pages
+
+# Publishes the playable production build from main. GitHub Pages must be
+# enabled once by a repository admin (Settings -> Pages -> Source: GitHub
+# Actions); until then the deploy is skipped with a notice instead of failing.
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.pages.outputs.enabled }}
+    steps:
+      - name: Check that GitHub Pages is enabled for Actions deployments
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          build_type=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages" | jq -r '.build_type // empty' || true)
+          if [ "$build_type" = "workflow" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=GitHub Pages not enabled::Enable Settings -> Pages -> Source: GitHub Actions to publish the game. Skipping deploy."
+          fi
+
+      - name: Checkout
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.pages.outputs.enabled == 'true'
+        run: npm ci
+
+      - name: Build for the project-site path
+        if: steps.pages.outputs.enabled == 'true'
+        run: npm run build
+        env:
+          CI: false
+          PUBLIC_URL: /${{ github.event.repository.name }}
+
+      - name: Serve deep links through the SPA shell
+        if: steps.pages.outputs.enabled == 'true'
+        run: cp build/index.html build/404.html
+
+      - name: Configure Pages
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

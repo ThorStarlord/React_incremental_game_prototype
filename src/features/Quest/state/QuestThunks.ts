@@ -27,6 +27,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { toDisplayNameFromId } from '../../../shared/utils/formatUtils';
 import type { StatusEffect } from '../../Player/state/PlayerTypes';
 import { QUEST_CONSTANTS } from '../../../constants/gameConstants';
+import { publicAsset } from '../../../shared/utils/publicAsset';
 
 const applyQuestRewards = async (
   rewards: QuestReward[],
@@ -85,7 +86,7 @@ export const initializeQuestsThunk = createAsyncThunk<
   { preserveExisting?: boolean } | undefined
 >('quest/initializeQuests', async (options, { dispatch, getState }) => {
   try {
-    const response = await fetch('/data/quests.json');
+    const response = await fetch(publicAsset('/data/quests.json'));
     const quests: Record<string, Quest> = await response.json();
     const existing = options?.preserveExisting
       ? (getState() as RootState).quest.quests

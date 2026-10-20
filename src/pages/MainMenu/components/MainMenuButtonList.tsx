@@ -1,25 +1,8 @@
 import React from 'react';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { type SavedGame } from '../../../hooks/useSavedGames';
 // Update import path for formatting functions
 import { formatPlaytime, formatSaveDate } from '../../../shared/utils/formatUtils';
-
-// Internal reusable button component
-interface MenuButtonProps {
-  onClick: () => void;
-  disabled: boolean;
-  className?: string;
-  children: React.ReactNode;
-}
-
-const MenuButton: React.FC<MenuButtonProps> = ({ onClick, disabled, className = '', children }) => (
-  <button
-    onClick={onClick}
-    disabled={disabled}
-    className={`px-4 py-2 rounded disabled:opacity-50 transition-colors ${className}`}
-  >
-    {children}
-  </button>
-);
 
 interface MainMenuButtonListProps {
   mostRecentSave: SavedGame | null;
@@ -32,6 +15,8 @@ interface MainMenuButtonListProps {
   onAbout: () => void;
 }
 
+const buttonSx = { py: 1.25, textTransform: 'none', fontSize: '1rem' } as const;
+
 export function MainMenuButtonList({
   mostRecentSave,
   isLoading,
@@ -43,67 +28,54 @@ export function MainMenuButtonList({
   onAbout
 }: MainMenuButtonListProps) {
   return (
-    <div className="flex flex-col space-y-3 w-64 mx-auto">
-      <MenuButton
-        onClick={onNewGame}
-        disabled={isLoading}
-        className="bg-blue-600 text-white hover:bg-blue-700"
-      >
+    <Stack spacing={1.5} sx={{ width: 280, mx: 'auto' }}>
+      <Button variant="contained" color="primary" onClick={onNewGame} disabled={isLoading} sx={buttonSx}>
         New Game
-      </MenuButton>
+      </Button>
 
-      <MenuButton
+      <Button
+        variant="contained"
+        color="success"
         onClick={onContinue}
         disabled={isLoading || !mostRecentSave}
-        className="bg-green-600 text-white hover:bg-green-700"
+        sx={{ ...buttonSx, flexDirection: 'column' }}
       >
         {mostRecentSave ? (
           <>
             Continue
-            <div className="text-xs mt-1 text-gray-200">
+            <Typography component="span" variant="caption" sx={{ display: 'block', opacity: 0.85, lineHeight: 1.4 }}>
               {mostRecentSave.name} • {formatPlaytime(mostRecentSave.playtime)}
               <br />
               {formatSaveDate(mostRecentSave.timestamp)}
-            </div>
+            </Typography>
           </>
         ) : (
           'Continue (No Saves)'
         )}
-      </MenuButton>
+      </Button>
 
-      <MenuButton
-        onClick={onLoadGame}
-        disabled={isLoading}
-        className="bg-indigo-600 text-white hover:bg-indigo-700"
-      >
+      <Button variant="contained" color="secondary" onClick={onLoadGame} disabled={isLoading} sx={buttonSx}>
         Load Game
-      </MenuButton>
+      </Button>
 
-      <div className="flex space-x-2">
-        <MenuButton
-          onClick={onImport}
-          disabled={isLoading}
-          className="flex-1 px-3 py-2 bg-purple-600 text-white hover:bg-purple-700" // Adjusted padding for flex items
-        >
+      <Box sx={{ display: 'flex', gap: 1.5 }}>
+        <Button variant="outlined" color="inherit" onClick={onImport} disabled={isLoading} sx={{ ...buttonSx, flex: 1 }}>
           Import
-        </MenuButton>
-
-        <MenuButton
+        </Button>
+        <Button
+          variant="outlined"
+          color="inherit"
           onClick={onExport}
           disabled={isLoading || !mostRecentSave}
-          className="flex-1 px-3 py-2 bg-purple-600 text-white hover:bg-purple-700" // Adjusted padding for flex items
+          sx={{ ...buttonSx, flex: 1 }}
         >
           Export
-        </MenuButton>
-      </div>
+        </Button>
+      </Box>
 
-      <MenuButton
-        onClick={onAbout}
-        disabled={isLoading}
-        className="bg-gray-600 text-white hover:bg-gray-700"
-      >
+      <Button variant="text" color="inherit" onClick={onAbout} disabled={isLoading} sx={buttonSx}>
         About
-      </MenuButton>
-    </div>
+      </Button>
+    </Stack>
   );
 }

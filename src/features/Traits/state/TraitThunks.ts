@@ -20,6 +20,7 @@ import type {
 import { recordAuthoredRelationshipExperienceThunk } from '../../Relationships/state/RelationshipThunks';
 import { evaluateTraitResonanceReadiness } from './TraitResonanceReadiness';
 import { classifyTraitEffectAuthority } from './TraitEffectAuthority';
+import { publicAsset } from '../../../shared/utils/publicAsset';
 
 export const fetchTraitsThunk = createAsyncThunk(
   'traits/fetchTraits',
@@ -27,7 +28,7 @@ export const fetchTraitsThunk = createAsyncThunk(
     try {
       dispatch(setLoading(true));
 
-      const response = await fetch('/data/traits.json');
+      const response = await fetch(publicAsset('/data/traits.json'));
       if (!response.ok) {
         throw new Error(`Failed to fetch traits: ${response.statusText}`);
       }
