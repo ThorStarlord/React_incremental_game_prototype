@@ -1,9 +1,10 @@
-# Repository Status — Campaign One Beta Convergence
+# Repository Status — Campaign One Release Qualification
 
-**Status date:** 2026-09-26
+**Status date:** 2026-10-20
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
-**Current strategic stage:** `BETA_CONVERGENCE / HUMAN_VALIDATION`  
+**Current strategic stage:** `RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA`  
+**Owner decision (2026-10-20):** `specification/Technical/OwnerPersonalReleaseDecision.md` — personal 1.0 release; human Beta floor waived, not satisfied; PR #165 parked post-1.0  
 **Provisional Product Direction:** `SELECTED / HUMAN-UNVALIDATED`  
 **M26:** `COMPLETE / INTEGRATED`  
 **GC-01:** `COMPLETE / INTEGRATED`  
@@ -17,16 +18,16 @@
 **GC-10:** `COMPLETE / INTEGRATED`  
 **GC-11 Alpha:** `ALPHA_PASS / HUMAN_UNVALIDATED`  
 **GC-12 Content Alpha:** `CONTENT_ALPHA / HUMAN_UNVALIDATED`  
-**GC-13 deterministic readiness:** `TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED / BETA_PASS=NO`  
-**GC-14 promotion guard:** `QUALIFIED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
-**Human Product Review:** issue #109 `OPEN / UNPROVEN`  
+**GC-13 deterministic readiness:** `TECHNICAL_BETA_READY / BETA_PASS=NO / BETA_OWNER_WAIVED`  
+**GC-14 promotion guard:** `QUALIFIED / RC ENTRY OPEN UNDER OWNER WAIVER / 1.0 NOT YET PROMOTED`  
+**Human Product Review:** issue #109 `OPEN / UNPROVEN` — optional post-1.0 lane; no longer a 1.0 gate  
 **Human evidence floor:** `0 / 5` accepted fresh-player first sessions; `0 / 3` accepted external full playthroughs  
-**Active program:** Campaign One / 1.0 Beta Convergence  
+**Active program:** Campaign One / 1.0 Release Qualification  
 **Feature Completion Gap Analysis:** `COMPLETE / HISTORICAL BREADTH + DEPTH AUTHORITY`  
 **Feature Complete:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED` — see `specification/Technical/FeatureCompleteResult.md`  
 **Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
 **Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
-**Current implementation frontier:** `NO OPEN FEATURE-CONSTRUCTION PACKAGE — Beta/human convergence active`
+**Current implementation frontier:** `NO OPEN FEATURE-CONSTRUCTION PACKAGE — RC qualification active (KD-002 full UI campaign evidence, KD-004 immutable RC/deployment identity)`
 
 ### Feature-completion convergence disposition
 
@@ -38,9 +39,10 @@ including a fortified finale entry that simultaneously consumes Relationship, Kn
 World State, and Faction authority.
 
 The Candidate-A exact head passed deterministic qualification and merged as `fd94adef92b30124e9d96e722f0d60ead811c4fa`; no further
-A/B/C construction package is authorized by inertia. The repository returns to the
-existing Beta/human-evidence lane. This does **not** mean `BETA_PASS`, RC eligibility,
-or 1.0 promotion has occurred.
+A/B/C construction package is authorized by inertia. The repository moved to the
+Beta/human-evidence lane, and on 2026-10-20 the owner waived that lane as a 1.0 gate
+(`OwnerPersonalReleaseDecision.md`). This does **not** mean `BETA_PASS` or 1.0
+promotion has occurred.
 
 ## Current authority
 
@@ -64,24 +66,34 @@ The project has passed proof-of-concept, technical-prototype, bounded vertical-s
 
 Those historical results established **integration maturity**, not automatic **feature maturity**. The subsequent B/A/C depth sequence has now closed that gap at the bounded Campaign One scope: Combat remains intentionally bounded, Doctrine specialization remains two-profile, and Standing Orders remain Archive + Forge rather than expanding into general planners. The historical `CONTENT_ALPHA / HUMAN-UNVALIDATED` and `TECHNICAL_BETA_READY` records remain valid evidence, and `FeatureCompleteResult.md` now records that repository-owned feature construction has converged.
 
-## Current goal — Beta convergence / human validation
+## Current goal — 1.0 release qualification under the owner waiver
+
+On 2026-10-20 the owner made Campaign One / 1.0 a **personal release** (`specification/Technical/OwnerPersonalReleaseDecision.md`):
+
+- **D1:** the human Beta floor (5 first sessions + 3 external full runs) is waived as a 1.0 prerequisite. `BETA_PASS=NO` stays true; the recorded state is `BETA_OWNER_WAIVED / HUMAN-UNVALIDATED`. Release notes must state the game was not externally playtested.
+- **D2:** the universal Trait redesign (draft PR #165) is parked until after 1.0. 1.0 ships the merged Trait model (save schema v2).
+- **D3:** an agent may merge its own PRs once exact-head Build Validation passes.
 
 The active optimization target is:
 
-> **Harden, clarify, validate, and prepare the existing feature-complete Campaign One for Beta without reopening feature construction by inertia.**
+> **Qualify one exact 1.0.0-rc.N candidate against `ReleaseQualificationContract.md` and promote it to 1.0.0, repairing only what that qualification finds.**
 
-Current repository-answerable work requires a named requirement or a concrete deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, persistence, release-readiness, or human finding. Prefer the smallest repair to the existing authority that owns the behavior.
+The remaining release blockers are tracked in `docs/release/KnownDefects.md`:
 
-The **scope boundary remains bounded**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. B/A/C feature construction is closed unless a concrete finding falsifies the recorded feature-complete role or the owner explicitly revises scope.
+1. **KD-002** — one ordinary-UI clean-storage New Game -> Epilogue run plus two materially divergent histories, with save/load/import-export checkpoints;
+2. **KD-004** — an intentionally versioned immutable `1.0.0-rc.N` candidate with exact-head Build Validation, Chromium + Firefox evidence and release-like static hosting evidence.
 
-The active lanes are:
+KD-001 (human Beta evidence) is accepted for release under the waiver and remains a disclosed limitation.
 
-1. genuine human Beta evidence under issue #109;
-2. bounded evidence-backed hardening of the existing Campaign One;
-3. release-readiness preparation that does not claim RC or 1.0 authority early;
-4. repository governance enforcement under issue #122 when the required GitHub administration capability is available.
+The **scope boundary remains locked**: Chapters 8+, interplanetary continuation, generic Crafting/Skills, autonomous irreversible Copy planning, generalized simulation, New Game+, and other post-1.0 expansion remain outside current authority. B/A/C feature construction is closed.
 
-Use explicit evidence provenance throughout Beta convergence:
+Other open lanes:
+
+1. bounded accessibility/reliability/presentation repairs that the release qualification surfaces (including open PR #163);
+2. repository governance enforcement under issue #122, which needs a GitHub administrator;
+3. optional post-1.0 human sessions under issue #109.
+
+Use explicit evidence provenance throughout:
 
 ```text
 DETERMINISTIC_FINDING -> implementation behavior within exercised evidence
@@ -90,7 +102,7 @@ SYNTHETIC_FINDING     -> reproducible automated/simulated player-facing risk
 HUMAN_FINDING         -> actual recorded participant experience
 ```
 
-`BETA_PASS`, immutable RC qualification, and 1.0 promotion remain blocked until their governing evidence exists.
+A synthetic full UI playthrough closes KD-002 as release evidence; it remains a `SYNTHETIC_FINDING` and never becomes human evidence.
 
 ## Product direction
 
@@ -243,7 +255,7 @@ merge commit: ff829ce6ee4da8a693adfb783fe843775403326d
 
 GC-01 removes the cut/deferred Skills, Crafting, general Inventory and duplicate-save placeholders from primary Campaign One player navigation while preserving compatibility IDs and the existing Main Menu persistence authority. It adds focused positive/rejection qualification through `npm run gc01:validate` and does not add any new progression system or persistence model.
 
-GC-04 through GC-12 are closed by integrated implementation plus exact-head qualification. GC-13 repository-controlled technical preparation is qualified by Build Validation #394, including Chromium + Firefox CI smoke. The **human-evidence lane** remains open under issue #109 while bounded repository-answerable hardening may continue concurrently. GC-14's promotion guard remains qualified and correctly blocks RC/1.0 entry until the current Beta contract produces a real BETA_PASS. Automation must neither expand scope merely because the external gate remains open nor treat that external gate as a universal stop signal.
+GC-04 through GC-12 are closed by integrated implementation plus exact-head qualification. GC-13 repository-controlled technical preparation is qualified by Build Validation #394, including Chromium + Firefox CI smoke. The **human-evidence lane** remains open under issue #109 as an optional post-1.0 lane. GC-14's promotion guard remains qualified; since the 2026-10-20 owner waiver it accepts either a real BETA_PASS or the recorded waiver, and still requires `1.0.0-rc.N` metadata, no open release blocker, exact-candidate browser evidence, and (for a waived release) release notes disclosing that the game was not externally playtested.
 
 ## Pre-Beta player-surface hygiene
 
@@ -313,8 +325,8 @@ Before 1.0, the campaign must support at least:
 [x] GC-10 Finale + Epilogue
 [x] GC-11 Alpha qualification
 [x] GC-12 Content Alpha completion
-[ ] GC-13 Beta
-[ ] GC-14 Release Candidate / 1.0
+[~] GC-13 Beta — technical readiness qualified; human floor OWNER-WAIVED for 1.0 (BETA_PASS=NO)
+[>] GC-14 Release Candidate / 1.0 — active
 ```
 
 GC-04/GC-05 may be satisfied within chapter packages where that is the natural content-driven implementation; package numbering must not force redundant feature work.
@@ -325,7 +337,7 @@ GC-04/GC-05 may be satisfied within chapter packages where that is the natural c
 
 **Content Alpha:** **PASS / HUMAN-UNVALIDATED**. The complete bounded campaign is fully authored; no required content placeholder remains.
 
-**Beta:** feature/content scope locked; genuine human evidence required; focus on comprehension, pacing, balance, reliability, accessibility, presentation and supported desktop browsers.
+**Beta:** feature/content scope locked; genuine human evidence required for `BETA_PASS` (waived as a 1.0 gate by the owner on 2026-10-20); focus on comprehension, pacing, balance, reliability, accessibility, presentation and supported desktop browsers.
 
 **Release Candidate / 1.0:** one exact production candidate passes the release contract, full New Game -> Epilogue play, representative divergence, save/recovery/browser qualification and has no release-blocking defects.
 
@@ -339,9 +351,9 @@ Timed-Quest precision remains comparison-only. M21 offline authority remains bou
 
 ## Human evidence boundary
 
-Issue #109 remains open. Automation and repository analysis cannot prove fresh-player comprehension, fairness, enjoyment, emotional impact, retention or market preference, and synthetic/model-assisted review must never be relabeled as human observation.
+Issue #109 remains open as an optional post-1.0 lane. Automation and repository analysis cannot prove fresh-player comprehension, fairness, enjoyment, emotional impact, retention or market preference, and synthetic/model-assisted review must never be relabeled as human observation.
 
-That epistemic boundary is **not** an execution freeze. Deterministic, heuristic and synthetic evidence may still expose concrete risks and justify bounded repairs to the already-authorized Campaign One. Human evidence remains required for the human-experience claims and promotion conditions owned by the current Beta contract.
+The owner waiver removes human evidence as a 1.0 gate; it does not create human evidence. Release materials must not claim player-experience quality.
 
 ## Do not restart by inertia
 

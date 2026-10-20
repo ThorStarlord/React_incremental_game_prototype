@@ -75,12 +75,14 @@ describe('GC-13 deterministic Beta technical readiness', () => {
     expect(dialog).toContain('aria-describedby');
   });
 
-  test('Beta and Release Candidate records remain explicitly blocked on external evidence', () => {
+  test('Beta record keeps the owner waiver distinct from human evidence and RC stays unpromoted', () => {
     const beta = read('docs/release/BetaResult.md');
     const rc = read('docs/release/ReleaseCandidateResult.md');
     const defects = read('docs/release/KnownDefects.md');
 
-    expect(beta).toContain('**Status:** NOT RECORDED — HUMAN EVIDENCE REQUIRED');
+    expect(beta).toContain('**Status:** OWNER_WAIVED — HUMAN-UNVALIDATED (BETA_PASS=NO)');
+    expect(beta).toContain('| Five fresh-player first-session observations | NOT RECORDED |');
+    expect(beta).toContain('| Three beginning-to-ending external playthroughs | NOT RECORDED |');
     expect(beta).toContain('Five fresh-player first-session observations');
     expect(beta).toContain('Three beginning-to-ending external playthroughs');
     expect(beta).not.toContain('**Status:** BETA_PASS');

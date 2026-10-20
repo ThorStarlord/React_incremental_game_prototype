@@ -2,9 +2,10 @@
 
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Active program:** Campaign One / 1.0 Beta Convergence  
-**Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
-**Human Product Review:** issue #109 OPEN / UNPROVEN — 0/5 first sessions, 0/3 full external runs
+**Active program:** Campaign One / 1.0 Release Qualification  
+**Current strategic stage:** RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA  
+**Owner decision:** `specification/Technical/OwnerPersonalReleaseDecision.md` (2026-10-20)  
+**Human Product Review:** issue #109 OPEN / UNPROVEN — 0/5 first sessions, 0/3 full external runs; floor waived as a 1.0 gate, BETA_PASS=NO
 
 This file owns **operational procedure**. It does not define what the finished game is; that authority belongs to `specification/GameCompletionDefinition.md`.
 
@@ -35,7 +36,7 @@ Do not start from an old milestone queue. Do not infer M27 from M26. Because `FE
 
 > Which existing Campaign One authority owns that behavior, and what is the smallest repair or qualification that resolves it without reopening feature scope?
 
-GC-01 through GC-12 remain integrated and deterministic Beta readiness remains qualified as historical evidence. `FEATURE_COMPLETE` is recorded in `specification/Technical/FeatureCompleteResult.md`; current repository work is **Beta convergence / human validation** on the bounded Campaign One. New feature construction requires concrete evidence that the recorded feature-complete contract is false or an explicit scope revision.
+GC-01 through GC-12 remain integrated and deterministic Beta readiness remains qualified as historical evidence. `FEATURE_COMPLETE` is recorded in `specification/Technical/FeatureCompleteResult.md`; current repository work is **1.0 release qualification** on the bounded Campaign One under the owner waiver (`OwnerPersonalReleaseDecision.md`). Beta convergence work remains valid when it repairs a release finding. New feature construction requires concrete evidence that the recorded feature-complete contract is false or an explicit scope revision.
 
 ## Environment
 
@@ -154,8 +155,8 @@ Canonical queue: `specification/Technical/GameCompletionRoadmap.md`.
 [x] Candidate A — repeated capability depth; PR #156 / Build Validation #477
 [x] Candidate C — sufficient through existing GC08-GC10 composition
 [x] GATE     FEATURE_COMPLETE — recorded / HUMAN-UNVALIDATED
-[>] GC-13    Beta convergence — technical readiness qualified; human evidence active
-[ ] GC-14    Release Candidate / 1.0 — promotion guard qualified; RC entry blocked until BETA_PASS
+[~] GC-13    Beta — technical readiness qualified; human floor OWNER-WAIVED for 1.0 (BETA_PASS=NO)
+[>] GC-14    Release Candidate / 1.0 — active under the owner waiver; KD-002 and KD-004 open
 ```
 
 The roadmap may merge/split packages where content proves that clearer, but requirement traceability must remain explicit.
@@ -535,7 +536,7 @@ The automatable release aggregate exists:
 npm run release:validate
 ```
 
-The GC-14 promotion guard is qualified, but current policy still blocks immutable RC entry until a real `BETA_PASS`. Repository hardening before that point should improve the existing release surface without pretending the RC gate is open.
+The GC-14 promotion guard is qualified. Since the 2026-10-20 owner waiver it accepts either a real `BETA_PASS` or the recorded waiver. RC entry still requires `1.0.0-rc.N` metadata and no open release-blocking KnownDefects row; final promotion also requires the RC record, browser evidence, and (for a waived release) `docs/release/ReleaseNotes.md` disclosing that the game was not externally playtested.
 
 RC must identify one exact:
 

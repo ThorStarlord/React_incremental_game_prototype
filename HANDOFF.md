@@ -1,16 +1,33 @@
-# Handoff — Campaign One Beta Convergence
+# Handoff — Campaign One Release Qualification
 
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
 **Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
 **Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
 **Deterministic readiness:** `TECHNICAL_BETA_READY`  
-**Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC_ENTRY_BLOCKED / 1.0_PROMOTION_BLOCKED`  
-**Current strategic stage:** `BETA_CONVERGENCE / HUMAN_VALIDATION`  
-**Current product responsibilities:** Beta convergence / human validation on the existing feature-complete Campaign One  
-**Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs  
+**Release preparation:** `TECHNICAL_RELEASE_PREPARED / RC ENTRY OPEN UNDER OWNER WAIVER / 1.0 NOT YET PROMOTED`  
+**Current strategic stage:** `RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA`  
+**Owner decision:** `specification/Technical/OwnerPersonalReleaseDecision.md` (2026-10-20)  
+**Current product responsibilities:** qualify and promote one exact 1.0.0-rc.N candidate of the existing feature-complete Campaign One  
+**Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs — floor waived as a 1.0 gate; `BETA_PASS=NO`  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
 
-## Current re-entry frontier
+## Current re-entry frontier — 2026-10-20 owner personal-release decision
+
+The owner decided (`OwnerPersonalReleaseDecision.md`):
+
+- **D1** — 1.0 is a personal release. The human Beta floor is waived as a 1.0 gate, not satisfied: `BETA_PASS=NO`, `BETA_OWNER_WAIVED / HUMAN-UNVALIDATED`. Release notes must say the game was not externally playtested.
+- **D2** — draft PR #165 (universal Trait redesign) is parked until after 1.0.
+- **D3** — an agent may merge its own PRs once exact-head Build Validation passes.
+
+Next work, in order:
+
+1. integrate open PR #163 (keyboard/control accessibility) onto current `main`;
+2. close KD-002: one ordinary-UI clean-storage New Game -> Epilogue run plus two materially divergent histories, with save/load/import-export checkpoints (`SYNTHETIC_FINDING` class; fix what it finds);
+3. close KD-004: release-like static hosting, then an intentionally versioned `1.0.0-rc.N` with exact-head Build Validation and Chromium + Firefox evidence;
+4. write `docs/release/ReleaseNotes.md` with the not-externally-playtested disclosure, promote to `1.0.0`.
+
+## Previous frontier — feature-completion stop
+
 
 PR #154 merged the second materially distinct Mastery Compression standing responsibility.
 Archive Verification and Forge Assistance now differ by role/location context, work type,
@@ -30,9 +47,9 @@ The B -> A -> C repository construction sequence has converged and the Candidate
   Faction, World State, build and delegation deeply enough for Campaign One; no generic
   strategy simulator is warranted.
 
-The next lane is the already-defined human Beta/product-validation
-and convergence work. Preserve `TECHNICAL_BETA_READY` while keeping `BETA_PASS=NO`
-until the governing human evidence exists.
+That stop led to the human Beta/product-validation lane, which the owner waived as
+a 1.0 gate on 2026-10-20. Preserve `TECHNICAL_BETA_READY` and keep `BETA_PASS=NO`
+unless genuine human evidence is later recorded.
 
 ## Repository reality
 
@@ -55,9 +72,9 @@ GC-10  Finale + state-responsive Epilogue            COMPLETE
 GC-11  Alpha qualification                           COMPLETE
 GC-12  Content Alpha                                 COMPLETE
 GC-13  deterministic Beta readiness                  QUALIFIED
-GC-13  genuine human Beta evidence                   OPEN
+GC-13  genuine human Beta evidence                   OWNER-WAIVED FOR 1.0 / BETA_PASS=NO
 GC-14  release-promotion guard                       QUALIFIED
-GC-14  immutable RC / final 1.0 promotion            BLOCKED
+GC-14  immutable RC / final 1.0 promotion            ACTIVE (KD-002, KD-004 open)
 ```
 
 Do not reopen closed GC packages as if their historical contracts failed. Instead, deepen the current gameplay domains directly when feature-maturity analysis shows that the bounded implementation is still below L4.
@@ -105,7 +122,7 @@ This remains human-unvalidated. Deterministic qualification does not prove compr
 
 ## Current responsibilities
 
-### Primary lane — Beta convergence / evidence-backed hardening
+### Primary lane — release qualification / evidence-backed hardening
 
 `FeatureCompleteResult.md` records the construction stop. Candidate B is bounded-converged, Candidate A is qualified/merged, and Candidate C is sufficient through existing GC08-GC10 composition. There is **no open feature-construction frontier**.
 
@@ -120,9 +137,9 @@ Repository-owned work may continue when a concrete finding justifies it, especia
 
 Do not create another gameplay-depth package merely because a system could be broader.
 
-### Human evidence lane — active Beta gate
+### Human evidence lane — optional after the owner waiver
 
-Issue #109 is the canonical human product-evidence backlog. The Beta contract still requires at least 5 accepted first sessions and 3 accepted external full playthroughs before `BETA_PASS`.
+Issue #109 remains the canonical human product-evidence backlog. A genuine `BETA_PASS` still requires at least 5 accepted first sessions and 3 accepted external full playthroughs, but the owner waived that floor as a 1.0 gate on 2026-10-20.
 
 Automation, synthetic traversal, repository analysis, and LLM judgment may diagnose or repair the product, but they may not be relabeled as accepted human evidence.
 
@@ -140,10 +157,10 @@ Preserve the bounded Campaign One product boundary:
 
 Use `AGENTS.md`, `GameCompletionDefinition.md`, `FeatureScopeMatrix.md`, and the Beta/Release contracts for work selection.
 
-## Release path after BETA_PASS
+## Release path under the owner waiver
 
 ```text
-BETA_PASS
+BETA_PASS or recorded owner waiver (current basis: waiver)
 -> intentionally version one immutable 1.0.0-rc.N candidate
 -> exact-head Build Validation
 -> full ordinary-UI New Game -> Epilogue qualification
@@ -156,7 +173,7 @@ BETA_PASS
 -> 1.0.0
 ```
 
-The GC-14 guard must continue to fail closed until these authorities are satisfied.
+The GC-14 guard must continue to fail closed until these authorities are satisfied. For a waived release it also requires `docs/release/ReleaseNotes.md` to state that the game was not externally playtested.
 
 ## Governance boundary
 
@@ -202,4 +219,4 @@ latest main
 
 ## Governing handoff conclusion
 
-> Campaign One is now feature-complete at its bounded 1.0 scope and remains human-unvalidated. The active question is whether the existing game is understandable, reliable, accessible, well-paced, and release-ready enough to earn Beta and later RC/1.0 evidence. Repair concrete findings without inventing new feature scope.
+> Campaign One is feature-complete at its bounded 1.0 scope and remains human-unvalidated. The owner has made 1.0 a personal release, so the active question is whether one exact candidate passes the release contract's technical gates through the ordinary UI. Repair concrete findings without inventing new feature scope, and never present the waiver as human validation.

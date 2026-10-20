@@ -3,13 +3,28 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const root = path.resolve(__dirname, '..');
+// RELEASE_ELIGIBILITY_ROOT lets the GC-14 regression suite exercise the guard
+// against fixture records without touching the real release ledger.
+const root = process.env.RELEASE_ELIGIBILITY_ROOT
+  ? path.resolve(process.env.RELEASE_ELIGIBILITY_ROOT)
+  : path.resolve(__dirname, '..');
+
+const OWNER_DECISION_PATH = 'specification/Technical/OwnerPersonalReleaseDecision.md';
+const RELEASE_NOTES_PATH = 'docs/release/ReleaseNotes.md';
+const OWNER_DECISION_MARKERS = [
+  'OWNER DECISION RECORDED',
+  'BETA_PASS = NO',
+  'BETA_OWNER_WAIVED / HUMAN-UNVALIDATED',
+];
 
 const read = relativePath =>
   fs.readFileSync(path.join(root, relativePath), 'utf8');
 
 const readJson = relativePath =>
   JSON.parse(read(relativePath));
+
+const exists = relativePath =>
+  fs.existsSync(path.join(root, relativePath));
 
 function fail(message) {
   throw new Error(`release eligibility blocked: ${message}`);
@@ -21,11 +36,36 @@ function statusLine(markdown, label) {
   return match[1].trim();
 }
 
-function requireBetaPass() {
+// Returns 'pass' for a genuine human-evidence BETA_PASS, or 'waived' when the
+// owner has explicitly waived the human floor for a personal release. A waiver
+// is never treated as BETA_PASS; it only satisfies the RC/1.0 entry condition.
+function requireBetaPassOrOwnerWaiver() {
   const beta = read('docs/release/BetaResult.md');
   const status = statusLine(beta, 'Beta result');
-  if (status !== 'BETA_PASS') {
-    fail(`BetaCompletionContract is not PASS (current Beta status: ${status})`);
+  if (status === 'BETA_PASS') return 'pass';
+
+  if (status.startsWith('OWNER_WAIVED')) {
+    if (!exists(OWNER_DECISION_PATH)) {
+      fail(`Beta result is OWNER_WAIVED but ${OWNER_DECISION_PATH} is missing`);
+    }
+    const decision = read(OWNER_DECISION_PATH);
+    for (const marker of OWNER_DECISION_MARKERS) {
+      if (!decision.includes(marker)) {
+        fail(`owner waiver record must contain ${JSON.stringify(marker)}`);
+      }
+    }
+    return 'waived';
+  }
+
+  fail(`BetaCompletionContract is not PASS and no owner waiver is recorded (current Beta status: ${status})`);
+}
+
+function requireWaiverDisclosure() {
+  if (!exists(RELEASE_NOTES_PATH)) {
+    fail(`owner-waived release requires ${RELEASE_NOTES_PATH}`);
+  }
+  if (!/not externally playtested/i.test(read(RELEASE_NOTES_PATH))) {
+    fail('owner-waived release notes must state that the game was not externally playtested');
   }
 }
 
@@ -93,16 +133,18 @@ function main() {
     fail('--stage must be rc or final');
   }
 
-  requireBetaPass();
+  const beta = requireBetaPassOrOwnerWaiver();
   requireNoOpenReleaseBlockers();
   requireVersion(stage);
 
   if (stage === 'final') {
     requireRcRecordPass();
     requireBrowserPasses();
+    if (beta === 'waived') requireWaiverDisclosure();
   }
 
-  console.log(`release eligibility PASS for ${stage} stage`);
+  const basis = beta === 'waived' ? 'owner waiver / HUMAN-UNVALIDATED' : 'BETA_PASS';
+  console.log(`release eligibility PASS for ${stage} stage (${basis})`);
 }
 
 try {

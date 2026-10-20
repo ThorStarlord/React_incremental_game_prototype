@@ -4,7 +4,8 @@ This file routes readers to the current product, completion, technical and domai
 
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
+**Current strategic stage:** RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA  
+**Owner decision:** [`Technical/OwnerPersonalReleaseDecision.md`](Technical/OwnerPersonalReleaseDecision.md) (2026-10-20)  
 **Human Product Review:** issue #109 OPEN / UNPROVEN
 
 ## Authority chain

@@ -17,17 +17,17 @@ Governance exists to improve the product and preserve justified scope. Governanc
 
 Campaign One is now **FEATURE_COMPLETE / HUMAN-UNVALIDATED** under `specification/Technical/FeatureCompleteResult.md`.
 
-The active sequence is:
+The active sequence, after the 2026-10-20 owner personal-release decision, is:
 
 ```text
 FEATURE_COMPLETE
--> Beta convergence / human validation
--> bounded tuning / accessibility / presentation / reliability repairs
--> BETA_PASS
--> RC qualification
+-> owner waiver of the human Beta floor for 1.0 (BETA_PASS = NO)
+-> bounded release-blocking repairs found by RC qualification
+-> 1.0.0-rc.N exact-candidate qualification
+-> 1.0.0 personal release, disclosed as not externally playtested
 ```
 
-Historical Alpha, Content Alpha, GC, Candidate B, Candidate A, Candidate C, and deterministic Beta-readiness results remain valid evidence. Do not invent another feature-construction package by inertia. Human Beta is now the active maturity lane for actual player-experience claims and eventual `BETA_PASS`; deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, and persistence findings may still justify bounded repairs to the existing feature-complete game.
+Historical Alpha, Content Alpha, GC, Candidate B, Candidate A, Candidate C, and deterministic Beta-readiness results remain valid evidence. Do not invent another feature-construction package by inertia. Human Beta remains the only route to actual player-experience claims and a genuine `BETA_PASS`, but it no longer gates 1.0; deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, and persistence findings may still justify bounded repairs to the existing feature-complete game.
 
 ## Required reading order
 
@@ -142,11 +142,11 @@ Before a package, answer:
 8. What is the stop condition?
 9. Does this finding actually falsify `FEATURE_COMPLETE`? If not, do not reopen feature construction.
 
-Technical possibility alone is not authorization. Evidence-backed **Beta convergence and release hardening inside the locked product boundary** is.
+Technical possibility alone is not authorization. Evidence-backed **release qualification and hardening inside the locked product boundary** is.
 
 ## Human Beta and release policy
 
-The current human evidence floor remains:
+The Beta contract's human evidence floor defines what a genuine `BETA_PASS` means:
 
 - at least 5 accepted fresh-player first sessions;
 - at least 3 accepted external beginning-to-ending fresh-save playthroughs;
@@ -154,6 +154,8 @@ The current human evidence floor remains:
 - exact build/browser/session provenance.
 
 Non-human evidence must never be relabeled as satisfying that floor.
+
+On 2026-10-20 the owner waived that floor as a **1.0 prerequisite** and made 1.0 a personal release (`specification/Technical/OwnerPersonalReleaseDecision.md`). The waiver is not a Beta pass, and release materials must disclose that the game was not externally playtested.
 
 Under current authority:
 
@@ -164,17 +166,22 @@ CONTENT_ALPHA + TECHNICAL_BETA_READY
 FEATURE_COMPLETE
 = recorded / HUMAN-UNVALIDATED
 
-current frontier
-= BETA_CONVERGENCE / HUMAN_VALIDATION
-
 BETA_PASS
-= not yet; still requires the human evidence contract
+= NO; still requires the human evidence contract
+
+BETA_OWNER_WAIVED / HUMAN-UNVALIDATED
+= recorded 2026-10-20; satisfies RC/1.0 entry only
+
+current frontier
+= RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA
 
 RC entry
-= downstream; remains blocked until BETA_PASS under the current release contract
+= open under the owner waiver once 1.0.0-rc.N metadata is set and no release blocker remains
 ```
 
-Changing those promotion requirements is an owner/product-policy decision. Improving the existing game while they remain open is not.
+Remaining release work follows `ReleaseQualificationContract.md`: full ordinary-UI campaign evidence, divergent histories, save/recovery evidence, exact-candidate browser and static-hosting evidence, and honest release notes. The universal Trait redesign (PR #165) is parked until after 1.0.
+
+An agent may merge its own pull request into `main` once exact-head Build Validation passes on that head (owner decision D3). It may not merge other people's pull requests or bypass Build Validation.
 
 ## Stop conditions
 

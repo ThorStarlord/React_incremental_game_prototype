@@ -32,15 +32,15 @@ Alpha                                PASS / HUMAN-UNVALIDATED
 Content Alpha                        PASS / HUMAN-UNVALIDATED
 Feature Complete                     PASS / HUMAN-UNVALIDATED
 Beta technical readiness             PASS
-Beta convergence                     ACTIVE
-Beta human evidence                  OPEN — 0/5 first sessions, 0/3 full runs
+Beta convergence                     ACTIVE — release-finding repairs only
+Beta human evidence                  OWNER-WAIVED FOR 1.0 — 0/5 first sessions, 0/3 full runs
 BETA_PASS                            NO
 Release promotion guard              PASS / fail-closed
-Release Candidate                    BLOCKED ON BETA_PASS
+Release Candidate                    ACTIVE UNDER OWNER WAIVER (2026-10-20)
 1.0                                  BLOCKED
 ```
 
-The repository has a complete authored Campaign One spine, whole-game traversal evidence, Content Alpha evidence, qualified deterministic Beta-readiness infrastructure, and a recorded `FEATURE_COMPLETE / HUMAN-UNVALIDATED` result. Candidate B is bounded-converged, Candidate A qualified through PR #156 / Build Validation #477, and Candidate C is sufficient through existing GC08-GC10 composition. The active work is now **Beta convergence / human validation** rather than further feature construction.
+The repository has a complete authored Campaign One spine, whole-game traversal evidence, Content Alpha evidence, qualified deterministic Beta-readiness infrastructure, and a recorded `FEATURE_COMPLETE / HUMAN-UNVALIDATED` result. Candidate B is bounded-converged, Candidate A qualified through PR #156 / Build Validation #477, and Candidate C is sufficient through existing GC08-GC10 composition. The active work moved to **Beta convergence / human validation** rather than further feature construction; since the 2026-10-20 owner waiver (`OwnerPersonalReleaseDecision.md`) it is **1.0 release qualification**, with `BETA_PASS = NO`.
 
 ## 3. Program invariants
 
@@ -131,9 +131,10 @@ Therefore:
 
 ```text
 FEATURE_COMPLETE = YES / HUMAN-UNVALIDATED
-BETA_CONVERGENCE = ACTIVE
+BETA_CONVERGENCE = ACTIVE (release-finding repairs only)
 BETA_PASS = NO
-RC_ENTRY = BLOCKED
+BETA_OWNER_WAIVED / HUMAN-UNVALIDATED (2026-10-20)
+RC_ENTRY = OPEN UNDER OWNER WAIVER
 ```
 
 Do not create another A/B/C construction package by inertia. New feature construction requires a concrete Beta finding that demonstrates a required Campaign One role is actually missing, a deterministic contradiction of the Feature Complete record, or an explicit scope revision.
@@ -559,14 +560,18 @@ Current valid state:
 
 ```text
 TECHNICAL_RELEASE_PREPARED
-RC_ENTRY_BLOCKED
-1.0_PROMOTION_BLOCKED
+BETA_PASS = NO
+BETA_OWNER_WAIVED / HUMAN-UNVALIDATED
+RC entry open under owner waiver
+1.0 not yet promoted
 ```
 
-`release:validate` may be used for deterministic preparation. RC qualification
-itself must not begin until `release:rc:eligibility` passes, which currently
-requires a real `BETA_PASS`. Final promotion additionally requires
-`release:promotion:eligibility`.
+The owner waived the human Beta floor as a 1.0 gate on 2026-10-20
+(`OwnerPersonalReleaseDecision.md`). `release:rc:eligibility` passes once
+`1.0.0-rc.N` metadata is set and no release-blocking KnownDefects row remains.
+Final promotion additionally requires `release:promotion:eligibility`, which for a
+waived release checks that `docs/release/ReleaseNotes.md` discloses the game was
+not externally playtested.
 
 ### Exit
 

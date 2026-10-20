@@ -2,7 +2,8 @@
 
 **Status:** CURRENT AUTHORITY — PROVISIONAL 1.0 RELEASE CONTRACT  
 **Parent:** `../GameCompletionDefinition.md`  
-**Requires:** `BetaCompletionContract.md` + recorded `FeatureCompleteResult.md`
+**Requires:** `BetaCompletionContract.md` (PASS or owner waiver) + recorded `FeatureCompleteResult.md`  
+**Owner decision:** `OwnerPersonalReleaseDecision.md` (2026-10-20) — human Beta floor waived for 1.0
 **Public contracts:** `PublicContracts.md`
 **Prepared:** 2026-09-11
 
@@ -32,7 +33,7 @@ Full mobile product support, live-service infrastructure, and post-campaign cont
 Do not create an RC until:
 
 - `FEATURE_COMPLETE` is recorded under the current completion/maturity authority;
-- `BETA_PASS` is recorded;
+- `BETA_PASS` is recorded, **or** the owner waiver in `OwnerPersonalReleaseDecision.md` is recorded (`BETA_OWNER_WAIVED / HUMAN-UNVALIDATED`);
 - feature scope is locked;
 - campaign content is locked except release-blocking corrections;
 - no known blocker/critical defect remains;
@@ -210,7 +211,9 @@ A `HIGH` defect that can corrupt saves, soft-lock normal progression, invalidate
 
 ## Human evidence carry-forward
 
-RC does not repeat all Beta playtesting, but must preserve evidence that:
+Under the 2026-10-20 owner waiver, this section is satisfied by recording the waiver in the RC record and by release notes (`docs/release/ReleaseNotes.md`) that state the game was not externally playtested. No human-experience claim may appear in release materials.
+
+When `BETA_PASS` is the basis instead, RC does not repeat all Beta playtesting, but must preserve evidence that:
 
 - required Beta human-review floor was reached;
 - no later RC change invalidated the relevant player-facing area without re-checking it;
@@ -248,7 +251,8 @@ release decision
 Promote an exact RC to 1.0 only when:
 
 ```text
-BetaCompletionContract = PASS
+(BetaCompletionContract = PASS
+ OR owner waiver recorded + release notes disclose no external playtesting)
 AND ReleaseQualificationContract deterministic gates = PASS
 AND primary browser evidence = PASS
 AND full New Game -> Epilogue run = PASS
