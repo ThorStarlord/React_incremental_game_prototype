@@ -49,7 +49,7 @@ describe('Beta accessibility baseline', () => {
     expect(npcPanel).toContain('aria-label="Close NPC panel"');
 
     expect(traitCodex).toContain(
-      'aria-label={`Make ${trait.name} permanent`}'
+      'aria-label={`Stabilize ${trait.name}`}'
     );
     expect(traitCodex).toContain('aria-label="Close Trait Codex"');
     expect(traitCodex).toContain(
@@ -59,7 +59,7 @@ describe('Beta accessibility baseline', () => {
       "inputProps={{ 'aria-label': 'Search traits' }}"
     );
     expect(traitCodex).toContain(
-      'aria-label="Trait Essence cost range"'
+      'getAriaLabel={(index: number) => index === 0 ? "Minimum Trait Essence cost" : "Maximum Trait Essence cost"'
     );
   });
 });
