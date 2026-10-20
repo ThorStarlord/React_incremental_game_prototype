@@ -24,12 +24,14 @@ import type {
 interface CombatEncounterPanelProps {
   definition: CombatEncounterDefinition;
   expressedTraitIds: readonly string[];
+  strikeDamageBonus?: number;
   onTargetKilled: (targetId: string) => void;
 }
 
 export const CombatEncounterPanel: React.FC<CombatEncounterPanelProps> = ({
   definition,
   expressedTraitIds,
+  strikeDamageBonus = 0,
   onTargetKilled,
 }) => {
   const [started, setStarted] = useState(false);
@@ -42,8 +44,8 @@ export const CombatEncounterPanel: React.FC<CombatEncounterPanelProps> = ({
   const victoryReported = useRef(false);
 
   const actions = useMemo(
-    () => getCombatActionPresentations(definition, state, expressedTraitIds),
-    [definition, state, expressedTraitIds]
+    () => getCombatActionPresentations(definition, state, expressedTraitIds, strikeDamageBonus),
+    [definition, state, expressedTraitIds, strikeDamageBonus]
   );
 
   const beginEncounter = () => {
@@ -58,7 +60,8 @@ export const CombatEncounterPanel: React.FC<CombatEncounterPanelProps> = ({
       definition,
       state,
       actionId,
-      expressedTraitIds
+      expressedTraitIds,
+      strikeDamageBonus
     );
 
     if (!result.ok) {
@@ -88,6 +91,9 @@ export const CombatEncounterPanel: React.FC<CombatEncounterPanelProps> = ({
                 {definition.name}
               </Typography>
               {started && <Chip size="small" label={`Phase: ${state.enemyPhase}`} />}
+              {started && strikeDamageBonus > 0 && (
+                <Chip size="small" label={`Expressed technique: +${strikeDamageBonus} Strike`} />
+              )}
               {started && <Chip size="small" label={`Round ${Math.max(1, state.round + 1)}`} />}
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
