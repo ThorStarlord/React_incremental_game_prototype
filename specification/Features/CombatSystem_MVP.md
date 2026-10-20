@@ -425,3 +425,17 @@ Potential future work, only when separately justified, includes:
 - richer encounter placement only if repeated production evidence warrants it.
 
 Do not infer that any of these are required merely because M17 or the bounded active-loop repair passed.
+
+## Campaign One 1.1 bounded procedural expression payoff (owner-directed)
+
+On the post-1.0 development branch, a currently expressed procedural/stat Trait with a live direct Attack effect can change **Strike** damage in the bounded Echo combat encounter. This adds one real consequence for non-cognitive Trait expression without replacing the intentionally small Strike/Guard/Trace/Disrupt system.
+
+- Baseline at `PLAYER_BASE_STATS.attack` is unchanged: no-Trait and Willow/Elara cognitive tactical routes retain their original definitions.
+- For each **five** final Attack points above the canonical player baseline, Strike gains **one** bonus damage, bounded to **two** maximum.
+- Negative, invalid and below-baseline amounts grant no bonus. The optional engine bonus defaults to zero for historical callers.
+- The player-facing combat action description and bonus indicator use the same effective value as actual damage.
+- Attack's **current** final stat follows expressed Trait stat calculation; suppression restores ordinary combat damage, while assimilated ownership remains.
+- Do not interpret this narrow bonus as a general combat rebalance, a new combat progression system, or proof of human enjoyment.
+
+Qualification includes `UniversalTraitOntology.test.ts` (express/suppress stat and combat difference), `CombatM17TraitTacticalVerticalSlice.test.tsx` (original no-Trait and tactical routes) and full Campaign One browser regressions. These checks must pass on the exact 1.1 candidate before integration.
+
