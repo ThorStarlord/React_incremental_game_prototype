@@ -1,8 +1,13 @@
 # Repository Runbook — Game Completion Program
 
+## 1.1 branch qualification procedure (owner-authorized)
+
+`work/1.1-universal-trait-expression-20261020` / PR #178 develops only the universal Trait scope under `specification/Technical/Version11ScopeContract.md`. The 1.0 release and its owner waiver are unchanged. Qualify using `npm run universal-traits:validate`, `npm run trait-depth:validate`, the complete exact-head Build Validation (including `npm run release:campaign` in Chromium and Firefox), save v2→v3 migration, UI/Doctrine/Copy journeys, accessibility and production build. Record the exact 1.1 candidate SHA and evidence separately from RC-1 of 1.0.0. Do not promote a new release or claim human validation from synthetic tests.
+
+
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Active program:** Campaign One / post-1.0 maintenance  
+**Active program on this branch:** owner-authorized 1.1 universal Trait construction and qualification; released-main 1.0 maintenance remains separate  
 **Current strategic stage:** RELEASED_1_0 / HUMAN-UNVALIDATED  
 **Release:** 1.0.0 (2026-10-20); RC-1 qualified by Build Validation #564  
 **Owner decision:** `specification/Technical/OwnerPersonalReleaseDecision.md` (2026-10-20)  
