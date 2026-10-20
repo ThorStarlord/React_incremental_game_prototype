@@ -1,0 +1,55 @@
+name: Tag release
+
+# When main carries a package version that has no tag yet, tag that exact
+# commit and publish a GitHub Release from docs/release/ReleaseNotes.md.
+# Versions with a prerelease suffix (e.g. 1.0.0-rc.1) are marked prerelease.
+# Promotion authority stays with the release guard and Build Validation; this
+# only records the version that main already declares.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Tag and release the declared version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          tag="v${version}"
+          if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+            echo "${tag} already exists; nothing to do."
+            exit 0
+          fi
+          case "$version" in
+            0.*) echo "Pre-1.0 development version ${version}; not tagging."; exit 0 ;;
+          esac
+
+          notes=docs/release/ReleaseNotes.md
+          if [ ! -f "$notes" ]; then
+            echo "::error::${notes} is required to publish ${tag}"
+            exit 1
+          fi
+
+          prerelease_flag=""
+          case "$version" in
+            *-*) prerelease_flag="--prerelease" ;;
+          esac
+
+          gh release create "$tag" \
+            --target "$GITHUB_SHA" \
+            --title "Campaign One ${tag}" \
+            --notes-file "$notes" \
+            $prerelease_flag
