@@ -56,10 +56,19 @@ const TraitSlotItem: React.FC<TraitSlotItemProps> = ({ traitId, trait, onRemove,
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h6">{trait.name}</Typography>
             <Box>
-              <IconButton size="small" onClick={() => setShowDetails(true)}>
+              <IconButton
+                size="small"
+                onClick={() => setShowDetails(true)}
+                aria-label={`Show ${trait.name} details`}
+              >
                 <InfoIcon fontSize="small" />
               </IconButton>
-              <IconButton size="small" onClick={() => onRemove(traitId)} color="error">
+              <IconButton
+                size="small"
+                onClick={() => onRemove(traitId)}
+                color="error"
+                aria-label={`Remove ${trait.name} from trait slot`}
+              >
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Box>
