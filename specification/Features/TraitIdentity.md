@@ -1,495 +1,591 @@
-# Trait Identity
+# Trait Identity — Universal Pattern Ontology
 
-**Status:** CURRENT DESIGN AUTHORITY — Campaign One / 1.0 Trait family identity  
-**Runtime contract:** [`TraitSystem.md`](TraitSystem.md)  
-**Catalogue/runtime authority:** [`../Technical/CampaignOneTraitCatalogueAudit.md`](../Technical/CampaignOneTraitCatalogueAudit.md)  
-**Gameplay doctrine:** [`../Technical/PostM16TraitGameplayReconciliation.md`](../Technical/PostM16TraitGameplayReconciliation.md)  
-**Story context:** [`../Narrative/CampaignArchitecture.md`](../Narrative/CampaignArchitecture.md), [`../Narrative/Synopsis.md`](../Narrative/Synopsis.md)  
-**Scope note:** This document constrains future Trait authoring and interpretation. It does not reopen Campaign One feature construction, add runtime schema, authorize catalogue expansion, or promote human-validation claims.
+**Status:** CURRENT DESIGN AUTHORITY — owner-selected 2026-09-28 universal Trait direction  
+**Runtime contract:** [TraitSystem.md](TraitSystem.md)  
+**Reconciliation:** [UniversalTraitOntologyReconciliation.md](../Technical/UniversalTraitOntologyReconciliation.md)  
+**Catalogue/runtime audit:** [CampaignOneTraitCatalogueAudit.md](../Technical/CampaignOneTraitCatalogueAudit.md)  
+**Story context:** [CampaignArchitecture.md](../Narrative/CampaignArchitecture.md), [Synopsis.md](../Narrative/Synopsis.md)
 
-## 1. Purpose
+## 1. Core identity
 
-The repository already defines how Traits work mechanically and which current effects have runtime authority. This document answers a different question:
+> **A Trait is a discrete, stable, salient pattern of being.**
 
-> **What should a Trait mean and feel like in this game?**
+A Trait may describe a meaningful part of what a being:
 
-Campaign One's strongest Trait work has converged on a distinctive identity: the protagonist changes because of what she experiences, understands, survives, practices, and learns from other people. Those internalized patterns later change what she can perceive, interpret, endure, attempt, or perform.
+- **is** — physiology, morphology, sensory structure, metaphysical composition;
+- **knows** — semantic knowledge or a learned model;
+- **remembers** — significant subjective episodic memory;
+- **can do** — procedural skill, trained response, embodied technique;
+- **tends to do or perceive** — cognitive/dispositional pattern;
+- **can express supernaturally** — Essence, resonance, elemental, void, or other metaphysical patterns.
 
-This identity is narrower than "RPG perk" and broader than "relationship reward."
+Traits are therefore broader than RPG perks and broader than capabilities.
 
-## 2. Core identity statement
+The protagonist's distinctive power is not merely "learn skills from friends." Through resonance with other beings and meaningful sources, patterns that were originally foreign can become legible, gradually assimilated, stabilized with Essence, and selectively expressed as part of the protagonist.
 
-> **A Trait is an internalized pattern or transformation that changes how the protagonist can perceive, interpret, endure, act, or operate.**
+## 2. Universal in-world, selective in runtime
 
-A Trait should feel like something that has become part of the protagonist rather than an item placed in an inventory.
+The fictional ontology is universal:
 
-For identity-bearing Traits, the preferred causal shape is:
+~~~text
+a being
+= an enormous constellation of patterns
+= potentially describable through Traits
+~~~
 
-```text
-source experience
--> recognition
--> practice / assimilation where applicable
--> internalization
--> reusable capability
--> player-owned choice
--> consequence
-```
+The game representation is deliberately selective.
 
-The source may be a relationship, repeated practice, conflict, dangerous knowledge, a place, a relic, metaphysical exposure, or embodied adaptation. Relationship provenance is central to Campaign One's primary product promise, but not every legitimate Trait must come from an NPC.
+> **Universal ontology does not require universal serialization.**
 
-## 3. Story alignment
+Only a pattern that is narratively or mechanically salient should normally become an authored runtime Trait.
 
-Campaign One dramatizes a protagonist who begins by treating connection primarily as leverage and gradually encounters forms of understanding, capability, reciprocity, and strategic resilience that cannot be reduced to control or approval.
+The game does **not** need a Trait object for every:
 
-The major story tensions relevant to Traits include:
+- ordinary memory;
+- mundane fact;
+- finger, organ, or trivial physical feature;
+- passing emotion;
+- momentary preference;
+- relationship-state update;
+- world-state fact.
 
-- instrumental connection vs authentic bond;
-- control vs vulnerability;
-- power vs surrender;
-- pragmatism vs idealism;
-- manipulation vs mutual calibration;
-- immediate leverage vs slower systemic understanding;
-- defending a useful model vs revising it from evidence;
-- imposing intention vs respecting real constraints;
-- isolated competence vs networked capability.
+A runtime Trait is warranted when representing the pattern produces useful identity, gameplay, provenance, or narrative consequence.
 
-Trait identity should reinforce those tensions rather than merely coexist with them.
+## 3. Trait is not Capability
 
-The strongest relationship-derived Traits therefore do more than increase effectiveness. They externalize a change in how the protagonist understands or approaches the world.
+The previous Campaign One implementation often used Trait and capability nearly synonymously. That is now too narrow.
 
-## 4. The canonical Campaign One capability core
+Canonical separation:
 
-The current identity-defining Trait set is:
+~~~text
+Trait
+= pattern instantiated in a being
 
-| Trait | Source | Internalized pattern | Why it fits Campaign One |
-| --- | --- | --- | --- |
-| `WillowsWisdom` | Elder Willow | Trace visible symptoms back to slower systemic causes and act on underlying flow. | Counters the protagonist's bias toward immediate leverage and makes patient systemic understanding actionable. |
-| `ScholarlyInsight` | Elara | Revise a model when contradictory evidence appears instead of defending the first plausible explanation. | Turns epistemic humility into gameplay capability and challenges strategic overconfidence. |
-| `ConstraintSense` | Gronk | Identify load-bearing constraints beneath surface appearance and preserve what actually carries the work. | Converts practical craft judgment into a reusable strategic principle. |
-| `AdversarialCalibration` | Lyra | Model an opponent precisely enough to predict, coordinate with, or counter them without requiring agreement or affection. | Transforms rivalry from target reduction into accurate mutual modeling while preserving ideological conflict. |
-
-These four Traits form the canonical relationship-derived capability core for Campaign One.
-
-They are not interchangeable content keys. Each must remain defensible from a coherent sentence:
-
-```text
-Because the protagonist internalized [TRAIT],
-they can now ____________________________________.
-```
-
-## 5. Trait as character transformation
-
-The best Traits answer two questions at once:
-
-1. **What can the protagonist do now that she could not do before?**
-2. **What changed in the protagonist for that capability to exist?**
-
-A capability can be mechanically useful without being identity-bearing. Identity-bearing Traits should make the protagonist's development legible through play.
+Capability
+= something one or more currently expressed Traits make possible
+~~~
 
 Examples:
 
-```text
-Willow
--> stop treating the visible symptom as the whole system
+~~~text
+Trait: Elven low-light sensory pattern
+Capability: perceive clearly in darkness
 
-Elara
--> stop defending the first workable model when evidence contradicts it
+Trait: swordsmanship procedural pattern
+Capability: perform a trained counter
 
-Gronk
--> stop optimizing the surface while ignoring load-bearing constraints
+Trait: memory of a sealed archive route
+Capability: navigate that route from remembered experience
 
-Lyra
--> stop reducing an opponent to an object of control
-   and model another agent accurately enough to coordinate or counter
-```
+Trait: Scholarly Insight
+Capability: reopen a model when contradictory evidence appears
+~~~
 
-This does not require every Trait to encode moral growth. A Trait may deepen, complicate, darken, or destabilize the protagonist as long as the transformation is coherent.
+A Trait may create several capabilities in different contexts. Several Traits may also compose into one capability.
 
-## 6. Trait source families
+## 4. Trait nature
 
-The following are useful **authoring lenses**, not required runtime enums.
+The following are **authoring lenses, not a required closed runtime enum**.
 
-### 6.1 Relationship-derived
+### 4.1 Physiological / morphological
 
-A meaningful relationship exposes and qualifies an internalized pattern.
+Stable bodily patterns such as resilient constitution, dense musculature, regenerative tissue, gills, wings, or altered blood chemistry.
 
-Examples:
+### 4.2 Sensory
 
-- `WillowsWisdom`;
-- `ScholarlyInsight`;
-- `ConstraintSense`;
-- `AdversarialCalibration`.
+Patterns that change what can be perceived, such as low-light vision, echolocation, Essence-spectrum perception, or thermal sensing.
 
-Campaign One's primary product identity gives these Traits special importance because they make "who the player learned from" part of build identity.
+### 4.3 Procedural / skill
 
-### 6.2 Practice-derived
+Knowing **how** to perform a practiced action, such as swordsmanship, forging technique, field surgery, or Battle Hardened combat conditioning.
 
-Repeated embodied or operational experience produces durable capability.
+### 4.4 Semantic knowledge
 
-Examples may include battle conditioning, disciplined focus, or another practice the protagonist personally performs enough to change.
+Knowing **that** something is the case, or possessing an organized body/model of knowledge, such as Dragon-God resonance engineering, forbidden metaphysical theory, regional ecology, or imperial logistics.
 
-The source should be more than generic XP accumulation when the Trait is intended to be identity-bearing.
+### 4.5 Episodic memory
 
-### 6.3 Knowledge-derived
+A subjective remembered experience belonging to a mind.
 
-Understanding dangerous, rare, or difficult knowledge alters what the protagonist can perceive or attempt.
+A Memory Trait is not the same authority as a Relationship Memory. See section 10.
 
-A knowledge-derived Trait should express the knowledge's actual consequences rather than exist only as an abstract intelligence bonus.
+### 4.6 Cognitive
 
-### 6.4 Exposure-derived
+A reusable pattern of reasoning, attention, interpretation, or model formation.
 
-Relics, environments, metaphysical phenomena, or other extraordinary exposures may permanently alter the protagonist.
+Campaign One examples are Willow's Wisdom, Scholarly Insight, Constraint Sense, and Adversarial Calibration.
 
-These Traits are especially suitable for capabilities with meaningful costs, distortions, or new perceptions.
+### 4.7 Dispositional / emotional
 
-### 6.5 Embodied adaptation
+A sufficiently stable pattern affecting tendency, regulation, fear, desire, or emotional response.
 
-Physical changes may legitimately produce direct passive capability.
+A passing mood is not automatically a Trait.
 
-Not every Trait needs a philosophical identity. Physical resilience or practiced combat capability can remain valid secondary build texture when the runtime effect is real and the fiction is honest.
+### 4.8 Metaphysical
 
-## 7. Identity-bearing vs secondary Traits
+A stable supernatural pattern such as Essence Flow, elemental affinity, void exposure, harmonic resonance, or another supernatural structure.
 
-Campaign One deliberately permits two different depths of Trait.
+## 5. Nature and provenance are different dimensions
 
-### Identity-bearing Traits
+"What kind of pattern is this?" and "How did this instance originate?" are separate questions.
 
-These should usually have:
+Example:
 
-- a legible source;
-- a coherent semantic capability;
-- repeated or cross-context meaning;
-- a relationship to the protagonist's development;
-- authored gameplay consumers where appropriate;
-- consequences that do not automatically resolve into a universally correct answer.
+~~~text
+Night Vision
 
-### Secondary Traits
+Nature in source:
+sensory / physiological
 
-These may provide bounded direct/passive texture such as:
+Source provenance:
+innate
 
-- Health;
-- Defense;
-- Mana;
-- regeneration;
-- attack/speed;
-- critical modifiers.
+Protagonist provenance:
+relationship-assimilated
+~~~
 
-Secondary Traits can be valid without carrying the narrative weight of the canonical four.
+Useful provenance language includes innate, practiced, learned, experienced, relationship-assimilated, exposure-derived, constructed/modified, and metaphysically inherited.
 
-The distinction is:
+These remain descriptive authoring lenses unless a concrete runtime need warrants schema.
 
-```text
-fits the setting
-!=
-expresses the game's identity
-```
+## 6. The protagonist's universal Trait loop
 
-Campaign One does not require every Trait to be identity-bearing. Future expansion should, however, prefer identity-bearing Traits when adding major authored progression.
+The intended fictional loop is:
 
-## 8. Catalogue breadth audit
+~~~text
+source possesses / instantiates pattern
+        ↓
+proximity + attention + relational or emotional significance
+        ↓
+Resonance makes pattern increasingly legible
+        ↓
+Recognition / Discovery
+        ↓
+Assimilation reconstructs pattern within protagonist
+        ↓
+temporary Expression can become possible
+        ↓
+continued meaningful evidence
+        ↓
+Assimilation becomes sufficient
+        ↓
+Essence Stabilization
+        ↓
+pattern becomes permanently available
+        ↓
+Player can Express / Suppress / combine available patterns
+~~~
 
-The current `public/data/traits.json` contains **27 Traits**. They do not all have the same relationship to the modern Trait identity.
+Campaign One does **not** need a generic continuous proximity simulator to tell this story. Authored Relationship Experiences remain a valid bounded representation of meaningful periods of proximity, attention, practice, conflict, teaching, and mutual exposure.
 
-### 8.1 Canonical identity core — KEEP / DEEPEN
+## 7. Resonance
 
-- `WillowsWisdom`
-- `ScholarlyInsight`
-- `ConstraintSense`
-- `AdversarialCalibration`
+> **Resonance is alignment/contact that permits one pattern to become legible to another being.**
 
-These are the strongest expression of the modern Trait ontology.
+Resonance is not the final permanent purchase.
 
-### 8.2 Runtime-valid secondary texture — KEEP where useful
+It may be strengthened by physical proximity, sustained attention, teaching, shared work, trust, vulnerability, dependence, rivalry, obsession, fear, conflict, mutual calibration, or intense shared experience.
 
-The current catalogue includes direct-stat Traits whose qualified effects are consumed by the Player stat pipeline. Examples include:
+Therefore:
 
-- `BattleHardened`;
-- `ResilientConstitution`;
-- `ArcaneIntellect`;
-- `SwiftStrikes`;
-- `IronWill`;
-- `LuckyCharm`;
-- `HeartOfTheMountain`;
-- `WhispersOfTheVoid`;
-- `MentalFocus` where its qualified Player-stat fields apply;
-- `TomeOfForbiddenKnowledge` where its qualified Player-stat fields apply.
+~~~text
+relationship significance
+!= positive Affinity
+~~~
 
-These are compatible secondary RPG texture. They should not silently become the design template for future major authored Traits.
+A hated rival may create stronger resonance than a casual friend.
 
-### 8.3 Live but non-permanent Player authority
+Lyra is the canonical Campaign One example: adversarial intensity and accurate mutual modeling can qualify learning without requiring agreement or affection.
 
-- `EssenceFlow`
+## 8. Assimilation
 
-Its current named runtime value exists when shared with or inherited by a Copy. That makes it legitimate temporary/shareable content, but not a permanent Player capability in Campaign One.
+> **Assimilation is the gradual reconstruction/internalization of a foreign Trait pattern.**
 
-### 8.4 Legacy identity debt / compatibility catalogue
+Discovery is only recognition.
 
-The following definitions largely reflect an older generic-perk ontology or cut/deferred systems:
+Assimilation is what makes the pattern increasingly reproducible by the protagonist.
 
-- `BargainingMaster`;
-- `QuickLearner`;
-- `MentorsInsight`;
-- `EssenceSiphon`;
-- `RelationshipSage`;
-- `CombatReflexes`;
-- `GrowingAffinity`;
-- `SilverTongue`;
-- `MasterCraftsman`;
-- `ShadowWalker`;
-- `ElementalAffinity`;
-- `EssenceAffinity`.
+Relationship-mediated Campaign One Traits may continue to use Connection evidence, compatibility, assimilation progress, landmark Memories, and authored Experiences. These represent evidence that the protagonist has had enough meaningful exposure to reconstruct the pattern.
 
-They may remain for save/content compatibility under the existing catalogue audit. Their historical metadata does **not** authorize new systems, and their presence does not establish them as models for future Trait identity.
+## 9. Stabilization
 
-## 9. Story-fit observations from the breadth audit
+> **Stabilization uses Essence to make an assimilated pattern durably self-sustaining in the protagonist.**
 
-### Strong fit
+Canonical distinction:
 
-The canonical four fit the story identity directly because each represents a meaningful correction, complication, or expansion of the protagonist's initial strategic worldview.
+~~~text
+Resonance
+= transfer/alignment becomes possible
 
-### Compatible but generic
+Assimilation
+= foreign pattern is reconstructed
 
-Direct-stat Traits can fit the setting and build texture without expressing the narrative thesis. They are legitimate but secondary.
+Stabilization
+= reconstructed pattern becomes permanently available
+~~~
 
-### Conceptually promising legacy names
+Historical runtime/data identifiers containing "resonance" may remain compatibility names until a later migration is specifically warranted.
 
-Some legacy concepts may contain future thematic potential if later story/content pulls them into production:
+## 10. Ownership and Expression
 
-- **Essence Siphon** could express extraction and instrumental power as a dark mirror to reciprocal connection.
-- **Mentor's Insight** could potentially express learning-how-to-learn from another person rather than a generic gain multiplier.
-- **Whispers of the Void** already suggests insight gained through destabilizing exposure.
-- **Tome of Forbidden Knowledge** already suggests capability purchased with transformation or cost.
+This is the central mechanical consequence of the universal identity.
 
-This document does not authorize those reinterpretations. They are examples of how an older name could become identity-bearing only through a later bounded content decision.
+~~~text
+Assimilated
+!= always active
 
-### Strong mismatch with the modern ontology
+Assimilated
+= permanently available
 
-Generic relationship-growth modifiers such as `RelationshipSage` and `GrowingAffinity` are especially weak fits with the current Relationship model because Campaign One treats relationships as evidence-bearing history rather than a universal XP stream.
+Expressed
+= currently manifested / active
+~~~
 
-Likewise, historical generic Skills/Crafting modifiers do not justify restoring cut systems.
+The protagonist may hoard many assimilated Traits while expressing only the set allowed by current expression capacity.
 
-## 10. Capability is not decision
+Stabilized Traits may be freely expressed or suppressed at will unless a future Trait has a specific authored reason to behave differently.
 
-The existing gameplay invariant remains central:
+No generic respec tax or arbitrary cooldown is implied.
 
-```text
+### Current compatibility mapping
+
+~~~text
+player.permanentTraits
+= legacy serialized name for assimilated Trait library
+
+player.traitSlots
+= current Trait expression capacity / expression set
+~~~
+
+This mapping preserves save compatibility without preserving the old ontology.
+
+## 11. Temporary Expression
+
+A discovered but not-yet-stabilized pattern may currently be expressed temporarily under the bounded existing Trait-slot behavior.
+
+Campaign One currently uses Discovery as the minimum temporary-expression threshold.
+
+That is a bounded implementation choice, not a universal metaphysical claim that first recognition always grants perfect reproduction.
+
+A future content case may justify partial/unstable expression thresholds. Do not build a generalized simulation without evidence.
+
+## 12. Relationship Memory vs Memory Trait
+
+These are different authorities.
+
+### Relationship Memory
+
+Answers:
+
+> **What meaningful history happened between these characters?**
+
+It is evidence/provenance owned by the Relationship system.
+
+Example: The Lesson Made Yours happened between Willow and the protagonist.
+
+### Memory Trait
+
+Answers:
+
+> **What subjective remembered experience is instantiated in this mind?**
+
+Example: Willow's memory of standing beneath an ancient tree during a particular disaster.
+
+Assimilating a Memory Trait does not rewrite history and does not mean the protagonist personally lived the source event.
+
+~~~text
+relationship historical evidence
+!= transferable episodic mental content
+~~~
+
+## 13. Knowledge authority vs Knowledge Trait
+
+The Knowledge system answers:
+
+> **Which NPC currently knows a selected objective fact?**
+
+A Knowledge Trait represents a substantial internalized informational/model pattern.
+
+Example:
+
+~~~text
+Knowledge state:
+Lyra knows the Echo entered Phase III.
+
+Knowledge Trait:
+Dragon-God Resonance Engineering
+~~~
+
+Do not serialize every learned fact as a Trait.
+
+## 14. Skill Trait vs routine familiarity
+
+A procedural/Skill Trait describes **knowing how**.
+
+Routine familiarity answers:
+
+> **Has the protagonist personally performed this repeatable work enough for the current delegation contract?**
+
+They can interact without collapsing:
+
+~~~text
+procedural Trait
+!= mastered routine identity
+~~~
+
+Generic Skills remain unnecessary as a parallel Campaign One subsystem because procedural skills may be represented through Traits where materially useful.
+
+## 15. Relationship state is not a Trait
+
+Affinity, Connection, trust, dominance/reciprocity, secrecy/transparency, and shared history remain Relationship authority.
+
+A stable dispositional pattern in a person may be a Trait.
+
+"This NPC currently trusts the protagonist" is relationship state, not a Trait.
+
+## 16. Faction and World State are not Traits
+
+Institutional standing and objective regional/world conditions remain separate causal authorities.
+
+Universal Traits do not become a universal condition engine.
+
+## 17. Expression owns active effects
+
+Under the current universal implementation:
+
+- direct Player-stat Trait effects apply while the Trait is expressed;
+- semantic authored Trait capabilities are available while the Trait is expressed;
+- shared projection to NPCs/Copies requires current expression;
+- suppressing an assimilated Trait removes its active expression without deleting ownership;
+- relationship deterioration does not normally remove a stabilized Trait from the assimilated library.
+
+The design invariant remains:
+
+~~~text
 capability != decision
-```
+~~~
 
-A Trait may:
+Expression may make an action possible without choosing it for the player.
 
-- reveal a possibility;
-- make a legal action possible;
-- change the information available;
-- improve or modify an action;
-- expose another strategic route.
+## 18. Sharing
 
-A Trait should not normally:
+Sharing projects a **currently expressed** Trait pattern to another supported target.
 
-- make an irreversible narrative choice automatically;
-- guarantee that its route is morally or strategically correct;
-- reward its own use merely because the player used it;
-- collapse a problem into "press the Trait button."
+~~~text
+Player expresses Trait
+-> Player may share/project pattern
+-> target receives bounded shared runtime effect
+~~~
 
-Trait-enabled options should usually expand meaningful solution space rather than become automatic golden answers.
+Sharing does **not** automatically mean the target permanently assimilates the Trait.
 
-## 11. Permanent learning vs temporary attunement
+Stabilized Player Traits remain shareable while expressed because stabilization changes ownership durability, not whether the pattern can be projected.
 
-The current distinction is identity-significant.
+## 19. Doctrine
 
-```text
-temporary attunement
-= I can currently imitate / borrow / experiment with this pattern
+A Doctrine is not a Trait and not the universal Trait ontology.
 
-permanent Resonance
-= this pattern has become durable part of the protagonist
+> **Doctrine is a higher-order strategic synthesis of assimilated cognitive/operational patterns that are currently expressed and deliberately foregrounded.**
 
-doctrine focus
-= this is what the protagonist is deliberately foregrounding now
-```
+Current Campaign One doctrines remain Structural Steward and Countermodeler.
 
-Do not erase this distinction by letting temporary attunement silently satisfy permanent authored mastery gates without new evidence and an explicit design decision.
+Current doctrine activation requires the component Traits to be:
 
-Temporary Traits may remain a lighter experimentation/sharing layer even if permanent Traits and doctrine carry more strategic narrative weight.
+~~~text
+assimilated
++ expressed
++ foregrounded
+~~~
 
-## 12. Trait vs Doctrine
+Doctrine adoption may express missing assimilated components into available open expression slots, but it must not silently evict unrelated expressed Traits.
 
-A permanent Trait represents **learned capability**.
+## 20. Essence identity
 
-A Doctrine represents **current synthesis / strategic posture** among learned capabilities.
+The universal Trait ontology gives Essence a clear role:
 
-Current Campaign One doctrines are intentionally bounded.
+> **Essence stabilizes reconstructed patterns that were not originally self-sustaining in the protagonist.**
 
-### Structural Steward
+This allows:
 
-```text
-Willow's Wisdom
-+
-Constraint Sense
-=
-understand slow systemic causality
-while preserving the structures that actually carry the work
-```
+~~~text
+relationship / exposure
+-> pattern legibility
 
-### Countermodeler
+assimilation
+-> reconstruction
 
-```text
-Scholarly Insight
-+
-Adversarial Calibration
-=
-continually revise an evidence-based opponent model
-under active opposition
-```
+Essence
+-> durable stabilization
+~~~
 
-Doctrine should emerge from a meaningful intellectual, tactical, or operational synthesis between Traits.
+Essence cannot replace the evidence needed to discover or assimilate a relationship-mediated Trait.
 
-It should not exist merely because two bonus-bearing Traits can be mathematically combined.
+## 21. Campaign One canonical cognitive core
 
-## 13. Doctrine synthesis test
+The four relationship-derived cognitive Traits remain excellent Campaign One content. Their importance does not mean all Traits are cognitive.
 
-A proposed doctrine should be able to answer:
+| Trait | Source | Pattern |
+| --- | --- | --- |
+| Willow's Wisdom | Elder Willow | Trace visible symptoms to slower systemic causes. |
+| Scholarly Insight | Elara | Revise a model when contradictory evidence appears. |
+| Constraint Sense | Gronk | Identify load-bearing constraints beneath surface appearance. |
+| Adversarial Calibration | Lyra | Model an opponent precisely without requiring agreement or affection. |
 
-```text
-Trait A teaches ____________________.
-Trait B teaches ____________________.
+They remain the strongest current expression of relationship-mediated cognitive assimilation.
 
-Together, foregrounding them creates a coherent posture:
-____________________________________.
-```
+## 22. Cross-category production proof
 
-If the final sentence is only "gain both bonuses at once," it is not sufficient evidence for a new doctrine.
+The current catalogue carries optional authoring metadata demonstrating that one Trait ontology can describe materially different pattern natures:
 
-Campaign One does not authorize a generic N-way synergy graph.
+- Willow's Wisdom — **cognitive**;
+- Resilient Constitution — **physiological**;
+- Battle Hardened — **procedural**;
+- Tome of Forbidden Knowledge — **semantic knowledge**;
+- Essence Flow — **metaphysical**.
 
-## 14. Future Trait authoring test
+This is a bounded ontology proof, not a mandate to expand Campaign One content.
 
-Before introducing a major new Trait, answer:
+No production Memory Trait is introduced merely to fill a category.
 
-### Source
+## 23. Current 27-Trait breadth interpretation
 
-What experience, person, practice, knowledge, environment, conflict, or exposure caused this pattern to exist?
+The catalogue remains mixed historical material. Universal ontology improves the test applied to it; it does not automatically validate every old effect.
 
-### Transformation
+### Strong current universal-pattern fits
 
-What changed in the protagonist?
+- Willow's Wisdom — cognitive / relationship-assimilated;
+- Scholarly Insight — cognitive / relationship-assimilated;
+- Constraint Sense — cognitive-procedural / relationship-assimilated;
+- Adversarial Calibration — cognitive-relational / relationship-assimilated;
+- Battle Hardened — procedural / embodied combat conditioning;
+- Resilient Constitution — physiological;
+- Arcane Intellect — cognitive/metaphysical;
+- Swift Strikes — procedural/embodied;
+- Iron Will — cognitive/embodied;
+- Lucky Charm — metaphysical probability-affecting pattern if fiction supports it;
+- Tome of Forbidden Knowledge — semantic-knowledge pattern; the historical ID names its source artifact;
+- Heart of the Mountain — physiological/metaphysical;
+- Whispers of the Void — metaphysical exposure;
+- Mental Focus — cognitive;
+- Essence Flow — metaphysical.
 
-### Capability
+### Legacy/deferred concepts requiring reinterpretation before promotion
 
-Complete:
+- Bargaining Master;
+- Quick Learner;
+- Mentor's Insight;
+- Essence Siphon;
+- Combat Reflexes;
+- Silver Tongue;
+- Master Craftsman;
+- Shadow Walker;
+- Elemental Affinity;
+- Essence Affinity.
 
-```text
-Because the protagonist internalized [TRAIT],
-they can now ____________________________________.
-```
+Many names could describe valid universal patterns, but obsolete effect metadata does not itself establish current runtime or Campaign One need.
 
-### Reuse
+### Especially weak current ontology fits
 
-Can at least one meaningful later use be explained by the same underlying capability identity, rather than treating the Trait as an arbitrary content key?
+- Relationship Sage as a generic relationship-gain multiplier;
+- Growing Affinity as passive relationship growth.
 
-### Choice
+Relationships are shared evidence-bearing history, not a meter that should become positive merely because the protagonist owns a Trait.
 
-Does the Trait create or modify meaningful choice without automatically selecting the correct outcome?
+No mass deletion is authorized solely by this identity revision.
 
-### Authority
+## 24. Authoring test for a new Trait
 
-Does the claimed effect have an actual named runtime or authored gameplay consumer?
+Before adding an important Trait, answer:
 
-### Story fit
+1. **Pattern:** What stable pattern actually exists?
+2. **Nature:** What kind of pattern is it?
+3. **Source:** In whom or what is it instantiated?
+4. **Provenance:** How did the source acquire it? How did the protagonist acquire it?
+5. **Salience:** Why is this pattern important enough to represent mechanically?
+6. **Assimilation:** What evidence makes the foreign pattern reconstructible?
+7. **Expression:** What changes while it is expressed?
+8. **Capability:** What does expressing the pattern allow?
+9. **Consequence:** Does it create meaningful possibilities without automatically choosing the correct outcome?
+10. **Domain boundary:** Is this really a Trait, or should the state remain Relationship, Knowledge, relationship Memory, Faction, World State, routine familiarity, inventory, or another existing authority?
 
-Does this Trait deepen the game's themes, character development, setting texture, or embodied capability rather than merely filling a genre-perk slot?
+## 25. Anti-patterns
 
-Not every minor passive Trait must satisfy the strongest narrative test. Major authored Traits should.
+Do not use universality as justification for:
 
-## 15. Anti-patterns
+- serializing every fact about every character;
+- turning every ordinary memory into runtime Trait data;
+- collapsing Relationship state into Traits;
+- collapsing Knowledge, Faction, or World State into Traits;
+- restoring a generic parallel Skills tree;
+- restoring generic Crafting because a procedural Trait exists;
+- continuous proximity simulation without demonstrated need;
+- automatically extracting every Trait from every nearby NPC;
+- personality overwrite as an automatic consequence of assimilation;
+- hundreds of Traits merely to demonstrate breadth;
+- a generic N-way Trait synergy engine;
+- arbitrary swap cooldowns or costs merely because other RPGs use them;
+- automatic "best answer" Trait actions.
 
-Avoid treating these as sufficient justification for a new major Trait:
+## 26. Story identity
 
-- "+X% to a system" with no coherent internalized pattern;
-- generic relationship XP or passive friendship growth;
-- a content prerequisite disguised as a Trait with no reusable meaning;
-- a generic Skills/Crafting/equipment hook used to resurrect cut systems;
-- arbitrary Trait proliferation to increase catalogue size;
-- doctrine combinations created only because two Traits coexist;
-- a Trait that automatically chooses irreversible narrative outcomes;
-- a Trait route that is universally superior by design;
-- flavor metadata presented as runtime authority without a consumer;
-- adding runtime schema merely to classify authoring concepts.
+Universal Traits strengthen the protagonist's story because her original instrumental worldview becomes mechanically literal.
 
-## 16. Relationship to the protagonist's arc
+Early framing can be:
 
-Campaign One's relationship-derived Traits can be read as a curriculum of strategic transformation:
+> **What can I extract from you?**
 
-```text
-Willow
--> perceive slower systems, not only immediate leverage
+But accumulated Traits can transform that question:
 
-Elara
--> revise a useful model when evidence contradicts it
+~~~text
+What can I take from you?
+        ↓
+What can I learn from you?
+        ↓
+What parts of you have become part of me?
+        ↓
+Who am I after carrying all of you?
+~~~
 
-Gronk
--> respect load-bearing constraints, not only surface optimization
+The protagonist does not have to become morally identical to her sources.
 
-Lyra
--> model another agent accurately without reducing them to agreement or control
-```
+A stronger identity is:
 
-The player does not have to become morally identical to these characters.
+> **She becomes capable of carrying other beings' patterns without ceasing to be herself.**
 
-The stronger promise is:
+That supports affection, rivalry, conflict, teaching, bodily adaptation, dangerous knowledge, and stranger future sources under one ontology.
 
-> The protagonist becomes capable of carrying other people's hard-earned patterns without ceasing to be herself.
+## 27. Evidence boundary
 
-This allows Traits to preserve ideological plurality rather than turning relationship progression into simple moral conversion.
+Repository evidence can establish:
 
-## 17. Evidence boundary
+- universal Trait terminology and runtime contracts;
+- assimilated ownership vs expression;
+- free expression/suppression through available slots;
+- stat/capability consumers using expression;
+- relationship-mediated assimilation;
+- Essence Stabilization;
+- sharing of currently expressed patterns;
+- save migration;
+- bounded cross-category catalogue metadata.
 
-Repository evidence currently establishes that:
+Repository evidence cannot establish without human observation:
 
-- authored relationship-derived Trait discovery exists;
-- assimilation / compatibility / Memory evidence can qualify permanent Resonance;
-- permanent Traits own durable gameplay capability;
-- the canonical four have distinct semantic identities;
-- those identities are reused in authored gameplay;
-- doctrines can derive from foregrounded permanent Traits;
-- current doctrine changes legal gameplay options;
-- legacy effect metadata is not automatically runtime authority.
+- that players understand the universal ontology;
+- that Trait hoarding feels exciting;
+- that expression capacity creates good build tension;
+- that swapping is discoverable;
+- that category breadth feels coherent rather than arbitrary;
+- that assimilation pacing is satisfying;
+- that the current UI communicates ownership vs expression cleanly enough.
 
-Repository evidence does **not** establish that:
+Those remain Beta / human-validation questions.
 
-- players understand the Trait identity without explanation;
-- the canonical four feel equally distinctive in human play;
-- doctrine switching is fun or well-paced;
-- temporary Trait management has sufficient strategic depth;
-- legacy Traits should be removed or redesigned;
-- a larger doctrine space is desirable;
-- any proposed future reinterpretation is worth implementing.
+## 28. Canonical authoring rule
 
-Those remain Beta / future-content questions.
+When deciding whether something belongs as a Trait, ask:
 
-## 18. Scope and change policy
+> **Is this a salient pattern instantiated in a being that meaningfully describes what they are, know, remember, perceive, or can do—and is representing that pattern as transferable/expressible useful to the game?**
 
-This identity document is a design constraint, not a construction queue.
+If yes, it may belong in the universal Trait ontology.
 
-It does not authorize:
-
-- adding more Campaign One Traits;
-- mass-deleting legacy Traits;
-- rewriting save-compatible catalogue IDs;
-- creating a new Trait taxonomy enum;
-- adding generic capability graphs;
-- adding generic synergy engines;
-- rebuilding Skills or Crafting;
-- changing the recorded FEATURE_COMPLETE maturity state.
-
-A future Trait package must still enter through current product/scope authority and be justified by a concrete content, Beta, expansion, or post-1.0 need.
-
-## 19. Canonical authoring rule
-
-When deciding whether a major future Trait belongs in the game, prefer this question:
-
-> **Does this Trait tell us something meaningful about what the protagonist has internalized—and therefore who she is becoming?**
-
-A Trait that only says "the number is larger" may remain useful secondary texture.
-
-A Trait that changes how the protagonist can understand or act can become part of the game's identity.
+If the answer is only "it is a number we want to increase," that is not enough.
