@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from '../../../app/store';
+import { gameEventListeners } from '../../../app/listeners/GameEventListeners';
 import { gainEssence } from '../../Essence/state/EssenceSlice';
 import {
   addAssimilatedTrait,
@@ -74,6 +75,28 @@ describe('Universal Trait ontology', () => {
     store.dispatch(expressTrait({ traitId: ATTACK_TRAIT.id, slotIndex: 0 }));
     await store.dispatch(recalculateStatsThunk());
     expect(store.getState().player.stats.attack).toBe(15);
+  });
+
+  test('normal runtime listener refreshes combat stats on expression and suppression without manual recalc', async () => {
+    const store = configureStore({
+      reducer: rootReducer,
+      middleware: getDefaultMiddleware =>
+        getDefaultMiddleware().prepend(gameEventListeners.middleware),
+    });
+    store.dispatch(loadTraits({ [ATTACK_TRAIT.id]: ATTACK_TRAIT }));
+
+    const initial = store.getState().player.stats.attack;
+    store.dispatch(addAssimilatedTrait(ATTACK_TRAIT.id));
+    expect(store.getState().player.stats.attack).toBe(initial + 5);
+    expect(getBoundedStrikeBonus(store.getState().player.stats.attack)).toBe(1);
+
+    store.dispatch(suppressTrait({ slotIndex: 0 }));
+    expect(store.getState().player.permanentTraits).toContain(ATTACK_TRAIT.id);
+    expect(store.getState().player.stats.attack).toBe(initial);
+    expect(getBoundedStrikeBonus(store.getState().player.stats.attack)).toBe(0);
+
+    store.dispatch(expressTrait({ traitId: ATTACK_TRAIT.id, slotIndex: 1 }));
+    expect(store.getState().player.stats.attack).toBe(initial + 5);
   });
 
   test('an expressed procedural Attack Trait changes bounded combat, while suppression restores the baseline', async () => {
