@@ -19,12 +19,14 @@ The owner decided (`OwnerPersonalReleaseDecision.md`):
 - **D2** — draft PR #165 (universal Trait redesign) is parked until after 1.0.
 - **D3** — an agent may merge its own PRs once exact-head Build Validation passes.
 
-Next work, in order:
+Progress since the decision:
 
-1. integrate open PR #163 (keyboard/control accessibility) onto current `main`;
-2. close KD-002: one ordinary-UI clean-storage New Game -> Epilogue run plus two materially divergent histories, with save/load/import-export checkpoints (`SYNTHETIC_FINDING` class; fix what it finds);
-3. close KD-004: release-like static hosting, then an intentionally versioned `1.0.0-rc.N` with exact-head Build Validation and Chromium + Firefox evidence;
-4. write `docs/release/ReleaseNotes.md` with the not-externally-playtested disclosure, promote to `1.0.0`.
+1. PR #163 (keyboard/control accessibility) integrated;
+2. KD-002 closed: `npm run release:campaign` plays New Game -> Epilogue through ordinary UI for two divergent histories with save/Continue and export/import checks, in Chromium and Firefox on every Build Validation run (`SYNTHETIC_FINDING`). Qualification found and fixed KD-010 through KD-015;
+3. KD-004 closed: `1.0.0-rc.1` declared; `deploy-pages.yml` publishes the static build once Pages is enabled;
+4. `docs/release/ReleaseNotes.md` carries the not-externally-playtested disclosure.
+
+Next: record the exact rc.1 candidate evidence in `ReleaseCandidateResult.md` and promote to `1.0.0`.
 
 ## Previous frontier — feature-completion stop
 

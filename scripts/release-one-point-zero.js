@@ -90,7 +90,7 @@ async function main() {
     for (const [label, command, args] of commands) runCommand(label, command, args);
     await runBrowserQualification();
     console.log('\n[release:1.0] deterministic release gates passed');
-    console.log('[release:1.0] human Beta evidence and immutable candidate identity remain separate promotion requirements');
+    console.log('[release:1.0] promotion still requires the release guard and an exact-candidate RC record');
   } catch (error) {
     console.error(`\n[release:1.0] ${error instanceof Error ? error.message : String(error)}`);
     process.exitCode = 1;

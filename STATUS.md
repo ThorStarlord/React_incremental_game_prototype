@@ -27,7 +27,7 @@
 **Feature Complete:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED` — see `specification/Technical/FeatureCompleteResult.md`  
 **Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
 **Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
-**Current implementation frontier:** `NO OPEN FEATURE-CONSTRUCTION PACKAGE — RC qualification active (KD-002 full UI campaign evidence, KD-004 immutable RC/deployment identity)`
+**Current implementation frontier:** `NO OPEN FEATURE-CONSTRUCTION PACKAGE — 1.0.0-rc.1 declared; KD-002 and KD-004 resolved; RC record and 1.0.0 promotion next`
 
 ### Feature-completion convergence disposition
 

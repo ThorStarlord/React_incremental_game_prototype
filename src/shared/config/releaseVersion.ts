@@ -1,5 +1,5 @@
 /**
- * Current product version. This is intentionally a beta version until the
- * external 1.0 release gates are closed and an immutable candidate is tagged.
+ * Current product version. Must match package.json; the release guard and
+ * GC-13 qualification check that they agree.
  */
-export const APP_VERSION = '0.9.0-beta.1';
+export const APP_VERSION = '1.0.0-rc.1';

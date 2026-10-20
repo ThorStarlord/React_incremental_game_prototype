@@ -8,16 +8,15 @@ const readJson = (relativePath: string): any =>
   JSON.parse(read(relativePath));
 
 describe('GC-13 deterministic Beta technical readiness', () => {
-  test('technical candidate identity is consistent and remains pre-1.0', () => {
+  test('candidate identity is consistent across package, lockfile, and app', () => {
     const packageJson = readJson('package.json');
     const packageLock = readJson('package-lock.json');
     const versionSource = read('src/shared/config/releaseVersion.ts');
 
-    expect(packageJson.version).toBe('0.9.0-beta.1');
+    expect(packageJson.version).toMatch(/^1\.0\.0(-rc\.\d+)?$/);
     expect(packageLock.version).toBe(packageJson.version);
     expect(packageLock.packages[''].version).toBe(packageJson.version);
-    expect(versionSource).toContain("APP_VERSION = '0.9.0-beta.1'");
-    expect(packageJson.version).not.toBe('1.0.0');
+    expect(versionSource).toContain(`APP_VERSION = '${packageJson.version}'`);
   });
 
   test('release-hardening utilities are wired to one package command surface', () => {
@@ -75,7 +74,7 @@ describe('GC-13 deterministic Beta technical readiness', () => {
     expect(dialog).toContain('aria-describedby');
   });
 
-  test('Beta record keeps the owner waiver distinct from human evidence and RC stays unpromoted', () => {
+  test('Beta record keeps the owner waiver distinct from human evidence and the RC record stays honest', () => {
     const beta = read('docs/release/BetaResult.md');
     const rc = read('docs/release/ReleaseCandidateResult.md');
     const defects = read('docs/release/KnownDefects.md');
@@ -87,11 +86,12 @@ describe('GC-13 deterministic Beta technical readiness', () => {
     expect(beta).toContain('Three beginning-to-ending external playthroughs');
     expect(beta).not.toContain('**Status:** BETA_PASS');
 
-    expect(rc).toContain('**Status:** DETERMINISTIC CANDIDATE VERIFIED; PROMOTION BLOCKED');
-    expect(rc).toContain('Beta human evidence');
-    expect(rc).toContain('GC-13 CI visible-UI smoke now passes Chromium');
-    expect(rc).toContain('future immutable RC still needs its own exact-candidate evidence');
-    expect(rc).toContain('release approval');
+    // The RC record is either a declared candidate awaiting its exact-head
+    // run or a qualified one tied to that run; it never claims human evidence.
+    expect(rc).toMatch(/\*\*Status:\*\* (RC-\d+ DECLARED — QUALIFICATION PENDING|RC-\d+ QUALIFIED\b.*)/);
+    expect(rc).toContain('BETA_PASS = NO / HUMAN-UNVALIDATED');
+    expect(rc).toContain('full-campaign-release-run');
+    expect(rc).not.toMatch(/human evidence (recorded|accepted)/i);
 
     for (const defect of ['KD-001', 'KD-002', 'KD-003', 'KD-004']) {
       expect(defects).toContain(defect);
@@ -101,7 +101,7 @@ describe('GC-13 deterministic Beta technical readiness', () => {
   test('deterministic release runner does not convert its own success into promotion authority', () => {
     const source = read('scripts/release-one-point-zero.js');
 
-    expect(source).toContain('human Beta evidence and immutable candidate identity remain separate promotion requirements');
+    expect(source).toContain('promotion still requires the release guard and an exact-candidate RC record');
     expect(source).not.toMatch(/git\s+tag|npm\s+publish|gh\s+release/);
   });
 });
