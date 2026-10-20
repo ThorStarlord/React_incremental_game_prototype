@@ -24,7 +24,7 @@ describe('Beta accessibility baseline', () => {
       'aria-label={`Manage ${trait.name} in trait slot ${slot.slotIndex + 1}`}'
     );
     expect(traitSlots).toContain(
-      'aria-label={`Equip a trait in slot ${slot.slotIndex + 1}`}'
+      'aria-label={`Express a Trait in slot ${slot.slotIndex + 1}`}'
     );
     expect(traitSlots).toContain(
       'aria-label={`Suppress ${trait.name}`}'
