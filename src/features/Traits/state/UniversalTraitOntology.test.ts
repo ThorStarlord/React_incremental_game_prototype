@@ -19,6 +19,8 @@ import {
   stabilizeTraitWithEssenceThunk,
 } from './TraitThunks';
 import { summarizeTraitAuthority } from './TraitEffectAuthority';
+import { createCombatEncounterState, getBoundedStrikeBonus, getCombatActionPresentations, performCombatAction } from '../../Combat/CombatEngine';
+import { TELLURIC_ECHO_ENCOUNTER } from '../../Combat/CombatEncounterDefinitions';
 
 const makeStore = () => configureStore({ reducer: rootReducer });
 
@@ -72,6 +74,44 @@ describe('Universal Trait ontology', () => {
     store.dispatch(expressTrait({ traitId: ATTACK_TRAIT.id, slotIndex: 0 }));
     await store.dispatch(recalculateStatsThunk());
     expect(store.getState().player.stats.attack).toBe(15);
+  });
+
+  test('an expressed procedural Attack Trait changes bounded combat, while suppression restores the baseline', async () => {
+    const store = makeStore();
+    store.dispatch(loadTraits({ [ATTACK_TRAIT.id]: ATTACK_TRAIT }));
+    const encounter = TELLURIC_ECHO_ENCOUNTER;
+    const initial = createCombatEncounterState(encounter);
+    const baseBonus = getBoundedStrikeBonus(store.getState().player.stats.attack);
+    const baseline = performCombatAction(encounter, initial, 'strike', [], baseBonus);
+
+    expect(baseBonus).toBe(0);
+    expect(baseline.ok).toBe(true);
+    expect(baseline.state.enemyHealth).toBe(encounter.enemyMaxHealth - encounter.strikeDamage);
+
+    store.dispatch(addAssimilatedTrait(ATTACK_TRAIT.id));
+    await store.dispatch(recalculateStatsThunk());
+    const expressedIds = store.getState().player.traitSlots
+      .map(slot => slot.traitId)
+      .filter((id): id is string => Boolean(id));
+    const expressedBonus = getBoundedStrikeBonus(store.getState().player.stats.attack);
+    const empowered = performCombatAction(encounter, initial, 'strike', expressedIds, expressedBonus);
+
+    expect(expressedIds).toContain(ATTACK_TRAIT.id);
+    expect(expressedBonus).toBe(1);
+    expect(empowered.state.enemyHealth).toBe(baseline.state.enemyHealth - 1);
+    expect(getCombatActionPresentations(encounter, initial, expressedIds, expressedBonus)
+      .find(action => action.id === 'strike')?.description).toContain('Deal 5 damage');
+
+    store.dispatch(suppressTrait({ slotIndex: 0 }));
+    await store.dispatch(recalculateStatsThunk());
+    const suppressedBonus = getBoundedStrikeBonus(store.getState().player.stats.attack);
+    const suppressed = performCombatAction(encounter, initial, 'strike', [], suppressedBonus);
+
+    expect(store.getState().player.permanentTraits).toContain(ATTACK_TRAIT.id);
+    expect(suppressedBonus).toBe(0);
+    expect(suppressed.state.enemyHealth).toBe(baseline.state.enemyHealth);
+    expect(getBoundedStrikeBonus(Number.NaN)).toBe(0);
+    expect(getBoundedStrikeBonus(1000)).toBe(2);
   });
 
   test('an assimilated pattern remains owned even when expression capacity is full', () => {
