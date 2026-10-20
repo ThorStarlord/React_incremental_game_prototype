@@ -1,12 +1,18 @@
 # Documentation Authority Index
 
+## 2026-10-20 owner personal-release decision
+
+- [`specification/Technical/OwnerPersonalReleaseDecision.md`](../specification/Technical/OwnerPersonalReleaseDecision.md) is **CURRENT AUTHORITY**: 1.0 is a personal release; the human Beta floor is waived as a 1.0 gate, not satisfied (`BETA_PASS = NO`, `BETA_OWNER_WAIVED / HUMAN-UNVALIDATED`); draft PR #165 is parked post-1.0; agents may merge their own PRs after exact-head Build Validation passes.
+- The current strategic stage is `RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA`. Remaining release blockers are KD-002 (full ordinary-UI campaign evidence) and KD-004 (immutable RC / deployment identity).
+- Release notes must state that the game was not externally playtested; the GC-14 guard enforces this for a waived final promotion.
+
 ## 2026-09-26 feature-depth reconciliation
 
 - Candidate B / Mastery Compression is **bounded-converged** after Archive Verification + Forge Assistance standing responsibilities.
 - Forge exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0` passed Build Validation #468 and merged in PR #154 as `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`.
 - Candidate A is repository-converged and qualified by repeated existing-capability use across GC08/GC09 plus doctrine consumers in GC06/GC08/GC10. PR #156 merged as `fd94adef92b30124e9d96e722f0d60ead811c4fa` after exact-head Build Validation PASS.
 - Candidate C is `SUFFICIENT / NO NEW SUBSYSTEM WARRANTED`: existing GC08-GC10 authored decisions already compose Relationship, Knowledge, Faction, World State, build and delegation.
-- The active lane is now Beta/human convergence; `BETA_PASS`, RC and 1.0 remain blocked by their own evidence contracts.
+- The active lane then became Beta/human convergence; the 2026-10-20 owner decision above supersedes that lane as a 1.0 gate.
 - Do not add a third standing responsibility by symmetry. Prefer repeated independent uses and later consequences for existing capabilities before adding Traits/doctrines.
 - Human Beta/product-value evidence remains external and unproven; deterministic feature qualification does not promote Beta/RC/1.0 claims.
 
@@ -14,8 +20,8 @@
 **Status:** CURRENT AUTHORITY for document classification  
 **Reconciled base before GC-12 merge:** `02f06426e05c345380e51ae19a1061b5ed5e1bb2`  
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
-**Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
-**Last reconciled:** 2026-09-26
+**Current strategic stage:** RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA  
+**Last reconciled:** 2026-10-20
 
 ## 2026-09-27 maturity-transition lesson
 
@@ -162,9 +168,10 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | GC-11 Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC11AlphaResult.md`](../specification/Technical/GC11AlphaResult.md) | Exact-head Build Validation #381 PASS; ALPHA_PASS / HUMAN_UNVALIDATED. |
 | GC-12 Content Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC12ContentAlphaResult.md`](../specification/Technical/GC12ContentAlphaResult.md) | Authored-corpus qualification passed; CONTENT_ALPHA / HUMAN_UNVALIDATED. |
 | GC-13 deterministic Beta readiness | CURRENT AUTHORITY, qualified | [`specification/Technical/GC13BetaTechnicalReadinessResult.md`](../specification/Technical/GC13BetaTechnicalReadinessResult.md) | Build Validation #394 PASS; Chromium + Firefox CI smoke PASS; TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED. |
-| GC-13 Beta human evidence | CURRENT ACTIVE EXTERNAL GATE | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | FEATURE_COMPLETE prerequisite satisfied; 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO. |
-| GC-14 release eligibility guard | CURRENT AUTHORITY, qualified | [`specification/Technical/GC14ReleaseEligibilityBlockedResult.md`](../specification/Technical/GC14ReleaseEligibilityBlockedResult.md) | Build Validation #405 PASS; deterministic release preparation is safe, but RC_ENTRY_BLOCKED and 1.0_PROMOTION_BLOCKED until governing external gates pass. |
-| Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY | issue #109 | Open/unproven. Automation cannot satisfy it. |
+| Owner personal-release decision | CURRENT AUTHORITY, owner decision 2026-10-20 | [`specification/Technical/OwnerPersonalReleaseDecision.md`](../specification/Technical/OwnerPersonalReleaseDecision.md) | Human Beta floor waived as a 1.0 gate (BETA_PASS = NO); PR #165 parked post-1.0; agent self-merge after exact-head Build Validation. |
+| GC-13 Beta human evidence | OWNER-WAIVED FOR 1.0 / optional lane | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO; no longer a 1.0 gate. |
+| GC-14 release eligibility guard | CURRENT AUTHORITY, qualified | [`specification/Technical/GC14ReleaseEligibilityBlockedResult.md`](../specification/Technical/GC14ReleaseEligibilityBlockedResult.md) | Build Validation #405 PASS; since 2026-10-20 accepts BETA_PASS or the recorded owner waiver; RC entry still needs 1.0.0-rc.N metadata and no open release blocker. |
+| Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY, optional post-1.0 | issue #109 | Open/unproven. Automation cannot satisfy it; no longer a 1.0 gate. |
 | M25 complete chapter | CURRENT AUTHORITY, bounded | [`specification/Technical/M25CompleteChapterVerticalSliceResult.md`](../specification/Technical/M25CompleteChapterVerticalSliceResult.md) | Qualified first complete two-route chapter. |
 | Post-M25 product evidence boundary | REFERENCE / predecessor authority | [`specification/Technical/PostM25ProductDirection.md`](../specification/Technical/PostM25ProductDirection.md) | Its anti-expansion/evidence doctrine remains useful; completion scope is now governed above. |
 | Product Direction decision readiness | HISTORICAL EVIDENCE / predecessor | [`specification/Technical/PostM25ProductDirectionDecisionReadiness.md`](../specification/Technical/PostM25ProductDirectionDecisionReadiness.md) | Led to provisional governance/direction decision; no longer active implementation queue. |
@@ -222,11 +229,11 @@ Current maturity is:
 ```text
 FEATURE_COMPLETE / HUMAN-UNVALIDATED
 TECHNICAL_BETA_READY
-HUMAN_EVIDENCE_BLOCKED
 BETA_PASS = NO
+BETA_OWNER_WAIVED / HUMAN-UNVALIDATED
 TECHNICAL_RELEASE_PREPARED
-RC_ENTRY_BLOCKED
-1.0_PROMOTION_BLOCKED
+RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA
+1.0 NOT YET PROMOTED
 ```
 
 The repository has passed proof-of-concept, systems-prototype, whole-game Alpha,

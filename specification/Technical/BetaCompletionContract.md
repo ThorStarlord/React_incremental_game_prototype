@@ -1,7 +1,8 @@
 # Beta Completion Contract — Campaign One / 1.0
 
-**Status:** CURRENT ACTIVE BETA-CONVERGENCE AUTHORITY — PROVISIONAL 1.0 RELEASE CONTRACT  
-**Activation:** FEATURE_COMPLETE RECORDED / BETA_PASS=NO  
+**Status:** CURRENT AUTHORITY — BETA CONTRACT; HUMAN FLOOR OWNER-WAIVED FOR 1.0  
+**Activation:** FEATURE_COMPLETE RECORDED / BETA_PASS=NO / BETA_OWNER_WAIVED  
+**Owner decision:** `OwnerPersonalReleaseDecision.md` (2026-10-20)  
 **Parent:** `../GameCompletionDefinition.md`  
 **Requires:** `AlphaCompletionContract.md` + Content Alpha  
 **Prepared:** 2026-09-11
@@ -21,7 +22,7 @@ Beta may begin only when:
 - the outer feature scope is locked except for release-blocking change control; feature depth is no longer materially unfinished;
 - a full fresh-save run can legally reach campaign completion through ordinary UI.
 
-Historically the repository recorded **Content Alpha** after authored-spine and integration qualification. That historical record remains valid. `FEATURE_COMPLETE` is now recorded in `FeatureCompleteResult.md`, so Beta convergence is active; `BETA_PASS` remains unavailable until the human and technical exit evidence in this contract is satisfied.
+Historically the repository recorded **Content Alpha** after authored-spine and integration qualification. That historical record remains valid. `FEATURE_COMPLETE` is recorded in `FeatureCompleteResult.md`. `BETA_PASS` remains unavailable until the human and technical exit evidence in this contract is satisfied; on 2026-10-20 the owner waived the human floor as a **1.0 prerequisite** (see "Owner waiver" below), so release qualification may proceed without `BETA_PASS`.
 
 ## Beta doctrine
 
@@ -82,6 +83,17 @@ Before `BETA_PASS`, record at least:
 - participant/build provenance sufficient to identify exact commit/build, browser, fresh-save basis, interventions, and deviations.
 
 The counts are minimum evidence, not statistical claims. A repeated severe failure is more important than merely reaching the count.
+
+### Owner waiver — 2026-10-20
+
+The owner waived this floor as a prerequisite for RC entry and 1.0 promotion (`OwnerPersonalReleaseDecision.md`, D1). The waiver:
+
+- records `BETA_OWNER_WAIVED / HUMAN-UNVALIDATED` and keeps `BETA_PASS = NO`;
+- does not count any deterministic, heuristic or synthetic evidence as human evidence;
+- requires the release notes to state that the game was not externally playtested;
+- leaves issue #109 open for optional post-1.0 human sessions.
+
+The floor and acceptance rules below still define what a genuine `BETA_PASS` means if human sessions are run later.
 
 ### Human evidence acceptance
 

@@ -37,6 +37,7 @@ const completionAuthorityFiles = [
   'specification/Technical/AlphaCompletionContract.md',
   'specification/Technical/BetaCompletionContract.md',
   'specification/Technical/ReleaseQualificationContract.md',
+  'specification/Technical/OwnerPersonalReleaseDecision.md',
 ];
 
 const requiredAuthorityFiles = [
@@ -122,6 +123,7 @@ if (exists('docs/CURRENT.md')) {
     'AlphaCompletionContract.md',
     'BetaCompletionContract.md',
     'ReleaseQualificationContract.md',
+    'OwnerPersonalReleaseDecision.md',
     'PostM25ProvisionalProductDirectionDecision.md',
     'M26ProvisionalProductDepthResult.md',
     'GC11AlphaResult.md',
@@ -144,10 +146,12 @@ requireContains('STATUS.md', [
   'FEATURE_COMPLETE / HUMAN-UNVALIDATED',
   'TECHNICAL_BETA_READY',
   'BETA_PASS=NO',
-  'BETA_CONVERGENCE / HUMAN_VALIDATION',
+  'BETA_OWNER_WAIVED',
+  'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA',
+  'OwnerPersonalReleaseDecision.md',
   'FeatureCompleteResult.md',
-  'RC_ENTRY_BLOCKED',
-  '1.0_PROMOTION_BLOCKED',
+  'KD-002',
+  'KD-004',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
@@ -158,10 +162,13 @@ requireContains('STATUS.md', [
 
 requireContains('README.md', [
   'Current maturity: FEATURE_COMPLETE / HUMAN-UNVALIDATED',
-  'Current strategic stage: BETA_CONVERGENCE / HUMAN_VALIDATION',
-  'Technical Beta readiness: PASS / HUMAN EVIDENCE BLOCKED',
-  'RC entry: BLOCKED',
-  '1.0: BLOCKED',
+  'Current strategic stage: RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA',
+  'Technical Beta readiness: PASS',
+  'Beta: BETA_PASS=NO',
+  'RC entry: OPEN UNDER OWNER WAIVER',
+  '1.0: NOT YET PROMOTED',
+  'not externally playtested',
+  'OwnerPersonalReleaseDecision.md',
   'GameCompletionDefinition.md',
   'FeatureScopeMatrix.md',
   'GameCompletionRoadmap.md',
@@ -207,7 +214,8 @@ requireContains('specification/README.md', [
 
 requireContains('specification/GameCompletionDefinition.md', [
   'FEATURE_COMPLETE / HUMAN-UNVALIDATED',
-  'BETA_CONVERGENCE / HUMAN_VALIDATION',
+  'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA',
+  'Technical/OwnerPersonalReleaseDecision.md',
   'Technical/FeatureCompleteResult.md',
   '1.0 stop condition',
   'Campaign One',
@@ -235,6 +243,8 @@ requireContains('specification/Technical/GameCompletionRoadmap.md', [
   'FeatureCompleteResult.md',
   'Feature Complete                     PASS / HUMAN-UNVALIDATED',
   'Beta convergence                     ACTIVE',
+  'Release Candidate                    ACTIVE UNDER OWNER WAIVER',
+  'BETA_OWNER_WAIVED / HUMAN-UNVALIDATED',
   'FEATURE_COMPLETE = YES / HUMAN-UNVALIDATED',
   'Alpha qualification',
   'Release Candidate',
@@ -273,9 +283,36 @@ requireContains('specification/Technical/FeatureCompleteResult.md', [
 ]);
 
 requireContains('specification/Technical/BetaCompletionContract.md', [
-  'CURRENT ACTIVE BETA-CONVERGENCE AUTHORITY',
+  'HUMAN FLOOR OWNER-WAIVED FOR 1.0',
   'FEATURE_COMPLETE RECORDED / BETA_PASS=NO',
   'FeatureCompleteResult.md',
+  'OwnerPersonalReleaseDecision.md',
+  'BETA_OWNER_WAIVED / HUMAN-UNVALIDATED',
+]);
+
+requireContains('specification/Technical/ReleaseQualificationContract.md', [
+  'OwnerPersonalReleaseDecision.md',
+  'not externally playtested',
+]);
+
+requireContains('specification/Technical/OwnerPersonalReleaseDecision.md', [
+  'OWNER DECISION RECORDED 2026-10-20',
+  'BETA_PASS = NO',
+  'BETA_OWNER_WAIVED / HUMAN-UNVALIDATED',
+  'not externally playtested',
+  'PR #165',
+  'exact-head Build Validation',
+]);
+
+requireContains('AGENTS.md', [
+  'OwnerPersonalReleaseDecision.md',
+  'BETA_OWNER_WAIVED / HUMAN-UNVALIDATED',
+  'RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA',
+]);
+
+requireContains('docs/release/BetaResult.md', [
+  '**Status:** OWNER_WAIVED — HUMAN-UNVALIDATED (BETA_PASS=NO)',
+  'OwnerPersonalReleaseDecision.md',
 ]);
 requireContains('specification/Technical/M26ProvisionalProductDepthResult.md', [
   'COMPLETE / INTEGRATED',
@@ -377,6 +414,32 @@ for (const [file, phrase] of forbiddenCurrentAuthorityPhrases) {
   const content = read(file);
   if (content.includes(phrase)) {
     fail(`${file} contains stale pre-FEATURE_COMPLETE authority: "${phrase}"`);
+  }
+}
+
+// Prevent pre-waiver "RC/1.0 blocked until BETA_PASS" authority from surviving the
+// 2026-10-20 owner personal-release decision.
+const forbiddenPreWaiverPhrases = [
+  ['STATUS.md', 'RC_ENTRY_BLOCKED'],
+  ['STATUS.md', '1.0_PROMOTION_BLOCKED'],
+  ['STATUS.md', '`BETA_CONVERGENCE / HUMAN_VALIDATION`'],
+  ['HANDOFF.md', 'RC_ENTRY_BLOCKED'],
+  ['HANDOFF.md', '## Release path after BETA_PASS'],
+  ['README.md', 'RC entry: BLOCKED'],
+  ['README.md', '1.0: BLOCKED'],
+  ['README.md', 'expected to fail until BETA_PASS'],
+  ['RUNBOOK.md', 'RC entry blocked until BETA_PASS'],
+  ['RUNBOOK.md', 'current policy still blocks immutable RC entry until a real `BETA_PASS`'],
+  ['AGENTS.md', 'remains blocked until BETA_PASS under the current release contract'],
+  ['docs/CURRENT.md', 'CURRENT ACTIVE EXTERNAL GATE'],
+  ['docs/CURRENT.md', 'RC_ENTRY_BLOCKED'],
+  ['specification/Technical/GameCompletionRoadmap.md', 'BLOCKED ON BETA_PASS'],
+  ['specification/Technical/GameCompletionRoadmap.md', 'RC_ENTRY_BLOCKED'],
+];
+
+for (const [file, phrase] of forbiddenPreWaiverPhrases) {
+  if (read(file).includes(phrase)) {
+    fail(`${file} contains stale pre-waiver release authority: "${phrase}"`);
   }
 }
 

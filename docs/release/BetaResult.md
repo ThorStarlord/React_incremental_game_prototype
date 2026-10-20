@@ -1,8 +1,25 @@
 # Beta Completion Result — Campaign One / 1.0
 
-**Status:** NOT RECORDED — HUMAN EVIDENCE REQUIRED  
-**Authority:** `specification/Technical/BetaCompletionContract.md`  
-**Last updated:** 2026-09-22
+**Status:** OWNER_WAIVED — HUMAN-UNVALIDATED (BETA_PASS=NO)  
+**Authority:** `specification/Technical/BetaCompletionContract.md` + `specification/Technical/OwnerPersonalReleaseDecision.md`  
+**Last updated:** 2026-10-20
+
+## Owner waiver — 2026-10-20
+
+The owner waived the human-evidence floor as a 1.0 prerequisite
+(`OwnerPersonalReleaseDecision.md`, decision D1). Campaign One / 1.0 is a personal
+release. The waiver is **not** a Beta pass: no human session has been recorded,
+the human rows below remain `NOT RECORDED`, and every human-experience claim
+remains unproven.
+
+```text
+BETA_PASS = NO
+BETA_OWNER_WAIVED / HUMAN-UNVALIDATED
+```
+
+The waiver satisfies only the RC/1.0 entry condition in
+`ReleaseQualificationContract.md`. Release notes must state that the game was not
+externally playtested.
 
 ## Evidence boundary
 
@@ -41,6 +58,7 @@ The operator procedure is `docs/release/BetaExecutionRunbook.md`; the real-human
 
 ## Promotion rule
 
-This file must be replaced or superseded by a dated, exact-build Beta PASS record
-before a Release Candidate can be promoted. A deterministic green build must not
-be relabeled as Beta PASS.
+Under the owner waiver, RC/1.0 may proceed without a Beta PASS record. A
+deterministic green build, synthetic UI playthrough, or the waiver itself must
+never be relabeled as Beta PASS. If genuine human sessions are recorded later,
+they are added here under their normal evidence class.

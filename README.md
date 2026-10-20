@@ -1,8 +1,8 @@
-# React Incremental RPG — Campaign One Beta Convergence
+# React Incremental RPG — Campaign One
 
 A React/TypeScript narrative incremental RPG where consequential relationships teach durable capabilities, remembered history changes later possibilities, and personally understood repetition can become deliberately delegated work.
 
-> The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **FEATURE_COMPLETE / HUMAN-UNVALIDATED**; Beta convergence is active.
+> The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **FEATURE_COMPLETE / HUMAN-UNVALIDATED**; 1.0 release qualification is active as a personal release that has not been externally playtested.
 
 ## Current state
 
@@ -12,20 +12,20 @@ Post-M25 timing/content/chapter hardening: COMPLETE / INTEGRATED
 Provisional Product Direction: SELECTED / HUMAN-UNVALIDATED
 M26 learn-to-delegate provenance: COMPLETE / INTEGRATED
 Current maturity: FEATURE_COMPLETE / HUMAN-UNVALIDATED
-Current strategic stage: BETA_CONVERGENCE / HUMAN_VALIDATION
-Active program: Campaign One / 1.0 Beta Convergence
-Human Product Review: OPEN / UNPROVEN
+Current strategic stage: RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA
+Active program: Campaign One / 1.0 Release Qualification
+Human Product Review: OPEN / UNPROVEN (optional post-1.0)
 Alpha: PASS / HUMAN-UNVALIDATED
 Content Alpha: PASS / HUMAN-UNVALIDATED
-Technical Beta readiness: PASS / HUMAN EVIDENCE BLOCKED
-Beta: NOT YET — HUMAN EVIDENCE BLOCKED
-RC entry: BLOCKED — promotion guard qualified
-1.0: BLOCKED — promotion guard qualified
+Technical Beta readiness: PASS
+Beta: BETA_PASS=NO — human floor OWNER-WAIVED for 1.0 (2026-10-20)
+RC entry: OPEN UNDER OWNER WAIVER — needs 1.0.0-rc.N metadata and no open release blocker
+1.0: NOT YET PROMOTED
 ```
 
 The application already has a real game loop, persistent save/load/import-export, Relationship/Memory progression, Traits/Essence, NPC dialogue, quests, authored travel, combat, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progression, and multiple chapter-scale compositions.
 
-The repository has already proved that these systems can coexist, that the authored campaign spine can traverse from New Game to a state-responsive ending, and that the bounded B/A/C depth program has reached its Campaign One feature-completion stop. The active program is now **Beta convergence / human validation**: comprehension, pacing, balance, accessibility, presentation, reliability, recovery, supported-browser behavior, and evidence-backed hardening of the existing 1.0 scope.
+The repository has already proved that these systems can coexist, that the authored campaign spine can traverse from New Game to a state-responsive ending, and that the bounded B/A/C depth program has reached its Campaign One feature-completion stop. On 2026-10-20 the owner made 1.0 a personal release ([`OwnerPersonalReleaseDecision.md`](specification/Technical/OwnerPersonalReleaseDecision.md)): the human playtest floor is waived as a release gate, not satisfied. The active program is now **1.0 release qualification**: one exact candidate must pass the release contract's technical gates, including a full ordinary-UI campaign run, before promotion.
 
 ## 1.0 product promise
 
@@ -111,7 +111,7 @@ These commands do not replace the required real-human Beta evidence or an immuta
 Release evidence templates and generated-artifact locations live under
 [`docs/release/`](docs/release/).
 
-There is **no automatic M27 or GC-15**. The repository-wide breadth/depth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md), and [`FeatureCompleteResult.md`](specification/Technical/FeatureCompleteResult.md) records the construction stop. Candidate B is bounded-converged, Candidate A is qualified/merged, and Candidate C is sufficient without a new subsystem. The active lane is Beta convergence / human validation, with `BETA_PASS=NO` until genuine sessions satisfy the Beta contract.
+There is **no automatic M27 or GC-15**. The repository-wide breadth/depth pass is recorded in [`FeatureCompletionGapAnalysis.md`](specification/Technical/FeatureCompletionGapAnalysis.md), and [`FeatureCompleteResult.md`](specification/Technical/FeatureCompleteResult.md) records the construction stop. Candidate B is bounded-converged, Candidate A is qualified/merged, and Candidate C is sufficient without a new subsystem. The active lane is 1.0 release qualification under the 2026-10-20 owner waiver; `BETA_PASS=NO` remains true because no genuine sessions have been recorded.
 
 ## Important 1.0 scope decisions
 
@@ -156,7 +156,7 @@ npm run content-alpha:validate
 npm run beta:technical:validate
 npm run release:browser -- --browser all
 npm run gc14:validate
-npm run release:rc:eligibility    # expected to fail until BETA_PASS
+npm run release:rc:eligibility    # fails until 1.0.0-rc.N metadata is set and no release blocker remains
 npm run release:promotion:eligibility # expected to fail until final release gates pass
 npm run simulated-review:validate
 npm run simulated-review:action-contract
@@ -175,11 +175,9 @@ Exact-head Build Validation is required before merge. A green automated run esta
 
 ## Human evidence
 
-Issue #109 remains the human Product Review evidence backlog. Use [`docs/release/BetaExecutionRunbook.md`](docs/release/BetaExecutionRunbook.md) to run the evidence program and [`docs/release/BetaHumanEvidenceTemplate.md`](docs/release/BetaHumanEvidenceTemplate.md) for accepted session records.
+Issue #109 remains the human Product Review evidence backlog. Use [`docs/release/BetaExecutionRunbook.md`](docs/release/BetaExecutionRunbook.md) to run sessions and [`docs/release/BetaHumanEvidenceTemplate.md`](docs/release/BetaHumanEvidenceTemplate.md) for accepted session records.
 
-The minimum floor remains 5 accepted fresh-player first-session observations plus 3 accepted external beginning-to-ending fresh-save playthroughs. Do not relabel synthetic UI traversal, code review, automated tests or LLM analysis as human playtest evidence.
-
-That human-evidence obligation limits human-quality claims and `BETA_PASS`; it does not freeze bounded heuristic, synthetic, deterministic, accessibility, reliability, presentation, pacing, balance, persistence, or release-hardening work on the existing Campaign One.
+A genuine `BETA_PASS` still needs 5 accepted fresh-player first-session observations plus 3 accepted external beginning-to-ending fresh-save playthroughs. The owner waived that floor as a 1.0 gate on 2026-10-20, so 1.0 ships disclosed as **not externally playtested**. Do not relabel synthetic UI traversal, code review, automated tests or LLM analysis as human playtest evidence.
 
 ## Governing rule
 

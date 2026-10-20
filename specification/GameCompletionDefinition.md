@@ -2,7 +2,8 @@
 
 **Status:** CURRENT AUTHORITY — PROVISIONAL / HUMAN-UNVALIDATED  
 **Program stage:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
-**Current strategic stage:** BETA_CONVERGENCE / HUMAN_VALIDATION  
+**Current strategic stage:** RC_QUALIFICATION / OWNER_WAIVED_HUMAN_BETA  
+**Owner decision:** `Technical/OwnerPersonalReleaseDecision.md` (2026-10-20) — personal 1.0 release; human Beta floor waived, BETA_PASS=NO  
 **Prepared:** 2026-09-11  
 **Product direction:** `Technical/PostM25ProvisionalProductDirectionDecision.md`  
 **Human Product Review:** issue #109 remains OPEN / UNPROVEN
@@ -35,7 +36,7 @@ The repository distinguishes **integration proof** from **feature completion**. 
 
 Historical milestone closure remains valid evidence. A closed milestone means its stated contract was satisfied; it does **not** permanently freeze the associated gameplay domain at that depth. A feature may be deepened without reopening or rewriting the historical result.
 
-`FEATURE_COMPLETE` is now recorded in `Technical/FeatureCompleteResult.md`. The repository-wide objective is therefore Beta convergence / human validation: make the bounded feature-complete Campaign One understandable, balanced, accessible, presentable, reliable, and release-ready without reopening feature construction by inertia. New feature depth requires concrete evidence that the recorded feature-complete contract is false or an explicit scope revision.
+`FEATURE_COMPLETE` is now recorded in `Technical/FeatureCompleteResult.md`. The repository-wide objective became Beta convergence: make the bounded feature-complete Campaign One understandable, balanced, accessible, presentable, reliable, and release-ready without reopening feature construction by inertia. On 2026-10-20 the owner waived the human Beta floor as a 1.0 gate (`Technical/OwnerPersonalReleaseDecision.md`), so the current objective is 1.0 release qualification of that game, disclosed as not externally playtested. New feature depth requires concrete evidence that the recorded feature-complete contract is false or an explicit scope revision.
 
 ## 1. Product identity
 
@@ -332,7 +333,7 @@ AND FeatureScopeMatrix has no unresolved critical-path decisions
 AND Campaign One is playable New Game -> epilogue through normal UI
 AND AlphaCompletionContract satisfied
 AND Content Alpha achieved
-AND BetaCompletionContract satisfied
+AND (BetaCompletionContract satisfied OR owner waiver recorded in Technical/OwnerPersonalReleaseDecision.md)
 AND ReleaseQualificationContract satisfied on an exact candidate
 AND no unresolved release-blocking defects remain
 ```
