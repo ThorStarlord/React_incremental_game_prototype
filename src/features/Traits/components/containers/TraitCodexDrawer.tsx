@@ -327,7 +327,7 @@ const TraitCodexDrawer: React.FC<TraitCodexDrawerProps> = ({ open, onClose, focu
           <Box>
             <Typography gutterBottom variant="caption">Cost Range (Essence)</Typography>
             <Slider
-              getAriaLabel={(index: number) => index === 0 ? "Minimum Trait Essence cost" : "Maximum Trait Essence cost"
+              getAriaLabel={(index: number) => index === 0 ? "Minimum Trait Essence cost" : "Maximum Trait Essence cost"}
               value={filterState.traitCostRange}
               onChange={(e, newValue) => setFilter('traitCostRange', newValue as number[])}
               valueLabelDisplay="auto"
