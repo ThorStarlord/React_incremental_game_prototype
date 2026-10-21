@@ -11,8 +11,8 @@ import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
 
 export const getMissingPermanentTraitIdsForResolution = (
   option: Pick<QuestResolutionOption, 'requiredPermanentTraitIds'>,
-  permanentTraitIds: readonly string[]
-): string[] => getMissingPermanentTraitIds(option.requiredPermanentTraitIds, permanentTraitIds);
+  expressedTraitIds: readonly string[]
+): string[] => getMissingPermanentTraitIds(option.requiredPermanentTraitIds, expressedTraitIds);
 
 export const getMissingActiveDoctrineIdsForResolution = (
   option: Pick<QuestResolutionOption, 'requiredActiveDoctrineIds'>,
@@ -25,8 +25,8 @@ export const canUseQuestResolution = (
     QuestResolutionOption,
     'requiredPermanentTraitIds' | 'requiredActiveDoctrineIds'
   >,
-  permanentTraitIds: readonly string[],
+  expressedTraitIds: readonly string[],
   activeDoctrineIds: readonly DoctrineId[] = []
 ): boolean =>
-  hasRequiredPermanentTraits(option.requiredPermanentTraitIds, permanentTraitIds) &&
+  hasRequiredPermanentTraits(option.requiredPermanentTraitIds, expressedTraitIds) &&
   hasRequiredActiveDoctrines(option.requiredActiveDoctrineIds, activeDoctrineIds);

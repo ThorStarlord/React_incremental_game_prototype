@@ -1,5 +1,10 @@
 # Handoff — Campaign One 1.0 Released
 
+## Current branch handoff — 1.1 construction, qualification pending
+
+The owner has authorized the bounded universal Trait 1.1 work in `specification/Technical/Version11ScopeContract.md`; integration is isolated on `work/1.1-universal-trait-expression-20261020` / PR #178. PR #165 is *not* to be merged unchanged. P0 scope and P1 source reconciliation have been carried out; P2–P6 require exact-head validation, recovery of any failing tests, normal-UI gameplay evidence, documentation re-closure and separate release qualification. **Do not assume 1.1 feature complete or released.** The 1.0 release and original owner waiver remain historical authority.
+
+
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
 **Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
 **Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
@@ -7,7 +12,7 @@
 **Release:** `1.0.0` released 2026-10-20 (personal release, not externally playtested); RC-1 qualified by Build Validation #564  
 **Current strategic stage:** `RELEASED_1_0 / HUMAN-UNVALIDATED`  
 **Owner decision:** `specification/Technical/OwnerPersonalReleaseDecision.md` (2026-10-20)  
-**Current product responsibilities:** release-hotfix repairs on the shipped Campaign One; 1.1 scope only by owner decision  
+**Current product responsibilities on this branch:** owner-authorized 1.1 universal Trait integration and exact-head qualification; released 1.0 maintenance remains separate  
 **Current human evidence:** `0 / 5` accepted first sessions; `0 / 3` accepted external full playthroughs — floor waived as a 1.0 gate; `BETA_PASS=NO`  
 **Operator procedure:** `docs/release/BetaExecutionRunbook.md`
 
@@ -28,7 +33,7 @@ Progress since the decision:
 
 5. RC-1 qualified by Build Validation #564 and recorded in `ReleaseCandidateResult.md`; `1.0.0` promoted and tagged by `release-tag.yml`.
 
-Re-entry after 1.0: fix release defects in the shipped scope (exact-head Build Validation, including `release:campaign`), keep the release records honest, and bring any new scope (1.1, PR #165) to the owner first.
+Re-entry after 1.0 on `main`: maintain released content and release records. Re-entry on PR #178: follow the explicitly approved `Version11ScopeContract.md`, repair exact-head failures, qualify the full normal-UI campaign and do not convert unqualified development code into the 1.0 release. No additional approval is required for repository-answerable actions in this already selected 1.1 scope.
 
 ## Previous frontier — feature-completion stop
 

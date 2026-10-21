@@ -11,6 +11,12 @@ on:
 permissions:
   contents: read
 
+# Obsolete PR heads must not consume full campaign CI after newer commits.
+# Only the latest exact-head qualification is eligible to satisfy merge policy.
+concurrency:
+  group: build-validation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest

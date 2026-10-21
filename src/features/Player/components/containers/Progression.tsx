@@ -172,7 +172,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
 
               <Grid item xs={12} sm={6}>
                 <StatDisplay
-                  label="Permanent Traits"
+                  label="Assimilated Traits"
                   value={permanentTraits.length}
                   color="success"
                 />
@@ -180,7 +180,7 @@ export const Progression: React.FC<ProgressionProps> = React.memo(({
 
               <Grid item xs={12} sm={6}>
                 <StatDisplay
-                  label="Active Trait Slots"
+                  label="Expressed Traits"
                   value={`${equippedCount} / ${maxTraitSlots}`}
                   color="primary"
                 />

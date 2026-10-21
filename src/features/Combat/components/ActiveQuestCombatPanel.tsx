@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { Alert, Card, CardContent, Stack, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { selectPermanentTraits } from '../../Player/state/PlayerSelectors';
+import { selectExpressedTraitIds } from '../../Player/state/PlayerSelectors';
 import { targetKilled } from '../CombatEvents';
+import { getBoundedStrikeBonus } from '../CombatEngine';
 import { getCombatEncounterByTargetId } from '../CombatEncounterDefinitions';
 import { getCombatEncounterLocationAvailability } from '../CombatEncounterAvailability';
 import CombatEncounterPanel from './CombatEncounterPanel';
@@ -11,7 +12,8 @@ export const ActiveQuestCombatPanel: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeQuestIds = useAppSelector(state => state.quest.activeQuestIds);
   const quests = useAppSelector(state => state.quest.quests);
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const expressedTraitIds = useAppSelector(selectExpressedTraitIds);
+  const playerAttack = useAppSelector(state => state.player.stats.attack);
   const playerLocation = useAppSelector(state => state.player.location);
 
   const candidate = useMemo(() => {
@@ -76,7 +78,8 @@ export const ActiveQuestCombatPanel: React.FC = () => {
   return (
     <CombatEncounterPanel
       definition={candidate.definition}
-      permanentTraitIds={permanentTraitIds}
+      expressedTraitIds={expressedTraitIds}
+      strikeDamageBonus={getBoundedStrikeBonus(playerAttack)}
       onTargetKilled={targetId => dispatch(targetKilled({ targetId }))}
     />
   );

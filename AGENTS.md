@@ -1,5 +1,10 @@
 # Agent Operating Policy — Campaign One / 1.0
 
+## Active branch scope overlay — 1.1 universal Traits (2026-10-20)
+
+Owner authority to execute the bounded P0–P6 1.1 program is recorded at `specification/Technical/Version11ScopeContract.md` on `work/1.1-universal-trait-expression-20261020` (PR #178). The 1.0 release authority below remains valid for **released 1.0.0**, but does **not** prohibit this specifically authorized 1.1 feature construction on its isolated branch. Run exact-head Build Validation, retain save/browser/accessibility protections, and keep 1.1 unqualified until evidence closes it. Do not merge PR #165 unchanged, treat synthetic UI qualification as human experience, or publish a 1.1 release from a failing/pending gate.
+
+
 **Status:** CURRENT AUTHORITY for coding-agent behavior  
 **Applies to:** repository analysis, implementation, review, qualification, and handoff work
 
@@ -25,7 +30,7 @@ FEATURE_COMPLETE
 -> bounded release-blocking repairs found by RC qualification
 -> 1.0.0-rc.N exact-candidate qualification
 -> 1.0.0 personal release, disclosed as not externally playtested  [released 2026-10-20]
--> post-1.0: release-hotfix repairs; 1.1 scope only by owner decision
+-> post-1.0: released 1.0 maintenance; 1.1 universal Traits now have an explicit owner scope decision on the isolated branch
 ```
 
 Historical Alpha, Content Alpha, GC, Candidate B, Candidate A, Candidate C, and deterministic Beta-readiness results remain valid evidence. Do not invent another feature-construction package by inertia. Human Beta remains the only route to actual player-experience claims and a genuine `BETA_PASS`, but it no longer gates 1.0; deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, and persistence findings may still justify bounded repairs to the existing feature-complete game.
@@ -180,7 +185,7 @@ current frontier
 = RELEASED_1_0 / HUMAN-UNVALIDATED (1.0.0 released 2026-10-20, not externally playtested)
 ```
 
-After 1.0, ordinary work is release-hotfix repair of defects in the shipped Campaign One scope, with the same exact-head Build Validation (including the full ordinary-UI campaign run). New ideas belong to 1.1 or an expansion and need an owner decision; the universal Trait redesign (PR #165) is the parked 1.1 candidate.
+After 1.0, normal `main` work is release-hotfix repair of the shipped Campaign One, with exact-head Build Validation (including full ordinary-UI campaign runs). On this owner-authorized 1.1 branch, universal Trait assimilation/expression is the bounded new feature scope; PR #165 is a historical reference, while PR #178 carries current integration. Other additions and expansions require a separate authorization.
 
 An agent may merge its own pull request into `main` once exact-head Build Validation passes on that head (owner decision D3). It may not merge other people's pull requests or bypass Build Validation.
 

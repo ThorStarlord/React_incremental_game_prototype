@@ -4,7 +4,7 @@
  */
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
-import { unequipTrait, equipTrait, addPermanentTrait } from '../../Player/state/PlayerSlice';
+import { unequipTrait, equipTrait } from '../../Player/state/PlayerSlice';
 import { markDialogueCompleted, setNPCSharedTraitInSlot } from './NPCSlice';
 import { recordRelationshipExperience } from '../../Relationships/state/RelationshipSlice';
 import { unlockCampaignNpcsThunk } from './NPCThunks';
@@ -60,21 +60,6 @@ npcListeners.startListening({
     if (cleared > 0) {
       api.dispatch(
         addNotification({ type: 'info', message: `Unshared replaced trait from ${cleared} NPC slot(s).` })
-      );
-    }
-  },
-});
-
-// Permanence: clear trait from all NPC slots because it’s no longer shared
-npcListeners.startListening({
-  actionCreator: addPermanentTrait,
-  effect: async (action, api) => {
-    const traitId = action.payload as string;
-    if (!traitId) return;
-    const cleared = unshareTraitFromAllNPCs(traitId, api);
-    if (cleared > 0) {
-      api.dispatch(
-        addNotification({ type: 'info', message: `Unshared trait from ${cleared} NPC slot(s) due to permanence.` })
       );
     }
   },

@@ -6,6 +6,7 @@ import { rootReducer } from '../../app/store';
 import {
   createCurrentSaveEnvelope,
   migrateSavePayload,
+  CURRENT_SAVE_SCHEMA_VERSION,
 } from '../../shared/utils/saveSchema';
 import { rehydratePersistedGameState } from '../../shared/persistence/PersistedGameState';
 import { addQuest } from '../Quest/state/QuestSlice';
@@ -226,8 +227,11 @@ describe('Package 2 timed Quest precision semantics resolution', () => {
     const migration = migrateSavePayload(envelope);
     const persistedElapsed = migration.envelope.state.quest.quests[QUEST_ID].elapsedSeconds;
 
-    expect(migration.sourceVersion).toBe(2);
-    expect(migration.targetVersion).toBe(2);
+    // The active save schema may advance (e.g. v2 -> v3 Trait expression),
+    // but an already-current envelope must round-trip without migrations or
+    // altering timed-Quest raw elapsedSeconds.
+    expect(migration.sourceVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+    expect(migration.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(migration.appliedMigrations).toEqual([]);
     expect(persistedElapsed).toBe(accumulatedBeforeSave);
 

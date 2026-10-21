@@ -3,6 +3,7 @@ import { rootReducer } from '../../../app/store';
 import {
   addPermanentTrait,
   setDoctrineFocus,
+  setResonanceLevel,
 } from '../../Player/state/PlayerSlice';
 import { addQuest } from '../../Quest/state/QuestSlice';
 import { resolveQuestOutcomeThunk } from '../../Quest/state/QuestThunks';
@@ -33,11 +34,12 @@ const learn = (
   store: ReturnType<typeof makeStore>,
   traitIds: readonly string[]
 ) => {
+  store.dispatch(setResonanceLevel(5));
   traitIds.forEach(traitId => store.dispatch(addPermanentTrait(traitId)));
 };
 
 describe('Relationship Capability Constellation', () => {
-  test('learned Traits remain durable knowledge while doctrine focus controls active synergy', async () => {
+  test('assimilated Traits remain durable while expression and doctrine focus control active synergy while doctrine focus controls active synergy', async () => {
     const store = makeStore();
     learn(store, [...STRUCTURAL_TRAITS, ...COUNTERMODELER_TRAITS]);
 
@@ -66,7 +68,7 @@ describe('Relationship Capability Constellation', () => {
     expect(selectIsDoctrineActive(store.getState(), 'countermodeler')).toBe(true);
   });
 
-  test('focus rejects unlearned Traits and selectors fail closed on corrupt focus', async () => {
+  test('focus rejects unassimilated Traits and selectors fail closed on corrupt focus', async () => {
     const store = makeStore();
     store.dispatch(addPermanentTrait('WillowsWisdom'));
 
@@ -78,7 +80,7 @@ describe('Relationship Capability Constellation', () => {
     expect(store.getState().player.doctrineFocus.foregroundedPermanentTraitIds).toEqual([]);
 
     // Raw reducer dispatch represents a corrupt/untrusted state probe. Derived
-    // doctrine authority must still require permanent ownership.
+    // doctrine authority must still require assimilated ownership plus expression.
     store.dispatch(setDoctrineFocus(['WillowsWisdom', 'ConstraintSense']));
 
     expect(selectIsDoctrineActive(store.getState(), 'structural_steward')).toBe(false);
@@ -118,7 +120,9 @@ describe('Relationship Capability Constellation', () => {
     expect(
       canUseQuestResolution(
         option,
-        store.getState().player.permanentTraits,
+        store.getState().player.traitSlots
+          .map(slot => slot.traitId)
+          .filter((traitId): traitId is string => Boolean(traitId)),
         selectActiveDoctrineIds(store.getState())
       )
     ).toBe(false);

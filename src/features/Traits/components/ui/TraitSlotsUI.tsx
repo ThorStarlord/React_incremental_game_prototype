@@ -33,7 +33,6 @@ export interface TraitSlotsUIProps {
   traitSlots: TraitSlot[];
   equippedTraits: Trait[];
   availableTraits: Trait[];
-  isInProximityToNPC: boolean;
   isLoading: boolean;
   error: string | null;
 
@@ -60,7 +59,6 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
   traitSlots,
   equippedTraits,
   availableTraits,
-  isInProximityToNPC,
   isLoading,
   error,
   isTraitSelectionModalOpen,
@@ -87,14 +85,13 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
     if (trait) {
        return (
         <Card
-          sx={{ minHeight: 120, cursor: isInProximityToNPC ? 'pointer' : 'not-allowed', transition: 'all 0.2s', '&:hover': { transform: isInProximityToNPC ? 'translateY(-2px)' : 'none', boxShadow: isInProximityToNPC ? 3 : 'none' }, border: 2, borderColor: 'primary.main' }}
+          sx={{ minHeight: 120, cursor: 'pointer', transition: 'all 0.2s', '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 }, border: 2, borderColor: 'primary.main' }}
           onClick={() => onSlotClick(slot)}
           role="button"
-          tabIndex={isInProximityToNPC ? 0 : -1}
-          aria-disabled={!isInProximityToNPC}
-          aria-label={`Manage ${trait.name} in trait slot ${slot.slotIndex + 1}`}
+          tabIndex={0}
+                    aria-label={`Manage ${trait.name} in trait slot ${slot.slotIndex + 1}`}
           onKeyDown={(event) => {
-            if (isInProximityToNPC && (event.key === 'Enter' || event.key === ' ')) {
+            if (event.key === 'Enter' || event.key === ' ') {
               event.preventDefault();
               onSlotClick(slot);
             }
@@ -103,12 +100,11 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
           <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', flexGrow: 1 }}>{trait.name}</Typography>
-              <Tooltip title="Unequip Trait">
+              <Tooltip title="Suppress Trait">
                 <IconButton
                   size="small"
                   color="error"
-                  aria-label={`Unequip ${trait.name}`}
-                  disabled={!isInProximityToNPC}
+                  aria-label={`Suppress ${trait.name}`}
                   onClick={(event) => {
                     event.stopPropagation();
                     onSlotClick(slot);
@@ -130,16 +126,15 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
       <Box
         onClick={() => onSlotClick(slot)}
         onKeyDown={(event) => {
-          if (isInProximityToNPC && (event.key === 'Enter' || event.key === ' ')) {
+          if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             onSlotClick(slot);
           }
         }}
         role="button"
-        tabIndex={isInProximityToNPC ? 0 : -1}
-        aria-disabled={!isInProximityToNPC}
-        aria-label={`Equip a trait in slot ${slot.slotIndex + 1}`}
-        sx={{ cursor: isInProximityToNPC ? 'pointer' : 'not-allowed', height: '100%' }}
+        tabIndex={0}
+                aria-label={`Express a Trait in slot ${slot.slotIndex + 1}`}
+        sx={{ cursor: 'pointer', height: '100%' }}
       >
         <EmptySlotCard />
       </Box>
@@ -166,19 +161,13 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
   return (
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-        <Typography variant="h5" component="h2">Trait Slots</Typography>
-        <Tooltip title="Equip traits to gain their effects. Click empty slots to equip, or equipped traits to unequip.">
+        <Typography variant="h5" component="h2">Trait Expression</Typography>
+        <Tooltip title="Express available Traits to manifest their effects. Click empty slots to express, or expressed Traits to suppress.">
           <IconButton size="small" aria-label="Trait slot help">
             <InfoIcon fontSize="small" />
           </IconButton>
         </Tooltip>
       </Box>
-
-      {!isInProximityToNPC && (
-        <Alert severity="warning" sx={{ mb: 2 }}>
-          You must be in close proximity to an NPC to manage your trait slots.
-        </Alert>
-      )}
 
       <Grid container spacing={2}>
         {traitSlots.map((slot) => (
@@ -190,7 +179,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
 
       {/* Trait Selection Dialog */}
       <Dialog open={isTraitSelectionModalOpen} onClose={onCloseTraitSelectionModal} maxWidth="sm" fullWidth>
-        <DialogTitle>Select a Trait for Slot {selectedSlotIndexForModal !== null ? selectedSlotIndexForModal + 1 : ''}</DialogTitle>
+        <DialogTitle>Select a Trait to Express in Slot {selectedSlotIndexForModal !== null ? selectedSlotIndexForModal + 1 : ''}</DialogTitle>
         <DialogContent>
           <List>
             {availableTraits.length > 0 ? (
@@ -208,25 +197,25 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
               </ListItem>
             ))
             ) : (
-                <Typography sx={{p: 2, textAlign: 'center'}} color="text.secondary">No available traits to equip. Learn new traits from NPCs.</Typography>
+                <Typography sx={{p: 2, textAlign: 'center'}} color="text.secondary">No available Traits to express. Discover or assimilate new patterns.</Typography>
             )}
           </List>
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseTraitSelectionModal}>Cancel</Button>
-          <Button onClick={onConfirmEquip} variant="contained" disabled={!selectedTraitIdInModal}>Equip</Button>
+          <Button onClick={onConfirmEquip} variant="contained" disabled={!selectedTraitIdInModal}>Express</Button>
         </DialogActions>
       </Dialog>
 
       {/* Unequip Confirmation Dialog */}
       <Dialog open={unequipDialogState.open} onClose={onCloseUnequipDialog}>
-        <DialogTitle>Unequip Trait</DialogTitle>
+        <DialogTitle>Suppress Trait</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to unequip "{unequipDialogState.trait?.name}"?</Typography>
+          <Typography>Are you sure you want to suppress "{unequipDialogState.trait?.name}"?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseUnequipDialog}>Cancel</Button>
-          <Button onClick={onConfirmUnequip} variant="contained" color="warning" disabled={!isInProximityToNPC}>Unequip</Button>
+          <Button onClick={onConfirmUnequip} variant="contained" color="warning">Suppress</Button>
         </DialogActions>
       </Dialog>
     </Box>

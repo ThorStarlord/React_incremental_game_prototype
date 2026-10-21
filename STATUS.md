@@ -1,5 +1,10 @@
 # Repository Status — Campaign One 1.0 Released
 
+## Active 1.1 construction branch — owner-authorized, unqualified
+
+This branch (`work/1.1-universal-trait-expression-20261020`, PR #178) is the owner-authorized **post-1.0 universal Trait construction candidate** under `specification/Technical/Version11ScopeContract.md`. The historic status and results below apply to **released 1.0.0**, not to 1.1. Source reconciliation from PR #165 is implemented on this branch, but full exact-head validation, UX/gameplay proof, authority re-closure, and a separate 1.1 release decision remain open. **1.1 is NOT RELEASED; HUMAN-UNVALIDATED.**
+
+
 **Status date:** 2026-10-20
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
@@ -29,7 +34,7 @@
 **Feature Complete:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED` — see `specification/Technical/FeatureCompleteResult.md`  
 **Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
 **Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
-**Current implementation frontier:** `NONE — 1.0.0 released; release-hotfix repairs only; 1.1 scope needs an owner decision`
+**Current implementation frontier on this 1.1 branch:** `UNIVERSAL_TRAITS_1_1 / INTEGRATION_QUALIFICATION_OPEN` — owner authorization is recorded in `Version11ScopeContract.md`; 1.0 remains released and does not reopen.
 
 ### Feature-completion convergence disposition
 
@@ -76,7 +81,7 @@ Post-1.0 work:
 
 - **release hotfixes** for defects in the shipped scope, under the same exact-head Build Validation;
 - **GitHub Pages**: `deploy-pages.yml` publishes `main` once a repository admin enables Pages with the "GitHub Actions" source;
-- **1.1 or expansion** only by owner decision (the universal Trait redesign, PR #165, is parked there);
+- **1.1 universal Traits** are owner-authorized for this feature branch only (`Version11ScopeContract.md`, PR #178); PR #165 remains a parked historical source. Other expansion still needs a separate owner decision;
 - **optional human sessions** under issue #109;
 - **issue #122** (branch protection) still needs a GitHub administrator.
 

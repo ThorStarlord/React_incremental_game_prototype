@@ -5,9 +5,10 @@ import {
   type PersistedGameState,
 } from '../persistence/PersistedGameState';
 import { APP_VERSION } from '../config/releaseVersion';
+import { INITIAL_TRAIT_SLOTS } from '../../constants/playerConstants';
 
 export const LEGACY_SAVE_SCHEMA_VERSION = 0;
-export const CURRENT_SAVE_SCHEMA_VERSION = 2;
+export const CURRENT_SAVE_SCHEMA_VERSION = 3;
 
 export type SaveMigrationErrorCode =
   | 'INVALID_SAVE'
@@ -245,9 +246,65 @@ const migrateV1ToV2: SaveMigrationStep = {
   },
 };
 
+const migrateV2ToV3: SaveMigrationStep = {
+  id: 'save-schema-v2-to-v3-trait-expression',
+  fromVersion: 2,
+  toVersion: 3,
+  migrate: envelope => {
+    const player = envelope.state.player;
+    const assimilatedTraitIds = Array.from(new Set(
+      (player.permanentTraits ?? []).filter(
+        (traitId): traitId is string =>
+          typeof traitId === 'string' && traitId.length > 0
+      )
+    ));
+    const expressionSlots = (player.traitSlots ?? []).map(slot => ({
+      ...slot,
+      // v3 changes the baseline from one to two starting expression slots.
+      // Preserve later unlocks while ensuring migrated saves receive the same
+      // minimum expression capacity as a fresh v3 game.
+      isLocked: slot.slotIndex < INITIAL_TRAIT_SLOTS ? false : slot.isLocked,
+    }));
+    const occupied = new Set(
+      expressionSlots
+        .map(slot => slot.traitId)
+        .filter((traitId): traitId is string => Boolean(traitId))
+    );
+    const focusIds = player.doctrineFocus?.foregroundedPermanentTraitIds ?? [];
+    const preferredExpressionOrder = Array.from(new Set([
+      ...focusIds,
+      ...assimilatedTraitIds,
+    ]));
+
+    for (const traitId of preferredExpressionOrder) {
+      if (!assimilatedTraitIds.includes(traitId) || occupied.has(traitId)) continue;
+      const emptySlot = expressionSlots.find(
+        slot => !slot.isLocked && slot.traitId === null
+      );
+      if (!emptySlot) break;
+      emptySlot.traitId = traitId;
+      occupied.add(traitId);
+    }
+
+    return {
+      ...envelope,
+      schemaVersion: 3,
+      state: {
+        ...envelope.state,
+        player: {
+          ...player,
+          permanentTraits: assimilatedTraitIds,
+          traitSlots: expressionSlots,
+        },
+      },
+    };
+  },
+};
+
 export const SAVE_MIGRATIONS: SaveMigrationRegistry = {
   0: migrateV0ToV1,
   1: migrateV1ToV2,
+  2: migrateV2ToV3,
 };
 
 export const runSaveMigrationChain = (

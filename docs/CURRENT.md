@@ -1,5 +1,13 @@
 # Documentation Authority Index
 
+## Current 1.1 construction branch authority — 2026-10-20
+
+- `specification/Technical/Version11ScopeContract.md` is the **CURRENT AUTHORITY** for the owner's bounded 1.1 universal Trait redesign on PR #178; it does not rewrite the qualified 1.0.0 release.
+- `specification/Technical/UniversalTraitOntologyReconciliation.md` is the 1.1 ontology / compatibility reference recovered from parked PR #165; the code and full qualification evidence must establish the actual implemented state.
+- `STATUS.md` and `HANDOFF.md` distinguish the released 1.0 baseline from the **unqualified** 1.1 construction candidate. PR #165 stays historical/unmerged. Current implementation work proceeds against PR #178, with complete CI, browser, migration and release validation still required.
+- The 1.0 owner waiver and 1.0 release records remain applicable to 1.0 **only**; no human comprehension/fun claim is promoted.
+
+
 ## 2026-10-20 owner personal-release decision
 
 - [`specification/Technical/OwnerPersonalReleaseDecision.md`](../specification/Technical/OwnerPersonalReleaseDecision.md) is **CURRENT AUTHORITY**: 1.0 is a personal release; the human Beta floor is waived as a 1.0 gate, not satisfied (`BETA_PASS = NO`, `BETA_OWNER_WAIVED / HUMAN-UNVALIDATED`); draft PR #165 is parked post-1.0; agents may merge their own PRs after exact-head Build Validation passes.
