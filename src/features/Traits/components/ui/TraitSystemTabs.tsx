@@ -130,6 +130,16 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
       {/* The Drawer is rendered here, but only visible when isCodexDrawerOpen is true */}
       <TraitCodexDrawer open={isCodexDrawerOpen} onClose={handleCloseCodex} />
 
+      <Paper variant="outlined" sx={{ mb: 2, p: 2 }} data-testid="trait-lifecycle-guide">
+        <Typography variant="subtitle2" gutterBottom>How Trait patterns become part of your build</Typography>
+        <Typography variant="body2" color="text.secondary">
+          <strong>Discovered:</strong> a pattern is known. <strong>Assimilating:</strong> qualifying experiences build understanding. <strong>Stabilization:</strong> eligible patterns can be made permanently available with Essence. <strong>Assimilated:</strong> the pattern now belongs to your learned library. <strong>Expressed:</strong> it occupies an unlocked slot and affects current play. <strong>Suppressed:</strong> it is not currently expressed, so its active effects are unavailable.
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Stabilization records lasting assimilation rather than a separate ongoing effect. Temporarily expressible discoveries are not automatically assimilated. Suppression never deletes assimilated ownership.
+        </Typography>
+      </Paper>
+
       <Paper elevation={1} sx={{ mb: 2 }}>
         <Tabs
           value={activeTab}
