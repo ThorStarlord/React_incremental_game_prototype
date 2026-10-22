@@ -11,6 +11,7 @@ import { addQuest } from '../Quest/state/QuestSlice';
 import { recordRelationshipExperience } from '../Relationships/state/RelationshipSlice';
 import { CITY_CENTER_LOCATION_ID, WHISPERING_WOODS_LOCATION_ID } from '../Exploration/LocationDefinitions';
 import { selectCurrentMoment } from './CurrentMomentSelectors';
+import { selectOpenCopyExceptions } from './PlayerInsightSelectors';
 import { CurrentMomentPanel } from './components/CurrentMomentPanel';
 import { SessionStatusStrip } from '../../layout/components/SessionStatusStrip';
 import NPCDialogueTab from '../NPCs/components/ui/tabs/NPCDialogueTab';
@@ -119,4 +120,15 @@ test('Current Moment does not churn its view model when only a raw GameLoop tick
     gameLoop: { ...snapshot.gameLoop, currentTick: snapshot.gameLoop.currentTick + 1 },
   };
   expect(selectCurrentMoment(afterUnrelatedTick)).toBe(first);
+});
+
+test('read-only Copy exception projection keeps its identity across unrelated simulation ticks', () => {
+  const store = makeStore();
+  const root = store.getState();
+  const before = selectOpenCopyExceptions(root);
+  const after = selectOpenCopyExceptions({
+    ...root,
+    gameLoop: { ...root.gameLoop, currentTick: root.gameLoop.currentTick + 1 },
+  });
+  expect(after).toBe(before);
 });

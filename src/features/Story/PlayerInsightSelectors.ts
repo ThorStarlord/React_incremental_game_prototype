@@ -373,16 +373,19 @@ export const selectMasteredRoutines = (state: RootState): MasteredRoutineView[] 
  * Notification state is intentionally not consulted: dismissing a Snackbar
  * cannot resolve an unresolved automation boundary.
  */
-export const selectOpenCopyExceptions = (
-  state: RootState
-): CopyExceptionInsight[] =>
-  Object.values(state.copy.exceptionsById ?? {})
+export const selectOpenCopyExceptions = createSelector(
+  [
+    (state: RootState) => state.copy.exceptionsById,
+    (state: RootState) => state.copy.copies,
+  ],
+  (exceptionsById, copies): CopyExceptionInsight[] =>
+  Object.values(exceptionsById ?? {})
     .filter(exception => exception.status !== 'resolved')
     .sort((a, b) =>
       b.detectedAtTick - a.detectedAtTick || a.id.localeCompare(b.id)
     )
     .map(exception => {
-      const copy = state.copy.copies[exception.copyId];
+      const copy = copies[exception.copyId];
       const definition = getCopyProductionTaskDefinition(exception.routineId);
       const isForgeDeviation = exception.context.code === 'forge_structural_deviation';
       const sourceCount = !isForgeDeviation && exception.context.code === 'archive_source_contradiction'
@@ -409,8 +412,8 @@ export const selectOpenCopyExceptions = (
         boundaryLabel: boundary.label,
         boundaryDescription: boundary.description,
       };
-    });
-
+    })
+);
 
 const COUNTERPHASE_PROFILE_LABELS: Record<NetworkPosture, string> = {
   distributed: 'Distributed Counterphase',
