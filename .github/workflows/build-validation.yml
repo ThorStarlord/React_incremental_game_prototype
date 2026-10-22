@@ -98,6 +98,12 @@ jobs:
         timeout-minutes: 24
         run: npm run beta:technical:validate
 
+      - name: Player Experience UI regression qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx
+        env:
+          CI: true
+
       - name: Beta accessibility baseline qualification
         timeout-minutes: 5
         run: npm run beta:accessibility:validate
