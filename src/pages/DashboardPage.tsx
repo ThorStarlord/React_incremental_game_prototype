@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -65,6 +66,13 @@ interface QuickActionItem {
 
 export const DashboardPage: React.FC = React.memo(() => {
   const theme = useTheme();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === '#travel-controls') {
+      document.getElementById('travel-controls')?.scrollIntoView({ block: 'start' });
+    }
+  }, [location.hash]);
 
   const health = useAppSelector(selectPlayerHealth);
   const maxHealth = useAppSelector(selectPlayerMaxHealth);

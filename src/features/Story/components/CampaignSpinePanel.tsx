@@ -63,6 +63,7 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc03-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 1 — Merchant District Crisis</AlertTitle>
+        <Typography variant="body2">Investigate the district's crisis and decide what resolution the evidence justifies.</Typography>
         <GuidanceDetails>
           Return through City Gate and investigate the Merchant District crisis. Work with the
           people already tied to the district; the chapter advances only when one authored
@@ -82,6 +83,7 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc03-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 2 — Archive Inquiry</AlertTitle>
+        <Typography variant="body2">Work with Scholar Elara to establish what the available evidence supports.</Typography>
         <GuidanceDetails>
           The Merchant District crisis has a recorded conclusion. Continue with Scholar Elara's
           inquiry and follow the evidence through independent verification.
@@ -97,6 +99,7 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc03-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 3 — Enemies in Phase</AlertTitle>
+        <Typography variant="body2">Face Lyra's challenge and build a relationship able to withstand disagreement.</Typography>
         <GuidanceDetails>
           The Archive Inquiry is resolved. Continue Lyra's adversarial-calibration arc until the
           relationship history records the chapter's authored conclusion.
@@ -112,6 +115,7 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc06-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 4 — Lattice Under Strain</AlertTitle>
+        <Typography variant="body2">The Telluric Echo threatens a fragile network. Find a defensible stabilization strategy.</Typography>
         <GuidanceDetails>
           The opening campaign is complete, but the Telluric Echo is now stressing the network
           those relationships built. Start with Elara's diagnosis, share the operational fact
@@ -133,6 +137,7 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc07-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 5 — The Chrono-Crypt</AlertTitle>
+        <Typography variant="body2">Investigate the Chrono-Crypt for a viable counterphase solution.</Typography>
         <GuidanceDetails>
           The local lattice is stable, but containment is not a countermeasure. Start Lyra's
           counterphase Quest, travel through the Whispering Woods into the unlocked Chrono-Crypt,
@@ -151,6 +156,7 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc08-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 6 — Network Under Pressure</AlertTitle>
+        <Typography variant="body2">Prepare the network for counterphase without surrendering important decisions.</Typography>
         <GuidanceDetails>
           Lyra knows the counterphase, but the rest of the network does not. Brief Elara first,
           choose which other anchors to inform, prepare one legal posture, and return to Lyra for
@@ -173,6 +179,7 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc09-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 7 — Counterphase</AlertTitle>
+        <Typography variant="body2">Decide how to prepare for an irreversible confrontation.</Typography>
         <GuidanceDetails>
           The network posture is committed. Prepare the matching finale profile, then return to
           Lyra for the irreversible finale commitment. Copies may continue mastered safe routines,
@@ -203,6 +210,7 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="warning" data-testid="gc10-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Finale — The Telluric Echo</AlertTitle>
+        <Typography variant="body2">Carry your chosen counterphase into the decisive confrontation.</Typography>
         <GuidanceDetails>
           The counterphase plan is committed. Return to Lyra to enter the matching finale Quest,
           carry that plan into the Whispering Woods, resolve the confrontation personally, then
