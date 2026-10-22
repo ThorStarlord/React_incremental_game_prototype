@@ -171,7 +171,7 @@ describe('Checkpoint C incremental integration repair qualification', () => {
 
     expect(screen.getByText('Ready to delegate: mastered by you, and this Copy meets the current requirements.')).toBeInTheDocument();
     expect(screen.getByText(/Not mastered yet: Successfully Resonate a Trait yourself/)).toBeInTheDocument();
-    const assignButtons = screen.getAllByRole('button', { name: 'Assign' });
+    const assignButtons = screen.getAllByRole('button', { name: 'Start Routine' });
     expect(assignButtons[0]).toBeEnabled();
     expect(assignButtons[1]).toBeDisabled();
   });
