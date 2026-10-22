@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -18,6 +19,8 @@ import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAllCopies, selectCopySegments } from '../features/Copy/state/CopySelectors';
 import { applySharePreferencesForCopyThunk, bolsterCopyLoyaltyThunk } from '../features/Copy/state/CopyThunks';
 import CopyCard from '../features/Copy/components/ui/CopyCard';
+import CopyDetailPanel from '../features/Copy/components/ui/CopyDetailPanel';
+import { COPY_SYSTEM } from '../constants/gameConstants';
 import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
 import { addNotification } from '../shared/state/NotificationSlice';
 // import { COPY_SYSTEM } from '../constants/gameConstants';
@@ -38,9 +41,13 @@ import { addNotification } from '../shared/state/NotificationSlice';
  */
 export const CopiesPage: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
   const copies = useAppSelector(selectAllCopies);
   const segments = useAppSelector(selectCopySegments);
   const currentEssence = useAppSelector(selectCurrentEssence);
+  const selectedCopyId = params.get('copy');
+  const selectedCopy = copies.find(copy => copy.id === selectedCopyId);
   const [tab, setTab] = useState(0);
   const [busyApplyAll, setBusyApplyAll] = useState(false);
   const [busyBolsterAll, setBusyBolsterAll] = useState(false);
@@ -76,17 +83,29 @@ export const CopiesPage: React.FC = React.memo(() => {
     });
   }, [baseList, search, roleFilter, sortBy, sortDir]);
 
+  // Bulk commands apply to the currently filtered list, not every Copy in the save.
+  // A resolved dispatch does not mean the thunk was fulfilled.
   const handleApplyPrefsAll = async () => {
     setBusyApplyAll(true);
+    let changed = 0;
+    let failed = 0;
     try {
-      for (const c of visibleCopies) {
-  // eslint-disable-next-line no-await-in-loop
-  await dispatch(applySharePreferencesForCopyThunk({ copyId: c.id, suppressNotify: true }));
+      for (const copy of visibleCopies) {
+        // eslint-disable-next-line no-await-in-loop
+        const result = await dispatch(applySharePreferencesForCopyThunk({ copyId: copy.id, suppressNotify: true }));
+        if (applySharePreferencesForCopyThunk.fulfilled.match(result)) {
+          changed += result.payload.applied;
+        } else {
+          failed += 1;
+        }
       }
-      // Single coalesced notification
       dispatch(addNotification({
-        type: 'success',
-        message: `Applied share preferences to ${visibleCopies.length} cop${visibleCopies.length === 1 ? 'y' : 'ies'}.`,
+        type: failed ? 'warning' : changed ? 'success' : 'info',
+        message: failed
+          ? `Applied ${changed} Trait share(s); ${failed} Copy operation(s) failed. Inspect individual Copy readiness.`
+          : changed
+            ? `Applied ${changed} Trait share(s) to the filtered Copies.`
+            : 'No eligible Trait share preferences were applied to the filtered Copies.',
       }));
     } finally {
       setBusyApplyAll(false);
@@ -95,14 +114,19 @@ export const CopiesPage: React.FC = React.memo(() => {
 
   const handleBolsterAll = async () => {
     setBusyBolsterAll(true);
+    let succeeded = 0;
+    let failed = 0;
     try {
-      for (const c of visibleCopies) {
-  // eslint-disable-next-line no-await-in-loop
-  await dispatch(bolsterCopyLoyaltyThunk({ copyId: c.id, suppressNotify: true }));
+      for (const copy of visibleCopies) {
+        // eslint-disable-next-line no-await-in-loop
+        const result = await dispatch(bolsterCopyLoyaltyThunk({ copyId: copy.id, suppressNotify: true }));
+        if (bolsterCopyLoyaltyThunk.fulfilled.match(result)) succeeded += 1;
+        else failed += 1;
       }
       dispatch(addNotification({
-        type: 'success',
-        message: `Bolstered loyalty for ${visibleCopies.length} low-loyalty cop${visibleCopies.length === 1 ? 'y' : 'ies'}.`,
+        type: failed ? 'warning' : succeeded ? 'success' : 'info',
+        message: `Bolstered ${succeeded} of ${visibleCopies.length} filtered Copies.` +
+          (failed ? ` ${failed} could not be bolstered (e.g. insufficient Essence or maximum loyalty).` : ''),
       }));
     } finally {
       setBusyBolsterAll(false);
@@ -119,7 +143,7 @@ export const CopiesPage: React.FC = React.memo(() => {
               Copy Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              View and manage your created Copies. Assign tasks and develop their abilities.
+              Delegate mastered routines, manage standing orders, and develop your Copies.
             </Typography>
           </Box>
         </Box>
@@ -188,9 +212,12 @@ export const CopiesPage: React.FC = React.memo(() => {
               <MenuItem value="desc">Desc</MenuItem>
               <MenuItem value="asc">Asc</MenuItem>
             </TextField>
-            <Button size="small" variant="contained" onClick={handleApplyPrefsAll} disabled={busyApplyAll || visibleCopies.length === 0}>Apply Share Prefs to All</Button>
-            <Button size="small" variant="outlined" color="secondary" onClick={handleBolsterAll} disabled={busyBolsterAll || tab !== 2 || visibleCopies.length === 0}>Bolster All (Low Loyalty)</Button>
+            <Button size="small" variant="contained" onClick={handleApplyPrefsAll} disabled={busyApplyAll || busyBolsterAll || visibleCopies.length === 0}>Apply Share Prefs ({visibleCopies.length})</Button>
+            <Button size="small" variant="outlined" color="secondary" onClick={handleBolsterAll} disabled={busyBolsterAll || busyApplyAll || tab !== 2 || visibleCopies.length === 0}>Bolster Filtered ({visibleCopies.length})</Button>
           </Box>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+            Bulk actions target the {visibleCopies.length} Copies visible in this tab after search and role filters. Bolstering costs {COPY_SYSTEM.BOLSTER_LOYALTY_COST} Essence per successful Copy (up to {COPY_SYSTEM.BOLSTER_LOYALTY_COST * visibleCopies.length} Essence); insufficient funds may prevent some actions.
+          </Typography>
           <Grid container spacing={2}>
             {visibleCopies.map((copy) => (
               <Grid item xs={12} md={6} lg={4} key={copy.id}>
@@ -200,7 +227,9 @@ export const CopiesPage: React.FC = React.memo(() => {
           </Grid>
         </Paper>
       )}
-
+      {selectedCopy && (
+        <CopyDetailPanel copyId={selectedCopy.id} open onClose={() => navigate('/game/copies', { replace: true })} />
+      )}
     </Container>
   );
 });
