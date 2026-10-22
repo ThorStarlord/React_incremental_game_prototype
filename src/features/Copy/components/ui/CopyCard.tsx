@@ -31,6 +31,7 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
   const selectActive = useMemo(makeSelectCopyIsActive, []);
   const generation = useAppSelector((s: RootState) => selectGen(s, copy.id));
   const isActive = useAppSelector((s: RootState) => selectActive(s, copy.id));
+  const originName = useAppSelector((s: RootState) => s.npcs.npcs[copy.parentNPCId]?.name);
 
   const handleBolster = useCallback(async () => {
     setBusy(true);
@@ -80,7 +81,7 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
             )}
           </Box>
         }
-        subheader={`ID: ${copy.id}`}
+        subheader={originName ? `Origin: ${originName}` : 'Origin: a known character'}
       />
       <CardContent sx={{ flexGrow: 1 }}>
         <Box mb={1}>
@@ -105,19 +106,19 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
           <Typography variant="body2">{generation.toFixed(3)} /s</Typography>
         </Box>
         <Typography variant="body2" color="text.secondary">Location: {copy.location}</Typography>
-        <Typography variant="body2" color="text.secondary">Parent NPC: {copy.parentNPCId}</Typography>
+
         {copy.currentTask && !taskEditOpen && (
-          <Typography variant="body2" sx={{ mt: 1 }}>Task: {copy.currentTask}</Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>Personal note (not executable work): {copy.currentTask}</Typography>
         )}
         <Collapse in={taskEditOpen} unmountOnExit>
           <TextField
             fullWidth
             size="small"
-            label="Assign Task"
+            label="Personal Note"
             value={taskValue}
             onChange={(e) => setTaskValue(e.target.value)}
             sx={{ mt: 1 }}
-            placeholder="e.g., Gathering intel"
+            placeholder="Optional reminder — does not start a routine"
           />
           <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
             <Button size="small" variant="contained" onClick={handleSaveTask} startIcon={<TaskAltIcon />}>Save</Button>
@@ -137,8 +138,8 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
           </span>
         </Tooltip>
   <Button size="small" variant="outlined" onClick={handleApplyPrefs} disabled={busyApply}>Apply Prefs</Button>
-  <Button size="small" variant="text" onClick={() => setTaskEditOpen(o => !o)}>{taskEditOpen ? 'Hide Task' : (copy.currentTask ? 'Edit Task' : 'Assign Task')}</Button>
-        <Button size="small" variant="text" onClick={() => setDetailsOpen(true)}>Details</Button>
+  <Button size="small" variant="text" onClick={() => setTaskEditOpen(o => !o)}>{taskEditOpen ? 'Hide Note' : (copy.currentTask ? 'Edit Note' : 'Add Note')}</Button>
+        <Button size="small" variant="text" onClick={() => setDetailsOpen(true)}>Manage Routines</Button>
       </CardActions>
       <CopyDetailPanel copyId={copy.id} open={detailsOpen} onClose={() => setDetailsOpen(false)} />
     </Card>

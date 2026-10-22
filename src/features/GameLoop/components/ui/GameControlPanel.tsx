@@ -59,7 +59,7 @@ export const GameControlPanel: React.FC = () => {
               onClick={handleStartGame}
               color="success"
             >
-              Start Game
+              Start Simulation
             </Button>
           ) : (
             <>
@@ -77,12 +77,15 @@ export const GameControlPanel: React.FC = () => {
                 onClick={handleStopGame}
                 color="error"
               >
-                Stop
+                Stop Simulation
               </Button>
             </>
           )}
         </Box>
 
+        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+          These controls only change time progression. Use Save &amp; Main Menu to leave the session.
+        </Typography>
         {gameLoop.isRunning && (
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" color="text.secondary">

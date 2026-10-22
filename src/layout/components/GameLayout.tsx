@@ -79,7 +79,6 @@ export const GameLayout: React.FC = React.memo(() => {
 
       {/* Main Content Area */}
       <Box
-        component="main"
         sx={{
           flexGrow: 1,
           marginLeft: isMobile ? 0 : `${getMainContentMargin()}px`,
