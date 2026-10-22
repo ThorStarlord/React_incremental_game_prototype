@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -27,6 +28,7 @@ type SortKey = 'title' | 'status';
 
 const QuestsPage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const [params, setParams] = useSearchParams();
   const allQuests = useAppSelector(selectAllQuests);
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<QuestStatus | 'ALL'>('IN_PROGRESS');
@@ -34,7 +36,9 @@ const QuestsPage: React.FC = () => {
   const [puzzleModalOpen, setPuzzleModalOpen] = useState(false);
   const [activeObjective, setActiveObjective] = useState<QuestObjective | null>(null);
 
-  const selectedQuest = useAppSelector((state) => (selectedQuestId ? selectQuestById(state, selectedQuestId) : null));
+  const queryQuestId = params.get('quest');
+  const effectiveQuestId = queryQuestId && allQuests[queryQuestId] ? queryQuestId : selectedQuestId;
+  const selectedQuest = useAppSelector((state) => (effectiveQuestId ? selectQuestById(state, effectiveQuestId) : null));
 
   const handleSolvePuzzle = (questId: string, objectiveId: string) => {
     const quest = allQuests[questId];
@@ -51,10 +55,10 @@ const QuestsPage: React.FC = () => {
   };
 
   const handleSolve = (solution: string) => {
-    if (selectedQuestId && activeObjective) {
+    if (effectiveQuestId && activeObjective) {
       dispatch(
         solveQuestPuzzleThunk({
-          questId: selectedQuestId,
+          questId: effectiveQuestId,
           objectiveId: activeObjective.objectiveId,
           solution,
         }),
@@ -131,8 +135,11 @@ const QuestsPage: React.FC = () => {
                 {filteredAndSortedQuests.map((quest) => (
                   <ListItemButton
                     key={quest.id}
-                    selected={selectedQuestId === quest.id}
-                    onClick={() => setSelectedQuestId(quest.id)}
+                    selected={effectiveQuestId === quest.id}
+                    onClick={() => {
+                      setSelectedQuestId(quest.id);
+                      setParams({ quest: quest.id });
+                    }}
                   >
                     <ListItemText primary={quest.title} secondary={quest.status} />
                   </ListItemButton>

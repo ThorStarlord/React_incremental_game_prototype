@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
   Button,
-  TextField,
   Grid,
   Paper,
-  Divider,
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
-import SendIcon from '@mui/icons-material/Send';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import {
   selectNPCById,
@@ -19,6 +16,8 @@ import {
 import { processNPCInteractionThunk } from '../../../state/NPCThunks';
 import type { DialogueEntry } from '../../../state/NPCTypes';
 import type { NPCDialogueChoice } from '../../../state/NPCSelectors';
+import { selectCausalJournalEntries, selectRecentRecordedDialogueExperiences } from '../../../../Story/PlayerInsightSelectors';
+
 
 interface NPCDialogueTabProps {
   npcId: string;
@@ -34,12 +33,17 @@ interface NPCDialogueTabProps {
  */
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
-  const [message, setMessage] = useState('');
 
   const npc = useAppSelector(state => selectNPCById(state, npcId));
   const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npcId));
   const availableDialogueChoices = useAppSelector(state =>
     selectAvailableNPCDialogueChoices(state, npcId)
+  );
+  const latestVisibleMemory = useAppSelector(state =>
+    selectCausalJournalEntries(state, 10).find(entry => entry.npcId === npcId)
+  );
+  const latestRecordedDialogue = useAppSelector(state =>
+    selectRecentRecordedDialogueExperiences(state, 1, npcId)[0]
   );
 
   if (!npc) {
@@ -49,25 +53,6 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
       </Box>
     );
   }
-
-  const handleSendFreeTextMessage = async () => {
-    if (!message.trim()) return;
-
-    try {
-      await dispatch(processNPCInteractionThunk({
-        npcId,
-        interactionType: 'dialogue',
-        context: {
-          choiceId: 'freetext',
-          playerMessage: message,
-          timestamp: Date.now(),
-        },
-      })).unwrap();
-      setMessage('');
-    } catch (error) {
-      console.error('Failed to send message:', error);
-    }
-  };
 
   const handleDialogueChoice = async (choice: NPCDialogueChoice, responseKey: string) => {
     try {
@@ -117,7 +102,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           ))
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No previous conversations. Start a dialogue below!
+            No previous conversations. Choose an available conversation topic when you are together.
           </Typography>
         )}
       </Paper>
@@ -168,31 +153,29 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         </Box>
       )}
 
-      <Divider sx={{ my: 2 }} />
+      {latestVisibleMemory && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }}>
+          <Typography variant="subtitle2">A remembered consequence</Typography>
+          <Typography variant="body2" fontWeight={600}>{latestVisibleMemory.title}</Typography>
+          <Typography variant="body2" color="text.secondary">{latestVisibleMemory.causeLabel}: {latestVisibleMemory.summary}</Typography>
+        </Paper>
+      )}
 
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder={`Type a message to ${npc.name}...`}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSendFreeTextMessage();
-            }
-          }}
-        />
-        <Button
-          variant="contained"
-          onClick={handleSendFreeTextMessage}
-          disabled={!message.trim()}
-          sx={{ minWidth: 'auto', px: 2 }}
-        >
-          <SendIcon />
-        </Button>
-      </Box>
+      {!latestVisibleMemory && latestRecordedDialogue && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }}>
+          <Typography variant="subtitle2">Recently recorded experience</Typography>
+          <Typography variant="body2" fontWeight={600}>{latestRecordedDialogue.title}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Your dialogue with {latestRecordedDialogue.npcName} is part of your recorded history.
+          </Typography>
+        </Paper>
+      )}
+
+      {availableDialogueChoices.length === 0 && (
+        <Typography variant="body2" color="text.secondary" role="status">
+          No authored conversation topics are available right now. New topics may require a recorded experience or a change in circumstances.
+        </Typography>
+      )}
     </Box>
   );
 };

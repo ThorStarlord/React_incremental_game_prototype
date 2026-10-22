@@ -3,8 +3,8 @@
  * @description Routed NPC detail container.
  */
 
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
 import {
@@ -64,6 +64,7 @@ export interface NPCPanelContainerProps {}
  */
 export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   const { npcId } = useParams<{ npcId: string }>();
+  const [params] = useSearchParams();
   const npc = useAppSelector(state => (npcId ? selectNPCById(state, npcId) : undefined));
   const isLoading = useAppSelector(selectNPCLoading);
   const error = useAppSelector(selectNPCError);
@@ -72,7 +73,10 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
     npcId ? selectUsesRelationshipConnectionAuthority(state, npcId) : false
   );
 
-  const [currentTab, setCurrentTab] = useState(0);
+  const [currentTab, setCurrentTab] = useState(() => params.get('view') === 'dialogue' ? 1 : 0);
+  useEffect(() => {
+    setCurrentTab(params.get('view') === 'dialogue' ? 1 : 0);
+  }, [npcId, params]);
   const [isCreateCopyModalOpen, setCreateCopyModalOpen] = useState(false);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {

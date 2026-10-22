@@ -1,4 +1,6 @@
 import React from 'react';
+import { Button } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -103,8 +105,11 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                       Escalation boundary: {exception.boundaryLabel}. {exception.boundaryDescription}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.75 }}>
-                      Open this Copy's details to acknowledge the operational exception. Player Insight remains read-only, and acknowledgement still does not resolve the underlying player-owned decision.
+                      Open this Copy's details to acknowledge the operational exception. Acknowledgement does not resolve the player-owned decision.
                     </Typography>
+                    <Button size="small" component={RouterLink} to={`/game/copies?copy=${encodeURIComponent(exception.copyId)}`} sx={{ mt: 0.5 }}>
+                      Manage {exception.copyName}
+                    </Button>
                   </Box>
                 ))}
               </Stack>

@@ -1,5 +1,16 @@
 # Layout Design Specification
 
+## Candidate 2026-10-21 UI authority (PR #179 — not part of released 1.0.0)
+
+The current candidate retains AppRouter, GameLayout, VerticalNavBar, MainContentArea and feature-driven pages. It adds a **CurrentMomentPanel inside DashboardPage** above the advanced statistic/game-control views, not a new navigation destination. The panel reads canonical locations, known NPC anchors, active quests, visible memories, and unresolved Copy exceptions.
+
+The persistent `SessionStatusStrip` sits beneath `GameSessionBar` in GameLayout. The core page landmark remains `MainContentArea`'s single `main`, removing an outer nested `main` from the former layout. The module-level pages remain unchanged as deep administrative controls.
+
+Responsive accessibility, stable status/projection performance, routed deep links and normal-UI full-campaign qualification are acceptance requirements. The legacy declarations below are retained for historical orientation; they do not alone prove modern UX comprehension.
+
+---
+
+
 This document outlines the user interface layout structure and design principles for the React Incremental RPG Prototype.
 
 ## 1. Layout Architecture Overview ✅ COMPLETE + MIGRATED (Legacy Deprecated)

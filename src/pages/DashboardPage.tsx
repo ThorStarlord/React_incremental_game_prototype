@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -45,6 +46,7 @@ import { selectGameLoop } from '../features/GameLoop/state/GameLoopSelectors';
 import { selectTraitsState } from '../features/Traits/state/TraitsSelectors';
 import { GameControlPanel } from '../features/GameLoop/components/ui/GameControlPanel';
 import { PlayerInsightPanel } from '../features/Story/components/PlayerInsightPanel';
+import { CurrentMomentPanel } from '../features/Story/components/CurrentMomentPanel';
 
 interface DashboardStatCard {
   title: string;
@@ -64,6 +66,13 @@ interface QuickActionItem {
 
 export const DashboardPage: React.FC = React.memo(() => {
   const theme = useTheme();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === '#travel-controls') {
+      document.getElementById('travel-controls')?.scrollIntoView({ block: 'start' });
+    }
+  }, [location.hash]);
 
   const health = useAppSelector(selectPlayerHealth);
   const maxHealth = useAppSelector(selectPlayerMaxHealth);
@@ -154,6 +163,8 @@ export const DashboardPage: React.FC = React.memo(() => {
         Campaign Overview
       </Typography>
 
+      <CurrentMomentPanel />
+
       <Grid container spacing={3}>
         <Grid item xs={12} lg={6}>
           <Card elevation={2}>
@@ -164,7 +175,7 @@ export const DashboardPage: React.FC = React.memo(() => {
                   Time & Activity
                 </Typography>
                 <Chip
-                  label={gameLoop.isRunning ? 'Running' : 'Stopped'}
+                  label={!gameLoop.isRunning ? 'Stopped' : gameLoop.isPaused ? 'Paused' : 'Running'}
                   color={gameLoop.isRunning ? 'success' : 'default'}
                   size="small"
                 />

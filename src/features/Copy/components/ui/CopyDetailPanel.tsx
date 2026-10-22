@@ -378,7 +378,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                             disabled={disabled}
                             onClick={() => dispatch(startCopyProductionTaskThunk({ copyId: copy.id, taskId: task.id }))}
                           >
-                            Assign
+                            Start Routine
                           </Button>
                           <Button
                             size="small"

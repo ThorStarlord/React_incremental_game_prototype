@@ -12,6 +12,23 @@ permissions:
   contents: read
 
 jobs:
+  ui-smoke:
+    name: UI smoke and TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Focused UI regression
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx CopyBulkActionsUX.test.tsx CopyBulkActionsUX.test.tsx CopyM20ProductionTaskAutomation.test.tsx GC02PrologueOnboarding.test.tsx GC03OpeningCampaignSpine.test.tsx
+        env:
+          CI: true
+      - name: TypeScript
+        run: npx tsc --noEmit
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -97,6 +114,12 @@ jobs:
       - name: GC-13 deterministic Beta readiness qualification
         timeout-minutes: 24
         run: npm run beta:technical:validate
+
+      - name: Player Experience UI regression qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx
+        env:
+          CI: true
 
       - name: Beta accessibility baseline qualification
         timeout-minutes: 5

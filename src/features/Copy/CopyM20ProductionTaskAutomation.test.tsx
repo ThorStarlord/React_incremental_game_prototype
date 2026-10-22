@@ -322,7 +322,7 @@ describe('M20 production Copy task automation qualification', () => {
     expect(screen.getByText(/Narrative and irreversible decisions remain under player authority/)).toBeInTheDocument();
     expect(screen.queryByText('Start timed task:')).not.toBeInTheDocument();
 
-    const assignButtons = screen.getAllByRole('button', { name: 'Assign' });
+    const assignButtons = screen.getAllByRole('button', { name: 'Start Routine' });
     expect(assignButtons).toHaveLength(3);
     expect(assignButtons[0]).toBeEnabled();
     expect(assignButtons[1]).toBeDisabled();

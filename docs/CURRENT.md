@@ -1,5 +1,13 @@
 # Documentation Authority Index
 
+## 2026-10-21 — Owner-approved UI candidate and 1.1 Trait dependency
+
+- The owner directed implementation of the adversarial UI review's scoped UX-A through UX-H work. The active candidate PR #179 (`work/ui-experience-truth-context-20261021`) contains UI truthfulness repairs, a read-only Current Moment layer, contextual links, Copy operational feedback, and regression coverage. These are **candidate construction changes** and do not update the released `v1.0.0` evidence.
+- `specification/UI_UX/PlayerExperienceContract.md` defines the bounded post-1.0 UX scope and evidence ceiling; `docs/ui/PlayerExperienceImplementation.md` traces changed surfaces and finding-specific checks.
+- 1.1 universal Trait semantics remain owned by draft PR #178 and its `Version11ScopeContract.md` on that branch; dependent draft PR #180 contains UX-D lifecycle and Doctrine expression-preview UI. Neither is qualified merely by existence of its code.
+- All promotion must preserve exact-head Build Validation and the human-evidence distinction; `BETA_PASS=NO`, `HUMAN-UNVALIDATED` remain the current external validation ceiling.
+
+
 ## 2026-10-20 owner personal-release decision
 
 - [`specification/Technical/OwnerPersonalReleaseDecision.md`](../specification/Technical/OwnerPersonalReleaseDecision.md) is **CURRENT AUTHORITY**: 1.0 is a personal release; the human Beta floor is waived as a 1.0 gate, not satisfied (`BETA_PASS = NO`, `BETA_OWNER_WAIVED / HUMAN-UNVALIDATED`); draft PR #165 is parked post-1.0; agents may merge their own PRs after exact-head Build Validation passes.
