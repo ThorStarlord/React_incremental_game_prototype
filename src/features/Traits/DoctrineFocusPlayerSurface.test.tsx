@@ -146,6 +146,8 @@ describe('Doctrine Focus player surface', () => {
     await user.click(
       within(panel).getByRole('button', { name: 'Switch to Countermodeler' })
     );
+    expect(within(screen.getByRole('dialog')).getByText(/This suppresses/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Confirm Switch' }));
     await waitFor(() =>
       expect(selectActiveDoctrineIds(store.getState())).toEqual(['countermodeler'])
     );
@@ -212,6 +214,8 @@ describe('Doctrine Focus player surface', () => {
     await user.click(
       within(panel).getByRole('button', { name: 'Switch to Countermodeler' })
     );
+    expect(within(screen.getByRole('dialog')).getByText(/This suppresses/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Confirm Switch' }));
     await waitFor(() =>
       expect(selectActiveDoctrineIds(store.getState())).toEqual(['countermodeler'])
     );

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   Box,
@@ -7,10 +7,15 @@ import {
   CardContent,
   Chip,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Stack,
   Typography,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
+import { previewDoctrineExpression } from '../../state/DoctrineExpressionPreview';
 import {
   DOCTRINE_DEFINITIONS,
   type DoctrineId,
@@ -27,14 +32,14 @@ import {
 const doctrineIds = Object.keys(DOCTRINE_DEFINITIONS) as DoctrineId[];
 
 /**
- * Player-facing doctrine selection over permanently learned Traits.
- *
- * The surface deliberately hides doctrines until every required Trait is
- * permanent, so it does not leak future relationship-derived capabilities.
+ * Player-facing doctrine selection over assimilated Traits. Future pairs remain
+ * hidden; current/prospective expression is explained before a commitment.
  */
 const DoctrineFocusPanel: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
   const assimilatedTraitIds = useAppSelector(state => state.player.permanentTraits);
+  const expressionSlots = useAppSelector(state => state.player.traitSlots);
+  const [pendingDoctrineId, setPendingDoctrineId] = useState<DoctrineId | null>(null);
   const allTraits = useAppSelector(state => state.traits.traits);
   const npcs = useAppSelector(state => state.npcs.npcs);
   const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
@@ -48,6 +53,12 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
       )
     );
   }, [assimilatedTraitIds]);
+
+  const traitName = (id: string) => allTraits[id]?.name ?? id;
+  const pendingDefinition = pendingDoctrineId ? DOCTRINE_DEFINITIONS[pendingDoctrineId] : undefined;
+  const pendingPreview = pendingDefinition
+    ? previewDoctrineExpression(expressionSlots, pendingDefinition.requiredPermanentTraitIds)
+    : null;
 
   const activeDoctrineId = activeDoctrineIds[0];
   const activeDoctrine = activeDoctrineId
@@ -68,8 +79,9 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
 
       <Alert severity="info">
         Adopting or switching a doctrine explicitly expresses its assimilated pair
-        in the first two available expression slots. Replaced patterns stay safely
-        assimilated and can be expressed again at any time.
+        in the first unlocked expression slots. Existing expressed patterns may
+        be suppressed, but their learned ownership does not change. Review each
+        doctrine's expression preview before committing.
       </Alert>
 
       <Box data-test-id="active-doctrine-summary">
@@ -107,6 +119,7 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
           {eligibleDoctrineIds.map(doctrineId => {
             const definition = DOCTRINE_DEFINITIONS[doctrineId];
             const isActive = activeDoctrineIds.includes(doctrineId);
+            const preview = previewDoctrineExpression(expressionSlots, definition.requiredPermanentTraitIds);
             const actionLabel = isActive
               ? 'Current doctrine'
               : activeDoctrineId
@@ -163,10 +176,29 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
                       })}
                     </Stack>
 
+                    <Box role="group" aria-label={`Expression preview for ${definition.name}`} sx={{ bgcolor: 'action.hover', borderRadius: 1, p: 1.5 }}>
+                      <Typography variant="caption" fontWeight={600} display="block">Before / after expression</Typography>
+                      <Typography variant="body2">Currently expressed: {preview?.before.map(traitName).join(', ') || 'none'}</Typography>
+                      <Typography variant="body2">After switching: {preview?.after.map(traitName).join(', ') || 'none'}</Typography>
+                      {preview?.newlyExpressed.length ? (
+                        <Typography variant="body2" color="success.main">Will express: {preview.newlyExpressed.map(traitName).join(', ')}</Typography>
+                      ) : null}
+                      {preview?.suppressed.length ? (
+                        <Typography variant="body2" color="warning.main">Will suppress: {preview.suppressed.map(traitName).join(', ')}</Typography>
+                      ) : null}
+                      {!preview && <Typography variant="body2" color="warning.main">Not enough unlocked expression slots.</Typography>}
+                      <Typography variant="caption" color="text.secondary">
+                        Current active effects come only from expressed patterns. Assimilated ownership is not lost when a pattern is suppressed.
+                      </Typography>
+                    </Box>
+
                     <Button
                       variant={isActive ? 'contained' : 'outlined'}
-                      disabled={isActive}
-                      onClick={() => dispatch(activateDoctrineThunk(doctrineId))}
+                      disabled={isActive || !preview}
+                      onClick={() => {
+                        if (preview?.suppressed.length) setPendingDoctrineId(doctrineId);
+                        else dispatch(activateDoctrineThunk(doctrineId));
+                      }}
                     >
                       {actionLabel}
                     </Button>
@@ -177,6 +209,25 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
           })}
         </Stack>
       )}
+
+      <Dialog open={Boolean(pendingDoctrineId)} onClose={() => setPendingDoctrineId(null)} aria-labelledby="doctrine-switch-confirm-title">
+        <DialogTitle id="doctrine-switch-confirm-title">Confirm Doctrine Switch</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            Switching to {pendingDefinition?.name} will express {pendingPreview?.after.map(traitName).join(', ') || 'the required pair'}.
+          </Typography>
+          <Typography variant="body2" color="warning.main">
+            This suppresses {pendingPreview?.suppressed.map(traitName).join(', ') || 'no patterns'} and stops their active effects. Known and assimilated ownership is not deleted.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPendingDoctrineId(null)}>Cancel</Button>
+          <Button variant="contained" onClick={() => {
+            if (pendingDoctrineId && pendingPreview) dispatch(activateDoctrineThunk(pendingDoctrineId));
+            setPendingDoctrineId(null);
+          }}>Confirm Switch</Button>
+        </DialogActions>
+      </Dialog>
 
       {focusTraitIds.length > 0 && (
         <Button
