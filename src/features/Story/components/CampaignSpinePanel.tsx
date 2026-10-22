@@ -7,6 +7,18 @@ import { selectChapterProgress } from '../ChapterSelectors';
 import { selectCounterphasePreparationExplanation } from '../PlayerInsightSelectors';
 import { selectCampaignEpilogueProjection } from '../CampaignEpilogueSelectors';
 
+/** Leave recovery steps optional: narrative objectives remain visible without a walkthrough. */
+const GuidanceDetails: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Box component="details" sx={{ mt: 1 }}>
+    <Typography component="summary" variant="body2" sx={{ cursor: 'pointer', fontWeight: 600 }}>
+      Need more detailed guidance?
+    </Typography>
+    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+      {children}
+    </Typography>
+  </Box>
+);
+
 const ActionButton: React.FC<{ to: string; children: React.ReactNode }> = ({
   to,
   children,
@@ -51,11 +63,11 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc03-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 1 — Merchant District Crisis</AlertTitle>
-        <Typography variant="body2">
+        <GuidanceDetails>
           Return through City Gate and investigate the Merchant District crisis. Work with the
           people already tied to the district; the chapter advances only when one authored
           conclusion is actually recorded.
-        </Typography>
+        </GuidanceDetails>
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
           <ActionButton to="/game/dashboard">Open travel controls</ActionButton>
           <ActionButton to="/game/npcs/npc_captain_valerius">Open Valerius</ActionButton>
@@ -70,10 +82,10 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc03-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 2 — Archive Inquiry</AlertTitle>
-        <Typography variant="body2">
+        <GuidanceDetails>
           The Merchant District crisis has a recorded conclusion. Continue with Scholar Elara's
           inquiry and follow the evidence through independent verification.
-        </Typography>
+        </GuidanceDetails>
         <Box sx={{ mt: 1.5 }}>
           <ActionButton to="/game/npcs/npc_scholar_elara">Open Scholar Elara</ActionButton>
         </Box>
@@ -85,10 +97,10 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc03-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 3 — Enemies in Phase</AlertTitle>
-        <Typography variant="body2">
+        <GuidanceDetails>
           The Archive Inquiry is resolved. Continue Lyra's adversarial-calibration arc until the
           relationship history records the chapter's authored conclusion.
-        </Typography>
+        </GuidanceDetails>
         <Box sx={{ mt: 1.5 }}>
           <ActionButton to="/game/npcs/npc_lyra">Open Lyra</ActionButton>
         </Box>
@@ -100,12 +112,12 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc06-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 4 — Lattice Under Strain</AlertTitle>
-        <Typography variant="body2">
+        <GuidanceDetails>
           The opening campaign is complete, but the Telluric Echo is now stressing the network
           those relationships built. Start with Elara's diagnosis, share the operational fact
           where useful, choose a stabilization strategy, then return to Lyra when the local
           lattice is stable.
-        </Typography>
+        </GuidanceDetails>
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
           <ActionButton to="/game/npcs/npc_scholar_elara">Open Scholar Elara</ActionButton>
           <ActionButton to="/game/npcs/npc_captain_valerius">Open Valerius</ActionButton>
@@ -121,11 +133,11 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc07-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 5 — The Chrono-Crypt</AlertTitle>
-        <Typography variant="body2">
+        <GuidanceDetails>
           The local lattice is stable, but containment is not a countermeasure. Start Lyra's
           counterphase Quest, travel through the Whispering Woods into the unlocked Chrono-Crypt,
           derive one legal solution, then return to Lyra to record what the result means.
-        </Typography>
+        </GuidanceDetails>
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
           <ActionButton to="/game/npcs/npc_lyra">Open Lyra</ActionButton>
           <ActionButton to="/game/quests">Open quests</ActionButton>
@@ -139,12 +151,12 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc08-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 6 — Network Under Pressure</AlertTitle>
-        <Typography variant="body2">
+        <GuidanceDetails>
           Lyra knows the counterphase, but the rest of the network does not. Brief Elara first,
           choose which other anchors to inform, prepare one legal posture, and return to Lyra for
           the manual commitment. Archive Verification is already mastered; repetitive verification
           may be delegated to an eligible Copy, but briefings and the posture choice remain yours.
-        </Typography>
+        </GuidanceDetails>
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
           <ActionButton to="/game/npcs/npc_scholar_elara">Open Scholar Elara</ActionButton>
           <ActionButton to="/game/npcs/npc_blacksmith_gronk">Open Gronk</ActionButton>
@@ -161,11 +173,11 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="info" data-testid="gc09-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Chapter 7 — Counterphase</AlertTitle>
-        <Typography variant="body2">
+        <GuidanceDetails>
           The network posture is committed. Prepare the matching finale profile, then return to
           Lyra for the irreversible finale commitment. Copies may continue mastered safe routines,
           but they cannot choose this plan.
-        </Typography>
+        </GuidanceDetails>
         {counterphaseExplanation && (
           <Box sx={{ mt: 1.5 }}>
             <Typography variant="subtitle2">
@@ -191,11 +203,11 @@ export const CampaignSpinePanel: React.FC = () => {
     return (
       <Alert severity="warning" data-testid="gc10-campaign-objective" sx={{ mb: 2 }}>
         <AlertTitle>Finale — The Telluric Echo</AlertTitle>
-        <Typography variant="body2">
+        <GuidanceDetails>
           The counterphase plan is committed. Return to Lyra to enter the matching finale Quest,
           carry that plan into the Whispering Woods, resolve the confrontation personally, then
           return to Lyra once more to record the aftermath.
-        </Typography>
+        </GuidanceDetails>
         {counterphaseExplanation && (
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             Committed preparation: {counterphaseExplanation.title}.

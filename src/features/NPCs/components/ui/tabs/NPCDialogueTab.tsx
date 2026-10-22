@@ -16,6 +16,8 @@ import {
 import { processNPCInteractionThunk } from '../../../state/NPCThunks';
 import type { DialogueEntry } from '../../../state/NPCTypes';
 import type { NPCDialogueChoice } from '../../../state/NPCSelectors';
+import { selectCausalJournalEntries } from '../../../../Story/PlayerInsightSelectors';
+
 
 interface NPCDialogueTabProps {
   npcId: string;
@@ -36,6 +38,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npcId));
   const availableDialogueChoices = useAppSelector(state =>
     selectAvailableNPCDialogueChoices(state, npcId)
+  );
+  const latestVisibleMemory = useAppSelector(state =>
+    selectCausalJournalEntries(state, 10).find(entry => entry.npcId === npcId)
   );
 
   if (!npc) {
@@ -143,6 +148,14 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
             ))}
           </Grid>
         </Box>
+      )}
+
+      {latestVisibleMemory && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }}>
+          <Typography variant="subtitle2">A remembered consequence</Typography>
+          <Typography variant="body2" fontWeight={600}>{latestVisibleMemory.title}</Typography>
+          <Typography variant="body2" color="text.secondary">{latestVisibleMemory.causeLabel}: {latestVisibleMemory.summary}</Typography>
+        </Paper>
       )}
 
       {availableDialogueChoices.length === 0 && (
