@@ -186,6 +186,16 @@ const DoctrineFocusPanel: React.FC = React.memo(() => {
                       {preview?.suppressed.length ? (
                         <Typography variant="body2" color="warning.main">Will suppress: {preview.suppressed.map(traitName).join(', ')}</Typography>
                       ) : null}
+                      {preview?.newlyExpressed.map(traitId => (
+                        <Typography key={traitId} variant="caption" display="block" color="text.secondary">
+                          Newly active pattern — {traitName(traitId)}: {allTraits[traitId]?.description ?? 'No recorded description'}
+                        </Typography>
+                      ))}
+                      {preview?.suppressed.map(traitId => (
+                        <Typography key={traitId} variant="caption" display="block" color="text.secondary">
+                          No longer active — {traitName(traitId)}: {allTraits[traitId]?.description ?? 'No recorded description'}
+                        </Typography>
+                      ))}
                       {!preview && <Typography variant="body2" color="warning.main">Not enough unlocked expression slots.</Typography>}
                       <Typography variant="caption" color="text.secondary">
                         Current active effects come only from expressed patterns. Assimilated ownership is not lost when a pattern is suppressed.
