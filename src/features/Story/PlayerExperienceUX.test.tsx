@@ -109,3 +109,14 @@ test('the first authored conversation appears as recorded history without invent
   expect(moment.consequences.some(change => change.title === 'The First Lesson')).toBe(true);
   expect(Object.values(store.getState().relationships.memoriesById)).toHaveLength(0);
 });
+
+test('Current Moment does not churn its view model when only a raw GameLoop tick changes', () => {
+  const store = makeStore();
+  const first = selectCurrentMoment(store.getState());
+  const snapshot = store.getState();
+  const afterUnrelatedTick = {
+    ...snapshot,
+    gameLoop: { ...snapshot.gameLoop, currentTick: snapshot.gameLoop.currentTick + 1 },
+  };
+  expect(selectCurrentMoment(afterUnrelatedTick)).toBe(first);
+});

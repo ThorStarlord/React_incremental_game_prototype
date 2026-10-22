@@ -26,7 +26,7 @@ export interface CurrentMomentView {
  * NPCs, valid world locations, active quests and visible memories.
  * Never read future dialogue definitions to manufacture available actions.
  */
-export const selectCurrentMoment = (state: RootState): CurrentMomentView => {
+const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
   const locationId = resolveCanonicalLocationId(state.player.location);
   const location = locationId ? getLocationDefinition(locationId) : undefined;
   const stage = selectOpeningCampaignStage(state);
@@ -140,4 +140,40 @@ export const selectCurrentMoment = (state: RootState): CurrentMomentView => {
       .map(({ id, title, explanation }) => ({ id, title, explanation })),
     attention,
   };
+};
+
+/**
+ * The global GameLoop ticks much more frequently than the player makes authored
+ * choices. Cache the projection while its actual source slices remain unchanged.
+ * This selector is read-only and derives no display values from raw engine ticks.
+ */
+let cachedSources: readonly unknown[] | null = null;
+let cachedMoment: CurrentMomentView | null = null;
+export const selectCurrentMoment = (state: RootState): CurrentMomentView => {
+  const sources: readonly unknown[] = [
+    state.player,
+    state.meta,
+    state.quest,
+    state.relationships,
+    state.npcs,
+    state.copy,
+    state.traits,
+    state.knowledge,
+    state.factions,
+    state.worldState,
+    state.essence,
+    state.inventory,
+  ];
+  if (
+    cachedSources &&
+    cachedMoment &&
+    cachedSources.length === sources.length &&
+    cachedSources.every((source, index) => source === sources[index])
+  ) {
+    return cachedMoment;
+  }
+  const next = deriveCurrentMoment(state);
+  cachedSources = sources;
+  cachedMoment = next;
+  return next;
 };

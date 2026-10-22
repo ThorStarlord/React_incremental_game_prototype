@@ -32,7 +32,10 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
   const generation = useAppSelector((s: RootState) => selectGen(s, copy.id));
   const isActive = useAppSelector((s: RootState) => selectActive(s, copy.id));
   const originName = useAppSelector((s: RootState) => s.npcs.npcs[copy.parentNPCId]?.name);
-  const exceptions = useAppSelector((s: RootState) => Object.values(s.copy.exceptionsById ?? {}).filter(item => item.copyId === copy.id && item.status !== 'resolved'));
+  // Primitive selector value avoids a new array on every GameLoop tick.
+  const openExceptionCount = useAppSelector((s: RootState) =>
+    Object.values(s.copy.exceptionsById ?? {}).filter(item => item.copyId === copy.id && item.status !== 'resolved').length
+  );
 
   const handleBolster = useCallback(async () => {
     setBusy(true);
@@ -108,9 +111,9 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
         </Box>
         <Typography variant="body2" color="text.secondary">Location: {copy.location}</Typography>
 
-        {exceptions.length > 0 && (
+        {openExceptionCount > 0 && (
           <Typography variant="body2" color="warning.main" role="status" sx={{ mt: 1 }}>
-            Attention required: {exceptions.length} unresolved routine exception(s). Open Manage Routines for the escalation boundary.
+            Attention required: {openExceptionCount} unresolved routine exception(s). Open Manage Routines for the escalation boundary.
           </Typography>
         )}
         {copy.activeTask?.status === 'running' && (
