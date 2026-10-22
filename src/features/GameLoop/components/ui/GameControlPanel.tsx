@@ -46,7 +46,7 @@ export const GameControlPanel: React.FC = () => {
 
   return (
     <>
-      <Paper sx={{ p: 2, mb: 2 }}>
+      <Paper id="travel-controls" sx={{ p: 2, mb: 2 }}>
         <Typography variant="h6" gutterBottom>
           Game Controls
         </Typography>

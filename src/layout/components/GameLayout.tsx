@@ -14,6 +14,7 @@ import { useNpcShopRestock } from '../../features/NPCs/hooks/useNpcShopRestock';
 import { PrologueObjectivePanel } from '../../features/Story/components/PrologueObjectivePanel';
 import { CampaignSpinePanel } from '../../features/Story/components/CampaignSpinePanel';
 import { GameSessionBar } from './GameSessionBar';
+import { SessionStatusStrip } from './SessionStatusStrip';
 
 /**
  * New GameLayout component that integrates with useLayoutState hook
@@ -94,6 +95,7 @@ export const GameLayout: React.FC = React.memo(() => {
           changeTab={setActiveTab}
         >
           <GameSessionBar />
+          <SessionStatusStrip />
           <PrologueObjectivePanel />
           <CampaignSpinePanel />
           <Outlet />
