@@ -11,7 +11,7 @@
 | UX-A | PlayerExperienceContract; this trace | Docs authority validation |
 | UX-B | NPCDialogueTab authored-choice focus; CopyCard notes; GameControlPanel simulation labels | Named control tests, existing narrative and delegation regressions |
 | UX-C | QuestPuzzleModal fresh-attempt reset/Undo/Clear; CopiesPage filtered reporting | QuestPuzzleModalUX, existing quests/Copy test suites |
-| UX-E | CurrentMomentSelectors + CurrentMomentPanel above Dashboard advanced panels | PlayerExperienceUX, normal-UI Prologue and Chapters 1–7 |
+| UX-E | New Game routes to Dashboard Current Moment; canonical projection above advanced panels | PlayerExperienceUX and ordinary-UI New Game → Current Moment → Willow path, full Chapters 1–7 |
 | UX-F | Optional guidance in campaign/prologue; targeted NPC/Quest/Copy links; dialogue memory summary | GC02/GC03 and advanced campaign suites |
 | UX-G | Copy active task + unresolved exception status, direct Copy detail route | MasteryCompression, CopyStandingOrders and player insight regressions |
 | UX-H | SessionStatusStrip, duplicate landmark correction, simulation-status explanation | Accessibility and browser matrix |

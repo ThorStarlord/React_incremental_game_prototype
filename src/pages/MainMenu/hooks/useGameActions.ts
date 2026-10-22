@@ -64,7 +64,8 @@ export function useGameActions({
       await dispatch(initializeQuestsThunk()).unwrap();
       await dispatch(newGameSeedNPCsThunk()).unwrap();
       dispatch(setSessionActive(true));
-      navigate('/game/npcs');
+      // Present the immediate authored situation before advanced feature management.
+      navigate('/game/dashboard');
     } catch (error) {
       dispatch(replaceState(previousState));
       console.error('Failed to start a new game; previous state restored.', error);

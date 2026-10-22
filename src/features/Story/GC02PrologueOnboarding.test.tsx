@@ -167,7 +167,7 @@ describe('GC-02 Prologue / onboarding vertical path', () => {
       'utf8'
     );
     expect(newGameSource).toContain('newGameSeedNPCsThunk');
-    expect(newGameSource).toContain("navigate('/game/npcs')");
+    expect(newGameSource).toContain("navigate('/game/dashboard')");
     expect(newGameSource).not.toContain("navigate('/game/debug')");
 
     const appSource = fs.readFileSync(path.join(process.cwd(), 'src/App.tsx'), 'utf8');
