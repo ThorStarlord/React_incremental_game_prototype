@@ -8,6 +8,7 @@ import { setHasSeenIntro } from '../Meta/state/MetaSlice';
 import { setLocation } from '../Player/state/PlayerSlice';
 import { setNPCs } from '../NPCs/state/NPCSlice';
 import { addQuest } from '../Quest/state/QuestSlice';
+import { recordRelationshipExperience } from '../Relationships/state/RelationshipSlice';
 import { CITY_CENTER_LOCATION_ID, WHISPERING_WOODS_LOCATION_ID } from '../Exploration/LocationDefinitions';
 import { selectCurrentMoment } from './CurrentMomentSelectors';
 import { CurrentMomentPanel } from './components/CurrentMomentPanel';
@@ -81,4 +82,30 @@ test('authored NPC dialogue does not advertise a free-text conversation engine',
   );
   expect(screen.queryByPlaceholderText(/Type a message/i)).not.toBeInTheDocument();
   expect(screen.getByText(/No authored conversation topics are available/)).toBeInTheDocument();
+});
+
+
+test('the first authored conversation appears as recorded history without inventing a Memory', () => {
+  const store = makeStore();
+  store.dispatch(setHasSeenIntro(true));
+  store.dispatch(setNPCs({
+    npc_elder_willow: { id: 'npc_elder_willow', name: 'Elder Willow', availableDialogues: [], completedDialogues: [] } as any,
+  }));
+  store.dispatch(recordRelationshipExperience({
+    id: 'first_lesson_experience_test',
+    uniqueKey: 'willow:ux:first-lesson',
+    title: 'The First Lesson',
+    primaryTargetId: 'npc_elder_willow',
+    participantIds: ['player', 'npc_elder_willow'],
+    sourceType: 'dialogue',
+    significance: 'meaningful',
+    relationshipEffects: { trust: 2, understanding: 6, sharedMeaning: 3 },
+    connectionProgressDelta: 8,
+    resonanceTags: ['Wisdom'],
+    memoryCandidate: false,
+    timestamp: 90000,
+  } as any));
+  const moment = selectCurrentMoment(store.getState());
+  expect(moment.consequences.some(change => change.title === 'The First Lesson')).toBe(true);
+  expect(Object.values(store.getState().relationships.memoriesById)).toHaveLength(0);
 });

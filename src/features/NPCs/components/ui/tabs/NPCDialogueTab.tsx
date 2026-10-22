@@ -16,7 +16,7 @@ import {
 import { processNPCInteractionThunk } from '../../../state/NPCThunks';
 import type { DialogueEntry } from '../../../state/NPCTypes';
 import type { NPCDialogueChoice } from '../../../state/NPCSelectors';
-import { selectCausalJournalEntries } from '../../../../Story/PlayerInsightSelectors';
+import { selectCausalJournalEntries, selectRecentRecordedDialogueExperiences } from '../../../../Story/PlayerInsightSelectors';
 
 
 interface NPCDialogueTabProps {
@@ -41,6 +41,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   );
   const latestVisibleMemory = useAppSelector(state =>
     selectCausalJournalEntries(state, 10).find(entry => entry.npcId === npcId)
+  );
+  const latestRecordedDialogue = useAppSelector(state =>
+    selectRecentRecordedDialogueExperiences(state, 1, npcId)[0]
   );
 
   if (!npc) {
@@ -155,6 +158,16 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           <Typography variant="subtitle2">A remembered consequence</Typography>
           <Typography variant="body2" fontWeight={600}>{latestVisibleMemory.title}</Typography>
           <Typography variant="body2" color="text.secondary">{latestVisibleMemory.causeLabel}: {latestVisibleMemory.summary}</Typography>
+        </Paper>
+      )}
+
+      {!latestVisibleMemory && latestRecordedDialogue && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }}>
+          <Typography variant="subtitle2">Recently recorded experience</Typography>
+          <Typography variant="body2" fontWeight={600}>{latestRecordedDialogue.title}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Your dialogue with {latestRecordedDialogue.npcName} is part of your recorded history.
+          </Typography>
         </Paper>
       )}
 

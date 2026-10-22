@@ -3,7 +3,7 @@ import { getConnectedLocationDefinitions, getLocationDefinition, resolveCanonica
 import { isPlayerAtNpcWorldLocation } from '../NPCs/state/NPCWorldLocationDefinitions';
 import { selectAllChapterProgress } from './ChapterSelectors';
 import { selectOpeningCampaignStage } from './CampaignSpine';
-import { selectCausalJournalEntries, selectOpenCopyExceptions } from './PlayerInsightSelectors';
+import { selectCausalJournalEntries, selectOpenCopyExceptions, selectRecentRecordedDialogueExperiences } from './PlayerInsightSelectors';
 
 export interface CurrentMomentAction {
   id: string;
@@ -122,11 +122,22 @@ export const selectCurrentMoment = (state: RootState): CurrentMomentView => {
     locationDescription: location?.description ?? 'A location without an authored travel description.',
     situation,
     actions: actions.slice(0, 5),
-    consequences: selectCausalJournalEntries(state, 2).map(entry => ({
-      id: entry.id,
-      title: entry.title,
-      explanation: `${entry.causeLabel}: ${entry.summary}`,
-    })),
+    consequences: [
+      ...selectCausalJournalEntries(state, 2).map(entry => ({
+        id: entry.id,
+        title: entry.title,
+        explanation: `${entry.causeLabel}: ${entry.summary}`,
+        timestamp: entry.timestamp,
+      })),
+      ...selectRecentRecordedDialogueExperiences(state, 2).map(entry => ({
+        id: `experience-${entry.id}`,
+        title: entry.title,
+        explanation: `This dialogue experience with ${entry.npcName} is now part of your recorded history.`,
+        timestamp: entry.timestamp,
+      })),
+    ].sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 3)
+      .map(({ id, title, explanation }) => ({ id, title, explanation })),
     attention,
   };
 };

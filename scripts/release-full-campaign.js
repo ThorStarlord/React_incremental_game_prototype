@@ -290,6 +290,14 @@ class CampaignRunner {
     await this.page.getByRole('button', { name: /^New Game$/ }).click();
     await this.page.waitForURL(/\/game\//, { timeout: STEP_TIMEOUT });
     await this.dismissIntro();
+
+    // UI-02: exercise the new situation-first path through the production UI,
+    // not just a mounted component test or a direct route with seeded state.
+    await this.nav('Dashboard');
+    const moment = this.page.locator('[data-testid="current-moment"]');
+    await moment.getByRole('heading', { name: 'Current Moment' }).waitFor({ timeout: STEP_TIMEOUT });
+    await moment.getByRole('link', { name: 'Find Elder Willow' }).click();
+    await this.page.getByRole('button', { name: 'Travel to City Gate', exact: true }).waitFor({ timeout: STEP_TIMEOUT });
   }
 
   npcName(npcId) {

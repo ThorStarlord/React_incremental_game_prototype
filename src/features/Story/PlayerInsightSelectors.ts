@@ -160,6 +160,34 @@ export const selectCausalJournalEntries = (
     });
 
 /**
+ * Dialogue is a player-chosen event even when it did not generate a separate,
+ * playerVisible Memory. Present it as *recorded history*, not an inferred
+ * causal effect or a memory that does not exist.
+ */
+export const selectRecentRecordedDialogueExperiences = (
+  state: RootState,
+  limit = 3,
+  targetNpcId?: string
+): Array<{ id: string; title: string; npcId: string; npcName: string; timestamp: number }> =>
+  Object.values(state.relationships.experiencesById)
+    .filter(experience =>
+      experience.sourceType === 'dialogue' &&
+      Boolean(experience.title) &&
+      Boolean(experience.primaryTargetId) &&
+      Boolean(state.npcs.npcs[experience.primaryTargetId]) &&
+      (!targetNpcId || experience.primaryTargetId === targetNpcId)
+    )
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, Math.max(0, limit))
+    .map(experience => ({
+      id: experience.id,
+      title: experience.title,
+      npcId: experience.primaryTargetId,
+      npcName: npcName(state, experience.primaryTargetId),
+      timestamp: experience.timestamp,
+    }));
+
+/**
  * Chapter opportunity projection. Shared opening evidence can reveal that a
  * chapter is underway, but future branch labels remain hidden until the player
  * has recorded route-specific evidence. This is a projection, not an unlock
