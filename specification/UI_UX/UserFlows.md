@@ -1,5 +1,22 @@
 # User Flows Specification
 
+## 2026-10-21 — Current Moment / truthfulness candidate (PR #179; not 1.0.0 release evidence)
+
+The current post-1.0 development candidate introduces a situation-first Dashboard layer, while retaining the existing GameLayout route and all advanced feature pages. This subsection describes **code proposed in the candidate branch**, not an already released 1.0.0 behavior.
+
+**First session:** New Game → existing Prologue objective → Dashboard Current Moment location and current action → travel through legal connections → known Elder Willow contact → authored Dialogue tab → recorded First Lesson → next Chapter. The old feature navigation remains accessible; the new selector cannot discover an NPC or unlock a Quest.
+
+**Meaningful decision:** known causal memories are visible beside dialogue where applicable; the full Player Insight projection remains optional. Current chapter title/objective appears by default, while concrete walkthrough directions are in an optional expandable hint.
+
+**Delegation:** Copy note ≠ executable mastered routine ≠ standing order ≠ unresolved procedural exception. Unresolved exceptions link to their relevant Copy management view, and the global session strip signals active timed Quests and Copy judgment needed.
+
+**Deep links:** `/game/npcs/:npcId?view=dialogue`, `/game/quests?quest=<known-id>`, `/game/copies?copy=<known-id>`; unknown/deferred identities do not create gameplay authority. The Dashboard travel hash targets the actual travel controls.
+
+The 1.1 Trait-expression lifecycle and Doctrine before/after preview belong to independent draft PR #180 stacked on draft PR #178, not to the v1.0.0 UI source. Technical qualification and human comprehension evidence remain separate.
+
+---
+
+
 This document outlines the key user interaction flows and navigation patterns within the React Incremental RPG Prototype.
 
 **Implementation Status**: ✅ **COMPLETE** - Core navigation flows implemented with responsive design, complete GameLayout integration, **and ✅ NEWLY IMPLEMENTED AppRouter coordination**.

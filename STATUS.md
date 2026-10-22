@@ -1,5 +1,13 @@
 # Repository Status — Campaign One 1.0 Released
 
+### 2026-10-21 — Owner-approved UI experience construction candidates
+
+- **PR #179 (draft / unqualified):** source-backed interaction-truthfulness repairs, Current Moment situation-first layer, contextual routes, Copy exception action, chapter hint hierarchy, global status, focused UI tests. Candidate branch `work/ui-experience-truth-context-20261021`. No released 1.0.0 tag or prior historical evidence changed.
+- **PR #180 (draft / unqualified, dependent on #178):** Trait lifecycle vocabulary and Doctrine expression before/after previews with suppression confirmation. Must await qualified PR #178 universal Trait semantics and save-schema v3.
+- **Human claim ceiling unchanged:** FEATURE_COMPLETE / HUMAN-UNVALIDATED for the released Campaign One. Synthetic browser checks and Jest qualify only exercised implementation behaviors; do not represent human comprehension.
+- **Active owner direction:** A bounded post-1.0 UI experience improvement program was explicitly approved on 2026-10-21; previously recorded "no new scope without owner decision" language is historical to the state preceding this direction. This is not an automatic release decision.
+
+
 **Status date:** 2026-10-20
 **Pre-activation main baseline:** `4b725286eadaf6b2c61076e532b0f48513a3687e`  
 **Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
