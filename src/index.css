@@ -1,4 +1,8 @@
-/* Global styles for the game */
+/* Global styles for the game — system UI stays readable and keyboard-first. */
+:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;

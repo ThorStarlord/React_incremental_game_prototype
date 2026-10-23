@@ -41,20 +41,26 @@ export const ThemeProviderWrapper: React.FC<ThemeProviderProps> = ({ children })
     palette: {
       mode: darkMode ? 'dark' : 'light',
       primary: { main: darkMode ? '#90caf9' : primaryColor },
-      secondary: { main: darkMode ? '#f48fb1' : secondaryColor },
+      secondary: { main: darkMode ? '#e2b981' : secondaryColor },
       background: {
-        default: darkMode ? '#20262d' : '#f5f7f9',
-        paper: darkMode ? '#2c343e' : '#ffffff',
+        default: darkMode ? '#1d2529' : '#f7f4ee',
+        paper: darkMode ? '#2d3536' : '#fffdf8',
       },
     },
     typography: {
       fontFamily: "'Segoe UI', 'Inter', system-ui, sans-serif",
+      h1: { fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 700 },
+      h2: { fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 700 },
+      h3: { fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 700 },
+      h4: { fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 650 },
+      h5: { fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 650 },
       fontSize: 14 * fontSize,
     },
     shape: { borderRadius: 10 },
     components: {
       MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
       MuiButton: { styleOverrides: { root: { textTransform: 'none', fontWeight: 600 } } },
+      MuiCard: { styleOverrides: { root: { borderRadius: 14 } } },
     },
   }), [darkMode, primaryColor, secondaryColor, fontSize]);
 

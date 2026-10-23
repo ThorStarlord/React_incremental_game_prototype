@@ -16,6 +16,7 @@ import {
   Tabs,
   Tab,
   CircularProgress,
+  Stack,
 } from '@mui/material';
 import { CreateCopyModal } from '../../../Copy/components/ui/CreateCopyModal';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
@@ -25,6 +26,7 @@ import NPCTradeTab from '../ui/tabs/NPCTradeTab';
 import NPCQuestsTab from '../ui/tabs/NPCQuestsTab';
 import NPCTraitsTab from '../ui/tabs/NPCTraitsTab';
 import MigratedRelationshipSummary from '../../../Relationships/components/MigratedRelationshipSummary';
+import NPCPortrait from '../ui/NPCPortrait';
 import { selectUsesRelationshipConnectionAuthority } from '../../../Relationships/state/RelationshipSelectors';
 import {
   getNpcWorldLocationId,
@@ -158,10 +160,19 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   return (
     <>
       <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h5">{npc.name}</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+          <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: '1 1 250px' }}>
+            <NPCPortrait npc={npc} size={76} />
+            <Box>
+              <Typography variant="h5" component="h1">{npc.name}</Typography>
+              <Typography variant="body2" color="text.secondary">{npc.description}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {inPersonBlocked ? `Remote — at ${requiredLocationLabel}` : `Present — ${requiredLocationLabel}`}
+              </Typography>
+            </Box>
+          </Stack>
           <Button
-            variant="contained"
+            variant="outlined"
             color="secondary"
             onClick={() => setCreateCopyModalOpen(true)}
             disabled={inPersonBlocked}

@@ -9,10 +9,10 @@ export const defaultTheme: ThemeSettings = {
   darkMode: false,
   
   /** Default primary color - Material UI blue */
-  primaryColor: '#1976d2',
+  primaryColor: '#355c69',
   
   /** Default secondary color - Material UI pink */
-  secondaryColor: '#dc004e',
+  secondaryColor: '#a36c39',
   
   /** Default font size scale (1 = normal) */
   fontSize: 1,

@@ -7,18 +7,17 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Avatar,
   Chip,
   LinearProgress,
   Paper,
   Button
 } from '@mui/material';
 import {
-  Person as PersonIcon,
   LocationOn as LocationIcon,
   Favorite as FavoriteIcon
 } from '@mui/icons-material';
 import type { NPC } from '../../state/NPCTypes';
+import NPCPortrait from './NPCPortrait';
 // Import getTierBenefits for comprehensive tier information
 import { getTierBenefits } from '../../../../config/relationshipConstants'; 
 import { useAppDispatch } from '../../../../app/hooks';
@@ -73,20 +72,7 @@ const NPCHeader: React.FC<NPCHeaderProps> = ({ npc }) => {
     >
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3 }}>
         {/* Avatar */}
-        <Avatar
-          sx={{ 
-            width: 80, 
-            height: 80,
-            bgcolor: 'primary.main',
-            fontSize: '2rem'
-          }}
-        >
-          {npc.avatar ? (
-            <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} />
-          ) : (
-            <PersonIcon fontSize="large" />
-          )}
-        </Avatar>
+        <NPCPortrait npc={npc} size={80} />
 
         {/* Main Info */}
         <Box sx={{ flexGrow: 1 }}>

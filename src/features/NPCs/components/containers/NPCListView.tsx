@@ -18,7 +18,6 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  Avatar,
   ListItemText,
   ListItemSecondaryAction,
   Tooltip,
@@ -29,7 +28,7 @@ import {
   Toolbar,
   Paper,
 } from '@mui/material';
-import { Search, Person, Star, ViewList, ViewModule } from '@mui/icons-material';
+import { Search, Star, ViewList, ViewModule } from '@mui/icons-material';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
 import { selectHasSeenIntro } from '../../../Meta/state/MetaSlice';
@@ -38,6 +37,7 @@ import { isPlayerAtNpcWorldLocation } from '../../state/NPCWorldLocationDefiniti
 import { NPC } from '../../state/NPCTypes';
 import { selectRelationshipState } from '../../../Relationships/state/RelationshipSelectors';
 import { NPCListCard } from '../ui/NPCListCard';
+import NPCPortrait from '../ui/NPCPortrait';
 
 interface NPCListViewProps {
   onSelectNPC: (npcId: string) => void;
@@ -145,9 +145,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
             selected={isSelected}
           >
             <ListItemAvatar>
-              <Avatar sx={{ bgcolor: npc.isAvailable ? 'success.light' : 'grey.500' }}>
-                <Person aria-hidden="true" />
-              </Avatar>
+              <NPCPortrait npc={npc} size={44} />
             </ListItemAvatar>
             <ListItemText primary={npc.name} secondary={npc.location} />
             <ListItemSecondaryAction>

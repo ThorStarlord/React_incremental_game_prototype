@@ -10,12 +10,12 @@ import {
   CardContent,
   Typography,
   Box,
-  Avatar,
   Chip,
 } from '@mui/material';
-import { Person, LocationOn, Favorite, Star } from '@mui/icons-material';
+import { LocationOn, Favorite, Star } from '@mui/icons-material';
 import { NPC } from '../../state/NPCTypes';
 import { getRelationshipTier as getCentralRelationshipTier } from '../../../../config/relationshipConstants';
+import NPCPortrait from './NPCPortrait';
 
 interface NPCListCardProps {
   npc: NPC;
@@ -59,9 +59,7 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
         >
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-            <Avatar sx={{ width: 48, height: 48, bgcolor: npc.isAvailable ? 'success.light' : 'grey.500', mr: 2 }}>
-              <Person aria-hidden="true" />
-            </Avatar>
+            <Box sx={{ mr: 2 }}><NPCPortrait npc={npc} size={52} /></Box>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography variant="h6" noWrap>{npc.name}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>

@@ -16,6 +16,8 @@ import {
   Star,
 } from '@mui/icons-material';
 import { PlayerStatsContainer } from '../features/Player/components/containers/PlayerStatsContainer';
+import { Button } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import { PlayerTraitsContainer } from '../features/Player/components/containers/PlayerTraitsContainer';
 
 interface TabPanelProps {
@@ -77,14 +79,14 @@ export const CharacterPage: React.FC = React.memo(() => {
             mb: 2,
           }}
         >
-          Character Management
+          Your Character
         </Typography>
         <Typography
           variant="h6"
           color="text.secondary"
           sx={{ maxWidth: 600, mx: 'auto' }}
         >
-          Manage your character's statistics, traits, and relationship-derived capabilities
+          Your health, attributes, and learned capabilities, shaped by the people you meet.
         </Typography>
       </Box>
 
@@ -159,8 +161,9 @@ export const CharacterPage: React.FC = React.memo(() => {
               </Typography>
               <Alert severity="info" sx={{ mb: 3 }}>
                 <AlertTitle>Traits and Capabilities</AlertTitle>
-                Equip active traits, review permanent traits, and follow the capabilities your character has learned through the campaign. Visit Traits for acquisition and Resonance details.
+                Review your active and permanent capabilities here. The Traits workspace holds acquisition, Resonance, Doctrine, and the Codex.
               </Alert>
+              <Button component={RouterLink} to="/game/traits" variant="outlined" sx={{ mb: 2 }}>Open the complete Traits workspace</Button>
               <PlayerTraitsContainer />
             </Box>
           </TabPanel>
