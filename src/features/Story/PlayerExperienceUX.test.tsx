@@ -74,6 +74,35 @@ test('an authored, currently available nearby conversation offers a direct dialo
   }));
 });
 
+
+test('Current Moment cannot disclose an undiscovered NPC even when their authored location is here', () => {
+  const store = makeStore();
+  store.dispatch(setHasSeenIntro(true));
+  store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
+  store.dispatch(setNPCs({
+    npc_elder_willow: { id: 'npc_elder_willow', name: 'Elder Willow', availableDialogues: [], completedDialogues: [] } as any,
+  }));
+  // setNPCs marks its records discovered. Simulate an existing catalog entry
+  // that has not become a known character in the current campaign.
+  const state = store.getState();
+  const unrevealed = {
+    ...state,
+    npcs: {
+      ...state.npcs,
+      npcs: {
+        ...state.npcs.npcs,
+        npc_hidden_willow: {
+          id: 'npc_hidden_willow', name: 'Hidden Woods Figure',
+          availableDialogues: [], completedDialogues: [],
+        } as any,
+      },
+      discoveredNPCs: ['npc_elder_willow'],
+    },
+  };
+  const moment = selectCurrentMoment(unrevealed);
+  expect(moment.actions.some(action => action.label.includes('Hidden Woods Figure'))).toBe(false);
+});
+
 test('global session status points to active timed quests rather than silently ticking off-screen', () => {
   const store = makeStore();
   store.dispatch(addQuest({

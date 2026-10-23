@@ -36,8 +36,9 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
   const currentChapter = stage !== 'PROLOGUE'
     ? selectAllChapterProgress(state).find(chapter => chapter.status !== 'complete')
     : undefined;
+  const discoveredNpcIds = new Set(state.npcs.discoveredNPCs);
   const knownContactsHere = Object.values(state.npcs.npcs)
-    .filter(npc => isPlayerAtNpcWorldLocation(npc.id, state.player.location) === true)
+    .filter(npc => discoveredNpcIds.has(npc.id) && isPlayerAtNpcWorldLocation(npc.id, state.player.location) === true)
     .slice(0, 3);
   const activeQuests = state.quest.activeQuestIds
     .map(id => state.quest.quests[id])
