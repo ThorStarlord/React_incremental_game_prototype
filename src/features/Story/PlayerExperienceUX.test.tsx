@@ -75,15 +75,13 @@ test('an authored, currently available nearby conversation offers a direct dialo
 });
 
 
-test('Current Moment cannot disclose an undiscovered NPC even when their authored location is here', () => {
+test('Current Moment cannot disclose an undiscovered canonical NPC even when their authored location is here', () => {
   const store = makeStore();
   store.dispatch(setHasSeenIntro(true));
-  store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
+  store.dispatch(setLocation(CITY_CENTER_LOCATION_ID));
   store.dispatch(setNPCs({
     npc_elder_willow: { id: 'npc_elder_willow', name: 'Elder Willow', availableDialogues: [], completedDialogues: [] } as any,
   }));
-  // setNPCs marks its records discovered. Simulate an existing catalog entry
-  // that has not become a known character in the current campaign.
   const state = store.getState();
   const unrevealed = {
     ...state,
@@ -91,8 +89,9 @@ test('Current Moment cannot disclose an undiscovered NPC even when their authore
       ...state.npcs,
       npcs: {
         ...state.npcs.npcs,
-        npc_hidden_willow: {
-          id: 'npc_hidden_willow', name: 'Hidden Woods Figure',
+        // Gronk has a real City Center world anchor, but is not discovered.
+        npc_blacksmith_gronk: {
+          id: 'npc_blacksmith_gronk', name: 'Gronk the Blacksmith',
           availableDialogues: [], completedDialogues: [],
         } as any,
       },
@@ -100,7 +99,7 @@ test('Current Moment cannot disclose an undiscovered NPC even when their authore
     },
   };
   const moment = selectCurrentMoment(unrevealed);
-  expect(moment.actions.some(action => action.label.includes('Hidden Woods Figure'))).toBe(false);
+  expect(moment.actions.some(action => action.label.includes('Gronk'))).toBe(false);
 });
 
 test('global session status points to active timed quests rather than silently ticking off-screen', () => {
