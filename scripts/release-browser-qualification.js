@@ -246,6 +246,35 @@ async function runBrowserQualification(name, browserType, options, outDir) {
     });
 
 
+
+    await check('mobile-current-moment-and-navigation', async () => {
+      // A real narrow-screen browser context catches inaccessible mobile drawers:
+      // desktop-only browser qualification cannot establish responsive usability.
+      const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      try {
+        const mobile = await mobileContext.newPage();
+        await mobile.goto(options.url, { waitUntil: name === 'firefox' ? 'commit' : 'domcontentloaded', timeout: 30000 });
+        await mobile.getByRole('button', { name: /^New Game$/ }).click();
+        const intro = mobile.getByRole('dialog', { name: 'Introduction' });
+        for (let step = 0; step < 10 && await intro.isVisible(); step += 1) {
+          await intro.getByRole('button', { name: /Continue|Begin/ }).click();
+        }
+        await intro.waitFor({ state: 'hidden', timeout: 10000 });
+        await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'mobile Current Moment');
+        await assertVisible(mobile.getByRole('button', { name: 'Open game navigation' }), 'mobile navigation open action');
+        await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-current-moment.png`), fullPage: true });
+        await mobile.getByRole('button', { name: 'Open game navigation' }).focus();
+        await mobile.keyboard.press('Enter');
+        const menu = mobile.getByRole('navigation', { name: 'Mobile navigation menu' });
+        await assertVisible(menu, 'opened mobile navigation drawer');
+        await menu.getByRole('button', { name: 'Navigate to Quests' }).click();
+        await mobile.waitForURL(/\/game\/quests$/, { timeout: 10000 });
+        await assertVisible(mobile.getByRole('heading', { name: 'Quest Log' }), 'mobile Quest page');
+      } finally {
+        await mobileContext.close();
+      }
+    });
+
     return {
       browser: name,
       browserVersion: browser.version(),

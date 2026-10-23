@@ -108,7 +108,7 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
     <Box className={className}>
       {isMobile ? (
         <>
-          <IconButton
+          {!isDrawerOpen && <IconButton
             aria-label="Open game navigation"
             onClick={openDrawer}
             sx={{
@@ -119,7 +119,7 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
             }}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton>}
           <MobileNavDrawer
             isOpen={isDrawerOpen}
             onClose={closeDrawer}
