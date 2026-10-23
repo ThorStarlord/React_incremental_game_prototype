@@ -79,3 +79,13 @@ test('invalid puzzle submission retains the dialog and error for revision', asyn
   expect(screen.getByRole('alert')).toHaveTextContent('Incorrect solution');
   expect(screen.getByText(/Current Sequence: North/)).toBeInTheDocument();
 });
+
+test('mobile navigation has an explicit keyboard-available menu trigger wired to its drawer', () => {
+  // JSDOM does not implement the media breakpoint; browser tests own the open interaction.
+  const fs = require('fs') as typeof import('fs');
+  const path = require('path') as typeof import('path');
+  const source = fs.readFileSync(path.join(process.cwd(), 'src/layout/components/VerticalNavBar/VerticalNavBar.tsx'), 'utf8');
+  expect(source).toContain('aria-label="Open game navigation"');
+  expect(source).toContain('onClick={openDrawer}');
+  expect(source).toContain('isOpen={isDrawerOpen}');
+});
