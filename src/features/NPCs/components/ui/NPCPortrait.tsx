@@ -8,7 +8,7 @@ export const NPCPortrait: React.FC<{ npc: NPC; size?: number }> = ({ npc, size =
     ['#3d5b63', '#a3c8bf'], ['#705d74', '#d4b9d0'], ['#76593e', '#d4ad78'],
     ['#475b79', '#b6c9e8'], ['#4e684f', '#c6d6a9'],
   ];
-  const hash = [...npc.id].reduce((n, c) => n + c.charCodeAt(0), 0);
+  const hash = npc.id.split('').reduce((n, c) => n + c.charCodeAt(0), 0);
   const [dark, light] = tones[hash % tones.length];
   const initials = npc.name.trim().split(/\s+/).slice(0, 2).map(word => word[0]?.toUpperCase()).join('');
   return (
