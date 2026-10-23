@@ -138,16 +138,16 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
-                    {isAffinityUnlocked(2) ? <TradeIcon color="primary" /> : <LockedIcon color="disabled" />}
+                    {isAffinityUnlocked(40) ? <TradeIcon color="primary" /> : <LockedIcon color="disabled" />}
                   </ListItemIcon>
                   <ListItemText
                     primary="Trading"
-                    secondary={isAffinityUnlocked(2) ? 'Buy and sell items' : 'Requires Affinity: 2'}
+                    secondary={isAffinityUnlocked(40) ? 'Buy and sell items' : 'Requires Affinity: 40'}
                   />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
-                    {usesRelationshipAuthority || isAffinityUnlocked(3)
+                    {usesRelationshipAuthority || isAffinityUnlocked(20)
                       ? <QuestIcon color="primary" />
                       : <LockedIcon color="disabled" />}
                   </ListItemIcon>
@@ -155,7 +155,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                     primary="Quests"
                     secondary={usesRelationshipAuthority
                       ? 'Quest opportunities appear when your shared history makes them relevant.'
-                      : isAffinityUnlocked(3) ? 'Accept and complete quests' : 'Requires Affinity: 3'}
+                      : isAffinityUnlocked(20) ? 'Accept and complete quests' : 'Requires Affinity: 20'}
                   />
                 </ListItem>
               </List>

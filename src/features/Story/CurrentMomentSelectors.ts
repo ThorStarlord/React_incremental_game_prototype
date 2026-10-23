@@ -1,6 +1,8 @@
 import type { RootState } from '../../app/store';
 import { getConnectedLocationDefinitions, getLocationDefinition, resolveCanonicalLocationId } from '../Exploration/LocationDefinitions';
 import { isPlayerAtNpcWorldLocation } from '../NPCs/state/NPCWorldLocationDefinitions';
+import { selectAvailableNPCDialogueChoices } from '../NPCs/state/NPCSelectors';
+import { CHAPTER_DEFINITIONS } from './ChapterDefinitions';
 import { selectAllChapterProgress } from './ChapterSelectors';
 import { selectOpeningCampaignStage } from './CampaignSpine';
 import { selectCausalJournalEntries, selectOpenCopyExceptions, selectRecentRecordedDialogueExperiences } from './PlayerInsightSelectors';
@@ -10,6 +12,7 @@ export interface CurrentMomentAction {
   label: string;
   description: string;
   to: string;
+  kind?: 'encounter' | 'quest' | 'travel' | 'reference';
 }
 
 export interface CurrentMomentView {
@@ -44,12 +47,22 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
 
   if (stage === 'PROLOGUE' && state.meta.hasSeenIntro) {
     const willowHere = knownContactsHere.some(npc => npc.id === 'npc_elder_willow');
-    if (willowHere) {
+    const willowHasTopic = willowHere && selectAvailableNPCDialogueChoices(state, 'npc_elder_willow').length > 0;
+    if (willowHasTopic) {
       actions.push({
         id: 'prologue-willow',
         label: 'Talk with Elder Willow',
-        description: 'Your known contact is here. Choose an authored conversation topic.',
+        description: 'A first conversation is ready here.',
         to: '/game/npcs/npc_elder_willow?view=dialogue',
+        kind: 'encounter',
+      });
+    } else if (willowHere) {
+      actions.push({
+        id: 'prologue-willow-inspect',
+        label: 'Review Elder Willow',
+        description: 'She is here, but no new authored conversation is currently available.',
+        to: '/game/npcs/npc_elder_willow',
+        kind: 'reference',
       });
     } else {
       actions.push({
@@ -57,17 +70,26 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
         label: 'Find Elder Willow',
         description: 'Use the travel controls to reach the Whispering Woods.',
         to: '/game/dashboard#travel-controls',
+        kind: 'travel',
       });
     }
   }
 
   knownContactsHere.forEach(npc => {
     if (stage === 'PROLOGUE' && npc.id === 'npc_elder_willow') return;
-    actions.push({
+    const available = selectAvailableNPCDialogueChoices(state, npc.id);
+    actions.push(available.length > 0 ? {
       id: `npc-${npc.id}`,
-      label: `Visit ${npc.name}`,
-      description: 'A currently known person at this world location.',
+      label: `Talk with ${npc.name}`,
+      description: `${available.length} authored conversation topic${available.length === 1 ? '' : 's'} currently available.`,
       to: `/game/npcs/${encodeURIComponent(npc.id)}?view=dialogue`,
+      kind: 'encounter',
+    } : {
+      id: `npc-${npc.id}`,
+      label: `Review ${npc.name}`,
+      description: 'This known person is present, but has no available conversation topic.',
+      to: `/game/npcs/${encodeURIComponent(npc.id)}`,
+      kind: 'reference',
     });
   });
 
@@ -79,6 +101,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
         ? 'Objectives are ready; review the authored resolution.'
         : 'Review the current objectives and what remains to do.',
       to: `/game/quests?quest=${encodeURIComponent(quest.id)}`,
+      kind: 'quest',
     });
   });
   if (connections.length > 0 && !actions.some(action => action.id === 'prologue-travel')) {
@@ -87,6 +110,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
       label: 'Explore connected locations',
       description: 'Choose a legal authored route using the travel controls.',
       to: '/game/dashboard#travel-controls',
+      kind: 'travel',
     });
   }
   if (actions.length === 0) {
@@ -95,6 +119,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
       label: 'Review known contacts',
       description: 'Inspect the people already encountered, without revealing unknown characters.',
       to: '/game/npcs',
+      kind: 'reference',
     });
   }
 
@@ -113,9 +138,14 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
     });
   });
 
+  const chapterIdentity = currentChapter
+    ? CHAPTER_DEFINITIONS.find(definition => definition.id === currentChapter.id)
+    : undefined;
   const situation = stage === 'PROLOGUE'
-    ? 'Your first task is to find Elder Willow and listen to her First Lesson.'
-    : currentChapter?.title ?? 'Campaign One: your choices and remembered history now determine what follows.';
+    ? 'Begin by finding Elder Willow. Your response to her First Lesson will become part of your shared history.'
+    : chapterIdentity
+      ? `${currentChapter?.title}: ${chapterIdentity.centerOfGravity}`
+      : 'Campaign One: your choices and remembered history determine what follows.';
 
   return {
     locationName: location?.name ?? state.player.location,

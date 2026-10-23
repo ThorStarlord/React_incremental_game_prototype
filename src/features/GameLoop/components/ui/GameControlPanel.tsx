@@ -3,8 +3,6 @@ import { Box, Button, Slider, Typography, Paper } from '@mui/material';
 import { PlayArrow, Pause, Stop, Speed } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { startGame, pauseGame, resumeGame, stopGame, setGameSpeed } from '../../state/GameLoopSlice';
-import TravelPanel from '../../../Exploration/components/TravelPanel';
-import ActiveQuestCombatPanel from '../../../Combat/components/ActiveQuestCombatPanel';
 
 export const GameControlPanel: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -111,10 +109,6 @@ export const GameControlPanel: React.FC = () => {
         </Box>
       </Paper>
 
-      <Box id="travel-controls" tabIndex={-1}>
-        <TravelPanel />
-      </Box>
-      <ActiveQuestCombatPanel />
     </>
   );
 };

@@ -11,8 +11,6 @@ import GlobalNotificationHost from '../../shared/components/ui/GlobalNotificatio
 import { useAppSelector } from '../../app/hooks';
 import { selectHasSeenIntro, selectSessionActive } from '../../features/Meta/state/MetaSlice';
 import { useNpcShopRestock } from '../../features/NPCs/hooks/useNpcShopRestock';
-import { PrologueObjectivePanel } from '../../features/Story/components/PrologueObjectivePanel';
-import { CampaignSpinePanel } from '../../features/Story/components/CampaignSpinePanel';
 import { GameSessionBar } from './GameSessionBar';
 import { SessionStatusStrip } from './SessionStatusStrip';
 
@@ -96,8 +94,6 @@ export const GameLayout: React.FC = React.memo(() => {
         >
           <GameSessionBar />
           <SessionStatusStrip />
-          <PrologueObjectivePanel />
-          <CampaignSpinePanel />
           <Outlet />
           {!hasSeenIntro && <IntroNarration />}
         </MainContentArea>
