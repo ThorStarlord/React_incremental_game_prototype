@@ -1,5 +1,10 @@
 # Documentation Authority Index
 
+## 2026-10-23 — UI2 and post-release documentation precedence
+
+PR #179 is **merged** on current main; the older 2026-10-21 candidate claims below are historical snapshots, not current PR status. Current `main` postdates original `v1.0.0`, which remains immutable. Owner-selected **draft PR #181** is the UI2 source candidate; `docs/ui/Phase2Implementation.md` owns its implementation/evidence mapping, subordinate to `PlayerExperienceContract.md` and this index. PR #178 is still an unqualified/conflicted 1.1 Trait candidate and PR #180 depends on it. No post-release merge or CI can be treated as real-player validation; `HUMAN-UNVALIDATED` / `BETA_PASS=NO` remains.
+
+
 ## 2026-10-21 — Owner-approved UI candidate and 1.1 Trait dependency
 
 - The owner directed implementation of the adversarial UI review's scoped UX-A through UX-H work. The active candidate PR #179 (`work/ui-experience-truth-context-20261021`) contains UI truthfulness repairs, a read-only Current Moment layer, contextual links, Copy operational feedback, and regression coverage. These are **candidate construction changes** and do not update the released `v1.0.0` evidence.

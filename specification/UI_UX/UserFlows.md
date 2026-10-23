@@ -1,5 +1,10 @@
 # User Flows Specification
 
+## 2026-10-23 — World-first UI2 candidate
+
+Approved UI2 draft PR #181 changes the first session to New Game → Current Moment → legal location movement → genuinely available authored NPC conversation → recorded feedback. Guidance and advanced statistics are expandable instead of globally persistent; Quest wrong answers remain editable and Force It reveals known authored effects; Copy exceptions link to player-owned judgment. All authority remains in existing Redux/Story/Quest/Copy rules, with no future spoilers. See `docs/ui/Phase2Implementation.md` for test gates; these changes do not rewrite the original v1.0.0 release.
+
+
 ## 2026-10-21 — Current Moment / truthfulness candidate (PR #179; not 1.0.0 release evidence)
 
 The current post-1.0 development candidate introduces a situation-first Dashboard layer, while retaining the existing GameLayout route and all advanced feature pages. This subsection describes **code proposed in the candidate branch**, not an already released 1.0.0 behavior.

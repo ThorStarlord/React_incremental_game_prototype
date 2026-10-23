@@ -1,5 +1,10 @@
 # Layout Design Specification
 
+## 2026-10-23 — Phase 2 candidate layout
+
+PR #181 centers current location, currently available choices, legal travel, and active encounter controls on the Dashboard. Global Save/timer/Copy-exception status remains; secondary chapter hints and advanced metrics become expandable. NPCs use offline-safe monogram sigils until verified authored artwork exists. This is a bounded presentation evolution of current main, not a new state authority or original v1.0.0 amendment. Browser and exact-head validation remain required.
+
+
 ## Candidate 2026-10-21 UI authority (PR #179 — not part of released 1.0.0)
 
 The current candidate retains AppRouter, GameLayout, VerticalNavBar, MainContentArea and feature-driven pages. It adds a **CurrentMomentPanel inside DashboardPage** above the advanced statistic/game-control views, not a new navigation destination. The panel reads canonical locations, known NPC anchors, active quests, visible memories, and unresolved Copy exceptions.

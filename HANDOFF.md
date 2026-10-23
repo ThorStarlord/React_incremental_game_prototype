@@ -1,5 +1,10 @@
 # Handoff — Campaign One 1.0 Released
 
+## 2026-10-23 — Scoped UI2 continuation
+
+Owner approved the Phase 2 player-experience program. PR #179 was qualified and merged into main at `4259e94573d189228af5ab71cf29ce7c5ab3c2d5`. Draft PR #181 at `codex/ui2-world-first-experience-20261023` implements world-first changes, controls truthfulness and tests. It is not qualified until exact-head Build Validation including the full ordinary-UI Campaign One passes. Read `docs/ui/Phase2Implementation.md` and reconcile its current head/CI failures; do not repeat the 1.0 or GC implementation work. PR #178/#180 1.1 remains separate. The original v1.0.0 tag and human validation ceiling are unchanged.
+
+
 **Handoff status:** CURRENT RE-ENTRY AUTHORITY  
 **Reconciled baseline before this activation package:** `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`  
 **Current maturity:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`  
