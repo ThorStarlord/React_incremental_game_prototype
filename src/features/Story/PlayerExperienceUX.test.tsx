@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { rootReducer } from '../../app/store';
 import { setHasSeenIntro } from '../Meta/state/MetaSlice';
 import { setLocation } from '../Player/state/PlayerSlice';
-import { setNPCs } from '../NPCs/state/NPCSlice';
+import { setNPCs, setDialogueNodes } from '../NPCs/state/NPCSlice';
 import { addQuest } from '../Quest/state/QuestSlice';
 import { recordRelationshipExperience } from '../Relationships/state/RelationshipSlice';
 import { CITY_CENTER_LOCATION_ID, WHISPERING_WOODS_LOCATION_ID } from '../Exploration/LocationDefinitions';
@@ -31,7 +31,7 @@ test('initial situation does not invent contacts or expose future narrative rout
   expect(moment.actions.some(action => /Lyra|Elara/.test(action.label))).toBe(false);
 });
 
-test('an authored known contact at the current location offers a direct dialogue link', () => {
+test('a known nearby contact without an available topic is inspectable but not falsely advertised as a conversation', () => {
   const store = makeStore();
   store.dispatch(setHasSeenIntro(true));
   store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
@@ -46,11 +46,32 @@ test('an authored known contact at the current location offers a direct dialogue
     </Provider>
   );
   expect(screen.getByText('Current Moment')).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: 'Talk with Elder Willow' })).toHaveAttribute(
+  expect(screen.getByRole('link', { name: 'Review Elder Willow' })).toHaveAttribute(
     'href',
-    '/game/npcs/npc_elder_willow?view=dialogue'
+    '/game/npcs/npc_elder_willow'
   );
+  expect(screen.queryByRole('link', { name: 'Talk with Elder Willow' })).not.toBeInTheDocument();
   expect(screen.queryByText(/Lyra/)).not.toBeInTheDocument();
+});
+
+
+test('an authored, currently available nearby conversation offers a direct dialogue link', () => {
+  const store = makeStore();
+  store.dispatch(setHasSeenIntro(true));
+  store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
+  store.dispatch(setNPCs({
+    npc_elder_willow: {
+      id: 'npc_elder_willow', name: 'Elder Willow',
+      availableDialogues: ['test_willow_intro'], completedDialogues: [],
+    } as any,
+  }));
+  store.dispatch(setDialogueNodes({
+    test_willow_intro: { id: 'test_willow_intro', title: 'The First Greeting', text: 'Welcome.', repeatable: true, responses: {} },
+  }));
+  const moment = selectCurrentMoment(store.getState());
+  expect(moment.actions.find(action => action.id === 'prologue-willow')).toEqual(expect.objectContaining({
+    label: 'Talk with Elder Willow', to: '/game/npcs/npc_elder_willow?view=dialogue',
+  }));
 });
 
 test('global session status points to active timed quests rather than silently ticking off-screen', () => {

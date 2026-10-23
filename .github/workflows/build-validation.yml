@@ -23,7 +23,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Focused UI regression
-        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx CopyBulkActionsUX.test.tsx CopyBulkActionsUX.test.tsx CopyM20ProductionTaskAutomation.test.tsx GC02PrologueOnboarding.test.tsx GC03OpeningCampaignSpine.test.tsx
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx UI2ExperienceRepair.test.tsx CopyBulkActionsUX.test.tsx CopyM20ProductionTaskAutomation.test.tsx GC02PrologueOnboarding.test.tsx GC03OpeningCampaignSpine.test.tsx
         env:
           CI: true
       - name: TypeScript
@@ -117,7 +117,7 @@ jobs:
 
       - name: Player Experience UI regression qualification
         timeout-minutes: 6
-        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx UI2ExperienceRepair.test.tsx
         env:
           CI: true
 
