@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { rootReducer } from '../../app/store';
 import { updateCategorySettings } from '../Settings/state/SettingsSlice';
 import { ThemeProviderWrapper } from '../../theme/provider';
-import NPCListCard from '../NPCs/components/ui/NPCListCard';
+import { NPCListCard } from '../NPCs/components/ui/NPCListCard';
 import type { NPC } from '../NPCs/state/NPCTypes';
 import QuestPuzzleModal from '../Quest/components/ui/QuestPuzzleModal';
 import type { QuestObjective } from '../Quest/state/QuestTypes';
@@ -35,7 +35,7 @@ test('the sole runtime theme consumes stored Redux dark mode and font size', () 
   const store = configureStore({ reducer: rootReducer });
   const Probe = () => {
     const theme = useTheme();
-    return <output data-testid="effective-theme">{theme.palette.mode}:{theme.typography.fontSize}</output>;
+    return <output data-test-id="effective-theme">{theme.palette.mode}:{theme.typography.fontSize}</output>;
   };
   render(
     <Provider store={store}>
