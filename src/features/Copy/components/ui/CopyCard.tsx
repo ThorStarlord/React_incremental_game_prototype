@@ -78,8 +78,12 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
             {copy.role && copy.role !== 'none' && (
               <Chip size="small" color="info" variant="outlined" label={copy.role.charAt(0).toUpperCase() + copy.role.slice(1)} />
             )}
-            {isActive ? (
-              <Chip size="small" color="success" variant="filled" label="Active" />
+            {openExceptionCount > 0 ? (
+              <Chip size="small" color="warning" variant="filled" label="Awaiting judgment" />
+            ) : copy.activeTask?.status === 'running' ? (
+              <Chip size="small" color="success" variant="filled" label="Working" />
+            ) : isActive ? (
+              <Chip size="small" color="info" variant="outlined" label="Available" />
             ) : (
               <Chip size="small" color="default" variant="outlined" label="Inactive" />
             )}
@@ -153,7 +157,9 @@ export const CopyCard: React.FC<CopyCardProps> = ({ copy }) => {
         </Tooltip>
   <Button size="small" variant="outlined" onClick={handleApplyPrefs} disabled={busyApply}>Apply Prefs</Button>
   <Button size="small" variant="text" onClick={() => setTaskEditOpen(o => !o)}>{taskEditOpen ? 'Hide Note' : (copy.currentTask ? 'Edit Note' : 'Add Note')}</Button>
-        <Button size="small" variant="text" onClick={() => setDetailsOpen(true)}>Manage Routines</Button>
+        <Button size="small" color={openExceptionCount ? 'warning' : 'primary'} variant={openExceptionCount ? 'contained' : 'text'} onClick={() => setDetailsOpen(true)}>
+    {openExceptionCount ? 'Review Exception' : 'Manage Routines'}
+  </Button>
       </CardActions>
       <CopyDetailPanel copyId={copy.id} open={detailsOpen} onClose={() => setDetailsOpen(false)} />
     </Card>

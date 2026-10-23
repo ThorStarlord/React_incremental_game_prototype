@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
   Button,
   Grid,
   Paper,
+  Alert,
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
@@ -33,6 +34,9 @@ interface NPCDialogueTabProps {
  */
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState<{ success: boolean; message: string } | null>(null);
+  useEffect(() => { setFeedback(null); }, [npcId]);
 
   const npc = useAppSelector(state => selectNPCById(state, npcId));
   const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npcId));
@@ -55,8 +59,11 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   }
 
   const handleDialogueChoice = async (choice: NPCDialogueChoice, responseKey: string) => {
+    if (busy) return;
+    setBusy(true);
+    setFeedback(null);
     try {
-      await dispatch(processNPCInteractionThunk({
+      const outcome = await dispatch(processNPCInteractionThunk({
         npcId,
         interactionType: 'dialogue',
         context: {
@@ -65,8 +72,13 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           timestamp: Date.now(),
         },
       })).unwrap();
-    } catch (error) {
-      console.error('Failed to process dialogue choice:', error);
+      setFeedback(outcome.success
+        ? { success: true, message: `"${choice.title}" recorded. Review the conversation and any visible consequences below.` }
+        : { success: false, message: outcome.message || 'This conversation is not currently available.' });
+    } catch {
+      setFeedback({ success: false, message: 'The conversation could not be completed. No success has been claimed.' });
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -76,6 +88,12 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         <ChatIcon color="primary" />
         <Typography variant="h6">Conversation with {npc.name}</Typography>
       </Box>
+
+      {feedback && (
+        <Alert severity={feedback.success ? 'success' : 'warning'} role="status" aria-live="polite">
+          {feedback.message}
+        </Alert>
+      )}
 
       <Paper sx={{ p: 2, mb: 2, maxHeight: 300, overflowY: 'auto' }}>
         <Typography variant="subtitle2" gutterBottom>Recent Conversations</Typography>
@@ -132,6 +150,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                         key={`${choice.id}-${response.id}`}
                         variant="outlined"
                         size="small"
+                        disabled={busy}
                         onClick={() => handleDialogueChoice(choice, response.id)}
                       >
                         {response.label}
@@ -141,6 +160,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                     <Button
                       variant="outlined"
                       size="small"
+                      disabled={busy}
                       onClick={() => handleDialogueChoice(choice, '')}
                     >
                       Continue

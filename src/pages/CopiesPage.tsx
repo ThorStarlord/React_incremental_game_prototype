@@ -23,6 +23,7 @@ import CopyDetailPanel from '../features/Copy/components/ui/CopyDetailPanel';
 import { COPY_SYSTEM } from '../constants/gameConstants';
 import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
 import { addNotification } from '../shared/state/NotificationSlice';
+import { selectOpenCopyExceptions } from '../features/Story/PlayerInsightSelectors';
 // import { COPY_SYSTEM } from '../constants/gameConstants';
 
 // Reserved for future copy stats summary UI
@@ -46,6 +47,7 @@ export const CopiesPage: React.FC = React.memo(() => {
   const copies = useAppSelector(selectAllCopies);
   const segments = useAppSelector(selectCopySegments);
   const currentEssence = useAppSelector(selectCurrentEssence);
+  const openExceptions = useAppSelector(selectOpenCopyExceptions);
   const selectedCopyId = params.get('copy');
   const selectedCopy = copies.find(copy => copy.id === selectedCopyId);
   const [tab, setTab] = useState(0);
@@ -153,6 +155,20 @@ export const CopiesPage: React.FC = React.memo(() => {
         </Box>
       </Box>
 
+      {openExceptions.length > 0 && (
+        <Alert severity="warning" sx={{ mb: 2 }} data-testid="copy-operational-attention">
+          <AlertTitle>{openExceptions.length} unresolved operational exception{openExceptions.length === 1 ? '' : 's'}</AlertTitle>
+          Acknowledgment does not resolve an exception. Review the affected Copy and make the required player-owned judgment.
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+            {openExceptions.slice(0, 4).map(exception => (
+              <Button key={exception.exceptionId} size="small" variant="outlined" color="warning"
+                onClick={() => navigate(`/game/copies?copy=${encodeURIComponent(exception.copyId)}`)}>
+                {exception.copyName}: {exception.title}
+              </Button>
+            ))}
+          </Box>
+        </Alert>
+      )}
       {copies.length === 0 ? (
         <Alert severity="info" sx={{ mb: 3 }}>
           <AlertTitle>No Copies Created</AlertTitle>

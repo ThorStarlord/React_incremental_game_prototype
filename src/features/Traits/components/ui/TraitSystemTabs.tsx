@@ -8,9 +8,7 @@ import {
   Alert,
   AlertTitle,
   Paper,
-  Button,
 } from '@mui/material';
-import BookIcon from '@mui/icons-material/Book'; // Added for the Codex button
 import EquippedSlotsPanel from './EquippedSlotsPanel';
 import TraitManagement from './TraitManagement';
 import type { Trait, TraitSlot } from '../../state/TraitsTypes';
@@ -65,18 +63,20 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
   const [activeTab, setActiveTab] = useState(0);
   const [isCodexDrawerOpen, setIsCodexDrawerOpen] = useState(false); // State for the drawer
 
-  const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
+  const handleTabChange = useCallback((_event: React.SyntheticEvent, newValue: number) => {
+    // The Codex is a drawer, not a separate empty page that then requires
+    // a second "Open Codex" click. Returning leaves the previous tab active.
+    if (newValue === 2) setIsCodexDrawerOpen(true);
+    else setActiveTab(newValue);
   }, []);
 
-  const handleOpenCodex = useCallback(() => setIsCodexDrawerOpen(true), []);
   const handleCloseCodex = () => setIsCodexDrawerOpen(false);
 
   // Define the tabs and their corresponding components
   const tabs = useMemo(() => [
     { id: 'slots', label: 'Slots', component: EquippedSlotsPanel },
     { id: 'management', label: 'Management', component: TraitManagement },
-    { id: 'codex', label: 'Codex', component: 'codex_placeholder' }, // Special case for the codex
+    { id: 'codex', label: 'Codex', component: 'codex_drawer' }, // Opens the Codex directly
     { id: 'doctrine', label: 'Doctrine', component: DoctrineFocusPanel },
   ], []);
 
@@ -86,28 +86,12 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
         return <EquippedSlotsPanel />;
       case 1: // Management
         return <TraitManagement currentEssence={currentEssence} />;
-      case 2: // Codex
-        return (
-          <Box sx={{ textAlign: 'center', p: 4 }}>
-            <Typography variant="h6" gutterBottom>Trait Codex</Typography>
-            <Typography color="text.secondary" sx={{ mb: 2 }}>
-              Browse all discovered and available traits in the game.
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<BookIcon />}
-              onClick={handleOpenCodex}
-            >
-              Open Codex
-            </Button>
-          </Box>
-        );
       case 3: // Doctrine
         return <DoctrineFocusPanel />;
       default:
         return null;
     }
-  }, [activeTab, currentEssence, handleOpenCodex]);
+  }, [activeTab, currentEssence]);
 
   if (loading && Object.keys(allTraits).length === 0) {
     return (

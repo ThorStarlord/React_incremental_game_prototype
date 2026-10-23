@@ -191,6 +191,9 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
       {/* Trait Selection Dialog */}
       <Dialog open={isTraitSelectionModalOpen} onClose={onCloseTraitSelectionModal} maxWidth="sm" fullWidth>
         <DialogTitle>Select a Trait for Slot {selectedSlotIndexForModal !== null ? selectedSlotIndexForModal + 1 : ''}</DialogTitle>
+        <Typography variant="body2" color="text.secondary" sx={{ px: 3 }}>
+          Preview the discovered Trait below. Equipping occupies this slot; permanent Traits remain active without slots.
+        </Typography>
         <DialogContent>
           <List>
             {availableTraits.length > 0 ? (
@@ -211,6 +214,19 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
                 <Typography sx={{p: 2, textAlign: 'center'}} color="text.secondary">No available traits to equip. Learn new traits from NPCs.</Typography>
             )}
           </List>
+          {selectedTraitIdInModal && (() => {
+            const chosen = availableTraits.find(trait => trait.id === selectedTraitIdInModal);
+            return chosen ? (
+              <Alert severity="info" sx={{ mt: 2 }}>
+                Equipping {chosen.name}: {chosen.description}
+                {chosen.essenceCost !== undefined && (
+                  <Typography variant="caption" display="block">
+                    This is a slot change, not the permanent Resonance purchase ({chosen.essenceCost} Essence).
+                  </Typography>
+                )}
+              </Alert>
+            ) : null;
+          })()}
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseTraitSelectionModal}>Cancel</Button>
