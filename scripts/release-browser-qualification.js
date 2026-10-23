@@ -261,8 +261,22 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         }
         await intro.waitFor({ state: 'hidden', timeout: 10000 });
         await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'mobile Current Moment');
-        await assertVisible(mobile.getByRole('button', { name: 'Open game navigation' }), 'mobile navigation open action');
         await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-current-moment.png`), fullPage: true });
+        const responsive = await mobile.evaluate(() => ({
+          innerWidth: window.innerWidth,
+          match: window.matchMedia('(max-width:899.95px)').matches,
+          availableButtons: Array.from(document.querySelectorAll('button')).map(item => ({
+            label: item.getAttribute('aria-label'), text: item.textContent?.trim().slice(0, 60),
+            display: window.getComputedStyle(item).display,
+            visibility: window.getComputedStyle(item).visibility,
+            rect: item.getBoundingClientRect().toJSON(),
+          })).filter(item => item.label?.includes('navigation') || item.text?.includes('Dashboard')),
+        }));
+        try {
+          await assertVisible(mobile.getByRole('button', { name: 'Open game navigation' }), 'mobile navigation open action');
+        } catch (error) {
+          throw new Error(`Mobile navigation trigger missing. Responsive evidence: ${JSON.stringify(responsive)}; ${String(error)}`);
+        }
         await mobile.getByRole('button', { name: 'Open game navigation' }).focus();
         await mobile.keyboard.press('Enter');
         const menu = mobile.getByRole('navigation', { name: 'Mobile navigation menu' });
