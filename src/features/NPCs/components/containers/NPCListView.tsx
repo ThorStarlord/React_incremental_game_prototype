@@ -36,6 +36,7 @@ import { selectHasSeenIntro } from '../../../Meta/state/MetaSlice';
 import { selectPlayerLocation } from '../../../Player/state/PlayerSelectors';
 import { isPlayerAtNpcWorldLocation } from '../../state/NPCWorldLocationDefinitions';
 import { NPC } from '../../state/NPCTypes';
+import { selectRelationshipState } from '../../../Relationships/state/RelationshipSelectors';
 import { NPCListCard } from '../ui/NPCListCard';
 
 interface NPCListViewProps {
@@ -54,6 +55,13 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   const discoveredNPCIds = useAppSelector(selectDiscoveredNPCs);
   const playerLocation = useAppSelector(selectPlayerLocation);
   const hasSeenIntro = useAppSelector(selectHasSeenIntro);
+  const relationships = useAppSelector(selectRelationshipState);
+
+  // Migrated relationships derive Connection from the Relationship authority,
+  // not from NPC.connectionDepth (which remains a legacy compatibility field).
+  const connectionFor = (npc: NPC) => relationships.progressionByNpc[npc.id]?.connectionAuthority === 'relationships'
+    ? (relationships.bondProfilesByNpc[npc.id]?.connectionLevel ?? 0)
+    : (npc.connectionDepth ?? 0);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name');
@@ -98,7 +106,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         });
         break;
       case 'connected':
-        npcList = npcList.filter(npc => npc.connectionDepth > 0);
+        npcList = npcList.filter(npc => connectionFor(npc) > 0);
         break;
       default:
         break;
@@ -118,13 +126,13 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList.sort((a, b) => (b.lastInteraction || 0) - (a.lastInteraction || 0));
         break;
       case 'connection':
-        npcList.sort((a, b) => b.connectionDepth - a.connectionDepth);
+        npcList.sort((a, b) => connectionFor(b) - connectionFor(a));
         break;
       default:
         break;
     }
     return npcList;
-  }, [npcs, discoveredNPCIds, searchTerm, filterBy, sortBy, playerLocation]);
+  }, [npcs, discoveredNPCIds, searchTerm, filterBy, sortBy, playerLocation, relationships]);
 
   const renderNPCListItem = (npc: NPC) => {
     const isSelected = selectedNPCId === npc.id;
@@ -138,15 +146,15 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
           >
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: npc.isAvailable ? 'success.light' : 'grey.500' }}>
-                {npc.avatar ? <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} /> : <Person />}
+                <Person aria-hidden="true" />
               </Avatar>
             </ListItemAvatar>
             <ListItemText primary={npc.name} secondary={npc.location} />
             <ListItemSecondaryAction>
-              <Tooltip title={`Connection Depth: ${npc.connectionDepth}`}>
+              <Tooltip title={`Connection Level: ${connectionFor(npc)}`}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pr: 2 }}>
                   <Star color="action" />
-                  <Typography variant="body2">{npc.connectionDepth}</Typography>
+                  <Typography variant="body2">{connectionFor(npc)}</Typography>
                 </Box>
               </Tooltip>
             </ListItemSecondaryAction>
@@ -231,6 +239,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
                 <NPCListCard
                   key={npc.id}
                   npc={npc}
+                  connectionLevel={connectionFor(npc)}
                   onSelectNPC={onSelectNPC}
                   isSelected={selectedNPCId === npc.id}
                   isGlowing={!hasSeenIntro && filteredAndSortedNPCs.length === 1}

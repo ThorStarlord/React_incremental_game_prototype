@@ -6,6 +6,7 @@ import React from 'react';
 import {
   Grid,
   Card,
+  CardActionArea,
   CardContent,
   Typography,
   Box,
@@ -21,9 +22,10 @@ interface NPCListCardProps {
   onSelectNPC: (npcId: string) => void;
   isSelected: boolean;
   isGlowing?: boolean;
+  connectionLevel?: number;
 }
 
-export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing }) => {
+export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing, connectionLevel }) => {
   const currentTier = getCentralRelationshipTier(npc.affinity);
 
   return (
@@ -48,15 +50,17 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
             '100%': { boxShadow: '0 0 0 0 rgba(255,255,255,0)' },
           },
         }}
-        onClick={() => onSelectNPC(npc.id)}
-        role="button"
-        aria-pressed={isSelected}
-        tabIndex={0}
       >
+        <CardActionArea
+          onClick={() => onSelectNPC(npc.id)}
+          aria-label={`Open ${npc.name}`}
+          aria-current={isSelected ? 'page' : undefined}
+          sx={{ height: '100%' }}
+        >
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
             <Avatar sx={{ width: 48, height: 48, bgcolor: npc.isAvailable ? 'success.light' : 'grey.500', mr: 2 }}>
-              {npc.avatar ? <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} /> : <Person />}
+              <Person aria-hidden="true" />
             </Avatar>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography variant="h6" noWrap>{npc.name}</Typography>
@@ -80,13 +84,14 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
             )}
             <Chip
               icon={<Star fontSize="small" />}
-              label={`${npc.connectionDepth}`}
+              label={`${connectionLevel ?? npc.connectionDepth ?? 0}`}
               size="small"
               variant="outlined"
-              title={`Connection Depth: ${npc.connectionDepth}`}
+              title={`Connection Level: ${connectionLevel ?? npc.connectionDepth ?? 0}`}
             />
           </Box>
         </CardContent>
+        </CardActionArea>
       </Card>
     </Grid>
   );

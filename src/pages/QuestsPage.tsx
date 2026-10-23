@@ -31,10 +31,11 @@ const QuestsPage: React.FC = () => {
   const [params, setParams] = useSearchParams();
   const allQuests = useAppSelector(selectAllQuests);
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<QuestStatus | 'ALL'>('IN_PROGRESS');
+  const [statusFilter, setStatusFilter] = useState<QuestStatus | 'ALL' | 'ACTIONABLE'>('ACTIONABLE');
   const [sortKey, setSortKey] = useState<SortKey>('title');
   const [puzzleModalOpen, setPuzzleModalOpen] = useState(false);
   const [activeObjective, setActiveObjective] = useState<QuestObjective | null>(null);
+  const [puzzleError, setPuzzleError] = useState<string | null>(null);
 
   const queryQuestId = params.get('quest');
   const effectiveQuestId = queryQuestId && allQuests[queryQuestId] ? queryQuestId : selectedQuestId;
@@ -45,6 +46,7 @@ const QuestsPage: React.FC = () => {
     const objective = quest.objectives.find((o) => o.objectiveId === objectiveId);
     if (objective) {
       setActiveObjective(objective);
+      setPuzzleError(null);
       setPuzzleModalOpen(true);
     }
   };
@@ -52,23 +54,34 @@ const QuestsPage: React.FC = () => {
   const handleModalClose = () => {
     setPuzzleModalOpen(false);
     setActiveObjective(null);
+    setPuzzleError(null);
   };
 
-  const handleSolve = (solution: string) => {
-    if (effectiveQuestId && activeObjective) {
-      dispatch(
-        solveQuestPuzzleThunk({
-          questId: effectiveQuestId,
-          objectiveId: activeObjective.objectiveId,
-          solution,
-        }),
-      );
+  const handleSolve = async (solution: string): Promise<boolean> => {
+    if (!effectiveQuestId || !activeObjective) {
+      setPuzzleError('No active Quest objective is selected.');
+      return false;
     }
-    handleModalClose();
+    try {
+      const outcome = await dispatch(solveQuestPuzzleThunk({
+        questId: effectiveQuestId,
+        objectiveId: activeObjective.objectiveId,
+        solution,
+      })).unwrap();
+      if (!outcome.success) {
+        setPuzzleError(outcome.message);
+        return false;
+      }
+      handleModalClose();
+      return true;
+    } catch {
+      setPuzzleError('Could not resolve this puzzle. Your selection has been preserved.');
+      return false;
+    }
   };
 
-  const handleStatusFilterChange = (event: SelectChangeEvent<QuestStatus | 'ALL'>) => {
-    setStatusFilter(event.target.value as QuestStatus | 'ALL');
+  const handleStatusFilterChange = (event: SelectChangeEvent<QuestStatus | 'ALL' | 'ACTIONABLE'>) => {
+    setStatusFilter(event.target.value as QuestStatus | 'ALL' | 'ACTIONABLE');
   };
 
   const handleSortKeyChange = (event: SelectChangeEvent<SortKey>) => {
@@ -78,8 +91,10 @@ const QuestsPage: React.FC = () => {
   const filteredAndSortedQuests = useMemo(() => {
     let quests = Object.values(allQuests);
 
-    if (statusFilter !== 'ALL') {
-      quests = quests.filter((quest) => quest.status === statusFilter);
+    if (statusFilter === 'ACTIONABLE') {
+      quests = quests.filter(quest => quest.status === 'IN_PROGRESS' || quest.status === 'READY_TO_COMPLETE');
+    } else if (statusFilter !== 'ALL') {
+      quests = quests.filter(quest => quest.status === statusFilter);
     }
 
     quests.sort((a, b) => {
@@ -115,6 +130,7 @@ const QuestsPage: React.FC = () => {
                 <FormControl size="small" sx={{ minWidth: 120 }}>
                   <InputLabel>Status</InputLabel>
                   <Select value={statusFilter} label="Status" onChange={handleStatusFilterChange}>
+                    <MenuItem value="ACTIONABLE">Active & Ready</MenuItem>
                     <MenuItem value="ALL">All</MenuItem>
                     <MenuItem value="NOT_STARTED">Not Started</MenuItem>
                     <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
@@ -187,6 +203,7 @@ const QuestsPage: React.FC = () => {
         onClose={handleModalClose}
         objective={activeObjective}
         onSolve={handleSolve}
+        error={puzzleError}
       />
     </Container>
   );
