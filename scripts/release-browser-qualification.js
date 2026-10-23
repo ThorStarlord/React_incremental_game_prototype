@@ -222,6 +222,14 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       const navigation = page.getByRole('button', { name: /^Navigate to / }).first();
       await assertVisible(navigation, 'game navigation control');
     });
+    await check('world-first-location-and-actions-visible', async () => {
+      const moment = page.locator('[data-testid="current-moment"]');
+      await assertVisible(moment, 'world-first Current Moment');
+      await assertVisible(moment.getByRole('heading', { name: 'Current Moment' }), 'Current Moment heading');
+      await assertVisible(moment.getByRole('link', { name: 'Find Elder Willow' }), 'opening story lead');
+      await assertVisible(page.getByRole('button', { name: 'Travel to City Gate' }), 'legal world travel');
+      await page.screenshot({ path: path.join(outDir, `${name}-first-session.png`), fullPage: true });
+    });
 
     await check('invalid-route-recovers', async () => {
       await page.goto(new URL('/route-that-does-not-exist', options.url).toString(), {
