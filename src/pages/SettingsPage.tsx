@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Container,
   Typography,
@@ -8,17 +8,14 @@ import {
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
-  selectAudioSettings,
   selectGraphicsSettings,
   selectGameplaySettings,
   selectUISettings,
   updateCategorySettings,
   resetSettings,
-  loadSettingsThunk,
   saveSettingsThunk
 } from '../features/Settings';
 
-import { AudioSettingsPanel } from '../features/Settings/components/ui/AudioSettingsPanel';
 import { GraphicsSettingsPanel } from '../features/Settings/components/ui/GraphicsSettingsPanel';
 import { GameplaySettingsPanel } from '../features/Settings/components/ui/GameplaySettingsPanel';
 import { UISettingsPanel } from '../features/Settings/components/ui/UISettingsPanel';
@@ -38,21 +35,11 @@ const SettingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   // Settings selectors
-  const audioSettings = useAppSelector(selectAudioSettings);
   const graphicsSettings = useAppSelector(selectGraphicsSettings);
   const gameplaySettings = useAppSelector(selectGameplaySettings);
   const uiSettings = useAppSelector(selectUISettings);
 
-  // Load settings on component mount
-  useEffect(() => {
-    dispatch(loadSettingsThunk());
-  }, [dispatch]);
-
-  // Category update handlers with proper type safety
-  const handleAudioUpdate = (newSettings: Partial<typeof audioSettings>) => {
-    dispatch(updateCategorySettings({ category: 'audio', settings: newSettings }));
-    dispatch(saveSettingsThunk());
-  };
+  // Settings are loaded once at application startup, not per-page mount.
 
   const handleGraphicsUpdate = (newSettings: Partial<typeof graphicsSettings>) => {
     dispatch(updateCategorySettings({ category: 'graphics', settings: newSettings }));
@@ -87,17 +74,13 @@ const SettingsPage: React.FC = () => {
       </Box>
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        <AlertTitle>Settings Auto-Save</AlertTitle>
-        Settings changes are automatically saved and will persist across game sessions.
+        <AlertTitle>Live Appearance Preferences</AlertTitle>
+        Changes to dark mode and text size take effect immediately and persist between sessions.
+        Audio playback and graphics quality controls are not offered because the
+        current game does not have an engine implementing those settings.
       </Alert>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        {/* Audio Settings */}
-        <AudioSettingsPanel
-          settings={audioSettings}
-          onUpdate={handleAudioUpdate}
-        />
-
         {/* Graphics Settings */}
         <GraphicsSettingsPanel
           settings={graphicsSettings}
