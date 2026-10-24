@@ -10,19 +10,21 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
   const referenceActions = moment.actions.filter(action => action.kind === 'reference');
 
   return (
-    <Card variant="outlined" data-testid="current-moment" sx={{ mb: 2, borderColor: 'primary.light' }}>
+    <Card variant="outlined" data-testid="current-moment" sx={{ mb: 2, borderColor: 'primary.light', borderTop: 4, borderTopColor: 'primary.main' }}>
       <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-        <Typography variant="overline" color="primary.main">Current place</Typography>
+        <Typography variant="overline" color="primary.main">Explorer's journal · Current place</Typography>
         <Typography variant="h5" component="h2" gutterBottom>Current Moment</Typography>
-        <Typography variant="h6" component="h3">You are in {moment.locationName}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{moment.locationDescription}</Typography>
-        <Typography variant="body1" sx={{ mb: 2 }}>{moment.situation}</Typography>
+        <Box sx={{ p: { xs: 1.5, md: 2 }, mb: 2, borderRadius: 2, backgroundColor: 'action.hover' }}>
+          <Typography variant="h6" component="h3">You are in {moment.locationName}</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{moment.locationDescription}</Typography>
+          <Typography variant="body1">{moment.situation}</Typography>
+        </Box>
 
         <Typography variant="subtitle2" gutterBottom>What you can do here</Typography>
         <Stack direction={{ xs: 'column', md: 'row' }} gap={1.5} flexWrap="wrap" sx={{ mb: 2 }}>
           {immediateActions.map(action => (
             <Paper key={action.id} variant="outlined" sx={{ p: 1.5, flex: { xs: '1 1 auto', md: '1 1 190px' }, width: { xs: '100%', md: 'auto' }, minWidth: 0 }}>
-              <Button size="small" variant={action.kind === 'encounter' ? 'contained' : 'outlined'} component={RouterLink} to={action.to}>
+              <Button size="small" variant={action.kind === 'encounter' || action.id === 'prologue-travel' ? 'contained' : 'outlined'} component={RouterLink} to={action.to}>
                 {action.label}
               </Button>
               <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
@@ -77,10 +79,10 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
         {moment.consequences.length ? (
           <Stack spacing={1}>
             {moment.consequences.map(change => (
-              <Box key={change.id}>
+              <Paper key={change.id} variant="outlined" sx={{ p: 1.5, borderLeft: 3, borderLeftColor: 'primary.main', backgroundColor: 'background.paper' }}>
                 <Typography variant="body2" fontWeight={600}>{change.title}</Typography>
                 <Typography variant="body2" color="text.secondary">{change.explanation}</Typography>
-              </Box>
+              </Paper>
             ))}
           </Stack>
         ) : (

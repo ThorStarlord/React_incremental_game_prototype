@@ -1,5 +1,5 @@
 import type { RootState } from '../../app/store';
-import { getConnectedLocationDefinitions, getLocationDefinition, resolveCanonicalLocationId } from '../Exploration/LocationDefinitions';
+import { CITY_CENTER_LOCATION_ID, CITY_GATE_LOCATION_ID, getConnectedLocationDefinitions, getLocationDefinition, resolveCanonicalLocationId } from '../Exploration/LocationDefinitions';
 import { isPlayerAtNpcWorldLocation } from '../NPCs/state/NPCWorldLocationDefinitions';
 import { selectAvailableNPCDialogueChoices } from '../NPCs/state/NPCSelectors';
 import { CHAPTER_DEFINITIONS } from './ChapterDefinitions';
@@ -88,7 +88,11 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
       actions.push({
         id: 'prologue-travel',
         label: 'Find Elder Willow',
-        description: 'Use the travel controls to reach the Whispering Woods.',
+        description: locationId === CITY_CENTER_LOCATION_ID
+          ? 'The road to Willow begins at City Gate. Choose Travel to City Gate below.'
+          : locationId === CITY_GATE_LOCATION_ID
+            ? 'Continue from City Gate to Whispering Woods using Travel below.'
+            : 'Use the existing authored travel routes to reach Whispering Woods. If already there, look for an available conversation.',
         to: '/game/dashboard#travel-controls',
         kind: 'travel',
       });

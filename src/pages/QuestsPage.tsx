@@ -19,6 +19,7 @@ import {
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectAllQuests, selectQuestById } from '../features/Quest/state/QuestSelectors';
 import { Quest, QuestObjective, QuestStatus } from '../features/Quest/state/QuestTypes';
+import { questStatusLabel } from '../features/Quest/state/QuestPresentation';
 import { getTimeRemaining } from '../shared/utils/time';
 import { solveQuestPuzzleThunk } from '../features/Quest/state/QuestThunks';
 import QuestPuzzleModal from '../features/Quest/components/ui/QuestPuzzleModal';
@@ -157,7 +158,7 @@ const QuestsPage: React.FC = () => {
                       setParams({ quest: quest.id });
                     }}
                   >
-                    <ListItemText primary={quest.title} secondary={quest.status} />
+                    <ListItemText primary={quest.title} secondary={questStatusLabel(quest.status)} />
                   </ListItemButton>
                 ))}
               </List>
@@ -172,7 +173,7 @@ const QuestsPage: React.FC = () => {
                 <>
                   <Typography variant="h5">{selectedQuest.title}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Status: {selectedQuest.status}
+                    Status: {questStatusLabel(selectedQuest.status)}
                   </Typography>
                   {renderTimeRemaining(selectedQuest)}
                   <Typography sx={{ mt: 2 }}>{selectedQuest.description}</Typography>

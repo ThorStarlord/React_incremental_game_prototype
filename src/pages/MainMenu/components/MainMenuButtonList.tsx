@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { type SavedGame } from '../../../hooks/useSavedGames';
 // Update import path for formatting functions
-import { formatPlaytime, formatSaveDate } from '../../../shared/utils/formatUtils';
+import { formatPlaytime, formatSaveDate, formatSaveName } from '../../../shared/utils/formatUtils';
 
 interface MainMenuButtonListProps {
   mostRecentSave: SavedGame | null;
@@ -44,7 +44,7 @@ export function MainMenuButtonList({
           <>
             Continue
             <Typography component="span" variant="caption" sx={{ display: 'block', opacity: 0.85, lineHeight: 1.4 }}>
-              {mostRecentSave.name} • {formatPlaytime(mostRecentSave.playtime)}
+              {formatSaveName(mostRecentSave.name)} • {formatPlaytime(mostRecentSave.playtime)}
               <br />
               {formatSaveDate(mostRecentSave.timestamp)}
             </Typography>

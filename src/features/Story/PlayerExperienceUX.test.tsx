@@ -9,7 +9,7 @@ import { setLocation } from '../Player/state/PlayerSlice';
 import { setNPCs, setDialogueNodes } from '../NPCs/state/NPCSlice';
 import { addQuest } from '../Quest/state/QuestSlice';
 import { recordRelationshipExperience } from '../Relationships/state/RelationshipSlice';
-import { CITY_CENTER_LOCATION_ID, WHISPERING_WOODS_LOCATION_ID } from '../Exploration/LocationDefinitions';
+import { CITY_CENTER_LOCATION_ID, CITY_GATE_LOCATION_ID, WHISPERING_WOODS_LOCATION_ID } from '../Exploration/LocationDefinitions';
 import { selectCurrentMoment } from './CurrentMomentSelectors';
 import { selectOpenCopyExceptions } from './PlayerInsightSelectors';
 import { CurrentMomentPanel } from './components/CurrentMomentPanel';
@@ -26,9 +26,20 @@ test('initial situation does not invent contacts or expose future narrative rout
   const moment = selectCurrentMoment(store.getState());
   expect(moment.locationName).toBe('City Center');
   expect(moment.actions[0].label).toBe('Find Elder Willow');
+  expect(moment.actions[0].description).toMatch(/City Gate/);
   expect(moment.actions[0].to).toBe('/game/dashboard#travel-controls');
   expect(moment.consequences).toHaveLength(0);
   expect(moment.actions.some(action => /Lyra|Elara/.test(action.label))).toBe(false);
+});
+
+test('the Willow route hint follows the legal next step without granting travel or revealing another contact', () => {
+  const store = makeStore();
+  store.dispatch(setHasSeenIntro(true));
+  store.dispatch(setLocation(CITY_GATE_LOCATION_ID));
+  const moment = selectCurrentMoment(store.getState());
+  expect(moment.actions[0].description).toMatch(/Whispering Woods/);
+  expect(moment.actions[0].to).toBe('/game/dashboard#travel-controls');
+  expect(moment.storyContacts).toEqual([]);
 });
 
 test('a known nearby contact without an available topic is inspectable but not falsely advertised as a conversation', () => {

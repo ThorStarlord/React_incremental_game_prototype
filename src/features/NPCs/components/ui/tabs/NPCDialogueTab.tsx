@@ -102,7 +102,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
             <Box key={msg.id} sx={{ mb: 2 }}>
               <Paper
                 elevation={1}
-                sx={{ p: 1.5, bgcolor: msg.playerText ? 'primary.light' : 'grey.100', color: msg.playerText ? 'primary.contrastText' : 'text.primary' }}
+                sx={{ p: 1.5, bgcolor: msg.playerText ? 'primary.main' : 'background.default', color: msg.playerText ? 'primary.contrastText' : 'text.primary' }}
               >
                 <Typography variant="body2">
                   {msg.playerText || msg.npcResponse}
