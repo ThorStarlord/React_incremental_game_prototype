@@ -1,7 +1,15 @@
 # UI Phase 2 — Source, responsibility, and qualification
 
+## 2026-10-24 — Final UI2/UI3 qualification and integration
+**Integrated state:** PR #181 merged on main at `41037697019dc7dcb8c9256d37002f230f737c26` (exact qualifying PR head `e1f32ca70d231b0f415032bc50c0ac29d5a08fcf`).
+**Final gate:** Build Validation #40090580707 **PASS** across focused UI2/UI3 regressions, all historical/chapter/Copy/Trait/Quest qualification, TypeScript, production build and real browser matrix including mobile and desktop geometry. The ordinary-UI Campaign One artifact reports **PASS** for Distributed Dissipation 105/105 and Fortified Containment 104/104 in **both Chromium and Firefox**, four save/Continue checkpoints and export/import verification per route.
+**Intermediate failure:** Earlier head `fa82a862` timed out while accepting Elara's Lost Tome in Firefox Distributed; all other three routes passed. Later exact-head full 2x2 run passed. Preserve as a non-reproduced intermittent reliability observation rather than claiming either a proven product bug or perfect reliability.
+**Excluded:** actual human usability comprehension and 1.1 universal Trait save schema. Neither was established by CI; the original `v1.0.0` tag is not amended.
+**Disposition:** all authorized UI2/UI3 source work integrated. The 'pending qualification' language lower in this document describes the pre-merge construction interval, not an active blocker.
+
+
 **Date:** 2026-10-23. **Owner scope:** UI correctness and world-first experience within Campaign One.
-**PR:** #181 (`codex/ui2-world-first-experience-20261023`), draft / exact-head qualification pending.
+**PR:** #181 (`codex/ui2-world-first-experience-20261023`) **merged** into `main` at `41037697019dc7dcb8c9256d37002f230f737c26` after exact-head `e1f32ca70d231b0f415032bc50c0ac29d5a08fcf` Build Validation `40090580707` **PASS**.
 **Main baseline:** `4259e94573d189228af5ab71cf29ce7c5ab3c2d5`; original `v1.0.0` unchanged.
 **Claim ceiling:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`, `BETA_PASS=NO`.
 

@@ -1,5 +1,12 @@
 # Handoff — Campaign One 1.0 Released
 
+## 2026-10-24 — Current re-entry: UI2/UI3 merged
+- `main = 41037697019dc7dcb8c9256d37002f230f737c26` after merged PR #181. Qualified exact PR head `e1f32ca70d231b0f415032bc50c0ac29d5a08fcf` via full Build Validation #40090580707 (both real browsers, both authored campaign outcomes, saves and import/export all green). The original `v1.0.0` tag is unchanged.
+- The earlier 2026-10-23/24 *draft / pending* handoff sections below are historical, not the current next responsibility. Source/verification map: `docs/ui/Phase2Implementation.md`; human participation procedure: `docs/ui/Phase2HumanEvaluation.md`.
+- Current boundary: UI2/UI3 implementation/qualification **completed**; no more mandatory repository changes from that selected package. Fresh participant comprehension evidence remains external and **not supplied** (`HUMAN-UNVALIDATED / BETA_PASS=NO`). Continue ordinary bounded 1.0 defect repairs only when new evidence warrants them; do not restart a broad UI rewrite.
+- 1.1 PR #178 and stacked #180/#182 remain independent, unqualified and must not be considered part of this merged 1.0-based UI.
+
+
 ## 2026-10-24 — UI3 bounded continuation
 - PR #181 earlier exact head `9f535361` passed full Build Validation #40058927308; owner-requested UI3 repairs modify it and therefore **invalidate reuse of that PASS for the new head**.
 - Continue from `codex/ui2-world-first-experience-20261023`. Current task: verify `UI3LayoutAndSettings.test.tsx`, `UI3WorldTruth.test.tsx`, then full exact-head Build Validation (desktop/sidebar spacing, mobile cards, theme, real Gameplay settings, NPC world vs story contacts, Trait slots, 2x2 campaign and saves). Repair failing causes; never relax gates to obtain green.

@@ -1,5 +1,11 @@
 # Documentation Authority Index
 
+## 2026-10-24 — Current integrated UI2/UI3 authority
+- PR #181 **merged** at main `41037697019dc7dcb8c9256d37002f230f737c26` after exact-head `e1f32ca70` Build Validation #40090580707 **PASS**. The old candidate/pending sections below are historical snapshots, not operative work selection.
+- `specification/UI_UX/PlayerExperienceContract.md` and `LayoutDesign.md` remain scope/layout authority; `docs/ui/Phase2Implementation.md` is now the *qualified implementation evidence record*, not an open PR plan. `docs/ui/Phase2HumanEvaluation.md` is an unexecuted external study protocol.
+- Original tagged `v1.0.0` remains immutable. The current `main` carries later work without rewriting that tag. Human `BETA_PASS=NO`, `FEATURE_COMPLETE / HUMAN-UNVALIDATED`, and unrelated 1.1 Trait PRs remain outside the qualified UI changes.
+
+
 ## 2026-10-24 — UI3 review-response authority
 - `docs/ui/Phase2Implementation.md` remains the scope/verification map for PR #181; UI3's concrete repair trace and required gates are appended there.
 - `docs/ui/Phase2HumanEvaluation.md` is a *procedure* for future external participant evidence, not a result.
