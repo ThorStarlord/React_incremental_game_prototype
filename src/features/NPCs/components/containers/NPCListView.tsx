@@ -59,7 +59,17 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
 
   // Migrated relationships derive Connection from the Relationship authority,
   // not from NPC.connectionDepth (which remains a legacy compatibility field).
-  const connectionFor = (npc: NPC) => relationships.progressionByNpc[npc.id]?.connectionAuthority === 'relationships'
+  const isMigrated = (npc: NPC) => relationships.progressionByNpc[npc.id]?.connectionAuthority === 'relationships';
+  const affinityFor = (npc: NPC) => isMigrated(npc)
+    ? (relationships.bondProfilesByNpc[npc.id]?.dimensions.affinity ?? 0)
+    : npc.affinity;
+  const bondLabelFor = (npc: NPC): string | undefined => {
+    if (!isMigrated(npc)) return undefined;
+    const profile = relationships.bondProfilesByNpc[npc.id];
+    return profile?.bondArchetypes[profile.bondArchetypes.length - 1] ||
+      ((profile?.connectionLevel ?? 0) > 0 ? 'Meaningful Connection' : 'Unformed Connection');
+  };
+  const connectionFor = (npc: NPC) => isMigrated(npc)
     ? (relationships.bondProfilesByNpc[npc.id]?.connectionLevel ?? 0)
     : (npc.connectionDepth ?? 0);
   
@@ -97,7 +107,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList = npcList.filter(npc => npc.isAvailable);
         break;
       case 'high_relationship':
-        npcList = npcList.filter(npc => npc.affinity >= 60);
+        npcList = npcList.filter(npc => affinityFor(npc) >= 60);
         break;
       case 'same_location':
         npcList = npcList.filter(npc => {
@@ -117,7 +127,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'relationship':
-        npcList.sort((a, b) => b.affinity - a.affinity);
+        npcList.sort((a, b) => affinityFor(b) - affinityFor(a));
         break;
       case 'location':
         npcList.sort((a, b) => a.location.localeCompare(b.location));
@@ -200,7 +210,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
               <Select value={filterBy} label="Filter By" onChange={(e) => setFilterBy(e.target.value as FilterOption)}>
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="available">Available</MenuItem>
-                <MenuItem value="high_relationship">High Affinity</MenuItem>
+                <MenuItem value="high_relationship">High Affinity (authoritative)</MenuItem>
                 <MenuItem value="same_location">Same Location</MenuItem>
                 <MenuItem value="connected">Connected</MenuItem>
               </Select>
@@ -238,6 +248,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
                   key={npc.id}
                   npc={npc}
                   connectionLevel={connectionFor(npc)}
+                  bondLabel={bondLabelFor(npc)}
                   onSelectNPC={onSelectNPC}
                   isSelected={selectedNPCId === npc.id}
                   isGlowing={!hasSeenIntro && filteredAndSortedNPCs.length === 1}

@@ -69,7 +69,7 @@ const SettingsPage: React.FC = () => {
           Settings
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Configure your game preferences and experience
+          Configure working appearance and autosave preferences
         </Typography>
       </Box>
 
@@ -78,6 +78,7 @@ const SettingsPage: React.FC = () => {
         Changes to dark mode and text size take effect immediately and persist between sessions.
         Audio playback and graphics quality controls are not offered because the
         current game does not have an engine implementing those settings.
+        Difficulty and tutorial-hint toggles are also hidden until those options have a real effect.
       </Alert>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>

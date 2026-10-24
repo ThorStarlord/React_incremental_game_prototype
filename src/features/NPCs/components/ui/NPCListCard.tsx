@@ -23,9 +23,10 @@ interface NPCListCardProps {
   isSelected: boolean;
   isGlowing?: boolean;
   connectionLevel?: number;
+  bondLabel?: string;
 }
 
-export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing, connectionLevel }) => {
+export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing, connectionLevel, bondLabel }) => {
   const currentTier = getCentralRelationshipTier(npc.affinity);
 
   return (
@@ -72,7 +73,9 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
             {npc.description || 'No description available.'}
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {currentTier && (
+            {bondLabel ? (
+              <Chip size="small" label={bondLabel} variant="outlined" color="primary" />
+            ) : currentTier && (
               <Chip
                 size="small"
                 label={currentTier.name}

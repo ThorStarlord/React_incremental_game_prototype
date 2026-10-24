@@ -21,7 +21,7 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
         <Typography variant="subtitle2" gutterBottom>What you can do here</Typography>
         <Stack direction={{ xs: 'column', md: 'row' }} gap={1.5} flexWrap="wrap" sx={{ mb: 2 }}>
           {immediateActions.map(action => (
-            <Paper key={action.id} variant="outlined" sx={{ p: 1.5, flex: '1 1 190px', minWidth: 0 }}>
+            <Paper key={action.id} variant="outlined" sx={{ p: 1.5, flex: { xs: '1 1 auto', md: '1 1 190px' }, width: { xs: '100%', md: 'auto' }, minWidth: 0 }}>
               <Button size="small" variant={action.kind === 'encounter' ? 'contained' : 'outlined'} component={RouterLink} to={action.to}>
                 {action.label}
               </Button>

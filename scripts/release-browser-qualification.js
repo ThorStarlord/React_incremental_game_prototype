@@ -218,9 +218,17 @@ async function runBrowserQualification(name, browserType, options, outDir) {
     });
 
     await check('game-navigation-visible', async () => {
-      await assertVisible(page.getByRole('main').first(), 'game main landmark');
+      const main = page.getByRole('main').first();
+      await assertVisible(main, 'game main landmark');
       const navigation = page.getByRole('button', { name: /^Navigate to / }).first();
       await assertVisible(navigation, 'game navigation control');
+      const navBounds = await navigation.boundingBox();
+      const mainBounds = await main.boundingBox();
+      // A flex sidebar already occupies its own width; never add that width
+      // again as a left margin. The old layout left a ~240px empty column.
+      if (!navBounds || !mainBounds || mainBounds.x > navBounds.x + navBounds.width + 40) {
+        throw new Error(`Unexpected desktop sidebar gap: nav=${JSON.stringify(navBounds)} main=${JSON.stringify(mainBounds)}`);
+      }
     });
     await check('world-first-location-and-actions-visible', async () => {
       const moment = page.locator('[data-testid="current-moment"]');
