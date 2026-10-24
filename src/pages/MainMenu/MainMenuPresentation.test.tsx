@@ -5,6 +5,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ExportDialog } from './dialogs/ExportDialog';
 import { DeleteConfirmationDialog } from './dialogs/DeleteConfirmationDialog';
 import { MainMenuButtonList } from './components/MainMenuButtonList';
+import { LoadGameDialog } from './dialogs/LoadGameDialog';
 
 /**
  * Release regression (KD-015): the main menu and its save dialogs used
@@ -55,6 +56,18 @@ describe('main menu presentation', () => {
     }
     expect(screen.getByRole('button', { name: 'Continue (No Saves)' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled();
+  });
+
+  test('Load Game displays readable autosave names while loading the unchanged ID', () => {
+    const onLoad = jest.fn();
+    render(<LoadGameDialog isOpen savedGames={[{
+      id: 'save_abc', name: 'Autosave_exit_1792842045257', timestamp: 1792842045257,
+      playerLevel: 1,
+    }]} isLoading={false} onLoad={onLoad} onDelete={noop} onClose={noop} />);
+    expect(screen.getByText('Exit autosave')).toBeInTheDocument();
+    expect(screen.queryByText('Autosave_exit_1792842045257')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('Exit autosave'));
+    expect(onLoad).toHaveBeenCalledWith('save_abc');
   });
 
   test('main menu sources do not depend on Tailwind utility classes', () => {

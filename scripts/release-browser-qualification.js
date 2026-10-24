@@ -308,6 +308,23 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         await menu.getByRole('button', { name: 'Navigate to Quests' }).click();
         await mobile.waitForURL(/\/game\/quests$/, { timeout: 10000 });
         await assertVisible(mobile.getByRole('heading', { name: 'Quest Log' }), 'mobile Quest page');
+        // Verify the real appearance control and a second narrow viewport.
+        await mobile.getByRole('button', { name: 'Open game navigation' }).click();
+        await menu.getByRole('button', { name: 'Navigate to Settings' }).click();
+        await mobile.waitForURL(/\/game\/settings$/, { timeout: 10000 });
+        const darkMode = mobile.getByRole('checkbox', { name: 'Dark mode' });
+        await assertVisible(darkMode, 'Dark mode setting');
+        if (!(await darkMode.isChecked())) await darkMode.check();
+        await mobile.getByRole('button', { name: 'Open game navigation' }).click();
+        await menu.getByRole('button', { name: 'Navigate to Dashboard' }).click();
+        await mobile.waitForURL(/\/game\/dashboard$/, { timeout: 10000 });
+        await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'dark-mode current location');
+        await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-dark-current-moment.png`), fullPage: true });
+        for (const width of [320, 375, 768]) {
+          await mobile.setViewportSize({ width, height: 800 });
+          const overflow = await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
+          if (overflow) throw new Error(`Horizontal overflow at ${width}px viewport`);
+        }
       } finally {
         await mobileContext.close();
       }
