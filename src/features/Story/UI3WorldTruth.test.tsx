@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { cleanup, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { rootReducer } from '../../app/store';
 import { setHasSeenIntro } from '../Meta/state/MetaSlice';
 import { setLocation } from '../Player/state/PlayerSlice';
@@ -10,7 +10,6 @@ import { setNPCs, setDialogueNodes } from '../NPCs/state/NPCSlice';
 import { CITY_CENTER_LOCATION_ID } from '../Exploration/LocationDefinitions';
 import { recordRelationshipExperience } from '../Relationships/state/RelationshipSlice';
 import { selectCurrentMoment } from './CurrentMomentSelectors';
-import { CurrentMomentPanel } from './components/CurrentMomentPanel';
 import NPCPanelContainer from '../NPCs/components/containers/NPCPanelContainer';
 
 afterEach(cleanup);
@@ -38,14 +37,11 @@ test('unanchored story characters are not represented as physically present or l
     sourceType: 'dialogue', significance: 'meaningful', relationshipEffects: {},
     resonanceTags: [], timestamp: Date.now(), memoryCandidate: false,
   } as any));
-  // This fixture does not assume that a single synthetic experience advances
-  // the authored prologue. The same rule applies whenever the chapter stage
-  // remains PROLOGUE.
-  if (selectCurrentMoment(store.getState()).storyContacts.length > 0) {
-    const contact = selectCurrentMoment(store.getState()).storyContacts[0];
-    expect(contact.to).toBe('/game/npcs/npc_scholar_elara?view=dialogue');
-    expect(contact.description).toMatch(/not established/i);
-  }
+  const contacts = selectCurrentMoment(store.getState()).storyContacts;
+  expect(contacts).toHaveLength(1);
+  expect(contacts[0].to).toBe('/game/npcs/npc_scholar_elara?view=dialogue');
+  expect(contacts[0].description).toMatch(/not established/i);
+  expect(selectCurrentMoment(store.getState()).actions.some(action => action.label.includes('Scholar Elara'))).toBe(false);
 });
 
 test('unanchored NPC profile never claims verified physical presence', () => {
@@ -58,10 +54,10 @@ test('unanchored NPC profile never claims verified physical presence', () => {
     } as any,
   }));
   render(<Provider store={store}><MemoryRouter initialEntries={['/game/npcs/npc_scholar_elara']}>
-    <NPCPanelContainer />
+    <Routes><Route path="/game/npcs/:npcId" element={<NPCPanelContainer />} /></Routes>
   </MemoryRouter></Provider>);
-  // Routing useParams is tested end-to-end by the full browser qualification;
-  // this unit case guards only against accidental "nearby" copy.
+  expect(screen.getByTestId('npc-unanchored-story-location')).toHaveTextContent('no confirmed position');
+  expect(screen.getByText(/Story contact — Grand Library/)).toBeInTheDocument();
   expect(screen.queryByText(/Present — Grand Library/)).not.toBeInTheDocument();
 });
 

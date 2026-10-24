@@ -48,3 +48,12 @@ test('migrated character cards show canonical bond identity rather than legacy A
   expect(screen.getByText('Meaningful Connection')).toBeInTheDocument();
   expect(screen.queryByText('Hostile')).not.toBeInTheDocument();
 });
+
+test('1.0 trait management does not claim a proximity requirement the reducer does not enforce', () => {
+  const container = read('src/features/Traits/components/containers/TraitSlotsContainer.tsx');
+  const surface = read('src/features/Traits/components/ui/TraitSlotsUI.tsx');
+  expect(container).toContain('const canManageSlots = !isLoading');
+  expect(container).not.toContain('selectIsInProximityToNPC');
+  expect(surface).not.toContain('You must be in close proximity');
+  expect(surface).toContain('Slot preview (before → after)');
+});
