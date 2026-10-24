@@ -6,10 +6,10 @@ Owner approved the fresh UI review's concrete repair response, within the existi
 
 ## 2026-10-23 — UI2 owner-approved supplement
 
-The 2026-10-21 UI program was qualified and merged via PR #179; its earlier candidate-only status label below is historical. Owner additionally approved bounded UI2: only actual dialogue availability creates primary encounter actions; current legal travel and authored encounters sit by Current Moment; chapter walkthroughs and advanced statistics can be expanded; settings controls must have real effects; NPC links use canonical relationship authority and keyboard access; puzzle error/Force It, Copy exceptions, and 1.0 Traits stay truthful. The candidate is draft PR #181 and must pass exact-head Build Validation before promotion. See `docs/ui/Phase2Implementation.md`. PR #178/#180 universal expression work remains separate; no new gameplay state or human claims.
+The 2026-10-21 UI program was qualified and merged via PR #179; its earlier candidate-only status label below is historical. Owner additionally approved bounded UI2: only actual dialogue availability creates primary encounter actions; current legal travel and authored encounters sit by Current Moment; chapter walkthroughs and advanced statistics can be expanded; settings controls must have real effects; NPC links use canonical relationship authority and keyboard access; puzzle error/Force It, Copy exceptions, and 1.0 Traits stay truthful. The follow-on source passed exact-head Build Validation #40090580707 and merged through PR #181. This is a post-release main update, not an amendment of the original v1.0.0 tag. See `docs/ui/Phase2Implementation.md`. PR #178/#180 universal expression work remains separate; no new gameplay state or human claims.
 
 
-**Status:** Implementation candidate (2026-10-21); exact-head Build Validation and human evidence pending. This is not a v1.0.0 release amendment.
+**Status:** UI2/UI3 implementation on `main` (merged PR #181, Build Validation #40090580707 PASS); independent human comprehension evidence remains pending. This is not a v1.0.0 tag amendment.
 
 ## Product identity
 

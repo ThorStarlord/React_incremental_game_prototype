@@ -1,5 +1,14 @@
 # Repository Status — Campaign One 1.0 Released
 
+## 2026-10-24 — UI2/UI3 integrated on main (qualified)
+- [PR #181](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/181) **merged** at `41037697019dc7dcb8c9256d37002f230f737c26`. Its exact-head `e1f32ca70d231b0f415032bc50c0ac29d5a08fcf` passed [Build Validation #40090580707](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40090580707), including UI3 targeted tests, TypeScript, Chromium/Firefox real browser navigation and the complete two-route/2-browser ordinary-UI campaign (105 Distributed steps and 104 Fortified steps per browser, four save/Continue checkpoints each, export/import verified). No new 1.0.0 release tag was created; the immutable original `v1.0.0` still points to `14ce21e2`.
+- Implementation: world-first Current Moment, truthful spatial/story contact availability, player-facing eight-chapter situation prose, NPC and relationship authority repair, Quest/Copies/Traits/Settings trust, mobile and desktop spacing, visual contrast, real browser regression coverage.
+- The earlier Firefox Distributed acceptance timeout on intermediate PR head `fa82a862` was retained as a reliability observation, **not** labeled a persistent reproduced bug; all four routes passed on the qualified exact head. Investigate if it recurs.
+- **Evidence ceiling unchanged:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`, `BETA_PASS=NO`; no genuine player study was performed. `docs/ui/Phase2HumanEvaluation.md` is the protocol for external first sessions and full campaigns.
+- Separate v1.1 universal Trait migration PR #178 remains unqualified/conflicted; stacked #180/#182 remain separate. No new 1.1 semantic authority was introduced by UI2/UI3.
+- The 2026-10-23/early-2026-10-24 candidate entries below are **historical snapshots**; do not treat them as an active backlog or unmerged PR.
+
+
 ## 2026-10-24 — UI3 review repairs on UI2 candidate
 - Previous exact-head **PR #181** Build Validation `40058927308` **passed** on `9f535361` (including real browser matrix and divergent campaign histories). `main` remained `4259e945`; the original `v1.0.0` tag remains immutable.
 - Owner then requested autonomous implementation of the fresh adversarial UI review. Further commits on PR #181 repair doubled desktop flex margin, mobile action sizing, dark-menu title contrast, inert Gameplay Settings, migrated bond presentation, story-contact spatial truth, situational Current Moment language, and legacy Trait-slot proximity messaging and effects preview.

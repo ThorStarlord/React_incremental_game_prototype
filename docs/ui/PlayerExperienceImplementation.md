@@ -2,7 +2,7 @@
 
 ## 2026-10-23 — Reconciled original UX program
 
-PR #179 passed exact-head full Build Validation and merged into current main. The table below is retained as the evidence mapping of the earlier UX-A–H work, not a list of still-open candidate construction steps. For the newly selected world-first work and its pending qualification see `docs/ui/Phase2Implementation.md` (draft PR #181). Neither PR amends original tagged `v1.0.0` or establishes human usability.
+PR #179 passed exact-head full Build Validation and merged into current main. The table below is retained as the evidence mapping of the earlier UX-A–H work, not a list of still-open candidate construction steps. The follow-on world-first work is now merged via qualified PR #181; see `docs/ui/Phase2Implementation.md` for actual source and exact-head evidence. Neither PR amends original tagged `v1.0.0` or establishes human usability.
 
 
 **Source:** prior adversarial UI review and selected 2026-10-21 implementation plan.
