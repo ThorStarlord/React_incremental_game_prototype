@@ -42,6 +42,7 @@ import { equipTrait } from '../../../../Player/state/PlayerSlice';
 import { updateNPCRelationshipThunk } from '../../../state/NPCThunks';
 import { recalculateStatsThunk } from '../../../../Player/state/PlayerThunks';
 import type { NPC } from '../../../state/NPCTypes';
+import { selectAvailableNPCDialogueChoices } from '../../../state/NPCSelectors';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
 import {
   selectBondProfileByNpcId,
@@ -50,9 +51,10 @@ import {
 
 interface NPCOverviewTabProps {
   npc: NPC;
+  presenceAtAnchor?: boolean;
 }
 
-const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
+const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc, presenceAtAnchor }) => {
   const dispatch = useAppDispatch();
   const [cooldown, setCooldown] = useState(false);
 
@@ -64,6 +66,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
     selectUsesRelationshipConnectionAuthority(state, npc.id)
   );
   const bondProfile = useAppSelector(state => selectBondProfileByNpcId(state, npc.id));
+  const availableTopics = useAppSelector(state => selectAvailableNPCDialogueChoices(state, npc.id));
 
   useEffect(() => {
     if (Object.keys(allTraits).length === 0 && !traitsLoading) {
@@ -131,9 +134,13 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                   <ListItemIcon><DialogueIcon color="primary" /></ListItemIcon>
                   <ListItemText
                     primary="Dialogue"
-                    secondary={usesRelationshipAuthority
-                      ? 'Available now. Meaningful responses can become Relationship Experiences.'
-                      : isAffinityUnlocked(1) ? 'Have conversations' : 'Requires Affinity: 1'}
+                    secondary={presenceAtAnchor === false
+                      ? 'Travel to this character’s authored location to talk in person.'
+                      : availableTopics.length > 0
+                        ? presenceAtAnchor === undefined
+                          ? `${availableTopics.length} authored topic(s) available through story interaction; world position unverified.`
+                          : `${availableTopics.length} authored conversation topic(s) available here.`
+                        : 'No new authored conversation is available right now.'}
                   />
                 </ListItem>
                 <ListItem>

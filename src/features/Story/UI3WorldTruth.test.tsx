@@ -92,3 +92,13 @@ test('story contact never advertises a dialogue that the legacy minAffinity runt
   } as any));
   expect(selectCurrentMoment(store.getState()).storyContacts).toEqual([]);
 });
+
+test('NPC overview only advertises actual dialogue availability, not generic conversation', () => {
+  const source = require('fs').readFileSync(
+    require('path').join(process.cwd(), 'src/features/NPCs/components/ui/tabs/NPCOverviewTab.tsx'), 'utf8',
+  );
+  expect(source).toContain('selectAvailableNPCDialogueChoices');
+  expect(source).toContain('No new authored conversation is available right now.');
+  expect(source).toContain('world position unverified');
+  expect(source).not.toContain("Available now. Meaningful responses can become Relationship Experiences.");
+});

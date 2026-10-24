@@ -231,7 +231,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
         </Box>
 
         <TabPanel value={currentTab} index={0}>
-          <NPCOverviewTab npc={npc} />
+          <NPCOverviewTab npc={npc} presenceAtAnchor={presenceAtAnchor} />
         </TabPanel>
         <TabPanel value={currentTab} index={1}>
           {renderInPersonSurface(<NPCDialogueTab npcId={npc.id} />)}
