@@ -283,6 +283,12 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         }
         await intro.waitFor({ state: 'hidden', timeout: 10000 });
         await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'mobile Current Moment');
+        // Opening dialog animation must be finished before capturing a usable
+        // mobile screenshot or judging action availability.
+        await mobile.locator('.MuiBackdrop-root').waitFor({ state: 'hidden', timeout: 10000 });
+        const firstTravel = mobile.getByRole('button', { name: 'Travel to City Gate' });
+        await assertVisible(firstTravel, 'mobile first legal travel step');
+        if (!(await firstTravel.isEnabled())) throw new Error('First legal travel step is disabled on mobile');
         await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-current-moment.png`), fullPage: true });
         const horizontalOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
         if (horizontalOverflow) throw new Error('Mobile layout overflows viewport horizontally');
@@ -318,6 +324,7 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         await mobile.getByRole('button', { name: 'Open game navigation' }).click();
         await menu.getByRole('button', { name: 'Navigate to Dashboard' }).click();
         await mobile.waitForURL(/\/game\/dashboard$/, { timeout: 10000 });
+        await menu.waitFor({ state: 'hidden', timeout: 10000 });
         await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'dark-mode current location');
         await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-dark-current-moment.png`), fullPage: true });
         for (const width of [320, 375, 768]) {
