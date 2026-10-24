@@ -25,7 +25,6 @@ export interface TraitSystemTabsProps {
   discoveredTraits: Trait[];
   availableTraitsForEquip: Trait[];
   currentEssence: number;
-  isInProximityToNPC: boolean;
   loading: boolean;
   error: string | null;
   onEquipTrait: (traitId: string, slotIndex: number) => void;
@@ -50,7 +49,6 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
   discoveredTraits,
   availableTraitsForEquip,
   currentEssence,
-  isInProximityToNPC,
   loading,
   error,
   onEquipTrait,

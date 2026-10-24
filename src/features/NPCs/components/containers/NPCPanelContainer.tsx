@@ -147,6 +147,11 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
     ? getLocationDefinition(npcWorldLocationId)
     : undefined;
   const requiredLocationLabel = npcWorldLocation?.name ?? npcWorldLocationId ?? npc.location;
+  const presenceDescription = presenceAtAnchor === true
+    ? `Present — ${requiredLocationLabel}`
+    : presenceAtAnchor === false
+      ? `Remote — at ${requiredLocationLabel}`
+      : `Story contact — ${npc.location || 'location not established'} (not verified nearby)`;
 
   const renderInPersonSurface = (children: React.ReactNode) => {
     if (!inPersonBlocked) return children;
@@ -167,7 +172,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
               <Typography variant="h5" component="h1">{npc.name}</Typography>
               <Typography variant="body2" color="text.secondary">{npc.description}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {inPersonBlocked ? `Remote — at ${requiredLocationLabel}` : `Present — ${requiredLocationLabel}`}
+                {presenceDescription}
               </Typography>
             </Box>
           </Stack>
@@ -181,6 +186,13 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
             Create Copy
           </Button>
         </Box>
+
+        {presenceAtAnchor === undefined && (
+          <Alert severity="info" sx={{ mt: 2 }} data-testid="npc-unanchored-story-location">
+            This character has an authored story setting, but no confirmed position in the current travel map.
+            Existing story interactions remain available; this does not establish that they are physically beside you.
+          </Alert>
+        )}
 
         {inPersonBlocked && (
           <Alert severity="info" sx={{ mt: 2 }}>

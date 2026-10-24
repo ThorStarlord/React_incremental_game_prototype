@@ -33,6 +33,23 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
           {immediateActions.length === 0 && <Typography variant="body2" color="text.secondary">There are no immediate authored actions here. Review a known person or travel onward.</Typography>}
         </Stack>
 
+        {moment.storyContacts.length > 0 && (
+          <Box sx={{ mb: 2 }} data-testid="story-contacts">
+            <Typography variant="subtitle2">Available story conversations</Typography>
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+              These known characters have authored conversation topics, but their physical location is not represented by the travel map.
+            </Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} gap={1} flexWrap="wrap" alignItems="flex-start">
+              {moment.storyContacts.map(action => (
+                <Box key={action.id} sx={{ maxWidth: 310 }}>
+                  <Button component={RouterLink} variant="outlined" size="small" to={action.to}>{action.label}</Button>
+                  <Typography variant="caption" color="text.secondary" display="block">{action.description}</Typography>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        )}
+
         {referenceActions.length > 0 && (
           <Stack spacing={0.5} sx={{ mb: 2 }} alignItems="flex-start">
             <Typography variant="caption" color="text.secondary">People and references</Typography>

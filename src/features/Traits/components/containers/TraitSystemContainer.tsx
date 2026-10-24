@@ -107,7 +107,6 @@ const TraitSystemContainer: React.FC = React.memo(() => {
     discoveredTraits,
     availableTraitsForEquip,
     currentEssence,
-    isInProximityToNPC: true, // Assuming default proximity or get from meta state
     loading,
     error,
     onEquipTrait: handleEquipTrait,
