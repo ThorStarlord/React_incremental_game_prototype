@@ -30,10 +30,10 @@ test('Settings only advertises consumed gameplay preferences', () => {
     settings={{ autosaveEnabled: true, autosaveInterval: 5 }}
     onUpdate={update}
   />);
-  expect(screen.getByRole('switch', { name: 'Enable autosave' })).toBeChecked();
+  expect(screen.getByRole('checkbox', { name: 'Enable autosave' })).toBeChecked();
   expect(screen.getByRole('slider')).toBeInTheDocument();
   expect(screen.queryByRole('combobox', { name: 'Difficulty' })).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole('switch', { name: 'Enable autosave' }));
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Enable autosave' }));
   expect(update).toHaveBeenCalledWith({ autosaveEnabled: false });
 });
 
