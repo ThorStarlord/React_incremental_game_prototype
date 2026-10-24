@@ -43,3 +43,21 @@ Prefer `situation → actually available action → recorded consequence → pro
 5. Real portraits and human testing are missing external evidence/assets. Monograms are deliberately honest visual fallbacks, not a claim that illustrated character art exists.
 
 **Stop:** Do not merge or report completion on an unqualified head; first reconcile returned CI evidence, repair exact causes, and re-run the authoritative gate.
+## 2026-10-24 UI3 review-response continuation
+
+The first exact-head 1.0 UI2 candidate at `9f535361` passed full Build Validation run `40058927308` with Chromium+Firefox release-browser matrix and two divergent ordinary-UI campaign histories. That green result is **historical** after UI3 commits.
+
+Owner authorized the follow-on bounded fixes to the same PR, without a generic UI framework or new game rule:
+
+| Review finding | Implementation | Rejection/acceptance evidence |
+|---|---|---|
+| Desktop double margin | `GameLayout` relies on sidebar flex footprint | Desktop browser checks actual sidebar-to-main gap |
+| Mobile giant cards | Responsive `CurrentMomentPanel` action flex-basis | Mobile browser screenshot + source regression |
+| Dark menu contrast | Explicit light heading on dark gradient | Source regression + screenshot review |
+| Inert Gameplay controls | Show actual autosave only; keep old payload fields | RTL excludes difficulty/tutorial controls, verifies switch |
+| Split migrated NPC Affinity | Canonical Bond profile Affinity for sort/filter; bond label from Relationship authority | RTL card + migrated source semantics |
+| Spatial/story availability confusion | Separate confirmed local encounter vs unanchored available story contact; truthful NPC profile copy | RTL story gate, no future/unseen contacts |
+| Ontology wording in world situation | Situation derived from chapter identity and *currently player-known* contact/quest availability | Source/RTL regression, human comprehension still unproven |
+| Trait proximity copy | 1.0 slot manipulation does not invent NPC vicinity rule; preview explicit known modifiers | RTL/source regression, no 1.1 effect extrapolation |
+
+**Required:** exact-head focused `UI3LayoutAndSettings` + `UI3WorldTruth`, original UI2 regression and full Build Validation (historic M4–M19, chapters, browser, static production, divergent campaigns, save/Continue). Human-facing quality can be established only by real participants according to `docs/ui/Phase2HumanEvaluation.md`. The tests are code/runtime correctness evidence, not cognitive/experiential results.

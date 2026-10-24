@@ -1,5 +1,12 @@
 # Documentation Authority Index
 
+## 2026-10-24 — UI3 review-response authority
+- `docs/ui/Phase2Implementation.md` remains the scope/verification map for PR #181; UI3's concrete repair trace and required gates are appended there.
+- `docs/ui/Phase2HumanEvaluation.md` is a *procedure* for future external participant evidence, not a result.
+- PR #181's first successful exact-head Build Validation #40058927308 belongs only to `9f535361`. Any later UI3 head requires independent qualification. Neither old PASS nor fresh source claims establish human understanding.
+- Both original tagged `v1.0.0` and the 1.1 unqualified Trait lane are separate from this 1.0 world-first UI candidate.
+
+
 ## 2026-10-23 — UI2 and post-release documentation precedence
 
 PR #179 is **merged** on current main; the older 2026-10-21 candidate claims below are historical snapshots, not current PR status. Current `main` postdates original `v1.0.0`, which remains immutable. Owner-selected **draft PR #181** is the UI2 source candidate; `docs/ui/Phase2Implementation.md` owns its implementation/evidence mapping, subordinate to `PlayerExperienceContract.md` and this index. PR #178 is still an unqualified/conflicted 1.1 Trait candidate and PR #180 depends on it. No post-release merge or CI can be treated as real-player validation; `HUMAN-UNVALIDATED` / `BETA_PASS=NO` remains.

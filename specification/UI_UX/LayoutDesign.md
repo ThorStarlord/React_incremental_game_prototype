@@ -1,5 +1,9 @@
 # Layout Design Specification
 
+## 2026-10-24 — UI3 layout repair limits
+The desktop sidebar owns its flex width once; content starts immediately after it. Mobile Current Moment action cards have natural height and full width rather than inheriting a large flex-basis from horizontal desktop layout. Main-menu title uses a light-on-dark accessible treatment consistent with the now warmer in-game palette. Current Moment shows confirmed nearby encounters separately from *available story contacts (not mapped in the current travel graph)*; it never asserts physical presence for an unanchored contact. Header and status controls stay accessible. These are bounded repairs, not license to globally redesign chapters or 1.1 mechanics.
+
+
 ## 2026-10-23 — Phase 2 candidate layout
 
 PR #181 centers current location, currently available choices, legal travel, and active encounter controls on the Dashboard. Global Save/timer/Copy-exception status remains; secondary chapter hints and advanced metrics become expandable. NPCs use offline-safe monogram sigils until verified authored artwork exists. This is a bounded presentation evolution of current main, not a new state authority or original v1.0.0 amendment. Browser and exact-head validation remain required.

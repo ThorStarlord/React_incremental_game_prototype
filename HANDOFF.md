@@ -1,5 +1,12 @@
 # Handoff — Campaign One 1.0 Released
 
+## 2026-10-24 — UI3 bounded continuation
+- PR #181 earlier exact head `9f535361` passed full Build Validation #40058927308; owner-requested UI3 repairs modify it and therefore **invalidate reuse of that PASS for the new head**.
+- Continue from `codex/ui2-world-first-experience-20261023`. Current task: verify `UI3LayoutAndSettings.test.tsx`, `UI3WorldTruth.test.tsx`, then full exact-head Build Validation (desktop/sidebar spacing, mobile cards, theme, real Gameplay settings, NPC world vs story contacts, Trait slots, 2x2 campaign and saves). Repair failing causes; never relax gates to obtain green.
+- Preserve 1.0 gameplay authority, authored source visibility, immutable `v1.0.0`, and `HUMAN-UNVALIDATED / BETA_PASS=NO`.
+- For player-research prompts/evidence capture, use `docs/ui/Phase2HumanEvaluation.md`; **do not label synthetic/browser tests as actual player comprehension**.
+
+
 ## 2026-10-23 — Scoped UI2 continuation
 
 Owner approved the Phase 2 player-experience program. PR #179 was qualified and merged into main at `4259e94573d189228af5ab71cf29ce7c5ab3c2d5`. Draft PR #181 at `codex/ui2-world-first-experience-20261023` implements world-first changes, controls truthfulness and tests. It is not qualified until exact-head Build Validation including the full ordinary-UI Campaign One passes. Read `docs/ui/Phase2Implementation.md` and reconcile its current head/CI failures; do not repeat the 1.0 or GC implementation work. PR #178/#180 1.1 remains separate. The original v1.0.0 tag and human validation ceiling are unchanged.
