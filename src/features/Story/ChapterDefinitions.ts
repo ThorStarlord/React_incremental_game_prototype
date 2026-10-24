@@ -96,7 +96,7 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'adversarial_calibration',
-    playerSituation: 'Lyra's challenge cannot be settled by agreement alone. Understand what an opponent knows before deciding how to work together.',
+    playerSituation: "Lyra's challenge cannot be settled by agreement alone. Understand what an opponent knows before deciding how to work together.",
     title: 'Enemies in Phase',
     centerOfGravity: 'adversarial learning, calibrated opposition, and necessary cooperation',
     description:
