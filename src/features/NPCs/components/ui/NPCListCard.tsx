@@ -6,24 +6,27 @@ import React from 'react';
 import {
   Grid,
   Card,
+  CardActionArea,
   CardContent,
   Typography,
   Box,
-  Avatar,
   Chip,
 } from '@mui/material';
-import { Person, LocationOn, Favorite, Star } from '@mui/icons-material';
+import { LocationOn, Favorite, Star } from '@mui/icons-material';
 import { NPC } from '../../state/NPCTypes';
 import { getRelationshipTier as getCentralRelationshipTier } from '../../../../config/relationshipConstants';
+import NPCPortrait from './NPCPortrait';
 
 interface NPCListCardProps {
   npc: NPC;
   onSelectNPC: (npcId: string) => void;
   isSelected: boolean;
   isGlowing?: boolean;
+  connectionLevel?: number;
+  bondLabel?: string;
 }
 
-export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing }) => {
+export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing, connectionLevel, bondLabel }) => {
   const currentTier = getCentralRelationshipTier(npc.affinity);
 
   return (
@@ -48,16 +51,16 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
             '100%': { boxShadow: '0 0 0 0 rgba(255,255,255,0)' },
           },
         }}
-        onClick={() => onSelectNPC(npc.id)}
-        role="button"
-        aria-pressed={isSelected}
-        tabIndex={0}
       >
+        <CardActionArea
+          onClick={() => onSelectNPC(npc.id)}
+          aria-label={`Open ${npc.name}`}
+          aria-current={isSelected ? 'page' : undefined}
+          sx={{ height: '100%' }}
+        >
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-            <Avatar sx={{ width: 48, height: 48, bgcolor: npc.isAvailable ? 'success.light' : 'grey.500', mr: 2 }}>
-              {npc.avatar ? <img src={npc.avatar} alt={npc.name} style={{ width: '100%', height: '100%' }} /> : <Person />}
-            </Avatar>
+            <Box sx={{ mr: 2 }}><NPCPortrait npc={npc} size={52} /></Box>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography variant="h6" noWrap>{npc.name}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
@@ -70,7 +73,9 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
             {npc.description || 'No description available.'}
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {currentTier && (
+            {bondLabel ? (
+              <Chip size="small" label={bondLabel} variant="outlined" color="primary" />
+            ) : currentTier && (
               <Chip
                 size="small"
                 label={currentTier.name}
@@ -80,13 +85,14 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
             )}
             <Chip
               icon={<Star fontSize="small" />}
-              label={`${npc.connectionDepth}`}
+              label={`${connectionLevel ?? npc.connectionDepth ?? 0}`}
               size="small"
               variant="outlined"
-              title={`Connection Depth: ${npc.connectionDepth}`}
+              title={`Connection Level: ${connectionLevel ?? npc.connectionDepth ?? 0}`}
             />
           </Box>
         </CardContent>
+        </CardActionArea>
       </Card>
     </Grid>
   );

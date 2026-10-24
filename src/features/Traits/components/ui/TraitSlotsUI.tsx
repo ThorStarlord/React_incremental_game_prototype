@@ -33,7 +33,7 @@ export interface TraitSlotsUIProps {
   traitSlots: TraitSlot[];
   equippedTraits: Trait[];
   availableTraits: Trait[];
-  isInProximityToNPC: boolean;
+  canManageSlots: boolean;
   isLoading: boolean;
   error: string | null;
 
@@ -60,7 +60,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
   traitSlots,
   equippedTraits,
   availableTraits,
-  isInProximityToNPC,
+  canManageSlots,
   isLoading,
   error,
   isTraitSelectionModalOpen,
@@ -87,14 +87,14 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
     if (trait) {
        return (
         <Card
-          sx={{ minHeight: 120, cursor: isInProximityToNPC ? 'pointer' : 'not-allowed', transition: 'all 0.2s', '&:hover': { transform: isInProximityToNPC ? 'translateY(-2px)' : 'none', boxShadow: isInProximityToNPC ? 3 : 'none' }, border: 2, borderColor: 'primary.main' }}
+          sx={{ minHeight: 120, cursor: canManageSlots ? 'pointer' : 'not-allowed', transition: 'all 0.2s', '&:hover': { transform: canManageSlots ? 'translateY(-2px)' : 'none', boxShadow: canManageSlots ? 3 : 'none' }, border: 2, borderColor: 'primary.main' }}
           onClick={() => onSlotClick(slot)}
           role="button"
-          tabIndex={isInProximityToNPC ? 0 : -1}
-          aria-disabled={!isInProximityToNPC}
+          tabIndex={canManageSlots ? 0 : -1}
+          aria-disabled={!canManageSlots}
           aria-label={`Manage ${trait.name} in trait slot ${slot.slotIndex + 1}`}
           onKeyDown={(event) => {
-            if (isInProximityToNPC && (event.key === 'Enter' || event.key === ' ')) {
+            if (canManageSlots && (event.key === 'Enter' || event.key === ' ')) {
               event.preventDefault();
               onSlotClick(slot);
             }
@@ -108,7 +108,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
                   size="small"
                   color="error"
                   aria-label={`Unequip ${trait.name}`}
-                  disabled={!isInProximityToNPC}
+                  disabled={!canManageSlots}
                   onClick={(event) => {
                     event.stopPropagation();
                     onSlotClick(slot);
@@ -130,16 +130,16 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
       <Box
         onClick={() => onSlotClick(slot)}
         onKeyDown={(event) => {
-          if (isInProximityToNPC && (event.key === 'Enter' || event.key === ' ')) {
+          if (canManageSlots && (event.key === 'Enter' || event.key === ' ')) {
             event.preventDefault();
             onSlotClick(slot);
           }
         }}
         role="button"
-        tabIndex={isInProximityToNPC ? 0 : -1}
-        aria-disabled={!isInProximityToNPC}
+        tabIndex={canManageSlots ? 0 : -1}
+        aria-disabled={!canManageSlots}
         aria-label={`Equip a trait in slot ${slot.slotIndex + 1}`}
-        sx={{ cursor: isInProximityToNPC ? 'pointer' : 'not-allowed', height: '100%' }}
+        sx={{ cursor: canManageSlots ? 'pointer' : 'not-allowed', height: '100%' }}
       >
         <EmptySlotCard />
       </Box>
@@ -174,9 +174,9 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
         </Tooltip>
       </Box>
 
-      {!isInProximityToNPC && (
+      {!canManageSlots && (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          You must be in close proximity to an NPC to manage your trait slots.
+          Trait slot management is unavailable while Trait data is loading.
         </Alert>
       )}
 
@@ -191,6 +191,9 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
       {/* Trait Selection Dialog */}
       <Dialog open={isTraitSelectionModalOpen} onClose={onCloseTraitSelectionModal} maxWidth="sm" fullWidth>
         <DialogTitle>Select a Trait for Slot {selectedSlotIndexForModal !== null ? selectedSlotIndexForModal + 1 : ''}</DialogTitle>
+        <Typography variant="body2" color="text.secondary" sx={{ px: 3 }}>
+          Preview the discovered Trait below. Equipping occupies this slot; permanent Traits remain active without slots.
+        </Typography>
         <DialogContent>
           <List>
             {availableTraits.length > 0 ? (
@@ -211,6 +214,30 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
                 <Typography sx={{p: 2, textAlign: 'center'}} color="text.secondary">No available traits to equip. Learn new traits from NPCs.</Typography>
             )}
           </List>
+          {selectedTraitIdInModal && (() => {
+            const chosen = availableTraits.find(trait => trait.id === selectedTraitIdInModal);
+            if (!chosen) return null;
+            const effectSummary = Array.isArray(chosen.effects)
+              ? chosen.effects.map(effect => `${effect.type.replace(/_/g, ' ')}: ${effect.magnitude >= 0 ? '+' : ''}${effect.magnitude}`)
+              : Object.entries(chosen.effects).map(([name, value]) => `${name.replace(/_/g, ' ')}: ${value >= 0 ? '+' : ''}${value}`);
+            return (
+              <Alert severity="info" sx={{ mt: 2 }} data-testid="trait-slot-before-after">
+                <Typography variant="subtitle2">Slot preview (before → after)</Typography>
+                <Typography variant="body2">
+                  Before: empty slot. After: {chosen.name} equipped.
+                </Typography>
+                <Typography variant="body2">Listed Trait effects: {effectSummary.join('; ') || 'No numeric modifiers listed'}.</Typography>
+                <Typography variant="caption" display="block">
+                  This is a preview of Trait definitions, not a prediction of final character statistics.
+                </Typography>
+                {chosen.essenceCost !== undefined && (
+                  <Typography variant="caption" display="block">
+                    Equipping is not the permanent Resonance purchase ({chosen.essenceCost} Essence).
+                  </Typography>
+                )}
+              </Alert>
+            );
+          })()}
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseTraitSelectionModal}>Cancel</Button>
@@ -226,7 +253,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseUnequipDialog}>Cancel</Button>
-          <Button onClick={onConfirmUnequip} variant="contained" color="warning" disabled={!isInProximityToNPC}>Unequip</Button>
+          <Button onClick={onConfirmUnequip} variant="contained" color="warning" disabled={!canManageSlots}>Unequip</Button>
         </DialogActions>
       </Dialog>
     </Box>

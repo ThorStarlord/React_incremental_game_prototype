@@ -1,6 +1,8 @@
 import type { RootState } from '../../app/store';
 import { getConnectedLocationDefinitions, getLocationDefinition, resolveCanonicalLocationId } from '../Exploration/LocationDefinitions';
 import { isPlayerAtNpcWorldLocation } from '../NPCs/state/NPCWorldLocationDefinitions';
+import { selectAvailableNPCDialogueChoices } from '../NPCs/state/NPCSelectors';
+import { CHAPTER_DEFINITIONS } from './ChapterDefinitions';
 import { selectAllChapterProgress } from './ChapterSelectors';
 import { selectOpeningCampaignStage } from './CampaignSpine';
 import { selectCausalJournalEntries, selectOpenCopyExceptions, selectRecentRecordedDialogueExperiences } from './PlayerInsightSelectors';
@@ -10,6 +12,7 @@ export interface CurrentMomentAction {
   label: string;
   description: string;
   to: string;
+  kind?: 'encounter' | 'quest' | 'travel' | 'reference';
 }
 
 export interface CurrentMomentView {
@@ -17,6 +20,8 @@ export interface CurrentMomentView {
   locationDescription: string;
   situation: string;
   actions: CurrentMomentAction[];
+  /** Authored story interaction with unanchored characters, not physical co-presence. */
+  storyContacts: CurrentMomentAction[];
   consequences: Array<{ id: string; title: string; explanation: string }>;
   attention: Array<{ id: string; label: string; to: string }>;
 }
@@ -33,9 +38,27 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
   const currentChapter = stage !== 'PROLOGUE'
     ? selectAllChapterProgress(state).find(chapter => chapter.status !== 'complete')
     : undefined;
-  const knownContactsHere = Object.values(state.npcs.npcs)
+  const discoveredNpcIds = new Set(state.npcs.discoveredNPCs);
+  const knownNPCs = Object.values(state.npcs.npcs).filter(npc => discoveredNpcIds.has(npc.id));
+  const knownContactsHere = knownNPCs
     .filter(npc => isPlayerAtNpcWorldLocation(npc.id, state.player.location) === true)
     .slice(0, 3);
+  // The older authored chapters use named story settings that were never
+  // integrated into M18's five-node travel graph. Exposing those contacts is
+  // valid under their existing dialogue contracts, but not proof they are here.
+  const storyContacts: CurrentMomentAction[] = (stage === 'PROLOGUE' ? [] : knownNPCs
+    .filter(npc => isPlayerAtNpcWorldLocation(npc.id, state.player.location) === undefined)
+    .map(npc => ({ npc, topics: selectAvailableNPCDialogueChoices(state, npc.id) }))
+    .filter(candidate => candidate.topics.length > 0)
+    .sort((left, right) => right.topics.length - left.topics.length)
+    .slice(0, 3)
+    .map(({ npc, topics }) => ({
+      id: `story-contact-${npc.id}`,
+      label: `Continue with ${npc.name}`,
+      description: `${topics.length} authored topic${topics.length === 1 ? '' : 's'} available. Presence in your current location is not established.`,
+      to: `/game/npcs/${encodeURIComponent(npc.id)}?view=dialogue`,
+      kind: 'reference' as const,
+    })));
   const activeQuests = state.quest.activeQuestIds
     .map(id => state.quest.quests[id])
     .filter(quest => quest && (quest.status === 'IN_PROGRESS' || quest.status === 'READY_TO_COMPLETE'));
@@ -44,12 +67,22 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
 
   if (stage === 'PROLOGUE' && state.meta.hasSeenIntro) {
     const willowHere = knownContactsHere.some(npc => npc.id === 'npc_elder_willow');
-    if (willowHere) {
+    const willowHasTopic = willowHere && selectAvailableNPCDialogueChoices(state, 'npc_elder_willow').length > 0;
+    if (willowHasTopic) {
       actions.push({
         id: 'prologue-willow',
         label: 'Talk with Elder Willow',
-        description: 'Your known contact is here. Choose an authored conversation topic.',
+        description: 'A first conversation is ready here.',
         to: '/game/npcs/npc_elder_willow?view=dialogue',
+        kind: 'encounter',
+      });
+    } else if (willowHere) {
+      actions.push({
+        id: 'prologue-willow-inspect',
+        label: 'Review Elder Willow',
+        description: 'She is here, but no new authored conversation is currently available.',
+        to: '/game/npcs/npc_elder_willow',
+        kind: 'reference',
       });
     } else {
       actions.push({
@@ -57,17 +90,26 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
         label: 'Find Elder Willow',
         description: 'Use the travel controls to reach the Whispering Woods.',
         to: '/game/dashboard#travel-controls',
+        kind: 'travel',
       });
     }
   }
 
   knownContactsHere.forEach(npc => {
     if (stage === 'PROLOGUE' && npc.id === 'npc_elder_willow') return;
-    actions.push({
+    const available = selectAvailableNPCDialogueChoices(state, npc.id);
+    actions.push(available.length > 0 ? {
       id: `npc-${npc.id}`,
-      label: `Visit ${npc.name}`,
-      description: 'A currently known person at this world location.',
+      label: `Talk with ${npc.name}`,
+      description: `${available.length} authored conversation topic${available.length === 1 ? '' : 's'} currently available.`,
       to: `/game/npcs/${encodeURIComponent(npc.id)}?view=dialogue`,
+      kind: 'encounter',
+    } : {
+      id: `npc-${npc.id}`,
+      label: `Review ${npc.name}`,
+      description: 'This known person is present, but has no available conversation topic.',
+      to: `/game/npcs/${encodeURIComponent(npc.id)}`,
+      kind: 'reference',
     });
   });
 
@@ -79,6 +121,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
         ? 'Objectives are ready; review the authored resolution.'
         : 'Review the current objectives and what remains to do.',
       to: `/game/quests?quest=${encodeURIComponent(quest.id)}`,
+      kind: 'quest',
     });
   });
   if (connections.length > 0 && !actions.some(action => action.id === 'prologue-travel')) {
@@ -87,6 +130,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
       label: 'Explore connected locations',
       description: 'Choose a legal authored route using the travel controls.',
       to: '/game/dashboard#travel-controls',
+      kind: 'travel',
     });
   }
   if (actions.length === 0) {
@@ -95,6 +139,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
       label: 'Review known contacts',
       description: 'Inspect the people already encountered, without revealing unknown characters.',
       to: '/game/npcs',
+      kind: 'reference',
     });
   }
 
@@ -113,15 +158,32 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
     });
   });
 
+  const chapterIdentity = currentChapter
+    ? CHAPTER_DEFINITIONS.find(definition => definition.id === currentChapter.id)
+    : undefined;
+  // Prefer the actual next player-known lead over an ontology-oriented
+  // centerOfGravity string (which belongs in the design documentation).
+  const availableHere = knownContactsHere.find(npc => selectAvailableNPCDialogueChoices(state, npc.id).length > 0);
+  const currentChapterTitle = currentChapter?.title ?? chapterIdentity?.title ?? 'Your campaign';
+  const chapterSituation = chapterIdentity?.playerSituation ?? `${currentChapterTitle} is underway.`;
   const situation = stage === 'PROLOGUE'
-    ? 'Your first task is to find Elder Willow and listen to her First Lesson.'
-    : currentChapter?.title ?? 'Campaign One: your choices and remembered history now determine what follows.';
+    ? knownContactsHere.some(npc => npc.id === 'npc_elder_willow')
+      ? 'Elder Willow is in the woods. Review her conversation when it becomes available, or continue exploring the known routes.'
+      : 'The road to the Whispering Woods leads toward Elder Willow and her first lesson.'
+    : availableHere
+      ? `${chapterSituation} ${availableHere.name} is here with an available conversation.`
+      : storyContacts.length > 0
+        ? `${chapterSituation} A known character has an available story conversation; their precise location is not tracked on this map.`
+        : activeQuests.length > 0
+          ? `${chapterSituation} ${activeQuests[0].title} is an unresolved quest in your journal.`
+          : `${chapterSituation} Revisit known contacts and recorded decisions for your next lead.`;
 
   return {
     locationName: location?.name ?? state.player.location,
     locationDescription: location?.description ?? 'A location without an authored travel description.',
     situation,
     actions: actions.slice(0, 5),
+    storyContacts,
     consequences: [
       ...selectCausalJournalEntries(state, 2).map(entry => ({
         id: entry.id,

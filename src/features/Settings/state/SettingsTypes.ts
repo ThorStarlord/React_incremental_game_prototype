@@ -34,6 +34,8 @@ export interface UISettings {
   showResourceNotifications: boolean;
   showLevelUpAnimations: boolean;
   compactInventory: boolean;
+  primaryColor?: string;
+  secondaryColor?: string;
 }
 
 // Main Settings State structure

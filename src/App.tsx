@@ -11,7 +11,7 @@ import { processCopyGrowthThunk, processCopyLoyaltyDecayThunk, processCopyTasksT
 import { processCopyStandingOrdersThunk } from './features/Copy/state/CopyStrategyThunks';
 import { processStatusEffectsThunk, regenerateVitalsThunk, recalculateStatsThunk } from './features/Player/state/PlayerThunks';
 import { AppRouter } from './routes/AppRouter';
-import { ThemeProviderWrapper as ThemeProvider } from './theme/provider';
+import { loadSettingsThunk } from './features/Settings/state/SettingsThunks';
 import { useAutosaveSystem } from './gameLogic/systems/autosaveSystem';
 
 const App: React.FC = () => {
@@ -21,6 +21,7 @@ const App: React.FC = () => {
 
   // Initialize application data on startup
   useEffect(() => {
+    dispatch(loadSettingsThunk());
     dispatch(fetchTraitsThunk());
     dispatch(initializeNPCsThunk());
     dispatch(initializeQuestsThunk({ preserveExisting: true }));
@@ -45,11 +46,7 @@ const App: React.FC = () => {
     onTick: handleGameTick,
   });
 
-  return (
-    <ThemeProvider>
-      <AppRouter />
-    </ThemeProvider>
-  );
+  return <AppRouter />;
 };
 
 export default App;

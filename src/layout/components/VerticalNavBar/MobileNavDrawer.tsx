@@ -211,7 +211,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
         {section.title}
       </SectionHeader>
       
-      {section.items.map(renderNavItem)}
+      {section.items.filter(item => item.isImplemented).map(renderNavItem)}
       
       <Divider sx={{ my: 1, mx: 2 }} />
     </Box>

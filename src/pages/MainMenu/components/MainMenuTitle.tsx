@@ -15,7 +15,7 @@ export function MainMenuTitle({ title, subtitle, sx }: MainMenuTitleProps) {
         variant="h2"
         component="h1"
         fontWeight="bold"
-        color="primary.main"
+        sx={{ color: '#f0f7f3', textShadow: '0 2px 12px rgba(0,0,0,0.45)' }}
         gutterBottom
       >
         {title}

@@ -218,9 +218,25 @@ async function runBrowserQualification(name, browserType, options, outDir) {
     });
 
     await check('game-navigation-visible', async () => {
-      await assertVisible(page.getByRole('main').first(), 'game main landmark');
+      const main = page.getByRole('main').first();
+      await assertVisible(main, 'game main landmark');
       const navigation = page.getByRole('button', { name: /^Navigate to / }).first();
       await assertVisible(navigation, 'game navigation control');
+      const navBounds = await navigation.boundingBox();
+      const mainBounds = await main.boundingBox();
+      // A flex sidebar already occupies its own width; never add that width
+      // again as a left margin. The old layout left a ~240px empty column.
+      if (!navBounds || !mainBounds || mainBounds.x > navBounds.x + navBounds.width + 40) {
+        throw new Error(`Unexpected desktop sidebar gap: nav=${JSON.stringify(navBounds)} main=${JSON.stringify(mainBounds)}`);
+      }
+    });
+    await check('world-first-location-and-actions-visible', async () => {
+      const moment = page.locator('[data-testid="current-moment"]');
+      await assertVisible(moment, 'world-first Current Moment');
+      await assertVisible(moment.getByRole('heading', { name: 'Current Moment' }), 'Current Moment heading');
+      await assertVisible(moment.getByRole('link', { name: 'Find Elder Willow' }), 'opening story lead');
+      await assertVisible(page.getByRole('button', { name: 'Travel to City Gate' }), 'legal world travel');
+      await page.screenshot({ path: path.join(outDir, `${name}-first-session.png`), fullPage: true });
     });
 
     await check('invalid-route-recovers', async () => {
@@ -245,6 +261,52 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await page.getByRole('button', { name: /^Cancel$/ }).click();
     });
 
+
+
+    await check('mobile-current-moment-and-navigation', async () => {
+      // A real narrow-screen browser context catches inaccessible mobile drawers:
+      // desktop-only browser qualification cannot establish responsive usability.
+      const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      try {
+        const mobile = await mobileContext.newPage();
+        await mobile.goto(options.url, { waitUntil: name === 'firefox' ? 'commit' : 'domcontentloaded', timeout: 30000 });
+        await mobile.getByRole('button', { name: /^New Game$/ }).click();
+        const intro = mobile.getByRole('dialog', { name: 'Introduction' });
+        // New Game navigation precedes the modal mount; a visibility check
+        // without waiting races it and makes background controls aria-hidden.
+        await intro.waitFor({ state: 'visible', timeout: 15000 });
+        for (let step = 0; step < 10 && await intro.isVisible(); step += 1) {
+          await intro.getByRole('button', { name: /Continue|Begin/ }).click();
+        }
+        await intro.waitFor({ state: 'hidden', timeout: 10000 });
+        await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'mobile Current Moment');
+        await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-current-moment.png`), fullPage: true });
+        const responsive = await mobile.evaluate(() => ({
+          innerWidth: window.innerWidth,
+          match: window.matchMedia('(max-width:899.95px)').matches,
+          availableButtons: Array.from(document.querySelectorAll('button')).map(item => ({
+            label: item.getAttribute('aria-label'), text: item.textContent?.trim().slice(0, 60),
+            display: window.getComputedStyle(item).display,
+            visibility: window.getComputedStyle(item).visibility,
+            rect: item.getBoundingClientRect().toJSON(),
+          })).filter(item => item.label?.includes('navigation') || item.text?.includes('Dashboard')),
+        }));
+        try {
+          await assertVisible(mobile.getByRole('button', { name: 'Open game navigation' }), 'mobile navigation open action');
+        } catch (error) {
+          throw new Error(`Mobile navigation trigger missing. Responsive evidence: ${JSON.stringify(responsive)}; ${String(error)}`);
+        }
+        await mobile.getByRole('button', { name: 'Open game navigation' }).focus();
+        await mobile.keyboard.press('Enter');
+        const menu = mobile.getByRole('navigation', { name: 'Mobile navigation menu' });
+        await assertVisible(menu, 'opened mobile navigation drawer');
+        await menu.getByRole('button', { name: 'Navigate to Quests' }).click();
+        await mobile.waitForURL(/\/game\/quests$/, { timeout: 10000 });
+        await assertVisible(mobile.getByRole('heading', { name: 'Quest Log' }), 'mobile Quest page');
+      } finally {
+        await mobileContext.close();
+      }
+    });
 
     return {
       browser: name,

@@ -23,7 +23,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Focused UI regression
-        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx CopyBulkActionsUX.test.tsx CopyBulkActionsUX.test.tsx CopyM20ProductionTaskAutomation.test.tsx GC02PrologueOnboarding.test.tsx GC03OpeningCampaignSpine.test.tsx
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx UI2ExperienceRepair.test.tsx UI3LayoutAndSettings.test.tsx UI3WorldTruth.test.tsx CopyBulkActionsUX.test.tsx CopyM20ProductionTaskAutomation.test.tsx GC02PrologueOnboarding.test.tsx GC03OpeningCampaignSpine.test.tsx
         env:
           CI: true
       - name: TypeScript
@@ -117,7 +117,7 @@ jobs:
 
       - name: Player Experience UI regression qualification
         timeout-minutes: 6
-        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx UI2ExperienceRepair.test.tsx UI3LayoutAndSettings.test.tsx UI3WorldTruth.test.tsx
         env:
           CI: true
 
@@ -237,13 +237,16 @@ jobs:
       - name: GC-13 Chromium and Firefox browser qualification
         timeout-minutes: 10
         run: |
-          HOST=127.0.0.1 PORT=3000 BROWSER=none npm start > /tmp/beta-browser-app.log 2>&1 &
+          # Use a distinct port from simulated-review smoke. CRA's npm wrapper
+          # can leave a child dev server alive after the preceding trap.
+          # Independent listener prevents silently qualifying that leftover server.
+          HOST=127.0.0.1 PORT=3001 BROWSER=none npm start > /tmp/beta-browser-app.log 2>&1 &
           app_pid=$!
           trap 'kill "$app_pid" 2>/dev/null || true' EXIT
 
           ready=0
           for attempt in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:3000 >/dev/null; then
+            if curl -fsS http://127.0.0.1:3001 >/dev/null; then
               ready=1
               break
             fi
@@ -256,7 +259,7 @@ jobs:
             exit 1
           fi
 
-          if ! npm run release:browser -- --browser all --url http://127.0.0.1:3000 --out /tmp/beta-browser-qualification; then
+          if ! npm run release:browser -- --browser all --url http://127.0.0.1:3001 --out /tmp/beta-browser-qualification; then
             echo "Beta browser matrix failed; app log follows"
             cat /tmp/beta-browser-app.log
             exit 1

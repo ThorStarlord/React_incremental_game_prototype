@@ -31,7 +31,7 @@ import type {
 } from '../types/NavigationTypes';
 
 export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
-  defaultTab: 'character',
+  defaultTab: 'dashboard',
   maxHistoryLength: 10,
   persistState: true,
   storageKey: 'rpg_navigation_state',
@@ -47,7 +47,7 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
     route: '/game/dashboard',
     isImplemented: true,
     tooltip: 'View game overview and statistics',
-    section: 'systems',
+    section: 'adventure',
   },
   character: {
     id: 'character',
@@ -186,6 +186,11 @@ export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
  */
 export const NAVIGATION_SECTIONS: NavSection[] = [
   {
+    id: 'adventure',
+    title: 'Adventure',
+    items: [NAVIGATION_ITEMS.dashboard],
+  },
+  {
     id: 'character-management',
     title: 'Character',
     items: [
@@ -207,7 +212,6 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     id: 'systems',
     title: 'Systems',
     items: [
-      NAVIGATION_ITEMS.dashboard,
       NAVIGATION_ITEMS.settings,
       NAVIGATION_ITEMS.debug,
     ],

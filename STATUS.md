@@ -1,5 +1,22 @@
 # Repository Status — Campaign One 1.0 Released
 
+## 2026-10-24 — UI3 review repairs on UI2 candidate
+- Previous exact-head **PR #181** Build Validation `40058927308` **passed** on `9f535361` (including real browser matrix and divergent campaign histories). `main` remained `4259e945`; the original `v1.0.0` tag remains immutable.
+- Owner then requested autonomous implementation of the fresh adversarial UI review. Further commits on PR #181 repair doubled desktop flex margin, mobile action sizing, dark-menu title contrast, inert Gameplay Settings, migrated bond presentation, story-contact spatial truth, situational Current Moment language, and legacy Trait-slot proximity messaging and effects preview.
+- **Those later commits require a NEW exact-head Build Validation.** The older green run cannot qualify the modified branch. Human player comprehension is still unknown (`BETA_PASS=NO`).
+- Fresh first-session and end-to-end human testing is an external participation dependency, not an agent-completed test. The non-leading procedure is at `docs/ui/Phase2HumanEvaluation.md`.
+- Separate 1.1 Trait branch PR #178 remains unqualified/conflicted with `main`; its dependent PR #180/#182 are not automatically integrated by UI3.
+
+
+## 2026-10-23 — Owner-selected UI2 world-first candidate
+
+- PR #179 is **merged** at `4259e94573d189228af5ab71cf29ce7c5ab3c2d5`; its exact-head Build Validation and GitHub Pages deployment succeeded. This code is in current main, **not the original immutable v1.0.0 tag**.
+- The owner approved follow-up UI2 experience and trust work. **Draft PR #181** (`codex/ui2-world-first-experience-20261023`) contains source changes for UI2-A through UI2-J. Full exact-head qualification is **pending**. See `docs/ui/Phase2Implementation.md`.
+- Draft PR #178 (1.1 Traits) remains unqualified/conflicted; #180 is stacked on it. UI2-K is outside this 1.0 branch.
+- Human evidence remains `HUMAN-UNVALIDATED / BETA_PASS=NO`. No candidate or merge changes that claim.
+- The 2026-10-21 snapshot below describes earlier draft status; do not interpret it as current PR state.
+
+
 ### 2026-10-21 — Owner-approved UI experience construction candidates
 
 - **PR #179 (draft / unqualified):** source-backed interaction-truthfulness repairs, Current Moment situation-first layer, contextual routes, Copy exception action, chapter hint hierarchy, global status, focused UI tests. Candidate branch `work/ui-experience-truth-context-20261021`. No released 1.0.0 tag or prior historical evidence changed.

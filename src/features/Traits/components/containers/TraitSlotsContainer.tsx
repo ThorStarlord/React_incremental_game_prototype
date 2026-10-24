@@ -12,7 +12,6 @@ import {
   selectPermanentTraits,
   selectPlayerTraitSlots
 } from '../../../Player/state/PlayerSelectors';
-import { selectIsInProximityToNPC } from '../../../Meta/state/MetaSlice';
 // Actions and Thunks
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import { recalculateStatsThunk } from '../../../Player/state/PlayerThunks';
@@ -29,9 +28,11 @@ export const TraitSlotsContainer: React.FC = () => {
   const equippedTraits = useAppSelector(selectEquippedTraits);
   const permanentTraitIds = useAppSelector(selectPermanentTraits);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
-  const isInProximityToNPC = useAppSelector(selectIsInProximityToNPC);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
+  // The 1.0 equip/unequip reducers have no spatial gate. The legacy Meta
+  // proximity boolean is not grounded in the canonical M18 world model.
+  const canManageSlots = !isLoading;
 
   // --- Local UI State Management ---
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
@@ -53,7 +54,7 @@ export const TraitSlotsContainer: React.FC = () => {
 
   // --- Callback Handlers ---
   const handleSlotClick = useCallback((slot: TraitSlot) => {
-    if (!isInProximityToNPC || slot.isLocked) return;
+    if (!canManageSlots || slot.isLocked) return;
 
     if (slot.traitId) {
       const equippedTrait = equippedTraits.find(t => t.id === slot.traitId);
@@ -63,7 +64,7 @@ export const TraitSlotsContainer: React.FC = () => {
     } else {
       setSelectedSlotIndex(slot.slotIndex);
     }
-  }, [equippedTraits, isInProximityToNPC]);
+  }, [equippedTraits, canManageSlots]);
 
   const handleCloseSelector = useCallback(() => {
     setSelectedSlotIndex(null);
@@ -99,7 +100,7 @@ export const TraitSlotsContainer: React.FC = () => {
       traitSlots={traitSlots}
       equippedTraits={equippedTraits}
       availableTraits={[]}
-      isInProximityToNPC={isInProximityToNPC}
+      canManageSlots={canManageSlots}
       isLoading={true}
       error={null} 
       onSlotClick={() => {}} 
@@ -126,7 +127,7 @@ export const TraitSlotsContainer: React.FC = () => {
       traitSlots={traitSlots}
       equippedTraits={equippedTraits}
       availableTraits={availableTraitsForEquip}
-      isInProximityToNPC={isInProximityToNPC}
+      canManageSlots={canManageSlots}
       isLoading={false}
       error={error}
       selectedSlotIndexForModal={selectedSlotIndex}

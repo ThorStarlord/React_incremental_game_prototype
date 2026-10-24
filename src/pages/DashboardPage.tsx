@@ -47,6 +47,10 @@ import { selectTraitsState } from '../features/Traits/state/TraitsSelectors';
 import { GameControlPanel } from '../features/GameLoop/components/ui/GameControlPanel';
 import { PlayerInsightPanel } from '../features/Story/components/PlayerInsightPanel';
 import { CurrentMomentPanel } from '../features/Story/components/CurrentMomentPanel';
+import TravelPanel from '../features/Exploration/components/TravelPanel';
+import ActiveQuestCombatPanel from '../features/Combat/components/ActiveQuestCombatPanel';
+import { PrologueObjectivePanel } from '../features/Story/components/PrologueObjectivePanel';
+import { CampaignSpinePanel } from '../features/Story/components/CampaignSpinePanel';
 
 interface DashboardStatCard {
   title: string;
@@ -164,7 +168,25 @@ export const DashboardPage: React.FC = React.memo(() => {
       </Typography>
 
       <CurrentMomentPanel />
-
+      <Box id="travel-controls" tabIndex={-1} sx={{ scrollMarginTop: 24, mb: 2 }}>
+        <TravelPanel />
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <ActiveQuestCombatPanel />
+      </Box>
+      <Box component="details" sx={{ mb: 2, border: 1, borderColor: 'divider', borderRadius: 2, p: 2 }}>
+        <Typography component="summary" variant="subtitle1" sx={{ cursor: 'pointer', fontWeight: 600 }}>
+          Chapter objective and optional guidance
+        </Typography>
+        <Box sx={{ mt: 2 }}>
+          <PrologueObjectivePanel />
+          <CampaignSpinePanel />
+        </Box>
+      </Box>
+      <Box component="details" sx={{ mb: 2 }}>
+        <Typography component="summary" variant="subtitle1" sx={{ cursor: 'pointer', mb: 2, fontWeight: 600 }}>
+          Advanced time controls, character statistics, and progression
+        </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} lg={6}>
           <Card elevation={2}>
@@ -420,6 +442,7 @@ export const DashboardPage: React.FC = React.memo(() => {
           </Card>
         </Grid>
       </Grid>
+      </Box>
     </Box>
   );
 });

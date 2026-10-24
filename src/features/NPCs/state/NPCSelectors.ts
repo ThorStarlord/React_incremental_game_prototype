@@ -124,8 +124,13 @@ export const selectNPCsWithSharedTraits = createSelector(
 
 // NEW SELECTOR
 export const selectActiveConnectionCount = createSelector(
-  [selectAllNPCs],
-  (npcs) => Object.values(npcs).filter(npc => npc.connectionDepth > 0).length
+  [selectAllNPCs, (state: RootState) => state.relationships?.progressionByNpc ?? {},
+    (state: RootState) => state.relationships?.bondProfilesByNpc ?? {}],
+  (npcs, progression, bonds) => Object.values(npcs).filter(npc =>
+    progression[npc.id]?.connectionAuthority === 'relationships'
+      ? (bonds[npc.id]?.connectionLevel ?? 0) > 0
+      : (npc.connectionDepth ?? 0) > 0
+  ).length
 );
 
 export const selectNPCAvailableQuestsById = createSelector(
@@ -175,6 +180,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
         if (!node) return null;
 
         const availability = evaluateDialogueAvailabilityPresentation(node, {
+          affinity: npc.affinity ?? 0,
           completedDialogueIds: npc.completedDialogues ?? [],
           recordedExperiences,
           routineFamiliarity,
