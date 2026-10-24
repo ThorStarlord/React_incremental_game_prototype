@@ -41,6 +41,7 @@ test('unanchored story characters are not represented as physically present or l
   expect(contacts).toHaveLength(1);
   expect(contacts[0].to).toBe('/game/npcs/npc_scholar_elara?view=dialogue');
   expect(contacts[0].description).toMatch(/not established/i);
+  expect(selectCurrentMoment(store.getState()).situation).toMatch(/Merchant District.*pressure/);
   expect(selectCurrentMoment(store.getState()).actions.some(action => action.label.includes('Scholar Elara'))).toBe(false);
 });
 
@@ -65,4 +66,5 @@ test('Current Moment never displays the internal chapter ontology string', () =>
   const source = require('fs').readFileSync(require('path').join(process.cwd(), 'src/features/Story/CurrentMomentSelectors.ts'), 'utf8');
   expect(source).not.toContain('currentChapter?.title}: ${chapterIdentity.centerOfGravity}');
   expect(source).toContain('storyContacts');
+  expect(source).toContain('chapterIdentity?.playerSituation');
 });

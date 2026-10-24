@@ -165,17 +165,18 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
   // centerOfGravity string (which belongs in the design documentation).
   const availableHere = knownContactsHere.find(npc => selectAvailableNPCDialogueChoices(state, npc.id).length > 0);
   const currentChapterTitle = currentChapter?.title ?? chapterIdentity?.title ?? 'Your campaign';
+  const chapterSituation = chapterIdentity?.playerSituation ?? `${currentChapterTitle} is underway.`;
   const situation = stage === 'PROLOGUE'
     ? knownContactsHere.some(npc => npc.id === 'npc_elder_willow')
       ? 'Elder Willow is in the woods. Review her conversation when it becomes available, or continue exploring the known routes.'
       : 'The road to the Whispering Woods leads toward Elder Willow and her first lesson.'
     : availableHere
-      ? `${currentChapterTitle} is unfolding. ${availableHere.name} is here with an available conversation.`
+      ? `${chapterSituation} ${availableHere.name} is here with an available conversation.`
       : storyContacts.length > 0
-        ? `${currentChapterTitle} is unfolding. A known character has an available story conversation; their precise location is not tracked on this map.`
+        ? `${chapterSituation} A known character has an available story conversation; their precise location is not tracked on this map.`
         : activeQuests.length > 0
-          ? `${currentChapterTitle} is unfolding. ${activeQuests[0].title} is an unresolved quest in your journal.`
-          : `${currentChapterTitle} is unfolding. Revisit known contacts and recorded decisions for your next lead.`;
+          ? `${chapterSituation} ${activeQuests[0].title} is an unresolved quest in your journal.`
+          : `${chapterSituation} Revisit known contacts and recorded decisions for your next lead.`;
 
   return {
     locationName: location?.name ?? state.player.location,
