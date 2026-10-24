@@ -21,22 +21,22 @@ export const SessionStatusStrip: React.FC = React.memo(() => {
     .sort((a, b) => a.remaining - b.remaining);
 
   return (
-    <Box role="region" aria-label="Current game status" sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center', mb: 2 }}>
-      <Chip size="small" variant="outlined" label={
+    <Box role="region" aria-label="Current game status" sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.5, sm: 1 }, alignItems: 'center', mb: { xs: 1, sm: 2 } }}>
+      <Chip size="small" variant="outlined" sx={{ display: { xs: !loop.isRunning || loop.isPaused ? 'inline-flex' : 'none', sm: 'inline-flex' } }} label={
         !loop.isRunning ? 'Simulation stopped' : loop.isPaused ? 'Simulation paused' : 'Simulation running'
       } color={!loop.isRunning || loop.isPaused ? 'warning' : 'success'} />
       {timed.length > 0 && (
-        <Button component={RouterLink} to={`/game/quests?quest=${encodeURIComponent(timed[0].id)}`} size="small" color="warning">
+        <Button component={RouterLink} to={`/game/quests?quest=${encodeURIComponent(timed[0].id)}`} size="small" sx={{ minHeight: 44 }} color="warning">
           {timed[0].name}: {Math.ceil(timed[0].remaining)}s left
         </Button>
       )}
       {exceptions.length > 0 && (
-        <Button component={RouterLink} to={`/game/copies?copy=${encodeURIComponent(exceptions[0].copyId)}`} size="small" color="warning">
+        <Button component={RouterLink} to={`/game/copies?copy=${encodeURIComponent(exceptions[0].copyId)}`} size="small" sx={{ minHeight: 44 }} color="warning">
           {exceptions.length} Copy exception{exceptions.length === 1 ? '' : 's'} awaiting judgment
         </Button>
       )}
       {timed.length === 0 && exceptions.length === 0 && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
           No active deadlines or unresolved Copy exceptions
         </Typography>
       )}

@@ -5,6 +5,7 @@ import { ExportDialog } from '../dialogs/ExportDialog';
 import { ImportDialog } from '../dialogs/ImportDialog';
 import { AboutDialog } from '../dialogs/AboutDialog';
 import { SavedGame } from '../../../hooks/useSavedGames';
+import { formatSaveName } from '../../../shared/utils/formatUtils';
 import { DialogState, SaveToDelete } from '../hooks/useDialogManager';
 
 interface DialogsContainerProps {
@@ -63,7 +64,7 @@ export function DialogsContainer({
 
       <DeleteConfirmationDialog
         isOpen={dialogState.deleteDialog}
-        saveName={saveToDelete?.name}
+        saveName={saveToDelete ? formatSaveName(saveToDelete.name) : undefined}
         isLoading={isLoading}
         onConfirm={() => { // Connects onConfirm to the passed onDeleteConfirm
           if (saveToDelete) {

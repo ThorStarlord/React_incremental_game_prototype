@@ -3,6 +3,8 @@ import { Alert, Box, Button, Paper, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   CITY_CENTER_LOCATION_ID,
+  CITY_GATE_LOCATION_ID,
+  WHISPERING_WOODS_LOCATION_ID,
   getConnectedLocationDefinitions,
   getLocationDefinition,
   getMissingLocationExperienceIds,
@@ -10,6 +12,7 @@ import {
 } from '../LocationDefinitions';
 import { practiceForgeAssistanceThunk, travelToLocationThunk } from '../TravelThunks';
 import { NPC_WORLD_LOCATION_IDS } from '../../NPCs/state/NPCWorldLocationDefinitions';
+import { selectOpeningCampaignStage } from '../../Story/CampaignSpine';
 import { deriveSpatialRelationshipTether } from '../../Relationships/state/RelationshipSelectors';
 
 interface SpatialTetherFeedback {
@@ -27,6 +30,8 @@ const TravelPanel: React.FC = () => {
   const locationValue = useAppSelector(state => state.player.location);
   const forgeFamiliar = useAppSelector(state => Boolean(state.player.routineFamiliarity?.forge_assistance));
   const npcs = useAppSelector(state => state.npcs.npcs);
+  const openingStage = useAppSelector(selectOpeningCampaignStage);
+  const hasSeenIntro = useAppSelector(state => state.meta.hasSeenIntro);
   const recordedExperiences = useAppSelector(state =>
     state.relationships.experiencesById
   );
@@ -38,6 +43,11 @@ const TravelPanel: React.FC = () => {
     ? getLocationDefinition(currentLocationId)
     : undefined;
   const destinations = getConnectedLocationDefinitions(locationValue);
+  const nextWillowStep = openingStage === 'PROLOGUE' && hasSeenIntro
+    ? currentLocationId === CITY_CENTER_LOCATION_ID ? CITY_GATE_LOCATION_ID
+      : currentLocationId === CITY_GATE_LOCATION_ID ? WHISPERING_WOODS_LOCATION_ID
+        : null
+    : null;
 
   const buildSpatialFeedback = (destinationId: string): SpatialTetherFeedback[] =>
     Object.keys(NPC_WORLD_LOCATION_IDS).flatMap(npcId => {
@@ -97,23 +107,11 @@ const TravelPanel: React.FC = () => {
             {currentLocation.description}
           </Typography>
 
-          {currentLocation.id === CITY_CENTER_LOCATION_ID && (
-            <Box sx={{ mb: 2, p: 1.5, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2">City Forge</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                Practice the workshop support routine yourself once to understand it before delegating it to a Copy.
-              </Typography>
-              <Button
-                variant="contained"
-                size="small"
-                disabled={forgeFamiliar}
-                onClick={handleForgePractice}
-              >
-                {forgeFamiliar ? 'Forge Assistance Learned' : 'Practice Forge Assistance (+5 Gold)'}
-              </Button>
-            </Box>
+          {nextWillowStep && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              To find Elder Willow, take the next legal road toward Whispering Woods. You will still travel one location at a time.
+            </Typography>
           )}
-
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             {destinations.map(destination => {
               const missingExperienceIds = getMissingLocationExperienceIds(
@@ -124,7 +122,8 @@ const TravelPanel: React.FC = () => {
               return (
                 <Button
                   key={destination.id}
-                  variant="outlined"
+                  variant={!locked && destination.id === nextWillowStep ? 'contained' : 'outlined'}
+                  sx={{ minHeight: 44 }}
                   disabled={locked}
                   onClick={() => handleTravel(destination.id)}
                   title={locked ? 'Travel access has not been established yet.' : undefined}
@@ -134,6 +133,24 @@ const TravelPanel: React.FC = () => {
               );
             })}
           </Box>
+
+          {currentLocation.id === CITY_CENTER_LOCATION_ID && (
+            <Box sx={{ mb: 2, p: 1.5, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2">City Forge</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Practice the workshop support routine yourself once to understand it before delegating it to a Copy.
+              </Typography>
+              <Button
+                variant={nextWillowStep ? 'outlined' : 'contained'}
+                size="small"
+                sx={{ minHeight: 44 }}
+                disabled={forgeFamiliar}
+                onClick={handleForgePractice}
+              >
+                {forgeFamiliar ? 'Forge Assistance Learned' : 'Practice Forge Assistance (+5 Gold)'}
+              </Button>
+            </Box>
+          )}
 
           {destinations.length === 0 && (
             <Typography variant="body2" color="text.secondary">
