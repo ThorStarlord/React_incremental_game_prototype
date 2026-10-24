@@ -325,6 +325,14 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         await menu.getByRole('button', { name: 'Navigate to Dashboard' }).click();
         await mobile.waitForURL(/\/game\/dashboard$/, { timeout: 10000 });
         await menu.waitFor({ state: 'hidden', timeout: 10000 });
+        // MUI marks the drawer inaccessible before its exit-slide ends.
+        // Screenshots must observe an actually closed drawer, not a transient
+        // partial overlay after navigation.
+        await mobile.waitForFunction(() =>
+          Array.from(document.querySelectorAll('.MuiDrawer-paper')).every(drawer =>
+            drawer.getBoundingClientRect().right <= 1 ||
+            window.getComputedStyle(drawer).visibility === 'hidden'
+          ), null, { timeout: 10000 });
         await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'dark-mode current location');
         await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-dark-current-moment.png`), fullPage: true });
         for (const width of [320, 375, 768]) {
