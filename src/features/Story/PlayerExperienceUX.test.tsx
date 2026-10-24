@@ -36,7 +36,7 @@ test('a known nearby contact without an available topic is inspectable but not f
   store.dispatch(setHasSeenIntro(true));
   store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
   store.dispatch(setNPCs({
-    npc_elder_willow: { id: 'npc_elder_willow', name: 'Elder Willow', availableDialogues: [], completedDialogues: [] } as any,
+    npc_elder_willow: { id: 'npc_elder_willow', name: 'Elder Willow', isDiscovered: true, availableDialogues: [], completedDialogues: [] } as any,
   }));
   render(
     <Provider store={store}>
@@ -61,7 +61,7 @@ test('an authored, currently available nearby conversation offers a direct dialo
   store.dispatch(setLocation(WHISPERING_WOODS_LOCATION_ID));
   store.dispatch(setNPCs({
     npc_elder_willow: {
-      id: 'npc_elder_willow', name: 'Elder Willow',
+      id: 'npc_elder_willow', name: 'Elder Willow', isDiscovered: true,
       availableDialogues: ['test_willow_intro'], completedDialogues: [],
     } as any,
   }));
