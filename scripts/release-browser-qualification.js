@@ -264,6 +264,9 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         await mobile.goto(options.url, { waitUntil: name === 'firefox' ? 'commit' : 'domcontentloaded', timeout: 30000 });
         await mobile.getByRole('button', { name: /^New Game$/ }).click();
         const intro = mobile.getByRole('dialog', { name: 'Introduction' });
+        // New Game navigation precedes the modal mount; a visibility check
+        // without waiting races it and makes background controls aria-hidden.
+        await intro.waitFor({ state: 'visible', timeout: 15000 });
         for (let step = 0; step < 10 && await intro.isVisible(); step += 1) {
           await intro.getByRole('button', { name: /Continue|Begin/ }).click();
         }

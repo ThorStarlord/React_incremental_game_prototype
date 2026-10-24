@@ -310,7 +310,7 @@ class CampaignRunner {
     const target = new RegExp(`/game/npcs/${npcId}$`);
     if (!target.test(this.page.url())) {
       await this.nav('NPCs');
-      const card = this.page.getByRole('button', { name: new RegExp(`^${escapeRegExp(this.npcName(npcId))}\\b`) });
+      const card = this.page.getByRole('button', { name: `Open ${this.npcName(npcId)}`, exact: true });
       await card.first().click({ timeout: STEP_TIMEOUT });
       await this.page.waitForURL(target, { timeout: STEP_TIMEOUT });
     }
@@ -399,6 +399,15 @@ class CampaignRunner {
 
   // The campaign objective heading (e.g. "Chapter 4 — Lattice Under Strain").
   async campaignHeading() {
+    // Chapter objectives are intentionally expandable in UI2. Exercise the
+    // visible summary, as a player would, before asserting the authored title.
+    const guidance = this.page.locator('details').filter({
+      has: this.page.getByText('Chapter objective and optional guidance', { exact: true }),
+    }).first();
+    await guidance.waitFor({ state: 'visible', timeout: STEP_TIMEOUT });
+    if ((await guidance.getAttribute('open')) === null) {
+      await guidance.locator('summary').first().click();
+    }
     const text = await this.page.getByRole('main').first().innerText();
     const match = text.match(/^(Prologue\b.*|Chapter \d+ — .*|Finale — .*|Campaign One Complete — .*)$/m);
     if (!match) throw new Error(`no campaign objective heading visible; saw: ${text.slice(0, 300)}`);
