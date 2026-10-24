@@ -120,7 +120,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           ))
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No previous conversations. Choose an available conversation topic when you are together.
+            No previous conversations. Choose an authored topic when one is available.
           </Typography>
         )}
       </Paper>
