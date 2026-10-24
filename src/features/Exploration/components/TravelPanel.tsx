@@ -123,6 +123,7 @@ const TravelPanel: React.FC = () => {
                 <Button
                   key={destination.id}
                   variant={!locked && destination.id === nextWillowStep ? 'contained' : 'outlined'}
+                  sx={{ minHeight: 44 }}
                   disabled={locked}
                   onClick={() => handleTravel(destination.id)}
                   title={locked ? 'Travel access has not been established yet.' : undefined}
@@ -142,6 +143,7 @@ const TravelPanel: React.FC = () => {
               <Button
                 variant="contained"
                 size="small"
+                sx={{ minHeight: 44 }}
                 disabled={forgeFamiliar}
                 onClick={handleForgePractice}
               >

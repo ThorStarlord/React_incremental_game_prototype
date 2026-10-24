@@ -26,12 +26,12 @@ export const SessionStatusStrip: React.FC = React.memo(() => {
         !loop.isRunning ? 'Simulation stopped' : loop.isPaused ? 'Simulation paused' : 'Simulation running'
       } color={!loop.isRunning || loop.isPaused ? 'warning' : 'success'} />
       {timed.length > 0 && (
-        <Button component={RouterLink} to={`/game/quests?quest=${encodeURIComponent(timed[0].id)}`} size="small" color="warning">
+        <Button component={RouterLink} to={`/game/quests?quest=${encodeURIComponent(timed[0].id)}`} size="small" sx={{ minHeight: 44 }} color="warning">
           {timed[0].name}: {Math.ceil(timed[0].remaining)}s left
         </Button>
       )}
       {exceptions.length > 0 && (
-        <Button component={RouterLink} to={`/game/copies?copy=${encodeURIComponent(exceptions[0].copyId)}`} size="small" color="warning">
+        <Button component={RouterLink} to={`/game/copies?copy=${encodeURIComponent(exceptions[0].copyId)}`} size="small" sx={{ minHeight: 44 }} color="warning">
           {exceptions.length} Copy exception{exceptions.length === 1 ? '' : 's'} awaiting judgment
         </Button>
       )}

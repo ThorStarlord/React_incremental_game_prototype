@@ -27,7 +27,7 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
         <Stack direction={{ xs: 'column', md: 'row' }} gap={1.5} flexWrap="wrap" sx={{ mb: 2 }}>
           {immediateActions.map(action => (
             <Paper key={action.id} variant="outlined" sx={{ p: 1.5, flex: { xs: '1 1 auto', md: '1 1 190px' }, width: { xs: '100%', md: 'auto' }, minWidth: 0 }}>
-              <Button size="small" variant={action.kind === 'encounter' || action.id === 'prologue-travel' ? 'contained' : 'outlined'} component={RouterLink} to={action.to}>
+              <Button size="small" sx={{ minHeight: 44, whiteSpace: 'normal', textAlign: 'left' }} variant={action.kind === 'encounter' || action.id === 'prologue-travel' ? 'contained' : 'outlined'} component={RouterLink} to={action.to}>
                 {action.label}
               </Button>
               <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
@@ -47,7 +47,7 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
             <Stack direction={{ xs: 'column', sm: 'row' }} gap={1} flexWrap="wrap" alignItems="flex-start">
               {moment.storyContacts.map(action => (
                 <Box key={action.id} sx={{ maxWidth: 310 }}>
-                  <Button component={RouterLink} variant="outlined" size="small" to={action.to}>{action.label}</Button>
+                  <Button component={RouterLink} variant="outlined" size="small" sx={{ minHeight: 44, whiteSpace: 'normal' }} to={action.to}>{action.label}</Button>
                   <Typography variant="caption" color="text.secondary" display="block">{action.description}</Typography>
                 </Box>
               ))}
