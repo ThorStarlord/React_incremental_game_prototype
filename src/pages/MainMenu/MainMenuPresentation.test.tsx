@@ -62,7 +62,7 @@ describe('main menu presentation', () => {
     const onLoad = jest.fn();
     render(<LoadGameDialog isOpen savedGames={[{
       id: 'save_abc', name: 'Autosave_exit_1792842045257', timestamp: 1792842045257,
-      playerLevel: 1,
+      playerLevel: 1, playtime: 0,
     }]} isLoading={false} onLoad={onLoad} onDelete={noop} onClose={noop} />);
     expect(screen.getByText('Exit autosave')).toBeInTheDocument();
     expect(screen.queryByText('Autosave_exit_1792842045257')).not.toBeInTheDocument();
