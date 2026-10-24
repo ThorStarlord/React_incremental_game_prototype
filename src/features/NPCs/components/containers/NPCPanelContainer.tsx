@@ -188,7 +188,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
         </Box>
 
         {presenceAtAnchor === undefined && (
-          <Alert severity="info" sx={{ mt: 2 }} data-test-id="npc-unanchored-story-location">
+          <Alert severity="info" sx={{ mt: 2 }} data-testid="npc-unanchored-story-location">
             This character has an authored story setting, but no confirmed position in the current travel map.
             Existing story interactions remain available; this does not establish that they are physically beside you.
           </Alert>

@@ -7,7 +7,8 @@ import { rootReducer } from '../../app/store';
 import { setHasSeenIntro } from '../Meta/state/MetaSlice';
 import { setLocation } from '../Player/state/PlayerSlice';
 import { setNPCs, setDialogueNodes } from '../NPCs/state/NPCSlice';
-import { CITY_CENTER_LOCATION_ID } from '../Exploration/LocationDefinitions';
+import { CITY_CENTER_LOCATION_ID, WHISPERING_WOODS_LOCATION_ID } from '../Exploration/LocationDefinitions';
+import { isConfirmedNpcAtPlayerLocation } from '../NPCs/state/NPCWorldLocationDefinitions';
 import { recordRelationshipExperience } from '../Relationships/state/RelationshipSlice';
 import { selectCurrentMoment } from './CurrentMomentSelectors';
 import NPCPanelContainer from '../NPCs/components/containers/NPCPanelContainer';
@@ -101,4 +102,13 @@ test('NPC overview only advertises actual dialogue availability, not generic con
   expect(source).toContain('No new authored conversation is available right now.');
   expect(source).toContain('world position unverified');
   expect(source).not.toContain("Available now. Meaningful responses can become Relationship Experiences.");
+});
+
+test('confirmed nearby never falls back to legacy story-setting text', () => {
+  expect(isConfirmedNpcAtPlayerLocation('npc_scholar_elara', CITY_CENTER_LOCATION_ID)).toBe(false);
+  expect(isConfirmedNpcAtPlayerLocation('npc_elder_willow', CITY_CENTER_LOCATION_ID)).toBe(false);
+  expect(isConfirmedNpcAtPlayerLocation('npc_elder_willow', WHISPERING_WOODS_LOCATION_ID)).toBe(true);
+  const list = require('fs').readFileSync(require('path').join(process.cwd(), 'src/features/NPCs/components/containers/NPCListView.tsx'), 'utf8');
+  expect(list).toContain('isConfirmedNpcAtPlayerLocation(npc.id, playerLocation)');
+  expect(list).not.toContain('npc.location === playerLocation');
 });

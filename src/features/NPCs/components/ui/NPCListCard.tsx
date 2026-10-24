@@ -24,9 +24,11 @@ interface NPCListCardProps {
   isGlowing?: boolean;
   connectionLevel?: number;
   bondLabel?: string;
+  /** Known authored world anchor or an explicitly unconfirmed story setting. */
+  locationLabel?: string;
 }
 
-export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing, connectionLevel, bondLabel }) => {
+export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSelectNPC, isSelected, isGlowing, connectionLevel, bondLabel, locationLabel }) => {
   const currentTier = getCentralRelationshipTier(npc.affinity);
 
   return (
@@ -65,7 +67,7 @@ export const NPCListCard: React.FC<NPCListCardProps> = React.memo(({ npc, onSele
               <Typography variant="h6" noWrap>{npc.name}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
                 <LocationOn fontSize="small" />
-                <Typography variant="body2" noWrap>{npc.location}</Typography>
+                <Typography variant="body2" noWrap title={locationLabel ?? npc.location}>{locationLabel ?? npc.location}</Typography>
               </Box>
             </Box>
           </Box>

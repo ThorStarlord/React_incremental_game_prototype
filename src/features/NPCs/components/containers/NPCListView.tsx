@@ -33,7 +33,8 @@ import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCs, selectDiscoveredNPCs } from '../../state/NPCSelectors';
 import { selectHasSeenIntro } from '../../../Meta/state/MetaSlice';
 import { selectPlayerLocation } from '../../../Player/state/PlayerSelectors';
-import { isPlayerAtNpcWorldLocation } from '../../state/NPCWorldLocationDefinitions';
+import { isConfirmedNpcAtPlayerLocation, getNpcWorldLocationId } from '../../state/NPCWorldLocationDefinitions';
+import { getLocationDefinition } from '../../../Exploration/LocationDefinitions';
 import { NPC } from '../../state/NPCTypes';
 import { selectRelationshipState } from '../../../Relationships/state/RelationshipSelectors';
 import { NPCListCard } from '../ui/NPCListCard';
@@ -72,6 +73,11 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
   const connectionFor = (npc: NPC) => isMigrated(npc)
     ? (relationships.bondProfilesByNpc[npc.id]?.connectionLevel ?? 0)
     : (npc.connectionDepth ?? 0);
+  const locationLabelFor = (npc: NPC) => {
+    const anchor = getNpcWorldLocationId(npc.id);
+    if (!anchor) return `Story setting: ${npc.location || 'not established'} (position unconfirmed)`;
+    return getLocationDefinition(anchor)?.name ?? npc.location;
+  };
   
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name');
@@ -110,10 +116,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
         npcList = npcList.filter(npc => affinityFor(npc) >= 60);
         break;
       case 'same_location':
-        npcList = npcList.filter(npc => {
-          const anchoredPresence = isPlayerAtNpcWorldLocation(npc.id, playerLocation);
-          return anchoredPresence ?? npc.location === playerLocation;
-        });
+        npcList = npcList.filter(npc => isConfirmedNpcAtPlayerLocation(npc.id, playerLocation));
         break;
       case 'connected':
         npcList = npcList.filter(npc => connectionFor(npc) > 0);
@@ -157,7 +160,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
             <ListItemAvatar>
               <NPCPortrait npc={npc} size={44} />
             </ListItemAvatar>
-            <ListItemText primary={npc.name} secondary={npc.location} />
+            <ListItemText primary={npc.name} secondary={locationLabelFor(npc)} />
             <ListItemSecondaryAction>
               <Tooltip title={`Connection Level: ${connectionFor(npc)}`}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pr: 2 }}>
@@ -211,7 +214,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="available">Available</MenuItem>
                 <MenuItem value="high_relationship">High Affinity (authoritative)</MenuItem>
-                <MenuItem value="same_location">Same Location</MenuItem>
+                <MenuItem value="same_location">Confirmed nearby</MenuItem>
                 <MenuItem value="connected">Connected</MenuItem>
               </Select>
             </FormControl>
@@ -249,6 +252,7 @@ export const NPCListView: React.FC<NPCListViewProps> = ({
                   npc={npc}
                   connectionLevel={connectionFor(npc)}
                   bondLabel={bondLabelFor(npc)}
+                  locationLabel={locationLabelFor(npc)}
                   onSelectNPC={onSelectNPC}
                   isSelected={selectedNPCId === npc.id}
                   isGlowing={!hasSeenIntro && filteredAndSortedNPCs.length === 1}

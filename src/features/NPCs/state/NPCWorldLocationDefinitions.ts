@@ -36,3 +36,7 @@ export const isPlayerAtNpcWorldLocation = (
 
   return playerLocationId === canonicalNpcLocationId;
 };
+
+/** List filter authority: no world anchor means unknown, never physically co-located. */
+export const isConfirmedNpcAtPlayerLocation = (npcId: string, playerLocation: string): boolean =>
+  isPlayerAtNpcWorldLocation(npcId, playerLocation) === true;

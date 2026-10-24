@@ -21,8 +21,8 @@ export const SessionStatusStrip: React.FC = React.memo(() => {
     .sort((a, b) => a.remaining - b.remaining);
 
   return (
-    <Box role="region" aria-label="Current game status" sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center', mb: 2 }}>
-      <Chip size="small" variant="outlined" label={
+    <Box role="region" aria-label="Current game status" sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.5, sm: 1 }, alignItems: 'center', mb: { xs: 1, sm: 2 } }}>
+      <Chip size="small" variant="outlined" sx={{ display: { xs: !loop.isRunning || loop.isPaused ? 'inline-flex' : 'none', sm: 'inline-flex' } }} label={
         !loop.isRunning ? 'Simulation stopped' : loop.isPaused ? 'Simulation paused' : 'Simulation running'
       } color={!loop.isRunning || loop.isPaused ? 'warning' : 'success'} />
       {timed.length > 0 && (
@@ -36,7 +36,7 @@ export const SessionStatusStrip: React.FC = React.memo(() => {
         </Button>
       )}
       {timed.length === 0 && exceptions.length === 0 && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
           No active deadlines or unresolved Copy exceptions
         </Typography>
       )}

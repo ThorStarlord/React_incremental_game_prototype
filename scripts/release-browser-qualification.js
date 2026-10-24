@@ -236,6 +236,9 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await assertVisible(moment.getByRole('heading', { name: 'Current Moment' }), 'Current Moment heading');
       await assertVisible(moment.getByRole('link', { name: 'Find Elder Willow' }), 'opening story lead');
       await assertVisible(page.getByRole('button', { name: 'Travel to City Gate' }), 'legal world travel');
+      const lead = moment.getByRole('link', { name: 'Find Elder Willow' });
+      if (!(await lead.textContent()).includes('Find Elder Willow')) throw new Error('Opening lead is missing');
+      await assertVisible(page.getByText(/road to Willow begins at City Gate/i), 'contextual legal next travel step');
       await page.screenshot({ path: path.join(outDir, `${name}-first-session.png`), fullPage: true });
     });
 
@@ -281,6 +284,8 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         await intro.waitFor({ state: 'hidden', timeout: 10000 });
         await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'mobile Current Moment');
         await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-current-moment.png`), fullPage: true });
+        const horizontalOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
+        if (horizontalOverflow) throw new Error('Mobile layout overflows viewport horizontally');
         const responsive = await mobile.evaluate(() => ({
           innerWidth: window.innerWidth,
           match: window.matchMedia('(max-width:899.95px)').matches,

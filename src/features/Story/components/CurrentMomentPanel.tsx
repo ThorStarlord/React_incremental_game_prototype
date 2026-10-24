@@ -1,6 +1,7 @@
 import React from 'react';
 import { Alert, Box, Button, Card, CardContent, Divider, Paper, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { alpha } from '@mui/material/styles';
 import { useAppSelector } from '../../../app/hooks';
 import { selectCurrentMoment } from '../CurrentMomentSelectors';
 
@@ -14,7 +15,9 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
       <CardContent sx={{ p: { xs: 2, md: 3 } }}>
         <Typography variant="overline" color="primary.main">Explorer's journal · Current place</Typography>
         <Typography variant="h5" component="h2" gutterBottom>Current Moment</Typography>
-        <Box sx={{ p: { xs: 1.5, md: 2 }, mb: 2, borderRadius: 2, backgroundColor: 'action.hover' }}>
+        <Box sx={{ p: { xs: 1.5, md: 2 }, mb: 2, borderRadius: 2,
+          background: theme => `linear-gradient(120deg, ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.21 : 0.09)}, ${theme.palette.background.paper} 92%)`,
+          border: 1, borderColor: 'divider' }}>
           <Typography variant="h6" component="h3">You are in {moment.locationName}</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{moment.locationDescription}</Typography>
           <Typography variant="body1">{moment.situation}</Typography>
