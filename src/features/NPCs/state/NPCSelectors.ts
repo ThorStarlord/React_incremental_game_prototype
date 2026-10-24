@@ -180,6 +180,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
         if (!node) return null;
 
         const availability = evaluateDialogueAvailabilityPresentation(node, {
+          affinity: npc.affinity ?? 0,
           completedDialogueIds: npc.completedDialogues ?? [],
           recordedExperiences,
           routineFamiliarity,

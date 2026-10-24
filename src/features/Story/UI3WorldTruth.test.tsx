@@ -68,3 +68,27 @@ test('Current Moment never displays the internal chapter ontology string', () =>
   expect(source).toContain('storyContacts');
   expect(source).toContain('chapterIdentity?.playerSituation');
 });
+
+test('story contact never advertises a dialogue that the legacy minAffinity runtime gate would reject', () => {
+  const store = makeStore();
+  store.dispatch(setHasSeenIntro(true));
+  store.dispatch(setNPCs({
+    npc_scholar_elara: {
+      id: 'npc_scholar_elara', name: 'Scholar Elara', location: 'Grand Library',
+      isDiscovered: true, affinity: 0, availableDialogues: ['elara_gated_topic'], completedDialogues: [],
+    } as any,
+  }));
+  store.dispatch(setDialogueNodes({
+    elara_gated_topic: {
+      id: 'elara_gated_topic', title: 'Private discussion', text: 'A guarded topic.',
+      repeatable: true, minAffinity: 50, responses: {},
+    },
+  }));
+  store.dispatch(recordRelationshipExperience({
+    id: 'willow_exp_first_lesson', uniqueKey: 'first_lesson_reject', title: 'First Lesson',
+    primaryTargetId: 'npc_elder_willow', participantIds: ['player', 'npc_elder_willow'],
+    sourceType: 'dialogue', significance: 'meaningful', relationshipEffects: {},
+    resonanceTags: [], timestamp: Date.now(), memoryCandidate: false,
+  } as any));
+  expect(selectCurrentMoment(store.getState()).storyContacts).toEqual([]);
+});

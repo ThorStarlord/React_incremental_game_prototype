@@ -7,6 +7,8 @@ import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
 
 export interface DialogueAvailabilityPresentationContext {
   completedDialogueIds: readonly string[];
+  /** Legacy Affinity gate still used by the authoritative interaction thunk. */
+  affinity?: number;
   recordedExperiences: Record<string, { title?: string } | undefined>;
   routineFamiliarity: Record<string, unknown>;
   knownFactIds: readonly string[];
@@ -39,6 +41,11 @@ export const evaluateDialogueAvailabilityPresentation = (
   node: DialogueNode,
   context: DialogueAvailabilityPresentationContext
 ): DialogueAvailabilityPresentation => {
+  // The interaction thunk rejects minAffinity before applying any effects.
+  // Mirror that rejection here so world/Dialogue surfaces never offer a false choice.
+  if (typeof node.minAffinity === 'number' && (context.affinity ?? 0) < node.minAffinity) {
+    return { available: false, availabilityReasons: [] };
+  }
   if (
     node.repeatable === false &&
     context.completedDialogueIds.includes(node.id)
