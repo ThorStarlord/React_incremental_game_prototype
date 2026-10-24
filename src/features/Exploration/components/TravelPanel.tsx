@@ -141,7 +141,7 @@ const TravelPanel: React.FC = () => {
                 Practice the workshop support routine yourself once to understand it before delegating it to a Copy.
               </Typography>
               <Button
-                variant="contained"
+                variant={nextWillowStep ? 'outlined' : 'contained'}
                 size="small"
                 sx={{ minHeight: 44 }}
                 disabled={forgeFamiliar}
