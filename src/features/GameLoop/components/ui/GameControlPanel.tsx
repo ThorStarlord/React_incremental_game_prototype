@@ -3,8 +3,6 @@ import { Box, Button, Slider, Typography, Paper } from '@mui/material';
 import { PlayArrow, Pause, Stop, Speed } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { startGame, pauseGame, resumeGame, stopGame, setGameSpeed } from '../../state/GameLoopSlice';
-import TravelPanel from '../../../Exploration/components/TravelPanel';
-import ActiveQuestCombatPanel from '../../../Combat/components/ActiveQuestCombatPanel';
 
 export const GameControlPanel: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -59,7 +57,7 @@ export const GameControlPanel: React.FC = () => {
               onClick={handleStartGame}
               color="success"
             >
-              Start Game
+              Start Simulation
             </Button>
           ) : (
             <>
@@ -77,12 +75,15 @@ export const GameControlPanel: React.FC = () => {
                 onClick={handleStopGame}
                 color="error"
               >
-                Stop
+                Stop Simulation
               </Button>
             </>
           )}
         </Box>
 
+        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+          These controls only change time progression. Use Save &amp; Main Menu to leave the session.
+        </Typography>
         {gameLoop.isRunning && (
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" color="text.secondary">
@@ -108,8 +109,6 @@ export const GameControlPanel: React.FC = () => {
         </Box>
       </Paper>
 
-      <TravelPanel />
-      <ActiveQuestCombatPanel />
     </>
   );
 };

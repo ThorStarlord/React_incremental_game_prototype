@@ -40,6 +40,8 @@ const initialState: SettingsState = {
     showResourceNotifications: true,
     showLevelUpAnimations: true,
     compactInventory: false,
+    primaryColor: '#355c69',
+    secondaryColor: '#a36c39',
   },
 };
 

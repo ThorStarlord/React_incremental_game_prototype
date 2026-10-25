@@ -10,7 +10,7 @@ const baseContext = {
   knownFactIds: [] as string[],
   factionReputationByFactionId: {} as Record<string, number>,
   worldStateRegions: {},
-  expressedTraitIds: [] as string[],
+  permanentTraitIds: [] as string[],
   activeDoctrineIds: [] as const,
 };
 
@@ -51,7 +51,7 @@ describe('post-M25 contextual causal legibility', () => {
     });
   });
 
-  test('expressed Trait requirements stay spoiler-safe while explaining current capability', () => {
+  test('permanent capability requirements stay spoiler-safe while explaining learned capability', () => {
     const node: DialogueNode = {
       id: 'constraint_topic',
       title: 'Read the Hard Margin',
@@ -65,10 +65,10 @@ describe('post-M25 contextual causal legibility', () => {
 
     expect(evaluateDialogueAvailabilityPresentation(node, {
       ...baseContext,
-      expressedTraitIds: ['ConstraintSense'],
+      permanentTraitIds: ['ConstraintSense'],
     })).toEqual({
       available: true,
-      availabilityReasons: ['Expressed Trait: ConstraintSense'],
+      availabilityReasons: ['Permanent capability: ConstraintSense'],
     });
   });
 

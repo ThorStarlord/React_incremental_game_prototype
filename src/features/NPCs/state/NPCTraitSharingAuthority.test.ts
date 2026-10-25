@@ -1,10 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from '../../../app/store';
-import {
-  addAssimilatedTrait,
-  expressTrait,
-  suppressTrait,
-} from '../../Player/state/PlayerSlice';
+import { addPermanentTrait, equipTrait } from '../../Player/state/PlayerSlice';
 import { loadTraits } from '../../Traits/state/TraitsSlice';
 import type { Trait } from '../../Traits/state/TraitsTypes';
 import { setNPCs } from './NPCSlice';
@@ -45,26 +41,10 @@ const seed = (store: ReturnType<typeof makeStore>) => {
 };
 
 describe('NPC Trait sharing authority', () => {
-  test('an assimilated and currently expressed Trait can be projected to an NPC', async () => {
+  test('permanent-only Traits cannot bypass the equipped non-permanent sharing contract', async () => {
     const store = makeStore();
     seed(store);
-    store.dispatch(addAssimilatedTrait(TEST_TRAIT.id));
-
-    await store.dispatch(shareTraitWithNPCThunk({
-      npcId: 'npc_share_probe',
-      traitId: TEST_TRAIT.id,
-      slotIndex: 0,
-    }));
-
-    expect(store.getState().npcs.npcs.npc_share_probe.sharedTraitSlots?.[0].traitId)
-      .toBe(TEST_TRAIT.id);
-  });
-
-  test('assimilation alone does not make a suppressed Trait shareable', async () => {
-    const store = makeStore();
-    seed(store);
-    store.dispatch(addAssimilatedTrait(TEST_TRAIT.id));
-    store.dispatch(suppressTrait({ slotIndex: 0 }));
+    store.dispatch(addPermanentTrait(TEST_TRAIT.id));
 
     await store.dispatch(shareTraitWithNPCThunk({
       npcId: 'npc_share_probe',
@@ -75,14 +55,14 @@ describe('NPC Trait sharing authority', () => {
     expect(store.getState().npcs.npcs.npc_share_probe.sharedTraitSlots?.[0].traitId)
       .toBeNull();
     expect(store.getState().notifications.items.some(notification =>
-      notification.message.includes('Only currently expressed Traits')
+      notification.message.includes('Only equipped, non-permanent Traits')
     )).toBe(true);
   });
 
-  test('a temporarily expressed discovered Trait remains shareable', async () => {
+  test('an equipped non-permanent Trait remains shareable', async () => {
     const store = makeStore();
     seed(store);
-    store.dispatch(expressTrait({ traitId: TEST_TRAIT.id, slotIndex: 0 }));
+    store.dispatch(equipTrait({ traitId: TEST_TRAIT.id, slotIndex: 0 }));
 
     await store.dispatch(shareTraitWithNPCThunk({
       npcId: 'npc_share_probe',

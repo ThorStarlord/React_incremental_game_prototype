@@ -172,7 +172,7 @@ describe('M18 narrow exploration / travel vertical slice', () => {
 
     renderTravel(store);
 
-    expect(screen.getByText('Current location: City Center')).toBeInTheDocument();
+    expect(screen.getByText(/From City Center, choose the next road/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Travel to Merchant District' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Travel to City Gate' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Travel to Whispering Woods' })).not.toBeInTheDocument();
@@ -182,7 +182,7 @@ describe('M18 narrow exploration / travel vertical slice', () => {
       expect(store.getState().player.location).toBe(CITY_GATE_LOCATION_ID);
     });
 
-    expect(await screen.findByText('Current location: City Gate')).toBeInTheDocument();
+    expect(await screen.findByText(/From City Gate, choose the next road/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Travel to Whispering Woods' })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Travel to Whispering Woods' }));
@@ -226,7 +226,7 @@ describe('M18 narrow exploration / travel vertical slice', () => {
     ).toEqual([MERCHANT_DISTRICT_LOCATION_ID, CITY_GATE_LOCATION_ID]);
 
     renderTravel(store);
-    expect(screen.getByText('Current location: City Center')).toBeInTheDocument();
+    expect(screen.getByText(/From City Center, choose the next road/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Travel to City Gate' }));
 
     await waitFor(() => {

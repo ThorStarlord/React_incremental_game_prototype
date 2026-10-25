@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import {
   Box,
+  Alert,
+  AlertTitle,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -148,6 +150,14 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
           <Typography variant="body2">Copy not found.</Typography>
         ) : (
           <Stack spacing={2}>
+            {unresolvedCopyExceptions.length > 0 && (
+              <Alert severity="warning" data-testid="copy-judgment-summary">
+                <AlertTitle>Needs your judgment</AlertTitle>
+                {unresolvedCopyExceptions.length} interrupted routine{unresolvedCopyExceptions.length === 1 ? '' : 's'}
+                {' '}need attention. Review the affected routines below. Acknowledging an
+                interruption will not resolve the decision.
+              </Alert>
+            )}
             <Box>
               <Typography variant="overline" color="text.secondary">Progress</Typography>
               <Stack spacing={1}>
@@ -201,7 +211,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                       {priorityLabel}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Start Preferred is a one-shot action. Enabled Standing Orders may start one bounded unit of known work on a later live tick; they never consume leftover task time or resolve exceptions.
+                      Start Preferred begins one eligible routine. Standing Orders can begin familiar work later when this Copy is idle, but never make decisions for you.
                     </Typography>
                   </Box>
                   <Button
@@ -280,7 +290,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                                 label="Standing Order"
                               />
                               <Typography variant="caption" color="text.secondary" display="block">
-                                Maintain the authored Archive verification backlog automatically when this Copy is idle and eligible. Pending: {archivePendingCount}.
+                                When this Copy is idle and ready, it can handle familiar Archive checks. Waiting: {archivePendingCount}.
                               </Typography>
                               {unresolvedCopyExceptions
                                 .filter(exception => exception.routineId === 'archive_verification')
@@ -335,7 +345,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                                 label="Standing Order"
                               />
                               <Typography variant="caption" color="text.secondary" display="block">
-                                Maintain the authored Forge maintenance backlog automatically when this Copy is idle and eligible. Pending: {forgePendingCount}.
+                                When this Copy is idle and ready, it can handle familiar Forge upkeep. Waiting: {forgePendingCount}.
                               </Typography>
                               {unresolvedCopyExceptions
                                 .filter(exception => exception.routineId === 'forge_assistance')
@@ -378,7 +388,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                             disabled={disabled}
                             onClick={() => dispatch(startCopyProductionTaskThunk({ copyId: copy.id, taskId: task.id }))}
                           >
-                            Assign
+                            Start Routine
                           </Button>
                           <Button
                             size="small"
@@ -415,6 +425,14 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
             )}
 
             <Divider flexItem sx={{ my: 1 }} />
+
+             <Box component="details" data-testid="copy-advanced-sharing" sx={{
+               border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5,
+             }}>
+               <Typography component="summary" variant="subtitle2"
+                 sx={{ cursor: 'pointer', fontWeight: 600 }}>
+                 Advanced · Trait sharing and inherited effects
+               </Typography>
 
             <Box>
               <Typography variant="overline" color="text.secondary">Share Preferences</Typography>
@@ -481,6 +499,7 @@ const CopyDetailPanel: React.FC<CopyDetailPanelProps> = ({ copyId, open, onClose
                   <Typography variant="caption" color="text.secondary">No traits yet.</Typography>
                 )}
               </Stack>
+            </Box>
             </Box>
           </Stack>
         )}

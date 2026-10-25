@@ -1,8 +1,68 @@
 # Repository Status — Campaign One 1.0 Released
 
-## Active 1.1 construction branch — owner-authorized, unqualified
+## 2026-10-25 — Universal Trait 1.1 source reconciliation (UNTESTED)
 
-This branch (`work/1.1-universal-trait-expression-20261020`, PR #178) is the owner-authorized **post-1.0 universal Trait construction candidate** under `specification/Technical/Version11ScopeContract.md`. The historic status and results below apply to **released 1.0.0**, not to 1.1. Source reconciliation from PR #165 is implemented on this branch, but full exact-head validation, UX/gameplay proof, authority re-closure, and a separate 1.1 release decision remain open. **1.1 is NOT RELEASED; HUMAN-UNVALIDATED.**
+- Owner-authorized 1.1 Trait PR #178 is being reconciled with the current post-UI4, Merchant District aftercare `main`. Its stacked UI/Doctrine PR #180 and schema-fixture PR #182 were **squash-merged into PR #178's original branch**; this reconciliation carries their resulting sources to current `main`.
+- Core construction: assimilated ownership remains durable; expressed Traits use finite Player slots; active effects, authored requirements, sharing, doctrine and save-schema v3 are driven by the 1.1 contract. Newer UI4 navigation, Copy affordances, NPC authoring and aftercare have priority where histories overlap. Unrelated original 1.0 release behavior is preserved as the baseline.
+- **Source-only evidence ceiling:** no exact-head TypeScript/build, unit tests, browser campaign, evidence tests or human play sessions were run by this integration. The PR's actual GitHub merge result is the authority for whether it reached main. It is not a 1.1 release or qualified candidate. Original `v1.0.0` remains unchanged; `HUMAN-UNVALIDATED`, `BETA_PASS=NO`.
+- PR #165 remains obsolete/overlapping historical implementation, not a separate feature to force-merge. No general Crafting, Skills, autonomous Copy planning, Chapter 8+ or 1.1 release is authorized by source integration.
+
+
+## 2026-10-25 — OWNER MERGE POLICY UPDATE / PR #190 source-only integration
+
+- The owner's **current** instruction is to merge owner-directed PRs without waiting for unit, browser, evidence, or full Build Validation tests. `AGENTS.md` now supersedes the former 2026-10-20 D3 test prerequisite for ordinary PR merges; older sections below retain historical evidence, not a live merge blocker.
+- [PR #190](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/190) integrates a narrow post-1.0 Merchant District aftercare experiment, recorded NPC-specific decisions, read-only world/standing context and old-save content refresh under this source-only waiver. Source commit and actual merge status are verified through the PR; this paragraph does **not** assert a qualifying test or independently verified integration behavior.
+- **Evidence ceiling: UNTESTED / UNQUALIFIED, HUMAN-UNVALIDATED, BETA_PASS=NO.** No tests, CI, synthetic participants or human players qualified this PR head. The original `v1.0.0` release tag is immutable and not changed by this PR.
+- Separate universal Trait PRs #165/#178 remain overlapping conflicted alternatives; #180/#182 depend on #178 and are not independent mainline changes. Do not treat the instruction to merge eligible PRs as permission to force incompatible or obsolete branches onto main.
+
+
+## 2026-10-25 — UI4 merged on main, qualified; human research still open
+
+- [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) **squash-merged** at `528d014d8de6b6cf775e4f6b229eb74b3b748dca`. Exact candidate head `cfad4349f4776ff7cd2b3effc30b60d695b0e8e5` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677): focused UI/TypeScript, regression suites, content and architecture, both responsive browsers, production build and full ordinary-UI campaign.
+- Full campaign evidence: Chromium and Firefox **Distributed Dissipation 105/105** and **Fortified Containment 104/104**, each with four save/Continue checkpoints and export/import PASS. A nested NPC-list return defect found in the first run was repaired and regression-tested; this PASS belongs to the repaired exact head.
+- Delivered presentation: player-language clarity, legal Willow travel lead, known-place journal vignettes and Willow motif, truthful relationship-history links, Copy exception-first management/advanced disclosure, and single route/page authority. See `docs/ui/Phase4PlayerClarity.md`.
+- **FEATURE_COMPLETE / HUMAN-UNVALIDATED; BETA_PASS=NO** remains. No actual participants were tested; protocol: `docs/ui/Phase2HumanEvaluation.md` and issue #109. Original `v1.0.0` tag unchanged. 1.1 Trait drafts #178/#180/#182 remain separate.
+- The earlier October 25 UI4 **candidate** entry immediately below is historical; do not restart that construction program or treat pending-gate wording as an open action.
+
+
+## 2026-10-25 — UI4 player clarity / experiential identity candidate
+
+- Owner authorized bounded implementation of the source-backed UI review. Branch **codex/ui4-player-experience-20261025** from main **96f6c595** changes player-facing language, known-place journal vignettes, recorded-consequence links, Copy attention and advanced controls, plus duplicate route-shell cleanup. Source and evidence map: docs/ui/Phase4PlayerClarity.md. Require full exact-head Build Validation before merge; no human-player claim from this work.
+- Prior UX3 PR #184 merged at **96f6c595** after Build Validation **40103050524 PASS**. The original v1.0.0 tag remains immutable and human Beta remains **BETA_PASS=NO / HUMAN-UNVALIDATED**. Universal Trait 1.1 PRs #178/#180/#182 are still independent drafts.
+- This candidate entry is not a merged/qualified claim until the PR's exact-head gate returns. Keep later historical UI2/UI3 snapshots as evidence, not a fresh construction queue.
+
+## 2026-10-24 — UI2/UI3 integrated on main (qualified)
+- [PR #181](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/181) **merged** at `41037697019dc7dcb8c9256d37002f230f737c26`. Its exact-head `e1f32ca70d231b0f415032bc50c0ac29d5a08fcf` passed [Build Validation #40090580707](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40090580707), including UI3 targeted tests, TypeScript, Chromium/Firefox real browser navigation and the complete two-route/2-browser ordinary-UI campaign (105 Distributed steps and 104 Fortified steps per browser, four save/Continue checkpoints each, export/import verified). No new 1.0.0 release tag was created; the immutable original `v1.0.0` still points to `14ce21e2`.
+- Implementation: world-first Current Moment, truthful spatial/story contact availability, player-facing eight-chapter situation prose, NPC and relationship authority repair, Quest/Copies/Traits/Settings trust, mobile and desktop spacing, visual contrast, real browser regression coverage.
+- The earlier Firefox Distributed acceptance timeout on intermediate PR head `fa82a862` was retained as a reliability observation, **not** labeled a persistent reproduced bug; all four routes passed on the qualified exact head. Investigate if it recurs.
+- **Evidence ceiling unchanged:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED`, `BETA_PASS=NO`; no genuine player study was performed. `docs/ui/Phase2HumanEvaluation.md` is the protocol for external first sessions and full campaigns.
+- Separate v1.1 universal Trait migration PR #178 remains unqualified/conflicted; stacked #180/#182 remain separate. No new 1.1 semantic authority was introduced by UI2/UI3.
+- The 2026-10-23/early-2026-10-24 candidate entries below are **historical snapshots**; do not treat them as an active backlog or unmerged PR.
+
+
+## 2026-10-24 — UI3 review repairs on UI2 candidate
+- Previous exact-head **PR #181** Build Validation `40058927308` **passed** on `9f535361` (including real browser matrix and divergent campaign histories). `main` remained `4259e945`; the original `v1.0.0` tag remains immutable.
+- Owner then requested autonomous implementation of the fresh adversarial UI review. Further commits on PR #181 repair doubled desktop flex margin, mobile action sizing, dark-menu title contrast, inert Gameplay Settings, migrated bond presentation, story-contact spatial truth, situational Current Moment language, and legacy Trait-slot proximity messaging and effects preview.
+- **Those later commits require a NEW exact-head Build Validation.** The older green run cannot qualify the modified branch. Human player comprehension is still unknown (`BETA_PASS=NO`).
+- Fresh first-session and end-to-end human testing is an external participation dependency, not an agent-completed test. The non-leading procedure is at `docs/ui/Phase2HumanEvaluation.md`.
+- Separate 1.1 Trait branch PR #178 remains unqualified/conflicted with `main`; its dependent PR #180/#182 are not automatically integrated by UI3.
+
+
+## 2026-10-23 — Owner-selected UI2 world-first candidate
+
+- PR #179 is **merged** at `4259e94573d189228af5ab71cf29ce7c5ab3c2d5`; its exact-head Build Validation and GitHub Pages deployment succeeded. This code is in current main, **not the original immutable v1.0.0 tag**.
+- The owner approved follow-up UI2 experience and trust work. **Draft PR #181** (`codex/ui2-world-first-experience-20261023`) contains source changes for UI2-A through UI2-J. Full exact-head qualification is **pending**. See `docs/ui/Phase2Implementation.md`.
+- Draft PR #178 (1.1 Traits) remains unqualified/conflicted; #180 is stacked on it. UI2-K is outside this 1.0 branch.
+- Human evidence remains `HUMAN-UNVALIDATED / BETA_PASS=NO`. No candidate or merge changes that claim.
+- The 2026-10-21 snapshot below describes earlier draft status; do not interpret it as current PR state.
+
+
+### 2026-10-21 — Owner-approved UI experience construction candidates
+
+- **PR #179 (draft / unqualified):** source-backed interaction-truthfulness repairs, Current Moment situation-first layer, contextual routes, Copy exception action, chapter hint hierarchy, global status, focused UI tests. Candidate branch `work/ui-experience-truth-context-20261021`. No released 1.0.0 tag or prior historical evidence changed.
+- **PR #180 (draft / unqualified, dependent on #178):** Trait lifecycle vocabulary and Doctrine expression before/after previews with suppression confirmation. Must await qualified PR #178 universal Trait semantics and save-schema v3.
+- **Human claim ceiling unchanged:** FEATURE_COMPLETE / HUMAN-UNVALIDATED for the released Campaign One. Synthetic browser checks and Jest qualify only exercised implementation behaviors; do not represent human comprehension.
+- **Active owner direction:** A bounded post-1.0 UI experience improvement program was explicitly approved on 2026-10-21; previously recorded "no new scope without owner decision" language is historical to the state preceding this direction. This is not an automatic release decision.
 
 
 **Status date:** 2026-10-20
@@ -34,7 +94,7 @@ This branch (`work/1.1-universal-trait-expression-20261020`, PR #178) is the own
 **Feature Complete:** `FEATURE_COMPLETE / HUMAN-UNVALIDATED` — see `specification/Technical/FeatureCompleteResult.md`  
 **Candidate B depth specification:** `IMPLEMENTED / BOUNDED EXIT SATISFIED`
 **Candidate B Forge evidence:** PR #154; exact-head `70c24d5a11c4238c60e1fdee9f83eb9164dd35f0`; Build Validation #468 PASS; merge `fbc19da437c0cfc7b0cd6dd9078741bc8b19f9f3`
-**Current implementation frontier on this 1.1 branch:** `UNIVERSAL_TRAITS_1_1 / INTEGRATION_QUALIFICATION_OPEN` — owner authorization is recorded in `Version11ScopeContract.md`; 1.0 remains released and does not reopen.
+**Current implementation frontier:** `NONE — 1.0.0 released; release-hotfix repairs only; 1.1 scope needs an owner decision`
 
 ### Feature-completion convergence disposition
 
@@ -81,7 +141,7 @@ Post-1.0 work:
 
 - **release hotfixes** for defects in the shipped scope, under the same exact-head Build Validation;
 - **GitHub Pages**: `deploy-pages.yml` publishes `main` once a repository admin enables Pages with the "GitHub Actions" source;
-- **1.1 universal Traits** are owner-authorized for this feature branch only (`Version11ScopeContract.md`, PR #178); PR #165 remains a parked historical source. Other expansion still needs a separate owner decision;
+- **1.1 or expansion** only by owner decision (the universal Trait redesign, PR #165, is parked there);
 - **optional human sessions** under issue #109;
 - **issue #122** (branch protection) still needs a GitHub administrator.
 

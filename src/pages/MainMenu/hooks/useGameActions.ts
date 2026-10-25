@@ -8,6 +8,7 @@ import { replaceState } from '../../../app/store';
 import { resetPlayerState } from '../../../features/Player/state/PlayerSlice';
 import { setHasSeenIntro, setSessionActive, updateLastSaved } from '../../../features/Meta/state/MetaSlice';
 import { newGameSeedNPCsThunk, setSelectedNPCId } from '../../../features/NPCs';
+import { refreshLoadedDistrictAftercareCatalogThunk } from '../../../features/NPCs/state/NPCThunks';
 import { resetEssence } from '../../../features/Essence/state/EssenceSlice';
 import { resetInventory } from '../../../features/Inventory/state/InventorySlice';
 import { resetQuestState } from '../../../features/Quest/state/QuestSlice';
@@ -64,7 +65,8 @@ export function useGameActions({
       await dispatch(initializeQuestsThunk()).unwrap();
       await dispatch(newGameSeedNPCsThunk()).unwrap();
       dispatch(setSessionActive(true));
-      navigate('/game/npcs');
+      // Present the immediate authored situation before advanced feature management.
+      navigate('/game/dashboard');
     } catch (error) {
       dispatch(replaceState(previousState));
       console.error('Failed to start a new game; previous state restored.', error);
@@ -122,6 +124,18 @@ export function useGameActions({
             'Migrated legacy relationship profiles:',
             migrationResult.migratedNpcIds.join(', ')
           );
+        }
+
+        // The save owns history; the current build owns authored dialogue
+        // definitions. Refresh this optional post-1.0 content *after* state
+        // replacement so old snapshots can see it without changing save schema,
+        // NPC discovery, relationship progress, or past decisions.
+        try {
+          await dispatch(refreshLoadedDistrictAftercareCatalogThunk()).unwrap();
+        } catch (error) {
+          // Missing optional content must not prevent an otherwise valid
+          // Campaign One save from loading.
+          console.warn('Merchant District aftercare could not be refreshed for this save.', error);
         }
 
         closeDialog('loadDialog');

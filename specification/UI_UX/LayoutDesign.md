@@ -1,5 +1,31 @@
 # Layout Design Specification
 
+## 2026-10-25 — UI4 clarity and route-ownership refinement, integrated
+
+[PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) merged at `528d014d` after exact head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677). The nested `/game/npcs/:npcId` route now returns to its tab root when selecting NPCs; the full-campaign run and targeted navigation tests pass. No new content or gameplay state was added.
+
+Current Moment retains its existing canonical actions and adds a decorative, responsive explorer-journal location vignette for three known early locations. It does not turn the panel into a map or fabricate NPC placement. The layout still contains a single semantic main region. AppRouter owns page choice through Outlet, MainContentArea owns only the shared presentation shell, and the active navigation tab is derived from the URL. Mobile legal travel actions and urgent status remain accessible. Copy's advanced Trait-sharing disclosure is separate from directly available production routines and unresolved-exception attention. Do not expand this into a generic UI engine or change gameplay/persistence authority.
+
+## 2026-10-24 — UI3 layout repair limits
+The desktop sidebar owns its flex width once; content starts immediately after it. Mobile Current Moment action cards have natural height and full width rather than inheriting a large flex-basis from horizontal desktop layout. Main-menu title uses a light-on-dark accessible treatment consistent with the now warmer in-game palette. Current Moment shows confirmed nearby encounters separately from *available story contacts (not mapped in the current travel graph)*; it never asserts physical presence for an unanchored contact. Header and status controls stay accessible. These are bounded repairs, not license to globally redesign chapters or 1.1 mechanics.
+
+
+## 2026-10-23 — Phase 2 authored layout (since merged by PR #181)
+
+PR #181 centers current location, currently available choices, legal travel, and active encounter controls on the Dashboard. Global Save/timer/Copy-exception status remains; secondary chapter hints and advanced metrics become expandable. NPCs use offline-safe monogram sigils until verified authored artwork exists. This is a bounded presentation evolution of current main, not a new state authority or original v1.0.0 amendment. Browser and exact-head validation passed on PR #181 head `e1f32ca70` (Build Validation #40090580707), ahead of merge.
+
+
+## Candidate 2026-10-21 UI authority (PR #179 — not part of released 1.0.0)
+
+The current candidate retains AppRouter, GameLayout, VerticalNavBar, MainContentArea and feature-driven pages. It adds a **CurrentMomentPanel inside DashboardPage** above the advanced statistic/game-control views, not a new navigation destination. The panel reads canonical locations, known NPC anchors, active quests, visible memories, and unresolved Copy exceptions.
+
+The persistent `SessionStatusStrip` sits beneath `GameSessionBar` in GameLayout. The core page landmark remains `MainContentArea`'s single `main`, removing an outer nested `main` from the former layout. The module-level pages remain unchanged as deep administrative controls.
+
+Responsive accessibility, stable status/projection performance, routed deep links and normal-UI full-campaign qualification are acceptance requirements. The legacy declarations below are retained for historical orientation; they do not alone prove modern UX comprehension.
+
+---
+
+
 This document outlines the user interface layout structure and design principles for the React Incremental RPG Prototype.
 
 ## 1. Layout Architecture Overview ✅ COMPLETE + MIGRATED (Legacy Deprecated)

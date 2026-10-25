@@ -19,6 +19,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { SavedGame } from '../../../hooks/useSavedGames';
+import { formatSaveName } from '../../../shared/utils/formatUtils';
 
 interface LoadGameDialogProps {
   isOpen: boolean;
@@ -106,7 +107,7 @@ export function LoadGameDialog({
                     <ListItemText
                       primary={
                         <Typography variant="subtitle1" component="span" fontWeight="medium">
-                          {game.name}
+                          {formatSaveName(game.name)}
                         </Typography>
                       }
                       secondary={

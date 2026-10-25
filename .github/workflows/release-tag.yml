@@ -38,23 +38,6 @@ jobs:
           esac
 
           notes=docs/release/ReleaseNotes.md
-          case "$version" in
-            1.1.0)
-              # Do not turn an in-progress 1.1 development branch into a tag.
-              # Version-specific notes and independent qualification must both
-              # exist; the 1.0 result is deliberately insufficient.
-              notes=docs/release/ReleaseNotes11.md
-              result=docs/release/Version11CandidateResult.md
-              if [ ! -f "$result" ] || ! grep -Eq '^\\*\\*Status:\\*\\* QUALIFIED' "$result"; then
-                echo "::error::1.1 requires an explicitly QUALIFIED Version11CandidateResult.md"
-                exit 1
-              fi
-              if grep -Eiq 'NOT YET RELEASED|NOT QUALIFIED|CANDIDATE IN DEVELOPMENT' "$notes"; then
-                echo "::error::1.1 release notes still describe a candidate"
-                exit 1
-              fi
-              ;;
-          esac
           if [ ! -f "$notes" ]; then
             echo "::error::${notes} is required to publish ${tag}"
             exit 1

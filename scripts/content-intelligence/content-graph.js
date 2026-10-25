@@ -134,6 +134,13 @@ function createModel(root, options = {}) {
       for (const experienceId of node.requiredExperienceIds || []) {
         addEdge('dialogue', dialogueId, 'experience', experienceId, 'requires-experience');
       }
+      // A follow-up that needs an earlier completed conversation has a real
+      // blocking authoring dependency, not merely a narrative association.
+      // The existing reachability and trace helpers already consume requires-*.
+      for (const prerequisiteId of node.requiredCompletedDialogueIds || []) {
+        if (typeof prerequisiteId !== 'string' || !prerequisiteId) continue;
+        addEdge('dialogue', dialogueId, 'dialogue', prerequisiteId, 'requires-completed-dialogue');
+      }
       for (const experienceId of node.anyOfExperienceIds || []) {
         addEdge('dialogue', dialogueId, 'experience', experienceId, 'requires-any-experience', {
           optionalAlternative: true,
@@ -408,6 +415,13 @@ function createModel(root, options = {}) {
     }
   }
 
+  // A required completed topic is checked against the *current NPC's* own
+  // completed dialogue IDs at runtime. Reject cross-recipient authoring, which
+  // would otherwise create an impossible or incorrectly attributed gate.
+  const ownerByDialogue = new Map(
+    edges.filter(edge => edge.relation === 'owned-by-npc')
+      .map(edge => [edge.from, edge.to])
+  );
   for (const edge of edges) {
     if (edge.nonBlocking) continue;
     if (!nodes.has(edge.from)) {
@@ -420,6 +434,18 @@ function createModel(root, options = {}) {
         entity: edge.from,
         target: edge.to,
       });
+    }
+    if (
+      edge.relation === 'requires-completed-dialogue' &&
+      nodes.has(edge.from) && nodes.has(edge.to) &&
+      (!ownerByDialogue.get(edge.from) ||
+        ownerByDialogue.get(edge.from) !== ownerByDialogue.get(edge.to))
+    ) {
+      issue(
+        'COMPLETED_DIALOGUE_NPC_MISMATCH',
+        `${edge.from} requires another NPC's completed dialogue ${edge.to}`,
+        { entity: edge.from, target: edge.to }
+      );
     }
   }
 

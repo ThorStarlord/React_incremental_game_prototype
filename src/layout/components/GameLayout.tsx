@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, useTheme, useMediaQuery } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { useAppDispatch } from '../../app/hooks';
 import { startGame } from '../../features/GameLoop/state/GameLoopSlice';
 import { useLayoutState } from '../hooks/useLayoutState';
@@ -11,9 +11,8 @@ import GlobalNotificationHost from '../../shared/components/ui/GlobalNotificatio
 import { useAppSelector } from '../../app/hooks';
 import { selectHasSeenIntro, selectSessionActive } from '../../features/Meta/state/MetaSlice';
 import { useNpcShopRestock } from '../../features/NPCs/hooks/useNpcShopRestock';
-import { PrologueObjectivePanel } from '../../features/Story/components/PrologueObjectivePanel';
-import { CampaignSpinePanel } from '../../features/Story/components/CampaignSpinePanel';
 import { GameSessionBar } from './GameSessionBar';
+import { SessionStatusStrip } from './SessionStatusStrip';
 
 /**
  * New GameLayout component that integrates with useLayoutState hook
@@ -21,7 +20,6 @@ import { GameSessionBar } from './GameSessionBar';
  */
 export const GameLayout: React.FC = React.memo(() => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const dispatch = useAppDispatch();
   const hasSeenIntro = useAppSelector(selectHasSeenIntro);
   const sessionActive = useAppSelector(selectSessionActive);
@@ -45,14 +43,6 @@ export const GameLayout: React.FC = React.memo(() => {
     syncWithRouter: true,
   });
 
-  // Calculate main content margin based on sidebar state and device type
-  const getMainContentMargin = () => {
-    if (isMobile) {
-      return 0;
-    }
-    
-    return sidebarCollapsed ? 64 : 240;
-  };
 
   // Without New Game or Load (e.g. after a page reload) the store holds only the
   // startup catalog, not a playable campaign. Send the player to the main menu,
@@ -79,24 +69,16 @@ export const GameLayout: React.FC = React.memo(() => {
 
       {/* Main Content Area */}
       <Box
-        component="main"
         sx={{
           flexGrow: 1,
-          marginLeft: isMobile ? 0 : `${getMainContentMargin()}px`,
-          transition: theme.transitions.create(['margin-left'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
+          // The desktop sidebar already occupies flex width. Adding a margin
+          // here doubled its footprint and stranded half the viewport.
           minWidth: 0,
         }}
       >
-        <MainContentArea 
-          activeTabId={activeTab}
-          changeTab={setActiveTab}
-        >
+        <MainContentArea activeTabId={activeTab}>
           <GameSessionBar />
-          <PrologueObjectivePanel />
-          <CampaignSpinePanel />
+          <SessionStatusStrip />
           <Outlet />
           {!hasSeenIntro && <IntroNarration />}
         </MainContentArea>

@@ -58,3 +58,10 @@ export const toDisplayNameFromId = (id: string, prefix?: string): string => {
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 };
+
+/** Display only: preserve the original save name/id for load, export and pruning. */
+export const formatSaveName = (name: string): string => {
+  if (/^Autosave_exit_\d+$/.test(name)) return 'Exit autosave';
+  if (name.startsWith('Autosave_')) return 'Autosave';
+  return name;
+};

@@ -8,8 +8,8 @@ import {
   selectTraitError
 } from '../../state/TraitsSelectors';
 import {
-  selectAssimilatedTraitIds,
   selectEquippedTraits,
+  selectAssimilatedTraitIds,
   selectPlayerTraitSlots
 } from '../../../Player/state/PlayerSelectors';
 // Actions and Thunks
@@ -30,6 +30,9 @@ export const TraitSlotsContainer: React.FC = () => {
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
+  // The 1.0 equip/unequip reducers have no spatial gate. The legacy Meta
+  // proximity boolean is not grounded in the canonical M18 world model.
+  const canManageSlots = !isLoading;
 
   // --- Local UI State Management ---
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
@@ -43,11 +46,8 @@ export const TraitSlotsContainer: React.FC = () => {
 
   // THIS IS THE KEY CHANGE: Base the list of equippable traits on what has been discovered.
   const availableTraitsForEquip = useMemo(() => {
-    const candidateIds = new Set([
-      ...discoveredTraits.map(trait => trait.id),
-      ...assimilatedTraitIds,
-    ]);
-    return Array.from(candidateIds)
+    const candidates = new Set([...discoveredTraits.map(trait => trait.id), ...assimilatedTraitIds]);
+    return Array.from(candidates)
       .map(traitId => allTraits[traitId])
       .filter((trait): trait is Trait => Boolean(trait))
       .filter(trait => !equippedTraitIds.includes(trait.id));
@@ -55,7 +55,7 @@ export const TraitSlotsContainer: React.FC = () => {
 
   // --- Callback Handlers ---
   const handleSlotClick = useCallback((slot: TraitSlot) => {
-    if (slot.isLocked) return;
+    if (!canManageSlots || slot.isLocked) return;
 
     if (slot.traitId) {
       const equippedTrait = equippedTraits.find(t => t.id === slot.traitId);
@@ -65,7 +65,7 @@ export const TraitSlotsContainer: React.FC = () => {
     } else {
       setSelectedSlotIndex(slot.slotIndex);
     }
-  }, [equippedTraits]);
+  }, [equippedTraits, canManageSlots]);
 
   const handleCloseSelector = useCallback(() => {
     setSelectedSlotIndex(null);
@@ -101,6 +101,7 @@ export const TraitSlotsContainer: React.FC = () => {
       traitSlots={traitSlots}
       equippedTraits={equippedTraits}
       availableTraits={[]}
+      canManageSlots={canManageSlots}
       isLoading={true}
       error={null} 
       onSlotClick={() => {}} 
@@ -127,6 +128,7 @@ export const TraitSlotsContainer: React.FC = () => {
       traitSlots={traitSlots}
       equippedTraits={equippedTraits}
       availableTraits={availableTraitsForEquip}
+      canManageSlots={canManageSlots}
       isLoading={false}
       error={error}
       selectedSlotIndexForModal={selectedSlotIndex}

@@ -154,14 +154,14 @@ export const solveQuestPuzzleThunk = createAsyncThunk(
 
     if (!quest || !objective || !objective.outcomes) {
       dispatch(addNotification({ message: 'Failed to solve puzzle: Invalid quest or objective.', type: 'error' }));
-      return;
+      return { success: false, message: 'Invalid quest or objective.' };
     }
 
     const outcome = objective.outcomes.find((o) => o.solution === solution);
 
     if (!outcome) {
       dispatch(addNotification({ message: 'Incorrect solution.', type: 'error' }));
-      return;
+      return { success: false, message: 'Incorrect solution. Your input is still available to revise.' };
     }
 
     for (const reward of outcome.rewards) {
@@ -194,6 +194,7 @@ export const solveQuestPuzzleThunk = createAsyncThunk(
 
     dispatch(addNotification({ message: outcome.logMessage, type: 'success' }));
     dispatch(updateObjectiveProgress({ questId, objectiveId, progress: 1 }));
+    return { success: true, message: outcome.logMessage };
   }
 );
 

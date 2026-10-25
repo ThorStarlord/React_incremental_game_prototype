@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react';
-import { Box, useMediaQuery, useTheme } from '@mui/material';
+import { Box, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { DesktopNavBar } from './DesktopNavBar';
 import { MobileNavDrawer } from './MobileNavDrawer';
@@ -80,15 +81,16 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
   }, [activeTab, location.pathname]);
 
   // Mobile navigation state
-  const { isDrawerOpen, closeDrawer } = useMobileNavigation();
+  const { isDrawerOpen, openDrawer, closeDrawer } = useMobileNavigation();
 
   // Handle tab changes
   const handleTabChange = useCallback((tabId: TabId) => {
-    // Navigate to the corresponding route
-    navigate(`/game/${tabId}`);
-
+    // The owning GameLayout callback handles navigation. Standalone usage
+    // can still navigate, but never invoke both paths for the same click.
     if (onTabChange) {
       onTabChange(tabId);
+    } else {
+      navigate(`/game/${tabId}`);
     }
     // Close mobile drawer on navigation
     if (isMobile) {
@@ -106,13 +108,27 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
   return (
     <Box className={className}>
       {isMobile ? (
-        <MobileNavDrawer
-          isOpen={isDrawerOpen}
-          onClose={closeDrawer}
-          activeTabId={currentTab}
-          onTabChange={handleTabChange}
-          navItems={navigationItems}
-        />
+        <>
+          {!isDrawerOpen && <IconButton
+            aria-label="Open game navigation"
+            onClick={openDrawer}
+            sx={{
+              position: 'fixed', top: 8, left: 8,
+              zIndex: theme.zIndex.drawer + 1,
+              bgcolor: 'background.paper', border: 1, borderColor: 'divider',
+              boxShadow: 1,
+            }}
+          >
+            <MenuIcon />
+          </IconButton>}
+          <MobileNavDrawer
+            isOpen={isDrawerOpen}
+            onClose={closeDrawer}
+            activeTabId={currentTab}
+            onTabChange={handleTabChange}
+            navItems={navItems}
+          />
+        </>
       ) : (
         <DesktopNavBar
           navItems={navigationItems}

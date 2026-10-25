@@ -56,9 +56,16 @@ export const PrologueObjectivePanel: React.FC = () => {
       <Alert severity="info" data-testid="gc02-prologue-objective" sx={{ mb: 2 }}>
         <AlertTitle>Prologue — Find Elder Willow</AlertTitle>
         <Typography variant="body2">
-          Your only known contact is Elder Willow. Use the Dashboard travel controls and follow
-          {' '}City Center → City Gate → Whispering Woods.
+          Your only known contact is Elder Willow. Find her in the Whispering Woods.
         </Typography>
+        <Box component="details" sx={{ mt: 1 }}>
+          <Typography component="summary" variant="body2" sx={{ cursor: 'pointer' }}>
+            Need directions?
+          </Typography>
+          <Typography variant="body2">
+            Use the Dashboard travel controls and follow City Center → City Gate → Whispering Woods.
+          </Typography>
+        </Box>
         <Box sx={{ mt: 1.5 }}>
           <Button component={RouterLink} to="/game/dashboard" size="small" variant="outlined">
             Open travel controls
@@ -73,8 +80,8 @@ export const PrologueObjectivePanel: React.FC = () => {
       <Alert severity="info" data-testid="gc02-prologue-objective" sx={{ mb: 2 }}>
         <AlertTitle>Prologue — Speak with Elder Willow</AlertTitle>
         <Typography variant="body2">
-          Open Dialogue and follow the conversation through The First Lesson. The prologue
-          advances only when that Relationship experience is recorded.
+          Open Dialogue with Willow and follow The First Lesson. Your conversation will help shape
+          what comes next.
         </Typography>
         <Box sx={{ mt: 1.5 }}>
           <Button

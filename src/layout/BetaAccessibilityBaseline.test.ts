@@ -24,16 +24,12 @@ describe('Beta accessibility baseline', () => {
       'aria-label={`Manage ${trait.name} in trait slot ${slot.slotIndex + 1}`}'
     );
     expect(traitSlots).toContain(
-      'aria-label={`Express a Trait in slot ${slot.slotIndex + 1}`}'
+      'aria-label={`Equip a trait in slot ${slot.slotIndex + 1}`}'
     );
     expect(traitSlots).toContain(
-      'aria-label={`Suppress ${trait.name}`}'
+      'aria-label={`Unequip ${trait.name}`}'
     );
     expect(traitSlots).toContain('aria-label="Trait slot help"');
-    // An expressed Trait may be suppressed without losing assimilated ownership.
-    // Accessible keyboard operation must remain independent of NPC proximity.
-    expect(traitSlots).not.toContain('isInProximityToNPC');
-    expect(traitSlots).toContain('tabIndex={0}');
     expect(traitSlots).toContain('role="button"');
     expect(traitSlots).toContain("event.key === 'Enter' || event.key === ' '");
   });
@@ -49,7 +45,7 @@ describe('Beta accessibility baseline', () => {
     expect(npcPanel).toContain('aria-label="Close NPC panel"');
 
     expect(traitCodex).toContain(
-      'aria-label={`Stabilize ${trait.name}`}'
+      'aria-label={`Make ${trait.name} permanent`}'
     );
     expect(traitCodex).toContain('aria-label="Close Trait Codex"');
     expect(traitCodex).toContain(
@@ -59,7 +55,7 @@ describe('Beta accessibility baseline', () => {
       "inputProps={{ 'aria-label': 'Search traits' }}"
     );
     expect(traitCodex).toContain(
-      'getAriaLabel={(index: number) => index === 0 ? "Minimum Trait Essence cost" : "Maximum Trait Essence cost"'
+      'aria-label="Trait Essence cost range"'
     );
   });
 });

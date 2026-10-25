@@ -16,6 +16,7 @@ import { setSelectedNPCId } from '../NPCs/state/NPCSlice';
 import {
   getNpcWorldLocationId,
   isPlayerAtNpcWorldLocation,
+  isConfirmedNpcAtPlayerLocation,
 } from '../NPCs/state/NPCWorldLocationDefinitions';
 import { initializeQuestsThunk, startQuestThunk } from '../Quest/state/QuestThunks';
 import { setLocation } from '../Player/state/PlayerSlice';
@@ -204,8 +205,11 @@ describe('Checkpoint B bounded active-loop integration repair', () => {
       path.join(process.cwd(), 'src/features/NPCs/components/containers/NPCListView.tsx'),
       'utf8'
     );
-    expect(listSource).toContain('isPlayerAtNpcWorldLocation');
-    expect(listSource).toContain('anchoredPresence ?? npc.location === playerLocation');
+    expect(isConfirmedNpcAtPlayerLocation(WILLOW_ID, WHISPERING_WOODS_LOCATION_ID)).toBe(true);
+    expect(isConfirmedNpcAtPlayerLocation(GRONK_ID, CITY_CENTER_LOCATION_ID)).toBe(true);
+    expect(isConfirmedNpcAtPlayerLocation(ELARA_ID, CITY_CENTER_LOCATION_ID)).toBe(false);
+    expect(listSource).toContain('isConfirmedNpcAtPlayerLocation(npc.id, playerLocation)');
+    expect(listSource).not.toContain('anchoredPresence ?? npc.location === playerLocation');
   });
 
   test('successful travel immediately explains Willow/Gronk Tether opportunity cost without mutating Bond history', async () => {

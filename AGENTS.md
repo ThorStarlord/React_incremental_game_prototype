@@ -1,8 +1,19 @@
 # Agent Operating Policy — Campaign One / 1.0
 
-## Active branch scope overlay — 1.1 universal Traits (2026-10-20)
+## 2026-10-25 — Owner-authorized 1.1 Trait integration (source-only)
 
-Owner authority to execute the bounded P0–P6 1.1 program is recorded at `specification/Technical/Version11ScopeContract.md` on `work/1.1-universal-trait-expression-20261020` (PR #178). The 1.0 release authority below remains valid for **released 1.0.0**, but does **not** prohibit this specifically authorized 1.1 feature construction on its isolated branch. Run exact-head Build Validation, retain save/browser/accessibility protections, and keep 1.1 unqualified until evidence closes it. Do not merge PR #165 unchanged, treat synthetic UI qualification as human experience, or publish a 1.1 release from a failing/pending gate.
+The owner previously authorized the bounded universal Trait assimilation/expression program in `specification/Technical/Version11ScopeContract.md` (PR #178), with dependent UI/fixture PRs #180 and #182. The integration preserves Campaign One's current world-first UI, district-aftercare decisions, Copy authority and released `v1.0.0` tag. This is a **1.1 source integration**, not a 1.1 release.
+
+The later owner decision directly above in the merge-workflow chronology waives unit, browser and evidence tests as **ordinary PR merge prerequisites**. A merged Trait candidate lacking qualification is explicitly `MERGED / UNTESTED / UNQUALIFIED`; do not claim Build Validation, correct migration behavior, player comprehension or `BETA_PASS`. Release/tag promotion remains separate and protected. The superseded #165 is a historical prototype; do not merge it as a duplicate.
+
+
+## 2026-10-25 owner decision — merge without waiting for tests
+
+**CURRENT MERGE AUTHORITY, superseding the 2026-10-20 D3 test prerequisite for ordinary owner-directed pull requests.** The owner explicitly instructed agents to **always merge their owner-directed PRs and not wait for unit tests or evidence tests**. After bounded source/merge-conflict inspection, an agent may merge an owner-directed PR immediately, without a unit suite, full Build Validation, browser campaign or participant evidence. Do not create placeholder tests or trigger CI merely to satisfy the superseded PR-merge gate.
+
+Record the source head, merge result, and actual evidence status. An untested merge is **MERGED / UNTESTED / UNQUALIFIED**; it is never a test PASS, human Beta PASS, release qualification, or proof of player experience. It may require later repair. Retain normal safeguards: do not force merges through actual conflicts or GitHub restrictions, publish secrets, overwrite unrelated work, silently merge another person's unreviewed PR, or merge obsolete/duplicate or dependent branches in the wrong order. Repair incompatibilities or explain the concrete blocker.
+
+This is a **PR merge-workflow waiver**, not a blanket waiver of independently protected release/tag/deployment contracts or permission to invent 1.1 thesis/scope. The original released `v1.0.0` and its historical evidence remain unchanged. When the owner supplies a more specific instruction, use that instruction rather than treating old D3 prose in historical documentation as the current merge gate.
 
 
 **Status:** CURRENT AUTHORITY for coding-agent behavior  
@@ -30,7 +41,7 @@ FEATURE_COMPLETE
 -> bounded release-blocking repairs found by RC qualification
 -> 1.0.0-rc.N exact-candidate qualification
 -> 1.0.0 personal release, disclosed as not externally playtested  [released 2026-10-20]
--> post-1.0: released 1.0 maintenance; 1.1 universal Traits now have an explicit owner scope decision on the isolated branch
+-> post-1.0: release-hotfix repairs; 1.1 scope only by owner decision
 ```
 
 Historical Alpha, Content Alpha, GC, Candidate B, Candidate A, Candidate C, and deterministic Beta-readiness results remain valid evidence. Do not invent another feature-construction package by inertia. Human Beta remains the only route to actual player-experience claims and a genuine `BETA_PASS`, but it no longer gates 1.0; deterministic, heuristic, synthetic, accessibility, reliability, presentation, pacing, balance, and persistence findings may still justify bounded repairs to the existing feature-complete game.
@@ -185,9 +196,9 @@ current frontier
 = RELEASED_1_0 / HUMAN-UNVALIDATED (1.0.0 released 2026-10-20, not externally playtested)
 ```
 
-After 1.0, normal `main` work is release-hotfix repair of the shipped Campaign One, with exact-head Build Validation (including full ordinary-UI campaign runs). On this owner-authorized 1.1 branch, universal Trait assimilation/expression is the bounded new feature scope; PR #165 is a historical reference, while PR #178 carries current integration. Other additions and expansions require a separate authorization.
+After 1.0, ordinary work is release-hotfix repair of defects in the shipped Campaign One scope; technical qualification remains desirable but is **not required before ordinary owner-directed PR merges** under the later 2026-10-25 owner waiver. New ideas belong to 1.1 or an expansion and need an owner decision; the universal Trait redesign (PR #165) remains a separate parked historical candidate.
 
-An agent may merge its own pull request into `main` once exact-head Build Validation passes on that head (owner decision D3). It may not merge other people's pull requests or bypass Build Validation.
+The historical 2026-10-20 D3 rule allowed self-merges only after exact-head Build Validation. **D3's test prerequisite is superseded for ordinary owner-directed PR merges by the 2026-10-25 decision above.** Agents should merge eligible owner-directed PRs without tests and disclose their unqualified state; merge conflicts, obsolete alternatives, external protection, and separately protected release transitions are not waived.
 
 ## Stop conditions
 
@@ -251,7 +262,7 @@ A transition is not complete merely because the new state appears somewhere. In 
 4. reconcile `STATUS.md`, `docs/CURRENT.md`, `HANDOFF.md`, `README.md`, `RUNBOOK.md`, and any affected completion/maturity contracts;
 5. preserve superseded reasoning as historical evidence rather than leaving it executable as current procedure;
 6. add or update documentation-authority validation for both the **presence of the new state** and the **absence of known stale current-authority phrases**;
-7. require exact-head Build Validation before merge;
+7. record exact-head qualification status; for ordinary owner-directed PR merges apply the 2026-10-25 owner test waiver transparently, while preserving independently protected release qualification requirements;
 8. close or supersede competing transition PRs so one canonical transition remains.
 
 The governing invariant is:

@@ -218,37 +218,29 @@ async function runBrowserQualification(name, browserType, options, outDir) {
     });
 
     await check('game-navigation-visible', async () => {
-      await assertVisible(page.getByRole('main').first(), 'game main landmark');
+      const main = page.getByRole('main').first();
+      await assertVisible(main, 'game main landmark');
       const navigation = page.getByRole('button', { name: /^Navigate to / }).first();
       await assertVisible(navigation, 'game navigation control');
+      const navBounds = await navigation.boundingBox();
+      const mainBounds = await main.boundingBox();
+      // A flex sidebar already occupies its own width; never add that width
+      // again as a left margin. The old layout left a ~240px empty column.
+      if (!navBounds || !mainBounds || mainBounds.x > navBounds.x + navBounds.width + 40) {
+        throw new Error(`Unexpected desktop sidebar gap: nav=${JSON.stringify(navBounds)} main=${JSON.stringify(mainBounds)}`);
+      }
     });
-
-    // 1.1 universal Trait expression: a fresh player must be able to discover
-    // and temporarily express an initially known procedural pattern through
-    // normal player controls, using keyboard alone for the slot. No debug,
-    // direct store mutation, NPC proximity or hidden test action is allowed.
-    await check('universal-trait-expression-ordinary-ui', async () => {
-      await page.getByRole('button', { name: 'Navigate to Traits' }).click();
-      await page.getByRole('tab', { name: 'Expression' }).waitFor({ state: 'visible', timeout: 15000 });
-      const empty = page.getByRole('button', { name: 'Express a Trait in slot 1' });
-      await empty.waitFor({ state: 'visible', timeout: 15000 });
-      await empty.focus();
-      await page.keyboard.press('Enter');
-
-      const selector = page.getByRole('dialog', { name: 'Select a Trait to Express in Slot 1' });
-      await selector.waitFor({ state: 'visible', timeout: 15000 });
-      await selector.getByText('Battle Hardened', { exact: true }).click();
-      await selector.getByRole('button', { name: 'Express' }).click();
-      await page.getByRole('button', {
-        name: 'Manage Battle Hardened in trait slot 1',
-      }).waitFor({ state: 'visible', timeout: 15000 });
-      const suppress = page.getByRole('button', { name: 'Suppress Battle Hardened' });
-      await suppress.click();
-      const confirmation = page.getByRole('dialog', { name: 'Suppress Trait' });
-      await confirmation.waitFor({ state: 'visible', timeout: 15000 });
-      await confirmation.getByRole('button', { name: 'Suppress' }).click();
-      await empty.waitFor({ state: 'visible', timeout: 15000 });
-      await page.getByRole('button', { name: 'Navigate to Dashboard' }).click();
+    await check('world-first-location-and-actions-visible', async () => {
+      const moment = page.locator('[data-testid="current-moment"]');
+      await assertVisible(moment, 'world-first Current Moment');
+      await assertVisible(moment.getByRole('heading', { name: 'Current Moment' }), 'Current Moment heading');
+      await assertVisible(moment.locator('[data-testid="location-vignette"]'), 'known City Center journal scene');
+      await assertVisible(moment.getByRole('link', { name: 'Find Elder Willow' }), 'opening story lead');
+      await assertVisible(page.getByRole('button', { name: 'Travel to City Gate' }), 'legal world travel');
+      const lead = moment.getByRole('link', { name: 'Find Elder Willow' });
+      if (!(await lead.textContent()).includes('Find Elder Willow')) throw new Error('Opening lead is missing');
+      await assertVisible(page.getByText(/road to Willow begins at City Gate/i), 'contextual legal next travel step');
+      await page.screenshot({ path: path.join(outDir, `${name}-first-session.png`), fullPage: true });
     });
 
     await check('invalid-route-recovers', async () => {
@@ -273,6 +265,87 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       await page.getByRole('button', { name: /^Cancel$/ }).click();
     });
 
+
+
+    await check('mobile-current-moment-and-navigation', async () => {
+      // A real narrow-screen browser context catches inaccessible mobile drawers:
+      // desktop-only browser qualification cannot establish responsive usability.
+      const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      try {
+        const mobile = await mobileContext.newPage();
+        await mobile.goto(options.url, { waitUntil: name === 'firefox' ? 'commit' : 'domcontentloaded', timeout: 30000 });
+        await mobile.getByRole('button', { name: /^New Game$/ }).click();
+        const intro = mobile.getByRole('dialog', { name: 'Introduction' });
+        // New Game navigation precedes the modal mount; a visibility check
+        // without waiting races it and makes background controls aria-hidden.
+        await intro.waitFor({ state: 'visible', timeout: 15000 });
+        for (let step = 0; step < 10 && await intro.isVisible(); step += 1) {
+          await intro.getByRole('button', { name: /Continue|Begin/ }).click();
+        }
+        await intro.waitFor({ state: 'hidden', timeout: 10000 });
+        await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'mobile Current Moment');
+        await assertVisible(mobile.locator('[data-testid="location-vignette"]'), 'mobile known-location illustration');
+        // Opening dialog animation must be finished before capturing a usable
+        // mobile screenshot or judging action availability.
+        await mobile.locator('.MuiBackdrop-root').waitFor({ state: 'hidden', timeout: 10000 });
+        const firstTravel = mobile.getByRole('button', { name: 'Travel to City Gate' });
+        await assertVisible(firstTravel, 'mobile first legal travel step');
+        if (!(await firstTravel.isEnabled())) throw new Error('First legal travel step is disabled on mobile');
+        await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-current-moment.png`), fullPage: true });
+        const horizontalOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
+        if (horizontalOverflow) throw new Error('Mobile layout overflows viewport horizontally');
+        const responsive = await mobile.evaluate(() => ({
+          innerWidth: window.innerWidth,
+          match: window.matchMedia('(max-width:899.95px)').matches,
+          availableButtons: Array.from(document.querySelectorAll('button')).map(item => ({
+            label: item.getAttribute('aria-label'), text: item.textContent?.trim().slice(0, 60),
+            display: window.getComputedStyle(item).display,
+            visibility: window.getComputedStyle(item).visibility,
+            rect: item.getBoundingClientRect().toJSON(),
+          })).filter(item => item.label?.includes('navigation') || item.text?.includes('Dashboard')),
+        }));
+        try {
+          await assertVisible(mobile.getByRole('button', { name: 'Open game navigation' }), 'mobile navigation open action');
+        } catch (error) {
+          throw new Error(`Mobile navigation trigger missing. Responsive evidence: ${JSON.stringify(responsive)}; ${String(error)}`);
+        }
+        await mobile.getByRole('button', { name: 'Open game navigation' }).focus();
+        await mobile.keyboard.press('Enter');
+        const menu = mobile.getByRole('navigation', { name: 'Mobile navigation menu' });
+        await assertVisible(menu, 'opened mobile navigation drawer');
+        await menu.getByRole('button', { name: 'Navigate to Quests' }).click();
+        await mobile.waitForURL(/\/game\/quests$/, { timeout: 10000 });
+        await assertVisible(mobile.getByRole('heading', { name: 'Quest Log' }), 'mobile Quest page');
+        // Verify the real appearance control and a second narrow viewport.
+        await mobile.getByRole('button', { name: 'Open game navigation' }).click();
+        await menu.getByRole('button', { name: 'Navigate to Settings' }).click();
+        await mobile.waitForURL(/\/game\/settings$/, { timeout: 10000 });
+        const darkMode = mobile.getByRole('checkbox', { name: 'Dark mode' });
+        await assertVisible(darkMode, 'Dark mode setting');
+        if (!(await darkMode.isChecked())) await darkMode.check();
+        await mobile.getByRole('button', { name: 'Open game navigation' }).click();
+        await menu.getByRole('button', { name: 'Navigate to Dashboard' }).click();
+        await mobile.waitForURL(/\/game\/dashboard$/, { timeout: 10000 });
+        await menu.waitFor({ state: 'hidden', timeout: 10000 });
+        // MUI marks the drawer inaccessible before its exit-slide ends.
+        // Screenshots must observe an actually closed drawer, not a transient
+        // partial overlay after navigation.
+        await mobile.waitForFunction(() =>
+          Array.from(document.querySelectorAll('.MuiDrawer-paper')).every(drawer =>
+            drawer.getBoundingClientRect().right <= 1 ||
+            window.getComputedStyle(drawer).visibility === 'hidden'
+          ), null, { timeout: 10000 });
+        await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'dark-mode current location');
+        await mobile.screenshot({ path: path.join(outDir, `${name}-mobile-dark-current-moment.png`), fullPage: true });
+        for (const width of [320, 375, 768]) {
+          await mobile.setViewportSize({ width, height: 800 });
+          const overflow = await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
+          if (overflow) throw new Error(`Horizontal overflow at ${width}px viewport`);
+        }
+      } finally {
+        await mobileContext.close();
+      }
+    });
 
     return {
       browser: name,

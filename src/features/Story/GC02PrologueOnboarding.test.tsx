@@ -153,21 +153,29 @@ describe('GC-02 Prologue / onboarding vertical path', () => {
   });
 
   test('production wiring keeps the prologue in ordinary UI and preserves the Willow-only New Game seed', () => {
-    const gameLayoutSource = fs.readFileSync(
+    const dashboardSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/pages/DashboardPage.tsx'),
+      'utf8'
+    );
+    expect(dashboardSource).toContain('<PrologueObjectivePanel />');
+    expect(dashboardSource.indexOf('<CurrentMomentPanel')).toBeLessThan(
+      dashboardSource.indexOf('<PrologueObjectivePanel')
+    );
+    const layoutSource = fs.readFileSync(
       path.join(process.cwd(), 'src/layout/components/GameLayout.tsx'),
       'utf8'
     );
-    expect(gameLayoutSource).toContain('PrologueObjectivePanel');
-    expect(gameLayoutSource.indexOf('<PrologueObjectivePanel')).toBeLessThan(
-      gameLayoutSource.indexOf('<Outlet />')
-    );
+    // The authored objective remains in the ordinary Dashboard but is no
+    // longer duplicated above every interaction page.
+    expect(layoutSource).toContain('<Outlet />');
+    expect(layoutSource).not.toContain('<PrologueObjectivePanel />');
 
     const newGameSource = fs.readFileSync(
       path.join(process.cwd(), 'src/pages/MainMenu/hooks/useGameActions.ts'),
       'utf8'
     );
     expect(newGameSource).toContain('newGameSeedNPCsThunk');
-    expect(newGameSource).toContain("navigate('/game/npcs')");
+    expect(newGameSource).toContain("navigate('/game/dashboard')");
     expect(newGameSource).not.toContain("navigate('/game/debug')");
 
     const appSource = fs.readFileSync(path.join(process.cwd(), 'src/App.tsx'), 'utf8');

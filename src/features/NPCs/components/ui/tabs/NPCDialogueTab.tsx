@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
   Button,
-  TextField,
   Grid,
   Paper,
-  Divider,
+  Alert,
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
-import SendIcon from '@mui/icons-material/Send';
 import { useAppDispatch, useAppSelector } from '../../../../../app/hooks';
 import {
   selectNPCById,
@@ -19,6 +17,10 @@ import {
 import { processNPCInteractionThunk } from '../../../state/NPCThunks';
 import type { DialogueEntry } from '../../../state/NPCTypes';
 import type { NPCDialogueChoice } from '../../../state/NPCSelectors';
+import { getNpcWorldLocationId, isPlayerAtNpcWorldLocation } from '../../../state/NPCWorldLocationDefinitions';
+import { getLocationDefinition } from '../../../../Exploration/LocationDefinitions';
+import { selectCausalJournalEntries, selectRecentRecordedDialogueExperiences } from '../../../../Story/PlayerInsightSelectors';
+
 
 interface NPCDialogueTabProps {
   npcId: string;
@@ -34,12 +36,29 @@ interface NPCDialogueTabProps {
  */
 const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const dispatch = useAppDispatch();
-  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState<{ success: boolean; message: string } | null>(null);
+  useEffect(() => { setFeedback(null); }, [npcId]);
 
   const npc = useAppSelector(state => selectNPCById(state, npcId));
   const dialogueHistory = useAppSelector(state => selectNPCDialogueHistory(state, npcId));
   const availableDialogueChoices = useAppSelector(state =>
     selectAvailableNPCDialogueChoices(state, npcId)
+  );
+  // Ready does not mean physically reachable. Keep the topic discoverable
+  // while preventing a choice that the NPC interaction authority must reject.
+  const anchoredElsewhere = useAppSelector(state =>
+    isPlayerAtNpcWorldLocation(npcId, state.player.location) === false
+  );
+  const anchorId = getNpcWorldLocationId(npcId);
+  const anchoredPlaceName = anchorId
+    ? getLocationDefinition(anchorId)?.name ?? 'the known location'
+    : 'the known location';
+  const latestVisibleMemory = useAppSelector(state =>
+    selectCausalJournalEntries(state, 10).find(entry => entry.npcId === npcId)
+  );
+  const latestRecordedDialogue = useAppSelector(state =>
+    selectRecentRecordedDialogueExperiences(state, 1, npcId)[0]
   );
 
   if (!npc) {
@@ -50,28 +69,12 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
     );
   }
 
-  const handleSendFreeTextMessage = async () => {
-    if (!message.trim()) return;
-
-    try {
-      await dispatch(processNPCInteractionThunk({
-        npcId,
-        interactionType: 'dialogue',
-        context: {
-          choiceId: 'freetext',
-          playerMessage: message,
-          timestamp: Date.now(),
-        },
-      })).unwrap();
-      setMessage('');
-    } catch (error) {
-      console.error('Failed to send message:', error);
-    }
-  };
-
   const handleDialogueChoice = async (choice: NPCDialogueChoice, responseKey: string) => {
+    if (busy) return;
+    setBusy(true);
+    setFeedback(null);
     try {
-      await dispatch(processNPCInteractionThunk({
+      const outcome = await dispatch(processNPCInteractionThunk({
         npcId,
         interactionType: 'dialogue',
         context: {
@@ -80,8 +83,24 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           timestamp: Date.now(),
         },
       })).unwrap();
-    } catch (error) {
-      console.error('Failed to process dialogue choice:', error);
+      const standingChanges = choice.responses.find(response => response.id === responseKey)?.standingChanges ?? [];
+      const standingSummary = standingChanges.length > 0
+        ? ` Institutional standing changed: ${standingChanges.map(
+            change => `${change.factionId} ${change.amount >= 0 ? '+' : ''}${change.amount}`
+          ).join(' · ')}.`
+        : '';
+      setFeedback(outcome.success
+        ? {
+            success: true,
+            message: choice.decisionContext
+              ? `Your request in "${choice.title}" was recorded with this person.${standingSummary} Review the conversation below; other characters were not automatically informed.`
+              : `Your choice in "${choice.title}" is part of your story. Review what changed below.`,
+          }
+        : { success: false, message: outcome.message || 'This conversation is not currently available.' });
+    } catch {
+      setFeedback({ success: false, message: 'The conversation could not be completed. No success has been claimed.' });
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -92,6 +111,12 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         <Typography variant="h6">Conversation with {npc.name}</Typography>
       </Box>
 
+      {feedback && (
+        <Alert severity={feedback.success ? 'success' : 'warning'} role="status" aria-live="polite">
+          {feedback.message}
+        </Alert>
+      )}
+
       <Paper sx={{ p: 2, mb: 2, maxHeight: 300, overflowY: 'auto' }}>
         <Typography variant="subtitle2" gutterBottom>Recent Conversations</Typography>
         {dialogueHistory.length > 0 ? (
@@ -99,9 +124,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
             <Box key={msg.id} sx={{ mb: 2 }}>
               <Paper
                 elevation={1}
-                sx={{ p: 1.5, bgcolor: msg.playerText ? 'primary.light' : 'grey.100', color: msg.playerText ? 'primary.contrastText' : 'text.primary' }}
+                sx={{ p: 1.5, bgcolor: msg.playerText ? 'primary.main' : 'background.default', color: msg.playerText ? 'primary.contrastText' : 'text.primary' }}
               >
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
                   {msg.playerText || msg.npcResponse}
                 </Typography>
               </Paper>
@@ -117,7 +142,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           ))
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No previous conversations. Start a dialogue below!
+            No conversations yet. Choose a topic when you are ready.
           </Typography>
         )}
       </Paper>
@@ -131,6 +156,16 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
                   {choice.title}
                 </Typography>
+                {choice.decisionContext && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.75 }}>
+                    {choice.decisionContext}
+                  </Typography>
+                )}
+                {choice.decisionContext && anchoredElsewhere && (
+                  <Typography variant="body2" color="warning.main" role="status" sx={{ mb: 0.75 }}>
+                    Meet {npc.name} in {anchoredPlaceName} using the connected routes before making this choice.
+                  </Typography>
+                )}
                 {choice.availabilityReasons.length > 0 && (
                   <Typography
                     variant="caption"
@@ -143,19 +178,30 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {choice.responses.length > 0 ? (
                     choice.responses.map(response => (
-                      <Button
-                        key={`${choice.id}-${response.id}`}
-                        variant="outlined"
-                        size="small"
-                        onClick={() => handleDialogueChoice(choice, response.id)}
-                      >
-                        {response.label}
-                      </Button>
+                      <Box key={`${choice.id}-${response.id}`} sx={{ maxWidth: '100%' }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          sx={{ minHeight: 44, whiteSpace: 'normal', textAlign: 'left' }}
+                          disabled={busy || Boolean(choice.decisionContext && anchoredElsewhere)}
+                          onClick={() => handleDialogueChoice(choice, response.id)}
+                        >
+                          {response.label}
+                        </Button>
+                        {Boolean(response.standingChanges?.length) && (
+                          <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                            If chosen, institutional standing changes: {(response.standingChanges ?? []).map(
+                              change => `${change.factionId} ${change.amount >= 0 ? '+' : ''}${change.amount}`
+                            ).join(' · ')}
+                          </Typography>
+                        )}
+                      </Box>
                     ))
                   ) : (
                     <Button
                       variant="outlined"
                       size="small"
+                      disabled={busy || Boolean(choice.decisionContext && anchoredElsewhere)}
                       onClick={() => handleDialogueChoice(choice, '')}
                     >
                       Continue
@@ -168,31 +214,29 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         </Box>
       )}
 
-      <Divider sx={{ my: 2 }} />
+      {latestVisibleMemory && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }}>
+          <Typography variant="subtitle2">A remembered consequence</Typography>
+          <Typography variant="body2" fontWeight={600}>{latestVisibleMemory.title}</Typography>
+          <Typography variant="body2" color="text.secondary">{latestVisibleMemory.causeLabel}: {latestVisibleMemory.summary}</Typography>
+        </Paper>
+      )}
 
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder={`Type a message to ${npc.name}...`}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSendFreeTextMessage();
-            }
-          }}
-        />
-        <Button
-          variant="contained"
-          onClick={handleSendFreeTextMessage}
-          disabled={!message.trim()}
-          sx={{ minWidth: 'auto', px: 2 }}
-        >
-          <SendIcon />
-        </Button>
-      </Box>
+      {!latestVisibleMemory && latestRecordedDialogue && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }}>
+          <Typography variant="subtitle2">Recently recorded experience</Typography>
+          <Typography variant="body2" fontWeight={600}>{latestRecordedDialogue.title}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Your dialogue with {latestRecordedDialogue.npcName} is part of your recorded history.
+          </Typography>
+        </Paper>
+      )}
+
+      {availableDialogueChoices.length === 0 && (
+        <Typography variant="body2" color="text.secondary" role="status">
+          There is nothing new to discuss right now. A shared experience or a change in circumstances may open another conversation.
+        </Typography>
+      )}
     </Box>
   );
 };

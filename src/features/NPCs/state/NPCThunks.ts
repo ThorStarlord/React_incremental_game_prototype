@@ -6,7 +6,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs, mergeNPCsPreservingExisting } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs, mergeNPCsPreservingExisting, appendAuthoredDialogueIdsToKnownNPCs } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { spendGold, addAvailableAttributePoints } from '../../Player/state/PlayerSlice';
 import { TRADING } from '../../../constants/gameConstants';
@@ -31,6 +31,7 @@ import type { WorldStateMutation } from '../../WorldState/state/WorldStateTypes'
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
 import { publicAsset } from '../../../shared/utils/publicAsset';
+import { isPlayerAtNpcWorldLocation } from './NPCWorldLocationDefinitions';
 
 const isExcludedCampaignOneService = (serviceId: string): boolean =>
   /trait_teacher|crafter_/i.test(serviceId);
@@ -218,6 +219,70 @@ export const unlockCampaignNpcsThunk = createAsyncThunk<
 );
 
 /**
+ * Reconcile only the optional post-1.0 Merchant District follow-up dialogues
+ * after replacing a save snapshot. A save can contain older NPC topic lists
+ * and older dialogue definitions even when startup loaded the current assets.
+ * No NPCs are discovered or reset and no historical evidence is invented.
+ */
+export const refreshLoadedDistrictAftercareCatalogThunk = createAsyncThunk<
+  string[],
+  void,
+  { state: RootState }
+>(
+  'npcs/refreshLoadedDistrictAftercareCatalog',
+  async (_, { getState, dispatch }) => {
+    const startingNpcState = getState().npcs;
+    const knownIds = new Set(startingNpcState.discoveredNPCs);
+    const aftercareTopics: Readonly<Record<string, string>> = {
+      npc_captain_valerius: 'valerius_m25_ledger_aftercare',
+      npc_blacksmith_gronk: 'gronk_m25_manifest_aftercare',
+    };
+    const targets = Object.entries(aftercareTopics)
+      .filter(([npcId]) => knownIds.has(npcId) && Boolean(startingNpcState.npcs[npcId]));
+    if (targets.length === 0) return [];
+
+    const response = await fetch(publicAsset('/data/m25-chapter-content.json'));
+    if (!response.ok) {
+      throw new Error('The optional Merchant District dialogue catalog could not be loaded.');
+    }
+    const extension = await response.json();
+    const availableIds: Record<string, string[]> = {};
+    const authoredNodes: Record<string, any> = {};
+
+    for (const [npcId, topicId] of targets) {
+      const listed = extension?.npcDialogueIds?.[npcId];
+      const topic = extension?.dialogues?.[topicId];
+      if (!Array.isArray(listed) || !listed.includes(topicId) ||
+          !topic || topic.id !== topicId || topic.npcId !== npcId) {
+        throw new Error(`The ${npcId} aftercare topic is missing from the authored catalog.`);
+      }
+
+      const responseNodes = Object.values(topic.next ?? {})
+        .filter((id): id is string => typeof id === 'string');
+      for (const replyId of responseNodes) {
+        const reply = extension?.dialogues?.[replyId];
+        if (!reply || reply.id !== replyId || reply.npcId !== npcId) {
+          throw new Error(`The ${npcId} aftercare reply ${replyId} is missing.`);
+        }
+        authoredNodes[replyId] = reply;
+      }
+      authoredNodes[topicId] = topic;
+      availableIds[npcId] = [topicId];
+    }
+
+    // If another save/New Game replaced or changed the NPC world while the
+    // optional catalog was being fetched, discard this stale load's targets.
+    if (getState().npcs !== startingNpcState) return [];
+
+    // Refresh definitions first, then attach only already-known characters'
+    // optional authored topic IDs. Neither action affects progress or facts.
+    dispatch(setDialogueNodes(authoredNodes));
+    dispatch(appendAuthoredDialogueIdsToKnownNPCs(availableIds));
+    return Object.keys(availableIds);
+  }
+);
+
+/**
  * NEW GAME THUNK: Seeds Willow-only onboarding and the authored M4 relationship config.
  */
 export const newGameSeedNPCsThunk = createAsyncThunk(
@@ -356,6 +421,43 @@ export const processNPCInteractionThunk = createAsyncThunk<
       if (node) {
         const isNonRepeatable = node.repeatable === false;
         const completedDialogues = Array.isArray(npc.completedDialogues) ? npc.completedDialogues : [];
+        const requiredCompletedDialogueIds = Array.isArray(node.requiredCompletedDialogueIds)
+          ? node.requiredCompletedDialogueIds as string[]
+          : [];
+        if (node.decisionContext || requiredCompletedDialogueIds.length > 0) {
+          // These opt-in 1.1 topics are explicitly NPC-authored decisions.
+          // A direct thunk dispatch may not impersonate the intended recipient
+          // or select a dialogue this player's NPC has never offered.
+          if (
+            node.npcId !== npcId ||
+            !state.npcs.discoveredNPCs.includes(npcId) ||
+            !npc.availableDialogues?.includes(node.id)
+          ) {
+            return {
+              success: false,
+              message: 'This authored follow-up is not available with this person.',
+            } as InteractionResult;
+          }
+        }
+        // Opt-in decisions with anchored NPCs require an actual meeting.
+        // Direct thunk dispatch must not bypass Gronk's known City Center anchor.
+        // Unanchored legacy story contacts retain their authored behavior.
+        if (
+          node.decisionContext &&
+          isPlayerAtNpcWorldLocation(npcId, state.player.location) === false
+        ) {
+          return {
+            success: false,
+            message: 'Visit this character at their known location before making this decision.',
+          } as InteractionResult;
+        }
+        if (requiredCompletedDialogueIds.some(id => !completedDialogues.includes(id))) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'Finish the earlier conversation with this person before this follow-up.',
+          }));
+          return { success: false, message: 'Earlier dialogue decision not yet recorded.' } as InteractionResult;
+        }
         if (isNonRepeatable && completedDialogues.includes(node.id)) {
           dispatch(addNotification({
             type: 'info',
@@ -586,7 +688,12 @@ export const processNPCInteractionThunk = createAsyncThunk<
         if (nextId) {
           const nextNode = (nodes as any)[nextId];
           if (nextNode && nextNode.text) {
-            npcText = nextNode.text;
+            // Preserve 1.0's existing next-node presentation on every ordinary
+            // topic. The new opt-in decisions show both the question and the
+            // character's immediate, response-specific reply.
+            npcText = node.decisionContext && npcText
+              ? `${npcText}\n\n${nextNode.text}`
+              : nextNode.text;
           }
 
           // The existing lightweight dialogue runtime displays the next node inline.
@@ -623,8 +730,16 @@ export const processNPCInteractionThunk = createAsyncThunk<
         await dispatch(updateNPCRelationshipThunk({ npcId, change: relDelta, reason: 'Dialogue' }));
       }
 
-      if (playerMessage) {
-        dispatch(addDialogueEntry({ id: `${npcId}-player-${now}`, npcId, timestamp: now, speaker: 'player', playerText: playerMessage, npcResponse: '' }));
+      // Only the new opt-in authored decisions add the selected answer to
+      // player history. Do not change all historical 1.0 dialogue transcript
+      // shapes as a side effect of adding district aftercare.
+      const authoredResponseLabel = node?.decisionContext && selectedResponse && node.responses &&
+        Object.prototype.hasOwnProperty.call(node.responses, selectedResponse)
+        ? String(node.responses[selectedResponse])
+        : undefined;
+      const recordedPlayerText = playerMessage || authoredResponseLabel;
+      if (recordedPlayerText) {
+        dispatch(addDialogueEntry({ id: `${npcId}-player-${now}`, npcId, timestamp: now, speaker: 'player', playerText: recordedPlayerText, npcResponse: '' }));
       }
       dispatch(addDialogueEntry({ id: `${npcId}-npc-${now + 1}`, npcId, timestamp: now + 1, speaker: 'npc', playerText: '', npcResponse: npcText, relationshipChange: relDelta || undefined }));
 

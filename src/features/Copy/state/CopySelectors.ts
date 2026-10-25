@@ -46,7 +46,9 @@ export const selectCopiesError = createSelector(
 );
 
 /** Internal: all copies array (non-memoized helper). */
-const _allCopies = (state: RootState) => Object.values(state.copy.copies);
+// The simulation ticks frequently. Do not regenerate the Copy list when the
+// underlying Copy collection is unchanged, or every Copy card rerenders.
+const _allCopies = createSelector([selectCopiesState], copies => Object.values(copies.copies));
 
 /** Select number of copies that qualify for the essence bonus. */
 export const selectQualifyingCopyCount = createSelector([_allCopies], (copies) =>

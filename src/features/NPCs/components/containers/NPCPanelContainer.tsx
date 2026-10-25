@@ -3,8 +3,8 @@
  * @description Routed NPC detail container.
  */
 
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '../../../../app/hooks';
 import { selectNPCById, selectNPCLoading, selectNPCError } from '../../state/NPCSelectors';
 import {
@@ -16,6 +16,7 @@ import {
   Tabs,
   Tab,
   CircularProgress,
+  Stack,
 } from '@mui/material';
 import { CreateCopyModal } from '../../../Copy/components/ui/CreateCopyModal';
 import NPCOverviewTab from '../ui/tabs/NPCOverviewTab';
@@ -25,6 +26,7 @@ import NPCTradeTab from '../ui/tabs/NPCTradeTab';
 import NPCQuestsTab from '../ui/tabs/NPCQuestsTab';
 import NPCTraitsTab from '../ui/tabs/NPCTraitsTab';
 import MigratedRelationshipSummary from '../../../Relationships/components/MigratedRelationshipSummary';
+import NPCPortrait from '../ui/NPCPortrait';
 import { selectUsesRelationshipConnectionAuthority } from '../../../Relationships/state/RelationshipSelectors';
 import {
   getNpcWorldLocationId,
@@ -64,6 +66,7 @@ export interface NPCPanelContainerProps {}
  */
 export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   const { npcId } = useParams<{ npcId: string }>();
+  const [params] = useSearchParams();
   const npc = useAppSelector(state => (npcId ? selectNPCById(state, npcId) : undefined));
   const isLoading = useAppSelector(selectNPCLoading);
   const error = useAppSelector(selectNPCError);
@@ -72,7 +75,10 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
     npcId ? selectUsesRelationshipConnectionAuthority(state, npcId) : false
   );
 
-  const [currentTab, setCurrentTab] = useState(0);
+  const [currentTab, setCurrentTab] = useState(() => params.get('view') === 'dialogue' ? 1 : 0);
+  useEffect(() => {
+    setCurrentTab(params.get('view') === 'dialogue' ? 1 : 0);
+  }, [npcId, params]);
   const [isCreateCopyModalOpen, setCreateCopyModalOpen] = useState(false);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -141,6 +147,11 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
     ? getLocationDefinition(npcWorldLocationId)
     : undefined;
   const requiredLocationLabel = npcWorldLocation?.name ?? npcWorldLocationId ?? npc.location;
+  const presenceDescription = presenceAtAnchor === true
+    ? `Present — ${requiredLocationLabel}`
+    : presenceAtAnchor === false
+      ? `Remote — at ${requiredLocationLabel}`
+      : `Story contact — ${npc.location || 'location not established'} (not verified nearby)`;
 
   const renderInPersonSurface = (children: React.ReactNode) => {
     if (!inPersonBlocked) return children;
@@ -154,10 +165,19 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
   return (
     <>
       <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h5">{npc.name}</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+          <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: '1 1 250px' }}>
+            <NPCPortrait npc={npc} size={76} />
+            <Box>
+              <Typography variant="h5" component="h1">{npc.name}</Typography>
+              <Typography variant="body2" color="text.secondary">{npc.description}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {presenceDescription}
+              </Typography>
+            </Box>
+          </Stack>
           <Button
-            variant="contained"
+            variant="outlined"
             color="secondary"
             onClick={() => setCreateCopyModalOpen(true)}
             disabled={inPersonBlocked}
@@ -166,6 +186,13 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
             Create Copy
           </Button>
         </Box>
+
+        {presenceAtAnchor === undefined && (
+          <Alert severity="info" sx={{ mt: 2 }} data-test-id="npc-unanchored-story-location">
+            This character has an authored story setting, but no confirmed position in the current travel map.
+            Existing story interactions remain available; this does not establish that they are physically beside you.
+          </Alert>
+        )}
 
         {inPersonBlocked && (
           <Alert severity="info" sx={{ mt: 2 }}>
@@ -204,7 +231,7 @@ export const NPCPanelContainer: React.FC<NPCPanelContainerProps> = () => {
         </Box>
 
         <TabPanel value={currentTab} index={0}>
-          <NPCOverviewTab npc={npc} />
+          <NPCOverviewTab npc={npc} presenceAtAnchor={presenceAtAnchor} />
         </TabPanel>
         <TabPanel value={currentTab} index={1}>
           {renderInPersonSurface(<NPCDialogueTab npcId={npc.id} />)}

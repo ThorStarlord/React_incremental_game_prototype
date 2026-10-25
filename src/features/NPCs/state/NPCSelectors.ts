@@ -20,7 +20,8 @@ const EMPTY_DIALOGUE_CHOICES: readonly NPCDialogueChoice[] = [];
 export interface NPCDialogueChoice {
   id: string;
   title: string;
-  responses: Array<{ id: string; label: string }>;
+  decisionContext?: string;
+  responses: Array<{ id: string; label: string; standingChanges?: Array<{ factionId: string; amount: number }> }>;
   availabilityReasons: string[];
 }
 
@@ -125,8 +126,13 @@ export const selectNPCsWithSharedTraits = createSelector(
 
 // NEW SELECTOR
 export const selectActiveConnectionCount = createSelector(
-  [selectAllNPCs],
-  (npcs) => Object.values(npcs).filter(npc => npc.connectionDepth > 0).length
+  [selectAllNPCs, (state: RootState) => state.relationships?.progressionByNpc ?? {},
+    (state: RootState) => state.relationships?.bondProfilesByNpc ?? {}],
+  (npcs, progression, bonds) => Object.values(npcs).filter(npc =>
+    progression[npc.id]?.connectionAuthority === 'relationships'
+      ? (bonds[npc.id]?.connectionLevel ?? 0) > 0
+      : (npc.connectionDepth ?? 0) > 0
+  ).length
 );
 
 export const selectNPCAvailableQuestsById = createSelector(
@@ -176,6 +182,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
         if (!node) return null;
 
         const availability = evaluateDialogueAvailabilityPresentation(node, {
+          affinity: npc.affinity ?? 0,
           completedDialogueIds: npc.completedDialogues ?? [],
           recordedExperiences,
           routineFamiliarity,
@@ -190,9 +197,19 @@ export const selectAvailableNPCDialogueChoices = createSelector(
         return {
           id: node.id,
           title: node.title || node.text || node.id,
+          ...(node.decisionContext ? { decisionContext: node.decisionContext } : {}),
           responses: Object.entries(node.responses || {}).map(([id, label]) => ({
             id,
             label: String(label),
+            // Preserve the historical {id,label} shape for ordinary topics;
+            // only a clearly authored decision opts into consequence previews.
+            ...(node.decisionContext ? {
+              standingChanges: (node.effects ?? []).flatMap(effect =>
+                effect.type === 'FACTION_REPUTATION' && effect.responseId === id
+                  ? [{ factionId: effect.factionId, amount: effect.value }]
+                  : []
+              ),
+            } : {}),
           })),
           availabilityReasons: availability.availabilityReasons,
         };

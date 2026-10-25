@@ -1,13 +1,20 @@
 # Repository Runbook — Game Completion Program
 
-## 1.1 branch qualification procedure (owner-authorized)
+## 2026-10-25 — 1.1 source-only integration procedure
 
-`work/1.1-universal-trait-expression-20261020` / PR #178 develops only the universal Trait scope under `specification/Technical/Version11ScopeContract.md`. The 1.0 release and its owner waiver are unchanged. Qualify using `npm run universal-traits:validate`, `npm run trait-depth:validate`, the complete exact-head Build Validation (including `npm run release:campaign` in Chromium and Firefox), save v2→v3 migration, UI/Doctrine/Copy journeys, accessibility and production build. Record the exact 1.1 candidate SHA and evidence separately from RC-1 of 1.0.0. Do not promote a new release or claim human validation from synthetic tests.
+- The owner's current `AGENTS.md` instruction permits merging an authorized 1.1 PR without waiting for unit, browser or evidence tests. Preserve honest `UNTESTED / UNQUALIFIED` status, exact PR head/merge SHA, and keep protected releases separate.
+- `specification/Technical/Version11ScopeContract.md` owns the 1.1 universal Trait construction boundary. PR #178 carries its code with dependent #180 and #182; preserve current UI4 and district-aftercare code when reconciling, and do not reapply obsolete #165 wholesale.
+- The existing 1.1 release qualification procedures remain usable **when the owner later permits qualification**; they were NOT executed during this source-only integration. Neither a PR merge nor an untouched `v1.0.0` tag is evidence that 1.1 was released or human-validated.
+
+
+## UI4 qualification — integrated PR #185 (2026-10-25)
+
+Run **npm run ui4:validate** on the exact candidate head, then the standard Build Validation workflow. CI repeats the UI4 tests beside UI2/UI3/UX3, TypeScript, production build, Chromium/Firefox responsive smoke and both full ordinary-UI campaign routes. UI4 changes presentation and route ownership only: preserve save schema, original v1.0.0 tag, separate 1.1 Traits and BETA_PASS=NO. Source/evidence map: docs/ui/Phase4PlayerClarity.md. This procedure was executed for [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185): exact head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677), including the Chromium/Firefox full campaign (105/105 Distributed; 104/104 Fortified; save/Continue and import/export PASS). Do not confuse this deterministic qualification with human Beta evidence. No new UI phase is selected by the pass.
 
 
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
-**Active program on this branch:** owner-authorized 1.1 universal Trait construction and qualification; released-main 1.0 maintenance remains separate  
+**Active program:** Campaign One / post-1.0 maintenance  
 **Current strategic stage:** RELEASED_1_0 / HUMAN-UNVALIDATED  
 **Release:** 1.0.0 (2026-10-20); RC-1 qualified by Build Validation #564  
 **Owner decision:** `specification/Technical/OwnerPersonalReleaseDecision.md` (2026-10-20)  

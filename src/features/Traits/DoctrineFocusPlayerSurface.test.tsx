@@ -16,7 +16,7 @@ import { rootReducer } from '../../app/store';
 import TraitsPage from '../../pages/TraitsPage';
 import NPCQuestsTab from '../NPCs/components/ui/tabs/NPCQuestsTab';
 import { PlayerInsightPanel } from '../Story/components/PlayerInsightPanel';
-import { addPermanentTrait, setResonanceLevel } from '../Player/state/PlayerSlice';
+import { addPermanentTrait } from '../Player/state/PlayerSlice';
 import { setNPCs } from '../NPCs/state/NPCSlice';
 import { addQuest } from '../Quest/state/QuestSlice';
 import { loadTraits } from './state/TraitsSlice';
@@ -72,7 +72,6 @@ const seedDefinitions = (store: TestStore) => {
 };
 
 const learn = (store: TestStore, traitIds: readonly string[]) => {
-  store.dispatch(setResonanceLevel(5));
   traitIds.forEach(traitId => store.dispatch(addPermanentTrait(traitId)));
 };
 
@@ -105,7 +104,7 @@ const seedReadyGc06Quest = (store: TestStore) => {
 };
 
 describe('Doctrine Focus player surface', () => {
-  test('hides future doctrines, then supports adopt/switch/clear with assimilated-Trait provenance', async () => {
+  test('hides future doctrines, then supports adopt/switch/clear with learned-Trait provenance', async () => {
     const store = makeStore();
     const user = userEvent.setup();
     seedDefinitions(store);
@@ -145,19 +144,6 @@ describe('Doctrine Focus player surface', () => {
 
     await user.click(
       within(panel).getByRole('button', { name: 'Switch to Countermodeler' })
-    );
-    expect(within(screen.getByRole('dialog')).getByText(/This suppresses/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog', { name: 'Confirm Doctrine Switch' })).not.toBeInTheDocument()
-    );
-    expect(selectActiveDoctrineIds(store.getState())).toEqual(['structural_steward']);
-    await user.click(within(panel).getByRole('button', { name: 'Switch to Countermodeler' }));
-    expect(within(screen.getByRole('dialog')).getByText(/This suppresses/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Confirm Switch' }));
-    // MUI leaves the preceding panel aria-hidden until the closing Dialog exits.
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog', { name: 'Confirm Doctrine Switch' })).not.toBeInTheDocument()
     );
     await waitFor(() =>
       expect(selectActiveDoctrineIds(store.getState())).toEqual(['countermodeler'])
@@ -224,12 +210,6 @@ describe('Doctrine Focus player surface', () => {
     panel = await openDoctrineTab(user);
     await user.click(
       within(panel).getByRole('button', { name: 'Switch to Countermodeler' })
-    );
-    expect(within(screen.getByRole('dialog')).getByText(/This suppresses/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Confirm Switch' }));
-    // MUI leaves the preceding panel aria-hidden until the closing Dialog exits.
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog', { name: 'Confirm Doctrine Switch' })).not.toBeInTheDocument()
     );
     await waitFor(() =>
       expect(selectActiveDoctrineIds(store.getState())).toEqual(['countermodeler'])

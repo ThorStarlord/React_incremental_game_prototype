@@ -11,13 +11,24 @@ on:
 permissions:
   contents: read
 
-# Obsolete PR heads must not consume full campaign CI after newer commits.
-# Only the latest exact-head qualification is eligible to satisfy merge policy.
-concurrency:
-  group: build-validation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
+  ui-smoke:
+    name: UI smoke and TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Focused UI regression
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx UI2ExperienceRepair.test.tsx UI3LayoutAndSettings.test.tsx UI3WorldTruth.test.tsx UX3Presentation.test.ts UI4PlayerClarity.test.tsx UI4RouteAuthority.test.ts UI4NavigationReturn.test.tsx MainMenuPresentation.test.tsx CopyBulkActionsUX.test.tsx CopyM20ProductionTaskAutomation.test.tsx GC02PrologueOnboarding.test.tsx GC03OpeningCampaignSpine.test.tsx
+        env:
+          CI: true
+      - name: TypeScript
+        run: npx tsc --noEmit
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -103,6 +114,12 @@ jobs:
       - name: GC-13 deterministic Beta readiness qualification
         timeout-minutes: 24
         run: npm run beta:technical:validate
+
+      - name: Player Experience UI regression qualification
+        timeout-minutes: 6
+        run: npm test -- --watchAll=false --runInBand QuestPuzzleModalUX.test.tsx PlayerExperienceUX.test.tsx UI2ExperienceRepair.test.tsx UI3LayoutAndSettings.test.tsx UI3WorldTruth.test.tsx UX3Presentation.test.ts UI4PlayerClarity.test.tsx UI4RouteAuthority.test.ts UI4NavigationReturn.test.tsx MainMenuPresentation.test.tsx
+        env:
+          CI: true
 
       - name: Beta accessibility baseline qualification
         timeout-minutes: 5
@@ -220,13 +237,16 @@ jobs:
       - name: GC-13 Chromium and Firefox browser qualification
         timeout-minutes: 10
         run: |
-          HOST=127.0.0.1 PORT=3000 BROWSER=none npm start > /tmp/beta-browser-app.log 2>&1 &
+          # Use a distinct port from simulated-review smoke. CRA's npm wrapper
+          # can leave a child dev server alive after the preceding trap.
+          # Independent listener prevents silently qualifying that leftover server.
+          HOST=127.0.0.1 PORT=3001 BROWSER=none npm start > /tmp/beta-browser-app.log 2>&1 &
           app_pid=$!
           trap 'kill "$app_pid" 2>/dev/null || true' EXIT
 
           ready=0
           for attempt in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:3000 >/dev/null; then
+            if curl -fsS http://127.0.0.1:3001 >/dev/null; then
               ready=1
               break
             fi
@@ -239,7 +259,7 @@ jobs:
             exit 1
           fi
 
-          if ! npm run release:browser -- --browser all --url http://127.0.0.1:3000 --out /tmp/beta-browser-qualification; then
+          if ! npm run release:browser -- --browser all --url http://127.0.0.1:3001 --out /tmp/beta-browser-qualification; then
             echo "Beta browser matrix failed; app log follows"
             cat /tmp/beta-browser-app.log
             exit 1

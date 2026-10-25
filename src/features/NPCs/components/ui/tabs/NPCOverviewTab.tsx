@@ -42,6 +42,7 @@ import { equipTrait } from '../../../../Player/state/PlayerSlice';
 import { updateNPCRelationshipThunk } from '../../../state/NPCThunks';
 import { recalculateStatsThunk } from '../../../../Player/state/PlayerThunks';
 import type { NPC } from '../../../state/NPCTypes';
+import { selectAvailableNPCDialogueChoices } from '../../../state/NPCSelectors';
 import type { Trait } from '../../../../Traits/state/TraitsTypes';
 import {
   selectBondProfileByNpcId,
@@ -50,9 +51,10 @@ import {
 
 interface NPCOverviewTabProps {
   npc: NPC;
+  presenceAtAnchor?: boolean;
 }
 
-const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
+const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc, presenceAtAnchor }) => {
   const dispatch = useAppDispatch();
   const [cooldown, setCooldown] = useState(false);
 
@@ -65,6 +67,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
     selectUsesRelationshipConnectionAuthority(state, npc.id)
   );
   const bondProfile = useAppSelector(state => selectBondProfileByNpcId(state, npc.id));
+  const availableTopics = useAppSelector(state => selectAvailableNPCDialogueChoices(state, npc.id));
 
   useEffect(() => {
     if (Object.keys(allTraits).length === 0 && !traitsLoading) {
@@ -132,31 +135,35 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc }) => {
                   <ListItemIcon><DialogueIcon color="primary" /></ListItemIcon>
                   <ListItemText
                     primary="Dialogue"
-                    secondary={usesRelationshipAuthority
-                      ? 'Available now. Meaningful responses can become Relationship Experiences.'
-                      : isAffinityUnlocked(1) ? 'Have conversations' : 'Requires Affinity: 1'}
+                    secondary={presenceAtAnchor === false
+                      ? 'Travel to this character’s authored location to talk in person.'
+                      : availableTopics.length > 0
+                        ? presenceAtAnchor === undefined
+                          ? `${availableTopics.length} topic(s) ready to discuss; this person's current location is unconfirmed.`
+                          : `${availableTopics.length} conversation topic(s) ready here.`
+                        : 'Nothing new to discuss right now.'}
                   />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
-                    {isAffinityUnlocked(2) ? <TradeIcon color="primary" /> : <LockedIcon color="disabled" />}
+                    {isAffinityUnlocked(40) ? <TradeIcon color="primary" /> : <LockedIcon color="disabled" />}
                   </ListItemIcon>
                   <ListItemText
                     primary="Trading"
-                    secondary={isAffinityUnlocked(2) ? 'Buy and sell items' : 'Requires Affinity: 2'}
+                    secondary={isAffinityUnlocked(40) ? 'Buy and sell items' : 'Requires Affinity: 40'}
                   />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
-                    {usesRelationshipAuthority || isAffinityUnlocked(3)
+                    {usesRelationshipAuthority || isAffinityUnlocked(20)
                       ? <QuestIcon color="primary" />
                       : <LockedIcon color="disabled" />}
                   </ListItemIcon>
                   <ListItemText
                     primary="Quests"
                     secondary={usesRelationshipAuthority
-                      ? 'Quest opportunities appear when your shared history makes them relevant.'
-                      : isAffinityUnlocked(3) ? 'Accept and complete quests' : 'Requires Affinity: 3'}
+                      ? 'New opportunities may emerge from your shared experiences.'
+                      : isAffinityUnlocked(20) ? 'Accept and complete quests' : 'Requires Affinity: 20'}
                   />
                 </ListItem>
               </List>

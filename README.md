@@ -7,6 +7,8 @@ A React/TypeScript narrative incremental RPG where consequential relationships t
 
 > The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **FEATURE_COMPLETE / HUMAN-UNVALIDATED**, released as **1.0.0**: a personal release that has not been externally playtested.
 
+**Current post-release UI (2026-10-25):** [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) merged world-first journal visuals, player-facing clarity, Copy workflow disclosure, context links and routing hardening. [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677) passed both browser families and full campaign routes. Original `v1.0.0` remains unchanged; external player evaluation is still outstanding.
+
 ## Current state
 
 ```text

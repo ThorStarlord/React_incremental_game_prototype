@@ -16,6 +16,8 @@ import {
   Star,
 } from '@mui/icons-material';
 import { PlayerStatsContainer } from '../features/Player/components/containers/PlayerStatsContainer';
+import { Button } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import { PlayerTraitsContainer } from '../features/Player/components/containers/PlayerTraitsContainer';
 
 interface TabPanelProps {
@@ -77,14 +79,14 @@ export const CharacterPage: React.FC = React.memo(() => {
             mb: 2,
           }}
         >
-          Character Management
+          Your Character
         </Typography>
         <Typography
           variant="h6"
           color="text.secondary"
           sx={{ maxWidth: 600, mx: 'auto' }}
         >
-          Manage your character's statistics, traits, and relationship-derived capabilities
+          Your health, attributes, and learned capabilities, shaped by the people you meet.
         </Typography>
       </Box>
 
@@ -159,8 +161,9 @@ export const CharacterPage: React.FC = React.memo(() => {
               </Typography>
               <Alert severity="info" sx={{ mb: 3 }}>
                 <AlertTitle>Traits and Capabilities</AlertTitle>
-                Express active Traits, review the assimilated library, and follow the patterns your character has internalized through the campaign. Visit Traits for assimilation and Stabilization details.
+                Express active Traits, review your assimilated library, and revisit how your character learned those patterns. The Traits workspace holds Stabilization, Doctrine, and the Codex.
               </Alert>
+              <Button component={RouterLink} to="/game/traits" variant="outlined" sx={{ mb: 2 }}>Open the complete Traits workspace</Button>
               <PlayerTraitsContainer />
             </Box>
           </TabPanel>
@@ -183,10 +186,10 @@ export const CharacterPage: React.FC = React.memo(() => {
               <strong>Statistics:</strong> Monitor your vital stats, combat capabilities, and performance metrics
             </Typography>
             <Typography component="li" variant="body2" color="text.secondary">
-              <strong>Traits:</strong> Express available patterns for active effects; Stabilization makes a pattern permanently available
+              <strong>Traits:</strong> Express assimilated or discovered patterns in limited slots. Stabilization preserves them permanently.
             </Typography>
             <Typography component="li" variant="body2" color="text.secondary">
-              <strong>Capabilities:</strong> Capabilities emerge from the Traits you currently express and the routines you have mastered
+              <strong>Capabilities:</strong> Capabilities emerge from your expressed Traits and personally mastered routines
             </Typography>
           </Box>
         </Paper>

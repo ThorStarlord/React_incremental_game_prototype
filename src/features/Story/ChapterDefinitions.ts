@@ -10,6 +10,8 @@ interface ChapterDefinitionShape {
   id: string;
   title: string;
   centerOfGravity: string;
+  /** Public current-chapter situation; unlike centerOfGravity this is written for a player. */
+  playerSituation: string;
   description: string;
   routes: readonly ChapterRouteDefinition[];
 }
@@ -38,6 +40,7 @@ const LYRA_ADVERSARIAL_CALIBRATION_ARC = [
 export const CHAPTER_DEFINITIONS = [
   {
     id: 'merchant_district',
+    playerSituation: 'Trade routes in the Merchant District are under pressure. Restoring public order and rebuilding trust may pull in different directions.',
     title: 'Merchant District Crisis',
     centerOfGravity: 'institutions, trade, public order, and social coordination',
     description:
@@ -59,6 +62,7 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'archive_inquiry',
+    playerSituation: 'The archives hold evidence that can overturn a comfortable explanation. Decide what to investigate before choosing what to defend.',
     title: 'Archive Inquiry',
     centerOfGravity: 'evidence interpretation, reciprocal revision, and independent verification',
     description:
@@ -92,6 +96,7 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'adversarial_calibration',
+    playerSituation: "Lyra's challenge cannot be settled by agreement alone. Understand what an opponent knows before deciding how to work together.",
     title: 'Enemies in Phase',
     centerOfGravity: 'adversarial learning, calibrated opposition, and necessary cooperation',
     description:
@@ -107,6 +112,7 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'lattice_under_strain',
+    playerSituation: 'The lattice is showing signs of strain. The response depends on what you have learned about the people and structures carrying its load.',
     title: 'Lattice Under Strain',
     centerOfGravity: 'network pressure, multi-anchor diagnosis, and capability-shaped stabilization',
     description:
@@ -143,6 +149,7 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'chrono_crypt',
+    playerSituation: 'The Chrono-Crypt preserves the traces of repeated failures. Study what remains consistent before trying to derive the counterphase.',
     title: 'The Chrono-Crypt',
     centerOfGravity: 'counterphase derivation, authored travel, and capability-deepened problem solving',
     description:
@@ -179,6 +186,7 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'network_under_pressure',
+    playerSituation: 'The counterphase must reach people with different knowledge and loyalties. Prepare the network before deciding how to commit it.',
     title: 'Network Under Pressure',
     centerOfGravity: 'information asymmetry, institutional access, delegated repetition, and manual network commitment',
     description:
@@ -230,6 +238,7 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'counterphase',
+    playerSituation: 'The time for an open-ended plan is ending. Review what your relationships and preparations actually support before committing.',
     title: 'Counterphase',
     centerOfGravity: 'causal finale preparation, profile-specific action, and explicit irreversible commitment',
     description:
@@ -275,6 +284,7 @@ export const CHAPTER_DEFINITIONS = [
   },
   {
     id: 'telluric_echo_finale',
+    playerSituation: 'The Telluric Echo calls for the response you have prepared. What survives will depend on the plan, people, and evidence behind it.',
     title: 'The Telluric Echo',
     centerOfGravity: 'final counterphase execution, accumulated-state payoff, and remembered aftermath',
     description:

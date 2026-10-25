@@ -33,6 +33,7 @@ export interface TraitSlotsUIProps {
   traitSlots: TraitSlot[];
   equippedTraits: Trait[];
   availableTraits: Trait[];
+  canManageSlots: boolean;
   isLoading: boolean;
   error: string | null;
 
@@ -59,6 +60,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
   traitSlots,
   equippedTraits,
   availableTraits,
+  canManageSlots,
   isLoading,
   error,
   isTraitSelectionModalOpen,
@@ -85,13 +87,14 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
     if (trait) {
        return (
         <Card
-          sx={{ minHeight: 120, cursor: 'pointer', transition: 'all 0.2s', '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 }, border: 2, borderColor: 'primary.main' }}
+          sx={{ minHeight: 120, cursor: canManageSlots ? 'pointer' : 'not-allowed', transition: 'all 0.2s', '&:hover': { transform: canManageSlots ? 'translateY(-2px)' : 'none', boxShadow: canManageSlots ? 3 : 'none' }, border: 2, borderColor: 'primary.main' }}
           onClick={() => onSlotClick(slot)}
           role="button"
-          tabIndex={0}
-                    aria-label={`Manage ${trait.name} in trait slot ${slot.slotIndex + 1}`}
+          tabIndex={canManageSlots ? 0 : -1}
+          aria-disabled={!canManageSlots}
+          aria-label={`Manage ${trait.name} in trait slot ${slot.slotIndex + 1}`}
           onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
+            if (canManageSlots && (event.key === 'Enter' || event.key === ' ')) {
               event.preventDefault();
               onSlotClick(slot);
             }
@@ -105,6 +108,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
                   size="small"
                   color="error"
                   aria-label={`Suppress ${trait.name}`}
+                  disabled={!canManageSlots}
                   onClick={(event) => {
                     event.stopPropagation();
                     onSlotClick(slot);
@@ -126,15 +130,16 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
       <Box
         onClick={() => onSlotClick(slot)}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
+          if (canManageSlots && (event.key === 'Enter' || event.key === ' ')) {
             event.preventDefault();
             onSlotClick(slot);
           }
         }}
         role="button"
-        tabIndex={0}
-                aria-label={`Express a Trait in slot ${slot.slotIndex + 1}`}
-        sx={{ cursor: 'pointer', height: '100%' }}
+        tabIndex={canManageSlots ? 0 : -1}
+        aria-disabled={!canManageSlots}
+        aria-label={`Express a Trait in slot ${slot.slotIndex + 1}`}
+        sx={{ cursor: canManageSlots ? 'pointer' : 'not-allowed', height: '100%' }}
       >
         <EmptySlotCard />
       </Box>
@@ -169,6 +174,12 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
         </Tooltip>
       </Box>
 
+      {!canManageSlots && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Trait slot management is unavailable while Trait data is loading.
+        </Alert>
+      )}
+
       <Grid container spacing={2}>
         {traitSlots.map((slot) => (
           <Grid item xs={12} sm={6} md={4} key={slot.id}>
@@ -180,6 +191,9 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
       {/* Trait Selection Dialog */}
       <Dialog open={isTraitSelectionModalOpen} onClose={onCloseTraitSelectionModal} maxWidth="sm" fullWidth>
         <DialogTitle>Select a Trait to Express in Slot {selectedSlotIndexForModal !== null ? selectedSlotIndexForModal + 1 : ''}</DialogTitle>
+        <Typography variant="body2" color="text.secondary" sx={{ px: 3 }}>
+          Preview the discovered Trait below. Expression occupies a slot; assimilation retains ownership but never grants active effects without expression.
+        </Typography>
         <DialogContent>
           <List>
             {availableTraits.length > 0 ? (
@@ -200,6 +214,30 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
                 <Typography sx={{p: 2, textAlign: 'center'}} color="text.secondary">No available Traits to express. Discover or assimilate new patterns.</Typography>
             )}
           </List>
+          {selectedTraitIdInModal && (() => {
+            const chosen = availableTraits.find(trait => trait.id === selectedTraitIdInModal);
+            if (!chosen) return null;
+            const effectSummary = Array.isArray(chosen.effects)
+              ? chosen.effects.map(effect => `${effect.type.replace(/_/g, ' ')}: ${effect.magnitude >= 0 ? '+' : ''}${effect.magnitude}`)
+              : Object.entries(chosen.effects).map(([name, value]) => `${name.replace(/_/g, ' ')}: ${value >= 0 ? '+' : ''}${value}`);
+            return (
+              <Alert severity="info" sx={{ mt: 2 }} data-testid="trait-slot-before-after">
+                <Typography variant="subtitle2">Slot preview (before → after)</Typography>
+                <Typography variant="body2">
+                  Before: empty slot. After: {chosen.name} expressed.
+                </Typography>
+                <Typography variant="body2">Listed Trait effects: {effectSummary.join('; ') || 'No numeric modifiers listed'}.</Typography>
+                <Typography variant="caption" display="block">
+                  This is a preview of Trait definitions, not a prediction of final character statistics.
+                </Typography>
+                {chosen.essenceCost !== undefined && (
+                  <Typography variant="caption" display="block">
+                    Expression is free; Stabilization is a separate Essence commitment ({chosen.essenceCost} Essence).
+                  </Typography>
+                )}
+              </Alert>
+            );
+          })()}
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseTraitSelectionModal}>Cancel</Button>
@@ -215,7 +253,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseUnequipDialog}>Cancel</Button>
-          <Button onClick={onConfirmUnequip} variant="contained" color="warning">Suppress</Button>
+          <Button onClick={onConfirmUnequip} variant="contained" color="warning" disabled={!canManageSlots}>Suppress</Button>
         </DialogActions>
       </Dialog>
     </Box>

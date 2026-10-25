@@ -62,20 +62,21 @@ export const GameSessionBar: React.FC = () => {
     <Box
       role="region"
       aria-label="Game session"
-      sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 1 }}
+      sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: { xs: 0.5, sm: 1 }, mb: { xs: 0.5, sm: 1 } }}
     >
       <Typography
         variant="caption"
         color={saveFailed ? 'error' : 'text.secondary'}
         role="status"
         aria-live="polite"
+        sx={{ display: { xs: saveFailed ? 'block' : 'none', sm: 'block' }, width: { xs: saveFailed ? '100%' : 'auto', sm: 'auto' } }}
       >
         {status}
       </Typography>
-      <Button size="small" variant="outlined" startIcon={<SaveIcon />} onClick={save} disabled={busy}>
+      <Button size="small" sx={{ minHeight: 44 }} variant="outlined" startIcon={<SaveIcon />} onClick={save} disabled={busy}>
         Save Game
       </Button>
-      <Button size="small" startIcon={<HomeIcon />} onClick={saveAndReturnToMenu} disabled={busy}>
+      <Button size="small" sx={{ minHeight: 44 }} startIcon={<HomeIcon />} onClick={saveAndReturnToMenu} disabled={busy}>
         Save &amp; Main Menu
       </Button>
     </Box>
