@@ -1,10 +1,10 @@
 # Handoff — Campaign One 1.0 Released
 
-## 2026-10-25 — 1.1 Trait reconciliation and merge-first owner instruction
+## 2026-10-25 — CURRENT RE-ENTRY: 1.1 Trait source merged, unqualified
 
 - Owner-directed PRs may merge without unit/browser/evidence tests under current `AGENTS.md`; avoid stale test-gate stop language in the older historical entries below. Explicitly record `UNTESTED / UNQUALIFIED` and do not infer any human Beta, release or migration PASS.
-- PR #178 is the active universal Trait 1.1 source candidate. Stacked PRs #180 (lifecycle/Doctrine UI) and #182 (Lyra schema expectation) have been merged into its original 1.1 branch. A current-`main` reconciliation preserves UI4, the direct Codex drawer, accessible Trait slot UX, newer Copy flows and PR #190's district decisions. Refer to `specification/Technical/Version11ScopeContract.md` for the bounded implementation contract and the GitHub PR for actual integration state.
-- PR #165 is superseded historical code, not a second PR to merge over #178. 1.1 release/tag promotion remains separately protected; `v1.0.0` and the `BETA_PASS=NO / HUMAN-UNVALIDATED` ceiling do not change.
+- [PR #178](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/178) was **merged into `main`** at `46e49f71127ac616b09dd582b56ca829a8d4e066` as a **source-only 1.1 integration**. Stacked PRs #180 (lifecycle/Doctrine UI) and #182 (Lyra schema fixture) were merged into its original source branch; all 21 test-file changes were intentionally excluded when reconciling to main. Current UI4, direct Codex drawer, accessible Trait slots, Copy flows and PR #190's district decisions remain source-preserved. See `specification/Technical/Version11ScopeContract.md`; no source-only correctness claim exceeds inspection.
+- PR #165 was **closed as superseded**; it was not merged over #178. 1.1 release/tag promotion remains separately protected; `v1.0.0` and the `BETA_PASS=NO / HUMAN-UNVALIDATED` ceiling do not change.
 
 
 ## 2026-10-25 — CURRENT RE-ENTRY: source-only merge authorization

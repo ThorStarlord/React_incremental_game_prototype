@@ -3,7 +3,7 @@
 ## 2026-10-25 — 1.1 source-only integration procedure
 
 - The owner's current `AGENTS.md` instruction permits merging an authorized 1.1 PR without waiting for unit, browser or evidence tests. Preserve honest `UNTESTED / UNQUALIFIED` status, exact PR head/merge SHA, and keep protected releases separate.
-- `specification/Technical/Version11ScopeContract.md` owns the 1.1 universal Trait construction boundary. PR #178 carries its code with dependent #180 and #182; preserve current UI4 and district-aftercare code when reconciling, and do not reapply obsolete #165 wholesale.
+- `specification/Technical/Version11ScopeContract.md` owns the 1.1 Trait boundary. PR #178 was **merged** at `46e49f71` after staged #180/#182 source integration. PR #165 was closed as superseded. Preserve the qualified UI4 and authored district-aftercare behavior on subsequent changes; do not reintegrate the old overlapping PR.
 - The existing 1.1 release qualification procedures remain usable **when the owner later permits qualification**; they were NOT executed during this source-only integration. Neither a PR merge nor an untouched `v1.0.0` tag is evidence that 1.1 was released or human-validated.
 
 

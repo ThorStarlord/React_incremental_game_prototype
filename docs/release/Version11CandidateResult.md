@@ -1,12 +1,12 @@
 # Campaign One 1.1 — Qualification Record
 
-**Status:** NOT QUALIFIED / INTEGRATION IN PROGRESS
+**Status:** SOURCE MERGED IN PR #178 AT 46e49f71 / NOT QUALIFIED / NOT RELEASED
 **Release target:** `1.1.0` (not yet declared by package metadata)
-**Current evidence ceiling:** REPOSITORY IMPLEMENTATION IN PROGRESS / HUMAN-UNVALIDATED
+**Current evidence ceiling:** SOURCE INTEGRATED, NO CURRENT EXECUTED QUALIFICATION / HUMAN-UNVALIDATED
 **Owner program:** `specification/Technical/Version11ScopeContract.md`
 **Qualification authority:** `specification/Technical/Version11ReleaseQualificationContract.md`
-**Work-in-progress PR:** #178 — `work/1.1-universal-trait-expression-20261020`
-**Historical implementation reference:** #165 (draft, parked, do not merge unchanged)
+**Merged source PR:** #178 — `46e49f71127ac616b09dd582b56ca829a8d4e066` (all new test/CI/browser files omitted from mainline reconciliation)
+**Historical implementation reference:** #165 (closed, superseded by merged #178)
 **Original release:** `v1.0.0`, qualified by Build Validation #564, immutable baseline
 
 ## Provenance
@@ -19,8 +19,8 @@ The state below must be updated only from actual exact-head results; prior runs 
 | --- | --- |
 | P0 owner-authorized 1.1 scope | RECORDED; see `Version11ScopeContract.md` |
 | P1 PR #165 recovery on 1.0 baseline | IMPLEMENTED; exact candidate requalification still needed |
-| P2 ownership/expression/Doctrine/sharing | IMPLEMENTED IN DRAFT; current CI result required |
-| P2 schema-v3 migration and v2 compatibility | IMPLEMENTED IN DRAFT; current CI result required |
+| P2 ownership/expression/Doctrine/sharing | SOURCE INTEGRATED; correctness and current CI result unverified |
+| P2 schema-v3 migration and v2 compatibility | SOURCE INTEGRATED; migration behavior NOT QUALIFIED |
 | P3 normal-UI discover/assimilate/express experience | UI CHANGE IMPLEMENTED; exact UI evidence pending |
 | P4 distinct cognitive and non-cognitive effect | Cognitive routes preserved in tests; procedural Attack→bounded combat payoff implemented, exact regression pending |
 | P5 whole Campaign One integration | NOT YET QUALIFIED FOR LATEST 1.1 HEAD |
@@ -30,7 +30,7 @@ The state below must be updated only from actual exact-head results; prior runs 
 
 ## Evidence to fill before promotion
 
-- Candidate commit SHA: NOT RECORDED
+- Source merge SHA: `46e49f71127ac616b09dd582b56ca829a8d4e066`; **qualified release candidate SHA: NOT RECORDED**
 - Exact-head Build Validation run and conclusion: NOT RECORDED
 - Production artifact identity: NOT RECORDED
 - Chromium ordinary-UI campaign result: NOT RECORDED

@@ -1,11 +1,11 @@
 # Repository Status — Campaign One 1.0 Released
 
-## 2026-10-25 — Universal Trait 1.1 source reconciliation (UNTESTED)
+## 2026-10-25 — Universal Trait 1.1 merged source-only (UNTESTED / UNQUALIFIED)
 
-- Owner-authorized 1.1 Trait PR #178 is being reconciled with the current post-UI4, Merchant District aftercare `main`. Its stacked UI/Doctrine PR #180 and schema-fixture PR #182 were **squash-merged into PR #178's original branch**; this reconciliation carries their resulting sources to current `main`.
+- Owner-authorized [PR #178](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/178) was **squash-merged into current `main`** at `46e49f71127ac616b09dd582b56ca829a8d4e066`, after reconciling its original branch with UI4 and Merchant District aftercare. Its stacked UI/Doctrine PR #180 and schema-fixture PR #182 were previously merged into the source branch. All 21 test-file changes and new CI/browser/release workflow changes were intentionally excluded under the owner's no-tests instruction.
 - Core construction: assimilated ownership remains durable; expressed Traits use finite Player slots; active effects, authored requirements, sharing, doctrine and save-schema v3 are driven by the 1.1 contract. Newer UI4 navigation, Copy affordances, NPC authoring and aftercare have priority where histories overlap. Unrelated original 1.0 release behavior is preserved as the baseline.
-- **Source-only evidence ceiling:** no exact-head TypeScript/build, unit tests, browser campaign, evidence tests or human play sessions were run by this integration. The PR's actual GitHub merge result is the authority for whether it reached main. It is not a 1.1 release or qualified candidate. Original `v1.0.0` remains unchanged; `HUMAN-UNVALIDATED`, `BETA_PASS=NO`.
-- PR #165 remains obsolete/overlapping historical implementation, not a separate feature to force-merge. No general Crafting, Skills, autonomous Copy planning, Chapter 8+ or 1.1 release is authorized by source integration.
+- **Source-only evidence ceiling:** no exact-head TypeScript/build, unit tests, browser campaign, evidence tests or human play sessions were run by this integration. GitHub independently confirms the PR is merged. This is not a 1.1 release or qualified candidate. Original `v1.0.0` remains unchanged; `HUMAN-UNVALIDATED`, `BETA_PASS=NO`.
+- PR #165 was **closed as superseded** without merging, since its older branch overlaps the reconciled #178 implementation. No general Crafting, Skills, autonomous Copy planning, Chapter 8+ or 1.1 release is authorized by source integration.
 
 
 ## 2026-10-25 — OWNER MERGE POLICY UPDATE / PR #190 source-only integration

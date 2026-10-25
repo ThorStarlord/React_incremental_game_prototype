@@ -2,9 +2,9 @@
 
 ## 2026-10-25 — Owner-authorized 1.1 Trait integration (source-only)
 
-The owner previously authorized the bounded universal Trait assimilation/expression program in `specification/Technical/Version11ScopeContract.md` (PR #178), with dependent UI/fixture PRs #180 and #182. The integration preserves Campaign One's current world-first UI, district-aftercare decisions, Copy authority and released `v1.0.0` tag. This is a **1.1 source integration**, not a 1.1 release.
+The owner previously authorized the bounded universal Trait assimilation/expression program in `specification/Technical/Version11ScopeContract.md` (PR #178), with dependent UI/fixture PRs #180 and #182. The integration preserves Campaign One's current world-first UI, district-aftercare decisions, Copy authority and released `v1.0.0` tag. PR #178 was source-only squash-merged to `main` at `46e49f71127ac616b09dd582b56ca829a8d4e066`, with predecessor #180/#182 merged into its branch and obsolete #165 closed. This is a **1.1 source integration**, not a 1.1 release.
 
-The later owner decision directly above in the merge-workflow chronology waives unit, browser and evidence tests as **ordinary PR merge prerequisites**. A merged Trait candidate lacking qualification is explicitly `MERGED / UNTESTED / UNQUALIFIED`; do not claim Build Validation, correct migration behavior, player comprehension or `BETA_PASS`. Release/tag promotion remains separate and protected. The superseded #165 is a historical prototype; do not merge it as a duplicate.
+The current owner merge-workflow decision documented below waives unit, browser and evidence tests as **ordinary PR merge prerequisites**. A merged Trait candidate lacking qualification is explicitly `MERGED / UNTESTED / UNQUALIFIED`; do not claim Build Validation, correct migration behavior, player comprehension or `BETA_PASS`. Release/tag promotion remains separate and protected. The superseded #165 is a historical prototype; do not merge it as a duplicate.
 
 
 ## 2026-10-25 owner decision — merge without waiting for tests
