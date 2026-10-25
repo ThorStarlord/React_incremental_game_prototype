@@ -69,6 +69,14 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
   const knownContactsHere = knownNPCs
     .filter(npc => isPlayerAtNpcWorldLocation(npc.id, state.player.location) === true)
     .slice(0, 3);
+  // Only an already-available authored topic can justify this actionable lead.
+  // An unanchored story contact is not a confirmed physical encounter.
+  const hasAvailableAftercare = (topics: readonly { id: string }[], npcId: string): boolean =>
+    topics.some(topic => topic.id === (
+      npcId === 'npc_blacksmith_gronk'
+        ? 'gronk_m25_manifest_aftercare'
+        : 'valerius_m25_ledger_aftercare'
+    ));
   // The older authored chapters use named story settings that were never
   // integrated into M18's five-node travel graph. Exposing those contacts is
   // valid under their existing dialogue contracts, but not proof they are here.
@@ -82,15 +90,25 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
         districtAftercare.id === 'watch-ledger' &&
         candidate.npc.id === 'npc_captain_valerius')
     )
-    .sort((left, right) => right.topics.length - left.topics.length)
+    .sort((left, right) =>
+      Number(hasAvailableAftercare(right.topics, right.npc.id)) -
+      Number(hasAvailableAftercare(left.topics, left.npc.id)) ||
+      right.topics.length - left.topics.length
+    )
     .slice(0, 3)
-    .map(({ npc, topics }) => ({
-      id: `story-contact-${npc.id}`,
-      label: `Continue with ${npc.name}`,
-      description: `${topics.length} conversation topic${topics.length === 1 ? '' : 's'} ready. Their presence here is not established.`,
-      to: `/game/npcs/${encodeURIComponent(npc.id)}?view=dialogue`,
-      kind: 'reference' as const,
-    })));
+    .map(({ npc, topics }) => {
+      const ledgerReady = npc.id === 'npc_captain_valerius' &&
+        hasAvailableAftercare(topics, npc.id);
+      return {
+        id: `story-contact-${npc.id}`,
+        label: ledgerReady ? 'Discuss the patrol ledger with Valerius' : `Continue with ${npc.name}`,
+        description: ledgerReady
+          ? 'A Watch ledger decision is ready through this authored story contact. Valerius is not confirmed to be here.'
+          : `${topics.length} conversation topic${topics.length === 1 ? '' : 's'} ready. Their presence here is not established.`,
+        to: `/game/npcs/${encodeURIComponent(npc.id)}?view=dialogue`,
+        kind: 'reference' as const,
+      };
+    }));
   const activeQuests = state.quest.activeQuestIds
     .map(id => state.quest.quests[id])
     .filter(quest => quest && (quest.status === 'IN_PROGRESS' || quest.status === 'READY_TO_COMPLETE'));
@@ -134,10 +152,14 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
   knownContactsHere.forEach(npc => {
     if (stage === 'PROLOGUE' && npc.id === 'npc_elder_willow') return;
     const available = selectAvailableNPCDialogueChoices(state, npc.id);
+    const manifestReady = npc.id === 'npc_blacksmith_gronk' &&
+      hasAvailableAftercare(available, npc.id);
     actions.push(available.length > 0 ? {
       id: `npc-${npc.id}`,
-      label: `Talk with ${npc.name}`,
-      description: `${available.length} conversation topic${available.length === 1 ? '' : 's'} ready now.`,
+      label: manifestReady ? 'Discuss the verified manifest with Gronk' : `Talk with ${npc.name}`,
+      description: manifestReady
+        ? 'Gronk is here and can discuss who should receive the verified freight record.'
+        : `${available.length} conversation topic${available.length === 1 ? '' : 's'} ready now.`,
       to: `/game/npcs/${encodeURIComponent(npc.id)}?view=dialogue`,
       kind: 'encounter',
     } : {

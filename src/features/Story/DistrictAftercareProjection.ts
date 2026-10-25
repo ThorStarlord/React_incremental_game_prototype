@@ -2,6 +2,8 @@ import type { RootState } from '../../app/store';
 import { MERCHANT_DISTRICT_LOCATION_ID, resolveCanonicalLocationId } from '../Exploration/LocationDefinitions';
 import { isPlayerAtNpcWorldLocation } from '../NPCs/state/NPCWorldLocationDefinitions';
 import { selectAvailableNPCDialogueChoices } from '../NPCs/state/NPCSelectors';
+import { selectNpcKnownFactIds } from '../Knowledge/state/KnowledgeSelectors';
+import { selectFactionReputation } from '../Factions/state/FactionSelectors';
 
 /** The canonical records remain NPC conversation, per-NPC Knowledge, World State
  * and Faction standing. This is a current-location journal projection only. */
@@ -62,7 +64,7 @@ export const selectDistrictAftercare = (state: RootState): DistrictAftercareView
     if (!recorded && !available) continue;
 
     // Only the NPC that actually heard the request owns its recorded fact.
-    const knownFacts = state.knowledge.factIdsByNpcId[route.npcId] ?? [];
+    const knownFacts = selectNpcKnownFactIds(state, route.npcId);
     const chosenFactEffect = recorded
       ? node.effects?.find(effect =>
           effect.type === 'KNOWLEDGE_FACT' &&
@@ -82,10 +84,7 @@ export const selectDistrictAftercare = (state: RootState): DistrictAftercareView
         )
       : [];
     const currentStanding = ['City Watch', 'Merchants Guild']
-      .map(id => {
-        const value = state.factions.reputationByFactionId[id];
-        return `${id}: ${typeof value === 'number' && Number.isFinite(value) ? value : 0}`;
-      })
+      .map(id => `${id}: ${selectFactionReputation(state, id)}`)
       .join(' · ');
 
     const confirmedElsewhere = isPlayerAtNpcWorldLocation(route.npcId, state.player.location) === false;

@@ -74,7 +74,9 @@ const npcSlice = createSlice({
     appendAuthoredDialogueIdsToKnownNPCs: (state, action: PayloadAction<Record<string, string[]>>) => {
       for (const [npcId, authoredIds] of Object.entries(action.payload)) {
         const existing = state.npcs[npcId];
-        if (!existing || !Array.isArray(authoredIds)) continue;
+        // Enforce the no-discovery policy at the reducer authority boundary,
+        // not solely in the asynchronous fetch caller.
+        if (!existing || !state.discoveredNPCs.includes(npcId) || !Array.isArray(authoredIds)) continue;
         existing.availableDialogues = Array.from(new Set([
           ...(existing.availableDialogues ?? []),
           ...authoredIds.filter(id => typeof id === 'string' && id.length > 0),

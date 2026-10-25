@@ -230,13 +230,14 @@ export const refreshLoadedDistrictAftercareCatalogThunk = createAsyncThunk<
 >(
   'npcs/refreshLoadedDistrictAftercareCatalog',
   async (_, { getState, dispatch }) => {
-    const knownIds = new Set(getState().npcs.discoveredNPCs);
+    const startingNpcState = getState().npcs;
+    const knownIds = new Set(startingNpcState.discoveredNPCs);
     const aftercareTopics: Readonly<Record<string, string>> = {
       npc_captain_valerius: 'valerius_m25_ledger_aftercare',
       npc_blacksmith_gronk: 'gronk_m25_manifest_aftercare',
     };
     const targets = Object.entries(aftercareTopics)
-      .filter(([npcId]) => knownIds.has(npcId) && Boolean(getState().npcs.npcs[npcId]));
+      .filter(([npcId]) => knownIds.has(npcId) && Boolean(startingNpcState.npcs[npcId]));
     if (targets.length === 0) return [];
 
     const response = await fetch(publicAsset('/data/m25-chapter-content.json'));
@@ -267,6 +268,10 @@ export const refreshLoadedDistrictAftercareCatalogThunk = createAsyncThunk<
       authoredNodes[topicId] = topic;
       availableIds[npcId] = [topicId];
     }
+
+    // If another save/New Game replaced or changed the NPC world while the
+    // optional catalog was being fetched, discard this stale load's targets.
+    if (getState().npcs !== startingNpcState) return [];
 
     // Refresh definitions first, then attach only already-known characters'
     // optional authored topic IDs. Neither action affects progress or facts.
