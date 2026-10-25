@@ -146,6 +146,19 @@ describe('Doctrine Focus player surface', () => {
     await user.click(
       within(panel).getByRole('button', { name: 'Switch to Countermodeler' })
     );
+    expect(within(screen.getByRole('dialog')).getByText(/This suppresses/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Confirm Doctrine Switch' })).not.toBeInTheDocument()
+    );
+    expect(selectActiveDoctrineIds(store.getState())).toEqual(['structural_steward']);
+    await user.click(within(panel).getByRole('button', { name: 'Switch to Countermodeler' }));
+    expect(within(screen.getByRole('dialog')).getByText(/This suppresses/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Confirm Switch' }));
+    // MUI leaves the preceding panel aria-hidden until the closing Dialog exits.
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Confirm Doctrine Switch' })).not.toBeInTheDocument()
+    );
     await waitFor(() =>
       expect(selectActiveDoctrineIds(store.getState())).toEqual(['countermodeler'])
     );
@@ -211,6 +224,12 @@ describe('Doctrine Focus player surface', () => {
     panel = await openDoctrineTab(user);
     await user.click(
       within(panel).getByRole('button', { name: 'Switch to Countermodeler' })
+    );
+    expect(within(screen.getByRole('dialog')).getByText(/This suppresses/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Confirm Switch' }));
+    // MUI leaves the preceding panel aria-hidden until the closing Dialog exits.
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Confirm Doctrine Switch' })).not.toBeInTheDocument()
     );
     await waitFor(() =>
       expect(selectActiveDoctrineIds(store.getState())).toEqual(['countermodeler'])
