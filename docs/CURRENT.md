@@ -2,7 +2,7 @@
 
 ## 2026-10-25 — Post-UI4 inquiry packets (not a new product milestone)
 
-- The **divergent ideas crosswalk** is in specification/Technical/PostUI4DivergentExploration.md. It distinguishes completed M25/M26/UI4 capabilities from prospective 1.1+ directions; no new system, chapter or release is authorized by exploration alone.
+- The **divergent ideas crosswalk** is in specification/Technical/PostUI4DivergentExploration.md, with three illustrative, non-canon decision sketches in specification/Technical/PostUI4ScenarioStressTest.md. It distinguishes completed M25/M26/UI4 capabilities from prospective 1.1+ directions; no new system, chapter or release is authorized by exploration alone.
 - The **coding-agent simulated-review packet** is in specification/Technical/UI4CodingAgentSimulationCampaign.md, frozen to UI4 main d3b397f9. It is **READY / NOT EXECUTED**; the prior September V1 was INCONCLUSIVE, and its V2 was never run against current UI4. The new panel requires six separate participant contexts and genuine ordinary-UI observation/action records.
 - These research documents are subordinate to current AGENTS, STATUS, FeatureScopeMatrix and the released 1.0. Human Product Review remains issue #109 at 0/5, 0/3 and BETA_PASS=NO.
 
