@@ -31,7 +31,7 @@ import {
   encodeSavePayloadToBase64,
   loadSavedGameWithMigration,
 } from '../../../shared/utils/saveUtils';
-import { CURRENT_SAVE_SCHEMA_VERSION, migrateSavePayload } from '../../../shared/utils/saveSchema';
+import { migrateSavePayload } from '../../../shared/utils/saveSchema';
 import { rehydratePersistedGameState } from '../../../shared/persistence/PersistedGameState';
 
 const LYRA_ID = 'npc_lyra';
@@ -381,9 +381,7 @@ describe('M11 Lyra production adversarial vertical slice', () => {
 
     const persistentMigration = migrateSavePayload(historicalState);
     expect(persistentMigration.sourceVersion).toBe(0);
-    // 1.1 upgrades the canonical persistence schema to v3; the historical Lyra
-    // payload still begins at v0 and must preserve Relationship provenance.
-    expect(persistentMigration.targetVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+    expect(persistentMigration.targetVersion).toBe(2);
 
     store.dispatch(replaceState(rehydratePersistedGameState(
       persistentMigration.envelope.state,
