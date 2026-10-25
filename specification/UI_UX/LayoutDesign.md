@@ -1,6 +1,8 @@
 # Layout Design Specification
 
-## 2026-10-25 — Bounded UI4 clarity and route-ownership refinement
+## 2026-10-25 — UI4 clarity and route-ownership refinement, integrated
+
+[PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) merged at `528d014d` after exact head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677). The nested `/game/npcs/:npcId` route now returns to its tab root when selecting NPCs; the full-campaign run and targeted navigation tests pass. No new content or gameplay state was added.
 
 Current Moment retains its existing canonical actions and adds a decorative, responsive explorer-journal location vignette for three known early locations. It does not turn the panel into a map or fabricate NPC placement. The layout still contains a single semantic main region. AppRouter owns page choice through Outlet, MainContentArea owns only the shared presentation shell, and the active navigation tab is derived from the URL. Mobile legal travel actions and urgent status remain accessible. Copy's advanced Trait-sharing disclosure is separate from directly available production routines and unresolved-exception attention. Do not expand this into a generic UI engine or change gameplay/persistence authority.
 

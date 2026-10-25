@@ -1,8 +1,8 @@
 # Repository Runbook — Game Completion Program
 
-## UI4 bounded candidate qualification (2026-10-25)
+## UI4 qualification — integrated PR #185 (2026-10-25)
 
-Run **npm run ui4:validate** on the exact candidate head, then the standard Build Validation workflow. CI repeats the UI4 tests beside UI2/UI3/UX3, TypeScript, production build, Chromium/Firefox responsive smoke and both full ordinary-UI campaign routes. UI4 changes presentation and route ownership only: preserve save schema, original v1.0.0 tag, separate 1.1 Traits and BETA_PASS=NO. Source/evidence map: docs/ui/Phase4PlayerClarity.md. This runbook entry is a procedure, not a claimed PASS.
+Run **npm run ui4:validate** on the exact candidate head, then the standard Build Validation workflow. CI repeats the UI4 tests beside UI2/UI3/UX3, TypeScript, production build, Chromium/Firefox responsive smoke and both full ordinary-UI campaign routes. UI4 changes presentation and route ownership only: preserve save schema, original v1.0.0 tag, separate 1.1 Traits and BETA_PASS=NO. Source/evidence map: docs/ui/Phase4PlayerClarity.md. This procedure was executed for [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185): exact head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677), including the Chromium/Firefox full campaign (105/105 Distributed; 104/104 Fortified; save/Continue and import/export PASS). Do not confuse this deterministic qualification with human Beta evidence. No new UI phase is selected by the pass.
 
 
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  

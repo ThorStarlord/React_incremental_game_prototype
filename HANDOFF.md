@@ -1,5 +1,12 @@
 # Handoff — Campaign One 1.0 Released
 
+## 2026-10-25 — UI4 integrated, release-tag and human boundary preserved
+
+- `main` after [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) is `528d014d8de6b6cf775e4f6b229eb74b3b748dca`. The qualified exact PR head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677), including two divergent full-campaign histories in **Chromium and Firefox** (Distributed 105/105, Fortified 104/104), four save/Continue checkpoints each and export/import.
+- Existing UI4 contract/evidence: `docs/ui/Phase4PlayerClarity.md`. The nested NPC detail → NPC list navigation regression was observed in actual full-campaign browser evidence, fixed, retested and closed on the qualifying head. UI4 is **integrated**, not pending. The candidate handoff section below is historical.
+- Next responsibility is not an automatic UI5. Normal post-1.0 maintenance remains bounded; genuine fresh-player evaluation is **external and outstanding** under issue #109 and `docs/ui/Phase2HumanEvaluation.md`. Preserve **FEATURE_COMPLETE / HUMAN-UNVALIDATED, BETA_PASS=NO**, original v1.0.0 tag, and the separate unqualified 1.1 Traits drafts.
+
+
 ## 2026-10-25 — UI4 re-entry, bounded source candidate
 
 - Branch **codex/ui4-player-experience-20261025** begins from merged UX3 main **96f6c595**. Owner requested autonomous implementation of the prior UI review, not a new 1.1 product scope. Change map: docs/ui/Phase4PlayerClarity.md.

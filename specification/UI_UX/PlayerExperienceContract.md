@@ -1,6 +1,8 @@
 # Campaign One — Player Experience and UI Contract
 
-## 2026-10-25 — Owner-selected UI4 experience hardening
+## 2026-10-25 — UI4 experience hardening, qualified on main
+
+[PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) merged at `528d014d` after exact head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677). The nested NPC detail → NPC-list return was repaired and covered by `UI4NavigationReturn.test.tsx`. The UI4 implementation record `docs/ui/Phase4PlayerClarity.md` is now qualified evidence rather than an unmerged candidate. Human comprehension, delight, and preference remain unvalidated.
 
 Within the already authored Campaign One, the presentation must communicate immediate situation and legal next action in natural player language, show player-visible recorded consequences without inventing Memories, and keep deeper Copy management progressive. A reversible decorative explorer-journal vignette may depict only known canonical location names and may not assert additional NPC presence, new roads or new story authority. The first Willow journey stays manually adjacent. One React Router page authority supplies the normal UI; MainContentArea must not maintain a second page-selection table or independent active tab. Consent-based human player evidence is still required for claims of intuitive navigation, felt world identity, or enjoyment. The implementation/evidence record is docs/ui/Phase4PlayerClarity.md; all 1.1 Trait migration and release actions remain separate.
 
