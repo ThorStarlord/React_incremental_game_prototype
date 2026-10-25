@@ -1,5 +1,11 @@
 # Handoff — Campaign One 1.0 Released
 
+## 2026-10-25 — UI4 re-entry, bounded source candidate
+
+- Branch **codex/ui4-player-experience-20261025** begins from merged UX3 main **96f6c595**. Owner requested autonomous implementation of the prior UI review, not a new 1.1 product scope. Change map: docs/ui/Phase4PlayerClarity.md.
+- Exact-head Build Validation of the final UI4 PR is required before any merge; investigate deterministic, browser, TypeScript, or campaign failure at source. Browser screenshots and automated campaigns do not establish fresh-player comprehension or preferences.
+- PR #184 is already integrated; the prior UI2/UI3 entries below are historical. Do not restart UX3, alter v1.0.0, merge 1.1 Traits, or report external human sessions that did not occur.
+
 ## 2026-10-24 — Current re-entry: UI2/UI3 merged
 - `main = 41037697019dc7dcb8c9256d37002f230f737c26` after merged PR #181. Qualified exact PR head `e1f32ca70d231b0f415032bc50c0ac29d5a08fcf` via full Build Validation #40090580707 (both real browsers, both authored campaign outcomes, saves and import/export all green). The original `v1.0.0` tag is unchanged.
 - The earlier 2026-10-23/24 *draft / pending* handoff sections below are historical, not the current next responsibility. Source/verification map: `docs/ui/Phase2Implementation.md`; human participation procedure: `docs/ui/Phase2HumanEvaluation.md`.
