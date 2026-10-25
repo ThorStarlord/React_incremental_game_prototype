@@ -4,7 +4,7 @@
 
 ## Final qualification and repair provenance
 
-The full ordinary-UI release runner first detected a regression at the Silas conversation: from nested `/game/npcs/:npcId`, the NPCs sidebar button failed to navigate back to `/game/npcs`. Route state compared only the top-level tab; the fix compares full canonical path. `UI4NavigationReturn.test.tsx` now asserts this nested navigation, alongside the original `UI4RouteAuthority` and player-clartity tests.
+The full ordinary-UI release runner first detected a regression at the Silas conversation: from nested `/game/npcs/:npcId`, the NPCs sidebar button failed to navigate back to `/game/npcs`. Route state compared only the top-level tab; the fix compares full canonical path. `UI4NavigationReturn.test.tsx` now asserts this nested navigation, alongside the original `UI4RouteAuthority` and player-clarity tests.
 
 **Final exact head:** `cfad4349f4776ff7cd2b3effc30b60d695b0e8e5`. **Build Validation:** [#40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677), **PASS**. Full campaign: both browsers, Distributed 105/105, Fortified 104/104; four save/Continue checkpoints and import/export PASS on every route. Responsive browser smoke and the production build also passed. This synthetic evidence establishes exercised behavior only; no human product judgment was made.
 
