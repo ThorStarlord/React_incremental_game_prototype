@@ -76,10 +76,7 @@ export const GameLayout: React.FC = React.memo(() => {
           minWidth: 0,
         }}
       >
-        <MainContentArea 
-          activeTabId={activeTab}
-          changeTab={setActiveTab}
-        >
+        <MainContentArea activeTabId={activeTab}>
           <GameSessionBar />
           <SessionStatusStrip />
           <Outlet />
