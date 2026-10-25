@@ -1,6 +1,6 @@
 # Campaign One 1.1 — Trait Expression UI contract (UX-D)
 
-**Status:** Stacked PR #180 integrated into the owner-authorized 1.1 source candidate. UI implementation is UNTESTED / UNQUALIFIED under the explicit owner merge waiver; not valid for released 1.0 and not proof of UI usability or 1.1 release readiness.
+**Status:** PR #180's UI source was included in merged mainline PR #178 (`46e49f71`) under the owner no-tests waiver. UNTESTED / UNQUALIFIED; not an independent 1.1 release, human usability finding or change to tagged 1.0.
 
 The 1.1 implementation distinguishes known/discovered Trait patterns, current expression, and permanent assimilation. Stabilization is the Essence-based transition that records lasting assimilation, not an additional always-on effect state. Slots hold expressed effects. Suppression never deletes assimilated ownership.
 

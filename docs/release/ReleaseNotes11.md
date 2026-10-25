@@ -1,6 +1,6 @@
 # Campaign One 1.1 — Release Notes (candidate; NOT YET RELEASED)
 
-**Release status:** CANDIDATE IN DEVELOPMENT / NOT QUALIFIED. The shipped game remains `1.0.0`.
+**Release status:** SOURCE INTEGRATED on main via PR #178 (`46e49f71`) / UNTESTED / NOT QUALIFIED / NOT RELEASED. The latest formal release tag remains `v1.0.0`.
 
 ## Intended 1.1 improvement
 

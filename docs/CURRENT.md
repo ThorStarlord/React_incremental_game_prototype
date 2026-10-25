@@ -1,9 +1,9 @@
 # Documentation Authority Index
 
-## 2026-10-25 — CURRENT: owner-approved 1.1 Trait source candidate
+## 2026-10-25 — CURRENT: universal Trait 1.1 source integrated, unqualified
 
 - `specification/Technical/Version11ScopeContract.md` and `specification/Technical/UniversalTraitOntologyReconciliation.md` govern the **bounded 1.1 universal Trait assimilation/expression redesign** derived from owner-approved PR #178; they do not supersede the qualified **released 1.0** baseline for prior release claims.
-- PRs #180 and #182 were already merged into PR #178's branch. The current-main reconciliation merges that code with UI4 player-facing affordances and PR #190's Merchant District aftercare. PR #165 remains an obsolete historical prototype. GitHub PR metadata is the authority for the actual merge.
+- [PR #178](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/178) **merged** at `46e49f71127ac616b09dd582b56ca829a8d4e066`. PRs #180 and #182 had been merged into its source branch. The reconciled 1.1 runtime/UX preserves UI4 and PR #190's Merchant District aftercare. All 21 test-file differences and new CI/browser/release workflow steps were deliberately omitted under the owner no-tests instruction. PR #165 was **closed as superseded**, not merged.
 - The 2026-10-25 `AGENTS.md` owner decision waives **ordinary PR merge** test prerequisites only; this 1.1 implementation remains `UNTESTED / UNQUALIFIED` without code/build, save-recovery, browser, player or CI evidence. `v1.0.0` remains immutable. No 1.1 release, external Beta or new thesis is claimed.
 
 

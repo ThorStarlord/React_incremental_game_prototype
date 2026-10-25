@@ -1,6 +1,6 @@
 # React Incremental RPG — Campaign One
 
-> **1.1 development branch:** The owner has authorized a bounded universal Trait assimilation/expression revision. It is being integrated on PR #178 using `specification/Technical/Version11ScopeContract.md`. **1.1 has not passed final qualification or been released.** The latest released personal build remains **1.0.0**, human-unvalidated.
+> **1.1 source integrated, NOT released:** The bounded universal Trait assimilation/expression revision was source-only merged in [PR #178](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/178) at `46e49f71`, preserving current UI4 and district-aftercare work. **No unit/browser/evidence tests or production qualification were performed on this merged candidate; 1.1 is UNTESTED / UNQUALIFIED and has not been released.** The most recent formal personal release remains **v1.0.0**, human-unvalidated.
 
 
 A React/TypeScript narrative incremental RPG where consequential relationships teach durable capabilities, remembered history changes later possibilities, and personally understood repetition can become deliberately delegated work.

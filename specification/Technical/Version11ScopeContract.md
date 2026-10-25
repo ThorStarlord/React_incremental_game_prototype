@@ -1,6 +1,6 @@
 # Campaign One 1.1 — Universal Trait Expression Contract
 
-**Status:** OWNER-DIRECTED 1.1 CONSTRUCTION SCOPE (2026-10-20); implementation and qualification OPEN
+**Status:** OWNER-DIRECTED 1.1 SCOPE / SOURCE-INTEGRATED on main by PR #178 (`46e49f71`) / UNTESTED / UNQUALIFIED / RELEASE NOT AUTHORIZED
 **Release boundary:** Campaign One `v1.0.0` remains the released and qualified personal build.
 **Basis:** owner instruction to implement the agreed P0–P6 plan with full repository delegation, without waiting between repository-answerable tasks.
 **Reference:** draft PR #165 and its `UniversalTraitOntologyReconciliation.md` are implementation evidence, not merge/qualification authority.
