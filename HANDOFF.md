@@ -5,7 +5,7 @@
 - UI4 PRs #185/#186 are already merged and technically qualified. Do not reopen or requalify them merely to begin this exploratory work.
 - Owner has requested a **coding-agent simulation** and exploration of other repository-documented game ideas. Execution packet: specification/Technical/UI4CodingAgentSimulationCampaign.md. Exploration and status crosswalk: specification/Technical/PostUI4DivergentExploration.md.
 - The six-profile **blind panel is NOT RUN** in the GitHub-only controller context; it needs independently spawned agent participants and UI-only observation/action artifacts. Never count role predictions, scripted full-campaign tests or this handoff as actual simulated participant evidence.
-- Provisional A/B/C exploration (Trait identity, Knowledge strategy, tangible World/Faction consequences) is not automatically an approved new 1.1 roadmap. Existing Trait drafts #178/#180/#182 remain separate and unqualified; no change to v1.0.0, issue #109 or BETA_PASS=NO.
+- Provisional A/B/C exploration (Trait identity, Knowledge strategy, tangible World/Faction consequences) includes bounded non-canon examples in specification/Technical/PostUI4ScenarioStressTest.md and is not automatically an approved new 1.1 roadmap. Existing Trait drafts #178/#180/#182 remain separate and unqualified; no change to v1.0.0, issue #109 or BETA_PASS=NO.
 
 
 ## 2026-10-25 — UI4 integrated, release-tag and human boundary preserved
