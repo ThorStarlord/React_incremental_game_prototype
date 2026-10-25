@@ -19,7 +19,8 @@ const EMPTY_DIALOGUE_CHOICES: readonly NPCDialogueChoice[] = [];
 export interface NPCDialogueChoice {
   id: string;
   title: string;
-  responses: Array<{ id: string; label: string }>;
+  decisionContext?: string;
+  responses: Array<{ id: string; label: string; standingChanges?: Array<{ factionId: string; amount: number }> }>;
   availabilityReasons: string[];
 }
 
@@ -195,9 +196,19 @@ export const selectAvailableNPCDialogueChoices = createSelector(
         return {
           id: node.id,
           title: node.title || node.text || node.id,
+          ...(node.decisionContext ? { decisionContext: node.decisionContext } : {}),
           responses: Object.entries(node.responses || {}).map(([id, label]) => ({
             id,
             label: String(label),
+            // Preserve the historical {id,label} shape for ordinary topics;
+            // only a clearly authored decision opts into consequence previews.
+            ...(node.decisionContext ? {
+              standingChanges: (node.effects ?? []).flatMap(effect =>
+                effect.type === 'FACTION_REPUTATION' && effect.responseId === id
+                  ? [{ factionId: effect.factionId, amount: effect.value }]
+                  : []
+              ),
+            } : {}),
           })),
           availabilityReasons: availability.availabilityReasons,
         };

@@ -231,6 +231,8 @@ export interface DialogueNode {
   npcId?: string;
   title?: string;
   text?: string;
+  /** Spoiler-safe decision stakes shown before an authored response is chosen. */
+  decisionContext?: string;
   /** Response options keyed by response id -> label */
   responses?: Record<string, string>;
   /** Effects executed when this node is selected/answered */
@@ -239,6 +241,8 @@ export interface DialogueNode {
   next?: Record<string, string | null>;
   /** All listed Relationship Experiences must already exist. */
   requiredExperienceIds?: string[];
+  /** All listed one-shot dialogues must be completed with this same NPC. */
+  requiredCompletedDialogueIds?: string[];
   /** At least one listed Relationship Experience must already exist. */
   anyOfExperienceIds?: string[];
   /** All listed objective Player routine-familiarity records must exist. */

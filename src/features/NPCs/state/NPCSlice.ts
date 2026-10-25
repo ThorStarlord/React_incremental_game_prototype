@@ -66,6 +66,23 @@ const npcSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    /**
+     * Load-side content reconciliation. Only add newly authored dialogue IDs to
+     * NPCs already present in this save. Never recreate an NPC, mark discovery,
+     * touch completed conversations, or replace relationship/shop progress.
+     */
+    appendAuthoredDialogueIdsToKnownNPCs: (state, action: PayloadAction<Record<string, string[]>>) => {
+      for (const [npcId, authoredIds] of Object.entries(action.payload)) {
+        const existing = state.npcs[npcId];
+        // Enforce the no-discovery policy at the reducer authority boundary,
+        // not solely in the asynchronous fetch caller.
+        if (!existing || !state.discoveredNPCs.includes(npcId) || !Array.isArray(authoredIds)) continue;
+        existing.availableDialogues = Array.from(new Set([
+          ...(existing.availableDialogues ?? []),
+          ...authoredIds.filter(id => typeof id === 'string' && id.length > 0),
+        ]));
+      }
+    },
     updateNpcAffinity: (state, action: PayloadAction<{ npcId: string; change: number; reason?: string }>) => {
       const { npcId, change } = action.payload;
       const npc = state.npcs[npcId];
@@ -310,6 +327,7 @@ export const {
   setError,
   setNPCs,
   mergeNPCsPreservingExisting,
+  appendAuthoredDialogueIdsToKnownNPCs,
   updateNpcAffinity,
   setAffinity,
   increaseConnectionDepth,

@@ -17,6 +17,8 @@ import {
 import { processNPCInteractionThunk } from '../../../state/NPCThunks';
 import type { DialogueEntry } from '../../../state/NPCTypes';
 import type { NPCDialogueChoice } from '../../../state/NPCSelectors';
+import { getNpcWorldLocationId, isPlayerAtNpcWorldLocation } from '../../../state/NPCWorldLocationDefinitions';
+import { getLocationDefinition } from '../../../../Exploration/LocationDefinitions';
 import { selectCausalJournalEntries, selectRecentRecordedDialogueExperiences } from '../../../../Story/PlayerInsightSelectors';
 
 
@@ -43,6 +45,15 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const availableDialogueChoices = useAppSelector(state =>
     selectAvailableNPCDialogueChoices(state, npcId)
   );
+  // Ready does not mean physically reachable. Keep the topic discoverable
+  // while preventing a choice that the NPC interaction authority must reject.
+  const anchoredElsewhere = useAppSelector(state =>
+    isPlayerAtNpcWorldLocation(npcId, state.player.location) === false
+  );
+  const anchorId = getNpcWorldLocationId(npcId);
+  const anchoredPlaceName = anchorId
+    ? getLocationDefinition(anchorId)?.name ?? 'the known location'
+    : 'the known location';
   const latestVisibleMemory = useAppSelector(state =>
     selectCausalJournalEntries(state, 10).find(entry => entry.npcId === npcId)
   );
@@ -72,8 +83,19 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           timestamp: Date.now(),
         },
       })).unwrap();
+      const standingChanges = choice.responses.find(response => response.id === responseKey)?.standingChanges ?? [];
+      const standingSummary = standingChanges.length > 0
+        ? ` Institutional standing changed: ${standingChanges.map(
+            change => `${change.factionId} ${change.amount >= 0 ? '+' : ''}${change.amount}`
+          ).join(' · ')}.`
+        : '';
       setFeedback(outcome.success
-        ? { success: true, message: `Your choice in "${choice.title}" is part of your story. Review what changed below.` }
+        ? {
+            success: true,
+            message: choice.decisionContext
+              ? `Your request in "${choice.title}" was recorded with this person.${standingSummary} Review the conversation below; other characters were not automatically informed.`
+              : `Your choice in "${choice.title}" is part of your story. Review what changed below.`,
+          }
         : { success: false, message: outcome.message || 'This conversation is not currently available.' });
     } catch {
       setFeedback({ success: false, message: 'The conversation could not be completed. No success has been claimed.' });
@@ -104,7 +126,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                 elevation={1}
                 sx={{ p: 1.5, bgcolor: msg.playerText ? 'primary.main' : 'background.default', color: msg.playerText ? 'primary.contrastText' : 'text.primary' }}
               >
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
                   {msg.playerText || msg.npcResponse}
                 </Typography>
               </Paper>
@@ -134,6 +156,16 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
                   {choice.title}
                 </Typography>
+                {choice.decisionContext && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.75 }}>
+                    {choice.decisionContext}
+                  </Typography>
+                )}
+                {choice.decisionContext && anchoredElsewhere && (
+                  <Typography variant="body2" color="warning.main" role="status" sx={{ mb: 0.75 }}>
+                    Meet {npc.name} in {anchoredPlaceName} using the connected routes before making this choice.
+                  </Typography>
+                )}
                 {choice.availabilityReasons.length > 0 && (
                   <Typography
                     variant="caption"
@@ -146,21 +178,30 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {choice.responses.length > 0 ? (
                     choice.responses.map(response => (
-                      <Button
-                        key={`${choice.id}-${response.id}`}
-                        variant="outlined"
-                        size="small"
-                        disabled={busy}
-                        onClick={() => handleDialogueChoice(choice, response.id)}
-                      >
-                        {response.label}
-                      </Button>
+                      <Box key={`${choice.id}-${response.id}`} sx={{ maxWidth: '100%' }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          sx={{ minHeight: 44, whiteSpace: 'normal', textAlign: 'left' }}
+                          disabled={busy || Boolean(choice.decisionContext && anchoredElsewhere)}
+                          onClick={() => handleDialogueChoice(choice, response.id)}
+                        >
+                          {response.label}
+                        </Button>
+                        {Boolean(response.standingChanges?.length) && (
+                          <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                            If chosen, institutional standing changes: {(response.standingChanges ?? []).map(
+                              change => `${change.factionId} ${change.amount >= 0 ? '+' : ''}${change.amount}`
+                            ).join(' · ')}
+                          </Typography>
+                        )}
+                      </Box>
                     ))
                   ) : (
                     <Button
                       variant="outlined"
                       size="small"
-                      disabled={busy}
+                      disabled={busy || Boolean(choice.decisionContext && anchoredElsewhere)}
                       onClick={() => handleDialogueChoice(choice, '')}
                     >
                       Continue

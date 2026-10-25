@@ -75,14 +75,148 @@
       "next": {
         "close": null
       }
+    },
+    "valerius_m25_ledger_aftercare": {
+      "id": "valerius_m25_ledger_aftercare",
+      "npcId": "npc_captain_valerius",
+      "title": "Who Can Examine the Patrol Ledger?",
+      "text": "Valerius places the signed patrol ledger beside the redeployment map. 'There is no way to make the choice cost nothing. I will record what you asked me to do, and the Watch will have to answer for the review.'",
+      "decisionContext": "Public patrols remain heavy. You can request an open merchant audit of the Watch ledger, sacrificing some command discretion, or request a dated internal Watch review that gives merchants less visibility. Neither choice means an unvisited contact already knows the ledger's contents.",
+      "repeatable": false,
+      "requiredCompletedDialogueIds": [
+        "valerius_m25_public_order_conclusion"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "watchPresence",
+          "equals": "heavy"
+        }
+      ],
+      "responses": {
+        "invite_audit": "Ask Valerius to invite merchant auditors to review the signed patrol ledger.",
+        "internal_review": "Ask Valerius to keep a dated internal Watch review of the patrol ledger."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_m25_valerius_audit_request",
+          "responseId": "invite_audit"
+        },
+        {
+          "type": "FACTION_REPUTATION",
+          "factionId": "Merchants Guild",
+          "value": 2,
+          "responseId": "invite_audit"
+        },
+        {
+          "type": "FACTION_REPUTATION",
+          "factionId": "City Watch",
+          "value": -1,
+          "responseId": "invite_audit"
+        },
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_m25_valerius_internal_review_request",
+          "responseId": "internal_review"
+        },
+        {
+          "type": "FACTION_REPUTATION",
+          "factionId": "City Watch",
+          "value": 2,
+          "responseId": "internal_review"
+        }
+      ],
+      "next": {
+        "invite_audit": "valerius_m25_ledger_audit_reply",
+        "internal_review": "valerius_m25_ledger_internal_reply"
+      }
+    },
+    "gronk_m25_manifest_aftercare": {
+      "id": "gronk_m25_manifest_aftercare",
+      "npcId": "npc_blacksmith_gronk",
+      "title": "Where Should the Verified Manifest Go?",
+      "text": "Gronk sets the audited freight manifest on his forge counter. 'The loads have been checked. That doesn't mean every desk needs the same copy at the same time. Tell me which review you want me to prepare, and I'll mark it against the original.'",
+      "decisionContext": "Trade is moving again. You can request a signed copy for the Watch's review, granting institutional oversight, or keep the verified copy in the Guild ledger for now, preserving merchant control over its timing. This records a request to Gronk, not automatic knowledge in distant NPCs.",
+      "repeatable": false,
+      "requiredCompletedDialogueIds": [
+        "gronk_m25_quiet_network_conclusion"
+      ],
+      "requiredWorldState": [
+        {
+          "regionId": "location_merchant_district",
+          "field": "tradeFlow",
+          "equals": "strong"
+        }
+      ],
+      "responses": {
+        "watch_copy": "Ask Gronk to prepare a signed manifest copy for the Watch's review.",
+        "guild_ledger": "Ask Gronk to keep the verified manifest in the Guild ledger for now."
+      },
+      "effects": [
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_m25_gronk_watch_manifest_request",
+          "responseId": "watch_copy"
+        },
+        {
+          "type": "FACTION_REPUTATION",
+          "factionId": "City Watch",
+          "value": 2,
+          "responseId": "watch_copy"
+        },
+        {
+          "type": "FACTION_REPUTATION",
+          "factionId": "Merchants Guild",
+          "value": -1,
+          "responseId": "watch_copy"
+        },
+        {
+          "type": "KNOWLEDGE_FACT",
+          "factId": "fact_m25_gronk_guild_manifest_request",
+          "responseId": "guild_ledger"
+        },
+        {
+          "type": "FACTION_REPUTATION",
+          "factionId": "Merchants Guild",
+          "value": 2,
+          "responseId": "guild_ledger"
+        }
+      ],
+      "next": {
+        "watch_copy": "gronk_m25_manifest_watch_reply",
+        "guild_ledger": "gronk_m25_manifest_guild_reply"
+      }
+    },
+    "valerius_m25_ledger_audit_reply": {
+      "id": "valerius_m25_ledger_audit_reply",
+      "npcId": "npc_captain_valerius",
+      "text": "Valerius signs the invitation and writes your name beside it. 'Merchants can challenge the ledger in the open. Some captains won't thank us for it, but they will know where the dispute belongs.'"
+    },
+    "valerius_m25_ledger_internal_reply": {
+      "id": "valerius_m25_ledger_internal_reply",
+      "npcId": "npc_captain_valerius",
+      "text": "Valerius dates the command review and closes the ledger. 'The Watch will account for its own patrols. The merchants may distrust a review they cannot inspect, and that is part of the cost.'"
+    },
+    "gronk_m25_manifest_watch_reply": {
+      "id": "gronk_m25_manifest_watch_reply",
+      "npcId": "npc_blacksmith_gronk",
+      "text": "Gronk marks a signed copy for Watch review. 'They can ask about the weight and the route. They will still need to learn what the figures mean before they use them.'"
+    },
+    "gronk_m25_manifest_guild_reply": {
+      "id": "gronk_m25_manifest_guild_reply",
+      "npcId": "npc_blacksmith_gronk",
+      "text": "Gronk files the verified sheet under a Guild ledger number. 'It stays with the people who checked the freight. If the Watch asks about a particular load, we will know exactly which page to bring out.'"
     }
   },
   "npcDialogueIds": {
     "npc_captain_valerius": [
-      "valerius_m25_public_order_conclusion"
+      "valerius_m25_public_order_conclusion",
+      "valerius_m25_ledger_aftercare"
     ],
     "npc_blacksmith_gronk": [
-      "gronk_m25_quiet_network_conclusion"
+      "gronk_m25_quiet_network_conclusion",
+      "gronk_m25_manifest_aftercare"
     ]
   }
 }
