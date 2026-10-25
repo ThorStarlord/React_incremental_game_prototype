@@ -70,6 +70,10 @@ These directions can reinforce each other, but **a possibility space is not an i
 
 **Less warranted now:** a generic economy, ChapterEngine, skill tree, open-world NPC schedule, general rumor simulator, autonomous Copy planner or procedural campaign. These add architecture and maintenance before a need has been shown.
 
+## Concrete A/B/C comparison already drafted
+
+The non-canon, side-by-side design stress test for the top three futures is in **PostUI4ScenarioStressTest.md**. It specifies two meaningful action paths, current authority owners, visible downstream consequences, and falsifying risks for each direction. It is a design exercise, not executed participant evidence or production content.
+
 ## Execution sequence and decision criteria
 
 1. **Run the current-game six-profile agent simulation** described in UI4CodingAgentSimulationCampaign.md. The coding agent must actually use independent participant contexts and real observation/action artifacts; scripted release routes cannot substitute.
