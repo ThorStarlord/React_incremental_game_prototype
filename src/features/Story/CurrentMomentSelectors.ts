@@ -1,5 +1,5 @@
 import type { RootState } from '../../app/store';
-import { CITY_CENTER_LOCATION_ID, CITY_GATE_LOCATION_ID, getConnectedLocationDefinitions, getLocationDefinition, resolveCanonicalLocationId } from '../Exploration/LocationDefinitions';
+import { CITY_CENTER_LOCATION_ID, CITY_GATE_LOCATION_ID, MERCHANT_DISTRICT_LOCATION_ID, getConnectedLocationDefinitions, getLocationDefinition, resolveCanonicalLocationId } from '../Exploration/LocationDefinitions';
 import { isPlayerAtNpcWorldLocation } from '../NPCs/state/NPCWorldLocationDefinitions';
 import { selectAvailableNPCDialogueChoices } from '../NPCs/state/NPCSelectors';
 import { CHAPTER_DEFINITIONS } from './ChapterDefinitions';
@@ -34,6 +34,28 @@ export interface CurrentMomentView {
 const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
   const locationId = resolveCanonicalLocationId(state.player.location);
   const location = locationId ? getLocationDefinition(locationId) : undefined;
+  // Only describe conditions actually recorded in the current district.
+  // World State remains the authority: this is read-only journal prose,
+  // not a shop, patrol encounter, NPC location, or new travel affordance.
+  const district = locationId === MERCHANT_DISTRICT_LOCATION_ID
+    ? state.worldState.regions[MERCHANT_DISTRICT_LOCATION_ID]
+    : undefined;
+  const recordedPlaceConditions = [
+    district?.watchPresence === 'heavy'
+      ? 'Watch patrols are a much more visible presence in these streets.'
+      : district?.watchPresence === 'normal'
+        ? 'Watch patrols follow their customary routes through the district.'
+        : null,
+    district?.tradeFlow === 'strong'
+      ? 'Trade is lively, with carts and stalls busy through the streets.'
+      : district?.tradeFlow === 'normal'
+        ? 'Trade moves at its usual pace through the market.'
+        : null,
+  ].filter((line): line is string => line !== null);
+  const locationDescription = [
+    location?.description ?? 'A location without an authored travel description.',
+    ...recordedPlaceConditions,
+  ].join(' ');
   const stage = selectOpeningCampaignStage(state);
   const currentChapter = stage !== 'PROLOGUE'
     ? selectAllChapterProgress(state).find(chapter => chapter.status !== 'complete')
@@ -184,7 +206,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
 
   return {
     locationName: location?.name ?? state.player.location,
-    locationDescription: location?.description ?? 'A location without an authored travel description.',
+    locationDescription,
     situation,
     actions: actions.slice(0, 5),
     storyContacts,
