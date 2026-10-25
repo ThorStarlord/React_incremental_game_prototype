@@ -53,6 +53,29 @@ After `replaceState` and relationship runtime reconciliation, the normal Load/Co
 
 This is source-only construction; no load/Continue scenario was executed under the owner's no-tests instruction. It still needs exact-head behavior and recovery qualification before any merge.
 
+## Next gate: executable acceptance matrix (NOT RUN)
+
+The repository's exact-head Build Validation remains the merger gate. The following cases are **planned checks only**, not executed results; listing them does not count as a unit, browser, synthetic, or human test:
+
+| Case | Expected behavior and rejected failure |
+| --- | --- |
+| Fresh public-order conclusion | After the exact Valerius conclusion, heavy patrol World State exposes only his ledger follow-up; before completion, no aftercare topic appears. |
+| Fresh quiet-network conclusion | After the exact Gronk conclusion, strong trade World State exposes only his manifest follow-up; Gronk remains anchored to City Center rather than physically appearing in the Merchant District. |
+| Response-specific outcomes | Each selected response applies only its authored faction effects and records one request fact with its actual NPC; no other NPC learns it automatically. Completed one-shot topics cannot fire effects again by direct thunk dispatch. |
+| Historical decision visibility | Player Insight has no future/unmade request; after a real completion it shows the specific NPC's recorded request and authored standing deltas without minting a new Relationship Memory. |
+| Older-save recovery | Load/Continue adds both optional topics only to already discovered saved NPCs. It preserves earlier progress and rejects a stale catalog refresh after a different save or New Game supersedes it. |
+| Dialogue compatibility | Ordinary original 1.0 conversation transcripts and next-node behavior are unchanged. Invalid response IDs, mismatched recipients, and missing same-NPC prerequisites fail closed before any effects. |
+| Content-authoring consistency | Completion edges point to real same-NPC dialogue definitions. No generic Chapter engine, additional region road or freeform rumor/belief authority is introduced. |
+| Release and player evidence | Full exact-head Build Validation must include original normal-UI campaign, save/Continue checkpoints, browsers and production build. Neither a pass nor a failure can be claimed until actually run. Human participants remain a separate requirement for genuine Beta findings. |
+
+**Construction stopping rule:** no further feature or integration expansion on this unqualified branch without a concrete source-level defect or fresh decision-changing evidence. The next action for publication is qualification, which remains expressly outside the owner's current no-tests mode. The draft may remain open; it must not be relabeled ready or merged merely because the source was inspected.
+
+## Frontier after this source candidate
+
+Post-UI4 exploration compared relationship-derived capability buildcraft (A), deliberate information control (B), reactive places/institutions (C), and earned Copy delegation (D). This branch is a narrow B+C reversible build; it does **not** establish that B+C is the preferred primary product identity. The rival 1.1 universal Trait implementation remains draft PR #178 based on an older released commit and not mergeable with current main; its dependent PRs #180/#182 are separate. The qualified existing Copy standing-order and exception surfaces already support D, so another Copy panel without a concrete new need would duplicate implemented functionality.
+
+**Bounded next recommendation:** qualify this small aftercare candidate first when testing is allowed; reconcile the current main/1.1 Trait branch and evaluate build differentiation separately before promoting any larger A expansion. Keep D a competing identity hypothesis until actual player-experience evidence discriminates it, not a license for an autonomous Copy planner. No 1.1 product thesis, merge, release, or broader scope decision is made by this candidate.
+
 ## Risks and qualifications still required
 
 - The two conversations and their modest reputation deltas are **provisional gameplay design**; they do not establish preference, fun, or balance.
