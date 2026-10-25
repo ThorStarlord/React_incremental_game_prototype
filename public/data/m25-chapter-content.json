@@ -128,8 +128,8 @@
         }
       ],
       "next": {
-        "invite_audit": null,
-        "internal_review": null
+        "invite_audit": "valerius_m25_ledger_audit_reply",
+        "internal_review": "valerius_m25_ledger_internal_reply"
       }
     },
     "gronk_m25_manifest_aftercare": {
@@ -184,9 +184,29 @@
         }
       ],
       "next": {
-        "watch_copy": null,
-        "guild_ledger": null
+        "watch_copy": "gronk_m25_manifest_watch_reply",
+        "guild_ledger": "gronk_m25_manifest_guild_reply"
       }
+    },
+    "valerius_m25_ledger_audit_reply": {
+      "id": "valerius_m25_ledger_audit_reply",
+      "npcId": "npc_captain_valerius",
+      "text": "Valerius signs the invitation and writes your name beside it. 'Merchants can challenge the ledger in the open. Some captains won't thank us for it, but they will know where the dispute belongs.'"
+    },
+    "valerius_m25_ledger_internal_reply": {
+      "id": "valerius_m25_ledger_internal_reply",
+      "npcId": "npc_captain_valerius",
+      "text": "Valerius dates the command review and closes the ledger. 'The Watch will account for its own patrols. The merchants may distrust a review they cannot inspect, and that is part of the cost.'"
+    },
+    "gronk_m25_manifest_watch_reply": {
+      "id": "gronk_m25_manifest_watch_reply",
+      "npcId": "npc_blacksmith_gronk",
+      "text": "Gronk marks a signed copy for Watch review. 'They can ask about the weight and the route. They will still need to learn what the figures mean before they use them.'"
+    },
+    "gronk_m25_manifest_guild_reply": {
+      "id": "gronk_m25_manifest_guild_reply",
+      "npcId": "npc_blacksmith_gronk",
+      "text": "Gronk files the verified sheet under a Guild ledger number. 'It stays with the people who checked the freight. If the Watch asks about a particular load, we will know exactly which page to bring out.'"
     }
   },
   "npcDialogueIds": {

@@ -18,6 +18,7 @@ Both choices remain viable and leave the prior chapter, map, quests, and save sc
 1. `requiredCompletedDialogueIds` is an optional prerequisite for an NPC's *own* earlier one-shot conversation. Both topic presentation and the interaction thunk check it. Other dialogue topics continue under existing gates.
 2. `decisionContext` is optional, already-available topic text displayed **before** the player commits. It is separate from the spoken response, and unavailable topics remain hidden.
 3. The interaction history records the authored response the player actually selected and the node's spoken text, including terminal nodes. This makes branching decisions recoverable by the player without generating a synthetic Memory.
+   The two follow-up choices also use existing inline next-node presentation to give each response its own character reaction, without creating an additional decision or independent conversation topic.
 4. Current Moment reflects only already recorded district World State and player-initiated, NPC-heard follow-up requests. It prioritizes a ready Valerius *story contact* without claiming he is physically in the district; the Gronk lead points toward City Center's existing adjacent route.
 5. The chapter routes remain owned by the original conclusion dialogue IDs; aftercare cannot complete, revoke, or rewrite Chapter 1. Existing Faction and Knowledge state, not extra parallel save flags, carry the results.
 
