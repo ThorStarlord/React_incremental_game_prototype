@@ -26,7 +26,12 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
   activeTabId = 'dashboard',
   className,
   children,
-}) => (
+}) => {
+  // Preserve each feature's former presentation width without selecting
+  // a page component. AppRouter alone decides what the outlet renders.
+  const maxWidth = activeTabId === 'dashboard' ? 'xl'
+    : activeTabId === 'essence' || activeTabId === 'settings' ? 'md' : 'lg';
+  return (
   <Box component="main" role="main" aria-label={activeTabId + ' content area'}
     className={className} tabIndex={-1} sx={{
       flexGrow: 1, minWidth: 0, overflow: 'auto',
@@ -34,7 +39,7 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
       position: 'relative',
       '&:focus': { outline: 'none' },
     }}>
-    <Container maxWidth="xl" sx={{
+    <Container maxWidth={maxWidth} sx={{
       py: 3, px: { xs: 2, sm: 3 },
       minHeight: 'calc(100vh - 64px)',
       display: 'flex', flexDirection: 'column',
@@ -42,6 +47,7 @@ export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
       <Suspense fallback={<LoadingPage />}>{children}</Suspense>
     </Container>
   </Box>
-));
+  );
+});
 MainContentArea.displayName = 'MainContentArea';
 export default MainContentArea;
