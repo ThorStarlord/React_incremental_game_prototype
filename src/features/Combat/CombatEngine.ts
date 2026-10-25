@@ -1,3 +1,4 @@
+import { PLAYER_BASE_STATS } from '../../constants/playerConstants';
 import {
   getMissingPermanentTraitIds,
   hasRequiredPermanentTraits,
@@ -9,6 +10,14 @@ import type {
   CombatEncounterDefinition,
   CombatEncounterState,
 } from './CombatTypes';
+
+// Campaign One keeps combat bounded. Expressed procedural/stat patterns can
+// add at most two points of Strike damage; baseline combat stays unchanged.
+const clampStrikeBonus = (value: number): number =>
+  Number.isFinite(value) ? Math.max(0, Math.min(2, Math.floor(value))) : 0;
+
+export const getBoundedStrikeBonus = (playerAttack: number): number =>
+  clampStrikeBonus((playerAttack - PLAYER_BASE_STATS.attack) / 5);
 
 export const createCombatEncounterState = (
   definition: CombatEncounterDefinition
@@ -33,14 +42,15 @@ const inactiveReason = (state: CombatEncounterState): string | undefined => {
 export const getCombatActionPresentations = (
   definition: CombatEncounterDefinition,
   state: CombatEncounterState,
-  permanentTraitIds: readonly string[]
+  expressedTraitIds: readonly string[],
+  strikeDamageBonus = 0
 ): CombatActionPresentation[] => {
   const inactive = inactiveReason(state);
   const actions: CombatActionPresentation[] = [
     {
       id: 'strike',
       label: 'Strike',
-      description: `Deal ${definition.strikeDamage} damage to the target.`,
+      description: `Deal ${definition.strikeDamage + clampStrikeBonus(strikeDamageBonus)} damage to the target.`,
       enabled: !inactive,
       reason: inactive,
     },
@@ -58,7 +68,7 @@ export const getCombatActionPresentations = (
 
   const hasTraitAccess = hasRequiredPermanentTraits(
     feedback.requiredPermanentTraitIds,
-    permanentTraitIds
+    expressedTraitIds
   );
 
   if (!hasTraitAccess || state.feedbackDisrupted) {
@@ -143,7 +153,8 @@ export const performCombatAction = (
   definition: CombatEncounterDefinition,
   state: CombatEncounterState,
   actionId: CombatActionId,
-  permanentTraitIds: readonly string[]
+  expressedTraitIds: readonly string[],
+  strikeDamageBonus = 0
 ): CombatActionResult => {
   const inactive = inactiveReason(state);
   if (inactive) return rejected(state, inactive);
@@ -157,12 +168,12 @@ export const performCombatAction = (
 
     const missingTraitIds = getMissingPermanentTraitIds(
       feedback.requiredPermanentTraitIds,
-      permanentTraitIds
+      expressedTraitIds
     );
     if (missingTraitIds.length > 0) {
       return rejected(
         state,
-        `Action requires permanent Trait${missingTraitIds.length === 1 ? '' : 's'}: ${missingTraitIds.join(', ')}.`
+        `Action requires expressed Trait${missingTraitIds.length === 1 ? '' : 's'}: ${missingTraitIds.join(', ')}.`
       );
     }
   }
@@ -253,7 +264,7 @@ export const performCombatAction = (
   }
 
   if (actionId === 'strike') {
-    const enemyHealth = Math.max(0, state.enemyHealth - definition.strikeDamage);
+    const enemyHealth = Math.max(0, state.enemyHealth - definition.strikeDamage - clampStrikeBonus(strikeDamageBonus));
     const afterStrike: CombatEncounterState = {
       ...state,
       round: state.round + 1,

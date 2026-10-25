@@ -527,9 +527,9 @@ describe('M5 fresh Willow routed vertical slice', () => {
 
     fireEvent.click(screen.getByRole('tab', { name: 'Traits' }));
     expect(await screen.findByText("Willow's Wisdom")).toBeInTheDocument();
-    await clickButton('Resonate');
-    expect(await screen.findByText('Confirm Trait Resonance')).toBeInTheDocument();
-    await clickButton('Confirm & Resonate');
+    await clickButton('Stabilize');
+    expect(await screen.findByText('Confirm Trait Stabilization')).toBeInTheDocument();
+    await clickButton('Confirm Stabilization');
 
     await waitFor(() => {
       expect(store.getState().player.permanentTraits).toContain(WISDOM_ID);

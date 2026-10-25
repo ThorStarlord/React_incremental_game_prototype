@@ -65,7 +65,7 @@ const renderActiveCombat = (store: ReturnType<typeof makeStore>) =>
 
 const runEngineActions = (
   actionIds: CombatActionId[],
-  permanentTraitIds: readonly string[]
+  expressedTraitIds: readonly string[]
 ): CombatEncounterState => {
   let state = createCombatEncounterState(TELLURIC_ECHO_ENCOUNTER);
   for (const actionId of actionIds) {
@@ -73,7 +73,7 @@ const runEngineActions = (
       TELLURIC_ECHO_ENCOUNTER,
       state,
       actionId,
-      permanentTraitIds
+      expressedTraitIds
     );
     expect(result.ok).toBe(true);
     state = result.state;
@@ -372,7 +372,7 @@ describe('M17 narrow Trait-sensitive combat vertical slice', () => {
     render(
       <CombatEncounterPanel
         definition={TELLURIC_ECHO_ENCOUNTER}
-        permanentTraitIds={[]}
+        expressedTraitIds={[]}
         onTargetKilled={onTargetKilled}
       />
     );

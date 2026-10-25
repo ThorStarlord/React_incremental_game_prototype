@@ -4,9 +4,10 @@
  */
 
 import React, { useMemo, useCallback } from 'react';
-import { useAppSelector } from '../../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { PlayerTraitsUI } from '../ui/PlayerTraitsUI';
 import type { Trait } from '../../../Traits/state/TraitsTypes';
+import { expressTrait, suppressTrait } from '../../state/PlayerSlice';
 
 import {
     selectAllTraits,
@@ -16,9 +17,9 @@ import {
 } from '../../../Traits/state/TraitsSelectors';
 
 import {
-  selectPermanentTraits as selectPermanentTraitIds, // Keep as IDs for filtering
+  selectAssimilatedTraitIds,
   selectPlayerTraitSlots,
-  selectEquippedTraits,
+  selectExpressedTraits,
 } from '../../state/PlayerSelectors';
 
 /**
@@ -38,50 +39,56 @@ export const PlayerTraitsContainer: React.FC<PlayerTraitsContainerProps> = ({
   onTraitChange,
   className,
 }) => {
-  // Use proper selectors from their correct locations
-  const permanentTraitIds = useAppSelector(selectPermanentTraitIds);
-  const equippedTraits = useAppSelector(selectEquippedTraits);
+  const dispatch = useAppDispatch();
+  const assimilatedTraitIds = useAppSelector(selectAssimilatedTraitIds);
+  const equippedTraits = useAppSelector(selectExpressedTraits);
   const allTraits = useAppSelector(selectAllTraits);
   const isLoading = useAppSelector(selectTraitLoading);
   const error = useAppSelector(selectTraitError);
   const traitSlots = useAppSelector(selectPlayerTraitSlots);
   const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
 
-  // Memoize the full permanent trait objects for display
-  const permanentTraits = useMemo(() => {
-    return permanentTraitIds.map(id => allTraits[id]).filter(Boolean) as Trait[];
-  }, [permanentTraitIds, allTraits]);
+  const assimilatedTraits = useMemo(() => {
+    return assimilatedTraitIds.map(id => allTraits[id]).filter(Boolean) as Trait[];
+  }, [assimilatedTraitIds, allTraits]);
 
-  // Get available traits (all known traits that aren't equipped or permanent)
   const availableTraits = useMemo(() => {
-    const equippedIds = equippedTraits.map(t => t.id);
-    return acquiredTraits.filter(trait => !equippedIds.includes(trait.id) && !permanentTraitIds.includes(trait.id));
-  }, [acquiredTraits, equippedTraits, permanentTraitIds]);
+    const equippedIds = new Set(equippedTraits.map(t => t.id));
+    const candidateIds = new Set([
+      ...acquiredTraits.map(trait => trait.id),
+      ...assimilatedTraitIds,
+    ]);
+    return Array.from(candidateIds)
+      .map(id => allTraits[id])
+      .filter((trait): trait is Trait => Boolean(trait))
+      .filter(trait => !equippedIds.has(trait.id));
+  }, [acquiredTraits, assimilatedTraitIds, equippedTraits, allTraits]);
 
 
   const handleEquipTrait = useCallback((traitId: string, slotIndex: number) => {
-    console.log(`Equipping trait ${traitId} to slot ${slotIndex} - functionality pending`);
+    if (slotIndex < 0) return;
+    dispatch(expressTrait({ traitId, slotIndex }));
     onTraitChange?.(traitId);
-  }, [onTraitChange]);
+  }, [dispatch, onTraitChange]);
 
   const handleUnequipTrait = useCallback((slotIndex: number) => {
     const slot = traitSlots.find(s => s.slotIndex === slotIndex);
     if (slot && slot.traitId) {
-      console.log(`Unequipping trait ${slot.traitId} from slot ${slotIndex} - functionality pending`);
+      dispatch(suppressTrait({ slotIndex }));
       onTraitChange?.(slot.traitId);
     }
-  }, [traitSlots, onTraitChange]);
+  }, [dispatch, traitSlots, onTraitChange]);
 
   const handleTraitSelect = useCallback((traitId: string) => {
-    console.log(`Trait selected: ${traitId} - functionality pending`);
     onTraitChange?.(traitId);
   }, [onTraitChange]);
 
   return (
     <PlayerTraitsUI
       traitSlots={traitSlots}
-      permanentTraits={permanentTraits} // Pass the full objects
+      assimilatedTraits={assimilatedTraits}
       availableTraits={availableTraits}
+      allTraits={allTraits}
       onEquipTrait={handleEquipTrait}
       onUnequipTrait={handleUnequipTrait}
       onTraitSelect={handleTraitSelect}

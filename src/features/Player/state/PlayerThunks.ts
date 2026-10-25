@@ -17,13 +17,15 @@ export const recalculateStatsThunk = createAsyncThunk(
     // --- Step 1: Calculate stats from base values and attributes ---
     let finalStats = calculateStatsFromAttributes(player);
     
-    // --- Step 2: Get all active traits ---
-    const activeTraitIds = new Set([
-      ...player.permanentTraits,
-      ...player.traitSlots.map(slot => slot.traitId).filter(Boolean) as string[]
-    ]);
-    
-    const activeTraits = Array.from(activeTraitIds).map(id => allTraits[id]).filter(Boolean);
+    // --- Step 2: Get currently expressed Traits ---
+    // Assimilation means permanent availability, not permanent activation.
+    // Only patterns occupying expression slots contribute active Player effects.
+    const expressedTraitIds = player.traitSlots
+      .map(slot => slot.traitId)
+      .filter((id): id is string => Boolean(id));
+    const activeTraits = Array.from(new Set(expressedTraitIds))
+      .map(id => allTraits[id])
+      .filter(Boolean);
 
     // --- Step 3: Process trait effects, applying them to the stats from step 1 ---
     finalStats = processTraitEffects(activeTraits, finalStats);
