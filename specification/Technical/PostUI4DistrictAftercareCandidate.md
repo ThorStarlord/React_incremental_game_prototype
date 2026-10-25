@@ -33,6 +33,12 @@ Both choices remain viable and leave the prior chapter, map, quests, and save sc
 
 `scripts/content-intelligence/content-graph.js` now models `requiredCompletedDialogueIds` as an ordinary blocking `requires-completed-dialogue` edge from the aftercare topic to the actual route conclusion. This keeps static dependency traces and missing-target reports aligned with the runtime gate, instead of implying the new choices are reachable independently of Chapter 1. No new ChapterEngine, content DSL, or alternate state machine is introduced.
 
+## Recipient and completion authority
+
+The interaction thunk now rejects direct attempts to run an opted-in 1.1 follow-up on the wrong NPC, an undiscovered NPC, or a topic not offered by that NPC. The earlier-completed-dialogue prerequisite remains checked against **that same NPC's** actual completion list. This narrows only the new opt-in decision contract, leaving legacy freeform/ordinary dialogue behavior unchanged.
+
+The content graph also reports `COMPLETED_DIALOGUE_NPC_MISMATCH` when a follow-up requires a completed topic authored for a different NPC. Missing prerequisite IDs remain normal `DANGLING_REFERENCE` errors. These source-level guards preserve the distinction between per-NPC Knowledge and institutional Faction standing; they do not make the intended player-facing behavior qualified without execution.
+
 ## Existing-save content compatibility
 
 The original source candidate relied on startup/Chapter 1 content loading, but a loaded save replaces the Redux snapshot, including old `NPC.availableDialogues` and `dialogueNodes` values. This can leave previously concluded routes with no route-follow-up topic, even when the new static asset is present.

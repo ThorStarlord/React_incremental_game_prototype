@@ -423,6 +423,21 @@ export const processNPCInteractionThunk = createAsyncThunk<
         const requiredCompletedDialogueIds = Array.isArray(node.requiredCompletedDialogueIds)
           ? node.requiredCompletedDialogueIds as string[]
           : [];
+        if (node.decisionContext || requiredCompletedDialogueIds.length > 0) {
+          // These opt-in 1.1 topics are explicitly NPC-authored decisions.
+          // A direct thunk dispatch may not impersonate the intended recipient
+          // or select a dialogue this player's NPC has never offered.
+          if (
+            node.npcId !== npcId ||
+            !state.npcs.discoveredNPCs.includes(npcId) ||
+            !npc.availableDialogues?.includes(node.id)
+          ) {
+            return {
+              success: false,
+              message: 'This authored follow-up is not available with this person.',
+            } as InteractionResult;
+          }
+        }
         if (requiredCompletedDialogueIds.some(id => !completedDialogues.includes(id))) {
           dispatch(addNotification({
             type: 'info',

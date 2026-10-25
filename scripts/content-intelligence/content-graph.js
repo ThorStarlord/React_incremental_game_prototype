@@ -415,6 +415,13 @@ function createModel(root, options = {}) {
     }
   }
 
+  // A required completed topic is checked against the *current NPC's* own
+  // completed dialogue IDs at runtime. Reject cross-recipient authoring, which
+  // would otherwise create an impossible or incorrectly attributed gate.
+  const ownerByDialogue = new Map(
+    edges.filter(edge => edge.relation === 'owned-by-npc')
+      .map(edge => [edge.from, edge.to])
+  );
   for (const edge of edges) {
     if (edge.nonBlocking) continue;
     if (!nodes.has(edge.from)) {
@@ -427,6 +434,18 @@ function createModel(root, options = {}) {
         entity: edge.from,
         target: edge.to,
       });
+    }
+    if (
+      edge.relation === 'requires-completed-dialogue' &&
+      nodes.has(edge.from) && nodes.has(edge.to) &&
+      (!ownerByDialogue.get(edge.from) ||
+        ownerByDialogue.get(edge.from) !== ownerByDialogue.get(edge.to))
+    ) {
+      issue(
+        'COMPLETED_DIALOGUE_NPC_MISMATCH',
+        `${edge.from} requires another NPC's completed dialogue ${edge.to}`,
+        { entity: edge.from, target: edge.to }
+      );
     }
   }
 
