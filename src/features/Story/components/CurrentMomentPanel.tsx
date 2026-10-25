@@ -91,6 +91,11 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
               <Paper key={change.id} variant="outlined" sx={{ p: 1.5, borderLeft: 3, borderLeftColor: 'primary.main', backgroundColor: 'background.paper' }}>
                 <Typography variant="body2" fontWeight={600}>{change.title}</Typography>
                 <Typography variant="body2" color="text.secondary">{change.explanation}</Typography>
+                {change.to && (
+                  <Button size="small" variant="text" component={RouterLink} to={change.to} sx={{ mt: 0.5 }}>
+                    Review this relationship
+                  </Button>
+                )}
               </Paper>
             ))}
           </Stack>
