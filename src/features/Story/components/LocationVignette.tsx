@@ -18,7 +18,7 @@ export const LocationVignette: React.FC<{ locationName: string }> = React.memo((
   if (!scene) return null;
 
   return (
-    <Box data-testid="location-vignette" aria-hidden="true" sx={{
+    <Box data-test-id="location-vignette" data-testid="location-vignette" aria-hidden="true" sx={{
       flex: '0 0 auto', width: { xs: '100%', md: 224 },
       height: { xs: 86, md: 150 }, overflow: 'hidden',
       borderRadius: 2, border: '1px solid', borderColor: 'divider',
