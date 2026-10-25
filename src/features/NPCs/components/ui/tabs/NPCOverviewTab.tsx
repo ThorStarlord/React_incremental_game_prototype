@@ -138,9 +138,9 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc, presenceAtAnchor }
                       ? 'Travel to this character’s authored location to talk in person.'
                       : availableTopics.length > 0
                         ? presenceAtAnchor === undefined
-                          ? `${availableTopics.length} authored topic(s) available through story interaction; world position unverified.`
-                          : `${availableTopics.length} authored conversation topic(s) available here.`
-                        : 'No new authored conversation is available right now.'}
+                          ? `${availableTopics.length} topic(s) ready to discuss; this person's current location is unconfirmed.`
+                          : `${availableTopics.length} conversation topic(s) ready here.`
+                        : 'Nothing new to discuss right now.'}
                   />
                 </ListItem>
                 <ListItem>
@@ -161,7 +161,7 @@ const NPCOverviewTab: React.FC<NPCOverviewTabProps> = ({ npc, presenceAtAnchor }
                   <ListItemText
                     primary="Quests"
                     secondary={usesRelationshipAuthority
-                      ? 'Quest opportunities appear when your shared history makes them relevant.'
+                      ? 'New opportunities may emerge from your shared experiences.'
                       : isAffinityUnlocked(20) ? 'Accept and complete quests' : 'Requires Affinity: 20'}
                   />
                 </ListItem>
