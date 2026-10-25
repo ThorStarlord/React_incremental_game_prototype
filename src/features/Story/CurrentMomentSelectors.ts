@@ -22,7 +22,7 @@ export interface CurrentMomentView {
   actions: CurrentMomentAction[];
   /** Authored story interaction with unanchored characters, not physical co-presence. */
   storyContacts: CurrentMomentAction[];
-  consequences: Array<{ id: string; title: string; explanation: string }>;
+  consequences: Array<{ id: string; title: string; explanation: string; to?: string }>;
   attention: Array<{ id: string; label: string; to: string }>;
 }
 
@@ -55,7 +55,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
     .map(({ npc, topics }) => ({
       id: `story-contact-${npc.id}`,
       label: `Continue with ${npc.name}`,
-      description: `${topics.length} authored topic${topics.length === 1 ? '' : 's'} available. Presence in your current location is not established.`,
+      description: `${topics.length} conversation topic${topics.length === 1 ? '' : 's'} ready. Their presence here is not established.`,
       to: `/game/npcs/${encodeURIComponent(npc.id)}?view=dialogue`,
       kind: 'reference' as const,
     })));
@@ -80,7 +80,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
       actions.push({
         id: 'prologue-willow-inspect',
         label: 'Review Elder Willow',
-        description: 'She is here, but no new authored conversation is currently available.',
+        description: 'She is here, but has nothing new to discuss right now.',
         to: '/game/npcs/npc_elder_willow',
         kind: 'reference',
       });
@@ -92,7 +92,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
           ? 'The road to Willow begins at City Gate. Choose Travel to City Gate below.'
           : locationId === CITY_GATE_LOCATION_ID
             ? 'Continue from City Gate to Whispering Woods using Travel below.'
-            : 'Use the existing authored travel routes to reach Whispering Woods. If already there, look for an available conversation.',
+            : 'Follow the known roads toward Whispering Woods. If you have arrived, look for a chance to speak.',
         to: '/game/dashboard#travel-controls',
         kind: 'travel',
       });
@@ -105,7 +105,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
     actions.push(available.length > 0 ? {
       id: `npc-${npc.id}`,
       label: `Talk with ${npc.name}`,
-      description: `${available.length} authored conversation topic${available.length === 1 ? '' : 's'} currently available.`,
+      description: `${available.length} conversation topic${available.length === 1 ? '' : 's'} ready now.`,
       to: `/game/npcs/${encodeURIComponent(npc.id)}?view=dialogue`,
       kind: 'encounter',
     } : {
@@ -122,7 +122,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
       id: `quest-${quest.id}`,
       label: `Review ${quest.title}`,
       description: quest.status === 'READY_TO_COMPLETE'
-        ? 'Objectives are ready; review the authored resolution.'
+        ? 'Your objectives are complete. Review what happens next.'
         : 'Review the current objectives and what remains to do.',
       to: `/game/quests?quest=${encodeURIComponent(quest.id)}`,
       kind: 'quest',
@@ -132,7 +132,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
     actions.push({
       id: 'travel',
       label: 'Explore connected locations',
-      description: 'Choose a legal authored route using the travel controls.',
+      description: 'Choose an available road below. You will travel one stop at a time.',
       to: '/game/dashboard#travel-controls',
       kind: 'travel',
     });
@@ -141,7 +141,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
     actions.push({
       id: 'relationships',
       label: 'Review known contacts',
-      description: 'Inspect the people already encountered, without revealing unknown characters.',
+      description: 'Return to people you have met and discover what has changed.',
       to: '/game/npcs',
       kind: 'reference',
     });
@@ -177,7 +177,7 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
     : availableHere
       ? `${chapterSituation} ${availableHere.name} is here with an available conversation.`
       : storyContacts.length > 0
-        ? `${chapterSituation} A known character has an available story conversation; their precise location is not tracked on this map.`
+        ? `${chapterSituation} Someone you know has something new to discuss, though their location is not shown on this map.`
         : activeQuests.length > 0
           ? `${chapterSituation} ${activeQuests[0].title} is an unresolved quest in your journal.`
           : `${chapterSituation} Revisit known contacts and recorded decisions for your next lead.`;
@@ -193,17 +193,19 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
         id: entry.id,
         title: entry.title,
         explanation: `${entry.causeLabel}: ${entry.summary}`,
+        to: `/game/npcs/${encodeURIComponent(entry.npcId)}`,
         timestamp: entry.timestamp,
       })),
       ...selectRecentRecordedDialogueExperiences(state, 2).map(entry => ({
         id: `experience-${entry.id}`,
         title: entry.title,
-        explanation: `This dialogue experience with ${entry.npcName} is now part of your recorded history.`,
+        explanation: `Your conversation with ${entry.npcName} is now part of your story.`,
+        to: `/game/npcs/${encodeURIComponent(entry.npcId)}`,
         timestamp: entry.timestamp,
       })),
     ].sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 3)
-      .map(({ id, title, explanation }) => ({ id, title, explanation })),
+      .map(({ id, title, explanation, to }) => ({ id, title, explanation, to })),
     attention,
   };
 };

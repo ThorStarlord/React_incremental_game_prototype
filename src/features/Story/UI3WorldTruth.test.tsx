@@ -99,8 +99,8 @@ test('NPC overview only advertises actual dialogue availability, not generic con
     require('path').join(process.cwd(), 'src/features/NPCs/components/ui/tabs/NPCOverviewTab.tsx'), 'utf8',
   );
   expect(source).toContain('selectAvailableNPCDialogueChoices');
-  expect(source).toContain('No new authored conversation is available right now.');
-  expect(source).toContain('world position unverified');
+  expect(source).toContain('Nothing new to discuss right now.');
+  expect(source).toContain('current location is unconfirmed');
   expect(source).not.toContain("Available now. Meaningful responses can become Relationship Experiences.");
 });
 

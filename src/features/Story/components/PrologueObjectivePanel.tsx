@@ -80,8 +80,8 @@ export const PrologueObjectivePanel: React.FC = () => {
       <Alert severity="info" data-testid="gc02-prologue-objective" sx={{ mb: 2 }}>
         <AlertTitle>Prologue — Speak with Elder Willow</AlertTitle>
         <Typography variant="body2">
-          Open Dialogue and follow the conversation through The First Lesson. The prologue
-          advances only when that Relationship experience is recorded.
+          Open Dialogue with Willow and follow The First Lesson. Your conversation will help shape
+          what comes next.
         </Typography>
         <Box sx={{ mt: 1.5 }}>
           <Button

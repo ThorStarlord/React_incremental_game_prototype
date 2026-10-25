@@ -69,7 +69,7 @@ const QuestPuzzleModal: React.FC<QuestPuzzleModalProps> = ({ open, onClose, obje
         {error && <Alert severity="error" role="alert" sx={{ mt: 1 }}>{error}</Alert>}
         {confirmForce && forceOutcome && (
           <Alert severity="warning" sx={{ mt: 2 }}>
-            Forcing this puzzle is an authored alternative, not a free retry.
+            Force It takes a different path and may have consequences. Check the known effects before choosing.
             {forcedConsequences.length > 0 && (
               <Typography variant="body2">Known effects: {forcedConsequences.join('; ')}.</Typography>
             )}

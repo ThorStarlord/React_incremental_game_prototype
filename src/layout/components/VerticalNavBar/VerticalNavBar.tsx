@@ -85,11 +85,12 @@ export const VerticalNavBar: React.FC<VerticalNavBarProps> = ({
 
   // Handle tab changes
   const handleTabChange = useCallback((tabId: TabId) => {
-    // Navigate to the corresponding route
-    navigate(`/game/${tabId}`);
-
+    // The owning GameLayout callback handles navigation. Standalone usage
+    // can still navigate, but never invoke both paths for the same click.
     if (onTabChange) {
       onTabChange(tabId);
+    } else {
+      navigate(`/game/${tabId}`);
     }
     // Close mobile drawer on navigation
     if (isMobile) {

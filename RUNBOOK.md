@@ -1,5 +1,10 @@
 # Repository Runbook — Game Completion Program
 
+## UI4 bounded candidate qualification (2026-10-25)
+
+Run **npm run ui4:validate** on the exact candidate head, then the standard Build Validation workflow. CI repeats the UI4 tests beside UI2/UI3/UX3, TypeScript, production build, Chromium/Firefox responsive smoke and both full ordinary-UI campaign routes. UI4 changes presentation and route ownership only: preserve save schema, original v1.0.0 tag, separate 1.1 Traits and BETA_PASS=NO. Source/evidence map: docs/ui/Phase4PlayerClarity.md. This runbook entry is a procedure, not a claimed PASS.
+
+
 **Current maturity:** FEATURE_COMPLETE / HUMAN-UNVALIDATED  
 **Repository-controlled readiness:** TECHNICAL_BETA_READY  
 **Active program:** Campaign One / post-1.0 maintenance  

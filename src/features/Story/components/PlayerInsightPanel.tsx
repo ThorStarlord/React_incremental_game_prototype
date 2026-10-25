@@ -67,7 +67,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               Player Insight
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              A read-only view of consequences, unresolved opportunities, learned capabilities, and repeatable work you have already mastered.
+              Explore the people, memories, abilities, and routines that have shaped your journey.
             </Typography>
           </Box>
 
@@ -96,16 +96,16 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                       />
                     </Stack>
                     <Typography variant="caption" color="text.secondary" display="block">
-                      {exception.copyName} · {exception.routineName} · tick {exception.detectedAtTick}
+                      {exception.copyName} · {exception.routineName}
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 0.5 }}>
                       {exception.summary}
                     </Typography>
                     <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 0.5 }}>
-                      Escalation boundary: {exception.boundaryLabel}. {exception.boundaryDescription}
+                      Outside this Copy's authority: {exception.boundaryLabel}. {exception.boundaryDescription}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.75 }}>
-                      Open this Copy's details to acknowledge the operational exception. Acknowledgement does not resolve the player-owned decision.
+                      You can acknowledge this interruption in Copy Management, but the decision still needs you.
                     </Typography>
                     <Button size="small" component={RouterLink} to={`/game/copies?copy=${encodeURIComponent(exception.copyId)}`} sx={{ mt: 0.5 }}>
                       Manage {exception.copyName}
@@ -124,7 +124,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                 </Typography>
                 {journal.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
-                    No player-visible relationship memories have formed yet.
+                    No lasting memories yet. Meaningful experiences may leave a mark.
                   </Typography>
                 ) : journal.map(entry => (
                   <Box key={entry.id}>
@@ -154,7 +154,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                 </Typography>
                 {visibleOpportunities.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
-                    No chapter-scale opportunity has enough player evidence to reveal a route yet.
+                    New paths will become clear as you learn more about the world.
                   </Typography>
                 ) : visibleOpportunities.map(chapter => (
                   <Box key={chapter.id}>
@@ -168,9 +168,6 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                         color={chapter.status === 'complete' ? 'success' : 'default'}
                       />
                     </Stack>
-                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.75 }}>
-                      {chapter.centerOfGravity}
-                    </Typography>
                     <Stack spacing={1}>
                       {chapter.routes.map(route => (
                         <Box key={route.routeId}>
@@ -183,7 +180,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                             sx={{ mt: 0.5 }}
                           />
                           <Typography variant="caption" color="text.secondary">
-                            {route.satisfiedRequirements}/{route.totalRequirements} evidenced
+                            {route.satisfiedRequirements}/{route.totalRequirements} conditions met
                           </Typography>
                         </Box>
                       ))}
@@ -221,7 +218,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                 )}
                 {capabilities.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
-                    Relationship-mediated capabilities remain hidden until discovered through play.
+                    New abilities will appear as your relationships deepen.
                   </Typography>
                 ) : capabilities.map(capability => (
                   <Box key={capability.traitId}>
@@ -326,10 +323,10 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                 <Box key={family.id}>
                   <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
                     <Typography variant="body2" fontWeight={600}>
-                      Procedure family — {family.name}
+                      Shared practice — {family.name}
                     </Typography>
                     <Chip
-                      label={family.status === 'mastered' ? 'Generalized' : `${family.masteredRoutineIds.length}/${family.requiredRoutineIds.length} evidence`}
+                      label={family.status === 'mastered' ? 'Mastered' : `${family.masteredRoutineIds.length}/${family.requiredRoutineIds.length} routines learned`}
                       size="small"
                       color={family.status === 'mastered' ? 'success' : 'default'}
                     />
@@ -343,7 +340,7 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               <Box>
                 <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
                   <Typography variant="body2" fontWeight={600}>
-                    Operational domain — {masteryCompression.operationalDomain.name}
+                    Work entrusted — {masteryCompression.operationalDomain.name}
                   </Typography>
                   <Chip
                     label={masteryCompression.operationalDomain.status.replace(/_/g, ' ')}
@@ -386,14 +383,14 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
               )}
 
               <Typography variant="caption" color="text.secondary">
-                Campaign One ceiling: {masteryCompression.organizationalCeiling.summary} Managers-of-managers and autonomous strategy remain outside this campaign.
+                Copies can carry out familiar work, but your choices and the larger strategy remain yours.
               </Typography>
             </Stack>
           </Box>
 
           <Divider />
           <Typography variant="caption" color="text.secondary">
-            This view explains recorded state; it does not create chapter completion, reveal undiscovered authored Traits, grant routine mastery, resolve Copy exceptions, or make delegation decisions for the player.
+            This journal remembers what you have already discovered. Your next choices are still yours to make.
           </Typography>
         </Stack>
       </CardContent>

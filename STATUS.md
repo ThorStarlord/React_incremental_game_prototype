@@ -1,5 +1,11 @@
 # Repository Status — Campaign One 1.0 Released
 
+## 2026-10-25 — UI4 player clarity / experiential identity candidate
+
+- Owner authorized bounded implementation of the source-backed UI review. Branch **codex/ui4-player-experience-20261025** from main **96f6c595** changes player-facing language, known-place journal vignettes, recorded-consequence links, Copy attention and advanced controls, plus duplicate route-shell cleanup. Source and evidence map: docs/ui/Phase4PlayerClarity.md. Require full exact-head Build Validation before merge; no human-player claim from this work.
+- Prior UX3 PR #184 merged at **96f6c595** after Build Validation **40103050524 PASS**. The original v1.0.0 tag remains immutable and human Beta remains **BETA_PASS=NO / HUMAN-UNVALIDATED**. Universal Trait 1.1 PRs #178/#180/#182 are still independent drafts.
+- This candidate entry is not a merged/qualified claim until the PR's exact-head gate returns. Keep later historical UI2/UI3 snapshots as evidence, not a fresh construction queue.
+
 ## 2026-10-24 — UI2/UI3 integrated on main (qualified)
 - [PR #181](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/181) **merged** at `41037697019dc7dcb8c9256d37002f230f737c26`. Its exact-head `e1f32ca70d231b0f415032bc50c0ac29d5a08fcf` passed [Build Validation #40090580707](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40090580707), including UI3 targeted tests, TypeScript, Chromium/Firefox real browser navigation and the complete two-route/2-browser ordinary-UI campaign (105 Distributed steps and 104 Fortified steps per browser, four save/Continue checkpoints each, export/import verified). No new 1.0.0 release tag was created; the immutable original `v1.0.0` still points to `14ce21e2`.
 - Implementation: world-first Current Moment, truthful spatial/story contact availability, player-facing eight-chapter situation prose, NPC and relationship authority repair, Quest/Copies/Traits/Settings trust, mobile and desktop spacing, visual contrast, real browser regression coverage.

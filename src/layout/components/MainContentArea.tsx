@@ -1,148 +1,53 @@
-import React, { useMemo, useCallback, Suspense, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Fade,
-  CircularProgress,
-  Typography
-} from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { useOutlet } from 'react-router-dom';
-
-// Page imports
-import CharacterPage from '../../pages/CharacterPage';
-import NPCsPage from '../../pages/NPCsPage';
-import EssencePage from '../../pages/EssencePage';
-import SettingsPage from '../../pages/SettingsPage';
-import { DashboardPage } from '../../pages/DashboardPage';
-import TraitsPage from '../../pages/TraitsPage';
-import DebugPage from '../../pages/DebugPage';
-import CopiesPage from '../../pages/CopiesPage'; // Import the new page
-import QuestsPage from '../../pages/QuestsPage';
-
-// Types
+import React, { Suspense } from 'react';
+import { Box, CircularProgress, Container, Typography } from '@mui/material';
 import type { TabId } from '../types/NavigationTypes';
 
+/**
+ * Routed layout shell. AppRouter alone chooses which page renders through
+ * GameLayout's Outlet; this component does not duplicate route or page state.
+ */
 export interface MainContentAreaProps {
   activeTabId?: TabId;
-  changeTab?: (tabId: TabId) => void;
   className?: string;
-  enableTransitions?: boolean;
-  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
-  debugMode?: boolean;
-  LoadingComponent?: React.ComponentType<{ text?: string }>;
   children?: React.ReactNode;
 }
 
-interface ContentConfig {
-  component: React.ComponentType<any>;
-  props?: Record<string, any>;
-  showContainer?: boolean;
-  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
-  loadingText?: string;
-  enableSuspense?: boolean;
-  preloadable?: boolean;
-}
-
-const ContentLoadingFallback: React.FC<{ text?: string }> = React.memo(({ text = 'Loading content...' }) => (
-  <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="200px" gap={2}>
-    <CircularProgress size={40} />
-    <Typography variant="body2" color="text.secondary">{text}</Typography>
+const LoadingPage: React.FC = () => (
+  <Box role="status" sx={{
+    display: 'flex', flexDirection: 'column', gap: 2, minHeight: 200,
+    justifyContent: 'center', alignItems: 'center',
+  }}>
+    <CircularProgress size={36} />
+    <Typography variant="body2" color="text.secondary">Loading your journey...</Typography>
   </Box>
-));
-ContentLoadingFallback.displayName = 'ContentLoadingFallback';
-
+);
 
 export const MainContentArea: React.FC<MainContentAreaProps> = React.memo(({
   activeTabId = 'dashboard',
-  changeTab,
   className,
-  enableTransitions = true,
-  maxWidth = 'lg',
-  debugMode = process.env.NODE_ENV === 'development',
-  LoadingComponent = ContentLoadingFallback,
-  children
+  children,
 }) => {
-  const theme = useTheme();
-  const outlet = useOutlet();
-
-  useEffect(() => {
-    if (debugMode) {
-      console.log(`[MainContentArea] Active tab changed to: ${activeTabId}`);
-    }
-  }, [activeTabId, debugMode]);
-
-  const contentConfig = useMemo((): Partial<Record<TabId, ContentConfig>> & Record<'dashboard', ContentConfig> => ({
-    dashboard: { component: DashboardPage, showContainer: true, maxWidth: 'xl', loadingText: 'Loading dashboard...', enableSuspense: true, preloadable: true },
-    character: { component: CharacterPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading character data...', enableSuspense: true, preloadable: true },
-    traits: { component: TraitsPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading traits system...', enableSuspense: true, preloadable: true },
-    npcs: { component: NPCsPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading NPC data...', enableSuspense: true, preloadable: true },
-    quests: { component: QuestsPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading quest system...', enableSuspense: true, preloadable: true },
-    copies: { component: CopiesPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading copy management...', enableSuspense: true, preloadable: true },
-    essence: { component: EssencePage, showContainer: true, maxWidth: 'md', loadingText: 'Loading essence data...', enableSuspense: true, preloadable: true },
-    settings: { component: SettingsPage, showContainer: true, maxWidth: 'md', loadingText: 'Loading settings...', enableSuspense: true, preloadable: false },
-    debug: { component: DebugPage, showContainer: true, maxWidth: 'lg', loadingText: 'Loading debug tools...', enableSuspense: false, preloadable: false },
-  }), []);
-
-  const currentConfig = useMemo(() => {
-    const configured = contentConfig[activeTabId];
-    if (configured) return configured;
-    if (debugMode) console.warn(`[MainContentArea] No config for tab: ${activeTabId}, falling back to dashboard`);
-    return contentConfig.dashboard;
-  }, [activeTabId, contentConfig, debugMode]);
-
-  const handleTabChange = useCallback((tabId: TabId) => {
-    if (!changeTab) {
-      if (debugMode) console.warn('[MainContentArea] changeTab callback not provided');
-      return;
-    }
-    if (!(tabId in contentConfig)) {
-      if (debugMode) console.error(`[MainContentArea] Invalid tab ID: ${tabId}`);
-      return;
-    }
-    if (debugMode) console.log(`[MainContentArea] Changing tab from ${activeTabId} to ${tabId}`);
-    changeTab(tabId);
-  }, [changeTab, activeTabId, contentConfig, debugMode]);
-
-  const renderContent = useCallback(() => {
-    // If a routed component is being rendered via <Outlet>, prioritize it.
-    if (outlet) {
-      return <Suspense fallback={<LoadingComponent text="Loading page..." />}>{children}</Suspense>;
-    }
-
-    const { component: Component, props: componentProps = {}, enableSuspense } = currentConfig;
-    const enhancedProps = { ...componentProps, onTabChange: handleTabChange, activeTab: activeTabId, debugMode };
-    const content = <Component {...enhancedProps} />;
-    if (enableSuspense) {
-      return <Suspense fallback={<LoadingComponent text={currentConfig.loadingText} />}>{content}</Suspense>;
-    }
-    return content;
-  }, [currentConfig, handleTabChange, activeTabId, debugMode, LoadingComponent, children, outlet]);
-
-  const content = useMemo(() => {
-    const renderedContent = renderContent();
-    if (currentConfig.showContainer) {
-      return (
-        <Container maxWidth={currentConfig.maxWidth || maxWidth} sx={{ py: 3, px: { xs: 2, sm: 3 }, minHeight: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-          {renderedContent}
-        </Container>
-      );
-    }
-    return renderedContent;
-  }, [renderContent, currentConfig, maxWidth]);
-
-  const mainContainer = useMemo(() => (
-    <Box className={className} component="main" role="main" aria-label={`${activeTabId} content area`} aria-busy={false} tabIndex={-1} sx={{ flexGrow: 1, overflow: 'auto', backgroundColor: theme.palette.background.default, position: 'relative', '&:focus': { outline: 'none' } }}>
-      {content}
-    </Box>
-  ), [className, activeTabId, theme.palette.background.default, content]);
-
-  if (enableTransitions) {
-    return <Fade in timeout={theme.transitions.duration.enteringScreen} style={{ transformOrigin: '0 0 0' }}>{mainContainer}</Fade>;
-  }
-  return mainContainer;
+  // Preserve each feature's former presentation width without selecting
+  // a page component. AppRouter alone decides what the outlet renders.
+  const maxWidth = activeTabId === 'dashboard' ? 'xl'
+    : activeTabId === 'essence' || activeTabId === 'settings' ? 'md' : 'lg';
+  return (
+  <Box component="main" role="main" aria-label={activeTabId + ' content area'}
+    className={className} tabIndex={-1} sx={{
+      flexGrow: 1, minWidth: 0, overflow: 'auto',
+      bgcolor: 'background.default',
+      position: 'relative',
+      '&:focus': { outline: 'none' },
+    }}>
+    <Container maxWidth={maxWidth} sx={{
+      py: 3, px: { xs: 2, sm: 3 },
+      minHeight: 'calc(100vh - 64px)',
+      display: 'flex', flexDirection: 'column',
+    }}>
+      <Suspense fallback={<LoadingPage />}>{children}</Suspense>
+    </Container>
+  </Box>
+  );
 });
-
 MainContentArea.displayName = 'MainContentArea';
-
 export default MainContentArea;

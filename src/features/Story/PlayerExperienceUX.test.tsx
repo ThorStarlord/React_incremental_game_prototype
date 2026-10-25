@@ -142,7 +142,7 @@ test('authored NPC dialogue does not advertise a free-text conversation engine',
     </Provider>
   );
   expect(screen.queryByPlaceholderText(/Type a message/i)).not.toBeInTheDocument();
-  expect(screen.getByText(/No authored conversation topics are available/)).toBeInTheDocument();
+  expect(screen.getByText(/There is nothing new to discuss right now/)).toBeInTheDocument();
 });
 
 

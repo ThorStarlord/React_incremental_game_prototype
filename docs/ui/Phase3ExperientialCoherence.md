@@ -1,5 +1,9 @@
 # UX3 — Experiential Coherence implementation and qualification
 
+## Integrated result — October 24, 2026
+
+PR [#184](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/184) merged into main at commit **96f6c595**, after exact-head **11fb23fd** passed [Build Validation #40103050524](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40103050524). The earlier candidate-only wording below is historical. UX3 source and automated evidence are integrated, not a pending package; genuine player evaluation (UX3-07) remains an external dependency. The original v1.0.0 tag and human-evidence ceiling are unchanged.
+
 **Scope:** Existing post-1.0 Campaign One UI. **Branch baseline:** `87f99628a8fbf901234b2d6ec7d5da75c8e60469` (2026-10-24). **Owner instruction:** implement the bounded Phase 3 plan autonomously. This document is a candidate work record, not evidence of a qualified merge.
 
 ## Product objective

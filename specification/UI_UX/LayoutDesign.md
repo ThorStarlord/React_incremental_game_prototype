@@ -1,5 +1,9 @@
 # Layout Design Specification
 
+## 2026-10-25 — Bounded UI4 clarity and route-ownership refinement
+
+Current Moment retains its existing canonical actions and adds a decorative, responsive explorer-journal location vignette for three known early locations. It does not turn the panel into a map or fabricate NPC placement. The layout still contains a single semantic main region. AppRouter owns page choice through Outlet, MainContentArea owns only the shared presentation shell, and the active navigation tab is derived from the URL. Mobile legal travel actions and urgent status remain accessible. Copy's advanced Trait-sharing disclosure is separate from directly available production routines and unresolved-exception attention. Do not expand this into a generic UI engine or change gameplay/persistence authority.
+
 ## 2026-10-24 — UI3 layout repair limits
 The desktop sidebar owns its flex width once; content starts immediately after it. Mobile Current Moment action cards have natural height and full width rather than inheriting a large flex-basis from horizontal desktop layout. Main-menu title uses a light-on-dark accessible treatment consistent with the now warmer in-game palette. Current Moment shows confirmed nearby encounters separately from *available story contacts (not mapped in the current travel graph)*; it never asserts physical presence for an unanchored contact. Header and status controls stay accessible. These are bounded repairs, not license to globally redesign chapters or 1.1 mechanics.
 

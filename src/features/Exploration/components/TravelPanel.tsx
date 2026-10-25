@@ -100,16 +100,13 @@ const TravelPanel: React.FC = () => {
 
       {currentLocation ? (
         <>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Current location: {currentLocation.name}
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            {currentLocation.description}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            From {currentLocation.name}, choose the next road. Each journey is one stop.
           </Typography>
 
           {nextWillowStep && (
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              To find Elder Willow, take the next legal road toward Whispering Woods. You will still travel one location at a time.
+              Follow the road toward Elder Willow. The next destination is highlighted below.
             </Typography>
           )}
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -154,13 +151,13 @@ const TravelPanel: React.FC = () => {
 
           {destinations.length === 0 && (
             <Typography variant="body2" color="text.secondary">
-              No direct routes are currently authored from this location.
+              There are no roads onward from here right now.
             </Typography>
           )}
         </>
       ) : (
         <Alert severity="warning">
-          Current location "{locationValue}" is not part of the authored M18 travel graph.
+          This location has no confirmed travel routes yet.
         </Alert>
       )}
 

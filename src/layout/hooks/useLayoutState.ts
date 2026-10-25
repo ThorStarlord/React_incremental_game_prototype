@@ -94,21 +94,12 @@ export const useLayoutState = (options: UseLayoutStateOptions = {}): UseLayoutSt
     getInitialSidebarState(config.persistSidebar)
   );
 
-  const [activeTab, setActiveTabState] = useState<TabId>(() => {
-    if (config.syncWithRouter) {
-      return getTabFromRoute(location.pathname, config.defaultTab);
-    }
-    return config.defaultTab;
-  });
-
-  useEffect(() => {
-    if (config.syncWithRouter) {
-      const tabFromRoute = getTabFromRoute(location.pathname, config.defaultTab);
-      if (tabFromRoute !== activeTab) {
-        setActiveTabState(tabFromRoute);
-      }
-    }
-  }, [location.pathname, config.syncWithRouter, config.defaultTab, activeTab]);
+  // The URL is the tab authority whenever router sync is enabled. Local tab
+  // state only exists for standalone, non-routed layouts.
+  const [manualTab, setActiveTabState] = useState<TabId>(config.defaultTab);
+  const activeTab = config.syncWithRouter
+    ? getTabFromRoute(location.pathname, config.defaultTab)
+    : manualTab;
 
   useEffect(() => {
     if (config.persistSidebar) {
@@ -126,11 +117,13 @@ export const useLayoutState = (options: UseLayoutStateOptions = {}): UseLayoutSt
       return;
     }
 
-    setActiveTabState(tabId);
-
-    if (config.syncWithRouter) {
+    if (!config.syncWithRouter) {
+      setActiveTabState(tabId);
+    } else {
       const targetRoute = tabToRouteMap[tabId];
-      if (targetRoute && location.pathname.split('/')[2] !== tabId) {
+      // A click on "NPCs" from a nested /game/npcs/:npcId route must
+      // return to the NPC list, even though both paths share the same tab.
+      if (targetRoute && location.pathname !== targetRoute) {
         navigate(targetRoute);
       }
     }
