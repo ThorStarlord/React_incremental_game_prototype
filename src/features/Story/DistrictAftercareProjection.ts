@@ -1,8 +1,8 @@
+import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
 import { MERCHANT_DISTRICT_LOCATION_ID, resolveCanonicalLocationId } from '../Exploration/LocationDefinitions';
 import { isPlayerAtNpcWorldLocation } from '../NPCs/state/NPCWorldLocationDefinitions';
 import { selectAvailableNPCDialogueChoices } from '../NPCs/state/NPCSelectors';
-import { selectNpcKnownFactIds } from '../Knowledge/state/KnowledgeSelectors';
 import { selectFactionReputation } from '../Factions/state/FactionSelectors';
 
 /** The canonical records remain NPC conversation, per-NPC Knowledge, World State
@@ -16,6 +16,17 @@ export interface DistrictAftercareView {
   recordedStandingChanges: string[];
   currentStanding: string;
   action: { label: string; to: string; description: string };
+}
+
+/** A player-owned record of what one identified NPC heard; not a Memory,
+ * a completed institutional review, or a claim about other NPCs' knowledge. */
+export interface RecordedDistrictRequestView {
+  id: string;
+  npcId: string;
+  npcName: string;
+  title: string;
+  recordedChoice?: string;
+  authoredStandingChanges: string[];
 }
 
 const DISTRICT_FOLLOW_UPS = [
@@ -38,6 +49,63 @@ const DISTRICT_FOLLOW_UPS = [
     actionLabel: 'Discuss the freight manifest with Gronk',
   },
 ] as const;
+
+/**
+ * A global, spoiler-safe projection of AFTERCARE DECISIONS ALREADY MADE.
+ * Reuses the owning NPC's completed-dialogue history and per-NPC Knowledge.
+ * Incomplete/undiscovered choices are absent; authored effects alone do not
+ * prove a historical choice or grant facts to another character.
+ */
+export const selectRecordedDistrictRequests = createSelector(
+  [
+    (state: RootState) => state.npcs.npcs,
+    (state: RootState) => state.npcs.discoveredNPCs,
+    (state: RootState) => state.npcs.dialogueNodes,
+    (state: RootState) => state.knowledge.factIdsByNpcId,
+  ],
+  (npcs, discoveredNpcIds, dialogueNodes, factsByNpcId): RecordedDistrictRequestView[] => {
+    const discovered = new Set(discoveredNpcIds);
+    return DISTRICT_FOLLOW_UPS.flatMap(route => {
+      const npc = npcs[route.npcId];
+      const node = dialogueNodes?.[route.topicId];
+      if (
+        !npc || !discovered.has(route.npcId) ||
+        !npc.completedDialogues?.includes(route.conclusionId) ||
+        !npc.completedDialogues.includes(route.topicId) ||
+        !node || node.npcId !== route.npcId
+      ) {
+        return [];
+      }
+
+      const knownFacts = factsByNpcId[route.npcId] ?? [];
+      const heardChoice = node.effects?.find(effect =>
+        effect.type === 'KNOWLEDGE_FACT' &&
+        Boolean(effect.responseId) &&
+        knownFacts.includes(effect.factId)
+      );
+      const chosenResponseId = heardChoice?.responseId;
+      const recordedChoice = chosenResponseId
+        ? node.responses?.[chosenResponseId]
+        : undefined;
+      const authoredStandingChanges = chosenResponseId
+        ? (node.effects ?? []).flatMap(effect =>
+            effect.type === 'FACTION_REPUTATION' && effect.responseId === chosenResponseId
+              ? [`${effect.factionId} ${effect.value >= 0 ? '+' : ''}${effect.value}`]
+              : []
+          )
+        : [];
+
+      return [{
+        id: route.id,
+        npcId: route.npcId,
+        npcName: npc.name,
+        title: node.title ?? 'District follow-up',
+        recordedChoice,
+        authoredStandingChanges,
+      }];
+    });
+  }
+);
 
 /**
  * A return visit surfaces only a completed Chapter 1 route with an actually
@@ -63,26 +131,11 @@ export const selectDistrictAftercare = (state: RootState): DistrictAftercareView
       .some(choice => choice.id === route.topicId);
     if (!recorded && !available) continue;
 
-    // Only the NPC that actually heard the request owns its recorded fact.
-    const knownFacts = selectNpcKnownFactIds(state, route.npcId);
-    const chosenFactEffect = recorded
-      ? node.effects?.find(effect =>
-          effect.type === 'KNOWLEDGE_FACT' &&
-          Boolean(effect.responseId) &&
-          knownFacts.includes(effect.factId)
-        )
+    // Reuse the same NPC-attributed, completed-only record that the global
+    // Player Insight panel displays. No duplicate story or knowledge authority.
+    const recordedRequest = recorded
+      ? selectRecordedDistrictRequests(state).find(item => item.id === route.id)
       : undefined;
-    const chosenResponse = chosenFactEffect?.responseId;
-    const recordedChoice = chosenResponse && node.responses
-      ? node.responses[chosenResponse]
-      : undefined;
-    const recordedStandingChanges = chosenResponse
-      ? (node.effects ?? []).flatMap(effect =>
-          effect.type === 'FACTION_REPUTATION' && effect.responseId === chosenResponse
-            ? [`${effect.factionId} ${effect.value >= 0 ? '+' : ''}${effect.value}`]
-            : []
-        )
-      : [];
     const currentStanding = ['City Watch', 'Merchants Guild']
       .map(id => `${id}: ${selectFactionReputation(state, id)}`)
       .join(' · ');
@@ -106,9 +159,9 @@ export const selectDistrictAftercare = (state: RootState): DistrictAftercareView
       status: recorded ? 'recorded' : 'available',
       explanation: recorded ? route.completedExplanation : route.pendingExplanation,
       recordedChoice: recorded
-        ? recordedChoice ?? 'The conversation was completed, but its specific request is not in the available Knowledge record.'
+        ? recordedRequest?.recordedChoice ?? 'The conversation was completed, but its specific request is not in the available Knowledge record.'
         : undefined,
-      recordedStandingChanges,
+      recordedStandingChanges: recordedRequest?.authoredStandingChanges ?? [],
       currentStanding,
       action: recorded
         ? {

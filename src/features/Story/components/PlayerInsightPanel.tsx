@@ -24,6 +24,7 @@ import {
 } from '../PlayerInsightSelectors';
 import { DOCTRINE_DEFINITIONS } from '../../Traits/state/DoctrineDefinitions';
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
+import { selectRecordedDistrictRequests } from '../DistrictAftercareProjection';
 
 const capabilityColor = (
   status: RelationshipCapabilityStatus
@@ -48,6 +49,7 @@ const capabilityLabel = (status: RelationshipCapabilityStatus): string => {
  */
 export const PlayerInsightPanel: React.FC = React.memo(() => {
   const journal = useAppSelector(state => selectCausalJournalEntries(state, 5));
+  const recordedDistrictRequests = useAppSelector(selectRecordedDistrictRequests);
   const opportunities = useAppSelector(selectOpportunityMap);
   const capabilities = useAppSelector(selectRelationshipBuildCapabilities);
   const activeDoctrineIds = useAppSelector(selectActiveDoctrineIds);
@@ -109,6 +111,46 @@ export const PlayerInsightPanel: React.FC = React.memo(() => {
                     </Typography>
                     <Button size="small" component={RouterLink} to={`/game/copies?copy=${encodeURIComponent(exception.copyId)}`} sx={{ mt: 0.5 }}>
                       Manage {exception.copyName}
+                    </Button>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
+
+          {recordedDistrictRequests.length > 0 && (
+            <Box
+              data-test-id="recorded-district-requests"
+              sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 2 }}
+            >
+              <Typography variant="subtitle1" fontWeight={600}>
+                Your district decisions
+              </Typography>
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
+                These are requests that a particular person heard. They do not mean an audit or review has already happened, or that anyone else was informed.
+              </Typography>
+              <Stack spacing={1.5}>
+                {recordedDistrictRequests.map(request => (
+                  <Box key={request.id}>
+                    <Typography variant="body2" fontWeight={600}>{request.title}</Typography>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      Recorded with {request.npcName}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {request.recordedChoice ?? 'This conversation is completed, but the available record does not identify which request was chosen.'}
+                    </Typography>
+                    {request.authoredStandingChanges.length > 0 && (
+                      <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                        Standing effects of that decision: {request.authoredStandingChanges.join(' · ')}
+                      </Typography>
+                    )}
+                    <Button
+                      size="small"
+                      component={RouterLink}
+                      to={`/game/npcs/${encodeURIComponent(request.npcId)}?view=dialogue`}
+                      sx={{ mt: 0.5 }}
+                    >
+                      Review {request.npcName}'s conversations
                     </Button>
                   </Box>
                 ))}

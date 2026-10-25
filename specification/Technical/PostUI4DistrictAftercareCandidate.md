@@ -29,6 +29,12 @@ Both choices remain viable and leave the prior chapter, map, quests, and save sc
 - The old-save catalog refresh now discards its result if the NPC state changes before the optional fetch resolves. The NPC reducer independently rejects topic additions to NPCs absent from the discovered list, not just trusting the async caller. This protects New Game / competing Load transitions without adding a duplicate save authority.
 - The aftercare projection consumes the existing Knowledge and Faction selectors for recipient awareness and current standing, preserving their legacy-safe read semantics.
 
+## Recorded decisions beyond the district
+
+The existing Player Insight panel now has an **optional, read-only “Your district decisions”** section. It does not require being in the Merchant District, and appears only for already discovered characters whose route conclusion and follow-up are actually marked completed. A memoized selector reads the *same NPC-specific Knowledge fact* and authored, response-scoped Faction effects used by the local return-visit view, so player decisions remain inspectable even when the location is elsewhere.
+
+The display distinguishes a request *recorded with an individual* from a completed public audit or automatic sharing, shows the authored standing delta without pretending to reconstruct an institution-wide transaction log, and links to the real NPC conversation surface. If completion exists but its specific Knowledge fact is missing, the UI reports that uncertainty rather than inventing an answer. It does not create Memories, make future topics visible, mutate state, add NPC schedules, or introduce another journal authority.
+
 ## Content-authoring dependency integrity
 
 `scripts/content-intelligence/content-graph.js` now models `requiredCompletedDialogueIds` as an ordinary blocking `requires-completed-dialogue` edge from the aftercare topic to the actual route conclusion. This keeps static dependency traces and missing-target reports aligned with the runtime gate, instead of implying the new choices are reachable independently of Chapter 1. No new ChapterEngine, content DSL, or alternate state machine is introduced.
