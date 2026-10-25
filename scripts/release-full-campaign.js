@@ -388,7 +388,9 @@ class CampaignRunner {
     if (!name) throw new Error(`unknown location ${location}`);
     await this.nav('Dashboard');
     await this.page.getByRole('button', { name: `Travel to ${name}`, exact: true }).click({ timeout: STEP_TIMEOUT });
-    await this.page.getByText(`Current location: ${name}`, { exact: true }).waitFor({ timeout: STEP_TIMEOUT });
+    await this.page.locator('[data-testid="current-moment"]')
+      .getByRole('heading', { name: `You are in ${name}`, exact: true })
+      .waitFor({ timeout: STEP_TIMEOUT });
   }
 
   async forge() {
