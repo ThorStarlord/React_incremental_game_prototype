@@ -1,5 +1,12 @@
 # Documentation Authority Index
 
+## 2026-10-25 — Post-UI4 inquiry packets (not a new product milestone)
+
+- The **divergent ideas crosswalk** is in specification/Technical/PostUI4DivergentExploration.md, with three illustrative, non-canon decision sketches in specification/Technical/PostUI4ScenarioStressTest.md. It distinguishes completed M25/M26/UI4 capabilities from prospective 1.1+ directions; no new system, chapter or release is authorized by exploration alone.
+- The **coding-agent simulated-review packet** is in specification/Technical/UI4CodingAgentSimulationCampaign.md, frozen to UI4 main d3b397f9. It is **READY / NOT EXECUTED**; the prior September V1 was INCONCLUSIVE, and its V2 was never run against current UI4. The new panel requires six separate participant contexts and genuine ordinary-UI observation/action records.
+- These research documents are subordinate to current AGENTS, STATUS, FeatureScopeMatrix and the released 1.0. Human Product Review remains issue #109 at 0/5, 0/3 and BETA_PASS=NO.
+
+
 ## 2026-10-25 — CURRENT: UI4 qualified and merged
 
 - [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) **integrated** on main at `528d014d` after exact head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677). Both Chromium/Firefox routes passed (Distributed 105/105, Fortified 104/104) with four save/Continue checkpoints and export/import per browser/route.

@@ -1,5 +1,13 @@
 # Handoff — Campaign One 1.0 Released
 
+## 2026-10-25 — Optional research continuation: simulated players and divergent product futures
+
+- UI4 PRs #185/#186 are already merged and technically qualified. Do not reopen or requalify them merely to begin this exploratory work.
+- Owner has requested a **coding-agent simulation** and exploration of other repository-documented game ideas. Execution packet: specification/Technical/UI4CodingAgentSimulationCampaign.md. Exploration and status crosswalk: specification/Technical/PostUI4DivergentExploration.md.
+- The six-profile **blind panel is NOT RUN** in the GitHub-only controller context; it needs independently spawned agent participants and UI-only observation/action artifacts. Never count role predictions, scripted full-campaign tests or this handoff as actual simulated participant evidence.
+- Provisional A/B/C exploration (Trait identity, Knowledge strategy, tangible World/Faction consequences) includes bounded non-canon examples in specification/Technical/PostUI4ScenarioStressTest.md and is not automatically an approved new 1.1 roadmap. Existing Trait drafts #178/#180/#182 remain separate and unqualified; no change to v1.0.0, issue #109 or BETA_PASS=NO.
+
+
 ## 2026-10-25 — UI4 integrated, release-tag and human boundary preserved
 
 - `main` after [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) is `528d014d8de6b6cf775e4f6b229eb74b3b748dca`. The qualified exact PR head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677), including two divergent full-campaign histories in **Chromium and Firefox** (Distributed 105/105, Fortified 104/104), four save/Continue checkpoints each and export/import.
