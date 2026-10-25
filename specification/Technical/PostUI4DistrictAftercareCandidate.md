@@ -26,6 +26,7 @@ Both choices remain viable and leave the prior chapter, map, quests, and save sc
 ## Discoverability and load-race boundaries
 
 - When a recorded route makes an authored follow-up available, the Current Moment lists **Gronk's manifest** by name when the player is actually in City Center with Gronk; Valerius's **patrol ledger** remains an explicitly unanchored story conversation, never an invented NPC location. Other NPC topics retain their ordinary titles and action labels. The Merchant District return-visit panel separately offers already-qualified travel/contact links.
+- **Spatial decision integrity:** an opted-in aftercare topic may be ready while its NPC is elsewhere, but the NPC dialogue UI disables commitment and names the known destination. The interaction thunk independently rejects direct remote dispatches against an anchored NPC, using the canonical world-location authority. Gronk therefore must be met in City Center; Valerius remains an unanchored authored story contact, not a purported encounter in the district. This is scoped to new opt-in decisionContext topics, not a retroactive change to historical campaign dialogue behavior.
 - The old-save catalog refresh now discards its result if the NPC state changes before the optional fetch resolves. The NPC reducer independently rejects topic additions to NPCs absent from the discovered list, not just trusting the async caller. This protects New Game / competing Load transitions without adding a duplicate save authority.
 - The aftercare projection consumes the existing Knowledge and Faction selectors for recipient awareness and current standing, preserving their legacy-safe read semantics.
 
@@ -60,7 +61,7 @@ The repository's exact-head Build Validation remains the merger gate. The follow
 | Case | Expected behavior and rejected failure |
 | --- | --- |
 | Fresh public-order conclusion | After the exact Valerius conclusion, heavy patrol World State exposes only his ledger follow-up; before completion, no aftercare topic appears. |
-| Fresh quiet-network conclusion | After the exact Gronk conclusion, strong trade World State exposes only his manifest follow-up; Gronk remains anchored to City Center rather than physically appearing in the Merchant District. |
+| Fresh quiet-network conclusion | After the exact Gronk conclusion, strong trade World State exposes only his manifest follow-up; Gronk remains anchored to City Center rather than physically appearing in the Merchant District. The decision is visible but not clickable while the player is elsewhere, and direct remote thunk dispatch has no effects. |
 | Response-specific outcomes | Each selected response applies only its authored faction effects and records one request fact with its actual NPC; no other NPC learns it automatically. Completed one-shot topics cannot fire effects again by direct thunk dispatch. |
 | Historical decision visibility | Player Insight has no future/unmade request; after a real completion it shows the specific NPC's recorded request and authored standing deltas without minting a new Relationship Memory. |
 | Older-save recovery | Load/Continue adds both optional topics only to already discovered saved NPCs. It preserves earlier progress and rejects a stale catalog refresh after a different save or New Game supersedes it. |

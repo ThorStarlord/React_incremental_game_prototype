@@ -31,6 +31,7 @@ import type { WorldStateMutation } from '../../WorldState/state/WorldStateTypes'
 import { selectActiveDoctrineIds } from '../../Traits/state/DoctrineSelectors';
 import type { DoctrineId } from '../../Traits/state/DoctrineDefinitions';
 import { publicAsset } from '../../../shared/utils/publicAsset';
+import { isPlayerAtNpcWorldLocation } from './NPCWorldLocationDefinitions';
 
 const isExcludedCampaignOneService = (serviceId: string): boolean =>
   /trait_teacher|crafter_/i.test(serviceId);
@@ -437,6 +438,18 @@ export const processNPCInteractionThunk = createAsyncThunk<
               message: 'This authored follow-up is not available with this person.',
             } as InteractionResult;
           }
+        }
+        // Opt-in decisions with anchored NPCs require an actual meeting.
+        // Direct thunk dispatch must not bypass Gronk's known City Center anchor.
+        // Unanchored legacy story contacts retain their authored behavior.
+        if (
+          node.decisionContext &&
+          isPlayerAtNpcWorldLocation(npcId, state.player.location) === false
+        ) {
+          return {
+            success: false,
+            message: 'Visit this character at their known location before making this decision.',
+          } as InteractionResult;
         }
         if (requiredCompletedDialogueIds.some(id => !completedDialogues.includes(id))) {
           dispatch(addNotification({

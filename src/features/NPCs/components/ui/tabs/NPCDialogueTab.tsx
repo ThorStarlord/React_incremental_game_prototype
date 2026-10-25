@@ -17,6 +17,8 @@ import {
 import { processNPCInteractionThunk } from '../../../state/NPCThunks';
 import type { DialogueEntry } from '../../../state/NPCTypes';
 import type { NPCDialogueChoice } from '../../../state/NPCSelectors';
+import { getNpcWorldLocationId, isPlayerAtNpcWorldLocation } from '../../../state/NPCWorldLocationDefinitions';
+import { getLocationDefinition } from '../../../../Exploration/LocationDefinitions';
 import { selectCausalJournalEntries, selectRecentRecordedDialogueExperiences } from '../../../../Story/PlayerInsightSelectors';
 
 
@@ -43,6 +45,15 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
   const availableDialogueChoices = useAppSelector(state =>
     selectAvailableNPCDialogueChoices(state, npcId)
   );
+  // Ready does not mean physically reachable. Keep the topic discoverable
+  // while preventing a choice that the NPC interaction authority must reject.
+  const anchoredElsewhere = useAppSelector(state =>
+    isPlayerAtNpcWorldLocation(npcId, state.player.location) === false
+  );
+  const anchorId = getNpcWorldLocationId(npcId);
+  const anchoredPlaceName = anchorId
+    ? getLocationDefinition(anchorId)?.name ?? 'the known location'
+    : 'the known location';
   const latestVisibleMemory = useAppSelector(state =>
     selectCausalJournalEntries(state, 10).find(entry => entry.npcId === npcId)
   );
@@ -150,6 +161,11 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                     {choice.decisionContext}
                   </Typography>
                 )}
+                {choice.decisionContext && anchoredElsewhere && (
+                  <Typography variant="body2" color="warning.main" role="status" sx={{ mb: 0.75 }}>
+                    Meet {npc.name} in {anchoredPlaceName} using the connected routes before making this choice.
+                  </Typography>
+                )}
                 {choice.availabilityReasons.length > 0 && (
                   <Typography
                     variant="caption"
@@ -167,7 +183,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                           variant="outlined"
                           size="small"
                           sx={{ minHeight: 44, whiteSpace: 'normal', textAlign: 'left' }}
-                          disabled={busy}
+                          disabled={busy || Boolean(choice.decisionContext && anchoredElsewhere)}
                           onClick={() => handleDialogueChoice(choice, response.id)}
                         >
                           {response.label}
@@ -185,7 +201,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                     <Button
                       variant="outlined"
                       size="small"
-                      disabled={busy}
+                      disabled={busy || Boolean(choice.decisionContext && anchoredElsewhere)}
                       onClick={() => handleDialogueChoice(choice, '')}
                     >
                       Continue
