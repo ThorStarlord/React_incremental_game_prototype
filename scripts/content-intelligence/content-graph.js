@@ -134,6 +134,13 @@ function createModel(root, options = {}) {
       for (const experienceId of node.requiredExperienceIds || []) {
         addEdge('dialogue', dialogueId, 'experience', experienceId, 'requires-experience');
       }
+      // A follow-up that needs an earlier completed conversation has a real
+      // blocking authoring dependency, not merely a narrative association.
+      // The existing reachability and trace helpers already consume requires-*.
+      for (const prerequisiteId of node.requiredCompletedDialogueIds || []) {
+        if (typeof prerequisiteId !== 'string' || !prerequisiteId) continue;
+        addEdge('dialogue', dialogueId, 'dialogue', prerequisiteId, 'requires-completed-dialogue');
+      }
       for (const experienceId of node.anyOfExperienceIds || []) {
         addEdge('dialogue', dialogueId, 'experience', experienceId, 'requires-any-experience', {
           optionalAlternative: true,
