@@ -1,5 +1,12 @@
 # Handoff — Campaign One 1.0 Released
 
+## 2026-10-25 — CURRENT RE-ENTRY: source-only merge authorization
+
+- **Owner explicit direction:** always merge eligible owner-directed PRs without waiting for unit tests or evidence/browser tests. Current `AGENTS.md` supersedes historical 2026-10-20 D3 test-gated merge language below for ordinary PR merges. Inspect actual GitHub mergeability/branch dependencies, preserve provenance, and disclose **UNTESTED / UNQUALIFIED** rather than inventing a PASS.
+- [PR #190](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/190) is the bounded Merchant District aftercare source integration. Refer to `specification/Technical/PostUI4DistrictAftercareCandidate.md` for exact scope and unexecuted acceptance cases. GitHub PR metadata—not an assumed SHA in this handoff—establishes actual merge outcome.
+- Historical `v1.0.0` release, release contract, and human-Beta evidence remain independent. Other open Trait branches #165/#178 are overlapping/conflicted; #180/#182 are stacked on #178 and must not be blindly or forcibly merged into main.
+
+
 ## 2026-10-25 — Optional research continuation: simulated players and divergent product futures
 
 - UI4 PRs #185/#186 are already merged and technically qualified. Do not reopen or requalify them merely to begin this exploratory work.

@@ -1,5 +1,12 @@
 # Documentation Authority Index
 
+## 2026-10-25 — CURRENT: owner-approved PR merges without test prerequisite
+
+- **Newer owner authority:** `AGENTS.md` section "2026-10-25 owner decision — merge without waiting for tests" supersedes the earlier D3 exact-head Build Validation prerequisite for **ordinary owner-directed PR merges**. Any earlier "require tests before merge" language in this index, the older `HANDOFF.md` or historical result files is provenance of the prior regime, not the active merge policy.
+- The source-only Merchant District aftercare integration is [PR #190](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/190), with its implementation/limits in `specification/Technical/PostUI4DistrictAftercareCandidate.md`. This is **UNTESTED / UNQUALIFIED** code regardless of merged status; the GitHub PR is the authority for its actual merge SHA.
+- No unit tests, browser/evidence tests, six-profile synthetic sessions, or human-player research are claimed. No change to the original `v1.0.0` tag, external-player `BETA_PASS=NO` ceiling, independent release requirements, or separate conflicted 1.1 Trait PRs.
+
+
 ## 2026-10-25 — Post-UI4 inquiry packets (not a new product milestone)
 
 - The **divergent ideas crosswalk** is in specification/Technical/PostUI4DivergentExploration.md, with three illustrative, non-canon decision sketches in specification/Technical/PostUI4ScenarioStressTest.md. It distinguishes completed M25/M26/UI4 capabilities from prospective 1.1+ directions; no new system, chapter or release is authorized by exploration alone.
@@ -214,7 +221,7 @@ If two CURRENT records conflict within the same scope, reconcile the conflict be
 | GC-11 Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC11AlphaResult.md`](../specification/Technical/GC11AlphaResult.md) | Exact-head Build Validation #381 PASS; ALPHA_PASS / HUMAN_UNVALIDATED. |
 | GC-12 Content Alpha | CURRENT AUTHORITY, integrated | [`specification/Technical/GC12ContentAlphaResult.md`](../specification/Technical/GC12ContentAlphaResult.md) | Authored-corpus qualification passed; CONTENT_ALPHA / HUMAN_UNVALIDATED. |
 | GC-13 deterministic Beta readiness | CURRENT AUTHORITY, qualified | [`specification/Technical/GC13BetaTechnicalReadinessResult.md`](../specification/Technical/GC13BetaTechnicalReadinessResult.md) | Build Validation #394 PASS; Chromium + Firefox CI smoke PASS; TECHNICAL_BETA_READY / HUMAN_EVIDENCE_BLOCKED. |
-| Owner personal-release decision | CURRENT AUTHORITY, owner decision 2026-10-20 | [`specification/Technical/OwnerPersonalReleaseDecision.md`](../specification/Technical/OwnerPersonalReleaseDecision.md) | Human Beta floor waived as a 1.0 gate (BETA_PASS = NO); PR #165 parked post-1.0; agent self-merge after exact-head Build Validation. |
+| Owner personal-release decision | HISTORICAL MERGE PREREQUISITE; 1.0 RELEASE AUTHORITY RETAINED | [`specification/Technical/OwnerPersonalReleaseDecision.md`](../specification/Technical/OwnerPersonalReleaseDecision.md) | Human Beta floor waived as a 1.0 gate (BETA_PASS = NO); PR #165 parked post-1.0. Earlier exact-head D3 merge prerequisite is superseded by the current 2026-10-25 owner instruction recorded in AGENTS. |
 | GC-13 Beta human evidence | OWNER-WAIVED FOR 1.0 / optional lane | [`specification/Technical/BetaCompletionContract.md`](../specification/Technical/BetaCompletionContract.md) + issue #109 + [`docs/release/BetaHumanEvidenceTemplate.md`](release/BetaHumanEvidenceTemplate.md) | 0/5 first-session and 0/3 external full-run records; BETA_PASS = NO; no longer a 1.0 gate. |
 | GC-14 release eligibility guard | CURRENT AUTHORITY, qualified | [`specification/Technical/GC14ReleaseEligibilityBlockedResult.md`](../specification/Technical/GC14ReleaseEligibilityBlockedResult.md) | Build Validation #405 PASS; since 2026-10-20 accepts BETA_PASS or the recorded owner waiver; RC entry still needs 1.0.0-rc.N metadata and no open release blocker. |
 | Human Product Review | CURRENT HUMAN-EVIDENCE AUTHORITY, optional post-1.0 | issue #109 | Open/unproven. Automation cannot satisfy it; no longer a 1.0 gate. |

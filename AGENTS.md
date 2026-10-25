@@ -1,5 +1,14 @@
 # Agent Operating Policy — Campaign One / 1.0
 
+## 2026-10-25 owner decision — merge without waiting for tests
+
+**CURRENT MERGE AUTHORITY, superseding the 2026-10-20 D3 test prerequisite for ordinary owner-directed pull requests.** The owner explicitly instructed agents to **always merge their owner-directed PRs and not wait for unit tests or evidence tests**. After bounded source/merge-conflict inspection, an agent may merge an owner-directed PR immediately, without a unit suite, full Build Validation, browser campaign or participant evidence. Do not create placeholder tests or trigger CI merely to satisfy the superseded PR-merge gate.
+
+Record the source head, merge result, and actual evidence status. An untested merge is **MERGED / UNTESTED / UNQUALIFIED**; it is never a test PASS, human Beta PASS, release qualification, or proof of player experience. It may require later repair. Retain normal safeguards: do not force merges through actual conflicts or GitHub restrictions, publish secrets, overwrite unrelated work, silently merge another person's unreviewed PR, or merge obsolete/duplicate or dependent branches in the wrong order. Repair incompatibilities or explain the concrete blocker.
+
+This is a **PR merge-workflow waiver**, not a blanket waiver of independently protected release/tag/deployment contracts or permission to invent 1.1 thesis/scope. The original released `v1.0.0` and its historical evidence remain unchanged. When the owner supplies a more specific instruction, use that instruction rather than treating old D3 prose in historical documentation as the current merge gate.
+
+
 **Status:** CURRENT AUTHORITY for coding-agent behavior  
 **Applies to:** repository analysis, implementation, review, qualification, and handoff work
 
@@ -180,9 +189,9 @@ current frontier
 = RELEASED_1_0 / HUMAN-UNVALIDATED (1.0.0 released 2026-10-20, not externally playtested)
 ```
 
-After 1.0, ordinary work is release-hotfix repair of defects in the shipped Campaign One scope, with the same exact-head Build Validation (including the full ordinary-UI campaign run). New ideas belong to 1.1 or an expansion and need an owner decision; the universal Trait redesign (PR #165) is the parked 1.1 candidate.
+After 1.0, ordinary work is release-hotfix repair of defects in the shipped Campaign One scope; technical qualification remains desirable but is **not required before ordinary owner-directed PR merges** under the later 2026-10-25 owner waiver. New ideas belong to 1.1 or an expansion and need an owner decision; the universal Trait redesign (PR #165) remains a separate parked historical candidate.
 
-An agent may merge its own pull request into `main` once exact-head Build Validation passes on that head (owner decision D3). It may not merge other people's pull requests or bypass Build Validation.
+The historical 2026-10-20 D3 rule allowed self-merges only after exact-head Build Validation. **D3's test prerequisite is superseded for ordinary owner-directed PR merges by the 2026-10-25 decision above.** Agents should merge eligible owner-directed PRs without tests and disclose their unqualified state; merge conflicts, obsolete alternatives, external protection, and separately protected release transitions are not waived.
 
 ## Stop conditions
 
@@ -246,7 +255,7 @@ A transition is not complete merely because the new state appears somewhere. In 
 4. reconcile `STATUS.md`, `docs/CURRENT.md`, `HANDOFF.md`, `README.md`, `RUNBOOK.md`, and any affected completion/maturity contracts;
 5. preserve superseded reasoning as historical evidence rather than leaving it executable as current procedure;
 6. add or update documentation-authority validation for both the **presence of the new state** and the **absence of known stale current-authority phrases**;
-7. require exact-head Build Validation before merge;
+7. record exact-head qualification status; for ordinary owner-directed PR merges apply the 2026-10-25 owner test waiver transparently, while preserving independently protected release qualification requirements;
 8. close or supersede competing transition PRs so one canonical transition remains.
 
 The governing invariant is:

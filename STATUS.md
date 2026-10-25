@@ -1,5 +1,13 @@
 # Repository Status — Campaign One 1.0 Released
 
+## 2026-10-25 — OWNER MERGE POLICY UPDATE / PR #190 source-only integration
+
+- The owner's **current** instruction is to merge owner-directed PRs without waiting for unit, browser, evidence, or full Build Validation tests. `AGENTS.md` now supersedes the former 2026-10-20 D3 test prerequisite for ordinary PR merges; older sections below retain historical evidence, not a live merge blocker.
+- [PR #190](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/190) integrates a narrow post-1.0 Merchant District aftercare experiment, recorded NPC-specific decisions, read-only world/standing context and old-save content refresh under this source-only waiver. Source commit and actual merge status are verified through the PR; this paragraph does **not** assert a qualifying test or independently verified integration behavior.
+- **Evidence ceiling: UNTESTED / UNQUALIFIED, HUMAN-UNVALIDATED, BETA_PASS=NO.** No tests, CI, synthetic participants or human players qualified this PR head. The original `v1.0.0` release tag is immutable and not changed by this PR.
+- Separate universal Trait PRs #165/#178 remain overlapping conflicted alternatives; #180/#182 depend on #178 and are not independent mainline changes. Do not treat the instruction to merge eligible PRs as permission to force incompatible or obsolete branches onto main.
+
+
 ## 2026-10-25 — UI4 merged on main, qualified; human research still open
 
 - [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) **squash-merged** at `528d014d8de6b6cf775e4f6b229eb74b3b748dca`. Exact candidate head `cfad4349f4776ff7cd2b3effc30b60d695b0e8e5` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677): focused UI/TypeScript, regression suites, content and architecture, both responsive browsers, production build and full ordinary-UI campaign.

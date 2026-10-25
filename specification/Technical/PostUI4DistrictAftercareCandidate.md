@@ -1,6 +1,6 @@
 # Merchant District Aftercare — Experimental source candidate
 
-**Status:** UNTESTED, UNQUALIFIED, post-1.0/1.1 exploratory branch. Not a 1.0 hotfix, not accepted 1.1 scope, not a release or Beta result.
+**Status:** OWNER-AUTHORIZED SOURCE-ONLY INTEGRATION / UNTESTED / UNQUALIFIED post-1.0/1.1 candidate. PR #190 records the actual merge state. Not a 1.0 hotfix, independently accepted 1.1 thesis, a release or a Beta result.
 
 **Base:** `main` at `06f7ab3e5765816343b98f9d93ef6f4ba6c0a6c0` (includes UI4, research PR #187, and read-only district journal PR #189). The original `v1.0.0` release tag is unchanged.
 
@@ -52,11 +52,11 @@ The original source candidate relied on startup/Chapter 1 content loading, but a
 
 After `replaceState` and relationship runtime reconciliation, the normal Load/Continue path now performs a **bounded, best-effort catalog refresh** of only the two aftercare topics and their authored reply nodes. A dedicated NPC reducer adds topic IDs **only to already discovered NPCs present in the saved snapshot**, with set union. It never creates new NPCs, grants undiscovered knowledge, clears completed topics, changes Affinity or Connection, changes inventory/quests, or alters the persisted save schema. A missing optional file logs a warning and does not invalidate the save. The ordinary fresh-game Chapter 1 cast-loading path is unchanged.
 
-This is source-only construction; no load/Continue scenario was executed under the owner's no-tests instruction. It still needs exact-head behavior and recovery qualification before any merge.
+This is source-only construction; no load/Continue scenario was executed under the owner's no-tests instruction. The owner subsequently authorized ordinary PR merges *without* waiting for such tests on 2026-10-25. This integration carries unverified load/recovery behavior and must not be described as technically qualified.
 
-## Next gate: executable acceptance matrix (NOT RUN)
+## Unexecuted acceptance matrix (NOT RUN)
 
-The repository's exact-head Build Validation remains the merger gate. The following cases are **planned checks only**, not executed results; listing them does not count as a unit, browser, synthetic, or human test:
+The following cases remain **planned checks only**, not executed results; listing them does not count as a unit, browser, synthetic, or human test. Under the 2026-10-25 owner instruction this is not a PR merge prerequisite, but it limits claims about integrated correctness:
 
 | Case | Expected behavior and rejected failure |
 | --- | --- |
@@ -69,18 +69,18 @@ The repository's exact-head Build Validation remains the merger gate. The follow
 | Content-authoring consistency | Completion edges point to real same-NPC dialogue definitions. No generic Chapter engine, additional region road or freeform rumor/belief authority is introduced. |
 | Release and player evidence | Full exact-head Build Validation must include original normal-UI campaign, save/Continue checkpoints, browsers and production build. Neither a pass nor a failure can be claimed until actually run. Human participants remain a separate requirement for genuine Beta findings. |
 
-**Construction stopping rule:** no further feature or integration expansion on this unqualified branch without a concrete source-level defect or fresh decision-changing evidence. The next action for publication is qualification, which remains expressly outside the owner's current no-tests mode. The draft may remain open; it must not be relabeled ready or merged merely because the source was inspected.
+**Construction stopping rule:** no further feature expansion merely to enlarge this unqualified source-only integration. The owner specifically authorized merging the PR without a test gate; publish only the factual GitHub merge result, never a technical qualification, human preference, or Beta pass. Repair a demonstrated problem when found.
 
 ## Frontier after this source candidate
 
 Post-UI4 exploration compared relationship-derived capability buildcraft (A), deliberate information control (B), reactive places/institutions (C), and earned Copy delegation (D). This branch is a narrow B+C reversible build; it does **not** establish that B+C is the preferred primary product identity. The rival 1.1 universal Trait implementation remains draft PR #178 based on an older released commit and not mergeable with current main; its dependent PRs #180/#182 are separate. The qualified existing Copy standing-order and exception surfaces already support D, so another Copy panel without a concrete new need would duplicate implemented functionality.
 
-**Bounded next recommendation:** qualify this small aftercare candidate first when testing is allowed; reconcile the current main/1.1 Trait branch and evaluate build differentiation separately before promoting any larger A expansion. Keep D a competing identity hypothesis until actual player-experience evidence discriminates it, not a license for an autonomous Copy planner. No 1.1 product thesis, merge, release, or broader scope decision is made by this candidate.
+**Bounded next recommendation:** after owner-authorized source-only integration, inspect actual gameplay only when tests/evidence become permitted or defects arise; reconcile the current main/1.1 Trait branch and evaluate build differentiation separately before promoting any larger A expansion. Keep D a competing identity hypothesis until actual player-experience evidence discriminates it, not a license for an autonomous Copy planner. The source-only merge does not select a full 1.1 product thesis, issue a release, or authorize broader scope.
 
 ## Risks and qualifications still required
 
 - The two conversations and their modest reputation deltas are **provisional gameplay design**; they do not establish preference, fun, or balance.
 - A historical save that has already recorded the Chapter 1 conclusion should become eligible once its existing NPC and dialogue catalog load; a save without the required completed conversation should not get this follow-up.
-- The original 1.0 release, its exact-head qualification, and the human-evidence ceiling remain independent. Do not promote this branch as tested, merge-ready, Beta-passing, or released.
-- **Owner-requested execution mode for this branch: no unit tests and no evidence/browser tests were added or run.** This intentional evidence gap must be resolved before any ordinary protected merge under `AGENTS.md`. Do not reuse the green checks of PR #189 as evidence for this head.
+- The original 1.0 release, its exact-head qualification, and the human-evidence ceiling remain independent. This branch may be merged under the owner's explicit waiver, but must not be represented as tested, technically qualified, Beta-passing, or a new release.
+- **Owner-requested execution mode: no unit tests and no evidence/browser tests were added or run.** On 2026-10-25 the owner explicitly waived this as an ordinary PR merge prerequisite; the intentional evidence gap remains real after merge. Do not reuse green checks of PR #189 as evidence for this head.
 - The six-profile coding-agent playtest on issue #188 remains separately blocked by unavailable GitHub AI Credits. These authored choices were not evaluated by independent simulated participants.

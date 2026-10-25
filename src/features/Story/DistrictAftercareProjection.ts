@@ -29,6 +29,9 @@ export interface RecordedDistrictRequestView {
   authoredStandingChanges: string[];
 }
 
+// Keep the memoized selector stable for pre-Knowledge legacy save snapshots.
+const EMPTY_FACTS_BY_NPC: Readonly<Record<string, readonly string[]>> = {};
+
 const DISTRICT_FOLLOW_UPS = [
   {
     id: 'watch-ledger',
@@ -61,7 +64,7 @@ export const selectRecordedDistrictRequests = createSelector(
     (state: RootState) => state.npcs.npcs,
     (state: RootState) => state.npcs.discoveredNPCs,
     (state: RootState) => state.npcs.dialogueNodes,
-    (state: RootState) => state.knowledge.factIdsByNpcId,
+    (state: RootState) => state.knowledge?.factIdsByNpcId ?? EMPTY_FACTS_BY_NPC,
   ],
   (npcs, discoveredNpcIds, dialogueNodes, factsByNpcId): RecordedDistrictRequestView[] => {
     const discovered = new Set(discoveredNpcIds);
