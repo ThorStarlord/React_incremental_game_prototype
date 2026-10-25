@@ -20,7 +20,7 @@ export interface NPCDialogueChoice {
   id: string;
   title: string;
   decisionContext?: string;
-  responses: Array<{ id: string; label: string }>;
+  responses: Array<{ id: string; label: string; standingChanges: Array<{ factionId: string; amount: number }> }>;
   availabilityReasons: string[];
 }
 
@@ -200,6 +200,13 @@ export const selectAvailableNPCDialogueChoices = createSelector(
           responses: Object.entries(node.responses || {}).map(([id, label]) => ({
             id,
             label: String(label),
+            // Explicit, already-unlocked authored decision contexts opt into
+            // a truthful numerical preview derived from effects, not prose guesses.
+            standingChanges: (node.decisionContext ? node.effects ?? [] : []).flatMap(effect =>
+              effect.type === 'FACTION_REPUTATION' && effect.responseId === id
+                ? [{ factionId: effect.factionId, amount: effect.value }]
+                : []
+            ),
           })),
           availabilityReasons: availability.availabilityReasons,
         };

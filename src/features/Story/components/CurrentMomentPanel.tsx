@@ -29,6 +29,41 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
           </Stack>
         </Box>
 
+        {moment.districtAftercare && (
+          <Paper variant="outlined" data-testid="district-aftercare" sx={{ p: 2, mb: 2, borderLeft: 3, borderLeftColor: 'secondary.main' }}>
+            <Typography variant="overline" color="text.secondary">
+              Merchant District · {moment.districtAftercare.status === 'available' ? 'Choice available' : 'Request recorded'}
+            </Typography>
+            <Typography variant="subtitle1" component="h3" fontWeight={600}>
+              {moment.districtAftercare.title}
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              {moment.districtAftercare.explanation}
+            </Typography>
+            {moment.districtAftercare.recordedChoice && (
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                <strong>Your recorded choice:</strong> {moment.districtAftercare.recordedChoice}
+              </Typography>
+            )}
+            {moment.districtAftercare.recordedStandingChanges.length > 0 && (
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                <strong>Standing effects of that choice:</strong> {moment.districtAftercare.recordedStandingChanges.join(' · ')}
+              </Typography>
+            )}
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+              Current standing · {moment.districtAftercare.currentStanding}
+            </Typography>
+            <Button component={RouterLink} to={moment.districtAftercare.action.to}
+              variant={moment.districtAftercare.status === 'available' ? 'contained' : 'outlined'}
+              size="small" sx={{ minHeight: 44, whiteSpace: 'normal', textAlign: 'left' }}>
+              {moment.districtAftercare.action.label}
+            </Button>
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.75 }}>
+              {moment.districtAftercare.action.description}
+            </Typography>
+          </Paper>
+        )}
+
         <Typography variant="subtitle2" gutterBottom>What you can do next</Typography>
         <Stack direction={{ xs: 'column', md: 'row' }} gap={1.5} flexWrap="wrap" sx={{ mb: 2 }}>
           {immediateActions.map(action => (

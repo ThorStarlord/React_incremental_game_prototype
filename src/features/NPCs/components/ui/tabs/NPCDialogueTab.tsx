@@ -151,15 +151,24 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {choice.responses.length > 0 ? (
                     choice.responses.map(response => (
-                      <Button
-                        key={`${choice.id}-${response.id}`}
-                        variant="outlined"
-                        size="small"
-                        disabled={busy}
-                        onClick={() => handleDialogueChoice(choice, response.id)}
-                      >
-                        {response.label}
-                      </Button>
+                      <Box key={`${choice.id}-${response.id}`} sx={{ maxWidth: '100%' }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          sx={{ minHeight: 44, whiteSpace: 'normal', textAlign: 'left' }}
+                          disabled={busy}
+                          onClick={() => handleDialogueChoice(choice, response.id)}
+                        >
+                          {response.label}
+                        </Button>
+                        {response.standingChanges.length > 0 && (
+                          <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                            If chosen, institutional standing changes: {response.standingChanges.map(
+                              change => `${change.factionId} ${change.amount >= 0 ? '+' : ''}${change.amount}`
+                            ).join(' · ')}
+                          </Typography>
+                        )}
+                      </Box>
                     ))
                   ) : (
                     <Button
