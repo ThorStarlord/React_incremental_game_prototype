@@ -413,9 +413,6 @@ export const processNPCInteractionThunk = createAsyncThunk<
       const node = choiceId ? (nodes as any)[choiceId] : undefined;
 
       if (node) {
-        // The current node is spoken in this interaction, even for terminal topics.
-        // Previously only a next-node response was written to dialogue history.
-        npcText = typeof node.text === 'string' ? node.text : '';
         const isNonRepeatable = node.repeatable === false;
         const completedDialogues = Array.isArray(npc.completedDialogues) ? npc.completedDialogues : [];
         const requiredCompletedDialogueIds = Array.isArray(node.requiredCompletedDialogueIds)
@@ -655,7 +652,12 @@ export const processNPCInteractionThunk = createAsyncThunk<
         if (nextId) {
           const nextNode = (nodes as any)[nextId];
           if (nextNode && nextNode.text) {
-            npcText = npcText ? `${npcText}\n\n${nextNode.text}` : nextNode.text;
+            // Preserve 1.0's existing next-node presentation on every ordinary
+            // topic. The new opt-in decisions show both the question and the
+            // character's immediate, response-specific reply.
+            npcText = node.decisionContext && npcText
+              ? `${npcText}\n\n${nextNode.text}`
+              : nextNode.text;
           }
 
           // The existing lightweight dialogue runtime displays the next node inline.
@@ -692,9 +694,10 @@ export const processNPCInteractionThunk = createAsyncThunk<
         await dispatch(updateNPCRelationshipThunk({ npcId, change: relDelta, reason: 'Dialogue' }));
       }
 
-      // Preserve the actual selected authored response, not only free-text input.
-      // This is what lets a player distinguish two outcomes in their own history.
-      const authoredResponseLabel = node && selectedResponse && node.responses &&
+      // Only the new opt-in authored decisions add the selected answer to
+      // player history. Do not change all historical 1.0 dialogue transcript
+      // shapes as a side effect of adding district aftercare.
+      const authoredResponseLabel = node?.decisionContext && selectedResponse && node.responses &&
         Object.prototype.hasOwnProperty.call(node.responses, selectedResponse)
         ? String(node.responses[selectedResponse])
         : undefined;
