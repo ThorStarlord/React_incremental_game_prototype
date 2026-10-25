@@ -354,8 +354,21 @@ export const processNPCInteractionThunk = createAsyncThunk<
       const node = choiceId ? (nodes as any)[choiceId] : undefined;
 
       if (node) {
+        // The current node is spoken in this interaction, even for terminal topics.
+        // Previously only a next-node response was written to dialogue history.
+        npcText = typeof node.text === 'string' ? node.text : '';
         const isNonRepeatable = node.repeatable === false;
         const completedDialogues = Array.isArray(npc.completedDialogues) ? npc.completedDialogues : [];
+        const requiredCompletedDialogueIds = Array.isArray(node.requiredCompletedDialogueIds)
+          ? node.requiredCompletedDialogueIds as string[]
+          : [];
+        if (requiredCompletedDialogueIds.some(id => !completedDialogues.includes(id))) {
+          dispatch(addNotification({
+            type: 'info',
+            message: 'Finish the earlier conversation with this person before this follow-up.',
+          }));
+          return { success: false, message: 'Earlier dialogue decision not yet recorded.' } as InteractionResult;
+        }
         if (isNonRepeatable && completedDialogues.includes(node.id)) {
           dispatch(addNotification({
             type: 'info',
@@ -583,7 +596,7 @@ export const processNPCInteractionThunk = createAsyncThunk<
         if (nextId) {
           const nextNode = (nodes as any)[nextId];
           if (nextNode && nextNode.text) {
-            npcText = nextNode.text;
+            npcText = npcText ? `${npcText}\n\n${nextNode.text}` : nextNode.text;
           }
 
           // The existing lightweight dialogue runtime displays the next node inline.
@@ -620,8 +633,15 @@ export const processNPCInteractionThunk = createAsyncThunk<
         await dispatch(updateNPCRelationshipThunk({ npcId, change: relDelta, reason: 'Dialogue' }));
       }
 
-      if (playerMessage) {
-        dispatch(addDialogueEntry({ id: `${npcId}-player-${now}`, npcId, timestamp: now, speaker: 'player', playerText: playerMessage, npcResponse: '' }));
+      // Preserve the actual selected authored response, not only free-text input.
+      // This is what lets a player distinguish two outcomes in their own history.
+      const authoredResponseLabel = node && selectedResponse && node.responses &&
+        Object.prototype.hasOwnProperty.call(node.responses, selectedResponse)
+        ? String(node.responses[selectedResponse])
+        : undefined;
+      const recordedPlayerText = playerMessage || authoredResponseLabel;
+      if (recordedPlayerText) {
+        dispatch(addDialogueEntry({ id: `${npcId}-player-${now}`, npcId, timestamp: now, speaker: 'player', playerText: recordedPlayerText, npcResponse: '' }));
       }
       dispatch(addDialogueEntry({ id: `${npcId}-npc-${now + 1}`, npcId, timestamp: now + 1, speaker: 'npc', playerText: '', npcResponse: npcText, relationshipChange: relDelta || undefined }));
 

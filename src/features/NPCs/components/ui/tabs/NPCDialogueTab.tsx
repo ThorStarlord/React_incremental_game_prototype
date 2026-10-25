@@ -104,7 +104,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                 elevation={1}
                 sx={{ p: 1.5, bgcolor: msg.playerText ? 'primary.main' : 'background.default', color: msg.playerText ? 'primary.contrastText' : 'text.primary' }}
               >
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
                   {msg.playerText || msg.npcResponse}
                 </Typography>
               </Paper>
@@ -134,6 +134,11 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
                   {choice.title}
                 </Typography>
+                {choice.decisionContext && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.75 }}>
+                    {choice.decisionContext}
+                  </Typography>
+                )}
                 {choice.availabilityReasons.length > 0 && (
                   <Typography
                     variant="caption"

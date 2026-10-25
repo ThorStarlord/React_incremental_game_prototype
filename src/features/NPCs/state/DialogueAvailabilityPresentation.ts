@@ -53,6 +53,14 @@ export const evaluateDialogueAvailabilityPresentation = (
     return { available: false, availabilityReasons: [] };
   }
 
+  // The player's earlier response is recorded by the NPC dialogue authority.
+  // Do not infer this completion from route state or an unrelated Experience.
+  if ((node.requiredCompletedDialogueIds ?? []).some(
+    id => !context.completedDialogueIds.includes(id)
+  )) {
+    return { available: false, availabilityReasons: [] };
+  }
+
   const requiredExperiences = node.requiredExperienceIds ?? [];
   if (requiredExperiences.some(id => !context.recordedExperiences[id])) {
     return { available: false, availabilityReasons: [] };
@@ -113,6 +121,10 @@ export const evaluateDialogueAvailabilityPresentation = (
   }
 
   const availabilityReasons: string[] = [];
+
+  if ((node.requiredCompletedDialogueIds ?? []).length > 0) {
+    availabilityReasons.push('An earlier conversation with this person was completed');
+  }
 
   requiredExperiences.forEach(id => {
     availabilityReasons.push(

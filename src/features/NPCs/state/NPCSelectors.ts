@@ -19,6 +19,7 @@ const EMPTY_DIALOGUE_CHOICES: readonly NPCDialogueChoice[] = [];
 export interface NPCDialogueChoice {
   id: string;
   title: string;
+  decisionContext?: string;
   responses: Array<{ id: string; label: string }>;
   availabilityReasons: string[];
 }
@@ -195,6 +196,7 @@ export const selectAvailableNPCDialogueChoices = createSelector(
         return {
           id: node.id,
           title: node.title || node.text || node.id,
+          decisionContext: node.decisionContext,
           responses: Object.entries(node.responses || {}).map(([id, label]) => ({
             id,
             label: String(label),
