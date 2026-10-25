@@ -24,5 +24,13 @@ Severity: **blocking** = cannot proceed without intervention; **major** = acts o
 
 Record the exact evidence and reproducibility for proposed repairs. Recurring severe findings must be resolved or explicitly accepted by the relevant release authority. A browser-only or coding-agent session cannot be counted as a human Beta session.
 
+## Release-decision boundary## UI4 session observations — use with the original non-leading protocol
+
+For each consented fresh player, separately capture what they infer from the first City Center scene, whether they can name the next legal road before clicking, whether the Elder Willow character motif communicates a memorable identity, and whether location art helps them feel oriented. Do not tell participants these are the study hypotheses beforehand.
+
+After an authentic decision, ask what they believe changed, whether they find the related relationship record without hints, and whether they mistakenly believe ordinary dialogue always creates a Memory. When Copy management is naturally reached, ask them to identify routine work, advanced Trait-sharing options, and what acknowledgement does **not** resolve. On mobile, observe where the next action sits and whether scrolling is understood. Record participant words and actions separately from reviewer interpretation; any visual preference is a *preference finding*, not a product-performance pass.
+
+Use a before/after comparison only if both builds are actually tested with comparable consented participants; do not infer experiential improvement merely from a new screenshot. This section is **research readiness**, not a conducted study.
+
 ## Release-decision boundary
 Current `v1.0.0` was a personal release under a documented human-floor waiver, not a true Beta pass. This procedure neither revokes that release nor silently promotes PR #181. Until accepted external records meet the defined floor, preserve **HUMAN-UNVALIDATED / BETA_PASS=NO**.
