@@ -14,7 +14,7 @@ export interface DialogueAvailabilityPresentationContext {
   knownFactIds: readonly string[];
   factionReputationByFactionId: Record<string, number | undefined>;
   worldStateRegions: WorldStateRegions;
-  permanentTraitIds: readonly string[];
+  expressedTraitIds: readonly string[];
   activeDoctrineIds: readonly DoctrineId[];
 }
 
@@ -108,7 +108,7 @@ export const evaluateDialogueAvailabilityPresentation = (
 
   const requiredPermanentTraits = node.requiredPermanentTraitIds ?? [];
   if (requiredPermanentTraits.some(
-    traitId => !context.permanentTraitIds.includes(traitId)
+    traitId => !context.expressedTraitIds.includes(traitId)
   )) {
     return { available: false, availabilityReasons: [] };
   }
@@ -156,7 +156,7 @@ export const evaluateDialogueAvailabilityPresentation = (
   }
 
   requiredPermanentTraits.forEach(traitId => {
-    availabilityReasons.push(`Permanent capability: ${humanizeId(traitId)}`);
+    availabilityReasons.push(`Expressed Trait: ${humanizeId(traitId)}`);
   });
 
   requiredActiveDoctrines.forEach(doctrineId => {

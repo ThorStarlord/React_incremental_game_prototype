@@ -1,5 +1,8 @@
 # React Incremental RPG — Campaign One
 
+> **1.1 development branch:** The owner has authorized a bounded universal Trait assimilation/expression revision. It is being integrated on PR #178 using `specification/Technical/Version11ScopeContract.md`. **1.1 has not passed final qualification or been released.** The latest released personal build remains **1.0.0**, human-unvalidated.
+
+
 A React/TypeScript narrative incremental RPG where consequential relationships teach durable capabilities, remembered history changes later possibilities, and personally understood repetition can become deliberately delegated work.
 
 > The repository name still contains `prototype` for historical/operational continuity. The current product maturity is **FEATURE_COMPLETE / HUMAN-UNVALIDATED**, released as **1.0.0**: a personal release that has not been externally playtested.
@@ -27,7 +30,7 @@ Release candidate: 1.0.0-rc.1 QUALIFIED — Build Validation #564
 
 The application already has a real game loop, persistent save/load/import-export, Relationship/Memory progression, Traits/Essence, NPC dialogue, quests, authored travel, combat, Knowledge, Faction Reputation, World State, Copy delegation, bounded offline progression, and multiple chapter-scale compositions.
 
-The repository has already proved that these systems can coexist, that the authored campaign spine can traverse from New Game to a state-responsive ending, and that the bounded B/A/C depth program has reached its Campaign One feature-completion stop. On 2026-10-20 the owner made 1.0 a personal release ([`OwnerPersonalReleaseDecision.md`](specification/Technical/OwnerPersonalReleaseDecision.md)): the human playtest floor is waived as a release gate, not satisfied. The active program is now **1.0 release qualification**: one exact candidate must pass the release contract's technical gates, including a full ordinary-UI campaign run, before promotion.
+The repository has already proved that these systems can coexist, that the authored campaign spine can traverse from New Game to a state-responsive ending, and that the bounded B/A/C depth program has reached its Campaign One feature-completion stop. On 2026-10-20 the owner made 1.0 a personal release ([`OwnerPersonalReleaseDecision.md`](specification/Technical/OwnerPersonalReleaseDecision.md)): the human playtest floor is waived as a release gate, not satisfied. The 1.0 release was subsequently qualified and promoted. The active program on this development branch is the separately authorized 1.1 universal Trait integration; ordinary released-main work remains 1.0 maintenance.
 
 ## Play
 
