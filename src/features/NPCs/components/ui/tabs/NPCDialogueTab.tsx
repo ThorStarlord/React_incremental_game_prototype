@@ -72,8 +72,19 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           timestamp: Date.now(),
         },
       })).unwrap();
+      const standingChanges = choice.responses.find(response => response.id === responseKey)?.standingChanges ?? [];
+      const standingSummary = standingChanges.length > 0
+        ? ` Institutional standing changed: ${standingChanges.map(
+            change => `${change.factionId} ${change.amount >= 0 ? '+' : ''}${change.amount}`
+          ).join(' · ')}.`
+        : '';
       setFeedback(outcome.success
-        ? { success: true, message: `Your choice in "${choice.title}" is part of your story. Review what changed below.` }
+        ? {
+            success: true,
+            message: choice.decisionContext
+              ? `Your request in "${choice.title}" was recorded with this person.${standingSummary} Review the conversation below; other characters were not automatically informed.`
+              : `Your choice in "${choice.title}" is part of your story. Review what changed below.`,
+          }
         : { success: false, message: outcome.message || 'This conversation is not currently available.' });
     } catch {
       setFeedback({ success: false, message: 'The conversation could not be completed. No success has been claimed.' });
@@ -161,9 +172,9 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
                         >
                           {response.label}
                         </Button>
-                        {response.standingChanges.length > 0 && (
+                        {Boolean(response.standingChanges?.length) && (
                           <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
-                            If chosen, institutional standing changes: {response.standingChanges.map(
+                            If chosen, institutional standing changes: {(response.standingChanges ?? []).map(
                               change => `${change.factionId} ${change.amount >= 0 ? '+' : ''}${change.amount}`
                             ).join(' · ')}
                           </Typography>
