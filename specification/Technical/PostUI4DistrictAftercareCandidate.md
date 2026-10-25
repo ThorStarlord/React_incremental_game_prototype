@@ -24,6 +24,14 @@ Both choices remain viable and leave the prior chapter, map, quests, and save sc
 6. A read-only district-aftercare panel appears on return visits **only** when a known character's actual route conclusion and available/completed follow-up establish its relevance. When pending, it links to an existing legal conversation or adjacent travel, never a teleport or inferred NPC position. When recorded, it reads the NPC's Knowledge fact, the selected authored response, and its Faction effects, while showing **current** standing separately from the decision's historical delta. Location atmosphere remains from objective World State, not duplicated as a fabricated Memory.
 7. Response-specific Faction standing previews are derived from authored effect definitions only for already available topics that explicitly opt into a `decisionContext`; no unknown locked-topic effects are revealed.
 
+## Existing-save content compatibility
+
+The original source candidate relied on startup/Chapter 1 content loading, but a loaded save replaces the Redux snapshot, including old `NPC.availableDialogues` and `dialogueNodes` values. This can leave previously concluded routes with no route-follow-up topic, even when the new static asset is present.
+
+After `replaceState` and relationship runtime reconciliation, the normal Load/Continue path now performs a **bounded, best-effort catalog refresh** of only the two aftercare topics and their authored reply nodes. A dedicated NPC reducer adds topic IDs **only to already discovered NPCs present in the saved snapshot**, with set union. It never creates new NPCs, grants undiscovered knowledge, clears completed topics, changes Affinity or Connection, changes inventory/quests, or alters the persisted save schema. A missing optional file logs a warning and does not invalidate the save. The ordinary fresh-game Chapter 1 cast-loading path is unchanged.
+
+This is source-only construction; no load/Continue scenario was executed under the owner's no-tests instruction. It still needs exact-head behavior and recovery qualification before any merge.
+
 ## Risks and qualifications still required
 
 - The two conversations and their modest reputation deltas are **provisional gameplay design**; they do not establish preference, fun, or balance.

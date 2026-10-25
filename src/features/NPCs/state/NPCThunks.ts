@@ -6,7 +6,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../../app/store';
 import type { NPC, InteractionResult, RelationshipChangeEntry } from './NPCTypes';
 import { updateEssenceGenerationRateThunk } from '../../Essence';
-import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs, mergeNPCsPreservingExisting } from './NPCSlice';
+import { setAffinity, increaseConnectionDepth, addRelationshipChangeEntry, updateNpcConnectionDepth, debugUnlockAllSharedSlots as debugUnlockAllSharedSlotsAction, setNPCSharedTraitInSlot, addDialogueEntry, markDialogueCompleted, setDialogueNodes, incrementNpcShopItem, markNpcRestock, addAvailableQuestToNPC, setNPCs, mergeNPCsPreservingExisting, appendAuthoredDialogueIdsToKnownNPCs } from './NPCSlice';
 import { addNotification } from '../../../shared/state/NotificationSlice';
 import { spendGold, addAvailableAttributePoints } from '../../Player/state/PlayerSlice';
 import { TRADING } from '../../../constants/gameConstants';
@@ -214,6 +214,65 @@ export const unlockCampaignNpcsThunk = createAsyncThunk<
       const message = error instanceof Error ? error.message : String(error);
       return rejectWithValue(message);
     }
+  }
+);
+
+/**
+ * Reconcile only the optional post-1.0 Merchant District follow-up dialogues
+ * after replacing a save snapshot. A save can contain older NPC topic lists
+ * and older dialogue definitions even when startup loaded the current assets.
+ * No NPCs are discovered or reset and no historical evidence is invented.
+ */
+export const refreshLoadedDistrictAftercareCatalogThunk = createAsyncThunk<
+  string[],
+  void,
+  { state: RootState }
+>(
+  'npcs/refreshLoadedDistrictAftercareCatalog',
+  async (_, { getState, dispatch }) => {
+    const knownIds = new Set(getState().npcs.discoveredNPCs);
+    const aftercareTopics: Readonly<Record<string, string>> = {
+      npc_captain_valerius: 'valerius_m25_ledger_aftercare',
+      npc_blacksmith_gronk: 'gronk_m25_manifest_aftercare',
+    };
+    const targets = Object.entries(aftercareTopics)
+      .filter(([npcId]) => knownIds.has(npcId) && Boolean(getState().npcs.npcs[npcId]));
+    if (targets.length === 0) return [];
+
+    const response = await fetch(publicAsset('/data/m25-chapter-content.json'));
+    if (!response.ok) {
+      throw new Error('The optional Merchant District dialogue catalog could not be loaded.');
+    }
+    const extension = await response.json();
+    const availableIds: Record<string, string[]> = {};
+    const authoredNodes: Record<string, any> = {};
+
+    for (const [npcId, topicId] of targets) {
+      const listed = extension?.npcDialogueIds?.[npcId];
+      const topic = extension?.dialogues?.[topicId];
+      if (!Array.isArray(listed) || !listed.includes(topicId) ||
+          !topic || topic.id !== topicId || topic.npcId !== npcId) {
+        throw new Error(`The ${npcId} aftercare topic is missing from the authored catalog.`);
+      }
+
+      const responseNodes = Object.values(topic.next ?? {})
+        .filter((id): id is string => typeof id === 'string');
+      for (const replyId of responseNodes) {
+        const reply = extension?.dialogues?.[replyId];
+        if (!reply || reply.id !== replyId || reply.npcId !== npcId) {
+          throw new Error(`The ${npcId} aftercare reply ${replyId} is missing.`);
+        }
+        authoredNodes[replyId] = reply;
+      }
+      authoredNodes[topicId] = topic;
+      availableIds[npcId] = [topicId];
+    }
+
+    // Refresh definitions first, then attach only already-known characters'
+    // optional authored topic IDs. Neither action affects progress or facts.
+    dispatch(setDialogueNodes(authoredNodes));
+    dispatch(appendAuthoredDialogueIdsToKnownNPCs(availableIds));
+    return Object.keys(availableIds);
   }
 );
 
