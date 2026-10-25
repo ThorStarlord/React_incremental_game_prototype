@@ -73,7 +73,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
         },
       })).unwrap();
       setFeedback(outcome.success
-        ? { success: true, message: `"${choice.title}" recorded. Review the conversation and any visible consequences below.` }
+        ? { success: true, message: `Your choice in "${choice.title}" is part of your story. Review what changed below.` }
         : { success: false, message: outcome.message || 'This conversation is not currently available.' });
     } catch {
       setFeedback({ success: false, message: 'The conversation could not be completed. No success has been claimed.' });
@@ -120,7 +120,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
           ))
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No previous conversations. Choose an authored topic when one is available.
+            No conversations yet. Choose a topic when you are ready.
           </Typography>
         )}
       </Paper>
@@ -193,7 +193,7 @@ const NPCDialogueTab: React.FC<NPCDialogueTabProps> = ({ npcId }) => {
 
       {availableDialogueChoices.length === 0 && (
         <Typography variant="body2" color="text.secondary" role="status">
-          No authored conversation topics are available right now. New topics may require a recorded experience or a change in circumstances.
+          There is nothing new to discuss right now. A shared experience or a change in circumstances may open another conversation.
         </Typography>
       )}
     </Box>
