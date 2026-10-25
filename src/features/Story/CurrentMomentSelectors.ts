@@ -22,7 +22,7 @@ export interface CurrentMomentView {
   actions: CurrentMomentAction[];
   /** Authored story interaction with unanchored characters, not physical co-presence. */
   storyContacts: CurrentMomentAction[];
-  consequences: Array<{ id: string; title: string; explanation: string }>;
+  consequences: Array<{ id: string; title: string; explanation: string; to?: string }>;
   attention: Array<{ id: string; label: string; to: string }>;
 }
 
@@ -193,17 +193,19 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
         id: entry.id,
         title: entry.title,
         explanation: `${entry.causeLabel}: ${entry.summary}`,
+        to: `/game/npcs/${encodeURIComponent(entry.npcId)}`,
         timestamp: entry.timestamp,
       })),
       ...selectRecentRecordedDialogueExperiences(state, 2).map(entry => ({
         id: `experience-${entry.id}`,
         title: entry.title,
         explanation: `Your conversation with ${entry.npcName} is now part of your story.`,
+        to: `/game/npcs/${encodeURIComponent(entry.npcId)}`,
         timestamp: entry.timestamp,
       })),
     ].sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 3)
-      .map(({ id, title, explanation }) => ({ id, title, explanation })),
+      .map(({ id, title, explanation, to }) => ({ id, title, explanation, to })),
     attention,
   };
 };
