@@ -4,6 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { alpha } from '@mui/material/styles';
 import { useAppSelector } from '../../../app/hooks';
 import { selectCurrentMoment } from '../CurrentMomentSelectors';
+import { LocationVignette } from './LocationVignette';
 
 export const CurrentMomentPanel: React.FC = React.memo(() => {
   const moment = useAppSelector(selectCurrentMoment);
@@ -18,12 +19,17 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
         <Box sx={{ p: { xs: 1.5, md: 2 }, mb: 2, borderRadius: 2,
           background: theme => `linear-gradient(120deg, ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.21 : 0.09)}, ${theme.palette.background.paper} 92%)`,
           border: 1, borderColor: 'divider' }}>
-          <Typography variant="h6" component="h3">You are in {moment.locationName}</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{moment.locationDescription}</Typography>
-          <Typography variant="body1">{moment.situation}</Typography>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="stretch">
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="h6" component="h3">You are in {moment.locationName}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{moment.locationDescription}</Typography>
+              <Typography variant="body1">{moment.situation}</Typography>
+            </Box>
+            <LocationVignette locationName={moment.locationName} />
+          </Stack>
         </Box>
 
-        <Typography variant="subtitle2" gutterBottom>What you can do here</Typography>
+        <Typography variant="subtitle2" gutterBottom>What you can do next</Typography>
         <Stack direction={{ xs: 'column', md: 'row' }} gap={1.5} flexWrap="wrap" sx={{ mb: 2 }}>
           {immediateActions.map(action => (
             <Paper key={action.id} variant="outlined" sx={{ p: 1.5, flex: { xs: '1 1 auto', md: '1 1 190px' }, width: { xs: '100%', md: 'auto' }, minWidth: 0 }}>
@@ -35,14 +41,14 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
               </Typography>
             </Paper>
           ))}
-          {immediateActions.length === 0 && <Typography variant="body2" color="text.secondary">There are no immediate authored actions here. Review a known person or travel onward.</Typography>}
+          {immediateActions.length === 0 && <Typography variant="body2" color="text.secondary">Nothing needs your attention here right now. Revisit someone you know, or take the next road.</Typography>}
         </Stack>
 
         {moment.storyContacts.length > 0 && (
           <Box sx={{ mb: 2 }} data-testid="story-contacts">
-            <Typography variant="subtitle2">Available story conversations</Typography>
+            <Typography variant="subtitle2">Conversations beyond the map</Typography>
             <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
-              These known characters have authored conversation topics, but their physical location is not represented by the travel map.
+              These people have something new to discuss. The map does not confirm where they are.
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} gap={1} flexWrap="wrap" alignItems="flex-start">
               {moment.storyContacts.map(action => (
@@ -90,7 +96,7 @@ export const CurrentMomentPanel: React.FC = React.memo(() => {
           </Stack>
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No player-visible relationship history is recorded yet. Your experiences and their known consequences will appear here.
+            Your story is just beginning. Memories and known consequences will appear here as you make choices.
           </Typography>
         )}
       </CardContent>
