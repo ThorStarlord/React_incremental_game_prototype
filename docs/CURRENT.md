@@ -1,5 +1,12 @@
 # Documentation Authority Index
 
+## 2026-10-25 — CURRENT: owner-approved 1.1 Trait source candidate
+
+- `specification/Technical/Version11ScopeContract.md` and `specification/Technical/UniversalTraitOntologyReconciliation.md` govern the **bounded 1.1 universal Trait assimilation/expression redesign** derived from owner-approved PR #178; they do not supersede the qualified **released 1.0** baseline for prior release claims.
+- PRs #180 and #182 were already merged into PR #178's branch. The current-main reconciliation merges that code with UI4 player-facing affordances and PR #190's Merchant District aftercare. PR #165 remains an obsolete historical prototype. GitHub PR metadata is the authority for the actual merge.
+- The 2026-10-25 `AGENTS.md` owner decision waives **ordinary PR merge** test prerequisites only; this 1.1 implementation remains `UNTESTED / UNQUALIFIED` without code/build, save-recovery, browser, player or CI evidence. `v1.0.0` remains immutable. No 1.1 release, external Beta or new thesis is claimed.
+
+
 ## 2026-10-25 — CURRENT: owner-approved PR merges without test prerequisite
 
 - **Newer owner authority:** `AGENTS.md` section "2026-10-25 owner decision — merge without waiting for tests" supersedes the earlier D3 exact-head Build Validation prerequisite for **ordinary owner-directed PR merges**. Any earlier "require tests before merge" language in this index, the older `HANDOFF.md` or historical result files is provenance of the prior regime, not the active merge policy.

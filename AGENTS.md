@@ -1,5 +1,12 @@
 # Agent Operating Policy — Campaign One / 1.0
 
+## 2026-10-25 — Owner-authorized 1.1 Trait integration (source-only)
+
+The owner previously authorized the bounded universal Trait assimilation/expression program in `specification/Technical/Version11ScopeContract.md` (PR #178), with dependent UI/fixture PRs #180 and #182. The integration preserves Campaign One's current world-first UI, district-aftercare decisions, Copy authority and released `v1.0.0` tag. This is a **1.1 source integration**, not a 1.1 release.
+
+The later owner decision directly above in the merge-workflow chronology waives unit, browser and evidence tests as **ordinary PR merge prerequisites**. A merged Trait candidate lacking qualification is explicitly `MERGED / UNTESTED / UNQUALIFIED`; do not claim Build Validation, correct migration behavior, player comprehension or `BETA_PASS`. Release/tag promotion remains separate and protected. The superseded #165 is a historical prototype; do not merge it as a duplicate.
+
+
 ## 2026-10-25 owner decision — merge without waiting for tests
 
 **CURRENT MERGE AUTHORITY, superseding the 2026-10-20 D3 test prerequisite for ordinary owner-directed pull requests.** The owner explicitly instructed agents to **always merge their owner-directed PRs and not wait for unit tests or evidence tests**. After bounded source/merge-conflict inspection, an agent may merge an owner-directed PR immediately, without a unit suite, full Build Validation, browser campaign or participant evidence. Do not create placeholder tests or trigger CI merely to satisfy the superseded PR-merge gate.

@@ -99,7 +99,7 @@ describe('Checkpoint C incremental integration repair qualification', () => {
       startCopyProductionTaskThunk({ copyId: 'copy-001', taskId: 'resonance_calibration' })
     );
     expect(startCopyProductionTaskThunk.rejected.match(before)).toBe(true);
-    expect(before.payload).toContain('Successfully Resonate a Trait yourself before delegating calibration.');
+    expect(before.payload).toContain('Successfully Stabilize a Trait yourself before delegating calibration.');
 
     const failed = await store.dispatch(
       acquireTraitWithEssenceThunk({ traitId: 'missing_repair_trait', essenceCost: 0 })
@@ -170,7 +170,7 @@ describe('Checkpoint C incremental integration repair qualification', () => {
     );
 
     expect(screen.getByText('Ready to delegate: mastered by you, and this Copy meets the current requirements.')).toBeInTheDocument();
-    expect(screen.getByText(/Not mastered yet: Successfully Resonate a Trait yourself/)).toBeInTheDocument();
+    expect(screen.getByText(/Not mastered yet: Successfully Stabilize a Trait yourself/)).toBeInTheDocument();
     const assignButtons = screen.getAllByRole('button', { name: 'Start Routine' });
     expect(assignButtons[0]).toBeEnabled();
     expect(assignButtons[1]).toBeDisabled();
