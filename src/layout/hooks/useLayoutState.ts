@@ -121,7 +121,9 @@ export const useLayoutState = (options: UseLayoutStateOptions = {}): UseLayoutSt
       setActiveTabState(tabId);
     } else {
       const targetRoute = tabToRouteMap[tabId];
-      if (targetRoute && location.pathname.split('/')[2] !== tabId) {
+      // A click on "NPCs" from a nested /game/npcs/:npcId route must
+      // return to the NPC list, even though both paths share the same tab.
+      if (targetRoute && location.pathname !== targetRoute) {
         navigate(targetRoute);
       }
     }
