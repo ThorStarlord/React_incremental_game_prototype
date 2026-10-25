@@ -1,5 +1,14 @@
 # Repository Status — Campaign One 1.0 Released
 
+## 2026-10-25 — UI4 merged on main, qualified; human research still open
+
+- [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) **squash-merged** at `528d014d8de6b6cf775e4f6b229eb74b3b748dca`. Exact candidate head `cfad4349f4776ff7cd2b3effc30b60d695b0e8e5` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677): focused UI/TypeScript, regression suites, content and architecture, both responsive browsers, production build and full ordinary-UI campaign.
+- Full campaign evidence: Chromium and Firefox **Distributed Dissipation 105/105** and **Fortified Containment 104/104**, each with four save/Continue checkpoints and export/import PASS. A nested NPC-list return defect found in the first run was repaired and regression-tested; this PASS belongs to the repaired exact head.
+- Delivered presentation: player-language clarity, legal Willow travel lead, known-place journal vignettes and Willow motif, truthful relationship-history links, Copy exception-first management/advanced disclosure, and single route/page authority. See `docs/ui/Phase4PlayerClarity.md`.
+- **FEATURE_COMPLETE / HUMAN-UNVALIDATED; BETA_PASS=NO** remains. No actual participants were tested; protocol: `docs/ui/Phase2HumanEvaluation.md` and issue #109. Original `v1.0.0` tag unchanged. 1.1 Trait drafts #178/#180/#182 remain separate.
+- The earlier October 25 UI4 **candidate** entry immediately below is historical; do not restart that construction program or treat pending-gate wording as an open action.
+
+
 ## 2026-10-25 — UI4 player clarity / experiential identity candidate
 
 - Owner authorized bounded implementation of the source-backed UI review. Branch **codex/ui4-player-experience-20261025** from main **96f6c595** changes player-facing language, known-place journal vignettes, recorded-consequence links, Copy attention and advanced controls, plus duplicate route-shell cleanup. Source and evidence map: docs/ui/Phase4PlayerClarity.md. Require full exact-head Build Validation before merge; no human-player claim from this work.

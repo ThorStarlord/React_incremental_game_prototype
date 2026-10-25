@@ -1,6 +1,14 @@
 # UI4 — Player clarity and experiential identity
 
-**Status:** Repository implementation candidate on branch **codex/ui4-player-experience-20261025**, based on main at **96f6c595**. This is bounded post-1.0 presentation and architecture hardening. Exact-head Build Validation is required before merge. **HUMAN-UNVALIDATED; BETA_PASS=NO.**
+**Status:** **INTEGRATED / QUALIFIED** on main at `528d014d` through [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185). Built on `96f6c595`, qualified at exact PR head `cfad4349` by [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677). Original v1.0.0 tag remains immutable. **FEATURE_COMPLETE / HUMAN-UNVALIDATED; BETA_PASS=NO.**
+
+## Final qualification and repair provenance
+
+The full ordinary-UI release runner first detected a regression at the Silas conversation: from nested `/game/npcs/:npcId`, the NPCs sidebar button failed to navigate back to `/game/npcs`. Route state compared only the top-level tab; the fix compares full canonical path. `UI4NavigationReturn.test.tsx` now asserts this nested navigation, alongside the original `UI4RouteAuthority` and player-clarity tests.
+
+**Final exact head:** `cfad4349f4776ff7cd2b3effc30b60d695b0e8e5`. **Build Validation:** [#40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677), **PASS**. Full campaign: both browsers, Distributed 105/105, Fortified 104/104; four save/Continue checkpoints and import/export PASS on every route. Responsive browser smoke and the production build also passed. This synthetic evidence establishes exercised behavior only; no human product judgment was made.
+
+The implementation sequence, pre-merge qualification instructions and historical candidate status below are retained as construction provenance, **not** as outstanding work. The remaining research is an external human-participation dependency.
 
 ## Product responsibility
 
