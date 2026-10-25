@@ -1,5 +1,11 @@
 # Documentation Authority Index
 
+## 2026-10-25 — UI4 scoped candidate / UX3 integration
+
+- Owner-selected UI4 presentation/route cleanup is in branch **codex/ui4-player-experience-20261025**, source/evidence contract docs/ui/Phase4PlayerClarity.md. It is **not yet a qualified merge**; exact-head Build Validation is mandatory, and no gameplay/save/release changes are authorized by UI4.
+- UX3 PR #184 is **merged** on main at **96f6c595**, qualifying head **11fb23fd** Build Validation **40103050524 PASS**. docs/ui/Phase3ExperientialCoherence.md now identifies its older candidate sections as historical; UX3 source is not an open backlog.
+- Original v1.0.0 is immutable. FEATURE_COMPLETE / HUMAN-UNVALIDATED and BETA_PASS=NO remain. The five-first-session/three-full-campaign participant floor is not supplied by source changes, automated screenshots, or synthetic playthroughs.
+
 ## 2026-10-24 — Current integrated UI2/UI3 authority
 - PR #181 **merged** at main `41037697019dc7dcb8c9256d37002f230f737c26` after exact-head `e1f32ca70` Build Validation #40090580707 **PASS**. The old candidate/pending sections below are historical snapshots, not operative work selection.
 - `specification/UI_UX/PlayerExperienceContract.md` and `LayoutDesign.md` remain scope/layout authority; `docs/ui/Phase2Implementation.md` is now the *qualified implementation evidence record*, not an open PR plan. `docs/ui/Phase2HumanEvaluation.md` is an unexecuted external study protocol.
