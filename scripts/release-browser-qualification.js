@@ -234,6 +234,7 @@ async function runBrowserQualification(name, browserType, options, outDir) {
       const moment = page.locator('[data-testid="current-moment"]');
       await assertVisible(moment, 'world-first Current Moment');
       await assertVisible(moment.getByRole('heading', { name: 'Current Moment' }), 'Current Moment heading');
+      await assertVisible(moment.locator('[data-testid="location-vignette"]'), 'known City Center journal scene');
       await assertVisible(moment.getByRole('link', { name: 'Find Elder Willow' }), 'opening story lead');
       await assertVisible(page.getByRole('button', { name: 'Travel to City Gate' }), 'legal world travel');
       const lead = moment.getByRole('link', { name: 'Find Elder Willow' });
@@ -283,6 +284,7 @@ async function runBrowserQualification(name, browserType, options, outDir) {
         }
         await intro.waitFor({ state: 'hidden', timeout: 10000 });
         await assertVisible(mobile.locator('[data-testid="current-moment"]'), 'mobile Current Moment');
+        await assertVisible(mobile.locator('[data-testid="location-vignette"]'), 'mobile known-location illustration');
         // Opening dialog animation must be finished before capturing a usable
         // mobile screenshot or judging action availability.
         await mobile.locator('.MuiBackdrop-root').waitFor({ state: 'hidden', timeout: 10000 });
