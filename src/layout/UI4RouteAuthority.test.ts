@@ -23,6 +23,8 @@ test('sidebar actions do not navigate twice and route state is derived from the 
   expect(nav).toContain('if (onTabChange)');
   expect(nav).toContain('} else {\n      navigate(');
   expect(state).toContain('getTabFromRoute(location.pathname, config.defaultTab)');
+  expect(state).toContain('location.pathname !== targetRoute');
+  expect(state).not.toContain("location.pathname.split('/')[2] !== tabId");
   expect(state).toContain('if (!config.syncWithRouter)');
   expect(state).not.toContain('tabFromRoute !== activeTab');
 });
