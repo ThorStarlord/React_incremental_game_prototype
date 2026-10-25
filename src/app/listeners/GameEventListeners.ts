@@ -1,7 +1,8 @@
 import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 import { addItem, removeItem } from '../../features/Inventory/state/InventorySlice';
-import { markRoutineFamiliarity, setLocation } from '../../features/Player/state/PlayerSlice';
+import { addPermanentTrait, equipTrait, markRoutineFamiliarity, removePermanentTrait, setLocation, unequipTrait } from '../../features/Player/state/PlayerSlice';
+import { recalculateStatsThunk } from '../../features/Player/state/PlayerThunks';
 import { updateNpcLocation } from '../../features/NPCs/state/NPCSlice';
 import { targetKilled } from '../../features/Combat/CombatEvents';
 import { failQuest, updateObjectiveProgress, patchObjectiveFields } from '../../features/Quest/state/QuestSlice';
@@ -10,6 +11,18 @@ import { calculateEssenceGenerationRate } from '../../features/Essence/utils/ess
 import { recordRelationshipExperience } from '../../features/Relationships/state/RelationshipSlice';
 
 export const gameEventListeners = createListenerMiddleware();
+
+// 1.1: expression owns active Player Trait effects. Refresh the derived stats
+// immediately after expression, suppression or assimilation changes, rather
+// than leaving combat/UI presentation stale until an unrelated game tick.
+// The recalculation thunk only dispatches applyCalculatedStats, so this matcher
+// does not react to its own derived-state result.
+gameEventListeners.startListening({
+  matcher: isAnyOf(equipTrait, unequipTrait, addPermanentTrait, removePermanentTrait),
+  effect: async (_action, listenerApi) => {
+    listenerApi.dispatch(recalculateStatsThunk());
+  },
+});
 
 // Listener for item additions (GATHER and DELIVER objectives)
 gameEventListeners.startListening({

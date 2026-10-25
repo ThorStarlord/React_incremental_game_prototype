@@ -161,7 +161,7 @@ export const CharacterPage: React.FC = React.memo(() => {
               </Typography>
               <Alert severity="info" sx={{ mb: 3 }}>
                 <AlertTitle>Traits and Capabilities</AlertTitle>
-                Review your active and permanent capabilities here. The Traits workspace holds acquisition, Resonance, Doctrine, and the Codex.
+                Express active Traits, review your assimilated library, and revisit how your character learned those patterns. The Traits workspace holds Stabilization, Doctrine, and the Codex.
               </Alert>
               <Button component={RouterLink} to="/game/traits" variant="outlined" sx={{ mb: 2 }}>Open the complete Traits workspace</Button>
               <PlayerTraitsContainer />
@@ -186,10 +186,10 @@ export const CharacterPage: React.FC = React.memo(() => {
               <strong>Statistics:</strong> Monitor your vital stats, combat capabilities, and performance metrics
             </Typography>
             <Typography component="li" variant="body2" color="text.secondary">
-              <strong>Traits:</strong> Equip traits for active benefits or make them permanent to free up slots
+              <strong>Traits:</strong> Express assimilated or discovered patterns in limited slots. Stabilization preserves them permanently.
             </Typography>
             <Typography component="li" variant="body2" color="text.secondary">
-              <strong>Capabilities:</strong> Build relationship-derived traits and routines that change which work you can perform
+              <strong>Capabilities:</strong> Capabilities emerge from your expressed Traits and personally mastered routines
             </Typography>
           </Box>
         </Paper>

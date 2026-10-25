@@ -103,11 +103,11 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
           <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', flexGrow: 1 }}>{trait.name}</Typography>
-              <Tooltip title="Unequip Trait">
+              <Tooltip title="Suppress Trait">
                 <IconButton
                   size="small"
                   color="error"
-                  aria-label={`Unequip ${trait.name}`}
+                  aria-label={`Suppress ${trait.name}`}
                   disabled={!canManageSlots}
                   onClick={(event) => {
                     event.stopPropagation();
@@ -138,7 +138,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
         role="button"
         tabIndex={canManageSlots ? 0 : -1}
         aria-disabled={!canManageSlots}
-        aria-label={`Equip a trait in slot ${slot.slotIndex + 1}`}
+        aria-label={`Express a Trait in slot ${slot.slotIndex + 1}`}
         sx={{ cursor: canManageSlots ? 'pointer' : 'not-allowed', height: '100%' }}
       >
         <EmptySlotCard />
@@ -166,8 +166,8 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
   return (
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-        <Typography variant="h5" component="h2">Trait Slots</Typography>
-        <Tooltip title="Equip traits to gain their effects. Click empty slots to equip, or equipped traits to unequip.">
+        <Typography variant="h5" component="h2">Trait Expression</Typography>
+        <Tooltip title="Express available Traits to manifest their effects. Click empty slots to express, or expressed Traits to suppress.">
           <IconButton size="small" aria-label="Trait slot help">
             <InfoIcon fontSize="small" />
           </IconButton>
@@ -190,9 +190,9 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
 
       {/* Trait Selection Dialog */}
       <Dialog open={isTraitSelectionModalOpen} onClose={onCloseTraitSelectionModal} maxWidth="sm" fullWidth>
-        <DialogTitle>Select a Trait for Slot {selectedSlotIndexForModal !== null ? selectedSlotIndexForModal + 1 : ''}</DialogTitle>
+        <DialogTitle>Select a Trait to Express in Slot {selectedSlotIndexForModal !== null ? selectedSlotIndexForModal + 1 : ''}</DialogTitle>
         <Typography variant="body2" color="text.secondary" sx={{ px: 3 }}>
-          Preview the discovered Trait below. Equipping occupies this slot; permanent Traits remain active without slots.
+          Preview the discovered Trait below. Expression occupies a slot; assimilation retains ownership but never grants active effects without expression.
         </Typography>
         <DialogContent>
           <List>
@@ -211,7 +211,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
               </ListItem>
             ))
             ) : (
-                <Typography sx={{p: 2, textAlign: 'center'}} color="text.secondary">No available traits to equip. Learn new traits from NPCs.</Typography>
+                <Typography sx={{p: 2, textAlign: 'center'}} color="text.secondary">No available Traits to express. Discover or assimilate new patterns.</Typography>
             )}
           </List>
           {selectedTraitIdInModal && (() => {
@@ -224,7 +224,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
               <Alert severity="info" sx={{ mt: 2 }} data-testid="trait-slot-before-after">
                 <Typography variant="subtitle2">Slot preview (before → after)</Typography>
                 <Typography variant="body2">
-                  Before: empty slot. After: {chosen.name} equipped.
+                  Before: empty slot. After: {chosen.name} expressed.
                 </Typography>
                 <Typography variant="body2">Listed Trait effects: {effectSummary.join('; ') || 'No numeric modifiers listed'}.</Typography>
                 <Typography variant="caption" display="block">
@@ -232,7 +232,7 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
                 </Typography>
                 {chosen.essenceCost !== undefined && (
                   <Typography variant="caption" display="block">
-                    Equipping is not the permanent Resonance purchase ({chosen.essenceCost} Essence).
+                    Expression is free; Stabilization is a separate Essence commitment ({chosen.essenceCost} Essence).
                   </Typography>
                 )}
               </Alert>
@@ -241,19 +241,19 @@ export const TraitSlotsUI: React.FC<TraitSlotsUIProps> = React.memo(({
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseTraitSelectionModal}>Cancel</Button>
-          <Button onClick={onConfirmEquip} variant="contained" disabled={!selectedTraitIdInModal}>Equip</Button>
+          <Button onClick={onConfirmEquip} variant="contained" disabled={!selectedTraitIdInModal}>Express</Button>
         </DialogActions>
       </Dialog>
 
       {/* Unequip Confirmation Dialog */}
       <Dialog open={unequipDialogState.open} onClose={onCloseUnequipDialog}>
-        <DialogTitle>Unequip Trait</DialogTitle>
+        <DialogTitle>Suppress Trait</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to unequip "{unequipDialogState.trait?.name}"?</Typography>
+          <Typography>Are you sure you want to suppress "{unequipDialogState.trait?.name}"?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={onCloseUnequipDialog}>Cancel</Button>
-          <Button onClick={onConfirmUnequip} variant="contained" color="warning" disabled={!canManageSlots}>Unequip</Button>
+          <Button onClick={onConfirmUnequip} variant="contained" color="warning" disabled={!canManageSlots}>Suppress</Button>
         </DialogActions>
       </Dialog>
     </Box>

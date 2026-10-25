@@ -86,19 +86,19 @@ At creation, a Copy snapshots a bounded inherited set informed by its parent NPC
 
 ### 3.2 Shared Traits
 
-The player may share currently equipped, non-permanent Traits into unlocked Copy Trait slots.
+The player may project currently expressed Traits into unlocked Copy Trait slots.
 
 Rules include:
 
-- source Trait must be equipped by the player;
-- permanent player Traits are not shareable;
+- source Trait must be currently expressed by the player;
+- assimilated Traits remain shareable while expressed;
 - inherited/shared duplicates are rejected;
 - an unlocked empty slot is required;
 - player preferences may be stored and applied to available slots.
 
 ### 3.3 Auto-unshare
 
-Listener middleware removes a shared Trait when the player unequips/replaces it or makes it permanent through Resonance.
+Listener middleware removes a shared Trait when the player suppresses/replaces its current expression. Stabilization alone does not unshare an expressed pattern.
 
 This keeps Copy sharing subordinate to Player Trait authority.
 

@@ -7,7 +7,7 @@ import {
   selectTraits,
   selectDiscoveredTraitObjects,
 } from '../../state/TraitsSelectors';
-import { selectPermanentTraits, selectPlayerTraitSlots, selectEquippedTraits } from '../../../Player/state/PlayerSelectors';
+import { selectAssimilatedTraitIds, selectPlayerTraitSlots, selectEquippedTraits } from '../../../Player/state/PlayerSelectors';
 // FIXED: Importing actions from PlayerSlice
 import { equipTrait, unequipTrait } from '../../../Player/state/PlayerSlice';
 import EquippedSlotsPanel from '../ui/EquippedSlotsPanel';
@@ -22,17 +22,22 @@ const ManageTraitsTab: React.FC = () => {
   const allTraits = useAppSelector(selectTraits);
   const acquiredTraits = useAppSelector(selectDiscoveredTraitObjects);
   const equippedTraitObjects = useAppSelector(selectEquippedTraits);
-  const permanentTraitIds = useAppSelector(selectPermanentTraits);
+  const assimilatedTraitIds = useAppSelector(selectAssimilatedTraitIds);
   const traitSlots = useAppSelector(selectPlayerTraitSlots); // Get official slots
 
-  // Filter for traits that are acquired but not equipped or permanent
+  // Any discovered pattern not currently expressed can be selected.
+  // Assimilated Traits remain in this pool when suppressed.
   const availableTraits = useMemo(() => {
-    const equippedIds = equippedTraitObjects.map(t => t.id);
-    return acquiredTraits.filter(trait =>
-      !equippedIds.includes(trait.id) &&
-      !permanentTraitIds.includes(trait.id)
-    );
-  }, [acquiredTraits, equippedTraitObjects, permanentTraitIds]);
+    const equippedIds = new Set(equippedTraitObjects.map(t => t.id));
+    const candidateIds = new Set([
+      ...acquiredTraits.map(trait => trait.id),
+      ...assimilatedTraitIds,
+    ]);
+    return Array.from(candidateIds)
+      .map(traitId => allTraits[traitId])
+      .filter((trait): trait is Trait => Boolean(trait))
+      .filter(trait => !equippedIds.has(trait.id));
+  }, [allTraits, acquiredTraits, assimilatedTraitIds, equippedTraitObjects]);
 
   const [activeTraitId, setActiveTraitId] = useState<string | null>(null);
 
@@ -77,7 +82,7 @@ const ManageTraitsTab: React.FC = () => {
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Manage Traits
+        Manage Trait Expression
       </Typography>
 
       <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
