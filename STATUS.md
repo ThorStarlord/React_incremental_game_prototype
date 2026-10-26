@@ -1,5 +1,12 @@
 # Repository Status — Campaign One 1.0 Released
 
+
+## 2026-10-26 — Owner-selected UI design direction recorded (no runtime change)
+
+- The owner accepted the Adaptive Adventure Workspace as a **post-UI4 design direction**: world-first Adventure, Glance / Decide / Inspect information depth, relationship-derived capability provenance, recorded consequences, and bounded incremental delegation. See `docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md`. It compares four UI futures and fifteen candidates; the proposed phased vertical-slice sequence is **not** an automatically authorized UI5 or a new 1.1 release.
+- **Documentation-only / HUMAN-UNVALIDATED:** this decision does not change game systems, make player-preference claims, qualify the source-only PR #178/#190 integrations, complete the six-profile issue #188, alter original `v1.0.0`, or change `BETA_PASS=NO`. Future implementations require bounded source/authority reconciliation and truthful test/release provenance.
+
+
 ## 2026-10-25 — Universal Trait 1.1 merged source-only (UNTESTED / UNQUALIFIED)
 
 - Owner-authorized [PR #178](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/178) was **squash-merged into current `main`** at `46e49f71127ac616b09dd582b56ca829a8d4e066`, after reconciling its original branch with UI4 and Merchant District aftercare. Its stacked UI/Doctrine PR #180 and schema-fixture PR #182 were previously merged into the source branch. All 21 test-file changes and new CI/browser/release workflow changes were intentionally excluded under the owner's no-tests instruction.
