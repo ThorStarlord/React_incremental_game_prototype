@@ -1,5 +1,13 @@
 # Documentation Authority Index
 
+
+## 2026-10-26 — CURRENT: owner-selected UI design direction (documentation only)
+
+- [Adaptive Adventure Workspace — owner-selected UI direction](superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md) is an **OWNER-SELECTED DESIGN COMPASS / HUMAN-UNVALIDATED**, not implemented UI, an executed experiment or an automatic UI5/1.1 feature milestone. It selects world-first Adventure presentation, contextual causal explanation, relationship-derived Trait buildcraft and earned Copy delegation; the 0–20 minute opening rhythm is an aspirational experience target, not a measured outcome.
+- Existing interaction and layout contracts remain `specification/UI_UX/PlayerExperienceContract.md` and `LayoutDesign.md`; gameplay/scope authority stays in `AGENTS.md`, `FeatureScopeMatrix.md` and relevant domain contracts. The new UI record compares alternative directions and gives a reversible P0–P6 **design sequence**, not permission to add generalized systems or rewrite qualified UI4.
+- Current evidence limits are preserved: UI4 PR #185 has historical qualification; 1.1 Trait PR #178 and district aftercare PR #190 were subsequently source-only merged **UNTESTED / UNQUALIFIED**. The six-profile issue #188 and human Product Review issue #109 are not completed by this documentation. Original `v1.0.0` and `BETA_PASS=NO` are unchanged.
+
+
 ## 2026-10-25 — CURRENT: universal Trait 1.1 source integrated, unqualified
 
 - `specification/Technical/Version11ScopeContract.md` and `specification/Technical/UniversalTraitOntologyReconciliation.md` govern the **bounded 1.1 universal Trait assimilation/expression redesign** derived from owner-approved PR #178; they do not supersede the qualified **released 1.0** baseline for prior release claims.

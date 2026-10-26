@@ -1,5 +1,13 @@
 # Campaign One — Player Experience and UI Contract
 
+
+## 2026-10-26 — Owner-selected future UI direction (DESIGN ONLY)
+
+The owner selected the **Adaptive Adventure Workspace** after divergent UI exploration; the full source-grounded design is at [`docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md`](../../docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md). The design prioritizes a world-first Adventure view, a **Glance -> Decide -> Inspect** information hierarchy, truthful relationship/Memory/Knowledge/standing context, understandable assimilated-vs-expressed Traits and bounded mastered Copy work. It preserves current AppRouter/Redux authority and the existing UI4 contracts while proposing an Elder Willow first-session vertical slice before larger Chronicle, Trait Loom or Copy views.
+
+**Classification:** OWNER-SELECTED DESIGN COMPASS / HUMAN-UNVALIDATED / NOT IMPLEMENTED BY THIS RECORD. Aspirational 20-minute session timing is not measured; the P0–P6 sequence is planning, not a new automatic UI5 or feature-backlog authorization. Any code implementation must remain within current scope and preserve canonical travel, story knowledge, NPC presence, Trait expression and Copy permission boundaries. Qualified UI4 and source-only unqualified 1.1 Trait/district additions retain their separate evidence. No new tests, human sessions, release or Beta PASS are claimed.
+
+
 ## 2026-10-25 — UI4 experience hardening, qualified on main
 
 [PR #185](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/185) merged at `528d014d` after exact head `cfad4349` passed [Build Validation #40158794677](https://github.com/ThorStarlord/React_incremental_game_prototype/actions/runs/40158794677). The nested NPC detail → NPC-list return was repaired and covered by `UI4NavigationReturn.test.tsx`. The UI4 implementation record `docs/ui/Phase4PlayerClarity.md` is now qualified evidence rather than an unmerged candidate. Human comprehension, delight, and preference remain unvalidated.
