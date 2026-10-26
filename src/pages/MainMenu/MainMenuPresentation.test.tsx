@@ -1,7 +1,7 @@
 import React from 'react';
 import fs from 'fs';
 import path from 'path';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ExportDialog } from './dialogs/ExportDialog';
 import { DeleteConfirmationDialog } from './dialogs/DeleteConfirmationDialog';
 import { MainMenuButtonList } from './components/MainMenuButtonList';
@@ -26,6 +26,32 @@ describe('main menu presentation', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     fireEvent.click(screen.getByRole('button', { name: 'Close export dialog' }));
     expect(onClose).toHaveBeenCalledTimes(2);
+  });
+
+  test('Export waits for clipboard success before claiming Copied', async () => {
+    let completeCopy: () => void = () => undefined;
+    const onCopy = jest.fn(() => new Promise<void>(resolve => {
+      completeCopy = resolve;
+    }));
+    render(<ExportDialog isOpen exportCode="abc123" onClose={noop} onCopyToClipboard={onCopy} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copy' }));
+    expect(screen.getByRole('button', { name: 'Copying...' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'Copied!' })).not.toBeInTheDocument();
+    await act(async () => { completeCopy(); });
+    expect(screen.getByRole('button', { name: 'Copied!' })).toBeInTheDocument();
+  });
+
+  test('Export reports failed clipboard writes and allows manual copying', async () => {
+    const onCopy = jest.fn(() => Promise.reject(new Error('Clipboard blocked')));
+    render(<ExportDialog isOpen exportCode="abc123" onClose={noop} onCopyToClipboard={onCopy} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copy' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Could not copy automatically. Select and copy the save code manually.'
+    );
+    expect(screen.queryByRole('button', { name: 'Copied!' })).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /copy this code/i })).toHaveValue('abc123');
   });
 
   test('Delete confirmation is a named modal dialog', () => {
