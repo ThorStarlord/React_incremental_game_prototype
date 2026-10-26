@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -15,7 +15,7 @@ interface ExportDialogProps {
   isOpen: boolean;
   exportCode: string;
   onClose: () => void;
-  onCopyToClipboard: () => void;
+  onCopyToClipboard: () => Promise<void> | void;
 }
 
 export function ExportDialog({
@@ -24,12 +24,38 @@ export function ExportDialog({
   onClose,
   onCopyToClipboard
 }: ExportDialogProps) {
-  const [isCopied, setIsCopied] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied' | 'failed'>('idle');
+  const copyAttempt = useRef(0);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleCopy = () => {
-    onCopyToClipboard();
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+  // Closing/reopening the dialog or exporting a new save invalidates the
+  // previous attempt; a delayed clipboard result cannot claim new success.
+  useEffect(() => {
+    copyAttempt.current += 1;
+    setCopyState('idle');
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    return () => {
+      copyAttempt.current += 1;
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    };
+  }, [isOpen, exportCode]);
+
+  const handleCopy = async () => {
+    if (copyState === 'copying') return;
+    const attempt = ++copyAttempt.current;
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    setCopyState('copying');
+
+    try {
+      await onCopyToClipboard();
+      if (copyAttempt.current !== attempt) return;
+      setCopyState('copied');
+      resetTimer.current = setTimeout(() => {
+        if (copyAttempt.current === attempt) setCopyState('idle');
+      }, 2000);
+    } catch {
+      if (copyAttempt.current === attempt) setCopyState('failed');
+    }
   };
 
   return (
@@ -56,10 +82,17 @@ export function ExportDialog({
           value={exportCode}
           inputProps={{ readOnly: true, style: { fontFamily: 'monospace', fontSize: '0.85rem' } }}
         />
+        {copyState === 'failed' && (
+          <Typography role="alert" color="error" variant="body2" sx={{ mt: 1 }}>
+            Could not copy automatically. Select and copy the save code manually.
+          </Typography>
+        )}
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={handleCopy}>{isCopied ? 'Copied!' : 'Copy'}</Button>
+        <Button onClick={handleCopy} disabled={copyState === 'copying'}>
+          {copyState === 'copied' ? 'Copied!' : copyState === 'copying' ? 'Copying...' : 'Copy'}
+        </Button>
         <Button variant="contained" onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>

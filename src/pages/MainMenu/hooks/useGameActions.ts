@@ -171,14 +171,16 @@ export function useGameActions({
     }
   }, [mostRecentSave, exportSave, openDialog]);
 
-  const handleCopyToClipboard = useCallback((exportCode: string) => {
-    navigator.clipboard.writeText(exportCode)
-      .then(() => {
-        console.log('Export code copied to clipboard');
-      })
-      .catch(() => {
-        console.error('Failed to copy to clipboard');
-      });
+  const handleCopyToClipboard = useCallback(async (exportCode: string): Promise<void> => {
+    try {
+      // Return the real clipboard result to the Export dialog. Logging a
+      // rejected write without propagating it made the UI claim "Copied!".
+      await navigator.clipboard.writeText(exportCode);
+      console.log('Export code copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy to clipboard', error);
+      throw error;
+    }
   }, []);
 
   const handleImport = useCallback(async () => {

@@ -23,7 +23,7 @@ interface DialogsContainerProps {
   onDeleteConfirm: (id: string, name: string) => void; // This is handleDeleteConfirm from useGameActions
   onCloseDialog: (dialogName: keyof DialogState) => void;
   onImport: () => void;
-  onCopyToClipboard: (code: string) => void;
+  onCopyToClipboard: (code: string) => Promise<void> | void;
   clearDeleteTarget: () => void;
 }
 
