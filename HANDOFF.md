@@ -1,5 +1,13 @@
 # Handoff — Campaign One 1.0 Released
 
+
+## 2026-10-26 — CURRENT RE-ENTRY: owner-selected Adaptive Adventure Workspace design
+
+- The owner approved the UI-specific divergent-exploration recommendations. The selected **Adaptive Adventure Workspace** is documented at `docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md`: world-first Adventure, three depths (Glance / Decide / Inspect), contextual relationship/causal/Traits views, and bounded earned Copy delegation. This entry records design intent **only**; no UI construction, simulated session, human test, UI5 milestone, 1.1 release, or gameplay scope expansion follows automatically.
+- Proposed construction sequence is **P0 baseline -> P1 Elder Willow Adventure slice -> P2 relationships/Chronicle -> P3 Trait Loom -> P4 Copy operations -> P5 reactive Merchant District -> P6 coherence**. Start any subsequent authorized implementation with a precise Phase 1 screen/selector/interaction specification, preserve React Router and canonical Redux authorities, and reject invented locations, Memories, knowledge, Traits, or Copy decisions. Treat later slices as alternatives to select based on value, not mandatory feature backlog.
+- UI4's previously qualified record and subsequent source-only **UNTESTED / UNQUALIFIED** 1.1 Trait/district integrations retain their separate evidence. Existing `v1.0.0`, issue #188 simulated panel status, issue #109 human evidence, and `BETA_PASS=NO` do not change.
+
+
 ## 2026-10-25 — CURRENT RE-ENTRY: 1.1 Trait source merged, unqualified
 
 - Owner-directed PRs may merge without unit/browser/evidence tests under current `AGENTS.md`; avoid stale test-gate stop language in the older historical entries below. Explicitly record `UNTESTED / UNQUALIFIED` and do not infer any human Beta, release or migration PASS.
