@@ -8,9 +8,12 @@ import { selectKnownRelationshipConstellation } from '../RelationshipConstellati
 export const RelationshipConstellationPanel: React.FC = React.memo(() => {
   const people = useAppSelector(selectKnownRelationshipConstellation);
   return (
-    <Paper variant="outlined" data-testid="relationship-constellation" sx={{ p: 2, mb: 2, borderTop: 3, borderTopColor: 'secondary.main' }}>
-      <Typography variant="overline" color="secondary.main">Your known connections</Typography>
-      <Typography variant="h6" component="h2" gutterBottom>Relationship Constellation</Typography>
+    <Paper component="details" variant="outlined" data-testid="relationship-constellation" sx={{ p: 2, mb: 2, borderTop: 3, borderTopColor: 'secondary.main' }}>
+      <Typography component="summary" variant="subtitle1" sx={{ fontWeight: 600, cursor: 'pointer' }}>
+        Relationship Constellation · {people.length} known people
+      </Typography>
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="overline" color="secondary.main">Your recorded connections</Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         Each person is linked only to your recorded experiences, visible Memories and already discovered Trait patterns. This does not show where they are in the world.
       </Typography>
@@ -49,6 +52,7 @@ export const RelationshipConstellationPanel: React.FC = React.memo(() => {
           ))}
         </Grid>
       )}
+      </Box>
     </Paper>
   );
 });
