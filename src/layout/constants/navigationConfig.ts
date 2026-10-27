@@ -42,11 +42,11 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
 export const NAVIGATION_ITEMS: Record<TabId, NavItem> = {
   dashboard: {
     id: 'dashboard',
-    label: 'Dashboard',
+    label: 'Adventure',
     icon: DashboardIcon,
     route: '/game/dashboard',
     isImplemented: true,
-    tooltip: 'View game overview and statistics',
+    tooltip: 'Explore the current place, known actions and recorded history',
     section: 'adventure',
   },
   character: {
