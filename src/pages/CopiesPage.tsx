@@ -156,8 +156,6 @@ export const CopiesPage: React.FC = React.memo(() => {
         </Box>
       </Box>
 
-      <CopyOperationsOverview copyCount={copies.length} unresolvedCount={openExceptions.length} />
-
       {openExceptions.length > 0 && (
         <Alert severity="warning" sx={{ mb: 2 }} data-testid="copy-operational-attention">
           <AlertTitle>{openExceptions.length} unresolved operational exception{openExceptions.length === 1 ? '' : 's'}</AlertTitle>
@@ -172,6 +170,8 @@ export const CopiesPage: React.FC = React.memo(() => {
           </Box>
         </Alert>
       )}
+      <CopyOperationsOverview copyCount={copies.length} unresolvedCount={openExceptions.length} />
+
       {copies.length === 0 ? (
         <Alert severity="info" sx={{ mb: 3 }}>
           <AlertTitle>No Copies Created</AlertTitle>
