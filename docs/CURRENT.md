@@ -1,6 +1,14 @@
 # Documentation Authority Index
 
 
+## 2026-10-27 — CURRENT: Adaptive Adventure Workspace source implementation record
+
+- `docs/ui/AdaptiveAdventureWorkspaceImplementation.md` is the **CURRENT SOURCE-CHANGE / EVIDENCE RECORD** for owner-directed [PR #194](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/194) against `main` baseline `db6e45c`. It maps implemented **presentation-only P0–P6** to actual Story/NPC/Traits/Copy/Exploration/router files. Its `UNTESTED / UNQUALIFIED` ceiling and GitHub PR merge state are not upgraded by this index.
+- The approved `docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md` remains the **owner-selected design compass**, with additional options still optional. The implementation plan is `docs/superpowers/plans/2026-10-27-adaptive-adventure-workspace.md`; it does not replace `PlayerExperienceContract.md`, `LayoutDesign.md`, current Trait/Copy contracts, the original release-tag evidence or current `AGENTS.md`.
+- No source-only UI merge satisfies human issue #109, synthetic issue #188, protected release qualification, the v1.1 migration gate, or `BETA_PASS`.
+
+
+
 ## 2026-10-26 — CURRENT: owner-selected UI design direction (documentation only)
 
 - [Adaptive Adventure Workspace — owner-selected UI direction](superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md) is an **OWNER-SELECTED DESIGN COMPASS / HUMAN-UNVALIDATED**, not implemented UI, an executed experiment or an automatic UI5/1.1 feature milestone. It selects world-first Adventure presentation, contextual causal explanation, relationship-derived Trait buildcraft and earned Copy delegation; the 0–20 minute opening rhythm is an aspirational experience target, not a measured outcome.
