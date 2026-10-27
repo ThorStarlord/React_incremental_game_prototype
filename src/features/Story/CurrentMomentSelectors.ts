@@ -7,6 +7,7 @@ import { selectAllChapterProgress } from './ChapterSelectors';
 import { selectOpeningCampaignStage } from './CampaignSpine';
 import { selectCausalJournalEntries, selectOpenCopyExceptions, selectRecentRecordedDialogueExperiences } from './PlayerInsightSelectors';
 import { selectDistrictAftercare, type DistrictAftercareView } from './DistrictAftercareProjection';
+import type { RegionalWorldState } from '../WorldState/state/WorldStateTypes';
 
 export interface CurrentMomentAction {
   id: string;
@@ -25,6 +26,8 @@ export interface CurrentMomentView {
   storyContacts: CurrentMomentAction[];
   /** Optional authored district follow-up, never an alternate state authority. */
   districtAftercare: DistrictAftercareView | null;
+  /** Recorded current-region conditions only; never a new regional state authority. */
+  districtConditions: Pick<RegionalWorldState, 'watchPresence' | 'tradeFlow'> | null;
   consequences: Array<{ id: string; title: string; explanation: string; to?: string }>;
   attention: Array<{ id: string; label: string; to: string }>;
 }
@@ -245,6 +248,9 @@ const deriveCurrentMoment = (state: RootState): CurrentMomentView => {
     actions: actions.slice(0, 5),
     storyContacts,
     districtAftercare,
+    districtConditions: district
+      ? { watchPresence: district.watchPresence, tradeFlow: district.tradeFlow }
+      : null,
     consequences: [
       ...selectCausalJournalEntries(state, 2).map(entry => ({
         id: entry.id,

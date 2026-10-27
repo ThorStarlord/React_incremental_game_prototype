@@ -1,6 +1,14 @@
 # Campaign One — Player Experience and UI Contract
 
 
+## 2026-10-27 — Adaptive Adventure Workspace owner-directed P0–P6 source candidate
+
+The owner requested construction across the agreed presentation roadmap. [PR #194](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/194) contains the relevant Story/NPC/Traits/Copy/Travel/dashboard/nav source and the implementation record [`docs/ui/AdaptiveAdventureWorkspaceImplementation.md`](../../docs/ui/AdaptiveAdventureWorkspaceImplementation.md). Existing `CurrentMomentAction`, authored dialogue/travel, player-visible Memories, Trait slots, Copy eligibility/exception and current regional World State remain authoritative; new Constellation, Chronicle, Loom, known roads and mastery overview are read-only projections. Existing `/game/dashboard` is relabelled Adventure, not replaced by a new route authority.
+
+**Status:** SOURCE ONLY / UNTESTED / UNQUALIFIED / HUMAN-UNVALIDATED. Code/TypeScript/build/browser, save v3 and external player evidence are unproven here. This extends the **presentation** of the existing product, not Campaign One story/mechanics scope or release. The owner-selected design dated 2026-10-26 remains the intent authority; the original UI4 qualification and `v1.0.0` tag remain historical evidence, not automatically applicable to this PR.
+
+
+
 ## 2026-10-26 — Owner-selected future UI direction (DESIGN ONLY)
 
 The owner selected the **Adaptive Adventure Workspace** after divergent UI exploration; the full source-grounded design is at [`docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md`](../../docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md). The design prioritizes a world-first Adventure view, a **Glance -> Decide -> Inspect** information hierarchy, truthful relationship/Memory/Knowledge/standing context, understandable assimilated-vs-expressed Traits and bounded mastered Copy work. It preserves current AppRouter/Redux authority and the existing UI4 contracts while proposing an Elder Willow first-session vertical slice before larger Chronicle, Trait Loom or Copy views.

@@ -24,6 +24,7 @@ import { COPY_SYSTEM } from '../constants/gameConstants';
 import { selectCurrentEssence } from '../features/Essence/state/EssenceSelectors';
 import { addNotification } from '../shared/state/NotificationSlice';
 import { selectOpenCopyExceptions } from '../features/Story/PlayerInsightSelectors';
+import { CopyOperationsOverview } from '../features/Copy/components/ui/CopyOperationsOverview';
 // import { COPY_SYSTEM } from '../constants/gameConstants';
 
 // Reserved for future copy stats summary UI
@@ -169,6 +170,8 @@ export const CopiesPage: React.FC = React.memo(() => {
           </Box>
         </Alert>
       )}
+      <CopyOperationsOverview copyCount={copies.length} unresolvedCount={openExceptions.length} />
+
       {copies.length === 0 ? (
         <Alert severity="info" sx={{ mb: 3 }}>
           <AlertTitle>No Copies Created</AlertTitle>

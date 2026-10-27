@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useParams, Outlet } from 'react-router-dom';
 import { Box, Paper, Button } from '@mui/material';
 import { useAppDispatch } from '../app/hooks';
+import { RelationshipConstellationPanel } from '../features/Story/components/RelationshipConstellationPanel';
 import {
   NPCListView,
   setSelectedNPCId,
@@ -52,6 +53,9 @@ const NPCsPage: React.FC = () => {
         overflow: 'auto',
       }}
     >
+      <Box sx={{ p: 2, flexShrink: 0 }}>
+        <RelationshipConstellationPanel />
+      </Box>
       <NPCListView onSelectNPC={handleSelectNPC} selectedNPCId={npcId} />
     </Paper>
   );

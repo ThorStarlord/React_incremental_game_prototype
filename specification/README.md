@@ -12,6 +12,11 @@ This file routes readers to the current product, completion, technical and domai
 
 ## Post-UI4 interface design direction
 
+## P0–P6 UI source implementation
+
+- [Adaptive Adventure Workspace implementation record](../docs/ui/AdaptiveAdventureWorkspaceImplementation.md) — **PR #194 SOURCE ONLY / UNTESTED / UNQUALIFIED**; shows exact Redux/Story/NPC/Traits/Copy/Exploration ownership, the reversible presentation-only source changes and outstanding release/human evidence. Read alongside the accepted design; it does not authorize or qualify a new gameplay system.
+
+
 - [Adaptive Adventure Workspace — owner-selected design](../docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md) — **OWNER-SELECTED DESIGN DIRECTION / HUMAN-UNVALIDATED**, not a new completion milestone or implemented system. Records the four competing UI identities, fifteen exploratory possibilities, selected experience, source-backed invariants, and reversible P0–P6 vertical-slice roadmap.
 - [`UI_UX/PlayerExperienceContract.md`](UI_UX/PlayerExperienceContract.md) and [`UI_UX/LayoutDesign.md`](UI_UX/LayoutDesign.md) continue to govern actual interaction/layout truth. Relevant scope, Trait and Copy contracts outrank the design's aspirational presentations; original `v1.0.0` and unqualified post-release source are not promoted by documentation.
 

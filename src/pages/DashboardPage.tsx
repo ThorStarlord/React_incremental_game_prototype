@@ -46,6 +46,7 @@ import { selectGameLoop } from '../features/GameLoop/state/GameLoopSelectors';
 import { selectTraitsState } from '../features/Traits/state/TraitsSelectors';
 import { GameControlPanel } from '../features/GameLoop/components/ui/GameControlPanel';
 import { PlayerInsightPanel } from '../features/Story/components/PlayerInsightPanel';
+import { ChronicleOfConsequencesPanel } from '../features/Story/components/ChronicleOfConsequencesPanel';
 import { CurrentMomentPanel } from '../features/Story/components/CurrentMomentPanel';
 import TravelPanel from '../features/Exploration/components/TravelPanel';
 import ActiveQuestCombatPanel from '../features/Combat/components/ActiveQuestCombatPanel';
@@ -75,6 +76,13 @@ export const DashboardPage: React.FC = React.memo(() => {
   useEffect(() => {
     if (location.hash === '#travel-controls') {
       document.getElementById('travel-controls')?.scrollIntoView({ block: 'start' });
+    }
+    if (location.hash === '#chronicle') {
+      const chronicle = document.getElementById('chronicle');
+      if (chronicle && 'open' in chronicle) {
+        (chronicle as HTMLDetailsElement).open = true;
+        chronicle.scrollIntoView({ block: 'start' });
+      }
     }
   }, [location.hash]);
 
@@ -164,7 +172,10 @@ export const DashboardPage: React.FC = React.memo(() => {
           color: theme.palette.primary.main
         }}
       >
-        Campaign Overview
+        Adventure
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Campaign Overview · Explore a known place, make a meaningful choice, and see what your history actually changed.
       </Typography>
 
       <CurrentMomentPanel />
@@ -173,6 +184,15 @@ export const DashboardPage: React.FC = React.memo(() => {
       </Box>
       <Box sx={{ mb: 2 }}>
         <ActiveQuestCombatPanel />
+      </Box>
+      <Box id="chronicle" component="details" sx={{
+        mb: 2, p: 2, border: 1, borderColor: 'divider', borderRadius: 2, scrollMarginTop: 24,
+      }}>
+        <Typography component="summary" variant="subtitle1" sx={{ cursor: 'pointer', fontWeight: 600 }}>
+          Your Chronicle · Memories, relationships, learned capabilities, and mastery
+        </Typography>
+        <ChronicleOfConsequencesPanel />
+        <PlayerInsightPanel />
       </Box>
       <Box component="details" sx={{ mb: 2, border: 1, borderColor: 'divider', borderRadius: 2, p: 2 }}>
         <Typography component="summary" variant="subtitle1" sx={{ cursor: 'pointer', fontWeight: 600 }}>
@@ -391,10 +411,6 @@ export const DashboardPage: React.FC = React.memo(() => {
               </Paper>
             </CardContent>
           </Card>
-        </Grid>
-
-        <Grid item xs={12}>
-          <PlayerInsightPanel />
         </Grid>
 
         <Grid item xs={12}>
