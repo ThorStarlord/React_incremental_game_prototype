@@ -1,6 +1,14 @@
 # Handoff — Campaign One 1.0 Released
 
 
+## 2026-10-27 — RE-ENTRY: Adaptive Adventure Workspace P0–P6 source construction
+
+- Owner requested autonomous implementation of the approved UI design. [PR #194](https://github.com/ThorStarlord/React_incremental_game_prototype/pull/194) carries the **reversible presentation-only** phases on the current Redux/Router structure; refer to `docs/ui/AdaptiveAdventureWorkspaceImplementation.md` for the exact component/authority map and the decision that fifteen speculative UI ideas are **not** a compulsory feature backlog. Consult GitHub for actual integration SHA/status.
+- Current work adds Adventure primary action, accessible Chronicle, known-person relationship summary, Trait expression Loom, Copy learning/delegation overview, adjacent-road access panel and recorded Merchant District appearance. All new views read existing state; the underlying authored actions/permission checks remain with current domains. No generic system or new save root.
+- **No build/TypeScript/browser/evidence tests or human sessions executed from the GitHub-only session**; source may merge as `UNTESTED / UNQUALIFIED` under ordinary owner waiver but is not release-ready or independently validated. Do not assume v1.1 save migration, UI enjoyment, issue #188, issue #109 or `BETA_PASS` succeeded.
+
+
+
 ## 2026-10-26 — CURRENT RE-ENTRY: owner-selected Adaptive Adventure Workspace design
 
 - The owner approved the UI-specific divergent-exploration recommendations. The selected **Adaptive Adventure Workspace** is documented at `docs/superpowers/specs/2026-10-26-adaptive-adventure-workspace-design.md`: world-first Adventure, three depths (Glance / Decide / Inspect), contextual relationship/causal/Traits views, and bounded earned Copy delegation. This entry records design intent **only**; no UI construction, simulated session, human test, UI5 milestone, 1.1 release, or gameplay scope expansion follows automatically.
