@@ -14,6 +14,7 @@ import TraitManagement from './TraitManagement';
 import type { Trait, TraitSlot } from '../../state/TraitsTypes';
 import TraitCodexDrawer from '../containers/TraitCodexDrawer'; // Import the drawer
 import DoctrineFocusPanel from './DoctrineFocusPanel';
+import { TraitLoomOverview } from './TraitLoomOverview';
 
 // Define the props interface for TraitSystemTabs (formerly TraitSystemUI)
 export interface TraitSystemTabsProps {
@@ -123,6 +124,8 @@ const TraitSystemTabs: React.FC<TraitSystemTabsProps> = React.memo(({
           Stabilization records lasting assimilation rather than a separate ongoing effect. Temporarily expressible discoveries are not automatically assimilated. Suppression never deletes assimilated ownership.
         </Typography>
       </Paper>
+
+      <TraitLoomOverview allTraits={allTraits} traitSlots={traitSlots} permanentTraits={permanentTraits} discoveredTraits={discoveredTraits} />
 
       <Paper elevation={1} sx={{ mb: 2 }}>
         <Tabs
