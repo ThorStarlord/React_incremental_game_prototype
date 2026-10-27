@@ -14,6 +14,7 @@ import { practiceForgeAssistanceThunk, travelToLocationThunk } from '../TravelTh
 import { NPC_WORLD_LOCATION_IDS } from '../../NPCs/state/NPCWorldLocationDefinitions';
 import { selectOpeningCampaignStage } from '../../Story/CampaignSpine';
 import { deriveSpatialRelationshipTether } from '../../Relationships/state/RelationshipSelectors';
+import { KnownRoadsPanel } from './KnownRoadsPanel';
 
 interface SpatialTetherFeedback {
   npcId: string;
@@ -109,6 +110,7 @@ const TravelPanel: React.FC = () => {
               Follow the road toward Elder Willow. The next destination is highlighted below.
             </Typography>
           )}
+          <KnownRoadsPanel locationValue={locationValue} recordedExperienceIds={new Set(Object.keys(recordedExperiences))} />
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             {destinations.map(destination => {
               const missingExperienceIds = getMissingLocationExperienceIds(
